@@ -27,8 +27,6 @@ import torch
 from _analytic import Poly, make_field
 from _sympy_field import axis_symbols, make_sympy_field
 
-torch.set_default_dtype(torch.float64)
-
 _U = ("u", "v", "w")
 _B = ("Bx", "By", "Bz")
 _AXES = ("x", "y", "z", "t")

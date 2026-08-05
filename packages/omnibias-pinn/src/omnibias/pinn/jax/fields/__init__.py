@@ -19,10 +19,27 @@ constructor automatically).
 
 from __future__ import annotations
 
+from omnibias.pinn.jax.fields.attention import (
+    AttentionVectorField,
+    make_attention_vector_field,
+)
 from omnibias.pinn.jax.fields.base import FieldBase
 from omnibias.pinn.jax.fields.chebyshev import (
     ChebyshevVectorField,
     make_chebyshev_vector_field,
+)
+from omnibias.pinn.jax.fields.jet_mlp import (
+    FourierFeatureVectorField,
+    JetMLPVectorField,
+    make_fourier_feature_vector_field,
+    make_jet_mlp_vector_field,
+    make_siren_vector_field,
+)
+from omnibias.pinn.jax.fields.multiscale import (
+    AdaptiveJetMLPVectorField,
+    MscaleVectorField,
+    make_adaptive_jet_mlp_vector_field,
+    make_mscale_vector_field,
 )
 from omnibias.pinn.jax.fields.one_layer import (
     OneLayerVectorField,
@@ -34,11 +51,22 @@ from omnibias.pinn.jax.fields.spectral import (
 )
 
 __all__ = [
+    "AdaptiveJetMLPVectorField",
+    "AttentionVectorField",
     "ChebyshevVectorField",
     "FieldBase",
+    "FourierFeatureVectorField",
+    "JetMLPVectorField",
+    "MscaleVectorField",
     "OneLayerVectorField",
     "SpectralVectorField",
+    "make_adaptive_jet_mlp_vector_field",
+    "make_attention_vector_field",
     "make_chebyshev_vector_field",
+    "make_fourier_feature_vector_field",
+    "make_jet_mlp_vector_field",
+    "make_mscale_vector_field",
     "make_one_layer_vector_field",
+    "make_siren_vector_field",
     "make_spectral_vector_field",
 ]

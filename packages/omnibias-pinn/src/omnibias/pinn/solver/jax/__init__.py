@@ -20,6 +20,7 @@ from omnibias.pinn.solver.jax.evolution import (  # noqa: E402
     burgers_semidiscrete,
     grid_solution,
     heat_semidiscrete,
+    kuramoto_sivashinsky_semidiscrete,
     method_of_lines,
     reaction_diffusion_semidiscrete,
     solve_evolution,
@@ -37,6 +38,18 @@ from omnibias.pinn.solver.jax.integrators import (  # noqa: E402
 )
 from omnibias.pinn.solver.jax.spectral import SpectralGrid1D  # noqa: E402
 from omnibias.pinn.solver.jax.steady import solve_least_squares, solve_steady  # noqa: E402
+from omnibias.pinn.solver.jax.stiff import (  # noqa: E402
+    closed_form_jacobian,
+    dense_jacobian,
+    etdrk4_step,
+    exponential_rosenbrock_step,
+    imex_cnab2_step,
+    imex_euler_step,
+    phi_diagonal,
+    phi_matrix,
+    rosenbrock_step,
+    stiff_rollout,
+)
 
 __all__ = [
     "FieldSolution",
@@ -47,16 +60,27 @@ __all__ = [
     "build_field",
     "burgers_jet_step",
     "burgers_semidiscrete",
+    "closed_form_jacobian",
+    "dense_jacobian",
+    "etdrk4_step",
+    "exponential_rosenbrock_step",
     "field_from_arrays",
     "grid_solution",
     "heat_semidiscrete",
+    "imex_cnab2_step",
+    "imex_euler_step",
     "implicit_linear_step",
+    "kuramoto_sivashinsky_semidiscrete",
     "linear_jet_step",
     "method_of_lines",
+    "phi_diagonal",
+    "phi_matrix",
     "reaction_diffusion_semidiscrete",
     "rk4_step",
+    "rosenbrock_step",
     "solve_evolution",
     "solve_least_squares",
     "solve_steady",
+    "stiff_rollout",
     "with_readout",
 ]

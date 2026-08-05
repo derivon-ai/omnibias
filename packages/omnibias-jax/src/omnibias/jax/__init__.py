@@ -34,6 +34,10 @@ Public API:
   :func:`jet_partials`, :func:`jet_gradient`, :func:`jet_hessian` -- exact
   *multivariate* (multi-index) Taylor jets: every mixed partial up to total
   order ``N`` from a single forward pass.
+* :func:`jet_reciprocal`, :func:`jet_exp`, :func:`jet_softmax`,
+  :func:`jet_attention` -- jet algebra beyond the elementwise layer: rational
+  maps, and the non-local attention block whose *coordinate* derivatives
+  (not merely its score derivatives) stay closed form.
 
 The complex-valued activation dictionary lives in
 :mod:`omnibias.jax.activations_complex` and is imported on demand.
@@ -109,10 +113,14 @@ from omnibias.jax.jet_mv import (
     affine_jet_mv,
     compose_jet_mv,
     identity_jet,
+    jet_attention,
+    jet_exp,
     jet_gradient,
     jet_hessian,
     jet_multiply,
     jet_partials,
+    jet_reciprocal,
+    jet_softmax,
     layer_jet_mv,
     mlp_jet_mv,
 )
@@ -192,10 +200,14 @@ __all__ = [
     "hellinger_distance",
     "identity_jet",
     "is_registered",
+    "jet_attention",
+    "jet_exp",
     "jet_gradient",
     "jet_hessian",
     "jet_multiply",
     "jet_partials",
+    "jet_reciprocal",
+    "jet_softmax",
     "jet_to_tower",
     "js_divergence",
     "kl_divergence",

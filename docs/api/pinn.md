@@ -19,7 +19,10 @@ Plus equation-aware modules:
   causal weighting, NTK rebalance, entropy-consistent residual, and
   **asymptotic / removable boundary conditions** (`asymptotic_ratio`,
   `asymptotic_bc_loss`, `far_field_decay_loss`) -- the differentiable jet
-  `lim` operator surfaced as trainable losses.
+  `lim` operator surfaced as trainable losses. Plus the *stateful* half:
+  `LossWeighter` and friends (EMA + update cadence over the per-term weights),
+  `self_adaptive_loss` (trained pointwise weights), and `TimeMarcher` (causal
+  time-window marching).
 * **Equations** (`equations/`): prebuilt PDE residuals
   (NavierStokes, Burgers, Heat, KuramotoSivashinsky, CahnHilliard,
   Biharmonic) returning :class:`NamedTuple` outputs with diagnostics, plus the
@@ -77,6 +80,180 @@ live in `omnibias.pinn._core`.
 
 ## Fields
 
+Every field turns `coords` into a `FieldState`; what distinguishes them is *how*
+the derivative tower is evaluated.
+
+| Field | Architecture | Derivative path |
+| --- | --- | --- |
+| `OneLayerVectorField` | one hidden layer | closed-form single-layer `sigma`-tower contraction |
+| `JetMLPVectorField` | deep MLP, any depth | closed-form multivariate jet (`mlp_jet_mv`) |
+| `FourierFeatureVectorField` | random Fourier front end + deep body | closed-form multivariate jet |
+| `AdaptiveJetMLPVectorField` | deep MLP with a trainable activation slope | closed-form multivariate jet |
+| `MscaleVectorField` | MscaleDNN band mixture | closed-form multivariate jet, one per band |
+| `AttentionVectorField` | deep encoder + softmax mixture over a trainable memory | closed-form multivariate jet (`jet_attention`) |
+| `SpectralVectorField` / `ChebyshevVectorField` | basis expansion | closed-form basis derivatives |
+
+### Deep and Fourier-feature fields (`jet_mlp`)
+
+`JetMLPVectorField` and `FourierFeatureVectorField` lift the arbitrary-depth
+architectures in `omnibias.torch.architectures.pinn` onto the field substrate, so
+a deep network reaches the full operator surface, the attribute DSL, the
+conservation cages and the prebuilt PDE residuals. `make_siren_vector_field`
+builds a SIREN the same way.
+
+Derivatives are **closed form, not autodiff**: one call to
+`omnibias.torch.jet_mv.mlp_jet_mv` yields every mixed partial `D^alpha u` up to
+total order `N` as `alpha! c_alpha`, at any depth. There is no
+`torch.autograd.grad` in the differential operator (contrast `PartitionedField`
+below, which must fall back to the autodiff product rule).
+
+The jet is memoised in `FieldState.extra`, so a whole second-order residual --
+value, gradient, Laplacian, Hessian, divergence, mixed partials -- costs **one**
+jet evaluation. `jet_order` is the planning knob: the jet is built at
+`max(requested_order, jet_order)`, so set it to the highest derivative order in
+your residual. `polylaplacian` reads `Delta^k` off a single order-`2k` jet via the
+multinomial expansion of `(sum_i d_i^2)^k`, so its cost is independent of `k`.
+
+`FourierFeatureVectorField` is the spectral-bias cure. The encoding
+`gamma(x) = [cos(B x), sin(B x)]` is a single `sin` layer (because
+`cos(z) = sin(z + pi/2)`), and `sin^(n)(z) = sin(z + n pi/2)` is exact at every
+order -- so breaking spectral bias costs nothing in the derivative tower. Passing
+a *sequence* of `frequency_scale` values concatenates bands into a multi-scale
+encoding, and `trainable_features=True` makes the frequencies learnable.
+
+See [`docs/examples/pinn_fourier_features.py`](https://github.com/derivon/omnibias/blob/main/docs/examples/pinn_fourier_features.py)
+for a runnable two-scale Poisson comparison.
+
+### Multi-scale fields: the frequency knob inside the network
+
+A Fourier encoding widens the *input basis* with a fixed random draw. The two
+fields below instead put the frequency knob inside the network, and both stay on
+the same `jet_mlp` path -- same jet cache, same operator surface, same exactness.
+
+`AdaptiveJetMLPVectorField` gives every hidden layer a **trainable slope** `a` and
+computes `sigma(n a z)` (Jagtap et al. 2020), so the network tunes its own
+frequency content instead of inheriting the fixed spectrum of a plain `tanh` MLP.
+`n` is a fixed amplification factor: it scales the gradient reaching `a` by
+exactly `n` without changing the initial function. `granularity="neuron"` gives
+one slope per hidden unit instead of one per layer.
+
+This is the construction that most obviously *ought* to break closed-form
+differentiation, since the frequency moves every optimiser step. It does not: the
+slope is the temperature of `omnibias.core.spec.tempered`, so the layer is a real
+`ActivationSpec` whose tower
+
+    d^k/dz^k sigma(n a z) = (n a)^k sigma^(k)(n a z)
+
+is inherited from the base activation at every order, and the kernel reads `a` at
+call time. `field.slopes()` reports the current effective slopes -- values well
+above 1 mean the solution carries more high-frequency content than the base
+activation supplies on its own.
+
+`MscaleVectorField` is the MscaleDNN band mixture `u(x) = sum_j f_j(alpha_j x)`
+(Liu, Cai & Xu 2020). Each subnetwork sees the input pre-scaled by its band factor,
+so a feature oscillating at frequency `k` looks like `k / alpha_j` to band `j`: the
+high bands turn the hard, high-frequency part of the target into the easy,
+low-frequency part a plain MLP learns quickly. Scaling the input is the same map as
+scaling the first weight matrix, so each band is an ordinary layer chain and the
+mixture's jet is the *sum* of the per-band jets -- one exact `mlp_jet_mv` call per
+band. `hidden` is the total width, split evenly across bands, so the mixture costs
+about as much as a single MLP of that width. `adaptive=True` puts a trainable slope
+inside every band as well.
+
+### Choosing the bands from data
+
+Band scales are normally guessed as the ladder `1, 2, 4, 8` (`geometric_bands`).
+`suggest_frequency_bands` measures them instead: it reads the power spectrum of a
+sampled field, splits it into equal-**energy** segments, and returns each segment's
+centroid converted to cycles per unit length (`s = j / L`). Equal-energy rather than
+equal-width splitting is what makes it useful -- a spectrum with a strong low peak
+and a weak high tail gets one band on each, where equal-width bins would spend every
+band on the peak.
+
+```python
+import numpy as np
+from omnibias.pinn.torch.diagnostics import suggest_frequency_bands
+
+x = np.linspace(0.0, 1.0, 256, endpoint=False)
+u_sample = np.sin(2 * np.pi * 3 * x) + 0.5 * np.sin(2 * np.pi * 20 * x)
+bands = suggest_frequency_bands(u_sample[None, :], L=1.0, n_bands=2)
+print(bands)  # (3.0, 20.0) -- the two tones, recovered
+```
+
+The tuple goes straight into `MscaleVectorField(scales=bands)` or
+`FourierFeatureVectorField(frequency_scale=bands)`.
+
+See [`docs/examples/pinn_multiscale_feedback.py`](https://github.com/derivon/omnibias/blob/main/docs/examples/pinn_multiscale_feedback.py)
+for the loop end to end: on a target whose two modes are twenty times apart the
+guessed ladder is no better than a plain MLP, the measured bands find the
+oscillation, and the adaptive slopes -- which need no spectrum at all -- do best
+while reporting the frequency they had to reach.
+
+### Non-local fields: attention with closed-form `d/dx`
+
+Every field above is *local*: `u(x)` is a chain of elementwise activations over
+affine maps of `x`, so its jet is the plain Faà di Bruno recursion.
+`AttentionVectorField` is not. It routes the coordinates through a softmax
+mixture over a trainable memory `(K, V)`,
+
+    u(x) = W_o [ softmax(beta q(x) K^T) V + q(x) ] + b_o,    q(x) = MLP(x)
+
+so every output couples to every memory slot through the shared denominator.
+Read as a PINN construction it is a **learned soft partition of the domain**
+with one local model `V_j` per region -- a differentiable, globally-coupled
+relative of a domain decomposition, and the reason this field is worth having
+next to the local ones. `field.attention_weights(coords)` returns the per-point
+partition of unity, which is what makes it interpretable.
+
+`omnibias.hopfield` already differentiates this block's log-sum-exp core in
+closed form -- but with respect to the **scores**, which is the wrong variable
+for a PDE. The missing `d/dx` is supplied by four jet primitives added to both
+backends:
+
+| Primitive | What it composes | Tower |
+| --- | --- | --- |
+| `jet_exp` | `exp(u)` | the registered `exp` activation (`exp^(k) = exp`) |
+| `jet_reciprocal` | `1 / u` | `(-1)^k k! u^(-(k+1))` |
+| `jet_softmax` | `softmax(s)` over the last axis | the two above + a sum + a jet product |
+| `jet_attention` | `softmax(beta q K^T) V` | `jet_softmax` between two affine maps |
+
+`compose_jet_mv` alone reaches only *elementwise* maps, so this genuinely widens
+the closed-form class to rational and coupled ones. The block's value agrees with
+`omnibias.hopfield.torch.ops.attention` exactly; what is new is that
+`D^alpha u(x)` at arbitrary order comes out of the same single jet, with no
+nested autodiff. Note the temperature collapse this shares with the rest of the
+repo: as `beta -> inf` the mixture hardens into a crisp assignment -- the
+*feasibility* sense of collapse, not the founding `delta -> 0` one.
+
+```python
+import torch
+from omnibias.pinn import ComponentSpec, CoordinateSpec
+from omnibias.pinn.torch import equations, ops
+from omnibias.pinn.torch.fields import build_attention_vector_field
+
+field = build_attention_vector_field(
+    coordinate_spec=CoordinateSpec(("x", "t")),
+    components=ComponentSpec(("u",)),
+    hidden=16,
+    depth=2,
+    memory=8,      # how many regions the field may specialise to
+    beta=1.0,      # softmax sharpness
+    jet_order=2,   # the residual below is second order
+    seed=0,
+)
+coords = torch.randn(32, 2, dtype=torch.float64)
+state = field(coords)
+
+residual = equations.burgers(state, nu=0.01).residual   # one jet, closed form
+weights = field.attention_weights(coords)               # (32, 8), rows sum to 1
+print(residual.shape, weights.shape, float(weights.sum(-1).mean().detach()))
+```
+
+The `residual=True` skip (on by default) keeps a local path alongside the
+non-local one; without it the readout is confined to the convex hull of the
+value slots. The JAX twin is `make_attention_vector_field`, bit-identical to
+float64 round-off.
+
 ::: omnibias.pinn.torch.fields
     options:
       show_root_heading: false
@@ -91,12 +268,281 @@ live in `omnibias.pinn._core`.
 
 ## Cage
 
+A cage enforces a constraint **by construction** rather than by penalty, so the
+corresponding loss term disappears from the objective entirely. Four are shipped:
+
+| Cage | Constraint | How it holds |
+| --- | --- | --- |
+| `StreamfunctionField` | `div u = 0` in 2-D | `u = (d_y psi, -d_x psi)` |
+| `VectorPotentialField` | `div u = 0` in 3-D | `u = curl A` |
+| `FluxFormField` | `div G = 0` in any dimension, space *or* space-time | `G^i = sum_j d_j A^ij`, `A` antisymmetric |
+| `IntegralConservationField` | `int sum_c u_c^p dx = C` | global rescaling by `lambda = (C / I)^(1/p)` |
+
+### Divergence form: the finite-volume cage
+
+A conservation law `d_t rho + div F = 0` says one space-time vector
+`G = (rho, F)` is divergence-free. For an antisymmetric potential
+`A^ij = -A^ji`, setting `G^i = sum_j d_j A^ij` makes `div G = sum_ij d_i d_j A^ij`
+vanish **identically**: `d_i d_j` is symmetric in `(i, j)` while `A^ij` is
+antisymmetric, so the double sum cancels term by term. No quadrature, no
+tolerance.
+
+`FluxFormField` is that statement in any dimension, and it subsumes the two
+incompressibility cages exactly: in 2-D the single potential is the
+streamfunction, in 3-D the three potentials are the vector potential and
+`G = curl A`. What it unlocks is the case neither covers -- letting `t` be one of
+the axes, so the divergence-free object is a space-time flux and the identity is
+a *conservation law* rather than incompressibility. On any control volume the
+divergence theorem then gives the cell balance
+`d/dt int_V rho = -oint_dV F . n` for **every** volume simultaneously.
+
+Adding a residual penalty for `div G` on top of this cage is not merely
+redundant but actively harmful: it contributes only round-off-scale gradient
+noise.
+
+### Conserved integrals: the rescaling cage
+
+A conserved *integral* couples the whole domain, so no pointwise rearrangement
+can enforce it. The one lever that does is a global rescaling, which works
+whenever the density is homogeneous of degree `p`:
+
+    I[lambda u] = lambda^p I[u]   =>   lambda = (C / I[u])^(1/p)
+
+`IntegralConservationField` is that cage, with `degree=1` for a mass / charge /
+probability density (`lambda = C / I`) and `degree=2` for a squared `L^2` norm
+(`lambda = sqrt(C / I)`). The `degree=2`, two-component case is exactly
+`omnibias.qpinn`'s `NormConservationField`; this generalises away both the
+hard-wired `|psi|^2` density and the hand-rolled quadrature -- the rule is a
+`QuadratureSpec`, so the same cage works on a Gauss-Legendre box in any
+dimension, a Gauss-Hermite weight on an unbounded domain, or a seeded
+Monte-Carlo sample.
+
+Because `lambda` is one scalar with no `x` dependence, every derivative is
+scaled by the same factor and the closed-form tower survives intact:
+`D^alpha u = lambda D^alpha(u~)`.
+
+**Honesty: the constraint holds to quadrature accuracy, not to machine
+precision.** What is exact is `sum_q w_q rho(u(x_q)) == C`; the continuum
+integral differs by the rule's own error. Use a rule that resolves the field and
+check it on a finer one. (`FluxFormField`, by contrast, is exact pointwise.)
+
+```python
+import torch
+from omnibias.fields._core.quadrature import gauss_legendre
+from omnibias.pinn import ComponentSpec, CoordinateSpec
+from omnibias.pinn.torch.cage import IntegralConservationField
+from omnibias.pinn.torch.fields import build_jet_mlp_vector_field
+
+bounds = ((-4.0, 4.0),)
+inner = build_jet_mlp_vector_field(
+    coordinate_spec=CoordinateSpec(("x",), domain=bounds),
+    components=ComponentSpec(("psi_re", "psi_im")),
+    hidden=16,
+    depth=2,
+    seed=0,
+)
+caged = IntegralConservationField(
+    base=inner,
+    rule=gauss_legendre(bounds, 128),
+    conserved=("psi_re", "psi_im"),
+    total=1.0,
+    degree=2,           # int (psi_re^2 + psi_im^2) dx = 1
+    dtype=torch.float64,
+)
+state = caged(torch.linspace(-3.0, 3.0, 16, dtype=torch.float64).reshape(-1, 1))
+print(round(float(caged.integral(state).detach()), 12))  # 1.0, by construction
+```
+
 ::: omnibias.pinn.torch.cage
     options:
       show_root_heading: false
       heading_level: 3
 
 ## Losses
+
+### Adaptive weighting: the EMA and the cadence
+
+A multi-term loss `L = sum_k lambda_k L_k` trains badly with fixed `lambda_k`,
+because the terms' gradients differ by orders of magnitude -- the *gradient
+pathology*. Every published cure has the same shape: measure something, turn it
+into a target `lhat_k`, and smooth it with an EMA. Only the measurement differs,
+so only the measurement is written per backend.
+
+`LossWeighter` (in `omnibias.pinn._core.weighting`, re-exported from both
+backends' `losses`) owns the rest: the EMA `lambda <- alpha lambda + (1 - alpha)
+lhat`, the update *cadence* (each estimate costs an extra backward pass per term,
+so refreshing every step is usually waste), the clamping, and `combine()`. It
+holds host-side floats, never tensors, which is why the torch and jax weights are
+bit-identical by construction rather than by test.
+
+| Weighter | Target | Measure with |
+| --- | --- | --- |
+| `GradNormWeighter` | `max|dL_r/dtheta| / mean|dL_k/dtheta|` (Wang, Teng & Perdikaris 2021) | `grad_stats` |
+| `NTKWeighter` | `exp(mean_j log T_j - log T_k)` -- the geometric-mean NTK balance | `ntk_trace_stats` |
+| `ConstantWeighter` | fixed; the ablation baseline | -- |
+
+```python
+from omnibias.pinn.torch.losses import GradNormWeighter, grad_stats
+
+weighter = GradNormWeighter(["pde", "bc"], reference="pde", alpha=0.9, every=10)
+# ... inside the training loop, with terms = {"pde": ..., "bc": ...}:
+#   weighter.update(grad_stats(terms, field.parameters()))
+#   weighter.combine(terms).backward()
+```
+
+`GradNormWeighter` is the *annealing* variant: it compares the reference's
+largest gradient entry against each other term's average, which is deliberately
+more aggressive on a stiff residual than the L2-norm ratio of
+`omnibias.torch.optim.GradNormBalancer`. The reference term's own weight stays
+pinned at 1, so the weights say what they mean.
+
+### Self-adaptive pointwise weights
+
+`self_adaptive_loss` and `SelfAdaptiveWeights` are the pointwise counterpart:
+one weight *per collocation point*, `L = mean_k m(lambda_k) r_k^2`, minimised
+over the network and **maximised** over `lambda` (McClenny & Braga-Neto 2020).
+The maximisation is the mechanism -- a point the network fits badly grows its own
+weight, so the optimiser is pulled toward shock fronts and boundary layers
+instead of averaging them away.
+
+`ascent=True` (the default) reverses the gradient reaching the mask, so a single
+`loss.backward()` and a single optimiser holding both `theta` and `lambda`
+performs the whole minimax. That is exact, not an approximation: `2 x_detached -
+x` is exactly `x` in IEEE-754 and differentiates to `-1`, and since Adam's update
+is `m / sqrt(v)`, flipping the gradient's sign flips the step's sign, which is
+what `maximize=True` does.
+
+The mask `m` is an omnibias activation (`"sigmoid"`, `"softplus"`, any
+`ActivationSpec`) -- so it comes from the shared dictionary and is bit-identical
+across backends -- or `"identity"` / `"square"` for the paper's polynomial masks.
+A bounded mask caps how far one point can dominate; `"identity"` does not.
+
+### Causal time marching
+
+`causal_residual_loss` implements the Wang-Perdikaris weight
+`w_i = exp(-eps sum_{j<i} L_j)`, which stops a PINN fitting late times before
+early ones. On its own that is half the recipe: it reweights whatever points it
+is handed, over the whole interval, for the whole run. The other half is to solve
+a short window and *march*, which is `TimeWindowSchedule` and `TimeMarcher`
+(`omnibias.pinn._core.marching`, pure numpy, re-exported by both backends).
+
+* `TimeWindowSchedule` -- window bounds (with optional `overlap` so window `k+1`
+  re-fits the seam), the time bins causality is enforced at, the annealed
+  sharpness `epsilon_at(k) = epsilon * growth^k`, and the advance criterion
+  `is_converged`, which is Wang et al.'s `min_i w_i >= tolerance` rule; because
+  the weights are non-increasing, the last bin's weight measures how much of the
+  window has unlocked.
+* `window_points` -- collocation stratified *by time bin*, returned already
+  shaped `(n_bins, per_bin, D)`. Uniform sampling would leave the bin counts to
+  chance, and an empty bin makes the cumulative causal weight meaningless.
+* `TimeMarcher` -- the driver, including the **warm start**: `handoff_points()`
+  are the next window's opening slice, and the values the trained field takes
+  there become that window's initial condition, so window `k+1` starts from a
+  real state rather than from noise.
+
+The marcher owns no tensors and no optimiser; it answers *which points, which
+epsilon, may I advance yet*, so it drives a torch loop, a jax loop, or the
+solver.
+
+Two things worth knowing before you reach for it, both measured rather than
+asserted:
+
+* **Scale `epsilon` to the residual you actually have.** The causal weights are
+  `exp(-eps sum_j L_j)`, a function of the residual's *absolute* magnitude, not
+  its shape. Non-dimensionalising a residual -- dividing `u_t - rho u(1-u)`
+  through by `rho`, say -- shrinks the per-bin losses by `rho^2` and quietly
+  drives every weight to 1, switching the causal filter off while leaving the
+  code looking correct. `causal_residual_loss(..., return_weights=True)` and a
+  glance at `weights.min()` is the check.
+* **Marching is not a free win.** The handoff is real error inherited by the next
+  window, so a window that ends badly compounds where a whole-interval solve
+  would not; whether marching helps is regime-dependent. `TimeMarcher.converged`
+  and the error at each seam are the diagnostics that say which regime you are
+  in -- report them rather than assuming.
+
+See
+[`docs/examples/pinn_causal_marching.py`](https://github.com/derivon/omnibias/blob/main/docs/examples/pinn_causal_marching.py)
+for the loop end to end: one hand-set weight separating a failed run from a good
+one, `GradNormWeighter` finding the right side of that cliff by measurement,
+marching improving on the best whole-interval result at identical budget, and
+self-adaptive weights sorting a collocation set by residual with rank
+correlation 1.
+
+### Interface residuals: gluing subdomains back together
+
+Domain decomposition (XPINN / cPINN) splits a hard problem into easy patches.
+The glue lives on a codimension-1 seam, and it is **two** conditions:
+
+\[
+[\![u]\!] = u_+ - u_- = 0,
+\qquad
+[\![k \partial_n u]\!] = k_+ \nabla u_+ \cdot n - k_- \nabla u_- \cdot n = 0.
+\]
+
+Driving only the first is the classic mistake. Value continuity is cheap to
+satisfy and says nothing about whether the two pieces exchange the right amount
+of flux, so an assembled field can be perfectly continuous and still fail to
+solve the equation across the seam. The flux condition is what makes the
+decomposition conservative, and the one that carries a genuine kink when the
+material coefficients differ.
+
+The geometry is backend-free numpy in `omnibias.pinn._core.interface`, so both
+backends sample *the same* points:
+
+* `Interface` — an oriented hyperplane `{x : n.x = c}` with the normal stored
+  unit-length, so `signed_distance` is a true distance and `unit_normal` is
+  directly the `n` in `d/dn`. `from_axis` / `from_spec` name it by axis;
+  `from_split` reads a `PartitionedField` gate's zero set, so the seam you sample
+  on is the seam the partition of unity blends across.
+* `interface_points` — points drawn **on** the seam, in its own tangent
+  coordinates and mapped back, so `n.x - c` is zero to round-off. This is the
+  part that is easy to get subtly wrong: sampling the box and keeping what is
+  "close to" the interface gives points that are *near* it, and the residual then
+  measures the jump plus however much the solution varies over the gap — a floor
+  no amount of training removes.
+* `split_by_interface` — the complement, routing ordinary collocation to the
+  patch that owns it.
+
+```python
+import torch
+from omnibias.pinn import ComponentSpec, CoordinateSpec
+from omnibias.pinn.torch.fields import build_jet_mlp_vector_field
+from omnibias.pinn.torch.losses import (
+    Interface, InterfaceSpec, interface_loss, interface_residual, interface_points,
+)
+
+cs, comps = CoordinateSpec(("x", "y")), ComponentSpec(("u",))
+seam = Interface.from_spec(cs, axis="x", value=0.5)
+pts = torch.as_tensor(
+    interface_points(seam, ((0.0, 1.0), (0.0, 1.0)), n_points=32, seed=0),
+    dtype=torch.float64,
+)
+
+left = build_jet_mlp_vector_field(coordinate_spec=cs, components=comps, hidden=8, seed=0)
+right = build_jet_mlp_vector_field(coordinate_spec=cs, components=comps, hidden=8, seed=1)
+
+spec = InterfaceSpec(seam, conductivity=(2.0, 1.0), weights=(1.0, 0.1))
+out = interface_residual(left(pts), right(pts), spec)
+loss = interface_loss(out, weights=spec.weights)
+sorted(out.diag)
+```
+
+`InterfaceSpec` carries the material pair `(k_+, k_-)` and the value / flux
+weights alongside the geometry, so a problem with several seams carries its own
+balance. `interface_residual` also takes `residuals=(r_+, r_-)` for XPINN's third
+condition, the PDE residual's own continuity.
+
+Everything routes through `state.ops`, so the ops work for *every* field type and
+each side may be a **different** one — which is the point of decomposing at all:
+a stiff patch can afford a bigger network than its quiet neighbour. See
+[`docs/examples/pinn_xpinn_stiff.py`](https://github.com/derivon/omnibias/blob/main/docs/examples/pinn_xpinn_stiff.py)
+for a two-patch solve with a genuine conductivity contrast, and the stiff
+integrators on [the solver page](pinn-solver.md#stiff-time-stepping).
+
+Honesty: `d/dn` is exactly as exact as the field it is taken on — closed form for
+the `sigma`-tower and `jet_mlp` families, autodiff for the partitioned and cage
+families. The op adds no approximation of its own; it contracts the gradient the
+substrate already provides, never a finite difference across the seam.
 
 ::: omnibias.pinn.torch.losses
     options:
@@ -175,29 +621,8 @@ which validates both sides against the same analytic oracle.
       show_root_heading: false
       heading_level: 3
       members:
-        - candidate_family_catalog
-        - generate_fast_candidate_runs
-        - replay_candidate_run
-        - certify_candidate_run
-        - falsify_candidate_run
-        - attempt_analytic_proof_for_survivor
-        - run_fast_candidate_sprint
         - build_ns_cap_bundle
         - ns_cap_schema_errors
-        - certified_transfer_matrix_gap
-        - certified_transfer_matrix_gap_schema_errors
-        - certified_heat_kernel_transfer_gap
-        - certified_heat_kernel_gap_schema_errors
-        - certified_symmetric_heat_kernel_gap
-        - certified_symmetric_heat_kernel_gap_schema_errors
-        - certified_wilson_transfer_gap
-        - certified_wilson_transfer_gap_schema_errors
-        - heat_kernel_gap_scaling_report
-        - heat_kernel_gap_scaling_schema_errors
-        - certified_multistep_gap_refinement
-        - multistep_gap_refinement_schema_errors
-        - certified_effective_mass_curve
-        - certified_effective_mass_curve_schema_errors
         - candidate_upgrade_gates
         - vorticity_residual_periodic
         - interval_arithmetic_metadata
@@ -314,12 +739,55 @@ interface between regions as the gate sharpness `beta -> ∞`. The conservative
 (cPINN) demo enforces the PDE per region with an interface-continuity penalty,
 beating a single `OneLayerVectorField` on interface error.
 
+### Heterogeneous patches
+
+The sub-solutions need not be the same *type* or the same *size*. Anything that
+answers `forward_values(coords) -> (B, C)` can be a patch — a
+`OneLayerVectorField`, a deep `JetMLPVectorField`, a Fourier-feature or Mscale
+field — and they can be mixed freely, provided they agree on the coordinate and
+component specs, which is checked rather than assumed.
+
+```python
+from omnibias.pinn.partition.torch import build_partitioned_field
+from omnibias.pinn.torch.fields import OneLayerVectorField
+
+one_d = CoordinateSpec(("x",))
+
+def patch(region):
+    if region == 0:  # the seam-side region gets the depth
+        return build_jet_mlp_vector_field(
+            coordinate_spec=one_d, components=comps, hidden=16, depth=3, seed=0,
+        )
+    return OneLayerVectorField(coordinate_spec=one_d, components=comps, hidden=4)
+
+field = build_partitioned_field(
+    coordinate_spec=one_d,
+    components=comps,
+    split_dirs=torch.tensor([[1.0]], dtype=torch.float64),
+    split_thresh=torch.tensor([0.0], dtype=torch.float64),
+    subfield_factory=patch,
+)
+[type(sub).__name__ for sub in field.subfields]
+```
+
+`hidden` and `base` also accept one entry per region for the common case where
+only the *size* differs; `subfield_factory(region_index)` is the general escape
+hatch. This is what makes decomposition worth the bookkeeping: the region holding
+a boundary layer or a shock gets a bigger, higher-frequency network instead of
+paying that capacity everywhere. Far from the seam the gate is saturated, so the
+blend *is* that patch — a deep patch's exact closed-form derivatives survive into
+the composite to float64 round-off on its own side.
+
+Whether a skewed budget *fits better* is a benchmark question that depends on the
+problem and the optimiser, and is not claimed here; what the library guarantees
+is that the capacity really moves and every patch still receives a gradient.
+
 **Honesty label.** The blended field's derivatives use the **autodiff product
 rule** (the closed-form `sigma`-tower does not cover products of sigmoids); the
 sound, certified quantity is the *soft->hard partition gap*
 (`omnibias.partition.certify_partition_gap`). The `beta -> ∞` hardening is the
 feasibility / temperature sense of "collapse", never the founding `delta -> 0`
-bias collapse. Torch only in this first pass.
+bias collapse.
 
 ::: omnibias.pinn.partition.torch
     options:

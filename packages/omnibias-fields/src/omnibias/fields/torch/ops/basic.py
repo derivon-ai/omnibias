@@ -53,6 +53,14 @@ def _is_partitioned(state: FieldState) -> bool:
     return getattr(state.field, "_omnibias_dispatch", None) == "partitioned"
 
 
+def _is_jet_mlp(state: FieldState) -> bool:
+    # A deep / Fourier-feature field (omnibias.pinn.<backend>.fields.jet_mlp) whose
+    # derivatives come from the exact multivariate jet ``mlp_jet_mv``. Still closed
+    # form -- just multi-layer Faa di Bruno rather than the single-layer sigma-tower
+    # reduction -- so it uses the state-method path with its own jet cache.
+    return getattr(state.field, "_omnibias_dispatch", None) == "jet_mlp"
+
+
 def _sigma_of_order(state: FieldState, order: int) -> Tensor:
     """Return ``sigma^(order)(z)`` from the cache, computing it once."""
     if not _is_one_layer(state):
@@ -77,7 +85,7 @@ def value(state: FieldState, name: str) -> Tensor:
         return state.field.value_component(state, name)  # type: ignore[attr-defined]
     if _is_chebyshev(state):
         return state.field.value_component(state, name)  # type: ignore[attr-defined]
-    if _is_cage(state) or _is_partitioned(state):
+    if _is_cage(state) or _is_partitioned(state) or _is_jet_mlp(state):
         return state.field.value_component(state, name)  # type: ignore[attr-defined]
     raise NotImplementedError(
         f"value op not implemented for field type {type(state.field).__name__}"
@@ -109,7 +117,7 @@ def derivative(
         return state.field.derivative(state, name, axis=a, order=order)  # type: ignore[attr-defined]
     if _is_chebyshev(state):
         return state.field.derivative(state, name, axis=a, order=order)  # type: ignore[attr-defined]
-    if _is_cage(state) or _is_partitioned(state):
+    if _is_cage(state) or _is_partitioned(state) or _is_jet_mlp(state):
         return state.field.derivative(state, name, axis=a, order=order)  # type: ignore[attr-defined]
     raise NotImplementedError(
         f"derivative op not implemented for field type {type(state.field).__name__}"
@@ -165,7 +173,7 @@ def mixed_partial(
         return state.field.mixed_partial(state, name, int_axes, int_orders)  # type: ignore[attr-defined]
     if _is_chebyshev(state):
         return state.field.mixed_partial(state, name, int_axes, int_orders)  # type: ignore[attr-defined]
-    if _is_cage(state) or _is_partitioned(state):
+    if _is_cage(state) or _is_partitioned(state) or _is_jet_mlp(state):
         return state.field.mixed_partial(state, name, int_axes, int_orders)  # type: ignore[attr-defined]
     raise NotImplementedError(
         f"mixed_partial op not implemented for field type {type(state.field).__name__}"
@@ -197,6 +205,12 @@ def gradient(
     if _is_one_layer(state):
         sigma_p = _sigma_of_order(state, 1)
         full = state.field.gradient_full(sigma_p, name)
+        if axis_idx == tuple(range(full.shape[-1])):
+            return full
+        return full[..., list(axis_idx)]
+    if _is_jet_mlp(state):
+        # One jet already holds every first partial; read them all in one go.
+        full = state.field.gradient_full(state, name)  # type: ignore[attr-defined]
         if axis_idx == tuple(range(full.shape[-1])):
             return full
         return full[..., list(axis_idx)]
@@ -254,6 +268,9 @@ def laplacian(
         # Fast-path: closed-form via row-norm-sq.
         sigma_pp = _sigma_of_order(state, 2)
         return state.field.laplacian(sigma_pp, name)
+    if axes is None and _is_jet_mlp(state):
+        # Fast-path: the spatial trace of the Hessian block of a single jet.
+        return state.field.laplacian(state, name)  # type: ignore[attr-defined]
     # Fallback: sum of pure 2nd partials along the requested axes.
     if axes is None:
         axes = tuple(state.coordinate_spec.spatial_axes)

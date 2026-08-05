@@ -11,6 +11,11 @@ from omnibias.pinn.jax.cage.conservation import (
     make_hard_boundary_field,
     make_mass_flux_potential_field,
 )
+from omnibias.pinn.jax.cage.fluxform import (
+    FluxFormField,
+    antisymmetric_pairs,
+    make_flux_form_field,
+)
 from omnibias.pinn.jax.cage.incompressible import (
     HelmholtzProjectionField,
     StreamfunctionField,
@@ -22,19 +27,28 @@ from omnibias.pinn.jax.cage.incompressible import (
     make_streamfunction_field,
     make_vector_potential_field,
 )
+from omnibias.pinn.jax.cage.integral import (
+    IntegralConservationField,
+    make_integral_conservation_field,
+)
 
 __all__ = [
+    "FluxFormField",
     "HardBoundaryField",
     "HelmholtzProjectionField",
+    "IntegralConservationField",
     "StreamfunctionField",
     "VectorPotentialField",
+    "antisymmetric_pairs",
     "coulomb_gauge_loss",
     "energy_conserving_advection",
     "enstrophy_conserving_advection",
     "helmholtz_gauge_loss",
     "is_cage_field",
+    "make_flux_form_field",
     "make_hard_boundary_field",
     "make_helmholtz_projection_field",
+    "make_integral_conservation_field",
     "make_mass_flux_potential_field",
     "make_streamfunction_field",
     "make_vector_potential_field",

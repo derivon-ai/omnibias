@@ -27,10 +27,52 @@ A fifth family -- **asymptotic / removable boundary conditions**
 residual cube: it builds the exact directional Taylor jet of the network
 (``mlp_jet``) and imposes a differentiable limit (``lhopital_ratio``) as a
 trainable loss (removable regularity at a singular point, far-field decay).
+
+A sixth -- **adaptive weighting** -- is stateful, which the five above are not.
+:class:`LossWeighter` and its subclasses (:class:`GradNormWeighter`,
+:class:`NTKWeighter`, :class:`ConstantWeighter`) hold an EMA of the per-term
+weights ``lambda_k`` and refresh it on a cadence; they are shared pure Python,
+so the torch and jax weights agree by construction, and only the measurement
+(:func:`grad_stats`, :func:`ntk_trace_stats`) is written per backend.
+:func:`self_adaptive_loss` and :class:`SelfAdaptiveWeights` are the pointwise
+counterpart: one *trained* weight per collocation point, ascended rather than
+estimated.
+
+Marching those weights across a long time horizon is
+:class:`~omnibias.pinn._core.marching.TimeWindowSchedule` and
+:class:`~omnibias.pinn._core.marching.TimeMarcher`, re-exported here beside the
+causal loss they drive.
+
+A seventh -- **interface residuals** for domain decomposition
+(:func:`interface_residual`, :func:`normal_derivative`) -- consumes *two*
+:class:`~omnibias.pinn._core.state.FieldState`\\ s, one per subdomain, and
+imposes value and normal-flux continuity on the seam between them. Its geometry
+(:class:`~omnibias.pinn._core.interface.Interface`,
+:func:`~omnibias.pinn._core.interface.interface_points`) is shared pure numpy
+and re-exported here too.
 """
 
 from __future__ import annotations
 
+from omnibias.pinn._core.interface import (
+    Interface,
+    InterfaceSpec,
+    interface_points,
+    split_by_interface,
+)
+from omnibias.pinn._core.marching import (
+    TimeMarcher,
+    TimeWindowSchedule,
+    slice_points,
+    window_points,
+)
+from omnibias.pinn._core.weighting import (
+    ConstantWeighter,
+    GradNormWeighter,
+    GradStats,
+    LossWeighter,
+    NTKWeighter,
+)
 from omnibias.pinn.torch.losses.asymptotic import (
     asymptotic_bc_loss,
     asymptotic_ratio,
@@ -43,6 +85,15 @@ from omnibias.pinn.torch.losses.causal import (
     causal_weights_from_per_bin,
 )
 from omnibias.pinn.torch.losses.entropy import entropy_consistent_residual
+from omnibias.pinn.torch.losses.interface import (
+    InterfaceOutput,
+    flux_jump,
+    interface_loss,
+    interface_residual,
+    normal_derivative,
+    normal_flux,
+    value_jump,
+)
 from omnibias.pinn.torch.losses.ntk import (
     estimate_ntk_trace,
     ntk_balanced_loss,
@@ -52,9 +103,27 @@ from omnibias.pinn.torch.losses.sobolev import (
     sobolev_residual_loss,
     sobolev_weight,
 )
+from omnibias.pinn.torch.losses.weighting import (
+    SelfAdaptiveWeights,
+    grad_stats,
+    ntk_trace_stats,
+    reverse_gradient,
+    self_adaptive_loss,
+)
 
 __all__ = [
     "CausalConfig",
+    "ConstantWeighter",
+    "GradNormWeighter",
+    "GradStats",
+    "Interface",
+    "InterfaceOutput",
+    "InterfaceSpec",
+    "LossWeighter",
+    "NTKWeighter",
+    "SelfAdaptiveWeights",
+    "TimeMarcher",
+    "TimeWindowSchedule",
     "asymptotic_bc_loss",
     "asymptotic_ratio",
     "causal_residual_loss",
@@ -62,9 +131,23 @@ __all__ = [
     "entropy_consistent_residual",
     "estimate_ntk_trace",
     "far_field_decay_loss",
+    "flux_jump",
+    "grad_stats",
+    "interface_loss",
+    "interface_points",
+    "interface_residual",
     "mse_residual_loss",
     "network_ray_jet",
+    "normal_derivative",
+    "normal_flux",
     "ntk_balanced_loss",
+    "ntk_trace_stats",
+    "reverse_gradient",
+    "self_adaptive_loss",
+    "slice_points",
     "sobolev_residual_loss",
     "sobolev_weight",
+    "split_by_interface",
+    "value_jump",
+    "window_points",
 ]

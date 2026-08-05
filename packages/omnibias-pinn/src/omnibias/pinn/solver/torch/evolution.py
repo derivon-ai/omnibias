@@ -25,6 +25,7 @@ import torch
 from omnibias.pinn.solver._core.system import System
 from omnibias.pinn.solver._core.taxonomy import Linearity
 from omnibias.pinn.solver.torch import integrators as _int
+from omnibias.pinn.solver.torch import stiff as _stiff
 from omnibias.pinn.solver.torch._solution import FieldSolution, GridSolution
 from omnibias.pinn.solver.torch.spectral import SpectralGrid1D
 from omnibias.pinn.solver.torch.steady import solve_least_squares, solve_optimize
@@ -65,9 +66,14 @@ def solve_evolution(
 class SemiDiscrete:
     """A semi-discrete RHS ``u_t = rhs(u)`` on a spectral grid.
 
-    ``symbol`` (the diagonal Fourier multiplier ``lambda(k)``) is set for linear
-    problems so implicit steps are available. ``jet_step`` is set when a
-    high-order jet-Taylor step exists.
+    ``symbol`` (the diagonal Fourier multiplier ``lambda(k)``) is set whenever
+    the *stiff* part of the problem is linear and diagonal in Fourier space.
+    ``nonlinear`` carries the rest, so that ``rhs(u) = L u + nonlinear(u)``: the
+    pair is what the exponential and IMEX integrators split on. A problem with a
+    ``symbol`` and no ``nonlinear`` is linear, and only then may an implicit
+    linear step be used -- otherwise it would silently drop the nonlinear term.
+
+    ``jet_step`` is set when a high-order jet-Taylor step exists.
     """
 
     rhs: Callable[[Tensor], Tensor]
@@ -75,6 +81,12 @@ class SemiDiscrete:
     n_fields: int = 1
     symbol: Tensor | None = None
     jet_step: Callable[[Tensor, float, int], Tensor] | None = None
+    nonlinear: Callable[[Tensor], Tensor] | None = None
+
+    @property
+    def is_linear(self) -> bool:
+        """Whether the whole right-hand side is the linear symbol."""
+        return self.symbol is not None and self.nonlinear is None
 
 
 def heat_semidiscrete(grid: SpectralGrid1D, diffusivity: float) -> SemiDiscrete:
@@ -113,10 +125,41 @@ def burgers_semidiscrete(grid: SpectralGrid1D, viscosity: float) -> SemiDiscrete
     def rhs(u: Tensor) -> Tensor:
         return nu * grid.dxx(u) - u * grid.dx(u)
 
+    def nonlinear(u: Tensor) -> Tensor:
+        return -u * grid.dx(u)
+
     def jet_step(u: Tensor, dt: float, order: int) -> Tensor:
         return _int.burgers_jet_step(grid, u, dt, order, nu)
 
-    return SemiDiscrete(rhs=rhs, grid=grid, jet_step=jet_step)
+    # The viscous term is the stiff, diagonal half; the advective term is not.
+    return SemiDiscrete(
+        rhs=rhs,
+        grid=grid,
+        symbol=-nu * grid.k**2,
+        jet_step=jet_step,
+        nonlinear=nonlinear,
+    )
+
+
+def kuramoto_sivashinsky_semidiscrete(grid: SpectralGrid1D) -> SemiDiscrete:
+    r"""``u_t = -u u_x - u_xx - u_xxxx`` -- the canonical stiff spectral test.
+
+    The fourth-derivative term makes the symbol ``k^2 - k^4`` scale like the
+    fourth power of the wavenumber, so an explicit step is stable only for
+    ``dt ~ dx^4`` while the solution itself evolves on ``O(1)`` timescales. That
+    gap is exactly what an exponential integrator closes: with ``L`` handled by
+    ``exp(dt L)`` the step size is set by accuracy alone.
+    """
+    symbol = grid.k**2 - grid.k**4
+
+    def nonlinear(u: Tensor) -> Tensor:
+        return -0.5 * grid.dx(u * u)
+
+    def rhs(u: Tensor) -> Tensor:
+        uh = torch.fft.fft(u)
+        return torch.fft.ifft(uh * symbol.to(uh.dtype)).real + nonlinear(u)
+
+    return SemiDiscrete(rhs=rhs, grid=grid, symbol=symbol, nonlinear=nonlinear)
 
 
 def reaction_diffusion_semidiscrete(
@@ -145,14 +188,34 @@ def method_of_lines(
     """March ``u_t = semi.rhs(u)`` over ``times``; return ``(snapshots, times)``.
 
     ``snapshots`` has shape ``(T, *u0.shape)``. ``integrator`` is one of
-    ``"rk4"``, ``"euler"``, ``"implicit_euler"``, ``"crank_nicolson"``, or
-    ``"jet_taylor"`` (order-``order`` high-order Taylor step).
+
+    ``"rk4"``, ``"euler"``
+        Explicit; stable only below the stiffness-imposed step size.
+    ``"jet_taylor"``
+        The order-``order`` high-order Taylor step (needs ``semi.jet_step``).
+    ``"implicit_euler"``, ``"crank_nicolson"``
+        Implicit baselines for a **linear** problem (needs ``semi.symbol`` and
+        no ``semi.nonlinear``).
+    ``"etdrk4"``, ``"imex_euler"``, ``"imex_cnab2"``
+        Stiff splittings for ``u_t = L u + N(u)`` (need ``semi.symbol``; a
+        problem with no ``semi.nonlinear`` is treated as ``N = 0``). ETDRK4
+        integrates the linear part exactly, so the step size answers to accuracy
+        rather than to stiffness.
     """
     ts = [float(t) for t in times]
     if len(ts) < 2:
         raise ValueError("times must contain at least two entries")
+    stiff_schemes = ("etdrk4", "imex_euler", "imex_cnab2")
+    if integrator in stiff_schemes and semi.symbol is None:
+        raise ValueError(
+            f"{integrator!r} splits off a linear Fourier symbol; this problem "
+            "has none"
+        )
+    zero: Callable[[Tensor], Tensor] = torch.zeros_like
+    nonlinear = semi.nonlinear if semi.nonlinear is not None else zero
     u = u0
     snaps = [u0]
+    previous_n: Tensor | None = None
     for i in range(len(ts) - 1):
         dt = ts[i + 1] - ts[i]
         if integrator == "rk4":
@@ -164,9 +227,25 @@ def method_of_lines(
                 raise ValueError("this problem has no jet-Taylor step")
             u = semi.jet_step(u, dt, order)
         elif integrator in ("implicit_euler", "crank_nicolson"):
-            if semi.symbol is None:
-                raise ValueError("implicit schemes require a linear Fourier symbol")
+            if not semi.is_linear:
+                raise ValueError(
+                    "implicit schemes require a linear Fourier symbol and no "
+                    "nonlinear part; use 'etdrk4' or 'imex_cnab2' for a split "
+                    "problem, which integrate the nonlinear term rather than "
+                    "dropping it"
+                )
+            assert semi.symbol is not None
             u = _int.implicit_linear_step(semi.grid, semi.symbol, u, dt, scheme=integrator)
+        elif integrator in stiff_schemes:
+            assert semi.symbol is not None
+            if integrator == "etdrk4":
+                u = _stiff.etdrk4_step(semi.symbol, nonlinear, u, dt)
+            elif integrator == "imex_euler":
+                u = _stiff.imex_euler_step(semi.symbol, nonlinear, u, dt)
+            else:
+                u, previous_n = _stiff.imex_cnab2_step(
+                    semi.symbol, nonlinear, u, dt, previous_nonlinear=previous_n
+                )
         else:
             raise ValueError(f"unknown integrator {integrator!r}")
         snaps.append(u)
@@ -192,6 +271,7 @@ __all__ = [
     "burgers_semidiscrete",
     "grid_solution",
     "heat_semidiscrete",
+    "kuramoto_sivashinsky_semidiscrete",
     "method_of_lines",
     "reaction_diffusion_semidiscrete",
     "solve_evolution",

@@ -242,48 +242,6 @@ Passing replay means the artifact was serialized honestly enough for a second
 implementation to reproduce the reported fit. It does not prove an inequality,
 certify a solution profile, or establish finite-energy `R^3` data.
 
-## Candidate Discovery Sprint
-
-`run_fast_candidate_sprint()` executes the current deterministic version of the
-research loop:
-
-1. catalog supported and literature-known ansatz families;
-2. generate the families that have fast deterministic builders;
-3. replay every generated artifact through `omnibias-symbolic`;
-4. attach interval/tail/finite-energy/axis certificates where kernels exist;
-5. falsify or block non-survivors; and
-6. package analytic-closure obligations for any survivor.
-
-```python
-from omnibias.pinn.certified import candidate_family_catalog, run_fast_candidate_sprint
-
-catalog = candidate_family_catalog()
-sprint = run_fast_candidate_sprint(seed=7)
-
-assert any(f["family_id"] == "leray_backward_self_similar_profile" for f in catalog)
-assert sprint["summary"]["replay_passed_count"] <= sprint["summary"]["generated_run_count"]
-assert sprint["honesty"]["unproven_claim"] is False
-```
-
-The catalog is broader than the fast generator. It includes implemented families
-such as `axisymmetric_swirl_refined`, trace candidates, bridge artifacts, and
-periodic CAP baselines, plus catalog-only literature classes such as Leray
-self-similar profiles, discretely self-similar profiles, Type I/II scaling,
-axisymmetric ring/concentration scenarios, helical reductions, homogeneous
-`-1` profiles, Landau/Slezkin singular flows, Lamb-Oseen diagnostics, Burgers
-vortices, and Kida-Pelz symmetry classes.
-
-Catalog-only does not mean ignored. Each such entry carries
-`not_generated_reason`, `open_obligations`, and `next_implementation_step`.
-Diagnostic baselines are replayed and kept in the ledger, but the falsifier
-rejects them as global-regularity candidates when they are periodic, forced, 2D-only,
-singular, or not finite-energy `R^3` data.
-
-The first fast sprint is expected to produce proof obligations, not a theorem.
-A survivor can reach `blocked_open_obligations` with a formal package and
-manifest, but `unproven_claim` remains false until analytic closure and external
-verification are supplied.
-
 ## Axisymmetric Candidate Sprint
 
 The first serious 3D candidate family beyond periodic manufactured flows is an
@@ -459,7 +417,7 @@ This closure report contains function-space metadata, a finite-dimensional
 linearized residual Jacobian certificate, a named projection/truncation map, a
 tail/operator-remainder bound, a Neumann-style defect interval, component-wise
 radii-polynomial evidence, norm-divergence linkage metadata, and symbolic replay
-inputs. A sprint survivor may now reach `closure_consistency_verified`, which
+inputs. A surviving candidate may now reach `closure_consistency_verified`, which
 means the interval report and finite-dimensional closure arithmetic replay
 consistently. It does not mean linearized invertibility has been proved in the
 continuum Banach space, nor that a critical norm divergence has been linked

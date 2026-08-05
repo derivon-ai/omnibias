@@ -68,6 +68,32 @@ def _jet_batched(layers: list[LayerSpec], x: Array, order: int) -> Array:
     return out
 
 
+def _check_layer_fastpaths(layers: list[LayerSpec], max_order: int) -> None:
+    """Reject any layer activation lacking a closed-form derivative kernel of ``max_order``.
+
+    Twin of :meth:`omnibias.torch.architectures.pinn._JetMLPCore._check_fastpath`:
+    a network without an exact tower cannot back a closed-form PDE residual, so it
+    is rejected at construction rather than deep inside the jet kernel.
+    """
+    seen: set[str] = set()
+    for _w, _b, spec in layers:
+        if spec is None or spec.name in seen:
+            continue
+        seen.add(spec.name)
+        if spec.fastpath is None:
+            raise ValueError(
+                f"jet-based networks require activations with a closed-form "
+                f"derivative kernel; activation {spec.name!r} has none."
+            )
+        try:
+            spec.fastpath(jnp.zeros(1), max_order)
+        except NotImplementedError as e:
+            raise ValueError(
+                f"Activation {spec.name!r} fast-path does not support order "
+                f"{max_order}: {e}"
+            ) from None
+
+
 def _gradient_batched(layers: list[LayerSpec], in_dim: int, x: Array) -> Array:
     out: Array = jax.vmap(lambda xi: jet_gradient(mlp_jet_mv(xi, layers, 1), in_dim, 1))(x)
     return out
@@ -151,6 +177,19 @@ class JetMLP:
             (self.weights[i], self.biases[i], None if i == n - 1 else self.spec)
             for i in range(n)
         ]
+
+    def _point_jet(self, xi: Array, order: int) -> Array:
+        """Single-point multivariate jet, shape ``(M, out_dim)``.
+
+        The hook every batched readout goes through, so a wrapper network (a band
+        mixture, a hard-constraint ansatz) overrides this one method and stays
+        exact. Twin of :meth:`omnibias.torch.architectures.pinn._JetMLPCore._point_jet`.
+        """
+        return mlp_jet_mv(xi, self._layer_specs(), order)
+
+    def _check_fastpath(self, max_order: int) -> None:
+        """Reject activations without a closed-form tower up to ``max_order``."""
+        _check_layer_fastpaths(self._layer_specs(), max_order)
 
     def value(self, x: Array) -> Array:
         """Plain network value ``u(x)``, shape ``(..., out_dim)``."""
@@ -265,6 +304,14 @@ class FourierFeatureMLP:
                 (self.weights[i], self.biases[i], None if i == n - 1 else self.base_spec)
             )
         return specs
+
+    def _point_jet(self, xi: Array, order: int) -> Array:
+        """Single-point multivariate jet, shape ``(M, out_dim)``."""
+        return mlp_jet_mv(xi, self._layer_specs(), order)
+
+    def _check_fastpath(self, max_order: int) -> None:
+        """Reject activations without a closed-form tower up to ``max_order``."""
+        _check_layer_fastpaths(self._layer_specs(), max_order)
 
     def value(self, x: Array) -> Array:
         """Plain network value ``u(x)``, shape ``(..., out_dim)``."""

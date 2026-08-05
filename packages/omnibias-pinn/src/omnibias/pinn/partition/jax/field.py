@@ -8,13 +8,25 @@ smooth sub-solutions can. :class:`PartitionedField` wraps
 
 * a soft partition (:func:`omnibias.partition.jax.weights.partition_weights_arrays`
   split gates over the coordinates), and
-* one :class:`~omnibias.pinn.jax.fields.OneLayerVectorField` sub-solution per region,
+* one sub-solution *field* per region,
 
 and evaluates the blend
 
 .. math:: u(x) = \sum_l w_l(x)\, u_l(x),
 
 a genuine field that plugs into the existing JAX PINN ops.
+
+Heterogeneous patches
+---------------------
+The sub-solutions need not be the same *type* or the same *size*. Anything that
+answers ``forward_values(coords) -> (B, C)`` -- a
+:class:`~omnibias.pinn.jax.fields.OneLayerVectorField`, a deep
+:class:`~omnibias.pinn.jax.fields.JetMLPVectorField`, a Fourier-feature or
+Mscale field -- can be a patch, and they can be mixed freely. That is the point
+of decomposing at all: the region holding a boundary layer or a shock can be
+given a bigger, higher-frequency network than the quiet region next to it.
+:func:`build_partitioned_field` accepts per-region ``hidden`` / ``base``
+sequences, or a ``subfield_factory`` for full control.
 
 Honesty
 -------
@@ -35,7 +47,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeVar, cast
 
 import jax
 import jax.numpy as jnp
@@ -43,13 +55,12 @@ from jax import Array
 from omnibias.pinn._core.components import ComponentSpec
 from omnibias.pinn._core.coords import CoordinateSpec
 from omnibias.pinn.jax.fields.base import FieldBase
-from omnibias.pinn.jax.fields.one_layer import (
-    OneLayerVectorField,
-    make_one_layer_vector_field,
-)
+from omnibias.pinn.jax.fields.one_layer import make_one_layer_vector_field
 
 if TYPE_CHECKING:  # pragma: no cover
     from omnibias.pinn._core.state import FieldState
+
+_T = TypeVar("_T")
 
 
 def _deriv_along(fn: Callable[[Array], Array], axis: int) -> Callable[[Array], Array]:
@@ -61,6 +72,35 @@ def _deriv_along(fn: Callable[[Array], Array], axis: int) -> Callable[[Array], A
     return d
 
 
+def _patch_values(sub: FieldBase, coords: Array, names: tuple[str, ...]) -> Array:
+    """``(B, C)`` values of one patch, whatever kind of field it is.
+
+    ``forward_values`` is the cheap direct route every trainable omnibias field
+    offers; the fallback drives the ordinary op dispatch so an exotic patch
+    (spectral, caged) still works, just with a :class:`FieldState` built per
+    call.
+    """
+    direct = getattr(sub, "forward_values", None)
+    if direct is not None:
+        out: Array = direct(coords)
+        return out
+    state = sub(coords)
+    return jnp.stack([state.ops.value(state, n) for n in names], axis=-1)
+
+
+def _per_region(value: _T | Sequence[_T], n_regions: int, what: str) -> tuple[_T, ...]:
+    """Broadcast a scalar setting to every region, or check a per-region sequence."""
+    if isinstance(value, str) or not isinstance(value, Sequence):
+        return (cast("_T", value),) * n_regions
+    out = tuple(value)
+    if len(out) != n_regions:
+        raise ValueError(
+            f"{what} must be a scalar or one entry per region "
+            f"({n_regions}), got {len(out)}"
+        )
+    return out
+
+
 @dataclass(frozen=True)
 class PartitionedField(FieldBase):
     r"""Discontinuity-capturing field ``u(x) = sum_l w_l(x) u_l(x)`` (JAX twin).
@@ -70,7 +110,9 @@ class PartitionedField(FieldBase):
     coordinate_spec, components:
         Shared input-axis / output-channel metadata (all sub-solutions use these).
     subfields:
-        The ``2**depth`` region sub-solutions, one per region.
+        The ``2**depth`` region sub-solutions, one per region. Any field type is
+        allowed and they may differ from each other; each must carry the same
+        coordinate / component specs, since the blend adds their outputs.
     split_W:
         ``(depth, D)`` oblique split directions of the partition gates.
     split_t:
@@ -83,7 +125,7 @@ class PartitionedField(FieldBase):
 
     coordinate_spec: CoordinateSpec
     components: ComponentSpec
-    subfields: tuple[OneLayerVectorField, ...]
+    subfields: tuple[FieldBase, ...]
     split_W: Array  # (depth, D)
     split_t: Array  # (depth,)
     depth: int
@@ -105,6 +147,18 @@ class PartitionedField(FieldBase):
                 f"expected {n_regions} subfields (2**depth for depth={depth}), "
                 f"got {len(self.subfields)}"
             )
+        for i, sub in enumerate(self.subfields):
+            if sub.components.names != self.components.names:
+                raise ValueError(
+                    f"subfield {i} has components {sub.components.names} but the "
+                    f"partition blends {self.components.names}; every patch must "
+                    "expose the same components"
+                )
+            if sub.coordinate_spec.axes != self.coordinate_spec.axes:
+                raise ValueError(
+                    f"subfield {i} has axes {sub.coordinate_spec.axes} but the "
+                    f"partition is over {self.coordinate_spec.axes}"
+                )
 
     @property
     def n_regions(self) -> int:
@@ -124,7 +178,8 @@ class PartitionedField(FieldBase):
 
     def _subfield_values(self, coords: Array) -> Array:
         r"""Each region sub-solution's raw values, stacked ``(B, n_regions, C)``."""
-        outs = [sub.value_all(sub._sigma(sub._pre_activations(coords))) for sub in self.subfields]
+        names = self.components.names
+        outs = [_patch_values(sub, coords, names) for sub in self.subfields]
         return jnp.stack(outs, axis=1)
 
     def forward_values(self, coords: Array, beta: float | None = None) -> Array:
@@ -211,17 +266,26 @@ def build_partitioned_field(
     components: ComponentSpec,
     split_dirs: Sequence[Sequence[float]] | Array,
     split_thresh: Sequence[float] | Array,
-    hidden: int = 16,
-    base: str = "tanh",
+    hidden: int | Sequence[int] = 16,
+    base: str | Sequence[str] = "tanh",
     beta: float = 8.0,
     seed: int = 0,
     dtype: Any = jnp.float64,
+    subfield_factory: Callable[[int], FieldBase] | None = None,
 ) -> PartitionedField:
-    r"""Convenience builder: one :class:`OneLayerVectorField` per region + the split.
+    r"""Convenience builder: one sub-solution per region, plus the split.
 
     ``split_dirs`` is ``(depth, D)`` and ``split_thresh`` is ``(depth,)``; the field has
     ``2**depth`` regions. Each region sub-solution is an independent small omnibias field
     (distinct PRNG seed per region).
+
+    ``hidden`` and ``base`` accept **either** a scalar (every region alike, the
+    old behaviour) **or** one entry per region, which is how a decomposition
+    earns its keep: spend the width where the solution is hard.
+    ``subfield_factory(region_index) -> FieldBase`` overrides both and lets a
+    region be a different field *type* -- a deep
+    :class:`~omnibias.pinn.jax.fields.JetMLPVectorField` next to a cheap
+    one-layer patch, say.
     """
     W = jnp.asarray(split_dirs, dtype=dtype)
     t = jnp.asarray(split_thresh, dtype=dtype)
@@ -229,17 +293,22 @@ def build_partitioned_field(
         raise ValueError(f"split_dirs must be (depth, D), got shape {tuple(W.shape)}")
     depth = int(W.shape[0])
     n_regions = 1 << depth
-    subfields = tuple(
-        make_one_layer_vector_field(
-            coordinate_spec=coordinate_spec,
-            components=components,
-            hidden=hidden,
-            base=base,
-            seed=seed + i,
-            dtype=dtype,
+    if subfield_factory is not None:
+        subfields = tuple(subfield_factory(i) for i in range(n_regions))
+    else:
+        widths = _per_region(hidden, n_regions, "hidden")
+        bases = _per_region(base, n_regions, "base")
+        subfields = tuple(
+            make_one_layer_vector_field(
+                coordinate_spec=coordinate_spec,
+                components=components,
+                hidden=int(h),
+                base=b,
+                seed=seed + i,
+                dtype=dtype,
+            )
+            for i, (h, b) in enumerate(zip(widths, bases, strict=True))
         )
-        for i in range(n_regions)
-    )
     return PartitionedField(
         coordinate_spec=coordinate_spec,
         components=components,

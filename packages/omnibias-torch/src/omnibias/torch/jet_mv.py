@@ -113,6 +113,148 @@ def jet_multiply(a: Tensor, b: Tensor, dim: int, order: int) -> Tensor:
     return torch.stack(out, dim=0)
 
 
+def jet_reciprocal(u_jet: Tensor, dim: int, order: int) -> Tensor:
+    r"""Jet of the reciprocal ``1 / u`` from the jet of ``u``.
+
+    ``1/u`` is analytic wherever ``u(x_0) != 0`` and its derivative tower is
+    elementary,
+
+    .. math::
+
+        \frac{d^k}{du^k}\,u^{-1} = (-1)^k\, k!\, u^{-(k+1)},
+
+    so the reciprocal composes through the *same* :func:`compose_jet_mv` kernel
+    as any activation -- it is simply a tower this module supplies itself rather
+    than one the activation dictionary carries. This is what makes a *rational*
+    map (a normalisation, a softmax denominator, a quotient ansatz) closed form
+    at arbitrary order instead of a nested-autodiff fallback.
+
+    Raises nothing on a vanishing ``u_jet[0]``: the result is then infinite or
+    ``nan`` in the usual floating-point way, matching division elsewhere.
+    """
+    u_jet = torch.as_tensor(u_jet)
+    m = num_multi_indices(dim, order)
+    if u_jet.shape[0] != m:
+        raise ValueError(
+            f"u_jet has {u_jet.shape[0]} rows but dim={dim}, order={order} "
+            f"requires {m}"
+        )
+    inv = 1.0 / u_jet[0]
+    rows = []
+    power = inv
+    coeff = 1.0
+    for k in range(order + 1):
+        if k > 0:
+            power = power * inv
+            coeff = -coeff * k
+        rows.append(coeff * power)
+    return compose_jet_mv(u_jet, torch.stack(rows, dim=0), dim, order)
+
+
+def jet_exp(u_jet: Tensor, dim: int, order: int) -> Tensor:
+    """Jet of ``exp(u)`` from the jet of ``u``.
+
+    A thin wrapper over :func:`compose_jet_mv` with the tower of the registered
+    ``"exp"`` activation (``exp^(k) = exp`` at every order), so the exponential
+    is not special-cased -- it is one more entry of the shared dictionary.
+    """
+    u_jet = torch.as_tensor(u_jet)
+    tower = _sigma_tower(get_activation("exp"), u_jet[0], order)
+    return compose_jet_mv(u_jet, tower, dim, order)
+
+
+def jet_softmax(s_jet: Tensor, dim: int, order: int) -> Tensor:
+    r"""Jet of ``softmax(s)`` over the trailing axis, from the jet of the scores.
+
+    Softmax is the first genuinely *non-elementwise* map in this module: every
+    output couples to every score through the shared denominator. It still
+    factors into primitives that are each exact --
+
+    .. math::
+
+        \mathrm{softmax}(s)_j = e^{s_j} \cdot \Big(\sum_i e^{s_i}\Big)^{-1},
+
+    an :func:`jet_exp`, a row-wise sum (linear, so it acts per coefficient), a
+    :func:`jet_reciprocal`, and a :func:`jet_multiply` -- so the composite jet is
+    exact to machine precision at arbitrary order, with no nested autodiff.
+
+    ``s_jet`` has shape ``(M, ..., n)``; the softmax is taken over the last axis.
+    The constant coefficient is max-shifted before exponentiating, exactly as a
+    stable softmax implementation does. The shift is detached and identical
+    across the axis, so it cancels in the mathematics and only removes overflow.
+    """
+    s_jet = torch.as_tensor(s_jet)
+    m = num_multi_indices(dim, order)
+    if s_jet.shape[0] != m:
+        raise ValueError(
+            f"s_jet has {s_jet.shape[0]} rows but dim={dim}, order={order} "
+            f"requires {m}"
+        )
+    if s_jet.ndim < 2:
+        raise ValueError(
+            "s_jet must carry a trailing softmax axis, got shape "
+            f"{tuple(s_jet.shape)}"
+        )
+    shift = s_jet[0].detach().max(dim=-1, keepdim=True).values
+    centred = torch.cat([(s_jet[0] - shift).unsqueeze(0), s_jet[1:]], dim=0)
+    e_jet = jet_exp(centred, dim, order)
+    total = e_jet.sum(dim=-1, keepdim=True)  # linear: acts per coefficient
+    return jet_multiply(e_jet, jet_reciprocal(total, dim, order), dim, order)
+
+
+def jet_attention(
+    q_jet: Tensor,
+    keys: Tensor,
+    values: Tensor,
+    dim: int,
+    order: int,
+    beta: float | Tensor = 1.0,
+) -> Tensor:
+    r"""Jet of dot-product attention ``softmax(beta q K^T) V`` w.r.t. the *inputs*.
+
+    :mod:`omnibias.hopfield` already differentiates the log-sum-exp core in closed
+    form, but with respect to the **scores**. That is the wrong variable for a PDE:
+    a residual needs ``d/dx``. Pushing the query jet through the block supplies the
+    missing coordinate story -- the value agrees with
+    :func:`omnibias.hopfield.torch.ops.attention` and every mixed partial
+    ``D^alpha`` of the attention output comes out of the same single jet.
+
+    Parameters
+    ----------
+    q_jet
+        Jet of the query, shape ``(M, ..., d_key)``.
+    keys, values
+        Memory of shape ``(n, d_key)`` and ``(n, d_val)``; constant in the input
+        (they are network parameters, not functions of ``x``), so they enter as
+        two affine maps around the softmax.
+    dim, order
+        Input-variable count and truncation total order.
+    beta
+        Inverse temperature. A tensor is allowed, which keeps a *trainable*
+        temperature closed form in exactly the same way.
+    """
+    q_jet = torch.as_tensor(q_jet)
+    keys = torch.as_tensor(keys)
+    values = torch.as_tensor(values)
+    if keys.ndim != 2 or values.ndim != 2:
+        raise ValueError(
+            f"keys and values must be 2-D, got {tuple(keys.shape)} and "
+            f"{tuple(values.shape)}"
+        )
+    if keys.shape[0] != values.shape[0]:
+        raise ValueError(
+            f"keys and values must share the memory axis, got {keys.shape[0]} "
+            f"keys and {values.shape[0]} values"
+        )
+    if q_jet.shape[-1] != keys.shape[-1]:
+        raise ValueError(
+            f"query width {q_jet.shape[-1]} != key width {keys.shape[-1]}"
+        )
+    scores = affine_jet(q_jet, keys * beta)
+    weights = jet_softmax(scores, dim, order)
+    return affine_jet(weights, values.transpose(-2, -1))
+
+
 def affine_jet_mv(z_jet: Tensor, W: Tensor, b: Tensor | None = None) -> Tensor:
     """Push a multivariate jet through an affine map ``u = W z + b``.
 
@@ -241,10 +383,14 @@ __all__ = [
     "affine_jet_mv",
     "compose_jet_mv",
     "identity_jet",
+    "jet_attention",
+    "jet_exp",
     "jet_gradient",
     "jet_hessian",
     "jet_multiply",
     "jet_partials",
+    "jet_reciprocal",
+    "jet_softmax",
     "layer_jet_mv",
     "mlp_jet_mv",
 ]

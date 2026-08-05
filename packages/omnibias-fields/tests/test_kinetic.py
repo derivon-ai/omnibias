@@ -29,8 +29,6 @@ from _sympy_field import axis_symbols, make_sympy_field
 from omnibias.fields._core.quadrature import gauss_legendre
 from omnibias.fields.torch.ops import kinetic as torch_kinetic
 
-torch.set_default_dtype(torch.float64)
-
 
 def _np(x):  # type: ignore[no-untyped-def]
     return x.detach().cpu().numpy() if isinstance(x, torch.Tensor) else np.asarray(x)

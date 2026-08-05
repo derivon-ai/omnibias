@@ -75,6 +75,105 @@ arity): `poisson`, `heat`, `wave`, `burgers`, `reaction_diffusion` (coupled), an
         - method_of_lines
         - SpectralGrid1D
 
+### Stiff time stepping
+
+A stiff problem is one where the *stable* step is far smaller than the
+*accurate* step. Diffusion on a fine grid, a fourth-order term, a fast chemical
+channel, a Rosenbrock-scale separation in a reaction network: an explicit
+integrator is then forced down to the fastest decaying mode even though that
+mode contributes nothing to the answer. `omnibias.pinn.solver.{torch,jax}.stiff`
+is the answer to that, written as ordinary differentiable functions so a step
+composes inside a training graph rather than sitting behind a solver API.
+
+Before this, the only implicit option was `implicit_linear_step`, which handles
+a *linear diagonal* Fourier symbol on a periodic 1-D grid — enough for the heat
+equation and nothing else. Four families now cover the rest:
+
+| Step | For | Cost per step | Order |
+| --- | --- | --- | --- |
+| `rosenbrock_step` | any dense `u' = f(u)` | one LU, two solves | 2, L-stable |
+| `exponential_rosenbrock_step` | stiff *and* nearly linear | one matrix `phi_1` | 2 (exact if `f` is affine) |
+| `imex_euler_step` / `imex_cnab2_step` | split `u_t = L u + N(u)` | one diagonal solve | 1 / 2 |
+| `etdrk4_step` | split, smooth, spectral | four `phi` evaluations | 4 |
+
+`SemiDiscrete` now carries the split explicitly: `symbol` is the stiff linear
+part `L` in Fourier space and `nonlinear` is `N(u)`, so the same object drives an
+explicit RK4 (`rhs = L u + N(u)`) or an IMEX / ETD scheme without restating the
+problem. `kuramoto_sivashinsky_semidiscrete` is the canonical hard case —
+`u_t = -u u_x - u_xx - u_xxxx`, whose fourth-order symbol reaches `-k^4` and
+makes explicit stepping hopeless.
+
+```python
+import math
+import torch
+import omnibias.pinn.solver.torch as pt
+
+grid = pt.SpectralGrid1D(128, 32.0 * math.pi)
+x = grid.points()
+u0 = torch.cos(x / 16.0) * (1.0 + torch.sin(x / 16.0))
+semi = pt.kuramoto_sivashinsky_semidiscrete(grid)
+
+snapshots, _ = pt.method_of_lines(semi, u0, [0.0, 1.0, 2.0], integrator="etdrk4")
+bool(torch.isfinite(snapshots).all())
+```
+
+Two things make this an omnibias story rather than a re-implementation of a
+textbook:
+
+* **The `phi` functions are computed, not cancelled.** `phi_k` is defined by
+  `phi_0 = e^z`, `phi_{k+1}(z) = (phi_k(z) - 1/k!) / z`, and evaluating that
+  literally loses every significant digit as `z -> 0` — the numerator and the
+  subtrahend agree to round-off. `phi_diagonal` / `phi_matrix` sum the Taylor
+  series after scaling `z` down by powers of two and recover the answer with the
+  exact doubling identities, so `phi_1(0)` is `1.0` and `phi_1(-300)` is right
+  too. Both accept a complex symbol, which is what a Fourier-space `L` is.
+* **The Jacobian can be closed form.** Rosenbrock needs `df/du`.
+  `dense_jacobian` is the honest autodiff fallback and works for any callable;
+  `closed_form_jacobian` takes the `(W, b, spec)` layer stack that
+  `mlp_jet_mv` consumes and reads the whole Jacobian off **one** order-1
+  multivariate jet — no autodiff graph, no finite difference, and the same
+  numbers on both backends.
+
+`stiff_rollout` composes a step into a trajectory that stays differentiable end
+to end, so a stiff integrator can sit inside a neural-ODE-style loss:
+
+```python
+def rhs(u):
+    return torch.stack([-1000.0 * u[0] + u[1], -u[1]])
+
+traj = pt.stiff_rollout(
+    lambda u, h: pt.rosenbrock_step(rhs, u, h),
+    torch.tensor([1.0, 1.0], dtype=torch.float64),
+    dt=0.01,
+    n_steps=10,
+)
+tuple(traj.shape)
+```
+
+Honest labels, as everywhere else: the `phi` functions and the `rosenbrock` /
+`etdrk4` coefficients are **numerical** (a truncated series with a bounded
+argument, then exact squaring); `closed_form_jacobian` is **closed form**;
+`dense_jacobian` is **autodiff**. The schemes' orders are not asserted from
+their derivation but measured against exact solutions in
+`packages/omnibias-pinn/tests/solver/test_stiff.py`.
+
+::: omnibias.pinn.solver.torch
+    options:
+      show_root_heading: false
+      heading_level: 4
+      members:
+        - phi_diagonal
+        - phi_matrix
+        - dense_jacobian
+        - closed_form_jacobian
+        - rosenbrock_step
+        - exponential_rosenbrock_step
+        - imex_euler_step
+        - imex_cnab2_step
+        - etdrk4_step
+        - stiff_rollout
+        - kuramoto_sivashinsky_semidiscrete
+
 ### Second-order training
 
 `solve_optimize(optimizer=...)` accepts, beyond the `"lbfgs"` default and `"adam"`,
@@ -200,8 +299,15 @@ same ansatz parameters, `omnibias.pinn.solver.jax.assemble` reproduces the torch
 residual rows to double-precision round-off (the parity test runs jax in x64). It
 provides the linear-collocation `solve_least_squares`, the spectral
 method-of-lines, and the same integrators (`rk4_step`, `linear_jet_step`,
-`burgers_jet_step`, `implicit_linear_step`). The nonlinear residual-minimisation
-`solve_optimize` driver is torch-only in v1.
+`burgers_jet_step`, `implicit_linear_step`, and the whole stiff family above).
+The nonlinear residual-minimisation `solve_optimize` driver is torch-only in v1.
+
+On a real symbol `phi_diagonal` is **bit-identical** across the backends, since
+it is elementwise arithmetic driven by one shared Python recursion. Three places
+fall back to round-off agreement instead, and the parity test says which and
+why: a complex symbol (the two backends' complex multiply differs in the last
+ulp, and squaring doubles that once per squaring), `phi_matrix` (BLAS chooses
+the summation order), and the spectral steps (each backend's own FFT).
 
 ## Optional certified mode
 

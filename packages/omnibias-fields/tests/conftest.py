@@ -8,11 +8,15 @@ pure-Python ``_Poly`` arithmetic runs on torch and jax tensors, so the two
 backends are bit-identical by construction. The field uses the state-method
 dispatch path (marker ``"spectral"``), exercising the foundational ops without
 depending on omnibias-pinn.
+
+The suite also runs in double precision on both backends -- see
+:func:`_double_precision_default` for why torch's half of that is a fixture
+rather than an import-time set.
 """
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
 
 import numpy as np
 import pytest
@@ -23,6 +27,11 @@ try:  # enable float64 in jax for the cross-backend bit-parity tests
     jax.config.update("jax_enable_x64", True)
 except ModuleNotFoundError:  # pragma: no cover - jax optional
     pass
+
+try:
+    import torch
+except ModuleNotFoundError:  # pragma: no cover - torch optional
+    torch = None  # type: ignore[assignment]
 
 from omnibias.fields._core.components import ComponentSpec
 from omnibias.fields._core.coords import CoordinateSpec
@@ -138,6 +147,35 @@ def _coordinate_spec() -> CoordinateSpec:
 
 def _component_spec() -> ComponentSpec:
     return ComponentSpec(("u", "v"), groups={"vec": ("u", "v")})
+
+
+@pytest.fixture(autouse=True)
+def _double_precision_default() -> Iterator[None]:
+    """Run every test in this suite with torch defaulting to ``float64``.
+
+    The cross-backend parity tests compare torch against a jax side that
+    ``jax_enable_x64`` has already put in double precision, and the elasticity /
+    MHD / kinetic modules need the headroom for their finite-difference and
+    autodiff references.
+
+    Setting it here rather than at a test module's import time is what makes it
+    survive collection order. ``torch.set_default_dtype`` is a process-global
+    mutation, so an import-time set lands during collection and can then be
+    reverted by another suite's own dtype fixture before these tests actually
+    run -- which is exactly what happens when this package and omnibias-torch
+    share one pytest session.
+    """
+    if torch is None:  # pragma: no cover - torch optional
+        yield
+        return
+    prev = torch.get_default_dtype()
+    if prev is not torch.float64:
+        torch.set_default_dtype(torch.float64)
+    try:
+        yield
+    finally:
+        if torch.get_default_dtype() is not prev:
+            torch.set_default_dtype(prev)
 
 
 @pytest.fixture

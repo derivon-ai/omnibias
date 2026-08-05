@@ -12,6 +12,11 @@ and runs on CPU in seconds (the QPINN demo in well under a minute).
 | [`pinn_heat.py`](examples/pinn_heat.py) | PyTorch | closed-form-Laplacian PINN for the 1D heat equation |
 | [`pinn_solver_curvature.py`](examples/pinn_solver_curvature.py) | PyTorch | second-order PINN training on the solver: Gauss-Newton / cubic-Newton vs Adam / L-BFGS, grad-norm balancing |
 | [`pinn_solver_inverse.py`](examples/pinn_solver_inverse.py) | PyTorch | recover an unknown PDE coefficient from point observations, and residual-adaptive collocation at equal point budget |
+| [`pinn_fourier_features.py`](examples/pinn_fourier_features.py) | PyTorch | spectral bias on two-scale Poisson: single layer vs deep vs Fourier-feature field, all on exact jets |
+| [`pinn_multiscale_feedback.py`](examples/pinn_multiscale_feedback.py) | PyTorch | measure the band scales with `suggest_frequency_bands` instead of guessing the ladder; MscaleDNN mixture and trainable activation slopes |
+| [`pinn_causal_marching.py`](examples/pinn_causal_marching.py) | PyTorch | one loss weight separating failure from success, `GradNormWeighter` finding it by measurement, `TimeMarcher` warm-started window by window, self-adaptive pointwise attention |
+| [`pinn_conservation_attention.py`](examples/pinn_conservation_attention.py) | PyTorch | conservation as structure rather than penalty: the flux-form and integral cages, plus a non-local attention field with closed-form `d/dx` |
+| [`pinn_xpinn_stiff.py`](examples/pinn_xpinn_stiff.py) | PyTorch | two-material seam where value continuity alone gets the wrong answer, heterogeneous per-patch subfields, and ETDRK4 / Rosenbrock where explicit stepping blows up |
 | [`transforms_closed_form.py`](examples/transforms_closed_form.py) | PyTorch + JAX | closed-form Laplace / Fourier / Mellin transforms of activations: quadrature oracle, the honest gaps, and a trainable transform layer |
 | [`qpinn_tise_qho.py`](examples/qpinn_tise_qho.py) | PyTorch | quantum harmonic-oscillator ground state (TISE) |
 | [`variational_harmonic_oscillator.py`](examples/variational_harmonic_oscillator.py) | PyTorch | least action: EL residual, energy conservation, action is minimized at the true path |

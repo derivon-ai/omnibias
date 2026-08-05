@@ -165,6 +165,15 @@ class OneLayerVectorField(FieldBase):
         """Return ``(B, C)`` stacked component values."""
         return self.c(sigma_z)
 
+    def forward_values(self, coords: Tensor) -> Tensor:
+        """Return ``(B, C)`` component values straight from ``coords``.
+
+        The one-line contract a composite field (a partition of unity, a
+        multi-patch decomposition) needs from a sub-solution, so composites can
+        mix field *types* instead of hard-coding this one.
+        """
+        return self.value_all(self._sigma(self._pre_activations(coords)))
+
     # First-order partial: ``df_c/dx_axis = sum_h c[c,h] W[h,axis] sigma'(z_h)``.
     def first_partial(self, sigma_p: Tensor, name: str, axis: int) -> Tensor:
         ci = self.components.index(name)

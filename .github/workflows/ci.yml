@@ -313,6 +313,26 @@ jobs:
         run: |
           source .venv-pinn/bin/activate
           python docs/examples/pinn_solver_inverse.py
+      - name: Run the Fourier-feature / spectral-bias example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_fourier_features.py
+      - name: Run the measured-frequency-band example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_multiscale_feedback.py
+      - name: Run the loss-balancing / causal-marching example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_causal_marching.py
+      - name: Run the conservation-cage / attention-field example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_conservation_attention.py
+      - name: Run the XPINN-interface / stiff-integrator example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_xpinn_stiff.py
 
   qpinn:
     name: omnibias-qpinn (alpha)

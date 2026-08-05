@@ -25,8 +25,6 @@ from _analytic import Poly, make_field
 from omnibias.fields.jax import ops as jo
 from omnibias.fields.torch import ops as to
 
-torch.set_default_dtype(torch.float64)
-
 
 def _np(x):  # type: ignore[no-untyped-def]
     return x.detach().cpu().numpy() if isinstance(x, torch.Tensor) else np.asarray(x)

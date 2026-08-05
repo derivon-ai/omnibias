@@ -10,6 +10,11 @@ from omnibias.pinn._core.diagnostics import (
     relative_l2_per_time,
     spectral_fidelity,
 )
+from omnibias.pinn._core.multiscale import (
+    dominant_wavenumbers,
+    geometric_bands,
+    suggest_frequency_bands,
+)
 from omnibias.pinn.jax.diagnostics.field_stability import (
     autograd_phase_check,
     derivative_stability,
@@ -18,8 +23,11 @@ from omnibias.pinn.jax.diagnostics.field_stability import (
 __all__ = [
     "autograd_phase_check",
     "derivative_stability",
+    "dominant_wavenumbers",
     "forecast_horizon",
+    "geometric_bands",
     "power_spectrum_per_d",
     "relative_l2_per_time",
     "spectral_fidelity",
+    "suggest_frequency_bands",
 ]

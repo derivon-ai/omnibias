@@ -139,6 +139,51 @@ def test_derivative_parity_and_finite_difference() -> None:
     assert np.allclose(d1_j, (fp - fm) / (2 * h), atol=1e-6)
 
 
+def test_heterogeneous_patches_keep_their_parity() -> None:
+    """Patches of *different* widths, matched across backends.
+
+    ``_matched_fields`` gives every region the same ``H``; the point of a
+    decomposition is that it need not, so the mixed case is what the parity
+    claim has to cover.
+    """
+    cs, comp = CoordinateSpec(("x",)), ComponentSpec(("u",))
+    rng = np.random.default_rng(21)
+    params = [_params(rng, 1, h, 1) for h in (4, 11)]
+    ft = TorchPartitioned(
+        coordinate_spec=cs,
+        components=comp,
+        subfields=[_torch_sub(cs, comp, p) for p in params],
+        split_dirs=torch.tensor([[1.0]], dtype=torch.float64),
+        split_thresh=torch.tensor([0.0], dtype=torch.float64),
+        beta=5.0,
+        trainable_partition=False,
+        dtype=torch.float64,
+    )
+    fj = JaxPartitioned(
+        coordinate_spec=cs,
+        components=comp,
+        subfields=tuple(_jax_sub(cs, comp, p) for p in params),
+        split_W=jnp.asarray([[1.0]], dtype=jnp.float64),
+        split_t=jnp.asarray([0.0], dtype=jnp.float64),
+        depth=1,
+        beta=5.0,
+    )
+    assert [sub.hidden for sub in ft.subfields] == [4, 11]
+
+    x = np.linspace(-1.5, 1.5, 17).reshape(-1, 1)
+    xt, xj = torch.tensor(x, dtype=torch.float64), jnp.asarray(x)
+    assert np.allclose(
+        ft.forward_values(xt).detach().numpy(),
+        np.asarray(fj.forward_values(xj)),
+        atol=1e-10,
+    )
+    assert np.allclose(
+        tops.derivative(ft(xt), "u", axis=0, order=2).detach().numpy(),
+        np.asarray(jops.derivative(fj(xj), "u", axis=0, order=2)),
+        atol=1e-7,
+    )
+
+
 def test_value_and_gradient_ops_route_partitioned() -> None:
     _, fj = _matched_fields([[1.0]], [0.0])
     x = jnp.asarray(np.random.default_rng(2).standard_normal((5, 1)))

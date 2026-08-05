@@ -89,6 +89,15 @@ class OneLayerVectorField(FieldBase):
     def value_all(self, sigma_z: Array) -> Array:
         return self.b + sigma_z @ self.c.T
 
+    def forward_values(self, coords: Array) -> Array:
+        """Return ``(B, C)`` component values straight from ``coords``.
+
+        The one-line contract a composite field (a partition of unity, a
+        multi-patch decomposition) needs from a sub-solution, so composites can
+        mix field *types* instead of hard-coding this one.
+        """
+        return self.value_all(self._sigma(self._pre_activations(coords)))
+
     def first_partial(self, sigma_p: Array, name: str, axis: int) -> Array:
         ci = self.components.index(name)
         return (sigma_p * self.W[:, axis]) @ self.c[ci]

@@ -10,6 +10,7 @@ import jax.numpy as jnp
 from jax import Array
 from omnibias.fields.jax.ops.basic import (
     _is_chebyshev,
+    _is_jet_mlp,
     _is_one_layer,
     _is_spectral,
     _resolve_axis,
@@ -30,6 +31,8 @@ def biharmonic(state: FieldState, name: str) -> Array:
         return state.field.biharmonic(state, name)  # type: ignore[attr-defined]
     if _is_chebyshev(state):
         return state.field.biharmonic(state, name)  # type: ignore[attr-defined]
+    if _is_jet_mlp(state):
+        return state.field.biharmonic(state, name)  # type: ignore[attr-defined]
     raise NotImplementedError(
         f"biharmonic not implemented for field type {type(state.field).__name__}"
     )
@@ -47,6 +50,9 @@ def polylaplacian(state: FieldState, name: str, *, k: int) -> Array:
     if _is_spectral(state):
         return state.field.polylaplacian(state, name, k=k)  # type: ignore[attr-defined]
     if _is_chebyshev(state):
+        return state.field.polylaplacian(state, name, k=k)  # type: ignore[attr-defined]
+    if _is_jet_mlp(state):
+        # Multinomial expansion of (sum_i d_i^2)^k over one order-2k jet.
         return state.field.polylaplacian(state, name, k=k)  # type: ignore[attr-defined]
     raise NotImplementedError(
         f"polylaplacian not implemented for field type {type(state.field).__name__}"
@@ -67,6 +73,13 @@ def hessian(
     if _is_one_layer(state):
         sigma_pp = _sigma_of_order(state, 2)
         full = state.field.hessian_full(sigma_pp, name)
+        if axis_idx == tuple(range(full.shape[-1])):
+            return full
+        idx = jnp.array(list(axis_idx))
+        return full[..., idx, :][..., :, idx]
+    if _is_jet_mlp(state):
+        # The order-2 block of a single jet is the whole Hessian.
+        full = state.field.hessian_full(state, name)  # type: ignore[attr-defined]
         if axis_idx == tuple(range(full.shape[-1])):
             return full
         idx = jnp.array(list(axis_idx))
@@ -104,6 +117,9 @@ def jacobian(state: FieldState, names: tuple[str, ...]) -> Array:
         rows = [
             state.field.gradient_full(sigma_p, n) for n in names
         ]
+        return jnp.stack(rows, axis=-2)
+    if _is_jet_mlp(state):
+        rows = [state.field.gradient_full(state, n) for n in names]  # type: ignore[attr-defined]
         return jnp.stack(rows, axis=-2)
     rows = []
     for n in names:
