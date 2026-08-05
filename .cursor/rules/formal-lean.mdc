@@ -1,0 +1,15 @@
+---
+description: omnibias formal loop -- Mathlib-free Lean kernel and honest theorem-prover claims
+globs:
+  - "formal/**"
+alwaysApply: false
+---
+
+# omnibias formal loop: never overstate a proof
+
+- `theorem_prover_verified` is earned **only** by a genuine kernel `lake build` pass. Never forge it from the certificate; asserting the claim without a pass must block the verdict.
+- With no Lean toolchain present the bridge **degrades gracefully**: `theorem_prover_verified` stays `False` and nothing errors.
+- The kernel is deliberately **Mathlib-free** (Lean 4 core only) so CI kernel-checks it cheaply. Do not add Mathlib or otherwise widen the kernel's trust base; "prove more" by adding finite, rational reductions that feed the kernel.
+- There are **two formal registers, kept apart**. (1) The Mathlib-free kernel `formal/omnibias-verified-kernel` (above) feeds `theorem_prover_verified` -- keep it Mathlib-free. (2) The Mathlib-backed track `formal/omnibias-analytic`, driven by the `omnibias-formal` package, *may* depend on Mathlib and feeds only the separate, larger-trust-base `mathlib_verified` tier -- never `theorem_prover_verified`. Do not conflate the two flags, and do not add Mathlib to the kernel to satisfy the analytic track. It lives off the fast CI path (the `lean-analytic` workflow).
+- **Infinite / analytic obligations are out of scope and are not expressed in Lean at all** -- no limit, continuum, or asymptotic statement is stated in either project, so none can be silently discharged. A green `mathlib_verified` build certifies a finite rational obligation only; it never implies `unproven_claim`.
+- **Both Lean projects are `sorry`-free and CI audits that.** Do not introduce a `sorry`: an unprovable obligation means the obligation does not belong here, not that it should be admitted. Scope creep toward an open problem is the failure mode this rule exists to prevent.

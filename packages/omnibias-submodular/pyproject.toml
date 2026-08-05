@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-submodular"
+version = "0.1.0a1"
+description = "Differentiable + certified submodular optimization for omnibias: the multilinear-extension relaxation solved by continuous greedy (Frank-Wolfe over a matroid polytope), pipage / swap rounding, accelerated (lazy / stochastic) and knapsack greedy, non-monotone (double / measured continuous) greedy, streaming, and a certified (1 - 1/e) / curvature-sharpened approximation guarantee plus a min-of-bounds optimality-gap sandwich; coverage / facility-location / budget-additive / log-det-DPP / graph-cut families + a submodular algebra over uniform / partition / laminar / graphic / transversal / intersection matroids and knapsack budgets (jax + torch twins), and honest P-class exact submodular minimization (Lovász extension + Fujishige-Wolfe min-norm-point)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = ["submodular", "multilinear-extension", "continuous-greedy", "matroid", "knapsack", "max-coverage", "facility-location", "log-determinant", "dpp", "non-monotone", "submodular-minimization", "lovasz-extension", "differentiable-optimization", "one-minus-one-over-e"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["omnibias-core>=0.2.0", "omnibias-discrete>=0.1.0a1", "numpy>=1.24"]
+
+[project.optional-dependencies]
+# the secondary *unconstrained* SOS / Lasserre certificate on the multilinear polynomial
+# reuses omnibias-sos (via the omnibias-discrete substrate); the headline matroid-constrained
+# gap certificate is self-contained and needs none of these extras.
+sos = ["omnibias-sos>=0.1.0a1"]
+# the differentiable continuous-greedy relaxation twins (temperature-axis feasibility
+# collapse, unrolled for backprop) each need a tensor backend.
+torch = ["torch>=2.0", "omnibias-torch>=0.2.0"]
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
+all = ["omnibias-submodular[sos,torch,jax]"]
+test = ["pytest>=7.0", "numpy>=1.24"]
+dev = ["omnibias-submodular[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.submodular" = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+files = ["src/omnibias/submodular"]

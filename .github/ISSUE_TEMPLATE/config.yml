@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/derivon-ai/omnibias/discussions
+    about: Ask usage questions and discuss ideas here.
+  - name: Security report
+    url: https://github.com/derivon-ai/omnibias/security/advisories/new
+    about: Report a vulnerability or a silent numerical-correctness regression privately.

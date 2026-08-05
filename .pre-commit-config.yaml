@@ -1,0 +1,51 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.bak$|results/.*|^LICENSES/.*'
+      - id: end-of-file-fixer
+        exclude: '\.bak$|results/.*|^LICENSES/.*'
+      - id: check-yaml
+      - id: check-toml
+      - id: check-merge-conflict
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+        exclude: 'data/.*|results/.*\.json$'
+      - id: mixed-line-ending
+
+  # Pinned to the exact version CI runs (`ruff==0.15.17` in the root
+  # `[dependency-groups].dev`). A drifting pin means pre-commit and CI disagree
+  # about what "clean" means, which is worse than having no hook.
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.17
+    hooks:
+      - id: ruff
+        args: ["--fix", "--exit-non-zero-on-fix"]
+        files: '^(packages|tests)/.*\.py$'
+      - id: ruff-format
+        files: '^(packages|tests)/.*\.py$'
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.11.2
+    hooks:
+      - id: mypy
+        files: '^packages/omnibias-(core|torch|jax|ferminet)/src/.*\.py$'
+        args: ["--strict", "--ignore-missing-imports"]
+        additional_dependencies:
+          - "numpy>=1.23"
+          - "torch>=2.0"
+          # jax / ferminet dependencies are handled via ignore-missing-imports
+          # at the workspace level; pre-commit env stays small.
+
+  - repo: local
+    hooks:
+      # The SPDX header of every file is derived from
+      # `[tool.omnibias.license_tiers]`, so a hand-written header is always
+      # either redundant or wrong. This catches it before it reaches CI.
+      - id: license-headers
+        name: SPDX headers match the licence tier table
+        entry: python scripts/license_headers.py --check
+        language: system
+        pass_filenames: false
+        files: '^(packages|scripts|tests|examples|docs|notebooks)/.*\.py$|^pyproject\.toml$'

@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-pinn"
+version = "0.1.0"
+description = "Physics-informed neural networks with closed-form n-th derivative operators on top of omnibias-core. Cross-backend (torch + jax) typed fields, ops, hard-conservation cages, prebuilt PDE residuals, and diagnostics."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = [
+    "physics-informed-neural-networks",
+    "pinn",
+    "pde",
+    "scientific-machine-learning",
+    "navier-stokes",
+    "spectral-methods",
+    "closed-form-derivatives",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = ["omnibias-core>=0.2.0", "omnibias-fields>=0.1.0"]
+
+[project.optional-dependencies]
+torch = ["omnibias-fields[torch]", "omnibias-torch>=0.2.0", "torch>=2.0"]
+jax = ["omnibias-fields[jax]", "omnibias-jax>=0.2.0", "jax>=0.4.30", "jaxlib>=0.4.30"]
+# The discontinuity-capturing PartitionedField bridge (``omnibias.pinn.partition``)
+# is built on the alpha ``omnibias-partition`` keystone; it is an opt-in extra so a
+# default ``omnibias-pinn`` install never pulls an alpha prerelease.
+partition = ["omnibias-partition>=0.1.0a1"]
+# The Fredholm / Volterra residuals (``omnibias.pinn.{torch,jax}.equations.integral``)
+# take their quadrature from the alpha ``omnibias-measure`` package. Same reasoning
+# as ``partition``: opt-in, so a default install never pulls an alpha prerelease.
+integral = ["omnibias-measure>=0.1.0a1"]
+all = ["omnibias-pinn[torch,jax]"]
+test = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    "numpy>=1.24",
+]
+dev = [
+    "omnibias-pinn[all,integral,partition,test]",
+    "ruff>=0.1.0",
+    "mypy>=1.5",
+]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.pinn" = ["py.typed"]

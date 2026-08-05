@@ -1,0 +1,20 @@
+line-length = 100
+target-version = "py310"
+extend-exclude = [
+    "research",
+    "experiments",
+    "results",
+    "logs",
+    "data",
+    "docs/site",
+    "pyproject.toml.v0.1.0.bak",
+]
+
+[lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]
+
+[lint.per-file-ignores]
+"tests/**" = ["E402", "F401"]
+"packages/*/tests/**" = ["E402", "F401"]
+"packages/omnibias-*/src/omnibias/*/__init__.py" = ["F401"]

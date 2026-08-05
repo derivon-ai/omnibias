@@ -1,0 +1,57 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-formal"
+version = "0.1.0a1"
+description = "Mathlib-backed formal checker for omnibias certificates: drives the formal/omnibias-analytic Lean project to discharge a certificate's rational/real finite obligations, reporting a `mathlib_verified` tier distinct from (and never conflated with) the Mathlib-free minimal kernel's `theorem_prover_verified`."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = [
+    "formal-methods",
+    "theorem-proving",
+    "lean4",
+    "mathlib",
+    "certificate-checking",
+    "computer-assisted-proof",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["omnibias-core>=0.2.0"]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+dev = ["omnibias-formal[test]", "ruff>=0.1.0", "mypy>=1.5"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.formal" = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true

@@ -1,0 +1,26 @@
+# Authored-strict module allowlist for the curated beta packages
+# (omnibias-fields / omnibias-geometry).
+#
+# These packages are NOT on the blanket `mypy --strict` gate: their
+# bulk-copied torch/jax field-operator modules carry systematic
+# `no-any-return` / `type-arg` findings (see AGENTS.md; a tracked
+# strict-typing follow-up). The foundational, pure-Python `_core` substrate is authored
+# strict-clean, so it is gated here as an incremental, growing strict surface.
+#
+# The `mypy_curated_beta` CI job checks exactly these files with
+# `--strict --follow-imports=silent`, so dependency churn in the (ungated)
+# backend-ops modules cannot leak errors into this gate. Add a module here
+# once `python -m mypy --strict --follow-imports=silent <file>` is clean.
+packages/omnibias-fields/src/omnibias/fields/__init__.py
+packages/omnibias-fields/src/omnibias/fields/_core/__init__.py
+packages/omnibias-fields/src/omnibias/fields/_core/catalog.py
+packages/omnibias-fields/src/omnibias/fields/_core/coords.py
+packages/omnibias-fields/src/omnibias/fields/_core/ops_registry.py
+packages/omnibias-fields/src/omnibias/fields/_core/quadrature.py
+packages/omnibias-fields/src/omnibias/fields/_core/sigma_cache.py
+packages/omnibias-geometry/src/omnibias/geometry/__init__.py
+packages/omnibias-geometry/src/omnibias/geometry/_core/__init__.py
+packages/omnibias-geometry/src/omnibias/geometry/_core/charts.py
+packages/omnibias-geometry/src/omnibias/geometry/_core/forms.py
+packages/omnibias-geometry/src/omnibias/geometry/_core/integration_core.py
+packages/omnibias-geometry/src/omnibias/geometry/_core/manifold.py

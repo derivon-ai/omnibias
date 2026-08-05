@@ -1,0 +1,1655 @@
+{
+  "schema": "omnibias-struct/refinement-sweep/v1",
+  "generated_utc": "2026-07-28T04:00:13Z",
+  "hardware_class": "commodity x86-64 CPU node (float64; no GPU required)",
+  "python": "3.11.0",
+  "package_version": "0.1.0a1",
+  "config": {
+    "seeds": 24,
+    "betas": [
+      1.0,
+      4.0,
+      16.0,
+      64.0,
+      256.0,
+      1000.0,
+      10000.0,
+      100000.0,
+      1000000.0
+    ],
+    "sizes": {
+      "viterbi": [
+        {
+          "T": 4,
+          "S": 3
+        },
+        {
+          "T": 16,
+          "S": 6
+        },
+        {
+          "T": 48,
+          "S": 12
+        },
+        {
+          "T": 96,
+          "S": 16
+        }
+      ],
+      "shortest_path": [
+        {
+          "n": 5
+        },
+        {
+          "n": 9
+        },
+        {
+          "n": 14
+        },
+        {
+          "n": 20
+        }
+      ],
+      "ctc": [
+        {
+          "T": 4,
+          "C": 3
+        },
+        {
+          "T": 16,
+          "C": 6
+        },
+        {
+          "T": 48,
+          "C": 12
+        },
+        {
+          "T": 96,
+          "C": 16
+        }
+      ]
+    },
+    "backends": [
+      "torch",
+      "jax"
+    ],
+    "size_ladder": "full",
+    "beta_ladder": "full"
+  },
+  "totals": {
+    "records": 21048,
+    "passed": 21048,
+    "failed": 0,
+    "pass_rate": 1.0
+  },
+  "highlights": {
+    "worst_parity_abs_diff": 5.684341886080802e-14,
+    "worst_marginal_vs_autodiff_diff": 3.410605713405346e-07,
+    "worst_marginal_norm_err": 3.410605713405346e-07,
+    "worst_oracle_abs_diff": 8.881784197001252e-16,
+    "worst_path_count_log_err": 2.220446049250313e-16,
+    "gap_tightness_ratio": {
+      "min": 0.0,
+      "max": 0.7986785013571873
+    },
+    "log_count_max": 4.394449154672439,
+    "beta_max": 1000000.0
+  },
+  "aggregates": [
+    {
+      "probe": "beta_stability",
+      "problem": "ctc",
+      "backend": "jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"C\": 12, \"T\": 48}",
+        "{\"C\": 16, \"T\": 96}",
+        "{\"C\": 3, \"T\": 4}",
+        "{\"C\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "value": {
+          "min": -297.5191019813332,
+          "mean": -109.58104266725549,
+          "max": -0.4825785516316597,
+          "n": 864
+        },
+        "value_finite": {
+          "min": 1.0,
+          "mean": 1.0,
+          "max": 1.0,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "beta_stability",
+      "problem": "ctc",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"C\": 12, \"T\": 48}",
+        "{\"C\": 16, \"T\": 96}",
+        "{\"C\": 3, \"T\": 4}",
+        "{\"C\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "value": {
+          "min": -297.5191019813332,
+          "mean": -109.58104266725549,
+          "max": -0.4825785516316597,
+          "n": 864
+        },
+        "value_finite": {
+          "min": 1.0,
+          "mean": 1.0,
+          "max": 1.0,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "beta_stability",
+      "problem": "shortest_path",
+      "backend": "jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 14}",
+        "{\"n\": 20}",
+        "{\"n\": 5}",
+        "{\"n\": 9}"
+      ],
+      "metrics": {
+        "value": {
+          "min": -3.2771035976234124,
+          "mean": 0.9692752959127996,
+          "max": 4.132460839168438,
+          "n": 864
+        },
+        "value_finite": {
+          "min": 1.0,
+          "mean": 1.0,
+          "max": 1.0,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "beta_stability",
+      "problem": "shortest_path",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 14}",
+        "{\"n\": 20}",
+        "{\"n\": 5}",
+        "{\"n\": 9}"
+      ],
+      "metrics": {
+        "value": {
+          "min": -3.2771035976234124,
+          "mean": 0.9692752959127996,
+          "max": 4.132460839168438,
+          "n": 864
+        },
+        "value_finite": {
+          "min": 1.0,
+          "mean": 1.0,
+          "max": 1.0,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "beta_stability",
+      "problem": "viterbi",
+      "backend": "jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"S\": 12, \"T\": 48}",
+        "{\"S\": 16, \"T\": 96}",
+        "{\"S\": 3, \"T\": 4}",
+        "{\"S\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "marginal_sum_err": {
+          "min": 0.0,
+          "mean": 8.600978916352883e-09,
+          "max": 3.410605713405346e-07,
+          "n": 864
+        },
+        "value": {
+          "min": -0.52584553018445,
+          "mean": 111.61633635157919,
+          "max": 367.43262762944534,
+          "n": 864
+        },
+        "value_finite": {
+          "min": 1.0,
+          "mean": 1.0,
+          "max": 1.0,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "beta_stability",
+      "problem": "viterbi",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"S\": 12, \"T\": 48}",
+        "{\"S\": 16, \"T\": 96}",
+        "{\"S\": 3, \"T\": 4}",
+        "{\"S\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "marginal_sum_err": {
+          "min": 0.0,
+          "mean": 8.600978943208972e-09,
+          "max": 3.410605713405346e-07,
+          "n": 864
+        },
+        "value": {
+          "min": -0.52584553018445,
+          "mean": 111.61633635157919,
+          "max": 367.43262762944534,
+          "n": 864
+        },
+        "value_finite": {
+          "min": 1.0,
+          "mean": 1.0,
+          "max": 1.0,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "entropy",
+      "problem": "operators",
+      "backend": "jax",
+      "count": 168,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n_edges\": 22}"
+      ],
+      "metrics": {
+        "closed": {
+          "min": -3.694378136742671e-08,
+          "mean": 0.27766925943017196,
+          "max": 1.8660044624978323,
+          "n": 168
+        },
+        "exact": {
+          "min": -0.0,
+          "mean": 0.2776692579382954,
+          "max": 1.8660044624978325,
+          "n": 168
+        },
+        "id_tol": {
+          "min": 1e-08,
+          "mean": 4.203558077393349e-08,
+          "max": 2.220446049250313e-07,
+          "n": 168
+        },
+        "identity_err": {
+          "min": 0.0,
+          "mean": 2.4505145370316793e-09,
+          "max": 1.3780532270857293e-07,
+          "n": 168
+        },
+        "mc": {
+          "min": -8.881784197001252e-12,
+          "mean": 0.27713225173043377,
+          "max": 1.8703820580658352,
+          "n": 168
+        },
+        "mc_err": {
+          "min": 0.0,
+          "mean": 0.002793600808104756,
+          "max": 0.028223052032537527,
+          "n": 168
+        }
+      }
+    },
+    {
+      "probe": "entropy",
+      "problem": "operators",
+      "backend": "torch",
+      "count": 168,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n_edges\": 22}"
+      ],
+      "metrics": {
+        "closed": {
+          "min": -3.694378136742671e-08,
+          "mean": 0.27766925943018894,
+          "max": 1.8660044624978325,
+          "n": 168
+        },
+        "exact": {
+          "min": -0.0,
+          "mean": 0.2776692579382954,
+          "max": 1.8660044624978325,
+          "n": 168
+        },
+        "id_tol": {
+          "min": 1e-08,
+          "mean": 4.203558077393349e-08,
+          "max": 2.220446049250313e-07,
+          "n": 168
+        },
+        "identity_err": {
+          "min": 0.0,
+          "mean": 2.450508244795527e-09,
+          "max": 1.3780088181647443e-07,
+          "n": 168
+        },
+        "mc": {
+          "min": -8.881784197001252e-12,
+          "mean": 0.27713225173043377,
+          "max": 1.8703820580658352,
+          "n": 168
+        },
+        "mc_err": {
+          "min": 0.0,
+          "mean": 0.002793600808104756,
+          "max": 0.028223052032537527,
+          "n": 168
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "align_affine",
+      "backend": "jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"la\": 4, \"lb\": 3}"
+      ],
+      "metrics": {
+        "hard": {
+          "min": -3.656950928739735,
+          "mean": -0.26371918721835813,
+          "max": 4.612958720810246,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.2251240722317624,
+          "max": 3.127552646771673,
+          "n": 216
+        },
+        "soft": {
+          "min": -3.6569498301274463,
+          "mean": -0.03859511498659576,
+          "max": 4.873430908751328,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "align_affine",
+      "backend": "torch",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"la\": 4, \"lb\": 3}"
+      ],
+      "metrics": {
+        "hard": {
+          "min": -3.656950928739735,
+          "mean": -0.26371918721835813,
+          "max": 4.612958720810246,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.2251240722317624,
+          "max": 3.127552646771673,
+          "n": 216
+        },
+        "soft": {
+          "min": -3.6569498301274463,
+          "mean": -0.03859511498659576,
+          "max": 4.873430908751328,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "align_local",
+      "backend": "jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"la\": 4, \"lb\": 3}"
+      ],
+      "metrics": {
+        "hard": {
+          "min": 0.10970639932180819,
+          "mean": 1.6283678429523054,
+          "max": 5.912958720810247,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.47170051858602274,
+          "max": 4.650201906971482,
+          "n": 216
+        },
+        "soft": {
+          "min": 0.10970749793409686,
+          "mean": 2.1000683615383284,
+          "max": 7.387843579338137,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "align_local",
+      "backend": "torch",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"la\": 4, \"lb\": 3}"
+      ],
+      "metrics": {
+        "hard": {
+          "min": 0.10970639932180819,
+          "mean": 1.6283678429523054,
+          "max": 5.912958720810247,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.47170051858602274,
+          "max": 4.650201906971482,
+          "n": 216
+        },
+        "soft": {
+          "min": 0.10970749793409686,
+          "mean": 2.1000683615383284,
+          "max": 7.387843579338137,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "ctc",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"C\": 12, \"T\": 48}",
+        "{\"C\": 16, \"T\": 96}",
+        "{\"C\": 3, \"T\": 4}",
+        "{\"C\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 2.7080502011022102e-06,
+          "mean": 1.4139161610130673,
+          "max": 15.099849709894386,
+          "n": 864
+        },
+        "num_paths": {
+          "min": 15.0,
+          "mean": 961413.75,
+          "max": 3612280.0,
+          "n": 864
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.3986750786301084,
+          "max": 5.955286570947493,
+          "n": 864
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.05860241985133209,
+          "max": 0.7613102036357964,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "eisner",
+      "backend": "jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 2.4849066497880003e-06,
+          "mean": 0.368081560237593,
+          "max": 2.4849066497880004,
+          "n": 216
+        },
+        "num_paths": {
+          "min": 12.0,
+          "mean": 12.0,
+          "max": 12.0,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.13338910693559575,
+          "max": 1.6456364937965935,
+          "n": 216
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.07592826371252495,
+          "max": 0.6622528431548891,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "eisner",
+      "backend": "torch",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 2.4849066497880003e-06,
+          "mean": 0.368081560237593,
+          "max": 2.4849066497880004,
+          "n": 216
+        },
+        "num_paths": {
+          "min": 12.0,
+          "mean": 12.0,
+          "max": 12.0,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.13338910693559575,
+          "max": 1.6456364937965935,
+          "n": 216
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.07592826371252495,
+          "max": 0.6622528431548891,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "mtt",
+      "backend": "jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 2.772588722239781e-06,
+          "mean": 0.41069501861015184,
+          "max": 2.772588722239781,
+          "n": 216
+        },
+        "num_paths": {
+          "min": 16.0,
+          "mean": 16.0,
+          "max": 16.0,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.027599873137260082,
+          "max": 0.5162974544894405,
+          "n": 216
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.009959346511709752,
+          "max": 0.18621494430387778,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "mtt",
+      "backend": "torch",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 2.772588722239781e-06,
+          "mean": 0.41069501861015184,
+          "max": 2.772588722239781,
+          "n": 216
+        },
+        "num_paths": {
+          "min": 16.0,
+          "mean": 16.0,
+          "max": 16.0,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.027599873137260086,
+          "max": 0.5162974544894405,
+          "n": 216
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.009959346511709754,
+          "max": 0.18621494430387778,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "parse",
+      "backend": "jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"L\": 3, \"R\": 2}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 2.0794415416798356e-06,
+          "mean": 0.30802126395761387,
+          "max": 2.0794415416798357,
+          "n": 216
+        },
+        "num_paths": {
+          "min": 8.0,
+          "mean": 8.0,
+          "max": 8.0,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.09563899708214572,
+          "max": 1.4041590125299352,
+          "n": 216
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.05543069102632258,
+          "max": 0.6752577479988272,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "parse",
+      "backend": "torch",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"L\": 3, \"R\": 2}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 2.0794415416798356e-06,
+          "mean": 0.30802126395761387,
+          "max": 2.0794415416798357,
+          "n": 216
+        },
+        "num_paths": {
+          "min": 8.0,
+          "mean": 8.0,
+          "max": 8.0,
+          "n": 216
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.09563899708214572,
+          "max": 1.4041590125299352,
+          "n": 216
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.05543069102632258,
+          "max": 0.6752577479988272,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "shortest_path",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 14}",
+        "{\"n\": 20}",
+        "{\"n\": 5}",
+        "{\"n\": 9}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 6.931471805599452e-07,
+          "mean": 0.7557563701041606,
+          "max": 10.375738654322342,
+          "n": 864
+        },
+        "num_paths": {
+          "min": 2.0,
+          "mean": 3386.8645833333335,
+          "max": 32072.0,
+          "n": 864
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 0.20525856320561986,
+          "max": 4.375349466148017,
+          "n": 864
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.04858569102897241,
+          "max": 0.7986785013571873,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "gap_tightness",
+      "problem": "viterbi",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"S\": 12, \"T\": 48}",
+        "{\"S\": 16, \"T\": 96}",
+        "{\"S\": 3, \"T\": 4}",
+        "{\"S\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "bound": {
+          "min": 4.394449154672439e-06,
+          "mean": 15.498024442767496,
+          "max": 266.168517335019,
+          "n": 864
+        },
+        "num_paths": {
+          "min": 81.0,
+          "mean": 9.85050154909862e+114,
+          "max": 3.940200619639448e+115,
+          "n": 864
+        },
+        "realized_gap": {
+          "min": 0.0,
+          "mean": 3.844642223118053,
+          "max": 99.85013507745794,
+          "n": 864
+        },
+        "tightness_ratio": {
+          "min": 0.0,
+          "mean": 0.043269451286448615,
+          "max": 0.6478142680480485,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "kbest",
+      "problem": "operators",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"k\": 5, \"n_edges\": 22}"
+      ],
+      "metrics": {
+        "max_score_diff": {
+          "min": 0.0,
+          "mean": 3.2150208421436826e-16,
+          "max": 8.881784197001252e-16,
+          "n": 24
+        },
+        "n_returned": {
+          "min": 5.0,
+          "mean": 5.0,
+          "max": 5.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "ctc",
+      "backend": "jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"C\": 12, \"T\": 48}",
+        "{\"C\": 16, \"T\": 96}",
+        "{\"C\": 3, \"T\": 4}",
+        "{\"C\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 6.301703748265647e-09,
+          "max": 2.8421713471615817e-07,
+          "n": 864
+        },
+        "norm_err": {
+          "min": 0.0,
+          "mean": 6.301705215777459e-09,
+          "max": 2.8421713471615817e-07,
+          "n": 864
+        },
+        "tol": {
+          "min": 1e-09,
+          "mean": 7.25483277838729e-08,
+          "max": 1.3642420526593924e-06,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "ctc",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"C\": 12, \"T\": 48}",
+        "{\"C\": 16, \"T\": 96}",
+        "{\"C\": 3, \"T\": 4}",
+        "{\"C\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 6.301703747558908e-09,
+          "max": 2.8421713471615817e-07,
+          "n": 864
+        },
+        "norm_err": {
+          "min": 0.0,
+          "mean": 6.301705216291451e-09,
+          "max": 2.8421713471615817e-07,
+          "n": 864
+        },
+        "tol": {
+          "min": 1e-09,
+          "mean": 7.25483277838729e-08,
+          "max": 1.3642420526593924e-06,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "eisner",
+      "backend": "jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 2.5191618852677462e-11,
+          "max": 8.881784197001252e-10,
+          "n": 216
+        },
+        "tol": {
+          "min": 1e-08,
+          "mean": 1.8362792032356894e-08,
+          "max": 8.526512829121202e-08,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "eisner",
+      "backend": "torch",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 2.5191616282716757e-11,
+          "max": 8.881784197001252e-10,
+          "n": 216
+        },
+        "tol": {
+          "min": 1e-08,
+          "mean": 1.8362792032356894e-08,
+          "max": 8.526512829121202e-08,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "mtt",
+      "backend": "jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 4.1744439338993735e-17,
+          "max": 3.3306690738754696e-16,
+          "n": 216
+        },
+        "tol": {
+          "min": 1e-07,
+          "mean": 1e-07,
+          "max": 1e-07,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "mtt",
+      "backend": "torch",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 3.5996641503781755e-17,
+          "max": 3.3306690738754696e-16,
+          "n": 216
+        },
+        "tol": {
+          "min": 1e-07,
+          "mean": 1e-07,
+          "max": 1e-07,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "parse",
+      "backend": "jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"L\": 3, \"R\": 2}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 3.4316368162727954e-11,
+          "max": 1.3322676295501878e-09,
+          "n": 216
+        },
+        "tol": {
+          "min": 1e-08,
+          "mean": 1.8362792032356894e-08,
+          "max": 8.526512829121202e-08,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "parse",
+      "backend": "torch",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"L\": 3, \"R\": 2}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 3.431636713474367e-11,
+          "max": 1.3322676295501878e-09,
+          "n": 216
+        },
+        "tol": {
+          "min": 1e-08,
+          "mean": 1.8362792032356894e-08,
+          "max": 8.526512829121202e-08,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "shortest_path",
+      "backend": "jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 14}",
+        "{\"n\": 20}",
+        "{\"n\": 5}",
+        "{\"n\": 9}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 5.787500181066835e-12,
+          "max": 8.881784197001252e-10,
+          "n": 864
+        },
+        "norm_err": {
+          "min": 0.0,
+          "mean": 5.733518341169933e-12,
+          "max": 8.881784197001252e-10,
+          "n": 864
+        },
+        "tol": {
+          "min": 1e-09,
+          "mean": 2.1706772124727852e-08,
+          "max": 2.842170943040401e-07,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "shortest_path",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 14}",
+        "{\"n\": 20}",
+        "{\"n\": 5}",
+        "{\"n\": 9}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 5.7874975428414254e-12,
+          "max": 8.881784197001252e-10,
+          "n": 864
+        },
+        "norm_err": {
+          "min": 0.0,
+          "mean": 5.733516285201369e-12,
+          "max": 8.881784197001252e-10,
+          "n": 864
+        },
+        "tol": {
+          "min": 1e-09,
+          "mean": 2.1706772124727852e-08,
+          "max": 2.842170943040401e-07,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "viterbi",
+      "backend": "jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"S\": 12, \"T\": 48}",
+        "{\"S\": 16, \"T\": 96}",
+        "{\"S\": 3, \"T\": 4}",
+        "{\"S\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 8.600973547833468e-09,
+          "max": 3.410605713405346e-07,
+          "n": 864
+        },
+        "norm_err": {
+          "min": 0.0,
+          "mean": 8.600978916352883e-09,
+          "max": 3.410605713405346e-07,
+          "n": 864
+        },
+        "tol": {
+          "min": 1e-09,
+          "mean": 7.25483277838729e-08,
+          "max": 1.3642420526593924e-06,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "marginals_vs_autodiff",
+      "problem": "viterbi",
+      "backend": "torch",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"S\": 12, \"T\": 48}",
+        "{\"S\": 16, \"T\": 96}",
+        "{\"S\": 3, \"T\": 4}",
+        "{\"S\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 8.600973465466227e-09,
+          "max": 3.410605713405346e-07,
+          "n": 864
+        },
+        "norm_err": {
+          "min": 0.0,
+          "mean": 8.600978943208972e-09,
+          "max": 3.410605713405346e-07,
+          "n": 864
+        },
+        "tol": {
+          "min": 1e-09,
+          "mean": 7.25483277838729e-08,
+          "max": 1.3642420526593924e-06,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "oracle_agreement",
+      "problem": "align_affine",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"la\": 4, \"lb\": 3}"
+      ],
+      "metrics": {
+        "abs_diff": {
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "oracle_agreement",
+      "problem": "align_local",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"la\": 4, \"lb\": 3}"
+      ],
+      "metrics": {
+        "abs_diff": {
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "oracle_agreement",
+      "problem": "ctc",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"C\": 3, \"T\": 4}"
+      ],
+      "metrics": {
+        "abs_diff": {
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "oracle_agreement",
+      "problem": "eisner",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "abs_diff": {
+          "min": 0.0,
+          "mean": 4.625929269271485e-18,
+          "max": 1.1102230246251565e-16,
+          "n": 24
+        },
+        "count": {
+          "min": 12.0,
+          "mean": 12.0,
+          "max": 12.0,
+          "n": 24
+        },
+        "enum": {
+          "min": 12.0,
+          "mean": 12.0,
+          "max": 12.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "oracle_agreement",
+      "problem": "mtt",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "abs_diff": {
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "oracle_agreement",
+      "problem": "parse",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"L\": 3, \"R\": 2}"
+      ],
+      "metrics": {
+        "abs_diff": {
+          "min": 0.0,
+          "mean": 5.551115123125783e-17,
+          "max": 8.881784197001252e-16,
+          "n": 24
+        },
+        "count": {
+          "min": 8.0,
+          "mean": 8.0,
+          "max": 8.0,
+          "n": 24
+        },
+        "enum": {
+          "min": 8.0,
+          "mean": 8.0,
+          "max": 8.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "oracle_agreement",
+      "problem": "shortest_path",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 5}"
+      ],
+      "metrics": {
+        "abs_diff": {
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "oracle_agreement",
+      "problem": "viterbi",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"S\": 3, \"T\": 4}"
+      ],
+      "metrics": {
+        "abs_diff": {
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "parity",
+      "problem": "align_affine",
+      "backend": "torch|jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"la\": 4, \"lb\": 3}"
+      ],
+      "metrics": {
+        "value_abs_diff": {
+          "min": 0.0,
+          "mean": 5.13992141030165e-19,
+          "max": 1.1102230246251565e-16,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "parity",
+      "problem": "align_local",
+      "backend": "torch|jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"la\": 4, \"lb\": 3}"
+      ],
+      "metrics": {
+        "value_abs_diff": {
+          "min": 0.0,
+          "mean": 9.573103626686824e-18,
+          "max": 8.881784197001252e-16,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "parity",
+      "problem": "ctc",
+      "backend": "torch|jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"C\": 12, \"T\": 48}",
+        "{\"C\": 16, \"T\": 96}",
+        "{\"C\": 3, \"T\": 4}",
+        "{\"C\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "value_abs_diff": {
+          "min": 0.0,
+          "mean": 2.569960705150825e-19,
+          "max": 2.220446049250313e-16,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "parity",
+      "problem": "eisner",
+      "backend": "torch|jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "value_abs_diff": {
+          "min": 0.0,
+          "mean": 2.05596856412066e-18,
+          "max": 4.440892098500626e-16,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "parity",
+      "problem": "mtt",
+      "backend": "torch|jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 3}"
+      ],
+      "metrics": {
+        "value_abs_diff": {
+          "min": 0.0,
+          "mean": 4.11193712824132e-18,
+          "max": 8.881784197001252e-16,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "parity",
+      "problem": "parse",
+      "backend": "torch|jax",
+      "count": 216,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"L\": 3, \"R\": 2}"
+      ],
+      "metrics": {
+        "value_abs_diff": {
+          "min": 0.0,
+          "mean": 2.569960705150825e-18,
+          "max": 4.440892098500626e-16,
+          "n": 216
+        }
+      }
+    },
+    {
+      "probe": "parity",
+      "problem": "shortest_path",
+      "backend": "torch|jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 14}",
+        "{\"n\": 20}",
+        "{\"n\": 5}",
+        "{\"n\": 9}"
+      ],
+      "metrics": {
+        "value_abs_diff": {
+          "min": 0.0,
+          "mean": 8.480870326997724e-18,
+          "max": 4.440892098500626e-16,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "parity",
+      "problem": "viterbi",
+      "backend": "torch|jax",
+      "count": 864,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"S\": 12, \"T\": 48}",
+        "{\"S\": 16, \"T\": 96}",
+        "{\"S\": 3, \"T\": 4}",
+        "{\"S\": 6, \"T\": 16}"
+      ],
+      "metrics": {
+        "value_abs_diff": {
+          "min": 0.0,
+          "mean": 3.618504672852362e-16,
+          "max": 5.684341886080802e-14,
+          "n": 864
+        }
+      }
+    },
+    {
+      "probe": "path_count",
+      "problem": "ctc",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"T\": 4}"
+      ],
+      "metrics": {
+        "abs_err": {
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0,
+          "n": 24
+        },
+        "count": {
+          "min": 15.0,
+          "mean": 15.0,
+          "max": 15.0,
+          "n": 24
+        },
+        "log_count_exact": {
+          "min": 2.70805020110221,
+          "mean": 2.70805020110221,
+          "max": 2.70805020110221,
+          "n": 24
+        },
+        "log_count_ref": {
+          "min": 2.70805020110221,
+          "mean": 2.70805020110221,
+          "max": 2.70805020110221,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "path_count",
+      "problem": "shortest_path",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n\": 5}"
+      ],
+      "metrics": {
+        "abs_err": {
+          "min": 0.0,
+          "mean": 4.625929269271486e-17,
+          "max": 2.220446049250313e-16,
+          "n": 24
+        },
+        "count": {
+          "min": 2.0,
+          "mean": 4.583333333333333,
+          "max": 7.0,
+          "n": 24
+        },
+        "log_count_exact": {
+          "min": 0.6931471805599453,
+          "mean": 1.4721995468980955,
+          "max": 1.9459101490553132,
+          "n": 24
+        },
+        "log_count_ref": {
+          "min": 0.6931471805599453,
+          "mean": 1.4721995468980953,
+          "max": 1.9459101490553132,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "path_count",
+      "problem": "viterbi",
+      "backend": "numpy",
+      "count": 24,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"S\": 3, \"T\": 4}"
+      ],
+      "metrics": {
+        "abs_err": {
+          "min": 0.0,
+          "mean": 0.0,
+          "max": 0.0,
+          "n": 24
+        },
+        "count": {
+          "min": 81.0,
+          "mean": 81.0,
+          "max": 81.0,
+          "n": 24
+        },
+        "log_count_exact": {
+          "min": 4.394449154672439,
+          "mean": 4.394449154672439,
+          "max": 4.394449154672439,
+          "n": 24
+        },
+        "log_count_ref": {
+          "min": 4.394449154672439,
+          "mean": 4.394449154672439,
+          "max": 4.394449154672439,
+          "n": 24
+        }
+      }
+    },
+    {
+      "probe": "sampling",
+      "problem": "operators",
+      "backend": "jax",
+      "count": 168,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n_edges\": 22, \"num\": 20000}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 0.0010732429888119159,
+          "max": 0.010440271079359631,
+          "n": 168
+        }
+      }
+    },
+    {
+      "probe": "sampling",
+      "problem": "operators",
+      "backend": "torch",
+      "count": 168,
+      "pass_rate": 1.0,
+      "sizes": [
+        "{\"n_edges\": 22, \"num\": 20000}"
+      ],
+      "metrics": {
+        "max_abs_diff": {
+          "min": 0.0,
+          "mean": 0.0010732429888119172,
+          "max": 0.010440271079359575,
+          "n": 168
+        }
+      }
+    }
+  ],
+  "wall_seconds": 6457.07
+}

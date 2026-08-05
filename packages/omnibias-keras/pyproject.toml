@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-keras"
+version = "0.0.1a1"
+description = "Keras 3 unified backend for omnibias: closed-form n-th derivative scalar operators (OMBU), operator-typed blocks, and drop-in cmbDense / cmbConv layers that run on TensorFlow, JAX, or PyTorch via keras.ops."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = [
+    "deep-learning",
+    "keras",
+    "tensorflow",
+    "jax",
+    "pytorch",
+    "activation-functions",
+    "operator-learning",
+    "closed-form-derivatives",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+    "Typing :: Typed",
+]
+dependencies = [
+    "omnibias-core>=0.2.0",
+    "keras>=3.0",
+    "numpy>=1.23",
+]
+
+[project.optional-dependencies]
+tf = ["tensorflow>=2.16"]
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30"]
+torch = ["torch>=2.0"]
+test = ["pytest>=7.0", "pytest-cov>=4.0", "numpy>=1.24"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:torch.*",
+    "ignore::DeprecationWarning:jax.*",
+    # NumPy 2.x <-> framework __array__ copy-keyword deprecation. This is a
+    # third-party interaction (Keras converting a backend tensor to NumPy),
+    # not omnibias code, so we do not let it fail the suite.
+    "ignore:.*__array__ implementation doesn't accept a copy keyword.*:DeprecationWarning",
+]
+markers = [
+    "slow_gpu: marks tests that require a GPU and are skipped in CI",
+    "gpu: marks tests that require GPU",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.keras" = ["py.typed"]

@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-control"
+version = "0.1.0a1"
+description = "Differentiable control for omnibias with a model-relative safety certificate: a batched, per-sample control-barrier-function (CBF-QP) safety filter (temperature-collapse projection), autodiff Lie-derivative CBF-row builders for generic control-affine and learned-Lagrangian dynamics, and a model-relative recoverable-set certificate (jax + torch)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = ["control-barrier-function", "safe-control", "cbf-qp", "safety-filter", "differentiable-optimization", "lagrangian-neural-network", "verified-numerics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["omnibias-core>=0.2.0", "numpy>=1.24"]
+
+[project.optional-dependencies]
+torch = ["torch>=2.0", "omnibias-torch>=0.2.0"]
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
+# learned-Lagrangian CBF builders reuse omnibias-variational; the certificate
+# reuses omnibias-verify. Both are optional (only needed for those helpers).
+lagrangian = ["omnibias-variational>=0.1.0a1"]
+verify = ["omnibias-verify>=0.1.0a1"]
+all = ["omnibias-control[torch,jax,lagrangian,verify]"]
+test = ["pytest>=7.0", "numpy>=1.24"]
+dev = ["omnibias-control[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.control" = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+files = ["src/omnibias/control"]

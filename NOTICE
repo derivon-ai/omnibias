@@ -1,0 +1,61 @@
+omnibias
+Copyright (C) 2026 Derivon
+
+omnibias was founded and authored by Vardan Grigoryants.
+Copyright is held by Derivon.
+
+------------------------------------------------------------------------------
+TWO LICENCE TIERS -- READ THIS BEFORE ASSUMING
+------------------------------------------------------------------------------
+
+omnibias ships as 42 separate distributions and they are NOT all under the
+same licence. LICENSING.md is authoritative; the table below is a summary.
+
+  Tier P -- permissive (28 distributions)
+    SPDX: Apache-2.0
+    The derivative tower and everything built directly on it: omnibias-core,
+    -torch, -jax, -keras, -fields, -ferminet, -pinn, -qpinn, -geometry,
+    -curvature, -symbolic, -score, -measure, -fractional, -variational,
+    -difference, -qcalculus, -timescale, -holonomic, -binary, -boolean,
+    -spiking, -hopfield, -struct, -graph, -partition, -shape, -skills.
+
+    Usable in closed-source and hosted products with no copyleft obligation.
+    A commercial licence is NEVER required for these.
+
+  Tier C -- copyleft, dual-licensed (14 distributions)
+    SPDX: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
+    The certified-decision layer: omnibias-verify, -formal, -sos, -dynamics,
+    -convex, -discrete, -qubo, -logic, -nphard, -submodular, -combinatorics,
+    -routing, -tab, -control.
+
+    Available under EITHER:
+      1. the GNU Affero General Public License v3.0 or later, whose copyleft
+         and network-use (Section 13) obligations then apply; OR
+      2. a separate signed commercial licence from Derivon, which removes
+         those obligations. See LICENSING.md and COMMERCIAL-LICENSE.md.
+
+    To obtain a commercial licence, contact info@derivon.ai.
+
+No Tier-P distribution depends on a Tier-C distribution, through required or
+optional dependencies. This is enforced in CI, so installing a permissive
+package never pulls copyleft code into your dependency tree.
+
+The repository-root LICENSE file is the AGPL so that automated licence
+detectors report the strongest licence present in the tree. It does not
+override the LICENSE file shipped inside each distribution, which states that
+distribution's actual terms. Full licence texts are in LICENSES/.
+
+------------------------------------------------------------------------------
+WARRANTY
+------------------------------------------------------------------------------
+
+This software is distributed WITHOUT ANY WARRANTY; without even the implied
+warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, under either
+tier. See the applicable licence text for the governing disclaimer.
+
+------------------------------------------------------------------------------
+TRADEMARKS
+------------------------------------------------------------------------------
+
+"omnibias" and the omnibias logo are trademarks of Derivon. See TRADEMARKS.md.
+Neither licence tier grants any right to use these marks.

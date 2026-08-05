@@ -1,0 +1,152 @@
+{
+  "schema": "omnibias/derivative-order/v1",
+  "generated_utc": "2026-08-05T12:20:06Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "activation": "tanh",
+    "n_points": 20000,
+    "orders": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8
+    ],
+    "fd_step": 0.05,
+    "dtype": "float64"
+  },
+  "rss_mb_at_start": 852.91,
+  "rows": [
+    {
+      "n": 1,
+      "time_ms": {
+        "closed_form": 0.066,
+        "nested_autograd": 0.153
+      },
+      "speedup_vs_closed_form": 2.317,
+      "median_rel_error": {
+        "closed_form_vs_self": 0.0,
+        "nested_autograd": 1.5812594873578136e-16,
+        "finite_difference": 0.0012148691562316703,
+        "jax_vs_torch": 0.0
+      },
+      "max_abs_jax_vs_torch": 6.661338147750939e-16
+    },
+    {
+      "n": 2,
+      "time_ms": {
+        "closed_form": 0.0743,
+        "nested_autograd": 0.2935
+      },
+      "speedup_vs_closed_form": 3.951,
+      "median_rel_error": {
+        "closed_form_vs_self": 0.0,
+        "nested_autograd": 1.6386308188932586e-16,
+        "finite_difference": 0.002872209059692388,
+        "jax_vs_torch": 0.0
+      },
+      "max_abs_jax_vs_torch": 1.3183898417423734e-15
+    },
+    {
+      "n": 3,
+      "time_ms": {
+        "closed_form": 0.0706,
+        "nested_autograd": 0.3522
+      },
+      "speedup_vs_closed_form": 4.991,
+      "median_rel_error": {
+        "closed_form_vs_self": 0.0,
+        "nested_autograd": 5.640429550032239e-16,
+        "finite_difference": 0.004363514813103992,
+        "jax_vs_torch": 0.0
+      },
+      "max_abs_jax_vs_torch": 3.552713678800501e-15
+    },
+    {
+      "n": 4,
+      "time_ms": {
+        "closed_form": 0.0936,
+        "nested_autograd": 0.653
+      },
+      "speedup_vs_closed_form": 6.976,
+      "median_rel_error": {
+        "closed_form_vs_self": 0.0,
+        "nested_autograd": 1.706391144073062e-15,
+        "finite_difference": 0.006492398592687243,
+        "jax_vs_torch": 0.0
+      },
+      "max_abs_jax_vs_torch": 1.0574874309554616e-14
+    },
+    {
+      "n": 5,
+      "time_ms": {
+        "closed_form": 0.1017,
+        "nested_autograd": 1.746
+      },
+      "speedup_vs_closed_form": 17.176,
+      "median_rel_error": {
+        "closed_form_vs_self": 0.0,
+        "nested_autograd": 4.073679765376258e-15,
+        "finite_difference": 0.016840786501194433,
+        "jax_vs_torch": 0.0
+      },
+      "max_abs_jax_vs_torch": 5.3290705182007514e-14
+    },
+    {
+      "n": 6,
+      "time_ms": {
+        "closed_form": 0.1014,
+        "nested_autograd": 6.0561
+      },
+      "speedup_vs_closed_form": 59.729,
+      "median_rel_error": {
+        "closed_form_vs_self": 0.0,
+        "nested_autograd": 8.027208722269574e-15,
+        "finite_difference": 0.03398578772421302,
+        "jax_vs_torch": 1.2421272610624125e-16
+      },
+      "max_abs_jax_vs_torch": 3.380073998471289e-13
+    },
+    {
+      "n": 7,
+      "time_ms": {
+        "closed_form": 0.1011,
+        "nested_autograd": 18.1298
+      },
+      "speedup_vs_closed_form": 179.355,
+      "median_rel_error": {
+        "closed_form_vs_self": 0.0,
+        "nested_autograd": 2.42868661962265e-14,
+        "finite_difference": 0.05457173583316538,
+        "jax_vs_torch": 1.2183554337193983e-16
+      },
+      "max_abs_jax_vs_torch": 4.490630090003833e-12
+    },
+    {
+      "n": 8,
+      "time_ms": {
+        "closed_form": 0.1388,
+        "nested_autograd": 48.4259
+      },
+      "speedup_vs_closed_form": 348.812,
+      "median_rel_error": {
+        "closed_form_vs_self": 0.0,
+        "nested_autograd": 7.970744701602406e-14,
+        "finite_difference": 0.08307417300957862,
+        "jax_vs_torch": 1.734256478910983e-16
+      },
+      "max_abs_jax_vs_torch": 4.0669745349219966e-11
+    }
+  ]
+}

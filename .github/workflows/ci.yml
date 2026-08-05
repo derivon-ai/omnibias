@@ -1,0 +1,1837 @@
+name: ci
+
+on:
+  push:
+    branches: [main, develop, "release/**"]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+  # Weekly, for the jobs too heavy to run per pull request (the `slow` documents
+  # and the notebook smoke run).
+  schedule:
+    - cron: "17 4 * * 1"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: ruff + mypy (T1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install uv
+        uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5.4.2
+        with:
+          enable-cache: true
+          version: "0.5.x"
+      - run: uv sync --all-extras --dev
+      - run: uv run ruff check packages tests
+      # mypy --strict is scoped to the workspace (T1) packages here. The curated
+      # beta packages' authored-strict `_core` substrate (fields / geometry) is
+      # gated incrementally by the separate `mypy_curated_beta` job; the remaining
+      # extension packages' bulk-copied field-ops stay off the gate until
+      # refactored (tracked strict-typing follow-up).
+      - run: uv run mypy --strict packages/omnibias-core/src packages/omnibias-torch/src packages/omnibias-jax/src packages/omnibias-ferminet/src
+
+  links:
+    name: docs & markdown link check
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      # Offline link + image checker: verifies that every relative link and
+      # local image in the README, the root governance docs, and the docs/ tree
+      # resolves on disk. This is the guard that catches a missing figure (e.g.
+      # an un-generated docs/img/*.png) or a doc renamed out from under a link.
+      # External http(s) URLs are skipped (--offline) to keep the job
+      # deterministic and free of network flake.
+      - name: Link + image checker (lychee)
+        uses: lycheeverse/lychee-action@f613c4a64e50d792e0b31ec34bbcbba12263c6a6  # v2.3.0
+        with:
+          args: "--offline --no-progress '*.md' 'docs/**/*.md'"
+          fail: true
+
+  guards:
+    name: release guards (licence / placeholders / version / leakage)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      # Static, dependency-light release guards: most only read the tracked
+      # tree (no package import). omnibias-core is installed so
+      # test_all_resolves can import the public package and resolve __all__.
+      - run: |
+          pip install pytest
+          pip install -e packages/omnibias-core
+      - name: Legal-identity, version, leakage/secret, honesty, and packaging scans
+        run: |
+          python -m pytest \
+            packages/omnibias-core/tests/test_no_placeholders.py \
+            packages/omnibias-core/tests/test_version_consistency.py \
+            packages/omnibias-core/tests/test_no_leakage.py \
+            packages/omnibias-core/tests/test_concept_terminology.py \
+            packages/omnibias-core/tests/test_license_consistency.py \
+            packages/omnibias-core/tests/test_lineage_declared.py \
+            packages/omnibias-core/tests/test_all_sorted.py \
+            packages/omnibias-core/tests/test_all_resolves.py \
+            packages/omnibias-core/tests/test_py_typed.py \
+            -q
+      # The header of every file is derived from the licence-tier table, so a
+      # hand-written one is always either redundant or wrong. The test above
+      # asserts the invariant; this reports the exact fix command.
+      - name: SPDX headers match the licence tier table
+        run: python scripts/license_headers.py --check
+
+  mypy_curated_beta:
+    name: mypy --strict (curated beta substrate)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      # The curated beta packages (fields / geometry) are not on the blanket
+      # strict gate (bulk-copied torch/jax field-ops carry no-any-return /
+      # type-arg findings; a tracked strict-typing follow-up). Their foundational, pure-Python
+      # `_core` substrate IS authored strict-clean and is gated incrementally via
+      # scripts/mypy_strict_allowlist.txt (`--follow-imports=silent`).
+      - name: Install curated beta packages + mypy
+        run: |
+          python -m venv .venv-mypy-beta
+          source .venv-mypy-beta/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install "mypy>=1.5"
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e "packages/omnibias-fields[torch,jax]"
+          pip install -e "packages/omnibias-geometry[torch,jax]"
+      - name: Strict-check the authored-strict substrate allowlist
+        run: |
+          source .venv-mypy-beta/bin/activate
+          python scripts/mypy_strict_check.py
+
+  # Interpreter policy: 3.14 is the development target, 3.10 is the supported
+  # floor, and the three backend-bearing jobs (core / torch / jax) test the whole
+  # span so backward compatibility is measured rather than assumed. `ruff` and
+  # `mypy` deliberately target the *floor* (py310) in the lint job, so a 3.11+
+  # only construct is caught even when developing on 3.14. The single-version
+  # jobs below sit on 3.11 to keep the matrix affordable; the classifier guard in
+  # test_package_registry.py fails if this span and the advertised classifiers
+  # ever diverge.
+  core:
+    name: omnibias-core (no torch / no jax)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install (clean venv, core only)
+        run: |
+          python -m venv .venv-core
+          source .venv-core/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core[test]
+      - name: Run pure-Python tests (coverage floor)
+        run: |
+          source .venv-core/bin/activate
+          # Modest floor so regressions are caught without blocking a thin day;
+          # raise after the next coverage pass (see docs/ci-hardening.md).
+          # Scoped to omnibias.core: this job installs core only.
+          python -m pytest packages/omnibias-core/tests -x -q \
+            --cov=omnibias.core --cov-fail-under=60
+
+  torch:
+    name: omnibias-torch
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m venv .venv-torch
+          source .venv-torch/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch[test]
+      - name: Run torch tests
+        run: |
+          source .venv-torch/bin/activate
+          python -m pytest packages/omnibias-torch/tests -x -q
+
+  jax:
+    # JAX upstream may raise its floor (historically 3.10, then 3.11/3.12). If a
+    # matrix cell fails solely because jax/jaxlib has no wheel for that CPython,
+    # that is an upstream constraint, not an omnibias regression -- document and
+    # exclude the cell rather than loosening requires-python on omnibias-jax.
+    name: omnibias-jax
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m venv .venv-jax
+          source .venv-jax/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-jax[test]
+      - name: Run jax tests
+        run: |
+          source .venv-jax/bin/activate
+          python -m pytest packages/omnibias-jax/tests -x -q
+
+  ferminet:
+    name: omnibias-ferminet
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-fn
+          source .venv-fn/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-ferminet[test]
+      - name: Run ferminet bridge tests
+        run: |
+          source .venv-fn/bin/activate
+          python -m pytest packages/omnibias-ferminet/tests -x -q
+
+  cross_backend:
+    name: cross-backend parity (torch + jax)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-cross
+          source .venv-cross/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-ferminet
+          # Independent oracles for the closed-form integral transforms:
+          # measure supplies the quadrature and fractional the Lerch series.
+          # Both are test-only -- test_transforms_parity.py asserts that neither
+          # backend imports them -- but without them installed those checks would
+          # importorskip rather than run, which defeats the point of having them.
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-measure
+          pip install -e "packages/omnibias-fractional[torch]"
+          pip install pytest
+      - name: Run cross-backend parity tests
+        run: |
+          source .venv-cross/bin/activate
+          python -m pytest tests/ -x -q
+      - name: Run the closed-form integral-transform example (smoke)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/transforms_closed_form.py
+
+  pinn:
+    name: omnibias-pinn (beta)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-pinn
+          source .venv-pinn/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-partition
+          # Quadrature for the Fredholm / Volterra residuals; without it those
+          # tests would silently skip rather than run.
+          pip install -e packages/omnibias-measure
+          pip install -e "packages/omnibias-pinn[torch,jax,test]"
+      - name: Run pinn tests (no research deps, no GPU)
+        run: |
+          source .venv-pinn/bin/activate
+          python -m pytest packages/omnibias-pinn/tests -q -m "not needs_research and not gpu and not slow_gpu"
+      - name: Run the second-order solver-training example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_solver_curvature.py
+      - name: Run the inverse-problem / adaptive-collocation example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_solver_inverse.py
+
+  qpinn:
+    name: omnibias-qpinn (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-qpinn
+          source .venv-qpinn/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-pinn
+          pip install -e "packages/omnibias-qpinn[torch,jax,test]"
+      - name: Run qpinn tests (no GPU, skip integration on default runner)
+        run: |
+          source .venv-qpinn/bin/activate
+          python -m pytest packages/omnibias-qpinn/tests \
+            --ignore=packages/omnibias-qpinn/tests/integration \
+            -q -m "not gpu and not slow_gpu"
+
+  curvature:
+    name: omnibias-curvature (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-curv
+          source .venv-curv/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-torch
+          pip install -e "packages/omnibias-curvature[test]"
+      - name: Run curvature tests
+        run: |
+          source .venv-curv/bin/activate
+          python -m pytest packages/omnibias-curvature/tests -x -q
+      - name: Run certified rank-collapse example (smoke)
+        run: |
+          source .venv-curv/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_rank_collapse.py
+
+  fields:
+    name: omnibias-fields (beta)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-fields
+          source .venv-fields/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e "packages/omnibias-fields[torch,jax,test]"
+      - name: Run fields tests
+        run: |
+          source .venv-fields/bin/activate
+          python -m pytest packages/omnibias-fields/tests -q
+
+  geometry:
+    name: omnibias-geometry (beta)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-geom
+          source .venv-geom/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-partition
+          pip install -e "packages/omnibias-geometry[torch,jax,test]"
+      - name: Run geometry tests
+        run: |
+          source .venv-geom/bin/activate
+          python -m pytest packages/omnibias-geometry/tests -q
+
+  binary:
+    name: omnibias-binary (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-binary
+          source .venv-binary/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e "packages/omnibias-binary[torch,jax,test]"
+      - name: Run binary tests
+        run: |
+          source .venv-binary/bin/activate
+          python -m pytest packages/omnibias-binary/tests -q
+
+  binary_vs_ste:
+    name: examples/binary_vs_ste (smoke)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-bvs
+          source .venv-bvs/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e "packages/omnibias-binary[torch]"
+      - name: Run binary-vs-STE example smoke (synthetic data, offline)
+        run: |
+          source .venv-bvs/bin/activate
+          python -m pytest examples/binary_vs_ste/tests -q
+
+  boolean:
+    name: omnibias-boolean (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-boolean
+          source .venv-boolean/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e "packages/omnibias-binary[torch,jax]"
+          pip install -e "packages/omnibias-boolean[torch,jax,test]"
+      - name: Run boolean tests
+        run: |
+          source .venv-boolean/bin/activate
+          python -m pytest packages/omnibias-boolean/tests -q
+      - name: Run RSA-limitation example smoke (reproducible tiny case)
+        run: |
+          source .venv-boolean/bin/activate
+          python -m pytest examples/boolean_limits/tests -q
+
+  verify:
+    name: omnibias-verify (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-verify
+          source .venv-verify/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-difference
+          pip install -e "packages/omnibias-verify[torch,jax,test]"
+      - name: Run verify tests
+        run: |
+          source .venv-verify/bin/activate
+          python -m pytest packages/omnibias-verify/tests -q
+
+  dynamics:
+    name: omnibias-dynamics (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [core]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-dynamics
+          source .venv-dynamics/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core
+          pip install -e "packages/omnibias-dynamics[test]"
+      - name: Run dynamics tests
+        run: |
+          source .venv-dynamics/bin/activate
+          python -m pytest packages/omnibias-dynamics/tests -q
+
+  difference:
+    name: omnibias-difference (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-difference
+          source .venv-difference/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e "packages/omnibias-difference[torch,jax,test]"
+          # Optional cross-package homes for the all-tiers refinement program
+          # (W3 symbolic, W5 verify, W6 dynamics); the umbrella smoke degrades
+          # gracefully if any is absent, but CI exercises the full program.
+          pip install -e packages/omnibias-dynamics
+          pip install -e packages/omnibias-verify
+          pip install -e packages/omnibias-symbolic
+      - name: Run difference tests
+        run: |
+          source .venv-difference/bin/activate
+          python -m pytest packages/omnibias-difference/tests -q
+      - name: Example smoke (certified difference towers)
+        run: |
+          source .venv-difference/bin/activate
+          python docs/examples/certified_difference_towers.py
+      - name: Refinement-program umbrella smoke (all-tiers probes)
+        run: |
+          source .venv-difference/bin/activate
+          python docs/examples/difference_validate.py
+
+  qcalculus:
+    name: omnibias-qcalculus (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-qcalculus
+          source .venv-qcalculus/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-difference
+          pip install -e "packages/omnibias-qcalculus[torch,jax,test]"
+      - name: Run qcalculus tests
+        run: |
+          source .venv-qcalculus/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-qcalculus/tests -q
+      - name: Probe smoke (q -> 1 collapse, certified q-series)
+        run: |
+          source .venv-qcalculus/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/qcalculus_validate.py
+
+  timescale:
+    name: omnibias-timescale (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-timescale
+          source .venv-timescale/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-difference
+          pip install -e packages/omnibias-qcalculus
+          pip install -e "packages/omnibias-timescale[torch,jax,test]"
+      - name: Run timescale tests
+        run: |
+          source .venv-timescale/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-timescale/tests -q
+      - name: Probe smoke (mu -> 0 collapse, unified dispatch, dynamic equations)
+        run: |
+          source .venv-timescale/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/timescale_validate.py
+
+  holonomic:
+    name: omnibias-holonomic (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [core]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-holonomic
+          source .venv-holonomic/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-difference
+          pip install -e packages/omnibias-symbolic
+          pip install -e "packages/omnibias-holonomic[test]"
+      - name: Run holonomic tests
+        run: |
+          source .venv-holonomic/bin/activate
+          python -m pytest packages/omnibias-holonomic/tests -q
+      - name: Probe smoke (Gosper, creative telescoping, Lean-checkable identities)
+        run: |
+          source .venv-holonomic/bin/activate
+          python docs/examples/holonomic_validate.py
+
+  sos:
+    name: omnibias-sos (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [core]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-sos
+          source .venv-sos/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core
+          pip install -e "packages/omnibias-sos[test]"
+      - name: Run sos tests
+        run: |
+          source .venv-sos/bin/activate
+          python -m pytest packages/omnibias-sos/tests -q
+
+  skills:
+    name: omnibias-skills (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-skills
+          source .venv-skills/bin/activate
+          pip install --upgrade pip
+          pip install -e "packages/omnibias-skills[dev]"
+      - name: Type-check (self-scoped strict config)
+        run: |
+          source .venv-skills/bin/activate
+          cd packages/omnibias-skills && mypy src/omnibias/skills
+      - name: Run skills tests
+        run: |
+          source .venv-skills/bin/activate
+          python -m pytest packages/omnibias-skills/tests -q
+      - name: Skill drift checks (consumer bundle + maintainer mirror)
+        run: |
+          source .venv-skills/bin/activate
+          omnibias-skills install --check --tool all --dest .
+          python scripts/sync_skills.py --check
+
+  formal:
+    name: omnibias-formal (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [core]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-formal
+          source .venv-formal/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core
+          pip install -e "packages/omnibias-formal[test]"
+      - name: Run formal bridge tests (no Lean toolchain; generation + graceful degradation)
+        run: |
+          source .venv-formal/bin/activate
+          python -m pytest packages/omnibias-formal/tests -q
+
+  lean_kernel:
+    name: lean verified kernel (golden replay)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    needs: [core]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install elan / Lean (toolchain pinned by lean-toolchain)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain leanprover/lean4:v4.31.0
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Build the verified kernel (kernel-checks the golden certificates)
+        run: |
+          cd formal/omnibias-verified-kernel
+          lake build
+      - name: Replay golden certificates through the Python bridge (lake on PATH)
+        run: |
+          python -m venv .venv-lean
+          source .venv-lean/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core[test]
+          python -m pytest packages/omnibias-core/tests/test_lean_check.py -q
+
+  spiking:
+    name: omnibias-spiking (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-spiking
+          source .venv-spiking/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e "packages/omnibias-spiking[torch,jax,test]"
+      - name: Run spiking tests
+        run: |
+          source .venv-spiking/bin/activate
+          python -m pytest packages/omnibias-spiking/tests -q
+
+  hopfield:
+    name: omnibias-hopfield (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-hopfield
+          source .venv-hopfield/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e "packages/omnibias-core"
+          pip install -e "packages/omnibias-torch"
+          pip install -e "packages/omnibias-jax"
+          pip install -e "packages/omnibias-curvature"
+          pip install -e "packages/omnibias-struct[torch,jax]"
+          pip install -e "packages/omnibias-hopfield[torch,jax,test]"
+      - name: Run hopfield tests
+        run: |
+          source .venv-hopfield/bin/activate
+          python -m pytest packages/omnibias-hopfield/tests -q
+
+  convex:
+    name: omnibias-convex (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-convex
+          source .venv-convex/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-torch
+          pip install -e "packages/omnibias-convex[torch,jax,test]"
+      - name: Run convex tests
+        run: |
+          source .venv-convex/bin/activate
+          python -m pytest packages/omnibias-convex/tests -q
+
+  graph:
+    name: omnibias-graph (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-graph
+          source .venv-graph/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e "packages/omnibias-graph[torch,jax,test]"
+      - name: Run graph tests
+        run: |
+          source .venv-graph/bin/activate
+          python -m pytest packages/omnibias-graph/tests -q
+
+  shape:
+    name: omnibias-shape (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-shape
+          source .venv-shape/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e "packages/omnibias-shape[torch,jax,test]"
+      - name: Run shape tests (torch + jax parity)
+        run: |
+          source .venv-shape/bin/activate
+          python -m pytest packages/omnibias-shape/tests -q
+
+  min_square_cover:
+    name: examples/min_square_cover (smoke)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-msc
+          source .venv-msc/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e "packages/omnibias-shape[torch]"
+          pip install -e "packages/omnibias-convex[torch]"
+      - name: Run min-square-cover example smoke (synthetic, offline, CPU)
+        run: |
+          source .venv-msc/bin/activate
+          python -m pytest examples/min_square_cover/tests -q
+
+  certified_fluid:
+    name: certified fluid dynamics (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-certified
+          source .venv-certified/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-pinn
+          pip install -e "packages/omnibias-qpinn[torch,jax]"
+          pip install -e "packages/omnibias-geometry[torch,jax]"
+          pip install -e packages/omnibias-symbolic
+          pip install pytest scipy
+      - name: Run Yang-Mills certified-evidence tests (gauge + qpinn + symbolic twin)
+        run: |
+          source .venv-certified/bin/activate
+          python -m pytest packages/omnibias-pinn/tests/certified -q
+
+  fractional:
+    name: omnibias-fractional (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-frac
+          source .venv-frac/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e "packages/omnibias-fractional[torch,jax,test]"
+      - name: Run fractional tests
+        run: |
+          source .venv-frac/bin/activate
+          python -m pytest packages/omnibias-fractional/tests -q
+
+  measure:
+    name: omnibias-measure (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-measure
+          source .venv-measure/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e "packages/omnibias-measure[torch,jax,test]"
+          # The integral-equation example also drives the PINN-side Fredholm residual.
+          pip install -e "packages/omnibias-pinn[torch]"
+      - name: Run measure tests
+        run: |
+          source .venv-measure/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-measure/tests -q
+      - name: Run the temporal-point-process / survival example (smoke)
+        run: |
+          source .venv-measure/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/measure_pointprocess.py
+      - name: Run the integral-equation example (smoke)
+        run: |
+          source .venv-measure/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/measure_integraleq.py
+
+  score:
+    name: omnibias-score (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-score
+          source .venv-score/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e "packages/omnibias-score[torch,jax,test]"
+      - name: Run score tests
+        run: |
+          source .venv-score/bin/activate
+          python -m pytest packages/omnibias-score/tests -q
+
+  variational:
+    name: omnibias-variational (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-variational
+          source .venv-variational/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-geometry
+          pip install -e "packages/omnibias-variational[torch,jax,test]"
+      - name: Run variational tests
+        run: |
+          source .venv-variational/bin/activate
+          python -m pytest packages/omnibias-variational/tests -q
+
+  control:
+    name: omnibias-control (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-control
+          source .venv-control/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-geometry
+          pip install -e packages/omnibias-variational
+          pip install -e packages/omnibias-verify
+          pip install -e "packages/omnibias-control[torch,jax,test]"
+      - name: Run control tests
+        run: |
+          source .venv-control/bin/activate
+          python -m pytest packages/omnibias-control/tests -q
+
+  routing:
+    name: omnibias-routing (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [convex]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-routing
+          source .venv-routing/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-graph
+          pip install -e packages/omnibias-verify
+          pip install -e packages/omnibias-convex
+          pip install -e "packages/omnibias-routing[convex,torch,jax,graph,verify,test]"
+      - name: Run routing tests
+        run: |
+          source .venv-routing/bin/activate
+          python -m pytest packages/omnibias-routing/tests -q
+      - name: Run the certified-routing example (smoke)
+        run: |
+          source .venv-routing/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/decision_focused_routing_tsp.py
+
+  discrete:
+    name: omnibias-discrete (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [sos]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-discrete
+          source .venv-discrete/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-sos
+          pip install -e packages/omnibias-convex
+          pip install -e "packages/omnibias-discrete[sos,torch,jax,convex,test]"
+      - name: Run discrete tests
+        run: |
+          source .venv-discrete/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-discrete/tests -q
+      - name: Run the certified-sparse-recovery example (smoke)
+        run: |
+          source .venv-discrete/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_sparse_recovery.py
+
+  qubo:
+    name: omnibias-qubo (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [sos, convex, discrete]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-qubo
+          source .venv-qubo/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-sos
+          pip install -e packages/omnibias-convex
+          pip install -e packages/omnibias-discrete
+          pip install -e "packages/omnibias-qubo[sos,convex,torch,jax,test]"
+      - name: Run qubo tests
+        run: |
+          source .venv-qubo/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-qubo/tests -q
+      - name: Run the certified-QUBO example (smoke)
+        run: |
+          source .venv-qubo/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_differentiable_qubo.py
+
+  tab:
+    name: omnibias-tab (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [discrete, curvature, verify]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-tab
+          source .venv-tab/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-difference
+          pip install -e packages/omnibias-curvature
+          pip install -e "packages/omnibias-verify[torch,jax]"
+          pip install -e packages/omnibias-discrete
+          pip install -e "packages/omnibias-tab[torch,jax,verify,curvature,gbm,test]"
+      - name: Run tab tests
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-tab/tests -q
+      - name: Run the certified soft-tree example (smoke)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/tab_validate.py
+
+  partition:
+    name: omnibias-partition (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [core]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-partition
+          source .venv-partition/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install jax
+          pip install -e packages/omnibias-core
+          pip install -e "packages/omnibias-partition[torch,jax,test]"
+      - name: Run partition tests
+        run: |
+          source .venv-partition/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-partition/tests -q
+      - name: Run the partition quickstart example (smoke)
+        run: |
+          source .venv-partition/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/partition_quickstart.py
+
+  submodular:
+    name: omnibias-submodular (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [sos, discrete]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-submodular
+          source .venv-submodular/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-sos
+          pip install -e packages/omnibias-discrete
+          pip install -e "packages/omnibias-submodular[sos,torch,jax,test]"
+      - name: Run submodular tests
+        run: |
+          source .venv-submodular/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-submodular/tests -q
+      - name: Run the certified-submodular example (smoke)
+        run: |
+          source .venv-submodular/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_differentiable_submodular.py
+      - name: Run the submodular families & constraints example (smoke)
+        run: |
+          source .venv-submodular/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/submodular_families_and_constraints.py
+
+  nphard:
+    name: omnibias-nphard (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: [sos, convex, discrete, qubo]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-nphard
+          source .venv-nphard/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-sos
+          pip install -e packages/omnibias-convex
+          pip install -e packages/omnibias-discrete
+          pip install -e packages/omnibias-qubo
+          pip install -e "packages/omnibias-nphard[sos,convex,torch,jax,test]"
+      - name: Run nphard tests
+        run: |
+          source .venv-nphard/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-nphard/tests -q
+      - name: Run the certified-differentiable-NP-hard example (smoke)
+        run: |
+          source .venv-nphard/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_differentiable_nphard.py
+      - name: Run the Go-like MCTS search example (smoke)
+        run: |
+          source .venv-nphard/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/nphard_mcts_search.py
+      - name: Run the certified chip placement flagship example (smoke)
+        run: |
+          source .venv-nphard/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_chip_placement.py
+
+  combinatorics:
+    name: omnibias-combinatorics (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [convex, graph, discrete]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-combinatorics
+          source .venv-combinatorics/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-sos
+          pip install -e packages/omnibias-convex
+          pip install -e packages/omnibias-graph
+          pip install -e packages/omnibias-discrete
+          pip install -e "packages/omnibias-combinatorics[convex,torch,jax,graph,test]"
+      - name: Run combinatorics tests
+        run: |
+          source .venv-combinatorics/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-combinatorics/tests -q
+      - name: Run the certified-matching example (smoke)
+        run: |
+          source .venv-combinatorics/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_differentiable_matching.py
+
+  logic:
+    name: omnibias-logic (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [discrete, boolean]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-logic
+          source .venv-logic/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-sos
+          pip install -e packages/omnibias-boolean
+          pip install -e packages/omnibias-discrete
+          pip install -e "packages/omnibias-logic[sos,torch,jax,test]"
+      - name: Run logic tests
+        run: |
+          source .venv-logic/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-logic/tests -q
+      - name: Run the certified-logic example (smoke)
+        run: |
+          source .venv-logic/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_logic_maxsat_sharpsat.py
+      - name: Run the exact + statistical counting example (smoke)
+        run: |
+          source .venv-logic/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/logic_exact_and_approx_counting.py
+
+  struct:
+    name: omnibias-struct (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-struct
+          source .venv-struct/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e "packages/omnibias-struct[torch,jax,test]"
+      - name: Run struct tests
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-struct/tests -q
+      - name: Run the certified soft-DP example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_soft_dp.py
+      - name: Run the certified-decoding example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_decoding.py
+      - name: Run the structured-DP applications example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/structured_dp_apps.py
+      - name: Run the semiring-driver example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/semiring_driver.py
+      - name: Run the CKY inside-outside parsing example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/cky_inside_outside.py
+      - name: Run the Eisner projective dependency example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/dependency_eisner.py
+      - name: Run the matrix-tree non-projective example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/matrix_tree_nonprojective.py
+      - name: Run the path-distribution operators example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/path_distributions.py
+      - name: Run the local + affine-gap alignment example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/local_affine_alignment.py
+      - name: Run the certified argmax / measure-mode collapse example (smoke)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/certified_argmax.py
+
+  symbolic:
+    name: omnibias-symbolic (alpha)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: |
+          python -m venv .venv-sym
+          source .venv-sym/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-fractional
+          pip install -e "packages/omnibias-symbolic[jax,sklearn,test]"
+          pip install -e "packages/omnibias-struct[torch,jax]"
+          pip install pandas
+      - name: Lint the symbolic package and recovered examples
+        run: |
+          source .venv-sym/bin/activate
+          pip install ruff==0.15.17
+          ruff check packages/omnibias-symbolic examples
+      - name: Run symbolic package tests
+        run: |
+          source .venv-sym/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-symbolic/tests -q
+      - name: Run recovered example experiments (reproducible synthetic paths)
+        run: |
+          source .venv-sym/bin/activate
+          JAX_PLATFORMS=cpu python -m pytest examples/symbolic_discovery -q
+      - name: Run the DP-recurrence discovery example (struct x symbolic smoke)
+        run: |
+          source .venv-sym/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/dp_recurrence_discovery.py
+
+  keras:
+    name: omnibias-keras (${{ matrix.keras_backend }} / py${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [torch, jax]
+    strategy:
+      fail-fast: false
+      # Three-way parity on one interpreter so the backends compare like with
+      # like. The tensorflow leg is pinned to Python <=3.13 because TensorFlow
+      # has no stable cp314 wheels yet; jax/torch legs stay on the same version
+      # for apples-to-apples. Activation math across 3.10-3.14 is covered by
+      # the core / torch / jax jobs. Raise the TF pin only after a tensorflow-cpu
+      # wheel exists for the target CPython.
+      matrix:
+        include:
+          - keras_backend: tensorflow
+            python-version: "3.13"
+          - keras_backend: jax
+            python-version: "3.13"
+          - keras_backend: torch
+            python-version: "3.13"
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install (keras + torch + jax so the three-way parity test runs)
+        run: |
+          python -m venv .venv-keras
+          source .venv-keras/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install jax jaxlib
+          if [ "${{ matrix.keras_backend }}" = "tensorflow" ]; then pip install tensorflow-cpu; fi
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e "packages/omnibias-keras[test]"
+      - name: Run keras package tests (own pytest config)
+        env:
+          KERAS_BACKEND: ${{ matrix.keras_backend }}
+        run: |
+          source $GITHUB_WORKSPACE/.venv-keras/bin/activate
+          cd packages/omnibias-keras
+          python -m pytest tests -q
+      - name: Run three-way (torch/jax/keras) parity test
+        env:
+          KERAS_BACKEND: ${{ matrix.keras_backend }}
+        run: |
+          source .venv-keras/bin/activate
+          python -m pytest tests/test_keras_parity.py -q
+
+  docs:
+    name: mkdocs --strict
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install docs deps + every public package (for mkdocstrings)
+        run: |
+          python -m venv .venv-docs
+          source .venv-docs/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install keras
+          pip install "mkdocs-material>=9.5" "mkdocstrings[python]>=0.24" pytest
+          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational symbolic binary boolean verify dynamics difference qcalculus timescale holonomic spiking hopfield graph shape formal sos convex control routing discrete qubo submodular nphard combinatorics logic struct tab partition keras skills; do
+            pip install -e packages/omnibias-$pkg
+          done
+      - name: Build docs strict
+        env:
+          KERAS_BACKEND: torch
+        run: |
+          source .venv-docs/bin/activate
+          mkdocs build --strict
+      # Every distribution is installed in this job, so the docs path guard is
+      # fully armed here (in the core job it can only check omnibias.core.*).
+      - name: Guard - every dotted omnibias.* path in the docs resolves
+        env:
+          KERAS_BACKEND: torch
+        run: |
+          source .venv-docs/bin/activate
+          python -m pytest packages/omnibias-core/tests/test_doc_module_paths.py -q
+      - name: Upload Pages artefact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa  # v3.0.1
+        with:
+          path: site
+
+  docs_deploy:
+    name: deploy GitHub Pages
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: docs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e  # v4.0.5
+        id: deployment
+
+  # Docs rot silently: a renamed symbol keeps rendering fine in mkdocs while every
+  # reader who copies the snippet hits a traceback. This job *runs* the documented
+  # code. Blocks are executed by default; opting out needs a stated reason in the
+  # markdown (see the doc-testing contract in CONTRIBUTING.md).
+  docs_snippets:
+    name: docs snippets execute
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install CPU torch, keras + every public package
+        run: |
+          python -m venv .venv-snippets
+          source .venv-snippets/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install keras pytest
+          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational symbolic binary boolean verify dynamics difference qcalculus timescale holonomic spiking hopfield graph shape formal sos convex control routing discrete qubo submodular nphard combinatorics logic struct tab partition keras skills; do
+            pip install -e packages/omnibias-$pkg
+          done
+      # The default `-m 'not slow'` from pyproject excludes the documents that
+      # carry a `docs-test: slow` block (training runs, lattice Monte Carlo).
+      # Every distribution is installed here, so a documented `omnibias.*` import
+      # that no longer resolves is a hard failure rather than a skip.
+      - name: Execute every documented python block (fast set)
+        env:
+          KERAS_BACKEND: torch
+          OMNIBIAS_DOCS_SNIPPETS_STRICT: "1"
+        run: |
+          source .venv-snippets/bin/activate
+          python -m pytest tests/test_docs_snippets.py -q
+      # The heavy documents are real code, so they are verified too -- just not on
+      # every pull request.
+      - name: Execute the slow documents (scheduled / dispatched only)
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        env:
+          KERAS_BACKEND: torch
+          OMNIBIAS_DOCS_SNIPPETS_STRICT: "1"
+          OMNIBIAS_DOCS_SNIPPET_TIMEOUT: "1800"
+        run: |
+          source .venv-snippets/bin/activate
+          python -m pytest tests/test_docs_snippets.py -q -m slow
+
+  # The notebook gallery promises "CPU in under ~2 minutes, fixed seeds, no
+  # external data". This job holds that promise to account. It is heavier than a
+  # per-PR check, so it runs on the weekly schedule (or on demand).
+  notebooks:
+    name: notebook gallery executes
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install CPU torch, plotting deps + every public package
+        run: |
+          python -m venv .venv-nb
+          source .venv-nb/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install keras matplotlib scipy pandas nbconvert ipykernel
+          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational symbolic binary boolean verify dynamics difference qcalculus timescale holonomic spiking hopfield graph shape formal sos convex control routing discrete qubo submodular nphard combinatorics logic struct tab partition keras skills; do
+            pip install -e packages/omnibias-$pkg
+          done
+          # Name the kernel explicitly: a notebook's default `python3` kernelspec
+          # can resolve to some other interpreter, which then fails on unrelated
+          # version skew rather than on the notebook.
+          python -m ipykernel install --user --name omnibias-ci
+      # `_style` / `_fields` are sibling helper modules, so the notebook directory
+      # has to be the working directory; `examples` imports need the repo root.
+      - name: Execute every notebook
+        env:
+          KERAS_BACKEND: torch
+          MPLBACKEND: Agg
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          source .venv-nb/bin/activate
+          cd notebooks
+          for nb in *.ipynb; do
+            echo "::group::$nb"
+            jupyter nbconvert --to notebook --execute --stdout \
+              --ExecutePreprocessor.kernel_name=omnibias-ci \
+              --ExecutePreprocessor.timeout=600 "$nb" > /dev/null
+            echo "::endgroup::"
+          done
+
+  build_wheels:
+    name: build + twine-check every distribution
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install build tooling
+        run: python -m pip install --upgrade pip build twine
+      - name: Build sdist + wheel for every publishable package
+        run: |
+          for d in packages/omnibias-*/; do
+            python -m build "$d" --outdir dist/
+          done
+          ls -1 dist/
+      - name: Validate distribution metadata (PyPI-renderable, well-formed)
+        run: twine check dist/*
+      - name: Verify distributions carry no packaging junk
+        run: python scripts/check_packaging.py dist/
+      - name: Upload built distributions
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: omnibias-dist
+          path: dist/
+          retention-days: 7
+
+  wheel_import_smoke:
+    name: wheel import smoke (every distribution)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    needs: [build_wheels]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Download built distributions
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          name: omnibias-dist
+          path: dist/
+      - name: Install every wheel into one clean venv (CPU backends)
+        run: |
+          python -m venv .venv-smoke
+          source .venv-smoke/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          # A generous scientific stack so optional top-level imports resolve.
+          pip install jax keras numpy scipy pandas scikit-learn sympy networkx
+          # Install every built wheel; sibling omnibias deps resolve from dist/.
+          pip install --find-links dist/ dist/omnibias_*.whl
+      - name: Import every shipped top-level package
+        env:
+          KERAS_BACKEND: torch
+          JAX_PLATFORMS: cpu
+        run: |
+          source .venv-smoke/bin/activate
+          python scripts/import_smoke.py
+
+  curated_clean_install:
+    name: curated-core clean install (${{ matrix.pkg }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [build_wheels]
+    strategy:
+      fail-fast: false
+      matrix:
+        pkg: [core, torch, jax, ferminet, keras, fields, pinn, geometry]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Download built distributions
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          name: omnibias-dist
+          path: dist/
+      - name: Clean-venv install from wheel + import
+        env:
+          KERAS_BACKEND: torch
+          JAX_PLATFORMS: cpu
+        run: |
+          python -m venv .venv-ci
+          source .venv-ci/bin/activate
+          pip install --upgrade pip
+          # Pre-provide CPU torch so torch-dependent curated packages do not pull
+          # the default (GPU) wheel; jax + keras cover the other backends. The
+          # omnibias package itself + its omnibias deps resolve from local dist/.
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install jax keras
+          pip install --find-links dist/ omnibias-${{ matrix.pkg }}
+          python -c "import importlib; m = importlib.import_module('omnibias.${{ matrix.pkg }}'); print('import OK:', m.__name__)"
+
+  curated_api:
+    name: curated-core public API surface (frozen)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [torch, jax]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install curated-core packages + pytest
+        run: |
+          python -m venv .venv-api
+          source .venv-api/bin/activate
+          pip install --upgrade pip
+          pip install --index-url https://download.pytorch.org/whl/cpu torch
+          pip install keras pytest
+          pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-torch
+          pip install -e packages/omnibias-jax
+          pip install -e packages/omnibias-ferminet
+          pip install -e "packages/omnibias-fields[torch,jax]"
+          pip install -e "packages/omnibias-pinn[torch,jax]"
+          pip install -e "packages/omnibias-geometry[torch,jax]"
+          pip install -e packages/omnibias-keras
+      - name: Assert the frozen public API surface is unchanged
+        env:
+          KERAS_BACKEND: torch
+          JAX_PLATFORMS: cpu
+        run: |
+          source .venv-api/bin/activate
+          python -m pytest tests/test_curated_core_api_surface.py -q

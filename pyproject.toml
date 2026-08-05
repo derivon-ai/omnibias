@@ -1,0 +1,240 @@
+[tool.uv.workspace]
+members = [
+    "packages/omnibias-core",
+    "packages/omnibias-torch",
+    "packages/omnibias-jax",
+    "packages/omnibias-ferminet",
+]
+exclude = [
+    "packages/omnibias-binary",
+    "packages/omnibias-spiking",
+    "packages/omnibias-fields",
+    "packages/omnibias-geometry",
+    "packages/omnibias-fractional",
+    "packages/omnibias-pinn",
+    "packages/omnibias-qpinn",
+    "packages/omnibias-curvature",
+    "packages/omnibias-symbolic",
+    "packages/omnibias-score",
+    "packages/omnibias-variational",
+    "packages/omnibias-hopfield",
+    "packages/omnibias-convex",
+    "packages/omnibias-boolean",
+    "packages/omnibias-verify",
+    "packages/omnibias-dynamics",
+    "packages/omnibias-graph",
+    "packages/omnibias-shape",
+    "packages/omnibias-skills",
+    "packages/omnibias-formal",
+    "packages/omnibias-sos",
+    "packages/omnibias-control",
+    "packages/omnibias-routing",
+    "packages/omnibias-discrete",
+    "packages/omnibias-qubo",
+    "packages/omnibias-submodular",
+    "packages/omnibias-logic",
+    "packages/omnibias-difference",
+    "packages/omnibias-struct",
+    "packages/omnibias-combinatorics",
+    "packages/omnibias-nphard",
+    "packages/omnibias-qcalculus",
+    "packages/omnibias-timescale",
+    "packages/omnibias-holonomic",
+    "packages/omnibias-tab",
+    "packages/omnibias-partition",
+    "packages/omnibias-measure",
+]
+
+[tool.uv]
+package = false
+
+# --------------------------------------------------------------------------
+# Licence tiers -- the single source of truth for the open-core split.
+#
+# `scripts/license_headers.py`, `packages/omnibias-core/tests/test_license_
+# consistency.py`, and every packaging check read this table. A package's
+# `LICENSE` file, its `project.license` SPDX expression, and the SPDX header on
+# every one of its `.py` files must all agree with the tier recorded here.
+#
+#   permissive -> Apache-2.0
+#   copyleft   -> AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
+#
+# The structural invariant, enforced by the guard: **no `permissive` package may
+# depend on a `copyleft` package**, through `dependencies` or through any
+# `optional-dependencies` extra. Permissive-below-copyleft is fine; the reverse
+# would silently relicense the adoption engine. Tier C is exactly the upward
+# closure of the certified-decision seed set (`verify`, `sos`, `formal`,
+# `dynamics`), which is why e.g. `discrete` is copyleft (it carries an `sos`
+# extra) while `difference` is permissive (`verify` requires it).
+#
+# See LICENSING.md for the rationale and the commercial terms.
+# --------------------------------------------------------------------------
+[tool.omnibias.license_tiers]
+omnibias-binary = "permissive"
+omnibias-boolean = "permissive"
+omnibias-combinatorics = "copyleft"
+omnibias-control = "copyleft"
+omnibias-convex = "copyleft"
+omnibias-core = "permissive"
+omnibias-curvature = "permissive"
+omnibias-difference = "permissive"
+omnibias-discrete = "copyleft"
+omnibias-dynamics = "copyleft"
+omnibias-ferminet = "permissive"
+omnibias-fields = "permissive"
+omnibias-formal = "copyleft"
+omnibias-fractional = "permissive"
+omnibias-geometry = "permissive"
+omnibias-graph = "permissive"
+omnibias-holonomic = "permissive"
+omnibias-hopfield = "permissive"
+omnibias-jax = "permissive"
+omnibias-keras = "permissive"
+omnibias-logic = "copyleft"
+omnibias-measure = "permissive"
+omnibias-nphard = "copyleft"
+omnibias-partition = "permissive"
+omnibias-pinn = "permissive"
+omnibias-qcalculus = "permissive"
+omnibias-qpinn = "permissive"
+omnibias-qubo = "copyleft"
+omnibias-routing = "copyleft"
+omnibias-score = "permissive"
+omnibias-shape = "permissive"
+omnibias-skills = "permissive"
+omnibias-sos = "copyleft"
+omnibias-spiking = "permissive"
+omnibias-struct = "permissive"
+omnibias-submodular = "copyleft"
+omnibias-symbolic = "permissive"
+omnibias-tab = "copyleft"
+omnibias-timescale = "permissive"
+omnibias-torch = "permissive"
+omnibias-variational = "permissive"
+omnibias-verify = "copyleft"
+
+[tool.omnibias.license_expressions]
+permissive = "Apache-2.0"
+copyleft = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+
+[tool.uv.sources]
+omnibias-core = { workspace = true }
+omnibias-torch = { workspace = true }
+omnibias-jax = { workspace = true }
+omnibias-ferminet = { workspace = true }
+
+[dependency-groups]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+    # The qpinn integration tests carry `@pytest.mark.timeout(...)`; without this
+    # plugin the marker parses but never fires, so a hung solve would block a run
+    # indefinitely instead of failing.
+    "pytest-timeout>=2.1",
+    "ruff==0.15.17",
+    "mypy>=1.5",
+    "hypothesis>=6.0",
+    "mpmath>=1.3",
+]
+docs = [
+    "mkdocs-material>=9.5",
+    "mkdocstrings[python]>=0.24",
+]
+
+[tool.pytest.ini_options]
+# `uv sync` installs only the workspace members (core/torch/jax/ferminet);
+# `omnibias-pinn`, `omnibias-qpinn`, `omnibias-curvature` ship their own
+# pyproject and have to be installed (and tested) explicitly per package
+# (see CI jobs `pinn` / `qpinn` / `curvature`). Listing only the
+# workspace-installable test trees here keeps `uv run pytest` from
+# collecting tests whose source package is not installed.
+testpaths = [
+    "packages/omnibias-core/tests",
+    "packages/omnibias-torch/tests",
+    "packages/omnibias-jax/tests",
+    "packages/omnibias-ferminet/tests",
+    "tests",
+]
+# importlib mode deliberately does *not* put a test file's own directory on
+# sys.path, so the handful of shared `_`-prefixed test helpers have to be
+# registered explicitly. Their basenames must stay globally unique across these
+# directories (guarded by `tests/test_test_layout.py`), otherwise one package's
+# helper would silently shadow another's.
+pythonpath = [
+    "tests",
+    "packages/omnibias-dynamics/tests",
+    "packages/omnibias-fields/tests",
+    "packages/omnibias-geometry/tests/gauge",
+    "packages/omnibias-pinn/tests/solver",
+    "packages/omnibias-struct/tests",
+    "packages/omnibias-variational/tests",
+]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:torch.*",
+    "ignore::DeprecationWarning:jax.*",
+]
+# Heavy lattice / Monte-Carlo / JAX-eager tests are marked `slow` and skipped by
+# default so a plain `pytest` run stays memory-safe on a laptop or login node.
+# Run them with `-m slow` (only heavy) or `-m "slow or not slow"` (everything),
+# typically on a compute grid (helpers live in the separate omnibias_experiments project).
+#
+# `--import-mode=importlib` is what lets the whole tree be collected in one run:
+# 39 test basenames are reused across packages (`test_certify.py` alone lives in
+# 13 of them), and the default prepend mode derives a module name from the
+# basename alone, so the second one collected fails with `import file mismatch`.
+# importlib mode keys the module on its full path instead. Without this, the
+# only way to run the suite is 42 isolated per-package invocations -- which is
+# how two unsound certificate paths stayed green.
+# `--strict-markers` turns a typo'd or undeclared marker into a collection error
+# rather than a silently unfiltered test.
+addopts = "-m 'not slow' --import-mode=importlib --strict-markers"
+markers = [
+    "slow: marks slow tests (run with -m 'slow' or skip with -m 'not slow')",
+    "slow_gpu: marks tests that require a GPU and are skipped in CI",
+    "gpu: marks tests that require GPU",
+    "needs_research: marks tests that depend on a private benchmark tree (skip in public CI)",
+    # Consumed by `pytest-timeout` (dev dependency). Declared here so
+    # `--strict-markers` accepts it; note the marker only has an effect when
+    # that plugin is installed -- without it the qpinn integration tests carry a
+    # timeout that silently does nothing.
+    "timeout: per-test wall-clock limit in seconds (requires pytest-timeout)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = [
+    "research",
+    "experiments",
+    "results",
+    "pyproject.toml.v0.1.0.bak",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+exclude = [
+    "research/",
+    "experiments/",
+    "results/",
+    "tests/",
+    "build/",
+    "dist/",
+]
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = [
+    "packages/omnibias-core/src",
+    "packages/omnibias-torch/src",
+    "packages/omnibias-jax/src",
+    "packages/omnibias-ferminet/src",
+]
+
+[[tool.mypy.overrides]]
+module = ["torch.*", "jax.*", "jaxlib.*", "folx.*", "ferminet.*", "kfac_jax.*"]
+ignore_missing_imports = true

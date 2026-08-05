@@ -1,0 +1,20 @@
+---
+description: Soundness rules for omnibias rigorous enclosures and certified verification
+globs:
+  - "packages/omnibias-core/src/omnibias/core/verified/**/*.py"
+  - "packages/omnibias-verify/**/*.py"
+alwaysApply: false
+---
+
+# omnibias rigorous register: soundness first
+
+Code here produces **proofs**: an enclosure must provably contain the true value.
+
+- Round **outward** on every operation. Never let a bound tighten by accident, and never widen one silently just to make a test pass.
+- Every new enclosure ships a soundness test that checks it contains **both** a dense deterministic grid **and** a random sample of true values.
+- Soundness, not completeness: return an *inconclusive* verdict rather than over-claim when branch-and-bound runs out of budget.
+- `omnibias.core.verified` is pure Python -- never import `torch`, `jax`, or `keras`.
+- State scope honestly in a sealed payload (e.g. a `scope` field such as `"local_box"`); a local proof is not a global or global-regularity-grade claim.
+
+If the primitive seals or checks a certificate, the `formal/**` rule and the
+`omnibias-dev-certificate-lean` skill also apply.

@@ -1,0 +1,482 @@
+# omnibias
+
+> Numerically-stable closed-form n-th derivative forward-pass framework.
+> omnibias computes `sigma^(n)(z)` (the n-th derivative of an activation)
+> in closed form for arbitrary `n`, with bit-stable accuracy and one
+> `sigma` evaluation regardless of order. The same primitive runs on
+> PyTorch, JAX, and Keras 3, with bit-identical coefficients shared from
+> one pure-Python core module.
+
+Operator surface: `OperatorBlock` dispatches on six roles --
+`identity | grad | laplacian | derivative | band | integral`. `grad` /
+`laplacian` / `derivative` are closed-form `sigma^(n)`; **`integral` is a
+closed-form antiderivative window** `S(z+b_hi)-S(z+b_lo)` with `S'=sigma` (the
+`ActivationSpec.integral` kernel, e.g. `sigmoid`'s antiderivative is
+`softplus`), and `band` is the literal window `sigma(z+b_hi)-sigma(z+b_lo)`.
+omnibias has a closed-form integral operator, not only closed-form derivatives.
+"Integral" has three senses -- activation antiderivative (above), domain
+quadrature (`omnibias-fields`), and the measure integral `integral f dmu`
+(`omnibias-measure`, with a certified variant in `omnibias-verify`). Canonical
+capability matrix: `docs/operator-surface.md`.
+
+The dictionary also carries **closed-form integral transforms** of the
+activations whose transform is itself elementary
+(`omnibias.{torch,jax}.transforms`; the identity table, the regions of
+convergence and the reasons for every gap live in the pure-Python
+`omnibias.core.transforms`). Laplace for `exp` / `relu` / `sin` / `cos` /
+`sinh` / `cosh` / `gaussian` / `sigmoid` / `tanh` / `sech`, Fourier for the two
+self-reciprocal profiles `gaussian` and `sech`, Mellin for `gaussian`, plus
+`fermi_dirac_mellin` (`Gamma(s) eta(s)`, the Mellin transform of the
+*complementary* sigmoid, restricted to `Re(s) > 1` to match the verified
+`dirichlet` zeta scope). `ActivationSpec.transforms` holds them,
+`tempered()` propagates them by exact beta-scaling laws, and
+`TransformBlock` / `LaplaceTransform` / `FourierTransform` / `MellinTransform`
+make a transform a trainable layer whose learnable spectral variable is
+softplus-reparameterised to stay inside the region of convergence. Gaps are
+deliberate and labelled (`relu` / `sigmoid` / `tanh` have no Fourier kernel:
+they are not `L^1` and their transforms are distributional; `exp` has no Mellin
+kernel because omnibias's `exp` is `e^{+z}`, not the decaying `e^{-z}` of the
+`Gamma(s)` pair). Example: `docs/examples/transforms_closed_form.py`.
+
+omnibias is a uv-workspace monorepo. The stable workspace is
+`omnibias-core` + `omnibias-torch` + `omnibias-jax` + `omnibias-ferminet`;
+`omnibias-keras` is a Keras 3 unified backend. Scientific extensions:
+`omnibias-fields` (the foundational field substrate: `FieldState`, the
+attribute-DSL views, the lazy sigma cache, and the torch/jax field-operator
+surface incl. integration, line integrals (the gradient theorem), norms,
+tensor divergence, Wirtinger),
+`omnibias-pinn` and `omnibias-qpinn` (physics-informed / quantum PINNs, built on
+`omnibias-fields`; the prebuilt residuals now include two **nonlocal** ones,
+`Fredholm` and `Volterra` integral equations, which re-evaluate the field at the
+quadrature nodes -- free, since an omnibias field is a function -- with the causal
+variant kept mesh-free by an affine pullback onto a single reference rule),
+`omnibias-curvature` (closed-form Hessian/Fisher/KFAC, plus the
+`eps -> 0` rank/regularization collapse: a min-norm / Tikhonov solver with a certified
+conditioning bound in `omnibias.core.verified.conditioning`),
+`omnibias-geometry` (differential geometry: metric, Christoffel, Laplace-Beltrami,
+curvature, geodesics, exterior calculus, and surface integration of differential
+forms over charts), `omnibias-fractional` (fractional calculus in two honest
+classes: grid/spectral GL / RL / Caputo -- non-local, numerical -- and a
+*closed-form* analytic fractional derivative on the analytic-function class, now
+extended with multi-terminal piecewise-analytic patching, activation-specific
+special-function closed forms (Mittag-Leffler / polylog / Lerch / incomplete
+gamma for exp / cosh / sinh), a two-sided non-periodic spectral fractional
+Laplacian (DST-I / DCT-II) + windowed variant, and trainable torch/jax
+fractional layers with a learnable order; all three are also exposed as
+**equation-discovery columns** in `omnibias-symbolic`
+(`build_jet_{piecewise,activation,spectral}_fractional_features`, labelled closed
+form / closed form / numerical-spectral, wired into `NeuralJetDiscoverer`)),
+`omnibias-measure` (autograd-native measure-theoretic integration: the third of
+omnibias's three senses of "integral" -- not the closed-form activation
+antiderivative window nor field domain quadrature but the measure integral
+`integral f dmu` against a discrete `Measure` (with pushforward / product /
+Radon-Nikodym reweight / normalize), plus (self-normalized) importance-sampling
+expectations, the layer-cake / distribution-function formula
+`integral f dmu = integral_0^inf mu({f>t}) dt` with a soft `sigmoid(beta(f-t))`
+superlevel indicator off the closed-form sigmoid tower, and the from-below
+simple-function construction; bit-identical numpy `_core` + torch/jax twins with
+trainable `LebesgueIntegral` / `ExpectationLayer` / `LayerCakeIntegral` layers,
+reusing the `omnibias-fields` quadrature rules; and a `pointprocess` submodule --
+neural temporal point processes + right-censored survival, whose compensator
+`int lambda` / cumulative hazard is the general Gauss-Legendre measure quadrature
+or, for an OMBU intensity `scale*act(w t+b)`, the exact closed-form antiderivative
+window `(scale/w)[S(wT+b)-S(w t0+b)]` with `S'=act` (`sigmoid`->`softplus`), giving
+an exact log-likelihood + a trainable `TemporalPointProcess`; its quadrature also
+supplies the **integral columns** in `omnibias-symbolic`
+(`build_jet_integral_features` running / Fredholm / Volterra +
+`measure_integral_columns` for field laws), the first non-local candidate library
+there and so the first that can express an integro-differential law; and an
+`integraleq` submodule -- Fredholm / Volterra **integral equations of the second
+kind** `u = f + lam integral K(x,t) u(t) dmu(t)`, the mirror image of a
+differential equation, where Nystrom discretisation is nearly free because a
+`Measure` already is the nodes and weights of `(I - lam K W) u = f`:
+`nystrom_solve` (numerical at the measure's own order, spectral for
+Gauss-Legendre), `volterra_solve` (causal, triangular, always solvable),
+`neumann_series` (valid only for `|lam| rho(KW) < 1`, returning a `NeumannResult`
+whose `converged` flag is earned by the measured residual rather than assumed),
+`degenerate_kernel_solve` (finite rank, **exact in the kernel**, the analytic
+oracle) and `fredholm_residual`; the direct solvers refuse a **Fredholm
+alternative** via `solvability_margin` = `sigma_min/max(1,sigma_max)`, not the
+scale-invariant condition number, because a near-eigenvalue solve otherwise
+returns a huge finite vector that looks like an answer),
+`omnibias-score`
+(score / Ito-generator / Fokker-Planck, composed from `omnibias-fields`),
+`omnibias-variational` (least action: action integrals, Euler-Lagrange
+residuals, Hamiltonian/Noether machinery, classical field theory,
+geodesics-as-least-action, symplectic integrators, forward Lagrangian dynamics
+for Lagrangian Neural Networks, the Legendre transform to the Hamiltonian with
+canonical equations, and rigorous action enclosures),
+`omnibias-shape` (differentiable soft shape / occupancy fields + soft-OR /
+log-sum-exp coverage with a closed-form gradient/Hessian tower, turning discrete
+geometric covering -- e.g. minimum-square-cover -- into a second-order-optimizable
+energy; torch + jax),
+`omnibias-binary` (closed-form quantization gradients for binary / ternary /
+k-bit training via the tanh-beta Riccati derivative; torch + jax),
+`omnibias-spiking` (spiking LIF / IF primitives with exact closed-form surrogate
+gradients off the activation dictionary; torch + jax),
+`omnibias-hopfield` (modern Hopfield / attention-as-operator with a closed-form
+log-sum-exp Jacobian / Hessian; torch + jax), and
+`omnibias-formal` (Mathlib-backed formal certificate checking: discharges a
+certificate's rational obligations -- enclosed-quantity sign, positive-definite
+pivots, and the Newton-Kantorovich / Krawczyk contraction polynomial inequalities
+-- against Mathlib, wires a `mathlib_verified` verdict tier distinct from the
+Mathlib-free Lean kernel, exposes a deterministic loop driver `drive_obligation`
+(classify -> generate -> `lake build` -> report) behind the `omnibias-dev-formal-agent`
+skill; every Lean module is `sorry`-free and the scope is finite rational
+obligations only), and
+`omnibias-sos` (certified *universal* positivity by optimization: sound
+Sum-of-Squares / Positivstellensatz decompositions and the auxiliary-functional /
+background method for `for all data` bounds on polynomial ODE / Galerkin-truncated
+systems -- a floating-point SDP proposes a Gram matrix and a rigorous interval
+`LDL^T` positive-definiteness certificate proves it, reusing `omnibias.core.verified`
+and the Mathlib-free Lean kernel obligation so certificates can earn
+`theorem_prover_verified`; not a continuum-PDE or global-regularity claim), and
+the `omnibias.pinn.solver` submodule of `omnibias-pinn` (mesh-free solver for **coupled systems of PDEs** on the
+closed-form derivative tower: a `System` abstraction of coupled fields +
+vector residuals + boundary/initial conditions, steady linear-collocation and
+nonlinear residual-minimisation drivers -- the latter accepting the exact-curvature
+optimisers of `omnibias.torch.optim` (`cubic_gauss_newton`, `gauss_newton`,
+`cubic_newton`, `trust_region_newton_cg`, `jet_subspace_tensor`, `natural_gradient`)
+plus `grad_norm` loss balancing, since a closed-form residual makes the matrix-free
+Hessian / Gauss-Newton product exact; torch-only, `KFAC` excluded --
+residual-adaptive collocation (`RefinementSpec`: grow the interior point set toward
+large `abs(residual)`, measured at equal final budget) and **first-class inverse
+problems** (`Unknown` coefficients recovered from `Observations` by `solve_inverse`,
+constrained by construction through a softplus / scaled-sigmoid transform;
+identifiability is the caller's responsibility and fails silently), a
+spectral method-of-lines with a
+high-order jet-Taylor time integrator, and an optional certified a-posteriori
+error mode reusing `omnibias.core.verified`; exact arbitrary-order / high-order
+operators in one pass, torch + jax, `unproven_claim = False`), and
+`omnibias-convex` (differentiable + certified LP/QP: a closed-form-Hessian
+log-barrier interior point, a KKT-differentiable `argmin` layer, a rigorous
+interval optimality certificate, and a first-order **temperature-collapse** gradient-descent
+solver `solve_lp_penalty`/`solve_qp_penalty` that turns each constraint hyperplane
+into a tempered softplus unit with the closed-form gradient
+`c + Q x + mu A^T sigma(beta (A x - b))`, annealed along a `beta`/`mu` homotopy), and
+`omnibias-control` (differentiable + certified safe control: a batched, per-sample
+control-barrier-function CBF-QP **safety filter** -- the temperature-collapse projection
+specialised to state-dependent constraints, so it is differentiable and a policy can be
+trained *through* it -- plus autodiff Lie-derivative CBF-row builders for generic
+control-affine and learned-Lagrangian dynamics (`lagrangian_cbf_rows`, reusing
+`omnibias-variational`), a differentiable safe rollout, and a rigorous model-relative
+recoverable-set certificate via `omnibias-verify`; torch + jax twins), and
+`omnibias-routing` (certified + differentiable combinatorial **routing**: a poly-size
+TSP relaxation -- assignment / single-commodity-flow / Held-Karp -- solved differentiably
+by the temperature-collapse penalty *unrolled* for backprop, a heatmap + 2-opt tour decoder,
+and a rigorous optimality-gap certificate `lower <= optimum <= tour_cost`
+(`certify_tour_gap`, Neumaier-Shcherbina verified LP bound), plus decision-focused
+predict-then-optimize routing; the honest "yes-if" answer to a differentiable TSP -- a
+certified gap, never a `P = NP` exactness claim; torch + jax twins), and
+`omnibias-qubo` (certified + differentiable **quadratic Boolean optimization**: an
+annealed sigmoid relaxation of a QUBO / Ising energy solved differentiably by the
+**temperature-collapse** penalty *unrolled* for backprop, a rounding + 1-flip
+local-search decoder, a brute-force oracle, and a rigorous optimality-gap certificate
+`lower <= optimum <= energy` (`certify_qubo_gap`) with a headline Lasserre / SOS lower
+bound over the Boolean hypercube (`omnibias-sos`) or a cheap spectral / box-QP seal
+(`omnibias-convex`), plus `max_cut` and `max_independent_set` front-ends; the honest
+"yes-if" answer to a differentiable QUBO -- a certified gap, never a `P = NP` exactness
+claim; torch + jax twins). `omnibias-discrete` factors the shared
+`encode -> relax -> decode -> certify` substrate out of `omnibias-qubo` (the
+`DiscreteProblem` seam, `AnnealSchedule`, the `anneal_descent` torch + jax twins, the
+rounding / k-flip decoder + brute-force oracle, and the Lasserre / SOS `certify_gap`
+seeded by the always-valid `negative_coeff_lower_bound`); `omnibias-qubo` re-exports it
+unchanged, and the in-tree `omnibias.discrete.maxsat` front-end (weighted CNF -> a
+pseudo-Boolean `MaxSATProblem`) is its second consumer -- same honest "yes-if" certified
+gap, never a `P = NP` claim. `omnibias.discrete.sparse` is a third in-tree consumer:
+certified sparse recovery driven by the `l_p -> l_0` penalty-exponent collapse -- a
+support-selection QUBO sealed directly by `certify_gap` (A), a continuous best-subset
+problem sealed by an `omnibias-convex` box-QP bound with an OLS-residual back-stop
+(`certify_best_subset_gap`, B), and a hybrid `certified_sparse_fit` that seals the
+pseudo-Boolean surrogate and ships the continuous OLS refit (C); torch + jax `l_p` twins. `omnibias-logic` builds on that substrate (+ `omnibias-boolean`
++ `omnibias-sos`): it re-exports the weighted-MaxSAT surface unchanged and adds (weighted)
+**#SAT / model counting** with a rigorous inclusion-exclusion **count enclosure**
+`lower <= #models <= upper` (exact-arithmetic Bonferroni bounds tightening to the exact
+`O(2^n)` oracle built on `omnibias-boolean`), plus a `beta -> inf` annealed model-finder
+relaxation (torch + jax twins) whose decoded models are sound witness lower bounds -- the
+same honest "yes-if": a certified enclosure, never a `#P` / `P = NP` claim. It also ships
+**exact sound fast-paths** on the tractable fragments -- affine/XOR via `GF(2)` rank
+(`xor_model_count`, unweighted), weighted bounded-treewidth DP (`treewidth_model_count`), and
+a weighted component-caching #DPLL counter (`count_models_exact`) -- behind a sound-only
+router (`count -> CountResult`, `guarantee in {exact, certified_enclosure}`) with optional
+relaxation-warm-started branching; genuinely statistical estimators (an `(epsilon,delta)`
+XOR-hashing counter and a split-conformal wrapper) are quarantined in `omnibias.logic.approx`
+behind a distinct, non-forgeable `ApproxCount` (`worst_case_sound = False`) that is never
+mistaken for a certified bound. A sound count `seal`s into the tamper-evident certificate v1
+format and its finite obligation into the Mathlib-free Lean kernel (`seal_count_certificate`
++ `check_certificate`): a tight unweighted count as the integer identity
+`Z0 - S1 + S2 - ... = #models` (certified UNSAT included), else a positive lower bound as a
+satisfiability sign -- `theorem_prover_verified` earned only by a genuine `lake build`, the
+kernel re-checking the finite arithmetic only (the inclusion-exclusion theorem stays a trusted
+input; no `#P` / `P = NP` claim). The same certificate flows through the shared
+`omnibias.core.proof` ProofMachine via a registerable `count_prover` (and the one-call
+`prove_model_count`): it adjudicates an enclosure / sat / unsat / exact-count claim as
+PROVED / DISPROVED / BLOCKED with an independent `O(2^n)`-oracle replay twin, and honestly
+BLOCKs an exact-count claim unless the enclosure is tight.
+`omnibias-nphard` is the **named-NP-hard-families** consumer of the `omnibias-qubo`
+substrate: the **quadratic assignment problem** (QAP, Kronecker `Q = F (x) D` + one-hot
+permutation penalty), the **generalized assignment problem** (GAP, one-hot + binary-slack
+capacity encoding), and **parallel-machine scheduling** (load-variance makespan proxy) each
+implement the `DiscreteProblem` seam + a `to_qubo()` reduction, so the shared annealed
+relaxation, decoder and spectral / SOS `certify_gap` all apply. It adds structure-preserving
+decoders (Hungarian + 2-opt for QAP, capacity-feasible rounding for GAP, argmax + LPT-repair
+for scheduling), named classical baselines (`scipy.optimize.quadratic_assignment` FAQ/2-opt,
+LPT, LP relaxation + greedy / optional OR-Tools CP-SAT), exponential brute-force oracles,
+decision-focused training (`qap_decision_cost` backprops the true QAP cost through the
+relaxation; `normalized_regret` / `spo_plus_gradient` on the linear-objective GAP), and a
+from-scratch **UCT / PUCT MCTS "search track"** over a construction MDP that uses the
+differentiable relaxation heatmap as an AlphaZero-style **prior** (the "Go-like" demo; on QAP
+the heatmap is a *measured-weak* prior, so the demo is honestly rescoped to "search + sound
+certificate", never a faked beats-uniform claim). The **certified chip-placement flagship**
+(`placement_qap` + `certify_gap(kind="glb")`) frames block/macro floorplanning as the
+Koopmans-Beckmann QAP and certifies it with the QAP-specific **Gilmore-Lawler bound**
+(`gilmore_lawler_bound`): sound at every size (exact integer arithmetic, or outward-rounded
+`omnibias.core.verified.Interval` for floats), far tighter than the spectral bound, and --
+unlike the SOS SDP (dead past `N ~= 4`) -- `O(N^3)` and non-trivial at realistic block counts
+(`N ~= 12-25`); scope is block-level floorplanning, never a claim of beating industrial
+million-cell placers. The honest "yes-if" is the same as `omnibias-qubo` / `omnibias-routing`
+and unlike the P-class
+`omnibias-combinatorics`: the certified gap `lower <= optimum <= decoded` is **generally
+non-tight** (a weaker bound only widens it, never asserted zero) -- a certified gap, never a
+`P = NP` exactness claim; both `relaxation.py` twins + `__init__.py` are registered in
+`PENALTY_FILES`, and it ships bit-identical torch + jax twins.
+`omnibias-submodular` is the **monotone-submodular-maximization** consumer of the
+`omnibias-discrete` substrate: it maximizes a monotone submodular `f: 2^[n] -> R>=0` over a
+matroid constraint (cardinality / partition) by the **multilinear extension**
+`F(p) = E_{x~p}[f(x)]` and **continuous greedy** (Frank-Wolfe over the matroid polytope; the
+soft LP oracle `sigmoid(beta (g - tau))` *unrolled* for backprop so a model predicting the
+coverage data trains *through* it), then **pipage / swap rounding** to a feasible integral
+set `S` with the a-priori `f(S) >= (1 - 1/e) OPT` guarantee, and a rigorous marginal-gain
+gap certificate `f(S) <= OPT <= U(S)` (`certify_submodular_gap`, self-checked against
+`brute_force_max` on small `n`) plus a secondary unconstrained SOS bound via the shared
+`certify_gap`; it ships `Coverage` (weighted max-coverage), `FacilityLocation`,
+`BudgetAdditive`, `LogDeterminant` (DPP, greedy-path) and non-monotone `GraphCut` families +
+a submodular algebra (`Sum` / `Scaled` / `Saturated`), accelerated greedy (`lazy_greedy`
+CELF with identical output, seeded `stochastic_greedy`), a `greedy_maximize` baseline it
+beats or matches, and bit-identical torch + jax twins (coverage / facility / budget /
+graph-cut). Beyond cardinality / partition it covers **knapsack** budgets (`knapsack_maximize`
+`1 - 1/e` + `certify_knapsack_gap`), laminar / graphic / transversal matroids +
+`MatroidIntersection` (`p_matroid_greedy` `1/(p+1)`), **non-monotone** maximization
+(`double_greedy` `1/2`, `measured_continuous_greedy` `1/e`), one-pass `sieve_streaming`
+(`1/2 - eps`), and a `total_curvature`-sharpened ratio. It implements the `DiscreteProblem`
+seam (`energy = -f`) but deliberately runs continuous greedy rather than `anneal_descent`,
+since the `(1 - 1/e)` guarantee is specific to the multilinear extension; the `beta -> inf`
+oracle hardening onto a `0/1` matroid-basis vertex is the feasibility / temperature sense of
+"collapse", distinct from the founding `delta -> 0` bias collapse (both `relaxation.py` twins
++ `__init__.py` are registered in `PENALTY_FILES`); the honest "yes-if" is a certified
+`(1 - 1/e)` approximation + gap, never a `P = NP` exactness claim. The one exact solver it
+does ship is honest: unconstrained submodular *minimization* (`submodular_minimize` /
+`min_norm_point`, Fujishige-Wolfe; `lovasz_extension` its convex closure) is **P-class**, so
+its exactness is not a `P = NP` claim -- only the *maximization* is NP-hard.
+`omnibias-combinatorics` is the **P-class** consumer of that substrate (+ `omnibias-convex`
++ `omnibias-graph`): exact **differentiable matching / flow / matroid** layers -- an
+entropic / Sinkhorn relaxation onto the assignment / transportation / min-cost-flow /
+matroid polytope that anneals `beta -> inf` to a polytope vertex (reusing `omnibias-graph`'s
+`sinkhorn_normalize` / `soft_top_k`, not re-deriving them), a decode to a vertex,
+`classical_optimum` (Hungarian / LP / max-flow / greedy) as the exact best-in-class
+baseline, and a `lower <= optimum <= objective` optimality-gap certificate (`certify_gap`)
+that is **tight** because these polytopes are integral (Neumaier-Shcherbina verified LP
+dual via `omnibias-convex`); the honest "yes-if" is narrower here -- these problems are in
+`P`, so the value-add is differentiability + the tight certificate, never a `P = NP` claim;
+torch + jax twins.
+`omnibias-tab` is the **tabular-learning** consumer: differentiable, exactly
+second-order-trained, certified **soft decision-tree ensembles** that take on gradient
+boosting (LightGBM). A tree split is a hard threshold `1[w.x > t]`; `tab` makes it a soft
+oblique gate `sigmoid(beta (w.x - t))` and anneals `beta -> inf` toward a genuine hard
+split -- **temperature collapse** (the feasibility sense), distinct from
+the founding `delta -> 0` bias collapse (its gate / model penalty files are registered in
+`PENALTY_FILES`). The model is an ensemble of oblivious soft trees whose `depth == 1` tier
+is a pure sum-of-sigmoids (additive, directly certifiable) and whose `depth >= 2` tier
+multiplies gates into `2**depth` leaf memberships (native feature interactions), with
+bit-identical torch + jax forwards. It ships three trainers -- an exact joint second-order
+driver over `omnibias.torch.optim` (`CubicNewton` / `TrustRegionNewtonCG` / `KFAC` /
+`NaturalGradient`), a first-order Adam baseline, and a stagewise **Newton-boosting** driver
+(the GBM-mirror: closed-form per-stage loss gradient + Hessian from the Riccati tower) --
+and sound certificates (`omnibias.tab.certify`): output bounds, Lipschitz, per-feature
+**monotonicity** (a certified constraint, not a soft prior), an optional sealed scalar
+global-min (additive via `omnibias-verify` ingestion; multiplicative via a bespoke
+outward-rounded interval / Taylor-model forward), and a certified train-soft / deploy-hard
+**rounding gap** as `beta -> inf`. The honest "yes-if": you get a differentiable +
+certified tree model, not an optimal hard tree (which is NP-hard); beating LightGBM is a
+benchmarked claim earned per dataset (`docs/benchmarks.md`), never asserted. Builds on
+`omnibias-discrete` / `-curvature` / `-verify`; torch + jax twins.
+`omnibias-partition` is the light, **certified soft partition-of-unity** keystone: `depth`
+oblique split gates `sigmoid(beta (w.x - t))` route an input into `2**depth` regions with
+weights that are non-negative, sum to one, and **harden** to a crisp partition as
+`beta -> inf` -- **temperature collapse** (the feasibility sense), distinct from the
+founding `delta -> 0` bias collapse (its penalty files are in `PENALTY_FILES`). Ships a
+numpy reference `partition_weights` with bit-identical torch + jax twins (parity `~1e-9`),
+`hard_assignment` / `hardened_rules` (exported `if w.x > t` boundaries; `axis` mode gives
+single-feature rules), a **sound** soft->hard membership-gap certificate
+(`certify_partition_gap`: outward-rounded `Interval` weight enclosure + closed-form
+`log(n_regions)/beta` Gibbs bound, a yes-if object), and a `RegionModels` registry whose
+one `combine(X, beta) = sum_l w_l * out_l` engine is shared by four bridges as submodules
+of existing packages -- `omnibias.pinn.partition` (discontinuity-capturing PINN,
+`u = sum_l w_l u_l`), `omnibias.geometry.atlas` (region-wise metric `g = sum_l w_l G_l`,
+convex-combo-of-SPD stays SPD), `omnibias.symbolic.piecewise` (per-region SINDy +
+hybrid-automaton switch), and `omnibias.struct.decision` + `omnibias.tab.decision` (a
+certified `log(N)/beta` differentiable decision layer). Depends only on `omnibias-core`
+(+ optional torch/jax); products of sigmoids are differentiated by autodiff, not the
+closed-form tower.
+`omnibias-difference` is the founding `delta -> 0` (multi-bias collapse) register for
+**discrete calculus / analytic combinatorics**: `K` biases on a difference stencil coalesce
+as `delta -> 0` so the finite difference *becomes* the derivative `sigma^(K-1)`, which the
+closed-form tower evaluates exactly (no `1/delta^(K-1)` cancellation). It ships certified
+finite-difference -> derivative extraction (interval-tower enclosure + a certified
+Taylor-remainder bound), umbral / Sheffer calculus (finite differences, Newton
+interpolation, Stirling transforms, plus Sheffer / associated sequence *generation* and the
+umbral operator layer -- shift / delta / Pincherle / umbral functional -- in the
+`omnibias.difference.umbral` namespace), and asymptotic-coefficient reading --
+Stirling (off `omnibias.core.bell`), Bernoulli (off the `tanh` tower) and Euler (off a new
+`sech` tower) numbers, exact as `int` / `Fraction` with mpmath-checked asymptotics -- plus
+bit-identical torch + jax twins of the finite-difference stencil operator. It is also the
+home of an all-tiers **data-driven refinement program** (probes with grid+random soundness,
+an mpmath oracle, `K >= 8` seeds and a named baseline; harness in
+`omnibias.difference.validation`, umbrella smoke `docs/examples/difference_validate.py`):
+a certified Euler-Maclaurin summation engine + `log_gamma`/`digamma` and exact
+`zeta(2m)`/`zeta(1-2m)`/`beta(2m+1)` with an attempted (numerical) critical-strip
+continuation in `omnibias.core.verified`; certificate-sealed, Lean-checkable derivative
+enclosures and special-number identities (`theorem_prover_verified` only on a real `lake`
+pass); certified analytic-combinatorics enclosures (`generating`); and cross-package
+bridges -- discrete recurrence discovery in `omnibias-symbolic`, certified PDE-stencil
+truncation in `omnibias-verify`, and a sigma-tower vector-field bridge into
+`omnibias-dynamics`. This is the `delta -> 0` *derivative* sense of collapse, never the
+`beta -> inf` feasibility penalty.
+`omnibias-qcalculus` is the **quantum / q-calculus** extension of the difference register:
+exact q-combinatorics (`[n]_q`, `[n]_q!`, Gaussian / q-binomial, q-Pochhammer as `Fraction`
+or integer polynomials in `q`), the Jackson q-derivative / q-integral, the two q-exponentials
+and q-deformed Bernoulli / Euler numbers, basic hypergeometric series `_r phi_s` with a
+certified geometric tail, and a q-umbral / q-Sheffer layer (`omnibias.qcalculus.umbral`:
+q-Stirling numbers + q-falling/rising bases, q-binomial / q-Stirling transforms, q-Newton
+interpolation on the `[j]_q` nodes, and q-Appell / general `q_sheffer_sequence` generation
+carrying the exact `Q s_n = [n]_q s_{n-1}` recurrence, all reducing to
+`omnibias.difference.umbral` as `q -> 1`), plus bit-identical torch + jax
+Jackson-derivative twins. Its
+collapse is the **`q -> 1`** limit (`[n]_q -> n`, `D_q f -> f'`, `e_q -> exp`) -- a *distinct*
+limit from the founding `delta -> 0` bias collapse of `omnibias-difference` and the
+`beta -> inf` feasibility penalty, same spirit, different parameter, never conflated. Honesty:
+q-combinatorics / polynomial operators / q-B / q-E are `closed-form`, the callable Jackson
+operators and direct q-series are `numerical`, and the q-exponential / basic-hypergeometric
+enclosures are `numerical (certified)`. Smoke `docs/examples/qcalculus_validate.py`.
+`omnibias-timescale` is **time-scale (Hilger) calculus**: one calculus over an arbitrary
+closed subset of the reals -- `TimeScale` for `R`, `hZ`, `q^Z u {0}` and finite sets (jump
+operators `sigma` / `rho`, graininess `mu` / `nu`); `delta` / `nabla` derivatives whose
+`delta_derivative_tower` **dispatches** to the closed-form derivative tower on `R`, the forward
+difference on `hZ`, and the Jackson q-derivative on the quantum scale; the delta integral, the
+Hilger exponential + regressive `circle-plus` group, and linear dynamic equations; with
+bit-identical torch + jax delta-derivative twins. It is the founding `delta -> 0` bias collapse
+**generalized** -- the graininess limit `mu -> 0` recovers the continuum tower -- a distinct
+limit from qcalculus's `q -> 1` and the `beta -> inf` penalty, carried honestly and registered
+in the `FOUNDING_FILES` terminology guard. Smoke `docs/examples/timescale_validate.py`.
+`omnibias-holonomic` is the **D-finite computer-algebra engine + Lean-certified identities**
+capstone: a genuine right-Euclidean Ore (skew-polynomial) algebra for the shift `S` and
+differential `D` operators (`ore_divmod` / `gcrd` / `lclm` / `symmetric_product`); `DFinite` /
+`PRecursive` objects closed under sum / Hadamard **symbolically for all `n`** (verified-ansatz
+fallback) plus Cauchy product; Gosper's algorithm for unconditional closed-form hypergeometric
+summation (non-summable terms *refused*); **true Zeilberger + WZ** (`zeilberger`, `wz_pair` on
+exact bivariate `ProperTerm`s -- a telescoper `L` + rational cofactor `R(n,k)` from one exact
+null space, degenerate sums like `sum (-1)^k C(n,k)=[n=0]` handled natively); **Petkovsek's
+`hyper`** (all hypergeometric-term solutions of a shift recurrence, on a scoped rational-root
+`factor` substrate); a **q-holonomic** bridge (`q_gosper` / `q_zeilberger` on
+`omnibias-qcalculus`, exact q-rational certificates at a fixed rational `q`, the `q -> 1`
+*distinct* limit); exact **D-finite ⇔ P-recursive transforms** + closures
+(`dfinite_derivative` / `dfinite_integral` / `dfinite_compose_poly`); `guess_dfinite` /
+`guess_algebraic` (guessed-then-verified); `precursive_asymptotics` (Poincare-Perron leading
+rate / exponent, `numerical`, `certified_asymptotic` bridging `difference.transfer_theorem`);
+and `prove_hypergeometric_identity` / `prove_identity_zeilberger`, discharging classic binomial
+identities as per-coefficient `rational_identity` obligations the omnibias Lean kernel checks --
+the Zeilberger path's `P(n,k)==0` grid proving the identity for **all** `n` (`HolonomicProof.all_n`).
+`theorem_prover_verified` is earned only on a genuine `lake` pass, never forged, degrading
+gracefully with no toolchain. Ore algebra / symbolic closures / Zeilberger sums / transforms /
+certificate payloads are `closed-form for all n`; `factor` is scoped to the rational-root /
+linear regime; *which* annihilator a guessed sum obeys is `guessed` then verified; asymptotics is
+`numerical`. Builds on `omnibias-difference` (probe harness + transfer theorem),
+`omnibias-qcalculus` (q-primitives), `omnibias-symbolic` (recurrence guessing) and the
+`omnibias.core.proof` Lean loop. Smoke `docs/examples/holonomic_validate.py`.
+`omnibias-struct` is the **dynamic-programming** register of the `beta -> inf` family:
+certified differentiable **soft Viterbi / shortest-path / CTC**, where the DP `max`
+combine becomes `lse_beta` (so `lse_beta -> max` as `beta -> inf`, annealing to exact hard
+DP -- the feasibility axis) and is differentiated *exactly* by the `delta -> 0` founding
+bias collapse tower (`softplus^(n) = sigma^(n-1)` propagated through `compose_jet` gives
+closed-form log-sum-exp / softmax jets; the soft-DP gradient is the forward-backward path
+marginal). It ships a closed-form `V* <= V_beta <= V* + log(N)/beta` gap certificate
+self-checked against brute-force hard DP, with bit-identical torch + jax twins -- the same
+honest "yes-if": a certified gap that shrinks with `beta`, never an exactness claim. The
+same substrate carries the application layers **soft-DTW, sequence alignment (global,
+local Smith-Waterman, affine-gap Gotoh), soft value iteration / planning, monotonic
+alignment search, and structured attention**. A **semiring / hypergraph driver**
+(`Hypergraph` + `MaxPlus`/`Log`/`Counting` semirings) generalises the whole substrate --
+every DP is a semiring reduction over a weighted hypergraph's derivations, and the driver
+reproduces the hand-written soft-DP layers bit-for-bit (the additive-safety proof) -- so
+the **tree / grammar families** lift onto it with no bespoke recursion: **CKY
+inside-outside parsing**, **Eisner projective dependency** parsing, and the **matrix-tree**
+non-projective marginals (an *exact* Kirchhoff-determinant partition, honestly not an
+`lse_beta` relaxation, with the `beta -> inf` gap taken against the max arborescence). On
+top sit the **distribution operators** -- path entropy, exact forward-filtering
+backward-sampling, and exact k-best (+ a top-k-restricted free energy). It also ships exact
+higher-order and second-order derivatives *through* the DP recursion (`dp_value_jet`,
+`hypergraph_lse_jet` / `cky_lse_jet` / `eisner_lse_jet`, + a torch curvature / HVP bridge);
+a **verified interval** enclosure of `V_beta` (`omnibias.struct.verified`, outward-rounded
+from `omnibias.core.verified`, now covering DTW / alignment / CTC values, certified
+forward-backward marginals, and the interval matrix-tree determinant); and a sealed,
+optionally Lean-checkable **certified-decoding** proof that the decoded path's
+winner-vs-runner-up margin stays `> 0` over an input `epsilon`-ball (chain and DAG /
+`omnibias.struct.decode`). A **certified argmax / measure-mode collapse** submodule
+(`omnibias.struct.select`) closes the `beta -> inf` collapse of a Gibbs law onto its mode:
+`certify_argmax` seals a `SelectionCertificate` (value gap `log(N)/beta`, the mode-mass lower
+bound `p_max >= 1/(1+(N-1)e^{-beta m})` checked against the exact `p_max`, and the optional
+`L^inf` argmax-stability radius `m/2`), with backend twins for the differentiable
+`soft_argmax` and the exact Gibbs moments (`gibbs_mean` / `gibbs_covariance` /
+`gibbs_cumulants_directional` via the log-partition `compose_jet`). A data-driven probe harness
++ committed refinement sweep (`docs/benchmarks/struct_refinement.json`) back every claim with a
+measured verdict.
+
+## Start here
+
+- [README](README.md): install, 30-second tour, package tiers.
+- [AGENTS.md](AGENTS.md): machine-oriented guide for AI agents (layout, commands, do/don't).
+- [CONTRIBUTING](CONTRIBUTING.md): dev setup, test/lint/docs commands, PR checklist.
+
+## Documentation
+
+- [Docs index](docs/index.md)
+- [Theory: closed-form derivatives](docs/theory.md)
+- [Activation dictionary](docs/activations.md)
+- [API stability matrix](docs/stability.md)
+- [Roadmap](docs/roadmap.md)
+
+## Examples
+
+- [PyTorch quickstart](docs/examples/quickstart_torch.py)
+- [JAX quickstart](docs/examples/quickstart_jax.py)
+- [Keras 3 quickstart](docs/examples/quickstart_keras.py)
+- [PINN heat equation](docs/examples/pinn_heat.py)
+- [Second-order PINN solver training](docs/examples/pinn_solver_curvature.py)
+- [PINN inverse problems + adaptive collocation](docs/examples/pinn_solver_inverse.py)
+- [QPINN harmonic oscillator](docs/examples/qpinn_tise_qho.py)
+- [PDE solver: coupled reaction-diffusion](docs/examples/pde_reaction_diffusion.py)
+- [Convex LP by gradient descent (bias collapse)](docs/examples/convex_lp_gradient_descent.py)
+- [Certified-safe learned control (learned-Lagrangian CBF filter)](docs/examples/control_learned_lagrangian_cbf.py)
+- [Certified differentiable decision-focused routing (TSP)](docs/examples/decision_focused_routing_tsp.py)
+- [Certified differentiable QUBO / max-cut (relax -> decode -> certify, + backprop-through-opt)](docs/examples/certified_differentiable_qubo.py)
+- [Certified differentiable submodular maximization (continuous greedy + pipage rounding, (1-1/e) sandwich vs brute force + train-through)](docs/examples/certified_differentiable_submodular.py)
+- [Submodular function families & constraints (lazy/stochastic greedy on a log-det DPP + certified gap; budgeted-knapsack coverage; non-monotone max-cut via double greedy; exact P-class submodular_minimize vs brute force)](docs/examples/submodular_families_and_constraints.py)
+- [Certified differentiable NP-hard (QAP sandwich vs scipy quadratic_assignment + train-through)](docs/examples/certified_differentiable_nphard.py)
+- [Go-like MCTS search with a differentiable relaxation prior (scheduling; beats-uniform + certified gap)](docs/examples/nphard_mcts_search.py)
+- [Certified chip placement (QAP floorplanning: Gilmore-Lawler GLB <= optimum <= decoded wirelength, scales past brute/SOS, vs scipy + place-through-the-solver)](docs/examples/certified_chip_placement.py)
+- [Certified differentiable matching (Sinkhorn relax -> decode -> tight LP-dual gap sandwiching Hungarian + train-through)](docs/examples/certified_differentiable_matching.py)
+- [Certified + differentiable Boolean logic (MaxSAT gap + #SAT count enclosure sandwiching the exact oracle)](docs/examples/certified_logic_maxsat_sharpsat.py)
+- [Exact #SAT fast-paths + sound router + a sealed Lean-checkable count certificate + a quarantined statistical layer (affine/treewidth/DPLL agree with the oracle; seal -> verify -> kernel-check; ApproxMC + conformal stay non-sound)](docs/examples/logic_exact_and_approx_counting.py)
+- [Certified differentiable dynamic programming (soft Viterbi / shortest-path, log(N)/beta gap + brute-force agreement, backprop-through-DP + tower marginals)](docs/examples/certified_soft_dp.py)
+
+## Agent tooling
+
+- [omnibias-skills package](packages/omnibias-skills/README.md): consumer agent skills + installer CLI (`omnibias-skills install`).
+- Skills & rules: [.cursor/skills](.cursor/skills), [.claude/skills](.claude/skills), [.cursor/rules](.cursor/rules). See the "Agent tooling" section of [AGENTS.md](AGENTS.md).
+
+## Optional
+
+- [DeepXDE / Modulus → omnibias-pinn migration](docs/migration-pinn.md)
+- [Benchmarks (vendor-neutral)](docs/benchmarks.md)
+- [Changelog](CHANGELOG.md)
+- [Release readiness](docs/release-readiness.md)

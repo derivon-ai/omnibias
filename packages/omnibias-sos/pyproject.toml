@@ -1,0 +1,68 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-sos"
+version = "0.1.0a1"
+description = "Certified universal positivity by optimization: sound Sum-of-Squares / Positivstellensatz decompositions and the auxiliary-functional (background) method. A floating-point SDP proposes a Gram matrix; the proof is a rigorous interval LDL^T positive-definiteness certificate that reuses omnibias.core.verified and the Mathlib-free Lean kernel obligation, so certificates can earn theorem_prover_verified."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = [
+    "sum-of-squares",
+    "positivstellensatz",
+    "semidefinite-programming",
+    "computer-assisted-proof",
+    "interval-arithmetic",
+    "auxiliary-functional-method",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["omnibias-core>=0.2.0", "numpy>=1.24"]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+dev = ["omnibias-sos[test]", "ruff>=0.1.0", "mypy>=1.5"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.sos" = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = ["src"]
+
+[[tool.mypy.overrides]]
+# numpy is used only by the advisory float SDP proposer; omnibias-core is a
+# hard dependency that ships no py.typed marker (so it is external from this
+# self-scoped check, exactly like numpy); omnibias-formal is an optional
+# (non-dependency) package used behind a guarded import in formal.py.
+module = ["numpy.*", "omnibias.core.*", "omnibias.formal.*"]
+ignore_missing_imports = true

@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-skills"
+version = "0.1.0a1"
+description = "Agent-skill library for building on omnibias: bundled Cursor / Claude Code Agent Skills plus an idempotent installer CLI that places them into a project's .cursor and .claude directories."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = [
+    "agent-skills",
+    "cursor",
+    "claude-code",
+    "ai-assistant",
+    "developer-tools",
+    "omnibias",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.scripts]
+omnibias-skills = "omnibias.skills.cli:main"
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+dev = ["omnibias-skills[test]", "ruff>=0.1.0", "mypy>=1.5"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.skills" = ["_bundled/**/*", "py.typed"]
+
+# Self-contained strict-typing config: this alpha extension package is not on the
+# shared T1 mypy gate (whose multi-base mypy_path owns the `omnibias` namespace),
+# so it scopes its own base. Run from this directory: `mypy src/omnibias/skills`.
+[tool.mypy]
+strict = true
+namespace_packages = true
+explicit_package_bases = true
+mypy_path = "src"

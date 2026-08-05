@@ -1,0 +1,28 @@
+---
+description: JAX backend tracing safety for omnibias (jit/vmap/grad-safe, functional, torch-parity)
+globs:
+  - "packages/omnibias-jax/**/*.py"
+alwaysApply: false
+---
+
+# omnibias JAX backend: tracing safety
+
+`omnibias.jax` is functional and must stay `jit` / `vmap` / `grad`-safe and
+bit-identical to its `omnibias.torch` twin (shared coefficients from
+`omnibias.core.polynomials`).
+
+- No host-side coercion of a traced value inside a kernel: never call `float(x)`, `x.item()`, `int(x)`, or `bool(x)` on a tracer.
+- No Python `if` / `for` that branches on a traced value; use `jnp.where`, `lax.cond`, `lax.select`, or `lax.scan`.
+- Keep functions pure: no in-place mutation, no global state; return new arrays.
+- Default to the JAX default dtype; enable float64 via config for parity tests, never hardcode `float32`.
+
+```python
+# BAD - breaks under jit / vmap
+if float(z[0]) > 0:          # host coercion + Python branch on a tracer
+    y = sigma(z)
+
+# GOOD
+y = jnp.where(z > 0, sigma(z), other)
+```
+
+Every change here needs a cross-backend parity test (torch vs jax) in `tests/`.

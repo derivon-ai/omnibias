@@ -1,0 +1,37 @@
+{
+  "title": "omnibias: numerically-stable closed-form n-th derivative forward-pass framework",
+  "description": "omnibias computes the closed-form n-th derivative of an activation, sigma^(n)(z), for arbitrary n with bit-stable accuracy and a single sigma evaluation regardless of order. The same primitive is exposed on PyTorch, JAX, and Keras 3 from one shared pure-Python coefficient core, so every backend is bit-identical by construction. The core math is the Riccati identity plus the Eulerian / Legendre / Hermite polynomial recurrences it implies, extended to multi-layer and multivariate Taylor jets via Bell / Faa di Bruno combinatorics. It also includes neural-jet symbolic regression / equation discovery that reads exact Taylor jets off a fitted field to recover ODE / PDE laws with full calculus primitives.",
+  "upload_type": "software",
+  "license": "Apache-2.0",
+  "access_right": "open",
+  "creators": [
+    {
+      "name": "Grigoryants, Vardan",
+      "affiliation": "Derivon"
+    }
+  ],
+  "keywords": [
+    "automatic differentiation",
+    "closed-form derivatives",
+    "Taylor jets",
+    "Faa di Bruno",
+    "physics-informed neural networks",
+    "differential geometry",
+    "verified numerics",
+    "symbolic regression",
+    "equation discovery",
+    "neural-jet discovery",
+    "SINDy",
+    "PyTorch",
+    "JAX",
+    "Keras"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/derivon-ai/omnibias",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    }
+  ],
+  "notes": "omnibias ships 42 distributions in two licence tiers. The 28 permissive packages -- the derivative tower and everything built directly on it -- are Apache-2.0. The 14 certified-decision packages (verify, formal, sos, dynamics, convex, discrete, qubo, logic, nphard, submodular, combinatorics, routing, tab, control) are AGPL-3.0-or-later or available under a commercial licence from Derivon. No permissive package depends on a copyleft one. See LICENSING.md."
+}

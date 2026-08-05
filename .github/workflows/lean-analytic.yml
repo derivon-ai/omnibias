@@ -1,0 +1,59 @@
+name: lean analytic (Mathlib-backed, non-blocking)
+
+# The Mathlib-backed analytic track is deliberately OFF the fast CI path: even
+# with `lake exe cache get` it takes minutes and multi-GB. It runs only when this
+# project changes, on manual dispatch, or on a weekly drift check against the
+# pinned Mathlib release -- never gating a normal push.
+on:
+  pull_request:
+    paths:
+      - "formal/omnibias-analytic/**"
+      - "packages/omnibias-formal/**"
+      - ".github/workflows/lean-analytic.yml"
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 5 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  lean_analytic:
+    name: omnibias-analytic (Mathlib kernel-check)
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - name: Install elan / Lean (toolchain pinned by lean-toolchain)
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh \
+            | sh -s -- -y --default-toolchain leanprover/lean4:v4.31.0
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Cache Mathlib build artifacts
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684  # v4.2.3
+        with:
+          path: formal/omnibias-analytic/.lake
+          key: >-
+            mathlib-${{ runner.os }}-${{ hashFiles(
+              'formal/omnibias-analytic/lakefile.lean',
+              'formal/omnibias-analytic/lean-toolchain') }}
+      - name: Resolve Mathlib, fetch prebuilt cache, and build (kernel-checks Check/)
+        run: |
+          cd formal/omnibias-analytic
+          lake update
+          lake exe cache get
+          lake build
+      - name: Honesty audit -- every module is sorry-free
+        run: |
+          cd formal/omnibias-analytic
+          # The analytic track discharges finite rational obligations only. Nothing
+          # here may be admitted: a sorry means an out-of-scope obligation crept in.
+          ! grep -R -n "sorry" OmnibiasAnalytic OmnibiasAnalytic.lean
+      - name: Replay a certificate end-to-end through the Python bridge (lake on PATH)
+        run: |
+          python -m venv .venv-formal
+          source .venv-formal/bin/activate
+          pip install --upgrade pip
+          pip install -e packages/omnibias-core[test]
+          pip install -e "packages/omnibias-formal[test]"
+          python -m pytest packages/omnibias-formal/tests -q

@@ -1,0 +1,61 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-holonomic"
+version = "0.1.0a1"
+description = "A D-finite / holonomic engine: exact Ore (skew-polynomial) algebra for the shift and differential operators, D-finite / P-recursive objects closed under sum / Hadamard / Cauchy product, Gosper's algorithm for closed-form indefinite and definite hypergeometric summation, creative telescoping (guessed-then-verified annihilating recurrences), and Lean-certified binomial identities whose per-coefficient rational obligations the omnibias Lean kernel discharges (theorem_prover_verified earned only on a genuine lake pass). Pure Python; builds on omnibias-core, omnibias-difference and omnibias-symbolic."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = [
+    "holonomic",
+    "d-finite",
+    "p-recursive",
+    "ore-algebra",
+    "gosper",
+    "zeilberger",
+    "creative-telescoping",
+    "hypergeometric-identities",
+    "lean",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = [
+    "omnibias-core>=0.2.0",
+    "omnibias-difference>=0.1.0a1",
+    "omnibias-qcalculus>=0.1.0a1",
+    "omnibias-symbolic>=0.1.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0", "numpy>=1.24", "mpmath>=1.3"]
+dev = ["omnibias-holonomic[test]", "ruff>=0.1.0", "mypy>=1.5"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.holonomic" = ["py.typed"]

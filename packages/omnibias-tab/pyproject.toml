@@ -1,0 +1,76 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-tab"
+version = "0.1.0a1"
+description = "Differentiable, exactly second-order-trained, and certified soft decision-tree ensembles for tabular data: oblique soft-split gates annealed by temperature collapse (the beta -> inf penalty) from soft toward hard trees, trained end to end with omnibias exact-curvature optimizers plus a Newton-boosting driver, carrying sound certificates (output bounds, Lipschitz, per-feature monotonicity, and a certified soft->hard rounding gap) with bit-identical torch/jax forwards, and benchmarked against gradient boosting (LightGBM)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = ["tabular", "decision-trees", "gradient-boosting", "soft-trees", "second-order-optimization", "differentiable-trees", "certified-machine-learning", "monotonicity"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = [
+    "omnibias-core>=0.2.0",
+    "omnibias-discrete>=0.1.0a1",
+    "omnibias-struct>=0.1.0a1",
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+# The trainable soft-tree module + the exact second-order optimizers
+# (omnibias.torch.optim CubicNewton / TrustRegionNewtonCG / KFAC / NaturalGradient)
+# and the Newton-boosting driver need a torch backend.
+torch = ["torch>=2.0", "omnibias-torch>=0.2.0"]
+# The bit-identical jax forward twin + functional natural-gradient direction.
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
+# Sealed / tighter certificates for the additive (depth-1) model via the
+# omnibias-verify Network (Taylor + branch-and-bound). The always-available
+# interval certificates use only omnibias-core's verified substrate, so
+# certify_tab degrades gracefully without this extra.
+verify = ["omnibias-verify>=0.1.0a1"]
+# Optional closed-form Fisher / Gauss-Newton metric blocks as a NaturalGradient
+# metric provider.
+curvature = ["omnibias-curvature>=0.1.0a1"]
+# The named gradient-boosting baseline + tabular dataset loaders for the
+# benchmark harness (kept out of the core deps; the refine loop needs them).
+gbm = ["lightgbm>=4.0", "scikit-learn>=1.2", "openml>=0.14"]
+all = ["omnibias-tab[torch,jax,verify,curvature]"]
+test = ["pytest>=7.0", "numpy>=1.24"]
+dev = ["omnibias-tab[all,test,gbm]", "ruff>=0.1.0", "mypy>=1.5"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.tab" = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+files = ["src/omnibias/tab"]

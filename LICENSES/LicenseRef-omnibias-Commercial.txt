@@ -1,0 +1,59 @@
+omnibias Commercial License (LicenseRef-omnibias-Commercial)
+============================================================
+
+This is a *license reference*, not a license grant. It exists so that the SPDX
+expression
+
+    AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
+
+is resolvable by REUSE-compliant and SPDX-aware tooling. It documents the
+alternative branch of that expression; it does not itself grant any rights.
+
+
+Which files this applies to
+---------------------------
+
+The copyleft tier of omnibias -- the packages recorded as `copyleft` in
+`[tool.omnibias.license_tiers]` in the repository root `pyproject.toml`. Every
+file in those packages carries the SPDX header
+
+    SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
+
+The permissive tier (recorded as `permissive` in the same table) is
+Apache-2.0 only and is **never** covered by this reference. You never need a
+commercial license to use a permissive-tier package.
+
+
+What the expression means
+-------------------------
+
+You may use the copyleft tier under **either** branch, at your option:
+
+1. **AGPL-3.0-or-later** -- the terms in `LICENSES/AGPL-3.0-or-later.txt`.
+   Free of charge. You accept the copyleft obligations, including the AGPL
+   Section 13 network-use source-disclosure requirement.
+
+2. **LicenseRef-omnibias-Commercial** -- a separate, signed, written commercial
+   license agreement issued by Derivon. Without such an executed agreement,
+   this branch grants nothing and the AGPL branch is the only one available to
+   you.
+
+Selecting branch 2 requires an executed agreement. Merely reading this file,
+downloading the software, or paying an invoice does not execute one.
+
+
+How to obtain the commercial branch
+-----------------------------------
+
+Contact Derivon at info@derivon.ai. The binding terms are set out solely in the
+signed agreement. `COMMERCIAL-LICENSE.md` in the repository root is a
+plain-language summary of the typical offer and is neither the contract nor
+legal advice.
+
+
+Copyright
+---------
+
+Copyright (C) 2026 Derivon. All rights reserved except as expressly granted
+under one of the two branches above. "omnibias" is a trademark of Derivon; see
+`TRADEMARKS.md`. Trademark rights are not granted by either branch.

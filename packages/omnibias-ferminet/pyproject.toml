@@ -1,0 +1,62 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-ferminet"
+version = "0.2.0"
+description = "FermiNet bridge for omnibias: folx-compatible Laplacian adapters, restricted-depth Tier-2 FermiNet ansatz with closed-form Laplacian, and multiblock primitives for analytic nuclear Hessian / Born-Oppenheimer derivative work."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = [
+    "ferminet",
+    "neural-quantum-states",
+    "variational-monte-carlo",
+    "deep-learning",
+    "jax",
+    "quantum-chemistry",
+    "physics",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Typing :: Typed",
+]
+dependencies = [
+    "omnibias-core>=0.2.0",
+    "omnibias-jax>=0.2.0",
+    "jax>=0.4.30",
+    "jaxlib>=0.4.30",
+    "numpy>=1.23",
+]
+
+[project.optional-dependencies]
+test = ["pytest>=7.0"]
+folx = ["folx>=0.1"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.ferminet" = ["py.typed"]

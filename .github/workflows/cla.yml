@@ -1,0 +1,45 @@
+name: cla
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_target:
+    types: [opened, closed, synchronize]
+
+permissions:
+  actions: write
+  contents: read
+  pull-requests: write
+  statuses: write
+
+jobs:
+  cla:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: CLA assistant
+        if: >
+          (github.event.comment.body == 'recheck' ||
+           github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA') ||
+          github.event_name == 'pull_request_target'
+        uses: contributor-assistant/github-action@ca4a40a7d1004f18d9960b404b97e5f30a505a08  # v2.6.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # A fine-grained PAT with write access to the signatures repo below.
+          # Create it and add it as a repo secret named PERSONAL_ACCESS_TOKEN.
+          PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        with:
+          path-to-document: "https://github.com/derivon-ai/omnibias/blob/main/docs/CLA.md"
+          path-to-signatures: "signatures/cla.json"
+          # Dedicated private repo that stores the signature registry:
+          remote-organization-name: "derivon-ai"
+          remote-repository-name: "cla-signatures"
+          branch: "main"
+          allowlist: "dependabot[bot],github-actions[bot]"
+          custom-pr-sign-comment: "I have read the CLA Document and I hereby sign the CLA"
+          custom-notsigned-prcomment: >
+            Thank you for your contribution! Before we can merge it, please read
+            our [Contributor License Agreement](docs/CLA.md) and sign it by
+            commenting exactly:
+
+            I have read the CLA Document and I hereby sign the CLA

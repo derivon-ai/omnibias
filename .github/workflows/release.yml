@@ -1,0 +1,141 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
+#
+# Publish the curated-core release set to TestPyPI and/or production PyPI.
+#
+# The curated-core packages ship first under an API-stability contract:
+#   core, torch, jax, ferminet, keras, fields, pinn, geometry
+#
+# Auth: Trusted Publishing (OIDC) only -- no long-lived API tokens in secrets.
+# Before the first publish, configure a PyPI / TestPyPI *trusted publisher* for
+# each project pointing at this workflow and the matching GitHub Environment
+# (`testpypi` or `pypi`). See https://docs.pypi.org/trusted-publishers/
+name: release
+
+on:
+  push:
+    tags:
+      # Independent per-package semver tags, e.g. omnibias-core-v0.4.0,
+      # plus a simple aggregate v0.4.0 tag for the whole curated core.
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+      - "omnibias-*-v[0-9]+.[0-9]+.[0-9]+*"
+  workflow_dispatch:
+    inputs:
+      packages:
+        description: "Curated-core short-names to publish (space-separated)"
+        required: false
+        default: "core torch jax ferminet keras fields pinn geometry"
+      repository:
+        description: "Publish target"
+        required: true
+        type: choice
+        default: testpypi
+        options:
+          - testpypi
+          - pypi
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build curated-core distributions
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      # Required by actions/attest-build-provenance to mint the signed
+      # attestation and record it in the public transparency log.
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065  # v5.6.0
+        with:
+          python-version: "3.11"
+      - name: Install build tooling
+        run: python -m pip install --upgrade pip build twine
+      - name: Resolve package list
+        id: select
+        run: |
+          PKGS="${{ github.event.inputs.packages }}"
+          if [ -z "$PKGS" ]; then
+            PKGS="core torch jax ferminet keras fields pinn geometry"
+          fi
+          echo "pkgs=$PKGS" >> "$GITHUB_OUTPUT"
+      - name: Build curated-core sdists + wheels
+        run: |
+          for name in ${{ steps.select.outputs.pkgs }}; do
+            python -m build "packages/omnibias-$name" --outdir dist/
+          done
+          ls -1 dist/
+      - name: Validate distribution metadata
+        run: twine check dist/*
+      # SLSA build provenance: a signed, verifiable attestation that these exact
+      # artifacts were produced by this workflow from this commit. Consumers
+      # verify with `gh attestation verify <dist> --repo derivon-ai/omnibias`.
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@0f67c3f4856b2e3261c31976d6725780e5e4c373  # v4.1.1
+        with:
+          subject-path: "dist/*"
+      - name: Upload built distributions
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: curated-core-dist
+          path: dist/
+          retention-days: 7
+
+  # Default path for tag pushes: TestPyPI via OIDC trusted publishing.
+  # Configure the GitHub Environment `testpypi` + TestPyPI trusted publishers
+  # before the first use.
+  testpypi:
+    name: publish curated-core to TestPyPI (OIDC)
+    needs: [build]
+    if: >
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && inputs.repository == 'testpypi')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: testpypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download built distributions
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          name: curated-core-dist
+          path: dist/
+      - name: Publish to TestPyPI
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc  # v1.12.4
+        with:
+          repository-url: https://test.pypi.org/legacy/
+          # skip-existing keeps re-runs idempotent (a re-tag will not error on an
+          # already-uploaded version).
+          skip-existing: true
+
+  # Production PyPI: OIDC trusted publishing only. Manual workflow_dispatch with
+  # repository=pypi, or extend the `if:` once the pypi environment + publishers
+  # are configured. No long-lived token is used.
+  pypi:
+    name: publish curated-core to PyPI (OIDC)
+    needs: [build]
+    if: github.event_name == 'workflow_dispatch' && inputs.repository == 'pypi'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: pypi
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - name: Download built distributions
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          name: curated-core-dist
+          path: dist/
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc  # v1.12.4

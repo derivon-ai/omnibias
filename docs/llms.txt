@@ -1,0 +1,44 @@
+# omnibias documentation
+
+> Numerically-stable closed-form n-th derivative forward-pass framework.
+> This is the documentation site map for LLMs. omnibias computes
+> `sigma^(n)(z)` in closed form for arbitrary `n`, bit-identical across
+> PyTorch, JAX, and Keras 3.
+
+## Theory
+
+- [Closed-form derivatives](theory.md)
+- [Activation dictionary](activations.md)
+- [API stability matrix](stability.md)
+- [Roadmap](roadmap.md)
+- [PINN derivations](pinn-derivations.md)
+
+## API reference
+
+- [omnibias-core](api/core.md)
+- [omnibias-torch](api/torch.md)
+- [omnibias-jax](api/jax.md)
+- [omnibias-ferminet](api/ferminet.md)
+- [omnibias-keras](api/keras.md)
+- [omnibias-fields](api/fields.md)
+- [omnibias-pinn](api/pinn.md)
+- [omnibias-qpinn](api/qpinn.md)
+- [omnibias-curvature](api/curvature.md)
+- [omnibias-geometry](api/geometry.md)
+- [omnibias-fractional](api/fractional.md)
+- [omnibias-measure](api/measure.md)
+- [omnibias-score](api/score.md)
+- [omnibias-skills](api/skills.md)
+
+## Cookbook
+
+- [Differential geometry on the sphere](cookbook/geometry-sphere.md)
+- [PINN heat equation](cookbook/pinn-heat.md)
+- [PINN Navier-Stokes (2D / 3D)](cookbook/pinn-navier-stokes.md)
+- [QPINN harmonic oscillator (TISE)](cookbook/qpinn-tise-qho.md)
+
+## Optional
+
+- [DeepXDE / Modulus → omnibias-pinn migration](migration-pinn.md)
+- [Benchmarks (vendor-neutral)](benchmarks.md)
+- [Release readiness](release-readiness.md)

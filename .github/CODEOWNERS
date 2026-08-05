@@ -1,0 +1,25 @@
+# CODEOWNERS -- review routing for the omnibias repository.
+# https://docs.github.com/articles/about-codeowners
+#
+# The last matching pattern wins, so the most specific paths are listed last.
+# The granular rules below are redundant while one team owns everything, but
+# they encode the sensitivity ordering and keep working unchanged as more
+# maintainers join.
+
+# Global owner (everything).
+*                                                    @derivon-ai
+
+# Derivative-tower core (highest-sensitivity math; keep backends bit-identical).
+/packages/omnibias-core/                             @derivon-ai
+/packages/omnibias-torch/                            @derivon-ai
+/packages/omnibias-jax/                              @derivon-ai
+
+# Rigorous numerics + formal loop.
+/packages/omnibias-core/src/omnibias/core/verified/  @derivon-ai
+/packages/omnibias-core/src/omnibias/core/proof/     @derivon-ai
+/formal/                                             @derivon-ai
+
+# CI, packaging, and legal / citation surface.
+/.github/                                            @derivon-ai
+/pyproject.toml                                      @derivon-ai
+/CITATION.cff                                        @derivon-ai

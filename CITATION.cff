@@ -1,0 +1,40 @@
+cff-version: 1.2.0
+message: "If you use omnibias in your research, please cite it as below."
+title: "omnibias: numerically-stable closed-form n-th derivative forward-pass framework"
+abstract: >-
+  omnibias computes the closed-form n-th derivative of an activation,
+  sigma^(n)(z), for arbitrary n with bit-stable accuracy and a single sigma
+  evaluation regardless of order. The same primitive is exposed on PyTorch,
+  JAX, and Keras 3 from one shared pure-Python coefficient core, so every
+  backend is bit-identical by construction. The core math is the Riccati
+  identity plus the Eulerian / Legendre / Hermite polynomial recurrences it
+  implies, extended to multi-layer and multivariate Taylor jets via Bell /
+  Faa di Bruno combinatorics.
+type: software
+authors:
+  - family-names: "Grigoryants"
+    given-names: "Vardan"
+    affiliation: "Derivon"
+    email: "vardan@derivon.ai"
+    # orcid: "https://orcid.org/0000-0000-0000-0000"   # add if/when you have one
+version: "0.4.0"
+date-released: "2026-07-29"
+# doi: "10.5281/zenodo.XXXXXXX"   # fill after the first Zenodo release (a GitHub Release mints it)
+# omnibias ships two licence tiers: the 28 permissive packages (the derivative
+# tower and its consumers) are Apache-2.0, and the 14 certified-decision
+# packages are AGPL-3.0-or-later or commercial. CFF takes a single value, so
+# this records the tier that covers `omnibias-core`. See LICENSING.md.
+license: "Apache-2.0"
+repository-code: "https://github.com/derivon-ai/omnibias"
+url: "https://github.com/derivon-ai/omnibias"
+keywords:
+  - "automatic differentiation"
+  - "closed-form derivatives"
+  - "Taylor jets"
+  - "Faa di Bruno"
+  - "physics-informed neural networks"
+  - "differential geometry"
+  - "verified numerics"
+  - "PyTorch"
+  - "JAX"
+  - "Keras"

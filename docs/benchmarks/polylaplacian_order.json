@@ -1,0 +1,119 @@
+{
+  "schema": "omnibias/polylaplacian-order/v1",
+  "generated_utc": "2026-08-05T12:21:41Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "H": 16,
+    "D": 16,
+    "B": 32,
+    "k": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "activation": "tanh",
+    "dtype": "float64",
+    "seed": 0,
+    "timeout_s": 120.0
+  },
+  "rss_mb_at_start": 15675.88,
+  "rows": [
+    {
+      "k": 1,
+      "omnibias": {
+        "status": "ok",
+        "time_ms": 0.0045,
+        "value_sample": -0.939882589357101,
+        "compile_s": 0.015
+      },
+      "folx_nested": {
+        "status": "ok",
+        "time_ms": 0.1059,
+        "value_sample": -0.9398825893571011,
+        "compile_s": 0.05
+      },
+      "dense_nested": {
+        "status": "ok",
+        "time_ms": 0.1877,
+        "value_sample": -0.939882589357101,
+        "compile_s": 0.066
+      },
+      "max_abs_diff_omnibias_vs_dense": 4.440892098500626e-16
+    },
+    {
+      "k": 2,
+      "omnibias": {
+        "status": "ok",
+        "time_ms": 0.0045,
+        "value_sample": 3.910954287930027,
+        "compile_s": 0.012
+      },
+      "folx_nested": {
+        "status": "ok",
+        "time_ms": 0.1375,
+        "value_sample": 3.910954287930026,
+        "compile_s": 0.15
+      },
+      "dense_nested": {
+        "status": "ok",
+        "time_ms": 0.6387,
+        "value_sample": 3.910954287930025,
+        "compile_s": 0.183
+      },
+      "max_abs_diff_omnibias_vs_dense": 4.773959005888173e-15
+    },
+    {
+      "k": 3,
+      "omnibias": {
+        "status": "ok",
+        "time_ms": 0.0045,
+        "value_sample": -45.146269357130556,
+        "compile_s": 0.014
+      },
+      "folx_nested": {
+        "status": "ok",
+        "time_ms": 1.1086,
+        "value_sample": -45.146269357130194,
+        "compile_s": 1.239
+      },
+      "dense_nested": {
+        "status": "ok",
+        "time_ms": 58.9651,
+        "value_sample": -45.146269357130194,
+        "compile_s": 0.83
+      },
+      "max_abs_diff_omnibias_vs_dense": 3.907985046680551e-13
+    },
+    {
+      "k": 4,
+      "omnibias": {
+        "status": "ok",
+        "time_ms": 0.0238,
+        "value_sample": 1139.5165627324568,
+        "compile_s": 0.014
+      },
+      "folx_nested": {
+        "status": "ok",
+        "time_ms": 110.8568,
+        "value_sample": 1139.5165627324973,
+        "compile_s": 13.841
+      },
+      "dense_nested": {
+        "status": "ok",
+        "time_ms": 4315.4495,
+        "value_sample": 1139.516562732498,
+        "compile_s": 11.041
+      },
+      "max_abs_diff_omnibias_vs_dense": 7.867129170335829e-11
+    }
+  ]
+}

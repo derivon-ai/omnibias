@@ -1,0 +1,87 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+*.egg
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage*
+htmlcov/
+.tox/
+.hypothesis/
+*.lprof
+.benchmarks/
+
+# uv. Note `uv.lock` is deliberately *tracked*: it pins the dev / CI workspace to
+# an exact resolution (see docs/reproducibility.md). It does not constrain
+# consumers of the published wheels, which carry their own dependency ranges.
+.venv/
+.venv-*/
+# Local, throwaway tool prefix for machines without uv (`pip install --target`).
+.tooling/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Backups & temp
+*.bak
+*.tmp
+.scratch/
+
+# mkdocs build output
+docs/site/
+/site/
+
+# Lean toolchain build + dependency cache (formal/*)
+.lake/
+
+# Reproducibility artefacts that get re-generated per run
+results/REPRODUCIBILITY/POST_SPLIT_REPORT.md
+results/REPRODUCIBILITY/canary_*.json
+
+# Heavy data we keep out of git
+data/raw/
+research/data/MNIST/raw/
+
+# Example experiment dataset caches + generated result artifacts (regenerated per run)
+/data/
+examples/**/results/
+examples/symbolic_discovery/**/data/
+
+# Run artifacts: the default target for $OMNIBIAS_SCRATCH (checkpoints, raw
+# per-run JSON, sweep output). Only small transcribed summaries are tracked.
+/artifacts/
+artifacts/
+
+# Private research and generated benchmark archives
+/research/
+/results/
+/m10_run_report.txt
+/docs/assets/
+/paper/
+
+# Off-band reproduction / scheduler scripts and their logs. AGENTS.md directs
+# contributors here for anything cluster-, vendor-, or environment-specific, so
+# this directory must never become tracked (the canonical tree lives in the
+# separate, private omnibias_experiments project).
+/internal/
+
+# omnibias-skills placement manifest (an install artifact; the installed
+# .cursor/skills/omnibias-* and .claude/skills/omnibias-* are committed and
+# drift-checked against the package bundle, so the manifest is not tracked)
+.omnibias-skills.manifest.json
+
+# Local build / scratch outputs
+out/

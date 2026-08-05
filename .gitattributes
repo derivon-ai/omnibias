@@ -1,0 +1,93 @@
+# Line endings, diff behaviour, and GitHub language detection for omnibias.
+#
+# The repository is developed on Linux and consumed cross-platform. Normalising
+# to LF in the repository (and in the working tree) keeps the bit-identity
+# guarantees honest: a CRLF-converted fixture or shell script is a real defect,
+# not a cosmetic one.
+
+# ---------------------------------------------------------------------------
+# Default: let git detect text, and always store / check out text as LF.
+# ---------------------------------------------------------------------------
+*                       text=auto eol=lf
+
+# ---------------------------------------------------------------------------
+# Explicit text types (belt and braces if detection is ever wrong), with
+# language-aware diff hunk headers where git provides them.
+# ---------------------------------------------------------------------------
+*.py                    text eol=lf diff=python
+*.pyi                   text eol=lf diff=python
+*.md                    text eol=lf diff=markdown
+*.mdc                   text eol=lf diff=markdown
+*.rst                   text eol=lf
+*.txt                   text eol=lf
+*.toml                  text eol=lf
+*.cfg                   text eol=lf
+*.ini                   text eol=lf
+*.yml                   text eol=lf
+*.yaml                  text eol=lf
+*.json                  text eol=lf
+*.csv                   text eol=lf
+*.lean                  text eol=lf
+*.sh                    text eol=lf
+*.cff                   text eol=lf
+.gitignore              text eol=lf
+.gitattributes          text eol=lf
+CODEOWNERS              text eol=lf
+py.typed                text eol=lf
+
+# Shell scripts must never be CRLF: the shebang breaks and the kernel refuses
+# to exec them. Called out separately so the reason survives a refactor.
+examples/**/*.sh        text eol=lf
+packages/**/*.sh        text eol=lf
+scripts/*               text eol=lf
+
+# ---------------------------------------------------------------------------
+# Binary: never munge, never try to diff.
+# ---------------------------------------------------------------------------
+*.png                   binary
+*.jpg                   binary
+*.jpeg                  binary
+*.gif                   binary
+*.webp                  binary
+*.ico                   binary
+*.pdf                   binary
+*.npy                   binary
+*.npz                   binary
+*.pkl                   binary
+*.pt                    binary
+*.pth                   binary
+*.onnx                  binary
+*.safetensors           binary
+*.gz                    binary
+*.zip                   binary
+*.whl                   binary
+*.so                    binary
+*.olean                 binary
+
+# ---------------------------------------------------------------------------
+# Generated / vendored: keep them out of PR diffs and out of the language stats.
+# ---------------------------------------------------------------------------
+uv.lock                 linguist-generated=true -diff
+*.lock                  linguist-generated=true -diff
+
+# Notebooks are documentation here (outputs are stripped); without this the 23
+# notebooks would dominate GitHub's language bar over 1,700 Python modules.
+*.ipynb                 text eol=lf linguist-documentation
+notebooks/**            linguist-documentation
+docs/**                 linguist-documentation
+
+# The Lean projects are real source, not vendored; label them explicitly so the
+# formal kernel shows up as Lean rather than as an unknown extension.
+formal/**/*.lean        linguist-language=Lean linguist-detectable=true
+
+# ---------------------------------------------------------------------------
+# Release hygiene: keep agent / CI tooling out of `git archive` exports (the
+# GitHub "Download ZIP"). Wheels and sdists are built by hatchling from
+# pyproject configuration, so this does not affect the published artifacts.
+# notebooks/ and docs/ are deliberately NOT export-ignored: they are
+# user-facing content the documentation links to.
+# ---------------------------------------------------------------------------
+.github/                export-ignore
+.cursor/                export-ignore
+.claude/                export-ignore
+artifacts/              export-ignore

@@ -1,0 +1,66 @@
+[build-system]
+requires = ["setuptools>=77", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "omnibias-qubo"
+version = "0.1.0a1"
+description = "Differentiable + certified quadratic Boolean optimization for omnibias: an annealed sigmoid relaxation of QUBO / Ising energies solved differentiably by the temperature-collapse (beta -> inf) penalty, a rounding + 1-flip local-search decoder, a brute-force oracle, and a rigorous optimality-gap certificate (cheap spectral seal or a headline SOS / Lasserre lower bound over the Boolean hypercube), plus max-cut and max-independent-set front-ends (jax + torch)."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE"]
+authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
+maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
+keywords = ["qubo", "ising", "combinatorial-optimization", "max-cut", "differentiable-optimization", "sum-of-squares", "lasserre", "verified-numerics"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["omnibias-core>=0.2.0", "omnibias-discrete>=0.1.0a1", "numpy>=1.24"]
+
+[project.optional-dependencies]
+# the headline SOS / Lasserre certified lower bound (Putinar Positivstellensatz over
+# the Boolean hypercube) reuses omnibias-sos; without it the certificate falls back to
+# the cheap spectral bound.
+sos = ["omnibias-sos>=0.1.0a1"]
+# the spectral lower bound's rigorous interval seal (Neumaier-Shcherbina / QP dual)
+# reuses omnibias-convex; without it the spectral bound degrades to the (still valid)
+# float value with certified=False.
+convex = ["omnibias-convex>=0.1.0a1"]
+# the differentiable annealed relaxation (temperature-collapse penalty,
+# unrolled for backprop) needs a tensor backend.
+torch = ["torch>=2.0", "omnibias-torch>=0.2.0"]
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
+all = ["omnibias-qubo[sos,convex,torch,jax]"]
+test = ["pytest>=7.0", "numpy>=1.24"]
+dev = ["omnibias-qubo[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
+
+[project.urls]
+Homepage = "https://github.com/derivon-ai/omnibias"
+Documentation = "https://omnibias.ai/"
+Source = "https://github.com/derivon-ai/omnibias"
+Issues = "https://github.com/derivon-ai/omnibias/issues"
+Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["omnibias.*"]
+
+[tool.setuptools.package-data]
+"omnibias.qubo" = ["py.typed"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+files = ["src/omnibias/qubo"]

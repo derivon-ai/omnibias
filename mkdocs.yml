@@ -1,0 +1,248 @@
+site_name: omnibias
+site_description: Numerically-stable closed-form n-th derivative forward-pass framework
+site_url: https://omnibias.ai/
+repo_name: omnibias
+repo_url: https://github.com/derivon-ai/omnibias
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: deep purple
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+exclude_docs: |
+  internal/
+  design/
+  math_validation_matrix.md
+  backend_parity_matrix.md
+  release_blockers.md
+  release-readiness.md
+  CLA.md
+  img/generate_figures.py
+
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+      handlers:
+        python:
+          paths:
+            - packages/omnibias-core/src
+            - packages/omnibias-torch/src
+            - packages/omnibias-jax/src
+            - packages/omnibias-ferminet/src
+            - packages/omnibias-fields/src
+            - packages/omnibias-pinn/src
+            - packages/omnibias-qpinn/src
+            - packages/omnibias-curvature/src
+            - packages/omnibias-keras/src
+            - packages/omnibias-geometry/src
+            - packages/omnibias-fractional/src
+            - packages/omnibias-measure/src
+            - packages/omnibias-score/src
+            - packages/omnibias-variational/src
+            - packages/omnibias-symbolic/src
+            - packages/omnibias-binary/src
+            - packages/omnibias-boolean/src
+            - packages/omnibias-verify/src
+            - packages/omnibias-dynamics/src
+            - packages/omnibias-spiking/src
+            - packages/omnibias-hopfield/src
+            - packages/omnibias-convex/src
+            - packages/omnibias-graph/src
+            - packages/omnibias-shape/src
+            - packages/omnibias-skills/src
+            - packages/omnibias-formal/src
+            - packages/omnibias-sos/src
+            - packages/omnibias-control/src
+            - packages/omnibias-routing/src
+            - packages/omnibias-discrete/src
+            - packages/omnibias-qubo/src
+            - packages/omnibias-submodular/src
+            - packages/omnibias-nphard/src
+            - packages/omnibias-combinatorics/src
+            - packages/omnibias-logic/src
+            - packages/omnibias-struct/src
+            - packages/omnibias-difference/src
+            - packages/omnibias-qcalculus/src
+            - packages/omnibias-timescale/src
+            - packages/omnibias-holonomic/src
+            - packages/omnibias-tab/src
+            - packages/omnibias-partition/src
+          options:
+            show_root_heading: true
+            show_source: false
+            members_order: source
+            docstring_style: numpy
+            filters: ["!^_"]
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.highlight
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.arithmatex:
+      generic: true
+  - tables
+  - footnotes
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+nav:
+  - Home: index.md
+  - Scope & guarantees: scope-and-guarantees.md
+  - Handbook:
+      - Overview: handbook/index.md
+      - AI quickstart (vibe-coding): handbook/ai-quickstart.md
+      - "1. Neural-jet discovery (1-D)": handbook/01-neural-jet-1d.md
+      - "2. Vector calculus & PDE discovery": handbook/02-vector-calculus-pde.md
+      - "3. Differential geometry": handbook/03-differential-geometry.md
+      - "4. Exterior calculus (de Rham-Hodge)": handbook/04-exterior-calculus.md
+      - "5. Information theory & divergences": handbook/05-information-theory.md
+      - "6. Optimal transport": handbook/06-optimal-transport.md
+      - "7. Information geometry & natural gradient": handbook/07-information-geometry.md
+  - Theory:
+      - Closed-form derivatives: theory.md
+      - Operator surface (capability matrix): operator-surface.md
+      - Differentiable binarization: theory-binary.md
+      - Activation dictionary: activations.md
+      - Complexity (time & memory): complexity.md
+      - API stability matrix: stability.md
+      - Roadmap: roadmap.md
+      - PINN derivations: pinn-derivations.md
+  - Operators: operators.md
+  - Packages:
+      - Package index (all 42): packages.md
+      - omnibias-core: api/core.md
+      - omnibias-fields: api/fields.md
+      - omnibias-torch: api/torch.md
+      - omnibias-jax: api/jax.md
+      - omnibias-keras: api/keras.md
+      - omnibias-ferminet: api/ferminet.md
+      - omnibias-pinn: api/pinn.md
+      - omnibias-qpinn: api/qpinn.md
+      - omnibias-curvature: api/curvature.md
+      - omnibias-geometry: api/geometry.md
+      - "omnibias.geometry.gauge": api/geometry-gauge.md
+      - omnibias-fractional: api/fractional.md
+      - omnibias-measure: api/measure.md
+      - omnibias-score: api/score.md
+      - omnibias-variational: api/variational.md
+      - omnibias-symbolic: api/symbolic.md
+      - omnibias-binary: api/binary.md
+      - omnibias-boolean: api/boolean.md
+      - omnibias-verify: api/verify.md
+      - omnibias-dynamics: api/dynamics.md
+      - omnibias-spiking: api/spiking.md
+      - "omnibias.score.flow (CNF)": api/score-flow.md
+      - omnibias-hopfield: api/hopfield.md
+      - omnibias-convex: api/convex.md
+      - omnibias-graph: api/graph.md
+      - omnibias-shape: api/shape.md
+      - omnibias-skills: api/skills.md
+      - omnibias-formal: api/formal.md
+      - omnibias-sos: api/sos.md
+      - "omnibias.pinn.solver (PDE)": api/pinn-solver.md
+      - omnibias-control: api/control.md
+      - omnibias-routing: api/routing.md
+      - omnibias-discrete: api/discrete.md
+      - omnibias-qubo: api/qubo.md
+      - omnibias-submodular: api/submodular.md
+      - omnibias-nphard: api/nphard.md
+      - omnibias-combinatorics: api/combinatorics.md
+      - omnibias-logic: api/logic.md
+      - omnibias-struct: api/struct.md
+      - omnibias-difference: api/difference.md
+      - omnibias-qcalculus: api/qcalculus.md
+      - omnibias-timescale: api/timescale.md
+      - omnibias-holonomic: api/holonomic.md
+      - omnibias-tab: api/tab.md
+      - omnibias-partition: api/partition.md
+  - Cookbook:
+      - Faà di Bruno multi-layer jets: cookbook/faa-di-bruno-jets.md
+      - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
+      - Better-than-STE binary training: cookbook/better-than-ste-binary.md
+      - Differentiable Boolean algebra: cookbook/boolean-equations.md
+      - "RSA limitation (negative result)": cookbook/rsa-limitation.md
+      - "Certified combinatorial optimization (relaxations & the one limit)": cookbook/graph-limitation.md
+      - Closed-form convolution: cookbook/closed-form-convolution.md
+      - Differentiable + certified LP/QP: cookbook/differentiable-certified-lp.md
+      - Certified-safe learned control (CBF-QP): cookbook/certified-safe-control.md
+      - Certified differentiable routing (TSP): cookbook/certified-differentiable-routing.md
+      - Differential geometry on the sphere: cookbook/geometry-sphere.md
+      - Pullback metric (learned manifolds): cookbook/pullback-learned-manifolds.md
+      - Manifold learning powered by omnibias: cookbook/manifold-learning.md
+      - Spectral shape analysis: cookbook/spectral-shape-analysis.md
+      - Equivariant operator features: cookbook/equivariant-operator-features.md
+      - PINN heat equation: cookbook/pinn-heat.md
+      - PINN advection-diffusion: cookbook/pinn-advection-diffusion.md
+      - Proof-carrying PDE certificates: cookbook/proof-carrying-pde.md
+      - Proof-carrying fluid dynamics: cookbook/proof-carrying-fluid-dynamics.md
+      - Train-then-certify (sealed network cert): cookbook/train-then-certify.md
+      - PINN reaction-diffusion & PNP: cookbook/pinn-reaction-diffusion.md
+      - PINN linear elasticity: cookbook/pinn-linear-elasticity.md
+      - PINN Maxwell equations: cookbook/pinn-maxwell.md
+      - PINN Navier-Stokes (2D / 3D): cookbook/pinn-navier-stokes.md
+      - Navier-Stokes certified validation: cookbook/navier-stokes-certified.md
+      - "Navier-Stokes tracks (numerical / certified / fractional)": cookbook/navier-stokes-tracks.md
+      - Prove/disprove machine: cookbook/proof-machine.md
+      - Gauge-theory primitives: cookbook/gauge-theory-primitives.md
+      - PINN strict-conservation cages: cookbook/pinn-strict-conservation.md
+      - CCF self-similar singularities (CAP): cookbook/ccf-singularity.md
+      - CCF-on-the-line calibration: cookbook/ccf-line-calibration.md
+      - 2-D Euler steady vortex (Riesz/Leray): cookbook/euler2d-vortex.md
+      - 2-D SQG steady vortex (single-Riesz): cookbook/sqg-vortex.md
+      - QPINN harmonic oscillator (TISE): cookbook/qpinn-tise-qho.md
+      - QPINN Gaussian wavepacket (TDSE): cookbook/qpinn-tdse.md
+      - QPINN dark soliton (Gross-Pitaevskii): cookbook/qpinn-gp-soliton.md
+      - CmbNet on MNIST: cookbook/cmbnet-mnist.md
+      - CvxLogistic: cookbook/cvxlogistic.md
+      - Operator-block discovery: cookbook/operator-block-discovery.md
+  - Examples: examples.md
+  - Benchmarks: benchmarks.md
+  - Licensing: licensing.md
+  - Reproducibility: reproducibility.md
+  - CI hardening: ci-hardening.md
+  - References: references.md
+  - Migration guide:
+      - DeepXDE / Modulus -> omnibias-pinn: migration-pinn.md
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/derivon-ai/omnibias
