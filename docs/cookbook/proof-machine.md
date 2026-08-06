@@ -95,6 +95,10 @@ assert v.status == "PROVED"
 | `gclm_selfsimilar_blowup` | `certified_gclm_selfsimilar_blowup` | No |
 | `gclm_gradient_amplification` | `certified_gclm_gradient_amplification` | No |
 | `perron_spectral_gap` | `certified_perron_spectral_gap` (`omnibias.core.verified.eig`) | No — a non-positive matrix or no certifiable gap → `BLOCKED` |
+| `pinn_aposteriori_error` | `prove_pinn_aposteriori` | No — a residual too large to close the estimate → `BLOCKED` |
+| `navier_stokes_periodic_residual` | `prove_navier_stokes_periodic_residual` | No |
+| `navier_stokes_streamfunction_residual` | `prove_streamfunction_residual` | No |
+| `navier_stokes_rollout_diagnostics` | `prove_rollout_diagnostics` | No |
 
 ```python
 # Birkhoff-Hopf spectral gap of a fixed positive transfer matrix:
@@ -104,6 +108,67 @@ v = machine.evaluate(
 assert v.status == "PROVED"
 print(v.certificate["spectral_gap_lower"])   # > 0 (lattice-unit gap lower bound)
 ```
+
+`sorted(machine.kinds())` is the authoritative list; the table above is checked
+against it by `tests/test_docs_snippets.py`, so it cannot drift again:
+
+```python
+assert sorted(machine.kinds()) == [
+    "ccf_selfsimilar_blowup",
+    "clm_blowup",
+    "clm_multizero_blowup",
+    "gclm_gradient_amplification",
+    "gclm_selfsimilar_blowup",
+    "navier_stokes_periodic_residual",
+    "navier_stokes_rollout_diagnostics",
+    "navier_stokes_streamfunction_residual",
+    "perron_spectral_gap",
+    "pinn_aposteriori_error",
+]
+```
+
+### The gauge machine, in its own package
+
+`omnibias-pinn` does not depend on `omnibias-geometry`, so the lattice
+transfer-matrix prover lives in its own registry rather than the default machine
+— the same arrangement `omnibias.sos.proofmachine` uses.
+
+| `kind` | Certificate | Can DISPROVE? |
+|---|---|---|
+| `transfer_matrix_spectral_gap` | `certified_transfer_matrix_gap` (`omnibias.geometry.gauge.transfer`) | No — a gap below the requested threshold → `BLOCKED` |
+
+```python
+from omnibias.core.proof import Conjecture
+from omnibias.geometry.gauge.proofmachine import build_gauge_machine
+
+gauge = build_gauge_machine()
+assert sorted(gauge.kinds()) == ["transfer_matrix_spectral_gap"]
+
+verdict = gauge.evaluate(
+    Conjecture(
+        "su2-gap",
+        "transfer_matrix_spectral_gap",
+        # ``parameters`` names the constructor and its arguments, so the replay can
+        # rebuild the matrix from scratch instead of trusting the sealed numbers.
+        {
+            "parameters": {
+                "builder": "su2_heat_kernel_transfer",
+                "coupling": "4/5",
+                "max_dynkin": 4,
+                "lattice_spacing": 1.0,
+            }
+        },
+    )
+)
+assert verdict.status == "PROVED"
+# su(2): C2(1) - C2(0) = 3/4, so the exact lattice-unit gap is 3t/4 = 0.6.
+assert abs(verdict.certificate["spectral_gap_lower"] - 0.6) < 1e-9
+assert verdict.certificate["continuum_claim"] is False
+```
+
+The certificate is a statement about **one fixed matrix at one fixed spacing in
+finite dimension**. `continuum_claim` is hard-wired `False`, and nothing in it is
+a claim about the Yang-Mills mass gap.
 
 ## The Lean formal loop (kernel-checked verdicts)
 

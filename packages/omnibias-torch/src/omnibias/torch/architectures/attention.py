@@ -250,7 +250,8 @@ class AttentionJetMLP(_JetMLPCore):
         h = self.attention_weights(x) @ self.values
         if self.residual:
             h = h + q
-        return self.readout(h)
+        out: Tensor = self.readout(h)
+        return out
 
     def extra_repr(self) -> str:
         return (

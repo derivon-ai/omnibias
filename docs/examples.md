@@ -46,6 +46,10 @@ python docs/examples/variational_higher_order.py
 pip install "omnibias-variational[torch,geometry]"
 python docs/examples/variational_geodesic.py
 
+# Certified lattice mass gap (fixed transfer matrix; not a continuum claim)
+pip install omnibias-geometry
+python docs/examples/gauge_certified_mass_gap.py
+
 # Proof-carrying PDE certificate
 python -m examples.proof_carrying_pde.run_demo
 

@@ -266,6 +266,18 @@ the relevant op:
   finite-volume periodic lattice (heat-bath / over-relaxation / Langevin
   / Wilson loops / Creutz ratios / GEVP glueball). Stochastic numerical
   evidence, not a continuum claim.
+- **`omnibias.geometry.gauge.transfer` certified mass gap** is a **sound lower
+  bound** on `m a = -ln(|λ₁| / λ₀)` for **one fixed finite transfer matrix at one
+  fixed spacing**, by interval arithmetic over the rigorous engines in
+  `omnibias.core.verified.eig`. It is *proof* about that matrix, and the sealed
+  certificate's rational obligation is Lean-checkable via `spectral_gap_pos`.
+  It is **not** a statement about the continuum limit (`continuum_claim` is
+  hard-wired `False`), **not** a statement about a lattice ensemble, and **not**
+  the Yang-Mills mass gap. `heat_kernel_gap_scaling_report` collects such bounds
+  across spacings as **evidence about a trend**, never an extrapolation.
+  `certified_gap_versus_monte_carlo` cross-checks the bound against a Monte Carlo
+  of the *same* matrix's path measure — an independent oracle, still evidence
+  rather than proof; only the interval arithmetic is proof.
 - **`omnibias-qpinn` Bloch cage** supports orders ≤ 2 on a **single axis** in
   v0.0.1; multi-axis mixed partials need the Leibniz expansion (planned).
 - **Random-feature fields** are accurate only inside the support of their

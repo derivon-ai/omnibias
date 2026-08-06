@@ -61,9 +61,9 @@ gauge), the exact self-dual solution of the Yang-Mills equations on `R^4`:
 | Yang-Mills EOM `D_mu F^{mu nu}` | `0` | machine precision |
 | Bianchi `D_mu *F^{mu nu}` | `0` (any connection) | machine precision |
 
-The numpy reimplementation in `omnibias.pinn.certified.yang_mills` is
-cross-checked against these torch/jax ops to `atol = 1e-10`, and the torch and
-jax backends agree to `rtol = 1e-9` in float64.
+Each row is asserted in the package's own test suite against an analytic numpy
+BPST reference built directly from the closed-form instanton field strength, and
+the torch and jax backends agree with each other to `rtol = 1e-9` in float64.
 
 !!! note "Scope"
     `omnibias.geometry.gauge` ships the full **continuum** primitive set **and** an SU(2)

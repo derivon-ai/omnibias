@@ -6,6 +6,78 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — `omnibias-geometry`: certified lattice mass gap (`omnibias.geometry.gauge.transfer`)
+
+The rigorous gap engines in `omnibias.core.verified.eig` were written *for* this
+application — their docstrings name heat-kernel and Wilson transfer matrices, the
+`+/- n` U(1) modes and the `(p,q) <-> (q,p)` SU(3) pairs — and were then never
+connected to one. This connects them.
+
+- **Transfer matrices** (`omnibias.geometry.gauge.transfer.matrices`):
+  `u1_heat_kernel_transfer` (`character` diagonal or `angle` dense circulant),
+  `su2_heat_kernel_transfer` / `su3_heat_kernel_transfer` (eigenvalues
+  `exp(-t C2)` from the *exact* `Fraction` of `quadratic_casimir`),
+  `su2_class_angle_transfer` (the `su(2)` spectrum in a dense, entrywise-positive
+  basis that a Markov chain can actually move in), and `su2_wilson_transfer`
+  (character expansion via the new `besseli_iv`). Entries are outward-rounded
+  intervals; the closed-form spectrum is carried alongside, so a certified bound
+  can be checked against truth rather than believed.
+- **Certified gaps** (`.gap`): `certified_transfer_matrix_gap` dispatches to the
+  symmetric power-sum engine with a partner chain, or Birkhoff-Hopf, whichever is
+  applicable and tighter, keeping every candidate it considered.
+  `certified_multistep_gap_refinement` sharpens via `T^n`;
+  `certified_effective_mass_curve` supplies rigorous *upper* bounds so the true
+  gap is genuinely sandwiched; `heat_kernel_gap_scaling_report` records bounds
+  across spacings as evidence about a trend.
+- **Certificates and a registry** (`.certificates`, `gauge/proofmachine.py`):
+  sealed, tamper-evident `verified-transfer-matrix-gap-1` certificates carrying a
+  top-level `subdominant_ratio_upper`, so the Mathlib-free Lean kernel's
+  `spectral_gap_pos` lemma discharges the obligation with no new Lean. Replay
+  rebuilds the matrix from its recorded *constructor arguments* and rejects a
+  sealed bound tighter than an independent derivation supports. `gauge_provers()`
+  / `build_gauge_machine()` mirror `omnibias.sos.proofmachine`, since
+  `omnibias-pinn` does not depend on `omnibias-geometry`.
+- **Monte-Carlo cross-check** (`.montecarlo`): rather than assume a matrix
+  corresponds to an ensemble, `certified_gap_versus_monte_carlo` samples the path
+  measure `prod_t T_{x_t, x_{t+1}}` that the matrix *itself* defines, reading
+  matrix entries only. On `su(2)` the certified bound is exactly tight and the
+  sampled effective mass brackets the closed-form gap.
+
+Scope, unchanged and non-negotiable: every certificate is a statement about **one
+fixed matrix at one fixed spacing in finite dimension**. `continuum_claim` is
+hard-wired `False`, the scaling report is labelled evidence, and nothing here is a
+claim about the Yang-Mills mass gap.
+
+### Added — `omnibias-core`: `besseli_iv`
+
+`omnibias.core.verified.besseli_iv` encloses the modified Bessel function
+`I_n(x)`, following the existing `erf_iv` mpmath-bracket pattern so it inherits
+`strict_backend()` / `libm_fallback_used()`. Because
+`I_n(z) = sum_k (z/2)^(2k+n) / (k! (k+n)!)` is all-positive, the no-mpmath path is
+a truncated series with a rigorous geometric tail bound — unconditionally sound,
+not a ulp-inflated guess — and refuses arguments too large to bound soundly.
+
+### Fixed — `omnibias-pinn`: `perron_spectral_gap` could never reach the Lean kernel
+
+`_perron_certificate` never called `seal_certificate()`, while `check_certificate`
+refuses unsealed certificates before emitting any Lean. `generate_obligation`
+succeeded (the math was Lean-ready) but `verify_certificate_digest` was always
+`False`, so the kind could never earn `theorem_prover_verified`.
+`test_perron_lean_check_flag_mirrors_kernel` passed only because no runner had
+Lean installed, and would have failed the moment one did. The certificate is now
+sealed, its schema validates the digest, and a **generic guard test** asserts that
+every default-machine prover whose certificate yields a non-`None`
+`generate_obligation` also passes `verify_certificate_digest`, so this class of
+bug cannot recur silently.
+
+### Fixed — `omnibias-core`: the `Prover` protocol demanded a settable `name`
+
+`Prover` declared `name: str`, which requires a *mutable* attribute, so the repo's
+own frozen `FunctionProver` did not satisfy its own protocol under a strict type
+check. It is now a read-only property, which accepts both plain attributes and
+properties. No caller assigned through a `Prover`-typed reference, so this is
+backwards-compatible.
+
 ### Added — `omnibias-pinn`: deep fields, multi-scale, balancing, conservation, decomposition
 
 Before this change the only trainable free-form PINN field on the substrate was

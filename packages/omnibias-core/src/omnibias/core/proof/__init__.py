@@ -172,9 +172,15 @@ class Prover(Protocol):
     :class:`ProofAttempt`; ``schema_errors`` validates a certificate (empty list
     == valid); ``replay`` runs an *independent* recomputation and returns
     ``True``/``False`` (or ``None`` when no twin exists).
+
+    ``name`` is declared **read-only**: a mutable ``name: str`` member would demand
+    a settable attribute, which the frozen :class:`FunctionProver` adapter cannot
+    provide, so no frozen prover could satisfy this protocol under a strict type
+    check.  A read-only member accepts both plain attributes and properties.
     """
 
-    name: str
+    @property
+    def name(self) -> str: ...
 
     def handles(self, conjecture: Conjecture) -> bool: ...
 

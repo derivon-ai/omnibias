@@ -32,11 +32,14 @@ always downgraded to ``BLOCKED``.
 Formal (Lean-kernel) gate
 -------------------------
 The Birkhoff-Hopf / Perron certificate carries a *rational* subdominant-ratio
-upper bound, i.e. a **finite, kernel-checkable** obligation.  Evaluating such a
-conjecture with ``machine.evaluate(conj, lean_check=True)`` -- or asserting the
-``theorem_prover_verified`` claim -- routes the certificate through
-:func:`omnibias.core.proof.lean_check.check_certificate`, which emits a Lean
-proof and runs the ``formal/omnibias-verified-kernel`` Lake build.  The
+upper bound, i.e. a **finite, kernel-checkable** obligation.  It is therefore
+sealed (:func:`omnibias.core.proof.seal_certificate`): ``check_certificate``
+refuses an unsealed payload before emitting any Lean, so a certificate that
+carries an obligation but no digest could never reach the kernel at all.
+Evaluating such a conjecture with ``machine.evaluate(conj, lean_check=True)`` --
+or asserting the ``theorem_prover_verified`` claim -- routes the certificate
+through :func:`omnibias.core.proof.lean_check.check_certificate`, which emits a
+Lean proof and runs the ``formal/omnibias-verified-kernel`` Lake build.  The
 :attr:`~omnibias.core.proof.Verdict.theorem_prover_verified` flag is set only on
 a genuine kernel pass; asserting the claim without one downgrades ``PROVED`` to
 ``BLOCKED``.  When no Lean toolchain is present the check degrades gracefully
@@ -54,6 +57,8 @@ from omnibias.core.proof import (
     FunctionProver,
     ProofAttempt,
     ProofMachine,
+    seal_certificate,
+    verify_certificate_digest,
 )
 from omnibias.core.verified.eig import certified_perron_spectral_gap
 from omnibias.pinn.certified.fluid import (
@@ -267,30 +272,38 @@ def _prove_gclm_gradient_amplification(conjecture: Conjecture) -> ProofAttempt:
 # --------------------------------------------------------------------------- #
 def _perron_certificate(matrix: Sequence[Sequence[Any]], lattice_spacing: float) -> Certificate:
     result = certified_perron_spectral_gap(matrix, lattice_spacing=lattice_spacing)
-    return {
-        "schema_version": PERRON_GAP_SCHEMA_VERSION,
-        "observable": "birkhoff_hopf_spectral_gap",
-        "model": "fixed_positive_transfer_matrix",
-        "method": "birkhoff_hopf_projective_contraction",
-        "dimension": int(result.dimension),
-        "min_entry": float(result.min_entry),
-        "kappa_upper": float(result.kappa_upper),
-        "subdominant_ratio_upper": float(result.subdominant_ratio_upper),
-        "spectral_gap_lower": float(result.spectral_gap_lower),
-        "spectral_gap_lower_per_unit": float(result.spectral_gap_lower_per_unit),
-        "lattice_spacing": float(lattice_spacing),
-        "continuum_claim": False,
-        "honesty": {
-            "unproven_claim": False,
+    # Sealed, because the rational ``subdominant_ratio_upper`` below is a finite
+    # Lean-checkable obligation and ``check_certificate`` refuses an unsealed
+    # payload before emitting any Lean.  Without the seal the kernel could never
+    # be reached and ``theorem_prover_verified`` would be unreachable by
+    # construction.  ``seal_certificate`` only ``setdefault``s ``schema_version``,
+    # so the domain version below survives.
+    return seal_certificate(
+        {
+            "schema_version": PERRON_GAP_SCHEMA_VERSION,
+            "observable": "birkhoff_hopf_spectral_gap",
+            "model": "fixed_positive_transfer_matrix",
+            "method": "birkhoff_hopf_projective_contraction",
+            "dimension": int(result.dimension),
+            "min_entry": float(result.min_entry),
+            "kappa_upper": float(result.kappa_upper),
+            "subdominant_ratio_upper": float(result.subdominant_ratio_upper),
+            "spectral_gap_lower": float(result.spectral_gap_lower),
+            "spectral_gap_lower_per_unit": float(result.spectral_gap_lower_per_unit),
+            "lattice_spacing": float(lattice_spacing),
             "continuum_claim": False,
-            "fixed_matrix": True,
-            "interval_verified": True,
-            "note": (
-                "fixed-matrix (fixed spacing / finite volume) Birkhoff-Hopf gap; "
-                "NOT a continuum / uniform-limit or global-regularity claim"
-            ),
-        },
-    }
+            "honesty": {
+                "unproven_claim": False,
+                "continuum_claim": False,
+                "fixed_matrix": True,
+                "interval_verified": True,
+                "note": (
+                    "fixed-matrix (fixed spacing / finite volume) Birkhoff-Hopf gap; "
+                    "NOT a continuum / uniform-limit or global-regularity claim"
+                ),
+            },
+        }
+    )
 
 
 def perron_spectral_gap_schema_errors(cert: Certificate) -> list[str]:
@@ -306,6 +319,7 @@ def perron_spectral_gap_schema_errors(cert: Certificate) -> list[str]:
         "lattice_spacing",
         "continuum_claim",
         "honesty",
+        "digest",
     )
     for key in required:
         if key not in cert:
@@ -319,6 +333,8 @@ def perron_spectral_gap_schema_errors(cert: Certificate) -> list[str]:
         errors.append("honesty.unproven_claim must be False")
     if float(cert.get("spectral_gap_lower", -1.0)) < 0.0:
         errors.append("spectral_gap_lower must be >= 0")
+    if "digest" in cert and not verify_certificate_digest(cert):
+        errors.append("digest does not match the certificate body (tampered/stale)")
     return errors
 
 

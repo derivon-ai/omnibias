@@ -6,6 +6,8 @@ from __future__ import annotations
 
 import pytest
 from omnibias.core.proof import Conjecture, ProofMachine, lean_check_available
+from omnibias.core.proof.certificate import verify_certificate_digest
+from omnibias.core.proof.lean_check import check_certificate, generate_obligation
 from omnibias.core.verified.pde_certificate import (
     aposteriori_error_certificate,
     laplace,
@@ -13,6 +15,7 @@ from omnibias.core.verified.pde_certificate import (
 from omnibias.pinn.certified import build_default_machine
 from omnibias.pinn.certified.machine import (
     PERRON_GAP_SCHEMA_VERSION,
+    _perron_certificate,
     perron_spectral_gap_schema_errors,
 )
 
@@ -199,6 +202,67 @@ def test_perron_spectral_gap_blocks_on_nonpositive_matrix(machine: ProofMachine)
     )
     assert verdict.status == "BLOCKED"
     assert any("could not build" in o for o in verdict.obligations)
+
+
+def test_perron_certificate_is_sealed_so_the_kernel_is_reachable(
+    machine: ProofMachine,
+) -> None:
+    """The gap certificate must carry a valid seal, or Lean is unreachable.
+
+    ``check_certificate`` refuses an unsealed payload *before* emitting any Lean,
+    so an unsealed certificate makes ``theorem_prover_verified`` impossible to
+    earn no matter how good the obligation is. This asserts the seal directly
+    rather than through the kernel, so it fails on a machine without Lean too --
+    which is exactly where the regression hid.
+    """
+    verdict = machine.evaluate(
+        Conjecture("gap", "perron_spectral_gap", {"matrix": [[2.0, 1.0], [1.0, 2.0]]})
+    )
+    cert = verdict.certificate
+    assert cert is not None
+    assert verify_certificate_digest(cert)
+    assert generate_obligation(cert) is not None
+    # Past the seal gate: whatever the detail says now, it is not a seal refusal.
+    assert "unsealed" not in check_certificate(cert).detail
+
+
+def test_a_tampered_gap_certificate_is_refused_by_schema_and_kernel() -> None:
+    cert = _perron_certificate([[2.0, 1.0], [1.0, 2.0]], 1.0)
+    forged = dict(cert)
+    forged["spectral_gap_lower"] = 999.0
+    assert any("digest" in e for e in perron_spectral_gap_schema_errors(forged))
+    assert "digest mismatch" in check_certificate(forged).detail
+
+
+def test_every_lean_ready_certificate_in_the_machine_is_sealed(
+    machine: ProofMachine,
+) -> None:
+    """No prover may emit a Lean-checkable obligation on an unsealed certificate.
+
+    The pairing is the whole point: an obligation the kernel could discharge is
+    worthless if the seal gate rejects the payload first. Sweeping every prover
+    keeps a future certificate from reintroducing the mismatch silently, since
+    the symptom only ever appears on a Lean-equipped machine.
+    """
+    probes = [
+        ("perron_spectral_gap", {"matrix": [[2.0, 1.0], [1.0, 2.0]]}),
+        ("clm_blowup", {"coeffs": [-1.0], "scales": [1.0]}),
+        ("clm_multizero_blowup", {"coeffs": [-1.0], "scales": [1.0]}),
+        ("gclm_selfsimilar_blowup", {"a": 0.5}),
+        ("gclm_gradient_amplification", {"a": 0.5, "coeffs": [-1.0], "scales": [1.0]}),
+    ]
+    checked = 0
+    for kind, data in probes:
+        cert = machine.evaluate(Conjecture("p", kind, data)).certificate
+        if cert is None or generate_obligation(cert) is None:
+            continue
+        checked += 1
+        assert verify_certificate_digest(cert), (
+            f"{kind} emits a Lean obligation but its certificate is unsealed, so "
+            "check_certificate would refuse it before running the kernel"
+        )
+    # Guard the guard: if nothing carried an obligation the sweep proved nothing.
+    assert checked > 0
 
 
 def test_forged_unproven_claim_is_blocked(machine: ProofMachine) -> None:

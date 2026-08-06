@@ -473,6 +473,7 @@ measured verdict.
 - [Certified + differentiable Boolean logic (MaxSAT gap + #SAT count enclosure sandwiching the exact oracle)](docs/examples/certified_logic_maxsat_sharpsat.py)
 - [Exact #SAT fast-paths + sound router + a sealed Lean-checkable count certificate + a quarantined statistical layer (affine/treewidth/DPLL agree with the oracle; seal -> verify -> kernel-check; ApproxMC + conformal stay non-sound)](docs/examples/logic_exact_and_approx_counting.py)
 - [Certified differentiable dynamic programming (soft Viterbi / shortest-path, log(N)/beta gap + brute-force agreement, backprop-through-DP + tower marginals)](docs/examples/certified_soft_dp.py)
+- [Certified lattice mass gap (sound lower bound on a fixed transfer matrix, sandwiched by the effective-mass curve, sealed + Lean-ready, cross-checked against a Monte Carlo of the same matrix; fixed-spacing only, never a continuum or Yang-Mills claim)](docs/examples/gauge_certified_mass_gap.py)
 
 ## Agent tooling
 

@@ -24,3 +24,9 @@ packages/omnibias-geometry/src/omnibias/geometry/_core/charts.py
 packages/omnibias-geometry/src/omnibias/geometry/_core/forms.py
 packages/omnibias-geometry/src/omnibias/geometry/_core/integration_core.py
 packages/omnibias-geometry/src/omnibias/geometry/_core/manifold.py
+packages/omnibias-geometry/src/omnibias/geometry/gauge/proofmachine.py
+packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/__init__.py
+packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/certificates.py
+packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/gap.py
+packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/matrices.py
+packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/montecarlo.py

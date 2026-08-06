@@ -246,3 +246,135 @@ assert len(mc["glueball_correlator"]) > 0
 The correlator, its GEVP plateau scan, and the resulting effective-mass
 estimate are lattice observables on a finite lattice at finite coupling. They
 say nothing about the continuum theory.
+
+## Certified transfer-matrix mass gap (`gauge.transfer`)
+
+A **proof** about one fixed matrix, sitting beside the Monte-Carlo *evidence*
+above. `gauge.transfer` builds a finite lattice transfer matrix whose entries are
+outward-rounded intervals, then certifies a lower bound on its lattice-unit mass
+gap `m a = -ln(|λ₁| / λ₀)` using the rigorous engines in
+`omnibias.core.verified.eig`.
+
+Read the scope note first: every result here is a statement about **one fixed
+matrix, at one fixed spacing, in finite dimension**. Nothing in this section is a
+continuum limit or a claim about the Yang-Mills mass gap.
+
+### Building a matrix
+
+| Constructor | Basis | Spectrum |
+|---|---|---|
+| `u1_heat_kernel_transfer` | `character` (diagonal) or `angle` (dense circulant) | `e^{-t n²}`, exactly; every `n ≠ 0` mode is doubly degenerate |
+| `su2_heat_kernel_transfer` | `character` | `e^{-t C₂(a)}` with `C₂ = a(a+2)/4` an exact `Fraction`; non-degenerate |
+| `su2_class_angle_transfer` | `angle` | the same `su(2)` spectrum, in a **dense, entrywise-positive** basis that can be sampled |
+| `su3_heat_kernel_transfer` | `character` | `e^{-t C₂(p,q)}`; the conjugate pair `(p,q) ↔ (q,p)` makes the subdominant mode doubly degenerate |
+| `su2_wilson_transfer` | `character` | `I_m(β)` via `besseli_iv`; the slowly-decaying tail the partner-chain deflation exists for |
+
+Because the spectrum is known in closed form for all of them, a certified bound
+can be checked against the exact answer rather than merely believed.
+
+```python
+from omnibias.geometry.gauge.transfer import (
+    certified_transfer_matrix_gap,
+    su2_heat_kernel_transfer,
+)
+
+transfer = su2_heat_kernel_transfer(0.8, max_dynkin=4)
+gap = certified_transfer_matrix_gap(transfer)
+
+# su(2): C2(1) - C2(0) = 3/4, so the exact lattice-unit gap is 3t/4 = 0.6.
+assert gap.certified
+assert abs(gap.spectral_gap_lower - 0.6) < 1e-9
+assert gap.method == "symmetric_power_sum_partner_chain"
+```
+
+`certified_transfer_matrix_gap` dispatches to whichever engine is both applicable
+and tighter: the symmetric power-sum engine with a partner chain (which deflates
+the subdominant degeneracy and the tail behind it), or Birkhoff-Hopf projective
+contraction (sound but deliberately conservative, and it needs an entrywise
+positive matrix). Every candidate it considered is kept on the result, including
+the losing ones.
+
+### Sandwiching the true gap
+
+`certified_effective_mass_curve` gives rigorous **upper** bounds from the
+closed-form spectrum, decreasing toward the true gap, so the looseness of a lower
+bound is measurable rather than a matter of opinion.
+`certified_multistep_gap_refinement` sharpens a bound via `Tⁿ`, which helps most
+when no partner chain is available.
+
+```python
+from omnibias.geometry.gauge.transfer import certified_effective_mass_curve
+
+curve = certified_effective_mass_curve(transfer, taus=(1, 2, 4, 8))
+assert curve.points[-1].upper >= gap.spectral_gap_lower  # a genuine sandwich
+```
+
+### A sealed, replayable, Lean-ready certificate
+
+```python
+from omnibias.core.proof import Conjecture
+from omnibias.core.proof.certificate import verify_certificate_digest
+from omnibias.geometry.gauge.proofmachine import build_gauge_machine
+
+machine = build_gauge_machine()
+verdict = machine.evaluate(
+    Conjecture(
+        "su2-gap",
+        "transfer_matrix_spectral_gap",
+        {
+            "parameters": {
+                "builder": "su2_heat_kernel_transfer",
+                "coupling": "4/5",
+                "max_dynkin": 4,
+                "lattice_spacing": 1.0,
+            }
+        },
+    )
+)
+
+assert verdict.status == "PROVED"
+assert verify_certificate_digest(verdict.certificate)
+assert verdict.certificate["continuum_claim"] is False
+assert verdict.certificate["honesty"]["yang_mills_claim"] is False
+```
+
+The certificate stores its matrix's *constructor arguments*, not just the
+resulting numbers, so `replay_transfer_matrix_gap` rebuilds the matrix from
+scratch and re-runs the gap engine — a sealed bound tighter than an independent
+derivation supports is rejected. The rational `subdominant_ratio_upper` is the
+obligation the Mathlib-free Lean kernel's `spectral_gap_pos` lemma discharges.
+
+### Cross-checking against Monte Carlo
+
+The certificate is about a fixed matrix; a lattice Monte Carlo is about an
+ensemble. Rather than assume a correspondence, `certified_gap_versus_monte_carlo`
+samples the path measure `∏ₜ T_{xₜ, xₜ₊₁}` that the matrix *itself* defines, so
+both sides describe the same object. The sampler reads matrix entries only — it
+never touches an eigenvalue — so the gap emerges from the decay of a sampled
+autocorrelation.
+
+<!-- docs-test: slow -->
+```python
+from omnibias.geometry.gauge.transfer import (
+    certified_gap_versus_monte_carlo,
+    su2_class_angle_transfer,
+)
+
+# The class-angle basis: same su(2) spectrum, but dense and positive, so the
+# induced Markov chain actually moves.  (A diagonal matrix freezes it.)
+sampled = su2_class_angle_transfer(0.8, max_dynkin=3)
+check = certified_gap_versus_monte_carlo(sampled, seed=0)
+
+assert check.consistent            # certified lower bound <= MC estimate
+assert check.agrees_with_exact     # and the MC brackets the closed-form gap
+```
+
+`consistent` is one-sided and the estimator's residual bias helps it pass;
+`agrees_with_exact` is the two-sided test with teeth. Both are **evidence** —
+only the interval arithmetic is proof.
+
+### Scaling across spacings, honestly
+
+`heat_kernel_gap_scaling_report` collects certified bounds at several spacings.
+That is a record of a trend, explicitly labelled evidence, and it is never an
+extrapolation to the continuum.

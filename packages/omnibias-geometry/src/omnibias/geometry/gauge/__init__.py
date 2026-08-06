@@ -14,6 +14,12 @@ The pure-Python schemas (:class:`LieAlgebra`, :class:`LieAlgebraValuedForm`,
 :class:`GaugeConnectionSpec`) live in :mod:`omnibias.geometry.gauge._core`; the backend
 ops live in ``omnibias.geometry.gauge.torch`` and ``omnibias.geometry.gauge.jax``.
 
+Two further submodules are imported by path rather than re-exported here:
+``omnibias.geometry.gauge.lattice`` (the SU(2) lattice Monte-Carlo engine and its
+statistical mass-gap estimators) and ``omnibias.geometry.gauge.transfer``
+(rigorously enclosed transfer matrices and their **certified** spectral gaps, with
+sealed certificates registered through ``omnibias.geometry.gauge.proofmachine``).
+
 Maturity: this is an **alpha** submodule (folded in from the former standalone
 ``omnibias-gauge`` package) shipped inside the Beta ``omnibias-geometry``
 distribution. It is the non-abelian extension of ``omnibias-geometry``'s

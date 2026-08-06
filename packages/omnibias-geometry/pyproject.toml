@@ -36,7 +36,11 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Physics",
     "Typing :: Typed",
 ]
-dependencies = ["omnibias-fields>=0.1.0", "numpy>=1.24"]
+# ``omnibias-core`` arrives transitively through ``omnibias-fields``, but
+# ``omnibias.geometry.gauge.transfer`` imports ``omnibias.core.verified`` directly
+# (interval arithmetic, the spectral-gap engines, ``besseli_iv``), so the dependency
+# is declared rather than inherited.
+dependencies = ["omnibias-core>=0.2.0", "omnibias-fields>=0.1.0", "numpy>=1.24"]
 
 [project.optional-dependencies]
 torch = ["omnibias-fields[torch]", "torch>=2.0"]

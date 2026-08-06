@@ -27,6 +27,11 @@ Two backends, selected automatically:
 ``mpmath`` is intentionally an *optional* dependency: it is imported lazily via
 :mod:`importlib` so :mod:`omnibias.core` keeps its zero-dependency contract and
 the strict type gate never tries to resolve an un-stubbed module.
+
+:func:`besseli_iv` is the one exception to the second bullet.  Its mpmath-free
+path is a truncated all-positive series with a geometric tail bound, not a
+libm reading, so it is *unconditionally* rigorous: it neither trips
+:func:`libm_fallback_used` nor is refused by :func:`strict_backend`.
 """
 
 from __future__ import annotations
@@ -460,6 +465,144 @@ def softplus_iv(x: Interval) -> Interval:
     return Interval(max(lo, 0.0), hi)
 
 
+#: Largest argument the mpmath-free :func:`besseli_iv` series accepts.  ``I_n(z)``
+#: grows like ``e^z``, so beyond roughly ``z = 709`` the individual series terms
+#: overflow a double and the "enclosure" would degenerate to ``[inf, inf]`` -- an
+#: *unsound* bound.  Refusing early is the only honest option; mpmath has no such
+#: limit.
+BESSELI_SERIES_MAX_ARG: float = 600.0
+
+#: Term budget for the mpmath-free :func:`besseli_iv` series.  Convergence needs
+#: roughly ``z / 2`` terms before the ratio test bites, so this is ample for every
+#: argument :data:`BESSELI_SERIES_MAX_ARG` admits.
+BESSELI_SERIES_MAX_TERMS: int = 4096
+
+#: Relative width at which the series stops refining.  Reaching it is a *quality*
+#: target, not a soundness one: the geometric tail bound below is valid from the
+#: first term whose ratio drops under ``1``, so exhausting the budget returns a
+#: wider-but-still-rigorous enclosure rather than an error.
+_BESSELI_REL_TOL: float = 1e-16
+
+
+def _besseli_series(n: int, z: float) -> Interval:
+    r"""Rigorous enclosure of ``I_n(z)`` for ``z >= 0``, ``n >= 0``, without mpmath.
+
+    Uses the ascending series
+
+    .. math::  I_n(z) = \sum_{k \ge 0} \frac{(z/2)^{2k+n}}{k!\,(k+n)!}
+
+    whose terms are **all positive** for ``z >= 0``.  That is what makes this a
+    proof rather than a ulp-inflated guess: a truncated sum is already a valid
+    *lower* bound (no cancellation can eat into it), and the consecutive ratio
+
+    .. math::  t_{k+1} / t_k = \frac{(z/2)^2}{(k+1)(k+n+1)}
+
+    *decreases* in ``k``, so once it drops below some ``r < 1`` it bounds every
+    later ratio too and the remaining tail is dominated by the geometric series
+    ``t_k \cdot r / (1 - r)``.  Summing with outward-rounded :class:`Interval`
+    arithmetic and adding that tail to the upper endpoint therefore encloses the
+    true value unconditionally -- in particular it does **not** depend on the
+    platform libm, so unlike :func:`_enclose_point` this fallback is not merely
+    *conditionally* rigorous.
+    """
+    if z > BESSELI_SERIES_MAX_ARG:
+        raise ValueError(
+            f"besseli series fallback requires z <= {BESSELI_SERIES_MAX_ARG} "
+            f"(got {z}): the terms would overflow a double and the enclosure "
+            "would stop being sound. Install mpmath for larger arguments."
+        )
+    if z == 0.0:
+        return Interval.point(1.0 if n == 0 else 0.0)
+    half = Interval.point(z) * 0.5
+    half_sq = half * half
+    term = Interval.point(1.0)
+    for j in range(1, n + 1):
+        term = term * half / Interval.point(float(j))
+    total = term
+    one = Interval.point(1.0)
+    widest_valid: Interval | None = None
+    for k in range(1, BESSELI_SERIES_MAX_TERMS + 1):
+        term = term * half_sq / Interval.point(float(k * (k + n)))
+        total = total + term
+        # Bounds t_{k+1}/t_k and, because the denominator only grows, every
+        # ratio after it as well.
+        ratio = half_sq / Interval.point(float((k + 1) * (k + n + 1)))
+        if ratio.hi >= 0.5:
+            continue
+        tail_hi = (Interval(0.0, term.hi) * ratio / (one - ratio)).hi
+        widest_valid = Interval(max(total.lo, 0.0), (total + Interval(0.0, tail_hi)).hi)
+        if tail_hi == 0.0 or tail_hi <= _BESSELI_REL_TOL * total.lo:
+            return widest_valid
+    if widest_valid is None:  # pragma: no cover - unreachable below the arg cap
+        raise ValueError(
+            f"besseli series did not reach its ratio test for n={n}, z={z} within "
+            f"{BESSELI_SERIES_MAX_TERMS} terms"
+        )
+    return widest_valid
+
+
+def _besseli_nonneg_point(n: int, z: float) -> Interval:
+    """Rigorous enclosure of ``I_n(z)`` at a scalar ``z >= 0`` with order ``n >= 0``."""
+    mp = _mpmath()
+    if mp is None:
+        return _besseli_series(n, z)
+    with mp.workdps(MPMATH_DPS):
+        y = mp.besseli(n, mp.mpf(z))
+    lo, hi = _bracket_mpf(mp, y)
+    return Interval(max(lo, 0.0), hi)  # I_n >= 0 on z >= 0
+
+
+def _besseli_point_signed(n: int, z: float) -> Interval:
+    """``I_n`` at any real ``z``, using the parity ``I_n(-z) = (-1)^n I_n(z)``."""
+    if z >= 0.0:
+        return _besseli_nonneg_point(n, z)
+    reflected = _besseli_nonneg_point(n, -z)
+    return reflected if n % 2 == 0 else -reflected
+
+
+def besseli_point(n: int, z: float) -> Interval:
+    """Guaranteed enclosure of the modified Bessel function ``I_n(z)`` at a scalar.
+
+    The order must be an integer; negative orders are folded through the exact
+    identity ``I_{-n} = I_n``.
+    """
+    return _besseli_point_signed(abs(int(n)), z)
+
+
+def besseli_iv(n: int, x: Interval) -> Interval:
+    r"""Guaranteed enclosure of the modified Bessel function ``I_n`` over ``x``.
+
+    ``I_n`` is the eigenvalue-generating function of the Wilson lattice transfer
+    matrix, whose character expansion has ``I_n`` ratios as coefficients.
+
+    The order is an integer and negative orders fold through ``I_{-n} = I_n``.
+    Bounding the *range* uses the parity of the function rather than raw endpoint
+    values, which would be unsound for even orders:
+
+    * odd ``n`` -- ``I_n`` is odd and strictly increasing on the whole real line
+      (``I_n' = (I_{n-1} + I_{n+1}) / 2 > 0``), so the endpoints do bound it;
+    * even ``n`` -- ``I_n`` is *even* with its minimum at ``z = 0``, so an
+      interval straddling zero attains its lower bound in the interior, not at an
+      endpoint, and its upper bound at whichever endpoint is farther from zero.
+
+    Enclosures come from mpmath when available and otherwise from the
+    unconditionally rigorous ascending series in :func:`_besseli_series`.
+    """
+    order = abs(int(n))
+    if order % 2 == 1:
+        return Interval(
+            _besseli_point_signed(order, x.lo).lo,
+            _besseli_point_signed(order, x.hi).hi,
+        )
+    lo_mag, hi_mag = abs(x.lo), abs(x.hi)
+    nearest = 0.0 if x.contains_zero() else min(lo_mag, hi_mag)
+    farthest = max(lo_mag, hi_mag)
+    return Interval(
+        max(_besseli_nonneg_point(order, nearest).lo, 0.0),
+        _besseli_nonneg_point(order, farthest).hi,
+    )
+
+
 #: A rigorous enclosure of Euler's number ``e = exp(1)`` via :func:`exp_iv`.  It
 #: uses the active transcendental backend (mpmath when present, else the
 #: ulp-inflated libm fallback), so it is exactly as rigorous as any other
@@ -474,6 +617,8 @@ clear_libm_fallback_used()
 __all__ = [
     "BACKEND_LIBM_FALLBACK",
     "BACKEND_MPMATH",
+    "BESSELI_SERIES_MAX_ARG",
+    "BESSELI_SERIES_MAX_TERMS",
     "E_IV",
     "FALLBACK_ULPS",
     "MPMATH_DPS",
@@ -481,6 +626,8 @@ __all__ = [
     "atan_iv",
     "atan_point",
     "backend_name",
+    "besseli_iv",
+    "besseli_point",
     "certificate_mode",
     "clear_libm_fallback_used",
     "cos_iv",
