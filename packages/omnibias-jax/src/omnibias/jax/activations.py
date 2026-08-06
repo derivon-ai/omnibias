@@ -346,7 +346,7 @@ LOG1PU2 = register_activation(
 
 
 # ---------------------------------------------------------------------------
-# Mixed (fastpath n in {0, 1})
+# Kinked and analytic-product activations (all orders; ``huber`` a.e.)
 # ---------------------------------------------------------------------------
 
 

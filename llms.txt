@@ -458,6 +458,8 @@ measured verdict.
 - [PINN loss balancing + causal time marching](docs/examples/pinn_causal_marching.py)
 - [PINN conservation cages + non-local attention field](docs/examples/pinn_conservation_attention.py)
 - [PINN domain decomposition (XPINN) + stiff integrators](docs/examples/pinn_xpinn_stiff.py)
+- [PINN partition of unity across an interface (soft partition captures a kink a single smooth field cannot; certified soft->hard gap)](docs/examples/partitioned_pinn.py)
+- [Conservative shock-capturing Burgers PINN (flux-form cage over a partitioned potential: div G = 0 to machine epsilon across a sharp moving seam, and tighter global mass balance than a non-conservative arm at equal budget as the layer goes under-resolved; conservation is structural, accuracy is optimised, entropy admissibility is out of scope)](docs/examples/pinn_burgers_shock.py)
 - [QPINN harmonic oscillator](docs/examples/qpinn_tise_qho.py)
 - [PDE solver: coupled reaction-diffusion](docs/examples/pde_reaction_diffusion.py)
 - [Convex LP by gradient descent (bias collapse)](docs/examples/convex_lp_gradient_descent.py)

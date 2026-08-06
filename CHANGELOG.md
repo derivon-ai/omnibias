@@ -6,6 +6,77 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — `omnibias-pinn`: conservative shock capturing (cage over partition)
+
+Representing a shock wants a sharp seam; representing a conservation law wants
+`div G = 0`. The two were separately available and had never been composed,
+because the obvious composition is wrong: making each partition patch a
+`FluxFormField` gives `div (sum_l w_l G_l) = sum_l grad w_l . G_l`, which
+vanishes only where the gates are saturated — conservation breaks exactly at the
+seam, the one place a shock needs it.
+
+Inverting the nesting fixes it, and needed no new code. `FluxFormField` builds
+`G^i = sum_j d_j P^{ij}` from an antisymmetric potential, so
+`div G = d_i d_j P^{ij} = 0` by symmetry of mixed partials, for *any*
+twice-differentiable `P` however sharp. Putting the partition inside, as the
+potential, buys an arbitrarily sharp front at no cost to the conservation law.
+That is also the right representation rather than a convenient one: with axes
+`(t, x)` the cage gives `rho = d_x P`, so `P` is the cumulative mass, and the
+exact viscous profile integrates to `P -> c0 x - (c0^2 + a^2) t/2 - a |x - c0 t|`
+as `nu -> 0`. The potential of a shock is a **kink**, which is what a partition
+of unity over smooth patches already represents well.
+
+- `packages/omnibias-pinn/tests/partition/test_cage_over_partition.py` pins the
+  composition: relative `|div G| < 1e-12` for `beta` from 2 to 200 (measured
+  2e-16 to 3e-14), holding after training relocates the seam, and the rejected
+  nesting is kept as a live falsifier at order-one divergence — without it the
+  passing test would look like a property of cages in general.
+- `docs/examples/pinn_burgers_shock.py` and
+  `benchmarks/burgers_shock_conservation.py` (artifact:
+  `docs/benchmarks/burgers_shock_conservation.json`) train the cage against a
+  non-conservative arm at identical architecture, parameter count, seed and
+  collocation budget, over 6 viscosities x 5 seeds.
+
+Measured, and reported the way it came out. The conservative arm holds global
+mass balance tighter at **every** viscosity, and the margin widens as the layer
+goes under-resolved: 1.3x at `nu = 2e-2`, 2.9x at `nu = 2e-3`, winning 5 seeds out
+of 5 once `nu <= 3e-3`. As `nu` falls tenfold the baseline's mass error grows
+4.5x while the cage's grows 2.0x. On shock speed and relative L2 the ordering
+**reverses** with resolution — the non-conservative arm is up to 16x better where
+the layer is resolved — so only the mass-balance result is asserted in CI and the
+rest is printed. That is the finite-volume result carried onto a mesh-free field:
+a conservative scheme is not more accurate on a well-resolved smooth problem, it
+is more robust when the feature is under-resolved.
+
+Scope: `div G = 0` is structural (3.4e-15 worst over all 30 sweep cells, no
+training, no quadrature, no tolerance); solution accuracy is optimised, not
+proven. Conservation pins the Rankine-Hugoniot jump condition and does **not**
+select the entropy solution. The `beta -> inf` seam sharpening is *temperature
+collapse*, never the founding `delta -> 0` bias collapse.
+
+Also adopts `docs/examples/partitioned_pinn.py`, which existed but appeared in no
+`docs/examples.md` row, no `llms.txt` entry and no CI job, so nothing had been
+running it.
+
+### Fixed — docs: the published derivative-order ceiling understated the tower
+
+`docs/scope-and-guarantees.md` sec 2 capped `huber`, `silu`/`swish`, `gelu`,
+`relu` and `mish` at order 1, blaming a "Dirac at the kink". Every entry in that
+row has had an all-orders fast path for some time, and three of the five have no
+kink at all: `silu`, `gelu` and `mish` are smooth everywhere and carry exact
+Leibniz towers over the `z f(z)` product, while `relu` and `huber` carry
+all-orders almost-everywhere / regular-part towers. `smooth_sign` was likewise
+listed at 2 despite being `tanh` rescaled, hence unbounded.
+
+The table is labelled "reading guidance for AI agents", so a stale ceiling there
+does not merely go out of date — it teaches every agent and reader the wrong
+answer. `tests/test_doc_activation_orders.py` now parses the table and checks
+every claim against the live registry on both backends, including a negative half
+that requires each claimed cap to genuinely raise past its ceiling, so replacing
+the table with "unbounded" everywhere would fail. Also corrects the stale header
+tables in `omnibias.torch.activations.nqs` (`mish`, `smooth_sign`) and a section
+comment in `omnibias.jax.activations`.
+
 ### Added — `omnibias-geometry`: certified lattice mass gap (`omnibias.geometry.gauge.transfer`)
 
 The rigorous gap engines in `omnibias.core.verified.eig` were written *for* this

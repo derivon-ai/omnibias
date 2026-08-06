@@ -26,14 +26,23 @@ class (`σ' = P(σ)`) or is the eigenfunction of `d/dz`. The classification is
 
 | Family | Max closed-form order `n` | Why |
 |---|---|---|
-| `sigmoid`, `tanh`, `softplus`, `exp`, `gaussian`, `sin`, `cos`, `sinh`, `cosh` | **unbounded** | Riccati or `d/dz` eigenfunction. |
+| `sigmoid`, `tanh`, `softplus`, `exp`, `gaussian`, `sin`, `cos`, `sinh`, `cosh`, `smooth_sign`, `soft_relu`, `soft_step`, `soft_sign` | **unbounded** | Riccati or `d/dz` eigenfunction. |
+| `silu`, `swish`, `gelu`, `mish` | **unbounded** | Analytic product `z · f(z)`: Leibniz over a Riccati / Hermite tower. |
+| `relu`, `huber`, `elu`, `selu`, `celu`, `leaky_relu`, `prelu`, `relu6`, `hardtanh`, `hardsigmoid`, `hardswish`, `softshrink`, `hardshrink`, `threshold`, `softsign`, `abs`, `sign`, `step` | **unbounded** (a.e.) | Exact tower on each open piece. The singular part at the kink (a Dirac) is dropped by the almost-everywhere / regular-part convention. |
 | `tan`, `cot`, `coth`, `sech`, `log_cosh` | 3 | Truncated Riccati table. |
-| `arctan`, `log1pu2`, `softabs`, `smooth_sign` | 2 | Mixed-class proximal. |
-| `huber`, `silu`/`swish`, `gelu`, `relu`, `mish` | 1 | Higher orders are **distributional** (Dirac at the kink); no float to return. |
+| `arctan`, `log1pu2`, `softabs` | 2 | Mixed-class proximal. |
+
+The a.e. row is the one to read carefully: the value returned is the
+**regular part**, so `relu''` is `0`, not a delta. That is a modelling
+convention, chosen because a float is what the caller can use — it is not a
+claim that the distributional derivative vanishes.
 
 `n < 0` raises `ValueError`. Genuinely unimplemented orders raise
 `NotImplementedError` with a specific message — the
 derivative-tower contract is enforced by every backend.
+[`tests/test_doc_activation_orders.py`](https://github.com/derivon-ai/omnibias/blob/main/tests/test_doc_activation_orders.py)
+parses this table and checks every row against the live registry on both
+backends, so it cannot drift from the code.
 
 ## 3. The certified PDE stacks (Navier–Stokes / CCF)
 

@@ -333,6 +333,14 @@ jobs:
         run: |
           source .venv-pinn/bin/activate
           python docs/examples/pinn_xpinn_stiff.py
+      - name: Run the partition-of-unity interface example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/partitioned_pinn.py
+      - name: Run the conservative shock-capturing Burgers example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_burgers_shock.py
 
   qpinn:
     name: omnibias-qpinn (alpha)

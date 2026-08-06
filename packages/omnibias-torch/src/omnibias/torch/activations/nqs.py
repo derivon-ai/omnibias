@@ -14,12 +14,16 @@ Activation          K=2 collapse / role                        Max fastpath orde
 ``softabs``         ``sqrt(z^2 + eps^2) - eps``: smooth |z|     n in {0, 1, 2}
                     used in Jastrow factors and complex
                     amplitude magnitudes.
-``smooth_sign``     ``tanh(z / T)``: temperature-controlled     n in {0, 1, 2}
+``smooth_sign``     ``tanh(z / T)``: temperature-controlled     all orders
                     smooth sign; used in variational
                     annealing schedules.
-``mish``            ``z * tanh(softplus(z))``: self-gated       n in {0, 1}
+``mish``            ``z * tanh(softplus(z))``: self-gated       all orders
                     residual activation, transformer FFN.
 ==================  =========================================  ===================
+
+``smooth_sign`` is ``tanh`` rescaled, so it inherits the whole Riccati tower;
+``mish`` is the analytic product ``z * g(z)``, so Leibniz over the ``(t, s)``
+recurrence gives every order. Both were once capped and are no longer.
 
 The PyTorch implementations here mirror :mod:`omnibias.jax.activations` so
 both backends register the same set of names; the parity test in
