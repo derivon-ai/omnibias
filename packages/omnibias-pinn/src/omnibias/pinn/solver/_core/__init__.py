@@ -16,6 +16,12 @@ from omnibias.pinn.solver._core.conditions import (
     ValueLike,
 )
 from omnibias.pinn.solver._core.domain import Domain
+from omnibias.pinn.solver._core.hard import (
+    HARD_CONDITION_MODES,
+    DeclinedCondition,
+    HardConditionPlan,
+    plan_hard_conditions,
+)
 from omnibias.pinn.solver._core.honesty import (
     AUTODIFF,
     CLOSED_FORM,
@@ -74,9 +80,12 @@ __all__ = [
     "Classification",
     "Coefficient",
     "CollocationSpec",
+    "DeclinedCondition",
     "Domain",
     "Field",
+    "HARD_CONDITION_MODES",
     "HIGH_ORDER",
+    "HardConditionPlan",
     "InitialCondition",
     "Linearity",
     "NUMERICAL",
@@ -106,6 +115,7 @@ __all__ = [
     "initial_slice_points",
     "interior_points",
     "make_system",
+    "plan_hard_conditions",
     "poisson",
     "reaction_diffusion",
     "sample_observations",

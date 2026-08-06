@@ -11,6 +11,7 @@ operators (no autodiff) and solved with one least-squares solve.
 from __future__ import annotations
 
 import jax.numpy as jnp
+from omnibias.pinn.solver._core.hard import plan_hard_conditions
 from omnibias.pinn.solver._core.sampling import CollocationSpec
 from omnibias.pinn.solver._core.system import System
 from omnibias.pinn.solver._core.taxonomy import Linearity
@@ -32,8 +33,14 @@ def solve_least_squares(
     seed: int = 0,
     collocation: CollocationSpec | None = None,
     ridge: float = 1e-8,
+    hard_conditions: str = "none",
 ) -> FieldSolution:
-    """Exact-operator linear collocation on jax (one least-squares solve)."""
+    """Exact-operator linear collocation on jax (one least-squares solve).
+
+    ``hard_conditions="auto"`` embeds every condition it can certify into the
+    ansatz and drops those rows from the system. Opt-in: the default ``"none"``
+    reproduces the previous behaviour bit for bit.
+    """
     if system.linearity is not Linearity.LINEAR:
         raise ValueError(
             "solve_least_squares requires a LINEAR system; jax has no nonlinear "
@@ -43,9 +50,11 @@ def solve_least_squares(
     # coefficient here can only be a mistake.
     system.require_bound_coefficients("solve_least_squares")
     spec = collocation or CollocationSpec()
+    hard = plan_hard_conditions(system, mode=hard_conditions)
     field = build_field(
         system, hidden=hidden, activation=activation,
         weight_init_scale=weight_init_scale, seed=seed,
+        hard_conditions=hard,
     )
     c_shape = field.c.shape
     n_c = int(c_shape[0] * c_shape[1])
@@ -56,7 +65,7 @@ def solve_least_squares(
     def rows_for(theta: jnp.ndarray) -> jnp.ndarray:
         c = theta[:n_c].reshape(c_shape)
         b = theta[n_c:]
-        return all_rows(with_readout(field, c, b), system, coords, spec)
+        return all_rows(with_readout(field, c, b), system, coords, spec, hard)
 
     r0 = rows_for(jnp.zeros(n_unknowns, dtype=dtype))
     columns = []
@@ -77,7 +86,13 @@ def solve_least_squares(
         system=system,
         residual_norm=residual_norm(fitted, system, spec),
         method="least_squares",
-        diagnostics={"n_unknowns": n_unknowns, "n_rows": int(r0.shape[0])},
+        diagnostics={
+            "n_unknowns": n_unknowns,
+            "n_rows": int(r0.shape[0]),
+            "hard_conditions": hard.summary(),
+            "hard_absorbed": len(hard.conditions),
+            "hard_declined": tuple(str(d) for d in hard.declined),
+        },
     )
 
 

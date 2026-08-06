@@ -14,6 +14,7 @@ from typing import Any
 import jax.numpy as jnp
 import numpy as np
 from omnibias.pinn.solver._core.conditions import BoundaryCondition, InitialCondition
+from omnibias.pinn.solver._core.hard import HardConditionPlan
 from omnibias.pinn.solver._core.sampling import (
     CollocationSpec,
     bc_faces,
@@ -76,22 +77,45 @@ def _ic_rows(
     return state.ops.derivative(state, ic.component, axis=ta, order=1) - target
 
 
-def condition_residual(field: Any, system: System, spec: CollocationSpec) -> Any:
+def condition_residual(
+    field: Any,
+    system: System,
+    spec: CollocationSpec,
+    hard: HardConditionPlan | None = None,
+) -> Any:
+    """Stack every boundary + initial condition row.
+
+    Conditions the ``hard`` plan reports absorbed contribute no rows, the same
+    way a periodic condition already contributes none. ``hard=None`` reproduces
+    the unconditional behaviour exactly.
+    """
+    absorbed_bc = hard.absorbed_boundary if hard else frozenset()
+    absorbed_ic = hard.absorbed_initial if hard else frozenset()
     rows: list[Any] = []
-    for bc in system.boundary:
+    for i, bc in enumerate(system.boundary):
+        if i in absorbed_bc:
+            continue
         r = _bc_rows(field, system, bc, spec)
         if r.shape[0]:
             rows.append(r)
-    for ic in system.initial:
+    for i, ic in enumerate(system.initial):
+        if i in absorbed_ic:
+            continue
         rows.append(_ic_rows(field, system, ic, spec))
     return jnp.concatenate(rows) if rows else jnp.zeros((0,), dtype=field.W.dtype)
 
 
-def all_rows(field: Any, system: System, coords_interior: Any, spec: CollocationSpec) -> Any:
+def all_rows(
+    field: Any,
+    system: System,
+    coords_interior: Any,
+    spec: CollocationSpec,
+    hard: HardConditionPlan | None = None,
+) -> Any:
     return jnp.concatenate(
         [
             interior_residual(field, system, coords_interior),
-            condition_residual(field, system, spec),
+            condition_residual(field, system, spec, hard),
         ]
     )
 
@@ -101,6 +125,11 @@ def default_interior(field: Any, system: System, spec: CollocationSpec) -> Any:
 
 
 def residual_norm(field: Any, system: System, spec: CollocationSpec | None = None) -> float:
+    """RMS of the full (interior + condition) residual, for diagnostics.
+
+    Assembled with **every** condition, absorbed or not, so a caged solve reports
+    the same quantity as an uncaged one.
+    """
     spec = spec or CollocationSpec()
     rows = all_rows(field, system, default_interior(field, system, spec), spec)
     return float(jnp.sqrt(jnp.mean(rows ** 2)))

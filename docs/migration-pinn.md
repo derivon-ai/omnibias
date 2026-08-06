@@ -91,9 +91,16 @@ the derivative chain by hand. The same pattern works for
 
 | DeepXDE | omnibias-pinn |
 | --- | --- |
-| `dde.icbc.DirichletBC(geom, lambda x: ..., on_boundary)` | `HardBoundaryField(base, distance_fn, boundary_fn, components)` |
+| `dde.icbc.DirichletBC(geom, lambda x: ..., on_boundary)` | `HardCondition(component, axis, dirichlet(face), value)` on a box, or `HardBoundaryField(base, distance_fn, boundary_fn, components)` for arbitrary geometry |
+| `dde.icbc.NeumannBC(...)` / `RobinBC(...)` | `HardCondition(component, axis, neumann(face))` / `robin(face, alpha=, beta=)` |
 | `dde.icbc.PeriodicBC(...)` | set `periodicity=(True, ...)` on the `CoordinateSpec` |
-| `dde.icbc.IC(geom, lambda x: ..., lambda x: x[1] == 0)` | hard-IC ansatz: `u_pred = u_0 + g(t) * NN(x, t)` |
+| `dde.icbc.IC(geom, lambda x: ..., lambda x: x[1] == 0)` | `HardCondition(component, time_axis, dirichlet(t0), value)`; `derivative_at(t0, 1)` for an initial velocity |
+
+DeepXDE imposes all of these as penalty terms. `ConstrainedExpressionField`
+collects the `HardCondition`s above into an ansatz that satisfies them
+identically, so the corresponding loss terms disappear rather than being
+weighted -- and on the solver, `hard_conditions="auto"` builds that ansatz for
+you and drops the rows it absorbed.
 
 ### Training loop
 

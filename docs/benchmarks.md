@@ -470,6 +470,32 @@ coefficient the data cannot see does not raise, it just stops moving. `wave` rec
 problems are small and their coefficients enter linearly in the residual; a coefficient inside a
 nonlinearity, or one poorly excited by the observation set, is a harder problem than anything measured here.
 
+### Hard vs soft boundary / initial conditions
+
+A boundary condition is normally one more penalty term, weighted against the interior residual. Absorbing it
+into the ansatz instead makes it exact -- that part is algebra -- but says nothing about whether the rest of the
+solve improves, so both halves are measured. Poisson (elliptic), heat (parabolic) and wave (hyperbolic), each
+with an analytic solution, 5 seeds, `solve_least_squares`, `hidden=96`, 48 interior / 16 per face. The two arms
+share architecture, parameter count, seed and collocation budget; only `hard_conditions` differs. Regenerate
+with `benchmarks/hard_conditions_solver.py`.
+
+| problem | absorbed | boundary violation (hard, **max** over cells) | boundary violation (soft, median) | interior rel-L2 hard | interior rel-L2 soft | hard wins |
+|---|---|---|---|---|---|---|
+| Poisson | 2 | **0.0** | 1.7e-06 | **3.5e-07** | 1.6e-06 | 5/5 |
+| heat | 3 | **3.4e-15** | 3.7e-02 | **3.8e-06** | 1.1e-02 | 5/5 |
+| wave | 4 | **1.4e-14** | 4.6e-03 | **1.1e-06** | 3.1e-03 | 5/5 |
+
+The boundary column is the *falsifier* for the exactness claim, not evidence for it: the hard arm is exact by
+construction, and it is reported as a max rather than a median so a single bad cell could not hide. The interior
+column is the one that decides whether absorption is worth using, and it is **optimised, not proven**. The
+parabolic and hyperbolic gaps are the large ones because that is where the soft arm has an initial condition
+competing with the interior residual for the same gradient budget; the elliptic gap is ~4x, not ~3000x.
+
+Absorption is partial and opt-in. `hard_conditions="auto"` absorbs what the planner can certify and leaves the
+rest soft, reporting a reason per declined condition; the default `"none"` reproduces the previous solve bit for
+bit. Stage A is validated for conditions on at most one spatial axis plus time -- more than that is declined,
+which is the same answer the solver gives today.
+
 ## Structured DP (omnibias-struct)
 
 `omnibias-struct` runs one soft-DP substrate (`logsumexp_beta` relaxation, exactly

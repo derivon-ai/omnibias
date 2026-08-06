@@ -341,6 +341,10 @@ jobs:
         run: |
           source .venv-pinn/bin/activate
           python docs/examples/pinn_burgers_shock.py
+      - name: Run the hard boundary / initial condition example (smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_hard_conditions.py
 
   qpinn:
     name: omnibias-qpinn (alpha)

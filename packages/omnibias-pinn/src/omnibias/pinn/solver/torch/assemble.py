@@ -16,6 +16,7 @@ from typing import Any
 import numpy as np
 import torch
 from omnibias.pinn.solver._core.conditions import BoundaryCondition, InitialCondition
+from omnibias.pinn.solver._core.hard import HardConditionPlan
 from omnibias.pinn.solver._core.sampling import (
     CollocationSpec,
     bc_faces,
@@ -86,24 +87,45 @@ def _ic_rows(
     return state.ops.derivative(state, ic.component, axis=ta, order=1) - target
 
 
-def condition_residual(field: Any, system: System, spec: CollocationSpec) -> Tensor:
-    """Stack every boundary + initial condition row."""
+def condition_residual(
+    field: Any,
+    system: System,
+    spec: CollocationSpec,
+    hard: HardConditionPlan | None = None,
+) -> Tensor:
+    """Stack every boundary + initial condition row.
+
+    Conditions the ``hard`` plan reports absorbed contribute no rows, the same
+    way a periodic condition already contributes none: the architecture enforces
+    them, so a penalty could only add noise. Passing ``hard=None`` reproduces the
+    unconditional behaviour exactly.
+    """
+    absorbed_bc = hard.absorbed_boundary if hard else frozenset()
+    absorbed_ic = hard.absorbed_initial if hard else frozenset()
     rows: list[Tensor] = []
-    for bc in system.boundary:
+    for i, bc in enumerate(system.boundary):
+        if i in absorbed_bc:
+            continue
         r = _bc_rows(field, system, bc, spec)
         if r.numel():
             rows.append(r)
-    for ic in system.initial:
+    for i, ic in enumerate(system.initial):
+        if i in absorbed_ic:
+            continue
         rows.append(_ic_rows(field, system, ic, spec))
     return torch.cat(rows) if rows else field.W.weight.new_zeros(0)
 
 
 def all_rows(
-    field: Any, system: System, coords_interior: Tensor, spec: CollocationSpec
+    field: Any,
+    system: System,
+    coords_interior: Tensor,
+    spec: CollocationSpec,
+    hard: HardConditionPlan | None = None,
 ) -> Tensor:
     """Interior residual rows followed by condition rows."""
     interior = interior_residual(field, system, coords_interior)
-    conditions = condition_residual(field, system, spec)
+    conditions = condition_residual(field, system, spec, hard)
     return torch.cat([interior, conditions])
 
 
@@ -115,7 +137,13 @@ def default_interior(field: Any, system: System, spec: CollocationSpec) -> Tenso
 def residual_norm(
     field: Any, system: System, spec: CollocationSpec | None = None
 ) -> float:
-    """RMS of the full (interior + condition) residual, for diagnostics."""
+    """RMS of the full (interior + condition) residual, for diagnostics.
+
+    Deliberately assembled with **every** condition, absorbed or not: a caged
+    solve should report the same quantity as an uncaged one, and a cage that
+    stopped enforcing something would show up here rather than be hidden by the
+    plan that dropped it from the loss.
+    """
     spec = spec or CollocationSpec()
     coords = default_interior(field, system, spec)
     with torch.no_grad():
@@ -171,12 +199,24 @@ def _as_target(value: Any, coords: Tensor) -> Tensor:
     return coords.new_full((coords.shape[0],), float(target))
 
 
-def build_plan(field: Any, system: System, spec: CollocationSpec) -> CollocationPlan:
-    """Build a cached collocation plan for a (frozen-feature) field."""
+def build_plan(
+    field: Any,
+    system: System,
+    spec: CollocationSpec,
+    hard: HardConditionPlan | None = None,
+) -> CollocationPlan:
+    """Build a cached collocation plan for a (frozen-feature) field.
+
+    Absorbed conditions contribute no terms, so the column probing in the linear
+    solve costs nothing for them -- the cage already carries them, and it is
+    affine in the readout, so the probing itself stays valid.
+    """
+    absorbed_bc = hard.absorbed_boundary if hard else frozenset()
+    absorbed_ic = hard.absorbed_initial if hard else frozenset()
     interior_state = field(default_interior(field, system, spec))
     bc_terms: list[_BCTerm] = []
-    for bc in system.boundary:
-        if bc.kind == "periodic":
+    for i, bc in enumerate(system.boundary):
+        if bc.kind == "periodic" or i in absorbed_bc:
             continue
         for axis, side in bc_faces(system.domain, bc):
             pts = boundary_points(system.domain, spec, axis=axis, side=side)
@@ -196,7 +236,9 @@ def build_plan(field: Any, system: System, spec: CollocationSpec) -> Collocation
                 )
             )
     ic_terms: list[_ICTerm] = []
-    for ic in system.initial:
+    for i, ic in enumerate(system.initial):
+        if i in absorbed_ic:
+            continue
         pts = initial_slice_points(system.domain, spec, t0=ic.t0)
         coords = to_tensor(pts, field)
         ic_terms.append(

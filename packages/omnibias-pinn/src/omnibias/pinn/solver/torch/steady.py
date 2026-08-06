@@ -29,6 +29,7 @@ from collections.abc import Callable, Sequence
 from typing import Any, Protocol
 
 import torch
+from omnibias.pinn.solver._core.hard import HardConditionPlan, plan_hard_conditions
 from omnibias.pinn.solver._core.sampling import (
     CollocationSpec,
     RefinementSpec,
@@ -120,6 +121,7 @@ def _weighted_rows(
     condition_weight: float,
     extra: torch.Tensor | None = None,
     extra_weight: float = 1.0,
+    hard: HardConditionPlan | None = None,
 ) -> torch.Tensor:
     r"""The residual vector whose ``sum(r^2)`` *is* the fused scalar loss.
 
@@ -136,7 +138,7 @@ def _weighted_rows(
     scaled the same way by ``extra_weight``.
     """
     rows = [_scaled(interior_residual(field, system, coords), 1.0)]
-    cond = condition_residual(field, system, spec)
+    cond = condition_residual(field, system, spec, hard)
     if cond.numel():
         rows.append(_scaled(cond, condition_weight))
     if extra is not None and extra.numel():
@@ -216,6 +218,7 @@ class _ResidualModule(torch.nn.Module):
         unknowns: _Unknowns,
         misfit: Callable[[Any], torch.Tensor] | None = None,
         data_weight: float = 1.0,
+        hard: HardConditionPlan | None = None,
     ) -> None:
         super().__init__()
         self.field = field
@@ -226,6 +229,7 @@ class _ResidualModule(torch.nn.Module):
         self._condition_weight = float(condition_weight)
         self._misfit = misfit
         self._data_weight = float(data_weight)
+        self._hard = hard
 
     def forward(self) -> torch.Tensor:
         with bind_unknowns(self.unknowns.binding()):
@@ -238,7 +242,17 @@ class _ResidualModule(torch.nn.Module):
                 self._condition_weight,
                 extra,
                 self._data_weight,
+                self._hard,
             )
+
+
+def _hard_diagnostics(hard: HardConditionPlan) -> dict[str, Any]:
+    """Report what the hard-condition plan absorbed, and what it declined and why."""
+    return {
+        "hard_conditions": hard.summary(),
+        "hard_absorbed": len(hard.conditions),
+        "hard_declined": tuple(str(d) for d in hard.declined),
+    }
 
 
 def solve_least_squares(
@@ -251,12 +265,18 @@ def solve_least_squares(
     seed: int = 0,
     collocation: CollocationSpec | None = None,
     ridge: float = 1e-8,
+    hard_conditions: str = "none",
 ) -> FieldSolution:
     """Exact-operator linear collocation: one least-squares solve.
 
     Only valid for linear systems. The hidden layer is frozen so the readout is
     the only unknown; the collocation matrix is assembled from the closed-form
     operators applied to each frozen feature.
+
+    ``hard_conditions="auto"`` embeds every condition it can certify into the
+    ansatz and drops those rows from the system, leaving a smaller least-squares
+    problem that satisfies them identically. It is opt-in: the default ``"none"``
+    reproduces the previous behaviour bit for bit.
     """
     if system.linearity is not Linearity.LINEAR:
         raise ValueError(
@@ -265,6 +285,7 @@ def solve_least_squares(
         )
     system.require_bound_coefficients("solve_least_squares")
     spec = collocation or CollocationSpec()
+    hard = plan_hard_conditions(system, mode=hard_conditions)
     field = build_field(
         system,
         hidden=hidden,
@@ -272,6 +293,7 @@ def solve_least_squares(
         weight_init_scale=weight_init_scale,
         dtype=dtype,
         seed=seed,
+        hard_conditions=hard,
     )
     freeze_features(field)
     _, _, n_unknowns = _readout_size(field)
@@ -279,8 +301,9 @@ def solve_least_squares(
     with torch.no_grad():
         # Build the collocation states ONCE (frozen features -> sigma constant),
         # then read off the affine collocation matrix column-by-column from the
-        # closed-form operators (no autodiff).
-        plan = build_plan(field, system, spec)
+        # closed-form operators (no autodiff). The cage is affine in the readout,
+        # so this stays a linear solve when hard conditions are absorbed.
+        plan = build_plan(field, system, spec, hard)
         basis = torch.zeros(n_unknowns, dtype=field.c.weight.dtype)
         _set_readout(field, basis)
         r0 = eval_plan_rows(plan)
@@ -304,7 +327,11 @@ def solve_least_squares(
         system=system,
         residual_norm=residual_norm(field, system, spec),
         method="least_squares",
-        diagnostics={"n_unknowns": n_unknowns, "n_rows": int(n_rows)},
+        diagnostics={
+            "n_unknowns": n_unknowns,
+            "n_rows": int(n_rows),
+            **_hard_diagnostics(hard),
+        },
     )
 
 
@@ -328,6 +355,7 @@ def solve_optimize(
     balance_alpha: float = 0.9,
     refinement: RefinementSpec | None = None,
     optimizer_kwargs: dict[str, Any] | None = None,
+    hard_conditions: str = "none",
 ) -> FieldSolution:
     """General residual-minimisation driver (Adam warmup, then ``optimizer``).
 
@@ -383,10 +411,18 @@ def solve_optimize(
         frozen-feature states are built once, so its point set cannot move.
     optimizer_kwargs
         Extra keyword arguments forwarded to the chosen optimiser's constructor.
+    hard_conditions
+        ``"none"`` (default) keeps every condition in the loss, exactly as
+        before. ``"auto"`` embeds each condition the planner can certify into the
+        ansatz and removes it from the loss, so the multi-term stiffness those
+        rows create disappears along with the need to tune ``condition_weight``
+        against them. Absorption is partial: whatever cannot be certified stays
+        soft, and ``solution.diagnostics["hard_declined"]`` says why.
     """
     _check_optimizer(optimizer, loss_balancing, balance_every)
     system.require_bound_coefficients("solve_optimize")
     spec = collocation or CollocationSpec()
+    hard = plan_hard_conditions(system, mode=hard_conditions)
     field = build_field(
         system,
         hidden=hidden,
@@ -394,6 +430,7 @@ def solve_optimize(
         weight_init_scale=weight_init_scale,
         dtype=dtype,
         seed=seed,
+        hard_conditions=hard,
     )
     diagnostics = _optimize(
         field=field,
@@ -411,7 +448,9 @@ def solve_optimize(
         balance_alpha=balance_alpha,
         refinement=refinement,
         opt_kwargs=dict(optimizer_kwargs or {}),
+        hard=hard,
     )
+    diagnostics.update(_hard_diagnostics(hard))
     diagnostics["hidden"] = hidden
     return FieldSolution(
         field=field,
@@ -463,6 +502,7 @@ def _optimize(
     opt_kwargs: dict[str, Any],
     misfit: Callable[[Any], torch.Tensor] | None = None,
     data_weight: float = 1.0,
+    hard: HardConditionPlan | None = None,
 ) -> dict[str, Any]:
     """The one optimisation loop behind both the forward and inverse drivers.
 
@@ -479,14 +519,22 @@ def _optimize(
     dtype = field.W.weight.dtype
     trainable = list(field.parameters()) + list(unknowns.parameters())
     rows = _ResidualModule(
-        field, system, points, spec, condition_weight, unknowns, misfit, data_weight
+        field,
+        system,
+        points,
+        spec,
+        condition_weight,
+        unknowns,
+        misfit,
+        data_weight,
+        hard,
     )
 
     def loss_terms() -> list[torch.Tensor]:
         with bind_unknowns(unknowns.binding()):
             r = interior_residual(field, system, points.coords)
             terms = [torch.mean(r ** 2)]
-            cr = condition_residual(field, system, spec)
+            cr = condition_residual(field, system, spec, hard)
             if cr.numel():
                 terms.append(torch.mean(cr ** 2))
             if misfit is not None:

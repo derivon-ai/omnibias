@@ -44,6 +44,7 @@ from dataclasses import field as dataclass_field
 from typing import Any
 
 import torch
+from omnibias.pinn.solver._core.hard import plan_hard_conditions
 from omnibias.pinn.solver._core.observations import Observations, check_observations
 from omnibias.pinn.solver._core.sampling import CollocationSpec, RefinementSpec
 from omnibias.pinn.solver._core.system import System
@@ -53,6 +54,7 @@ from omnibias.pinn.solver.torch.assemble import residual_norm, to_tensor
 from omnibias.pinn.solver.torch.fields import build_field
 from omnibias.pinn.solver.torch.steady import (
     _check_optimizer,
+    _hard_diagnostics,
     _optimize,
     _Unknowns,
 )
@@ -97,6 +99,7 @@ def solve_inverse(
     balance_alpha: float = 0.9,
     refinement: RefinementSpec | None = None,
     optimizer_kwargs: dict[str, Any] | None = None,
+    hard_conditions: str = "none",
 ) -> InverseSolution:
     """Recover ``system.unknowns`` from ``observations`` while fitting the field.
 
@@ -152,6 +155,7 @@ def solve_inverse(
         ndim=system.domain.ndim,
     )
     spec = collocation or CollocationSpec()
+    hard = plan_hard_conditions(system, mode=hard_conditions)
     field = build_field(
         system,
         hidden=hidden,
@@ -159,6 +163,7 @@ def solve_inverse(
         weight_init_scale=weight_init_scale,
         dtype=dtype,
         seed=seed,
+        hard_conditions=hard,
     )
     unknowns = _Unknowns(system.unknowns, dtype=dtype)
     blocks = [
@@ -203,8 +208,10 @@ def solve_inverse(
         opt_kwargs=dict(optimizer_kwargs or {}),
         misfit=misfit,
         data_weight=data_weight,
+        hard=hard,
     )
     recovered = unknowns.recovered()
+    diagnostics.update(_hard_diagnostics(hard))
     diagnostics["hidden"] = hidden
     diagnostics["n_observations"] = sum(len(o) for o in obs)
     diagnostics["recovered"] = recovered

@@ -17,6 +17,7 @@ uv run python benchmarks/polylaplacian_order.py
 uv run python benchmarks/derivative_order.py
 uv run python benchmarks/optimizer_pinn.py
 uv run python benchmarks/burgers_shock_conservation.py
+uv run python benchmarks/hard_conditions_solver.py
 ```
 
 Then rebuild the figures that plot those JSON files:
@@ -34,6 +35,7 @@ uv run python docs/img/generate_figures.py
 | `derivative_order.py` | `docs/benchmarks/derivative_order.json` | `σ^(n)` closed-form vs nested autograd vs finite differences (cost + accuracy) |
 | `optimizer_pinn.py` | `docs/benchmarks/optimizer_pinn.json` | 1-D Poisson PINN: Adam / L-BFGS vs Gauss–Newton / cubic GN / trust-region Newton-CG |
 | `burgers_shock_conservation.py` | `docs/benchmarks/burgers_shock_conservation.json` | shock-capturing Burgers PINN, conservative flux-form cage vs non-conservative arm at identical architecture / budget / seed, swept over 6 viscosities x 5 seeds |
+| `hard_conditions_solver.py` | `docs/benchmarks/hard_conditions_solver.json` | Poisson / heat / wave with boundary + initial conditions absorbed into the ansatz vs kept as loss terms, at identical architecture / budget / seed over 5 seeds; reports boundary violation and interior relative L2 |
 
 All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries
 `generated_utc`, `hardware_class`, library versions, and the exact config.

@@ -135,9 +135,20 @@ adv_omega = enstrophy_conserving_advection(
 
 ## Hard boundary conditions
 
-`HardBoundaryField` enforces a Dirichlet boundary
-$u\big|_{\partial\Omega} = g(x, t)$ via a distance-function ansatz
-$u = g + d(x) \cdot \tilde u$:
+Two cages impose boundary data exactly, and the choice is made by geometry.
+
+`HardBoundaryField` handles a boundary of **any shape**, but only Dirichlet
+data, and it does not compose -- wrapping it around a derivative condition
+breaks whichever constraint ends up inside.
+[`ConstrainedExpressionField`](#hard-neumann-robin-and-initial-conditions)
+needs an axis-aligned **box**, and in exchange covers Dirichlet, Neumann, Robin
+and initial conditions uniformly, composes exactly across axes and kinds, and
+does not blow up at corners.
+
+### Dirichlet on an arbitrary boundary
+
+`HardBoundaryField` enforces $u\big|_{\partial\Omega} = g(x, t)$ via a
+distance-function ansatz $u = g + d(x) \cdot \tilde u$:
 
 ```python
 from omnibias.pinn.torch.cage import HardBoundaryField
@@ -168,6 +179,45 @@ unchanged. All derivative paths use the product rule on
 $d \cdot \tilde u$ and the chain rule on $g(x, t)$, so the closed-form
 fastpath is preserved end-to-end.
 
+### Hard Neumann, Robin and initial conditions
+
+On a box, `ConstrainedExpressionField` embeds any set of linear conditions
+$C_k[u] = t_k$ using switching functions $\varphi_i$ with
+$C_k[\varphi_i] = \delta_{ki}$:
+
+$$u = g + \sum_k \varphi_k \bigl(t_k - C_k[g]\bigr),$$
+
+which satisfies every condition for **any** free function $g$. Dirichlet,
+Neumann, Robin and an initial value or velocity are all one `LinearConstraint`
+type with different terms.
+
+```python
+from omnibias.pinn._core.constrained import HardCondition, derivative_at, dirichlet, neumann
+from omnibias.pinn.torch.cage import ConstrainedExpressionField
+
+wave_cage = ConstrainedExpressionField(
+    base=spectral(("x", "y", "t"), ("u", "p")),
+    conditions=[
+        HardCondition("u", 0, dirichlet(0.0), 0.0),          # u(0, y, t) = 0
+        HardCondition("u", 0, neumann(1.0), 0.0),            # u_x(1, y, t) = 0
+        HardCondition("u", 2, dirichlet(0.0), lambda c: torch.sin(c[:, 0])),
+        HardCondition("u", 2, derivative_at(0.0, 1), 0.0),   # u_t(x, y, 0) = 0
+    ],
+    bounds=((0.0, 1.0), (0.0, 1.0), (0.0, 1.0)),
+    passthrough_names=("p",),
+)
+face = torch.rand(4, 3, dtype=torch.float64)
+face[:, 0] = 0.0
+print(float(wave_cage(face).u.value.abs().max()) < 1e-14)    # True, untrained
+```
+
+The support matrix behind the switching functions has to be invertible, and
+that is **certified** rather than assumed: `support_certificates()` seals a
+hash-verifiable enclosure of `lambda_min(M^T M) > 0`, and a linearly dependent
+condition set is refused at construction. Condition data on different axes must
+also agree where those axes meet; `compatibility_residual` reports the size of
+any disagreement, which is order one when it is real.
+
 ## When to choose which cage
 
 | Cage | Constraint | Cost | Notes |
@@ -175,7 +225,8 @@ fastpath is preserved end-to-end.
 | `StreamfunctionField` | 2D `div u = 0` | free | Optimal for 2D NS |
 | `VectorPotentialField` | 3D `div u = 0` | small (1 extra tensor) | Headline 3D NS choice |
 | `HelmholtzProjectionField` | soft `div u = 0` via Poisson | medium (extra `phi` field) | Use when a learned pressure is required |
-| `HardBoundaryField` | Dirichlet `u = g` | free | Replaces soft BC penalty |
+| `HardBoundaryField` | Dirichlet `u = g` | free | Any geometry; Dirichlet only, does not compose |
+| `ConstrainedExpressionField` | Dirichlet / Neumann / Robin / initial | one base evaluation per distinct face | Box geometry; composes across axes and kinds, certified |
 | `MassFluxPotentialField` | compressible `rho u = curl Psi` | small | For variable-density flows |
 
 All cages are duals across `omnibias.pinn.torch.cage` and

@@ -4,16 +4,22 @@
 
 from __future__ import annotations
 
+from dataclasses import replace
 from typing import Any
 
 import jax.numpy as jnp
 from omnibias.fields._core.components import ComponentSpec
 from omnibias.fields._core.coords import CoordinateSpec
 from omnibias.jax.activations import get_activation
+from omnibias.pinn.jax.cage.constrained import (
+    ConstrainedExpressionField,
+    make_constrained_expression_field,
+)
 from omnibias.pinn.jax.fields.one_layer import (
     OneLayerVectorField,
     make_one_layer_vector_field,
 )
+from omnibias.pinn.solver._core.hard import HardConditionPlan
 from omnibias.pinn.solver._core.system import System
 
 
@@ -26,9 +32,15 @@ def build_field(
     bias_init: str = "zeros",
     dtype: Any = jnp.float64,
     seed: int = 0,
-) -> OneLayerVectorField:
-    """Build a one-layer omnibias field carrying every system component."""
-    return make_one_layer_vector_field(
+    hard_conditions: HardConditionPlan | None = None,
+) -> Any:
+    """Build a one-layer omnibias field carrying every system component.
+
+    When ``hard_conditions`` carries a non-empty plan the ansatz is wrapped in a
+    :class:`~omnibias.pinn.jax.cage.constrained.ConstrainedExpressionField`, so
+    the absorbed conditions hold identically rather than being penalised.
+    """
+    base = make_one_layer_vector_field(
         coordinate_spec=system.domain.coordinate_spec,
         components=system.component_spec(),
         hidden=hidden,
@@ -38,10 +50,30 @@ def build_field(
         seed=seed,
         dtype=dtype,
     )
+    if not hard_conditions:
+        return base
+    return make_constrained_expression_field(
+        base=base,
+        conditions=hard_conditions.conditions,
+        bounds=system.domain.bounds,
+        passthrough_names=tuple(
+            n
+            for n in system.component_names()
+            if n not in {c.component for c in hard_conditions.conditions}
+        ),
+        certify=False,  # the plan already sealed these certificates
+    )
 
 
-def with_readout(field: OneLayerVectorField, c: Any, b: Any) -> OneLayerVectorField:
-    """Return a copy of ``field`` with a new (frozen) readout ``(c, b)``."""
+def with_readout(field: Any, c: Any, b: Any) -> Any:
+    """Return a copy of ``field`` with a new (frozen) readout ``(c, b)``.
+
+    A cage is rebuilt around the new base rather than replaced, because the
+    constrained expression is affine in the readout: swapping ``(c, b)`` changes
+    the free function and leaves every enforced condition exactly where it was.
+    """
+    if isinstance(field, ConstrainedExpressionField):
+        return replace(field, base=with_readout(field.base, c, b))
     return OneLayerVectorField(
         coordinate_spec=field.coordinate_spec,
         components=field.components,
@@ -77,4 +109,10 @@ def field_from_arrays(
     )
 
 
-__all__ = ["OneLayerVectorField", "build_field", "field_from_arrays", "with_readout"]
+__all__ = [
+    "ConstrainedExpressionField",
+    "OneLayerVectorField",
+    "build_field",
+    "field_from_arrays",
+    "with_readout",
+]

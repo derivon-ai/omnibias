@@ -11,6 +11,10 @@ from omnibias.pinn.jax.cage.conservation import (
     make_hard_boundary_field,
     make_mass_flux_potential_field,
 )
+from omnibias.pinn.jax.cage.constrained import (
+    ConstrainedExpressionField,
+    make_constrained_expression_field,
+)
 from omnibias.pinn.jax.cage.fluxform import (
     FluxFormField,
     antisymmetric_pairs,
@@ -33,6 +37,7 @@ from omnibias.pinn.jax.cage.integral import (
 )
 
 __all__ = [
+    "ConstrainedExpressionField",
     "FluxFormField",
     "HardBoundaryField",
     "HelmholtzProjectionField",
@@ -45,6 +50,7 @@ __all__ = [
     "enstrophy_conserving_advection",
     "helmholtz_gauge_loss",
     "is_cage_field",
+    "make_constrained_expression_field",
     "make_flux_form_field",
     "make_hard_boundary_field",
     "make_helmholtz_projection_field",

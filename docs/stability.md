@@ -105,7 +105,8 @@ public surface is
 | `fields.ChebyshevVectorField` | experimental | Non-periodic; Chebyshev-T basis. |
 | `ops.{basic, vector, nonlinear, high_order}` | stable | All cross-backend bit-parity verified. |
 | `cage.{Streamfunction, VectorPotential}Field` | stable | Hard incompressibility cages. |
-| `cage.{Helmholtz, HardBoundary, MassFluxPotential}Field` | experimental | Newer cages -- API may shift. |
+| `cage.{Helmholtz, HardBoundary, MassFluxPotential}Field` | experimental | Newer cages -- API may shift. `HardBoundaryField` is Dirichlet-only and does not compose. |
+| `cage.ConstrainedExpressionField` | experimental | Hard Dirichlet / Neumann / Robin / initial conditions on a box, with a certified support matrix. |
 | `losses.{sobolev, causal, ntk, entropy}` | stable | Public loss surface with package-level tests. |
 | `equations.{Heat, Burgers, KuramotoSivashinsky, CahnHilliard, Biharmonic, NavierStokes}` | stable | `NamedTuple` outputs; integration-tested with pinned smoke fixtures. |
 | `diagnostics.{relative_l2_per_time, forecast_horizon, spectral_fidelity}` | stable | Backend-agnostic NumPy. |

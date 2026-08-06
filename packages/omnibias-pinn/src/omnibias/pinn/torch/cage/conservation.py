@@ -15,7 +15,15 @@ Three families:
    underlying field by a user-supplied *distance function*
    :math:`d(x) \\to 0` on the boundary plus a scalar *boundary value*
    :math:`g(x, t)`, so :math:`u(x, t) = g(x, t) + d(x) f_{NN}(x, t)`.
-   This enforces :math:`u|_{\\partial \\Omega} = g` exactly.
+   This enforces :math:`u|_{\\partial \\Omega} = g` exactly, on a boundary
+   of any shape.
+
+   It is **Dirichlet-only and does not compose**: the multiplicative
+   ansatz breaks an inner derivative condition, because the distance
+   factor lands on it. For Neumann, Robin or initial conditions --
+   and for several conditions at once -- use the additive switching
+   form, :class:`~omnibias.pinn.torch.cage.constrained.ConstrainedExpressionField`,
+   which needs an axis-aligned box in exchange.
 
 3. Mass-flux potential: :class:`MassFluxPotentialField` is an alias of
    the vector-potential cage (Section 1) for compressible flows where
