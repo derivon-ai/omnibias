@@ -14,7 +14,7 @@ from typing import Any
 import jax.numpy as jnp
 import numpy as np
 from omnibias.pinn.solver._core.conditions import BoundaryCondition, InitialCondition
-from omnibias.pinn.solver._core.hard import HardConditionPlan
+from omnibias.pinn.solver._core.hard import PERIODIC_ORDERS, HardConditionPlan
 from omnibias.pinn.solver._core.sampling import (
     CollocationSpec,
     bc_faces,
@@ -39,11 +39,46 @@ def interior_residual(field: Any, system: System, coords: Any) -> Any:
     return jnp.concatenate(parts) if parts else jnp.zeros((0,), dtype=field.W.dtype)
 
 
+def _periodic_axes(system: System, bc: BoundaryCondition) -> tuple[str, ...]:
+    cs = system.domain.coordinate_spec
+    if bc.axis is not None:
+        return (bc.axis,)
+    return tuple(a for a in system.domain.spatial_axes if cs.is_periodic(a))
+
+
+def _periodic_rows(
+    field: Any, system: System, bc: BoundaryCondition, spec: CollocationSpec
+) -> Any:
+    """Seam-matching rows; twin of the torch assembler, same orders and points."""
+    rows: list[Any] = []
+    cs = system.domain.coordinate_spec
+    for axis in _periodic_axes(system, bc):
+        pts = boundary_points(system.domain, spec, axis=axis, side="lo")
+        if pts.shape[0] == 0:
+            continue
+        index = cs.axis_index(axis)
+        _, hi = system.domain.bounds[index]
+        low = to_array(pts, field)
+        high = low.at[:, index].set(hi)
+        s_lo, s_hi = field(low), field(high)
+        for order in PERIODIC_ORDERS:
+            if order == 0:
+                rows.append(
+                    s_hi.ops.value(s_hi, bc.component) - s_lo.ops.value(s_lo, bc.component)
+                )
+            else:
+                rows.append(
+                    s_hi.ops.derivative(s_hi, bc.component, axis=axis, order=order)
+                    - s_lo.ops.derivative(s_lo, bc.component, axis=axis, order=order)
+                )
+    return jnp.concatenate(rows) if rows else jnp.zeros((0,), dtype=field.W.dtype)
+
+
 def _bc_rows(
     field: Any, system: System, bc: BoundaryCondition, spec: CollocationSpec
 ) -> Any:
     if bc.kind == "periodic":
-        return jnp.zeros((0,), dtype=field.W.dtype)
+        return _periodic_rows(field, system, bc, spec)
     rows: list[Any] = []
     for axis, side in bc_faces(system.domain, bc):
         pts = boundary_points(system.domain, spec, axis=axis, side=side)
@@ -85,9 +120,10 @@ def condition_residual(
 ) -> Any:
     """Stack every boundary + initial condition row.
 
-    Conditions the ``hard`` plan reports absorbed contribute no rows, the same
-    way a periodic condition already contributes none. ``hard=None`` reproduces
-    the unconditional behaviour exactly.
+    Conditions the ``hard`` plan reports absorbed contribute no rows: the
+    architecture enforces them, so a penalty could only add noise.
+    ``hard=None`` assembles every condition, which is what makes it usable as a
+    check on the plan's own claims.
     """
     absorbed_bc = hard.absorbed_boundary if hard else frozenset()
     absorbed_ic = hard.absorbed_initial if hard else frozenset()

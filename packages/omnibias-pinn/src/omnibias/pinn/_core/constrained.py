@@ -33,8 +33,14 @@ rather than assumed:
   axis ``a``'s target. That is a condition on the *data* -- physically, the
   initial state must agree with the boundary state at ``t = t0`` -- not on the
   method, and violating it leaves an order-one residual rather than a small one.
-  The check needs to evaluate user target callables, so it lives in the backend
-  cages; :func:`apply_constraint` is the shared operator both of them use.
+  :func:`corner_pairs` enumerates every pair that has to agree, over any number
+  of axes; evaluating them needs user target callables, so the arithmetic lives
+  in the backend cages, sharing :func:`apply_constraint` and
+  :func:`compatibility_sample` so the two cannot disagree about what was checked.
+
+A constraint is not restricted to a single point: :func:`periodic` ties two
+faces together as the *relative* functional ``u(hi) - u(lo) = 0``, which is how
+periodicity becomes structural rather than a penalty.
 
 This module is *pure Python*: no torch, no jax, no numpy. Both backend cages
 import the switching coefficients from here, so they cannot disagree about the
@@ -139,6 +145,43 @@ def derivative_at(point: float, order: int, *, label: str = "") -> LinearConstra
     return LinearConstraint(
         (ConstraintTerm(1.0, point, order),), label or f"d^{order}u({point})"
     )
+
+
+def periodic(lo: float, hi: float, *, order: int = 0, label: str = "") -> LinearConstraint:
+    """``d^order u(hi) - d^order u(lo) = 0`` -- periodicity as a *relative* constraint.
+
+    Every other helper here pins a value at one point; this one ties two points
+    together without fixing either, which the switching form handles as readily
+    because a linear functional may reference several points. ``order=0`` matches
+    the value across the seam and ``order=1`` matches the slope; a smooth
+    periodic solution satisfies both, and matching only the value leaves a
+    solution free to have a kink exactly where nothing is watching.
+
+    The target of a relative constraint is ``0`` and is not attached to either
+    face, so it must be a constant -- a callable target would have no
+    well-defined face to be evaluated on.
+    """
+    if hi == lo:
+        raise ValueError(f"a periodic constraint needs two distinct points, got {lo}")
+    prefix = "u" if order == 0 else f"d^{order}u"
+    return LinearConstraint(
+        (ConstraintTerm(1.0, hi, order), ConstraintTerm(-1.0, lo, order)),
+        label or f"{prefix}({hi}) - {prefix}({lo})",
+    )
+
+
+def is_relative(constraint: LinearConstraint) -> bool:
+    """Whether the functional ties several points together rather than pinning one."""
+    return len(constraint.points) > 1
+
+
+def face_point(constraint: LinearConstraint) -> float | None:
+    """The single axis coordinate a constraint's target lives on.
+
+    ``None`` for a relative constraint, whose target belongs to no single face.
+    """
+    points = constraint.points
+    return points[0] if len(points) == 1 else None
 
 
 def apply_constraint(
@@ -582,19 +625,157 @@ def group_hard_conditions(
     return plans
 
 
+@dataclass(frozen=True)
+class CornerPair:
+    """Two conditions on different axes, whose data must agree where the axes meet.
+
+    The construction embeds each axis in turn, so the *last* axis applied always
+    wins; if the data disagrees, the earlier axis quietly loses. Enumerating the
+    pairs explicitly is what turns that into a detected refusal rather than a
+    solution that satisfies three of the four conditions it was given.
+    """
+
+    component: str
+    axis_a: int
+    constraint_a: LinearConstraint
+    target_a: Any
+    axis_b: int
+    constraint_b: LinearConstraint
+    target_b: Any
+
+    @property
+    def label(self) -> str:
+        return (
+            f"{self.constraint_a.label!r} on axis {self.axis_a} vs "
+            f"{self.constraint_b.label!r} on axis {self.axis_b}"
+        )
+
+
+def corner_pairs(plans: dict[str, tuple[AxisPlan, ...]]) -> tuple[CornerPair, ...]:
+    """Every (component, condition, condition) pair spanning two different axes.
+
+    With ``A`` axes carrying ``n_a`` conditions each this is
+    ``sum_{a<b} n_a n_b`` pairs -- quadratic in the conditions, not exponential
+    in the axes, so checking all of them stays cheap as the recursion depth
+    grows. Conditions on the *same* axis are excluded: they are embedded
+    simultaneously by one support matrix, whose invertibility is the certificate's
+    business rather than a data question.
+    """
+    out: list[CornerPair] = []
+    for name, steps in plans.items():
+        for i, first in enumerate(steps):
+            for second in steps[i + 1 :]:
+                for k, ck in enumerate(first.constraints.constraints):
+                    for m, cm in enumerate(second.constraints.constraints):
+                        out.append(
+                            CornerPair(
+                                component=name,
+                                axis_a=first.constraints.axis,
+                                constraint_a=ck,
+                                target_a=first.targets[k],
+                                axis_b=second.constraints.axis,
+                                constraint_b=cm,
+                                target_b=second.targets[m],
+                            )
+                        )
+    return tuple(out)
+
+
+#: Irrational multipliers for the compatibility sample -- square roots of the
+#: first primes, whose fractional parts equidistribute (Weyl). Any axis beyond
+#: this many reuses the list scaled by the repeat index, which keeps the points
+#: distinct without needing a prime table.
+_SAMPLE_ROOTS = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
+
+
+def compatibility_sample(
+    bounds: Sequence[tuple[float, float]], count: int = 16
+) -> tuple[tuple[float, ...], ...]:
+    """A small deterministic point set spanning ``bounds``, in pure Python.
+
+    Used to evaluate condition *data* -- the targets, not the field -- when
+    checking that conditions on different axes agree. A Kronecker lattice rather
+    than an RNG draw, so the two backends see literally the same coordinates and
+    a refusal is reproducible rather than seed-dependent. Compatibility is an
+    identity in the data when it holds, so a handful of points suffices to
+    expose it when it does not.
+    """
+    if count < 1:
+        raise ValueError(f"compatibility sample needs at least one point, got {count}")
+    alphas = [
+        _SAMPLE_ROOTS[d % len(_SAMPLE_ROOTS)] * (1 + d // len(_SAMPLE_ROOTS))
+        for d in range(len(bounds))
+    ]
+    out: list[tuple[float, ...]] = []
+    for i in range(count):
+        row: list[float] = []
+        for d, (lo, hi) in enumerate(bounds):
+            frac = ((i + 0.5) * alphas[d] ** 0.5) % 1.0
+            row.append(lo + (hi - lo) * frac)
+        out.append(tuple(row))
+    return tuple(out)
+
+
+def projection_cost(plans: dict[str, tuple[AxisPlan, ...]]) -> int:
+    """Base-field evaluations one forward pass costs.
+
+    The recursion pins each constrained axis in turn, so the distinct projected
+    coordinate sets are the *product* over axes of ``1 + #projection points``,
+    not the sum: a face carrying both a value and a slope still costs one, and a
+    second constrained axis multiplies. Components share the cache, so a pin
+    combination two components both need is paid for once.
+
+    Worth computing before absorbing every face of a 3-D box, which is why it is
+    a public number rather than a docstring claim.
+    """
+    combos: set[tuple[tuple[int, float], ...]] = set()
+    for steps in plans.values():
+        per_axis: list[list[tuple[int, float] | None]] = []
+        for step in steps:
+            points: list[tuple[int, float] | None] = [None]
+            points.extend(
+                (step.constraints.axis, p) for p in _axis_projection_points(step)
+            )
+            per_axis.append(points)
+        stack: list[tuple[tuple[int, float], ...]] = [()]
+        for points in per_axis:
+            stack = [
+                pins if pin is None else (*pins, pin) for pins in stack for pin in points
+            ]
+        combos.update(stack)
+    return len(combos)
+
+
+def _axis_projection_points(step: AxisPlan) -> tuple[float, ...]:
+    """The distinct coordinates on one axis the recursion has to evaluate at."""
+    seen: list[float] = []
+    for constraint in step.constraints.constraints:
+        for point in constraint.points:
+            if point not in seen:
+                seen.append(point)
+    return tuple(seen)
+
+
 __all__ = [
     "SUPPORT_CONDITION_LIMIT",
     "AxisConstraints",
     "AxisPlan",
     "ConstraintTerm",
+    "CornerPair",
     "HardCondition",
     "LinearConstraint",
     "apply_constraint",
     "certify_support_matrix",
+    "compatibility_sample",
+    "corner_pairs",
     "derivative_at",
     "dirichlet",
+    "face_point",
     "group_hard_conditions",
+    "is_relative",
     "neumann",
+    "periodic",
+    "projection_cost",
     "robin",
     "solve_linear",
     "support_derivative",

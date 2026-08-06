@@ -4,10 +4,11 @@
 
 Absorbing a condition into the architecture makes it exact. That much is
 algebra. What is *not* algebra is whether it helps the rest of the solve, so
-this measures both halves on three problems with analytic solutions -- Poisson
-(elliptic), heat (parabolic) and wave (hyperbolic) -- over several seeds, at an
-identical architecture, parameter count and collocation budget. The only
-difference between the arms is ``hard_conditions``.
+this measures both halves on five problems with analytic solutions -- Poisson
+(elliptic), heat (parabolic), wave (hyperbolic), a 2-D square whose four faces
+are absorbed at once, and a periodic seam -- over several seeds, at an identical
+architecture, parameter count and collocation budget. The only difference
+between the arms is ``hard_conditions``.
 
 Two numbers per cell, and the second one is the honest one:
 
@@ -30,6 +31,7 @@ import os
 import statistics
 import sys
 import time
+from dataclasses import replace
 from pathlib import Path
 from typing import Any
 
@@ -107,7 +109,58 @@ def wave_case() -> tuple[Any, Any]:
     return sys_, exact
 
 
-CASES = {"poisson": poisson_case, "heat": heat_case, "wave": wave_case}
+def square_case() -> tuple[Any, Any]:
+    """2-D Poisson, ``u = sin(pi x) sin(pi y)``, all four faces zero.
+
+    Two constrained *spatial* axes, so the corner terms the recursion generates
+    are load bearing rather than incidental.
+    """
+    dom = pde.Domain(("x", "y"), ((0.0, 1.0), (0.0, 1.0)))
+
+    def source(c):  # noqa: ANN001, ANN202
+        xp = pde.array_namespace(c)
+        return -2.0 * (math.pi**2) * xp.sin(math.pi * c[:, 0]) * xp.sin(math.pi * c[:, 1])
+
+    def exact(pts: np.ndarray) -> np.ndarray:
+        return np.sin(math.pi * pts[:, 0]) * np.sin(math.pi * pts[:, 1])
+
+    return pde.poisson(dom, source=source, boundary=0.0), exact
+
+
+def seam_case() -> tuple[Any, Any]:
+    """``u'' = -(2 pi)^2 sin(2 pi x)`` on a periodic interval.
+
+    A relative constraint rather than a pointwise one. Note the solution is
+    pinned only up to an additive constant, so the interior error is measured
+    after removing the mean from both sides -- that gauge freedom is a property
+    of the problem, not of either arm.
+    """
+    dom = pde.Domain(("x",), ((0.0, 1.0),), periodic=True)
+
+    def source(c):  # noqa: ANN001, ANN202
+        xp = pde.array_namespace(c)
+        return -((2.0 * math.pi) ** 2) * xp.sin(2.0 * math.pi * c[:, 0])
+
+    def exact(pts: np.ndarray) -> np.ndarray:
+        return np.sin(2.0 * math.pi * pts[:, 0])
+
+    system = replace(
+        pde.poisson(dom, source=source, boundary=0.0),
+        boundary=(pde.BoundaryCondition(component="u", kind="periodic", axis="x"),),
+    )
+    return system, exact
+
+
+CASES = {
+    "poisson": poisson_case,
+    "heat": heat_case,
+    "wave": wave_case,
+    "square": square_case,
+    "seam": seam_case,
+}
+
+#: Problems whose solution is only determined up to an additive constant.
+GAUGE_FREE = frozenset({"seam"})
 
 
 # ------------------------------------------------------------------ metrics --
@@ -129,10 +182,12 @@ def boundary_violation(sol: Any) -> float:
     return float(rows.detach().abs().max()) if rows.numel() else 0.0
 
 
-def interior_error(sol: Any, exact: Any) -> float:
+def interior_error(sol: Any, exact: Any, *, gauge_free: bool = False) -> float:
     pts = _interior_grid(sol.system)
     u = sol.evaluate(pts, "u").detach().numpy()
     truth = exact(pts)
+    if gauge_free:
+        u, truth = u - u.mean(), truth - truth.mean()
     return float(np.linalg.norm(u - truth) / np.linalg.norm(truth))
 
 
@@ -155,7 +210,9 @@ def run_case(name: str, seed: int) -> dict[str, Any]:
         )
         out[arm] = {
             "boundary_violation": boundary_violation(sol),
-            "interior_relative_l2": interior_error(sol, exact),
+            "interior_relative_l2": interior_error(
+                sol, exact, gauge_free=name in GAUGE_FREE
+            ),
             "n_rows": sol.diagnostics.get("n_rows"),
             "n_unknowns": sol.diagnostics.get("n_unknowns"),
             "absorbed": sol.diagnostics.get("hard_absorbed", 0),

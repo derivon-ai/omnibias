@@ -21,6 +21,7 @@ from omnibias.pinn._core.constrained import (
     derivative_at,
     dirichlet,
     neumann,
+    periodic,
     robin,
 )
 from omnibias.pinn._core.coords import CoordinateSpec
@@ -242,16 +243,28 @@ def test_gradients_reach_the_base_parameters() -> None:
 # The two refusals. Both are live falsifiers: if the cage ever stopped
 # detecting them, these tests fail rather than silently pass.
 # --------------------------------------------------------------------------- #
-def test_incompatible_corner_data_is_detected_and_refused() -> None:
+_INCOMPATIBLE = [
+    HardCondition("u", 1, dirichlet(0.0), 0.0),
+    HardCondition("u", 0, dirichlet(0.0), lambda c: 1.0 + c[:, 1] ** 2),
+]
+
+
+def test_incompatible_corner_data_is_refused_at_construction() -> None:
     """Dirichlet u(t,0)=0 against an initial state that is 1 at x=0."""
-    bad = _cage(
-        [
-            HardCondition("u", 1, dirichlet(0.0), 0.0),
-            HardCondition("u", 0, dirichlet(0.0), lambda c: 1.0 + c[:, 1] ** 2),
-        ]
-    )
-    residual = bad.compatibility_residual(_pts(32))
-    assert residual == pytest.approx(1.0, abs=1e-10), "the gap must show at its true size"
+    with pytest.raises(ValueError, match="mutually inconsistent"):
+        _cage(list(_INCOMPATIBLE))
+
+
+def test_the_refusal_names_the_two_conditions_that_clash() -> None:
+    with pytest.raises(ValueError, match=r"'u\(0.0\)' on axis 0 vs 'u\(0.0\)' on axis 1"):
+        _cage(list(_INCOMPATIBLE))
+
+
+def test_incompatible_corner_data_shows_at_its_true_size() -> None:
+    """The falsifier: the gate must report order one, not a small number."""
+    bad = _cage(list(_INCOMPATIBLE), check_data=False)
+    assert bad.compatibility_residual(_pts(32)) == pytest.approx(1.0, abs=1e-10)
+    assert bad.compatibility_residual() == pytest.approx(1.0, abs=1e-10)
     with pytest.raises(ValueError, match="mutually inconsistent"):
         bad.check_compatibility(_pts(32))
 
@@ -263,16 +276,15 @@ def test_corner_data_that_clashes_only_in_its_slopes_is_caught_too() -> None:
     contradicts. Nothing about the values reveals it, so a gate that only
     compared values would pass this and leave the cage quietly wrong.
     """
-    bad = _cage(
-        [
-            HardCondition("u", 1, dirichlet(0.0), lambda c: torch.sin(c[:, 0])),
-            HardCondition("u", 0, dirichlet(0.0), lambda c: torch.sin(c[:, 1])),
-            HardCondition("u", 0, derivative_at(0.0, 1), 0.0),
-        ]
-    )
-    assert bad.compatibility_residual(_pts(32)) == pytest.approx(1.0, abs=1e-10)
+    conditions = [
+        HardCondition("u", 1, dirichlet(0.0), lambda c: torch.sin(c[:, 0])),
+        HardCondition("u", 0, dirichlet(0.0), lambda c: torch.sin(c[:, 1])),
+        HardCondition("u", 0, derivative_at(0.0, 1), 0.0),
+    ]
     with pytest.raises(ValueError, match="mutually inconsistent"):
-        bad.check_compatibility(_pts(32))
+        _cage(list(conditions))
+    bad = _cage(conditions, check_data=False)
+    assert bad.compatibility_residual(_pts(32)) == pytest.approx(1.0, abs=1e-10)
 
 
 def test_slope_compatible_corner_data_passes() -> None:
@@ -371,3 +383,167 @@ def test_conditions_sharing_a_face_share_one_base_evaluation() -> None:
     state.ops.value(state, "u")
     projected = state.extra["_cage_inner_state"].extra["_constrained_cache"]
     assert len(projected) == 1, "both conditions live on t = 0, so one projection"
+
+
+# --------------------------------------------------------------------------- #
+# Three axes at once. The recursion is the same one used for two, so what is
+# actually under test is that nothing about it was two-dimensional by accident:
+# the edges (two axes pinned) and the corner (all three) are where a missing
+# cross term would first show.
+# --------------------------------------------------------------------------- #
+CUBE = ((0.0, 1.0), (0.0, 1.0), (0.0, 1.0))
+
+
+def _cube_base(seed: int = 0, hidden: int = 12) -> OneLayerVectorField:
+    torch.manual_seed(seed)
+    return OneLayerVectorField(
+        coordinate_spec=CoordinateSpec(("t", "x", "y"), domain=CUBE, time_axis="t"),
+        components=ComponentSpec(("u",)),
+        hidden=hidden,
+        base="tanh",
+        dtype=DTYPE,
+    )
+
+
+def _cube_conditions() -> list[HardCondition]:
+    """Six conditions over three axes, of four different kinds.
+
+    Every target is zero so the data is trivially compatible at all twelve
+    corner pairs; what is being tested here is the *recursion*, and a nonzero
+    target would only add a compatibility puzzle to the same algebra.
+    """
+    return [
+        HardCondition("u", 0, dirichlet(0.0), 0.0),
+        HardCondition("u", 0, derivative_at(0.0, 1), 0.0),
+        HardCondition("u", 1, dirichlet(0.0), 0.0),
+        HardCondition("u", 1, neumann(1.0), 0.0),
+        HardCondition("u", 2, dirichlet(0.0), 0.0),
+        HardCondition("u", 2, robin(1.0, alpha=1.0, beta=0.5), 0.0),
+    ]
+
+
+def _cube_cage(seed: int = 0) -> ConstrainedExpressionField:
+    return ConstrainedExpressionField(base=_cube_base(seed), conditions=_cube_conditions())
+
+
+def _cube_pts(n: int = 32, seed: int = 7) -> torch.Tensor:
+    g = torch.Generator().manual_seed(seed)
+    return torch.rand(n, 3, generator=g, dtype=DTYPE)
+
+
+def test_six_conditions_over_three_axes_all_hold_identically() -> None:
+    cage = _cube_cage()
+    for _ in range(2):
+        assert cage.condition_residual(_cube_pts()) < EXACT
+        _randomise(cage)
+
+
+def test_the_edges_where_two_constrained_axes_meet_are_exact() -> None:
+    """A missing cross term survives on the faces and dies on the edges."""
+    cage = _cube_cage()
+    _randomise(cage)
+    for a, b in ((0, 1), (0, 2), (1, 2)):
+        pts = _cube_pts(24, seed=5)
+        pts[:, a] = 0.0
+        pts[:, b] = 0.0
+        assert _gap(_val(cage, pts), torch.zeros(24, dtype=DTYPE)) < EXACT
+
+
+def test_the_corner_where_all_three_meet_is_exact() -> None:
+    cage = _cube_cage()
+    _randomise(cage)
+    corner = torch.zeros(1, 3, dtype=DTYPE)
+    assert _gap(_val(cage, corner), torch.zeros(1, dtype=DTYPE)) < EXACT
+
+
+def test_a_third_axis_multiplies_the_projection_cost_rather_than_adding_to_it() -> None:
+    """Stated in the docstring, so it is measured rather than assumed."""
+    cage = _cube_cage()
+    state = cage(_cube_pts(8))
+    state.ops.value(state, "u")
+    projected = state.extra["_cage_inner_state"].extra["_constrained_cache"]
+    # t has one projection point, x has two, y has two: 2 * 3 * 3 - 1 pinned states
+    assert len(projected) == 2 * 3 * 3 - 1
+
+
+def test_the_reported_cost_is_the_cost_actually_paid() -> None:
+    """A published number that nothing checks is a number that drifts."""
+    cage = _cube_cage()
+    state = cage(_cube_pts(8))
+    state.ops.value(state, "u")
+    projected = state.extra["_cage_inner_state"].extra["_constrained_cache"]
+    assert cage.projection_cost == len(projected) + 1  # + the unpinned batch
+
+
+def test_the_corner_gate_covers_every_axis_pair_not_just_neighbours() -> None:
+    """Axes 0 and 2 clash while both agree with axis 1, which sits between them.
+
+    ``u(t, 0, y) = t`` and ``u(t, x, 0) = t + x`` agree with each other and with
+    ``u(0, x, y) = 0`` pairwise except on the one pair that skips a step. A gate
+    that only compared consecutive axes would report this set as fine.
+    """
+    conditions = [
+        HardCondition("u", 0, dirichlet(0.0), 0.0),
+        HardCondition("u", 1, dirichlet(0.0), lambda c: c[:, 0]),
+        HardCondition("u", 2, dirichlet(0.0), lambda c: c[:, 0] + c[:, 1]),
+    ]
+    with pytest.raises(ValueError, match=r"on axis 0 vs .* on axis 2"):
+        ConstrainedExpressionField(base=_cube_base(), conditions=conditions)
+
+
+# --------------------------------------------------------------------------- #
+# Periodicity: a *relative* constraint, tying two faces together without
+# pinning either.
+# --------------------------------------------------------------------------- #
+def test_a_periodic_seam_closes_in_value_and_slope() -> None:
+    cage = _cage(
+        [
+            HardCondition("u", 1, periodic(0.0, 1.0, order=0), 0.0),
+            HardCondition("u", 1, periodic(0.0, 1.0, order=1), 0.0),
+        ]
+    )
+    for _ in range(2):
+        lo, hi = _face(1, 0.0), _face(1, 1.0)
+        assert _gap(_val(cage, hi), _val(cage, lo)) < EXACT
+        assert _gap(_der(cage, hi, 1, 1), _der(cage, lo, 1, 1)) < EXACT
+        _randomise(cage)
+
+
+def test_periodicity_composes_with_a_condition_on_another_axis() -> None:
+    cage = _cage(
+        [
+            HardCondition("u", 1, periodic(0.0, 1.0, order=0), 0.0),
+            HardCondition("u", 1, periodic(0.0, 1.0, order=1), 0.0),
+            HardCondition(
+                "u", 0, dirichlet(0.0), lambda c: torch.sin(2 * math.pi * c[:, 1])
+            ),
+        ]
+    )
+    _randomise(cage)
+    assert cage.condition_residual(_pts(32)) < EXACT
+    t0 = _face(0, 0.0)
+    assert _gap(_val(cage, t0), torch.sin(2 * math.pi * t0[:, 1])) < EXACT
+
+
+def test_initial_data_that_is_not_itself_periodic_is_refused() -> None:
+    """``u(0, x) = x`` cannot meet a seam that demands ``u(t, 0) = u(t, 1)``."""
+    with pytest.raises(ValueError, match="mutually inconsistent"):
+        _cage(
+            [
+                HardCondition("u", 1, periodic(0.0, 1.0, order=0), 0.0),
+                HardCondition("u", 1, periodic(0.0, 1.0, order=1), 0.0),
+                HardCondition("u", 0, dirichlet(0.0), lambda c: c[:, 1]),
+            ]
+        )
+
+
+def test_a_relative_constraint_refuses_a_callable_target() -> None:
+    """It would have no face to be evaluated on, so guessing one is not an option."""
+    with pytest.raises(ValueError, match="must be a constant"):
+        _cage(
+            [
+                HardCondition(
+                    "u", 1, periodic(0.0, 1.0), lambda c: torch.sin(c[:, 0])
+                ),
+            ]
+        )

@@ -278,14 +278,14 @@ corresponding loss term disappears from the objective entirely. Six are shipped:
 | `FluxFormField` | `div G = 0` in any dimension, space *or* space-time | `G^i = sum_j d_j A^ij`, `A` antisymmetric |
 | `IntegralConservationField` | `int sum_c u_c^p dx = C` | global rescaling by `lambda = (C / I)^(1/p)` |
 | `HardBoundaryField` | `u = g` on a boundary of any shape | `u = g + d * f` with a user distance function `d` |
-| `ConstrainedExpressionField` | linear Dirichlet / Neumann / Robin / initial conditions on a box | `u = g + sum_k phi_k (t_k - C_k[g])`, switching functions from a certified support matrix |
+| `ConstrainedExpressionField` | linear Dirichlet / Neumann / Robin / initial / periodic conditions on a box | `u = g + sum_k phi_k (t_k - C_k[g])`, switching functions from a certified support matrix |
 
 The last two both impose boundary data exactly; pick by geometry. `HardBoundaryField`
 takes any shape but only Dirichlet data, and does not compose -- wrapping it around a
 derivative condition breaks whichever constraint ends up inside.
 `ConstrainedExpressionField` needs an axis-aligned box, and in exchange covers value,
-normal-derivative, Robin and initial conditions uniformly, composes exactly across
-axes and kinds, and is better behaved at corners (its switching functions are
+normal-derivative, Robin, initial and periodic conditions uniformly, composes exactly
+across axes and kinds, and is better behaved at corners (its switching functions are
 polynomials, so nothing blows up where two faces meet -- the known failure mode of
 distance-function ansaetze under second-order operators).
 
@@ -381,9 +381,19 @@ recursion rather than special-cased.
 
 `ConstrainedExpressionField` is that cage. Dirichlet, Neumann, Robin and an
 initial value or velocity are all the same `LinearConstraint` type with
-different terms, which is why there is no per-kind branching. Cost is one base
-evaluation per *distinct* projection point plus one for the collocation batch,
-so a face carrying both a value and a slope costs one, not two.
+different terms, which is why there is no per-kind branching. **Periodicity is
+the same type too**, as a *relative* constraint `d^n u(hi) - d^n u(lo) = 0`,
+because a linear functional may reference more than one point; `periodic(lo, hi,
+order=0)` matches the value across the seam and `order=1` matches the slope. A
+smooth periodic solution satisfies both, and matching only the value leaves the
+field free to have a kink exactly where nothing is watching.
+
+Cost is one base evaluation per *distinct combination* of projection points
+across the constrained axes -- the product over axes of `1 + #projection
+points`, reported by `projection_cost`. A face carrying both a value and a slope
+costs one, but a second constrained axis multiplies rather than adds. That is
+the price of exact corners, and it is why absorbing every face of a 3-D box is a
+deliberate choice.
 
 Two preconditions are checked rather than assumed:
 
@@ -394,11 +404,13 @@ Two preconditions are checked rather than assumed:
   than its float image, and seals a hash-verifiable certificate. A linearly
   dependent condition set is **refused**, not silently approximated. It is a
   finite rational obligation, so it is in scope for the Lean kernel.
-* **Data on different axes must agree where those axes meet.**
-  `compatibility_residual` measures the disagreement; it is order one when real
-  and round-off when not. This is a statement about the data -- physically, the
-  initial state has to satisfy the boundary condition at `t0` -- and no ansatz
-  can repair it.
+* **Data on different axes must agree where those axes meet.** Construction
+  refuses data that does not, naming the two conditions that clash; the gate
+  covers every *pair* of axes rather than consecutive ones, on a deterministic
+  lattice so a refusal is reproducible across backends. `compatibility_residual`
+  keeps the number visible: order one when the clash is real, round-off when it
+  is not. This is a statement about the data -- physically, the initial state has
+  to satisfy the boundary condition at `t0` -- and no ansatz can repair it.
 
 The cage is **closed form in the network**: every value and derivative of `g` it
 needs, including at the projected face points, comes from the sigma-tower.
@@ -426,7 +438,9 @@ hard = ConstrainedExpressionField(
     conditions=[
         HardCondition("u", 1, dirichlet(0.0), 0.0),          # u(t, 0) = 0
         HardCondition("u", 1, neumann(1.0), 0.0),            # u_x(t, 1) = 0
-        HardCondition("u", 0, dirichlet(0.0), lambda c: torch.sin(c[:, 1])),
+        # Initial state x(2 - x): zero at x = 0 and flat at x = 1, so it agrees
+        # with the two conditions above where the axes meet.
+        HardCondition("u", 0, dirichlet(0.0), lambda c: c[:, 1] * (2.0 - c[:, 1])),
         HardCondition("u", 0, derivative_at(0.0, 1), 0.0),   # u_t(0, x) = 0
     ],
 )

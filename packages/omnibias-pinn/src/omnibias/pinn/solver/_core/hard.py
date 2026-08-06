@@ -25,6 +25,7 @@ from :mod:`omnibias.pinn._core.constrained` and never imports torch or jax.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -36,6 +37,7 @@ from omnibias.pinn._core.constrained import (
     dirichlet,
     group_hard_conditions,
     neumann,
+    periodic,
     robin,
 )
 from omnibias.pinn.solver._core.sampling import bc_faces
@@ -43,6 +45,12 @@ from omnibias.pinn.solver._core.system import System
 
 #: Accepted values of the ``hard_conditions`` solver keyword.
 HARD_CONDITION_MODES = ("none", "auto")
+
+#: Derivative orders matched across a periodic seam. A smooth periodic solution
+#: matches every derivative, so requiring the value *and* the slope is a subset
+#: of the truth rather than an extra assumption -- and matching only the value
+#: leaves the solution free to kink exactly where nothing is watching.
+PERIODIC_ORDERS = (0, 1)
 
 
 @dataclass(frozen=True)
@@ -96,10 +104,14 @@ class HardConditionPlan:
         """One-line human summary, suitable for solver diagnostics."""
         if not self.conditions:
             return "hard conditions: none absorbed"
+        # Two different counts: the linear functionals the cage enforces, and
+        # the *declarations* they came from. One `BoundaryCondition` covering a
+        # whole axis becomes two functionals, and saying "2 absorbed (1
+        # declaration)" is less confusing than reporting either alone.
         head = (
-            f"hard conditions: {len(self.conditions)} absorbed "
-            f"({len(self.absorbed_boundary)} boundary, "
-            f"{len(self.absorbed_initial)} initial)"
+            f"hard conditions: {len(self.conditions)} absorbed from "
+            f"{len(self.absorbed_boundary)} boundary + "
+            f"{len(self.absorbed_initial)} initial declaration(s)"
         )
         if not self.declined:
             return head + "; interior residual only"
@@ -111,13 +123,51 @@ def _face_value(domain: Any, axis: str, side: str) -> float:
     return float(lo if side == "lo" else hi)
 
 
-def _boundary_conditions(system: System, bc: Any) -> tuple[list[HardCondition], str | None]:
+def _periodic_conditions(
+    system: System, bc: Any, orders: Sequence[int]
+) -> tuple[list[HardCondition], str | None]:
+    """Periodicity as relative constraints ``d^n u(hi) - d^n u(lo) = 0``.
+
+    The mesh-free ansatz is not spectral, so nothing else enforces this: the
+    row was dropped from the loss on the grounds that the ansatz carried it,
+    which is true of the spectral method-of-lines route and false here. Tying
+    the two faces together with a relative functional is what makes the claim
+    true for this route as well.
+    """
+    domain = system.domain
+    cs = domain.coordinate_spec
+    names = (
+        (bc.axis,)
+        if bc.axis is not None
+        else tuple(a for a in domain.spatial_axes if cs.is_periodic(a))
+    )
+    if not names:
+        return [], (
+            "periodic condition names no axis and the domain declares none "
+            "periodic, so there is no seam to tie together"
+        )
+    out: list[HardCondition] = []
+    for axis in names:
+        index = cs.axis_index(axis)
+        lo, hi = domain.bounds[index]
+        out.extend(
+            HardCondition(
+                component=bc.component,
+                axis=index,
+                constraint=periodic(lo, hi, order=order, label=f"periodic^{order}@{axis}"),
+                target=0.0,
+            )
+            for order in orders
+        )
+    return out, None
+
+
+def _boundary_conditions(
+    system: System, bc: Any, *, periodic_orders: Sequence[int]
+) -> tuple[list[HardCondition], str | None]:
     """The hard conditions one :class:`BoundaryCondition` maps to, or a decline."""
     if bc.kind == "periodic":
-        return [], (
-            "periodicity is carried by the ansatz / domain, not by a switching "
-            "function (Stage C adds it as a relative constraint)"
-        )
+        return _periodic_conditions(system, bc, periodic_orders)
     domain = system.domain
     out: list[HardCondition] = []
     for axis, side in bc_faces(domain, bc):
@@ -170,31 +220,12 @@ def _initial_condition(system: System, ic: Any) -> tuple[list[HardCondition], st
     ], None
 
 
-def _stage_a_scope(system: System, axes: set[int]) -> str | None:
-    """Stage A enforces at most one spatial axis plus the time axis.
-
-    The engine itself recurses over any number of axes; the gate is on what has
-    been *validated*. Declining an unvalidated configuration keeps it soft,
-    which is the same answer the solver gives today.
-    """
-    domain = system.domain
-    time_index = (
-        domain.coordinate_spec.axis_index(domain.time_axis)
-        if domain.time_axis is not None
-        else None
-    )
-    spatial = {a for a in axes if a != time_index}
-    if len(spatial) > 1:
-        names = sorted(domain.axes[a] for a in spatial)
-        return (
-            f"conditions span {len(spatial)} spatial axes {names}; Stage A is "
-            "validated for at most one spatial axis plus time"
-        )
-    return None
-
-
 def plan_hard_conditions(
-    system: System, *, mode: str = "auto", condition_limit: float | None = None
+    system: System,
+    *,
+    mode: str = "auto",
+    condition_limit: float | None = None,
+    periodic_orders: Sequence[int] = PERIODIC_ORDERS,
 ) -> HardConditionPlan:
     """Work out which conditions of ``system`` can be enforced by construction.
 
@@ -207,12 +238,23 @@ def plan_hard_conditions(
         ``"auto"`` absorbs everything it can certify.
     condition_limit
         Optional override of the support-matrix conditioning refusal threshold.
+    periodic_orders
+        Derivative orders matched across a periodic seam; see
+        :data:`PERIODIC_ORDERS`. Pass ``(0,)`` for value-only matching, which is
+        what a solution with a genuine kink at the seam needs.
 
     Returns
     -------
     HardConditionPlan
         Absorbed conditions, the indices to drop from the loss, per-condition
         decline reasons, and the sealed certificates.
+
+    Notes
+    -----
+    The planner sees only the *structure* of the conditions, never the target
+    values, because it is pure Python and the targets are backend callables.
+    Whether the data is mutually consistent across axes is therefore checked
+    where the cage is built, not here.
     """
     if mode not in HARD_CONDITION_MODES:
         raise ValueError(
@@ -225,7 +267,7 @@ def plan_hard_conditions(
     declined: list[DeclinedCondition] = []
 
     for i, bc in enumerate(system.boundary):
-        conds, reason = _boundary_conditions(system, bc)
+        conds, reason = _boundary_conditions(system, bc, periodic_orders=periodic_orders)
         if reason is not None:
             declined.append(DeclinedCondition("boundary", bc.component, i, reason))
         else:
@@ -239,18 +281,6 @@ def plan_hard_conditions(
 
     if not candidates:
         return HardConditionPlan(declined=tuple(declined))
-
-    scope = _stage_a_scope(
-        system, {c.axis for _, _, group in candidates for c in group}
-    )
-    if scope is not None:
-        return HardConditionPlan(
-            declined=tuple(declined)
-            + tuple(
-                DeclinedCondition(kind, group[0].component, idx, scope)
-                for kind, idx, group in candidates
-            )
-        )
 
     accepted = [c for _, _, group in candidates for c in group]
     try:
@@ -300,6 +330,7 @@ def _certify(
 
 __all__ = [
     "HARD_CONDITION_MODES",
+    "PERIODIC_ORDERS",
     "DeclinedCondition",
     "HardConditionPlan",
     "plan_hard_conditions",

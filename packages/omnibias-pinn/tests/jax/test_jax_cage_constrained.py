@@ -24,6 +24,7 @@ from omnibias.pinn._core.constrained import (
     derivative_at,
     dirichlet,
     neumann,
+    periodic,
     robin,
 )
 from omnibias.pinn._core.coords import CoordinateSpec
@@ -51,8 +52,12 @@ def _base(seed: int = 0, hidden: int = 16) -> OneLayerVectorField:
     )
 
 
-def _cage(conditions: list[HardCondition], seed: int = 0) -> ConstrainedExpressionField:
-    return make_constrained_expression_field(base=_base(seed), conditions=conditions)
+def _cage(
+    conditions: list[HardCondition], seed: int = 0, **kw: object
+) -> ConstrainedExpressionField:
+    return make_constrained_expression_field(
+        base=_base(seed), conditions=conditions, **kw
+    )
 
 
 def _mixed_cage(seed: int = 0) -> ConstrainedExpressionField:
@@ -225,13 +230,15 @@ def test_closed_form_derivatives_match_autodiff_through_the_cage() -> None:
 # The refusals, matching the torch twin.
 # --------------------------------------------------------------------------- #
 def test_incompatible_corner_data_is_detected_and_refused() -> None:
-    bad = _cage(
-        [
-            HardCondition("u", 1, dirichlet(0.0), 0.0),
-            HardCondition("u", 0, dirichlet(0.0), lambda c: 1.0 + c[:, 1] ** 2),
-        ]
-    )
+    conditions = [
+        HardCondition("u", 1, dirichlet(0.0), 0.0),
+        HardCondition("u", 0, dirichlet(0.0), lambda c: 1.0 + c[:, 1] ** 2),
+    ]
+    with pytest.raises(ValueError, match="mutually inconsistent"):
+        _cage(list(conditions))
+    bad = _cage(conditions, check_data=False)
     assert bad.compatibility_residual(_pts(32)) == pytest.approx(1.0, abs=1e-10)
+    assert bad.compatibility_residual() == pytest.approx(1.0, abs=1e-10)
     with pytest.raises(ValueError, match="mutually inconsistent"):
         bad.check_compatibility(_pts(32))
 
@@ -257,3 +264,99 @@ def test_every_constrained_axis_carries_a_verifiable_certificate() -> None:
     certs = _mixed_cage().support_certificates()
     assert len(certs["u"]) == 2
     assert all(verify_certificate_digest(c) for c in certs["u"])
+
+
+# --------------------------------------------------------------------------- #
+# Three axes and a periodic seam, so the JAX-only concerns (pytree, jit, grad)
+# are exercised on the recursion depth and the constraint kind that Stage C
+# added rather than only on the two-axis pointwise case.
+# --------------------------------------------------------------------------- #
+CUBE = ((0.0, 1.0), (0.0, 1.0), (0.0, 1.0))
+
+
+def _cube_cage(seed: int = 0, hidden: int = 12) -> ConstrainedExpressionField:
+    rng = np.random.default_rng(seed)
+    base = OneLayerVectorField(
+        coordinate_spec=CoordinateSpec(("t", "x", "y"), domain=CUBE, time_axis="t"),
+        components=ComponentSpec(("u",)),
+        spec=get_activation("tanh"),
+        W=jnp.asarray(rng.normal(scale=0.8, size=(hidden, 3))),
+        beta=jnp.asarray(rng.normal(scale=0.3, size=(hidden,))),
+        c=jnp.asarray(rng.normal(scale=0.6, size=(1, hidden))),
+        b=jnp.asarray(rng.normal(scale=0.2, size=(1,))),
+        hidden=hidden,
+    )
+    return make_constrained_expression_field(
+        base=base,
+        conditions=[
+            HardCondition("u", 0, dirichlet(0.0), 0.0),
+            HardCondition("u", 0, derivative_at(0.0, 1), 0.0),
+            HardCondition("u", 1, dirichlet(0.0), 0.0),
+            HardCondition("u", 1, neumann(1.0), 0.0),
+            HardCondition("u", 2, dirichlet(0.0), 0.0),
+            HardCondition("u", 2, robin(1.0, alpha=1.0, beta=0.5), 0.0),
+        ],
+    )
+
+
+def _cube_pts(n: int = 24, seed: int = 7) -> jnp.ndarray:
+    return jnp.asarray(np.random.default_rng(seed).random((n, 3)))
+
+
+def test_six_conditions_over_three_axes_hold_and_survive_a_pytree_round_trip() -> None:
+    cage = _cube_cage()
+    assert cage.condition_residual(_cube_pts()) < EXACT
+    leaves, treedef = jax.tree_util.tree_flatten(cage)
+    perturbed = jax.tree_util.tree_unflatten(
+        treedef, [leaf + 0.6 for leaf in leaves]
+    )
+    assert perturbed.condition_residual(_cube_pts()) < EXACT
+
+
+def test_the_three_axis_recursion_traces_under_jit() -> None:
+    cage = _cube_cage()
+
+    @jax.jit
+    def value(f: ConstrainedExpressionField, c: jnp.ndarray) -> jnp.ndarray:
+        s = f(c)
+        return s.ops.value(s, "u")
+
+    edge = _cube_pts().at[:, 0].set(0.0).at[:, 1].set(0.0)
+    assert float(jnp.max(jnp.abs(value(cage, edge)))) < EXACT
+
+
+def test_a_periodic_seam_closes_in_value_and_slope() -> None:
+    cage = _cage(
+        [
+            HardCondition("u", 1, periodic(0.0, 1.0, order=0), 0.0),
+            HardCondition("u", 1, periodic(0.0, 1.0, order=1), 0.0),
+        ]
+    )
+    lo, hi = _face(1, 0.0), _face(1, 1.0)
+    np.testing.assert_allclose(_val(cage, hi), _val(cage, lo), rtol=0, atol=EXACT)
+    np.testing.assert_allclose(
+        _der(cage, hi, 1, 1), _der(cage, lo, 1, 1), rtol=0, atol=EXACT
+    )
+
+
+def test_gradients_still_reach_the_base_through_a_relative_constraint() -> None:
+    cage = _cube_cage()
+
+    def loss(f: ConstrainedExpressionField) -> jnp.ndarray:
+        s = f(_cube_pts())
+        return jnp.mean(s.ops.value(s, "u") ** 2)
+
+    grads = jax.grad(loss)(cage)
+    total = sum(
+        float(jnp.sum(jnp.abs(g))) for g in jax.tree_util.tree_leaves(grads)
+    )
+    assert total > 0.0
+
+
+def test_the_reported_cost_is_the_cost_actually_paid() -> None:
+    """A published number that nothing checks is a number that drifts."""
+    cage = _cube_cage()
+    state = cage(_cube_pts(8))
+    state.ops.value(state, "u")
+    projected = state.extra["_cage_inner_state"].extra["_constrained_cache"]
+    assert cage.projection_cost == len(projected) + 1  # + the unpinned batch

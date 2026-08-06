@@ -93,7 +93,7 @@ the derivative chain by hand. The same pattern works for
 | --- | --- |
 | `dde.icbc.DirichletBC(geom, lambda x: ..., on_boundary)` | `HardCondition(component, axis, dirichlet(face), value)` on a box, or `HardBoundaryField(base, distance_fn, boundary_fn, components)` for arbitrary geometry |
 | `dde.icbc.NeumannBC(...)` / `RobinBC(...)` | `HardCondition(component, axis, neumann(face))` / `robin(face, alpha=, beta=)` |
-| `dde.icbc.PeriodicBC(...)` | set `periodicity=(True, ...)` on the `CoordinateSpec` |
+| `dde.icbc.PeriodicBC(...)` | `HardCondition(component, axis, periodic(lo, hi, order=n))` for `n = 0, 1`, or set `periodicity=(True, ...)` on the `CoordinateSpec` when the ansatz is spectral and already carries it |
 | `dde.icbc.IC(geom, lambda x: ..., lambda x: x[1] == 0)` | `HardCondition(component, time_axis, dirichlet(t0), value)`; `derivative_at(t0, 1)` for an initial velocity |
 
 DeepXDE imposes all of these as penalty terms. `ConstrainedExpressionField`

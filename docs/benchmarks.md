@@ -474,16 +474,19 @@ nonlinearity, or one poorly excited by the observation set, is a harder problem 
 
 A boundary condition is normally one more penalty term, weighted against the interior residual. Absorbing it
 into the ansatz instead makes it exact -- that part is algebra -- but says nothing about whether the rest of the
-solve improves, so both halves are measured. Poisson (elliptic), heat (parabolic) and wave (hyperbolic), each
-with an analytic solution, 5 seeds, `solve_least_squares`, `hidden=96`, 48 interior / 16 per face. The two arms
-share architecture, parameter count, seed and collocation budget; only `hard_conditions` differs. Regenerate
-with `benchmarks/hard_conditions_solver.py`.
+solve improves, so both halves are measured. Poisson (elliptic), heat (parabolic), wave (hyperbolic), a 2-D
+square whose four faces are absorbed at once, and a periodic seam, each with an analytic solution, 5 seeds,
+`solve_least_squares`, `hidden=96`, 48 interior / 16 per face. The two arms share architecture, parameter count,
+seed and collocation budget; only `hard_conditions` differs. Regenerate with
+`benchmarks/hard_conditions_solver.py`.
 
 | problem | absorbed | boundary violation (hard, **max** over cells) | boundary violation (soft, median) | interior rel-L2 hard | interior rel-L2 soft | hard wins |
 |---|---|---|---|---|---|---|
 | Poisson | 2 | **0.0** | 1.7e-06 | **3.5e-07** | 1.6e-06 | 5/5 |
 | heat | 3 | **3.4e-15** | 3.7e-02 | **3.8e-06** | 1.1e-02 | 5/5 |
 | wave | 4 | **1.4e-14** | 4.6e-03 | **1.1e-06** | 3.1e-03 | 5/5 |
+| square (2-D) | 4 | **0.0** | 1.6e-01 | **2.8e-05** | 7.3e-02 | 5/5 |
+| seam (periodic) | 2 | **0.0** | 2.4e-03 | 1.2e-04 | **4.3e-05** | 0/5 |
 
 The boundary column is the *falsifier* for the exactness claim, not evidence for it: the hard arm is exact by
 construction, and it is reported as a max rather than a median so a single bad cell could not hide. The interior
@@ -491,10 +494,18 @@ column is the one that decides whether absorption is worth using, and it is **op
 parabolic and hyperbolic gaps are the large ones because that is where the soft arm has an initial condition
 competing with the interior residual for the same gradient budget; the elliptic gap is ~4x, not ~3000x.
 
+**The seam row is the one that loses**, and it is left in rather than dropped. Hard periodicity closes the seam
+exactly where the soft arm leaves `2.4e-03`, but the interior fit is ~3x *worse* on every seed. The relative
+constraint spends two of the ansatz's degrees of freedom tying the two ends together, and on a problem whose
+solution is pinned only up to an additive constant that is a real cost paid for a guarantee. Use it when the
+seam has to close; do not expect it to be free. (The interior figure removes the mean from both sides, since
+that gauge freedom belongs to the problem, not to either arm.)
+
 Absorption is partial and opt-in. `hard_conditions="auto"` absorbs what the planner can certify and leaves the
 rest soft, reporting a reason per declined condition; the default `"none"` reproduces the previous solve bit for
-bit. Stage A is validated for conditions on at most one spatial axis plus time -- more than that is declined,
-which is the same answer the solver gives today.
+bit. Conditions on any number of axes are in scope -- the square row is two constrained spatial axes, whose
+corner terms the recursion generates on its own -- and a condition the planner cannot certify is declined, which
+is the same answer the solver gives today.
 
 ## Structured DP (omnibias-struct)
 

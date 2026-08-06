@@ -29,7 +29,8 @@ untrained network, a randomised one, and every optimiser step in between.
 Part 1 shows that on the four condition kinds. Part 2 shows the precondition
 being *certified* rather than assumed, and refused when it fails. Part 3 hands
 the whole thing to the solver, which works out which conditions it can absorb
-and deletes those rows from the loss.
+and deletes those rows from the loss. Part 4 goes to three axes and to a
+periodic seam, which the same recursion covers without a special case.
 
 Honesty, in three parts.
 
@@ -42,15 +43,19 @@ certificate over a finite rational obligation.
 architecture, parameter count and collocation budget: the hard arm's worst
 boundary violation over every cell was ``1.4e-14``, and its median interior
 relative L2 was better on Poisson (``3.5e-07`` vs ``1.6e-06``), heat
-(``3.8e-06`` vs ``1.2e-02``) and wave (``1.1e-06`` vs ``3.1e-03``), winning 5
-seeds out of 5 on all three. The parabolic and hyperbolic gaps are the large
-ones because that is where the soft arm has an initial condition competing with
-the interior residual.
+(``3.8e-06`` vs ``1.2e-02``), wave (``1.1e-06`` vs ``3.1e-03``) and the 2-D
+square (``2.8e-05`` vs ``7.3e-02``), winning 5 seeds out of 5 on all four. The
+parabolic and hyperbolic gaps are the large ones because that is where the soft
+arm has an initial condition competing with the interior residual. **On the
+periodic seam it lost**: the seam closes exactly, but the interior fit was ~3x
+worse on every seed, because two degrees of freedom go into tying the ends
+together. Absorption buys a guarantee, and on that problem the guarantee is not
+free.
 
 *Out of scope.* The domain must be an axis-aligned box; arbitrary geometry is
-what the distance-function ``HardBoundaryField`` is for. Stage A absorbs
-conditions on at most one spatial axis plus time -- more than that is declined
-with a reason, and stays soft, which is exactly what the solver does today.
+what the distance-function ``HardBoundaryField`` is for. A condition whose
+support matrix will not certify is declined with a reason and stays soft, which
+is exactly what the solver does today.
 """
 
 from __future__ import annotations
@@ -66,6 +71,7 @@ from omnibias.pinn._core.constrained import (
     derivative_at,
     dirichlet,
     neumann,
+    periodic,
     robin,
 )
 from omnibias.pinn.solver import CollocationSpec, Domain, array_namespace, heat, poisson
@@ -243,11 +249,10 @@ def part_two() -> None:
         raise AssertionError("a singular condition set must be refused")
 
     # (b) Data on different axes must agree where those axes meet. That is a
-    # statement about the *data*, not the method, and it is not repairable: the
-    # gate reports the size of the disagreement, which is order one when it is
-    # real. The second case is the one worth knowing about -- the values agree
-    # perfectly and only the *derivatives* clash, which is easy to write by
-    # accident and impossible to see by inspection.
+    # statement about the *data*, not the method, and it is not repairable, so
+    # construction refuses it outright. The second case is the one worth knowing
+    # about -- the values agree perfectly and only the *derivatives* clash,
+    # which is easy to write by accident and impossible to see by inspection.
     g = torch.Generator().manual_seed(5)
     sample = torch.rand(64, 2, generator=g, dtype=DTYPE)
     clashes = {
@@ -262,9 +267,19 @@ def part_two() -> None:
         ],
     }
     for label, conditions in clashes.items():
-        bad = ConstrainedExpressionField(base=build_base(), conditions=conditions)
+        try:
+            ConstrainedExpressionField(base=build_base(), conditions=conditions)
+        except ValueError:
+            pass
+        else:  # pragma: no cover -- the refusal is the point
+            raise AssertionError(f"incompatible data must be refused: {label}")
+        # Building with the gate off keeps the residual visible as a live
+        # falsifier: order one when the clash is real, round-off when it is not.
+        bad = ConstrainedExpressionField(
+            base=build_base(), conditions=conditions, check_data=False
+        )
         residual = bad.compatibility_residual(sample)
-        print(f"    {label:40s} -> residual {residual:.2e}")
+        print(f"    {label:40s} -> refused, residual {residual:.2e}")
         assert residual > 0.9, (label, residual)
 
 
@@ -346,12 +361,93 @@ def _interior_grid(system: object, n: int = 40) -> np.ndarray:
     return np.stack([m.ravel() for m in mesh], axis=-1)
 
 
+# ---------------------------------------------------------------- part 4 -----
+
+CUBE = ((0.0, 1.0), (0.0, 1.0), (0.0, 1.0))
+
+
+def part_four() -> None:
+    print("\n[4] three axes, and a seam -- same recursion, no special cases")
+    torch.manual_seed(SEED)
+    base = OneLayerVectorField(
+        coordinate_spec=CoordinateSpec(("t", "x", "y"), domain=CUBE, time_axis="t"),
+        components=ComponentSpec(("u",)),
+        hidden=HIDDEN,
+        base="tanh",
+        dtype=DTYPE,
+    )
+    # An initial value on t, Dirichlet + Neumann on x, and a *periodic seam* on
+    # y. The seam is a relative constraint -- it ties u(y=0) to u(y=1) without
+    # pinning either -- which the same switching form absorbs because a linear
+    # functional may reference more than one point.
+    cage = ConstrainedExpressionField(
+        base=base,
+        conditions=[
+            HardCondition("u", 0, dirichlet(0.0), 0.0),
+            HardCondition("u", 1, dirichlet(0.0), 0.0),
+            HardCondition("u", 1, neumann(1.0), 0.0),
+            HardCondition("u", 2, periodic(0.0, 1.0, order=0), 0.0),
+            HardCondition("u", 2, periodic(0.0, 1.0, order=1), 0.0),
+        ],
+    )
+    randomise(cage, seed=17)
+
+    gen = torch.Generator().manual_seed(23)
+    pts = torch.rand(48, 3, generator=gen, dtype=DTYPE)
+    t0, x0, x1 = pts.clone(), pts.clone(), pts.clone()
+    t0[:, 0], x0[:, 1], x1[:, 1] = 0.0, 0.0, 1.0
+    lo, hi = pts.clone(), pts.clone()
+    lo[:, 2], hi[:, 2] = 0.0, 1.0
+
+    checks = {
+        "initial u(0,x,y) = 0": worst(value_at(cage, t0), 0.0),
+        "dirichlet u(t,0,y) = 0": worst(value_at(cage, x0), 0.0),
+        "neumann u_x(t,1,y) = 0": worst(derivative_at_points(cage, x1, 1, 1), 0.0),
+        "seam u(.,.,1) - u(.,.,0) = 0": worst(
+            value_at(cage, hi), value_at(cage, lo)
+        ),
+        "seam slope matches too": worst(
+            derivative_at_points(cage, hi, 2, 1),
+            derivative_at_points(cage, lo, 2, 1),
+        ),
+    }
+    for name, err in checks.items():
+        print(f"      {name:32s} |err| = {err:.1e}")
+        assert err < EXACT, (name, err)
+
+    # The edge where two constrained axes meet, and the corner where three do.
+    edge = torch.rand(16, 3, generator=gen, dtype=DTYPE)
+    edge[:, 0], edge[:, 1] = 0.0, 0.0
+    print(f"      edge (t=0, x=0)                  |err| = {worst(value_at(cage, edge), 0.0):.1e}")
+    assert worst(value_at(cage, edge), 0.0) < EXACT
+
+    # And the cost, stated rather than implied: the recursion multiplies.
+    print(
+        f"    base evaluations per pass: {cage.projection_cost} "
+        f"(product over axes of 1 + #projection points)"
+    )
+
+    # The solver reaches the same conclusion on its own, on a square whose four
+    # faces all get absorbed -- two constrained spatial axes, no time.
+    def source(c):  # noqa: ANN001, ANN202
+        xp = array_namespace(c)
+        return -2.0 * (math.pi**2) * xp.sin(math.pi * c[:, 0]) * xp.sin(math.pi * c[:, 1])
+
+    square = poisson(
+        Domain(("x", "y"), ((0.0, 1.0), (0.0, 1.0))), source=source, boundary=0.0
+    )
+    plan = plan_hard_conditions(square)
+    print(f"    2-D square: {plan.summary()}")
+    assert plan.is_total, plan.declined
+
+
 def main() -> None:
     torch.set_default_dtype(DTYPE)
     print("=== Hard boundary / initial conditions ===")
     part_one()
     part_two()
     part_three()
+    part_four()
     print("\nThe conditions are algebra, not training; all checks passed.")
 
 

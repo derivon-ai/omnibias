@@ -189,10 +189,14 @@ $$u = g + \sum_k \varphi_k \bigl(t_k - C_k[g]\bigr),$$
 
 which satisfies every condition for **any** free function $g$. Dirichlet,
 Neumann, Robin and an initial value or velocity are all one `LinearConstraint`
-type with different terms.
+type with different terms -- and so is periodicity, as the *relative* constraint
+$\partial^n u(hi) - \partial^n u(lo) = 0$, since a linear functional may
+reference several points.
 
 ```python
-from omnibias.pinn._core.constrained import HardCondition, derivative_at, dirichlet, neumann
+from omnibias.pinn._core.constrained import (
+    HardCondition, derivative_at, dirichlet, neumann, periodic,
+)
 from omnibias.pinn.torch.cage import ConstrainedExpressionField
 
 wave_cage = ConstrainedExpressionField(
@@ -200,7 +204,12 @@ wave_cage = ConstrainedExpressionField(
     conditions=[
         HardCondition("u", 0, dirichlet(0.0), 0.0),          # u(0, y, t) = 0
         HardCondition("u", 0, neumann(1.0), 0.0),            # u_x(1, y, t) = 0
-        HardCondition("u", 2, dirichlet(0.0), lambda c: torch.sin(c[:, 0])),
+        HardCondition("u", 1, periodic(0.0, 1.0, order=0), 0.0),  # seam in y
+        HardCondition("u", 1, periodic(0.0, 1.0, order=1), 0.0),  # ... and slope
+        # Initial state x(2 - x): zero at x = 0 and flat at x = 1, so it agrees
+        # with the two conditions above where the axes meet. Data that does not
+        # is refused at construction rather than half-satisfied.
+        HardCondition("u", 2, dirichlet(0.0), lambda c: c[:, 0] * (2.0 - c[:, 0])),
         HardCondition("u", 2, derivative_at(0.0, 1), 0.0),   # u_t(x, y, 0) = 0
     ],
     bounds=((0.0, 1.0), (0.0, 1.0), (0.0, 1.0)),
@@ -209,14 +218,21 @@ wave_cage = ConstrainedExpressionField(
 face = torch.rand(4, 3, dtype=torch.float64)
 face[:, 0] = 0.0
 print(float(wave_cage(face).u.value.abs().max()) < 1e-14)    # True, untrained
+print(wave_cage.projection_cost)                             # 18 base evaluations
 ```
+
+Three constrained axes cost `3 * 3 * 2 = 18` base evaluations per pass -- the
+product over axes of `1 + #projection points`, not the sum. That is the price of
+exact edges and corners, and `projection_cost` reports it so the decision to
+absorb a third axis is made on a number.
 
 The support matrix behind the switching functions has to be invertible, and
 that is **certified** rather than assumed: `support_certificates()` seals a
 hash-verifiable enclosure of `lambda_min(M^T M) > 0`, and a linearly dependent
 condition set is refused at construction. Condition data on different axes must
-also agree where those axes meet; `compatibility_residual` reports the size of
-any disagreement, which is order one when it is real.
+also agree where those axes meet, and construction refuses data that does not,
+naming the two conditions that clash; `compatibility_residual` keeps the size of
+the disagreement visible, which is order one when it is real.
 
 ## When to choose which cage
 
@@ -226,7 +242,7 @@ any disagreement, which is order one when it is real.
 | `VectorPotentialField` | 3D `div u = 0` | small (1 extra tensor) | Headline 3D NS choice |
 | `HelmholtzProjectionField` | soft `div u = 0` via Poisson | medium (extra `phi` field) | Use when a learned pressure is required |
 | `HardBoundaryField` | Dirichlet `u = g` | free | Any geometry; Dirichlet only, does not compose |
-| `ConstrainedExpressionField` | Dirichlet / Neumann / Robin / initial | one base evaluation per distinct face | Box geometry; composes across axes and kinds, certified |
+| `ConstrainedExpressionField` | Dirichlet / Neumann / Robin / initial / periodic | product over axes of `1 + #faces` | Box geometry; composes across axes and kinds, certified |
 | `MassFluxPotentialField` | compressible `rho u = curl Psi` | small | For variable-density flows |
 
 All cages are duals across `omnibias.pinn.torch.cage` and

@@ -110,3 +110,61 @@ def test_the_two_backends_absorb_the_same_conditions() -> None:
     )
     assert j.diagnostics["hard_conditions"] == t.diagnostics["hard_conditions"]
     assert j.diagnostics["hard_declined"] == t.diagnostics["hard_declined"]
+
+
+# --------------------------------------------------------------------------- #
+# What Stage C added: a second spatial axis, and a periodic seam.
+# --------------------------------------------------------------------------- #
+def _square():
+    dom = pde.Domain(("x", "y"), ((0.0, 1.0), (0.0, 1.0)))
+
+    def source(c):
+        xp = pde.array_namespace(c)
+        return -2.0 * (math.pi**2) * xp.sin(math.pi * c[:, 0]) * xp.sin(math.pi * c[:, 1])
+
+    return pde.poisson(dom, source=source, boundary=0.0)
+
+
+def test_all_four_faces_of_a_square_are_absorbed_and_hold() -> None:
+    sol = pj.solve_least_squares(
+        _square(),
+        hidden=48,
+        seed=0,
+        collocation=pde.CollocationSpec(n_interior=12, n_boundary=8),
+        hard_conditions="auto",
+    )
+    assert sol.diagnostics["hard_absorbed"] == 4
+    assert _full_condition_residual(sol) < EXACT
+    rng = np.random.default_rng(4)
+    for axis in (0, 1):
+        for value in (0.0, 1.0):
+            pts = rng.uniform(0.0, 1.0, size=(32, 2))
+            pts[:, axis] = value
+            assert np.abs(np.asarray(sol.evaluate(pts, "u"))).max() < EXACT
+
+
+def test_a_periodic_seam_closes_exactly() -> None:
+    from dataclasses import replace
+
+    dom = pde.Domain(("x",), ((0.0, 1.0),), periodic=True)
+
+    def source(c):
+        xp = pde.array_namespace(c)
+        return -((2.0 * math.pi) ** 2) * xp.sin(2.0 * math.pi * c[:, 0])
+
+    system = replace(
+        pde.poisson(dom, source=source, boundary=0.0),
+        boundary=(pde.BoundaryCondition(component="u", kind="periodic", axis="x"),),
+    )
+    sol = pj.solve_least_squares(
+        system,
+        hidden=48,
+        seed=0,
+        collocation=pde.CollocationSpec(n_interior=48),
+        hard_conditions="auto",
+    )
+    assert sol.diagnostics["hard_absorbed"] == 2
+    ends = np.array([[0.0], [1.0]])
+    value = np.asarray(sol.evaluate(ends, "u"))
+    assert abs(value[0] - value[1]) < EXACT
+    assert _full_condition_residual(sol) < EXACT

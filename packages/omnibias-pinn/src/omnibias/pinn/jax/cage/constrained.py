@@ -24,10 +24,16 @@ from jax import Array
 from omnibias.pinn._core.components import ComponentSpec
 from omnibias.pinn._core.constrained import (
     AxisPlan,
+    CornerPair,
     HardCondition,
     apply_constraint,
     certify_support_matrix,
+    compatibility_sample,
+    corner_pairs,
+    face_point,
     group_hard_conditions,
+    is_relative,
+    projection_cost,
     switching_derivative_coeffs,
 )
 from omnibias.pinn._core.coords import CoordinateSpec
@@ -56,6 +62,7 @@ class ConstrainedExpressionField(_CageFieldBase):
     passthrough_names: tuple[str, ...]
     coordinate_spec: CoordinateSpec
     components: ComponentSpec
+    bounds: tuple[tuple[float, float], ...]
     compatibility_tol: float
     certified: bool
 
@@ -142,9 +149,8 @@ class ConstrainedExpressionField(_CageFieldBase):
     # ----- targets ----------------------------------------------------
 
     def _target_partial(
-        self, inner: FieldState, target: Any, pins: Pins, orders: tuple[int, ...]
+        self, coords: Array, target: Any, pins: Pins, orders: tuple[int, ...]
     ) -> Array:
-        coords = inner.coords
         zeros = jnp.zeros((coords.shape[0],), dtype=coords.dtype)
         if not callable(target):
             if any(orders):
@@ -201,8 +207,9 @@ class ConstrainedExpressionField(_CageFieldBase):
             phi = self._switching(step, i, orders[axis], xi)
             if phi is None:
                 continue
-            face: Pins = _with_pin(pins, axis, constraint.points[0])
-            rho = self._target_partial(inner, step.targets[i], face, rest)
+            point = face_point(constraint)
+            face: Pins = pins if point is None else _with_pin(pins, axis, point)
+            rho = self._target_partial(inner.coords, step.targets[i], face, rest)
             rho = rho - apply_constraint(
                 constraint,
                 lambda point, order, _rest=rest: self._level(  # type: ignore[misc]
@@ -275,11 +282,88 @@ class ConstrainedExpressionField(_CageFieldBase):
 
     # ----- the cross-axis data gate -----------------------------------
 
-    def compatibility_residual(self, coords: Array) -> float:
-        """How badly the condition data disagrees where two axes meet.
+    @property
+    def corner_pairs(self) -> tuple[CornerPair, ...]:
+        """Every pair of conditions on different axes whose data must agree."""
+        return corner_pairs(dict(self.plans))
+
+    @property
+    def projection_cost(self) -> int:
+        """Base-field evaluations one forward pass costs.
+
+        The product over constrained axes of ``1 + #projection points``, shared
+        across components. See
+        :func:`omnibias.pinn._core.constrained.projection_cost`.
+        """
+        return projection_cost(dict(self.plans))
+
+    def _sample(self, coords: Array | None) -> Array:
+        if coords is not None:
+            return jnp.asarray(coords)
+        return jnp.asarray(compatibility_sample(self.bounds), dtype=self.base.c.dtype)
+
+    def _corner_gap(self, coords: Array, pair: CornerPair) -> Array:
+        ndim = self.coordinate_spec.ndim
+        pin_a = face_point(pair.constraint_a)
+        pin_b = face_point(pair.constraint_b)
+        base_a: Pins = () if pin_a is None else ((pair.axis_a, pin_a),)
+        base_b: Pins = () if pin_b is None else ((pair.axis_b, pin_b),)
+        lhs = apply_constraint(
+            pair.constraint_a,
+            lambda point, order: self._target_partial(
+                coords,
+                pair.target_b,
+                _with_pin(base_b, pair.axis_a, point),
+                tuple(order if a == pair.axis_a else 0 for a in range(ndim)),
+            ),
+        )
+        rhs = apply_constraint(
+            pair.constraint_b,
+            lambda point, order: self._target_partial(
+                coords,
+                pair.target_a,
+                _with_pin(base_a, pair.axis_b, point),
+                tuple(order if a == pair.axis_b else 0 for a in range(ndim)),
+            ),
+        )
+        return lhs - rhs
+
+    def worst_corner(self, coords: Array | None = None) -> tuple[float, CornerPair | None]:
+        """The largest cross-axis data disagreement, and which pair carries it."""
+        sample = self._sample(coords)
+        worst = 0.0
+        culprit: CornerPair | None = None
+        for pair in self.corner_pairs:
+            gap = float(jnp.max(jnp.abs(self._corner_gap(sample, pair))))
+            if gap >= worst:
+                worst, culprit = gap, pair
+        return worst, culprit
+
+    def compatibility_residual(self, coords: Array | None = None) -> float:
+        """How badly the condition *data* disagrees where two axes meet.
 
         Order one when the disagreement is real, round-off when it is not; see
         the torch twin for what the quantity means.
+        """
+        return self.worst_corner(coords)[0]
+
+    def check_compatibility(self, coords: Array | None = None) -> None:
+        """Raise when the condition data is inconsistent across axes."""
+        residual, pair = self.worst_corner(coords)
+        if residual > self.compatibility_tol:
+            where = f" ({pair.label})" if pair is not None else ""
+            raise ValueError(
+                f"hard conditions are mutually inconsistent: residual {residual:.3e} "
+                f"exceeds {self.compatibility_tol:.3e}{where}. The conditions on "
+                "different axes disagree where those axes meet (typically the "
+                "initial state does not satisfy the boundary condition at t0); no "
+                "ansatz can satisfy both, so the data must be reconciled first"
+            )
+
+    def condition_residual(self, coords: Array) -> float:
+        """How far the built expression is from the conditions it claims to enforce.
+
+        The falsifier for the construction itself; see the torch twin.
         """
         worst = 0.0
         state = self.base.evaluate(jnp.asarray(coords))
@@ -301,26 +385,13 @@ class ConstrainedExpressionField(_CageFieldBase):
                             memo,
                         ),
                     )
+                    point = face_point(constraint)
+                    face: Pins = () if point is None else ((axis, point),)
                     want = self._target_partial(
-                        state,
-                        step.targets[i],
-                        ((axis, constraint.points[0]),),
-                        (0,) * ndim,
+                        state.coords, step.targets[i], face, (0,) * ndim
                     )
                     worst = max(worst, float(jnp.max(jnp.abs(got - want))))
         return worst
-
-    def check_compatibility(self, coords: Array) -> None:
-        """Raise when the condition data is inconsistent across axes."""
-        residual = self.compatibility_residual(coords)
-        if residual > self.compatibility_tol:
-            raise ValueError(
-                f"hard conditions are mutually inconsistent: residual {residual:.3e} "
-                f"exceeds {self.compatibility_tol:.3e}. The conditions on different "
-                "axes disagree where those axes meet (typically the initial state "
-                "does not satisfy the boundary condition at t0); no ansatz can "
-                "satisfy both, so the data must be reconciled first"
-            )
 
 
 def _with_pin(pins: Pins, axis: int, value: float) -> Pins:
@@ -337,6 +408,7 @@ def make_constrained_expression_field(
     passthrough_names: tuple[str, ...] = (),
     groups: dict[str, tuple[str, ...]] | None = None,
     certify: bool = True,
+    check_data: bool = True,
     compatibility_tol: float = 1e-8,
 ) -> ConstrainedExpressionField:
     """Build a JAX constrained-expression cage around ``base``."""
@@ -351,6 +423,13 @@ def make_constrained_expression_field(
             "hard conditions need per-axis (lo, hi) bounds: pass `bounds=` or "
             "build the base field with a CoordinateSpec carrying `domain=`"
         )
+    for cond in conditions:
+        if is_relative(cond.constraint) and callable(cond.target):
+            raise ValueError(
+                f"relative constraint {cond.constraint.label!r} ties several "
+                "points together, so its target belongs to no single face and "
+                "must be a constant"
+            )
     plans = group_hard_conditions(conditions, tuple(resolved))
     constrained = tuple(plans)
     overlap = set(constrained) & set(passthrough_names)
@@ -368,11 +447,14 @@ def make_constrained_expression_field(
             constrained + tuple(passthrough_names),
             groups=groups if groups is not None else {"constrained": constrained},
         ),
+        bounds=tuple((float(lo), float(hi)) for lo, hi in resolved),
         compatibility_tol=float(compatibility_tol),
         certified=bool(certify),
     )
     if certify:
         field.support_certificates()
+    if check_data and field.corner_pairs:
+        field.check_compatibility()
     return field
 
 
@@ -383,6 +465,7 @@ def _ce_flatten(f: ConstrainedExpressionField):  # type: ignore[no-untyped-def]
         f.passthrough_names,
         f.coordinate_spec,
         f.components,
+        f.bounds,
         f.compatibility_tol,
         f.certified,
     )
@@ -396,6 +479,7 @@ def _ce_unflatten(aux, leaves):  # type: ignore[no-untyped-def]
         passthrough_names,
         coordinate_spec,
         components,
+        bounds,
         compatibility_tol,
         certified,
     ) = aux
@@ -406,6 +490,7 @@ def _ce_unflatten(aux, leaves):  # type: ignore[no-untyped-def]
     object.__setattr__(obj, "passthrough_names", passthrough_names)
     object.__setattr__(obj, "coordinate_spec", coordinate_spec)
     object.__setattr__(obj, "components", components)
+    object.__setattr__(obj, "bounds", bounds)
     object.__setattr__(obj, "compatibility_tol", compatibility_tol)
     object.__setattr__(obj, "certified", certified)
     return obj

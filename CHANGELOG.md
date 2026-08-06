@@ -37,8 +37,20 @@ special-cased.
   closed form *in the network*: every value and derivative of `g` it needs,
   including at the projected face points, comes from the sigma-tower. Autodiff
   appears only when a user-supplied target callable has to be differentiated
-  along another axis. Cost is one base evaluation per **distinct** projection
-  point, so a face carrying both a value and a slope costs one, not two.
+  along another axis. It recurses over **every** constrained axis, so the edges
+  and corners where two or three axes meet come out exact without a special
+  case. Cost, reported by `projection_cost` rather than left implicit, is the
+  product over axes of `1 + #distinct projection points`: a face carrying both a
+  value and a slope costs one, but a second constrained axis multiplies rather
+  than adds, which is why absorbing every face of a 3-D box is a choice.
+- Periodicity is absorbed as a **relative** constraint `d^n u(hi) - d^n u(lo) =
+  0`, matching value *and* slope across the seam, since a linear functional may
+  reference several points. This also fixes a real gap: the solver previously
+  emitted a zero-length row for a periodic boundary on the grounds that the
+  ansatz carried it, which is true of a spectral method-of-lines discretisation
+  and false for the mesh-free route. The soft path now assembles genuine seam
+  rows, so `hard_conditions="none"` enforces periodicity approximately where it
+  previously did not enforce it at all.
 - `plan_hard_conditions(system)` triages a solver `System` into what can be
   absorbed and what cannot, with a reason for every decline, and
   `hard_conditions="auto"` on `solve_least_squares` / `solve_optimize` /
@@ -56,10 +68,15 @@ Weyl bound so the claim is about the *exact* Gram rather than its float image,
 and seals a hash-verifiable certificate — a finite rational obligation, so it is
 in scope for the Lean kernel. A dependent condition set is **refused**, not
 approximated. Separately, condition data on different axes has to agree where
-those axes meet; `compatibility_residual` reports the disagreement at its true
-order-one size, including the case where the values agree perfectly and only the
-slopes clash (a time-dependent Dirichlet against a zero initial velocity), which
-is easy to write by accident and impossible to see by inspection.
+those axes meet, and construction now refuses data that does not, naming the two
+conditions that clash. The gate is checked over **every pair** of axes rather
+than consecutive ones — quadratic in the conditions, not exponential in the axes
+— on a deterministic Kronecker lattice, so a refusal is reproducible across
+backends rather than seed-dependent. `compatibility_residual` keeps the
+disagreement visible at its true order-one size, including the case where the
+values agree perfectly and only the slopes clash (a time-dependent Dirichlet
+against a zero initial velocity), which is easy to write by accident and
+impossible to see by inspection.
 
 The guard that matters most is the one against silence: after an auto-caged
 solve the tests re-assemble the **full** condition residual *ignoring* the plan's
@@ -69,20 +86,26 @@ notice. `hard_conditions="none"` is the default and reproduces the previous solv
 bit for bit, pinned by its own test.
 
 Measured (`benchmarks/hard_conditions_solver.py`, artifact
-`docs/benchmarks/hard_conditions_solver.json`): Poisson / heat / wave, 5 seeds,
-identical architecture, parameter count, seed and collocation budget. The hard
-arm's worst boundary violation over every cell was `1.4e-14`, and its median
-interior relative L2 beat the soft arm on Poisson (`3.5e-07` vs `1.6e-06`), heat
-(`3.8e-06` vs `1.1e-02`) and wave (`1.1e-06` vs `3.1e-03`), 5 seeds out of 5 on
-all three. The parabolic and hyperbolic gaps are the large ones because that is
-where the soft arm has an initial condition competing with the interior residual.
+`docs/benchmarks/hard_conditions_solver.json`): Poisson / heat / wave / a 2-D
+square / a periodic seam, 5 seeds, identical architecture, parameter count, seed
+and collocation budget. The hard arm's worst boundary violation over every cell
+was `1.4e-14`, and its median interior relative L2 beat the soft arm on Poisson
+(`3.5e-07` vs `1.6e-06`), heat (`3.8e-06` vs `1.1e-02`), wave (`1.1e-06` vs
+`3.1e-03`) and the square (`2.8e-05` vs `7.3e-02`), 5 seeds out of 5 on all
+four. The parabolic and hyperbolic gaps are the large ones because that is where
+the soft arm has an initial condition competing with the interior residual. **On
+the periodic seam it lost** and the row is kept rather than dropped: the seam
+closes exactly where the soft arm leaves `2.4e-03`, but the interior fit is ~3x
+worse on every seed, because two degrees of freedom go into tying the ends
+together. Absorption buys a guarantee, and there it is not free.
 
 Scope, stated rather than implied. The domain must be an axis-aligned box;
 `HardBoundaryField` remains the route for arbitrary geometry, and the docs now
-say which to use when instead of describing it as the only hard-BC cage. This
-stage absorbs conditions on at most one spatial axis plus time — more is declined
-with a reason and stays soft, which is what the solver does today. The conditions
-are exact by construction; interior accuracy is optimised, not proven.
+say which to use when instead of describing it as the only hard-BC cage.
+Conditions on any number of axes are in scope, but a condition whose support
+matrix will not certify is declined with a reason and stays soft, which is what
+the solver does today. The conditions are exact by construction; interior
+accuracy is optimised, not proven.
 
 `docs/examples/pinn_hard_conditions.py` is runnable and wired into CI.
 

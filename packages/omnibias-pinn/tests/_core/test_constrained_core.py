@@ -17,12 +17,21 @@ import pytest
 from omnibias.core.proof.certificate import verify_certificate_digest
 from omnibias.pinn._core.constrained import (
     AxisConstraints,
+    AxisPlan,
+    HardCondition,
     LinearConstraint,
     apply_constraint,
     certify_support_matrix,
+    compatibility_sample,
+    corner_pairs,
     derivative_at,
     dirichlet,
+    face_point,
+    group_hard_conditions,
+    is_relative,
     neumann,
+    periodic,
+    projection_cost,
     robin,
     support_matrix,
     support_matrix_condition,
@@ -279,3 +288,179 @@ def test_switching_derivatives_terminate_at_the_polynomial_degree() -> None:
     # phi_i are degree <= 1, so the second derivative is identically zero.
     for i in range(2):
         assert switching_derivative_coeffs(axis.switching[i], 2, axis.length) == ()
+
+
+# --------------------------------------------------------------------------- #
+# Relative constraints: two points, neither of them pinned.
+# --------------------------------------------------------------------------- #
+def test_a_periodic_seam_satisfies_the_same_switching_identity() -> None:
+    axis = AxisConstraints(
+        axis=0,
+        lo=0.0,
+        hi=2.0,
+        constraints=(periodic(0.0, 2.0, order=0), periodic(0.0, 2.0, order=1)),
+    )
+    # The constant is invisible to a difference, so the family starts at x.
+    assert axis.degrees == (1, 2)
+    for k, c in enumerate(axis.constraints):
+        for i in range(2):
+            got = apply_constraint(c, lambda p, o, _i=i: _phi(axis, _i, p, o))
+            assert got == pytest.approx(1.0 if k == i else 0.0, abs=1e-12)
+    certify_support_matrix(axis)
+
+
+def test_a_seam_on_top_of_both_dirichlet_ends_is_refused() -> None:
+    """``u(1)-u(0)`` is the difference of two conditions already present."""
+    with pytest.raises(ValueError, match="singular support matrix"):
+        AxisConstraints(
+            axis=0,
+            lo=0.0,
+            hi=1.0,
+            constraints=(dirichlet(0.0), dirichlet(1.0), periodic(0.0, 1.0)),
+        )
+
+
+def test_a_seam_needs_two_distinct_points() -> None:
+    with pytest.raises(ValueError, match="two distinct points"):
+        periodic(0.5, 0.5)
+
+
+def test_face_point_is_none_exactly_for_a_relative_constraint() -> None:
+    assert face_point(dirichlet(0.25)) == 0.25
+    assert face_point(robin(1.0, alpha=1.0, beta=2.0)) == 1.0  # one point, two terms
+    assert face_point(periodic(0.0, 1.0)) is None
+    assert not is_relative(dirichlet(0.0))
+    assert is_relative(periodic(0.0, 1.0))
+
+
+# --------------------------------------------------------------------------- #
+# The pairwise corner enumeration, which is what makes the n-D gate complete.
+# --------------------------------------------------------------------------- #
+def _plans() -> dict[str, tuple[AxisPlan, ...]]:
+    return group_hard_conditions(
+        [
+            HardCondition("u", 0, dirichlet(0.0), 1.0),
+            HardCondition("u", 0, derivative_at(0.0, 1), 2.0),
+            HardCondition("u", 1, dirichlet(0.0), 3.0),
+            HardCondition("u", 2, dirichlet(0.0), 4.0),
+            HardCondition("u", 2, neumann(1.0), 5.0),
+        ],
+        ((0.0, 1.0),) * 3,
+    )
+
+
+def test_every_pair_spanning_two_axes_is_enumerated_and_no_others() -> None:
+    pairs = corner_pairs(_plans())
+    # 2 conditions on axis 0, 1 on axis 1, 2 on axis 2 -> 2*1 + 2*2 + 1*2
+    assert len(pairs) == 8
+    assert all(p.axis_a != p.axis_b for p in pairs)
+    assert {(p.axis_a, p.axis_b) for p in pairs} == {(0, 1), (0, 2), (1, 2)}
+
+
+def test_conditions_sharing_an_axis_are_not_a_corner_pair() -> None:
+    """They are embedded together by one support matrix; that is the certificate's job."""
+    plans = group_hard_conditions(
+        [
+            HardCondition("u", 0, dirichlet(0.0), 1.0),
+            HardCondition("u", 0, dirichlet(1.0), 2.0),
+        ],
+        ((0.0, 1.0),) * 2,
+    )
+    assert corner_pairs(plans) == ()
+
+
+def test_the_pair_label_names_both_conditions_and_both_axes() -> None:
+    pair = corner_pairs(_plans())[0]
+    assert "axis 0" in pair.label
+    assert "axis 1" in pair.label
+
+
+def test_components_do_not_pair_across_each_other() -> None:
+    plans = group_hard_conditions(
+        [
+            HardCondition("u", 0, dirichlet(0.0), 1.0),
+            HardCondition("v", 1, dirichlet(0.0), 2.0),
+        ],
+        ((0.0, 1.0),) * 2,
+    )
+    assert corner_pairs(plans) == ()
+
+
+# --------------------------------------------------------------------------- #
+# The shared sample: identical points on both backends, by construction.
+# --------------------------------------------------------------------------- #
+def test_the_compatibility_sample_lies_inside_the_bounds_and_is_deterministic() -> None:
+    bounds = ((-1.0, 2.0), (0.0, 0.5))
+    sample = compatibility_sample(bounds, 12)
+    assert len(sample) == 12
+    assert sample == compatibility_sample(bounds, 12)
+    for row in sample:
+        for value, (lo, hi) in zip(row, bounds, strict=True):
+            assert lo <= value < hi
+
+
+def test_the_sample_does_not_collapse_onto_a_diagonal() -> None:
+    """A lattice with equal multipliers would test one line through the box."""
+    sample = compatibility_sample(((0.0, 1.0), (0.0, 1.0)), 16)
+    assert max(abs(a - b) for a, b in sample) > 0.2
+
+
+def test_the_sample_handles_more_axes_than_the_multiplier_table() -> None:
+    sample = compatibility_sample(((0.0, 1.0),) * 15, 4)
+    assert len(sample[0]) == 15
+    assert len(set(sample[0])) == 15, "every axis must get a distinct offset"
+
+
+def test_an_empty_sample_is_refused() -> None:
+    with pytest.raises(ValueError, match="at least one point"):
+        compatibility_sample(((0.0, 1.0),), 0)
+
+
+# --------------------------------------------------------------------------- #
+# The cost, which is a product rather than a sum -- stated in the docs, so
+# measured here rather than trusted.
+# --------------------------------------------------------------------------- #
+def test_two_conditions_on_one_face_share_a_projection() -> None:
+    plans = group_hard_conditions(
+        [
+            HardCondition("u", 0, dirichlet(0.0), 1.0),
+            HardCondition("u", 0, derivative_at(0.0, 1), 2.0),
+        ],
+        ((0.0, 1.0),),
+    )
+    assert projection_cost(plans) == 2  # the batch itself, plus one pinned face
+
+
+def test_a_second_axis_multiplies_rather_than_adds() -> None:
+    plans = group_hard_conditions(
+        [
+            HardCondition("u", 0, dirichlet(0.0), 1.0),
+            HardCondition("u", 1, dirichlet(0.0), 2.0),
+            HardCondition("u", 1, neumann(1.0), 3.0),
+        ],
+        ((0.0, 1.0),) * 2,
+    )
+    # axis 0 has one face, axis 1 has two: 2 * 3, not 2 + 3.
+    assert projection_cost(plans) == 6
+
+
+def test_a_relative_constraint_costs_both_of_its_faces() -> None:
+    plans = group_hard_conditions(
+        [HardCondition("u", 0, periodic(0.0, 1.0), 0.0)], ((0.0, 1.0),)
+    )
+    assert projection_cost(plans) == 3
+
+
+def test_components_needing_the_same_pins_pay_once() -> None:
+    """The projected states are cached per pin tuple, not per component."""
+    shared = group_hard_conditions(
+        [
+            HardCondition("u", 0, dirichlet(0.0), 1.0),
+            HardCondition("v", 0, dirichlet(0.0), 2.0),
+        ],
+        ((0.0, 1.0),),
+    )
+    alone = group_hard_conditions(
+        [HardCondition("u", 0, dirichlet(0.0), 1.0)], ((0.0, 1.0),)
+    )
+    assert projection_cost(shared) == projection_cost(alone)

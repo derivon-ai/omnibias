@@ -93,7 +93,37 @@ def test_an_unknown_mode_is_refused_rather_than_guessed() -> None:
         plan_hard_conditions(_poisson(), mode="yes")
 
 
-def test_periodicity_is_declined_with_a_reason_naming_the_ansatz() -> None:
+def _periodic_heat():
+    dom = pde.Domain(
+        ("t", "x"), ((0.0, 0.2), (0.0, 1.0)), periodic=(False, True), time_axis="t"
+    )
+
+    def initial(c):
+        xp = pde.array_namespace(c)
+        return xp.sin(2.0 * math.pi * c[:, 1])
+
+    base = pde.heat(dom, diffusivity=0.1, initial=initial)
+    return replace(
+        base,
+        boundary=(pde.BoundaryCondition(component="u", kind="periodic", axis="x"),),
+    )
+
+
+def test_periodicity_becomes_a_relative_constraint_on_both_seam_orders() -> None:
+    plan = plan_hard_conditions(_periodic_heat())
+    labels = [c.constraint.label for c in plan.conditions]
+    assert "periodic^0@x" in labels
+    assert "periodic^1@x" in labels
+    assert plan.is_total, plan.declined
+
+
+def test_a_seam_stacked_on_dirichlet_ends_is_refused_as_redundant() -> None:
+    """``u(0)=u(1)=0`` already implies ``u(1)-u(0)=0``, so ``M`` is singular.
+
+    The right answer is a refusal, not a nearly-singular inverse: the extra
+    functional carries no information and inverting through it would amplify
+    round-off into the switching functions.
+    """
     base = _heat()
     sys = replace(
         base,
@@ -103,8 +133,8 @@ def test_periodicity_is_declined_with_a_reason_naming_the_ansatz() -> None:
         ),
     )
     plan = plan_hard_conditions(sys)
-    reasons = [d.reason for d in plan.declined]
-    assert any("periodicity is carried by the ansatz" in r for r in reasons)
+    assert not plan
+    assert all("singular support matrix" in d.reason for d in plan.declined)
 
 
 def test_a_condition_whose_faces_are_all_periodic_is_declined_too() -> None:
@@ -118,21 +148,35 @@ def test_a_condition_whose_faces_are_all_periodic_is_declined_too() -> None:
     assert plan.absorbed_initial == frozenset({0})
 
 
-def test_two_spatial_axes_are_declined_by_the_stage_a_scope() -> None:
-    """The engine recurses over any number of axes; only this scope is validated."""
+def test_a_periodic_condition_with_no_seam_to_tie_is_declined() -> None:
+    dom = pde.Domain(("x",), ((0.0, 1.0),))
+    sys = replace(
+        pde.poisson(dom, source=0.0, boundary=0.0),
+        boundary=(pde.BoundaryCondition(component="u", kind="periodic"),),
+    )
+    plan = plan_hard_conditions(sys)
+    assert not plan
+    assert "no seam to tie together" in plan.declined[0].reason
+
+
+def test_both_spatial_axes_of_a_square_are_absorbed() -> None:
+    """The Stage A one-spatial-axis gate is gone: the recursion covers every axis."""
     dom = pde.Domain(("x", "y"), ((0.0, 1.0), (0.0, 1.0)))
     plan = plan_hard_conditions(pde.poisson(dom, source=0.0, boundary=0.0))
-    assert not plan
-    assert plan.declined
-    assert all("at most one spatial axis" in d.reason for d in plan.declined)
+    assert plan.is_total
+    assert sorted(c.axis for c in plan.conditions) == [0, 0, 1, 1]
+    assert len(plan.certificates) == 2  # one support matrix per constrained axis
 
 
 def test_a_declined_condition_prints_what_it_was_and_why() -> None:
-    dom = pde.Domain(("x", "y"), ((0.0, 1.0), (0.0, 1.0)))
-    plan = plan_hard_conditions(pde.poisson(dom, source=0.0, boundary=0.0))
-    text = str(plan.declined[0])
+    dom = pde.Domain(("x",), ((0.0, 1.0),))
+    sys = replace(
+        pde.poisson(dom, source=0.0, boundary=0.0),
+        boundary=(pde.BoundaryCondition(component="u", kind="periodic"),),
+    )
+    text = str(plan_hard_conditions(sys).declined[0])
     assert text.startswith("boundary[0] on 'u':")
-    assert "Stage A" in text
+    assert "no seam" in text
 
 
 # --------------------------------------------------------------------------- #
@@ -271,3 +315,143 @@ def test_auto_mode_does_wrap_the_field() -> None:
         _poisson(), hidden=16, seed=0, collocation=SMALL, hard_conditions="auto"
     )
     assert isinstance(sol.field, ConstrainedExpressionField)
+
+
+# --------------------------------------------------------------------------- #
+# Two spatial axes: what the Stage A gate used to decline.
+# --------------------------------------------------------------------------- #
+def _square():
+    """2-D Poisson, ``u = sin(pi x) sin(pi y)``, zero on all four faces."""
+    dom = pde.Domain(("x", "y"), ((0.0, 1.0), (0.0, 1.0)))
+
+    def source(c):
+        xp = pde.array_namespace(c)
+        return -2.0 * (math.pi**2) * xp.sin(math.pi * c[:, 0]) * xp.sin(math.pi * c[:, 1])
+
+    return pde.poisson(dom, source=source, boundary=0.0)
+
+
+def _square_faces(sol) -> float:
+    worst = 0.0
+    rng = np.random.default_rng(4)
+    for axis in (0, 1):
+        for value in (0.0, 1.0):
+            pts = rng.uniform(0.0, 1.0, size=(48, 2))
+            pts[:, axis] = value
+            worst = max(worst, float(sol.evaluate(pts, "u").detach().abs().max()))
+    return worst
+
+
+def test_all_four_faces_of_a_square_hold_after_a_solve() -> None:
+    torch.set_default_dtype(torch.float64)
+    sol = pt.solve_least_squares(
+        _square(),
+        hidden=48,
+        seed=0,
+        collocation=pde.CollocationSpec(n_interior=12, n_boundary=8),
+        hard_conditions="auto",
+    )
+    assert sol.diagnostics["hard_absorbed"] == 4
+    assert _square_faces(sol) < EXACT
+    assert _full_condition_residual(sol) < EXACT
+
+
+def test_two_absorbed_axes_beat_the_soft_arm_inside_the_square() -> None:
+    """Corners are where a soft arm is worst, so this is the honest comparison."""
+    torch.set_default_dtype(torch.float64)
+    spec = pde.CollocationSpec(n_interior=20, n_boundary=20)
+    hard = pt.solve_least_squares(
+        _square(), hidden=64, seed=0, collocation=spec, hard_conditions="auto"
+    )
+    soft = pt.solve_least_squares(_square(), hidden=64, seed=0, collocation=spec)
+    rng = np.random.default_rng(11)
+    pts = rng.uniform(0.0, 1.0, size=(400, 2))
+    want = np.sin(math.pi * pts[:, 0]) * np.sin(math.pi * pts[:, 1])
+
+    def rel(sol) -> float:
+        u = sol.evaluate(pts, "u").detach().numpy()
+        return float(np.linalg.norm(u - want) / np.linalg.norm(want))
+
+    assert _square_faces(hard) < EXACT
+    assert _square_faces(soft) > 1e-3, "the soft arm must not accidentally be exact"
+    assert rel(hard) < rel(soft)
+
+
+# --------------------------------------------------------------------------- #
+# Periodicity, which nothing enforced on this route before.
+# --------------------------------------------------------------------------- #
+def _periodic_poisson():
+    """``u'' = -(2 pi)^2 sin(2 pi x)`` on a periodic interval."""
+    dom = pde.Domain(("x",), ((0.0, 1.0),), periodic=True)
+
+    def source(c):
+        xp = pde.array_namespace(c)
+        return -((2.0 * math.pi) ** 2) * xp.sin(2.0 * math.pi * c[:, 0])
+
+    sys = pde.poisson(dom, source=source, boundary=0.0)
+    return replace(
+        sys,
+        boundary=(pde.BoundaryCondition(component="u", kind="periodic", axis="x"),),
+    )
+
+
+def _seam(sol) -> tuple[float, float]:
+    ends = np.array([[0.0], [1.0]])
+    value = sol.evaluate(ends, "u").detach()
+    state = sol.field(torch.as_tensor(ends, dtype=torch.float64))
+    slope = state.ops.derivative(state, "u", axis=0, order=1).detach()
+    return float((value[0] - value[1]).abs()), float((slope[0] - slope[1]).abs())
+
+
+def test_a_periodic_seam_closes_exactly_when_absorbed() -> None:
+    torch.set_default_dtype(torch.float64)
+    sol = pt.solve_least_squares(
+        _periodic_poisson(),
+        hidden=48,
+        seed=0,
+        collocation=pde.CollocationSpec(n_interior=48),
+        hard_conditions="auto",
+    )
+    assert sol.diagnostics["hard_absorbed"] == 2  # value and slope across the seam
+    value_gap, slope_gap = _seam(sol)
+    assert value_gap < EXACT
+    assert slope_gap < EXACT
+    assert _full_condition_residual(sol) < EXACT
+
+
+def test_a_seam_and_an_initial_condition_are_absorbed_together() -> None:
+    """A relative constraint on one axis, a pointwise one on the other."""
+    torch.set_default_dtype(torch.float64)
+    sol = pt.solve_least_squares(
+        _periodic_heat(),
+        hidden=48,
+        seed=0,
+        collocation=pde.CollocationSpec(n_interior=10, n_boundary=10),
+        hard_conditions="auto",
+    )
+    assert sol.diagnostics["hard_absorbed"] == 3
+    assert _full_condition_residual(sol) < EXACT
+    pts = np.stack(
+        [np.full(40, 0.0), np.linspace(0.0, 1.0, 40)], axis=-1
+    )  # the initial slice
+    u = sol.evaluate(pts, "u").detach().numpy()
+    assert np.abs(u - np.sin(2.0 * math.pi * pts[:, 1])).max() < EXACT
+
+
+def test_the_soft_arm_now_at_least_sees_the_seam() -> None:
+    """It used to contribute no rows at all, so the condition did nothing.
+
+    This is the falsifier for that fix: a genuinely unenforced seam on this
+    problem drifts by order 100, because ``u'' = f`` pins the solution only up
+    to ``a x + b`` and nothing was removing the ``a``.
+    """
+    torch.set_default_dtype(torch.float64)
+    sol = pt.solve_least_squares(
+        _periodic_poisson(),
+        hidden=48,
+        seed=0,
+        collocation=pde.CollocationSpec(n_interior=48),
+    )
+    value_gap, _ = _seam(sol)
+    assert 0.0 < value_gap < 1e-3
+    assert condition_residual(sol.field, sol.system, SMALL, None).numel() > 0

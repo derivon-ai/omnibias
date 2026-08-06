@@ -45,10 +45,16 @@ from typing import Any
 import torch
 from omnibias.pinn._core.constrained import (
     AxisPlan,
+    CornerPair,
     HardCondition,
     apply_constraint,
     certify_support_matrix,
+    compatibility_sample,
+    corner_pairs,
+    face_point,
     group_hard_conditions,
+    is_relative,
+    projection_cost,
     switching_derivative_coeffs,
 )
 from omnibias.pinn._core.state import FieldState
@@ -85,16 +91,23 @@ class ConstrainedExpressionField(_CageFieldBase):
         is the gate that makes the ansatz exact rather than merely plausible, so
         turning it off is only for a caller who has already certified the same
         condition set.
+    check_data
+        Refuse condition *data* that disagrees where two axes meet (default).
+        The check evaluates only the targets, never the field, so it costs
+        almost nothing and it runs before any training does.
     compatibility_tol
-        Tolerance for the cross-axis data-compatibility check
-        (:meth:`compatibility_residual`). Incompatible data leaves an order-one
-        error, so this separates cleanly from round-off.
+        Tolerance for that check (:meth:`compatibility_residual`). Incompatible
+        data leaves an order-one error, so this separates cleanly from round-off.
 
     Notes
     -----
-    Cost is one base evaluation per *distinct projection point* plus one for the
-    collocation batch. Conditions sharing a face -- a value and a slope at the
-    same end, say -- share that evaluation.
+    Cost is one base evaluation per *distinct combination* of projection points
+    across the constrained axes, i.e. the product over axes of
+    ``1 + #projection points``: a face carrying both a value and a slope still
+    costs one, but a second constrained axis multiplies rather than adds. That
+    is the price of exact corners, and it is why absorbing every face of a 3-D
+    box is a deliberate choice rather than a free one. :attr:`projection_cost`
+    reports the number for a given condition set.
     """
 
     def __init__(
@@ -106,6 +119,7 @@ class ConstrainedExpressionField(_CageFieldBase):
         passthrough_names: tuple[str, ...] = (),
         groups: dict[str, tuple[str, ...]] | None = None,
         certify: bool = True,
+        check_data: bool = True,
         compatibility_tol: float = 1e-8,
     ) -> None:
         if not conditions:
@@ -119,6 +133,13 @@ class ConstrainedExpressionField(_CageFieldBase):
                 "hard conditions need per-axis (lo, hi) bounds: pass `bounds=` or "
                 "build the base field with a CoordinateSpec carrying `domain=`"
             )
+        for cond in conditions:
+            if is_relative(cond.constraint) and callable(cond.target):
+                raise ValueError(
+                    f"relative constraint {cond.constraint.label!r} ties several "
+                    "points together, so its target belongs to no single face and "
+                    "must be a constant"
+                )
         plans = group_hard_conditions(conditions, tuple(resolved))
         constrained = tuple(plans)
         overlap = set(constrained) & set(passthrough_names)
@@ -134,10 +155,23 @@ class ConstrainedExpressionField(_CageFieldBase):
         )
         self._plans = plans
         self._bounds = tuple(resolved)
+        self._pairs = corner_pairs(plans)
         self.compatibility_tol = float(compatibility_tol)
         self.certified = bool(certify)
         if certify:
             self.support_certificates()
+        if check_data and self._pairs:
+            self.check_compatibility()
+
+    @property
+    def projection_cost(self) -> int:
+        """Base-field evaluations one forward pass costs.
+
+        The product over constrained axes of ``1 + #projection points``, shared
+        across components. See
+        :func:`omnibias.pinn._core.constrained.projection_cost`.
+        """
+        return projection_cost(self._plans)
 
     def support_certificates(self) -> dict[str, tuple[dict[str, Any], ...]]:
         """Sealed certificates that every constrained axis admits an exact ansatz.
@@ -226,7 +260,7 @@ class ConstrainedExpressionField(_CageFieldBase):
 
     def _target_partial(
         self,
-        inner_state: FieldState,
+        coords: Tensor,
         target: Any,
         pins: Pins,
         orders: tuple[int, ...],
@@ -238,7 +272,6 @@ class ConstrainedExpressionField(_CageFieldBase):
         cage is not closed form, and only because the target is the user's own
         function rather than the network.
         """
-        coords = inner_state.coords
         zeros = torch.zeros(coords.shape[0], dtype=coords.dtype, device=coords.device)
         if not callable(target):
             if any(orders):
@@ -311,8 +344,9 @@ class ConstrainedExpressionField(_CageFieldBase):
             phi = self._switching(step, i, orders[axis], xi)
             if phi is None:
                 continue
-            face: Pins = _with_pin(pins, axis, constraint.points[0])
-            rho = self._target_partial(inner_state, step.targets[i], face, rest)
+            point = face_point(constraint)
+            face: Pins = pins if point is None else _with_pin(pins, axis, point)
+            rho = self._target_partial(inner_state.coords, step.targets[i], face, rest)
             rho = rho - apply_constraint(
                 constraint,
                 lambda point, order, _rest=rest: self._level(  # type: ignore[misc]
@@ -391,15 +425,98 @@ class ConstrainedExpressionField(_CageFieldBase):
 
     # ----- the cross-axis data gate -----------------------------------
 
-    def compatibility_residual(self, coords: Tensor) -> float:
-        r"""How badly the condition data disagrees where two axes meet.
+    def _sample(self, coords: Tensor | None) -> Tensor:
+        """The caller's points, or the shared deterministic lattice over ``bounds``."""
+        if coords is not None:
+            return coords
+        ref = next(self.parameters(), None)
+        return torch.tensor(
+            compatibility_sample(self._bounds),
+            dtype=torch.get_default_dtype() if ref is None else ref.dtype,
+            device=None if ref is None else ref.device,
+        )
 
-        For every pair of constrained axes the data must satisfy
+    def _corner_gap(self, coords: Tensor, pair: CornerPair) -> Tensor:
+        r""":math:`C^a_k[t^b_l] - C^b_l[t^a_k]` on the sample.
+
+        Each side pins the *other* condition's face and applies this condition's
+        functional along its own axis, which is why a relative constraint (no
+        single face) is required to carry a constant target.
+        """
+        ndim = self.coordinate_spec.ndim
+        pin_a = face_point(pair.constraint_a)
+        pin_b = face_point(pair.constraint_b)
+        base_a: Pins = () if pin_a is None else ((pair.axis_a, pin_a),)
+        base_b: Pins = () if pin_b is None else ((pair.axis_b, pin_b),)
+        lhs = apply_constraint(
+            pair.constraint_a,
+            lambda point, order: self._target_partial(
+                coords,
+                pair.target_b,
+                _with_pin(base_b, pair.axis_a, point),
+                tuple(order if a == pair.axis_a else 0 for a in range(ndim)),
+            ),
+        )
+        rhs = apply_constraint(
+            pair.constraint_b,
+            lambda point, order: self._target_partial(
+                coords,
+                pair.target_a,
+                _with_pin(base_a, pair.axis_b, point),
+                tuple(order if a == pair.axis_b else 0 for a in range(ndim)),
+            ),
+        )
+        return lhs - rhs
+
+    def worst_corner(self, coords: Tensor | None = None) -> tuple[float, CornerPair | None]:
+        """The largest cross-axis data disagreement, and which pair carries it."""
+        sample = self._sample(coords)
+        worst = 0.0
+        culprit: CornerPair | None = None
+        for pair in self._pairs:
+            gap = float(self._corner_gap(sample, pair).abs().max().detach())
+            if gap >= worst:
+                worst, culprit = gap, pair
+        return worst, culprit
+
+    def compatibility_residual(self, coords: Tensor | None = None) -> float:
+        r"""How badly the condition *data* disagrees where two axes meet.
+
+        For every pair of conditions on different axes the data must satisfy
         :math:`C^a_k[t^b_l] = C^b_l[t^a_k]` -- physically, the initial state must
-        already satisfy the boundary condition at ``t = t0``. The construction
-        cannot repair inconsistent data, and does not pretend to: this returns
-        the size of the disagreement, which is order one when it is real and
-        round-off when it is not.
+        already satisfy the boundary condition at ``t = t0``, and its slope must
+        match too. The construction cannot repair inconsistent data and does not
+        pretend to: what it would do instead is satisfy the last axis it embeds
+        and quietly lose the earlier one. This returns the size of the
+        disagreement, which is order one when it is real and round-off when it
+        is not.
+
+        Only the targets are evaluated, so this is cheap and says nothing about
+        the network; :meth:`condition_residual` is the check that the built
+        expression really does satisfy what it claims.
+        """
+        return self.worst_corner(coords)[0]
+
+    def check_compatibility(self, coords: Tensor | None = None) -> None:
+        """Raise when the condition data is inconsistent across axes."""
+        residual, pair = self.worst_corner(coords)
+        if residual > self.compatibility_tol:
+            where = f" ({pair.label})" if pair is not None else ""
+            raise ValueError(
+                f"hard conditions are mutually inconsistent: residual {residual:.3e} "
+                f"exceeds {self.compatibility_tol:.3e}{where}. The conditions on "
+                "different axes disagree where those axes meet (typically the "
+                "initial state does not satisfy the boundary condition at t0); no "
+                "ansatz can satisfy both, so the data must be reconciled first"
+            )
+
+    def condition_residual(self, coords: Tensor) -> float:
+        """How far the built expression is from the conditions it claims to enforce.
+
+        The falsifier for the construction itself: it re-applies every declared
+        functional to the *assembled* field and compares against the target, so
+        a recursion that quietly dropped a term shows up here as an order-one
+        number rather than as a slightly worse fit.
         """
         worst = 0.0
         state = self.base.evaluate(coords)
@@ -421,26 +538,13 @@ class ConstrainedExpressionField(_CageFieldBase):
                             memo,
                         ),
                     )
+                    point = face_point(constraint)
+                    face: Pins = () if point is None else ((axis, point),)
                     want = self._target_partial(
-                        state,
-                        step.targets[i],
-                        ((axis, constraint.points[0]),),
-                        (0,) * ndim,
+                        state.coords, step.targets[i], face, (0,) * ndim
                     )
                     worst = max(worst, float((got - want).abs().max().detach()))
         return worst
-
-    def check_compatibility(self, coords: Tensor) -> None:
-        """Raise when the condition data is inconsistent across axes."""
-        residual = self.compatibility_residual(coords)
-        if residual > self.compatibility_tol:
-            raise ValueError(
-                f"hard conditions are mutually inconsistent: residual {residual:.3e} "
-                f"exceeds {self.compatibility_tol:.3e}. The conditions on different "
-                "axes disagree where those axes meet (typically the initial state "
-                "does not satisfy the boundary condition at t0); no ansatz can "
-                "satisfy both, so the data must be reconciled first"
-            )
 
 
 def _with_pin(pins: Pins, axis: int, value: float) -> Pins:

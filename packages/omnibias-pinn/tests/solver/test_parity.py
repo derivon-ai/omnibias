@@ -102,6 +102,38 @@ def test_parity_advection_diffusion_coupled() -> None:
     np.testing.assert_allclose(tr, jr, rtol=1e-9, atol=1e-10)
 
 
+def test_parity_periodic_seam_rows() -> None:
+    """The seam rows are new, and the two backends build them independently.
+
+    A backend that matched only the value and not the slope would still produce
+    a plausible-looking solve, so the row count is asserted alongside the values.
+    """
+    from dataclasses import replace
+
+    from omnibias.pinn.solver._core.sampling import boundary_points
+
+    dom = pde.Domain(("x", "y"), ((0.0, 1.0), (0.0, 1.0)), periodic=(True, False))
+
+    def source(c):
+        xp = pde.array_namespace(c)
+        return -((2.0 * math.pi) ** 2) * xp.sin(2.0 * math.pi * c[:, 0])
+
+    system = replace(
+        pde.poisson(dom, source=source, boundary=0.0),
+        boundary=(pde.BoundaryCondition(component="u", kind="periodic", axis="x"),),
+    )
+    spec = pde.CollocationSpec(n_interior=8, n_boundary=6)
+    n_seam = boundary_points(dom, spec, axis="x", side="lo").shape[0]
+
+    tfield, jfield = _matched_fields(system, hidden=24, seed=3)
+    with torch.no_grad():
+        tr = tabm.condition_residual(tfield, system, spec, None).detach().numpy()
+    jr = np.asarray(ja.condition_residual(jfield, system, spec, None))
+
+    assert tr.shape == jr.shape == (2 * n_seam,)  # value and slope, per point
+    np.testing.assert_allclose(tr, jr, rtol=1e-10, atol=1e-10)
+
+
 def test_parity_linear_solve_converges_on_both_backends() -> None:
     """The linear collocation driver reaches the manufactured solution on both.
 
