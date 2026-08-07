@@ -1,0 +1,76 @@
+{
+  "schema": "operator_shared_grid/v1",
+  "generated_utc": "2026-08-07T18:21:47Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "seed": 0,
+    "F_values": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32
+    ],
+    "Q": 64,
+    "diffusivity": 0.1,
+    "warmup": 2,
+    "repeats": 5,
+    "trunk_width": 16,
+    "jet_order": 2
+  },
+  "rss_mb_at_start": 682.25,
+  "rows": [
+    {
+      "F": 1,
+      "shared_median_ms": 2.0791,
+      "loop_median_ms": 1.8858,
+      "speedup": 0.907,
+      "max_abs_diff": 0.0
+    },
+    {
+      "F": 2,
+      "shared_median_ms": 2.0316,
+      "loop_median_ms": 3.866,
+      "speedup": 1.9029,
+      "max_abs_diff": 6.938893903907228e-17
+    },
+    {
+      "F": 4,
+      "shared_median_ms": 2.1003,
+      "loop_median_ms": 8.1567,
+      "speedup": 3.8836,
+      "max_abs_diff": 1.3877787807814457e-16
+    },
+    {
+      "F": 8,
+      "shared_median_ms": 2.2455,
+      "loop_median_ms": 16.3556,
+      "speedup": 7.2838,
+      "max_abs_diff": 1.1796119636642288e-16
+    },
+    {
+      "F": 16,
+      "shared_median_ms": 2.3088,
+      "loop_median_ms": 33.4905,
+      "speedup": 14.5055,
+      "max_abs_diff": 8.326672684688674e-17
+    },
+    {
+      "F": 32,
+      "shared_median_ms": 2.9152,
+      "loop_median_ms": 70.8573,
+      "speedup": 24.3058,
+      "max_abs_diff": 1.942890293094024e-16
+    }
+  ],
+  "elapsed_seconds": 1.392
+}

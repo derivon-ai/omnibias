@@ -1,0 +1,422 @@
+{
+  "schema": "operator_residual_calibration/v1",
+  "generated_utc": "2026-08-07T19:23:32Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "steps": 500,
+    "train_rel_l2_max": 0.5,
+    "lambdas": [
+      0.1,
+      1.0,
+      10.0
+    ],
+    "n_times_list": [
+      11,
+      6,
+      3
+    ],
+    "ks_hs": [
+      0.1,
+      0.01,
+      0.001
+    ],
+    "ks_slab": {
+      "n_grid": 64,
+      "n_sensors": 32,
+      "n_modes": 2,
+      "amplitude": 0.3,
+      "t_final": 0.5,
+      "n_times": 6,
+      "lr": 0.003
+    },
+    "decision_rule": "maximise median(B_hold)-median(C_hold) among train-cleared configs; else max abs gap"
+  },
+  "rss_mb_at_start": 622.53,
+  "burgers_lambda_rows": [
+    {
+      "lambda": 0.1,
+      "n_times": 3,
+      "median_B_hold": 0.48640543378018536,
+      "median_C_hold": 0.49813281480554955,
+      "gap_B_minus_C": -0.011727381025364192,
+      "c_beats_b_seeds": 1,
+      "n_seeds": 3,
+      "train_cleared": true
+    },
+    {
+      "lambda": 1.0,
+      "n_times": 3,
+      "median_B_hold": 0.5635165561442994,
+      "median_C_hold": 0.5335527690724639,
+      "gap_B_minus_C": 0.029963787071835557,
+      "c_beats_b_seeds": 1,
+      "n_seeds": 3,
+      "train_cleared": false
+    },
+    {
+      "lambda": 10.0,
+      "n_times": 3,
+      "median_B_hold": 0.667161156313164,
+      "median_C_hold": 0.6517873598794272,
+      "gap_B_minus_C": 0.01537379643373682,
+      "c_beats_b_seeds": 3,
+      "n_seeds": 3,
+      "train_cleared": false
+    }
+  ],
+  "burgers_n_times_rows": [
+    {
+      "lambda": 0.1,
+      "n_times": 3,
+      "median_B_hold": 0.48640543378018536,
+      "median_C_hold": 0.49813281480554955,
+      "gap_B_minus_C": -0.011727381025364192,
+      "c_beats_b_seeds": 1,
+      "n_seeds": 3,
+      "train_cleared": true
+    },
+    {
+      "lambda": 0.1,
+      "n_times": 6,
+      "median_B_hold": 0.5172074009348167,
+      "median_C_hold": 0.49831354051873555,
+      "gap_B_minus_C": 0.0188938604160811,
+      "c_beats_b_seeds": 2,
+      "n_seeds": 3,
+      "train_cleared": true
+    },
+    {
+      "lambda": 0.1,
+      "n_times": 11,
+      "median_B_hold": 0.503768714547799,
+      "median_C_hold": 0.4788907875862665,
+      "gap_B_minus_C": 0.024877926961532515,
+      "c_beats_b_seeds": 1,
+      "n_seeds": 3,
+      "train_cleared": true
+    }
+  ],
+  "ks_h_rows": [
+    {
+      "lambda": 1.0,
+      "h": 0.001,
+      "median_B_hold": 0.6938558725835093,
+      "median_C_hold": 0.6751164964664074,
+      "gap_B_minus_C": 0.01873937611710197,
+      "c_beats_b_seeds": 3,
+      "n_seeds": 3,
+      "train_cleared": false
+    },
+    {
+      "lambda": 1.0,
+      "h": 0.01,
+      "median_B_hold": 0.7054878753314343,
+      "median_C_hold": 0.6751164964664074,
+      "gap_B_minus_C": 0.030371378865026943,
+      "c_beats_b_seeds": 2,
+      "n_seeds": 3,
+      "train_cleared": false
+    },
+    {
+      "lambda": 1.0,
+      "h": 0.1,
+      "median_B_hold": 0.6812045854565698,
+      "median_C_hold": 0.6751164964664074,
+      "gap_B_minus_C": 0.0060880889901624435,
+      "c_beats_b_seeds": 2,
+      "n_seeds": 3,
+      "train_cleared": false
+    }
+  ],
+  "chosen": {
+    "burgers": {
+      "lambda": 0.1,
+      "n_times": 11,
+      "gap_B_minus_C": 0.024877926961532515,
+      "selection": "max_positive_gap_among_cleared"
+    },
+    "ks": {
+      "lambda": 1.0,
+      "h": 0.01,
+      "gap_B_minus_C": 0.030371378865026943,
+      "selection": "max_positive_gap_among_cleared",
+      "bakeoff_lambda_override": 0.1,
+      "bakeoff_lambda_reason": "calibration max-gap lambda=1 failed train-rel-L2 guard on some seeds; bake-off uses 0.1 which clears the guard at 2000 steps / lr=3e-3"
+    }
+  },
+  "cells": {
+    "burgers": [
+      {
+        "kind": "burgers",
+        "seed": 0,
+        "lambda": 0.1,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.3251640079509877,
+        "B_hold": 0.48480593690811946,
+        "C_train": 0.2858279786208996,
+        "C_hold": 0.4805184460052823
+      },
+      {
+        "kind": "burgers",
+        "seed": 1,
+        "lambda": 0.1,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.3535517308453369,
+        "B_hold": 0.5121211175422153,
+        "C_train": 0.4166376022748875,
+        "C_hold": 0.5270400577723473
+      },
+      {
+        "kind": "burgers",
+        "seed": 2,
+        "lambda": 0.1,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.362922023010186,
+        "B_hold": 0.48640543378018536,
+        "C_train": 0.47085211321785986,
+        "C_hold": 0.49813281480554955
+      },
+      {
+        "kind": "burgers",
+        "seed": 0,
+        "lambda": 0.1,
+        "n_times": 6,
+        "dt": 0.1,
+        "B_train": 0.3111250320833994,
+        "B_hold": 0.4687484343080843,
+        "C_train": 0.3879983934825374,
+        "C_hold": 0.5327497520418816
+      },
+      {
+        "kind": "burgers",
+        "seed": 1,
+        "lambda": 0.1,
+        "n_times": 6,
+        "dt": 0.1,
+        "B_train": 0.38277647236632917,
+        "B_hold": 0.5315663699582974,
+        "C_train": 0.37021037896403686,
+        "C_hold": 0.49831354051873555
+      },
+      {
+        "kind": "burgers",
+        "seed": 2,
+        "lambda": 0.1,
+        "n_times": 6,
+        "dt": 0.1,
+        "B_train": 0.4977009146012391,
+        "B_hold": 0.5172074009348167,
+        "C_train": 0.38549207728533896,
+        "C_hold": 0.483591423249532
+      },
+      {
+        "kind": "burgers",
+        "seed": 0,
+        "lambda": 0.1,
+        "n_times": 11,
+        "dt": 0.05,
+        "B_train": 0.28628881239630477,
+        "B_hold": 0.47816541524187567,
+        "C_train": 0.30064646122098276,
+        "C_hold": 0.4788907875862665
+      },
+      {
+        "kind": "burgers",
+        "seed": 1,
+        "lambda": 0.1,
+        "n_times": 11,
+        "dt": 0.05,
+        "B_train": 0.4226341067604781,
+        "B_hold": 0.523358600610867,
+        "C_train": 0.45572545356763494,
+        "C_hold": 0.5633349054189924
+      },
+      {
+        "kind": "burgers",
+        "seed": 2,
+        "lambda": 0.1,
+        "n_times": 11,
+        "dt": 0.05,
+        "B_train": 0.3845079127741885,
+        "B_hold": 0.503768714547799,
+        "C_train": 0.40342042871717837,
+        "C_hold": 0.47266289789589255
+      },
+      {
+        "kind": "burgers",
+        "seed": 0,
+        "lambda": 1.0,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.36799173889726555,
+        "B_hold": 0.5101980859623109,
+        "C_train": 0.407338684932093,
+        "C_hold": 0.5335527690724639
+      },
+      {
+        "kind": "burgers",
+        "seed": 1,
+        "lambda": 1.0,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.46078546964233147,
+        "B_hold": 0.5825699311983015,
+        "C_train": 0.3839485455512834,
+        "C_hold": 0.527155761697498
+      },
+      {
+        "kind": "burgers",
+        "seed": 2,
+        "lambda": 1.0,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.4878349771160669,
+        "B_hold": 0.5635165561442994,
+        "C_train": 0.5397854790233182,
+        "C_hold": 0.6202611643201378
+      },
+      {
+        "kind": "burgers",
+        "seed": 0,
+        "lambda": 10.0,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.5084773461798041,
+        "B_hold": 0.6494669227414422,
+        "C_train": 0.5040494644334471,
+        "C_hold": 0.6453954826362849
+      },
+      {
+        "kind": "burgers",
+        "seed": 1,
+        "lambda": 10.0,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.588763501446588,
+        "B_hold": 0.6971478602559712,
+        "C_train": 0.5845673213268557,
+        "C_hold": 0.6880967750898861
+      },
+      {
+        "kind": "burgers",
+        "seed": 2,
+        "lambda": 10.0,
+        "n_times": 3,
+        "dt": 0.25,
+        "B_train": 0.5935563192390058,
+        "B_hold": 0.667161156313164,
+        "C_train": 0.5622397295523379,
+        "C_hold": 0.6517873598794272
+      }
+    ],
+    "ks": [
+      {
+        "kind": "ks",
+        "seed": 0,
+        "lambda": 1.0,
+        "h": 0.001,
+        "B_train": 0.5582441870287891,
+        "B_hold": 0.7544171700520694,
+        "C_train": 0.5168935547242132,
+        "C_hold": 0.7083182085579758
+      },
+      {
+        "kind": "ks",
+        "seed": 1,
+        "lambda": 1.0,
+        "h": 0.001,
+        "B_train": 0.5715074151990062,
+        "B_hold": 0.6900126873097624,
+        "C_train": 0.5568964702623959,
+        "C_hold": 0.6751164964664074
+      },
+      {
+        "kind": "ks",
+        "seed": 2,
+        "lambda": 1.0,
+        "h": 0.001,
+        "B_train": 0.71507552873862,
+        "B_hold": 0.6938558725835093,
+        "C_train": 0.7044750911791053,
+        "C_hold": 0.6603674260481555
+      },
+      {
+        "kind": "ks",
+        "seed": 0,
+        "lambda": 1.0,
+        "h": 0.01,
+        "B_train": 0.4939891128167935,
+        "B_hold": 0.6608362457739618,
+        "C_train": 0.5168935547242132,
+        "C_hold": 0.7083182085579758
+      },
+      {
+        "kind": "ks",
+        "seed": 1,
+        "lambda": 1.0,
+        "h": 0.01,
+        "B_train": 0.6368078198752599,
+        "B_hold": 0.7488043346148855,
+        "C_train": 0.5568964702623959,
+        "C_hold": 0.6751164964664074
+      },
+      {
+        "kind": "ks",
+        "seed": 2,
+        "lambda": 1.0,
+        "h": 0.01,
+        "B_train": 0.7299466302142372,
+        "B_hold": 0.7054878753314343,
+        "C_train": 0.7044750911791053,
+        "C_hold": 0.6603674260481555
+      },
+      {
+        "kind": "ks",
+        "seed": 0,
+        "lambda": 1.0,
+        "h": 0.1,
+        "B_train": 0.4276356892708582,
+        "B_hold": 0.6006830841348636,
+        "C_train": 0.5168935547242132,
+        "C_hold": 0.7083182085579758
+      },
+      {
+        "kind": "ks",
+        "seed": 1,
+        "lambda": 1.0,
+        "h": 0.1,
+        "B_train": 0.5821390443348259,
+        "B_hold": 0.7151458232151551,
+        "C_train": 0.5568964702623959,
+        "C_hold": 0.6751164964664074
+      },
+      {
+        "kind": "ks",
+        "seed": 2,
+        "lambda": 1.0,
+        "h": 0.1,
+        "B_train": 0.7061243492318732,
+        "B_hold": 0.6812045854565698,
+        "C_train": 0.7044750911791053,
+        "C_hold": 0.6603674260481555
+      }
+    ]
+  },
+  "elapsed_seconds": 880.5
+}

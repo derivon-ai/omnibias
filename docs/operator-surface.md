@@ -67,6 +67,29 @@ contract and its tests live in
 [`omnibias.torch.fastpath.dispatch`](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-torch/src/omnibias/torch/fastpath/dispatch.py)
 and `packages/omnibias-torch/tests/test_integral_primitives.py`.
 
+## Three distinct senses of "operator" (do not conflate)
+
+"Operator" names three *different* objects in omnibias. Qualify which one you
+mean:
+
+1. **`OperatorBlock` / OMBU** -- the activation-level multi-bias unit
+   (`omnibias.torch.blocks.operator`, the six roles above). Acts on scalar
+   channels; closed-form derivative / antiderivative tower. This is what
+   *this page* is about.
+2. **Field operators** -- `grad` / `div` / `curl` / `laplacian` / `hessian` /
+   `jacobian` / ... applied to a typed `FieldState`
+   (`omnibias.fields`, `omnibias.pinn`). Closed-form when the field declares a
+   dispatch tag (`one_layer`, `jet_mlp`, `spectral`, ...).
+3. **Neural operator learning** -- a map between function spaces,
+   `G: u(.) ↦ v(.)` (`omnibias.pinn.operator`: DeepONet / FNO). The DeepONet
+   trunk is a jet field, so *query-coordinate* derivatives of `G(u)` are
+   closed form; FNO derivatives stay FFT-based and periodic-grid-bound. This
+   is *not* an `OperatorBlock` and is *not* a field operator.
+
+Senses 1-3 are all real capabilities. Do not cite this page for sense 3
+claims: the code of record for neural operators is
+[`omnibias.pinn.operator`](api/pinn-operator.md).
+
 ## Three distinct senses of "integral" (do not conflate)
 
 "Integral" names three *different* objects in omnibias. Qualify which one you
@@ -112,6 +135,9 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | Rigorous multivariate integral / NN `L^p` / `H^k` norm | TM/interval + branch-and-bound | certified | `omnibias.verify.certified_domain_integral` / `certified_lp_norm` / `certified_sobolev_norm` |
 | Fractional derivative (analytic class) | Gamma-ratio jet series | closed form | `omnibias.fractional...analytic` |
 | Fractional derivative (general sampled `f`) | Grunwald-Letnikov / spectral | numerical | `omnibias.fractional...fractional` |
+| Neural operator `G(u)(y)` query derivatives (DeepONet) | trunk jet × branch coeffs | closed form | `omnibias.pinn.operator` |
+| Neural operator 4th-order residual (KS on DeepONet) | one order-4 trunk jet × live coeffs | closed form | `omnibias.pinn.operator` + shipped `KuramotoSivashinsky` |
+| Neural operator spectral-conv (FNO) | FFT multiply | numerical | `omnibias.pinn.operator` |
 
 ## Where NOT to look for a capability
 

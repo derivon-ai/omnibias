@@ -46,10 +46,18 @@ attribute-DSL views, the lazy sigma cache, and the torch/jax field-operator
 surface incl. integration, line integrals (the gradient theorem), norms,
 tensor divergence, Wirtinger),
 `omnibias-pinn` and `omnibias-qpinn` (physics-informed / quantum PINNs, built on
-`omnibias-fields`; the prebuilt residuals now include two **nonlocal** ones,
+`omnibias-fields`; hosts `omnibias.pinn.operator` for neural operator learning
+(DeepONet with closed-form trunk-jet query derivatives through order 4, so a
+shipped KS residual runs unchanged on one jet; `ks_residual_loss_fd` is the
+5-point FD twin for the bake-off; Burgers closed-form-vs-FD is an honest
+negative at 1st-order-in-time, KS is seed-fragile on median (5/8) against the
+≥6/8 rule; FNO baseline stays FFT-based; residual
+enclosure is not a solution-error bound; accuracy is optimised not proven); the
+prebuilt residuals now include two **nonlocal** ones,
 `Fredholm` and `Volterra` integral equations, which re-evaluate the field at the
 quadrature nodes -- free, since an omnibias field is a function -- with the causal
 variant kept mesh-free by an affine pullback onto a single reference rule),
+
 `omnibias-curvature` (closed-form Hessian/Fisher/KFAC, plus the
 `eps -> 0` rank/regularization collapse: a min-norm / Tikhonov solver with a certified
 conditioning bound in `omnibias.core.verified.conditioning`),
@@ -466,7 +474,9 @@ measured verdict.
 - [PINN partition of unity across an interface (soft partition captures a kink a single smooth field cannot; certified soft->hard gap)](docs/examples/partitioned_pinn.py)
 - [Conservative shock-capturing Burgers PINN (flux-form cage over a partitioned potential: div G = 0 to machine epsilon across a sharp moving seam, and tighter global mass balance than a non-conservative arm at equal budget as the layer goes under-resolved; conservation is structural, accuracy is optimised, entropy admissibility is out of scope)](docs/examples/pinn_burgers_shock.py)
 - [Hard boundary / initial conditions for PINNs (constrained-expression cage: Dirichlet / Neumann / Robin / initial-velocity / periodic-seam conditions satisfied identically for any parameters, over any number of axes with exact edges and corners; support-matrix invertibility sealed as a certificate, incompatible cross-axis data refused at construction, and solver auto-detection that deletes the absorbed rows from the loss; for time-dependent periodic spatial axes prefer `basis="spectral"` / `SpectralVectorField`)](docs/examples/pinn_hard_conditions.py)
+- [PINN operator learning (DeepONet with closed-form query-coordinate trunk jet through order 4 so a shipped KS residual costs one jet; ks_residual_loss_fd 5-point twin; Burgers bake-off honest-negative vs FD-u_t; KS bake-off median-win but seed-fragile vs ≥6/8 rule; measured FD accuracy floor; shared-grid scaling; FNO remains FFT-based/periodic; residual enclosure over a sensor/coefficient family is sound but not a solution-error bound; operator accuracy is optimised not proven; sense 3 of docs/operator-surface.md, not OperatorBlock)](docs/examples/pinn_operator_learning.py)
 - [QPINN harmonic oscillator](docs/examples/qpinn_tise_qho.py)
+
 - [PDE solver: coupled reaction-diffusion](docs/examples/pde_reaction_diffusion.py)
 - [Convex LP by gradient descent (bias collapse)](docs/examples/convex_lp_gradient_descent.py)
 - [Certified-safe learned control (learned-Lagrangian CBF filter)](docs/examples/control_learned_lagrangian_cbf.py)

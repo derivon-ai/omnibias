@@ -1,5 +1,6 @@
 # Authored-strict module allowlist for the curated beta packages
-# (omnibias-fields / omnibias-geometry).
+# (omnibias-fields / omnibias-geometry) and the authored-strict
+# omnibias.pinn.operator surface.
 #
 # These packages are NOT on the blanket `mypy --strict` gate: their
 # bulk-copied torch/jax field-operator modules carry systematic
@@ -30,3 +31,18 @@ packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/certificates.py
 packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/gap.py
 packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/matrices.py
 packages/omnibias-geometry/src/omnibias/geometry/gauge/transfer/montecarlo.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/__init__.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/_core/__init__.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/_core/sensors.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/_core/spec.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/_core/verified.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/jax/__init__.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/jax/data.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/jax/deeponet.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/jax/fno.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/jax/losses.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/torch/__init__.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/torch/data.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/torch/deeponet.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/torch/fno.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/torch/losses.py

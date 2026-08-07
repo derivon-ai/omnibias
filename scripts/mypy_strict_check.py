@@ -1,16 +1,16 @@
 #!/usr/bin/env python
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Strict-typecheck the authored-strict allowlist for the curated beta packages.
+"""Strict-typecheck the authored-strict allowlist for curated packages.
 
-The curated beta packages (``omnibias-fields`` / ``omnibias-geometry``) are not
-on the blanket ``mypy --strict`` gate -- their bulk-copied torch/jax field-op
-modules carry systematic ``no-any-return`` / ``type-arg`` findings. This script
-gates the foundational, authored-strict ``_core`` substrate listed in
-``scripts/mypy_strict_allowlist.txt`` with ``--follow-imports=silent`` so the
-(ungated) backend-op modules cannot leak errors into the gate. It is an
-incremental, growing strict surface: add a module to the allowlist once it is
-clean under this exact invocation.
+The curated beta packages (``omnibias-fields`` / ``omnibias-geometry``) and the
+authored-strict ``omnibias.pinn.operator`` surface are not on the blanket
+``mypy --strict`` gate -- bulk-copied torch/jax field-op modules carry
+systematic ``no-any-return`` / ``type-arg`` findings. This script gates the
+modules listed in ``scripts/mypy_strict_allowlist.txt`` with
+``--follow-imports=silent`` so the (ungated) backend-op modules cannot leak
+errors into the gate. It is an incremental, growing strict surface: add a
+module to the allowlist once it is clean under this exact invocation.
 """
 
 from __future__ import annotations

@@ -1,0 +1,176 @@
+{
+  "schema": "operator_deeponet/v1",
+  "generated_utc": "2026-08-07T21:35:41Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "steps": 1500,
+    "viscosity": 0.05,
+    "phys_weight": 0.1,
+    "n_times": 11,
+    "dt_source": "derived_from_slab_time_column",
+    "n_samples_train": 16,
+    "n_samples_hold": 8,
+    "n_grid": 64,
+    "n_sensors": 32,
+    "n_modes": 2,
+    "amplitude": 0.5,
+    "trunk_width": 32,
+    "hidden": 64,
+    "depth": 3,
+    "train_rel_l2_max": 0.35,
+    "budget_kind": "step_count",
+    "decision_rule": "C beats B on median held-out rel-L2 -> advertise the FD truncation win; otherwise keep only structural claims / KS bake-off. If A beats both, report the honest negative. Refuse the run if any arm fails the train-rel-L2 convergence guard."
+  },
+  "rss_mb_at_start": 622.54,
+  "cells": [
+    {
+      "seed": 0,
+      "dt": 0.05,
+      "A_data_only": 0.3322593386772645,
+      "B_fd_residual": 0.30445737046670834,
+      "C_closed_form": 0.29484480503650806,
+      "A_train_rel_l2": 0.13953442133422772,
+      "B_train_rel_l2": 0.15368667399002003,
+      "C_train_rel_l2": 0.1562533354664596,
+      "A_wall_seconds": 26.074486872996204,
+      "B_wall_seconds": 375.17180166799517,
+      "C_wall_seconds": 421.0332455769967
+    },
+    {
+      "seed": 1,
+      "dt": 0.05,
+      "A_data_only": 0.2899125549012124,
+      "B_fd_residual": 0.3076287461639646,
+      "C_closed_form": 0.3237056287386252,
+      "A_train_rel_l2": 0.17047707773712673,
+      "B_train_rel_l2": 0.16509492833216716,
+      "C_train_rel_l2": 0.16545515048055678,
+      "A_wall_seconds": 26.21685707200959,
+      "B_wall_seconds": 370.71733588499774,
+      "C_wall_seconds": 422.0031515849987
+    },
+    {
+      "seed": 2,
+      "dt": 0.05,
+      "A_data_only": 0.29906379237913344,
+      "B_fd_residual": 0.3134115020400146,
+      "C_closed_form": 0.3209133995448534,
+      "A_train_rel_l2": 0.15696351231826733,
+      "B_train_rel_l2": 0.16979206711493192,
+      "C_train_rel_l2": 0.16740599918060858,
+      "A_wall_seconds": 26.244507558993064,
+      "B_wall_seconds": 371.4120652269921,
+      "C_wall_seconds": 425.8015130769927
+    },
+    {
+      "seed": 3,
+      "dt": 0.05,
+      "A_data_only": 0.25704489635092487,
+      "B_fd_residual": 0.2575768014448746,
+      "C_closed_form": 0.2598279614017067,
+      "A_train_rel_l2": 0.19025084451654878,
+      "B_train_rel_l2": 0.20325596178975275,
+      "C_train_rel_l2": 0.20507809802272825,
+      "A_wall_seconds": 26.059950777998893,
+      "B_wall_seconds": 372.8804476670048,
+      "C_wall_seconds": 424.36535235600604
+    },
+    {
+      "seed": 4,
+      "dt": 0.05,
+      "A_data_only": 0.21131654478880812,
+      "B_fd_residual": 0.23433803509416293,
+      "C_closed_form": 0.23441942788929016,
+      "A_train_rel_l2": 0.1912583211972513,
+      "B_train_rel_l2": 0.19088821760917873,
+      "C_train_rel_l2": 0.19114596458115143,
+      "A_wall_seconds": 25.771327723996365,
+      "B_wall_seconds": 375.88611668199883,
+      "C_wall_seconds": 423.1517477019952
+    },
+    {
+      "seed": 5,
+      "dt": 0.05,
+      "A_data_only": 0.2603256634672794,
+      "B_fd_residual": 0.2778686781993827,
+      "C_closed_form": 0.27686312601931234,
+      "A_train_rel_l2": 0.14901530167376992,
+      "B_train_rel_l2": 0.16374403344299093,
+      "C_train_rel_l2": 0.16109007256689775,
+      "A_wall_seconds": 26.56411185101024,
+      "B_wall_seconds": 374.9497537030111,
+      "C_wall_seconds": 422.78880957799265
+    },
+    {
+      "seed": 6,
+      "dt": 0.05,
+      "A_data_only": 0.21770439151689835,
+      "B_fd_residual": 0.23331894563105202,
+      "C_closed_form": 0.24129129796860435,
+      "A_train_rel_l2": 0.14603692531514348,
+      "B_train_rel_l2": 0.17284728781632094,
+      "C_train_rel_l2": 0.1681924488353658,
+      "A_wall_seconds": 26.193927297004848,
+      "B_wall_seconds": 373.00908775599964,
+      "C_wall_seconds": 422.47433206600545
+    },
+    {
+      "seed": 7,
+      "dt": 0.05,
+      "A_data_only": 0.25691643395603553,
+      "B_fd_residual": 0.2600769739765711,
+      "C_closed_form": 0.2616787252708966,
+      "A_train_rel_l2": 0.12802219677322418,
+      "B_train_rel_l2": 0.1437237036443575,
+      "C_train_rel_l2": 0.1422432973345879,
+      "A_wall_seconds": 26.186158695010818,
+      "B_wall_seconds": 376.25585011500516,
+      "C_wall_seconds": 422.7348728779907
+    }
+  ],
+  "decision": {
+    "median_rel_l2": {
+      "A": 0.2586852799091022,
+      "B": 0.2689728260879769,
+      "C": 0.26927092564510446
+    },
+    "iqr_rel_l2": {
+      "A": 0.06926858088297055,
+      "B": 0.06668817555780968,
+      "C": 0.06847078709088708
+    },
+    "median_wall_seconds": {
+      "A": 26.190042996007833,
+      "B": 373.97942072950536,
+      "C": 422.7618412279917
+    },
+    "c_beats_b_seeds": 2,
+    "a_beats_both_seeds": 7,
+    "n_seeds": 8,
+    "n_finite": {
+      "A": 8,
+      "B": 8,
+      "C": 8
+    },
+    "verdict": "closed-form residual (C) did not beat FD residual (B) on median held-out rel-L2 under this budget; keep the structural claims and let the KS bake-off carry the 4th-order claim"
+  },
+  "elapsed_seconds": 827.8
+}

@@ -1,0 +1,186 @@
+{
+  "schema": "operator_ks_bakeoff/v1",
+  "generated_utc": "2026-08-07T21:21:42Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7
+    ],
+    "steps": 2000,
+    "phys_weight": 0.1,
+    "fd_h": 0.01,
+    "lr": 0.003,
+    "train_rel_l2_max": 0.35,
+    "n_samples_train": 8,
+    "n_samples_hold": 4,
+    "n_grid": 64,
+    "n_sensors": 32,
+    "n_modes": 2,
+    "amplitude": 0.3,
+    "t_final": 0.5,
+    "n_times": 6,
+    "trunk_width": 32,
+    "hidden": 64,
+    "depth": 3,
+    "jet_order": 4,
+    "budget_kind": "step_count",
+    "decision_rule": "C beats B on median held-out rel-L2 AND on >=6/8 seeds -> claim the 4th-order FD-floor training win; else honest negative / structural-only. Beating A is not required.",
+    "smoke_note": "KS slab shortened vs house stiff-test (n_grid=64, t_final=0.5, amplitude=0.3) so a DeepONet clears train-rel-L2<=0.35 at lr=3e-3 / 2000 steps on CPU. Calibration picked h=0.01 and lambda=1 for max C-vs-B gap, but lambda=1 failed the train guard on seed 4 (arm B train=0.58); bake-off uses lambda=0.1 which clears the guard. Mechanism diagnostic still uses the measured FD u_xxxx floor."
+  },
+  "rss_mb_at_start": 622.4,
+  "cells": [
+    {
+      "seed": 0,
+      "A_data_only": 0.24196350778123862,
+      "B_fd_residual": 0.3271027145278799,
+      "C_closed_form": 0.18214411804318714,
+      "A_train_rel_l2": 0.06741501907396454,
+      "B_train_rel_l2": 0.17367863736470038,
+      "C_train_rel_l2": 0.045899915573875884,
+      "A_wall_seconds": 17.81183594399772,
+      "B_wall_seconds": 1701.359798638994,
+      "C_wall_seconds": 1321.054095718995,
+      "B_fd_vs_closed_u_xxxx": 1.1339944623893396e-07,
+      "C_fd_vs_closed_u_xxxx": 1.0632001172437665e-07
+    },
+    {
+      "seed": 1,
+      "A_data_only": 0.2528052025499768,
+      "B_fd_residual": 0.20126520969604905,
+      "C_closed_form": 0.3407103337128072,
+      "A_train_rel_l2": 0.04532408832121212,
+      "B_train_rel_l2": 0.036001090951329716,
+      "C_train_rel_l2": 0.13710470673282907,
+      "A_wall_seconds": 20.4198563349928,
+      "B_wall_seconds": 1597.5030290649884,
+      "C_wall_seconds": 1435.6285211429931,
+      "B_fd_vs_closed_u_xxxx": 2.844460931750127e-07,
+      "C_fd_vs_closed_u_xxxx": 1.7823966560908576e-07
+    },
+    {
+      "seed": 2,
+      "A_data_only": 0.20874978282542297,
+      "B_fd_residual": 0.2231931772213031,
+      "C_closed_form": 0.1631569876943793,
+      "A_train_rel_l2": 0.12146454372921346,
+      "B_train_rel_l2": 0.07364460638709475,
+      "C_train_rel_l2": 0.056829073365257145,
+      "A_wall_seconds": 20.07599375899008,
+      "B_wall_seconds": 1637.7003592369874,
+      "C_wall_seconds": 1417.8809847260127,
+      "B_fd_vs_closed_u_xxxx": 3.043401308215274e-07,
+      "C_fd_vs_closed_u_xxxx": 1.5270226140506882e-07
+    },
+    {
+      "seed": 3,
+      "A_data_only": 0.1882460177740021,
+      "B_fd_residual": 0.22906221431828097,
+      "C_closed_form": 0.25975218435721975,
+      "A_train_rel_l2": 0.054065759153741136,
+      "B_train_rel_l2": 0.1130439610510586,
+      "C_train_rel_l2": 0.13049903527121176,
+      "A_wall_seconds": 19.77802529699693,
+      "B_wall_seconds": 1615.4752564460068,
+      "C_wall_seconds": 1389.6236328770028,
+      "B_fd_vs_closed_u_xxxx": 6.776842863096162e-07,
+      "C_fd_vs_closed_u_xxxx": 8.89452383775132e-07
+    },
+    {
+      "seed": 4,
+      "A_data_only": 0.15878614400825417,
+      "B_fd_residual": 0.14354726819846422,
+      "C_closed_form": 0.12281954725673568,
+      "A_train_rel_l2": 0.06521856424226594,
+      "B_train_rel_l2": 0.06347017255183088,
+      "C_train_rel_l2": 0.03769759423331044,
+      "A_wall_seconds": 23.61397811200004,
+      "B_wall_seconds": 1648.0702654149936,
+      "C_wall_seconds": 1409.3882351810025,
+      "B_fd_vs_closed_u_xxxx": 3.0069447010453826e-07,
+      "C_fd_vs_closed_u_xxxx": 3.055060192058576e-07
+    },
+    {
+      "seed": 5,
+      "A_data_only": 0.29199659688187635,
+      "B_fd_residual": 0.3082703312505058,
+      "C_closed_form": 0.3056227741108264,
+      "A_train_rel_l2": 0.041724262751334645,
+      "B_train_rel_l2": 0.07385902139811629,
+      "C_train_rel_l2": 0.042826878788426934,
+      "A_wall_seconds": 22.979053312999895,
+      "B_wall_seconds": 1596.556732505007,
+      "C_wall_seconds": 1428.4190322089999,
+      "B_fd_vs_closed_u_xxxx": 5.722771299926268e-07,
+      "C_fd_vs_closed_u_xxxx": 4.4799760645294895e-07
+    },
+    {
+      "seed": 6,
+      "A_data_only": 0.1635149856578806,
+      "B_fd_residual": 0.21597496394955568,
+      "C_closed_form": 0.19137629121628005,
+      "A_train_rel_l2": 0.055710927668647985,
+      "B_train_rel_l2": 0.03475103409937715,
+      "C_train_rel_l2": 0.08257416722052374,
+      "A_wall_seconds": 18.43033344199648,
+      "B_wall_seconds": 1652.222440507001,
+      "C_wall_seconds": 1398.5537706059986,
+      "B_fd_vs_closed_u_xxxx": 5.912931117864513e-07,
+      "C_fd_vs_closed_u_xxxx": 7.218350606141041e-07
+    },
+    {
+      "seed": 7,
+      "A_data_only": 0.2015414899496173,
+      "B_fd_residual": 0.19059491080259786,
+      "C_closed_form": 0.2043829584585393,
+      "A_train_rel_l2": 0.06531943633278753,
+      "B_train_rel_l2": 0.051980317958598435,
+      "C_train_rel_l2": 0.02732705695109294,
+      "A_wall_seconds": 19.807865048991516,
+      "B_wall_seconds": 1711.0705311960046,
+      "C_wall_seconds": 1336.7829624680016,
+      "B_fd_vs_closed_u_xxxx": 9.334504121084886e-07,
+      "C_fd_vs_closed_u_xxxx": 7.203278892531362e-07
+    }
+  ],
+  "decision": {
+    "median_rel_l2": {
+      "A": 0.20514563638752015,
+      "B": 0.2195840705854294,
+      "C": 0.19787962483740967
+    },
+    "iqr_rel_l2": {
+      "A": 0.08039703517088126,
+      "B": 0.09520581649148896,
+      "C": 0.12625135639084345
+    },
+    "median_wall_seconds": {
+      "A": 19.941929403990798,
+      "B": 1642.8853123259905,
+      "C": 1403.9710028935006
+    },
+    "median_fd_vs_closed_u_xxxx": {
+      "B": 4.383086304070771e-07,
+      "C": 3.7675181282940327e-07
+    },
+    "c_beats_b_seeds": 5,
+    "a_beats_both_seeds": 3,
+    "n_seeds": 8,
+    "verdict": "closed-form residual (C) beats FD residual (B) on median held-out rel-L2 but only on 5/8 seeds -- seed-fragile; keep the structural claims (exact order-4 derivatives, one-jet residual, measured FD floor) and do not advertise a seed-stable training win"
+  },
+  "elapsed_seconds": 3084.3
+}

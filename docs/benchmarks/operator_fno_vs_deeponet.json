@@ -1,0 +1,102 @@
+{
+  "schema": "operator_fno_vs_deeponet/v1",
+  "generated_utc": "2026-08-07T19:10:02Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "steps": 1500,
+    "viscosity": 0.05,
+    "n_samples_train": 16,
+    "n_samples_hold": 8,
+    "n_grid": 64,
+    "n_sensors": 32,
+    "deeponet": {
+      "trunk_width": 32,
+      "hidden": 64,
+      "depth": 3
+    },
+    "fno": {
+      "modes": 8,
+      "width": 20,
+      "n_layers": 3
+    },
+    "asymmetry": "FNO evaluates only on its periodic grid and supplies no off-grid u_t or u_xxxx; DeepONet query derivatives are closed-form from one trunk jet",
+    "budget_kind": "step_count",
+    "target_note": "DeepONet is scored on full space-time slabs; FNO is scored on the final-time spatial snapshot (the natural FNO target)"
+  },
+  "rss_mb_at_start": 622.17,
+  "cells": [
+    {
+      "seed": 0,
+      "deeponet_hold_rel_l2": 0.3322593386772645,
+      "fno_hold_rel_l2": 0.03498631559813394,
+      "deeponet_params": 23169,
+      "fno_params": 20521,
+      "deeponet_wall_seconds": 24.824404429004062,
+      "fno_wall_seconds": 11.299294675001875
+    },
+    {
+      "seed": 1,
+      "deeponet_hold_rel_l2": 0.2899125549012124,
+      "fno_hold_rel_l2": 0.07433920646066362,
+      "deeponet_params": 23169,
+      "fno_params": 20521,
+      "deeponet_wall_seconds": 24.626347602999886,
+      "fno_wall_seconds": 11.476818971001194
+    },
+    {
+      "seed": 2,
+      "deeponet_hold_rel_l2": 0.29906379237913344,
+      "fno_hold_rel_l2": 0.07535849165049326,
+      "deeponet_params": 23169,
+      "fno_params": 20521,
+      "deeponet_wall_seconds": 24.513301222003065,
+      "fno_wall_seconds": 11.45190234099573
+    },
+    {
+      "seed": 3,
+      "deeponet_hold_rel_l2": 0.25704489635092487,
+      "fno_hold_rel_l2": 0.03362195074123059,
+      "deeponet_params": 23169,
+      "fno_params": 20521,
+      "deeponet_wall_seconds": 25.027281367001706,
+      "fno_wall_seconds": 11.273218300993904
+    },
+    {
+      "seed": 4,
+      "deeponet_hold_rel_l2": 0.21131654478880812,
+      "fno_hold_rel_l2": 0.036386350709874594,
+      "deeponet_params": 23169,
+      "fno_params": 20521,
+      "deeponet_wall_seconds": 24.462024039996322,
+      "fno_wall_seconds": 11.38716539699817
+    }
+  ],
+  "decision": {
+    "median_hold_rel_l2": {
+      "deeponet": 0.2899125549012124,
+      "fno": 0.036386350709874594
+    },
+    "median_params": {
+      "deeponet": 23169,
+      "fno": 20521
+    },
+    "n_seeds": 5,
+    "verdict": "median hold rel-L2: DeepONet=0.2899, FNO=0.0364. FNO cannot supply off-grid u_t or u_xxxx; that asymmetry is the structural point of the comparison, independent of which arm wins on grid-restricted final-time error."
+  },
+  "elapsed_seconds": 39.3
+}

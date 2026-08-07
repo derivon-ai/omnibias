@@ -374,10 +374,11 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   gate and in `[tool.mypy].mypy_path`. **Every other package is
   extension-tier** and is not strict-gated, because the bulk-copied torch/jax
   field ops carry systematic `no-any-return` / `type-arg` findings. Two curated
-  beta packages (`omnibias-fields`, `omnibias-geometry`) additionally gate an
-  *incremental, growing* authored-strict surface through
-  `scripts/mypy_strict_allowlist.txt` (the `mypy_curated_beta` job); add a
-  module there once `mypy --strict --follow-imports=silent <file>` is clean.
+  beta packages (`omnibias-fields`, `omnibias-geometry`) plus the authored-strict
+  `omnibias.pinn.operator` surface additionally gate an *incremental, growing*
+  authored-strict surface through `scripts/mypy_strict_allowlist.txt` (the
+  `mypy_curated_beta` job); add a module there once
+  `mypy --strict --follow-imports=silent <file>` is clean.
   Newly authored modules are written strict-clean regardless of tier, and each
   package ships its own CI test job.
 

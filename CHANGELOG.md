@@ -6,7 +6,37 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — `omnibias-pinn`: neural operator learning (`omnibias.pinn.operator`)
+
+DeepONet / FNO operator learning as an alpha submodule of `omnibias-pinn`. A
+DeepONet is linear in its trunk basis, so every query-coordinate mixed partial of
+`G(u)(y)` is a closed-form trunk jet times the branch coefficients -- one jet
+yields a full PDE residual mesh-free, with no finite differences and no
+periodic-grid requirement on the query side. FNO is shipped as the honest
+FFT-based / periodic baseline; its derivatives are not closed form. A residual
+enclosure over a branch-coefficient box is sound interval arithmetic, not a
+solution-error bound; operator accuracy is optimised, not proven. Naming sense 3
+of `docs/operator-surface.md` (not `OperatorBlock`, not a field operator).
+
+Torch + jax twins (`build_deeponet` / `make_deeponet`, heat / Burgers / KS slabs
+and residuals including `ks_residual_loss_fd`), verified residual helpers with a
+sensor-box → coefficient-box → sealed residual family certificate,
+`docs/examples/pinn_operator_learning.py` (order-4 exactness + KS one-jet +
+FD-floor smoke + family cert), API page `docs/api/pinn-operator.md`, CPU smoke
+benchmarks (`operator_fd_floor` / `operator_shared_grid` /
+`operator_residual_calibration` / Burgers `operator_deeponet` / KS
+`operator_ks_bakeoff` / `operator_fno_vs_deeponet`), and a CI smoke step. The
+authored-strict operator modules are on `scripts/mypy_strict_allowlist.txt`.
+
+Measured bake-offs (decision rules fixed before the runs; 8 seeds): Burgers is
+an honest negative — closed-form residual does not beat FD-`u_t` on median
+held-out rel-L2 (FD error at `dt=0.05` is ~1e-8). KS closed-form beats
+FD-`u_xxxx` on median but only 5/8 seeds (seed-fragile; rule required ≥6/8).
+Structural claims (order-4 closed form, one-jet residual, measured FD floor
+4.5e-6) stand regardless.
+
 ### Changed — `omnibias-pinn`: the periodic-seam claim is scoped to the orders it matches
+
 
 No behaviour changed here; what changed is what the benchmark can prove and what
 the docs are entitled to claim. The hard-conditions boundary-violation column

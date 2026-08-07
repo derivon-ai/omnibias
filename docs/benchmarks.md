@@ -40,6 +40,12 @@ These are verified in CI on every push (counts captured on a CPU-dev host):
 | Laplacian vs folx / `jax.hessian` / torch (CPU) | [`benchmarks/laplacian_scaling.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/laplacian_scaling.py) | see [Complexity](complexity.md); JSON in [`laplacian_scaling.json`](benchmarks/laplacian_scaling.json) |
 | Polylaplacian `Δᵏ` vs nested (CPU) | [`benchmarks/polylaplacian_order.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/polylaplacian_order.py) | **4,660×** vs folx-nested at `k=4`; JSON in [`polylaplacian_order.json`](benchmarks/polylaplacian_order.json) |
 | 1-D Poisson optimiser bake-off (CPU, 5 seeds) | [`benchmarks/optimizer_pinn.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/optimizer_pinn.py) | GN **5×** faster wall-clock than L-BFGS at matched accuracy; JSON in [`optimizer_pinn.json`](benchmarks/optimizer_pinn.json) |
+| DeepONet FD accuracy floor (deterministic) | [`benchmarks/operator_fd_floor.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_fd_floor.py) | 5-point `u_xxxx` floor **4.5e-6** vs closed-form **2e-17**; truncation order ≈ 2.0; JSON in [`operator_fd_floor.json`](benchmarks/operator_fd_floor.json) |
+| DeepONet shared-grid residual scaling | [`benchmarks/operator_shared_grid.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_shared_grid.py) | speedup → **~24×** at `F=32` with round-off agreement; JSON in [`operator_shared_grid.json`](benchmarks/operator_shared_grid.json) |
+| Residual-weight / FD-step calibration | [`benchmarks/operator_residual_calibration.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_residual_calibration.py) | picks Burgers `λ,n_times` and KS `h` from short-budget curves; JSON in [`operator_residual_calibration.json`](benchmarks/operator_residual_calibration.json) |
+| DeepONet Burgers bake-off (CPU, 8 seeds) | [`benchmarks/operator_deeponet.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_deeponet.py) | see § DeepONet; JSON in [`operator_deeponet.json`](benchmarks/operator_deeponet.json) |
+| DeepONet KS bake-off (CPU, 8 seeds) | [`benchmarks/operator_ks_bakeoff.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_ks_bakeoff.py) | see § KS; JSON in [`operator_ks_bakeoff.json`](benchmarks/operator_ks_bakeoff.json) |
+| DeepONet vs FNO (CPU, matched steps) | [`benchmarks/operator_fno_vs_deeponet.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_fno_vs_deeponet.py) | see § DeepONet; JSON in [`operator_fno_vs_deeponet.json`](benchmarks/operator_fno_vs_deeponet.json) |
 
 ## Performance (GPU headline tier)
 
@@ -579,6 +585,77 @@ rest soft, reporting a reason per declined condition; the default `"none"` repro
 bit. Conditions on any number of axes are in scope -- the square row is two constrained spatial axes, whose
 corner terms the recursion generates on its own -- and a condition the planner cannot certify is declined, which
 is the same answer the solver gives today.
+
+### DeepONet operator learning (closed-form residual vs FD)
+
+CPU smoke, regenerable from the scripts below. Physics weight `λ` and Burgers
+time spacing / KS stencil step `h` are read off
+[`operator_residual_calibration.json`](benchmarks/operator_residual_calibration.json)
+(short-budget curves; Burgers bake-off uses `λ=0.1`, `n_times=11`; KS uses
+`h=0.01` and a train-clearing `λ=0.1` override — calibration's max-gap `λ=1`
+failed the train-rel-L2 guard on some seeds).
+
+#### Burgers (1st-order-in-time FD vs closed form)
+
+[`benchmarks/operator_deeponet.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_deeponet.py)
+→ [`operator_deeponet.json`](benchmarks/operator_deeponet.json). A DeepONet learns
+the periodic viscous-Burgers solution operator `u(·,0) ↦ u(·,t)` on a space-time
+slab; ground truth is the spectral MOL reference. Three arms share architecture
+(~23k params), seed and **step budget** (1500 Adam steps; FD `dt` is derived from
+the slab's time column). Convergence guard: train rel-L2 ≤ 0.35.
+
+| arm | held-out rel-L2 (median / IQR / 8 seeds) | median wall (s) | notes |
+|---|---|---|---|
+| A — data-only Adam | **0.259** / 0.069 | 26 | beats B and C on 7/8 seeds |
+| B — physics-informed, `u_t` by finite difference | 0.269 / 0.067 | 374 | — |
+| C — physics-informed, closed-form trunk jet | 0.269 / 0.068 | 423 | beats B on 2/8 seeds |
+
+**Verdict (decision rule fixed before the run).** Honest negative on Burgers:
+closed-form residual (C) does **not** beat FD residual (B) on median held-out
+rel-L2 under this budget (C wins the head-to-head on only 2/8 seeds). That is
+expected once the FD error in `u_t` at `dt=0.05` sits near **1e-8** — far below
+anything the training loss can feel — so B and C are near-identical by
+construction. Data-only Adam (A) still beats both physics arms on 7/8 seeds.
+The 4th-order claim is carried by the KS bake-off below, not by Burgers.
+
+#### KS (4th-order FD `u_xxxx` vs closed form)
+
+[`benchmarks/operator_ks_bakeoff.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_ks_bakeoff.py)
+→ [`operator_ks_bakeoff.json`](benchmarks/operator_ks_bakeoff.json). Same three
+arms on periodic Kuramoto–Sivashinsky (`jet_order=4`; arm B uses
+`ks_residual_loss_fd` with a 5-point stencil at the calibrated `h=0.01`). Slab
+shortened vs the house stiff-test (`n_grid=64`, `t_final=0.5`, `amplitude=0.3`)
+so the DeepONet clears train-rel-L2 ≤ 0.35 at `lr=3e-3` / 2000 steps on CPU.
+
+| arm | held-out rel-L2 (median / IQR / 8 seeds) | median wall (s) | notes |
+|---|---|---|---|
+| A — data-only Adam | 0.205 / 0.080 | 20 | beats both on 3/8 seeds |
+| B — physics-informed, `u_xxxx` by 5-point FD | 0.220 / 0.095 | 1643 | — |
+| C — physics-informed, closed-form trunk jet | **0.198** / 0.126 | 1404 | beats B on **5/8** seeds |
+
+**Verdict (decision rule fixed before the run):** claim the 4th-order FD-floor
+training win only if C beats B on median **and** on ≥6/8 seeds. Measured: C
+beats B on median (0.198 vs 0.220) but only on **5/8** seeds — seed-fragile.
+Do **not** advertise a seed-stable training win; keep the structural claims.
+Trained-model mechanism diagnostic `|FD u_xxxx − closed-form u_xxxx|` median ≈
+**4e-7** (arm B), consistent with a polluted biharmonic term inside the residual.
+
+**Structural claims, independent of the training outcome.** Query-coordinate
+derivatives of `G(u)` are closed form through order 4 (machine-epsilon vs nested
+autograd; see [`operator_fd_floor.json`](benchmarks/operator_fd_floor.json):
+5-point `u_xxxx` floors at **4.5e-6** while the closed form sits at **2e-17**).
+A 4th-order residual costs exactly one trunk jet. One trunk jet is shared across
+a batch of input functions
+([`operator_shared_grid.json`](benchmarks/operator_shared_grid.json): ~24× at
+`F=32`). A residual enclosure over a sensor / coefficient family seals as a
+sound interval certificate (not a solution-error bound).
+
+**FNO baseline** ([`operator_fno_vs_deeponet.json`](benchmarks/operator_fno_vs_deeponet.json)):
+matched parameter count (FNO `modes=8 / width=20 / layers=3` → ~20.5k vs DeepONet
+~23k) and step budget on the same Burgers target. FNO wins on its natural
+final-time grid map (median hold rel-L2 **0.036** vs DeepONet space-time
+**~0.26**), and supplies **no** off-grid `u_t` or `u_xxxx` at all — that
+asymmetry is the structural point of the comparison.
 
 ## Structured DP (omnibias-struct)
 

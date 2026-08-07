@@ -20,7 +20,9 @@ and runs on CPU in seconds (the QPINN demo in well under a minute).
 | [`partitioned_pinn.py`](examples/partitioned_pinn.py) | PyTorch | a soft partition of unity captures an interface kink that a single smooth field cannot, with a sound certified soft-to-hard gap |
 | [`pinn_burgers_shock.py`](examples/pinn_burgers_shock.py) | PyTorch | shock capturing that conserves by construction: a flux-form cage wrapped *around* a partitioned potential holds `div G = 0` to machine epsilon across a sharp moving seam, and beats a non-conservative arm on global mass balance as the viscous layer goes under-resolved |
 | [`pinn_hard_conditions.py`](examples/pinn_hard_conditions.py) | PyTorch | Dirichlet / Neumann / Robin / initial conditions satisfied by algebra rather than by penalty, with a sealed certificate that the ansatz exists, a live falsifier for incompatible data, and a solver that finds the absorbable conditions itself |
+| [`pinn_operator_learning.py`](examples/pinn_operator_learning.py) | PyTorch | DeepONet operator learning: order-4 closed-form exactness, shipped KS residual on one trunk jet, FD accuracy-floor smoke, and a sound family residual certificate (not a solution-error bound) |
 | [`transforms_closed_form.py`](examples/transforms_closed_form.py) | PyTorch + JAX | closed-form Laplace / Fourier / Mellin transforms of activations: quadrature oracle, the honest gaps, and a trainable transform layer |
+
 | [`qpinn_tise_qho.py`](examples/qpinn_tise_qho.py) | PyTorch | quantum harmonic-oscillator ground state (TISE) |
 | [`variational_harmonic_oscillator.py`](examples/variational_harmonic_oscillator.py) | PyTorch | least action: EL residual, energy conservation, action is minimized at the true path |
 | [`variational_brachistochrone.py`](examples/variational_brachistochrone.py) | PyTorch | the cycloid extremizes and minimizes the descent-time functional |

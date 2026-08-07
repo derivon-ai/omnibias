@@ -21,6 +21,11 @@ Public API split:
   torch/jax collocation and spectral method-of-lines drivers), folded in from
   the former standalone ``omnibias-pde`` package. Imported on demand; not part
   of the eager ``omnibias.pinn`` API.
+- :mod:`omnibias.pinn.operator` -- an **alpha** neural-operator-learning
+  submodule (DeepONet with closed-form trunk-jet query derivatives through
+  order 4, so a shipped KS residual runs unchanged; FNO baseline stays
+  FFT-based; residual enclosure is not a solution-error bound). Imported on
+  demand; not part of the eager ``omnibias.pinn`` API.
 
 Backend selection
 -----------------
