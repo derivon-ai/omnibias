@@ -258,3 +258,4 @@ __all__ = ["OneLayerVectorField", "make_one_layer_vector_field"]
 # Marker read by the omnibias-fields backend ops to select the closed-form
 # sigma-tower reduction path (avoids a fields -> pinn import cycle).
 OneLayerVectorField._omnibias_dispatch = "one_layer"
+OneLayerVectorField._omnibias_readout_independent = True

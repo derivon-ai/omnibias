@@ -151,3 +151,4 @@ __all__ = [
 # Marker read by the omnibias-fields backend ops to select the exact multivariate
 # jet path (avoids a fields -> pinn import cycle).
 AttentionVectorField._omnibias_dispatch = "jet_mlp"
+AttentionVectorField._omnibias_readout_independent = True

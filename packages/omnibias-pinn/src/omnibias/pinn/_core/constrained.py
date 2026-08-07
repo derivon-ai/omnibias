@@ -757,13 +757,13 @@ def _axis_projection_points(step: AxisPlan) -> tuple[float, ...]:
 
 
 __all__ = [
-    "SUPPORT_CONDITION_LIMIT",
     "AxisConstraints",
     "AxisPlan",
     "ConstraintTerm",
     "CornerPair",
     "HardCondition",
     "LinearConstraint",
+    "SUPPORT_CONDITION_LIMIT",
     "apply_constraint",
     "certify_support_matrix",
     "compatibility_sample",

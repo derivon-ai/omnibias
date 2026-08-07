@@ -92,11 +92,28 @@ class System:
         if len(set(names)) != len(names):
             raise ValueError(f"duplicate field names: {names!r}")
         known = set(names)
+        cs = self.domain.coordinate_spec
         for bc in self.boundary:
             if bc.component not in known:
                 raise ValueError(
                     f"boundary condition references unknown component {bc.component!r}"
                 )
+            if bc.kind == "periodic" and bc.axis is not None:
+                if bc.axis not in self.domain.axes:
+                    raise ValueError(
+                        f"periodic boundary condition references unknown axis "
+                        f"{bc.axis!r}; domain axes are {self.domain.axes!r}"
+                    )
+                if bc.axis == self.domain.time_axis:
+                    raise ValueError(
+                        f"periodic boundary condition cannot use the time axis "
+                        f"{bc.axis!r}"
+                    )
+                if not cs.is_periodic(bc.axis):
+                    raise ValueError(
+                        f"periodic boundary condition names axis {bc.axis!r}, "
+                        "which the domain does not declare periodic"
+                    )
         for ic in self.initial:
             if ic.component not in known:
                 raise ValueError(

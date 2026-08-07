@@ -88,6 +88,11 @@ class NormConservationField(_CageFieldBase):
     quadrature_weights: Tensor
     psi_group_name: str
 
+    @property
+    def _omnibias_readout_independent(self) -> bool:
+        """Nonlinear in the readout (``psi / ||psi||``); refuse a linear solve."""
+        return False
+
     def __init__(
         self,
         *,

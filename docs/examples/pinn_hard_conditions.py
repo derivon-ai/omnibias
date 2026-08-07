@@ -50,7 +50,11 @@ arm has an initial condition competing with the interior residual. **On the
 periodic seam it lost**: the seam closes exactly, but the interior fit was ~3x
 worse on every seed, because two degrees of freedom go into tying the ends
 together. Absorption buys a guarantee, and on that problem the guarantee is not
-free.
+free. For *time-dependent* periodic problems an alternative is
+``basis="spectral"`` on ``solve_least_squares`` / ``build_field`` (a
+``SpectralVectorField``): spatial periodicity is free in the Fourier base, so
+the cage need not spend capacity on the seam -- see Part 4's note and
+``docs/benchmarks.md``.
 
 *Out of scope.* The domain must be an axis-aligned box; arbitrary geometry is
 what the distance-function ``HardBoundaryField`` is for. A condition whose
@@ -380,6 +384,12 @@ def part_four() -> None:
     # y. The seam is a relative constraint -- it ties u(y=0) to u(y=1) without
     # pinning either -- which the same switching form absorbs because a linear
     # functional may reference more than one point.
+    #
+    # For a time-dependent problem whose *spatial* axes are periodic, prefer
+    # SpectralVectorField / solve_least_squares(..., basis="spectral") instead:
+    # Fourier modes make that periodicity free, so the cage need not spend
+    # degrees of freedom on the seam. The ConstrainedExpressionField route below
+    # is the right tool when the ansatz is an MLP (or the problem is steady).
     cage = ConstrainedExpressionField(
         base=base,
         conditions=[

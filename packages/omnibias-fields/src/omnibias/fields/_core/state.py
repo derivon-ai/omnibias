@@ -74,6 +74,24 @@ class FieldState(Generic[T]):
         (like a precomputed gradient) keyed by string. Mutable but
         intended for op-internal use.
 
+        **Readout-independence contract.** A :class:`FieldState` is a
+        coherent snapshot of one evaluation. Entries written by the field
+        or its ops may depend only on ``coords`` and *frozen feature*
+        parameters (hidden weights, temporal heads, geometry factors) --
+        never on the *readout* parameters the frozen-feature linear
+        solver sweeps (``c`` / ``b`` on a one-layer field, ``V`` / ``b_t``
+        on a spectral / Chebyshev field, the final affine layer of a jet
+        MLP). Fields that honour this contract declare it via the class
+        attribute named by
+        :data:`~omnibias.fields._core.field_base.READOUT_INDEPENDENT_ATTR`.
+
+        Caller-installed entries are the caller's responsibility. The
+        ``lim_along`` extension, for example, stashes user-supplied
+        closures in ``extra["lim_along"]``; those closures are typically
+        readout-dependent and unverifiable by the library, so installing
+        them disqualifies the field from declaring readout-independence
+        for any subsequent frozen-feature solve against that state.
+
     Notes
     -----
     The class behaves frozen-ish: the dataclass attributes are set in

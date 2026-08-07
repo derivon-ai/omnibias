@@ -19,6 +19,8 @@ Public surface:
 - :mod:`ops_registry` -- third-party op extension point.
 - :data:`DISPATCH_ATTR` -- the field marker attribute name used by the
   backend ops to pick the closed-form reduction path.
+- :data:`READOUT_INDEPENDENT_ATTR` -- the field marker declaring that
+  per-state caches are independent of the readout parameters.
 """
 
 from __future__ import annotations
@@ -33,7 +35,11 @@ from omnibias.fields._core.catalog import (
 )
 from omnibias.fields._core.components import ComponentSpec
 from omnibias.fields._core.coords import CoordinateSpec
-from omnibias.fields._core.field_base import DISPATCH_ATTR, FieldBase
+from omnibias.fields._core.field_base import (
+    DISPATCH_ATTR,
+    READOUT_INDEPENDENT_ATTR,
+    FieldBase,
+)
 from omnibias.fields._core.sigma_cache import SigmaCache
 from omnibias.fields._core.state import FieldState
 from omnibias.fields._core.view import ComponentView, VectorView, did_you_mean
@@ -47,6 +53,7 @@ __all__ = [
     "FieldBase",
     "FieldState",
     "OperatorInfo",
+    "READOUT_INDEPENDENT_ATTR",
     "SigmaCache",
     "VectorView",
     "did_you_mean",

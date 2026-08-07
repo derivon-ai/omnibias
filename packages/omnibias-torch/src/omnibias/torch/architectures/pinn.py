@@ -239,14 +239,47 @@ class _JetMLPCore(nn.Module):
                     f"{max_order}: {e}"
                 ) from None
 
+    def _point_hidden_jet(self, xi: Tensor, order: int) -> Tensor:
+        """Single-point jet through every layer *except* the affine readout.
+
+        Shape ``(M, H)``. The expensive Faà-di-Bruno work lives here; the live
+        readout is applied by :meth:`_apply_readout_jet` so a cached
+        :class:`~omnibias.fields._core.state.FieldState` stays valid across
+        frozen-feature readout sweeps.
+        """
+        layers = self._layer_specs()
+        if len(layers) < 2:
+            raise ValueError(
+                f"{type(self).__name__} needs at least one hidden layer plus a "
+                f"readout to split a hidden jet; got {len(layers)} layer(s)"
+            )
+        return mlp_jet_mv(xi, layers[:-1], order)
+
+    def _apply_readout_jet(self, hidden_jet: Tensor) -> Tensor:
+        """Push a (possibly batched) hidden jet through the live affine readout.
+
+        ``hidden_jet`` has shape ``(M, H)`` or ``(B, M, H)``; returns the same
+        leading shape with trailing width ``out_dim``.
+        """
+        w, b, _spec = self._layer_specs()[-1]
+        out: Tensor = torch.tensordot(hidden_jet, w, dims=([-1], [-1]))
+        if b is not None:
+            if hidden_jet.ndim == 2:
+                out = out.clone()
+                out[0] = out[0] + b
+            else:
+                out = out.clone()
+                out[:, 0, :] = out[:, 0, :] + b
+        return out
+
     def _point_jet(self, xi: Tensor, order: int) -> Tensor:
         """Single-point multivariate jet, shape ``(M, out_dim)``.
 
-        Default: the bare network jet. Subclasses that wrap the network (for
-        example the hard-constraint ansatz ``u = g + b * net``) override this so
-        every readout below stays exact and closed form.
+        Default: hidden jet plus the live affine readout. Subclasses that wrap
+        the network (for example the hard-constraint ansatz ``u = g + b * net``)
+        override this so every readout below stays exact and closed form.
         """
-        return mlp_jet_mv(xi, self._layer_specs(), order)
+        return self._apply_readout_jet(self._point_hidden_jet(xi, order))
 
     def value(self, x: Tensor) -> Tensor:
         """Plain network value ``u(x)``, shape ``(..., out_dim)`` (no jet needed)."""

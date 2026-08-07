@@ -339,6 +339,40 @@ def test_a_periodic_seam_closes_in_value_and_slope() -> None:
     )
 
 
+def test_the_seam_is_exact_at_the_matched_orders_and_discontinuous_above_them() -> None:
+    """Twin of the torch contract test: C^k matching at declared orders only.
+
+    A residual assembled from the periodic condition scores exactly the orders
+    that condition declares, so it is graded against the same set the cage
+    enforces and could never catch a kink one order up. Both halves are pinned
+    so "exact seam" can never quietly widen into "smooth seam".
+    """
+    matched = (0, 1, 2)
+    cage = _cage(
+        [HardCondition("u", 1, periodic(0.0, 1.0, order=n), 0.0) for n in matched]
+    )
+    cage = _perturb(cage)
+    lo, hi = _face(1, 0.0), _face(1, 1.0)
+
+    for n in matched:
+        got = _val(cage, hi) if n == 0 else _der(cage, hi, 1, n)
+        want = _val(cage, lo) if n == 0 else _der(cage, lo, 1, n)
+        tol = EXACT * max(1.0, float(np.abs(want).max()))
+        assert np.abs(got - want).max() < tol, (
+            f"declared order {n} must close structurally"
+        )
+
+    beyond = max(matched) + 1
+    jump = float(
+        np.abs(_der(cage, hi, 1, beyond) - _der(cage, lo, 1, beyond)).max()
+    )
+    scale = float(np.abs(_der(cage, _pts(64), 1, beyond)).max())
+    assert jump > 1e-3 * scale, (
+        f"order {beyond} closed to {jump:.3e} against a scale of {scale:.3e} without "
+        "being asked to -- the seam would then be smoother than documented"
+    )
+
+
 def test_gradients_still_reach_the_base_through_a_relative_constraint() -> None:
     cage = _cube_cage()
 

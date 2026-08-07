@@ -34,7 +34,8 @@ These static/regression guards gate every public tag and run in CI:
   in-code `__version__`; no stray submodule markers
   (`packages/omnibias-core/tests/test_version_consistency.py`).
 - **Leakage / secrets** -- no local paths (`/u/`, `/home/`), scheduler/vendor
-  names, private-tree references, or tokens in shipped files (CI leakage scan).
+  names, private-tree references, or tokens in shipped files
+  (`packages/omnibias-core/tests/test_no_leakage.py`).
 - **Concept terminology** -- no over-claim vocabulary regressions
   (`test_concept_terminology.py`).
 - **Packaging hygiene** -- sorted `__all__`, `py.typed` present, and a clean

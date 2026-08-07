@@ -6,6 +6,149 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Changed — `omnibias-pinn`: the periodic-seam claim is scoped to the orders it matches
+
+No behaviour changed here; what changed is what the benchmark can prove and what
+the docs are entitled to claim. The hard-conditions boundary-violation column
+scores exactly the orders each condition declares. For Dirichlet and Neumann that
+is the whole condition. For a periodic seam it was graded on its own syllabus --
+the cage enforces `PERIODIC_ORDERS` and the column measured those same orders --
+so it could never report a kink one order up, and "exact seam" was doing more
+work in prose than the measurement supported.
+
+`benchmarks/hard_conditions_solver.py` (schema v3) now also probes the first
+*unmatched* order, by re-declaring the seam there and reassembling, so the probe
+travels the same row path as the enforced orders instead of a lookalike that
+could drift from it. Measured: the `(0, 1, 2)` cage jumps `6.1e+00` at order 3 on
+the gauge-free seam, 2.5% of that derivative's own scale, and `2.6e+01` on the
+gauge-pinned heat, 11.1%. Two results fall out of the new column. The hard arm is
+better behaved than soft *beyond* its contract as well as inside it (11% against
+64%), so absorption is not buying its exactness by displacing error just past
+where anyone was looking. And the **spectral arm is the only one that closes the
+seam at every order** (exactly `0.0`), because periodicity there is a property of
+the Fourier basis rather than three constraints bolted onto a generic one -- an
+advantage the interior-L2 column does not show at all. Both cage suites now pin
+the contract boundary in torch and jax: machine-zero at every declared order,
+genuinely discontinuous one order up, with three orders of magnitude of margin.
+
+`benchmarks/hard_conditions_periodic_sweep.py` (schema v2) gained `(0, 1, 2, 3)`
+and a stopping rule fixed before the run: raise the default again only if the
+fourth matched order buys more than the third did. It does not -- read on the
+hard arm alone, since the hard−soft gap conflates it with the soft arm getting
+worse as rows are added, the third order gains 3.34x and the fourth 1.30x. **The
+default stays `(0, 1, 2)`**, now resting on an exhausted sweep rather than a
+two-point one. A smooth manufactured solution matches every derivative and so
+rewards extra orders indefinitely, which is exactly why diminishing returns are
+the signal to stop rather than continue; and a higher default would over-smooth
+seams near steep gradients, the failure the periodic-emit measurement already
+recorded for Burgers.
+
+### Fixed — the release guards job was failing on a guard that never existed
+
+`.github/workflows/ci.yml` invoked `packages/omnibias-core/tests/test_no_leakage.py`
+by path in the `guards` job, and `AGENTS.md`, `GOVERNANCE.md`,
+`docs/release-readiness.md` and `docs/release_blockers.md` all described it as the
+enforcing guard for the vendor-neutral-language rule. It had never existed in the
+repository's history. pytest aborts on a missing path argument without running
+anything, so the job did not merely skip that one check -- the placeholder,
+version, terminology, licence, lineage, sorted-`__all__`, resolvable-`__all__` and
+`py.typed` guards in the same invocation never ran either, and vendor neutrality
+was enforced by nothing.
+
+The guard now exists and blocks seven leak families across every file in the
+working tree -- tracked files *and* new ones that are not gitignored, which is
+slightly wider than the rule as written and deliberately so, since a leak is
+easiest to introduce in a file that has just been created and a guard that waits
+for the commit reports it a step too late (reaching `.github/`, `notebooks/` and
+`formal/`): local developer paths, site
+mounts and scratch conventions, batch-scheduler commands / script directives /
+environment variables / product names from any vendor, the EDA-shop synonym for a
+compute cluster, personal accounts, private-tree paths, and credentials. It cannot
+go vacuous: every pattern carries synthetic bait a self-test asserts it catches,
+the scanner is driven end-to-end over that bait, and the file list is pinned as
+large and as actually reaching those trees. Sanctioned vocabulary is pinned as
+legal in the same test -- `$OMNIBIAS_SCRATCH`, "GPU job" / "GPU cluster", the
+published Derivon identity, and the prose that *documents* the rule -- so the
+guard cannot tax good writing. The tree needed no redactions; it was already
+clean.
+
+Restoring the job immediately caught two unsorted `__all__` lists,
+`pinn._core.constrained` and `pinn.solver._core.hard`, both extended during the
+hard-conditions work. Both are sorted again.
+
+### Fixed — `omnibias-pinn`: jet-field value path no longer pays for a jet
+
+`JetMLPVectorField.value_component` (torch + jax, inherited by attention /
+multiscale) again takes the plain forward pass. The readout-independence refactor
+had routed values through `_jet_at_least(..., 0)`, which builds at
+`max(0, jet_order)` and made every boundary-condition loss cost a full order-2
+(or order-3) jet. After the hidden/readout split both paths already read live
+parameters, jet fields are refused by the frozen-feature linear solver, and the
+forward / row-0 equality is pinned at `1e-14`, so the cheap path is the correct
+one. A regression test asserts a value-only evaluation leaves the hidden-jet
+cache empty.
+
+### Added — `omnibias-pinn` / `omnibias-fields`: readout-independence invariant + spectral linear solve
+
+The frozen-feature linear solver reuses cached `FieldState`s while sweeping the
+readout. That is sound only when every cached quantity is independent of those
+weights. The contract is now named and enforced:
+
+- `READOUT_INDEPENDENT_ATTR` (`"_omnibias_readout_independent"`) on
+  `omnibias.fields` / `omnibias.pinn.solver` -- fields that honour the contract
+  declare it; the driver raises `ReadoutDependentError` otherwise.
+- Spectral / Chebyshev caches store the hidden temporal features `h` (not
+  `a = b_t + h @ V.T`); jet fields cache the hidden jet through `layers[:-1]` and
+  apply `affine_jet_mv` per call, so a state stays coherent under a readout
+  sweep.
+- Affine cages recurse through `base` and declare when the base does.
+  Nonlinear cages (`IntegralConservationField`, `NormConservationField`) decline
+  and are refused by `solve_least_squares` -- use `solve_optimize` instead.
+- Per-backend readout seam (`readout_size`, `set_readout` / `with_readout`,
+  `readout_dtype`) replaces hardcoded `W` / `c` access, and
+  `build_field` / `solve_least_squares` accept `basis="spectral"` (requires a
+  time axis; spatial periodicity is free in the Fourier ansatz).
+
+### Changed — `omnibias-pinn`: `PERIODIC_ORDERS` default is now `(0, 1, 2)`
+
+A periodic `BoundaryCondition` carries `periodic_orders` (default
+`PERIODIC_ORDERS`). The Stage-4 C¹-seam sweep
+(`benchmarks/hard_conditions_periodic_sweep.py`) showed that matching only
+value and slope leaves a second-order operator free to jump in `u''` across a
+gauge-free Poisson seam; raising the matched orders to `(0, 1, 2)` flips hard
+vs soft interior L2 in hard's favour on every seed. Override with an explicit
+tuple if you need the old subset.
+
+The hard-conditions benchmark also gained a **gauge-pinned** periodic heat row
+(hard wins 5/5, absorbed 4 under the shipped `(0, 1, 2)` default) and a third
+**spectral** arm (`basis="spectral"`, `K=8`): machine-zero seam residual, beats
+soft on every seed, does not yet beat the MLP cage on that budget. Regenerated
+under the same default, the gauge-free Poisson seam row also wins 5/5 (absorbed
+3; interior `3.6e-05` vs soft `5.7e-05`) -- a flip from the earlier `(0, 1)`
+measurement that lost on every seed.
+
+### Added — `omnibias-pinn`: opt-in `periodic_boundary` on the six problem builders
+
+The six canonical builders (`poisson`, `heat`, `wave`, `burgers`,
+`reaction_diffusion`, `advection_diffusion`) accept
+`periodic_boundary: bool = False`. When `True`, each emits one periodic
+`BoundaryCondition` per component per periodic *spatial* axis, **appended**
+after existing BCs so `absorbed_boundary` indices stay stable. The default is
+off and reproduces today's boundary tuples / residual arrays bit for bit
+(`packages/omnibias-pinn/tests/solver/test_periodic_boundary_emit.py`).
+
+Measured (`benchmarks/hard_conditions_periodic_emit_measure.py`, artifact
+`docs/benchmarks/hard_conditions_periodic_emit_measure.json`): manufactured
+periodic Burgers and reaction-diffusion, 3 seeds, hard and soft, identical
+small budget, under the shipped `PERIODIC_ORDERS = (0, 1, 2)`. Decision rule
+stated up front — flip the default to `True` only if it is strictly better on
+both interior rel-L2 and seam violation for both problems. **Default stays
+`False` (opt-in):** reaction-diffusion wins on both metrics with emit on
+(interior `4.5e-02` vs `5.6e-02`, seam `~9e-16` vs `7.3e-01`), but Burgers
+closes the seam (`~2e-16` vs `1.0`) while the interior fit gets worse
+(`1.5e-01` vs `2.3e-02`). Absorbed counts under emit-on / hard are 4 (Burgers)
+and 8 (reaction-diffusion).
+
 ### Added — `omnibias-pinn`: hard Neumann / Robin / initial conditions, with solver auto-detection
 
 The only hard-condition cage the package shipped was `HardBoundaryField`, whose
@@ -44,8 +187,9 @@ special-cased.
   value and a slope costs one, but a second constrained axis multiplies rather
   than adds, which is why absorbing every face of a 3-D box is a choice.
 - Periodicity is absorbed as a **relative** constraint `d^n u(hi) - d^n u(lo) =
-  0`, matching value *and* slope across the seam, since a linear functional may
-  reference several points. This also fixes a real gap: the solver previously
+  0` for each `n` in `periodic_orders` (default `(0, 1, 2)`: value, slope, and
+  second derivative), matching a linear functional that may reference several
+  points. This also fixes a real gap: the solver previously
   emitted a zero-length row for a periodic boundary on the grounds that the
   ansatz carried it, which is true of a spectral method-of-lines discretisation
   and false for the mesh-free route. The soft path now assembles genuine seam
@@ -87,17 +231,21 @@ bit for bit, pinned by its own test.
 
 Measured (`benchmarks/hard_conditions_solver.py`, artifact
 `docs/benchmarks/hard_conditions_solver.json`): Poisson / heat / wave / a 2-D
-square / a periodic seam, 5 seeds, identical architecture, parameter count, seed
-and collocation budget. The hard arm's worst boundary violation over every cell
-was `1.4e-14`, and its median interior relative L2 beat the soft arm on Poisson
-(`3.5e-07` vs `1.6e-06`), heat (`3.8e-06` vs `1.1e-02`), wave (`1.1e-06` vs
-`3.1e-03`) and the square (`2.8e-05` vs `7.3e-02`), 5 seeds out of 5 on all
-four. The parabolic and hyperbolic gaps are the large ones because that is where
-the soft arm has an initial condition competing with the interior residual. **On
-the periodic seam it lost** and the row is kept rather than dropped: the seam
-closes exactly where the soft arm leaves `2.4e-03`, but the interior fit is ~3x
-worse on every seed, because two degrees of freedom go into tying the ends
-together. Absorption buys a guarantee, and there it is not free.
+square / a periodic seam / a gauge-pinned periodic heat, 5 seeds, identical
+architecture, parameter count, seed and collocation budget, under the shipped
+`PERIODIC_ORDERS = (0, 1, 2)`. The hard arm's worst boundary violation over
+every cell was `1.3e-13`, and its median interior relative L2 beat the soft arm
+on Poisson (`3.5e-07` vs `1.6e-06`), heat (`3.8e-06` vs `1.1e-02`), wave
+(`1.1e-06` vs `3.1e-03`), the square (`2.8e-05` vs `7.3e-02`), the gauge-free
+seam (`3.6e-05` vs `5.7e-05`) and the gauge-pinned heat (`2.4e-04` vs
+`4.2e-01`), 5 seeds out of 5 on all six. The parabolic and hyperbolic gaps are
+the large ones because that is where the soft arm has an initial condition
+competing with the interior residual. Under the earlier `(0, 1)` default the
+gauge-free seam had *lost* ~3x on every seed; the C¹-seam sweep implicated
+discontinuous `u''` rather than lost degrees of freedom alone and flipped
+`PERIODIC_ORDERS` to `(0, 1, 2)` (see the Changed entry above), after which the
+regenerated table shows hard winning. Absorption buys a guarantee, and under
+C² matching it is no longer free of accuracy either.
 
 Scope, stated rather than implied. The domain must be an axis-aligned box;
 `HardBoundaryField` remains the route for arbitrary geometry, and the docs now

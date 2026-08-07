@@ -38,7 +38,11 @@ if TYPE_CHECKING:  # pragma: no cover
 
 @dataclass(frozen=True)
 class IntegralConservationField(_CageFieldBase):
-    """JAX global-integral conservation cage; build it with the factory below."""
+    """JAX global-integral conservation cage; build it with the factory below.
+
+    Nonlinear in the readout, so this cage declines the frozen-feature linear
+    solver.
+    """
 
     base: FieldBase
     velocity_names: tuple[str, ...]
@@ -49,6 +53,10 @@ class IntegralConservationField(_CageFieldBase):
     quadrature_weights: Array
     total: float
     degree: int
+
+    @property
+    def _omnibias_readout_independent(self) -> bool:
+        return False
 
     def _raw_integral(self) -> Array:
         """``sum_q w_q sum_c u_c(x_q)^degree`` on the *un*-scaled base field."""

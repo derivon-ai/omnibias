@@ -509,6 +509,38 @@ def test_a_periodic_seam_closes_in_value_and_slope() -> None:
         _randomise(cage)
 
 
+def test_the_seam_is_exact_at_the_matched_orders_and_discontinuous_above_them() -> None:
+    """The contract is C^k matching at declared orders, *not* smoothness.
+
+    Both halves are pinned here because only the first half is normally
+    measured: a residual assembled from the periodic condition scores exactly
+    the orders that condition declares, so it is graded against the same set the
+    cage enforces and could never catch a kink one order up. It stays a real
+    kink -- if this second assertion ever starts failing because the cage became
+    smooth past its contract, the honest claim in the docs changes with it.
+    """
+    matched = (0, 1, 2)
+    cage = _cage(
+        [HardCondition("u", 1, periodic(0.0, 1.0, order=n), 0.0) for n in matched]
+    )
+    _randomise(cage)
+    lo, hi = _face(1, 0.0), _face(1, 1.0)
+
+    for n in matched:
+        got = _val(cage, hi) if n == 0 else _der(cage, hi, 1, n)
+        want = _val(cage, lo) if n == 0 else _der(cage, lo, 1, n)
+        tol = EXACT * max(1.0, float(want.detach().abs().max()))
+        assert _gap(got, want) < tol, f"declared order {n} must close structurally"
+
+    beyond = max(matched) + 1
+    jump = _gap(_der(cage, hi, 1, beyond), _der(cage, lo, 1, beyond))
+    scale = float(_der(cage, _pts(64), 1, beyond).detach().abs().max())
+    assert jump > 1e-3 * scale, (
+        f"order {beyond} closed to {jump:.3e} against a scale of {scale:.3e} without "
+        "being asked to -- the seam would then be smoother than documented"
+    )
+
+
 def test_periodicity_composes_with_a_condition_on_another_axis() -> None:
     cage = _cage(
         [

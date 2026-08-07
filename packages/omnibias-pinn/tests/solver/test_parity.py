@@ -130,7 +130,7 @@ def test_parity_periodic_seam_rows() -> None:
         tr = tabm.condition_residual(tfield, system, spec, None).detach().numpy()
     jr = np.asarray(ja.condition_residual(jfield, system, spec, None))
 
-    assert tr.shape == jr.shape == (2 * n_seam,)  # value and slope, per point
+    assert tr.shape == jr.shape == (3 * n_seam,)  # value, slope, u'', per point
     np.testing.assert_allclose(tr, jr, rtol=1e-10, atol=1e-10)
 
 

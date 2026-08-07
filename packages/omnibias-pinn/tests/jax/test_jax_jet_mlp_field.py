@@ -164,13 +164,13 @@ def test_order2_residual_triggers_exactly_one_jet(coords, specs, monkeypatch):
         coordinate_spec=cs, components=comps, hidden=6, depth=2, jet_order=2, seed=2,
     )
     calls: list[int] = []
-    original = JetMLPVectorField._compute_jet
+    original = JetMLPVectorField._compute_hidden_jet
 
     def counting(self, c, order):
         calls.append(order)
         return original(self, c, order)
 
-    monkeypatch.setattr(JetMLPVectorField, "_compute_jet", counting, raising=False)
+    monkeypatch.setattr(JetMLPVectorField, "_compute_hidden_jet", counting, raising=False)
 
     state = field(coords)
     ops.value(state, "u")
@@ -193,6 +193,20 @@ def test_cached_higher_order_jet_serves_lower_orders(coords, specs):
     assert sorted(state.extra[JET_CACHE_KEY]) == [3]
     ops.gradient(state, "u")
     assert sorted(state.extra[JET_CACHE_KEY]) == [3]
+
+
+def test_value_only_never_pays_for_a_jet(coords, specs):
+    """A boundary-condition loss must not populate the hidden-jet cache."""
+    cs, comps = specs
+    field = make_jet_mlp_vector_field(
+        coordinate_spec=cs, components=comps, hidden=5, depth=2, jet_order=2, seed=4,
+    )
+    state = field(coords)
+    ops.value(state, "u")
+    ops.value(state, "v")
+    assert JET_CACHE_KEY not in state.extra or not state.extra[JET_CACHE_KEY]
+    ops.gradient(state, "u")
+    assert sorted(state.extra[JET_CACHE_KEY]) == [2]
 
 
 # -- JAX transformations ------------------------------------------------------ #

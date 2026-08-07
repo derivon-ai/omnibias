@@ -163,7 +163,7 @@ def test_a_periodic_seam_closes_exactly() -> None:
         collocation=pde.CollocationSpec(n_interior=48),
         hard_conditions="auto",
     )
-    assert sol.diagnostics["hard_absorbed"] == 2
+    assert sol.diagnostics["hard_absorbed"] == 3  # value, slope, second deriv
     ends = np.array([[0.0], [1.0]])
     value = np.asarray(sol.evaluate(ends, "u"))
     assert abs(value[0] - value[1]) < EXACT

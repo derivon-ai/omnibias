@@ -34,7 +34,11 @@ from omnibias.pinn.jax.fields.base import FieldBase, _import_jax_ops
 
 @dataclass(frozen=True)
 class NormConservationField(_CageFieldBase):
-    r"""Hard :math:`L^2`-norm conservation for a complex wavefunction (JAX)."""
+    r"""Hard :math:`L^2`-norm conservation for a complex wavefunction (JAX).
+
+    Nonlinear in the readout (``psi / ||psi||``), so this cage declines the
+    frozen-feature linear solver.
+    """
 
     base: FieldBase
     quadrature_coords: Array
@@ -44,6 +48,10 @@ class NormConservationField(_CageFieldBase):
     passthrough_names: tuple[str, ...]
     coordinate_spec: CoordinateSpec
     components: ComponentSpec
+
+    @property
+    def _omnibias_readout_independent(self) -> bool:
+        return False
 
     def _compute_norm(self) -> Array:
         re_name, im_name = self.velocity_names

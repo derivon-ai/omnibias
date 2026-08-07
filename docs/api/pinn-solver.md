@@ -47,7 +47,12 @@ The solver never asserts a `unproven_claim` / continuum-regularity claim.
 
 Six neutral builders span the taxonomy cross-product (type x linearity x kind x
 arity): `poisson`, `heat`, `wave`, `burgers`, `reaction_diffusion` (coupled), and
-`advection_diffusion` (coupled).
+`advection_diffusion` (coupled). Pass `periodic_boundary=True` to append a
+periodic `BoundaryCondition` per component per periodic spatial axis (default
+`False`; seam orders default to `PERIODIC_ORDERS = (0, 1, 2)`). Hand-built
+systems still need an explicit periodic BC. For time-dependent periodic
+problems, `build_field(..., basis="spectral")` / `solve_least_squares(...,
+basis="spectral")` makes spatial periodicity free in a `SpectralVectorField`.
 
 ::: omnibias.pinn.solver
     options:
@@ -60,6 +65,10 @@ arity): `poisson`, `heat`, `wave`, `burgers`, `reaction_diffusion` (coupled), an
         - burgers
         - reaction_diffusion
         - advection_diffusion
+        - PERIODIC_ORDERS
+        - READOUT_INDEPENDENT_ATTR
+        - ReadoutDependentError
+        - requires_readout_independent
 
 ## Solver drivers (torch)
 

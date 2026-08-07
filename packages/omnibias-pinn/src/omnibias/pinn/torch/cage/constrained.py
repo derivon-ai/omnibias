@@ -199,18 +199,49 @@ class ConstrainedExpressionField(_CageFieldBase):
     #
     # The constrained expression is *affine* in the base readout, so every
     # caller that treats the readout as the linear unknown keeps working when a
-    # cage is wrapped around the ansatz. Forwarding the parameter handles is
-    # what lets the frozen-feature linear solve stay a linear solve.
+    # cage is wrapped around the ansatz. Prefer the solver readout seam for new
+    # code; these forwards exist for duck-typed call sites that still poke
+    # ``.W`` / ``.c`` (one-layer) or ``.V`` / ``.b_t`` (spectral).
 
     @property
     def W(self) -> Any:
-        """The base field's hidden layer."""
+        """The base field's hidden layer (one-layer only)."""
+        if not hasattr(self.base, "W"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .W; spectral bases expose "
+                "V / b_t. Use omnibias.pinn.solver.torch.readout instead."
+            )
         return self.base.W
 
     @property
     def c(self) -> Any:
-        """The base field's readout layer."""
+        """The base field's readout layer (one-layer only)."""
+        if not hasattr(self.base, "c"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .c; spectral bases expose "
+                "V / b_t. Use omnibias.pinn.solver.torch.readout instead."
+            )
         return self.base.c
+
+    @property
+    def V(self) -> Any:
+        """The base field's spectral readout weights."""
+        if not hasattr(self.base, "V"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .V; one-layer bases expose "
+                "c. Use omnibias.pinn.solver.torch.readout instead."
+            )
+        return self.base.V
+
+    @property
+    def b_t(self) -> Any:
+        """The base field's spectral readout biases."""
+        if not hasattr(self.base, "b_t"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .b_t; one-layer bases expose "
+                "c.bias. Use omnibias.pinn.solver.torch.readout instead."
+            )
+        return self.base.b_t
 
     # ----- per-evaluation caching ------------------------------------
 

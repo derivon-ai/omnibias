@@ -14,19 +14,21 @@ from typing import Any
 import jax.numpy as jnp
 import numpy as np
 from omnibias.pinn.solver._core.conditions import BoundaryCondition, InitialCondition
-from omnibias.pinn.solver._core.hard import PERIODIC_ORDERS, HardConditionPlan
+from omnibias.pinn.solver._core.hard import HardConditionPlan
 from omnibias.pinn.solver._core.sampling import (
     CollocationSpec,
     bc_faces,
     boundary_points,
     initial_slice_points,
     interior_points,
+    periodic_axes,
 )
 from omnibias.pinn.solver._core.system import System
+from omnibias.pinn.solver.jax.readout import readout_dtype
 
 
 def to_array(pts: np.ndarray, field: Any) -> Any:
-    return jnp.asarray(pts, dtype=field.W.dtype)
+    return jnp.asarray(pts, dtype=readout_dtype(field))
 
 
 def _eval_target(value: Any, coords: Any) -> Any:
@@ -36,14 +38,11 @@ def _eval_target(value: Any, coords: Any) -> Any:
 def interior_residual(field: Any, system: System, coords: Any) -> Any:
     state = field(coords)
     parts = [jnp.reshape(r(state), (-1,)) for r in system.residuals]
-    return jnp.concatenate(parts) if parts else jnp.zeros((0,), dtype=field.W.dtype)
-
-
-def _periodic_axes(system: System, bc: BoundaryCondition) -> tuple[str, ...]:
-    cs = system.domain.coordinate_spec
-    if bc.axis is not None:
-        return (bc.axis,)
-    return tuple(a for a in system.domain.spatial_axes if cs.is_periodic(a))
+    return (
+        jnp.concatenate(parts)
+        if parts
+        else jnp.zeros((0,), dtype=readout_dtype(field))
+    )
 
 
 def _periodic_rows(
@@ -52,7 +51,9 @@ def _periodic_rows(
     """Seam-matching rows; twin of the torch assembler, same orders and points."""
     rows: list[Any] = []
     cs = system.domain.coordinate_spec
-    for axis in _periodic_axes(system, bc):
+    orders = bc.periodic_orders
+    assert orders is not None  # BoundaryCondition defaults for kind="periodic"
+    for axis in periodic_axes(system.domain, bc):
         pts = boundary_points(system.domain, spec, axis=axis, side="lo")
         if pts.shape[0] == 0:
             continue
@@ -61,7 +62,7 @@ def _periodic_rows(
         low = to_array(pts, field)
         high = low.at[:, index].set(hi)
         s_lo, s_hi = field(low), field(high)
-        for order in PERIODIC_ORDERS:
+        for order in orders:
             if order == 0:
                 rows.append(
                     s_hi.ops.value(s_hi, bc.component) - s_lo.ops.value(s_lo, bc.component)
@@ -71,7 +72,7 @@ def _periodic_rows(
                     s_hi.ops.derivative(s_hi, bc.component, axis=axis, order=order)
                     - s_lo.ops.derivative(s_lo, bc.component, axis=axis, order=order)
                 )
-    return jnp.concatenate(rows) if rows else jnp.zeros((0,), dtype=field.W.dtype)
+    return jnp.concatenate(rows) if rows else jnp.zeros((0,), dtype=readout_dtype(field))
 
 
 def _bc_rows(
@@ -97,7 +98,7 @@ def _bc_rows(
             rows.append(normal - target)
         else:
             rows.append(bc.alpha * u + bc.beta * normal - target)
-    return jnp.concatenate(rows) if rows else jnp.zeros((0,), dtype=field.W.dtype)
+    return jnp.concatenate(rows) if rows else jnp.zeros((0,), dtype=readout_dtype(field))
 
 
 def _ic_rows(
@@ -138,7 +139,7 @@ def condition_residual(
         if i in absorbed_ic:
             continue
         rows.append(_ic_rows(field, system, ic, spec))
-    return jnp.concatenate(rows) if rows else jnp.zeros((0,), dtype=field.W.dtype)
+    return jnp.concatenate(rows) if rows else jnp.zeros((0,), dtype=readout_dtype(field))
 
 
 def all_rows(

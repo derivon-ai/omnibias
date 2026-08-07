@@ -17,23 +17,25 @@ from typing import Any
 import numpy as np
 import torch
 from omnibias.pinn.solver._core.conditions import BoundaryCondition, InitialCondition
-from omnibias.pinn.solver._core.hard import PERIODIC_ORDERS, HardConditionPlan
+from omnibias.pinn.solver._core.hard import HardConditionPlan
 from omnibias.pinn.solver._core.sampling import (
     CollocationSpec,
     bc_faces,
     boundary_points,
     initial_slice_points,
     interior_points,
+    periodic_axes,
     spatial_boundary_points,
 )
 from omnibias.pinn.solver._core.system import System
+from omnibias.pinn.solver.torch.readout import empty_rows, readout_device, readout_dtype
 from torch import Tensor
 
 
 def to_tensor(pts: np.ndarray, field: Any) -> Tensor:
     """Convert numpy points to a tensor matching the field's dtype/device."""
     return torch.as_tensor(
-        pts, dtype=field.W.weight.dtype, device=field.W.weight.device
+        pts, dtype=readout_dtype(field), device=readout_device(field)
     )
 
 
@@ -46,13 +48,6 @@ def interior_residual(field: Any, system: System, coords: Tensor) -> Tensor:
     state = field(coords)
     parts = [torch.reshape(r(state), (-1,)) for r in system.residuals]
     return torch.cat(parts) if parts else coords.new_zeros(0)
-
-
-def _periodic_axes(system: System, bc: BoundaryCondition) -> tuple[str, ...]:
-    cs = system.domain.coordinate_spec
-    if bc.axis is not None:
-        return (bc.axis,)
-    return tuple(a for a in system.domain.spatial_axes if cs.is_periodic(a))
 
 
 def _periodic_rows(
@@ -70,7 +65,7 @@ def _periodic_rows(
     copies that could disagree about what a seam means would defeat it.
     """
     rows = [_periodic_row(term) for term in _periodic_terms(field, system, bc, spec)]
-    return torch.cat(rows) if rows else field.W.weight.new_zeros(0)
+    return torch.cat(rows) if rows else empty_rows(field)
 
 
 def _bc_rows(
@@ -96,7 +91,7 @@ def _bc_rows(
             rows.append(normal - target)
         else:  # robin: alpha*u + beta*du/dn = value
             rows.append(bc.alpha * u + bc.beta * normal - target)
-    return torch.cat(rows) if rows else field.W.weight.new_zeros(0)
+    return torch.cat(rows) if rows else empty_rows(field)
 
 
 def _ic_rows(
@@ -138,7 +133,7 @@ def condition_residual(
         if i in absorbed_ic:
             continue
         rows.append(_ic_rows(field, system, ic, spec))
-    return torch.cat(rows) if rows else field.W.weight.new_zeros(0)
+    return torch.cat(rows) if rows else empty_rows(field)
 
 
 def all_rows(
@@ -180,10 +175,12 @@ def residual_norm(
 # Cached collocation plan (fast frozen-feature assembly for linear solves)
 # ---------------------------------------------------------------------
 #
-# When the hidden layer is frozen, ``sigma^(n)(z)`` is constant, so the
-# ``FieldState`` (which owns the ``SigmaCache``) can be built ONCE and reused
-# while only the readout weights vary. This turns the ``O(#unknowns)`` linear
-# assembly from ``O(H^2 N)`` full re-evaluations into cheap readout contractions.
+# Declaring fields cache only readout-independent quantities (SigmaCache of
+# the frozen feature map for a one-layer field; the temporal hidden state ``h``
+# for spectral / Chebyshev). The ``FieldState`` can therefore be built ONCE and
+# reused while only the linear readout varies -- that is the readout-
+# independence invariant. This turns the ``O(#unknowns)`` linear assembly from
+# ``O(H^2 N)`` full re-evaluations into cheap readout contractions.
 
 
 @dataclass
@@ -313,8 +310,10 @@ def _periodic_terms(
 ) -> list[_PeriodicTerm]:
     """Cached seam states, one pair per (axis, order) the periodic row matches."""
     cs = system.domain.coordinate_spec
+    orders = bc.periodic_orders
+    assert orders is not None  # BoundaryCondition defaults for kind="periodic"
     out: list[_PeriodicTerm] = []
-    for axis in _periodic_axes(system, bc):
+    for axis in periodic_axes(system.domain, bc):
         pts = boundary_points(system.domain, spec, axis=axis, side="lo")
         if pts.shape[0] == 0:
             continue
@@ -332,7 +331,7 @@ def _periodic_terms(
                 axis=axis,
                 order=order,
             )
-            for order in PERIODIC_ORDERS
+            for order in orders
         )
     return out
 

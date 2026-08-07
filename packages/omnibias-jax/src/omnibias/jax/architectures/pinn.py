@@ -63,11 +63,6 @@ def _value_from_layers(layers: list[LayerSpec], x: Array) -> Array:
     return out
 
 
-def _jet_batched(layers: list[LayerSpec], x: Array, order: int) -> Array:
-    out: Array = jax.vmap(lambda xi: mlp_jet_mv(xi, layers, order))(x)
-    return out
-
-
 def _check_layer_fastpaths(layers: list[LayerSpec], max_order: int) -> None:
     """Reject any layer activation lacking a closed-form derivative kernel of ``max_order``.
 
@@ -94,35 +89,42 @@ def _check_layer_fastpaths(layers: list[LayerSpec], max_order: int) -> None:
             ) from None
 
 
-def _gradient_batched(layers: list[LayerSpec], in_dim: int, x: Array) -> Array:
-    out: Array = jax.vmap(lambda xi: jet_gradient(mlp_jet_mv(xi, layers, 1), in_dim, 1))(x)
-    return out
-
-
-def _hessian_batched(layers: list[LayerSpec], in_dim: int, x: Array) -> Array:
-    out: Array = jax.vmap(lambda xi: jet_hessian(mlp_jet_mv(xi, layers, 2), in_dim, 2))(x)
-    return out
-
-
-def _value_grad_hessian_batched(
-    layers: list[LayerSpec], in_dim: int, x: Array
-) -> tuple[Array, Array, Array]:
-    def f(xi: Array) -> tuple[Array, Array, Array]:
-        j = mlp_jet_mv(xi, layers, 2)
-        return j[0], jet_gradient(j, in_dim, 2), jet_hessian(j, in_dim, 2)
-
-    res = jax.vmap(f)(x)
-    value_b: Array = res[0]
-    grad_b: Array = res[1]
-    hess_b: Array = res[2]
-    return value_b, grad_b, hess_b
-
-
 def _partials_from_jet(jet_b: Array, in_dim: int, order: int) -> dict[tuple[int, ...], Array]:
     idx = multi_indices(in_dim, order)
     return {
         alpha: jet_b[:, i] * multi_index_factorial(alpha) for i, alpha in enumerate(idx)
     }
+
+
+def _point_hidden_jet_from_layers(layers: list[LayerSpec], xi: Array, order: int) -> Array:
+    """Single-point jet through every layer *except* the affine readout.
+
+    Shape ``(M, H)``. Twin of
+    :meth:`omnibias.torch.architectures.pinn._JetMLPCore._point_hidden_jet`.
+    """
+    if len(layers) < 2:
+        raise ValueError(
+            "jet-based networks need at least one hidden layer plus a "
+            f"readout to split a hidden jet; got {len(layers)} layer(s)"
+        )
+    return mlp_jet_mv(xi, layers[:-1], order)
+
+
+def _apply_readout_jet_from_layers(layers: list[LayerSpec], hidden_jet: Array) -> Array:
+    """Push a (possibly batched) hidden jet through the live affine readout.
+
+    ``hidden_jet`` has shape ``(M, H)`` or ``(B, M, H)``; returns the same
+    leading shape with trailing width ``out_dim``. Twin of
+    :meth:`omnibias.torch.architectures.pinn._JetMLPCore._apply_readout_jet`.
+    """
+    w, b, _spec = layers[-1]
+    out = jnp.tensordot(hidden_jet, w, axes=([-1], [-1]))
+    if b is not None:
+        if hidden_jet.ndim == 2:
+            out = out.at[0].add(b)
+        else:
+            out = out.at[:, 0, :].add(b)
+    return out
 
 
 def _as_scales(frequency_scale: float | Sequence[float]) -> tuple[float, ...]:
@@ -178,14 +180,34 @@ class JetMLP:
             for i in range(n)
         ]
 
+    def _point_hidden_jet(self, xi: Array, order: int) -> Array:
+        """Single-point jet through every layer *except* the affine readout.
+
+        Shape ``(M, H)``. The expensive Faà-di-Bruno work lives here; the live
+        readout is applied by :meth:`_apply_readout_jet` so a cached
+        :class:`~omnibias.fields._core.state.FieldState` stays valid across
+        frozen-feature readout sweeps.
+        """
+        return _point_hidden_jet_from_layers(self._layer_specs(), xi, order)
+
+    def _apply_readout_jet(self, hidden_jet: Array) -> Array:
+        """Push a (possibly batched) hidden jet through the live affine readout.
+
+        ``hidden_jet`` has shape ``(M, H)`` or ``(B, M, H)``; returns the same
+        leading shape with trailing width ``out_dim``.
+        """
+        return _apply_readout_jet_from_layers(self._layer_specs(), hidden_jet)
+
     def _point_jet(self, xi: Array, order: int) -> Array:
         """Single-point multivariate jet, shape ``(M, out_dim)``.
 
-        The hook every batched readout goes through, so a wrapper network (a band
-        mixture, a hard-constraint ansatz) overrides this one method and stays
-        exact. Twin of :meth:`omnibias.torch.architectures.pinn._JetMLPCore._point_jet`.
+        Default: hidden jet plus the live affine readout. Subclasses / wrappers
+        that wrap the network (for example the hard-constraint ansatz
+        ``u = g + b * net``) override this so every readout below stays exact
+        and closed form. Twin of
+        :meth:`omnibias.torch.architectures.pinn._JetMLPCore._point_jet`.
         """
-        return mlp_jet_mv(xi, self._layer_specs(), order)
+        return self._apply_readout_jet(self._point_hidden_jet(xi, order))
 
     def _check_fastpath(self, max_order: int) -> None:
         """Reject activations without a closed-form tower up to ``max_order``."""
@@ -200,19 +222,38 @@ class JetMLP:
 
     def jet(self, x: Array, order: int) -> Array:
         """Batched multivariate jet, shape ``(B, M, out_dim)``."""
-        return _jet_batched(self._layer_specs(), x, order)
+        out: Array = jax.vmap(lambda xi: self._point_jet(xi, order))(x)
+        return out
 
     def gradient(self, x: Array) -> Array:
         """Exact input gradient ``d u / d x_i``, shape ``(B, in_dim, out_dim)``."""
-        return _gradient_batched(self._layer_specs(), self.in_dim, x)
+        dim = self.in_dim
+        out: Array = jax.vmap(
+            lambda xi: jet_gradient(self._point_jet(xi, 1), dim, 1)
+        )(x)
+        return out
 
     def hessian(self, x: Array) -> Array:
         """Exact input Hessian, shape ``(B, in_dim, in_dim, out_dim)``."""
-        return _hessian_batched(self._layer_specs(), self.in_dim, x)
+        dim = self.in_dim
+        out: Array = jax.vmap(
+            lambda xi: jet_hessian(self._point_jet(xi, 2), dim, 2)
+        )(x)
+        return out
 
     def value_grad_hessian(self, x: Array) -> tuple[Array, Array, Array]:
         """One jet -> ``(value, gradient, Hessian)`` for 2nd-order PDE residuals."""
-        return _value_grad_hessian_batched(self._layer_specs(), self.in_dim, x)
+        dim = self.in_dim
+
+        def f(xi: Array) -> tuple[Array, Array, Array]:
+            j = self._point_jet(xi, 2)
+            return j[0], jet_gradient(j, dim, 2), jet_hessian(j, dim, 2)
+
+        res = jax.vmap(f)(x)
+        value_b: Array = res[0]
+        grad_b: Array = res[1]
+        hess_b: Array = res[2]
+        return value_b, grad_b, hess_b
 
     def partials(self, x: Array, order: int) -> dict[tuple[int, ...], Array]:
         """All raw partials ``{alpha: D^alpha u(x)}`` to total ``order`` (``(B, out_dim)``)."""
@@ -305,9 +346,23 @@ class FourierFeatureMLP:
             )
         return specs
 
+    def _point_hidden_jet(self, xi: Array, order: int) -> Array:
+        """Single-point jet through every layer *except* the affine readout.
+
+        Shape ``(M, H)``.
+        """
+        return _point_hidden_jet_from_layers(self._layer_specs(), xi, order)
+
+    def _apply_readout_jet(self, hidden_jet: Array) -> Array:
+        """Push a (possibly batched) hidden jet through the live affine readout.
+
+        ``hidden_jet`` has shape ``(M, H)`` or ``(B, M, H)``.
+        """
+        return _apply_readout_jet_from_layers(self._layer_specs(), hidden_jet)
+
     def _point_jet(self, xi: Array, order: int) -> Array:
         """Single-point multivariate jet, shape ``(M, out_dim)``."""
-        return mlp_jet_mv(xi, self._layer_specs(), order)
+        return self._apply_readout_jet(self._point_hidden_jet(xi, order))
 
     def _check_fastpath(self, max_order: int) -> None:
         """Reject activations without a closed-form tower up to ``max_order``."""
@@ -322,19 +377,38 @@ class FourierFeatureMLP:
 
     def jet(self, x: Array, order: int) -> Array:
         """Batched multivariate jet, shape ``(B, M, out_dim)``."""
-        return _jet_batched(self._layer_specs(), x, order)
+        out: Array = jax.vmap(lambda xi: self._point_jet(xi, order))(x)
+        return out
 
     def gradient(self, x: Array) -> Array:
         """Exact input gradient ``d u / d x_i``, shape ``(B, in_dim, out_dim)``."""
-        return _gradient_batched(self._layer_specs(), self.in_dim, x)
+        dim = self.in_dim
+        out: Array = jax.vmap(
+            lambda xi: jet_gradient(self._point_jet(xi, 1), dim, 1)
+        )(x)
+        return out
 
     def hessian(self, x: Array) -> Array:
         """Exact input Hessian, shape ``(B, in_dim, in_dim, out_dim)``."""
-        return _hessian_batched(self._layer_specs(), self.in_dim, x)
+        dim = self.in_dim
+        out: Array = jax.vmap(
+            lambda xi: jet_hessian(self._point_jet(xi, 2), dim, 2)
+        )(x)
+        return out
 
     def value_grad_hessian(self, x: Array) -> tuple[Array, Array, Array]:
         """One jet -> ``(value, gradient, Hessian)`` for 2nd-order PDE residuals."""
-        return _value_grad_hessian_batched(self._layer_specs(), self.in_dim, x)
+        dim = self.in_dim
+
+        def f(xi: Array) -> tuple[Array, Array, Array]:
+            j = self._point_jet(xi, 2)
+            return j[0], jet_gradient(j, dim, 2), jet_hessian(j, dim, 2)
+
+        res = jax.vmap(f)(x)
+        value_b: Array = res[0]
+        grad_b: Array = res[1]
+        hess_b: Array = res[2]
+        return value_b, grad_b, hess_b
 
     def partials(self, x: Array, order: int) -> dict[tuple[int, ...], Array]:
         """All raw partials ``{alpha: D^alpha u(x)}`` to total ``order`` (``(B, out_dim)``)."""

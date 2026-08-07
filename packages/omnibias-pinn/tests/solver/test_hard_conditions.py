@@ -122,13 +122,24 @@ def test_a_seam_stacked_on_dirichlet_ends_is_refused_as_redundant() -> None:
 
     The right answer is a refusal, not a nearly-singular inverse: the extra
     functional carries no information and inverting through it would amplify
-    round-off into the switching functions.
+    round-off into the switching functions. The domain must declare the seam
+    axis periodic so ``System`` accepts the periodic BC; the Dirichlet faces
+    are named explicitly because the default Dirichlet skip skips periodic
+    faces.
     """
-    base = _heat()
+    dom = pde.Domain(
+        ("t", "x"), ((0.0, 0.2), (0.0, 1.0)), periodic=(False, True), time_axis="t"
+    )
+
+    def initial(c):
+        return 0.0 * c[:, 0]
+
+    base = pde.heat(dom, diffusivity=0.1, initial=initial)
     sys = replace(
         base,
         boundary=(
-            *base.boundary,
+            pde.BoundaryCondition("u", "dirichlet", 0.0, axis="x", side="lo"),
+            pde.BoundaryCondition("u", "dirichlet", 0.0, axis="x", side="hi"),
             pde.BoundaryCondition(component="u", kind="periodic", axis="x"),
         ),
     )
@@ -412,7 +423,7 @@ def test_a_periodic_seam_closes_exactly_when_absorbed() -> None:
         collocation=pde.CollocationSpec(n_interior=48),
         hard_conditions="auto",
     )
-    assert sol.diagnostics["hard_absorbed"] == 2  # value and slope across the seam
+    assert sol.diagnostics["hard_absorbed"] == 3  # value, slope, and second deriv
     value_gap, slope_gap = _seam(sol)
     assert value_gap < EXACT
     assert slope_gap < EXACT
@@ -429,7 +440,7 @@ def test_a_seam_and_an_initial_condition_are_absorbed_together() -> None:
         collocation=pde.CollocationSpec(n_interior=10, n_boundary=10),
         hard_conditions="auto",
     )
-    assert sol.diagnostics["hard_absorbed"] == 3
+    assert sol.diagnostics["hard_absorbed"] == 4  # three seam orders + IC
     assert _full_condition_residual(sol) < EXACT
     pts = np.stack(
         [np.full(40, 0.0), np.linspace(0.0, 1.0, 40)], axis=-1
@@ -455,3 +466,34 @@ def test_the_soft_arm_now_at_least_sees_the_seam() -> None:
     value_gap, _ = _seam(sol)
     assert 0.0 < value_gap < 1e-3
     assert condition_residual(sol.field, sol.system, SMALL, None).numel() > 0
+
+
+def test_seam_orders_on_the_bc_reach_hard_path_and_soft_guard() -> None:
+    """Orders live on the declaration so the two paths cannot diverge.
+
+    A non-default ``(0, 1)`` must appear in the hard plan *and* in the
+    ``hard=None`` residual guard; that is the whole point of moving the
+    parameter off ``plan_hard_conditions``. The default is now ``(0, 1, 2)``.
+    """
+    torch.set_default_dtype(torch.float64)
+    orders = (0, 1)
+    sys = replace(
+        _periodic_poisson(),
+        boundary=(
+            pde.BoundaryCondition(
+                component="u", kind="periodic", axis="x", periodic_orders=orders
+            ),
+        ),
+    )
+    plan = plan_hard_conditions(sys)
+    labels = [c.constraint.label for c in plan.conditions]
+    assert labels == [f"periodic^{n}@x" for n in orders]
+    assert plan.is_total, plan.declined
+
+    field = pt.build_field(sys, hidden=16, seed=0)
+    soft = condition_residual(field, sys, SMALL, None)
+    default_soft = condition_residual(field, _periodic_poisson(), SMALL, None)
+    # 1-D seam: one collocation point per order; default matches (0, 1, 2).
+    assert default_soft.numel() == 3
+    assert soft.numel() == len(orders)
+    assert soft.numel() < default_soft.numel()

@@ -19,8 +19,9 @@ knob **inside** the network, and both keep the derivative tower exact:
   another. The mixture's jet is the sum of the per-band jets, so it is still
   exact closed form.
 
-Both are ordinary ``jet_mlp``-tagged fields: they inherit the jet cache, the
-gradient / Hessian / polylaplacian fast paths and the whole operator surface from
+Both are ordinary ``jet_mlp``-tagged fields: they inherit the hidden-jet cache
+(with the live affine readout applied per call), the gradient / Hessian /
+polylaplacian fast paths and the whole operator surface from
 :class:`~omnibias.pinn.torch.fields.jet_mlp._JetFieldBase`, and need no new
 dispatch tag.
 

@@ -2,13 +2,17 @@
 # Copyright (C) 2026 Derivon
 """Steady / boundary-value driver (jax): exact-operator linear collocation.
 
-Twin of :func:`omnibias.pinn.solver.torch.steady.solve_least_squares`. The hidden layer
-is fixed, so for a linear system the residual is affine in the readout weights;
-the collocation matrix is assembled column-by-column from the **closed-form**
-operators (no autodiff) and solved with one least-squares solve.
+Twin of :func:`omnibias.pinn.solver.torch.steady.solve_least_squares`. The
+feature map is frozen (one-layer: the hidden ``W`` / ``beta``; spectral /
+Chebyshev: the temporal MLP), so for a linear system the residual is affine in
+the readout weights; the collocation matrix is assembled column-by-column from
+the **closed-form** operators (no autodiff) and solved with one least-squares
+solve.
 """
 
 from __future__ import annotations
+
+import math
 
 import jax.numpy as jnp
 from omnibias.pinn.solver._core.hard import plan_hard_conditions
@@ -21,7 +25,13 @@ from omnibias.pinn.solver.jax.assemble import (
     default_interior,
     residual_norm,
 )
-from omnibias.pinn.solver.jax.fields import build_field, with_readout
+from omnibias.pinn.solver.jax.fields import build_field
+from omnibias.pinn.solver.jax.readout import (
+    freeze_features,
+    readout_dtype,
+    readout_size,
+    with_readout,
+)
 
 
 def solve_least_squares(
@@ -34,6 +44,11 @@ def solve_least_squares(
     collocation: CollocationSpec | None = None,
     ridge: float = 1e-8,
     hard_conditions: str = "none",
+    basis: str = "mlp",
+    K: int = 8,
+    L: float | tuple[float, ...] = 2.0 * math.pi,
+    time_hidden: int | None = None,
+    time_depth: int = 1,
 ) -> FieldSolution:
     """Exact-operator linear collocation on jax (one least-squares solve).
 
@@ -52,20 +67,35 @@ def solve_least_squares(
     spec = collocation or CollocationSpec()
     hard = plan_hard_conditions(system, mode=hard_conditions)
     field = build_field(
-        system, hidden=hidden, activation=activation,
-        weight_init_scale=weight_init_scale, seed=seed,
+        system,
+        hidden=hidden,
+        activation=activation,
+        weight_init_scale=weight_init_scale,
+        seed=seed,
         hard_conditions=hard,
+        basis=basis,
+        K=K,
+        L=L,
+        time_hidden=time_hidden,
+        time_depth=time_depth,
     )
-    c_shape = field.c.shape
-    n_c = int(c_shape[0] * c_shape[1])
-    n_unknowns = n_c + int(c_shape[0])
+    freeze_features(field)
+    n_out, n_feat, n_unknowns = readout_size(field)
+    n_w = n_out * n_feat
+    weight_shape = (n_out, n_feat)
     coords = default_interior(field, system, spec)
-    dtype = field.W.dtype
+    dtype = readout_dtype(field)
 
     def rows_for(theta: jnp.ndarray) -> jnp.ndarray:
-        c = theta[:n_c].reshape(c_shape)
-        b = theta[n_c:]
-        return all_rows(with_readout(field, c, b), system, coords, spec, hard)
+        return all_rows(
+            with_readout(
+                field, theta[:n_w].reshape(weight_shape), theta[n_w:]
+            ),
+            system,
+            coords,
+            spec,
+            hard,
+        )
 
     r0 = rows_for(jnp.zeros(n_unknowns, dtype=dtype))
     columns = []
@@ -80,7 +110,9 @@ def solve_least_squares(
     else:
         theta = jnp.linalg.lstsq(mat, rhs, rcond=None)[0]
 
-    fitted = with_readout(field, theta[:n_c].reshape(c_shape), theta[n_c:])
+    fitted = with_readout(
+        field, theta[:n_w].reshape(weight_shape), theta[n_w:]
+    )
     return FieldSolution(
         field=fitted,
         system=system,

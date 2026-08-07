@@ -34,7 +34,6 @@ from omnibias.jax.architectures.pinn import (
     _check_layer_fastpaths,
     _partials_from_jet,
 )
-from omnibias.jax.jet import affine_jet
 from omnibias.jax.jet_mv import (
     jet_attention,
     jet_gradient,
@@ -113,15 +112,31 @@ class AttentionJetMLP:
         """
         _check_layer_fastpaths(self._encoder_specs(), max_order)
 
-    def _point_jet(self, xi: Array, order: int) -> Array:
-        """Single-point jet of the whole block, shape ``(M, out_dim)``."""
+    def _point_hidden_jet(self, xi: Array, order: int) -> Array:
+        """Single-point pre-readout jet (encoder + attention [+ residual])."""
         q_jet = mlp_jet_mv(xi, self._encoder_specs(), order)
         h_jet = jet_attention(
             q_jet, self.keys, self.values, self.in_dim, order, beta=self.beta
         )
         if self.residual:
             h_jet = h_jet + q_jet
-        return affine_jet(h_jet, self.readout_weight, self.readout_bias)
+        return h_jet
+
+    def _apply_readout_jet(self, hidden_jet: Array) -> Array:
+        """Push a (possibly batched) pre-readout jet through the live affine head."""
+        w = self.readout_weight
+        b = self.readout_bias
+        out = jnp.tensordot(hidden_jet, w, axes=([-1], [-1]))
+        if b is not None:
+            if hidden_jet.ndim == 2:
+                out = out.at[0].add(b)
+            else:
+                out = out.at[:, 0, :].add(b)
+        return out
+
+    def _point_jet(self, xi: Array, order: int) -> Array:
+        """Single-point jet of the whole block, shape ``(M, out_dim)``."""
+        return self._apply_readout_jet(self._point_hidden_jet(xi, order))
 
     def query(self, x: Array) -> Array:
         """Encoder output ``q(x)``, shape ``(..., hidden)``."""

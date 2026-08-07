@@ -154,8 +154,8 @@ class ChebyshevVectorField(FieldBase):
         W_t_pow = self.W_t.squeeze(-1) ** t_order
         return sigma_n * W_t_pow
 
-    def _coeff_blocks_at_t(self, t: Array, *, t_order: int = 0) -> Array:
-        h = self._hidden_t_and_dt(t, t_order=t_order)
+    def _a_from_hidden(self, h: Array, *, t_order: int = 0) -> Array:
+        """Apply the live readout ``(V, b_t)`` to a cached temporal feature ``h``."""
         if t_order == 0:
             a = self.b_t + h @ self.V.T
         else:
@@ -163,6 +163,10 @@ class ChebyshevVectorField(FieldBase):
         return a.reshape(
             -1, self.C, *([self._modes_per_axis] * self.D_spatial),
         )
+
+    def _coeff_blocks_at_t(self, t: Array, *, t_order: int = 0) -> Array:
+        h = self._hidden_t_and_dt(t, t_order=t_order)
+        return self._a_from_hidden(h, t_order=t_order)
 
     def _pre_activations(self, coords: Array) -> Array:
         t = coords[..., self._time_axis_idx]
@@ -204,14 +208,14 @@ class ChebyshevVectorField(FieldBase):
     def _coeff_blocks_for_state(
         self, state: FieldState, *, t_order: int = 0,
     ) -> Array:
-        key = f"chebyshev_a_t{t_order}"
-        cached = state.extra.get(key)
-        if cached is not None:
-            return cached
-        t = state.coords[..., self._time_axis_idx]
-        a = self._coeff_blocks_at_t(t, t_order=t_order)
-        state.extra[key] = a
-        return a
+        """Return ``a(t)`` from a readout-independent cached temporal feature ``h``."""
+        key = f"chebyshev_h_t{t_order}"
+        h = state.extra.get(key)
+        if h is None:
+            t = state.coords[..., self._time_axis_idx]
+            h = self._hidden_t_and_dt(t, t_order=t_order)
+            state.extra[key] = h
+        return self._a_from_hidden(h, t_order=t_order)
 
     def value_component(self, state: FieldState, name: str) -> Array:
         ci = self.components.index(name)
@@ -461,3 +465,4 @@ __all__ = ["ChebyshevVectorField", "make_chebyshev_vector_field"]
 
 # Marker read by the omnibias-fields backend ops to select the dispatch path.
 ChebyshevVectorField._omnibias_dispatch = "chebyshev"
+ChebyshevVectorField._omnibias_readout_independent = True

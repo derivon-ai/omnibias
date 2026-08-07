@@ -25,7 +25,6 @@ from :mod:`omnibias.pinn._core.constrained` and never imports torch or jax.
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -40,17 +39,11 @@ from omnibias.pinn._core.constrained import (
     periodic,
     robin,
 )
-from omnibias.pinn.solver._core.sampling import bc_faces
+from omnibias.pinn.solver._core.sampling import bc_faces, periodic_axes
 from omnibias.pinn.solver._core.system import System
 
 #: Accepted values of the ``hard_conditions`` solver keyword.
 HARD_CONDITION_MODES = ("none", "auto")
-
-#: Derivative orders matched across a periodic seam. A smooth periodic solution
-#: matches every derivative, so requiring the value *and* the slope is a subset
-#: of the truth rather than an extra assumption -- and matching only the value
-#: leaves the solution free to kink exactly where nothing is watching.
-PERIODIC_ORDERS = (0, 1)
 
 
 @dataclass(frozen=True)
@@ -124,7 +117,7 @@ def _face_value(domain: Any, axis: str, side: str) -> float:
 
 
 def _periodic_conditions(
-    system: System, bc: Any, orders: Sequence[int]
+    system: System, bc: Any
 ) -> tuple[list[HardCondition], str | None]:
     """Periodicity as relative constraints ``d^n u(hi) - d^n u(lo) = 0``.
 
@@ -133,19 +126,21 @@ def _periodic_conditions(
     which is true of the spectral method-of-lines route and false here. Tying
     the two faces together with a relative functional is what makes the claim
     true for this route as well.
+
+    Orders come from ``bc.periodic_orders`` so the hard path and the
+    ``hard=None`` residual guard cannot disagree about which derivatives the
+    seam matches.
     """
     domain = system.domain
     cs = domain.coordinate_spec
-    names = (
-        (bc.axis,)
-        if bc.axis is not None
-        else tuple(a for a in domain.spatial_axes if cs.is_periodic(a))
-    )
+    names = periodic_axes(domain, bc)
     if not names:
         return [], (
             "periodic condition names no axis and the domain declares none "
             "periodic, so there is no seam to tie together"
         )
+    orders = bc.periodic_orders
+    assert orders is not None  # BoundaryCondition defaults for kind="periodic"
     out: list[HardCondition] = []
     for axis in names:
         index = cs.axis_index(axis)
@@ -163,11 +158,11 @@ def _periodic_conditions(
 
 
 def _boundary_conditions(
-    system: System, bc: Any, *, periodic_orders: Sequence[int]
+    system: System, bc: Any
 ) -> tuple[list[HardCondition], str | None]:
     """The hard conditions one :class:`BoundaryCondition` maps to, or a decline."""
     if bc.kind == "periodic":
-        return _periodic_conditions(system, bc, periodic_orders)
+        return _periodic_conditions(system, bc)
     domain = system.domain
     out: list[HardCondition] = []
     for axis, side in bc_faces(domain, bc):
@@ -225,7 +220,6 @@ def plan_hard_conditions(
     *,
     mode: str = "auto",
     condition_limit: float | None = None,
-    periodic_orders: Sequence[int] = PERIODIC_ORDERS,
 ) -> HardConditionPlan:
     """Work out which conditions of ``system`` can be enforced by construction.
 
@@ -238,10 +232,6 @@ def plan_hard_conditions(
         ``"auto"`` absorbs everything it can certify.
     condition_limit
         Optional override of the support-matrix conditioning refusal threshold.
-    periodic_orders
-        Derivative orders matched across a periodic seam; see
-        :data:`PERIODIC_ORDERS`. Pass ``(0,)`` for value-only matching, which is
-        what a solution with a genuine kink at the seam needs.
 
     Returns
     -------
@@ -254,7 +244,10 @@ def plan_hard_conditions(
     The planner sees only the *structure* of the conditions, never the target
     values, because it is pure Python and the targets are backend callables.
     Whether the data is mutually consistent across axes is therefore checked
-    where the cage is built, not here.
+    where the cage is built, not here. Periodic seam orders live on each
+    :class:`~omnibias.pinn.solver._core.conditions.BoundaryCondition`
+    (``periodic_orders``), not on this planner, so the hard path and the
+    residual guard share one declaration.
     """
     if mode not in HARD_CONDITION_MODES:
         raise ValueError(
@@ -267,7 +260,7 @@ def plan_hard_conditions(
     declined: list[DeclinedCondition] = []
 
     for i, bc in enumerate(system.boundary):
-        conds, reason = _boundary_conditions(system, bc, periodic_orders=periodic_orders)
+        conds, reason = _boundary_conditions(system, bc)
         if reason is not None:
             declined.append(DeclinedCondition("boundary", bc.component, i, reason))
         else:
@@ -329,9 +322,8 @@ def _certify(
 
 
 __all__ = [
-    "HARD_CONDITION_MODES",
-    "PERIODIC_ORDERS",
     "DeclinedCondition",
+    "HARD_CONDITION_MODES",
     "HardConditionPlan",
     "plan_hard_conditions",
 ]

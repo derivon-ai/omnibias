@@ -37,6 +37,18 @@ if TYPE_CHECKING:  # pragma: no cover
 #: classes from a downstream package (which would create a dependency cycle).
 DISPATCH_ATTR = "_omnibias_dispatch"
 
+#: Name of the class attribute a concrete field sets to ``True`` when every
+#: quantity cached on a produced :class:`~omnibias.fields._core.state.FieldState`
+#: (``SigmaCache`` and ``extra``) is independent of the field's *readout*
+#: parameters, and every op re-reads those parameters live.
+#:
+#: The frozen-feature linear solver builds a collocation plan once and sweeps
+#: the readout against the same cached states; that is sound only for fields
+#: that declare this marker. Fields that are nonlinear in the readout (e.g. an
+#: integral-conservation cage) must leave it unset / ``False`` so the driver
+#: refuses them with a named error rather than silently miscomputing.
+READOUT_INDEPENDENT_ATTR = "_omnibias_readout_independent"
+
 
 @runtime_checkable
 class FieldBase(Protocol):
@@ -46,6 +58,10 @@ class FieldBase(Protocol):
     :data:`DISPATCH_ATTR` to one of the dispatch tags understood by the
     backend ops (``"one_layer"`` selects the closed-form sigma-tower
     reduction; other tags select the state-method path).
+
+    Fields that participate in the frozen-feature linear solver also set the
+    class attribute named by :data:`READOUT_INDEPENDENT_ATTR` to ``True`` when
+    their per-state caches are independent of the readout parameters.
     """
 
     @property
@@ -59,4 +75,4 @@ class FieldBase(Protocol):
     def __call__(self, coords: Any) -> FieldState: ...
 
 
-__all__ = ["DISPATCH_ATTR", "FieldBase"]
+__all__ = ["DISPATCH_ATTR", "FieldBase", "READOUT_INDEPENDENT_ATTR"]

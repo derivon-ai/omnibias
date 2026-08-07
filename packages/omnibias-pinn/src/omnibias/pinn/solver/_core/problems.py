@@ -61,17 +61,60 @@ def _advection(state: Any, name: str, velocity: Sequence[Coefficient]) -> Any:
     return total
 
 
+def _periodic_boundary_conditions(
+    domain: Domain, components: Sequence[str]
+) -> tuple[BoundaryCondition, ...]:
+    """One periodic BC per component per periodic *spatial* axis.
+
+    The time axis is never included: even if the domain marks it periodic, seam
+    matching in time is not a spatial boundary condition. Axis is named
+    explicitly so the declaration is self-describing; the shared
+    :func:`~omnibias.pinn.solver._core.sampling.periodic_axes` helper would
+    resolve the same seams from ``axis=None``.
+    """
+    cs = domain.coordinate_spec
+    axes = tuple(a for a in domain.spatial_axes if cs.is_periodic(a))
+    return tuple(
+        BoundaryCondition(component=name, kind="periodic", axis=axis)
+        for name in components
+        for axis in axes
+    )
+
+
+def _with_periodic_boundary(
+    boundary: tuple[BoundaryCondition, ...],
+    domain: Domain,
+    components: Sequence[str],
+    *,
+    periodic_boundary: bool,
+) -> tuple[BoundaryCondition, ...]:
+    """Append emitted periodic BCs after ``boundary`` (never prepend).
+
+    Appending keeps existing ``absorbed_boundary`` indices stable when the flag
+    is flipped on: the original conditions stay at the same positions.
+    """
+    if not periodic_boundary:
+        return boundary
+    return boundary + _periodic_boundary_conditions(domain, components)
+
+
 def poisson(
     domain: Domain,
     *,
     source: ValueLike = 0.0,
     boundary: ValueLike = 0.0,
     component: str = "u",
+    periodic_boundary: bool = False,
 ) -> System:
     r"""Poisson problem ``Delta u = source`` with Dirichlet boundary data.
 
     Residual: ``laplacian(u) - source``. To solve ``-Delta u = f`` pass
     ``source = lambda c: -f(c)``.
+
+    Set ``periodic_boundary=True`` to also emit a periodic seam condition on
+    every spatial axis the domain declares periodic (appended after the
+    Dirichlet condition). Default ``False`` recovers today's builders bit for
+    bit.
     """
 
     def residual(state: Any) -> Any:
@@ -81,7 +124,12 @@ def poisson(
         domain=domain,
         fields=(Field(component),),
         residuals=(residual,),
-        boundary=(BoundaryCondition(component, "dirichlet", boundary),),
+        boundary=_with_periodic_boundary(
+            (BoundaryCondition(component, "dirichlet", boundary),),
+            domain,
+            (component,),
+            periodic_boundary=periodic_boundary,
+        ),
         pde_type=PDEType.ELLIPTIC,
         linearity=Linearity.LINEAR,
         name="poisson",
@@ -96,10 +144,16 @@ def heat(
     boundary: ValueLike = 0.0,
     source: ValueLike = 0.0,
     component: str = "u",
+    periodic_boundary: bool = False,
 ) -> System:
     r"""Heat equation ``u_t = diffusivity * Delta u + source``.
 
     Residual: ``u_t - diffusivity * laplacian(u) - source``.
+
+    Set ``periodic_boundary=True`` to also emit a periodic seam condition on
+    every spatial axis the domain declares periodic (appended after the
+    Dirichlet condition). Default ``False`` recovers today's builders bit for
+    bit.
     """
     ta = domain.time_axis
     if ta is None:
@@ -114,7 +168,12 @@ def heat(
         domain=domain,
         fields=(Field(component),),
         residuals=(residual,),
-        boundary=(BoundaryCondition(component, "dirichlet", boundary),),
+        boundary=_with_periodic_boundary(
+            (BoundaryCondition(component, "dirichlet", boundary),),
+            domain,
+            (component,),
+            periodic_boundary=periodic_boundary,
+        ),
         initial=(InitialCondition(component, initial, order=0),),
         pde_type=PDEType.PARABOLIC,
         linearity=Linearity.LINEAR,
@@ -131,6 +190,7 @@ def wave(
     initial_velocity: ValueLike = 0.0,
     boundary: ValueLike = 0.0,
     component: str = "u",
+    periodic_boundary: bool = False,
 ) -> System:
     r"""Wave equation ``u_tt = speed**2 * Delta u``.
 
@@ -140,6 +200,11 @@ def wave(
     Recovering ``speed`` recovers only its *magnitude*: the residual sees
     ``speed ** 2``, so the sign is not identifiable. Use
     ``Unknown(..., transform="positive")``.
+
+    Set ``periodic_boundary=True`` to also emit a periodic seam condition on
+    every spatial axis the domain declares periodic (appended after the
+    Dirichlet condition). Default ``False`` recovers today's builders bit for
+    bit.
     """
     ta = domain.time_axis
     if ta is None:
@@ -154,7 +219,12 @@ def wave(
         domain=domain,
         fields=(Field(component),),
         residuals=(residual,),
-        boundary=(BoundaryCondition(component, "dirichlet", boundary),),
+        boundary=_with_periodic_boundary(
+            (BoundaryCondition(component, "dirichlet", boundary),),
+            domain,
+            (component,),
+            periodic_boundary=periodic_boundary,
+        ),
         initial=(
             InitialCondition(component, initial, order=0),
             InitialCondition(component, initial_velocity, order=1),
@@ -172,11 +242,16 @@ def burgers(
     viscosity: Coefficient = 0.05,
     initial: ValueLike = 0.0,
     component: str = "u",
+    periodic_boundary: bool = False,
 ) -> System:
     r"""Viscous Burgers ``u_t + u u_x = viscosity * u_xx`` (1 spatial axis).
 
     Residual: ``u_t + u * u_x - viscosity * laplacian(u)``. Typically posed on a
     periodic spatial domain.
+
+    Set ``periodic_boundary=True`` to emit a periodic seam condition on every
+    spatial axis the domain declares periodic. Default ``False`` recovers
+    today's builders bit for bit (no boundary conditions).
     """
     ta = domain.time_axis
     if ta is None:
@@ -196,6 +271,12 @@ def burgers(
         domain=domain,
         fields=(Field(component),),
         residuals=(residual,),
+        boundary=_with_periodic_boundary(
+            (),
+            domain,
+            (component,),
+            periodic_boundary=periodic_boundary,
+        ),
         initial=(InitialCondition(component, initial, order=0),),
         pde_type=PDEType.PARABOLIC,
         linearity=Linearity.NONLINEAR,
@@ -211,6 +292,7 @@ def reaction_diffusion(
     reaction: Callable[[Any, Any], tuple[Any, Any]],
     initial: tuple[ValueLike, ValueLike] = (0.0, 0.0),
     components: tuple[str, str] = ("u", "v"),
+    periodic_boundary: bool = False,
 ) -> System:
     r"""Two-species reaction-diffusion (coupled, nonlinear).
 
@@ -218,6 +300,10 @@ def reaction_diffusion(
     ``reaction(u, v)`` returns the pair ``(R_u, R_v)`` given the component
     *values* (tensors). Residuals: ``u_t - Du * lap(u) - R_u`` and likewise for
     ``v``.
+
+    Set ``periodic_boundary=True`` to emit a periodic seam condition per
+    component on every spatial axis the domain declares periodic. Default
+    ``False`` recovers today's builders bit for bit (no boundary conditions).
     """
     ta = domain.time_axis
     if ta is None:
@@ -243,6 +329,12 @@ def reaction_diffusion(
         domain=domain,
         fields=(Field(cu), Field(cv)),
         residuals=(residual_u, residual_v),
+        boundary=_with_periodic_boundary(
+            (),
+            domain,
+            components,
+            periodic_boundary=periodic_boundary,
+        ),
         initial=(
             InitialCondition(cu, initial[0], order=0),
             InitialCondition(cv, initial[1], order=0),
@@ -263,6 +355,7 @@ def advection_diffusion(
     initial: tuple[ValueLike, ValueLike] = (0.0, 0.0),
     boundary: tuple[ValueLike, ValueLike] = (0.0, 0.0),
     components: tuple[str, str] = ("u", "v"),
+    periodic_boundary: bool = False,
 ) -> System:
     r"""Two-field advection-diffusion (coupled, linear).
 
@@ -273,6 +366,11 @@ def advection_diffusion(
     ``velocity`` is a scalar (broadcast over spatial axes) or one value per
     spatial axis; either form may mix floats and
     :class:`~omnibias.pinn.solver._core.unknowns.Unknown` entries.
+
+    Set ``periodic_boundary=True`` to also emit a periodic seam condition per
+    component on every spatial axis the domain declares periodic (appended
+    after the Dirichlet conditions). Default ``False`` recovers today's
+    builders bit for bit.
     """
     ta = domain.time_axis
     if ta is None:
@@ -313,9 +411,14 @@ def advection_diffusion(
         domain=domain,
         fields=(Field(cu), Field(cv)),
         residuals=(residual_u, residual_v),
-        boundary=(
-            BoundaryCondition(cu, "dirichlet", boundary[0]),
-            BoundaryCondition(cv, "dirichlet", boundary[1]),
+        boundary=_with_periodic_boundary(
+            (
+                BoundaryCondition(cu, "dirichlet", boundary[0]),
+                BoundaryCondition(cv, "dirichlet", boundary[1]),
+            ),
+            domain,
+            components,
+            periodic_boundary=periodic_boundary,
         ),
         initial=(
             InitialCondition(cu, initial[0], order=0),

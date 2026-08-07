@@ -219,3 +219,5 @@ __all__ = [
 # jet path (avoids a fields -> pinn import cycle).
 AdaptiveJetMLPVectorField._omnibias_dispatch = "jet_mlp"
 MscaleVectorField._omnibias_dispatch = "jet_mlp"
+AdaptiveJetMLPVectorField._omnibias_readout_independent = True
+MscaleVectorField._omnibias_readout_independent = True

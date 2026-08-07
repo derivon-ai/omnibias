@@ -406,14 +406,42 @@ class MscaleMLP(_JetMLPCore):
             assert isinstance(sub, _JetMLPCore)
             sub._check_fastpath(max_order)
 
-    def _point_jet(self, xi: Tensor, order: int) -> Tensor:
-        """Single-point jet of the mixture: the sum of the per-band jets."""
-        total: Tensor | None = None
+    def _point_hidden_jet(self, xi: Tensor, order: int) -> Tensor:
+        """Stack of per-band hidden jets, shape ``(n_bands, M, H)``."""
+        bands: list[Tensor] = []
         for layers in self._band_layer_specs():
-            j = mlp_jet_mv(xi, layers, order)
-            total = j if total is None else total + j
+            if len(layers) < 2:
+                raise ValueError(
+                    "each Mscale band needs a hidden layer plus a readout"
+                )
+            bands.append(mlp_jet_mv(xi, layers[:-1], order))
+        return torch.stack(bands, dim=0)
+
+    def _apply_readout_jet(self, hidden_jet: Tensor) -> Tensor:
+        """Apply each band's live readout and sum.
+
+        ``hidden_jet`` is ``(n_bands, M, H)`` or ``(B, n_bands, M, H)``.
+        """
+        band_layers = self._band_layer_specs()
+        total: Tensor | None = None
+        batched = hidden_jet.ndim == 4
+        for i, layers in enumerate(band_layers):
+            w, b, _spec = layers[-1]
+            h_i = hidden_jet[:, i] if batched else hidden_jet[i]
+            out_i: Tensor = torch.tensordot(h_i, w, dims=([-1], [-1]))
+            if b is not None:
+                out_i = out_i.clone()
+                if batched:
+                    out_i[:, 0, :] = out_i[:, 0, :] + b
+                else:
+                    out_i[0] = out_i[0] + b
+            total = out_i if total is None else total + out_i
         assert total is not None
         return total
+
+    def _point_jet(self, xi: Tensor, order: int) -> Tensor:
+        """Single-point jet of the mixture: the sum of the per-band jets."""
+        return self._apply_readout_jet(self._point_hidden_jet(xi, order))
 
     def value(self, x: Tensor) -> Tensor:
         """Plain mixture value ``sum_j f_j(alpha_j x)``, shape ``(..., out_dim)``."""

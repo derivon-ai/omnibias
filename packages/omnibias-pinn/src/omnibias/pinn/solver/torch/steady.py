@@ -50,6 +50,11 @@ from omnibias.pinn.solver.torch.assemble import (
     to_tensor,
 )
 from omnibias.pinn.solver.torch.fields import build_field, freeze_features
+from omnibias.pinn.solver.torch.readout import (
+    readout_dtype,
+    readout_size,
+    set_readout,
+)
 from omnibias.torch.optim import (
     CubicGaussNewton,
     CubicNewton,
@@ -94,18 +99,6 @@ _RESIDUAL_OPTIMIZERS = frozenset({"cubic_gauss_newton", "gauss_newton"})
 OPTIMIZERS: frozenset[str] = frozenset(
     {"adam", "lbfgs"} | set(_SCALAR_OPTIMIZERS) | set(_RESIDUAL_OPTIMIZERS)
 )
-
-
-def _readout_size(field: Any) -> tuple[int, int, int]:
-    c, h = field.c.weight.shape
-    return c, h, c * h + c
-
-
-def _set_readout(field: Any, theta: torch.Tensor) -> None:
-    c, h = field.c.weight.shape
-    with torch.no_grad():
-        field.c.weight.copy_(theta[: c * h].reshape(c, h))
-        field.c.bias.copy_(theta[c * h:])
 
 
 def _scaled(rows: torch.Tensor, weight: float) -> torch.Tensor:
@@ -266,12 +259,19 @@ def solve_least_squares(
     collocation: CollocationSpec | None = None,
     ridge: float = 1e-8,
     hard_conditions: str = "none",
+    basis: str = "mlp",
+    K: int = 8,
+    L: float | tuple[float, ...] = 2.0 * math.pi,
+    time_hidden: int | None = None,
+    time_depth: int = 1,
 ) -> FieldSolution:
     """Exact-operator linear collocation: one least-squares solve.
 
-    Only valid for linear systems. The hidden layer is frozen so the readout is
-    the only unknown; the collocation matrix is assembled from the closed-form
-    operators applied to each frozen feature.
+    Only valid for linear systems. The feature map is frozen so the linear
+    readout is the only unknown (one-layer: the hidden ``W`` / ``beta``;
+    spectral / Chebyshev: the temporal MLP ``W_t`` / ``beta_t`` / inner layers);
+    the collocation matrix is assembled from the closed-form operators applied
+    to each frozen feature.
 
     ``hard_conditions="auto"`` embeds every condition it can certify into the
     ansatz and drops those rows from the system, leaving a smaller least-squares
@@ -294,9 +294,14 @@ def solve_least_squares(
         dtype=dtype,
         seed=seed,
         hard_conditions=hard,
+        basis=basis,
+        K=K,
+        L=L,
+        time_hidden=time_hidden,
+        time_depth=time_depth,
     )
     freeze_features(field)
-    _, _, n_unknowns = _readout_size(field)
+    _, _, n_unknowns = readout_size(field)
 
     with torch.no_grad():
         # Build the collocation states ONCE (frozen features -> sigma constant),
@@ -304,15 +309,15 @@ def solve_least_squares(
         # closed-form operators (no autodiff). The cage is affine in the readout,
         # so this stays a linear solve when hard conditions are absorbed.
         plan = build_plan(field, system, spec, hard)
-        basis = torch.zeros(n_unknowns, dtype=field.c.weight.dtype)
-        _set_readout(field, basis)
+        e_k = torch.zeros(n_unknowns, dtype=readout_dtype(field))
+        set_readout(field, e_k)
         r0 = eval_plan_rows(plan)
         n_rows = r0.shape[0]
         mat = torch.zeros(n_rows, n_unknowns, dtype=r0.dtype)
         for k in range(n_unknowns):
-            basis.zero_()
-            basis[k] = 1.0
-            _set_readout(field, basis)
+            e_k.zero_()
+            e_k[k] = 1.0
+            set_readout(field, e_k)
             mat[:, k] = eval_plan_rows(plan) - r0
         rhs = (-r0).unsqueeze(1)
         if ridge > 0.0:
@@ -320,7 +325,7 @@ def solve_least_squares(
             theta = torch.linalg.solve(gram, mat.T @ rhs)
         else:
             theta = torch.linalg.lstsq(mat, rhs, driver="gelsd").solution
-        _set_readout(field, theta.squeeze(1))
+        set_readout(field, theta.squeeze(1))
 
     return FieldSolution(
         field=field,
@@ -356,6 +361,11 @@ def solve_optimize(
     refinement: RefinementSpec | None = None,
     optimizer_kwargs: dict[str, Any] | None = None,
     hard_conditions: str = "none",
+    basis: str = "mlp",
+    K: int = 8,
+    L: float | tuple[float, ...] = 2.0 * math.pi,
+    time_hidden: int | None = None,
+    time_depth: int = 1,
 ) -> FieldSolution:
     """General residual-minimisation driver (Adam warmup, then ``optimizer``).
 
@@ -431,6 +441,11 @@ def solve_optimize(
         dtype=dtype,
         seed=seed,
         hard_conditions=hard,
+        basis=basis,
+        K=K,
+        L=L,
+        time_hidden=time_hidden,
+        time_depth=time_depth,
     )
     diagnostics = _optimize(
         field=field,
@@ -516,7 +531,7 @@ def _optimize(
     """
     points = _Collocation(default_interior(field, system, spec))
     n_uniform = int(points.coords.shape[0])
-    dtype = field.W.weight.dtype
+    dtype = readout_dtype(field)
     trainable = list(field.parameters()) + list(unknowns.parameters())
     rows = _ResidualModule(
         field,

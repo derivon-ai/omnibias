@@ -70,6 +70,14 @@ class JetNet(Protocol):
     in_dim: int
     out_dim: int
 
+    def _point_hidden_jet(self, xi: Array, order: int) -> Array:
+        """Single-point readout-independent jet (hidden layers only)."""
+        ...
+
+    def _apply_readout_jet(self, hidden_jet: Array) -> Array:
+        """Push a (possibly batched) hidden jet through the live affine readout."""
+        ...
+
     def _point_jet(self, xi: Array, order: int) -> Array:
         """Single-point multivariate jet, shape ``(M, out_dim)``."""
         ...
@@ -104,32 +112,43 @@ class _JetFieldOps:
 
     # -- jet machinery ---------------------------------------------------------- #
 
-    def _compute_jet(self, coords: Array, order: int) -> Array:
-        """Batched multivariate jet of shape ``(B, M, C)``.
+    def _compute_hidden_jet(self, coords: Array, order: int) -> Array:
+        """Batched readout-independent jet (hidden layers only).
 
-        Routed through the architecture's ``_point_jet`` hook rather than
-        ``mlp_jet_mv`` directly, so a wrapper network -- a band mixture, a
-        hard-constraint ansatz -- overrides one method and the field inherits its
-        exact derivatives unchanged.
+        Routed through the architecture's ``_point_hidden_jet`` hook so a
+        wrapper network -- a band mixture, attention -- overrides one method and
+        the field inherits exact derivatives with a live readout.
         """
-        out: Array = jax.vmap(lambda xi: self.net._point_jet(xi, order))(coords)
+        out: Array = jax.vmap(lambda xi: self.net._point_hidden_jet(xi, order))(coords)
         return out
 
     def _jet_at_least(self, state: FieldState, order: int) -> tuple[Array, int]:
-        """Return ``(jet, jet_order)`` with ``jet_order >= order``, memoised on the state."""
+        """Return ``(jet, jet_order)`` with ``jet_order >= order``.
+
+        The *hidden* jet is memoised on the state (readout-independent); the
+        live affine readout is applied on every call so a frozen-feature column
+        sweep against a reused state stays correct. Values take the plain
+        forward path (:meth:`value_component`) and never populate this cache.
+        """
         cache = cast("dict[int, Array]", state.extra.setdefault(JET_CACHE_KEY, {}))
+        hidden: Array | None = None
+        got_order = -1
         for cached_order in sorted(cache):
             if cached_order >= order:
-                return cache[cached_order], cached_order
-        want = max(int(order), self.jet_order)
-        jet = self._compute_jet(state.coords, want)
-        cache[want] = jet
-        return jet, want
+                hidden = cache[cached_order]
+                got_order = cached_order
+                break
+        if hidden is None:
+            want = max(int(order), self.jet_order)
+            hidden = self._compute_hidden_jet(state.coords, want)
+            cache[want] = hidden
+            got_order = want
+        return self.net._apply_readout_jet(hidden), got_order
 
     def _partial(
         self, state: FieldState, name: str, alpha: tuple[int, ...], order: int
     ) -> Array:
-        """``D^alpha f_name`` of shape ``(B,)``, read off the cached jet."""
+        """``D^alpha f_name`` of shape ``(B,)``, off the live-readout jet."""
         jet, jet_order = self._jet_at_least(state, order)
         pos = index_position(self.coordinate_spec.ndim, jet_order)
         ci = self.components.index(name)
@@ -148,6 +167,14 @@ class _JetFieldOps:
         return self.net.value(coords)
 
     def value_component(self, state: FieldState, name: str) -> Array:
+        """Component value from the plain forward pass (no jet).
+
+        A value-only term -- a boundary-condition loss -- never pays for a jet.
+        The forward pass and row 0 of the jet are the same function to float64
+        round-off (pinned by the attention / jet field tests); derivatives
+        still go through :meth:`_jet_at_least` so a residual that also needs
+        partials shares one cached hidden jet.
+        """
         ci = self.components.index(name)
         return self.forward_values(state.coords)[:, ci]
 
@@ -475,3 +502,5 @@ __all__ = [
 # jet path (avoids a fields -> pinn import cycle).
 JetMLPVectorField._omnibias_dispatch = "jet_mlp"
 FourierFeatureVectorField._omnibias_dispatch = "jet_mlp"
+JetMLPVectorField._omnibias_readout_independent = True
+FourierFeatureVectorField._omnibias_readout_independent = True

@@ -253,6 +253,19 @@ def bc_faces(domain: Domain, bc: BoundaryCondition) -> list[tuple[str, str]]:
     return [(bc.axis, s) for s in sides]
 
 
+def periodic_axes(domain: Domain, bc: BoundaryCondition) -> tuple[str, ...]:
+    """Axes a periodic boundary condition ties together across the seam.
+
+    An explicit ``bc.axis`` is used as-is; otherwise every spatial axis the
+    domain declares periodic. Shared by the hard planner and both assemblers so
+    the three paths cannot disagree about which seams exist.
+    """
+    if bc.axis is not None:
+        return (bc.axis,)
+    cs = domain.coordinate_spec
+    return tuple(a for a in domain.spatial_axes if cs.is_periodic(a))
+
+
 def initial_slice_points(
     domain: Domain, spec: CollocationSpec, *, t0: float | None = None
 ) -> np.ndarray:
@@ -275,6 +288,7 @@ __all__ = [
     "candidate_points",
     "initial_slice_points",
     "interior_points",
+    "periodic_axes",
     "select_refinement_points",
     "spatial_boundary_points",
 ]

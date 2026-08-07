@@ -68,11 +68,20 @@ class _CageFieldBase(FieldBase):
       Tensor`` for caged derivative.
     - :meth:`_velocity_mixed`: ``f(state, vname, axes, orders) -> Tensor``
       for caged mixed partial.
+
+    Readout-independence recurses through :attr:`base`: an affine cage over a
+    declaring base declares; a nonlinear cage overrides to ``False``.
     """
 
     base: FieldBase
     velocity_names: tuple[str, ...]
     passthrough_names: tuple[str, ...]
+
+    @property
+    def _omnibias_readout_independent(self) -> bool:
+        from omnibias.fields._core.field_base import READOUT_INDEPENDENT_ATTR
+
+        return bool(getattr(self.base, READOUT_INDEPENDENT_ATTR, False))
 
     def __init__(
         self,

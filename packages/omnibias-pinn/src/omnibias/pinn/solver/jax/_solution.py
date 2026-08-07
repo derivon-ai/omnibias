@@ -12,7 +12,9 @@ from omnibias.pinn.solver._core.system import System
 
 
 def _as_coords(field_obj: Any, coords: Any) -> Any:
-    return jnp.asarray(coords, dtype=field_obj.W.dtype)
+    from omnibias.pinn.solver.jax.readout import readout_dtype
+
+    return jnp.asarray(coords, dtype=readout_dtype(field_obj))
 
 
 @dataclass

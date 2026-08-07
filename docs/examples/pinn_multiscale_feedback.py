@@ -202,13 +202,14 @@ def main() -> None:
         print(f"    {name}: closed-form u'' vs autograd u'', max rel error {err:.2e}")
         assert err < 1e-12, (name, err)
 
-    # And the jet cache still holds: value + gradient + laplacian is one jet.
+    # And the hidden-jet cache still holds: gradient + laplacian share one entry
+    # (value takes the plain forward path and never pays for a jet).
     state = informed(torch.linspace(0.0, 1.0, 5, dtype=DTYPE).reshape(-1, 1))
     ops.value(state, "u")
     ops.gradient(state, "u")
     ops.laplacian(state, "u")
     cached = state.extra["_jet_mlp_jets"]
-    print(f"    mscale: value + gradient + laplacian used {len(cached)} jet order.")
+    print(f"    mscale: gradient + laplacian used {len(cached)} hidden-jet order.")
     assert sorted(cached) == [2]
 
     print("\nBands measured, not guessed; tower exact throughout; all checks passed.")

@@ -11,9 +11,10 @@ differentiation is normally abandoned.
 The tests therefore pin, in order: that the coordinate derivatives still match
 ``torch.autograd.grad`` to float64 round-off at orders 1-3; that the whole
 operator surface (gradient / Hessian / Laplacian / prebuilt residuals) reaches
-the field on one memoised jet; that the softmax weights are a genuine partition
-of unity that sharpens with ``beta``; and that gradients flow to the memory and
-the temperature so the block is trainable.
+the field on one memoised *hidden* jet (live readout applied per call); that
+the softmax weights are a genuine partition of unity that sharpens with
+``beta``; and that gradients flow to the memory and the temperature so the
+block is trainable.
 """
 
 from __future__ import annotations

@@ -93,6 +93,26 @@ the derivative tower is evaluated.
 | `AttentionVectorField` | deep encoder + softmax mixture over a trainable memory | closed-form multivariate jet (`jet_attention`) |
 | `SpectralVectorField` / `ChebyshevVectorField` | basis expansion | closed-form basis derivatives |
 
+### Readout-independence invariant
+
+The frozen-feature linear solver (`solve_least_squares`) builds a collocation
+plan once and reuses the same `FieldState` caches while sweeping the readout
+weights. That is sound only when every cached quantity is independent of those
+weights and every op re-reads the readout live.
+
+Fields that honour the contract set the class attribute named by
+`omnibias.fields.READOUT_INDEPENDENT_ATTR` (`"_omnibias_readout_independent"`)
+to `True`. Affine cages (`ConstrainedExpressionField`, streamfunction / flux-form
+/ hard-boundary, …) recurse through `base` and declare when the base does.
+Fields that are *nonlinear* in the readout (`IntegralConservationField`,
+`NormConservationField`) leave the marker unset; the driver refuses them with
+`ReadoutDependentError` rather than silently miscomputing -- use
+`solve_optimize` instead.
+
+Spectral / Chebyshev / jet caches store the readout-*independent* factor (hidden
+temporal features, or the jet through `layers[:-1]`) and apply the final affine
+readout per call, so a state remains coherent under a readout sweep.
+
 ### Deep and Fourier-feature fields (`jet_mlp`)
 
 `JetMLPVectorField` and `FourierFeatureVectorField` lift the arbitrary-depth
@@ -107,12 +127,15 @@ total order `N` as `alpha! c_alpha`, at any depth. There is no
 `torch.autograd.grad` in the differential operator (contrast `PartitionedField`
 below, which must fall back to the autodiff product rule).
 
-The jet is memoised in `FieldState.extra`, so a whole second-order residual --
-value, gradient, Laplacian, Hessian, divergence, mixed partials -- costs **one**
-jet evaluation. `jet_order` is the planning knob: the jet is built at
-`max(requested_order, jet_order)`, so set it to the highest derivative order in
-your residual. `polylaplacian` reads `Delta^k` off a single order-`2k` jet via the
-multinomial expansion of `(sum_i d_i^2)^k`, so its cost is independent of `k`.
+The *hidden* jet (layers before the final affine readout) is memoised in
+`FieldState.extra`, and the live readout is applied on every call, so a whole
+second-order residual -- gradient, Laplacian, Hessian, divergence, mixed
+partials -- costs **one** jet evaluation (a value-only term takes the plain
+forward path and never pays for a jet). `jet_order` is the planning knob: the
+jet is built at `max(requested_order, jet_order)`, so set it to the highest
+derivative order in your residual. `polylaplacian` reads `Delta^k` off a single
+order-`2k` jet via the multinomial expansion of `(sum_i d_i^2)^k`, so its cost
+is independent of `k`.
 
 `FourierFeatureVectorField` is the spectral-bias cure. The encoding
 `gamma(x) = [cos(B x), sin(B x)]` is a single `sin` layer (because
@@ -128,7 +151,8 @@ for a runnable two-scale Poisson comparison.
 
 A Fourier encoding widens the *input basis* with a fixed random draw. The two
 fields below instead put the frequency knob inside the network, and both stay on
-the same `jet_mlp` path -- same jet cache, same operator surface, same exactness.
+the same `jet_mlp` path -- same hidden-jet cache, same operator surface, same
+exactness.
 
 `AdaptiveJetMLPVectorField` gives every hidden layer a **trainable slope** `a` and
 computes `sigma(n a z)` (Jagtap et al. 2020), so the network tunes its own
@@ -383,10 +407,45 @@ recursion rather than special-cased.
 initial value or velocity are all the same `LinearConstraint` type with
 different terms, which is why there is no per-kind branching. **Periodicity is
 the same type too**, as a *relative* constraint `d^n u(hi) - d^n u(lo) = 0`,
-because a linear functional may reference more than one point; `periodic(lo, hi,
-order=0)` matches the value across the seam and `order=1` matches the slope. A
-smooth periodic solution satisfies both, and matching only the value leaves the
-field free to have a kink exactly where nothing is watching.
+because a linear functional may reference more than one point. On the cage /
+`HardCondition` side, `periodic(lo, hi, order=n)` matches one derivative order
+at a time. On the solver side, a periodic `BoundaryCondition` carries
+`periodic_orders` (default `PERIODIC_ORDERS = (0, 1, 2)`): value, slope *and*
+second derivative across the seam. The default rose from `(0, 1)` after a C¹-seam
+sweep under a second-order operator -- matching only value and slope left `u''`
+free to jump.
+
+What that buys is matching **at the declared orders and nothing above**. The
+first unmatched order still jumps across the seam, by roughly the magnitude of
+that derivative itself, and both cage test suites pin it so the claim cannot
+drift from "exact at three orders" to "smooth". The sweep stops at `(0, 1, 2)`
+because the fourth order gains only 1.30x against the third's 3.34x on a smooth
+manufactured solution -- which would reward extra orders indefinitely -- while a
+higher default would over-smooth seams near steep gradients. If you need a seam
+closed at *every* order, that is what the spectral basis below gives you. See
+[benchmarks](../benchmarks.md#hard-vs-soft-boundary-initial-conditions).
+
+### Periodic domains: spectral basis vs periodic cage
+
+Two routes close a periodic seam, and they are not substitutes:
+
+| Route | When | How |
+| --- | --- | --- |
+| `basis="spectral"` on `build_field` / `solve_least_squares` | Time-dependent problem; spatial axes are periodic | `SpectralVectorField` -- Fourier modes make spatial periodicity free in the ansatz; no periodic BC rows required for that axis |
+| Periodic cage / BC | Steady or MLP ansatz; any axis you want matched by algebra | `ConstrainedExpressionField` with `periodic(...)` / a periodic `BoundaryCondition`, absorbed by `hard_conditions="auto"` |
+
+`basis="spectral"` needs a time axis (the spectral field is a space-time Fourier
+ansatz). For a steady Poisson seam, use the cage. For a time-dependent periodic
+heat / Burgers / RD problem you can pick either: free periodicity in the Fourier
+base, or an MLP wrapped in the constrained-expression cage.
+
+The six problem builders (`poisson`, `heat`, `wave`, `burgers`,
+`reaction_diffusion`, `advection_diffusion`) accept `periodic_boundary: bool =
+False`. When `True`, each appends one periodic `BoundaryCondition` per component
+per periodic *spatial* axis (after existing BCs, so absorbed indices stay
+stable). The default stays off: measured on manufactured periodic Burgers and
+reaction-diffusion, emit helped RD but hurt Burgers' interior fit, so
+auto-emit is opt-in. Hand-built `System`s still need an explicit periodic BC.
 
 Cost is one base evaluation per *distinct combination* of projection points
 across the constrained axes -- the product over axes of `1 + #projection

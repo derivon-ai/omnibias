@@ -475,10 +475,11 @@ nonlinearity, or one poorly excited by the observation set, is a harder problem 
 A boundary condition is normally one more penalty term, weighted against the interior residual. Absorbing it
 into the ansatz instead makes it exact -- that part is algebra -- but says nothing about whether the rest of the
 solve improves, so both halves are measured. Poisson (elliptic), heat (parabolic), wave (hyperbolic), a 2-D
-square whose four faces are absorbed at once, and a periodic seam, each with an analytic solution, 5 seeds,
-`solve_least_squares`, `hidden=96`, 48 interior / 16 per face. The two arms share architecture, parameter count,
-seed and collocation budget; only `hard_conditions` differs. Regenerate with
-`benchmarks/hard_conditions_solver.py`.
+square whose four faces are absorbed at once, a gauge-free periodic seam, and a **gauge-pinned** periodic heat,
+each with an analytic solution, 5 seeds, `solve_least_squares`, `hidden=96`, 48 interior / 16 per face. The MLP
+hard/soft arms share architecture, parameter count, seed and collocation budget; only `hard_conditions` differs.
+The gauge-pinned heat row also runs a third **spectral** arm (`basis="spectral"`, `K=8`, `hard_conditions="auto"`)
+where spatial periodicity is free in the Fourier base. Regenerate with `benchmarks/hard_conditions_solver.py`.
 
 | problem | absorbed | boundary violation (hard, **max** over cells) | boundary violation (soft, median) | interior rel-L2 hard | interior rel-L2 soft | hard wins |
 |---|---|---|---|---|---|---|
@@ -486,7 +487,14 @@ seed and collocation budget; only `hard_conditions` differs. Regenerate with
 | heat | 3 | **3.4e-15** | 3.7e-02 | **3.8e-06** | 1.1e-02 | 5/5 |
 | wave | 4 | **1.4e-14** | 4.6e-03 | **1.1e-06** | 3.1e-03 | 5/5 |
 | square (2-D) | 4 | **0.0** | 1.6e-01 | **2.8e-05** | 7.3e-02 | 5/5 |
-| seam (periodic) | 2 | **0.0** | 2.4e-03 | 1.2e-04 | **4.3e-05** | 0/5 |
+| seam (periodic) | 3 | **1.0e-14** | 9.6e-02 | **3.6e-05** | 5.7e-05 | 5/5 |
+| heat (periodic, gauge-pinned) | 4 | **1.3e-13** | 5.2e-01 | **2.4e-04** | 4.2e-01 | 5/5 |
+
+Spectral arm on the gauge-pinned heat row (not parameter-matched to the MLP):
+
+| arm | boundary violation (median) | interior rel-L2 (median) | beats hard | beats soft |
+|---|---|---|---|---|
+| spectral (`basis="spectral"`, `K=8`) | **3.3e-16** | 3.9e-03 | 0/5 | 5/5 |
 
 The boundary column is the *falsifier* for the exactness claim, not evidence for it: the hard arm is exact by
 construction, and it is reported as a max rather than a median so a single bad cell could not hide. The interior
@@ -494,12 +502,77 @@ column is the one that decides whether absorption is worth using, and it is **op
 parabolic and hyperbolic gaps are the large ones because that is where the soft arm has an initial condition
 competing with the interior residual for the same gradient budget; the elliptic gap is ~4x, not ~3000x.
 
-**The seam row is the one that loses**, and it is left in rather than dropped. Hard periodicity closes the seam
-exactly where the soft arm leaves `2.4e-03`, but the interior fit is ~3x *worse* on every seed. The relative
-constraint spends two of the ansatz's degrees of freedom tying the two ends together, and on a problem whose
-solution is pinned only up to an additive constant that is a real cost paid for a guarantee. Use it when the
-seam has to close; do not expect it to be free. (The interior figure removes the mean from both sides, since
-that gauge freedom belongs to the problem, not to either arm.)
+**What the boundary column cannot falsify.** It scores exactly the orders each condition declares. For Dirichlet
+and Neumann that is the whole condition, so the column is a real test. For a **periodic** seam it is not: the
+condition declares `PERIODIC_ORDERS = (0, 1, 2)` and the cage enforces those same three, so the column is graded
+on its own syllabus and could never report a kink one order up. A separate probe covers that, re-declaring the
+seam at the first *unmatched* order and reassembling:
+
+| arm on a periodic row | seam jump at order 3 | as a fraction of that derivative's own scale |
+|---|---|---|
+| seam, hard | 6.1e+00 | 2.5% |
+| seam, soft | 6.6e+00 | 2.6% |
+| heat-periodic, hard | 2.6e+01 | 11.1% |
+| heat-periodic, soft | 1.1e+02 | 63.9% |
+| heat-periodic, spectral | **0.0** | **0.0%** |
+
+So the honest claim for a cage is C² matching, not smoothness: `u'''` really does jump, by roughly the size of
+`u'''` itself. Two things follow from the column. The hard arm is better behaved than soft *beyond* its contract
+as well as inside it (11% against 64% on the gauge-pinned row), so absorption is not buying its exactness by
+displacing the error just past where anyone is looking. And the **spectral arm is the only one that closes the
+seam at every order**, because periodicity there is a property of the Fourier basis rather than three
+constraints bolted onto a generic one -- an advantage the interior-L2 column does not show at all. Both cage
+test suites pin this contract boundary in both backends, so "exact seam" cannot quietly widen into "smooth seam".
+
+**The gauge-free seam row now wins under the shipped default** `PERIODIC_ORDERS = (0, 1, 2)`
+(value, slope, and second derivative): hard wins 5/5 on interior L2 (`3.6e-05` vs `5.7e-05`), with a seam
+residual at machine zero on all three matched orders. That is a flip from the earlier `(0, 1)` measurement,
+where hard lost ~3x on every seed (absorbed 2, hard wins 0/5). That old row also illustrates the paragraph
+above: it advertised a boundary violation of exactly `0.0`, and the same solutions graded on `(0, 1, 2)` instead
+score `2.6e-01`. They had closed the seam to C¹ and no further. (The interior figure removes the mean from both
+sides, since that gauge freedom belongs to the problem, not to either arm.)
+
+**Sweep verdict (C¹ seam), and where to stop.** `benchmarks/hard_conditions_periodic_sweep.py` sweeps
+`periodic_orders ∈ {(0,1), (0,1,2), (0,1,2,3)}` × `hidden ∈ {48, 96, 192}` over 3 seeds on that same gauge-free
+Poisson seam, with the decision rule fixed up front: gap ~ `1/hidden` → lost degrees of freedom; `(0,1,2)`
+closing the gap → C¹ seam (default should change); neither → gauge. Measured medians (hard − soft interior L2):
+
+| orders | hidden=48 | hidden=96 | hidden=192 |
+|---|---|---|---|
+| `(0, 1)` | +8.7e-05 (hard loses) | +7.6e-05 | +6.1e-05 |
+| `(0, 1, 2)` | **−2.9e-05** (hard wins 3/3) | **−2.2e-05** | **−1.8e-05** |
+| `(0, 1, 2, 3)` | **−6.8e-05** (hard wins 3/3) | **−3.5e-05** | **−2.7e-05** |
+
+The `(0, 1)` gap shrinks only weakly with width (log-log slope vs `1/hidden` ≈ 0.26, not ≈ 1), so this is
+**not** a pure degrees-of-freedom cost. Raising the matched orders to `(0, 1, 2)` flips the comparison: hard
+wins on every seed. That implicates the C¹ seam under a second-order operator (quadratic switching leaves
+`u''` discontinuous across it).
+
+`(0, 1, 2, 3)` answers a different question -- *how far to go* -- under its own rule, also fixed before the run:
+raise the default again only if the fourth matched order buys more than the third did. That has to be read on
+the hard arm alone, because the gap column above conflates it with the soft arm getting worse as rows are added.
+The third order gains **3.34x**, the fourth **1.30x**:
+
+| orders | hard interior rel-L2 (hidden=96) | gain over previous |
+|---|---|---|
+| `(0, 1)` | 1.21e-04 | -- |
+| `(0, 1, 2)` | 3.61e-05 | 3.34x |
+| `(0, 1, 2, 3)` | 2.79e-05 | 1.30x |
+
+**The default stays `(0, 1, 2)`.** A smooth manufactured solution matches every derivative, so it rewards extra
+orders indefinitely and "better here" is not grounds to ship them; diminishing returns are the signal to stop.
+The default also has to hold on problems that are *not* smooth, and the periodic-emit measurement already showed
+Burgers losing interior accuracy when its seam is enforced at all -- over-smoothing a seam near a steep gradient
+is exactly the failure a higher default would deepen. Artifact:
+`docs/benchmarks/hard_conditions_periodic_sweep.json`; the main solver table above was regenerated under the
+shipped default.
+
+**The gauge-pinned heat row keeps the story.** With IC `u(x,0) = sin(2πx)` and exact
+`exp(-α(2π)² t) sin(2πx)`, soft's additive freedom buys nothing: hard wins 5/5 (interior `2.4e-04` vs
+`4.2e-01`). The spectral arm beats soft on every seed (`3.9e-03`) and is the one arm whose seam closes at every
+order rather than at three of them, but it still does not beat the MLP cage on interior accuracy at this budget
+-- free periodicity is not free accuracy when the Fourier time-head is under-resolved relative to the one-layer
+MLP.
 
 Absorption is partial and opt-in. `hard_conditions="auto"` absorbs what the planner can certify and leaves the
 rest soft, reporting a reason per declined condition; the default `"none"` reproduces the previous solve bit for

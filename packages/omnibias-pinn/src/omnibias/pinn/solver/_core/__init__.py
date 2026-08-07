@@ -9,8 +9,10 @@ problem builders. The torch and jax numeric drivers live in
 
 from __future__ import annotations
 
+from omnibias.fields._core.field_base import READOUT_INDEPENDENT_ATTR
 from omnibias.pinn.solver._core.arrays import array_namespace
 from omnibias.pinn.solver._core.conditions import (
+    PERIODIC_ORDERS,
     BoundaryCondition,
     InitialCondition,
     ValueLike,
@@ -44,6 +46,10 @@ from omnibias.pinn.solver._core.problems import (
     reaction_diffusion,
     wave,
 )
+from omnibias.pinn.solver._core.readout import (
+    ReadoutDependentError,
+    requires_readout_independent,
+)
 from omnibias.pinn.solver._core.sampling import (
     CollocationSpec,
     RefinementSpec,
@@ -51,6 +57,7 @@ from omnibias.pinn.solver._core.sampling import (
     candidate_points,
     initial_slice_points,
     interior_points,
+    periodic_axes,
     select_refinement_points,
     spatial_boundary_points,
 )
@@ -91,7 +98,10 @@ __all__ = [
     "NUMERICAL",
     "Observations",
     "PDEType",
+    "PERIODIC_ORDERS",
     "ProblemKind",
+    "READOUT_INDEPENDENT_ATTR",
+    "ReadoutDependentError",
     "RefinementSpec",
     "Residual",
     "SPECTRAL",
@@ -115,9 +125,11 @@ __all__ = [
     "initial_slice_points",
     "interior_points",
     "make_system",
+    "periodic_axes",
     "plan_hard_conditions",
     "poisson",
     "reaction_diffusion",
+    "requires_readout_independent",
     "sample_observations",
     "select_refinement_points",
     "spatial_boundary_points",

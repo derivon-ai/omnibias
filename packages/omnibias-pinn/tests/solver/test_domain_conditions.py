@@ -41,6 +41,14 @@ def test_boundary_condition_validation() -> None:
         BoundaryCondition("u", "bogus")
     with pytest.raises(ValueError):
         BoundaryCondition("u", "neumann")  # needs an axis
+    bc = BoundaryCondition("u", "periodic", axis="x")
+    assert bc.periodic_orders == (0, 1, 2)
+    with pytest.raises(ValueError, match="periodic_orders"):
+        BoundaryCondition("u", "dirichlet", 0.0, periodic_orders=(0,))
+    with pytest.raises(ValueError, match="non-empty"):
+        BoundaryCondition("u", "periodic", axis="x", periodic_orders=())
+    with pytest.raises(ValueError, match="non-negative"):
+        BoundaryCondition("u", "periodic", axis="x", periodic_orders=(-1,))
 
 
 def test_initial_condition_order() -> None:
@@ -90,4 +98,26 @@ def test_system_validation() -> None:
             fields=(Field("u"),),
             residuals=(lambda s: s,),
             initial=(InitialCondition("u", 0.0),),
+        )
+
+
+def test_system_refuses_periodic_on_time_axis() -> None:
+    dom = Domain(("x", "t"), ((0.0, 1.0), (0.0, 1.0)), periodic=(True, False))
+    with pytest.raises(ValueError, match="time axis"):
+        System(
+            domain=dom,
+            fields=(Field("u"),),
+            residuals=(lambda s: s,),
+            boundary=(BoundaryCondition("u", "periodic", axis="t"),),
+        )
+
+
+def test_system_refuses_periodic_on_non_periodic_named_axis() -> None:
+    dom = Domain(("x", "y"), ((0.0, 1.0), (0.0, 1.0)), periodic=(True, False))
+    with pytest.raises(ValueError, match="does not declare periodic"):
+        System(
+            domain=dom,
+            fields=(Field("u"),),
+            residuals=(lambda s: s,),
+            boundary=(BoundaryCondition("u", "periodic", axis="y"),),
         )

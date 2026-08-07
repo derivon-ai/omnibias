@@ -67,6 +67,9 @@ class IntegralConservationField(_CageFieldBase):
     out multiplied by the scalar ``lambda = (total / I)^(1/degree)`` and the
     rest pass through untouched.
 
+    Nonlinear in the readout (``lambda`` depends on the integral of the base),
+    so this cage declines the frozen-feature linear solver.
+
     Parameters
     ----------
     base:
@@ -97,6 +100,10 @@ class IntegralConservationField(_CageFieldBase):
 
     quadrature_nodes: Tensor
     quadrature_weights: Tensor
+
+    @property
+    def _omnibias_readout_independent(self) -> bool:
+        return False
 
     def __init__(
         self,

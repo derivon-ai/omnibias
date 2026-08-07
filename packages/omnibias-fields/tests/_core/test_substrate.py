@@ -17,6 +17,7 @@ import omnibias.fields as fields
 import pytest
 from omnibias.fields._core import (
     DISPATCH_ATTR,
+    READOUT_INDEPENDENT_ATTR,
     ComponentSpec,
     CoordinateSpec,
     FieldState,
@@ -34,6 +35,10 @@ def test_public_surface() -> None:
 
 def test_dispatch_attr_name_is_stable() -> None:
     assert DISPATCH_ATTR == "_omnibias_dispatch"
+
+
+def test_readout_independent_attr_name_is_stable() -> None:
+    assert READOUT_INDEPENDENT_ATTR == "_omnibias_readout_independent"
 
 
 def test_sigma_cache_single_evaluation() -> None:

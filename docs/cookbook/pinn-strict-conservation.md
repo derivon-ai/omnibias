@@ -193,6 +193,14 @@ type with different terms -- and so is periodicity, as the *relative* constraint
 $\partial^n u(hi) - \partial^n u(lo) = 0$, since a linear functional may
 reference several points.
 
+For a **time-dependent** problem whose spatial axes are already periodic, prefer
+a `SpectralVectorField` (or the solver's `basis="spectral"` on
+`build_field` / `solve_least_squares`): spatial periodicity is free in the
+Fourier ansatz, so you do not need to spend cage degrees of freedom on the
+seam. Keep `ConstrainedExpressionField` + `periodic(...)` for steady problems,
+MLP ansatze, or when you want algebraic seam matching on top of a non-spectral
+base.
+
 ```python
 from omnibias.pinn._core.constrained import (
     HardCondition, derivative_at, dirichlet, neumann, periodic,
@@ -242,7 +250,7 @@ the disagreement visible, which is order one when it is real.
 | `VectorPotentialField` | 3D `div u = 0` | small (1 extra tensor) | Headline 3D NS choice |
 | `HelmholtzProjectionField` | soft `div u = 0` via Poisson | medium (extra `phi` field) | Use when a learned pressure is required |
 | `HardBoundaryField` | Dirichlet `u = g` | free | Any geometry; Dirichlet only, does not compose |
-| `ConstrainedExpressionField` | Dirichlet / Neumann / Robin / initial / periodic | product over axes of `1 + #faces` | Box geometry; composes across axes and kinds, certified |
+| `ConstrainedExpressionField` | Dirichlet / Neumann / Robin / initial / periodic | product over axes of `1 + #faces` | Box geometry; composes across axes and kinds, certified. For time-dependent periodic *spatial* axes, prefer `SpectralVectorField` / `basis="spectral"` (periodicity free in the Fourier base) |
 | `MassFluxPotentialField` | compressible `rho u = curl Psi` | small | For variable-density flows |
 
 All cages are duals across `omnibias.pinn.torch.cage` and

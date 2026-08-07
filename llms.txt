@@ -133,7 +133,12 @@ and the Mathlib-free Lean kernel obligation so certificates can earn
 `theorem_prover_verified`; not a continuum-PDE or global-regularity claim), and
 the `omnibias.pinn.solver` submodule of `omnibias-pinn` (mesh-free solver for **coupled systems of PDEs** on the
 closed-form derivative tower: a `System` abstraction of coupled fields +
-vector residuals + boundary/initial conditions, steady linear-collocation and
+vector residuals + boundary/initial conditions; periodic BCs carry
+`periodic_orders` defaulting to `(0, 1, 2)`, builders take opt-in
+`periodic_boundary=True`, and `basis="spectral"` builds a `SpectralVectorField`
+for time-dependent periodic problems; fields declare readout-independence via
+`READOUT_INDEPENDENT_ATTR` so the frozen-feature linear solve can reuse
+`FieldState` caches safely (nonlinear cages are refused); steady linear-collocation and
 nonlinear residual-minimisation drivers -- the latter accepting the exact-curvature
 optimisers of `omnibias.torch.optim` (`cubic_gauss_newton`, `gauss_newton`,
 `cubic_newton`, `trust_region_newton_cg`, `jet_subspace_tensor`, `natural_gradient`)
@@ -460,7 +465,7 @@ measured verdict.
 - [PINN domain decomposition (XPINN) + stiff integrators](docs/examples/pinn_xpinn_stiff.py)
 - [PINN partition of unity across an interface (soft partition captures a kink a single smooth field cannot; certified soft->hard gap)](docs/examples/partitioned_pinn.py)
 - [Conservative shock-capturing Burgers PINN (flux-form cage over a partitioned potential: div G = 0 to machine epsilon across a sharp moving seam, and tighter global mass balance than a non-conservative arm at equal budget as the layer goes under-resolved; conservation is structural, accuracy is optimised, entropy admissibility is out of scope)](docs/examples/pinn_burgers_shock.py)
-- [Hard boundary / initial conditions for PINNs (constrained-expression cage: Dirichlet / Neumann / Robin / initial-velocity / periodic-seam conditions satisfied identically for any parameters, over any number of axes with exact edges and corners; support-matrix invertibility sealed as a certificate, incompatible cross-axis data refused at construction, and solver auto-detection that deletes the absorbed rows from the loss)](docs/examples/pinn_hard_conditions.py)
+- [Hard boundary / initial conditions for PINNs (constrained-expression cage: Dirichlet / Neumann / Robin / initial-velocity / periodic-seam conditions satisfied identically for any parameters, over any number of axes with exact edges and corners; support-matrix invertibility sealed as a certificate, incompatible cross-axis data refused at construction, and solver auto-detection that deletes the absorbed rows from the loss; for time-dependent periodic spatial axes prefer `basis="spectral"` / `SpectralVectorField`)](docs/examples/pinn_hard_conditions.py)
 - [QPINN harmonic oscillator](docs/examples/qpinn_tise_qho.py)
 - [PDE solver: coupled reaction-diffusion](docs/examples/pde_reaction_diffusion.py)
 - [Convex LP by gradient descent (bias collapse)](docs/examples/convex_lp_gradient_descent.py)

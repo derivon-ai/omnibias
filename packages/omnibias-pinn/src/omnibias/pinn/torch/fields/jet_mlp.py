@@ -27,12 +27,14 @@ back to the autodiff product rule.
 One jet per residual
 --------------------
 A naive adapter would rebuild the jet on every ``derivative()`` call, which is
-slower than autodiff. Instead the jet is memoised in ``FieldState.extra`` (the
-per-evaluation op scratch cache) keyed by the order it was computed at, and
-every partial is a row lookup into it. Because
-:func:`~omnibias.core.multi_index.multi_indices` sorts by total degree, the rows
-of an order-``N`` jet are a prefix-compatible superset of an order-``M`` jet for
-``M <= N``, so a cached higher-order jet also serves lower-order requests.
+slower than autodiff. Instead the *hidden* jet (layers before the final affine
+readout) is memoised in ``FieldState.extra`` keyed by the order it was computed
+at, and every partial is a row lookup into the live-readout jet built from it.
+Because :func:`~omnibias.core.multi_index.multi_indices` sorts by total degree,
+the rows of an order-``N`` hidden jet are a prefix-compatible superset of an
+order-``M`` jet for ``M <= N``, so a cached higher-order entry also serves
+lower-order requests. The final affine readout is applied on every call so a
+frozen-feature column sweep against a reused state stays correct.
 
 ``jet_order`` is the planning knob: the jet is built at
 ``max(requested_order, jet_order)``, so setting it to the highest derivative
@@ -98,6 +100,7 @@ class _JetFieldBase(FieldBase):
     """
 
     _omnibias_dispatch = "jet_mlp"
+    _omnibias_readout_independent = True
 
     net: _JetMLPCore
 
@@ -135,38 +138,49 @@ class _JetFieldBase(FieldBase):
 
     # -- jet machinery ---------------------------------------------------------- #
 
-    def _compute_jet(self, coords: Tensor, order: int) -> Tensor:
-        """Batched multivariate jet of shape ``(B, M, C)``.
+    def _compute_hidden_jet(self, coords: Tensor, order: int) -> Tensor:
+        """Batched readout-independent jet (hidden layers only).
 
-        Routed through the architecture's ``_point_jet`` hook rather than
-        ``mlp_jet_mv`` directly, so a wrapper network -- a band mixture, a
-        hard-constraint ansatz -- overrides one method and the field inherits its
-        exact derivatives unchanged.
+        Routed through the architecture's ``_point_hidden_jet`` hook so a
+        wrapper network -- a band mixture, attention -- overrides one method and
+        the field inherits exact derivatives with a live readout.
         """
 
         def one(xi: Tensor) -> Tensor:
-            return self.net._point_jet(xi, order)
+            return self.net._point_hidden_jet(xi, order)
 
         out: Tensor = vmap(one)(coords)
         return out
 
     def _jet_at_least(self, state: FieldState, order: int) -> tuple[Tensor, int]:
-        """Return ``(jet, jet_order)`` with ``jet_order >= order``, memoised on the state."""
+        """Return ``(jet, jet_order)`` with ``jet_order >= order``.
+
+        The *hidden* jet is memoised on the state (readout-independent); the
+        live affine readout is applied on every call so a frozen-feature column
+        sweep against a reused state stays correct. Values take the plain
+        forward path (:meth:`value_component`) and never populate this cache.
+        """
         cache = cast(
             "dict[int, Tensor]", state.extra.setdefault(JET_CACHE_KEY, {})
         )
+        hidden: Tensor | None = None
+        got_order = -1
         for cached_order in sorted(cache):
             if cached_order >= order:
-                return cache[cached_order], cached_order
-        want = max(int(order), self.jet_order)
-        jet = self._compute_jet(state.coords, want)
-        cache[want] = jet
-        return jet, want
+                hidden = cache[cached_order]
+                got_order = cached_order
+                break
+        if hidden is None:
+            want = max(int(order), self.jet_order)
+            hidden = self._compute_hidden_jet(state.coords, want)
+            cache[want] = hidden
+            got_order = want
+        return self.net._apply_readout_jet(hidden), got_order
 
     def _partial(
         self, state: FieldState, name: str, alpha: tuple[int, ...], order: int
     ) -> Tensor:
-        """``D^alpha f_name`` of shape ``(B,)``, read off the cached jet."""
+        """``D^alpha f_name`` of shape ``(B,)``, off the live-readout jet."""
         jet, jet_order = self._jet_at_least(state, order)
         pos = index_position(self.coordinate_spec.ndim, jet_order)
         ci = self.components.index(name)
@@ -185,6 +199,14 @@ class _JetFieldBase(FieldBase):
         return self.net.value(coords)
 
     def value_component(self, state: FieldState, name: str) -> Tensor:
+        """Component value from the plain forward pass (no jet).
+
+        A value-only term -- a boundary-condition loss -- never pays for a jet.
+        The forward pass and row 0 of the jet are the same function to float64
+        round-off (pinned by the attention / jet field tests); derivatives
+        still go through :meth:`_jet_at_least` so a residual that also needs
+        partials shares one cached hidden jet.
+        """
         ci = self.components.index(name)
         return self.forward_values(state.coords)[:, ci]
 

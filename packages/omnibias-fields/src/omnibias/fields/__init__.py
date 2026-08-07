@@ -36,7 +36,9 @@ from importlib.metadata import PackageNotFoundError as _PkgNotFound
 from importlib.metadata import version as _pkg_version
 
 from omnibias.fields._core import (
+    DISPATCH_ATTR,
     DOMAINS,
+    READOUT_INDEPENDENT_ATTR,
     ComponentSpec,
     ComponentView,
     CoordinateSpec,
@@ -64,10 +66,12 @@ __all__ = [
     "ComponentSpec",
     "ComponentView",
     "CoordinateSpec",
+    "DISPATCH_ATTR",
     "DOMAINS",
     "FieldBase",
     "FieldState",
     "OperatorInfo",
+    "READOUT_INDEPENDENT_ATTR",
     "SigmaCache",
     "VectorView",
     "__lineage__",

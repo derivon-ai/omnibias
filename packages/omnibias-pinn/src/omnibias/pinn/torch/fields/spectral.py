@@ -341,6 +341,19 @@ class SpectralVectorField(FieldBase):
         out: Tensor = vmap(per_b)(t.reshape(-1))
         return out
 
+    def _a_from_hidden(self, h: Tensor, *, t_order: int = 0) -> Tensor:
+        """Apply the live readout ``(V, b_t)`` to a cached temporal feature ``h``.
+
+        ``h`` depends only on ``t`` and the frozen temporal weights; ``a`` is
+        rebuilt on every call so a frozen-feature column sweep against a reused
+        :class:`~omnibias.fields._core.state.FieldState` stays correct.
+        """
+        if t_order == 0:
+            a = self.b_t + h @ self.V.T
+        else:
+            a = h @ self.V.T
+        return a.view(-1, self.C, *([self._modes_per_axis] * self.D_spatial))
+
     def _coeff_blocks_at_t(
         self, t: Tensor, *, t_order: int = 0,
     ) -> Tensor:
@@ -349,12 +362,7 @@ class SpectralVectorField(FieldBase):
         ``t_order`` selects ``d^t_order a / dt^t_order``.
         """
         h = self._hidden_t_and_dt(t, t_order=t_order)
-        if t_order == 0:
-            a = self.b_t + h @ self.V.T
-        else:
-            a = h @ self.V.T
-        a = a.view(-1, self.C, *([self._modes_per_axis] * self.D_spatial))
-        return a
+        return self._a_from_hidden(h, t_order=t_order)
 
     def _make_sigma_cache(self, coords: Tensor):  # type: ignore[override]
         # Use the time-axis pre-activation as the sigma cache key.
@@ -401,15 +409,18 @@ class SpectralVectorField(FieldBase):
     def _coeff_blocks_for_state(
         self, state: FieldState, *, t_order: int = 0,
     ) -> Tensor:
-        """Cache the coefficient tensor ``a(t)`` (or its t-derivative) on the state."""
-        key = f"spectral_a_t{t_order}"
-        cached = state.extra.get(key)
-        if cached is not None:
-            return cached
-        t = state.coords[..., self._time_axis_idx]
-        a = self._coeff_blocks_at_t(t, t_order=t_order)
-        state.extra[key] = a
-        return a
+        """Return ``a(t)`` from a readout-independent cached temporal feature ``h``.
+
+        The expensive ``h = _hidden_t_and_dt(t)`` is memoised on the state; the
+        live readout ``(V, b_t)`` is applied on every call.
+        """
+        key = f"spectral_h_t{t_order}"
+        h = state.extra.get(key)
+        if h is None:
+            t = state.coords[..., self._time_axis_idx]
+            h = self._hidden_t_and_dt(t, t_order=t_order)
+            state.extra[key] = h
+        return self._a_from_hidden(h, t_order=t_order)
 
     # The ops module calls these:
 
@@ -521,3 +532,4 @@ __all__ = ["SpectralVectorField"]
 
 # Marker read by the omnibias-fields backend ops to select the dispatch path.
 SpectralVectorField._omnibias_dispatch = "spectral"
+SpectralVectorField._omnibias_readout_independent = True

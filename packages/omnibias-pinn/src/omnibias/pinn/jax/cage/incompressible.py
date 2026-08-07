@@ -35,13 +35,23 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class _CageFieldBase(FieldBase):
-    """Common machinery for JAX cage fields."""
+    """Common machinery for JAX cage fields.
+
+    Readout-independence recurses through :attr:`base`: an affine cage over a
+    declaring base declares; a nonlinear cage overrides to ``False``.
+    """
 
     base: FieldBase
     velocity_names: tuple[str, ...]
     passthrough_names: tuple[str, ...]
     coordinate_spec: CoordinateSpec
     components: ComponentSpec
+
+    @property
+    def _omnibias_readout_independent(self) -> bool:
+        from omnibias.fields._core.field_base import READOUT_INDEPENDENT_ATTR
+
+        return bool(getattr(self.base, READOUT_INDEPENDENT_ATTR, False))
 
     def evaluate(self, coords: Array) -> FieldState[Array]:
         coords = jnp.asarray(coords)

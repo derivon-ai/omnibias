@@ -69,26 +69,68 @@ class ConstrainedExpressionField(_CageFieldBase):
     # The constrained expression is *affine* in the base readout, so forwarding
     # the parameter arrays lets every caller that treats the readout as the
     # linear unknown keep working when a cage is wrapped around the ansatz.
+    # Prefer the solver readout seam for new code; these forwards cover duck-
+    # typed one-layer (W/c/b) and spectral (V/b_t) call sites.
 
     @property
     def W(self) -> Array:
-        """The base field's hidden weights."""
+        """The base field's hidden weights (one-layer only)."""
+        if not hasattr(self.base, "W"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .W; spectral bases expose "
+                "V / b_t. Use omnibias.pinn.solver.jax.readout instead."
+            )
         return self.base.W
 
     @property
     def beta(self) -> Array:
-        """The base field's hidden biases."""
+        """The base field's hidden biases (one-layer only)."""
+        if not hasattr(self.base, "beta"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .beta; spectral bases expose "
+                "V / b_t. Use omnibias.pinn.solver.jax.readout instead."
+            )
         return self.base.beta
 
     @property
     def c(self) -> Array:
-        """The base field's readout weights."""
+        """The base field's readout weights (one-layer only)."""
+        if not hasattr(self.base, "c"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .c; spectral bases expose "
+                "V / b_t. Use omnibias.pinn.solver.jax.readout instead."
+            )
         return self.base.c
 
     @property
     def b(self) -> Array:
-        """The base field's readout biases."""
+        """The base field's readout biases (one-layer only)."""
+        if not hasattr(self.base, "b"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .b; spectral bases expose "
+                "V / b_t. Use omnibias.pinn.solver.jax.readout instead."
+            )
         return self.base.b
+
+    @property
+    def V(self) -> Array:
+        """The base field's spectral readout weights."""
+        if not hasattr(self.base, "V"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .V; one-layer bases expose "
+                "c. Use omnibias.pinn.solver.jax.readout instead."
+            )
+        return self.base.V
+
+    @property
+    def b_t(self) -> Array:
+        """The base field's spectral readout biases."""
+        if not hasattr(self.base, "b_t"):
+            raise AttributeError(
+                f"{type(self.base).__name__} has no .b_t; one-layer bases expose "
+                "b. Use omnibias.pinn.solver.jax.readout instead."
+            )
+        return self.base.b_t
 
     def steps_for(self, name: str) -> tuple[AxisPlan, ...]:
         """The axis recursion steps for one constrained component."""
@@ -300,7 +342,16 @@ class ConstrainedExpressionField(_CageFieldBase):
     def _sample(self, coords: Array | None) -> Array:
         if coords is not None:
             return jnp.asarray(coords)
-        return jnp.asarray(compatibility_sample(self.bounds), dtype=self.base.c.dtype)
+        base = self.base
+        if hasattr(base, "c"):
+            dtype = base.c.dtype
+        elif hasattr(base, "V"):
+            dtype = base.V.dtype
+        elif hasattr(base, "W"):
+            dtype = base.W.dtype
+        else:
+            dtype = jnp.float64
+        return jnp.asarray(compatibility_sample(self.bounds), dtype=dtype)
 
     def _corner_gap(self, coords: Array, pair: CornerPair) -> Array:
         ndim = self.coordinate_spec.ndim

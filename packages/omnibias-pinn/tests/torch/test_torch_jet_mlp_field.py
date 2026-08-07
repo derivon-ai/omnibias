@@ -203,13 +203,13 @@ def test_order2_residual_triggers_exactly_one_jet(coords, specs, monkeypatch):
         coordinate_spec=cs, components=comps, hidden=6, depth=2, jet_order=2, seed=2,
     )
     calls: list[int] = []
-    original = type(field)._compute_jet
+    original = type(field)._compute_hidden_jet
 
     def counting(self, c, order):
         calls.append(order)
         return original(self, c, order)
 
-    monkeypatch.setattr(type(field), "_compute_jet", counting, raising=False)
+    monkeypatch.setattr(type(field), "_compute_hidden_jet", counting, raising=False)
 
     state = field(coords)
     # A full second-order residual surface: value, gradient, Laplacian, Hessian,
@@ -233,10 +233,25 @@ def test_cache_is_per_state_and_reused_across_orders(coords, specs):
     tops.laplacian(s1, "u")
     assert sorted(s1.extra[JET_CACHE_KEY]) == [3]
     tops.gradient(s1, "u")
-    assert sorted(s1.extra[JET_CACHE_KEY]) == [3], "a cached order-3 jet must serve order 1"
+    assert sorted(s1.extra[JET_CACHE_KEY]) == [3], "a cached order-3 hidden jet must serve order 1"
 
     s2 = field(coords)
     assert JET_CACHE_KEY not in s2.extra or not s2.extra[JET_CACHE_KEY]
+
+
+def test_value_only_never_pays_for_a_jet(coords, specs):
+    """A boundary-condition loss must not populate the hidden-jet cache."""
+    cs, comps = specs
+    field = build_jet_mlp_vector_field(
+        coordinate_spec=cs, components=comps, hidden=5, depth=2, jet_order=2, seed=4,
+    )
+    state = field(coords)
+    tops.value(state, "u")
+    tops.value(state, "v")
+    assert JET_CACHE_KEY not in state.extra or not state.extra[JET_CACHE_KEY]
+    # A derivative still builds exactly one entry; the value path stayed cheap.
+    tops.gradient(state, "u")
+    assert sorted(state.extra[JET_CACHE_KEY]) == [2]
 
 
 # -- Fourier-feature / SIREN variants ----------------------------------------- #

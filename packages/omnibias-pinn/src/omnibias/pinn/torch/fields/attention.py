@@ -29,8 +29,9 @@ u^{-(k+1)}``) and a jet product, each of which is exact. So ``D^alpha u(x)`` is
 closed form at arbitrary order and there is no ``torch.autograd.grad`` in the
 differential operator -- the same guarantee the local fields carry.
 
-The field is an ordinary ``jet_mlp``-tagged field, inheriting the jet cache, the
-gradient / Hessian / polylaplacian fast paths and the whole operator surface from
+The field is an ordinary ``jet_mlp``-tagged field, inheriting the hidden-jet
+cache (with the live affine readout applied per call), the gradient / Hessian /
+polylaplacian fast paths and the whole operator surface from
 :class:`~omnibias.pinn.torch.fields.jet_mlp._JetFieldBase`.
 
 Reading the attention

@@ -47,7 +47,6 @@ import math
 
 from omnibias.torch.activations.registry import ActivationSpec, get_activation
 from omnibias.torch.architectures.pinn import _JetMLPCore
-from omnibias.torch.jet import affine_jet
 from omnibias.torch.jet_mv import jet_attention, mlp_jet_mv
 
 import torch
@@ -212,15 +211,33 @@ class AttentionJetMLP(_JetMLPCore):
                 f"{max_order}: {e}"
             ) from None
 
-    def _point_jet(self, xi: Tensor, order: int) -> Tensor:
-        """Single-point jet of the whole block, shape ``(M, out_dim)``."""
+    def _point_hidden_jet(self, xi: Tensor, order: int) -> Tensor:
+        """Single-point pre-readout jet (encoder + attention [+ residual])."""
         q_jet = mlp_jet_mv(xi, self._encoder_specs(), order)
         h_jet = jet_attention(
             q_jet, self.keys, self.values, self.in_dim, order, beta=self.beta
         )
         if self.residual:
             h_jet = h_jet + q_jet
-        return affine_jet(h_jet, self.readout.weight, self.readout.bias)
+        return h_jet
+
+    def _apply_readout_jet(self, hidden_jet: Tensor) -> Tensor:
+        """Push a (possibly batched) pre-readout jet through the live affine head."""
+        w = self.readout.weight
+        b = self.readout.bias
+        out: Tensor = torch.tensordot(hidden_jet, w, dims=([-1], [-1]))
+        if b is not None:
+            if hidden_jet.ndim == 2:
+                out = out.clone()
+                out[0] = out[0] + b
+            else:
+                out = out.clone()
+                out[:, 0, :] = out[:, 0, :] + b
+        return out
+
+    def _point_jet(self, xi: Tensor, order: int) -> Tensor:
+        """Single-point jet of the whole block, shape ``(M, out_dim)``."""
+        return self._apply_readout_jet(self._point_hidden_jet(xi, order))
 
     def query(self, x: Tensor) -> Tensor:
         """Encoder output ``q(x)``, shape ``(..., hidden)``."""

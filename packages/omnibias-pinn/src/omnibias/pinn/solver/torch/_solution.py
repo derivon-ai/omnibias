@@ -14,8 +14,10 @@ from torch import Tensor
 
 
 def _as_coords(field_obj: Any, coords: Any) -> Tensor:
-    dtype = field_obj.W.weight.dtype
-    device = field_obj.W.weight.device
+    from omnibias.pinn.solver.torch.readout import readout_device, readout_dtype
+
+    dtype = readout_dtype(field_obj)
+    device = readout_device(field_obj)
     if isinstance(coords, Tensor):
         return coords.to(dtype=dtype, device=device)
     return torch.as_tensor(np.asarray(coords), dtype=dtype, device=device)

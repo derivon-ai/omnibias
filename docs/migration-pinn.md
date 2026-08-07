@@ -93,7 +93,7 @@ the derivative chain by hand. The same pattern works for
 | --- | --- |
 | `dde.icbc.DirichletBC(geom, lambda x: ..., on_boundary)` | `HardCondition(component, axis, dirichlet(face), value)` on a box, or `HardBoundaryField(base, distance_fn, boundary_fn, components)` for arbitrary geometry |
 | `dde.icbc.NeumannBC(...)` / `RobinBC(...)` | `HardCondition(component, axis, neumann(face))` / `robin(face, alpha=, beta=)` |
-| `dde.icbc.PeriodicBC(...)` | `HardCondition(component, axis, periodic(lo, hi, order=n))` for `n = 0, 1`, or set `periodicity=(True, ...)` on the `CoordinateSpec` when the ansatz is spectral and already carries it |
+| `dde.icbc.PeriodicBC(...)` | Solver: `BoundaryCondition(component, kind="periodic", axis=...)` (default `periodic_orders=(0, 1, 2)`), or cage: `HardCondition(component, axis, periodic(lo, hi, order=n))` for each order; or `basis="spectral"` / `SpectralVectorField` when the ansatz already carries spatial periodicity |
 | `dde.icbc.IC(geom, lambda x: ..., lambda x: x[1] == 0)` | `HardCondition(component, time_axis, dirichlet(t0), value)`; `derivative_at(t0, 1)` for an initial velocity |
 
 DeepXDE imposes all of these as penalty terms. `ConstrainedExpressionField`
@@ -101,6 +101,21 @@ collects the `HardCondition`s above into an ansatz that satisfies them
 identically, so the corresponding loss terms disappear rather than being
 weighted -- and on the solver, `hard_conditions="auto"` builds that ansatz for
 you and drops the rows it absorbed.
+
+#### Periodic domains (migration)
+
+Marking an axis `periodicity=True` on a `Domain` / `CoordinateSpec` does **not**
+by itself emit a periodic boundary condition into the residual. The six
+canonical builders take `periodic_boundary=False` by default; pass
+`periodic_boundary=True` to append one periodic `BoundaryCondition` per
+component per periodic spatial axis. Hand-built `System`s still need an
+explicit periodic BC (or `basis="spectral"` on a time-dependent solve, where
+spatial periodicity lives in the Fourier ansatz).
+
+Default seam orders moved from `(0, 1)` to `PERIODIC_ORDERS = (0, 1, 2)`
+(value, slope, and second derivative) after a C¹-seam sweep under a second-order
+operator. Override with `periodic_orders=(...)` on the `BoundaryCondition` if
+you need the old subset.
 
 ### Training loop
 
