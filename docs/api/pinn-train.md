@@ -7,15 +7,17 @@ diagnostics for temporal discordance and trivial-solution collapse.
 
 Maturity: **alpha** submodule of Beta `omnibias-pinn`.
 
-## Honest method labels
+## Guarantee level
 
-- The **causality index** is a *measurement* (Kendall-tau discordance of
-  per-bin residuals), not a proof of temporal consistency.
-- **`march_solve`** uses Adam + soft (or caller-provided hard) IC penalties;
-  residual operators stay on whatever closed-form / autodiff path the field
-  already exposes.
-- **`SpectralBandScheduler`** grows Fourier / Mscale bands from the residual
-  spectrum — a numerical curriculum, not a certificate against spectral bias.
+| Piece | Level | Acceptance domain |
+| --- | --- | --- |
+| Window geometry / handoff / advance gate | by construction | shared numpy `TimeMarcher` |
+| Causality index | empirical measurement | inversion fraction of per-bin residual energies (`tau = 1 - 2 * index`); not a proof of temporal consistency |
+| `march_solve` | empirical (multi-seed) | Adam (torch) / hand-rolled Adam (JAX); soft IC or caller `hard_ic_factory`; refuses silent advance under `advance_policy="gate"` |
+| `SpectralBandScheduler` | numerical curriculum | applies measured residual bands at deterministic steps; not a certificate against spectral bias |
+
+Same-time triviality guards use variance / energy / residual modes — do **not**
+compare a late-time decaying field against the global `t=0` IC amplitude.
 
 ## Core schemas
 
@@ -45,8 +47,9 @@ Maturity: **alpha** submodule of Beta `omnibias-pinn`.
 
 ## JAX twin
 
-`omnibias.pinn.train.jax.march_solve` is the functional twin (optax Adam,
-pytree params). Window geometry and diagnostics are shared pure numpy.
+`omnibias.pinn.train.jax.march_solve` is the functional twin (hand-rolled Adam
+over pytree params; no `optax` dependency). Window geometry and diagnostics are
+shared pure numpy.
 
 ## Example
 

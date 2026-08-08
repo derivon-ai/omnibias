@@ -9,17 +9,31 @@ from typing import cast
 import jax.numpy as jnp
 from jax import Array
 from omnibias.pinn.jax import ops as jops
-from omnibias.pinn.operator.jax.data import OperatorSlab
+from omnibias.pinn.operator.jax.data import OperatorSlab, ParametricOperatorSlab
 from omnibias.pinn.operator.jax.deeponet import DeepONetOperator
 
 
 def data_loss(
     operator: DeepONetOperator,
-    slab: OperatorSlab,
+    slab: OperatorSlab | ParametricOperatorSlab,
     *,
     component: str = "u",
+    parameters: Array | None = None,
+    boundary: Array | None = None,
+    geometry: Array | None = None,
 ) -> Array:
-    field = operator.condition(slab.sensors)
+    if isinstance(slab, ParametricOperatorSlab):
+        cond = operator.spec.conditioning
+        if cond is not None and cond.has_parameters:
+            parameters = slab.parameters if parameters is None else parameters
+        else:
+            parameters = None
+    field = operator.condition(
+        slab.sensors,
+        parameters=parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
     state = field.on_grid(slab.coords)
     pred = jops.value(state, component).reshape(slab.values.shape[0], -1)
     target = slab.values[..., 0] if slab.values.ndim == 3 else slab.values
@@ -31,14 +45,48 @@ def heat_residual_loss(
     sensors: Array,
     coords: Array,
     *,
-    diffusivity: float = 0.1,
+    diffusivity: float | Array = 0.1,
     component: str = "u",
+    parameters: Array | None = None,
+    boundary: Array | None = None,
+    geometry: Array | None = None,
 ) -> Array:
-    field = operator.condition(sensors)
+    field = operator.condition(
+        sensors,
+        parameters=parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
     state = field.on_grid(coords)
     u_t = jops.derivative(state, component, axis=1, order=1)
     u_xx = jops.derivative(state, component, axis=0, order=2)
+    if isinstance(diffusivity, Array) or not isinstance(diffusivity, (int, float)):
+        F = int(sensors.shape[0])
+        Q = int(coords.shape[0])
+        D = jnp.reshape(diffusivity, (F, 1))
+        D = jnp.broadcast_to(D, (F, Q)).reshape(-1)
+        return jnp.mean((u_t - D * u_xx) ** 2)
     return jnp.mean((u_t - float(diffusivity) * u_xx) ** 2)
+
+
+def parametric_heat_residual_loss(
+    operator: DeepONetOperator,
+    slab: ParametricOperatorSlab,
+    *,
+    component: str = "u",
+    boundary: Array | None = None,
+    geometry: Array | None = None,
+) -> Array:
+    return heat_residual_loss(
+        operator,
+        slab.sensors,
+        slab.coords,
+        diffusivity=slab.parameters,
+        component=component,
+        parameters=slab.parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
 
 
 def burgers_residual_loss(
@@ -46,16 +94,50 @@ def burgers_residual_loss(
     sensors: Array,
     coords: Array,
     *,
-    viscosity: float = 0.05,
+    viscosity: float | Array = 0.05,
     component: str = "u",
+    parameters: Array | None = None,
+    boundary: Array | None = None,
+    geometry: Array | None = None,
 ) -> Array:
-    field = operator.condition(sensors)
+    field = operator.condition(
+        sensors,
+        parameters=parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
     state = field.on_grid(coords)
     u = jops.value(state, component)
     u_t = jops.derivative(state, component, axis=1, order=1)
     u_x = jops.derivative(state, component, axis=0, order=1)
     u_xx = jops.derivative(state, component, axis=0, order=2)
+    if isinstance(viscosity, Array) or not isinstance(viscosity, (int, float)):
+        F = int(sensors.shape[0])
+        Q = int(coords.shape[0])
+        nu = jnp.reshape(viscosity, (F, 1))
+        nu = jnp.broadcast_to(nu, (F, Q)).reshape(-1)
+        return jnp.mean((u_t + u * u_x - nu * u_xx) ** 2)
     return jnp.mean((u_t + u * u_x - float(viscosity) * u_xx) ** 2)
+
+
+def parametric_burgers_residual_loss(
+    operator: DeepONetOperator,
+    slab: ParametricOperatorSlab,
+    *,
+    component: str = "u",
+    boundary: Array | None = None,
+    geometry: Array | None = None,
+) -> Array:
+    return burgers_residual_loss(
+        operator,
+        slab.sensors,
+        slab.coords,
+        viscosity=slab.parameters,
+        component=component,
+        parameters=slab.parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
 
 
 def ks_residual_loss(
@@ -198,4 +280,6 @@ __all__ = [
     "heat_residual_loss_fd",
     "ks_residual_loss",
     "ks_residual_loss_fd",
+    "parametric_burgers_residual_loss",
+    "parametric_heat_residual_loss",
 ]

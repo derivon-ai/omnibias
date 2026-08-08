@@ -138,12 +138,14 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | Neural operator `G(u)(y)` query derivatives (DeepONet) | trunk jet × branch coeffs | closed form | `omnibias.pinn.operator` |
 | Neural operator 4th-order residual (KS on DeepONet) | one order-4 trunk jet × live coeffs | closed form | `omnibias.pinn.operator` + shipped `KuramotoSivashinsky` |
 | Neural operator spectral-conv (FNO 1-D / 2-D) | FFT multiply | numerical | `omnibias.pinn.operator` |
-| Operator multi-head conditioning (params / BC / geometry) | concatenated branch input | numerical | `omnibias.pinn.operator.ConditioningSpec` |
-| Causal time-marching PINN training | Wang–Perdikaris weights + window ladder | numerical | `omnibias.pinn.train` |
-| Causality / trivial-solution diagnostics | Kendall-tau / energy ratio | measurement | `omnibias.pinn.train` |
+| Operator multi-head conditioning (params / BC / geometry) | LayerNorm head encoders + fusion MLP | numerical | `omnibias.pinn.operator.ConditioningSpec` |
+| Causal time-marching PINN training | Wang–Perdikaris weights + gated window ladder | numerical | `omnibias.pinn.train` |
+| Causality / trivial-solution diagnostics | inversion fraction / same-time variance | measurement | `omnibias.pinn.train` |
 | Curved-boundary hard Dirichlet (`u = g + φ·NN`) | SDF / ADF multiplicative cage | exact on `φ=0`; `φ` autodiff-exact | `omnibias.pinn.domain` |
-| FBPINN multi-window spectral-bias mitigation | fixed raised-cosine POU + local coords | numerical | `omnibias.pinn.torch.fields.FBPINNField` |
-| NTK eigenspectrum / spectral-bias index | Jacobian SVD | measurement | `omnibias.pinn.torch.losses.ntk` |
+| Curved Neumann / Robin (smooth primitives) | normalized-distance factor modes | by construction where normals exist | `omnibias.pinn.domain.DistanceConstrainedField` |
+| Negative-inside R-function CSG | Rvachev ops via `r_intersect_sdf` / `r_union_sdf` | algebraic zero-set | `omnibias.pinn.domain` |
+| Multilevel FBPINN spectral-bias mitigation | hierarchy + partition combine / POU | numerical | `omnibias.pinn.{torch,jax}.fields.FBPINNField` |
+| NTK eigenspectrum / spectral-bias index | empirical Jacobian + Lanczos / mode LRs | measurement | `omnibias.pinn.{torch,jax}.losses.ntk` |
 
 ## Where NOT to look for a capability
 

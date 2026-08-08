@@ -16,10 +16,11 @@ Backend-free diagnostics
 
 Maturity: **alpha** submodule of the Beta ``omnibias-pinn`` distribution.
 
-Honesty
--------
-The causality index is a *measurement*, not a proof of temporal consistency.
-Nothing here turns a PINN into a method with an a-priori error guarantee.
+Guarantee level
+---------------
+Window geometry and advance gating are by construction; the causality index and
+triviality guards are measurements. Training success is empirical on the named
+PDE families in ``docs/benchmarks.md`` -- not an a-priori error method.
 """
 
 from __future__ import annotations

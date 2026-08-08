@@ -4,8 +4,8 @@
 
 These are *measurements*, not proofs of temporal consistency. A causally
 trained solution should not fit a late time bin better than an earlier one;
-:func:`causality_index` quantifies that discordance. The Wang-Perdikaris
-advance criterion is exposed as :func:`unlocked_fraction`.
+:func:`causality_index` quantifies that discordance as an inversion fraction.
+The Wang-Perdikaris advance criterion is exposed as :func:`unlocked_fraction`.
 """
 
 from __future__ import annotations
@@ -22,9 +22,10 @@ class CausalityReport:
     Attributes
     ----------
     causality_index
-        Kendall-tau-style discordance in ``[0, 1]``. ``0`` means per-bin
-        residuals are non-decreasing in time (physically ordered); ``1`` means
-        every pairwise comparison is inverted.
+        Inversion fraction in ``[0, 1]`` (related to Kendall ``tau`` by
+        ``tau = 1 - 2 * causality_index``). ``0`` means per-bin residuals are
+        non-decreasing in time; ``1`` means every pairwise comparison is
+        inverted.
     unlocked_fraction
         ``min_i w_i`` of the causal weights -- Wang et al.'s advance signal.
     n_bins
@@ -40,12 +41,13 @@ class CausalityReport:
 
 
 def causality_index(L_per_bin: np.ndarray | list[float]) -> float:
-    """Kendall-tau discordance of per-bin residual magnitudes.
+    """Inversion fraction of per-bin residual magnitudes.
 
     For a sequence ``L_0, ..., L_{n-1}`` of non-negative per-bin losses, count
     the fraction of pairs ``(i, j)`` with ``i < j`` where ``L_j < L_i`` (a late
     bin is fitted *better* than an earlier one). Returns ``0.0`` for a
     non-decreasing sequence and ``1.0`` when every pair is inverted.
+    Related to Kendall ``tau`` by ``tau = 1 - 2 * causality_index``.
 
     A single bin (or empty) returns ``0.0`` -- there is nothing to discord.
     """

@@ -12,7 +12,10 @@ from __future__ import annotations
 from typing import cast
 
 import torch
-from omnibias.pinn.operator.torch.data import OperatorSlab
+from omnibias.pinn.operator.torch.data import (
+    OperatorSlab,
+    ParametricOperatorSlab,
+)
 from omnibias.pinn.operator.torch.deeponet import DeepONetOperator
 from omnibias.pinn.torch import ops as tops
 from torch import Tensor
@@ -20,12 +23,26 @@ from torch import Tensor
 
 def data_loss(
     operator: DeepONetOperator,
-    slab: OperatorSlab,
+    slab: OperatorSlab | ParametricOperatorSlab,
     *,
     component: str = "u",
+    parameters: Tensor | None = None,
+    boundary: Tensor | None = None,
+    geometry: Tensor | None = None,
 ) -> Tensor:
     """Mean-square error of ``G(u_0)`` against the reference slab values."""
-    field = operator.condition(slab.sensors)
+    if isinstance(slab, ParametricOperatorSlab):
+        cond = operator.spec.conditioning
+        if cond is not None and cond.has_parameters:
+            parameters = slab.parameters if parameters is None else parameters
+        else:
+            parameters = None
+    field = operator.condition(
+        slab.sensors,
+        parameters=parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
     state = field.on_grid(slab.coords)
     pred = tops.value(state, component).reshape(slab.values.shape[0], -1)
     target = slab.values[..., 0] if slab.values.ndim == 3 else slab.values
@@ -37,19 +54,54 @@ def heat_residual_loss(
     sensors: Tensor,
     coords: Tensor,
     *,
-    diffusivity: float = 0.1,
+    diffusivity: float | Tensor = 0.1,
     component: str = "u",
+    parameters: Tensor | None = None,
+    boundary: Tensor | None = None,
+    geometry: Tensor | None = None,
 ) -> Tensor:
     """Closed-form heat residual ``||u_t - D u_xx||^2`` on a shared query grid.
 
     ``coords`` columns are ``(x, t)`` matching :class:`DeepONetOperator` built
-    with ``CoordinateSpec(("x", "t"))``.
+    with ``CoordinateSpec(("x", "t"))``. When ``diffusivity`` is a tensor of
+    shape ``(F, 1)`` the per-sample value is broadcast across queries.
     """
-    field = operator.condition(sensors)
+    field = operator.condition(
+        sensors,
+        parameters=parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
     state = field.on_grid(coords)
     u_t = tops.derivative(state, component, axis=1, order=1)
     u_xx = tops.derivative(state, component, axis=0, order=2)
+    if isinstance(diffusivity, Tensor):
+        F = int(sensors.shape[0])
+        Q = int(coords.shape[0])
+        D = diffusivity.reshape(F, 1).expand(F, Q).reshape(-1)
+        return torch.mean((u_t - D * u_xx) ** 2)
     return torch.mean((u_t - float(diffusivity) * u_xx) ** 2)
+
+
+def parametric_heat_residual_loss(
+    operator: DeepONetOperator,
+    slab: ParametricOperatorSlab,
+    *,
+    component: str = "u",
+    boundary: Tensor | None = None,
+    geometry: Tensor | None = None,
+) -> Tensor:
+    """Heat residual with per-sample diffusivity from ``slab.parameters``."""
+    return heat_residual_loss(
+        operator,
+        slab.sensors,
+        slab.coords,
+        diffusivity=slab.parameters,
+        component=component,
+        parameters=slab.parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
 
 
 def burgers_residual_loss(
@@ -57,17 +109,51 @@ def burgers_residual_loss(
     sensors: Tensor,
     coords: Tensor,
     *,
-    viscosity: float = 0.05,
+    viscosity: float | Tensor = 0.05,
     component: str = "u",
+    parameters: Tensor | None = None,
+    boundary: Tensor | None = None,
+    geometry: Tensor | None = None,
 ) -> Tensor:
     """Closed-form Burgers residual ``||u_t + u u_x - nu u_xx||^2``."""
-    field = operator.condition(sensors)
+    field = operator.condition(
+        sensors,
+        parameters=parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
     state = field.on_grid(coords)
     u = tops.value(state, component)
     u_t = tops.derivative(state, component, axis=1, order=1)
     u_x = tops.derivative(state, component, axis=0, order=1)
     u_xx = tops.derivative(state, component, axis=0, order=2)
+    if isinstance(viscosity, Tensor):
+        F = int(sensors.shape[0])
+        Q = int(coords.shape[0])
+        nu = viscosity.reshape(F, 1).expand(F, Q).reshape(-1)
+        return torch.mean((u_t + u * u_x - nu * u_xx) ** 2)
     return torch.mean((u_t + u * u_x - float(viscosity) * u_xx) ** 2)
+
+
+def parametric_burgers_residual_loss(
+    operator: DeepONetOperator,
+    slab: ParametricOperatorSlab,
+    *,
+    component: str = "u",
+    boundary: Tensor | None = None,
+    geometry: Tensor | None = None,
+) -> Tensor:
+    """Burgers residual with per-sample viscosity from ``slab.parameters``."""
+    return burgers_residual_loss(
+        operator,
+        slab.sensors,
+        slab.coords,
+        viscosity=slab.parameters,
+        component=component,
+        parameters=slab.parameters,
+        boundary=boundary,
+        geometry=geometry,
+    )
 
 
 def ks_residual_loss(
@@ -259,4 +345,6 @@ __all__ = [
     "heat_residual_loss_fd",
     "ks_residual_loss",
     "ks_residual_loss_fd",
+    "parametric_burgers_residual_loss",
+    "parametric_heat_residual_loss",
 ]

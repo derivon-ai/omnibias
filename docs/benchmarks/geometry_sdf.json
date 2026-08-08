@@ -1,6 +1,6 @@
 {
-  "schema": "geometry_sdf/v1",
-  "generated_utc": "2026-08-08T06:42:03Z",
+  "schema": "geometry_sdf/v2",
+  "generated_utc": "2026-08-08T09:15:11Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,10 +11,71 @@
     "folx": "0.2.22"
   },
   "config": {
-    "n_boundary": 63,
-    "hidden": 16
+    "smoke": false,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "hidden": 24,
+    "cases": 4
   },
-  "rss_mb_at_start": 625.59,
-  "max_abs_on_circle": 6.340006367881232e-17,
-  "elapsed_seconds": 0.24664806798682548
+  "rss_mb_at_start": 773.07,
+  "cases": [
+    {
+      "case": "disk",
+      "hard_max_abs_median": 3.025028010976124e-17,
+      "hard_max_abs_max": 3.8303033635472844e-17,
+      "soft_max_abs_median": 0.021630156860595898,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "case": "annulus",
+      "hard_max_abs_median": 4.2413299964566346e-17,
+      "hard_max_abs_max": 1.1178936090467935e-16,
+      "soft_max_abs_median": 0.03148362584323361,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "case": "csg_box_cap",
+      "hard_max_abs_median": 2.6491858334583482e-17,
+      "hard_max_abs_max": 6.769079962878247e-17,
+      "soft_max_abs_median": 0.018530187437762632,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    {
+      "case": "nonconvex_l",
+      "hard_max_abs_median": 9.540036761473285e-45,
+      "hard_max_abs_max": 5.343195283014611e-39,
+      "soft_max_abs_median": 0.03784088509806864,
+      "seeds": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ]
+    }
+  ],
+  "elapsed_seconds": 1.4824812099977862
 }

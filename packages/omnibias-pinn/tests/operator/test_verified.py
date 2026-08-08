@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import numpy as np
 import pytest
 import torch
@@ -189,17 +191,30 @@ def test_family_certificate_contains_real_deeponet_residuals() -> None:
         per_sample_bias=False,
         dtype=DTYPE,
     )
-    # Extract branch layers for interval propagation.
-    branch_linears = list(op.branch.linears)
-    assert len(branch_linears) == 2
-    W1 = branch_linears[0].weight.detach().cpu().numpy()
-    b1 = branch_linears[0].bias.detach().cpu().numpy()
-    W2 = branch_linears[1].weight.detach().cpu().numpy()
-    b2 = branch_linears[1].bias.detach().cpu().numpy()
+    # Extract branch layers for interval propagation (encoder + fusion; LayerNorm omitted).
+    enc = op.branch.encoders["function"]
+    func_lin = enc.linears[0]
+    layers: list[tuple[Any, Any, str | None]] = [
+        (
+            func_lin.weight.detach().cpu().numpy(),
+            func_lin.bias.detach().cpu().numpy(),
+            "tanh",
+        )
+    ]
+    for i, lin in enumerate(op.branch.fusion):
+        act: str | None = "tanh" if i < len(op.branch.fusion) - 1 else None
+        layers.append(
+            (
+                lin.weight.detach().cpu().numpy(),
+                lin.bias.detach().cpu().numpy(),
+                act,
+            )
+        )
+    assert len(layers) >= 2
     sensors_box = [(-0.15, 0.15)] * 4
     coeff_box, _ = branch_coefficient_box(
         sensors_box,
-        [(W1.tolist(), b1.tolist(), "tanh"), (W2.tolist(), b2.tolist(), None)],
+        [(W, b, a) for W, b, a in layers],
     )
     # Trunk layers: depth-1 JetMLP is hidden affine+tanh then affine readout.
     trunk_linears = list(op.core.trunk.linears)

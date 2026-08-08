@@ -22,6 +22,16 @@ not adjectives.
 
 Refine = iterate on the training dynamics until all three pass, then lock them in.
 
+## Phase A (explore) vs Phase B (ship)
+
+| Phase | Goal | Evidence |
+| --- | --- | --- |
+| **A – explore** | Find the strongest constructive route; losing baselines trigger diagnosis and another attempt, not immediate claim reduction | Scratch artifacts under `$OMNIBIAS_SCRATCH`; notebooks / uncommitted sweeps OK |
+| **B – ship** | Lock an acceptance-gated API + CI smoke + committed summary JSON | Multi-seed distributions, named baseline, certificate when the math supports it |
+
+A failed Phase-A run is a research input. Only after a concrete structural blocker
+(or a measured compute wall) may Phase B narrow the public claim.
+
 ## Local vs GPU cluster (CPU smoke vs cluster sweeps)
 
 - **Local CPU smoke** on `python`: imports, tiny `n`,
@@ -46,6 +56,10 @@ python examples/<pkg>_validate.py --n 30 --seeds 20 --sweep
 | `delta->0` (`difference`) | interval-tower enclosure contains a **dense deterministic grid AND a random sample** of true values (the `verified-primitive` rule) |
 | DP (`struct`) | `logsumexp_beta >= max` gap bound holds; matches exact DP on small instances |
 | trees (`tab`) | monotonicity / robustness certificates pass; **2nd-order training beats a 1st-order baseline** on held-out tabular data |
+| PINN causality (`pinn.train`) | equal-budget whole / causal / marching / combined arms on a named PDE; multi-seed reference + seam error; advance gate refuses silent unconverged promotion |
+| PINN geometry (`pinn.domain`) | CSG truth table + SDF-driven sampling + hard Dirichlet vs soft-penalty baseline on named shapes |
+| PINN operators (`pinn.operator`) | held-out params/shapes; conditioned vs unconditioned vs per-instance PINN retrain under equal budget |
+| PINN spectral (`pinn` FBPINN/NTK) | nonzero NTK on a known model; equal-param plain/Fourier/Mscale/FBPINN arms with mode-wise error |
 
 ## Anti-overfitting rule (the sharpest one)
 

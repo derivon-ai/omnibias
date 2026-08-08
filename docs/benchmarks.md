@@ -46,10 +46,13 @@ These are verified in CI on every push (counts captured on a CPU-dev host):
 | DeepONet Burgers bake-off (CPU, 8 seeds) | [`benchmarks/operator_deeponet.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_deeponet.py) | see § DeepONet; JSON in [`operator_deeponet.json`](benchmarks/operator_deeponet.json) |
 | DeepONet KS bake-off (CPU, 8 seeds) | [`benchmarks/operator_ks_bakeoff.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_ks_bakeoff.py) | see § KS; JSON in [`operator_ks_bakeoff.json`](benchmarks/operator_ks_bakeoff.json) |
 | DeepONet vs FNO (CPU, matched steps) | [`benchmarks/operator_fno_vs_deeponet.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_fno_vs_deeponet.py) | see § DeepONet; JSON in [`operator_fno_vs_deeponet.json`](benchmarks/operator_fno_vs_deeponet.json) |
-| Causal marching smoke | [`benchmarks/causal_marching.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/causal_marching.py) | windowed `march_solve` finite; JSON in [`causal_marching.json`](benchmarks/causal_marching.json) |
-| SDF hard-BC on a circle | [`benchmarks/geometry_sdf.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/geometry_sdf.py) | max \|u\| on circle **&lt; 1e-10**; JSON in [`geometry_sdf.json`](benchmarks/geometry_sdf.json) |
-| Parametric DeepONet zero-shot | [`benchmarks/operator_zero_shot.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_zero_shot.py) | held-out MSE drops after training; JSON in [`operator_zero_shot.json`](benchmarks/operator_zero_shot.json) |
-| FBPINN vs plain (high-freq 1-D) | [`benchmarks/spectral_bias_fbpinn.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/spectral_bias_fbpinn.py) | FBPINN MSE &lt; plain; JSON in [`spectral_bias_fbpinn.json`](benchmarks/spectral_bias_fbpinn.json) |
+| Causal marching (1-D heat) | [`benchmarks/causal_marching.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/causal_marching.py) | equal-budget whole / causal / marching / combined arms; smoke JSON [`causal_marching.json`](benchmarks/causal_marching.json); `--full` for ≥5 seeds |
+| SDF hard-BC geometry | [`benchmarks/geometry_sdf.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/geometry_sdf.py) | disk / annulus / CSG / nonconvex vs soft-penalty; smoke [`geometry_sdf_smoke.json`](benchmarks/geometry_sdf_smoke.json) |
+| Parametric DeepONet zero-shot | [`benchmarks/operator_zero_shot.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_zero_shot.py) | held-out vs unconditioned vs per-instance PINN retrain; JSON [`operator_zero_shot.json`](benchmarks/operator_zero_shot.json) |
+| Spectral bias / FBPINN | [`benchmarks/spectral_bias_fbpinn.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/spectral_bias_fbpinn.py) | equal-param plain / Fourier / Mscale / adaptive / multilevel FBPINN + NTK alignment; JSON [`spectral_bias_fbpinn.json`](benchmarks/spectral_bias_fbpinn.json) |
+
+Four-gap status matrix (capability / empirical / structural / certified):
+[`benchmarks/pinn_four_gap_matrix.md`](benchmarks/pinn_four_gap_matrix.md).
 
 ## Performance (GPU headline tier)
 

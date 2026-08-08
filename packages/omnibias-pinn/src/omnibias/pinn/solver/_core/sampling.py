@@ -115,8 +115,51 @@ def _axis_grid(lo: float, hi: float, n: int, *, periodic: bool) -> np.ndarray:
     return lo + step * np.arange(1, n + 1)
 
 
+def _sdf_sample_count(domain: Domain, spec: CollocationSpec) -> int:
+    """Absolute interior count for SDF rejection sampling."""
+    if spec.method == "grid":
+        return max(spec.n_interior ** domain.n_spatial, spec.n_interior)
+    return spec.n_interior
+
+
+def _embed_spatial_in_domain(
+    domain: Domain,
+    spatial: np.ndarray,
+    spec: CollocationSpec,
+    *,
+    t0: float | None = None,
+) -> np.ndarray:
+    """Lift ``(n, n_spatial)`` samples into full domain coordinates."""
+    if domain.time_axis is None:
+        return spatial
+    n = spatial.shape[0]
+    out = np.empty((n, domain.ndim), dtype=float)
+    cs = domain.coordinate_spec
+    t_val = domain.time_bounds()[0] if t0 is None else float(t0)
+    rng = np.random.default_rng(spec.seed)
+    for ax in domain.axes:
+        ai = cs.axis_index(ax)
+        if ax == domain.time_axis:
+            out[:, ai] = (
+                t_val if t0 is not None else rng.uniform(*domain.time_bounds(), size=n)
+            )
+        else:
+            out[:, ai] = spatial[:, domain.spatial_axes.index(ax)]
+    return out
+
+
 def interior_points(domain: Domain, spec: CollocationSpec) -> np.ndarray:
     """Interior collocation points, shape ``(N, ndim)``."""
+    if domain.is_sdf:
+        from omnibias.pinn.domain._core.sampling import interior_points_sdf
+
+        spatial = interior_points_sdf(
+            domain.sdf,
+            domain.spatial_bounds(),
+            n=_sdf_sample_count(domain, spec),
+            seed=spec.seed,
+        )
+        return _embed_spatial_in_domain(domain, spatial, spec)
     cs = domain.coordinate_spec
     if spec.method == "grid":
         per_axis = [
@@ -224,6 +267,16 @@ def boundary_points(
 
 def spatial_boundary_points(domain: Domain, spec: CollocationSpec) -> np.ndarray:
     """All non-periodic spatial-boundary faces, concatenated."""
+    if domain.is_sdf:
+        from omnibias.pinn.domain._core.sampling import boundary_points_sdf
+
+        spatial = boundary_points_sdf(
+            domain.sdf,
+            domain.spatial_bounds(),
+            n=max(spec.n_boundary, 1),
+            seed=spec.seed + 1,
+        )
+        return _embed_spatial_in_domain(domain, spatial, spec)
     cs = domain.coordinate_spec
     faces: list[np.ndarray] = []
     for axis in domain.spatial_axes:
@@ -272,6 +325,16 @@ def initial_slice_points(
     """Spatial grid at the initial time (time axis fixed to ``t0``)."""
     if domain.time_axis is None:
         raise ValueError("initial_slice_points requires a time axis")
+    if domain.is_sdf:
+        from omnibias.pinn.domain._core.sampling import interior_points_sdf
+
+        spatial = interior_points_sdf(
+            domain.sdf,
+            domain.spatial_bounds(),
+            n=_sdf_sample_count(domain, spec),
+            seed=spec.seed + 2,
+        )
+        return _embed_spatial_in_domain(domain, spatial, spec, t0=t0)
     t_lo, _ = domain.time_bounds()
     t_val = t_lo if t0 is None else t0
     pts = boundary_points(domain, spec, axis=domain.time_axis, side="lo")

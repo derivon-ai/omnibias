@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from omnibias.pinn.domain.torch.boundary_torch import boundary_factor_jet_at
 from omnibias.pinn.domain.torch.field import (
     DistanceConstrainedField,
     build_distance_constrained_field,
@@ -11,6 +12,7 @@ from omnibias.pinn.domain.torch.field import (
 from omnibias.pinn.domain.torch.sdf_torch import (
     box_distance,
     from_primitive,
+    from_sdf,
     halfspace_distance,
     normalize_distance,
     sphere_distance,
@@ -18,9 +20,11 @@ from omnibias.pinn.domain.torch.sdf_torch import (
 
 __all__ = [
     "DistanceConstrainedField",
+    "boundary_factor_jet_at",
     "box_distance",
     "build_distance_constrained_field",
     "from_primitive",
+    "from_sdf",
     "halfspace_distance",
     "normalize_distance",
     "sphere_distance",

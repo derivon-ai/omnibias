@@ -505,5 +505,6 @@ measured verdict.
 
 - [DeepXDE / Modulus → omnibias-pinn migration](docs/migration-pinn.md)
 - [Benchmarks (vendor-neutral)](docs/benchmarks.md)
+- [PINN four-gap capability matrix](docs/benchmarks/pinn_four_gap_matrix.md)
 - [Changelog](CHANGELOG.md)
 - [Release readiness](docs/release-readiness.md)

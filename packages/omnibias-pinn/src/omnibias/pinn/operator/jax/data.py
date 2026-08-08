@@ -159,9 +159,97 @@ def make_ks_slab(
     return OperatorSlab(sensors=sensors, coords=coords, values=values, grid=grid)
 
 
+@dataclass(frozen=True)
+class ParametricOperatorSlab:
+    sensors: Array
+    coords: Array
+    values: Array
+    grid: SpectralGrid1D
+    parameters: Array
+
+
+def make_parametric_heat_slab(
+    *,
+    n_samples: int = 16,
+    n_grid: int = 64,
+    n_sensors: int = 32,
+    n_modes: int = 4,
+    amplitude: float = 1.0,
+    diffusivities: tuple[float, ...] | None = None,
+    diffusivity_range: tuple[float, float] = (0.05, 0.2),
+    t_final: float = 0.5,
+    n_times: int = 11,
+    seed: int = 0,
+) -> ParametricOperatorSlab:
+    """Heat slabs with a swept diffusivity parameter per sample (JAX twin)."""
+
+    from omnibias.pinn.operator.torch.data import make_parametric_heat_slab as _torch
+
+    slab = _torch(
+        n_samples=n_samples,
+        n_grid=n_grid,
+        n_sensors=n_sensors,
+        n_modes=n_modes,
+        amplitude=amplitude,
+        diffusivities=diffusivities,
+        diffusivity_range=diffusivity_range,
+        t_final=t_final,
+        n_times=n_times,
+        seed=seed,
+    )
+    jgrid = SpectralGrid1D(slab.grid.n, slab.grid.length)
+    return ParametricOperatorSlab(
+        sensors=jnp.asarray(slab.sensors),
+        coords=jnp.asarray(slab.coords),
+        values=jnp.asarray(slab.values),
+        grid=jgrid,
+        parameters=jnp.asarray(slab.parameters),
+    )
+
+
+def make_parametric_burgers_slab(
+    *,
+    n_samples: int = 8,
+    n_grid: int = 64,
+    n_sensors: int = 32,
+    n_modes: int = 2,
+    amplitude: float = 0.5,
+    viscosities: tuple[float, ...] | None = None,
+    viscosity_range: tuple[float, float] = (0.03, 0.1),
+    t_final: float = 0.5,
+    n_times: int = 11,
+    seed: int = 0,
+) -> ParametricOperatorSlab:
+    from omnibias.pinn.operator.torch.data import make_parametric_burgers_slab as _torch
+
+    slab = _torch(
+        n_samples=n_samples,
+        n_grid=n_grid,
+        n_sensors=n_sensors,
+        n_modes=n_modes,
+        amplitude=amplitude,
+        viscosities=viscosities,
+        viscosity_range=viscosity_range,
+        t_final=t_final,
+        n_times=n_times,
+        seed=seed,
+    )
+    jgrid = SpectralGrid1D(slab.grid.n, slab.grid.length)
+    return ParametricOperatorSlab(
+        sensors=jnp.asarray(slab.sensors),
+        coords=jnp.asarray(slab.coords),
+        values=jnp.asarray(slab.values),
+        grid=jgrid,
+        parameters=jnp.asarray(slab.parameters),
+    )
+
+
 __all__ = [
     "OperatorSlab",
+    "ParametricOperatorSlab",
     "make_burgers_slab",
     "make_heat_slab",
     "make_ks_slab",
+    "make_parametric_burgers_slab",
+    "make_parametric_heat_slab",
 ]

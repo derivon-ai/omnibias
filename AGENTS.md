@@ -343,6 +343,13 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   with no distinct domain, should be a submodule instead. `omnibias-score` and
   `omnibias-qpinn` are the cautionary stubs that inflated the tree; `pde`, `gauge`,
   and `flow` were folded back into `pinn` / `geometry` / `score` for this reason.
+  **Ambition is still encouraged inside existing packages:** alpha submodules
+  (`omnibias.pinn.train` / `.domain` / `.operator`, …) and regenerable public
+  benchmark artifacts are the right place for aggressive research. Distinguish
+  *structural* impossibility from *absent implementation*; do not declare a
+  capability solved without an acceptance gate (see
+  `omnibias-dev-pinn-research` and the "ambition plus claim discipline" section
+  of `.cursor/rules/omnibias.md`).
   A folded package is de-wired everywhere at once (workspace exclude, CI job,
   `mkdocs.yml` nav + `paths`, `docs/api`, `llms.txt`, `CHANGELOG.md`, `AGENTS.md`);
   `test_package_registry` enforces the workspace / folded-name / Python-floor

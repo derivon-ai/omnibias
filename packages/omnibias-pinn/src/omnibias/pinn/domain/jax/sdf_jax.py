@@ -7,8 +7,17 @@ from __future__ import annotations
 from collections.abc import Callable
 
 import jax.numpy as jnp
+import numpy as np
 from jax import Array
-from omnibias.pinn.domain._core.sdf import Box, Halfspace, Sphere
+from omnibias.pinn.domain._core.sdf import (
+    SDF,
+    Box,
+    Halfspace,
+    Negate,
+    RCompose,
+    Sphere,
+    evaluate_sdf,
+)
 
 DistanceFn = Callable[[Array], Array]
 
@@ -53,6 +62,46 @@ def halfspace_distance(
     return _fn
 
 
+def _r_conj_jax(a: Array, b: Array, *, alpha: float = 0.0) -> Array:
+    rad = jnp.maximum(a * a + b * b - 2.0 * alpha * a * b, 0.0)
+    return (a + b - jnp.sqrt(rad)) / (1.0 + alpha)
+
+
+def _r_disj_jax(a: Array, b: Array, *, alpha: float = 0.0) -> Array:
+    rad = jnp.maximum(a * a + b * b - 2.0 * alpha * a * b, 0.0)
+    return (a + b + jnp.sqrt(rad)) / (1.0 + alpha)
+
+
+def from_sdf(sdf: SDF) -> DistanceFn:
+    if isinstance(sdf, (Sphere, Box, Halfspace)):
+        return from_primitive(sdf)
+    if isinstance(sdf, Negate):
+        child = from_sdf(sdf.child)
+
+        def _neg(coords: Array) -> Array:
+            return -child(coords)
+
+        return _neg
+    if isinstance(sdf, RCompose):
+        left = from_sdf(sdf.left)
+        right = from_sdf(sdf.right)
+
+        def _compose(coords: Array) -> Array:
+            a = left(coords)
+            b = right(coords)
+            if sdf.op == "and":
+                return -_r_conj_jax(-a, -b, alpha=sdf.alpha)
+            return -_r_disj_jax(-a, -b, alpha=sdf.alpha)
+
+        return _compose
+
+    def _numpy_bridge(coords: Array) -> Array:
+        vals = evaluate_sdf(sdf, np.asarray(coords))
+        return jnp.asarray(vals, dtype=coords.dtype)
+
+    return _numpy_bridge
+
+
 def from_primitive(sdf: Sphere | Box | Halfspace) -> DistanceFn:
     if isinstance(sdf, Sphere):
         return sphere_distance(sdf.center, sdf.radius)
@@ -84,6 +133,7 @@ def normalize_distance(distance_fn: DistanceFn, *, eps: float = 1e-12) -> Distan
 __all__ = [
     "box_distance",
     "from_primitive",
+    "from_sdf",
     "halfspace_distance",
     "normalize_distance",
     "sphere_distance",

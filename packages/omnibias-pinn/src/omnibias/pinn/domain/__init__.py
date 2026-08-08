@@ -16,23 +16,29 @@ Maturity: **alpha** submodule of the Beta ``omnibias-pinn`` distribution.
 Honesty
 -------
 ADF normalization of a general SDF uses a numerical gradient unless an
-analytic ``grad_fn`` is supplied. The hard-BC ansatz is exact on the
-zero level set of ``phi``; residual accuracy elsewhere is optimised, not
-proven.
+analytic ``grad_fn`` / torch autodiff path is supplied. The hard-BC ansatz is
+exact on the zero level set of ``phi``; residual accuracy elsewhere is
+optimised, not proven.
 """
 
 from __future__ import annotations
 
 from omnibias.pinn.domain._core import (
+    SDF,
+    BCMode,
     Box,
     Cylinder,
     Halfspace,
     Negate,
+    NonSmoothBoundaryError,
     Polygon,
     RCompose,
-    SDF,
     Sphere,
     approximate_distance,
+    assert_smooth_for_normal_bc,
+    bc_distance_factor,
+    boundary_factor_jet,
+    boundary_junction_mask,
     boundary_points_sdf,
     complement,
     evaluate_sdf,
@@ -40,22 +46,32 @@ from omnibias.pinn.domain._core import (
     interior_points_sdf,
     intersect,
     normalize_adf,
+    normalized_boundary_factor,
+    omega_gradient,
     r_conjunction,
     r_disjunction,
+    r_intersect_sdf,
     r_negation,
+    r_union_sdf,
     union,
 )
 
 __all__ = [
+    "BCMode",
     "Box",
     "Cylinder",
     "Halfspace",
     "Negate",
+    "NonSmoothBoundaryError",
     "Polygon",
     "RCompose",
     "SDF",
     "Sphere",
     "approximate_distance",
+    "assert_smooth_for_normal_bc",
+    "bc_distance_factor",
+    "boundary_factor_jet",
+    "boundary_junction_mask",
     "boundary_points_sdf",
     "complement",
     "evaluate_sdf",
@@ -63,8 +79,12 @@ __all__ = [
     "interior_points_sdf",
     "intersect",
     "normalize_adf",
+    "normalized_boundary_factor",
+    "omega_gradient",
     "r_conjunction",
     "r_disjunction",
+    "r_intersect_sdf",
     "r_negation",
+    "r_union_sdf",
     "union",
 ]

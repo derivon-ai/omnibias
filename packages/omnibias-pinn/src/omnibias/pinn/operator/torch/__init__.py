@@ -10,8 +10,11 @@ from omnibias.pinn.operator.torch.data import (
     make_burgers_slab,
     make_heat_slab,
     make_ks_slab,
+    make_nonperiodic_parametric_burgers_slab,
+    make_nonperiodic_parametric_heat_slab,
     make_parametric_burgers_slab,
     make_parametric_heat_slab,
+    make_variable_diffusivity_disk_poisson,
 )
 from omnibias.pinn.operator.torch.deeponet import (
     DeepONetField,
@@ -31,6 +34,10 @@ from omnibias.pinn.operator.torch.geometry import (
     encode_geometry_batch,
     probe_grid,
 )
+from omnibias.pinn.operator.torch.geometry_field import (
+    condition_with_geometry,
+    evaluate_geometry_batch,
+)
 from omnibias.pinn.operator.torch.losses import (
     burgers_residual_loss,
     causal_operator_loss,
@@ -39,6 +46,8 @@ from omnibias.pinn.operator.torch.losses import (
     heat_residual_loss_fd,
     ks_residual_loss,
     ks_residual_loss_fd,
+    parametric_burgers_residual_loss,
+    parametric_heat_residual_loss,
 )
 
 __all__ = [
@@ -55,9 +64,11 @@ __all__ = [
     "build_fno2d",
     "burgers_residual_loss",
     "causal_operator_loss",
+    "condition_with_geometry",
     "data_loss",
     "encode_geometry",
     "encode_geometry_batch",
+    "evaluate_geometry_batch",
     "heat_residual_loss",
     "heat_residual_loss_fd",
     "ks_residual_loss",
@@ -65,7 +76,12 @@ __all__ = [
     "make_burgers_slab",
     "make_heat_slab",
     "make_ks_slab",
+    "make_nonperiodic_parametric_burgers_slab",
+    "make_nonperiodic_parametric_heat_slab",
     "make_parametric_burgers_slab",
     "make_parametric_heat_slab",
+    "make_variable_diffusivity_disk_poisson",
+    "parametric_burgers_residual_loss",
+    "parametric_heat_residual_loss",
     "probe_grid",
 ]

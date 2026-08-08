@@ -11,7 +11,11 @@ from __future__ import annotations
 import torch
 from omnibias.pinn import ComponentSpec, CoordinateSpec
 from omnibias.pinn.torch.fields import build_fbpinn_field
-from omnibias.pinn.torch.losses import ntk_eigenspectrum, spectral_bias_index
+from omnibias.pinn.torch.losses import (
+    fourier_mode_learning_rates,
+    ntk_eigenspectrum,
+    spectral_bias_index,
+)
 
 
 def main() -> None:
@@ -37,7 +41,11 @@ def main() -> None:
         return field.forward_values(x)[:, 0] - torch.sin(4.0 * torch.pi * x[:, 0])
 
     evals = ntk_eigenspectrum(residual_fn, list(field.parameters()), n_eigen=6)
-    idx = spectral_bias_index(evals)
+    modes = (2, 4, 8)
+    rates = fourier_mode_learning_rates(
+        residual_fn, list(field.parameters()), coords=x, modes=modes, L=1.0
+    )
+    idx = spectral_bias_index(rates)
     assert 0.0 <= float(idx) <= 1.0
     print("pinn_fbpinn: ok", float(idx), float(evals[0]))
 

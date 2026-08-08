@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from omnibias.pinn.domain.jax.boundary_jax import boundary_factor_jet_at
 from omnibias.pinn.domain.jax.field import (
     DistanceConstrainedField,
     build_distance_constrained_field,
@@ -18,6 +19,7 @@ from omnibias.pinn.domain.jax.sdf_jax import (
 
 __all__ = [
     "DistanceConstrainedField",
+    "boundary_factor_jet_at",
     "box_distance",
     "build_distance_constrained_field",
     "from_primitive",

@@ -239,6 +239,7 @@ nav:
       - Operator-block discovery: cookbook/operator-block-discovery.md
   - Examples: examples.md
   - Benchmarks: benchmarks.md
+  - PINN four-gap matrix: benchmarks/pinn_four_gap_matrix.md
   - Licensing: licensing.md
   - Reproducibility: reproducibility.md
   - CI hardening: ci-hardening.md

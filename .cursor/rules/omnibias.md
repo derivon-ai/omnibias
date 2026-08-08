@@ -41,6 +41,21 @@ enclosures, the formal loop).
 - `omnibias-fields` is the foundational substrate; `omnibias-pinn` re-exports it through transparent shims -- do not duplicate it. Backend field ops dispatch on the `_omnibias_dispatch` marker (`omnibias.fields._core.DISPATCH_ATTR`), never on concrete downstream classes.
 - Label results honestly: **closed-form** (the sigma tower) vs **autodiff-exact** (autodiff of an analytic expression) vs **numerical** (grid / quadrature). `omnibias-fractional` is non-local / grid-based -- NOT closed form; `omnibias-score` is a pure composition of field ops.
 
+## Ambition plus claim discipline
+
+- **Do not reject without a structural argument.** An absent implementation or a
+  failed first experiment is not a mathematical impossibility -- explore the
+  strongest constructive route (exact cages, closed-form towers, certificates)
+  before narrowing scope.
+- **Do not declare solved without evidence.** Capability claims need an
+  acceptance gate: multi-seed empirical result, by-construction identity, or a
+  sound certificate. Smoke wiring alone is not enough.
+- Alpha **submodules** inside an existing package are encouraged for ambitious
+  research; premature top-level distributions are not (see `omnibias-dev-new-package`).
+- Public benchmark artifacts under `docs/benchmarks/` are part of the claim
+  surface -- keep them regenerable and vendor-neutral (`$OMNIBIAS_SCRATCH` for
+  heavy full-run outputs).
+
 ## Leakage (public repo)
 
 Tracked files must never contain a specific cluster scheduler name, vendor name,

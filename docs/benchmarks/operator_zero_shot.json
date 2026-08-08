@@ -1,6 +1,6 @@
 {
-  "schema": "operator_zero_shot/v1",
-  "generated_utc": "2026-08-08T06:42:05Z",
+  "schema": "operator_zero_shot/v2",
+  "generated_utc": "2026-08-08T09:15:22Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,13 +11,63 @@
     "folx": "0.2.22"
   },
   "config": {
-    "steps": 40,
-    "n_train": 6,
-    "n_test": 2
+    "smoke": false,
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "decision_rule": "held-out MSE after training must beat pre-training MSE; conditioned arm should beat unconditioned ablation on median MSE"
   },
-  "rss_mb_at_start": 776.84,
-  "mse_before": 0.44699314652800853,
-  "mse_after": 0.32408748600741405,
-  "improved": true,
-  "elapsed_seconds": 0.9887613429891644
+  "rss_mb_at_start": 779.05,
+  "runs": [
+    {
+      "seed": 0,
+      "mse_before": 5.30958170847121e+16,
+      "mse_conditioned": 5.309581704412985e+16,
+      "mse_unconditioned": 5.309581655699491e+16,
+      "mse_pinn_retrain": 5.3095817050450856e+16,
+      "wall_s_conditioned": 1.0450482360029127,
+      "wall_s_unconditioned": 0.8722235820023343,
+      "wall_s_pinn_retrain": 1.1457114949880634,
+      "n_params_conditioned": 6019,
+      "amortization_break_even_queries": 7,
+      "improved_vs_init": true,
+      "conditioned_beats_ablation": false
+    },
+    {
+      "seed": 1,
+      "mse_before": 6.811507585865494e+16,
+      "mse_conditioned": 6.811507576160468e+16,
+      "mse_unconditioned": 6.811507542680936e+16,
+      "mse_pinn_retrain": 6.811507567308716e+16,
+      "wall_s_conditioned": 0.9618291739898268,
+      "wall_s_unconditioned": 0.8866281069931574,
+      "wall_s_pinn_retrain": 1.1491400899831206,
+      "n_params_conditioned": 6019,
+      "amortization_break_even_queries": 7,
+      "improved_vs_init": true,
+      "conditioned_beats_ablation": false
+    },
+    {
+      "seed": 2,
+      "mse_before": 4.781315778227476e+17,
+      "mse_conditioned": 4.781315769922179e+17,
+      "mse_unconditioned": 4.781315680554004e+17,
+      "mse_pinn_retrain": 4.7813157714962714e+17,
+      "wall_s_conditioned": 0.9507185879920144,
+      "wall_s_unconditioned": 0.8496753190120216,
+      "wall_s_pinn_retrain": 1.1414573229849339,
+      "n_params_conditioned": 6019,
+      "amortization_break_even_queries": 7,
+      "improved_vs_init": true,
+      "conditioned_beats_ablation": false
+    }
+  ],
+  "summary": {
+    "median_mse_conditioned": 6.811507576160468e+16,
+    "median_mse_unconditioned": 6.811507542680936e+16,
+    "median_mse_pinn_retrain": 6.811507567308716e+16,
+    "elapsed_seconds": 9.864350908028428
+  }
 }

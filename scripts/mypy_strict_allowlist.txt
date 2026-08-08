@@ -38,6 +38,7 @@ packages/omnibias-pinn/src/omnibias/pinn/domain/_core/sampling.py
 packages/omnibias-pinn/src/omnibias/pinn/domain/_core/sdf.py
 packages/omnibias-pinn/src/omnibias/pinn/operator/__init__.py
 packages/omnibias-pinn/src/omnibias/pinn/operator/_core/__init__.py
+packages/omnibias-pinn/src/omnibias/pinn/operator/_core/branch.py
 packages/omnibias-pinn/src/omnibias/pinn/operator/_core/conditioning.py
 packages/omnibias-pinn/src/omnibias/pinn/operator/_core/sensors.py
 packages/omnibias-pinn/src/omnibias/pinn/operator/_core/spec.py

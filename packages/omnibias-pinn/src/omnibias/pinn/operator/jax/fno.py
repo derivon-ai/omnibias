@@ -169,8 +169,134 @@ def make_fno1d(
     )
 
 
+@dataclass(frozen=True)
+class SpectralConv2d:
+    """Complex spectral convolution on the leading ``modes_x x modes_y`` modes."""
+
+    weight_real: Array
+    weight_imag: Array
+    modes_x: int
+    modes_y: int
+
+    def __call__(self, x: Array) -> Array:
+        if x.ndim != 4:
+            raise ValueError(f"SpectralConv2d expects (B, C, H, W); got {tuple(x.shape)}")
+        h, w = int(x.shape[-2]), int(x.shape[-1])
+        x_ft = jnp.fft.rfft2(x, axes=(-2, -1))
+        mx = min(self.modes_x, x_ft.shape[-2])
+        my = min(self.modes_y, x_ft.shape[-1])
+        wgt = self.weight_real[..., :mx, :my] + 1j * self.weight_imag[..., :mx, :my]
+        out_ft = jnp.zeros(
+            (x.shape[0], wgt.shape[1], x_ft.shape[-2], x_ft.shape[-1]),
+            dtype=x_ft.dtype,
+        )
+        contracted = jnp.einsum("bixy,ioxy->boxy", x_ft[:, :, :mx, :my], wgt)
+        out_ft = out_ft.at[:, :, :mx, :my].set(contracted)
+        return jnp.fft.irfft2(out_ft, s=(h, w), axes=(-2, -1))
+
+
+@dataclass(frozen=True)
+class FNO2d:
+    """2-D Fourier Neural Operator on a periodic grid (JAX)."""
+
+    lift_w: Array
+    lift_b: Array
+    proj_w: Array
+    proj_b: Array
+    spectral: tuple[SpectralConv2d, ...]
+    pointwise_w: tuple[Array, ...]
+    pointwise_b: tuple[Array, ...]
+    spec: JaxActivationSpec
+
+    def __call__(self, u0: Array) -> Array:
+        if u0.ndim == 3:
+            u0 = u0[..., None]
+        if u0.ndim != 4:
+            raise ValueError(
+                f"u0 must be (B, H, W) or (B, H, W, C); got {tuple(u0.shape)}"
+            )
+        h = u0 @ self.lift_w.T + self.lift_b
+        h = jnp.transpose(h, (0, 3, 1, 2))
+        for sc, pw, pb in zip(
+            self.spectral, self.pointwise_w, self.pointwise_b, strict=True
+        ):
+            h1 = sc(h)
+            h2 = jnp.transpose(
+                jnp.transpose(h, (0, 2, 3, 1)) @ pw.T + pb, (0, 3, 1, 2)
+            )
+            h = self.spec.forward(h1 + h2)
+        out = jnp.transpose(h, (0, 2, 3, 1)) @ self.proj_w.T + self.proj_b
+        return out
+
+
+def make_fno2d(
+    *,
+    modes_x: int = 8,
+    modes_y: int = 8,
+    width: int = 32,
+    n_layers: int = 4,
+    in_channels: int = 1,
+    out_channels: int = 1,
+    base: str | JaxActivationSpec = "gelu",
+    seed: int = 0,
+    dtype: Any = jnp.float64,
+) -> FNO2d:
+    """Build a randomly-initialised :class:`FNO2d` (JAX)."""
+    if n_layers < 1:
+        raise ValueError(f"n_layers must be >= 1, got {n_layers}")
+    spec = get_activation(base)
+    key = jax.random.PRNGKey(seed)
+
+    def _linear(k: Array, din: int, dout: int) -> tuple[Array, tuple[Array, Array]]:
+        k, wk = jax.random.split(k)
+        scale = 1.0 / math.sqrt(din)
+        return k, (
+            jax.random.normal(wk, (dout, din), dtype=dtype) * scale,
+            jnp.zeros((dout,), dtype=dtype),
+        )
+
+    key, (lift_w, lift_b) = _linear(key, in_channels, width)
+    key, (proj_w, proj_b) = _linear(key, width, out_channels)
+    spectral = []
+    pointwise_w = []
+    pointwise_b = []
+    scale = 1.0 / (width * width)
+    for _ in range(n_layers):
+        key, rk, ik, pk = jax.random.split(key, 4)
+        spectral.append(
+            SpectralConv2d(
+                weight_real=scale
+                * jax.random.normal(
+                    rk, (width, width, modes_x, modes_y), dtype=dtype
+                ),
+                weight_imag=scale
+                * jax.random.normal(
+                    ik, (width, width, modes_x, modes_y), dtype=dtype
+                ),
+                modes_x=modes_x,
+                modes_y=modes_y,
+            )
+        )
+        key, (pw, pb) = _linear(key, width, width)
+        pointwise_w.append(pw)
+        pointwise_b.append(pb)
+    return FNO2d(
+        lift_w=lift_w,
+        lift_b=lift_b,
+        proj_w=proj_w,
+        proj_b=proj_b,
+        spectral=tuple(spectral),
+        pointwise_w=tuple(pointwise_w),
+        pointwise_b=tuple(pointwise_b),
+        spec=spec,
+    )
+
+
 __all__ = [
     "FNO1d",
+    "FNO2d",
     "SpectralConv1d",
+    "SpectralConv2d",
     "make_fno1d",
+    "make_fno2d",
 ]

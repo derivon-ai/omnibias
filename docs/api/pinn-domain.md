@@ -9,13 +9,17 @@ Named `domain` (not `geometry`) to avoid colliding with the
 
 Maturity: **alpha** submodule of Beta `omnibias-pinn`.
 
-## Honest method labels
+## Guarantee level
 
-- **Dirichlet satisfaction on `φ = 0`** is exact by construction.
-- **ADF normalization** of a general SDF uses a numerical gradient unless an
-  analytic `grad_fn` / torch autodiff path is supplied (`autodiff-exact` for
-  the torch primitives).
-- Residual accuracy away from the boundary is **optimised, not proven**.
+| Piece | Level | Acceptance domain |
+| --- | --- | --- |
+| Dirichlet on `φ = 0` | by construction | smooth primitives / R-compositions with a vanishing factor |
+| Neumann / Robin | by construction | smooth primitives with well-defined normals; **raises** at non-smooth CSG junctions |
+| Negative-inside R-CSG | algebraic | `intersect` / `union` use `r_*_sdf` (positive-inside Rvachev primitives remain available) |
+| ADF / higher jets | autodiff-exact / FD | analytic ω jets for Sphere / Halfspace / Box; normalized ADF order &gt; 1 may use FD |
+| Residual accuracy off-boundary | empirical | optimised, not proven |
+
+`solver.Domain.sdf` drives interior / boundary / RAR candidate sampling.
 
 ## Core schemas
 

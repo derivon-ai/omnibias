@@ -7,7 +7,15 @@ from __future__ import annotations
 from collections.abc import Callable
 
 import torch
-from omnibias.pinn.domain._core.sdf import Box, Halfspace, Sphere
+from omnibias.pinn.domain._core.sdf import (
+    SDF,
+    Box,
+    Halfspace,
+    Negate,
+    RCompose,
+    Sphere,
+    evaluate_sdf,
+)
 from torch import Tensor
 
 DistanceFn = Callable[[Tensor], Tensor]
@@ -57,6 +65,47 @@ def halfspace_distance(
     return _fn
 
 
+def _r_conj_torch(a: Tensor, b: Tensor, *, alpha: float = 0.0) -> Tensor:
+    rad = torch.clamp(a * a + b * b - 2.0 * alpha * a * b, min=0.0)
+    return (a + b - torch.sqrt(rad)) / (1.0 + alpha)
+
+
+def _r_disj_torch(a: Tensor, b: Tensor, *, alpha: float = 0.0) -> Tensor:
+    rad = torch.clamp(a * a + b * b - 2.0 * alpha * a * b, min=0.0)
+    return (a + b + torch.sqrt(rad)) / (1.0 + alpha)
+
+
+def from_sdf(sdf: SDF) -> DistanceFn:
+    """Build a torch distance callable from any numpy SDF node."""
+    if isinstance(sdf, (Sphere, Box, Halfspace)):
+        return from_primitive(sdf)
+    if isinstance(sdf, Negate):
+        child = from_sdf(sdf.child)
+
+        def _neg(coords: Tensor) -> Tensor:
+            return -child(coords)
+
+        return _neg
+    if isinstance(sdf, RCompose):
+        left = from_sdf(sdf.left)
+        right = from_sdf(sdf.right)
+
+        def _compose(coords: Tensor) -> Tensor:
+            a = left(coords)
+            b = right(coords)
+            if sdf.op == "and":
+                return -_r_conj_torch(-a, -b, alpha=sdf.alpha)
+            return -_r_disj_torch(-a, -b, alpha=sdf.alpha)
+
+        return _compose
+
+    def _numpy_bridge(coords: Tensor) -> Tensor:
+        vals = evaluate_sdf(sdf, coords.detach().cpu().numpy())
+        return torch.tensor(vals, dtype=coords.dtype, device=coords.device)
+
+    return _numpy_bridge
+
+
 def from_primitive(sdf: Sphere | Box | Halfspace) -> DistanceFn:
     """Build a torch distance callable from a numpy SDF primitive."""
     if isinstance(sdf, Sphere):
@@ -94,6 +143,7 @@ def normalize_distance(distance_fn: DistanceFn, *, eps: float = 1e-12) -> Distan
 __all__ = [
     "box_distance",
     "from_primitive",
+    "from_sdf",
     "halfspace_distance",
     "normalize_distance",
     "sphere_distance",

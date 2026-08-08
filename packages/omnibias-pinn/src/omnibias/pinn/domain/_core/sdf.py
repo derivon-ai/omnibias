@@ -14,7 +14,7 @@ Rvachev, *Theory of R-functions and Some Applications* (1982).
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Protocol, cast
 
@@ -35,7 +35,16 @@ class SDF(Protocol):
 
 @dataclass(frozen=True)
 class Halfspace:
-    """``n · (x - p)`` -- positive on the ``n`` side of the plane through ``p``."""
+    r"""Outward-normal halfspace SDF: negative on the interior ``-n`` side.
+
+    With unit outward normal ``n`` and anchor ``p`` on the boundary,
+
+    .. math::
+
+        \phi(x) = n \cdot (x - p),
+
+    so ``\phi < 0`` on the interior (the ``-n`` side) and ``\phi > 0`` outside.
+    """
 
     normal: tuple[float, ...]
     point: tuple[float, ...]
@@ -197,14 +206,20 @@ class Polygon:
 
 
 def r_conjunction(a: FloatArray, b: FloatArray, *, alpha: float = 0.0) -> FloatArray:
-    r"""R-function conjunction (intersection): zero when either factor is zero.
+    r"""R-function conjunction in the **positive-inside** (Rvachev) convention.
+
+    Both factors are positive in the interior; the result is positive iff
+    *both* arguments are positive. Zero when either factor is zero and the
+    other is non-negative.
 
     .. math::
 
         a \wedge_\alpha b = \frac{1}{1+\alpha}\Bigl(
             a + b - \sqrt{a^2 + b^2 - 2\alpha a b}\Bigr)
 
-    With ``alpha=0`` this is the classical R0 conjunction.
+    With ``alpha=0`` this is the classical R0 conjunction. For SDFs with
+    ``\phi < 0`` inside, use :func:`r_intersect_sdf` / :func:`intersect`
+    instead (the roles of conjunction and disjunction swap).
     """
     a = np.asarray(a, dtype=float)
     b = np.asarray(b, dtype=float)
@@ -218,7 +233,11 @@ def r_conjunction(a: FloatArray, b: FloatArray, *, alpha: float = 0.0) -> FloatA
 
 
 def r_disjunction(a: FloatArray, b: FloatArray, *, alpha: float = 0.0) -> FloatArray:
-    r"""R-function disjunction (union)."""
+    r"""R-function disjunction in the **positive-inside** (Rvachev) convention.
+
+    Positive iff *either* argument is positive. For SDFs with ``\phi < 0``
+    inside, use :func:`r_union_sdf` / :func:`union` instead.
+    """
     a = np.asarray(a, dtype=float)
     b = np.asarray(b, dtype=float)
     if not -1.0 < alpha <= 1.0:
@@ -235,9 +254,28 @@ def r_negation(a: FloatArray) -> FloatArray:
     return np.asarray(-np.asarray(a, dtype=float), dtype=float)
 
 
+def r_intersect_sdf(a: FloatArray, b: FloatArray, *, alpha: float = 0.0) -> FloatArray:
+    r"""R-intersection for **negative-inside** SDFs (``\phi < 0`` in the interior).
+
+    Negative iff both arguments are negative. Equivalent to negating the
+    positive-inside conjunction of negated arguments:
+    ``-r_conjunction(-a, -b)``.
+    """
+    return -r_conjunction(-np.asarray(a, dtype=float), -np.asarray(b, dtype=float), alpha=alpha)
+
+
+def r_union_sdf(a: FloatArray, b: FloatArray, *, alpha: float = 0.0) -> FloatArray:
+    r"""R-union for **negative-inside** SDFs (``\phi < 0`` in the interior).
+
+    Negative iff either argument is negative. Equivalent to
+    ``-r_disjunction(-a, -b)``.
+    """
+    return -r_disjunction(-np.asarray(a, dtype=float), -np.asarray(b, dtype=float), alpha=alpha)
+
+
 @dataclass(frozen=True)
 class RCompose:
-    """Binary R-function composition of two SDFs."""
+    """Binary R-function composition of two negative-inside SDFs."""
 
     left: SDF
     right: SDF
@@ -260,8 +298,8 @@ class RCompose:
         a = self.left(X)
         b = self.right(X)
         if self.op == "and":
-            return r_conjunction(a, b, alpha=self.alpha)
-        return r_disjunction(a, b, alpha=self.alpha)
+            return r_intersect_sdf(a, b, alpha=self.alpha)
+        return r_union_sdf(a, b, alpha=self.alpha)
 
 
 @dataclass(frozen=True)
@@ -309,6 +347,8 @@ __all__ = [
     "intersect",
     "r_conjunction",
     "r_disjunction",
+    "r_intersect_sdf",
     "r_negation",
+    "r_union_sdf",
     "union",
 ]

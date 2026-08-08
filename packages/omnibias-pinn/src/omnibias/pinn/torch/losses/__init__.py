@@ -95,9 +95,13 @@ from omnibias.pinn.torch.losses.interface import (
     value_jump,
 )
 from omnibias.pinn.torch.losses.ntk import (
+    empirical_jacobian,
     estimate_ntk_trace,
+    fourier_mode_learning_rates,
+    kernel_task_alignment,
     ntk_balanced_loss,
     ntk_eigenspectrum,
+    ntk_tail_head_index,
     spectral_bias_index,
 )
 from omnibias.pinn.torch.losses.sobolev import (
@@ -131,7 +135,10 @@ __all__ = [
     "causal_residual_loss",
     "causal_weights_from_per_bin",
     "entropy_consistent_residual",
+    "empirical_jacobian",
     "estimate_ntk_trace",
+    "fourier_mode_learning_rates",
+    "kernel_task_alignment",
     "far_field_decay_loss",
     "flux_jump",
     "grad_stats",
@@ -150,6 +157,7 @@ __all__ = [
     "slice_points",
     "sobolev_residual_loss",
     "sobolev_weight",
+    "ntk_tail_head_index",
     "spectral_bias_index",
     "split_by_interface",
     "value_jump",

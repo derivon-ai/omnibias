@@ -24,6 +24,8 @@ from omnibias.jax.activations import JaxActivationSpec, get_activation
 from omnibias.jax.architectures.pinn import JetMLP, make_jet_mlp
 from omnibias.pinn.jax.fields.base import FieldBase
 from omnibias.pinn.jax.fields.jet_mlp import _JetFieldOps
+from omnibias.pinn.operator._core.branch import BranchHeadLayout
+from omnibias.pinn.operator._core.conditioning import ConditioningSpec
 from omnibias.pinn.operator._core.spec import OperatorSpec
 
 #: ``FieldState.extra`` key for the per-evaluation trunk-jet cache.
@@ -34,33 +36,87 @@ class PerSampleReadoutError(TypeError):
     """Raised when a shared affine readout is asked of a DeepONet trunk adapter."""
 
 
-@dataclass(frozen=True)
-class _BranchNet:
-    """Sensor -> ``(coeffs, bias)`` MLP (frozen pytree)."""
+def _layer_norm(x: Array, gamma: Array, beta: Array, eps: float = 1e-5) -> Array:
+    mean = jnp.mean(x, axis=-1, keepdims=True)
+    var = jnp.var(x, axis=-1, keepdims=True)
+    return gamma * (x - mean) / jnp.sqrt(var + eps) + beta
 
+
+@dataclass(frozen=True)
+class _HeadEncoder:
+    """Independently normalised head encoder (frozen pytree)."""
+
+    norm_gamma: Array
+    norm_beta: Array
     weights: tuple[Array, ...]
     biases: tuple[Array, ...]
     spec: JaxActivationSpec
-    n_sensors: int
+    n_input: int
+    encoder_dim: int
+
+    def __call__(self, x: Array) -> Array:
+        if x.shape[-1] != self.n_input:
+            raise ValueError(
+                f"head input trailing dim must be {self.n_input}, got {tuple(x.shape)}"
+            )
+        h = _layer_norm(x, self.norm_gamma, self.norm_beta)
+        n = len(self.weights)
+        for i in range(n):
+            h = h @ self.weights[i].T + self.biases[i]
+            if i < n - 1:
+                h = self.spec.forward(h)
+        return h
+
+
+@dataclass(frozen=True)
+class _BranchNet:
+    """Multi-head encoders + fusion network (frozen pytree)."""
+
+    function_encoder: _HeadEncoder
+    parameter_encoder: _HeadEncoder | None
+    boundary_encoder: _HeadEncoder | None
+    geometry_encoder: _HeadEncoder | None
+    fusion_weights: tuple[Array, ...]
+    fusion_biases: tuple[Array, ...]
+    spec: JaxActivationSpec
+    layout: BranchHeadLayout
     n_components: int
     trunk_width: int
     per_sample_bias: bool = True
 
     @property
     def n_input(self) -> int:
-        """Total branch-input dimension (alias of ``n_sensors``)."""
-        return int(self.n_sensors)
+        return int(self.layout.spec.total_dim)
 
-    def __call__(self, sensors: Array) -> tuple[Array, Array | None]:
-        if sensors.shape[-1] != self.n_sensors:
-            raise ValueError(
-                f"branch input trailing dim must be n_input={self.n_sensors}, "
-                f"got {tuple(sensors.shape)}"
-            )
-        h = sensors
-        n = len(self.weights)
+    @property
+    def n_sensors(self) -> int:
+        return self.n_input
+
+    def __call__(
+        self,
+        *,
+        sensors: Array,
+        parameters: Array | None = None,
+        boundary: Array | None = None,
+        geometry: Array | None = None,
+    ) -> tuple[Array, Array | None]:
+        parts = [self.function_encoder(sensors)]
+        if self.parameter_encoder is not None:
+            if parameters is None:
+                raise ValueError("parameters required for this branch")
+            parts.append(self.parameter_encoder(parameters))
+        if self.boundary_encoder is not None:
+            if boundary is None:
+                raise ValueError("boundary required for this branch")
+            parts.append(self.boundary_encoder(boundary))
+        if self.geometry_encoder is not None:
+            if geometry is None:
+                raise ValueError("geometry required for this branch")
+            parts.append(self.geometry_encoder(geometry))
+        h = jnp.concatenate(parts, axis=-1)
+        n = len(self.fusion_weights)
         for i in range(n):
-            h = h @ self.weights[i].T + self.biases[i]
+            h = h @ self.fusion_weights[i].T + self.fusion_biases[i]
             if i < n - 1:
                 h = self.spec.forward(h)
         leading = h.shape[:-1]
@@ -71,30 +127,68 @@ class _BranchNet:
         return coeffs, None
 
 
-def _branch_flatten(
-    net: _BranchNet,
-) -> tuple[tuple[Array, ...], tuple[Any, ...]]:
-    leaves = (*net.weights, *net.biases)
-    aux = (
-        net.spec,
-        net.n_sensors,
-        net.n_components,
-        net.trunk_width,
-        net.per_sample_bias,
-        len(net.weights),
-    )
+def _head_flatten(enc: _HeadEncoder) -> tuple[tuple[Array, ...], tuple[Any, ...]]:
+    leaves = (enc.norm_gamma, enc.norm_beta, *enc.weights, *enc.biases)
+    aux = (enc.spec, enc.n_input, enc.encoder_dim, len(enc.weights))
     return leaves, aux
 
 
-def _branch_unflatten(aux: tuple[Any, ...], leaves: tuple[Array, ...]) -> _BranchNet:
-    spec, n_sensors, n_components, trunk_width, per_sample_bias, n = aux
-    weights = leaves[:n]
-    biases = leaves[n:]
-    return _BranchNet(
-        weights=weights,
-        biases=biases,
+def _head_unflatten(aux: tuple[Any, ...], leaves: tuple[Array, ...]) -> _HeadEncoder:
+    spec, n_input, encoder_dim, n = aux
+    return _HeadEncoder(
+        norm_gamma=leaves[0],
+        norm_beta=leaves[1],
+        weights=leaves[2 : 2 + n],
+        biases=leaves[2 + n :],
         spec=spec,
-        n_sensors=n_sensors,
+        n_input=n_input,
+        encoder_dim=encoder_dim,
+    )
+
+
+jax.tree_util.register_pytree_node(_HeadEncoder, _head_flatten, _head_unflatten)
+
+
+def _branch_flatten(
+    net: _BranchNet,
+) -> tuple[tuple[Any, ...], tuple[Any, ...]]:
+    encoders = (
+        net.function_encoder,
+        net.parameter_encoder,
+        net.boundary_encoder,
+        net.geometry_encoder,
+    )
+    leaves: list[Any] = list(encoders)
+    leaves.extend(net.fusion_weights)
+    leaves.extend(net.fusion_biases)
+    aux = (
+        net.spec,
+        net.layout,
+        net.n_components,
+        net.trunk_width,
+        net.per_sample_bias,
+        len(net.fusion_weights),
+    )
+    return tuple(leaves), aux
+
+
+def _branch_unflatten(aux: tuple[Any, ...], leaves: tuple[Any, ...]) -> _BranchNet:
+    spec, layout, n_components, trunk_width, per_sample_bias, n_fusion = aux
+    function_encoder = leaves[0]
+    parameter_encoder = leaves[1]
+    boundary_encoder = leaves[2]
+    geometry_encoder = leaves[3]
+    fusion_weights = leaves[4 : 4 + n_fusion]
+    fusion_biases = leaves[4 + n_fusion : 4 + 2 * n_fusion]
+    return _BranchNet(
+        function_encoder=function_encoder,
+        parameter_encoder=parameter_encoder,
+        boundary_encoder=boundary_encoder,
+        geometry_encoder=geometry_encoder,
+        fusion_weights=fusion_weights,
+        fusion_biases=fusion_biases,
+        spec=spec,
+        layout=layout,
         n_components=n_components,
         trunk_width=trunk_width,
         per_sample_bias=per_sample_bias,
@@ -254,14 +348,14 @@ class DeepONetOperator:
     def components(self) -> ComponentSpec:
         return self.spec.components
 
-    def _assemble_branch_input(
+    def _validate_heads(
         self,
         sensors: Array,
         *,
         parameters: Array | None = None,
         boundary: Array | None = None,
         geometry: Array | None = None,
-    ) -> Array:
+    ) -> tuple[Array, Array | None, Array | None, Array | None]:
         cond = self.spec.conditioning
         assert cond is not None
         sensors = jnp.asarray(sensors)
@@ -277,13 +371,12 @@ class DeepONetOperator:
                 f"{cond.n_function_sensors}, got {tuple(sensors.shape)}"
             )
         F = int(sensors.shape[0])
-        parts: list[Array] = [sensors]
 
         def _check(name: str, t: Array | None, width: int) -> Array | None:
             if width == 0:
                 if t is not None:
                     raise ValueError(
-                        f"{name} provided but conditioning.{name} width is 0"
+                        f"{name} provided but conditioning width is 0"
                     )
                 return None
             if t is None:
@@ -306,16 +399,12 @@ class DeepONetOperator:
                 )
             return t
 
-        p = _check("parameters", parameters, cond.n_parameters)
-        if p is not None:
-            parts.append(p)
-        b = _check("boundary", boundary, cond.n_boundary_sensors)
-        if b is not None:
-            parts.append(b)
-        g = _check("geometry", geometry, cond.n_geometry_probes)
-        if g is not None:
-            parts.append(g)
-        return jnp.concatenate(parts, axis=-1)
+        return (
+            sensors,
+            _check("parameters", parameters, cond.n_parameters),
+            _check("boundary", boundary, cond.n_boundary_sensors),
+            _check("geometry", geometry, cond.n_geometry_probes),
+        )
 
     def condition(
         self,
@@ -325,13 +414,18 @@ class DeepONetOperator:
         boundary: Array | None = None,
         geometry: Array | None = None,
     ) -> DeepONetField:
-        branch_in = self._assemble_branch_input(
+        sensors_v, params_v, boundary_v, geometry_v = self._validate_heads(
             sensors,
             parameters=parameters,
             boundary=boundary,
             geometry=geometry,
         )
-        coeffs, bias = self.branch(branch_in)
+        coeffs, bias = self.branch(
+            sensors=sensors_v,
+            parameters=params_v,
+            boundary=boundary_v,
+            geometry=geometry_v,
+        )
         if bias is None:
             if self.shared_bias is None:
                 raise RuntimeError("shared_bias missing for per_sample_bias=False")
@@ -343,7 +437,7 @@ class DeepONetOperator:
             coeffs=coeffs,
             bias=bias,
             jet_order=self.jet_order,
-            n_functions=int(branch_in.shape[0]),
+            n_functions=int(sensors_v.shape[0]),
         )
 
 
@@ -408,38 +502,133 @@ DeepONetField._omnibias_dispatch = "jet_mlp"  # type: ignore[attr-defined]
 DeepONetField._omnibias_readout_independent = True  # type: ignore[attr-defined]
 
 
+def _make_head_encoder(
+    n_input: int,
+    encoder_dim: int,
+    *,
+    hidden: int,
+    depth: int,
+    base: str | JaxActivationSpec,
+    key: Array,
+    dtype: Any,
+) -> tuple[_HeadEncoder, Array]:
+    spec = get_activation(base)
+    gamma = jnp.ones((n_input,), dtype=dtype)
+    beta = jnp.zeros((n_input,), dtype=dtype)
+    weights: list[Array] = []
+    biases: list[Array] = []
+    prev = n_input
+    for i in range(depth):
+        out = encoder_dim if i == depth - 1 else hidden
+        key, wk = jax.random.split(key)
+        scale = 1.0 / math.sqrt(prev)
+        weights.append(jax.random.normal(wk, (out, prev), dtype=dtype) * scale)
+        biases.append(jnp.zeros((out,), dtype=dtype))
+        prev = out
+    return (
+        _HeadEncoder(
+            norm_gamma=gamma,
+            norm_beta=beta,
+            weights=tuple(weights),
+            biases=tuple(biases),
+            spec=spec,
+            n_input=n_input,
+            encoder_dim=encoder_dim,
+        ),
+        key,
+    )
+
+
 def _make_branch(
-    n_sensors: int,
+    conditioning: ConditioningSpec,
     n_components: int,
     trunk_width: int,
     *,
     hidden: int,
     depth: int,
+    encoder_dim: int | None,
+    encoder_depth: int,
     base: str | JaxActivationSpec,
     per_sample_bias: bool,
     seed: int,
     dtype: Any,
 ) -> _BranchNet:
+    enc_dim = int(encoder_dim if encoder_dim is not None else hidden)
+    layout = BranchHeadLayout(conditioning, enc_dim)
     spec = get_activation(base)
     key = jax.random.PRNGKey(seed)
+    key, enc_key = jax.random.split(key)
+    function_encoder, key = _make_head_encoder(
+        conditioning.n_function_sensors,
+        enc_dim,
+        hidden=hidden,
+        depth=encoder_depth,
+        base=base,
+        key=enc_key,
+        dtype=dtype,
+    )
+    parameter_encoder = None
+    boundary_encoder = None
+    geometry_encoder = None
+    if conditioning.has_parameters:
+        key, enc_key = jax.random.split(key)
+        parameter_encoder, key = _make_head_encoder(
+            conditioning.n_parameters,
+            enc_dim,
+            hidden=hidden,
+            depth=encoder_depth,
+            base=base,
+            key=enc_key,
+            dtype=dtype,
+        )
+    if conditioning.has_boundary:
+        key, enc_key = jax.random.split(key)
+        boundary_encoder, key = _make_head_encoder(
+            conditioning.n_boundary_sensors,
+            enc_dim,
+            hidden=hidden,
+            depth=encoder_depth,
+            base=base,
+            key=enc_key,
+            dtype=dtype,
+        )
+    if conditioning.has_geometry:
+        key, enc_key = jax.random.split(key)
+        geometry_encoder, key = _make_head_encoder(
+            conditioning.n_geometry_probes,
+            enc_dim,
+            hidden=hidden,
+            depth=encoder_depth,
+            base=base,
+            key=enc_key,
+            dtype=dtype,
+        )
     out = n_components * trunk_width
     if per_sample_bias:
         out += n_components
-    dims = [hidden] * depth + [out]
-    weights: list[Array] = []
-    biases: list[Array] = []
-    prev = n_sensors
-    for d in dims:
+    fusion_in = layout.fusion_dim
+    fusion_weights: list[Array] = []
+    fusion_biases: list[Array] = []
+    prev = fusion_in
+    for _ in range(depth):
         key, wk = jax.random.split(key)
         scale = 1.0 / math.sqrt(prev)
-        weights.append(jax.random.normal(wk, (d, prev), dtype=dtype) * scale)
-        biases.append(jnp.zeros((d,), dtype=dtype))
-        prev = d
+        fusion_weights.append(jax.random.normal(wk, (hidden, prev), dtype=dtype) * scale)
+        fusion_biases.append(jnp.zeros((hidden,), dtype=dtype))
+        prev = hidden
+    key, wk = jax.random.split(key)
+    scale = 1.0 / math.sqrt(prev)
+    fusion_weights.append(jax.random.normal(wk, (out, prev), dtype=dtype) * scale)
+    fusion_biases.append(jnp.zeros((out,), dtype=dtype))
     return _BranchNet(
-        weights=tuple(weights),
-        biases=tuple(biases),
+        function_encoder=function_encoder,
+        parameter_encoder=parameter_encoder,
+        boundary_encoder=boundary_encoder,
+        geometry_encoder=geometry_encoder,
+        fusion_weights=tuple(fusion_weights),
+        fusion_biases=tuple(fusion_biases),
         spec=spec,
-        n_sensors=n_sensors,
+        layout=layout,
         n_components=n_components,
         trunk_width=trunk_width,
         per_sample_bias=per_sample_bias,
@@ -481,12 +670,19 @@ def make_deeponet(
         dtype=dtype,
     )
     trunk._check_fastpath(jet_order)
+    conditioning_resolved = spec.conditioning
+    if conditioning_resolved is None:
+        from omnibias.pinn.operator._core.conditioning import ConditioningSpec
+
+        conditioning_resolved = ConditioningSpec.function_only(spec.n_sensors)
     branch = _make_branch(
-        n_sensors=spec.branch_input_dim,
+        conditioning_resolved,
         n_components=spec.n_components,
         trunk_width=trunk_width,
         hidden=branch_hidden,
         depth=branch_depth,
+        encoder_dim=None,
+        encoder_depth=1,
         base=base,
         per_sample_bias=per_sample_bias,
         seed=seed + 1,

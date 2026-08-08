@@ -1,0 +1,61 @@
+{
+  "schema": "geometry_sdf/v2",
+  "generated_utc": "2026-08-08T08:41:54Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "smoke": true,
+    "seeds": [
+      0
+    ],
+    "hidden": 12,
+    "cases": 4
+  },
+  "rss_mb_at_start": 772.8,
+  "cases": [
+    {
+      "case": "disk",
+      "hard_max_abs_median": 5.74460580741991e-17,
+      "hard_max_abs_max": 5.74460580741991e-17,
+      "soft_max_abs_median": 0.021676838797095255,
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "case": "annulus",
+      "hard_max_abs_median": 0.0,
+      "hard_max_abs_max": 0.0,
+      "soft_max_abs_median": 0.027431034234296374,
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "case": "csg_box_cap",
+      "hard_max_abs_median": 2.8096706380889636e-17,
+      "hard_max_abs_max": 2.8096706380889636e-17,
+      "soft_max_abs_median": 0.017182641176028392,
+      "seeds": [
+        0
+      ]
+    },
+    {
+      "case": "nonconvex_l",
+      "hard_max_abs_median": 9.00682386519036e-46,
+      "hard_max_abs_max": 9.00682386519036e-46,
+      "soft_max_abs_median": 0.02445742475357394,
+      "seeds": [
+        0
+      ]
+    }
+  ],
+  "elapsed_seconds": 1.0091600230080076
+}

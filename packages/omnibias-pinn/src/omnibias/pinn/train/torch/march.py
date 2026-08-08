@@ -8,10 +8,14 @@ collocation, Wang-Perdikaris causal weights fed back through
 ``marcher.observe``, warm-start handoff, and a
 :class:`MarchResult` carrying per-window causality reports.
 
-Honesty: the causality index is a measurement, not a proof of temporal
-consistency. ``ic_mode="hard"`` requires the caller to wrap the field in a
-:class:`~omnibias.pinn.torch.cage.ConstrainedExpressionField` (or similar)
-before calling; this driver does not construct the TFC cage itself.
+Windows retry until the advance criterion passes or ``max_steps_per_window``
+is exhausted. An unconverged window is *not* silently advanced unless
+``advance_policy="force"``.
+
+``ic_mode="hard"`` expects a field that already embeds the IC (for example a
+:class:`~omnibias.pinn.torch.cage.ConstrainedExpressionField` built by the
+caller or returned from ``hard_ic_factory``); this driver never forges a
+structural cage on its own.
 """
 
 from __future__ import annotations
@@ -35,10 +39,13 @@ from omnibias.pinn.train._core.guards import (
     trivial_solution_guard,
 )
 from torch import Tensor
+from torch.optim import Optimizer
 
 ResidualFn = Callable[[nn.Module, Tensor], Tensor]
 ValueFn = Callable[[nn.Module, Tensor], Tensor]
 ICFn = Callable[[Tensor], Tensor]
+HardICFactory = Callable[[nn.Module, Tensor, Tensor], nn.Module]
+OptimizerFactory = Callable[[Sequence[nn.Parameter]], Optimizer]
 
 
 @dataclass(frozen=True)
@@ -49,9 +56,12 @@ class WindowResult:
     bounds: tuple[float, float]
     epsilon: float
     converged: bool
+    exhausted: bool
     final_loss: float
     causality: CausalityReport
     steps_run: int
+    seam_mse: float | None = None
+    handoff_values: tuple[float, ...] | None = None
 
 
 @dataclass
@@ -61,10 +71,30 @@ class MarchResult:
     windows: list[WindowResult] = field(default_factory=list)
     trivial: TrivialSolutionVerdict | None = None
     diagnostics: dict[str, Any] = field(default_factory=dict)
+    field: nn.Module | None = None
 
     @property
     def all_converged(self) -> bool:
         return bool(self.windows) and all(w.converged for w in self.windows)
+
+
+def _reshape_residual(resid: Tensor, n_bins: int, pb: int) -> Tensor:
+    """Shape residual to ``(n_bins, per_bin, C...)`` then mean over components."""
+    if resid.shape[0] == n_bins * pb:
+        resid_t = resid.reshape(n_bins, pb, *resid.shape[1:])
+    else:
+        try:
+            resid_t = resid.reshape(n_bins, pb, *resid.shape[1:])
+        except RuntimeError as exc:
+            raise ValueError(
+                f"residual leading dim {resid.shape[0]} incompatible "
+                f"with n_bins*per_bin={n_bins * pb}"
+            ) from exc
+    # Keep per-component structure for causal weights: average components
+    # only after squaring, so opposing signs cannot cancel.
+    if resid_t.dim() > 2:
+        resid_t = (resid_t**2).mean(dim=tuple(range(2, resid_t.dim()))).sqrt()
+    return resid_t
 
 
 def march_solve(
@@ -74,18 +104,25 @@ def march_solve(
     schedule: TimeWindowSchedule,
     *,
     steps_per_window: int = 50,
+    max_steps_per_window: int | None = None,
     lr: float = 1e-3,
+    optimizer: Optimizer | OptimizerFactory | None = None,
     per_bin: int = 16,
     n_slice: int = 32,
     ic_values: np.ndarray | Tensor | None = None,
     ic_fn: ICFn | None = None,
     ic_weight: float = 1.0,
     ic_mode: str = "soft",
+    hard_ic_factory: HardICFactory | None = None,
     value_fn: ValueFn | None = None,
     seed: int = 0,
     dtype: torch.dtype | None = None,
     check_trivial: bool = True,
     trivial_ratio: float = 1e-3,
+    trivial_mode: str = "variance",
+    advance_policy: str = "gate",
+    resample_every: int = 0,
+    stop_on_exhaust: bool = False,
 ) -> MarchResult:
     """March a PINN solve window-by-window with causal residual weighting.
 
@@ -95,58 +132,81 @@ def march_solve(
         Trainable field (``nn.Module`` exposing ``parameters()``).
     residual_fn
         ``residual_fn(field, coords) -> residual`` where ``coords`` is
-        ``(n_bins * per_bin, D)`` flattened from the marcher's collocation
-        layout. The residual is reshaped to ``(n_bins, per_bin)`` (or
-        ``(n_bins, per_bin, ...)``) before
-        :func:`~omnibias.pinn.torch.losses.causal_residual_loss`.
+        ``(n_bins * per_bin, D)``.
     coordinate_spec
         Must declare a time axis and explicit domain bounds.
     schedule
         Window ladder (geometry + annealed epsilon + advance tolerance).
     steps_per_window
-        Adam steps per window before the advance check.
+        Adam steps attempted before each advance check. If the window has
+        not unlocked, training continues until ``max_steps_per_window``.
+    max_steps_per_window
+        Hard cap on optimiser steps per window. Defaults to
+        ``steps_per_window`` (single attempt) when omitted; set higher to
+        allow retries until the advance gate passes.
     lr
-        Adam learning rate.
+        Learning rate when constructing the default Adam optimiser.
+    optimizer
+        An existing :class:`~torch.optim.Optimizer`, or a factory
+        ``params -> Optimizer``. Defaults to Adam.
     per_bin, n_slice
         Forwarded to :class:`~omnibias.pinn._core.marching.TimeMarcher`.
-    ic_values
-        Optional ``(n_slice, ...)`` array of initial-condition values at
-        ``marcher.initial_points()``. Used for the first window; later windows
-        inherit the warm-start handoff.
-    ic_fn
-        Alternative to ``ic_values``: ``ic_fn(coords) -> values`` evaluated
-        once at the first window's opening slice.
+    ic_values, ic_fn
+        Required initial condition. Exactly one must be provided.
     ic_weight
         Soft IC penalty weight (ignored when ``ic_mode="hard"``).
     ic_mode
-        ``"soft"`` (default) adds an MSE IC term; ``"hard"`` assumes the field
-        already embeds the IC structurally and skips the penalty.
+        ``"soft"`` (default) adds an MSE IC term; ``"hard"`` assumes the
+        field already embeds the IC structurally (or builds one via
+        ``hard_ic_factory``) and skips the penalty.
+    hard_ic_factory
+        Optional ``(field, ic_coords, ic_values) -> field`` used once when
+        ``ic_mode="hard"`` to wrap the free network in a structural cage.
     value_fn
-        ``value_fn(field, coords) -> values`` used for the warm-start handoff
-        and the trivial-solution guard. Defaults to calling
-        ``field(coords)`` / ``field.forward(coords)`` and taking the leading
-        component.
+        ``value_fn(field, coords) -> values`` for handoff / trivial guard.
     seed
         Base seed for the marcher.
     dtype
-        Collocation / IC tensor dtype; defaults to the first parameter's dtype
-        or ``float64``.
+        Collocation / IC tensor dtype.
     check_trivial
-        Run :func:`~omnibias.pinn.train._core.guards.trivial_solution_guard`
-        on the final handoff against the first-window IC.
-    trivial_ratio
-        Threshold for the trivial-solution guard.
+        Run a same-time trivial-solution guard on the final handoff.
+    trivial_ratio, trivial_mode
+        Forwarded to :func:`~omnibias.pinn.train.trivial_solution_guard`.
+    advance_policy
+        ``"gate"`` (default) refuses to advance an unconverged window and
+        marks it ``exhausted``; ``"force"`` advances anyway (legacy smoke).
+    resample_every
+        If ``> 0``, redraw collocation points every ``resample_every`` steps
+        within a window (adaptive resampling).
+    stop_on_exhaust
+        If True, stop marching after the first exhausted window.
     """
     if ic_mode not in ("soft", "hard"):
         raise ValueError(f"ic_mode must be 'soft' or 'hard', got {ic_mode!r}")
+    if advance_policy not in ("gate", "force"):
+        raise ValueError(
+            f"advance_policy must be 'gate' or 'force', got {advance_policy!r}"
+        )
     if steps_per_window < 1:
         raise ValueError(f"steps_per_window must be >= 1, got {steps_per_window}")
+    if max_steps_per_window is None:
+        max_steps_per_window = int(steps_per_window)
+    if max_steps_per_window < steps_per_window:
+        raise ValueError("max_steps_per_window must be >= steps_per_window")
+    if ic_values is None and ic_fn is None:
+        raise ValueError("provide ic_values or ic_fn; silent zero IC is refused")
+    if ic_values is not None and ic_fn is not None:
+        raise ValueError("provide only one of ic_values or ic_fn")
 
-    if dtype is None:
-        try:
-            dtype = next(field.parameters()).dtype
-        except StopIteration:
-            dtype = torch.float64
+    try:
+        _param = next(field.parameters())
+        if dtype is None:
+            dtype = _param.dtype
+        device = _param.device
+    except StopIteration:
+        if dtype is None:
+            dtype = torch.get_default_dtype()
+        device = torch.device("cpu")
 
     marcher = TimeMarcher(
         coordinate_spec,
@@ -168,9 +228,7 @@ def march_solve(
             return out
         return out[..., 0]
 
-    # Seed the first window IC.
-    ic_pts_np = marcher.initial_points()
-    ic_pts = torch.as_tensor(ic_pts_np, dtype=dtype)
+    ic_pts = torch.as_tensor(marcher.initial_points(), dtype=dtype, device=device)
     if ic_values is not None:
         ic0 = np.asarray(
             ic_values.detach().cpu().numpy()
@@ -178,88 +236,129 @@ def march_solve(
             else ic_values,
             dtype=float,
         )
-    elif ic_fn is not None:
+    else:
+        assert ic_fn is not None
         with torch.no_grad():
             ic0 = ic_fn(ic_pts).detach().cpu().numpy()
-    else:
-        ic0 = np.zeros((n_slice,), dtype=float)
     marcher.set_initial(ic0.reshape(n_slice, -1) if ic0.ndim > 1 else ic0)
 
-    opt = torch.optim.Adam(field.parameters(), lr=lr)
-    result = MarchResult(diagnostics={"ic_mode": ic_mode, "lr": lr})
-    first_ic = np.asarray(marcher.initial_values, dtype=float).reshape(-1)
+    if ic_mode == "hard" and hard_ic_factory is not None:
+        ic_u0 = torch.as_tensor(
+            np.asarray(marcher.initial_values, dtype=float),
+            dtype=dtype,
+            device=device,
+        )
+        if ic_u0.ndim > 1:
+            ic_u0 = ic_u0.reshape(ic_u0.shape[0], -1)[..., 0]
+        field = hard_ic_factory(field, ic_pts, ic_u0)
+
+    if optimizer is None:
+        opt: Optimizer = torch.optim.Adam(field.parameters(), lr=lr)
+    elif callable(optimizer) and not isinstance(optimizer, Optimizer):
+        opt = optimizer(list(field.parameters()))
+    else:
+        opt = optimizer  # type: ignore[assignment]
+
+    result = MarchResult(
+        diagnostics={
+            "ic_mode": ic_mode,
+            "lr": lr,
+            "advance_policy": advance_policy,
+            "max_steps_per_window": max_steps_per_window,
+        },
+        field=field,
+    )
     last_handoff: np.ndarray | None = None
+    last_pred_ic: np.ndarray | None = None
+    last_window_ic: np.ndarray | None = None
 
     while not marcher.done:
-        pts_np = marcher.collocation()  # (n_bins, per_bin, D)
-        n_bins, pb, D = pts_np.shape
-        coords = torch.as_tensor(pts_np.reshape(-1, D), dtype=dtype)
         eps = float(marcher.epsilon)
-        ic_x = torch.as_tensor(marcher.initial_points(), dtype=dtype)
+        ic_x = torch.as_tensor(
+            marcher.initial_points(), dtype=dtype, device=device
+        )
         ic_u = torch.as_tensor(
-            np.asarray(marcher.initial_values, dtype=float), dtype=dtype
+            np.asarray(marcher.initial_values, dtype=float),
+            dtype=dtype,
+            device=device,
         )
         if ic_u.ndim > 1:
             ic_u = ic_u.reshape(ic_u.shape[0], -1)[..., 0]
+        window_ic = ic_u.detach().cpu().numpy().reshape(-1)
 
         final_loss = 0.0
-        weights_np = np.ones(n_bins, dtype=float)
-        L_np = np.zeros(n_bins, dtype=float)
+        weights_np = np.ones(schedule.n_time_bins, dtype=float)
+        L_np = np.zeros(schedule.n_time_bins, dtype=float)
+        steps_run = 0
+        converged = False
+        pts_np = marcher.collocation()
+        n_bins, pb, D = pts_np.shape
+        coords = torch.as_tensor(
+            pts_np.reshape(-1, D), dtype=dtype, device=device
+        )
 
-        for _step in range(steps_per_window):
-            opt.zero_grad()
-            resid = residual_fn(field, coords)
-            if resid.shape[0] != n_bins * pb:
-                # Allow (n_bins, per_bin, ...) already.
-                try:
-                    resid_t = resid.reshape(n_bins, pb, *resid.shape[1:])
-                except RuntimeError as exc:
-                    raise ValueError(
-                        f"residual leading dim {resid.shape[0]} incompatible "
-                        f"with n_bins*per_bin={n_bins * pb}"
-                    ) from exc
-            else:
-                resid_t = resid.reshape(n_bins, pb, *resid.shape[1:])
-            # Reduce extra trailing dims so causal_residual_loss sees (n_t, spatial).
-            while resid_t.dim() > 2:
-                resid_t = resid_t.mean(dim=-1)
-            loss_c, w = causal_residual_loss(
-                resid_t, epsilon=eps, return_weights=True
-            )
-            assert isinstance(w, Tensor)
-            loss: Tensor = loss_c
-            if ic_mode == "soft" and ic_weight > 0.0:
-                pred_ic = _default_value(field, ic_x)
-                loss = loss + float(ic_weight) * torch.mean((pred_ic - ic_u) ** 2)
-            loss.backward()
-            opt.step()
-            final_loss = float(loss.detach())
-            L_np = (
-                (resid_t.detach() ** 2)
-                .mean(dim=tuple(range(1, resid_t.dim())))
-                .cpu()
-                .numpy()
-            )
-            weights_np = w.detach().cpu().numpy()
+        while steps_run < max_steps_per_window and not converged:
+            block = min(steps_per_window, max_steps_per_window - steps_run)
+            for _step_i in range(block):
+                if (
+                    resample_every > 0
+                    and steps_run > 0
+                    and steps_run % resample_every == 0
+                ):
+                    pts_np = marcher.collocation()
+                    coords = torch.as_tensor(
+                        pts_np.reshape(-1, D), dtype=dtype, device=device
+                    )
+                opt.zero_grad()
+                resid = residual_fn(field, coords)
+                resid_t = _reshape_residual(resid, n_bins, pb)
+                loss_c, w = causal_residual_loss(
+                    resid_t, epsilon=eps, return_weights=True
+                )
+                assert isinstance(w, Tensor)
+                loss: Tensor = loss_c
+                if ic_mode == "soft" and ic_weight > 0.0:
+                    pred_ic = _default_value(field, ic_x)
+                    loss = loss + float(ic_weight) * torch.mean((pred_ic - ic_u) ** 2)
+                loss.backward()
+                opt.step()
+                final_loss = float(loss.detach())
+                L_np = (
+                    (resid_t.detach() ** 2)
+                    .mean(dim=tuple(range(1, resid_t.dim())))
+                    .cpu()
+                    .numpy()
+                )
+                weights_np = w.detach().cpu().numpy()
+                steps_run += 1
 
-        # Refresh weights once more for the report / advance criterion.
-        with torch.no_grad():
-            resid = residual_fn(field, coords)
-            resid_t = resid.reshape(n_bins, pb, *resid.shape[1:])
-            while resid_t.dim() > 2:
-                resid_t = resid_t.mean(dim=-1)
-            L_t = (resid_t**2).mean(dim=tuple(range(1, resid_t.dim())))
-            w_t = causal_weights_from_per_bin(L_t, epsilon=eps)
-            L_np = L_t.cpu().numpy()
-            weights_np = w_t.cpu().numpy()
+            # Residual diagnostics may themselves use autograd (e.g. u_t - u_xx);
+            # allow the graph, then detach the reduced statistics.
+            with torch.enable_grad():
+                resid = residual_fn(field, coords)
+                resid_t = _reshape_residual(resid, n_bins, pb)
+                L_t = (resid_t**2).mean(dim=tuple(range(1, resid_t.dim())))
+                w_t = causal_weights_from_per_bin(L_t, epsilon=eps)
+                L_np = L_t.detach().cpu().numpy()
+                weights_np = w_t.detach().cpu().numpy()
+            converged = bool(marcher.observe(weights_np))
 
-        converged = bool(marcher.observe(weights_np))
+        exhausted = not converged
         report = report_causality(L_np, weights_np)
 
         with torch.no_grad():
-            handoff_pts = torch.as_tensor(marcher.handoff_points(), dtype=dtype)
+            handoff_pts = torch.as_tensor(
+                marcher.handoff_points(), dtype=dtype, device=device
+            )
             handoff_vals = _default_value(field, handoff_pts).detach().cpu().numpy()
+            # Same-time reference: opening-slice prediction vs prescribed IC.
+            pred_ic_now = (
+                _default_value(field, ic_x).detach().cpu().numpy().reshape(-1)
+            )
         last_handoff = np.asarray(handoff_vals, dtype=float).reshape(-1)
+        last_pred_ic = pred_ic_now
+        last_window_ic = window_ic
+        seam_mse = float(np.mean((pred_ic_now - window_ic) ** 2))
 
         result.windows.append(
             WindowResult(
@@ -267,21 +366,35 @@ def march_solve(
                 bounds=marcher.bounds,
                 epsilon=eps,
                 converged=converged,
+                exhausted=exhausted,
                 final_loss=final_loss,
                 causality=report,
-                steps_run=steps_per_window,
+                steps_run=steps_run,
+                seam_mse=seam_mse,
+                handoff_values=tuple(float(x) for x in last_handoff),
             )
         )
-        marcher.advance(handoff_vals)
 
-    if check_trivial and last_handoff is not None and first_ic.size > 0:
-        # Compare final handoff energy against the original IC.
+        if exhausted and advance_policy == "gate":
+            # Refuse to propagate an unconverged handoff into the next IC.
+            break
+        marcher.advance(handoff_vals)
+        if exhausted and stop_on_exhaust:
+            break
+
+    if (
+        check_trivial
+        and last_pred_ic is not None
+        and last_window_ic is not None
+    ):
+        # Same-window opening IC as reference (not the global t0 amplitude).
         result.trivial = trivial_solution_guard(
-            last_handoff,
-            first_ic,
+            last_pred_ic if trivial_mode == "variance" else last_handoff,
+            last_window_ic,
             ratio_threshold=trivial_ratio,
-            mode="energy",
+            mode=trivial_mode,
         )
+    result.field = field
     return result
 
 

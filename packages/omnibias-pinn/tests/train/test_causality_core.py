@@ -76,3 +76,18 @@ def test_trivial_solution_guard_variance_mode_catches_constant():
     constant = np.full_like(ic, 0.5)
     v = trivial_solution_guard(constant, ic, ratio_threshold=1e-3, mode="variance")
     assert v.is_trivial
+
+
+def test_trivial_solution_guard_default_is_variance():
+    ic = np.sin(np.linspace(0, 2 * np.pi, 64))
+    constant = np.full_like(ic, 0.5)
+    v = trivial_solution_guard(constant, ic, ratio_threshold=1e-3)
+    assert v.mode == "variance"
+    assert v.is_trivial
+
+
+def test_trivial_solution_guard_residual_mode():
+    baseline = np.ones(32)
+    small = 1e-4 * np.ones(32)
+    v = trivial_solution_guard(small, baseline, ratio_threshold=1e-3, mode="residual")
+    assert v.is_trivial

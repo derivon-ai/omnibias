@@ -31,6 +31,7 @@ from omnibias.pinn.operator.jax.deeponet import (
 )
 from omnibias.pinn.operator.jax.deeponet import (
     _BranchNet,
+    _HeadEncoder,
 )
 from omnibias.pinn.operator.torch import (
     build_deeponet,
@@ -141,9 +142,10 @@ def test_ks_residual_loss_fd_parity_torch_jax() -> None:
     j_loss = jax_ks_residual_loss_fd(
         jop, jnp.asarray(sensors_np), jnp.asarray(coords_np), h=h
     )
-    # 5-point / h^4 amplifies float64 round-off vs the closed-form path.
+    # 5-point / h^4 amplifies float64 round-off; multi-head LayerNorm branches
+    # add another ~1e-7 relative drift between torch and JAX reductions.
     np.testing.assert_allclose(
-        float(t_loss.detach()), float(j_loss), rtol=1e-7, atol=1e-12
+        float(t_loss.detach()), float(j_loss), rtol=1e-6, atol=1e-12
     )
 
 
@@ -196,17 +198,48 @@ def _copy_trunk(torch_trunk: TorchJetMLP) -> JetMLP:
     )
 
 
-def _copy_branch(torch_branch) -> _BranchNet:
+def _copy_head_torch_to_jax(torch_enc) -> _HeadEncoder:
     weights = []
     biases = []
-    for lin in torch_branch.linears:
+    for lin in torch_enc.linears:
         weights.append(jnp.asarray(lin.weight.detach().cpu().numpy()))
         biases.append(jnp.asarray(lin.bias.detach().cpu().numpy()))
-    return _BranchNet(
+    return _HeadEncoder(
+        norm_gamma=jnp.asarray(torch_enc.norm.weight.detach().cpu().numpy()),
+        norm_beta=jnp.asarray(torch_enc.norm.bias.detach().cpu().numpy()),
         weights=tuple(weights),
         biases=tuple(biases),
+        spec=jax_get_activation(torch_enc.spec.name),
+        n_input=torch_enc.n_input,
+        encoder_dim=torch_enc.encoder_dim,
+    )
+
+
+def _copy_branch(torch_branch) -> _BranchNet:
+    function_encoder = _copy_head_torch_to_jax(torch_branch.encoders["function"])
+    parameter_encoder = None
+    boundary_encoder = None
+    geometry_encoder = None
+    if "pde_params" in torch_branch.encoders:
+        parameter_encoder = _copy_head_torch_to_jax(torch_branch.encoders["pde_params"])
+    if "boundary" in torch_branch.encoders:
+        boundary_encoder = _copy_head_torch_to_jax(torch_branch.encoders["boundary"])
+    if "geometry" in torch_branch.encoders:
+        geometry_encoder = _copy_head_torch_to_jax(torch_branch.encoders["geometry"])
+    fusion_weights = []
+    fusion_biases = []
+    for lin in torch_branch.fusion:
+        fusion_weights.append(jnp.asarray(lin.weight.detach().cpu().numpy()))
+        fusion_biases.append(jnp.asarray(lin.bias.detach().cpu().numpy()))
+    return _BranchNet(
+        function_encoder=function_encoder,
+        parameter_encoder=parameter_encoder,
+        boundary_encoder=boundary_encoder,
+        geometry_encoder=geometry_encoder,
+        fusion_weights=tuple(fusion_weights),
+        fusion_biases=tuple(fusion_biases),
         spec=jax_get_activation(torch_branch.spec.name),
-        n_sensors=torch_branch.n_sensors,
+        layout=torch_branch.layout,
         n_components=torch_branch.n_components,
         trunk_width=torch_branch.trunk_width,
         per_sample_bias=torch_branch.per_sample_bias,
