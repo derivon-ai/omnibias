@@ -348,8 +348,11 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   benchmark artifacts are the right place for aggressive research. Distinguish
   *structural* impossibility from *absent implementation*; default to achievable
   and claim a capability plainly once its absolute acceptance gate passes (see
-  `omnibias-dev-pinn-research` and the "Discovery doctrine" section of
-  `.cursor/rules/omnibias.md`).
+  `omnibias-dev-pinn-research`, `omnibias-dev-frontier-research`, and the
+  "Discovery doctrine" / "Frontier program" sections of
+  `.cursor/rules/omnibias.md`). Clay / Nobel *parent* problems stay external
+  obligations; only finite or compact sub-obligations escalate through absolute
+  gates.
   A folded package is de-wired everywhere at once (workspace exclude, CI job,
   `mkdocs.yml` nav + `paths`, `docs/api`, `llms.txt`, `CHANGELOG.md`, `AGENTS.md`);
   `test_package_registry` enforces the workspace / folded-name / Python-floor
@@ -436,14 +439,20 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   users run `omnibias-skills install`. The repo's copies are installed + committed
   and a CI drift check (`omnibias-skills install --check`) keeps them
   byte-identical to the bundle. **Do not hand-edit `.cursor/skills/omnibias-*`** --
-  edit the bundle and re-run the installer.
+  edit the bundle and re-run the installer. Includes `omnibias-frontier` for
+  Clay/Nobel-*adjacent* sub-results with honesty gates.
 - **Maintainer skills** (`omnibias-dev-*`) teach an assistant how to *develop*
   omnibias. They are hand-authored **canonically in `.cursor/skills/`** and
   mirrored to `.claude/skills/` by `python scripts/sync_skills.py` (with `--check`
-  in CI). Edit the `.cursor` copy, then re-run the sync.
+  in CI). Edit the `.cursor` copy, then re-run the sync. Includes
+  `omnibias-dev-pinn-research`, `omnibias-dev-empirical-validation`, and
+  `omnibias-dev-frontier-research` (decompose famous open problems into
+  winnable sub-obligations; never forge continuum claims).
 - **Rules** (`.cursor/rules/`): one always-apply `omnibias.md` (universal
-  invariants) plus path-scoped `.mdc` rules (`jax-tracing`, `verified-enclosures`,
-  `formal-lean`). Root `CLAUDE.md` points Claude Code at this file.
+  invariants, including Discovery doctrine and Frontier program) plus
+  path-scoped `.mdc` rules (`jax-tracing`, `verified-enclosures`,
+  `formal-lean`, `frontier-claims`). Root `CLAUDE.md` points Claude Code at
+  this file.
 
 ## Where to look
 
@@ -461,7 +470,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
 - JAX closed-form fields: `omnibias.jax.laplacian`.
 - Keras 3 unified backend: `omnibias.keras`.
 - Runnable examples: [`docs/examples/`](docs/examples/).
-- Agent skills & rules: `.cursor/skills`, `.claude/skills`, `.cursor/rules`; the consumer package is `omnibias.skills` (`packages/omnibias-skills`).
+- Agent skills & rules: `.cursor/skills`, `.claude/skills`, `.cursor/rules`;
+  the consumer package is `omnibias.skills` (`packages/omnibias-skills`);
+  frontier doctrine: `omnibias-dev-frontier-research` + `frontier-claims.mdc`
+  + consumer `omnibias-frontier`.
 - Public docs: [`docs/index.md`](docs/index.md).
 - Benchmarks (vendor-neutral): [`docs/benchmarks.md`](docs/benchmarks.md).
   PINN four-gap suite: `benchmarks/{causal_marching,geometry_sdf,operator_zero_shot,spectral_bias_fbpinn}.py`
@@ -469,3 +481,5 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   default smoke writes `docs/benchmarks/*_smoke.json` (CI), `--full` writes the
   multi-seed acceptance JSON. Capability matrix:
   [`docs/benchmarks/pinn_four_gap_matrix.md`](docs/benchmarks/pinn_four_gap_matrix.md).
+  Causal marching is two families (heat + Krishnapriyan reaction); IC via
+  `ic_fn`. Spectral artifacts record per-arm `wall_seconds` and `lstsq_matched`.

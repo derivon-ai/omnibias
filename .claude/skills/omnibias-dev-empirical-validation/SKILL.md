@@ -70,10 +70,10 @@ result while encoding a divergence.
 | `delta->0` (`difference`) | interval-tower enclosure contains a **dense deterministic grid AND a random sample** of true values (the `verified-primitive` rule) |
 | DP (`struct`) | `logsumexp_beta >= max` gap bound holds; matches exact DP on small instances |
 | trees (`tab`) | monotonicity / robustness certificates pass; **2nd-order training beats a 1st-order baseline** on held-out tabular data |
-| PINN causality (`pinn.train`) | hard IC/BC + closed-form residual; every arm `skill_score > 0`; best-arm median rel-L2 clears a named threshold; `advance_policy="gate"` |
+| PINN causality (`pinn.train`) | two families (heat hard-cage + Krishnapriyan reaction soft IC); IC via `ic_fn` on marcher points; every arm `skill_score > 0`; heat best-arm clears named rel-L2; reaction marching beats whole-interval; `advance_policy="gate"` |
 | PINN geometry (`pinn.domain`) | boundary identity by construction; hard interior skill > 0 and beats soft-penalty on named shapes |
 | PINN operators (`pinn.operator`) | reference maximum principle; every arm skill > 0; conditioned median rel-L2 beats unconditioned **and** per-instance retrain |
-| PINN spectral (`pinn` FBPINN/NTK/lstsq) | one-shot `lstsq` rel-L2 < 5e-6 through f=16; capacity falsification at high frequency; GD arms recorded for mechanism evidence |
+| PINN spectral (`pinn` FBPINN/NTK/lstsq) | one-shot `lstsq` rel-L2 < 5e-6 through f=16; capacity falsification at high frequency; GD arms for mechanism evidence; publish `lstsq_matched` beside capacity-rich `lstsq`; speed claims require per-arm `wall_seconds` / `median_wall_seconds` (never invent a speedup); memory is structural `O(N H)` |
 
 ## Anti-overfitting rule (the sharpest one)
 
@@ -92,7 +92,9 @@ loosening the tol to hide the frustrated one.
 - qubo: brute force (small `n`) + the spectral / SOS bounds.
 - trees / tabular: a gradient-boosting baseline on a held-out split.
 - PINN spectral: the zero predictor and a plain MLP; the decisive arm is
-  one-shot least-squares when the PDE is linear.
+  one-shot least-squares when the PDE / regression is linear in the readout.
+  Quote wall-clock only from instrumented artifacts; state the `O(N H)`
+  design-matrix memory cost honestly.
 
 ## The validation-report artifact (lock it in)
 

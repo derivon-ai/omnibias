@@ -58,10 +58,15 @@ Emit a `gates` block in every artifact (`benchmarks/_gates.py`).
 
 | Gap | Constructive route | Absolute gate |
 | --- | --- | --- |
-| Causality | Hard IC/BC cage + closed-form residual + gated `march_solve` | Every arm `skill_score > 0`; best-arm median rel-L2 clears a named threshold; `advance_policy="gate"` |
+| Causality | Hard IC/BC cage (heat) + soft-IC Krishnapriyan reaction; closed-form residual; gated `march_solve`; IC via `ic_fn` on marcher `slice_points` (never linspace-ordered `ic_values`) | Every arm `skill_score > 0`; **heat** best-arm median rel-L2 clears a named threshold (whole-interval may win); **reaction** best marching arm beats `whole_interval`; `advance_policy="gate"` |
 | Geometry | Negative-inside SDF + `DistanceConstrainedField` | Boundary identity by construction; hard interior skill > 0 and beats soft-penalty |
 | Operators | Multi-head DeepONet + ETDRK4 reference | Maximum principle on slabs; every arm skill > 0; conditioned median rel-L2 beats unconditioned **and** per-instance retrain |
 | Spectral bias | One-shot frozen-feature least-squares (no GD dynamics) | `lstsq` rel-L2 < 5e-6 through f=16; capacity falsification at high f by raising feature count |
+
+Regime note: marching is not a free win. On linear heat with a hard cage,
+whole-interval can already hit skill near 1; on stiff reaction
+(`u_t = rho u(1-u)`, `rho=12`) whole-interval fails causality and gated
+marching is the gate that must win. See `benchmarks/causal_marching.py`.
 
 Certificates: reuse a-posteriori linear PDE certificates when stability
 constants exist; for nonlinear cases seal **residual evidence** and label it

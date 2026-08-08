@@ -1,6 +1,24 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""CI smoke: causal time-marching driver on a tiny manufactured ODE residual."""
+"""CI smoke: causal time-marching driver on a tiny manufactured ODE residual.
+
+This file is a *wiring* smoke for ``march_solve`` + causality / trivial-solution
+diagnostics. It is **not** the measured acceptance result.
+
+Regime (do not conflate with this smoke):
+
+* **Heat** with a hard IC/BC cage -- whole-interval can already win; marching
+  is not a free win.
+* **Krishnapriyan reaction** ``u_t = rho u(1-u)`` at ``rho = 12`` -- whole-
+  interval fails causality; gated marching must beat it.
+
+Acceptance artifact: ``benchmarks/causal_marching.py`` (smoke / ``--full``).
+Recipe: ``docs/cookbook/pinn-causal-marching.md``.
+Matrix: ``docs/benchmarks/pinn_four_gap_matrix.md``.
+
+Always supply the IC as ``ic_fn`` evaluated on the marcher's own slice points.
+A linspace-ordered ``ic_values`` vector contaminates the seam metric.
+"""
 
 from __future__ import annotations
 
@@ -39,9 +57,10 @@ def main() -> None:
         target = torch.sin(torch.pi * coords[:, 0]) * torch.exp(-coords[:, 1])
         return u - target
 
-    import numpy as np
+    def ic_fn(coords: torch.Tensor) -> torch.Tensor:
+        # coords columns are (x, t) with t fixed at the initial slice.
+        return torch.sin(torch.pi * coords[:, 0])
 
-    ic = np.sin(np.pi * np.linspace(0.0, 1.0, 16, endpoint=False))
     result = march_solve(
         field,
         residual_fn,
@@ -51,14 +70,19 @@ def main() -> None:
         lr=1e-2,
         per_bin=4,
         n_slice=16,
-        ic_values=ic,
+        ic_fn=ic_fn,
         seed=0,
     )
     assert len(result.windows) == 2
     assert result.windows[0].causality.n_bins == 4
     # Instrument smokes.
     assert causality_index([1.0, 2.0, 3.0]) == 0.0
-    v = trivial_solution_guard(ic, ic, ratio_threshold=1e-3)
+    ic_probe = torch.sin(
+        torch.pi * torch.linspace(0.0, 1.0, 17, dtype=torch.float64)[:-1]
+    )
+    v = trivial_solution_guard(
+        ic_probe.numpy(), ic_probe.numpy(), ratio_threshold=1e-3
+    )
     assert not v.is_trivial
     print("pinn_causal_marching: ok", result.windows[-1].final_loss)
 
