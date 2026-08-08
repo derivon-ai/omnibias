@@ -6,10 +6,56 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Fixed — causal marching seam metric + stiff reaction family
+
+`benchmarks/causal_marching.py` now supplies the IC as `ic_fn` evaluated on the
+marcher's own random `slice_points` (a linspace-ordered `ic_values` vector was
+measuring a ~0.19 grid-alignment artifact, not handoff error). Hard-cage heat
+seams collapse to machine zero. A second **reaction** family
+(`u_t = rho u(1-u)`, `rho=12`, soft IC weight 10) gates marching beating
+whole-interval -- the classical causality failure where heat-with-hard-cage
+cannot show a win. Summaries surface realized `total_steps_*` because gated
+retries may exceed the advertised equal budget. Schema `causal_marching/v4`.
+
+### Added — spectral instrumentation + frontier doctrine + four-gap cookbooks
+
+- `benchmarks/spectral_bias_fbpinn.py` records per-arm `wall_seconds` /
+  `peak_rss_mb` and a parameter-matched `lstsq_matched` arm (schema v4).
+- Maintainer skill `omnibias-dev-frontier-research`, rule section +
+  `frontier-claims.mdc`, consumer skill `omnibias-frontier`.
+- Executable cookbooks: causal marching, SDF geometry, operator zero-shot,
+  one-shot least-squares.
+
+### Fixed — `omnibias-pinn`: four-gap benchmarks now pass absolute gates
+
+Three of four committed gap artifacts were numerically invalid: the parametric
+heat reference marched with explicit RK4 (unstable above diffusivity ~0.14,
+producing `max|u| ~ 1e9` that still passed `isfinite`), causal arms scored ~9×
+worse than predicting zero, and spectral "beats plain" compared two failing
+arms. Fixes:
+
+1. **Heat reference** — `make_heat_slab` / `make_parametric_heat_slab` now use
+   ETDRK4 (exact linear advance) plus a maximum-principle guard (torch + JAX).
+2. **Absolute gates** — shared `benchmarks/_gates.py` (`rel_l2`, `skill_score`,
+   validity / skill / threshold helpers); every artifact emits a `gates` block.
+3. **Causality** — hard IC/BC cage + closed-form residual + `advance_policy="gate"`.
+4. **Geometry** — interior Poisson solve with manufactured `u* = |φ|·…` vs soft
+   penalty (boundary identity kept as by-construction).
+5. **Spectral** — one-shot frozen-feature least-squares arm dissolves GD spectral
+   bias; capacity falsification at high frequency.
+6. **Operators** — shared-IC diffusivity sweep (conditioning necessary);
+   width-1 parameter heads use `Identity` instead of LayerNorm (which mapped
+   every scalar to 0); comparator is a residual PINN (IC + closed-form heat
+   residual), not full-field supervised fit.
+7. **Doctrine** — discovery framing in rules/skills; CI wires the four smoke
+   benchmarks into the `pinn` job; smoke writes `*_smoke.json` so CI cannot
+   clobber multi-seed acceptance artifacts.
+
 ### Added — `omnibias-pinn`: four-gap PINN closure (`train` / `domain` / operator / spectral)
 
 Acceptance-gated alpha capabilities folded into Beta `omnibias-pinn`. Claims are
-per tested PDE / domain family — not a universal elimination of PINN limits.
+earned per tested PDE / domain family once the absolute gate passes
+(`docs/benchmarks/pinn_four_gap_matrix.md`).
 
 1. **`omnibias.pinn.train`** — `march_solve` (torch + JAX) with advance gating,
    required IC, same-time triviality guards, optional `hard_ic_factory`,
@@ -18,18 +64,19 @@ per tested PDE / domain family — not a universal elimination of PINN limits.
 2. **`omnibias.pinn.domain`** — negative-inside R-function CSG, boundary-factor /
    jet protocol, SDF-driven solver sampling, `DistanceConstrainedField` with
    Dirichlet / Neumann / Robin modes (explicit junction failure for normals).
-3. **Operator conditioning** — multi-head LayerNorm encoders + fusion (function /
-   parameters / BC / geometry), non-periodic parametric slabs, geometry hard-BC
-   wrapping, JAX FNO2d twin; zero-shot bench vs unconditioned + per-instance PINN
-   retrain under equal budget.
-4. **Spectral bias** — mutation-free NTK + Lanczos path, multilevel FBPINN with
-   partition combine (fallback documented), mode-wise equal-param arm bake-off.
+3. **Operator conditioning** — multi-head encoders + fusion (function /
+   parameters / BC / geometry; width-1 parameter heads skip LayerNorm), ETDRK4
+   parametric slabs, geometry hard-BC wrapping, JAX FNO2d twin; zero-shot bench
+   vs unconditioned + per-instance residual PINN retrain under equal budget.
+4. **Spectral bias** — mutation-free NTK + Lanczos path, multilevel FBPINN,
+   one-shot least-squares arm, mode-wise equal-param arm bake-off.
 
-Guarantee levels: hard cages / window geometry are by construction; training and
-zero-shot accuracy are empirical (multi-seed `--full`); certificates remain
-a-posteriori residual / linear-PDE scope. API pages `pinn-train` / `pinn-domain`,
-examples `pinn_causal_marching` / `pinn_sdf_geometry` / `pinn_fbpinn`, smoke
-benchmarks `causal_marching` / `geometry_sdf` / `operator_zero_shot` /
+Guarantee levels: hard cages / window geometry / ETDRK4 linear advance are by
+construction; training and zero-shot accuracy are empirical (multi-seed
+`--full`) with absolute skill floors; certificates remain a-posteriori residual /
+linear-PDE scope. API pages `pinn-train` / `pinn-domain`, examples
+`pinn_causal_marching` / `pinn_sdf_geometry` / `pinn_fbpinn`, smoke benchmarks
+`causal_marching` / `geometry_sdf` / `operator_zero_shot` /
 `spectral_bias_fbpinn`.
 
 ### Added — `omnibias-pinn`: neural operator learning (`omnibias.pinn.operator`)

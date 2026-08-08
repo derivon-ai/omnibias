@@ -1,6 +1,6 @@
 {
-  "schema": "operator_zero_shot/v2",
-  "generated_utc": "2026-08-08T09:15:22Z",
+  "schema": "operator_zero_shot/v3",
+  "generated_utc": "2026-08-08T10:49:06Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,59 +15,239 @@
     "seeds": [
       0,
       1,
-      2
+      2,
+      3,
+      4
     ],
-    "decision_rule": "held-out MSE after training must beat pre-training MSE; conditioned arm should beat unconditioned ablation on median MSE"
+    "decision_rule": "reference maximum principle; conditioned+retrain skill>0; conditioned median rel-L2 beats unconditioned ablation and per-instance residual PINN retrain"
   },
-  "rss_mb_at_start": 779.05,
+  "rss_mb_at_start": 780.98,
   "runs": [
     {
       "seed": 0,
-      "mse_before": 5.30958170847121e+16,
-      "mse_conditioned": 5.309581704412985e+16,
-      "mse_unconditioned": 5.309581655699491e+16,
-      "mse_pinn_retrain": 5.3095817050450856e+16,
-      "wall_s_conditioned": 1.0450482360029127,
-      "wall_s_unconditioned": 0.8722235820023343,
-      "wall_s_pinn_retrain": 1.1457114949880634,
-      "n_params_conditioned": 6019,
-      "amortization_break_even_queries": 7,
+      "rel_l2_before": 1.0191989123548069,
+      "skill_before": -0.03876642294522137,
+      "mse_before": 0.48733253405204313,
+      "rel_l2_conditioned": 0.013430052395889543,
+      "skill_conditioned": 0.9998196336926437,
+      "mse_conditioned": 8.46180312339662e-05,
+      "rel_l2_unconditioned": 0.018029745114380335,
+      "skill_unconditioned": 0.9996749282911105,
+      "mse_unconditioned": 0.00015250591099449953,
+      "rel_l2_pinn_retrain": 0.01846958825094672,
+      "skill_pinn_retrain": 0.9996555223453032,
+      "mse_pinn_retrain": 0.00016459940989647988,
+      "wall_s_conditioned": 7.215124789974652,
+      "wall_s_unconditioned": 7.4410296300193295,
+      "wall_s_pinn_retrain": 14.976305260002846,
+      "n_params_conditioned": 34193,
+      "amortization_break_even_queries": 12,
       "improved_vs_init": true,
-      "conditioned_beats_ablation": false
+      "conditioned_beats_ablation": true,
+      "conditioned_beats_pinn_retrain": true
     },
     {
       "seed": 1,
-      "mse_before": 6.811507585865494e+16,
-      "mse_conditioned": 6.811507576160468e+16,
-      "mse_unconditioned": 6.811507542680936e+16,
-      "mse_pinn_retrain": 6.811507567308716e+16,
-      "wall_s_conditioned": 0.9618291739898268,
-      "wall_s_unconditioned": 0.8866281069931574,
-      "wall_s_pinn_retrain": 1.1491400899831206,
-      "n_params_conditioned": 6019,
-      "amortization_break_even_queries": 7,
+      "rel_l2_before": 0.986473626747966,
+      "skill_before": 0.026869783730714913,
+      "mse_before": 0.45653960676983885,
+      "rel_l2_conditioned": 0.02183963283398562,
+      "skill_conditioned": 0.9995230304376767,
+      "mse_conditioned": 0.00022376809679086707,
+      "rel_l2_unconditioned": 0.02069970020821611,
+      "skill_unconditioned": 0.99957152241129,
+      "mse_unconditioned": 0.00020101830833010634,
+      "rel_l2_pinn_retrain": 0.017728351248563857,
+      "skill_pinn_retrain": 0.9996680789356809,
+      "mse_pinn_retrain": 0.00015625317164341448,
+      "wall_s_conditioned": 8.509207321010763,
+      "wall_s_unconditioned": 8.259153580991551,
+      "wall_s_pinn_retrain": 14.555469554994488,
+      "n_params_conditioned": 34193,
+      "amortization_break_even_queries": 10,
       "improved_vs_init": true,
-      "conditioned_beats_ablation": false
+      "conditioned_beats_ablation": false,
+      "conditioned_beats_pinn_retrain": false
     },
     {
       "seed": 2,
-      "mse_before": 4.781315778227476e+17,
-      "mse_conditioned": 4.781315769922179e+17,
-      "mse_unconditioned": 4.781315680554004e+17,
-      "mse_pinn_retrain": 4.7813157714962714e+17,
-      "wall_s_conditioned": 0.9507185879920144,
-      "wall_s_unconditioned": 0.8496753190120216,
-      "wall_s_pinn_retrain": 1.1414573229849339,
-      "n_params_conditioned": 6019,
-      "amortization_break_even_queries": 7,
+      "rel_l2_before": 1.03293032045126,
+      "skill_before": -0.066945046907543,
+      "mse_before": 0.5005524070844447,
+      "rel_l2_conditioned": 0.011253946280321255,
+      "skill_conditioned": 0.9998733486931196,
+      "mse_conditioned": 5.9417883519962375e-05,
+      "rel_l2_unconditioned": 0.08476566232367042,
+      "skill_unconditioned": 0.9928147824908294,
+      "mse_unconditioned": 0.0033709120540603298,
+      "rel_l2_pinn_retrain": 0.01695148955863226,
+      "skill_pinn_retrain": 0.9997110653008566,
+      "mse_pinn_retrain": 0.00013293216644558734,
+      "wall_s_conditioned": 8.514225609978894,
+      "wall_s_unconditioned": 8.083402610995108,
+      "wall_s_pinn_retrain": 14.741250307997689,
+      "n_params_conditioned": 34193,
+      "amortization_break_even_queries": 10,
       "improved_vs_init": true,
-      "conditioned_beats_ablation": false
+      "conditioned_beats_ablation": true,
+      "conditioned_beats_pinn_retrain": true
+    },
+    {
+      "seed": 3,
+      "rel_l2_before": 1.043202506969332,
+      "skill_before": -0.08827147054709905,
+      "mse_before": 0.5105576015583523,
+      "rel_l2_conditioned": 0.01480356724377889,
+      "skill_conditioned": 0.9997808543968589,
+      "mse_conditioned": 0.00010281116114853413,
+      "rel_l2_unconditioned": 0.018579337942528737,
+      "skill_unconditioned": 0.9996548082016173,
+      "mse_unconditioned": 0.0001619451593004449,
+      "rel_l2_pinn_retrain": 0.02219733791794591,
+      "skill_pinn_retrain": 0.9995068125906363,
+      "mse_pinn_retrain": 0.00022890392185741178,
+      "wall_s_conditioned": 8.851997232006397,
+      "wall_s_unconditioned": 8.328760296979453,
+      "wall_s_pinn_retrain": 14.931407216005027,
+      "n_params_conditioned": 34193,
+      "amortization_break_even_queries": 10,
+      "improved_vs_init": true,
+      "conditioned_beats_ablation": true,
+      "conditioned_beats_pinn_retrain": true
+    },
+    {
+      "seed": 4,
+      "rel_l2_before": 0.91493689487152,
+      "skill_before": 0.1628904784028613,
+      "mse_before": 0.3927261176601779,
+      "rel_l2_conditioned": 0.014844878764820463,
+      "skill_conditioned": 0.9997796295744578,
+      "mse_conditioned": 0.00010338578099696555,
+      "rel_l2_unconditioned": 0.01709031570934512,
+      "skill_unconditioned": 0.9997079211089549,
+      "mse_unconditioned": 0.0001370274808387985,
+      "rel_l2_pinn_retrain": 0.027358294077180094,
+      "skill_pinn_retrain": 0.9992480930855695,
+      "mse_pinn_retrain": 0.0003429914130380171,
+      "wall_s_conditioned": 8.523510459985118,
+      "wall_s_unconditioned": 8.334460966987535,
+      "wall_s_pinn_retrain": 14.981148696999298,
+      "n_params_conditioned": 34193,
+      "amortization_break_even_queries": 11,
+      "improved_vs_init": true,
+      "conditioned_beats_ablation": true,
+      "conditioned_beats_pinn_retrain": true
     }
   ],
   "summary": {
-    "median_mse_conditioned": 6.811507576160468e+16,
-    "median_mse_unconditioned": 6.811507542680936e+16,
-    "median_mse_pinn_retrain": 6.811507567308716e+16,
-    "elapsed_seconds": 9.864350908028428
+    "median_rel_l2_conditioned": 0.01480356724377889,
+    "median_rel_l2_unconditioned": 0.018579337942528737,
+    "median_rel_l2_pinn_retrain": 0.01846958825094672,
+    "median_mse_conditioned": 0.00010281116114853413,
+    "median_mse_unconditioned": 0.0001619451593004449,
+    "median_mse_pinn_retrain": 0.00016459940989647988,
+    "elapsed_seconds": 157.2477330499969
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "seed0_conditioned_skill",
+        "skill_score": 0.9998196336926437,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed0_pinn_retrain_skill",
+        "skill_score": 0.9996555223453032,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed0_unconditioned_skill_diagnostic",
+        "skill_score": 0.9996749282911105,
+        "passed": true
+      },
+      {
+        "name": "seed1_conditioned_skill",
+        "skill_score": 0.9995230304376767,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed1_pinn_retrain_skill",
+        "skill_score": 0.9996680789356809,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed1_unconditioned_skill_diagnostic",
+        "skill_score": 0.99957152241129,
+        "passed": true
+      },
+      {
+        "name": "seed2_conditioned_skill",
+        "skill_score": 0.9998733486931196,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed2_pinn_retrain_skill",
+        "skill_score": 0.9997110653008566,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed2_unconditioned_skill_diagnostic",
+        "skill_score": 0.9928147824908294,
+        "passed": true
+      },
+      {
+        "name": "seed3_conditioned_skill",
+        "skill_score": 0.9997808543968589,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed3_pinn_retrain_skill",
+        "skill_score": 0.9995068125906363,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed3_unconditioned_skill_diagnostic",
+        "skill_score": 0.9996548082016173,
+        "passed": true
+      },
+      {
+        "name": "seed4_conditioned_skill",
+        "skill_score": 0.9997796295744578,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed4_pinn_retrain_skill",
+        "skill_score": 0.9992480930855695,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed4_unconditioned_skill_diagnostic",
+        "skill_score": 0.9997079211089549,
+        "passed": true
+      },
+      {
+        "name": "conditioned_beats_unconditioned_median_rel_l2",
+        "median_rel_l2_conditioned": 0.01480356724377889,
+        "median_rel_l2_unconditioned": 0.018579337942528737,
+        "passed": true
+      },
+      {
+        "name": "conditioned_beats_pinn_retrain_median_rel_l2",
+        "median_rel_l2_conditioned": 0.01480356724377889,
+        "median_rel_l2_pinn_retrain": 0.01846958825094672,
+        "passed": true
+      }
+    ]
   }
 }

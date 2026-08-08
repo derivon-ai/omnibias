@@ -78,6 +78,9 @@ certified stacks do (and don't) claim.
   sphere, proof-carrying PDE and fluid-dynamics certificates, gauge-theory
   primitives, and the certified fluid-dynamics walkthroughs
   (certified finite-model evidence, **not** proofs of global regularity).
+  The four PINN capability gaps (causality, SDF geometry, parametric
+  operators, spectral bias) are acceptance-gated; see
+  [`benchmarks/pinn_four_gap_matrix.md`](benchmarks/pinn_four_gap_matrix.md).
 - **[API reference](https://github.com/derivon-ai/omnibias/tree/main/docs/api)**
   — per-package autodoc.
 

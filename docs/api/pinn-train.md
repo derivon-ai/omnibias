@@ -19,6 +19,22 @@ Maturity: **alpha** submodule of Beta `omnibias-pinn`.
 Same-time triviality guards use variance / energy / residual modes — do **not**
 compare a late-time decaying field against the global `t=0` IC amplitude.
 
+## Regime note (heat vs reaction)
+
+Whether marching beats whole-interval is **regime-dependent**, and the
+acceptance script measures both families under an equal advertised step budget
+([`benchmarks/causal_marching.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/causal_marching.py)):
+
+- **Heat** (`u_t = u_xx`, smooth manufactured decay): whole-interval is expected
+  to win; the gate requires every arm `skill_score > 0` and the best-arm median
+  rel-L2 under a named threshold.
+- **Reaction** (Krishnapriyan `u_t = ρ u(1−u)` at large `ρ`): whole-interval is
+  the classical causality failure; the gate requires the best marching arm to
+  beat `whole_interval` on median rel-L2.
+
+Capability matrix:
+[`docs/benchmarks/pinn_four_gap_matrix.md`](../benchmarks/pinn_four_gap_matrix.md).
+
 ## Core schemas
 
 ::: omnibias.pinn.train
@@ -54,3 +70,6 @@ shared pure numpy.
 ## Example
 
 See [`docs/examples/pinn_causal_marching.py`](../examples/pinn_causal_marching.py).
+Acceptance artifact + matrix:
+[`docs/benchmarks/causal_marching.json`](../benchmarks/causal_marching.json),
+[`docs/benchmarks/pinn_four_gap_matrix.md`](../benchmarks/pinn_four_gap_matrix.md).

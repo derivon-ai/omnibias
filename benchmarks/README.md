@@ -40,6 +40,59 @@ uv run python docs/img/generate_figures.py
 All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries
 `generated_utc`, `hardware_class`, library versions, and the exact config.
 
+## PINN four-gap suite
+
+Acceptance-gated scripts that close the four named PINN capability gaps.
+Capability matrix:
+[`docs/benchmarks/pinn_four_gap_matrix.md`](../docs/benchmarks/pinn_four_gap_matrix.md).
+
+| Script | Gap | Smoke artifact | Full (`--full`) artifact |
+|---|---|---|---|
+| `causal_marching.py` | Causality (`omnibias.pinn.train`) | `docs/benchmarks/causal_marching_smoke.json` | `docs/benchmarks/causal_marching.json` |
+| `geometry_sdf.py` | Geometry (`omnibias.pinn.domain`) | `docs/benchmarks/geometry_sdf_smoke.json` | `docs/benchmarks/geometry_sdf.json` |
+| `operator_zero_shot.py` | Operators (`omnibias.pinn.operator`) | `docs/benchmarks/operator_zero_shot_smoke.json` | `docs/benchmarks/operator_zero_shot.json` |
+| `spectral_bias_fbpinn.py` | Spectral bias (FBPINN + one-shot `lstsq`) | `docs/benchmarks/spectral_bias_fbpinn_smoke.json` | `docs/benchmarks/spectral_bias_fbpinn.json` |
+
+### Smoke vs `--full`
+
+| Mode | How | Seeds / budget | Role |
+|---|---|---|---|
+| **Smoke** (default) | `uv run python benchmarks/<script>.py` | 1 seed, tiny nets / steps | CI wiring gate; writes `*_smoke.json` under `docs/benchmarks/` |
+| **Full** | `uv run python benchmarks/<script>.py --full` | multi-seed acceptance (typically 5) | Commit the summary JSON under `docs/benchmarks/`; heavier copies may also land under `$OMNIBIAS_SCRATCH` (default `artifacts/`) |
+
+Never substitute a smoke JSON for a multi-seed acceptance claim. CI runs the
+four scripts in smoke mode on every push.
+
+### Absolute gates (`benchmarks/_gates.py`)
+
+Shared helpers live in [`_gates.py`](_gates.py). Every four-gap artifact emits a
+top-level `gates` block that self-declares pass/fail so a JSON can never look
+like a result while encoding a divergence. Gates answer three questions in
+order:
+
+1. Is the **reference** physically valid? (maximum principle, known amplitude, …)
+2. Does every prediction beat the **zero predictor**? (`skill_score > 0`)
+3. Does absolute error clear a **named threshold**? (`rel_l2 <= tol`, or a
+   conditioned-vs-baseline comparison)
+
+Helpers: `rel_l2`, `skill_score`, `require_reference_valid`, `gates_block`.
+
+### Regenerate the four-gap artifacts
+
+```bash
+# CI smoke (writes *_smoke.json)
+uv run python benchmarks/causal_marching.py
+uv run python benchmarks/geometry_sdf.py
+uv run python benchmarks/operator_zero_shot.py
+uv run python benchmarks/spectral_bias_fbpinn.py
+
+# Multi-seed acceptance (writes the committed full JSON + optional scratch copy)
+uv run python benchmarks/causal_marching.py --full
+uv run python benchmarks/geometry_sdf.py --full
+uv run python benchmarks/operator_zero_shot.py --full
+uv run python benchmarks/spectral_bias_fbpinn.py --full
+```
+
 ## Hardware tiers
 
 | Tier | Where numbers live | Reproducible from this repo? |
@@ -55,3 +108,4 @@ number into a "reproduce this" block.
 - Required: `omnibias-core`, `omnibias-torch`, `omnibias-jax`, `numpy`, `torch`, `jax`.
 - Optional: `folx` (Laplacian and polylaplacian scripts). Without it those two
   scripts exit with an import error — install it to regenerate those artifacts.
+  Four-gap scripts additionally need `omnibias-pinn` (workspace install).

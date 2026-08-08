@@ -346,10 +346,10 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   **Ambition is still encouraged inside existing packages:** alpha submodules
   (`omnibias.pinn.train` / `.domain` / `.operator`, …) and regenerable public
   benchmark artifacts are the right place for aggressive research. Distinguish
-  *structural* impossibility from *absent implementation*; do not declare a
-  capability solved without an acceptance gate (see
-  `omnibias-dev-pinn-research` and the "ambition plus claim discipline" section
-  of `.cursor/rules/omnibias.md`).
+  *structural* impossibility from *absent implementation*; default to achievable
+  and claim a capability plainly once its absolute acceptance gate passes (see
+  `omnibias-dev-pinn-research` and the "Discovery doctrine" section of
+  `.cursor/rules/omnibias.md`).
   A folded package is de-wired everywhere at once (workspace exclude, CI job,
   `mkdocs.yml` nav + `paths`, `docs/api`, `llms.txt`, `CHANGELOG.md`, `AGENTS.md`);
   `test_package_registry` enforces the workspace / folded-name / Python-floor
@@ -464,3 +464,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
 - Agent skills & rules: `.cursor/skills`, `.claude/skills`, `.cursor/rules`; the consumer package is `omnibias.skills` (`packages/omnibias-skills`).
 - Public docs: [`docs/index.md`](docs/index.md).
 - Benchmarks (vendor-neutral): [`docs/benchmarks.md`](docs/benchmarks.md).
+  PINN four-gap suite: `benchmarks/{causal_marching,geometry_sdf,operator_zero_shot,spectral_bias_fbpinn}.py`
+  with shared absolute gates in [`benchmarks/_gates.py`](benchmarks/_gates.py);
+  default smoke writes `docs/benchmarks/*_smoke.json` (CI), `--full` writes the
+  multi-seed acceptance JSON. Capability matrix:
+  [`docs/benchmarks/pinn_four_gap_matrix.md`](docs/benchmarks/pinn_four_gap_matrix.md).

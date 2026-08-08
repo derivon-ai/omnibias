@@ -117,5 +117,31 @@ bit patterns). Builder names follow the jax convention (`make_deeponet` /
 is the runnable smoke: order-4 closed-form exactness, the shipped KS residual
 on an operator field, an FD-floor smoke, and a family residual certificate.
 
+## Multi-head conditioning and the width-1 guard
+
+`ConditioningSpec` names four branch heads (function sensors, PDE parameters,
+boundary sensors, geometry probes). Each head is independently LayerNorm'd and
+fused before the branch MLP — except **width-1 parameter heads**, which skip
+LayerNorm (`nn.Identity` / JAX equivalent). A single scalar diffusivity under
+LayerNorm maps every value to zero (mean = itself, variance = 0), which would
+silently erase parametric conditioning. Locked by
+`test_parameter_head_distinguishes_scalar_values`.
+
+## Reference validity (ETDRK4 + maximum principle)
+
+Parametric heat slabs used for zero-shot evaluation must obey the heat
+maximum principle (`max|u(t)| ≤ max|u(0)|`). Explicit RK4 on stiff
+diffusivities can blow up while still looking "finite" under a weak check;
+the public reference path uses ETDRK4 (exact linear advance) plus a maximum-
+principle guard (`tests/operator/test_heat_reference_exact.py`).
+
+## Zero-shot acceptance gate
+
+[`benchmarks/operator_zero_shot.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_zero_shot.py)
+(smoke / `--full`) requires: reference maximum principle; conditioned and
+per-instance residual-PINN retrain skill > 0; conditioned median rel-L2 beats
+the unconditioned ablation **and** the residual PINN. Status:
+[`docs/benchmarks/pinn_four_gap_matrix.md`](../benchmarks/pinn_four_gap_matrix.md).
+
 Status: Alpha submodule (`omnibias.pinn.operator`) of the Beta `omnibias-pinn`
 package.

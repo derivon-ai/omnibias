@@ -32,6 +32,21 @@ Plus equation-aware modules:
   ``relative_l2_per_time``, ``forecast_horizon``, ``spectral_fidelity``,
   plus field-level ``derivative_stability`` and ``autograd_phase_check``.
 
+## Alpha submodules
+
+Four alpha submodules of Beta `omnibias-pinn` host the gated research surface
+(not separate distributions — see [`packages.md`](../packages.md)):
+
+| Submodule | Role | Docs |
+| --- | --- | --- |
+| `omnibias.pinn.solver` | Mesh-free PDE solver, stiff ETDRK4 / Rosenbrock, least-squares collocation | [pinn-solver.md](pinn-solver.md) |
+| `omnibias.pinn.train` | Causal `march_solve`, causality / trivial-solution diagnostics | [pinn-train.md](pinn-train.md) |
+| `omnibias.pinn.domain` | SDF / R-function geometry + hard curved BCs | [pinn-domain.md](pinn-domain.md) |
+| `omnibias.pinn.operator` | DeepONet / FNO + multi-head conditioning | [pinn-operator.md](pinn-operator.md) |
+
+Four-gap acceptance matrix (smoke vs `--full`):
+[`benchmarks/pinn_four_gap_matrix.md`](../benchmarks/pinn_four_gap_matrix.md).
+
 ## Pythonic DSL
 
 The canonical user surface is **attribute-based** (Option 1 in the
@@ -613,19 +628,34 @@ asserted:
   drives every weight to 1, switching the causal filter off while leaving the
   code looking correct. `causal_residual_loss(..., return_weights=True)` and a
   glance at `weights.min()` is the check.
-* **Marching is not a free win.** The handoff is real error inherited by the next
-  window, so a window that ends badly compounds where a whole-interval solve
-  would not; whether marching helps is regime-dependent. `TimeMarcher.converged`
-  and the error at each seam are the diagnostics that say which regime you are
-  in -- report them rather than assuming.
+* **Marching is not a free win -- and not a free loss.** Regime decides.
+  On linear heat with a hard IC/BC cage
+  ([`causal_marching.json`](../benchmarks/causal_marching.json) family
+  `heat`), `whole_interval` is best (median rel-L2 ≈ 9.4e-3, skill ≈ 0.9999);
+  marching pays budget fragmentation and cannot improve on an already-easy
+  problem. On Krishnapriyan's stiff reaction
+  ``u_t = rho u(1-u)`` at ``rho = 12`` (family `reaction`, soft IC weight 10),
+  whole-interval collapses (median rel-L2 ≈ 0.99) and gated
+  `causal_marching` wins (≈ 8.4e-2). Supply the IC as `ic_fn` on the
+  marcher's own slice points -- a linspace-ordered `ic_values` vector
+  contaminates the seam metric. Advertised equal step budgets may be
+  exceeded by gated retries; read `total_steps_*` in the summary. Full
+  matrix: [`pinn_four_gap_matrix.md`](../benchmarks/pinn_four_gap_matrix.md).
 
 See
 [`docs/examples/pinn_causal_marching.py`](https://github.com/derivon/omnibias/blob/main/docs/examples/pinn_causal_marching.py)
-for the loop end to end: one hand-set weight separating a failed run from a good
-one, `GradNormWeighter` finding the right side of that cliff by measurement,
-marching improving on the best whole-interval result at identical budget, and
-self-adaptive weights sorting a collocation set by residual with rank
-correlation 1.
+for a short `march_solve` smoke, and
+[`docs/cookbook/pinn-causal-marching.md`](../cookbook/pinn-causal-marching.md)
+for the hard-cage + `ic_fn` pattern. The acceptance artifact is
+`benchmarks/causal_marching.py` (both families).
+
+### Alpha submodules
+
+| Submodule | Role |
+| --- | --- |
+| [`omnibias.pinn.train`](pinn-train.md) | Causal `march_solve`, causality / trivial-solution diagnostics |
+| [`omnibias.pinn.domain`](pinn-domain.md) | SDF / R-function geometry, `DistanceConstrainedField` |
+| [`omnibias.pinn.operator`](pinn-operator.md) | DeepONet / FNO + multi-head conditioning, ETDRK4 references |
 
 ### Interface residuals: gluing subdomains back together
 

@@ -3,7 +3,10 @@
 """CI smoke: FBPINN multi-window field + spectral-bias index.
 
 Honesty: FBPINN / NTK-spectrum tools are *numerical* mitigations and
-measurements of spectral bias, not certificates that remove it.
+measurements of spectral bias, not certificates that remove it. The
+acceptance benchmark's winning arm is one-shot frozen-feature ``lstsq``
+(``benchmarks/spectral_bias_fbpinn.py``), which removes GD dynamics
+entirely -- see ``docs/benchmarks/pinn_four_gap_matrix.md``.
 """
 
 from __future__ import annotations

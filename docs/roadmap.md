@@ -10,7 +10,7 @@ under NDA on request.
 
 | package | scope | status |
 |---|---|---|
-| `omnibias-pinn` | Physics-informed NNs with closed-form Laplacian / biharmonic / curl / div / p-Laplacian operators. | **Beta (v0.1.0)** |
+| `omnibias-pinn` | Physics-informed NNs with closed-form Laplacian / biharmonic / curl / div / p-Laplacian operators; alpha submodules `train` / `domain` / `operator` / `solver` close the four named capability gaps (causality, SDF geometry, parametric operators, spectral bias — see [`benchmarks/pinn_four_gap_matrix.md`](benchmarks/pinn_four_gap_matrix.md)). | **Beta (v0.1.0)**; four gaps **closed** |
 | `omnibias-fields` | Backend-agnostic field substrate (`FieldState`, `SigmaCache`, attribute-DSL views, op registry) + cross-backend (torch + jax) closed-form differential-operator surface (gradient, divergence, curl, laplacian, hessian, jacobian, integration, Sobolev norms, tensor divergence, Wirtinger). | **Beta (v0.1.0)** |
 | `omnibias-geometry` | Differential geometry on manifolds: metric, Christoffel, covariant derivative, Laplace-Beltrami, Riemann / Ricci / scalar curvature, geodesics, exterior calculus (`d`, wedge, Hodge star), pullback metric `g = JᵀhJ` of a learned chart. | **Beta (v0.2.0)** |
 | `omnibias-qpinn` | Quantum-physics PINNs (TISE / TDSE / NLS / Helmholtz / Klein-Gordon / Dirac) with norm / Bloch / Hermitian / nuclear-cusp cages, a closed-form molecular local-energy surface, and bit-parity torch + JAX backends. | **Alpha (v0.0.2a1)** |

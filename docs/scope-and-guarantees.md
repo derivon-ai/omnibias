@@ -238,7 +238,7 @@ So the machine never manufactures a global-regularity claim. `PROVED` always mea
 | Tier | Packages | Contract |
 |---|---|---|
 | **Stable** | `omnibias-core`, `omnibias-torch`, `omnibias-jax`, `omnibias-ferminet` | Public surface frozen; two-step deprecation policy. |
-| **Beta** | `omnibias-pinn`, `omnibias-fields`, `omnibias-geometry` | Public surface frozen; production-fidelity benchmarks may live in the internal archive. |
+| **Beta** | `omnibias-pinn`, `omnibias-fields`, `omnibias-geometry` | Public surface frozen; heavy off-band GPU / large-scale production runs may live outside the public tree, but **CPU smoke and multi-seed acceptance JSON for the PINN four-gap suite are public** under [`docs/benchmarks/`](benchmarks.md) (see §6). |
 | **Alpha** | `omnibias-qpinn`, `omnibias-curvature`, `omnibias-symbolic`, `omnibias-score`, `omnibias-fractional`, `omnibias-binary`, `omnibias-boolean`, `omnibias-spiking`, `omnibias-hopfield`, `omnibias-keras`, `omnibias-convex`, `omnibias-control`, `omnibias-routing`, `omnibias-verify`, `omnibias-dynamics`, `omnibias-graph`, `omnibias-struct` | API may shift between alpha releases; per-package CI gate. |
 
 Each tier ships with its own breaking-change policy
@@ -264,6 +264,14 @@ is identical, the precision is the user's choice.
 A few specific scope notes that an AI agent should know before reaching for
 the relevant op:
 
+- **Empirical PINN four-gap gates** (`omnibias.pinn.train` / `.domain` /
+  `.operator`, plus FBPINN / one-shot `lstsq`) are **public, regenerable CPU
+  artifacts**, not an internal-archive-only claim. Scripts in `benchmarks/`
+  write smoke (`*_smoke.json`, CI) by default and `--full` multi-seed acceptance
+  JSON under `docs/benchmarks/`; every artifact emits a `gates` block via
+  `benchmarks/_gates.py`. Status matrix:
+  [`benchmarks/pinn_four_gap_matrix.md`](benchmarks/pinn_four_gap_matrix.md).
+  Smoke is a wiring gate — do not quote it as a multi-seed result.
 - **`omnibias-fractional`** is non-local and **grid-based**. Accuracy is
   controlled by `h`; see the per-op error budget in
   [`FRACTIONAL_DERIVATIONS.md`](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-fractional/FRACTIONAL_DERIVATIONS.md).

@@ -28,7 +28,8 @@ def test_conditioning_spec_total_dim():
     assert c.has_parameters and c.has_boundary and c.has_geometry
 
 
-def test_deeponet_with_parameter_conditioning():
+def test_parameter_head_distinguishes_scalar_values():
+    """Width-1 LayerNorm would map every scalar to 0; coeffs must still vary."""
     cond = ConditioningSpec(n_function_sensors=8, n_parameters=1)
     op = build_deeponet(
         coordinate_spec=CoordinateSpec(
@@ -44,14 +45,44 @@ def test_deeponet_with_parameter_conditioning():
         conditioning=cond,
         dtype=DTYPE,
     )
-    sensors = torch.randn(3, 8, dtype=DTYPE)
-    params = torch.tensor([[0.1], [0.2], [0.05]], dtype=DTYPE)
-    field = op.condition(sensors, parameters=params)
-    coords = torch.rand(16, 2, dtype=DTYPE)
-    state = field.on_grid(coords)
-    u = tops.value(state, "u")
-    assert u.shape[0] == 3 * 16
-    assert torch.isfinite(u).all()
+    sensors = torch.randn(1, 8, dtype=DTYPE).expand(3, -1).contiguous()
+    params = torch.tensor([[0.05], [0.15], [0.35]], dtype=DTYPE)
+    coeffs, _bias = op.branch(sensors=sensors, parameters=params)
+    # Identical sensors, distinct parameters => distinct branch coeffs.
+    d01 = float((coeffs[0] - coeffs[1]).detach().norm())
+    d02 = float((coeffs[0] - coeffs[2]).detach().norm())
+    assert d01 > 1e-8, d01
+    assert d02 > 1e-8, d02
+
+
+def test_parameter_head_distinguishes_scalar_values_jax():
+    """JAX twin of the width-1 LayerNorm identity guard."""
+    import jax
+    import jax.numpy as jnp
+    from omnibias.pinn.operator.jax import make_deeponet as make_deeponet_jax
+
+    cond = ConditioningSpec(n_function_sensors=8, n_parameters=1)
+    op = make_deeponet_jax(
+        coordinate_spec=CoordinateSpec(
+            ("x", "t"), domain=((0.0, 1.0), (0.0, 1.0)), time_axis="t"
+        ),
+        components=ComponentSpec(("u",)),
+        n_sensors=8,
+        trunk_width=4,
+        trunk_hidden=8,
+        trunk_depth=2,
+        branch_hidden=8,
+        branch_depth=2,
+        conditioning=cond,
+        seed=0,
+    )
+    sensors = jnp.broadcast_to(jax.random.normal(jax.random.PRNGKey(1), (1, 8)), (3, 8))
+    params = jnp.asarray([[0.05], [0.15], [0.35]])
+    coeffs, _bias = op.branch(sensors=sensors, parameters=params)
+    d01 = float(jnp.linalg.norm(coeffs[0] - coeffs[1]))
+    d02 = float(jnp.linalg.norm(coeffs[0] - coeffs[2]))
+    assert d01 > 1e-8, d01
+    assert d02 > 1e-8, d02
 
 
 def test_geometry_encoding_length():

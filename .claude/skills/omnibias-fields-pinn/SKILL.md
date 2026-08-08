@@ -37,9 +37,11 @@ re-export shims of the moved `omnibias-fields` substrate -- do not duplicate it.
 
 Closed-form towers and hard cages are exact **by construction** for the
 quantities they encode (e.g. Dirichlet on `φ = 0`). Training success, spectral
-bias mitigation, and zero-shot operator generalization are **empirical** on the
-named families in `docs/benchmarks.md` -- not universal PDE solvers. Prefer
-capability + acceptance-domain language over blanket "PINNs are solved" claims.
+bias mitigation via one-shot collocation, and zero-shot operator generalization
+are **empirical** on the named families in `docs/benchmarks.md` -- claim them
+plainly once the absolute gate in `docs/benchmarks/pinn_four_gap_matrix.md`
+passes. Prefer capability + acceptance-domain language; absolute skill floors
+and validity guards are what make the win undeniable.
 
 ## Gotchas that bite
 

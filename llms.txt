@@ -49,11 +49,18 @@ tensor divergence, Wirtinger),
 `omnibias-fields`; hosts `omnibias.pinn.operator` for neural operator learning
 (DeepONet with closed-form trunk-jet query derivatives through order 4, so a
 shipped KS residual runs unchanged on one jet; multi-head `ConditioningSpec` for
-parameters / BC / geometry; FNO1d/FNO2d FFT baseline; `ks_residual_loss_fd` is the
-5-point FD twin for the bake-off; Burgers closed-form-vs-FD is an honest
-negative at 1st-order-in-time, KS is seed-fragile on median (5/8) against the
-≥6/8 rule; FNO baseline stays FFT-based; residual
-enclosure is not a solution-error bound; accuracy is optimised not proven); the
+parameters / BC / geometry with a width-1 parameter-head LayerNorm guard; FNO1d/FNO2d
+FFT baseline; `ks_residual_loss_fd` is the 5-point FD twin for the bake-off;
+Burgers closed-form-vs-FD is an honest negative at 1st-order-in-time, KS is
+seed-fragile on median (5/8) against the ≥6/8 rule; FNO baseline stays FFT-based;
+residual enclosure is not a solution-error bound; accuracy is optimised not proven;
+zero-shot parametric heat gate closed in `benchmarks/operator_zero_shot.py` with
+ETDRK4 / maximum-principle reference); also `omnibias.pinn.train` (gated causal
+marching; heat vs Krishnapriyan reaction families in `benchmarks/causal_marching.py`),
+`omnibias.pinn.domain` (SDF hard cages), and one-shot `solve_least_squares` /
+`benchmarks/spectral_bias_fbpinn.py`; absolute gates via `benchmarks/_gates.py`
+with smoke `*_smoke.json` vs `--full` acceptance JSON; matrix at
+`docs/benchmarks/pinn_four_gap_matrix.md`; the
 prebuilt residuals now include two **nonlocal** ones,
 `Fredholm` and `Volterra` integral equations, which re-evaluate the field at the
 quadrature nodes -- free, since an omnibias field is a function -- with the causal

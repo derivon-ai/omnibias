@@ -59,7 +59,11 @@ class _HeadEncoder:
             raise ValueError(
                 f"head input trailing dim must be {self.n_input}, got {tuple(x.shape)}"
             )
-        h = _layer_norm(x, self.norm_gamma, self.norm_beta)
+        # Width-1 LayerNorm maps every scalar to zero; skip it (torch twin uses Identity).
+        if self.n_input == 1:
+            h = x
+        else:
+            h = _layer_norm(x, self.norm_gamma, self.norm_beta)
         n = len(self.weights)
         for i in range(n):
             h = h @ self.weights[i].T + self.biases[i]

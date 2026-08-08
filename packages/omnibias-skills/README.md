@@ -29,10 +29,11 @@ Run `omnibias-skills install --check` in CI to fail on drift.
 
 ## What you get
 
-Six capability skills, each a thin `SKILL.md` that links the versioned docs:
+Seven capability skills, each a thin `SKILL.md` that links the versioned docs:
 
 - `omnibias-backends` -- closed-form n-th derivatives and jets on torch / jax / keras.
 - `omnibias-fields-pinn` -- field operators (grad / div / curl / laplacian / hessian) and PINNs.
+- `omnibias-frontier` -- frontier sub-results (certified fluids, CAP, gauge/spectral) with honesty gates.
 - `omnibias-geometry` -- metric, curvature, geodesics, exterior calculus (with honesty labels).
 - `omnibias-curvature-optim` -- second-order optimizers, Fisher, and natural gradient.
 - `omnibias-verify` -- certified enclosures, robustness certificates, validated dynamics.

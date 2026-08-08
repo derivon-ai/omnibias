@@ -1,0 +1,30 @@
+---
+description: Honesty rules for frontier / certified claims (fluids, gauge, SOS, dynamics)
+globs:
+  - "packages/**/certified/**"
+  - "packages/omnibias-sos/**"
+  - "packages/omnibias-dynamics/**"
+  - "packages/omnibias-geometry/src/omnibias/geometry/gauge/**"
+alwaysApply: false
+---
+
+# Frontier claims: escalate, never forge
+
+Code on these paths can produce results that look like Clay / Nobel adjacent
+sub-results. Treat every claim as a **sub-obligation** with an absolute gate.
+
+- Decompose the famous parent into a finite or compact obligation. If it does
+  not reduce, seal it as an **external obligation** and do not infer it.
+- Escalate only through: empirical (skill > 0, multi-seed) → sound enclosure →
+  `theorem_prover_verified` (genuine kernel `lake build`) → `mathlib_verified`
+  (genuine analytic `lake build`). Never conflate the two Lean tiers.
+- Forbidden: RH proved/inferred; NS global regularity; Yang-Mills mass gap
+  solved; P=NP claim; Lean discharging continuum / asymptotic obligations;
+  forging `theorem_prover_verified`.
+- State scope in the sealed payload (`local_box`, truncation, ansatz class).
+  A local proof is not a global one.
+- Emit a `gates` block for empirical artifacts; enclosure soundness still
+  requires dense grid **and** random sample containment.
+
+See the `omnibias-dev-frontier-research` maintainer skill for the route list
+and the seam-artifact / ETDRK4 worked examples.

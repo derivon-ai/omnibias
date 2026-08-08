@@ -3,7 +3,8 @@
 **Status: Beta (v0.1.0).**
 
 Physics-informed neural networks (PINNs) with **closed-form n-th
-derivative operators**, built on top of `omnibias-core`. While
+derivative operators**, built on top of `omnibias-fields` (which itself
+sits on `omnibias-core`). While
 [DeepXDE](https://github.com/lululxvi/deepxde) and
 [NVIDIA Modulus](https://github.com/NVIDIA/modulus-sym) differentiate
 through stacked layers via autograd (cost grows exponentially as you nest
@@ -54,8 +55,23 @@ The package surfaces three layers --
   `relative_l2_per_time`, `forecast_horizon`, `spectral_fidelity`,
   `derivative_stability`, `autograd_phase_check`.
 
+Alpha submodules (still under Beta `omnibias-pinn`, not separate wheels):
+
+* **`omnibias.pinn.solver`** — mesh-free PDE solver, stiff ETDRK4 / Rosenbrock,
+  least-squares collocation.
+* **`omnibias.pinn.train`** — causal `march_solve` + causality / trivial-
+  solution diagnostics.
+* **`omnibias.pinn.domain`** — SDF / R-function geometry + hard curved BCs.
+* **`omnibias.pinn.operator`** — DeepONet / FNO + multi-head conditioning.
+* **`omnibias.pinn.partition`** — discontinuity / interface PINNs on the soft
+  partition-of-unity substrate.
+
+Four-gap acceptance matrix (smoke vs `--full`):
+[`docs/benchmarks/pinn_four_gap_matrix.md`](../../docs/benchmarks/pinn_four_gap_matrix.md).
+
 Both the PyTorch and JAX backends ship in lockstep, with bit-identical
-numerics enforced by 620 cross-backend tests.
+numerics enforced by the package test suite (currently ~2112 collected
+tests under `packages/omnibias-pinn/tests`).
 
 ## Install
 
@@ -127,13 +143,21 @@ from the uncaged spectral field.
 * **Integration parity**: integration tests verify residual / loss
   parity for 2D Navier-Stokes, Kuramoto-Sivashinsky, and Cahn-Hilliard
   on pinned smoke configs (`tests/integration/`).
-* **Headline 3D Navier-Stokes benchmark** lives in the internal benchmark
-  archive (not shipped publicly; see [`docs/benchmarks.md`](../../docs/benchmarks.md));
-  the package keeps only public APIs, docs, and regression tests.
+* **Four-gap CPU benchmarks** are public under
+  [`docs/benchmarks/`](../../docs/benchmarks/) (smoke + `--full`); see
+  [`pinn_four_gap_matrix.md`](../../docs/benchmarks/pinn_four_gap_matrix.md).
+  Large off-band GPU / 3D Navier–Stokes production runs may still live
+  outside the public tree — labelled as such in
+  [`docs/benchmarks.md`](../../docs/benchmarks.md).
 
 ## Documentation
 
-* API reference: [`docs/api/pinn.md`](../../docs/api/pinn.md).
+* API reference: [`docs/api/pinn.md`](../../docs/api/pinn.md), plus alpha
+  submodule pages
+  [`pinn-train.md`](../../docs/api/pinn-train.md),
+  [`pinn-domain.md`](../../docs/api/pinn-domain.md),
+  [`pinn-operator.md`](../../docs/api/pinn-operator.md),
+  [`pinn-solver.md`](../../docs/api/pinn-solver.md).
 * Cookbook:
   [`docs/cookbook/pinn-navier-stokes.md`](../../docs/cookbook/pinn-navier-stokes.md),
   [`docs/cookbook/pinn-strict-conservation.md`](../../docs/cookbook/pinn-strict-conservation.md).
@@ -143,6 +167,8 @@ from the uncaged spectral field.
   [`docs/pinn-derivations.md`](../../docs/pinn-derivations.md).
 * Stability matrix:
   [`docs/stability.md`](../../docs/stability.md) (omnibias-pinn section).
+* Four-gap matrix:
+  [`docs/benchmarks/pinn_four_gap_matrix.md`](../../docs/benchmarks/pinn_four_gap_matrix.md).
 
 ## Tests
 

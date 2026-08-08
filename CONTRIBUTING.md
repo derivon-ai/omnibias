@@ -226,6 +226,9 @@ kernelspec is resolving to another interpreter; register your environment's kern
 - [ ] No GPU-only, cluster-specific, or local-path details leak into tracked files.
 - [ ] `CHANGELOG.md` has an entry under the unreleased section.
 - [ ] Agent skill / rule drift checks pass if you touched them (`omnibias-skills install --check`, `python scripts/sync_skills.py --check`).
+- [ ] If you changed a public benchmark script or its claim, regenerate the
+      matching `docs/benchmarks/*.json` (smoke and/or `--full` as appropriate)
+      and keep any `gates` block green.
 - [ ] You have signed the [CLA](docs/CLA.md) (the PR bot will confirm).
 - [ ] `python scripts/license_headers.py --check` is clean, and no permissive package gained a copyleft dependency.
 

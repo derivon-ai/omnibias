@@ -60,6 +60,11 @@ uv run python benchmarks/laplacian_scaling.py
 uv run python benchmarks/polylaplacian_order.py
 uv run python benchmarks/derivative_order.py
 uv run python benchmarks/optimizer_pinn.py
+# PINN four-gap suite (smoke by default; add --full for multi-seed acceptance)
+uv run python benchmarks/causal_marching.py
+uv run python benchmarks/geometry_sdf.py
+uv run python benchmarks/operator_zero_shot.py
+uv run python benchmarks/spectral_bias_fbpinn.py
 uv run python docs/img/generate_figures.py
 ```
 
@@ -166,6 +171,23 @@ for PINNs, operator learning with physics residuals, and small/medium smooth
 objectives — not a universal Adam replacement at LLM scale. That honesty is
 the point.
 
+### PINN four-gap closure (CPU, multi-seed, gated)
+
+Four absolute acceptance gates — causality, SDF geometry, parametric operator
+zero-shot, and spectral bias — all pass on committed `--full` JSON under
+[`docs/benchmarks/`](docs/benchmarks/). Matrix:
+[`docs/benchmarks/pinn_four_gap_matrix.md`](docs/benchmarks/pinn_four_gap_matrix.md).
+
+| Gap | Best-arm headline (`--full`, 5 seeds, float64 CPU) | Artifact |
+|---|---|---|
+| Causality | **heat**: `whole_interval` ≈ 9.4×10⁻³; **reaction** (`rho=12`): `causal_marching` ≈ 8.4×10⁻² beats whole ≈ 0.99 | [`causal_marching.json`](docs/benchmarks/causal_marching.json) |
+| Geometry | Disk hard skill ≈ 0.91; boundary max\|u−g\| ~10⁻¹⁶ by construction | [`geometry_sdf.json`](docs/benchmarks/geometry_sdf.json) |
+| Operators | Conditioned median rel-L2 1.48×10⁻² < unconditioned 1.86×10⁻² and residual PINN 1.85×10⁻² | [`operator_zero_shot.json`](docs/benchmarks/operator_zero_shot.json) |
+| Spectral | One-shot `lstsq` median rel-L2 ≈ 5.2×10⁻⁹ through f=16 | [`spectral_bias_fbpinn.json`](docs/benchmarks/spectral_bias_fbpinn.json) |
+
+Smoke (`*_smoke.json`) is the CI wiring gate; use `--full` before claiming a
+multi-seed result. Shared helpers: [`benchmarks/_gates.py`](benchmarks/_gates.py).
+
 ---
 
 ## Packages (42)
@@ -211,7 +233,7 @@ A permissive install can never pull copyleft code into your tree.
 | [`omnibias-jax`](packages/omnibias-jax) | JAX: closed-form Laplacian / Hessian / polylaplacian, jet kernels. |
 | [`omnibias-ferminet`](packages/omnibias-ferminet) | FermiNet / DeepQMC bridge: folx-compatible local kinetic energy. |
 | [`omnibias-fields`](packages/omnibias-fields) | Field substrate: `FieldState`, grad / div / curl / lap / hess / jacobian. |
-| [`omnibias-pinn`](packages/omnibias-pinn) | Physics-informed NNs, hard-conservation cages, mesh-free PDE solver. |
+| [`omnibias-pinn`](packages/omnibias-pinn) | Physics-informed NNs: hard-conservation cages, mesh-free `solver`, causal `train`, SDF `domain`, DeepONet/FNO `operator`. |
 | [`omnibias-geometry`](packages/omnibias-geometry) | Riemannian geometry + exterior calculus; gauge theory submodule. |
 | [`omnibias-keras`](packages/omnibias-keras) | Keras 3 unified backend (TF / JAX / torch). |
 

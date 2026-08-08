@@ -57,6 +57,34 @@ def _space_time_coords(grid: SpectralGrid1D, times: Tensor) -> Tensor:
     return torch.stack([xs, ts], dim=-1)
 
 
+def _assert_heat_maximum_principle(
+    snaps: Tensor,
+    u0: Tensor,
+    *,
+    name: str,
+) -> None:
+    """Enforce the heat maximum principle ``max|u(t)| <= max|u0|``.
+
+    Explicit RK4 on a stiff Fourier heat operator can produce finite-but-
+    exploding snapshots that pass an ``isfinite`` check while encoding a
+    divergence (measured: ``max|u| ~ 1e9`` at diffusivity 0.24). The
+    physical invariant catches that class of failure.
+    """
+    if not torch.isfinite(snaps).all():
+        raise RuntimeError(
+            f"{name}: non-finite values; reduce amplitude / n_modes "
+            "or use an unconditionally stable integrator"
+        )
+    u0_max = float(u0.detach().abs().amax())
+    snaps_max = float(snaps.detach().abs().amax())
+    if snaps_max > u0_max * (1.0 + 1e-6) + 1e-12:
+        raise RuntimeError(
+            f"{name}: maximum principle violated "
+            f"(max|u|={snaps_max:.3e} > max|u0|={u0_max:.3e}); "
+            "the reference integrator is unstable -- use etdrk4 for heat"
+        )
+
+
 def make_heat_slab(
     *,
     n_samples: int = 32,
@@ -85,17 +113,16 @@ def make_heat_slab(
     sensors = u0[:, idx]
     times = torch.linspace(0.0, t_final, n_times, dtype=dtype)
     times_seq = [float(t) for t in times]
+    # Heat is linear with a diagonal Fourier symbol; ETDRK4 advances it by
+    # exp(dt L) exactly and is unconditionally stable. Explicit RK4 crosses
+    # its stability boundary around diffusivity ~0.14 on a 64-point grid.
     semi = heat_semidiscrete(grid, diffusivity)
     snaps_list = []
     for i in range(n_samples):
-        snaps, _ = method_of_lines(semi, u0[i], times_seq, integrator="rk4")
+        snaps, _ = method_of_lines(semi, u0[i], times_seq, integrator="etdrk4")
         snaps_list.append(snaps)  # (T, n)
     snaps_b = torch.stack(snaps_list, dim=0)  # (F, T, n)
-    if not torch.isfinite(snaps_b).all():
-        raise RuntimeError(
-            "heat MOL reference produced non-finite values; reduce amplitude "
-            "or n_modes, or increase n_grid"
-        )
+    _assert_heat_maximum_principle(snaps_b, u0, name="heat MOL reference")
     coords = _space_time_coords(grid, times)
     # values (F, T*n, 1)
     values = snaps_b.reshape(n_samples, -1, 1)
@@ -260,11 +287,13 @@ def make_parametric_heat_slab(
     snaps_list = []
     for i in range(n_samples):
         semi = heat_semidiscrete(grid, float(diffs[i]))
-        snaps, _ = method_of_lines(semi, u0[i], times_seq, integrator="rk4")
+        # ETDRK4: exact linear advance; RK4 is unstable for large diffusivity.
+        snaps, _ = method_of_lines(semi, u0[i], times_seq, integrator="etdrk4")
         snaps_list.append(snaps)
     snaps_b = torch.stack(snaps_list, dim=0)
-    if not torch.isfinite(snaps_b).all():
-        raise RuntimeError("parametric heat MOL produced non-finite values")
+    _assert_heat_maximum_principle(
+        snaps_b, u0, name="parametric heat MOL reference"
+    )
     coords = _space_time_coords(grid, times)
     values = snaps_b.reshape(n_samples, -1, 1)
     parameters = torch.tensor(diffs.reshape(n_samples, 1), dtype=dtype)

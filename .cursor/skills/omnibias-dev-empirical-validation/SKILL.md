@@ -1,6 +1,6 @@
 ---
 name: omnibias-dev-empirical-validation
-description: Make "validated and refined from training results" an enforceable loop for omnibias packages -- a data-driven / verified / best-in-class methodology -- pick every design choice from a measured curve, back the headline with a sound certificate, beat a named classical baseline, run CPU smoke locally and heavier sweeps on the GPU cluster, calibrate across seeds to avoid overfitting, and lock results in as a validation report + CI smoke. Use when validating, benchmarking, tuning, or refining any omnibias package against baselines and oracles. For contributors modifying omnibias itself, not for consumers using it.
+description: Make "validated and refined from training results" an enforceable loop for omnibias packages -- a data-driven / verified / best-in-class methodology -- pick every design choice from a measured curve, back the headline with a sound certificate, beat a named classical baseline, run CPU smoke locally and heavier sweeps via optional GPU submit, calibrate across seeds to avoid overfitting, and lock results in as a validation report + CI smoke. Use when validating, benchmarking, tuning, or refining any omnibias package against baselines and oracles. For contributors modifying omnibias itself, not for consumers using it.
 ---
 
 # Empirical validation & refinement (data-driven, verified, best-in-class)
@@ -27,26 +27,40 @@ Refine = iterate on the training dynamics until all three pass, then lock them i
 | Phase | Goal | Evidence |
 | --- | --- | --- |
 | **A – explore** | Find the strongest constructive route; losing baselines trigger diagnosis and another attempt, not immediate claim reduction | Scratch artifacts under `$OMNIBIAS_SCRATCH`; notebooks / uncommitted sweeps OK |
-| **B – ship** | Lock an acceptance-gated API + CI smoke + committed summary JSON | Multi-seed distributions, named baseline, certificate when the math supports it |
+| **B – ship** | Lock an acceptance-gated API + CI smoke + committed summary JSON with a `gates` block | Multi-seed distributions, named baseline, absolute skill floor, certificate when the math supports it |
 
 A failed Phase-A run is a research input. Only after a concrete structural blocker
-(or a measured compute wall) may Phase B narrow the public claim.
+(or a measured compute wall) may Phase B narrow the public claim -- and only after
+the constructive routes have been tried.
 
-## Local vs GPU cluster (CPU smoke vs cluster sweeps)
+## Local vs submitted compute
 
-- **Local CPU smoke** on `python`: imports, tiny `n`,
-  unit tests, a 1-2 min sanity curve. This is the loop you iterate in.
-- **GPU cluster** for sweeps / training / real-size benchmarks. Big
-  artifacts -> `artifacts/omnibias_runs/<name>/`; write only **summaries**
-  (metrics JSON + small plots + a short md) back into the repo -- never large
-  binaries in the tree.
+- **Local CPU smoke** on `uv run python`: imports, tiny `n`, unit tests, a
+  1-2 min sanity curve. This is the loop you iterate in.
+- **Heavier / GPU work** via the optional `$OMNIBIAS_SUBMIT` wrapper when set;
+  otherwise run locally (backgrounded with a durable log under
+  `$OMNIBIAS_SCRATCH`). Big artifacts -> `$OMNIBIAS_SCRATCH/omnibias_runs/<name>/`;
+  write only **summaries** (metrics JSON + small plots + a short md) back into
+  the repo -- never large binaries in the tree.
 
 ```bash
 # tiny local smoke first
-python examples/<pkg>_validate.py --n 8 --seeds 3
-# then the sweep on the GPU cluster (submit through your cluster's batch wrapper)
-python examples/<pkg>_validate.py --n 30 --seeds 20 --sweep
+uv run python benchmarks/<name>.py
+# then the full multi-seed acceptance run
+uv run python benchmarks/<name>.py --full
 ```
+
+## Validity floor (absolute gates)
+
+Ask these three questions in order before any arm comparison:
+
+1. Is the **reference** physically valid? (maximum principle, known amplitude, …)
+2. Does every prediction beat the **zero predictor**? (`skill_score > 0`)
+3. Does absolute error clear a **named threshold**? (`rel_l2 <= tol`)
+
+Shared helpers live in `benchmarks/_gates.py`. Every public artifact should emit
+a `gates` block that self-declares pass/fail so a JSON can never look like a
+result while encoding a divergence.
 
 ## What to measure, with acceptance gates
 
@@ -56,10 +70,10 @@ python examples/<pkg>_validate.py --n 30 --seeds 20 --sweep
 | `delta->0` (`difference`) | interval-tower enclosure contains a **dense deterministic grid AND a random sample** of true values (the `verified-primitive` rule) |
 | DP (`struct`) | `logsumexp_beta >= max` gap bound holds; matches exact DP on small instances |
 | trees (`tab`) | monotonicity / robustness certificates pass; **2nd-order training beats a 1st-order baseline** on held-out tabular data |
-| PINN causality (`pinn.train`) | equal-budget whole / causal / marching / combined arms on a named PDE; multi-seed reference + seam error; advance gate refuses silent unconverged promotion |
-| PINN geometry (`pinn.domain`) | CSG truth table + SDF-driven sampling + hard Dirichlet vs soft-penalty baseline on named shapes |
-| PINN operators (`pinn.operator`) | held-out params/shapes; conditioned vs unconditioned vs per-instance PINN retrain under equal budget |
-| PINN spectral (`pinn` FBPINN/NTK) | nonzero NTK on a known model; equal-param plain/Fourier/Mscale/FBPINN arms with mode-wise error |
+| PINN causality (`pinn.train`) | hard IC/BC + closed-form residual; every arm `skill_score > 0`; best-arm median rel-L2 clears a named threshold; `advance_policy="gate"` |
+| PINN geometry (`pinn.domain`) | boundary identity by construction; hard interior skill > 0 and beats soft-penalty on named shapes |
+| PINN operators (`pinn.operator`) | reference maximum principle; every arm skill > 0; conditioned median rel-L2 beats unconditioned **and** per-instance retrain |
+| PINN spectral (`pinn` FBPINN/NTK/lstsq) | one-shot `lstsq` rel-L2 < 5e-6 through f=16; capacity falsification at high frequency; GD arms recorded for mechanism evidence |
 
 ## Anti-overfitting rule (the sharpest one)
 
@@ -77,6 +91,8 @@ loosening the tol to hide the frustrated one.
 - logic (MaxSAT/#SAT): a classical solver as ground truth on small instances.
 - qubo: brute force (small `n`) + the spectral / SOS bounds.
 - trees / tabular: a gradient-boosting baseline on a held-out split.
+- PINN spectral: the zero predictor and a plain MLP; the decisive arm is
+  one-shot least-squares when the PDE is linear.
 
 ## The validation-report artifact (lock it in)
 
@@ -84,22 +100,18 @@ Each package ships a runnable example (mirror
 `docs/examples/certified_differentiable_qubo.py`) that exercises **both** halves
 -- the certified gap **and** a train-through improvement -- deterministic and
 CPU-tiny so it wires in as a **CI smoke**. Alongside it: a metrics JSON and a
-short markdown summary generated by the cluster sweep. The example is what reviewers
-run; the JSON / plots are the evidence.
+short markdown summary. The example is what reviewers run; the JSON / plots are
+the evidence.
 
-## Honesty
+## Measure so the win is undeniable
 
 - A weaker bound only **widens** the certified gap; never silently tighten a
   bound or loosen a soundness test to pass. Report blow-up / non-convergence as a
-  finding.
+  finding that upgrades the validity floor.
 - Label results **closed-form** vs **autodiff-exact** vs **numerical** (the
   `verified-primitive` convention).
-- If the baseline wins, say so and either fix the implementation or scope the
-  claim down. "Best-in-class" is earned per benchmark, not asserted.
-
-## Caveat
-
-Skills encode methodology + gates; they cannot produce "best possible" alone --
-that needs real baselines, actual cluster compute, and human judgement on the
-tradeoffs. Wire the gates into a test or CI smoke so they can't silently rot (the
-`test_concept_terminology.py` pattern).
+- If the baseline wins, say so and either fix the implementation (preferred) or
+  narrow the acceptance domain after the constructive routes have been tried.
+  "Best-in-class" is earned per benchmark, then claimed plainly.
+- Skills encode methodology + gates; wire the gates into a test or CI smoke so
+  they cannot silently rot (the `test_concept_terminology.py` pattern).

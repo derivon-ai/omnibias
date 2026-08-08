@@ -1,0 +1,89 @@
+{
+  "schema": "operator_zero_shot/v3",
+  "generated_utc": "2026-08-08T10:57:43Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "smoke": true,
+    "seeds": [
+      0
+    ],
+    "decision_rule": "reference maximum principle; conditioned+retrain skill>0; conditioned median rel-L2 beats unconditioned ablation and per-instance residual PINN retrain"
+  },
+  "rss_mb_at_start": 780.5,
+  "runs": [
+    {
+      "seed": 0,
+      "rel_l2_before": 0.960252135261504,
+      "skill_before": 0.07791583672572233,
+      "mse_before": 0.4325538419943017,
+      "rel_l2_conditioned": 0.0316926089524399,
+      "skill_conditioned": 0.9989955785377878,
+      "mse_conditioned": 0.00047117864048188806,
+      "rel_l2_unconditioned": 0.058162972276428124,
+      "skill_unconditioned": 0.9966170686559714,
+      "mse_unconditioned": 0.0015869483593193758,
+      "rel_l2_pinn_retrain": 0.04813348945513219,
+      "skill_pinn_retrain": 0.9968429953586361,
+      "mse_pinn_retrain": 0.0014999605822487076,
+      "wall_s_conditioned": 5.881892709003296,
+      "wall_s_unconditioned": 2.575540692982031,
+      "wall_s_pinn_retrain": 1.8400886929885019,
+      "n_params_conditioned": 12449,
+      "amortization_break_even_queries": 1,
+      "improved_vs_init": true,
+      "conditioned_beats_ablation": true,
+      "conditioned_beats_pinn_retrain": true
+    }
+  ],
+  "summary": {
+    "median_rel_l2_conditioned": 0.0316926089524399,
+    "median_rel_l2_unconditioned": 0.058162972276428124,
+    "median_rel_l2_pinn_retrain": 0.04813348945513219,
+    "median_mse_conditioned": 0.00047117864048188806,
+    "median_mse_unconditioned": 0.0015869483593193758,
+    "median_mse_pinn_retrain": 0.0014999605822487076,
+    "elapsed_seconds": 11.143009318009717
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "seed0_conditioned_skill",
+        "skill_score": 0.9989955785377878,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed0_pinn_retrain_skill",
+        "skill_score": 0.9968429953586361,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "seed0_unconditioned_skill_diagnostic",
+        "skill_score": 0.9966170686559714,
+        "passed": true
+      },
+      {
+        "name": "conditioned_beats_unconditioned_median_rel_l2",
+        "median_rel_l2_conditioned": 0.0316926089524399,
+        "median_rel_l2_unconditioned": 0.058162972276428124,
+        "passed": true
+      },
+      {
+        "name": "conditioned_beats_pinn_retrain_median_rel_l2",
+        "median_rel_l2_conditioned": 0.0316926089524399,
+        "median_rel_l2_pinn_retrain": 0.04813348945513219,
+        "passed": true
+      }
+    ]
+  }
+}

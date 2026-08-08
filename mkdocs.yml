@@ -214,6 +214,10 @@ nav:
       - Spectral shape analysis: cookbook/spectral-shape-analysis.md
       - Equivariant operator features: cookbook/equivariant-operator-features.md
       - PINN heat equation: cookbook/pinn-heat.md
+      - PINN causal marching: cookbook/pinn-causal-marching.md
+      - PINN SDF geometry: cookbook/pinn-sdf-geometry.md
+      - Operator zero-shot: cookbook/operator-zero-shot.md
+      - One-shot least-squares (spectral): cookbook/spectral-one-shot-lstsq.md
       - PINN advection-diffusion: cookbook/pinn-advection-diffusion.md
       - Proof-carrying PDE certificates: cookbook/proof-carrying-pde.md
       - Proof-carrying fluid dynamics: cookbook/proof-carrying-fluid-dynamics.md

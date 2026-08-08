@@ -125,7 +125,13 @@ class _HeadEncoder(nn.Module):
         self.n_input = int(n_input)
         self.encoder_dim = int(encoder_dim)
         self.spec = base if isinstance(base, ActivationSpec) else get_activation(base)
-        self.norm = nn.LayerNorm(n_input, dtype=dtype)
+        # LayerNorm over a width-1 feature maps every scalar to zero
+        # (mean = itself, variance = 0). Skip it for single-parameter heads.
+        self.norm: nn.Module
+        if n_input == 1:
+            self.norm = nn.Identity()
+        else:
+            self.norm = nn.LayerNorm(n_input, dtype=dtype)
         linears: list[nn.Linear] = []
         prev = n_input
         for i in range(depth):

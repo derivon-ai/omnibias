@@ -61,16 +61,25 @@ def make_heat_slab(
     sensors = u0[:, idx]
     times = jnp.linspace(0.0, t_final, n_times)
     times_seq = [float(t) for t in times]
+    # ETDRK4 advances linear heat by exp(dt L) exactly; RK4 is conditionally
+    # stable and blows up for larger diffusivities on typical grids.
     semi = heat_semidiscrete(grid, diffusivity)
     snaps_list = []
     for i in range(n_samples):
-        snaps, _ = method_of_lines(semi, u0[i], times_seq, integrator="rk4")
+        snaps, _ = method_of_lines(semi, u0[i], times_seq, integrator="etdrk4")
         snaps_list.append(snaps)
     snaps_b = jnp.stack(snaps_list, axis=0)
     if not bool(jnp.isfinite(snaps_b).all()):
         raise RuntimeError(
             "heat MOL reference produced non-finite values; reduce amplitude "
             "or n_modes, or increase n_grid"
+        )
+    u0_max = float(jnp.max(jnp.abs(u0)))
+    snaps_max = float(jnp.max(jnp.abs(snaps_b)))
+    if snaps_max > u0_max * (1.0 + 1e-6) + 1e-12:
+        raise RuntimeError(
+            "heat MOL reference: maximum principle violated "
+            f"(max|u|={snaps_max:.3e} > max|u0|={u0_max:.3e})"
         )
     coords = _space_time_coords(grid, times)
     values = snaps_b.reshape(n_samples, -1, 1)

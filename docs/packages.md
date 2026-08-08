@@ -18,7 +18,7 @@ Published first and held to the [API-stability contract](stability.md).
 | omnibias-jax | 0.4.0 | Beta | JAX backend: closed-form n-th derivative kernels, neural-field Laplacian / Hessian, Born-Oppenheimer derivative tools for VMC. |
 | omnibias-ferminet | 0.2.0 | Beta | FermiNet bridge: folx-compatible Laplacian, restricted Tier-2 ansatz, analytic nuclear Hessian / Born-Oppenheimer primitives. |
 | omnibias-fields | 0.1.0 | Beta | Backend-agnostic field substrate (`FieldState`, attribute-DSL views, sigma^(n) cache) and the closed-form differential-operator surface (grad / div / curl / laplacian / hessian / jacobian, integration, Sobolev norms). |
-| omnibias-pinn | 0.1.0 | Beta | Physics-informed neural networks: cross-backend typed fields, hard-conservation cages, prebuilt PDE residuals, diagnostics. |
+| omnibias-pinn | 0.1.0 | Beta | Physics-informed neural networks: typed fields, hard-conservation cages, PDE residuals, diagnostics; alpha `train` / `domain` / `operator` / `solver` (four-gap gated). |
 | omnibias-geometry | 0.2.0 | Beta | Differential geometry: metric, Christoffel, covariant derivative, Laplace-Beltrami, Riemann / Ricci / scalar curvature, geodesics, exterior calculus, learned-chart pullback metric. |
 | omnibias-keras | 0.0.1a1 | Alpha | Keras 3 unified backend: OMBU, operator blocks, and drop-in `cmbDense` / `cmbConv` layers on TensorFlow / JAX / PyTorch. |
 
@@ -89,7 +89,7 @@ API-stability contract -- the public surface may shift between alpha releases.
 
 | Package | Version | Status | Scope |
 |---|---|---|---|
-| omnibias-skills | 0.1.0a1 | Alpha | Agent-skill library for building on omnibias: bundled Cursor / Claude Code Agent Skills and an idempotent installer CLI. |
+| omnibias-skills | 0.1.0a1 | Alpha | Agent-skill library for building on omnibias: bundled Cursor / Claude Code Agent Skills (backends, fields/PINN, frontier, geometry, curvature, verify, symbolic) and an idempotent installer CLI. |
 
 ## Folded modules (not separate distributions)
 

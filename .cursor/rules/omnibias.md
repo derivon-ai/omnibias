@@ -41,20 +41,46 @@ enclosures, the formal loop).
 - `omnibias-fields` is the foundational substrate; `omnibias-pinn` re-exports it through transparent shims -- do not duplicate it. Backend field ops dispatch on the `_omnibias_dispatch` marker (`omnibias.fields._core.DISPATCH_ATTR`), never on concrete downstream classes.
 - Label results honestly: **closed-form** (the sigma tower) vs **autodiff-exact** (autodiff of an analytic expression) vs **numerical** (grid / quadrature). `omnibias-fractional` is non-local / grid-based -- NOT closed form; `omnibias-score` is a pure composition of field ops.
 
-## Ambition plus claim discipline
+## Discovery doctrine
 
-- **Do not reject without a structural argument.** An absent implementation or a
-  failed first experiment is not a mathematical impossibility -- explore the
-  strongest constructive route (exact cages, closed-form towers, certificates)
-  before narrowing scope.
-- **Do not declare solved without evidence.** Capability claims need an
-  acceptance gate: multi-seed empirical result, by-construction identity, or a
-  sound certificate. Smoke wiring alone is not enough.
+- **Default to achievable.** An absent implementation or a failed first
+  experiment is not a mathematical impossibility -- explore the strongest
+  constructive route (exact cages, closed-form towers, one-shot collocation,
+  certificates) before narrowing scope.
+- **You are authorized to claim a capability plainly the moment its gate
+  passes.** Capability claims need an absolute acceptance gate: multi-seed
+  empirical result with skill > 0, by-construction identity, or a sound
+  certificate. Relative comparisons between two failing arms are not enough;
+  smoke wiring alone is not enough.
+- **Validity floor protects discoveries.** Ask in order: is the reference
+  physically valid? Does every arm beat the zero predictor? Does absolute
+  error clear a named threshold? Worked case: the parametric heat benchmark
+  marched with RK4, produced `max|u| ~ 1e9` that still passed `isfinite`, and
+  reported MSE ~1e17 as if it were a result -- ETDRK4 plus a maximum-principle
+  guard is what made the experiment real (`benchmarks/_gates.py`).
 - Alpha **submodules** inside an existing package are encouraged for ambitious
   research; premature top-level distributions are not (see `omnibias-dev-new-package`).
 - Public benchmark artifacts under `docs/benchmarks/` are part of the claim
   surface -- keep them regenerable and vendor-neutral (`$OMNIBIAS_SCRATCH` for
-  heavy full-run outputs).
+  heavy full-run outputs), and emit a `gates` block that self-declares pass/fail.
+
+## Frontier program
+
+- Famous open problems enter the repo only as **decomposed sub-obligations**
+  (finite rational checks, compact enclosures, multi-seed absolute gates, or
+  by-construction identities). What does not reduce stays an **external
+  obligation** in the sealed payload -- never inferred from a local result.
+- Escalate claims through the ladder: unverified prototype → empirical
+  (skill > 0, multi-seed) → sound enclosure → `theorem_prover_verified` →
+  `mathlib_verified`. The two Lean tiers are earned by genuine `lake build`
+  passes and are never conflated or forged.
+- Forbidden claims (canonical sources in AGENTS.md / verified docs): RH
+  proved or inferred; Navier-Stokes global regularity; Yang-Mills mass gap
+  solved; P=NP; Lean discharging continuum obligations.
+- Worked metric failure: a linspace-ordered `ic_values` seam compared against
+  random `slice_points` produced a ~0.19 artifact that looked like physics.
+  Absolute, self-consistent metrics (and maximum-principle reference checks)
+  are what protect discoveries -- see `omnibias-dev-frontier-research`.
 
 ## Leakage (public repo)
 

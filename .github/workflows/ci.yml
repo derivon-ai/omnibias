@@ -353,6 +353,13 @@ jobs:
           python docs/examples/pinn_causal_marching.py
           python docs/examples/pinn_sdf_geometry.py
           python docs/examples/pinn_fbpinn.py
+      - name: Run PINN four-gap benchmark smokes
+        run: |
+          source .venv-pinn/bin/activate
+          python benchmarks/causal_marching.py
+          python benchmarks/geometry_sdf.py
+          python benchmarks/operator_zero_shot.py
+          python benchmarks/spectral_bias_fbpinn.py
 
   qpinn:
 
