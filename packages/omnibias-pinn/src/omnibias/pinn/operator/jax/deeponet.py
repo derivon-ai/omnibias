@@ -46,10 +46,15 @@ class _BranchNet:
     trunk_width: int
     per_sample_bias: bool = True
 
+    @property
+    def n_input(self) -> int:
+        """Total branch-input dimension (alias of ``n_sensors``)."""
+        return int(self.n_sensors)
+
     def __call__(self, sensors: Array) -> tuple[Array, Array | None]:
         if sensors.shape[-1] != self.n_sensors:
             raise ValueError(
-                f"sensors trailing dim must be n_sensors={self.n_sensors}, "
+                f"branch input trailing dim must be n_input={self.n_sensors}, "
                 f"got {tuple(sensors.shape)}"
             )
         h = sensors
@@ -249,7 +254,16 @@ class DeepONetOperator:
     def components(self) -> ComponentSpec:
         return self.spec.components
 
-    def condition(self, sensors: Array) -> DeepONetField:
+    def _assemble_branch_input(
+        self,
+        sensors: Array,
+        *,
+        parameters: Array | None = None,
+        boundary: Array | None = None,
+        geometry: Array | None = None,
+    ) -> Array:
+        cond = self.spec.conditioning
+        assert cond is not None
         sensors = jnp.asarray(sensors)
         if sensors.ndim == 1:
             sensors = sensors[None, :]
@@ -257,7 +271,67 @@ class DeepONetOperator:
             raise ValueError(
                 f"sensors must be 1-D or 2-D; got shape {tuple(sensors.shape)}"
             )
-        coeffs, bias = self.branch(sensors)
+        if sensors.shape[-1] != cond.n_function_sensors:
+            raise ValueError(
+                f"sensors trailing dim must be n_function_sensors="
+                f"{cond.n_function_sensors}, got {tuple(sensors.shape)}"
+            )
+        F = int(sensors.shape[0])
+        parts: list[Array] = [sensors]
+
+        def _check(name: str, t: Array | None, width: int) -> Array | None:
+            if width == 0:
+                if t is not None:
+                    raise ValueError(
+                        f"{name} provided but conditioning.{name} width is 0"
+                    )
+                return None
+            if t is None:
+                raise ValueError(
+                    f"{name} required: conditioning width is {width}"
+                )
+            t = jnp.asarray(t)
+            if t.ndim == 1:
+                t = t[None, :]
+            if t.ndim != 2 or t.shape[-1] != width:
+                raise ValueError(
+                    f"{name} must have shape (F, {width}) or ({width},); "
+                    f"got {tuple(t.shape)}"
+                )
+            if t.shape[0] == 1 and F > 1:
+                t = jnp.broadcast_to(t, (F, width))
+            elif int(t.shape[0]) != F:
+                raise ValueError(
+                    f"{name} batch {t.shape[0]} != sensors batch {F}"
+                )
+            return t
+
+        p = _check("parameters", parameters, cond.n_parameters)
+        if p is not None:
+            parts.append(p)
+        b = _check("boundary", boundary, cond.n_boundary_sensors)
+        if b is not None:
+            parts.append(b)
+        g = _check("geometry", geometry, cond.n_geometry_probes)
+        if g is not None:
+            parts.append(g)
+        return jnp.concatenate(parts, axis=-1)
+
+    def condition(
+        self,
+        sensors: Array,
+        *,
+        parameters: Array | None = None,
+        boundary: Array | None = None,
+        geometry: Array | None = None,
+    ) -> DeepONetField:
+        branch_in = self._assemble_branch_input(
+            sensors,
+            parameters=parameters,
+            boundary=boundary,
+            geometry=geometry,
+        )
+        coeffs, bias = self.branch(branch_in)
         if bias is None:
             if self.shared_bias is None:
                 raise RuntimeError("shared_bias missing for per_sample_bias=False")
@@ -269,7 +343,7 @@ class DeepONetOperator:
             coeffs=coeffs,
             bias=bias,
             jet_order=self.jet_order,
-            n_functions=int(sensors.shape[0]),
+            n_functions=int(branch_in.shape[0]),
         )
 
 
@@ -387,6 +461,7 @@ def make_deeponet(
     per_sample_bias: bool = True,
     seed: int = 0,
     dtype: Any = jnp.float64,
+    conditioning: Any = None,
 ) -> DeepONetOperator:
     """Build a randomly-initialised :class:`DeepONetOperator` (JAX)."""
     spec = OperatorSpec(
@@ -394,6 +469,7 @@ def make_deeponet(
         components=components,
         n_sensors=n_sensors,
         trunk_width=trunk_width,
+        conditioning=conditioning,
     )
     trunk = make_jet_mlp(
         in_dim=spec.ndim,
@@ -406,7 +482,7 @@ def make_deeponet(
     )
     trunk._check_fastpath(jet_order)
     branch = _make_branch(
-        n_sensors=n_sensors,
+        n_sensors=spec.branch_input_dim,
         n_components=spec.n_components,
         trunk_width=trunk_width,
         hidden=branch_hidden,

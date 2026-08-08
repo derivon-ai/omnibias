@@ -93,13 +93,15 @@ API-stability contract -- the public surface may shift between alpha releases.
 
 ## Folded modules (not separate distributions)
 
-Four names are frequently mistaken for standalone packages. They ship *inside*
+Six names are frequently mistaken for standalone packages. They ship *inside*
 their parent distribution and are guarded by
 `packages/omnibias-core/tests/test_package_registry.py`:
 
 
 - `omnibias.score.flow` -- continuous normalizing flows (in `omnibias-score`).
 - `omnibias.pinn.solver` -- the PDE solver (in `omnibias-pinn`).
-- `omnibias.pinn.operator` -- neural operator learning: DeepONet closed-form trunk jet through order 4 (KS residual unchanged) + FNO baseline (in `omnibias-pinn`).
+- `omnibias.pinn.operator` -- neural operator learning: DeepONet closed-form trunk jet through order 4 (KS residual unchanged) + FNO baseline + multi-head conditioning (in `omnibias-pinn`).
+- `omnibias.pinn.train` -- causal marching drivers + causality / trivial-solution diagnostics + spectral band scheduler (in `omnibias-pinn`).
+- `omnibias.pinn.domain` -- SDF / R-function geometry + distance-constrained hard BCs (in `omnibias-pinn`).
 - `omnibias.geometry.gauge` -- the non-abelian gauge engine (in `omnibias-geometry`).
 

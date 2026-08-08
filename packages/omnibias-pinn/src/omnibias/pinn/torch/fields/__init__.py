@@ -17,6 +17,11 @@ from omnibias.pinn.torch.fields.attention import (
 )
 from omnibias.pinn.torch.fields.base import FieldBase
 from omnibias.pinn.torch.fields.chebyshev import ChebyshevVectorField
+from omnibias.pinn.torch.fields.fbpinn import (
+    FBPINNField,
+    build_fbpinn_field,
+    window_centers_1d,
+)
 from omnibias.pinn.torch.fields.jet_mlp import (
     FourierFeatureVectorField,
     JetMLPVectorField,
@@ -37,6 +42,7 @@ __all__ = [
     "AdaptiveJetMLPVectorField",
     "AttentionVectorField",
     "ChebyshevVectorField",
+    "FBPINNField",
     "FieldBase",
     "FourierFeatureVectorField",
     "JetMLPVectorField",
@@ -45,8 +51,10 @@ __all__ = [
     "SpectralVectorField",
     "build_adaptive_jet_mlp_vector_field",
     "build_attention_vector_field",
+    "build_fbpinn_field",
     "build_fourier_feature_vector_field",
     "build_jet_mlp_vector_field",
     "build_mscale_vector_field",
     "make_siren_vector_field",
+    "window_centers_1d",
 ]

@@ -6,6 +6,34 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — `omnibias-pinn`: PINN limitation mitigations (`train` / `domain` / operator conditioning / FBPINN)
+
+Four alpha submodules and extensions that mitigate (not eliminate) standard PINN
+failure modes, all folded into Beta `omnibias-pinn`:
+
+1. **`omnibias.pinn.train`** — closes the `TimeMarcher` loop with `march_solve`
+   (torch + jax), plus `causality_index` / `unlocked_fraction` /
+   `trivial_solution_guard` diagnostics and a `SpectralBandScheduler` that grows
+   Fourier / Mscale bands from residual spectra. Operator slab training gets
+   `causal_operator_loss`.
+2. **`omnibias.pinn.domain`** — SDF primitives + R-function CSG, normalized ADF,
+   SDF-aware sampling, and `DistanceConstrainedField` (`u = g + φ·NN`) for
+   curved-boundary hard BCs. `solver.Domain` accepts optional `sdf=`.
+3. **Operator conditioning** — `ConditioningSpec` multi-head branch over
+   (function, parameters, BC, geometry probes), SDF geometry encoder, parametric
+   heat / Burgers slabs, `FNO2d`, and a measured zero-shot vs pre-train baseline
+   (`benchmarks/operator_zero_shot.py`).
+4. **Spectral bias** — `FBPINNField` (fixed overlapping windows, local
+   normalization, per-window frequency scales), `ntk_eigenspectrum` /
+   `spectral_bias_index`, torch + jax twins.
+
+Honesty: these are mitigations with explicit labels (`closed form` /
+`autodiff-exact` / `numerical`); none turns a PINN into an a-priori error method.
+API pages `docs/api/pinn-train.md` / `pinn-domain.md`, examples
+`pinn_causal_marching.py` / `pinn_sdf_geometry.py` / `pinn_fbpinn.py`,
+CPU smoke benchmarks `causal_marching` / `geometry_sdf` /
+`operator_zero_shot` / `spectral_bias_fbpinn`.
+
 ### Added — `omnibias-pinn`: neural operator learning (`omnibias.pinn.operator`)
 
 DeepONet / FNO operator learning as an alpha submodule of `omnibias-pinn`. A

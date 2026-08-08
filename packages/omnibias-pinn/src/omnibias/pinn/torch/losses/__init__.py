@@ -97,6 +97,8 @@ from omnibias.pinn.torch.losses.interface import (
 from omnibias.pinn.torch.losses.ntk import (
     estimate_ntk_trace,
     ntk_balanced_loss,
+    ntk_eigenspectrum,
+    spectral_bias_index,
 )
 from omnibias.pinn.torch.losses.sobolev import (
     mse_residual_loss,
@@ -141,12 +143,14 @@ __all__ = [
     "normal_derivative",
     "normal_flux",
     "ntk_balanced_loss",
+    "ntk_eigenspectrum",
     "ntk_trace_stats",
     "reverse_gradient",
     "self_adaptive_loss",
     "slice_points",
     "sobolev_residual_loss",
     "sobolev_weight",
+    "spectral_bias_index",
     "split_by_interface",
     "value_jump",
     "window_points",

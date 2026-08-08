@@ -323,10 +323,6 @@ jobs:
         run: |
           source .venv-pinn/bin/activate
           python docs/examples/pinn_multiscale_feedback.py
-      - name: Run the loss-balancing / causal-marching example (smoke)
-        run: |
-          source .venv-pinn/bin/activate
-          python docs/examples/pinn_causal_marching.py
       - name: Run the conservation-cage / attention-field example (smoke)
         run: |
           source .venv-pinn/bin/activate
@@ -351,6 +347,12 @@ jobs:
         run: |
           source .venv-pinn/bin/activate
           python docs/examples/pinn_operator_learning.py
+      - name: Run PINN limitation-mitigation example smokes
+        run: |
+          source .venv-pinn/bin/activate
+          python docs/examples/pinn_causal_marching.py
+          python docs/examples/pinn_sdf_geometry.py
+          python docs/examples/pinn_fbpinn.py
 
   qpinn:
 

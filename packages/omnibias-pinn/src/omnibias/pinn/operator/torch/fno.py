@@ -152,8 +152,143 @@ def build_fno1d(
     )
 
 
+class SpectralConv2d(nn.Module):
+    """Complex spectral convolution on the leading ``modes_x x modes_y`` Fourier modes.
+
+    Input / output shape ``(batch, channels, H, W)``.
+    """
+
+    def __init__(
+        self,
+        in_channels: int,
+        out_channels: int,
+        modes_x: int,
+        modes_y: int,
+        *,
+        dtype: torch.dtype = torch.float64,
+    ) -> None:
+        super().__init__()
+        if modes_x < 1 or modes_y < 1:
+            raise ValueError(f"modes must be >= 1, got {(modes_x, modes_y)}")
+        self.in_channels = int(in_channels)
+        self.out_channels = int(out_channels)
+        self.modes_x = int(modes_x)
+        self.modes_y = int(modes_y)
+        scale = 1.0 / (in_channels * out_channels)
+        shape = (in_channels, out_channels, modes_x, modes_y)
+        self.weight_real = nn.Parameter(scale * torch.randn(*shape, dtype=dtype))
+        self.weight_imag = nn.Parameter(scale * torch.randn(*shape, dtype=dtype))
+
+    def forward(self, x: Tensor) -> Tensor:
+        if x.ndim != 4:
+            raise ValueError(
+                f"SpectralConv2d expects (B, C, H, W); got {tuple(x.shape)}"
+            )
+        h, w = int(x.shape[-2]), int(x.shape[-1])
+        x_ft = torch.fft.rfft2(x, dim=(-2, -1))
+        out_ft = torch.zeros(
+            x.shape[0],
+            self.out_channels,
+            x_ft.shape[-2],
+            x_ft.shape[-1],
+            dtype=torch.complex128 if x.dtype == torch.float64 else torch.complex64,
+            device=x.device,
+        )
+        mx = min(self.modes_x, x_ft.shape[-2])
+        my = min(self.modes_y, x_ft.shape[-1])
+        wgt = torch.complex(
+            self.weight_real[..., :mx, :my], self.weight_imag[..., :mx, :my]
+        )
+        out_ft[:, :, :mx, :my] = torch.einsum(
+            "bixy,ioxy->boxy", x_ft[:, :, :mx, :my], wgt
+        )
+        return cast(Tensor, torch.fft.irfft2(out_ft, s=(h, w), dim=(-2, -1)))
+
+
+class FNO2d(nn.Module):
+    """2-D Fourier Neural Operator on a periodic grid.
+
+    Maps ``(B, H, W)`` or ``(B, H, W, C_in)`` to ``(B, H, W, C_out)``.
+    Derivatives remain FFT-based and periodic-grid-bound (same honesty as FNO1d).
+    """
+
+    def __init__(
+        self,
+        *,
+        modes_x: int = 8,
+        modes_y: int = 8,
+        width: int = 32,
+        n_layers: int = 4,
+        in_channels: int = 1,
+        out_channels: int = 1,
+        base: str | ActivationSpec[Tensor] = "gelu",
+        dtype: torch.dtype = torch.float64,
+    ) -> None:
+        super().__init__()
+        if n_layers < 1:
+            raise ValueError(f"n_layers must be >= 1, got {n_layers}")
+        self.modes_x = int(modes_x)
+        self.modes_y = int(modes_y)
+        self.width = int(width)
+        self.spec = base if isinstance(base, ActivationSpec) else get_activation(base)
+        self.lift = nn.Linear(in_channels, width, dtype=dtype)
+        self.proj = nn.Linear(width, out_channels, dtype=dtype)
+        self.spectral = nn.ModuleList(
+            [
+                SpectralConv2d(width, width, modes_x, modes_y, dtype=dtype)
+                for _ in range(n_layers)
+            ]
+        )
+        self.pointwise = nn.ModuleList(
+            [nn.Linear(width, width, dtype=dtype) for _ in range(n_layers)]
+        )
+
+    def forward(self, u0: Tensor) -> Tensor:
+        if u0.ndim == 3:
+            u0 = u0.unsqueeze(-1)
+        if u0.ndim != 4:
+            raise ValueError(
+                f"u0 must be (B, H, W) or (B, H, W, C); got {tuple(u0.shape)}"
+            )
+        h = self.lift(u0)  # (B, H, W, width)
+        h = h.permute(0, 3, 1, 2)  # (B, width, H, W)
+        for spec_conv, pw in zip(self.spectral, self.pointwise, strict=True):
+            h1 = spec_conv(h)
+            h2 = pw(h.permute(0, 2, 3, 1)).permute(0, 3, 1, 2)
+            h = self.spec.forward(h1 + h2)
+        out = self.proj(h.permute(0, 2, 3, 1))
+        return cast(Tensor, out)
+
+
+def build_fno2d(
+    *,
+    modes_x: int = 8,
+    modes_y: int = 8,
+    width: int = 32,
+    n_layers: int = 4,
+    in_channels: int = 1,
+    out_channels: int = 1,
+    base: str | ActivationSpec[Tensor] = "gelu",
+    dtype: torch.dtype = torch.float64,
+) -> FNO2d:
+    """Build a :class:`FNO2d`."""
+    return FNO2d(
+        modes_x=modes_x,
+        modes_y=modes_y,
+        width=width,
+        n_layers=n_layers,
+        in_channels=in_channels,
+        out_channels=out_channels,
+        base=base,
+        dtype=dtype,
+    )
+
+
 __all__ = [
     "FNO1d",
+    "FNO2d",
     "SpectralConv1d",
+    "SpectralConv2d",
     "build_fno1d",
+    "build_fno2d",
 ]

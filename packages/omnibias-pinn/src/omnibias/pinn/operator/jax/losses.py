@@ -106,6 +106,64 @@ def ks_residual_loss_fd(
     return jnp.mean(resid**2)
 
 
+def causal_operator_loss(
+    residual: Array,
+    coords: Array,
+    *,
+    epsilon: float = 1.0,
+    n_time_bins: int | None = None,
+    time_axis: int = 1,
+) -> Array:
+    """Wang-Perdikaris causal weighting for an operator residual on a slab."""
+    from omnibias.pinn.jax.losses.causal import causal_residual_loss
+
+    if coords.ndim != 2:
+        raise ValueError(f"coords must be 2-D (Q, D); got {tuple(coords.shape)}")
+    Q = int(coords.shape[0])
+    t = coords[:, int(time_axis)]
+    times_sorted = jnp.sort(jnp.unique(t))
+    n_unique = int(times_sorted.size)
+    if n_unique < 1:
+        raise ValueError("coords time column is empty")
+    bins = int(n_time_bins) if n_time_bins is not None else n_unique
+    if bins < 1:
+        raise ValueError(f"n_time_bins must be >= 1, got {bins}")
+
+    flat = residual.reshape(-1)
+    if flat.size % Q != 0:
+        raise ValueError(
+            f"residual numel {flat.size} is not a multiple of Q={Q}"
+        )
+    F = int(flat.size // Q)
+    t0 = float(times_sorted[0])
+    t1 = float(times_sorted[-1])
+    if t1 <= t0:
+        return jnp.mean(flat**2)
+    edges = jnp.linspace(t0, t1, bins + 1)
+    idx = jnp.clip(jnp.searchsorted(edges[1:-1], t, side="right"), 0, bins - 1)
+    resid_FQ = flat.reshape(F, Q)
+    # Equal-count product-grid path: reshape by sorting queries into bins.
+    # For a product grid every bin has the same count; pad otherwise.
+    counts = jnp.bincount(idx, length=bins)
+    max_c = int(jnp.max(counts))
+    if max_c == 0:
+        return jnp.mean(flat**2)
+    cube = jnp.zeros((bins, F, max_c), dtype=flat.dtype)
+
+    def _fill(b: int, cube_in: Array) -> Array:
+        sel = idx == b
+        n_b = int(jnp.sum(sel))
+        if n_b == 0:
+            return cube_in
+        vals = resid_FQ[:, sel]
+        return cube_in.at[b, :, :n_b].set(vals)
+
+    for b in range(bins):
+        cube = _fill(b, cube)
+    resid_t = cube.reshape(bins, F * max_c)
+    return cast(Array, causal_residual_loss(resid_t, epsilon=float(epsilon)))
+
+
 def heat_residual_loss_fd(
     operator: DeepONetOperator,
     sensors: Array,
@@ -134,6 +192,7 @@ def heat_residual_loss_fd(
 
 __all__ = [
     "burgers_residual_loss",
+    "causal_operator_loss",
     "data_loss",
     "heat_residual_loss",
     "heat_residual_loss_fd",

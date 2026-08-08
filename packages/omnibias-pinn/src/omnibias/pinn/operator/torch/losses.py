@@ -130,6 +130,94 @@ def ks_residual_loss_fd(
     return torch.mean(resid**2)
 
 
+def causal_operator_loss(
+    residual: Tensor,
+    coords: Tensor,
+    *,
+    epsilon: float = 1.0,
+    n_time_bins: int | None = None,
+    time_axis: int = 1,
+) -> Tensor:
+    """Wang-Perdikaris causal weighting for an operator residual on a slab.
+
+    The whole space-time slab is otherwise fit at once, which is the same
+    temporal-causality violation as a standard PINN. This helper bins the
+    residual by the time coordinate and applies
+    :func:`~omnibias.pinn.torch.losses.causal_residual_loss`.
+
+    Parameters
+    ----------
+    residual
+        Flat residual of shape ``(F*Q,)`` or ``(F*Q, ...)`` aligned with
+        ``coords`` of shape ``(Q, D)`` tiled across ``F`` samples (samples
+        slow, queries fast -- the :meth:`DeepONetField.on_grid` layout).
+    coords
+        Shared query grid ``(Q, D)``.
+    epsilon
+        Causal sharpness.
+    n_time_bins
+        Number of time bins. Defaults to the number of unique time values
+        in ``coords[:, time_axis]`` (so a product grid bins exactly).
+    time_axis
+        Column of ``coords`` holding time (default ``1`` for ``(x, t)``).
+    """
+    from omnibias.pinn.torch.losses.causal import causal_residual_loss
+
+    if coords.ndim != 2:
+        raise ValueError(f"coords must be 2-D (Q, D); got {tuple(coords.shape)}")
+    Q = int(coords.shape[0])
+    t = coords[:, int(time_axis)].contiguous()
+    # Unique sorted times define the natural bins on a product grid.
+    times_sorted, _ = torch.sort(torch.unique(t))
+    n_unique = int(times_sorted.numel())
+    if n_unique < 1:
+        raise ValueError("coords time column is empty")
+    bins = int(n_time_bins) if n_time_bins is not None else n_unique
+    if bins < 1:
+        raise ValueError(f"n_time_bins must be >= 1, got {bins}")
+
+    flat = residual.reshape(-1)
+    if flat.numel() % Q != 0:
+        raise ValueError(
+            f"residual numel {flat.numel()} is not a multiple of Q={Q}"
+        )
+    F = flat.numel() // Q
+    # Assign each query to a time bin by nearest unique time / equal-width.
+    t0 = float(times_sorted[0])
+    t1 = float(times_sorted[-1])
+    if t1 <= t0:
+        # Degenerate: single time -> no causality to enforce.
+        return torch.mean(flat**2)
+    # Bin index in [0, bins) for each of the Q query points.
+    edges = torch.linspace(t0, t1, bins + 1, dtype=t.dtype, device=t.device)
+    # right=False so the closing edge lands in the last bin.
+    idx = torch.bucketize(t, edges[1:-1].contiguous(), right=False)
+    idx = torch.clamp(idx, 0, bins - 1)
+
+    # Build (bins, F * per_bin_varies) by scattering; pad short bins with zeros
+    # and a mask so the mean is over real entries only.
+    resid_FQ = flat.reshape(F, Q)
+    # Gather per-bin: stack as (bins, F, max_count) with NaN pad, then nanmean.
+    counts = torch.bincount(idx, minlength=bins)
+    max_c = int(counts.max().item()) if bins > 0 else 0
+    if max_c == 0:
+        return torch.mean(flat**2)
+    cube = flat.new_zeros((bins, F, max_c))
+    # Fill each bin's columns.
+    for b in range(bins):
+        sel = idx == b
+        n_b = int(sel.sum().item())
+        if n_b == 0:
+            continue
+        cube[b, :, :n_b] = resid_FQ[:, sel]
+    # causal_residual_loss wants (n_t, ...spatial); use (bins, F*max_c) and
+    # zero-fill empty slots (they contribute 0 to the MSE of that bin -- a
+    # mild bias when bins are unbalanced, acceptable for the product-grid
+    # default where every bin has the same count).
+    resid_t = cube.reshape(bins, F * max_c)
+    return cast(Tensor, causal_residual_loss(resid_t, epsilon=float(epsilon)))
+
+
 def heat_residual_loss_fd(
     operator: DeepONetOperator,
     sensors: Tensor,
@@ -165,6 +253,7 @@ def heat_residual_loss_fd(
 
 __all__ = [
     "burgers_residual_loss",
+    "causal_operator_loss",
     "data_loss",
     "heat_residual_loss",
     "heat_residual_loss_fd",

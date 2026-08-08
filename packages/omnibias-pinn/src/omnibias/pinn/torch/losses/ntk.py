@@ -11,7 +11,9 @@ the geometric mean.
 We expose a cheap Hutchinson-style trace estimator
 (:func:`estimate_ntk_trace`) using a single backward pass and a
 combiner (:func:`ntk_balanced_loss`) so the user can mix the two as
-they see fit.
+they see fit. :func:`ntk_eigenspectrum` and :func:`spectral_bias_index`
+expose the eigenvalue *decay* that is the theory-of-record instrument
+for spectral bias.
 
 Reference
 ---------
@@ -22,6 +24,7 @@ tangent kernel perspective*, JCP 2022.
 from __future__ import annotations
 
 import math
+from collections.abc import Callable, Sequence
 
 import torch
 from torch import Tensor
@@ -102,7 +105,78 @@ def estimate_ntk_trace(
     return out
 
 
+def ntk_eigenspectrum(
+    residual_fn: Callable[[], Tensor],
+    parameters: Sequence[torch.nn.Parameter],
+    *,
+    n_eigen: int = 16,
+) -> Tensor:
+    """Leading empirical-NTK eigenvalues of a residual vector.
+
+    Forms the Jacobian ``J = dr / dtheta`` (flattened) and returns the
+    largest singular values of ``J`` squared -- i.e. the eigenvalues of
+    ``J J^T`` / ``J^T J`` -- sorted descending. Intended for small
+    residual batches / networks (CPU smoke, diagnostics); for large
+    problems prefer a Lanczos / Hutchinson estimator.
+
+    Honesty: this is a *measurement* of spectral bias, not a certificate.
+    """
+    params = [p for p in parameters if p.requires_grad]
+    if not params:
+        raise ValueError("parameters must contain at least one requires_grad tensor")
+
+    flat0 = torch.cat([p.detach().reshape(-1) for p in params])
+    shapes = [p.shape for p in params]
+    sizes = [p.numel() for p in params]
+
+    def _unflatten(flat: Tensor) -> list[Tensor]:
+        out: list[Tensor] = []
+        offset = 0
+        for shape, sz in zip(shapes, sizes, strict=True):
+            out.append(flat[offset : offset + sz].reshape(shape))
+            offset += sz
+        return out
+
+    def f_flat(flat: Tensor) -> Tensor:
+        chunks = _unflatten(flat)
+        tokens = [p.data for p in params]
+        try:
+            for p, c in zip(params, chunks, strict=True):
+                p.data = c
+            return residual_fn().reshape(-1)
+        finally:
+            for p, t in zip(params, tokens, strict=True):
+                p.data = t
+
+    # Jacobian: (n_out, n_params)
+    J = torch.autograd.functional.jacobian(f_flat, flat0, create_graph=False)
+    # Singular values of J; eigenvalues of J J^T are s^2.
+    s = torch.linalg.svdvals(J)
+    evals = s * s
+    k = min(int(n_eigen), int(evals.numel()))
+    return torch.sort(evals, descending=True).values[:k]
+
+
+def spectral_bias_index(eigenvalues: Tensor, *, n_head: int = 4) -> float:
+    """Ratio of tail-mean to head-mean eigenvalue (smaller => stronger bias).
+
+    ``eigenvalues`` should be sorted descending. Returns
+    ``mean(tail) / mean(head)`` in ``[0, 1]`` for a typical decaying spectrum.
+    """
+    ev = eigenvalues.detach().reshape(-1)
+    if ev.numel() < 2:
+        return 1.0
+    n_head = max(1, min(int(n_head), ev.numel() // 2))
+    head = ev[:n_head].mean()
+    tail = ev[n_head:].mean()
+    if float(head) <= 0.0:
+        return 0.0
+    return float((tail / head).clamp(min=0.0, max=1.0))
+
+
 __all__ = [
     "estimate_ntk_trace",
     "ntk_balanced_loss",
+    "ntk_eigenspectrum",
+    "spectral_bias_index",
 ]

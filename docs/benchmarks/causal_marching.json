@@ -1,0 +1,28 @@
+{
+  "schema": "causal_marching/v1",
+  "generated_utc": "2026-08-08T06:42:01Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "n_windows": 2,
+    "steps_per_window": 20,
+    "n_time_bins": 4
+  },
+  "rss_mb_at_start": 768.75,
+  "n_windows": 2,
+  "final_loss": 0.02099283273416155,
+  "last_causality_index": 0.8333333333333334,
+  "unlocked_fraction": 0.9387769803053125,
+  "trivial": {
+    "is_trivial": false,
+    "ratio": 0.02583994291308597
+  },
+  "elapsed_seconds": 0.9316884339932585
+}

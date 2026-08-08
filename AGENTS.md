@@ -35,8 +35,10 @@ packages/
                         #   norms, tensor divergence, Wirtinger). (beta)
   omnibias-pinn/        # physics-informed NNs; builds on omnibias-fields,
                         #   re-exports the moved substrate via shims (beta).
-                        #   Hosts omnibias.pinn.solver: mesh-free coupled-PDE
-                        #   solver, alpha (folded from omnibias-pde).
+                        #   Hosts omnibias.pinn.solver (mesh-free PDE solver),
+                        #   omnibias.pinn.operator (DeepONet / FNO + conditioning),
+                        #   omnibias.pinn.train (causal marching), and
+                        #   omnibias.pinn.domain (SDF / hard curved BCs); all alpha.
   omnibias-qpinn/       # quantum PINNs (alpha)
   omnibias-curvature/   # closed-form Hessian / Fisher / KFAC (alpha)
   omnibias-geometry/    # differential geometry: metric, Christoffel, covariant

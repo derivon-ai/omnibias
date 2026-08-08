@@ -137,7 +137,13 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | Fractional derivative (general sampled `f`) | Grunwald-Letnikov / spectral | numerical | `omnibias.fractional...fractional` |
 | Neural operator `G(u)(y)` query derivatives (DeepONet) | trunk jet × branch coeffs | closed form | `omnibias.pinn.operator` |
 | Neural operator 4th-order residual (KS on DeepONet) | one order-4 trunk jet × live coeffs | closed form | `omnibias.pinn.operator` + shipped `KuramotoSivashinsky` |
-| Neural operator spectral-conv (FNO) | FFT multiply | numerical | `omnibias.pinn.operator` |
+| Neural operator spectral-conv (FNO 1-D / 2-D) | FFT multiply | numerical | `omnibias.pinn.operator` |
+| Operator multi-head conditioning (params / BC / geometry) | concatenated branch input | numerical | `omnibias.pinn.operator.ConditioningSpec` |
+| Causal time-marching PINN training | Wang–Perdikaris weights + window ladder | numerical | `omnibias.pinn.train` |
+| Causality / trivial-solution diagnostics | Kendall-tau / energy ratio | measurement | `omnibias.pinn.train` |
+| Curved-boundary hard Dirichlet (`u = g + φ·NN`) | SDF / ADF multiplicative cage | exact on `φ=0`; `φ` autodiff-exact | `omnibias.pinn.domain` |
+| FBPINN multi-window spectral-bias mitigation | fixed raised-cosine POU + local coords | numerical | `omnibias.pinn.torch.fields.FBPINNField` |
+| NTK eigenspectrum / spectral-bias index | Jacobian SVD | measurement | `omnibias.pinn.torch.losses.ntk` |
 
 ## Where NOT to look for a capability
 

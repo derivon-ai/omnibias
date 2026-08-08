@@ -31,6 +31,7 @@ operator like ``grad`` / ``laplacian``.
 from __future__ import annotations
 
 from omnibias.pinn.operator._core import (
+    ConditioningSpec,
     OperatorSpec,
     SensorGrid,
     branch_coefficient_box,
@@ -40,6 +41,7 @@ from omnibias.pinn.operator._core import (
 )
 
 __all__ = [
+    "ConditioningSpec",
     "OperatorSpec",
     "SensorGrid",
     "branch_coefficient_box",

@@ -179,6 +179,8 @@ nav:
       - omnibias-sos: api/sos.md
       - "omnibias.pinn.solver (PDE)": api/pinn-solver.md
       - "omnibias.pinn.operator (DeepONet / FNO)": api/pinn-operator.md
+      - "omnibias.pinn.train (causal marching)": api/pinn-train.md
+      - "omnibias.pinn.domain (SDF geometry)": api/pinn-domain.md
       - omnibias-control: api/control.md
 
       - omnibias-routing: api/routing.md

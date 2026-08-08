@@ -11,6 +11,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+import numpy as np
 import torch
 from omnibias.pinn.operator._core.sensors import SensorGrid, sample_fourier_ics
 from omnibias.pinn.solver.torch.evolution import (
@@ -192,9 +193,151 @@ def make_ks_slab(
     return OperatorSlab(sensors=sensors, coords=coords, values=values, grid=grid)
 
 
+@dataclass(frozen=True)
+class ParametricOperatorSlab:
+    """Operator slab with a per-sample PDE-parameter vector.
+
+    Attributes
+    ----------
+    sensors, coords, values, grid
+        As in :class:`OperatorSlab`.
+    parameters
+        Parameter vectors of shape ``(F, n_parameters)``.
+    """
+
+    sensors: Tensor
+    coords: Tensor
+    values: Tensor
+    grid: SpectralGrid1D
+    parameters: Tensor
+
+    def as_slab(self) -> OperatorSlab:
+        return OperatorSlab(
+            sensors=self.sensors,
+            coords=self.coords,
+            values=self.values,
+            grid=self.grid,
+        )
+
+
+def make_parametric_heat_slab(
+    *,
+    n_samples: int = 16,
+    n_grid: int = 64,
+    n_sensors: int = 32,
+    n_modes: int = 4,
+    amplitude: float = 1.0,
+    diffusivities: tuple[float, ...] | None = None,
+    diffusivity_range: tuple[float, float] = (0.05, 0.2),
+    t_final: float = 0.5,
+    n_times: int = 11,
+    seed: int = 0,
+    dtype: torch.dtype = torch.float64,
+) -> ParametricOperatorSlab:
+    """Heat slabs with a swept diffusivity parameter per sample."""
+    rng = np.random.default_rng(seed)
+    if diffusivities is None:
+        lo, hi = diffusivity_range
+        diffs = rng.uniform(lo, hi, size=n_samples)
+    else:
+        diffs = np.asarray(diffusivities, dtype=float)
+        if diffs.shape[0] != n_samples:
+            raise ValueError(
+                f"diffusivities length {diffs.shape[0]} != n_samples={n_samples}"
+            )
+    length = 2.0 * torch.pi
+    grid = SpectralGrid1D(n_grid, float(length), dtype=dtype)
+    fine = SensorGrid(points=grid.points().detach().cpu().numpy(), length=float(length))
+    u0_np = sample_fourier_ics(
+        n_samples, fine, n_modes=n_modes, amplitude=amplitude, seed=seed
+    )
+    u0 = torch.tensor(u0_np, dtype=dtype)
+    idx = torch.linspace(0, n_grid, steps=n_sensors + 1, dtype=torch.long)[:-1]
+    sensors = u0[:, idx]
+    times = torch.linspace(0.0, t_final, n_times, dtype=dtype)
+    times_seq = [float(t) for t in times]
+    snaps_list = []
+    for i in range(n_samples):
+        semi = heat_semidiscrete(grid, float(diffs[i]))
+        snaps, _ = method_of_lines(semi, u0[i], times_seq, integrator="rk4")
+        snaps_list.append(snaps)
+    snaps_b = torch.stack(snaps_list, dim=0)
+    if not torch.isfinite(snaps_b).all():
+        raise RuntimeError("parametric heat MOL produced non-finite values")
+    coords = _space_time_coords(grid, times)
+    values = snaps_b.reshape(n_samples, -1, 1)
+    parameters = torch.tensor(diffs.reshape(n_samples, 1), dtype=dtype)
+    return ParametricOperatorSlab(
+        sensors=sensors,
+        coords=coords,
+        values=values,
+        grid=grid,
+        parameters=parameters,
+    )
+
+
+def make_parametric_burgers_slab(
+    *,
+    n_samples: int = 8,
+    n_grid: int = 64,
+    n_sensors: int = 32,
+    n_modes: int = 2,
+    amplitude: float = 0.5,
+    viscosities: tuple[float, ...] | None = None,
+    viscosity_range: tuple[float, float] = (0.03, 0.1),
+    t_final: float = 0.5,
+    n_times: int = 11,
+    seed: int = 0,
+    dtype: torch.dtype = torch.float64,
+) -> ParametricOperatorSlab:
+    """Burgers slabs with a swept viscosity parameter per sample."""
+    rng = np.random.default_rng(seed)
+    if viscosities is None:
+        lo, hi = viscosity_range
+        nus = rng.uniform(lo, hi, size=n_samples)
+    else:
+        nus = np.asarray(viscosities, dtype=float)
+        if nus.shape[0] != n_samples:
+            raise ValueError(
+                f"viscosities length {nus.shape[0]} != n_samples={n_samples}"
+            )
+    length = 2.0 * torch.pi
+    grid = SpectralGrid1D(n_grid, float(length), dtype=dtype)
+    fine = SensorGrid(points=grid.points().detach().cpu().numpy(), length=float(length))
+    u0_np = sample_fourier_ics(
+        n_samples, fine, n_modes=n_modes, amplitude=amplitude, seed=seed
+    )
+    u0 = torch.tensor(u0_np, dtype=dtype)
+    idx = torch.linspace(0, n_grid, steps=n_sensors + 1, dtype=torch.long)[:-1]
+    sensors = u0[:, idx]
+    times = torch.linspace(0.0, t_final, n_times, dtype=dtype)
+    times_seq = [float(t) for t in times]
+    snaps_list = []
+    for i in range(n_samples):
+        semi = burgers_semidiscrete(grid, float(nus[i]))
+        snaps, _ = method_of_lines(semi, u0[i], times_seq, integrator="etdrk4")
+        snaps_list.append(snaps)
+    snaps_b = torch.stack(snaps_list, dim=0)
+    if not torch.isfinite(snaps_b).all():
+        raise RuntimeError("parametric Burgers MOL produced non-finite values")
+    coords = _space_time_coords(grid, times)
+    values = snaps_b.reshape(n_samples, -1, 1)
+    parameters = torch.tensor(nus.reshape(n_samples, 1), dtype=dtype)
+    return ParametricOperatorSlab(
+        sensors=sensors,
+        coords=coords,
+        values=values,
+        grid=grid,
+        parameters=parameters,
+    )
+
+
 __all__ = [
     "OperatorSlab",
+    "ParametricOperatorSlab",
     "make_burgers_slab",
     "make_heat_slab",
     "make_ks_slab",
+    "make_parametric_burgers_slab",
+    "make_parametric_heat_slab",
 ]

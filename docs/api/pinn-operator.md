@@ -42,6 +42,7 @@ The submodule never asserts a continuum / global-regularity claim.
       show_root_heading: false
       heading_level: 3
       members:
+        - ConditioningSpec
         - OperatorSpec
         - SensorGrid
         - sample_fourier_ics
@@ -60,13 +61,22 @@ The submodule never asserts a continuum / global-regularity claim.
         - DeepONetField
         - build_deeponet
         - FNO1d
+        - FNO2d
         - SpectralConv1d
+        - SpectralConv2d
         - build_fno1d
+        - build_fno2d
         - OperatorSlab
+        - ParametricOperatorSlab
         - make_heat_slab
         - make_burgers_slab
         - make_ks_slab
+        - make_parametric_heat_slab
+        - make_parametric_burgers_slab
+        - encode_geometry
+        - probe_grid
         - data_loss
+        - causal_operator_loss
         - heat_residual_loss
         - heat_residual_loss_fd
         - burgers_residual_loss

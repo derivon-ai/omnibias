@@ -28,6 +28,11 @@ from omnibias.pinn.jax.fields.chebyshev import (
     ChebyshevVectorField,
     make_chebyshev_vector_field,
 )
+from omnibias.pinn.jax.fields.fbpinn import (
+    FBPINNField,
+    make_fbpinn_field,
+    window_centers_1d,
+)
 from omnibias.pinn.jax.fields.jet_mlp import (
     FourierFeatureVectorField,
     JetMLPVectorField,
@@ -54,6 +59,7 @@ __all__ = [
     "AdaptiveJetMLPVectorField",
     "AttentionVectorField",
     "ChebyshevVectorField",
+    "FBPINNField",
     "FieldBase",
     "FourierFeatureVectorField",
     "JetMLPVectorField",
@@ -63,10 +69,12 @@ __all__ = [
     "make_adaptive_jet_mlp_vector_field",
     "make_attention_vector_field",
     "make_chebyshev_vector_field",
+    "make_fbpinn_field",
     "make_fourier_feature_vector_field",
     "make_jet_mlp_vector_field",
     "make_mscale_vector_field",
     "make_one_layer_vector_field",
     "make_siren_vector_field",
     "make_spectral_vector_field",
+    "window_centers_1d",
 ]

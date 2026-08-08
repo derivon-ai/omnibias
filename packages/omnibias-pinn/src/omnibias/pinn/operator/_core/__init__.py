@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+from omnibias.pinn.operator._core.conditioning import ConditioningSpec
 from omnibias.pinn.operator._core.sensors import SensorGrid, sample_fourier_ics
 from omnibias.pinn.operator._core.spec import OperatorSpec
 from omnibias.pinn.operator._core.verified import (
@@ -13,6 +14,7 @@ from omnibias.pinn.operator._core.verified import (
 )
 
 __all__ = [
+    "ConditioningSpec",
     "OperatorSpec",
     "SensorGrid",
     "branch_coefficient_box",

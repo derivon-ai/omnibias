@@ -21,6 +21,9 @@ and runs on CPU in seconds (the QPINN demo in well under a minute).
 | [`pinn_burgers_shock.py`](examples/pinn_burgers_shock.py) | PyTorch | shock capturing that conserves by construction: a flux-form cage wrapped *around* a partitioned potential holds `div G = 0` to machine epsilon across a sharp moving seam, and beats a non-conservative arm on global mass balance as the viscous layer goes under-resolved |
 | [`pinn_hard_conditions.py`](examples/pinn_hard_conditions.py) | PyTorch | Dirichlet / Neumann / Robin / initial conditions satisfied by algebra rather than by penalty, with a sealed certificate that the ansatz exists, a live falsifier for incompatible data, and a solver that finds the absorbable conditions itself |
 | [`pinn_operator_learning.py`](examples/pinn_operator_learning.py) | PyTorch | DeepONet operator learning: order-4 closed-form exactness, shipped KS residual on one trunk jet, FD accuracy-floor smoke, and a sound family residual certificate (not a solution-error bound) |
+| [`pinn_causal_marching.py`](examples/pinn_causal_marching.py) | PyTorch | Causal time-marching driver (`omnibias.pinn.train.march_solve`) with causality / trivial-solution diagnostics |
+| [`pinn_sdf_geometry.py`](examples/pinn_sdf_geometry.py) | PyTorch | Curved-boundary hard Dirichlet on a disk via `omnibias.pinn.domain.DistanceConstrainedField` |
+| [`pinn_fbpinn.py`](examples/pinn_fbpinn.py) | PyTorch | FBPINN multi-window field smoke + `ntk_eigenspectrum` / `spectral_bias_index` |
 | [`transforms_closed_form.py`](examples/transforms_closed_form.py) | PyTorch + JAX | closed-form Laplace / Fourier / Mellin transforms of activations: quadrature oracle, the honest gaps, and a trainable transform layer |
 
 | [`qpinn_tise_qho.py`](examples/qpinn_tise_qho.py) | PyTorch | quantum harmonic-oscillator ground state (TISE) |

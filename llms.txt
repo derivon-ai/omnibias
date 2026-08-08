@@ -48,7 +48,8 @@ tensor divergence, Wirtinger),
 `omnibias-pinn` and `omnibias-qpinn` (physics-informed / quantum PINNs, built on
 `omnibias-fields`; hosts `omnibias.pinn.operator` for neural operator learning
 (DeepONet with closed-form trunk-jet query derivatives through order 4, so a
-shipped KS residual runs unchanged on one jet; `ks_residual_loss_fd` is the
+shipped KS residual runs unchanged on one jet; multi-head `ConditioningSpec` for
+parameters / BC / geometry; FNO1d/FNO2d FFT baseline; `ks_residual_loss_fd` is the
 5-point FD twin for the bake-off; Burgers closed-form-vs-FD is an honest
 negative at 1st-order-in-time, KS is seed-fragile on median (5/8) against the
 ≥6/8 rule; FNO baseline stays FFT-based; residual
@@ -468,13 +469,15 @@ measured verdict.
 - [PINN inverse problems + adaptive collocation](docs/examples/pinn_solver_inverse.py)
 - [PINN spectral bias + Fourier-feature fields](docs/examples/pinn_fourier_features.py)
 - [PINN measured frequency bands (Mscale + adaptive slopes)](docs/examples/pinn_multiscale_feedback.py)
-- [PINN loss balancing + causal time marching](docs/examples/pinn_causal_marching.py)
 - [PINN conservation cages + non-local attention field](docs/examples/pinn_conservation_attention.py)
 - [PINN domain decomposition (XPINN) + stiff integrators](docs/examples/pinn_xpinn_stiff.py)
 - [PINN partition of unity across an interface (soft partition captures a kink a single smooth field cannot; certified soft->hard gap)](docs/examples/partitioned_pinn.py)
 - [Conservative shock-capturing Burgers PINN (flux-form cage over a partitioned potential: div G = 0 to machine epsilon across a sharp moving seam, and tighter global mass balance than a non-conservative arm at equal budget as the layer goes under-resolved; conservation is structural, accuracy is optimised, entropy admissibility is out of scope)](docs/examples/pinn_burgers_shock.py)
 - [Hard boundary / initial conditions for PINNs (constrained-expression cage: Dirichlet / Neumann / Robin / initial-velocity / periodic-seam conditions satisfied identically for any parameters, over any number of axes with exact edges and corners; support-matrix invertibility sealed as a certificate, incompatible cross-axis data refused at construction, and solver auto-detection that deletes the absorbed rows from the loss; for time-dependent periodic spatial axes prefer `basis="spectral"` / `SpectralVectorField`)](docs/examples/pinn_hard_conditions.py)
 - [PINN operator learning (DeepONet with closed-form query-coordinate trunk jet through order 4 so a shipped KS residual costs one jet; ks_residual_loss_fd 5-point twin; Burgers bake-off honest-negative vs FD-u_t; KS bake-off median-win but seed-fragile vs ≥6/8 rule; measured FD accuracy floor; shared-grid scaling; FNO remains FFT-based/periodic; residual enclosure over a sensor/coefficient family is sound but not a solution-error bound; operator accuracy is optimised not proven; sense 3 of docs/operator-surface.md, not OperatorBlock)](docs/examples/pinn_operator_learning.py)
+- [PINN causal time marching (`omnibias.pinn.train.march_solve`)](docs/examples/pinn_causal_marching.py)
+- [PINN SDF hard BC on a disk (`omnibias.pinn.domain`)](docs/examples/pinn_sdf_geometry.py)
+- [PINN FBPINN multi-window field + spectral-bias index](docs/examples/pinn_fbpinn.py)
 - [QPINN harmonic oscillator](docs/examples/qpinn_tise_qho.py)
 
 - [PDE solver: coupled reaction-diffusion](docs/examples/pde_reaction_diffusion.py)

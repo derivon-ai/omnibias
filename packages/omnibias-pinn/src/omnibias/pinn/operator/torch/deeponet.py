@@ -103,8 +103,11 @@ class _DeepONetCore(_JetMLPCore):
 
 
 class _BranchNet(nn.Module):
-    """Sensor -> ``(coeffs, bias)`` MLP.
+    """Conditioning vector -> ``(coeffs, bias)`` MLP.
 
+    The branch input is the concatenation of function sensors and optional
+    parameter / boundary / geometry heads (see
+    :class:`~omnibias.pinn.operator._core.conditioning.ConditioningSpec`).
     ``coeffs`` has shape ``(..., C, p)``; ``bias`` has shape ``(..., C)`` when
     ``per_sample_bias`` is True, else a shared ``(C,)`` buffer lives on the
     operator (not here).
@@ -112,7 +115,7 @@ class _BranchNet(nn.Module):
 
     def __init__(
         self,
-        n_sensors: int,
+        n_input: int,
         n_components: int,
         trunk_width: int,
         *,
@@ -123,11 +126,13 @@ class _BranchNet(nn.Module):
         dtype: torch.dtype = torch.float64,
     ) -> None:
         super().__init__()
-        if n_sensors < 1:
-            raise ValueError(f"n_sensors must be >= 1, got {n_sensors}")
+        if n_input < 1:
+            raise ValueError(f"n_input must be >= 1, got {n_input}")
         if depth < 1:
             raise ValueError(f"branch depth must be >= 1, got {depth}")
-        self.n_sensors = int(n_sensors)
+        self.n_input = int(n_input)
+        # Backward-compatible alias used by older tests / callers.
+        self.n_sensors = int(n_input)
         self.n_components = int(n_components)
         self.trunk_width = int(trunk_width)
         self.per_sample_bias = bool(per_sample_bias)
@@ -136,7 +141,7 @@ class _BranchNet(nn.Module):
         if per_sample_bias:
             out += n_components
         linears: list[nn.Linear] = []
-        prev = n_sensors
+        prev = n_input
         for _ in range(depth):
             linears.append(nn.Linear(prev, hidden, dtype=dtype))
             prev = hidden
@@ -144,10 +149,10 @@ class _BranchNet(nn.Module):
         self.linears = nn.ModuleList(linears)
 
     def forward(self, sensors: Tensor) -> tuple[Tensor, Tensor | None]:
-        """Return ``(coeffs, bias_or_None)`` from sensors of shape ``(..., m)``."""
-        if sensors.shape[-1] != self.n_sensors:
+        """Return ``(coeffs, bias_or_None)`` from a branch input ``(..., n_input)``."""
+        if sensors.shape[-1] != self.n_input:
             raise ValueError(
-                f"sensors trailing dim must be n_sensors={self.n_sensors}, "
+                f"branch input trailing dim must be n_input={self.n_input}, "
                 f"got {tuple(sensors.shape)}"
             )
         h = sensors
@@ -435,7 +440,7 @@ class DeepONetOperator(nn.Module):
         self.core = _DeepONetCore(trunk, n_components=spec.n_components)
         self.core._check_fastpath(jet_order)
         self.branch = _BranchNet(
-            n_sensors=spec.n_sensors,
+            n_input=spec.branch_input_dim,
             n_components=spec.n_components,
             trunk_width=spec.trunk_width,
             hidden=branch_hidden,
@@ -457,15 +462,90 @@ class DeepONetOperator(nn.Module):
     def components(self) -> ComponentSpec:
         return self.spec.components
 
-    def condition(self, sensors: Tensor) -> DeepONetField:
-        """Attach branch coefficients for ``sensors`` of shape ``(F, m)`` or ``(m,)``."""
+    def _assemble_branch_input(
+        self,
+        sensors: Tensor,
+        *,
+        parameters: Tensor | None = None,
+        boundary: Tensor | None = None,
+        geometry: Tensor | None = None,
+    ) -> Tensor:
+        """Concatenate conditioning heads into the branch input vector."""
+        cond = self.spec.conditioning
+        assert cond is not None
         if sensors.ndim == 1:
             sensors = sensors.unsqueeze(0)
         if sensors.ndim != 2:
             raise ValueError(
                 f"sensors must be 1-D or 2-D; got shape {tuple(sensors.shape)}"
             )
-        coeffs, bias = self.branch(sensors)
+        if sensors.shape[-1] != cond.n_function_sensors:
+            raise ValueError(
+                f"sensors trailing dim must be n_function_sensors="
+                f"{cond.n_function_sensors}, got {tuple(sensors.shape)}"
+            )
+        F = int(sensors.shape[0])
+        parts: list[Tensor] = [sensors]
+
+        def _check(name: str, t: Tensor | None, width: int) -> Tensor | None:
+            if width == 0:
+                if t is not None:
+                    raise ValueError(
+                        f"{name} provided but conditioning.{name} width is 0"
+                    )
+                return None
+            if t is None:
+                raise ValueError(
+                    f"{name} required: conditioning width is {width}"
+                )
+            if t.ndim == 1:
+                t = t.unsqueeze(0)
+            if t.ndim != 2 or t.shape[-1] != width:
+                raise ValueError(
+                    f"{name} must have shape (F, {width}) or ({width},); "
+                    f"got {tuple(t.shape)}"
+                )
+            if t.shape[0] == 1 and F > 1:
+                t = t.expand(F, -1)
+            elif t.shape[0] != F:
+                raise ValueError(
+                    f"{name} batch {t.shape[0]} != sensors batch {F}"
+                )
+            return t
+
+        p = _check("parameters", parameters, cond.n_parameters)
+        if p is not None:
+            parts.append(p)
+        b = _check("boundary", boundary, cond.n_boundary_sensors)
+        if b is not None:
+            parts.append(b)
+        g = _check("geometry", geometry, cond.n_geometry_probes)
+        if g is not None:
+            parts.append(g)
+        return torch.cat(parts, dim=-1)
+
+    def condition(
+        self,
+        sensors: Tensor,
+        *,
+        parameters: Tensor | None = None,
+        boundary: Tensor | None = None,
+        geometry: Tensor | None = None,
+    ) -> DeepONetField:
+        """Attach branch coefficients for the concatenated conditioning input.
+
+        ``sensors`` has shape ``(F, m)`` or ``(m,)``. Optional ``parameters``,
+        ``boundary``, and ``geometry`` heads are required exactly when the
+        operator's :class:`~omnibias.pinn.operator.ConditioningSpec` declares
+        a non-zero width for that head.
+        """
+        branch_in = self._assemble_branch_input(
+            sensors,
+            parameters=parameters,
+            boundary=boundary,
+            geometry=geometry,
+        )
+        coeffs, bias = self.branch(branch_in)
         if bias is None:
             assert self.shared_bias is not None
             bias = self.shared_bias
@@ -476,7 +556,7 @@ class DeepONetOperator(nn.Module):
             coeffs=coeffs,
             bias=bias,
             jet_order=self.jet_order,
-            n_functions=int(sensors.shape[0]),
+            n_functions=int(branch_in.shape[0]),
         )
 
 
@@ -494,6 +574,7 @@ def build_deeponet(
     jet_order: int = 2,
     per_sample_bias: bool = True,
     dtype: torch.dtype = torch.float64,
+    conditioning: Any = None,
 ) -> DeepONetOperator:
     """Build a :class:`DeepONetOperator` from explicit metadata."""
     spec = OperatorSpec(
@@ -501,6 +582,7 @@ def build_deeponet(
         components=components,
         n_sensors=n_sensors,
         trunk_width=trunk_width,
+        conditioning=conditioning,
     )
     return DeepONetOperator(
         spec,
