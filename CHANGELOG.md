@@ -6,6 +6,24 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — CCF Hardy exact-Hilbert basis, whole-line CAP attempt, dissipation threshold
+
+Line-domain CCF discovery now uses the Cauchy–Hardy pair
+(`omnibias.core.verified.hardy_line`) with \(\alpha=1/(1+\lambda)\), lambda-tied
+compactification, Martens–Grosse Gauss–Newton, linearized multistage, funnel,
+and mpmath polish. New CAP kind `ccf_hardy_wholeline_blowup` attempts whole-line
+interval covering + \(\ell^1_\nu\) NK (flips `whole_line_certified` only on
+closure; sequence \(Y_0\) no longer double-counts the residual). Vorticity-form
+discovery (`omnibias.pinn.jax.discovery.ccf_vorticity`) evaluates Rung-1 on a
+dense Wang residual with exact \(U=H\Theta\). Absolute Rung-1 gates in
+`benchmarks/_gates.py` require **both** published \(\lambda\) digits **and** the
+residual gate (`reproduces_published_lambda` is not λ-alone). Acceptance ladder:
+`benchmarks/ccf_hardy_rung_acceptance.py` (writes `docs/benchmarks/` only when
+`earned=true`). **Rung-1 / Rung-2 are not earned yet** — measured dense vorticity
+floors on nontrivial finite Hardy dictionaries remain \(O(10^{-2})\) under
+\(\Omega(0.5)=0.05\); near-null cancelling micro-scale ghosts are rejected by
+gauge/nontriviality checks and must not forge. Clay NS / Yang–Mills parents stay external.
+
 ### Fixed — causal marching seam metric + stiff reaction family
 
 `benchmarks/causal_marching.py` now supplies the IC as `ic_fn` evaluated on the

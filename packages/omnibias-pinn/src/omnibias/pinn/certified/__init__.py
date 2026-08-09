@@ -17,11 +17,29 @@ for the gate that blocks such a claim from ever being emitted.
 
 from __future__ import annotations
 
+from omnibias.pinn.certified.boussinesq import build_boussinesq_cap_bundle
+from omnibias.pinn.certified.ccf_hardy import (
+    CCF_HARDY_WHOLELINE_SCHEMA_VERSION,
+    REQUIRED_CCF_HARDY_KEYS,
+    certified_ccf_hardy_wholeline_blowup_attempt,
+    certified_ccf_hardy_wholeline_blowup_attempt_schema_errors,
+    refine_ccf_hardy_profile,
+)
+from omnibias.pinn.certified.dissipation_threshold import (
+    alpha_crit_lower,
+    certified_fractional_dissipation_threshold,
+    verify_fractional_dissipation_threshold,
+)
 from omnibias.pinn.certified.euler2d import (
     EULER2D_VORTEX_SCHEMA_VERSION,
     REQUIRED_EULER2D_VORTEX_KEYS,
     certified_euler2d_steady_vortex,
     certified_euler2d_steady_vortex_schema_errors,
+)
+from omnibias.pinn.certified.ipm import build_ipm_cap_bundle
+from omnibias.pinn.certified.viscous_perturbation import (
+    verify_viscous_perturbation_enclosure,
+    viscous_perturbation_enclosure,
 )
 from omnibias.pinn.certified.fluid import (
     NS_PERIODIC_RESIDUAL_SCHEMA_VERSION,
@@ -315,6 +333,7 @@ __all__ = [
     "ProofProgramFunctionSpaceDefinition",
     "REQUIRED_CANDIDATE_KEYS",
     "REQUIRED_CAP_KEYS",
+    "REQUIRED_CCF_HARDY_KEYS",
     "REQUIRED_CCF_SELFSIMILAR_KEYS",
     "REQUIRED_CLM_BLOWUP_KEYS",
     "REQUIRED_EULER2D_VORTEX_KEYS",
@@ -376,10 +395,12 @@ __all__ = [
     "build_axisymmetric_interval_report",
     "build_axisymmetric_swirl_candidate_artifact",
     "build_blowup_closure_report",
+    "build_boussinesq_cap_bundle",
     "build_candidate_artifact",
     "build_certificate_manifest",
     "build_default_machine",
     "build_formal_proof_package",
+    "build_ipm_cap_bundle",
     "build_ns_cap_bundle",
     "build_ns_proof_program_report",
     "build_ns_solve_or_falsify_report",
@@ -391,7 +412,11 @@ __all__ = [
     "candidate_artifact_schema_errors",
     "candidate_upgrade_gates",
     "cellular_streamfunction",
+    "CCF_HARDY_WHOLELINE_SCHEMA_VERSION",
+    "alpha_crit_lower",
     "certified_candidate_refinement_report",
+    "certified_ccf_hardy_wholeline_blowup_attempt",
+    "certified_ccf_hardy_wholeline_blowup_attempt_schema_errors",
     "certified_ccf_linearized_operator_bound",
     "certified_ccf_linearized_operator_bound_schema_errors",
     "certified_ccf_selfsimilar_blowup_attempt",
@@ -402,6 +427,7 @@ __all__ = [
     "certified_clm_multizero_first_blowup_schema_errors",
     "certified_euler2d_steady_vortex",
     "certified_euler2d_steady_vortex_schema_errors",
+    "certified_fractional_dissipation_threshold",
     "certified_gclm_gradient_amplification",
     "certified_gclm_gradient_amplification_schema_errors",
     "certified_gclm_selfsimilar_blowup",
@@ -488,6 +514,7 @@ __all__ = [
     "radii_polynomial_certificate",
     "radii_polynomial_closure",
     "refine_axisymmetric_coefficients",
+    "refine_ccf_hardy_profile",
     "refine_ccf_selfsimilar_profile",
     "regenerate_periodic_flow",
     "regularity_all_data_proof_attempt",
@@ -520,6 +547,9 @@ __all__ = [
     "theorem_interval_backend_readiness_report",
     "theorem_verifier_record",
     "verify_external_proof_package",
+    "verify_fractional_dissipation_threshold",
+    "verify_viscous_perturbation_enclosure",
+    "viscous_perturbation_enclosure",
     "vorticity_from_descriptor",
     "vorticity_residual_periodic",
     "weighted_analytic_tail_norm_contract",

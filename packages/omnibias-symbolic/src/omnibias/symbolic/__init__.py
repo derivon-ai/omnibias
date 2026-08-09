@@ -65,17 +65,29 @@ from omnibias.symbolic.causal import (
     notears_lite,
     term_parent_ranking,
 )
+from omnibias.symbolic.boussinesq import (
+    boussinesq_selfsimilar_residual,
+    verify_boussinesq_bundle,
+)
 from omnibias.symbolic.ccf import (
     assess_ccf_candidate,
     ccf_self_similar_line_residual,
     ccf_self_similar_residual,
+    hardy_even_numpy,
+    hardy_odd_numpy,
+    hardy_profile_numpy,
     line_even_profile_jet,
     periodic_hilbert,
     recover_ccf_scaling_law,
+    truncated_line_hilbert,
     verify_cap_bundle,
     verify_ccf_linearized_operator_bound,
     verify_ccf_residual,
     verify_ccf_selfsimilar_blowup_attempt,
+)
+from omnibias.symbolic.ipm import (
+    ipm_selfsimilar_residual,
+    verify_ipm_bundle,
 )
 from omnibias.symbolic.diagnostics import (
     DIVERGENCE_OBJECTIVES,
@@ -398,6 +410,7 @@ __all__ = [
     "attach_uncertainty",
     "bic",
     "bootstrap_coefficients",
+    "boussinesq_selfsimilar_residual",
     "buckingham_pi_groups",
     "build_axisymmetric_candidate_bridge_artifacts",
     "build_blowup_candidate_artifact",
@@ -509,6 +522,7 @@ __all__ = [
     "hodge_star",
     "information_criterion",
     "integer_null_space",
+    "ipm_selfsimilar_residual",
     "is_dimensionless",
     "jet_name",
     "js_to_gaussian",
@@ -570,6 +584,10 @@ __all__ = [
     "symbolic_hidden_law",
     "takens_embedding",
     "term_parent_ranking",
+    "hardy_even_numpy",
+    "hardy_odd_numpy",
+    "hardy_profile_numpy",
+    "truncated_line_hilbert",
     "total_variation_to_gaussian",
     "validate_rational_expression",
     "verify_active_projector_error_certificate",
@@ -585,6 +603,7 @@ __all__ = [
     "verify_axisymmetric_swirl_candidate_artifact",
     "verify_binomial_recurrence",
     "verify_blowup_closure_report",
+    "verify_boussinesq_bundle",
     "verify_cap_bundle",
     "verify_ccf_linearized_operator_bound",
     "verify_ccf_residual",
@@ -593,6 +612,7 @@ __all__ = [
     "verify_euler2d_steady_vortex",
     "verify_finite_active_tail_contraction_diagnostic",
     "verify_interval_jacobian_error_certificate",
+    "verify_ipm_bundle",
     "verify_nonlinear_tail_remainder_certificate",
     "verify_ns_cap_bundle",
     "verify_ns_proof_program_report",

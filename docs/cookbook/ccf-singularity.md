@@ -7,14 +7,21 @@ either a measured number you can reproduce from this repository, a cited
 published value, or an explicit *non-claim*.
 
 !!! info "Scope — read first"
-    This is the **1D inviscid CCF model on a periodic torus**, *not* viscous
-    Navier–Stokes and *not* the line-domain problem studied in
-    [arXiv:2509.14185](https://arxiv.org/abs/2509.14185). Deliverables: a
-    bit-parity residual operator, a deterministic discovery harness, an
-    interval-friendly CAP export, and an *independent* numpy validator. The
-    project-wide rules for the certified-evidence stack (`unproven_claim`,
-    `navier_stokes_proof_claim`, the "periodic torus is a model" disclaimer) are
-    in
+    The repository ships **two** CCF residual domains:
+
+    1. **Periodic torus** (`CordobaCordobaFontelos`) — tractable spectral Hilbert
+       model; does **not** by itself reproduce published line-domain \(\lambda\).
+    2. **Line / compactified** (`CordobaCordobaFontelosCompactified` + Hardy
+       `hilbert_mode="hardy_exact"`) — lambda-tied compactification
+       \(q=(1+y^2)^{-1/(2(1+\lambda))}\), Cauchy–Hardy exact Hilbert pair
+       \(P/Q\) with \(\alpha=1/(1+\lambda)\), residual factorisation
+       \(\mathcal{E}=F\cdot\mathcal{R}\). This is the DeepMind-style substrate
+       aimed at published admissible \(\lambda\). The truncated FFT Hilbert path
+       remains for periodic CCF only.
+
+    Neither is viscous Navier–Stokes. Deliverables: bit-parity residual operators,
+    discovery harnesses, CAP export, and an independent numpy validator. Honesty
+    rules live in
     [Scope & guarantees § 3 / § 6](../scope-and-guarantees.md#3-the-certified-pde-stacks-navierstokes-ccf).
 
 ## The model and the contract
@@ -54,9 +61,36 @@ values) lives in the docstring of the residual module
 |---|---|
 | Exponent gauge | \(k(\lambda)=\lambda\) (amplitude decays as \((1-t)^\lambda\)) |
 | Parity | even \(\Theta\) (odd velocity \(H\Theta\)); all residual terms even |
-| Domain (numerics) | periodic torus \([-\pi,\pi)\), spectral \(H\) |
+| Domain (numerics) | periodic torus \([-\pi,\pi)\) *or* compactified line (see below) |
 | Published \(\lambda\) | stable; \(\lambda_1\approx0.6057\); \(\lambda_2\approx0.4703\) (line domain) |
 | Residual norms | \(\max|\mathcal{E}|\) and RMS over the collocation grid |
+
+## Line / compactified domain
+
+```python
+import jax; jax.config.update("jax_enable_x64", True)
+import jax.numpy as jnp
+from omnibias.pinn.jax.equations.ccf_compactified import (
+    compactified_grid,
+    ccf_compactified_residual_samples,
+    apply_envelope,
+)
+
+q, y = compactified_grid(128, q_max=0.99)
+# hat profile in q-space (even): use cos features of q, lift with decay envelope
+hat = jnp.cos(jnp.pi * q)
+hat_y = -jnp.pi * jnp.sin(jnp.pi * q) * (1.0 + y * y) ** (-1.5)  # chain rule via dq/dy
+theta, theta_y = apply_envelope(y, hat, hat_y, power=1.0)
+equation, factored, weight = ccf_compactified_residual_samples(
+    y, theta, theta_y, lam=0.6057
+)
+assert equation.shape == y.shape
+```
+
+Hilbert on the **default line discovery path** is the **Cauchy–Hardy exact
+pair** (`hilbert_mode="hardy_exact"`, \(\alpha=1/(1+\lambda)\)). The truncated
+FFT path remains available for periodic / diagnostic use and is honesty-labelled
+numerical — not closed-form.
 
 ## What is closed-form and what is not
 
@@ -84,6 +118,25 @@ cfg = ccf.CCFDiscoveryConfig(hidden=32, n_grid=256, parity="even", lam_init=0.60
 result = ccf.run_ccf_discovery(cfg, steps=1500, lr=3e-3)
 print(result.diagnostics["max_abs_residual"], result.diagnostics["rms_residual"])
 ```
+
+Line / compactified discovery (Hardy exact-Hilbert substrate):
+
+```python
+import jax; jax.config.update("jax_enable_x64", True)
+from omnibias.pinn.jax.discovery import ccf_line, cap
+from omnibias.symbolic import verify_cap_bundle
+
+cfg = ccf_line.CCFLineDiscoveryConfig(
+    n_terms=4, n_grid=48, y_max=12.0, optimizer="adam", lam_init=0.6057
+)
+result = ccf_line.run_ccf_line_discovery(cfg, steps=40, lr=5e-3, funnel_updates=0)
+bundle = cap.build_cap_bundle(result)
+assert cap.cap_schema_errors(bundle) == []
+assert verify_cap_bundle(bundle)["residual_samples_match"]
+```
+
+CPU smoke benchmark: `python benchmarks/ccf_line_discovery.py` writes
+`docs/benchmarks/ccf_line_smoke.json` with a `gates` block.
 
 Export an interval-friendly CAP bundle and verify it with the *independent*
 numpy validator (no JAX/Torch, no shared code path):
@@ -115,6 +168,10 @@ optimising \(\mathcal{E}[\Theta]=g\). Symbolic regression reads \(\lambda^\*\)
 back off the recovered law.
 
 ```python
+from omnibias.pinn.jax.discovery import ccf
+from omnibias.symbolic import recover_ccf_scaling_law
+
+cfg = ccf.CCFDiscoveryConfig(hidden=32, n_grid=256, parity="even", lam_init=0.6057)
 theta_star = ccf.default_manufactured_profile()
 g, th, th_y = ccf.manufactured_forcing(cfg, theta_star, 0.5)
 law = recover_ccf_scaling_law(ccf.make_grid(cfg), th, th_y, forcing=g)
@@ -164,16 +221,20 @@ at **near machine precision** (residuals \(\sim10^{-13}\)) with
 ## Where reproduction / improvement / proof-readiness stand
 
 - **Reproduction:** the *operator* and *self-similar algebra* are reproduced
-  exactly (bit-parity across backends, zero substitution error). The
-  *line-domain \(\lambda\) values* are **not** reproduced here — that needs a
-  line/decaying-domain discretisation, which is future work.
-- **Improvement:** the measurable wins over a bare reimplementation are
-  bit-identical JAX/Torch twins, an independent second-source validator, and
-  an interval-friendly CAP export with a certified spectral-tail bound.
-- **Proof readiness:** the CAP bundle is the artifact a computer-assisted
-  proof would consume. It is interval-friendly and independently
-  recomputable, but reaching the published \(10^{-13}\) residual bar on the
-  correct domain remains open.
+  exactly (bit-parity across backends, zero substitution error). Line-domain
+  discovery now uses the Hardy exact-Hilbert ansatz
+  (`omnibias.pinn.jax.discovery.ccf_line`); absolute Rung-1 gates for published
+  \(\lambda\) digits and residual thresholds are reported in
+  `docs/benchmarks/ccf_line_smoke.json` (`absolute_gates`) and are earned only
+  when measured.
+- **Improvement:** bit-identical JAX/Torch/numpy twins, Martens–Grosse GN,
+  linearized multistage, funnel, mpmath polish, and an independent second-source
+  validator.
+- **Proof readiness:** Poisson collocation CAP and the Hardy whole-line CAP
+  attempt (`certified_ccf_hardy_wholeline_blowup_attempt`) are the artifacts a
+  computer-assisted proof would consume. `whole_line_certified` flips only on
+  a genuine residual + \(\ell^1_\nu\) closure. Clay NS remains an external
+  obligation (`navier_stokes_proof_claim=False`).
 
 ## See also
 

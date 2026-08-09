@@ -120,6 +120,33 @@ class CCFOutput(NamedTuple):
     diag: dict[str, float]
 
 
+class CCFCompactifiedOutput(NamedTuple):
+    """Output of compactified / line-domain CCF residual.
+
+    Attributes
+    ----------
+    residual
+        Factored residual ``R = E / F``. Shape ``(B,)``.
+    equation_residual
+        Raw self-similar equation residual ``E``. Shape ``(B,)``.
+    hilbert
+        Truncated-line Hilbert transform of the profile. Shape ``(B,)``.
+    weight
+        Factorisation weight ``F(y)``. Shape ``(B,)``.
+    q
+        Compactified coordinates ``q(y)``. Shape ``(B,)``.
+    diag
+        Diagnostic dict.
+    """
+
+    residual: Tensor
+    equation_residual: Tensor
+    hilbert: Tensor
+    weight: Tensor
+    q: Tensor
+    diag: dict[str, float]
+
+
 class FredholmOutput(NamedTuple):
     """Output of :class:`omnibias.pinn.torch.equations.Fredholm`.
 
@@ -177,6 +204,7 @@ class BiharmonicOutput(NamedTuple):
 __all__ = [
     "BiharmonicOutput",
     "BurgersOutput",
+    "CCFCompactifiedOutput",
     "CCFOutput",
     "CHOutput",
     "FredholmOutput",

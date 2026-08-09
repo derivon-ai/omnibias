@@ -30,12 +30,13 @@ from __future__ import annotations
 import json
 import platform
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Union
 
 import numpy as np
 
 if TYPE_CHECKING:  # pragma: no cover
     from omnibias.pinn.jax.discovery.ccf import CCFDiscoveryResult
+    from omnibias.pinn.jax.discovery.ccf_line import CCFLineDiscoveryResult
 
 SCHEMA_VERSION = "ccf-cap-1"
 
@@ -97,13 +98,44 @@ def _band_limited_representation(
 
 
 def build_cap_bundle(
-    result: CCFDiscoveryResult,
+    result: Union["CCFDiscoveryResult", "CCFLineDiscoveryResult"],
     *,
     fourier_threshold: float = 1e-12,
     reproduces_published_lambda: bool | None = None,
     notes: str = "",
 ) -> dict[str, Any]:
-    """Assemble a JSON-serializable CAP bundle from a discovery result."""
+    """Assemble a JSON-serializable CAP bundle from a discovery result.
+
+    Accepts periodic :class:`~omnibias.pinn.jax.discovery.ccf.CCFDiscoveryResult`
+    or line/compactified
+    :class:`~omnibias.pinn.jax.discovery.ccf_line.CCFLineDiscoveryResult`.
+    """
+    # Duck-type line vs periodic via presence of ``q`` / domain extra.
+    if hasattr(result, "q") or (
+        getattr(result, "extra", {}) or {}
+    ).get("domain") == "line_compactified":
+        return _build_line_cap_bundle(
+            result,  # type: ignore[arg-type]
+            fourier_threshold=fourier_threshold,
+            reproduces_published_lambda=reproduces_published_lambda,
+            notes=notes,
+        )
+    return _build_periodic_cap_bundle(
+        result,  # type: ignore[arg-type]
+        fourier_threshold=fourier_threshold,
+        reproduces_published_lambda=reproduces_published_lambda,
+        notes=notes,
+    )
+
+
+def _build_periodic_cap_bundle(
+    result: "CCFDiscoveryResult",
+    *,
+    fourier_threshold: float,
+    reproduces_published_lambda: bool | None,
+    notes: str,
+) -> dict[str, Any]:
+    """Assemble a JSON-serializable CAP bundle from a periodic discovery result."""
     cfg = result.config
     theta = np.asarray(result.theta, dtype=float)
     bundle: dict[str, Any] = {
@@ -170,6 +202,121 @@ def build_cap_bundle(
     return bundle
 
 
+def _build_line_cap_bundle(
+    result: "CCFLineDiscoveryResult",
+    *,
+    fourier_threshold: float,
+    reproduces_published_lambda: bool | None,
+    notes: str,
+) -> dict[str, Any]:
+    """CAP bundle for line / compactified Hardy discovery."""
+    cfg = result.config
+    theta = np.asarray(result.theta, dtype=float)
+    residual = np.asarray(result.equation_residual, dtype=float)
+    coeffs = np.asarray(result.params.get("coeffs", []), dtype=float)
+    scales = np.asarray(result.params.get("scales", []), dtype=float)
+    alpha = float(result.diagnostics.get("alpha", 1.0 / (1.0 + result.lam)))
+    hilbert_convention = str(result.extra.get("hilbert_convention", "hardy_exact"))
+    # Recompute H for validation_inputs when Hardy
+    hilbert = None
+    hilbert_y = None
+    if hilbert_convention == "hardy_exact" and coeffs.size and scales.size:
+        from omnibias.symbolic.ccf import hardy_profile_numpy
+
+        _th, _thp, hilbert, hilbert_y = hardy_profile_numpy(
+            np.asarray(result.y, dtype=float), coeffs, scales, alpha
+        )
+    bundle: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "problem": {
+            "model": "cordoba_cordoba_fontelos",
+            "description": "1D nonlocal-transport self-similar blow-up profile (Hardy line)",
+            "form": cfg.form,
+            "velocity_sign": float(cfg.velocity_sign),
+            "ansatz": "theta(x,t) = (1-t)^{k(lambda)} Theta(y), y = (1-t)^{-(1+lambda)} x",
+            "blowup_time": 1.0,
+            "scalar_exponent_k": "lambda",
+            "stationary_residual_transport": "(1+lambda) y Theta' - lambda Theta + (H Theta) Theta'",
+            "parity": "even",
+            "basis": "cauchy_hardy",
+            "n_terms": int(cfg.n_terms),
+            "weight_kind": cfg.weight_kind,
+        },
+        "lambda": float(result.lam),
+        "domain": {
+            "type": "line_compactified",
+            "y_max": float(cfg.y_max),
+            "n_grid": int(cfg.n_grid),
+            "periodic": False,
+            "compactification": "q = (1+y^2)^{-1/(2(1+lambda))}",
+            "dtype": "float64",
+            "y_min": float(np.min(result.y)),
+            "y_max_samples": float(np.max(result.y)),
+        },
+        "profile_samples": {
+            "y": np.asarray(result.y, dtype=float).tolist(),
+            "q": np.asarray(result.q, dtype=float).tolist(),
+            "theta": theta.tolist(),
+            "theta_y": np.asarray(result.theta_y, dtype=float).tolist(),
+        },
+        "fourier_representation": _band_limited_representation(
+            theta, threshold=fourier_threshold
+        ),
+        "hardy_representation": {
+            "coeffs": coeffs.tolist(),
+            "scales": scales.tolist(),
+            "alpha": alpha,
+        },
+        "residual_diagnostics": {
+            k: float(v) for k, v in result.diagnostics.items() if isinstance(v, (int, float))
+        },
+        "residual_samples": residual.tolist(),
+        "validation_inputs": {
+            "y": np.asarray(result.y, dtype=float).tolist(),
+            "theta": theta.tolist(),
+            "theta_y": np.asarray(result.theta_y, dtype=float).tolist(),
+            "lambda": float(result.lam),
+            "form": cfg.form,
+            "velocity_sign": float(cfg.velocity_sign),
+            "hilbert_convention": hilbert_convention,
+            "coeffs": coeffs.tolist(),
+            "scales": scales.tolist(),
+            "alpha": alpha,
+            **(
+                {
+                    "hilbert": np.asarray(hilbert, dtype=float).tolist(),
+                    "hilbert_y": np.asarray(hilbert_y, dtype=float).tolist(),
+                }
+                if hilbert is not None
+                else {}
+            ),
+        },
+        "honesty": {
+            "exact_solution_claim": False,
+            "domain_note": (
+                "Line-domain Hardy-basis candidate with exact whole-line Hilbert "
+                "(closed-form P/Q pair); lambda-tied compactification."
+            ),
+            "reproduces_published_lambda": reproduces_published_lambda,
+            "is_forced_manufactured_solution": False,
+            "navier_stokes_proof_claim": False,
+            "continuum_navier_stokes_claim": False,
+            "notes": notes,
+        },
+        "provenance": {
+            "harness": "omnibias.pinn.jax.discovery.ccf_line",
+            "seed": int(cfg.seed),
+            "n_terms": int(cfg.n_terms),
+            "optimizer": cfg.optimizer,
+            "derivatives": (
+                "exact Hardy closed-form jets (local + nonlocal Hilbert)"
+            ),
+            "python": platform.python_version(),
+        },
+    }
+    return bundle
+
+
 def cap_schema_errors(bundle: dict[str, Any]) -> list[str]:
     """Return a list of schema problems (empty list == valid)."""
     errors: list[str] = []
@@ -201,13 +348,23 @@ def write_cap_bundle(bundle: dict[str, Any], out_dir: Path | str) -> Path:
     json_path = out / "ccf_cap.json"
     json_path.write_text(json.dumps(bundle, indent=2, sort_keys=True))
     diag = bundle["residual_diagnostics"]
+    domain = bundle["domain"]
+    if domain.get("type") == "line_compactified":
+        domain_line = (
+            f"- domain: line_compactified q_max=`{domain.get('q_max')}`, "
+            f"n_grid=`{domain['n_grid']}`"
+        )
+    else:
+        domain_line = (
+            f"- domain: periodic `[-{domain.get('half_period', float('nan')):.6g}, "
+            f"{domain.get('half_period', float('nan')):.6g})`, n_grid=`{domain['n_grid']}`"
+        )
     lines = [
         "# CCF self-similar candidate (CAP-ready bundle)",
         "",
         f"- model: `{bundle['problem']['model']}` ({bundle['problem']['form']} form)",
         f"- lambda: `{bundle['lambda']:.10g}`",
-        f"- domain: periodic `[-{bundle['domain']['half_period']:.6g}, "
-        f"{bundle['domain']['half_period']:.6g})`, n_grid=`{bundle['domain']['n_grid']}`",
+        domain_line,
         f"- max|residual|: `{diag.get('max_abs_residual', float('nan')):.3e}`",
         f"- rms residual: `{diag.get('rms_residual', float('nan')):.3e}`",
         f"- band-limited modes kept: `{bundle['fourier_representation']['n_kept']}` "

@@ -2,18 +2,52 @@
 # Copyright (C) 2026 Derivon
 """Deterministic JAX discovery harnesses for self-similar blow-up profiles.
 
-Currently ships the Córdoba-Córdoba-Fontelos (CCF) periodic self-similar
-discovery / refinement harness (:mod:`omnibias.pinn.jax.discovery.ccf`) plus its
-CAP-ready export (:mod:`omnibias.pinn.jax.discovery.cap`).
+Ships:
 
-This subpackage is intentionally *not* auto-imported by
-:mod:`omnibias.pinn.jax` -- import it explicitly::
+* periodic CCF (:mod:`omnibias.pinn.jax.discovery.ccf`)
+* line / compactified CCF (:mod:`omnibias.pinn.jax.discovery.ccf_line`)
+* funnel ``lambda`` inference (:mod:`omnibias.pinn.jax.discovery.funnel`)
+* Gauss-Newton trainer (:mod:`omnibias.pinn.jax.discovery.train_gn`)
+* multi-stage correction (:mod:`omnibias.pinn.jax.discovery.multistage`)
+* CAP export (:mod:`omnibias.pinn.jax.discovery.cap`)
 
-    from omnibias.pinn.jax.discovery import ccf, cap
+Import explicitly::
+
+    from omnibias.pinn.jax.discovery import ccf, ccf_line, cap, funnel, multistage
 """
 
 from __future__ import annotations
 
-from omnibias.pinn.jax.discovery import cap, ccf
+from omnibias.pinn.jax.discovery import (
+    boussinesq,
+    cap,
+    ccf,
+    ccf_line,
+    ccf_vorticity,
+    euler3d_axisym,
+    funnel,
+    ipm,
+    lambda_laws,
+    multistage,
+    pipeline,
+    polish_mp,
+    spectrum,
+    train_gn,
+)
 
-__all__ = ["cap", "ccf"]
+__all__ = [
+    "boussinesq",
+    "cap",
+    "ccf",
+    "ccf_line",
+    "ccf_vorticity",
+    "euler3d_axisym",
+    "funnel",
+    "ipm",
+    "lambda_laws",
+    "multistage",
+    "pipeline",
+    "polish_mp",
+    "spectrum",
+    "train_gn",
+]

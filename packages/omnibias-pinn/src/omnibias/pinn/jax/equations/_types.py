@@ -41,6 +41,15 @@ class CCFOutput(NamedTuple):
     diag: dict[str, float]
 
 
+class CCFCompactifiedOutput(NamedTuple):
+    residual: Array
+    equation_residual: Array
+    hilbert: Array
+    weight: Array
+    q: Array
+    diag: dict[str, float]
+
+
 class BiharmonicOutput(NamedTuple):
     residual: Array
     diag: dict[str, float]
@@ -61,6 +70,7 @@ class VolterraOutput(NamedTuple):
 __all__ = [
     "BiharmonicOutput",
     "BurgersOutput",
+    "CCFCompactifiedOutput",
     "CCFOutput",
     "CHOutput",
     "FredholmOutput",

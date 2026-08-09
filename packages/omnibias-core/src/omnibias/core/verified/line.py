@@ -11,6 +11,11 @@ conjugate-Poisson pair.  For a scale ``a > 0`` define
     p_a(x) = a / (x^2 + a^2)        (even, the Poisson kernel),
     q_a(x) = x / (x^2 + a^2)        (odd,  the conjugate Poisson kernel).
 
+These are the ``alpha = 1`` special case of the generalized Cauchy-Hardy pair in
+:mod:`omnibias.core.verified.hardy_line` (``P_{a,1} = p_a``, ``Q_{a,1} = q_a``).
+For CCF self-similar far fields with exponent ``alpha = 1/(1+lambda) != 1``, use
+the Hardy module instead.
+
 With the convention ``H[f](x) = (1/pi) p.v. \int f(t)/(x - t) dt`` the Hilbert
 transform rotates the pair (a fact equivalent to ``hat{p_a}(xi) = pi e^{-a|xi|}``
 and the multiplier ``-i sgn(xi)``):

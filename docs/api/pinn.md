@@ -834,8 +834,12 @@ which validates both sides against the same analytic oracle.
         - certified_clm_multizero_first_blowup_schema_errors
         - certified_ccf_selfsimilar_blowup_attempt
         - certified_ccf_selfsimilar_blowup_attempt_schema_errors
+        - certified_ccf_hardy_wholeline_blowup_attempt
+        - certified_ccf_hardy_wholeline_blowup_attempt_schema_errors
         - certified_ccf_linearized_operator_bound
         - certified_ccf_linearized_operator_bound_schema_errors
+        - certified_fractional_dissipation_threshold
+        - refine_ccf_hardy_profile
         - certified_euler2d_steady_vortex
         - certified_euler2d_steady_vortex_schema_errors
         - taylor_green_vortex

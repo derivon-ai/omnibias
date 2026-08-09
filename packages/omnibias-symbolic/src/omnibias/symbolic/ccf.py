@@ -62,6 +62,75 @@ def periodic_hilbert(values: np.ndarray, *, axis: int = -1) -> np.ndarray:
     return np.real(out)
 
 
+def truncated_line_hilbert(
+    y: np.ndarray,
+    values: np.ndarray,
+    *,
+    n_uniform: int | None = None,
+) -> np.ndarray:
+    """Independent numpy truncated-line Hilbert (resample + periodic FFT).
+
+    Matches ``hilbert_convention=truncated_line_resampled_periodic_fft``.
+    Prefer :func:`hardy_profile_numpy` for whole-line CCF.
+    """
+    y = np.asarray(y, dtype=float).reshape(-1)
+    values = np.asarray(values, dtype=float).reshape(-1)
+    if y.shape != values.shape:
+        raise ValueError(f"y and values shape mismatch: {y.shape} vs {values.shape}")
+    n = int(y.shape[0])
+    if n < 4:
+        raise ValueError(f"need at least 4 samples, got {n}")
+    order = np.argsort(y)
+    y_s = y[order]
+    v_s = values[order]
+    n_u = int(n if n_uniform is None else n_uniform)
+    y_u = np.linspace(y_s[0], y_s[-1], n_u)
+    v_u = np.interp(y_u, y_s, v_s)
+    h_u = periodic_hilbert(v_u)
+    h_s = np.interp(y_s, y_u, h_u)
+    out = np.empty_like(values)
+    out[order] = h_s
+    return out
+
+
+def hardy_even_numpy(y: np.ndarray, a: float, alpha: float) -> np.ndarray:
+    """``P_{a,alpha}(y)`` (numpy twin of the verified / jax Hardy even kernel)."""
+    y = np.asarray(y, dtype=float)
+    r = np.hypot(a, y)
+    phi = np.arctan(y / a)
+    return (r ** (-alpha)) * np.cos(alpha * phi)
+
+
+def hardy_odd_numpy(y: np.ndarray, a: float, alpha: float) -> np.ndarray:
+    """``Q_{a,alpha}(y)``."""
+    y = np.asarray(y, dtype=float)
+    r = np.hypot(a, y)
+    phi = np.arctan(y / a)
+    return (r ** (-alpha)) * np.sin(alpha * phi)
+
+
+def hardy_profile_numpy(
+    y: np.ndarray,
+    coeffs: np.ndarray,
+    scales: np.ndarray,
+    alpha: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Return ``(Theta, Theta', HTheta, (HTheta)')`` for a Hardy even sum."""
+    y = np.asarray(y, dtype=float).reshape(-1)
+    coeffs = np.asarray(coeffs, dtype=float).reshape(-1)
+    scales = np.asarray(scales, dtype=float).reshape(-1)
+    th = np.zeros_like(y)
+    thp = np.zeros_like(y)
+    hth = np.zeros_like(y)
+    hthp = np.zeros_like(y)
+    for c, a in zip(coeffs, scales, strict=True):
+        th = th + c * hardy_even_numpy(y, float(a), alpha)
+        thp = thp + c * (-alpha) * hardy_odd_numpy(y, float(a), alpha + 1.0)
+        hth = hth + c * hardy_odd_numpy(y, float(a), alpha)
+        hthp = hthp + c * alpha * hardy_even_numpy(y, float(a), alpha + 1.0)
+    return th, thp, hth, hthp
+
+
 def ccf_self_similar_residual(
     y: np.ndarray,
     theta: np.ndarray,
@@ -70,6 +139,9 @@ def ccf_self_similar_residual(
     *,
     form: str = "transport",
     velocity_sign: float = 1.0,
+    hilbert_convention: str = "periodic_fft_minus_i_sgn",
+    hilbert_values: np.ndarray | None = None,
+    hilbert_y_values: np.ndarray | None = None,
 ) -> np.ndarray:
     """Independent numpy reimplementation of the CCF self-similar residual."""
     if form not in _FORMS:
@@ -77,11 +149,29 @@ def ccf_self_similar_residual(
     y = np.asarray(y, dtype=float)
     theta = np.asarray(theta, dtype=float)
     theta_y = np.asarray(theta_y, dtype=float)
-    h_theta = periodic_hilbert(theta)
+    if hilbert_convention == "periodic_fft_minus_i_sgn":
+        h_theta = periodic_hilbert(theta)
+        h_theta_y_fn = periodic_hilbert
+    elif hilbert_convention == "truncated_line_resampled_periodic_fft":
+        h_theta = truncated_line_hilbert(y, theta)
+        h_theta_y_fn = lambda v: truncated_line_hilbert(y, v)
+    elif hilbert_convention == "hardy_exact":
+        if hilbert_values is None:
+            raise ValueError("hardy_exact requires hilbert_values")
+        h_theta = np.asarray(hilbert_values, dtype=float)
+        h_theta_y_fn = None
+    else:
+        raise ValueError(f"unknown hilbert_convention {hilbert_convention!r}")
     if form == "transport":
         nonlocal_term = h_theta * theta_y
     else:
-        h_theta_y = periodic_hilbert(theta_y)
+        if hilbert_convention == "hardy_exact":
+            if hilbert_y_values is None:
+                raise ValueError("flux + hardy_exact requires hilbert_y_values")
+            h_theta_y = np.asarray(hilbert_y_values, dtype=float)
+        else:
+            assert h_theta_y_fn is not None
+            h_theta_y = h_theta_y_fn(theta_y)
         nonlocal_term = theta_y * h_theta + theta * h_theta_y
     residual = (1.0 + lam) * y * theta_y - lam * theta + velocity_sign * nonlocal_term
     return np.asarray(residual, dtype=float)
@@ -123,16 +213,56 @@ def verify_cap_bundle(bundle: dict[str, Any], *, atol: float = 1e-8) -> dict[str
     lam = float(vin["lambda"])
     form = vin.get("form", "transport")
     velocity_sign = float(vin.get("velocity_sign", 1.0))
+    hilbert_convention = vin.get("hilbert_convention", "periodic_fft_minus_i_sgn")
+    hilbert_values = None
+    hilbert_y_values = None
+    if hilbert_convention == "hardy_exact":
+        if "hilbert" in vin:
+            hilbert_values = np.asarray(vin["hilbert"], dtype=float)
+            if "hilbert_y" in vin:
+                hilbert_y_values = np.asarray(vin["hilbert_y"], dtype=float)
+        elif "coeffs" in vin and "scales" in vin:
+            alpha = float(vin.get("alpha", 1.0 / (1.0 + lam)))
+            th, thp, hth, hthp = hardy_profile_numpy(
+                y,
+                np.asarray(vin["coeffs"], dtype=float),
+                np.asarray(vin["scales"], dtype=float),
+                alpha,
+            )
+            # Prefer recomputed jets from coeffs when available
+            theta = th
+            theta_y = thp
+            hilbert_values = hth
+            hilbert_y_values = hthp
+        else:
+            raise ValueError(
+                "hardy_exact CAP bundle needs hilbert samples or coeffs/scales"
+            )
     recomputed = ccf_self_similar_residual(
-        y, theta, theta_y, lam, form=form, velocity_sign=velocity_sign
+        y,
+        theta,
+        theta_y,
+        lam,
+        form=form,
+        velocity_sign=velocity_sign,
+        hilbert_convention=hilbert_convention,
+        hilbert_values=hilbert_values,
+        hilbert_y_values=hilbert_y_values,
     )
     reported = np.asarray(bundle["residual_samples"], dtype=float)
     diff = float(np.max(np.abs(recomputed - reported)))
+    scaling = None
+    try:
+        scaling = recover_ccf_scaling_law(y, theta, theta_y)
+    except Exception as exc:  # noqa: BLE001 — report failure, don't raise
+        scaling = {"error": str(exc)}
     return {
         "recomputed_max_abs": float(np.max(np.abs(recomputed))),
         "reported_max_abs": float(np.max(np.abs(reported))),
         "agreement_max_abs_diff": diff,
         "residual_samples_match": bool(diff <= atol),
+        "hilbert_convention": hilbert_convention,
+        "scaling_law": scaling,
     }
 
 
@@ -476,9 +606,13 @@ __all__ = [
     "assess_ccf_candidate",
     "ccf_self_similar_line_residual",
     "ccf_self_similar_residual",
+    "hardy_even_numpy",
+    "hardy_odd_numpy",
+    "hardy_profile_numpy",
     "line_even_profile_jet",
     "periodic_hilbert",
     "recover_ccf_scaling_law",
+    "truncated_line_hilbert",
     "verify_cap_bundle",
     "verify_ccf_residual",
     "verify_ccf_selfsimilar_blowup_attempt",

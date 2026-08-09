@@ -165,7 +165,115 @@ def gates_block(entries: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+# Published CCF self-similar lambda digits (DeepMind arXiv:2509.14185).
+CCF_LAMBDA_1ST_UNSTABLE = 0.6057
+CCF_LAMBDA_2ND_UNSTABLE = 0.4703
+CCF_RESIDUAL_GATE_STABLE = 1e-11
+CCF_RESIDUAL_GATE_1ST_UNSTABLE = 1e-11
+CCF_RESIDUAL_GATE_2ND_UNSTABLE = 1e-6
+CCF_STRETCH_RESIDUAL_GATE = 1e-13
+
+
+def ccf_lambda_digits_gate(
+    lam: float,
+    target: float,
+    *,
+    abs_tol: float = 5e-5,
+    name: str = "ccf_lambda",
+) -> dict[str, Any]:
+    """Require recovered ``lambda`` to match a published target within ``abs_tol``."""
+    err = abs(float(lam) - float(target))
+    passed = bool(err <= float(abs_tol))
+    return {
+        "name": name,
+        "lam": float(lam),
+        "target": float(target),
+        "abs_error": err,
+        "abs_tol": float(abs_tol),
+        "passed": passed,
+    }
+
+
+def ccf_residual_gate(
+    max_abs_residual: float,
+    threshold: float,
+    *,
+    name: str = "ccf_residual",
+) -> dict[str, Any]:
+    """Require whole-line max |d0 residual| at or below ``threshold``."""
+    val = float(max_abs_residual)
+    thr = float(threshold)
+    passed = bool(np.isfinite(val) and val <= thr)
+    return {
+        "name": name,
+        "max_abs_residual": val,
+        "threshold": thr,
+        "passed": passed,
+    }
+
+
+def ccf_absolute_gates(
+    *,
+    lam: float,
+    max_abs_residual: float,
+    family: str = "1st_unstable",
+    stretch_mp_residual: float | None = None,
+) -> dict[str, Any]:
+    """Absolute Rung-1 gates for a CCF Hardy discovery result.
+
+    ``family`` is one of ``stable``, ``1st_unstable``, ``2nd_unstable``.
+    Empirical-law outputs must never be passed as ``target`` — callers supply
+    published digits only.
+    """
+    if family == "1st_unstable":
+        target = CCF_LAMBDA_1ST_UNSTABLE
+        res_thr = CCF_RESIDUAL_GATE_1ST_UNSTABLE
+    elif family == "2nd_unstable":
+        target = CCF_LAMBDA_2ND_UNSTABLE
+        res_thr = CCF_RESIDUAL_GATE_2ND_UNSTABLE
+    elif family == "stable":
+        target = CCF_LAMBDA_1ST_UNSTABLE  # placeholder: stable digits vary by paper
+        res_thr = CCF_RESIDUAL_GATE_STABLE
+    else:
+        raise ValueError(f"unknown CCF family {family!r}")
+    entries = [
+        ccf_lambda_digits_gate(lam, target, name=f"lambda_{family}"),
+        ccf_residual_gate(max_abs_residual, res_thr, name=f"residual_{family}"),
+    ]
+    if stretch_mp_residual is not None:
+        entries.append(
+            ccf_residual_gate(
+                stretch_mp_residual,
+                CCF_STRETCH_RESIDUAL_GATE,
+                name="stretch_mpmath_residual",
+            )
+        )
+    block = gates_block(entries)
+    residual_ok = bool(entries[1]["passed"])
+    lambda_ok = bool(entries[0]["passed"])
+    return {
+        "family": family,
+        "earned": bool(block["all_passed"]),
+        "gates": block,
+        "honesty": {
+            # Both residual and lambda digits must clear — lambda alone (e.g. frozen init) is not reproduction.
+            "reproduces_published_lambda": bool(lambda_ok and residual_ok),
+            "navier_stokes_proof_claim": False,
+            "anti_circularity": "targets are published digits, never empirical-law outputs",
+        },
+    }
+
+
 __all__ = [
+    "CCF_LAMBDA_1ST_UNSTABLE",
+    "CCF_LAMBDA_2ND_UNSTABLE",
+    "CCF_RESIDUAL_GATE_1ST_UNSTABLE",
+    "CCF_RESIDUAL_GATE_2ND_UNSTABLE",
+    "CCF_RESIDUAL_GATE_STABLE",
+    "CCF_STRETCH_RESIDUAL_GATE",
+    "ccf_absolute_gates",
+    "ccf_lambda_digits_gate",
+    "ccf_residual_gate",
     "gates_block",
     "mse",
     "rel_l2",

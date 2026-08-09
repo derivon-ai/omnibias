@@ -1,0 +1,64 @@
+{
+  "benchmark": "ccf_line_discovery",
+  "tier": "cpu_smoke",
+  "config": {
+    "steps": 30,
+    "n_grid": 40,
+    "n_terms": 4,
+    "y_max": 12.0,
+    "seed": 0,
+    "lam_init": 0.6057,
+    "hilbert": "hardy_exact"
+  },
+  "metrics": {
+    "lam": 0.6057,
+    "max_abs_residual": 1.6617706729946866,
+    "rms_residual": 1.5271306922334453,
+    "wall_seconds": 5.561869612021837,
+    "agreement_max_abs_diff": 4.440892098500626e-16
+  },
+  "honesty": {
+    "exact_solution_claim": false,
+    "navier_stokes_proof_claim": false,
+    "domain": "line_compactified",
+    "reproduces_published_lambda": true,
+    "hilbert": "hardy_exact"
+  },
+  "absolute_gates": {
+    "family": "1st_unstable",
+    "earned": false,
+    "gates": {
+      "all_passed": false,
+      "entries": [
+        {
+          "name": "lambda_1st_unstable",
+          "lam": 0.6057,
+          "target": 0.6057,
+          "abs_error": 0.0,
+          "abs_tol": 5e-05,
+          "passed": true
+        },
+        {
+          "name": "residual_1st_unstable",
+          "max_abs_residual": 1.6617706729946866,
+          "threshold": 1e-11,
+          "passed": false
+        }
+      ]
+    },
+    "honesty": {
+      "reproduces_published_lambda": true,
+      "navier_stokes_proof_claim": false,
+      "anti_circularity": "targets are published digits, never empirical-law outputs"
+    }
+  },
+  "gates": {
+    "schema_ok": true,
+    "symbolic_replay_match": true,
+    "residual_finite": true,
+    "max_abs_residual_below": true,
+    "navier_stokes_proof_claim": false,
+    "absolute_rung1_earned": false,
+    "passed": true
+  }
+}

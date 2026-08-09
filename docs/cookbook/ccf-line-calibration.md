@@ -16,24 +16,40 @@ singularity, with amplitude \(\sim (1-t)^{\lambda}\) and gradient
 \(\sim (1-t)^{-1}\).
 
 `certified_ccf_selfsimilar_blowup_attempt` represents \(\Theta\) in the
-**verified even Poisson basis** \(p_a(x)=a/(x^2+a^2)\), whose whole-line Hilbert
-transform \(H[p_a]=q_a(x)=x/(x^2+a^2)\) is *exact and quadrature-free*
-([`omnibias.core.verified.line`](../api/core.md)). It then evaluates the residual
-and its Jacobian/Hessian as outward-rounded intervals on a verified collocation
-grid and attempts a **Newton–Kantorovich radii-polynomial closure**. This page
-is the honest calibration: *which inequality closed or failed, and by how much.*
+**verified even Poisson basis** \(p_a(x)=a/(x^2+a^2)\) (the \(\alpha=1\) case of
+the Cauchy–Hardy pair), whose whole-line Hilbert transform \(H[p_a]=q_a\) is
+*exact and quadrature-free*
+([`omnibias.core.verified.line`](../api/core.md)). For physical far-field decay
+\(|y|^{-\alpha}\) with \(\alpha=1/(1+\lambda)\), use the Hardy upgrade
+`certified_ccf_hardy_wholeline_blowup_attempt`
+([`omnibias.pinn.certified.ccf_hardy`](../api/pinn.md)) which attempts a
+whole-line covering + \(\ell^1_\nu\) Newton–Kantorovich closure and flips
+`honesty.whole_line_certified` only when the gate actually passes.
+
+The classical Poisson CAP evaluates the residual and its Jacobian/Hessian as
+outward-rounded intervals on a verified collocation grid and attempts a
+**Newton–Kantorovich radii-polynomial closure**. This page is the honest
+calibration: *which inequality closed or failed, and by how much.*
+
+The **float discovery** substrate for line-domain profiles (Hardy ansatz,
+lambda-tied compactification, Gauss–Newton / funnel / mpmath polish) lives in
+`omnibias.pinn.jax.discovery.ccf_line` and
+`omnibias.pinn.jax.equations.ccf_compactified`; see
+[CCF singularities](ccf-singularity.md#line--compactified-domain).
 
 !!! warning "Scope — this is a research phase that can end `BLOCKED`"
     A closure certifies a true zero of the **finite collocation map** near the
     candidate — a profile that makes the residual vanish at the collocation
     nodes, plus a two-sided enclosure of \(\lambda\). The whole-line residual
-    sup-norm is now **certified** (`residual_certified_sup`), and the continuum
-    profile linearization carries a **certified operator-norm bound + Neumann
-    invertibility test** (`continuum_operator`). What stays open is driving the
-    certified residual and the Neumann \(\rho\) below their closure thresholds.
-    This is a 1D-model result: `honesty.unproven_claim`, `three_d_claim`, and
-    `whole_line_certified` are all `False`. It is **not** 3D Navier–Stokes/Euler
-    and **not** a global-regularity claim.
+    covering is certified only when the interval-\(y\) path is used
+    (`between_node_residual_certified`); sequence-space \(Y_0\) must not
+    double-count that residual. Absolute Rung-1 gates (dense Wang vorticity
+    residual + published \(\lambda\) digits) and Rung-2
+    (`honesty.whole_line_certified`) are **earned only when measured** — never
+    forged from a frozen \(\lambda\) or collocation-only zero. This is a
+    1D-model result: `honesty.unproven_claim`, `three_d_claim`, and (until the
+    gate passes) `whole_line_certified` stay `False`. It is **not** 3D
+    Navier–Stokes/Euler and **not** a global-regularity claim.
 
 ## The radii polynomial
 

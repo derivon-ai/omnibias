@@ -16,6 +16,8 @@ kind                          certificate
 ``clm_blowup``                :func:`.certified_clm_blowup` (origin only)
 ``clm_multizero_blowup``      :func:`.certified_clm_multizero_first_blowup`
 ``ccf_selfsimilar_blowup``    :func:`.certified_ccf_selfsimilar_blowup_attempt`
+``ccf_hardy_wholeline_blowup`` :func:`omnibias.pinn.certified.ccf_hardy.certified_ccf_hardy_wholeline_blowup_attempt`
+``ccf_fractional_dissipation`` :func:`omnibias.pinn.certified.dissipation_threshold.certified_fractional_dissipation_threshold`
 ``gclm_selfsimilar_blowup``   :func:`.certified_gclm_selfsimilar_blowup`
 ``gclm_gradient_amplification`` :func:`.certified_gclm_gradient_amplification`
 ``perron_spectral_gap``       :func:`omnibias.core.verified.eig.certified_perron_spectral_gap`
@@ -88,6 +90,14 @@ from omnibias.pinn.certified.navier_stokes import (
     certified_gclm_selfsimilar_blowup,
     certified_gclm_selfsimilar_blowup_schema_errors,
     refine_ccf_selfsimilar_profile,
+)
+from omnibias.pinn.certified.ccf_hardy import (
+    certified_ccf_hardy_wholeline_blowup_attempt,
+    certified_ccf_hardy_wholeline_blowup_attempt_schema_errors,
+)
+from omnibias.pinn.certified.dissipation_threshold import (
+    certified_fractional_dissipation_threshold,
+    verify_fractional_dissipation_threshold,
 )
 from omnibias.pinn.certified.pde import (
     pinn_aposteriori_proof_schema_errors,
@@ -168,6 +178,96 @@ def _replay_clm_multizero(certificate: Certificate) -> bool | None:
     return bool(report["replay_match"])
 
 
+def _prove_viscous_perturbation_enclosure(conjecture: Conjecture) -> ProofAttempt:
+    data = conjecture.data
+    try:
+        from omnibias.pinn.certified.viscous_perturbation import (
+            verify_viscous_perturbation_enclosure,
+            viscous_perturbation_enclosure,
+        )
+        cert = viscous_perturbation_enclosure(
+            inviscid_residual_sup=float(data["inviscid_residual_sup"]),
+            viscosity=float(data["viscosity"]),
+            enstrophy_bound=float(data["enstrophy_bound"]),
+            window_length=float(data["window_length"]),
+            tol=float(data.get("tol", 1e-2)),
+        )
+    except (KeyError, ValueError, TypeError) as exc:
+        return _blocked(f"could not build viscous perturbation enclosure: {exc}")
+    report = verify_viscous_perturbation_enclosure(cert)
+    if not report["replay_match"]:
+        return _blocked("viscous enclosure independent recomputation failed")
+    if cert["enclosure_closed"]:
+        return ProofAttempt(
+            status="PROVED",
+            certificate=cert,
+            detail=(
+                "compact-window viscous residual upper bound closed "
+                "(not a continuum Navier-Stokes theorem)"
+            ),
+        )
+    return ProofAttempt(
+        status="BLOCKED",
+        certificate=cert,
+        obligations=("ns_residual_upper_bound exceeds tol on the compact window",),
+        detail="viscous perturbation enclosure did not close",
+    )
+
+
+def _prove_ccf_line_compactified_cap(conjecture: Conjecture) -> ProofAttempt:
+    """Schema + honesty gate for a float line/compactified CCF CAP bundle.
+
+    This does **not** claim radii-polynomial closure or Navier-Stokes. It only
+    admits a well-formed CAP bundle whose honesty flags forbid continuum claims
+    and whose residual samples agree with the independent symbolic twin.
+    """
+    data = conjecture.data
+    try:
+        from omnibias.pinn.jax.discovery.cap import cap_schema_errors
+        from omnibias.symbolic.ccf import verify_cap_bundle
+    except ImportError as exc:
+        return _blocked(f"line CAP dependencies unavailable: {exc}")
+
+    bundle = data.get("certificate") or data.get("bundle")
+    if not isinstance(bundle, dict):
+        return _blocked("conjecture.data must include 'certificate' or 'bundle' dict")
+    errors = cap_schema_errors(bundle)
+    if errors:
+        return _blocked("CAP schema errors: " + "; ".join(errors))
+    honesty = bundle.get("honesty", {})
+    if honesty.get("navier_stokes_proof_claim", True) is not False:
+        return _blocked("honesty.navier_stokes_proof_claim must be False")
+    if honesty.get("continuum_navier_stokes_claim", False) is True:
+        return _blocked("honesty.continuum_navier_stokes_claim must not be True")
+    if bundle.get("domain", {}).get("type") != "line_compactified":
+        return _blocked("domain.type must be 'line_compactified'")
+    report = verify_cap_bundle(bundle)
+    if not report.get("residual_samples_match"):
+        return ProofAttempt(
+            status="BLOCKED",
+            certificate=bundle,
+            obligations=("independent symbolic residual replay failed",),
+            detail=f"agreement_max_abs_diff={report.get('agreement_max_abs_diff')}",
+        )
+    return ProofAttempt(
+        status="PROVED",
+        certificate=bundle,
+        detail=(
+            "line_compactified CAP schema-ok + symbolic residual replay match "
+            "(float evidence; not a continuum NS theorem)"
+        ),
+    )
+
+
+def _replay_ccf_line_compactified_cap(certificate: Certificate) -> bool | None:
+    try:
+        from omnibias.symbolic.ccf import verify_cap_bundle
+    except ImportError:
+        return None
+    report = verify_cap_bundle(certificate if isinstance(certificate, dict) else dict(certificate))
+    return bool(report.get("residual_samples_match"))
+
+
 # --------------------------------------------------------------------------- #
 # Cordoba-Cordoba-Fontelos self-similar profile (radii-polynomial; may BLOCK)
 # --------------------------------------------------------------------------- #
@@ -218,6 +318,64 @@ def _replay_ccf_selfsimilar(certificate: Certificate) -> bool | None:
         return None
     report = verify_ccf_selfsimilar_blowup_attempt(certificate)
     return bool(report["replay_match"])
+
+
+def _prove_ccf_hardy_wholeline(conjecture: Conjecture) -> ProofAttempt:
+    data = conjecture.data
+    try:
+        cert = certified_ccf_hardy_wholeline_blowup_attempt(
+            coeffs=list(data["coeffs"]),
+            scales=list(data["scales"]),
+            lam=float(data["lam"]),
+            nodes=data.get("nodes"),
+            form=str(data.get("form", "transport")),
+            velocity_sign=float(data.get("velocity_sign", 1.0)),
+            residual_gate=float(data.get("residual_gate", 1e-11)),
+        )
+    except (ValueError, ZeroDivisionError, KeyError) as exc:
+        return _blocked(f"could not build Hardy whole-line CCF certificate: {exc}")
+    # PROVED only when whole_line_certified (collocation close alone is not enough).
+    if cert["closure_certified"] and cert["honesty"].get("whole_line_certified"):
+        return ProofAttempt(
+            status="PROVED",
+            certificate=cert,
+            detail="Hardy whole-line CAP closed (residual gate + ell1_nu radii)",
+        )
+    gap = cert["closure_report"].get("quantified_gap", {})
+    return ProofAttempt(
+        status="BLOCKED",
+        certificate=cert,
+        obligations=(
+            f"whole-line CAP gap: residual_gap={gap.get('residual_gap')}",
+            "collocation/sequence closure incomplete — see closure_report",
+        ),
+        detail="Hardy whole-line CAP not closed (gap quantified)",
+    )
+
+
+def _prove_ccf_fractional_dissipation(conjecture: Conjecture) -> ProofAttempt:
+    data = conjecture.data
+    try:
+        cert = certified_fractional_dissipation_threshold(
+            lambda_lo=float(data["lambda_lo"]),
+            lambda_hi=float(data["lambda_hi"]),
+            alpha_claimed=data.get("alpha_claimed"),
+        )
+    except (ValueError, KeyError) as exc:
+        return _blocked(f"could not build dissipation threshold: {exc}")
+    replay = verify_fractional_dissipation_threshold(cert)
+    if cert["threshold_closed"] and replay["replay_match"]:
+        return ProofAttempt(
+            status="PROVED",
+            certificate=cert,
+            detail="alpha_crit >= 1/(1+lambda_hi) margin sealed",
+        )
+    return ProofAttempt(
+        status="BLOCKED",
+        certificate=cert,
+        obligations=("dissipation threshold margin not non-negative",),
+        detail="fractional dissipation threshold not closed",
+    )
 
 
 # --------------------------------------------------------------------------- #
@@ -379,6 +537,31 @@ def default_provers() -> list[FunctionProver]:
             prove_fn=_prove_ccf_selfsimilar,
             schema_fn=certified_ccf_selfsimilar_blowup_attempt_schema_errors,
             replay_fn=_replay_ccf_selfsimilar,
+        ),
+        FunctionProver(
+            name="ccf_hardy_wholeline_blowup",
+            kinds=frozenset({"ccf_hardy_wholeline_blowup"}),
+            prove_fn=_prove_ccf_hardy_wholeline,
+            schema_fn=certified_ccf_hardy_wholeline_blowup_attempt_schema_errors,
+        ),
+        FunctionProver(
+            name="ccf_fractional_dissipation",
+            kinds=frozenset({"ccf_fractional_dissipation"}),
+            prove_fn=_prove_ccf_fractional_dissipation,
+        ),
+        FunctionProver(
+            name="ccf_line_compactified_cap",
+            kinds=frozenset({"ccf_line_compactified_cap"}),
+            prove_fn=_prove_ccf_line_compactified_cap,
+            schema_fn=lambda cert: __import__(
+                "omnibias.pinn.jax.discovery.cap", fromlist=["cap_schema_errors"]
+            ).cap_schema_errors(cert),
+            replay_fn=_replay_ccf_line_compactified_cap,
+        ),
+        FunctionProver(
+            name="viscous_perturbation_enclosure",
+            kinds=frozenset({"viscous_perturbation_enclosure"}),
+            prove_fn=_prove_viscous_perturbation_enclosure,
         ),
         FunctionProver(
             name="gclm_selfsimilar_blowup",

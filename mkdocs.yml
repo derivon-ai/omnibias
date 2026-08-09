@@ -233,6 +233,8 @@ nav:
       - PINN strict-conservation cages: cookbook/pinn-strict-conservation.md
       - CCF self-similar singularities (CAP): cookbook/ccf-singularity.md
       - CCF-on-the-line calibration: cookbook/ccf-line-calibration.md
+      - IPM self-similar singularities: cookbook/ipm-singularity.md
+      - Boussinesq self-similar singularities: cookbook/boussinesq-singularity.md
       - 2-D Euler steady vortex (Riesz/Leray): cookbook/euler2d-vortex.md
       - 2-D SQG steady vortex (single-Riesz): cookbook/sqg-vortex.md
       - QPINN harmonic oscillator (TISE): cookbook/qpinn-tise-qho.md

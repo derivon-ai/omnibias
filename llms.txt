@@ -46,6 +46,16 @@ attribute-DSL views, the lazy sigma cache, and the torch/jax field-operator
 surface incl. integration, line integrals (the gradient theorem), norms,
 tensor divergence, Wirtinger),
 `omnibias-pinn` and `omnibias-qpinn` (physics-informed / quantum PINNs, built on
+the field substrate). CCF line discovery uses a Cauchy–Hardy exact-Hilbert
+basis (`omnibias.core.verified.hardy_line`, `hilbert_mode="hardy_exact"`) with a
+whole-line CAP attempt (`ccf_hardy_wholeline_blowup`; `whole_line_certified` only
+on genuine covering + NK close), vorticity-form Rung-1 metric
+(`omnibias.pinn.jax.discovery.ccf_vorticity`), sealed Galerkin spectrum,
+and a fractional dissipation threshold certificate; reusable via
+`omnibias.pinn.jax.discovery.pipeline`. Absolute Rung-1/Rung-2 gates are not
+forged — smoke/acceptance report earned only when dense residual and CAP close.
+Clay NS / Yang–Mills parents stay
+external obligations (`navier_stokes_proof_claim=False`).
 `omnibias-fields`; hosts `omnibias.pinn.operator` for neural operator learning
 (DeepONet with closed-form trunk-jet query derivatives through order 4, so a
 shipped KS residual runs unchanged on one jet; multi-head `ConditioningSpec` for
