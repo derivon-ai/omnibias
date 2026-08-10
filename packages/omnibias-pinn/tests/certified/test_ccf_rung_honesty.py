@@ -75,6 +75,59 @@ def test_whole_line_certified_not_forged_without_closure() -> None:
         assert cert["closure_report"]["residual_certified_sup"] <= 1e-11
 
 
+def test_earn_path_default_train_hilbert_is_hardy() -> None:
+    from omnibias.pinn.torch.discovery import ccf_vorticity_neural as cvn
+
+    assert cvn.CCFVorticityNeuralConfig().train_hilbert == "hardy_projection"
+    assert cvn.CCFVorticityNeuralConfig().adam_warmup_steps == 0
+    assert cvn.CCFVorticityNeuralConfig().arm == "earn"
+    assert cvn.CCFVorticityNeuralConfig().optimizer == "cubic_gauss_newton"
+
+
+def test_earn_arm_forbids_adam_warmup() -> None:
+    from omnibias.pinn.torch.discovery import ccf_vorticity_neural as cvn
+
+    cfg = cvn.CCFVorticityNeuralConfig(
+        arm="earn",
+        adam_warmup_steps=5,
+        n_grid=17,
+        hidden=4,
+        cubic_gn_steps=1,
+        qr_gn_steps=0,
+        n_scales=2,
+        n_gamma_multiples=1,
+    )
+    with pytest.raises(ValueError, match="forbids Adam"):
+        cvn.run_ccf_vorticity_neural_discovery(cfg)
+
+
+def test_reproduce_config_allows_adam_and_martens_grosse() -> None:
+    from omnibias.pinn.torch.discovery import ccf_vorticity_neural as cvn
+
+    cfg = cvn.reproduce_deepmind_config(
+        n_grid=17,
+        hidden=4,
+        mg_steps=2,
+        qr_gn_steps=1,
+        adam_warmup_steps=2,
+        dense_n_val=41,
+        y_max=4.0,
+        n_scales=2,
+        n_gamma_multiples=1,
+        mg_solver="qr",
+        d2_weight=0.0,
+        resample_every=0,
+    )
+    assert cfg.arm == "reproduce"
+    assert cfg.optimizer == "martens_grosse"
+    assert cfg.train_hilbert == "hardy_corrected_pv"
+    assert cfg.adam_warmup_steps == 2
+    result = cvn.run_ccf_vorticity_neural_discovery(cfg)
+    assert "MartensGrosse" in str(result.extra["optimizer"])
+    assert np.isfinite(result.diagnostics["reproduction_dense_max_abs_for_gate"])
+    assert result.extra["arm"] == "reproduce"
+
+
 def test_ccf_absolute_gates_require_both_lambda_and_residual() -> None:
     import sys
     from pathlib import Path
@@ -105,6 +158,43 @@ def test_vorticity_discovery_module_imports_and_dense_helper() -> None:
     )
     assert dense["dense_max_abs_vorticity"] >= 0.0
     assert np.isfinite(dense["dense_max_abs_vorticity"])
+
+
+def test_vorticity_train_residual_uses_exact_hardy_hilbert() -> None:
+    """Earn-path residual must be Hardy-Ω exact Hilbert (HΩ=-P), not FFT spectral H."""
+    from omnibias.pinn.jax.discovery import ccf_vorticity
+
+    y = jnp.asarray([-1.0, -0.3, 0.0, 0.3, 1.0], dtype=jnp.float64)
+    coeffs = jnp.asarray([0.2, -0.05], dtype=jnp.float64)
+    scales = jnp.asarray([0.9, 1.7], dtype=jnp.float64)
+    alphas = jnp.asarray([1.62, 3.24], dtype=jnp.float64)
+    lam = 0.6057
+    _r, fields = ccf_vorticity.vorticity_residual_samples(y, coeffs, scales, alphas, lam)
+    # Closed-form Hardy atoms: Ω = Σ c Q, HΩ = -Σ c P.
+    yy = y[:, None]
+    aa = scales[None, :]
+    gg = alphas[None, :]
+    cc = coeffs[None, :]
+    r = jnp.hypot(aa, yy)
+    phi = jnp.arctan2(yy, aa)
+    om_exact = jnp.sum(cc * (r ** (-gg)) * jnp.sin(gg * phi), axis=1)
+    huy_exact = jnp.sum(cc * (-(r ** (-gg)) * jnp.cos(gg * phi)), axis=1)
+    assert jnp.allclose(fields["omega"], om_exact, atol=1e-12)
+    assert jnp.allclose(fields["U_y"], huy_exact, atol=1e-12)
+    assert bool(jnp.all(jnp.isfinite(_r)))
+
+
+def test_vorticity_discovery_reports_qr_mg_and_hardy_train_hilbert() -> None:
+    from omnibias.pinn.jax.discovery import ccf_vorticity
+
+    cfg = ccf_vorticity.CCFVorticityDiscoveryConfig(
+        n_scales=2, n_gamma_multiples=1, n_grid=17, gn_steps=4, y_max=8.0, seed=0
+    )
+    out = ccf_vorticity.run_ccf_vorticity_discovery(cfg)
+    assert out.extra["train_hilbert"] == "hardy_exact_omega"
+    assert out.extra["gn_solver"] == "qr"
+    assert out.extra["optimizer"] == "martens_grosse_gn"
+    assert out.extra["hilbert_convention"] == "hardy_exact_omega"
 
 
 def test_near_null_profile_is_not_a_rung1_win() -> None:

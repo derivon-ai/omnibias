@@ -264,6 +264,63 @@ def ccf_absolute_gates(
     }
 
 
+# IPM / Boussinesq scaffold residual floors (promote when discovery upgrades).
+# Gaussian Adam smoke clears ~O(1); tighten when CubicGN/Martens paths land.
+IPM_SCAFFOLD_RESIDUAL_GATE = 2.0
+BOUSSINESQ_SCAFFOLD_RESIDUAL_GATE = 2.0
+
+
+def ipm_boussinesq_scaffold_gates(
+    *,
+    family: str,
+    max_abs_residual: float,
+    navier_stokes_proof_claim: bool = False,
+) -> dict[str, Any]:
+    """Scaffold absolute gate for IPM/Boussinesq smoke (not Clay NS).
+
+    ``earned`` stays False while residual exceeds the scaffold floor or if any
+    continuum NS claim is asserted. Thresholds tighten when discovery leaves
+    Gaussian Adam smoke.
+    """
+    if navier_stokes_proof_claim:
+        return {
+            "family": family,
+            "earned": False,
+            "gates": gates_block(
+                [
+                    {
+                        "name": "honesty_ns_claim_blocked",
+                        "passed": False,
+                        "detail": "navier_stokes_proof_claim must be False",
+                    }
+                ]
+            ),
+            "honesty": {
+                "navier_stokes_proof_claim": False,
+                "scaffold": True,
+            },
+        }
+    thr = (
+        IPM_SCAFFOLD_RESIDUAL_GATE
+        if family == "ipm"
+        else BOUSSINESQ_SCAFFOLD_RESIDUAL_GATE
+    )
+    entry = ccf_residual_gate(
+        max_abs_residual, thr, name=f"{family}_scaffold_residual"
+    )
+    block = gates_block([entry])
+    return {
+        "family": family,
+        "earned": bool(block["all_passed"]),
+        "gates": block,
+        "honesty": {
+            "navier_stokes_proof_claim": False,
+            "scaffold": True,
+            "not_navier_stokes": True,
+        },
+    }
+
+
 __all__ = [
     "CCF_LAMBDA_1ST_UNSTABLE",
     "CCF_LAMBDA_2ND_UNSTABLE",
@@ -271,10 +328,13 @@ __all__ = [
     "CCF_RESIDUAL_GATE_2ND_UNSTABLE",
     "CCF_RESIDUAL_GATE_STABLE",
     "CCF_STRETCH_RESIDUAL_GATE",
+    "IPM_SCAFFOLD_RESIDUAL_GATE",
+    "BOUSSINESQ_SCAFFOLD_RESIDUAL_GATE",
     "ccf_absolute_gates",
     "ccf_lambda_digits_gate",
     "ccf_residual_gate",
     "gates_block",
+    "ipm_boussinesq_scaffold_gates",
     "mse",
     "rel_l2",
     "require_reference_valid",

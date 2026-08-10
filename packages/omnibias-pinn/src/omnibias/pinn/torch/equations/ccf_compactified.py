@@ -13,8 +13,9 @@ DeepMind-style line-domain toolkit:
   - ``hardy_exact`` -- closed-form whole-line Hilbert on a Cauchy-Hardy
     profile (preferred for the line);
   - ``truncated_line_resampled_periodic_fft`` -- numerical nonlocal on a
-    truncated interval (kept for periodic-path compatibility; not
-    recommended for competitive line CCF).
+    truncated interval (kept for periodic-path compatibility). **Not** the
+    CCF Rung acceptance metric: Rung-1 / CAP use Hardy exact Hilbert on an
+    Omega-primary dictionary, never this FFT path.
 
 A legacy rational map ``q = y/sqrt(1+y^2)`` remains as
 :func:`compactify_y_rational` for callers that need the odd coordinate.
@@ -340,7 +341,12 @@ def ccf_compactified_residual_samples(
 
 @dataclass
 class CordobaCordobaFontelosCompactified:
-    r"""Line-domain / compactified CCF residual on a 1-D spatial ``FieldState``."""
+    r"""Line-domain / compactified CCF residual on a 1-D spatial ``FieldState``.
+
+    The default Hilbert mode is truncated-line FFT for FieldState convenience.
+    It is **not** the CCF Rung acceptance path -- use Hardy-exact Omega-primary
+    discovery / CAP instead.
+    """
 
     lam: float = 0.6057
     component: str = "theta"

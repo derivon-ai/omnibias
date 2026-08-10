@@ -1,0 +1,36 @@
+{
+  "benchmark": "ipm_scaffold_smoke",
+  "tier": "cpu_smoke",
+  "metrics": {
+    "lam": 0.47209895194032675,
+    "max_abs_residual": 0.804912194080905
+  },
+  "absolute_gates": {
+    "family": "ipm",
+    "earned": true,
+    "gates": {
+      "all_passed": true,
+      "entries": [
+        {
+          "name": "ipm_scaffold_residual",
+          "max_abs_residual": 0.804912194080905,
+          "threshold": 1.0,
+          "passed": true
+        }
+      ]
+    },
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "scaffold": true,
+      "not_navier_stokes": true
+    }
+  },
+  "honesty": {
+    "navier_stokes_proof_claim": false,
+    "scaffold": true
+  },
+  "gates": {
+    "earned": true,
+    "passed": true
+  }
+}

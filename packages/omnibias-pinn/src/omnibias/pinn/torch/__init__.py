@@ -23,6 +23,7 @@ from __future__ import annotations
 from omnibias.pinn.torch import (
     cage,
     diagnostics,
+    discovery,
     equations,
     fields,
     losses,
@@ -32,6 +33,7 @@ from omnibias.pinn.torch import (
 __all__ = [
     "cage",
     "diagnostics",
+    "discovery",
     "equations",
     "fields",
     "losses",

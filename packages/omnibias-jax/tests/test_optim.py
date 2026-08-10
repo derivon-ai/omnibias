@@ -243,3 +243,87 @@ def test_natural_gradient_step_newton_on_quadratic() -> None:
         grad = a @ theta - b  # grad of 0.5 theta^T A theta - b^T theta
         theta = natural_gradient_step(theta, grad, a, learning_rate=1.0, damping=0.0)
     assert jnp.allclose(theta, theta_star, atol=1e-8)
+
+
+# --- Exact Martens–Grosse + non-squaring QR / CGLS -------------------------
+
+
+def test_lstsq_qr_matches_dense_on_mild_ls() -> None:
+    from omnibias.jax.optim import lstsq_gauss_newton_direction
+
+    rng = np.random.RandomState(7)
+    jac = jnp.asarray(rng.randn(30, 4))
+    res = jnp.asarray(rng.randn(30))
+    mu = 1e-2
+    d_qr = lstsq_gauss_newton_direction(jac, res, mu)
+    d_dense = gauss_newton_direction(jac, res, mu)
+    assert jnp.allclose(d_qr, d_dense, atol=1e-8, rtol=1e-7)
+
+
+def test_cgls_matches_qr_on_small_problem() -> None:
+    from omnibias.jax.optim import (
+        gauss_newton_direction_cgls,
+        lstsq_gauss_newton_direction,
+    )
+
+    rng = np.random.RandomState(11)
+    a = jnp.asarray(rng.randn(20, 5))
+    true = jnp.asarray(rng.randn(5))
+    b = a @ true
+
+    def residual_fn(p: Array) -> Array:
+        return a @ p - b
+
+    p0 = jnp.zeros(5)
+    jac = a
+    r0 = residual_fn(p0)
+    d_qr = lstsq_gauss_newton_direction(jac, r0, 1e-8)
+    d_cgls = gauss_newton_direction_cgls(residual_fn, p0, 1e-8, cgls_tol=1e-14)
+    assert jnp.allclose(d_qr, d_cgls, atol=1e-6)
+
+
+def test_martens_grosse_jvp_recovers_exact_line_search_on_linear() -> None:
+    from omnibias.jax.optim import martens_grosse_combine
+
+    rng = np.random.RandomState(13)
+    a = jnp.asarray(rng.randn(16, 4))
+    b = jnp.asarray(rng.randn(16))
+
+    def residual_fn(p: Array) -> Array:
+        return a @ p - b
+
+    p0 = jnp.zeros(4)
+    # Any GN direction for linear residual is exact once alpha is optimal.
+    delta = jnp.linalg.lstsq(a, b, rcond=None)[0]
+    step, _ = martens_grosse_combine(residual_fn, p0, delta, None)
+    # Exact alpha for linear: min_a ||r0 + a J d||^2 with Jd = A d, r0 = -b
+    jd = a @ delta
+    r0 = residual_fn(p0)
+    alpha_star = float(-jnp.vdot(jd, r0) / (jnp.vdot(jd, jd) + 1e-30))
+    assert jnp.allclose(step, alpha_star * delta, atol=1e-12)
+    # With alpha_star=1 when delta is the exact LS step from 0: A delta = b => r0=-b, Jd=b
+    assert jnp.allclose(p0 + step, jnp.linalg.lstsq(a, b, rcond=None)[0], atol=1e-9)
+
+
+def test_martens_grosse_gauss_newton_minimize_recovers_nonlinear_ls() -> None:
+    from omnibias.jax.optim import (
+        MartensGrosseGNConfig,
+        martens_grosse_gauss_newton_minimize,
+    )
+
+    t = jnp.linspace(0.0, 1.0, 24)
+    true = jnp.array([2.0, -0.7])
+    y = true[0] * jnp.exp(true[1] * t)
+
+    def residual_fn(p: Array) -> Array:
+        return p[0] * jnp.exp(p[1] * t) - y
+
+    p0 = jnp.array([1.0, 0.0])
+    p1, hist = martens_grosse_gauss_newton_minimize(
+        residual_fn,
+        p0,
+        config=MartensGrosseGNConfig(steps=40, damping=1e-3, solver="qr"),
+    )
+    assert float(hist[-1]) < 1e-16
+    assert jnp.allclose(p1, true, atol=1e-6)
+

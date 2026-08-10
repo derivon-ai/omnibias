@@ -50,11 +50,18 @@ the field substrate). CCF line discovery uses a Cauchy–Hardy exact-Hilbert
 basis (`omnibias.core.verified.hardy_line`, `hilbert_mode="hardy_exact"`) with a
 whole-line CAP attempt (`ccf_hardy_wholeline_blowup`; `whole_line_certified` only
 on genuine covering + NK close), vorticity-form Rung-1 metric
-(`omnibias.pinn.jax.discovery.ccf_vorticity`), sealed Galerkin spectrum,
-and a fractional dissipation threshold certificate; reusable via
+(`omnibias.pinn.jax.discovery.ccf_vorticity` and torch
+`omnibias.pinn.torch.discovery.ccf_vorticity_neural` with CubicGaussNewton +
+Hardy-projection Hilbert — truncated FFT is not the Rung path), sealed Galerkin
+spectrum, and a fractional dissipation threshold certificate; reusable via
 `omnibias.pinn.jax.discovery.pipeline`. Absolute Rung-1/Rung-2 gates are not
 forged — smoke/acceptance report earned only when dense residual and CAP close.
-Clay NS / Yang–Mills parents stay
+Stretch `1e-13` is reported separately when measured. Prior basis spike floors
+~3e-2 to 4e-2 under nontrivial gauge; the five-point torch ladder (grad-norm,
+d1/d2, linearized MSNN, hybrid Hilbert, CubicGN `--full`) measures dense floors
+near ~9e-2 under nontrivial gauge on CPU full probes (smoke ~2e-1) — still above
+the 1e-4 plan bar and absolute gates. Gates remain unearned and thresholds were
+not moved. Clay NS / Yang–Mills parents stay
 external obligations (`navier_stokes_proof_claim=False`).
 `omnibias-fields`; hosts `omnibias.pinn.operator` for neural operator learning
 (DeepONet with closed-form trunk-jet query derivatives through order 4, so a

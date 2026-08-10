@@ -47,7 +47,9 @@ These are verified in CI on every push (counts captured on a CPU-dev host):
 | DeepONet KS bake-off (CPU, 8 seeds) | [`benchmarks/operator_ks_bakeoff.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_ks_bakeoff.py) | see § KS; JSON in [`operator_ks_bakeoff.json`](benchmarks/operator_ks_bakeoff.json) |
 | DeepONet vs FNO (CPU, matched steps) | [`benchmarks/operator_fno_vs_deeponet.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_fno_vs_deeponet.py) | see § DeepONet; JSON in [`operator_fno_vs_deeponet.json`](benchmarks/operator_fno_vs_deeponet.json) |
 | Causal marching (heat + Krishnapriyan reaction) | [`benchmarks/causal_marching.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/causal_marching.py) | equal-budget whole / causal / marching / combined on two families; smoke [`causal_marching_smoke.json`](benchmarks/causal_marching_smoke.json); full [`causal_marching.json`](benchmarks/causal_marching.json) |
-| CCF Hardy line discovery + CAP | [`benchmarks/ccf_line_discovery.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/ccf_line_discovery.py) | Hardy exact-Hilbert smoke + absolute Rung-1 gate reporting; [`ccf_line_smoke.json`](benchmarks/ccf_line_smoke.json) |
+| CCF DeepMind neural reproduction (phase 0) | [`benchmarks/reproduce_deepmind_ccf.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/reproduce_deepmind_ccf.py) / [`benchmarks/deepmind_campaign_tick.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/deepmind_campaign_tick.py) | Neural compactified Ω + spectral Hilbert + Martens–Grosse; dense residual gated on neural profile; stretch \(10^{-13}\) unearned (smoke ~\(10^{-1}\)); [`reproduce_deepmind_ccf_smoke.json`](benchmarks/reproduce_deepmind_ccf_smoke.json) |
+| CCF Hardy line discovery + CAP | [`benchmarks/ccf_line_discovery.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/ccf_line_discovery.py) / [`benchmarks/ccf_hardy_rung_acceptance.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/ccf_hardy_rung_acceptance.py) | After stretch: exact-JVP Martens–Grosse + QR on Hardy-Ω (Adam forbidden). Absolute Rung-1/Rung-2 earned only when measured; [`ccf_line_smoke.json`](benchmarks/ccf_line_smoke.json) |
+| IPM / Boussinesq scaffold | [`benchmarks/ipm_boussinesq_scaffold_smoke.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/ipm_boussinesq_scaffold_smoke.py) | Pipeline adapters + scaffold residual gates; not NS; [`ipm_scaffold_smoke.json`](benchmarks/ipm_scaffold_smoke.json) / [`boussinesq_scaffold_smoke.json`](benchmarks/boussinesq_scaffold_smoke.json) |
 | SDF hard-BC geometry | [`benchmarks/geometry_sdf.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/geometry_sdf.py) | disk / annulus / CSG / nonconvex vs soft-penalty; smoke [`geometry_sdf_smoke.json`](benchmarks/geometry_sdf_smoke.json); full [`geometry_sdf.json`](benchmarks/geometry_sdf.json) |
 | Parametric DeepONet zero-shot | [`benchmarks/operator_zero_shot.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/operator_zero_shot.py) | shared-IC ν sweep; conditioned vs unconditioned vs residual PINN; smoke [`operator_zero_shot_smoke.json`](benchmarks/operator_zero_shot_smoke.json); full [`operator_zero_shot.json`](benchmarks/operator_zero_shot.json) |
 | Spectral bias / FBPINN | [`benchmarks/spectral_bias_fbpinn.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/spectral_bias_fbpinn.py) | equal-param arms + one-shot `lstsq`; smoke [`spectral_bias_fbpinn_smoke.json`](benchmarks/spectral_bias_fbpinn_smoke.json); full [`spectral_bias_fbpinn.json`](benchmarks/spectral_bias_fbpinn.json) |
@@ -83,8 +85,12 @@ time/memory **complexity derivation** in [Complexity](complexity.md). Conditions
 
 ## Curvature optimizers (PINN / operator / scaling / LLM)
 
-`omnibias.torch.optim` ships exact-curvature optimisers as drop-in `torch.optim.Optimizer`
-subclasses — they sit *alongside* Adam (nothing is taken away). Three vendor-neutral studies, all
+`omnibias.torch.optim` / `omnibias.jax.optim` ship exact-curvature optimisers as
+drop-in tools alongside Adam (nothing is taken away). The DeepMind-style
+singularity earn path uses **damped Gauss–Newton with Martens–Grosse closed-form
+LR/momentum via exact JVPs** (`martens_grosse_combine`) and a **non-squaring QR
+(or CGLS) LM solve** — not finite-difference MG probes and not dense
+\(J^\top J\) as the default. Three vendor-neutral studies, all
 iso-wall-clock against a tuned Adam/AdamW baseline that is never handicapped:
 
 **1. PINN accuracy (6 PDEs, CPU-dev, float64, 5 seeds).** Best relative-L2 vs the analytic solution

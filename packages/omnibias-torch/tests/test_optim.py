@@ -34,6 +34,8 @@ from omnibias.torch.optim import (
     hvp,
     lanczos_tridiag,
     lstsq_gauss_newton_direction,
+    martens_grosse_combine,
+    martens_grosse_gauss_newton_minimize,
     quadrature_loss,
     taylor_line_min,
     weighted_residual_fn,
@@ -399,6 +401,69 @@ def test_gauss_newton_cgls_recovers_nonlinear_least_squares() -> None:
     p, history = opt.minimize(residual_fn, torch.tensor([1.0, 0.0], dtype=torch.float64), steps=30)
     assert history[-1] < 1e-12
     assert torch.allclose(p, true, atol=1e-5)
+
+
+def test_martens_grosse_combine_exact_jvp_on_linear() -> None:
+    rng = np.random.RandomState(17)
+    a = torch.tensor(rng.randn(16, 4), dtype=torch.float64)
+    b = torch.tensor(rng.randn(16), dtype=torch.float64)
+
+    def residual_fn(p: torch.Tensor) -> torch.Tensor:
+        return a @ p - b
+
+    p0 = torch.zeros(4, dtype=torch.float64)
+    delta = torch.linalg.lstsq(a, b.unsqueeze(1)).solution.reshape(-1)
+    step, _ = martens_grosse_combine(residual_fn, p0, delta, None)
+    assert torch.allclose(p0 + step, delta, atol=1e-9)
+
+
+def test_martens_grosse_gauss_newton_minimize_qr() -> None:
+    t = torch.linspace(0.0, 1.0, 24, dtype=torch.float64)
+    true = torch.tensor([2.0, -0.7], dtype=torch.float64)
+    y = true[0] * torch.exp(true[1] * t)
+
+    def residual_fn(p: torch.Tensor) -> torch.Tensor:
+        return p[0] * torch.exp(p[1] * t) - y
+
+    p, history = martens_grosse_gauss_newton_minimize(
+        residual_fn,
+        torch.tensor([1.0, 0.0], dtype=torch.float64),
+        steps=40,
+        damping=1e-3,
+        solver="qr",
+        use_martens_grosse=True,
+    )
+    assert history[-1] < 1e-14
+    assert torch.allclose(p, true, atol=1e-5)
+
+
+def test_martens_grosse_torch_jax_parity_on_linear_combine() -> None:
+    """Exact-JVP MG combine agrees across backends on a shared linear residual."""
+    jax = pytest.importorskip("jax")
+    jax.config.update("jax_enable_x64", True)
+    import jax.numpy as jnp
+    from omnibias.jax.optim import martens_grosse_combine as jax_mg
+
+    rng = np.random.RandomState(19)
+    a_np = rng.randn(12, 3)
+    b_np = rng.randn(12)
+    d_np = rng.randn(3)
+    p_np = rng.randn(3)
+
+    a_t = torch.tensor(a_np, dtype=torch.float64)
+    b_t = torch.tensor(b_np, dtype=torch.float64)
+    d_t = torch.tensor(d_np, dtype=torch.float64)
+    p_t = torch.tensor(p_np, dtype=torch.float64)
+
+    def r_torch(p: torch.Tensor) -> torch.Tensor:
+        return a_t @ p - b_t
+
+    def r_jax(p):  # noqa: ANN001
+        return jnp.asarray(a_np) @ p - jnp.asarray(b_np)
+
+    step_t, _ = martens_grosse_combine(r_torch, p_t, d_t, None)
+    step_j, _ = jax_mg(r_jax, jnp.asarray(p_np), jnp.asarray(d_np), None)
+    assert np.allclose(step_t.detach().numpy(), np.asarray(step_j), atol=1e-12)
 
 
 # --- Nielsen (gain-ratio trust-region) damping ----------------------------

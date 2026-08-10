@@ -1,0 +1,36 @@
+{
+  "benchmark": "boussinesq_scaffold_smoke",
+  "tier": "cpu_smoke",
+  "metrics": {
+    "lam": 1.3992015968063871,
+    "max_abs_residual": 1.1106369559096747
+  },
+  "absolute_gates": {
+    "family": "boussinesq",
+    "earned": true,
+    "gates": {
+      "all_passed": true,
+      "entries": [
+        {
+          "name": "boussinesq_scaffold_residual",
+          "max_abs_residual": 1.1106369559096747,
+          "threshold": 2.0,
+          "passed": true
+        }
+      ]
+    },
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "scaffold": true,
+      "not_navier_stokes": true
+    }
+  },
+  "honesty": {
+    "navier_stokes_proof_claim": false,
+    "scaffold": true
+  },
+  "gates": {
+    "earned": true,
+    "passed": true
+  }
+}

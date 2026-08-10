@@ -1,0 +1,23 @@
+---
+description: DeepMind-style CCF/IPM singularity campaign — reproduce neural first, then Hardy, no Clay forge
+globs:
+  - packages/omnibias-pinn/**/discovery/**
+  - packages/omnibias-pinn/**/certified/ccf*
+  - packages/omnibias-pinn/**/certified/ipm*
+  - packages/omnibias-pinn/**/certified/boussinesq*
+  - benchmarks/ccf_*
+  - benchmarks/deepmind_campaign*
+  - benchmarks/reproduce_deepmind*
+alwaysApply: false
+---
+
+# DeepMind campaign claims
+
+- Phase 0: reproduce neural line CCF to stretch `1e-13` (`reproduce_deepmind_ccf.py`) before Hardy CAP.
+- Absolute Rung-1 residual gate stays `1e-11` for 1st unstable CCF (`benchmarks/_gates.py`).
+- Reproduce arm: Martens–Grosse + **`hardy_corrected_pv`** Hilbert; Adam warmup allowed only on cold-start reproduce (not escalate).
+- Stretch still unearned (~`1e-1` Hilbert×dictionary floor); never weaken `1e-13`.
+- Earn-path (after stretch): exact-JVP Martens–Grosse / CubicGaussNewton — never Adam as primary; Hardy train Hilbert.
+- Never forge `whole_line_certified`, `theorem_prover_verified`, or `navier_stokes_proof_claim`.
+- Phase 5 (`phase5_beyond`) requires Rung-2; discrete packages do not replace residual GN.
+- Heavy runs: `$OMNIBIAS_SCRATCH`; commit only small `gates` JSON summaries.

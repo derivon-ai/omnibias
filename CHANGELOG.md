@@ -6,6 +6,80 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Fixed — Phase-0 CCF reproduce audit (P0 honesty / warm / anti-ghost)
+
+- Warm-start: architecture mismatch rebuilds a fresh net (`strict=True`); no
+  hybrid `strict=False` leftover weights.
+- Anti-ghost uses **pre-rescale** gauge / peak samples so hard gauge rescale
+  cannot hide ghosts.
+- CLI / `run_once` default train Hilbert is `hardy_corrected_pv` (matches
+  `reproduce_deepmind_config`); multistage GN labeled `gauss_newton_corr_proxy`
+  (corr-matching, not Wang-linearized).
+- Escalate warm lineage syncs `reproduce` ↔ `ab`; multistage re-score uses
+  `max(dense, projection_defect)`.
+
+### Added — Phase-0 DeepMind neural CCF reproduction (stretch 1e-13)
+
+- `reproduce_deepmind_config` / Martens–Grosse primary on compactified neural Ω
+  with **`hardy_corrected_pv`** train Hilbert; dense Wang metric on the neural
+  profile (`dense_neural_vorticity_residual`) with anti-ghost.
+- `benchmarks/reproduce_deepmind_ccf.py` smoke + escalate loop; campaign tick
+  starts at `phase0_reproduce_neural` until stretch clears (then Hardy Rung-1/2).
+- Multistage `iterate_multistage` with labeled `stage2_heuristic_adam` and
+  optional `gauss_newton_corr_proxy`.
+- Stretch \(10^{-13}\) and Rung-1 \(10^{-11}\) **unchanged / unearned**; measured
+  floor ~\(10^{-1}\) (Hilbert × dictionary catch-22 — not cleared by more MG).
+
+### Added — Exact Martens–Grosse Gauss–Newton (QR / CGLS, exact JVP)
+
+- `omnibias.jax.optim`: `lstsq_gauss_newton_direction`, `cgls`,
+  `gauss_newton_direction_cgls`, `martens_grosse_combine` (exact JVP — no FD
+  probes), and `martens_grosse_gauss_newton_minimize` (default `solver="qr"`,
+  `use_martens_grosse=True`).
+- Torch twins: `martens_grosse_combine`, `martens_grosse_gauss_newton_minimize`,
+  and `GaussNewton(..., use_martens_grosse=True)`.
+- Discovery `train_gn` is a thin pytree wrapper over the JAX primitive; CCF
+  Hardy earn path records `train_hilbert=hardy_exact_omega`, `gn_solver=qr`.
+  Absolute Rung-1 residual gate unchanged / still unearned.
+
+### Added — DeepMind campaign autonomy (Hardy-aligned earn path, adapters, Phase 5)
+
+- Earn-path default train Hilbert is now **Hardy projection** (matches Rung/CAP);
+  truncated-line spectral `H` remains diagnostic-only. Adam forbidden on
+  `CCFHardyAdapter` earn path (Martens–Grosse Hardy-Ω GN).
+- Acceptance ladder prefers JAX Martens–Grosse vs torch CubicGN by dense residual;
+  multistage uses Hardy Wang residual.
+- `benchmarks/deepmind_campaign_tick.py` for Cursor `/loop`; skill
+  `omnibias-dev-deepmind-campaign` + rule `deepmind-campaign.mdc`.
+- Pipeline adapters: `CCFHardyAdapter` (vorticity), `IPMAdapter`, `BoussinesqAdapter`.
+- Phase 5 beyond-DeepMind helpers in `phase5_beyond.py` (partition / tab / logic
+  gates; blocked until Rung-2). Scaffold IPM/Boussinesq smoke + `_gates.py`
+  helpers. Absolute CCF residual gates **unchanged** (`1e-11`); still unearned
+  until dense Wang clears under anti-ghost.
+
+### Added — CCF five-point residual push (grad-norm, d1/d2, linearized MSNN, hybrid H)
+
+Torch vorticity discoverer now trains with gradient-normalized Wang residual,
+d1/d2 residual stack + hybrid adaptive collocation, softplus multiscale core,
+CubicGaussNewton early-stop, and (historically) hybrid Hilbert. **Superseded for
+earn path** by Hardy-aligned train Hilbert above. Acceptance `--full` budgets
+default to serious CubicGN/QR/MS counts under `$OMNIBIAS_SCRATCH`, wrapping
+`$OMNIBIAS_SUBMIT` when set. Absolute gates \(10^{-11}\) / \(10^{-6}\) / stretch
+\(10^{-13}\) remain **uncleared** until measured.
+
+### Added — CCF DeepMind residual push (neural CubicGaussNewton, vorticity end-to-end)
+
+Torch compactified neural vorticity discoverer
+(`omnibias.pinn.torch.discovery.ccf_vorticity_neural`) with OMBU closed-form
+\(\Omega_y\), Hardy-projection exact Hilbert (not truncated FFT as the Rung
+metric), CubicGaussNewton primary + QR polish, multistage correction, optional
+funnel \(\lambda\), and vorticity-form mpmath polish / CAP. Far-field Ω-primary
+Hardy dictionary cancels the linear operator on \(\gamma=\alpha\). Acceptance
+ladder `benchmarks/ccf_hardy_rung_acceptance.py` is vorticity end-to-end with
+no multi-α collapse; CPU smoke vs `--full`. Absolute gates unchanged
+(`1e-11` / `1e-6`); stretch `1e-13` is reported only when measured.
+**Rung-1 / Rung-2 / stretch remain unearned until dense residual clears.**
+
 ### Added — CCF Hardy exact-Hilbert basis, whole-line CAP attempt, dissipation threshold
 
 Line-domain CCF discovery now uses the Cauchy–Hardy pair
@@ -19,10 +93,14 @@ dense Wang residual with exact \(U=H\Theta\). Absolute Rung-1 gates in
 `benchmarks/_gates.py` require **both** published \(\lambda\) digits **and** the
 residual gate (`reproduces_published_lambda` is not λ-alone). Acceptance ladder:
 `benchmarks/ccf_hardy_rung_acceptance.py` (writes `docs/benchmarks/` only when
-`earned=true`). **Rung-1 / Rung-2 are not earned yet** — measured dense vorticity
-floors on nontrivial finite Hardy dictionaries remain \(O(10^{-2})\) under
-\(\Omega(0.5)=0.05\); near-null cancelling micro-scale ghosts are rejected by
-gauge/nontriviality checks and must not forge. Clay NS / Yang–Mills parents stay external.
+`earned=true`). **Rung-1 / Rung-2 are not earned yet.** A feasibility spike of
+the corrected far-field / compactified-angle Hardy family (exact
+\(H\Omega=U'\), mode continuation, Chebyshev+FFT PINN fallback) measured dense
+Wang vorticity floors \(\approx 3\times10^{-2}\)–\(4\times10^{-2}\) under a
+nontrivial gauge — still far above the \(10^{-11}\) absolute gate. Thresholds
+were not weakened; Phase-2 CAP rewiring was not started. Near-null micro-scale
+ghosts remain rejected by gauge/nontriviality checks. Clay NS / Yang–Mills
+parents stay external.
 
 ### Fixed — causal marching seam metric + stiff reaction family
 

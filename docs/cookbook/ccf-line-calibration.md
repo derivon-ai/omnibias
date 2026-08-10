@@ -43,13 +43,21 @@ lambda-tied compactification, Gauss–Newton / funnel / mpmath polish) lives in
     nodes, plus a two-sided enclosure of \(\lambda\). The whole-line residual
     covering is certified only when the interval-\(y\) path is used
     (`between_node_residual_certified`); sequence-space \(Y_0\) must not
-    double-count that residual. Absolute Rung-1 gates (dense Wang vorticity
+    double-count that residual.     Absolute Rung-1 gates (dense Wang vorticity
     residual + published \(\lambda\) digits) and Rung-2
     (`honesty.whole_line_certified`) are **earned only when measured** — never
-    forged from a frozen \(\lambda\) or collocation-only zero. This is a
-    1D-model result: `honesty.unproven_claim`, `three_d_claim`, and (until the
-    gate passes) `whole_line_certified` stay `False`. It is **not** 3D
-    Navier–Stokes/Euler and **not** a global-regularity claim.
+    forged from a frozen \(\lambda\) or collocation-only zero. A basis-rework
+    spike measured dense vorticity floors \(\sim 3\times10^{-2}\)–\(4\times10^{-2}\)
+    under a nontrivial gauge; the torch five-point ladder
+    (`benchmarks/ccf_hardy_rung_acceptance.py`: grad-norm residual, d1/d2 +
+    adaptive collocation, linearized Fourier MSNN, hybrid spectral-train /
+    Hardy-CAP Hilbert, CubicGaussNewton `--full`) measures dense floors near
+    \(\sim 9\times10^{-2}\) under nontrivial gauge on CPU full probes (smoke
+    \(\sim 2\times10^{-1}\)). The plan \(10^{-4}\) smoke bar and the \(10^{-11}\)
+    absolute gate remain unearned; absolute thresholds were not moved. This is a
+    1D-model result: `honesty.unproven_claim`, `three_d_claim`,
+    and (until the gate passes) `whole_line_certified` stay `False`. It is
+    **not** 3D Navier–Stokes/Euler and **not** a global-regularity claim.
 
 ## The radii polynomial
 

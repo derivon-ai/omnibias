@@ -222,19 +222,22 @@ at **near machine precision** (residuals \(\sim10^{-13}\)) with
 
 - **Reproduction:** the *operator* and *self-similar algebra* are reproduced
   exactly (bit-parity across backends, zero substitution error). Line-domain
-  discovery now uses the Hardy exact-Hilbert ansatz
-  (`omnibias.pinn.jax.discovery.ccf_line`); absolute Rung-1 gates for published
-  \(\lambda\) digits and residual thresholds are reported in
-  `docs/benchmarks/ccf_line_smoke.json` (`absolute_gates`) and are earned only
-  when measured.
-- **Improvement:** bit-identical JAX/Torch/numpy twins, Martens–Grosse GN,
-  linearized multistage, funnel, mpmath polish, and an independent second-source
-  validator.
-- **Proof readiness:** Poisson collocation CAP and the Hardy whole-line CAP
-  attempt (`certified_ccf_hardy_wholeline_blowup_attempt`) are the artifacts a
-  computer-assisted proof would consume. `whole_line_certified` flips only on
-  a genuine residual + \(\ell^1_\nu\) closure. Clay NS remains an external
-  obligation (`navier_stokes_proof_claim=False`).
+  discovery uses Hardy exact-Hilbert (`ccf_line` / `ccf_vorticity`) plus torch
+  compactified neural vorticity (`ccf_vorticity_neural`) with **Hardy-aligned
+  train Hilbert** (default) and CubicGaussNewton / Martens–Grosse earn path
+  (Adam forbidden). Absolute Rung-1 gates are reported via
+  `benchmarks/ccf_hardy_rung_acceptance.py` / `docs/benchmarks/` **only when
+  earned**. Stretch \(10^{-13}\) never forges Rung-1. Measured dense Wang
+  floors under nontrivial gauge remain \(O(10^{-2})\)–\(O(10^{-1})\);
+  **Rung-1 (\(10^{-11}\)) and Rung-2 remain unearned** until dense residual +
+  CAP close; absolute thresholds were not moved.
+- **Improvement:** autonomy tick `benchmarks/deepmind_campaign_tick.py`,
+  `CCFHardyAdapter` (Martens–Grosse), IPM/Boussinesq adapters, Phase 5
+  beyond-DeepMind helpers (`phase5_beyond`, gated on Rung-2).
+- **Proof readiness:** Hardy whole-line CAP
+  (`certified_ccf_hardy_wholeline_blowup_attempt`, `form="vorticity"`).
+  `whole_line_certified` flips only on genuine residual + \(\ell^1_\nu\)
+  closure. Clay NS remains external (`navier_stokes_proof_claim=False`).
 
 ## See also
 

@@ -1,0 +1,83 @@
+{
+  "benchmark": "reproduce_deepmind_ccf",
+  "tier": "cpu_smoke",
+  "wall_seconds": 2.5957683070446365,
+  "config": {
+    "arm": "reproduce",
+    "lam": 0.6057,
+    "hidden": 8,
+    "depth": 1,
+    "n_grid": 33,
+    "mg_steps": 6,
+    "qr_gn_steps": 2,
+    "adam_warmup_steps": 5,
+    "train_hilbert": "hardy_corrected_pv",
+    "mg_solver": "qr",
+    "optimizer": "MartensGrosseGN(qr)+QR",
+    "multistage_rounds": 0,
+    "y_max": 8.0,
+    "dense_n_val": 201,
+    "seed": 0
+  },
+  "metrics": {
+    "reproduction_dense_max_abs_for_gate": 1.0,
+    "reproduction_dense_max_abs": 0.1033724660962161,
+    "omega_gauge_sample": 0.05,
+    "omega_max_abs": 0.06016861243472903,
+    "collocation_max_abs": 0.1032333065648275,
+    "orders_to_stretch": 13.0
+  },
+  "multistage": {
+    "skipped": true
+  },
+  "gates": {
+    "lambda_ok": true,
+    "stretch_1e-13_cleared": false,
+    "rung1_1e-11_report": false,
+    "entries": [
+      {
+        "name": "ccf_lambda_reproduce",
+        "lam": 0.6057,
+        "target": 0.6057,
+        "abs_error": 0.0,
+        "abs_tol": 5e-05,
+        "passed": true
+      },
+      {
+        "name": "ccf_stretch_1e-13_reproduce",
+        "max_abs_residual": 1.0,
+        "threshold": 1e-13,
+        "passed": false
+      },
+      {
+        "name": "ccf_rung1_1e-11_report",
+        "max_abs_residual": 1.0,
+        "threshold": 1e-11,
+        "passed": false
+      }
+    ]
+  },
+  "diagnosis": {
+    "residual": 1.0,
+    "next_actions": [
+      "never_weaken_1e-13_stretch",
+      "never_forge_navier_stokes",
+      "widen_hardy_dictionary_or_hilbert_fidelity",
+      "widen_network_hidden",
+      "increase_mg_steps",
+      "more_collocation",
+      "run_multistage_rounds",
+      "hilbert_dictionary_catch22_enrich_dict_or_free_omega_hilbert",
+      "orders_to_stretch=13.00",
+      "current_hidden=8",
+      "current_mg_steps=6"
+    ]
+  },
+  "honesty": {
+    "navier_stokes_proof_claim": false,
+    "continuum_claim": false,
+    "arm": "reproduce",
+    "hardy_cap_deferred_until_stretch": true,
+    "metric": "wang_vorticity_dense_neural_matched_hilbert"
+  }
+}

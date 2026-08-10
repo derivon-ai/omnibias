@@ -154,6 +154,42 @@ def lstsq_gauss_newton_direction(jac: Tensor, res: Tensor, damping: float) -> Te
     return cast(Tensor, sol.reshape(-1))
 
 
+def martens_grosse_combine(
+    residual_fn: ResidualFn,
+    params: Tensor,
+    delta_gn: Tensor,
+    prev_delta: Tensor | None,
+) -> tuple[Tensor, Tensor]:
+    r"""Martens–Grosse closed-form LR / momentum via **exact** JVPs.
+
+    Minimises ``|| r + J (alpha d + mu prev) ||^2`` for ``(alpha, mu)`` using
+    ``Jd = jvp(r, d)`` and ``Jp = jvp(r, prev)`` -- no finite-difference probes.
+    Returns ``(step, momentum_state)``. Twin of
+    :func:`omnibias.jax.optim.martens_grosse_combine`.
+    """
+    r0 = residual_fn(params)
+    _, j_d = jvp(residual_fn, (params,), (delta_gn,))
+    if prev_delta is None:
+        num = -torch.dot(j_d, r0)
+        den = torch.dot(j_d, j_d) + 1e-30
+        alpha = num / den
+        step = alpha * delta_gn
+        return step, step
+
+    _, j_p = jvp(residual_fn, (params,), (prev_delta,))
+    a11 = torch.dot(j_d, j_d)
+    a12 = torch.dot(j_d, j_p)
+    a22 = torch.dot(j_p, j_p)
+    b1 = -torch.dot(j_d, r0)
+    b2 = -torch.dot(j_p, r0)
+    det = a11 * a22 - a12 * a12
+    det = torch.where(torch.abs(det) < 1e-30, torch.as_tensor(1e-30, dtype=det.dtype, device=det.device), det)
+    alpha = (a22 * b1 - a12 * b2) / det
+    mu = (-a12 * b1 + a11 * b2) / det
+    step = alpha * delta_gn + mu * prev_delta
+    return step, step
+
+
 def conjugate_gradient(
     matvec: MatVec,
     b: Tensor,
@@ -638,7 +674,7 @@ class GaussNewton:
         doubling ``mu <- mu * nu`` (``nu <- 2 nu``) on rejection, where ``rho`` is the ratio of
         actual to model-predicted reduction. It anneals ``mu -> 0`` in the fast regime so GN
         can enter its quadratic convergence, and is recommended together with ``qr`` / ``cgls``.
-    cg_max_iter, cg_tol:
+        cg_max_iter, cg_tol:
         Krylov budget / relative tolerance for the iterative solvers (``"cg"`` and ``"cgls"``).
     target_condition:
         Optional certified-conditioning target (``> 1``); ``"dense"`` solver only. When set,
@@ -648,6 +684,9 @@ class GaussNewton:
         the ``eps -> 0`` rank/regularization collapse), and stashes the sealed conditioning
         certificate on ``last_certificate``. Matrix-free solvers assemble no matrix to certify
         and ignore it.
+    use_martens_grosse:
+        If ``True``, after each LM direction apply :func:`martens_grosse_combine` (exact
+        JVP 2x2 LR/momentum). Momentum state resets on rejected steps.
     """
 
     def __init__(
@@ -664,6 +703,7 @@ class GaussNewton:
         cg_max_iter: int = 100,
         cg_tol: float = 1e-8,
         target_condition: float | None = None,
+        use_martens_grosse: bool = False,
     ) -> None:
         if damping <= 0.0:
             raise ValueError(f"damping must be > 0, got {damping}")
@@ -696,6 +736,8 @@ class GaussNewton:
         self.cg_max_iter = int(cg_max_iter)
         self.cg_tol = float(cg_tol)
         self.target_condition = None if target_condition is None else float(target_condition)
+        self.use_martens_grosse = bool(use_martens_grosse)
+        self._prev_delta: Tensor | None = None
         self.last_certificate: dict[str, Any] | None = None
         self.n_iter = 0
 
@@ -753,11 +795,18 @@ class GaussNewton:
             else:  # cgls
                 assert jt is not None and jvec is not None
                 delta = _gn_cgls_direction(res, jt, jvec, mu, self.cg_max_iter, self.cg_tol)
+            if self.use_martens_grosse:
+                delta, mom = martens_grosse_combine(
+                    residual_fn, params, delta, self._prev_delta
+                )
+            else:
+                mom = delta
             new_params = params + delta
             res_new = residual_fn(new_params)
             loss1 = _half_mean_sq(res_new)
             if math.isfinite(loss1) and loss1 < loss0:
                 self.damping = self._accept_damping(mu, delta, res_new, sse0, grad)
+                self._prev_delta = mom.detach()
                 self.n_iter += 1
                 return new_params, GaussNewtonInfo(loss1, self.damping, True, self.n_iter)
             if self.damping_strategy == "nielsen":
@@ -765,6 +814,7 @@ class GaussNewton:
                 nu *= 2.0
             else:
                 mu = min(mu * self.damping_increase, self.max_damping)
+            self._prev_delta = None
         self.damping = mu
         self.n_iter += 1
         return params, GaussNewtonInfo(loss0, self.damping, False, self.n_iter)
@@ -791,6 +841,32 @@ class GaussNewton:
             params, info = self.step(residual_fn, params)
             history.append(info.loss)
         return params, history
+
+
+def martens_grosse_gauss_newton_minimize(
+    residual_fn: ResidualFn,
+    params0: Tensor,
+    *,
+    steps: int = 50,
+    damping: float = 1e-3,
+    solver: Literal["dense", "qr", "cg", "cgls"] = "qr",
+    use_martens_grosse: bool = True,
+    damping_decrease: float = 0.7,
+    damping_increase: float = 2.0,
+) -> tuple[Tensor, list[float]]:
+    r"""Functional twin of :func:`omnibias.jax.optim.martens_grosse_gauss_newton_minimize`.
+
+    Defaults to QR + Martens–Grosse (exact JVP). Prefer this for PINN residual maps
+    when parity with the JAX earn path matters.
+    """
+    opt = GaussNewton(
+        damping=damping,
+        damping_decrease=damping_decrease,
+        damping_increase=damping_increase,
+        solver=solver,
+        use_martens_grosse=use_martens_grosse,
+    )
+    return opt.minimize(residual_fn, params0, steps=steps)
 
 
 # --- Cubic-regularised Newton (exact-jet second-order, saddle-escaping) ----
@@ -3686,6 +3762,8 @@ __all__ = [
     "hvp",
     "lanczos_tridiag",
     "lstsq_gauss_newton_direction",
+    "martens_grosse_combine",
+    "martens_grosse_gauss_newton_minimize",
     "natural_gradient_direction",
     "quadrature_loss",
     "solve_subspace_trust_region",

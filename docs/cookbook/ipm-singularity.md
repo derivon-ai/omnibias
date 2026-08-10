@@ -4,9 +4,14 @@ Incompressible porous media (IPM) self-similar residual + smoke discovery for
 the DeepMind unstable-singularity ladder. Honesty-first: local Darcy velocity
 proxy, not Biot–Savart; **not** Navier–Stokes.
 
+Pipeline adapter: `omnibias.pinn.jax.discovery.pipeline.IPMAdapter`.
+CPU smoke: `python benchmarks/ipm_boussinesq_scaffold_smoke.py --family ipm`
+→ [`docs/benchmarks/ipm_scaffold_smoke.json`](../benchmarks/ipm_scaffold_smoke.json).
+
 ```python
 import jax; jax.config.update("jax_enable_x64", True)
 from omnibias.pinn.jax.discovery import ipm
+from omnibias.pinn.jax.discovery.pipeline import IPMAdapter, run_singularity_pipeline
 from omnibias.pinn.certified.ipm import build_ipm_cap_bundle
 from omnibias.symbolic.ipm import verify_ipm_bundle
 
@@ -14,4 +19,6 @@ out = ipm.run_ipm_discovery(ipm.IPMDiscoveryConfig(n=12, steps=40))
 bundle = build_ipm_cap_bundle(out)
 assert verify_ipm_bundle(bundle)["residual_samples_match"]
 assert bundle["honesty"]["navier_stokes_proof_claim"] is False
+pipe = run_singularity_pipeline(IPMAdapter(n=8, steps=5), None)
+assert pipe.honesty["navier_stokes_proof_claim"] is False
 ```
