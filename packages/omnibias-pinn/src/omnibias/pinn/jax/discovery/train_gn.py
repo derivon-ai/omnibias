@@ -20,7 +20,6 @@ from dataclasses import dataclass
 import jax.numpy as jnp
 from jax import Array
 from jax.flatten_util import ravel_pytree
-
 from omnibias.jax.optim import (  # noqa: E402
     MartensGrosseGNConfig,
     martens_grosse_gauss_newton_minimize,

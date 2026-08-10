@@ -265,7 +265,7 @@ def polish_hardy_ccf(
             },
         }
 
-    from omnibias.symbolic.ccf import hardy_profile_numpy, ccf_self_similar_residual
+    from omnibias.symbolic.ccf import ccf_self_similar_residual, hardy_profile_numpy
 
     th, thp, hth, hthp = hardy_profile_numpy(nodes, c_f, a_f, alpha)
     r64 = ccf_self_similar_residual(

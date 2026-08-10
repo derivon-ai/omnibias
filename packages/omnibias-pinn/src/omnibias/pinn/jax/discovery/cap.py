@@ -30,7 +30,7 @@ from __future__ import annotations
 import json
 import platform
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -98,7 +98,7 @@ def _band_limited_representation(
 
 
 def build_cap_bundle(
-    result: Union["CCFDiscoveryResult", "CCFLineDiscoveryResult"],
+    result: CCFDiscoveryResult | CCFLineDiscoveryResult,
     *,
     fourier_threshold: float = 1e-12,
     reproduces_published_lambda: bool | None = None,
@@ -129,7 +129,7 @@ def build_cap_bundle(
 
 
 def _build_periodic_cap_bundle(
-    result: "CCFDiscoveryResult",
+    result: CCFDiscoveryResult,
     *,
     fourier_threshold: float,
     reproduces_published_lambda: bool | None,
@@ -203,7 +203,7 @@ def _build_periodic_cap_bundle(
 
 
 def _build_line_cap_bundle(
-    result: "CCFLineDiscoveryResult",
+    result: CCFLineDiscoveryResult,
     *,
     fourier_threshold: float,
     reproduces_published_lambda: bool | None,

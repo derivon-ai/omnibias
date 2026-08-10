@@ -130,7 +130,7 @@ def hardy_galerkin_matrix(
     for i, y in enumerate(nodes):
         y_iv = Interval.point(float(y))
         row: list[Interval] = []
-        for j, a in enumerate(scales):
+        for _j, a in enumerate(scales):
             pk = hardy_even(float(y), float(a), alpha)
             dpk = hardy_even_deriv(float(y), float(a), alpha)
             qk = hardy_odd(float(y), float(a), alpha)

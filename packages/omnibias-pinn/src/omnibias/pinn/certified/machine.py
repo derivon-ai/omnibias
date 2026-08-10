@@ -63,6 +63,14 @@ from omnibias.core.proof import (
     verify_certificate_digest,
 )
 from omnibias.core.verified.eig import certified_perron_spectral_gap
+from omnibias.pinn.certified.ccf_hardy import (
+    certified_ccf_hardy_wholeline_blowup_attempt,
+    certified_ccf_hardy_wholeline_blowup_attempt_schema_errors,
+)
+from omnibias.pinn.certified.dissipation_threshold import (
+    certified_fractional_dissipation_threshold,
+    verify_fractional_dissipation_threshold,
+)
 from omnibias.pinn.certified.fluid import (
     navier_stokes_periodic_residual_schema_errors,
     prove_navier_stokes_periodic_residual,
@@ -90,14 +98,6 @@ from omnibias.pinn.certified.navier_stokes import (
     certified_gclm_selfsimilar_blowup,
     certified_gclm_selfsimilar_blowup_schema_errors,
     refine_ccf_selfsimilar_profile,
-)
-from omnibias.pinn.certified.ccf_hardy import (
-    certified_ccf_hardy_wholeline_blowup_attempt,
-    certified_ccf_hardy_wholeline_blowup_attempt_schema_errors,
-)
-from omnibias.pinn.certified.dissipation_threshold import (
-    certified_fractional_dissipation_threshold,
-    verify_fractional_dissipation_threshold,
 )
 from omnibias.pinn.certified.pde import (
     pinn_aposteriori_proof_schema_errors,

@@ -27,24 +27,22 @@ from typing import Any, Literal
 import numpy as np
 import torch
 import torch.nn as nn
-from torch import Tensor
-
+from omnibias.pinn.torch.equations.ccf_compactified import (
+    alpha_from_lambda,
+    apply_envelope,
+    compactify_y_lambda,
+    hardy_odd,
+    hilbert_transform_truncated_line,
+)
 from omnibias.torch.activations.registry import get_activation
-from omnibias.torch.architectures.pinn import JetMLP, PINNOMBU
+from omnibias.torch.architectures.pinn import PINNOMBU, JetMLP
 from omnibias.torch.optim import (
     CubicGaussNewton,
     GaussNewton,
     functional_residual_fn,
     martens_grosse_gauss_newton_minimize,
 )
-from omnibias.pinn.torch.equations.ccf_compactified import (
-    alpha_from_lambda,
-    apply_envelope,
-    compactify_y_lambda,
-    hardy_even,
-    hardy_odd,
-    hilbert_transform_truncated_line,
-)
+from torch import Tensor
 
 TrainHilbert = Literal[
     "truncated_line_spectral",

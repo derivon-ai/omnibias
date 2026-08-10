@@ -222,7 +222,11 @@ def run_ccf_line_discovery(
                 n_chunk = min(chunk, remaining)
                 lam_hold = float(p["lam"])
 
-                def r_fn(pp: object, y_ref: Array = y_cur) -> Array:
+                def r_fn(
+                    pp: object,
+                    y_ref: Array = y_cur,
+                    lam_hold: float = lam_hold,
+                ) -> Array:
                     assert isinstance(pp, dict)
                     if not train_lam:
                         pp = {**pp, "lam": jnp.asarray(lam_hold, dtype=jnp.float64)}
@@ -261,7 +265,7 @@ def run_ccf_line_discovery(
         train_lam = cfg.train_lam and funnel_updates <= 0
         y_cur = y_grid
         for t in range(1, int(n_steps) + 1):
-            loss, grad = jax.value_and_grad(lambda pp: loss_fn(pp, y_cur))(p)
+            loss, grad = jax.value_and_grad(lambda pp, y_ref=y_cur: loss_fn(pp, y_ref))(p)
             if not train_lam:
                 grad = {**grad, "lam": jnp.zeros_like(grad["lam"])}
             m = jax.tree_util.tree_map(lambda mm, gg: b1 * mm + (1 - b1) * gg, m, grad)
@@ -269,7 +273,7 @@ def run_ccf_line_discovery(
             bc1 = 1.0 - b1**t
             bc2 = 1.0 - b2**t
             p = jax.tree_util.tree_map(
-                lambda pp, mm, vv: pp - lr * (mm / bc1) / (jnp.sqrt(vv / bc2) + eps),
+                lambda pp, mm, vv, c1=bc1, c2=bc2: pp - lr * (mm / c1) / (jnp.sqrt(vv / c2) + eps),
                 p, m, v,
             )
             loss_hist.append(float(loss))

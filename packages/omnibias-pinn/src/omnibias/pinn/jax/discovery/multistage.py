@@ -160,7 +160,8 @@ def train_stage2_correction(
         bc1 = 1.0 - b1**t
         bc2 = 1.0 - b2**t
         params = jax.tree_util.tree_map(
-            lambda pp, mm, vv: pp - cfg.lr * (mm / bc1) / (jnp.sqrt(vv / bc2) + eps_adam),
+            lambda pp, mm, vv, c1=bc1, c2=bc2: pp
+            - cfg.lr * (mm / c1) / (jnp.sqrt(vv / c2) + eps_adam),
             params, m, v,
         )
         losses.append(float(loss))

@@ -14,8 +14,8 @@ jax.config.update("jax_enable_x64", True)
 
 def test_theta_transport_residual_at_origin_is_minus_lam_theta0() -> None:
     """Even profiles cannot clear the Theta residual at y=0 unless Theta(0)=0."""
-    from omnibias.symbolic.ccf import ccf_self_similar_residual, hardy_profile_numpy
     from omnibias.pinn.jax.equations.ccf_compactified import alpha_from_lambda
+    from omnibias.symbolic.ccf import ccf_self_similar_residual, hardy_profile_numpy
 
     lam = 0.6057
     y = np.array([0.0])

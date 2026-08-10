@@ -18,12 +18,12 @@ Companion documents:
 - Licensing (two tiers, and the invariant between them): [`LICENSING.md`](../LICENSING.md)
 - Governance and maintainer roster: [`GOVERNANCE.md`](../GOVERNANCE.md), [`MAINTAINERS.md`](../MAINTAINERS.md)
 - Blocker / limitation register: [`release_blockers.md`](release_blockers.md)
-- API-stability contract: [`docs/stability.md`](docs/stability.md)
-- Reproduction (pinned toolchain, seeds, selectors): [`docs/reproducibility.md`](docs/reproducibility.md)
+- API-stability contract: [`docs/stability.md`](stability.md)
+- Reproduction (pinned toolchain, seeds, selectors): [`docs/reproducibility.md`](reproducibility.md)
 
 ## Curated-core release set
 
-Published first, under the [API-stability contract](docs/stability.md). The
+Published first, under the [API-stability contract](stability.md). The
 `pyproject` metadata is the single source of truth for each version; every
 distribution derives `__version__` from the installed metadata. Use
 `python scripts/bump_version.py` rather than editing versions by hand.
@@ -42,7 +42,7 @@ distribution derives `__version__` from the installed metadata. Use
 The whole curated core is permissive, which is the point of the split: the
 adoption surface carries no copyleft obligation. The remaining 34 distributions
 are Alpha on the extended track and are **not** under the stability contract.
-See [`docs/packages.md`](docs/packages.md) for the full grouped inventory.
+See [`docs/packages.md`](packages.md) for the full grouped inventory.
 
 ## Verification gate (all green)
 
@@ -78,7 +78,7 @@ jobs, one per distribution.
 ## Licensing posture (new since the previous sign-off)
 
 omnibias is **open-core**, in two tiers recorded in
-`[tool.omnibias.license_tiers]` in the root [`pyproject.toml`](pyproject.toml):
+`[tool.omnibias.license_tiers]` in the root [`pyproject.toml`](../pyproject.toml):
 
 - **Tier P -- `Apache-2.0`** (28 packages): the derivative tower and everything
   built directly on it. Express patent grant; usable in closed-source and
@@ -91,7 +91,7 @@ Three mechanical properties are enforced rather than documented:
 1. **The DAG invariant.** No permissive package depends on a copyleft package,
    through `dependencies` or any `optional-dependencies` extra. Verified across
    all 42 distributions;
-   [`test_license_consistency.py`](packages/omnibias-core/tests/test_license_consistency.py)
+   [`test_license_consistency.py`](../packages/omnibias-core/tests/test_license_consistency.py)
    fails the build if such an edge is ever added, and self-tests that the check
    is not a tautology.
 2. **Single source of truth.** The tier table drives the per-package `LICENSE`
@@ -142,7 +142,7 @@ Static, backend-free guards that must stay green to tag (they run in the
 
 - **Publishing:** PyPI trusted publishing (OIDC) only. No long-lived API token
   exists in secrets.
-- **Provenance:** [`release.yml`](.github/workflows/release.yml) emits SLSA
+- **Provenance:** [`release.yml`](../.github/workflows/release.yml) emits SLSA
   build-provenance attestations for every artifact. Consumers verify with
   `gh attestation verify <dist> --repo derivon-ai/omnibias`.
 - **Scanning:** CodeQL, OpenSSF Scorecard, dependency review, and SBOM
@@ -195,7 +195,7 @@ Highlights:
 ## Cutting the release candidates (human sign-off required)
 
 Tagging triggers the TestPyPI publish workflow
-([`.github/workflows/release.yml`](.github/workflows/release.yml)), so it is a
+([`.github/workflows/release.yml`](../.github/workflows/release.yml)), so it is a
 deliberate release-owner action and is intentionally **not** automated here.
 From a clean, green `main`, with the owner actions above complete:
 
@@ -236,4 +236,4 @@ tag.
 - [ ] **Release owner** cuts the RC tags above (final human action).
 
 *Prepared for Derivon. Every gate above is reproducible via
-[`docs/reproducibility.md`](docs/reproducibility.md).*
+[`docs/reproducibility.md`](reproducibility.md).*

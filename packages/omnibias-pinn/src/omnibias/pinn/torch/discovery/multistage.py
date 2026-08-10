@@ -28,13 +28,12 @@ from typing import Any, Literal
 import numpy as np
 import torch
 import torch.nn as nn
-from torch import Tensor
-
 from omnibias.pinn.jax.discovery.multistage import (
     MultiStageConfig,
     compose_profiles,
     dominant_residual_frequency,
 )
+from torch import Tensor
 
 Stage2Optimizer = Literal["adam", "gauss_newton"]
 

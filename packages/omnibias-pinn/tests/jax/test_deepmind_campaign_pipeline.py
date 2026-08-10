@@ -18,8 +18,8 @@ def test_ccf_hardy_adapter_forbids_adam() -> None:
 
 def test_ccf_hardy_adapter_martens_grosse_smoke() -> None:
     from omnibias.pinn.jax.discovery.pipeline import (
-        CCFHardyAdapter,
         CCF_RUNG1_RESIDUAL_GATE,
+        CCFHardyAdapter,
         PipelineConfig,
         run_singularity_pipeline,
     )

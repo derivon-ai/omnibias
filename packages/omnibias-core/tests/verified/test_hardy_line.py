@@ -15,6 +15,8 @@ import random
 import mpmath as mp
 import pytest
 from omnibias.core.verified import (
+    conjugate_poisson,
+    conjugate_poisson_deriv,
     hardy_even,
     hardy_even_deriv,
     hardy_even_profile,
@@ -26,9 +28,7 @@ from omnibias.core.verified import (
     hilbert_of_hardy_even,
     hilbert_of_hardy_odd,
     poisson_kernel,
-    conjugate_poisson,
     poisson_kernel_deriv,
-    conjugate_poisson_deriv,
 )
 
 

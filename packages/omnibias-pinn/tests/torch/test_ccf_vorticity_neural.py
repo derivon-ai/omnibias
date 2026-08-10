@@ -10,11 +10,11 @@ import pytest
 torch = pytest.importorskip("torch")
 torch.set_default_dtype(torch.float64)
 
-from omnibias.pinn.jax.discovery.ccf_vorticity import (  # noqa: E402
-    leading_mode_far_field_cancel,
-)
 from omnibias.pinn.certified.ccf_hardy import (  # noqa: E402
     certified_ccf_hardy_wholeline_blowup_attempt,
+)
+from omnibias.pinn.jax.discovery.ccf_vorticity import (  # noqa: E402
+    leading_mode_far_field_cancel,
 )
 from omnibias.pinn.torch.discovery import ccf_vorticity_neural as cvn  # noqa: E402
 from omnibias.pinn.torch.discovery import multistage as ms  # noqa: E402

@@ -58,16 +58,16 @@ from omnibias.symbolic.blasius import (
     solve_blasius,
     write_blasius_artifacts,
 )
+from omnibias.symbolic.boussinesq import (
+    boussinesq_selfsimilar_residual,
+    verify_boussinesq_bundle,
+)
 from omnibias.symbolic.causal import (
     causal_discovery_report,
     mutual_information_matrix,
     notears_acyclicity,
     notears_lite,
     term_parent_ranking,
-)
-from omnibias.symbolic.boussinesq import (
-    boussinesq_selfsimilar_residual,
-    verify_boussinesq_bundle,
 )
 from omnibias.symbolic.ccf import (
     assess_ccf_candidate,
@@ -84,10 +84,6 @@ from omnibias.symbolic.ccf import (
     verify_ccf_linearized_operator_bound,
     verify_ccf_residual,
     verify_ccf_selfsimilar_blowup_attempt,
-)
-from omnibias.symbolic.ipm import (
-    ipm_selfsimilar_residual,
-    verify_ipm_bundle,
 )
 from omnibias.symbolic.diagnostics import (
     DIVERGENCE_OBJECTIVES,
@@ -271,6 +267,10 @@ from omnibias.symbolic.geometry_discovery import (
     riemann_tensor,
     scalar_curvature,
     warped_product_metric_field,
+)
+from omnibias.symbolic.ipm import (
+    ipm_selfsimilar_residual,
+    verify_ipm_bundle,
 )
 from omnibias.symbolic.latent import (
     LatentODEResult,
@@ -517,6 +517,9 @@ __all__ = [
     "gl_fractional_derivative",
     "global_sparse_law",
     "gradient_form",
+    "hardy_even_numpy",
+    "hardy_odd_numpy",
+    "hardy_profile_numpy",
     "hellinger_to_gaussian",
     "hodge_laplacian",
     "hodge_star",
@@ -584,11 +587,8 @@ __all__ = [
     "symbolic_hidden_law",
     "takens_embedding",
     "term_parent_ranking",
-    "hardy_even_numpy",
-    "hardy_odd_numpy",
-    "hardy_profile_numpy",
-    "truncated_line_hilbert",
     "total_variation_to_gaussian",
+    "truncated_line_hilbert",
     "validate_rational_expression",
     "verify_active_projector_error_certificate",
     "verify_active_subspace_absorption_frontier_report",

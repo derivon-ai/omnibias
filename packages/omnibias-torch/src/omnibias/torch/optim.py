@@ -168,7 +168,8 @@ def martens_grosse_combine(
     :func:`omnibias.jax.optim.martens_grosse_combine`.
     """
     r0 = residual_fn(params)
-    _, j_d = jvp(residual_fn, (params,), (delta_gn,))
+    # Stubs may type jvp as a 3-tuple; runtime returns 2 for this call shape.
+    _, j_d, *_ = jvp(residual_fn, (params,), (delta_gn,))
     if prev_delta is None:
         num = -torch.dot(j_d, r0)
         den = torch.dot(j_d, j_d) + 1e-30
@@ -176,7 +177,7 @@ def martens_grosse_combine(
         step = alpha * delta_gn
         return step, step
 
-    _, j_p = jvp(residual_fn, (params,), (prev_delta,))
+    _, j_p, *_ = jvp(residual_fn, (params,), (prev_delta,))
     a11 = torch.dot(j_d, j_d)
     a12 = torch.dot(j_d, j_p)
     a22 = torch.dot(j_p, j_p)

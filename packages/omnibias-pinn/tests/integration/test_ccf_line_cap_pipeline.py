@@ -9,9 +9,9 @@ import pytest
 jax = pytest.importorskip("jax")
 jax.config.update("jax_enable_x64", True)
 
+from omnibias.core.proof import Conjecture  # noqa: E402
 from omnibias.pinn.certified import build_default_machine  # noqa: E402
 from omnibias.pinn.jax.discovery import cap, ccf_line  # noqa: E402
-from omnibias.core.proof import Conjecture  # noqa: E402
 
 
 def test_line_discovery_cap_symbolic_replay() -> None:

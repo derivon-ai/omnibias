@@ -154,7 +154,9 @@ def ccf_self_similar_residual(
         h_theta_y_fn = periodic_hilbert
     elif hilbert_convention == "truncated_line_resampled_periodic_fft":
         h_theta = truncated_line_hilbert(y, theta)
-        h_theta_y_fn = lambda v: truncated_line_hilbert(y, v)
+
+        def h_theta_y_fn(v: np.ndarray) -> np.ndarray:
+            return truncated_line_hilbert(y, v)
     elif hilbert_convention == "hardy_exact":
         if hilbert_values is None:
             raise ValueError("hardy_exact requires hilbert_values")

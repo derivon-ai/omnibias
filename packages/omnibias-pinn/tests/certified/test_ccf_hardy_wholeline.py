@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
+from omnibias.core.proof import Conjecture
 from omnibias.pinn.certified.ccf_hardy import (
     certified_ccf_hardy_wholeline_blowup_attempt,
     certified_ccf_hardy_wholeline_blowup_attempt_schema_errors,
@@ -17,7 +17,6 @@ from omnibias.pinn.certified.dissipation_threshold import (
     verify_fractional_dissipation_threshold,
 )
 from omnibias.pinn.certified.machine import build_default_machine
-from omnibias.core.proof import Conjecture
 
 
 def test_hardy_wholeline_cap_schema_and_honesty() -> None:

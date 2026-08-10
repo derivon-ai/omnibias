@@ -10,8 +10,11 @@ import pytest
 jax = pytest.importorskip("jax")
 jax.config.update("jax_enable_x64", True)
 
-from omnibias.pinn.jax.discovery import ccf_line, lambda_laws  # noqa: E402
-from omnibias.pinn.jax.discovery import polish_mp  # noqa: E402
+from omnibias.pinn.jax.discovery import (  # noqa: E402
+    ccf_line,
+    lambda_laws,
+    polish_mp,  # noqa: E402
+)
 
 
 def test_ccf_line_adam_smoke_descent() -> None:

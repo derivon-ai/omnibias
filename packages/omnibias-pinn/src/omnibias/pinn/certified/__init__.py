@@ -36,11 +36,6 @@ from omnibias.pinn.certified.euler2d import (
     certified_euler2d_steady_vortex,
     certified_euler2d_steady_vortex_schema_errors,
 )
-from omnibias.pinn.certified.ipm import build_ipm_cap_bundle
-from omnibias.pinn.certified.viscous_perturbation import (
-    verify_viscous_perturbation_enclosure,
-    viscous_perturbation_enclosure,
-)
 from omnibias.pinn.certified.fluid import (
     NS_PERIODIC_RESIDUAL_SCHEMA_VERSION,
     REQUIRED_NS_PERIODIC_RESIDUAL_KEYS,
@@ -87,6 +82,7 @@ from omnibias.pinn.certified.fluid_rollout import (
     rollout_diagnostics_schema_errors,
     vorticity_from_descriptor,
 )
+from omnibias.pinn.certified.ipm import build_ipm_cap_bundle
 from omnibias.pinn.certified.machine import (
     PERRON_GAP_SCHEMA_VERSION,
     build_default_machine,
@@ -297,6 +293,10 @@ from omnibias.pinn.certified.sqg import (
     certified_sqg_steady_vortex,
     certified_sqg_steady_vortex_schema_errors,
 )
+from omnibias.pinn.certified.viscous_perturbation import (
+    verify_viscous_perturbation_enclosure,
+    viscous_perturbation_enclosure,
+)
 
 __all__ = [
     "AxisymmetricBasisMetadata",
@@ -304,6 +304,7 @@ __all__ = [
     "AxisymmetricFunctionSpaceMetadata",
     "AxisymmetricSwirlAnsatzMetadata",
     "CANDIDATE_SCHEMA_VERSION",
+    "CCF_HARDY_WHOLELINE_SCHEMA_VERSION",
     "CCF_SELFSIMILAR_SCHEMA_VERSION",
     "CLM_BLOWUP_SCHEMA_VERSION",
     "CLM_MULTIZERO_SCHEMA_VERSION",
@@ -362,6 +363,7 @@ __all__ = [
     "active_subspace_invariance_report",
     "active_subspace_tail_contraction_attempt",
     "active_tail_contraction_lift_certificate",
+    "alpha_crit_lower",
     "analytic_tail_error_certificate",
     "assemble_axisymmetric_active_subspace_operator",
     "assemble_axisymmetric_linearized_operator",
@@ -412,8 +414,6 @@ __all__ = [
     "candidate_artifact_schema_errors",
     "candidate_upgrade_gates",
     "cellular_streamfunction",
-    "CCF_HARDY_WHOLELINE_SCHEMA_VERSION",
-    "alpha_crit_lower",
     "certified_candidate_refinement_report",
     "certified_ccf_hardy_wholeline_blowup_attempt",
     "certified_ccf_hardy_wholeline_blowup_attempt_schema_errors",

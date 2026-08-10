@@ -40,7 +40,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import jax
 import jax.numpy as jnp
@@ -158,10 +158,10 @@ def _linearize_gn(residual_fn: ResidualFn, params: Array) -> tuple[Array, MatVec
     res, vjp_fn = jax.vjp(residual_fn, params)
 
     def jt(u: Array) -> Array:
-        return vjp_fn(u)[0]
+        return cast(Array, vjp_fn(u)[0])
 
     def jvec(v: Array) -> Array:
-        return jax.jvp(residual_fn, (params,), (v,))[1]
+        return cast(Array, jax.jvp(residual_fn, (params,), (v,))[1])
 
     return res, jt, jvec
 

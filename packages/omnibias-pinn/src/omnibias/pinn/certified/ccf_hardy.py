@@ -40,7 +40,6 @@ from omnibias.core.verified.hardy_line import (
 )
 from omnibias.core.verified.interval import Interval, sum_intervals
 from omnibias.core.verified.kantorovich import radii_polynomial_certificate
-from omnibias.core.verified.line import hilbert_tail_bound
 from omnibias.core.verified.linalg import (
     identity_matrix,
     inf_norm_matrix,
@@ -51,6 +50,7 @@ from omnibias.core.verified.linalg import (
     neumann_inverse_norm_bound,
     to_interval_matrix,
 )
+from omnibias.core.verified.line import hilbert_tail_bound
 from omnibias.core.verified.sequence_space import geometric_tail_bound
 from omnibias.pinn.certified.navier_stokes import (
     default_ccf_collocation_nodes,

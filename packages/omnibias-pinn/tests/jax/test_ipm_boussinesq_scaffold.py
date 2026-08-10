@@ -10,6 +10,7 @@ import pytest
 jax = pytest.importorskip("jax")
 jax.config.update("jax_enable_x64", True)
 
+import jax.numpy as jnp  # noqa: E402
 from omnibias.pinn.certified.boussinesq import build_boussinesq_cap_bundle  # noqa: E402
 from omnibias.pinn.certified.ipm import build_ipm_cap_bundle  # noqa: E402
 from omnibias.pinn.jax.discovery import boussinesq, ipm  # noqa: E402
@@ -17,8 +18,9 @@ from omnibias.pinn.jax.equations.boussinesq_selfsimilar import (  # noqa: E402
     boussinesq_selfsimilar_residual_samples,
     infer_lambda_from_streamfunction_u1_y1,
 )
-from omnibias.pinn.jax.equations.ipm_selfsimilar import ipm_selfsimilar_residual_samples  # noqa: E402
-import jax.numpy as jnp  # noqa: E402
+from omnibias.pinn.jax.equations.ipm_selfsimilar import (
+    ipm_selfsimilar_residual_samples,  # noqa: E402
+)
 
 
 def test_ipm_streamfunction_residual_finite() -> None:
