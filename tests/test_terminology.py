@@ -34,6 +34,7 @@ SCANNED_SUFFIXES = frozenset({".py", ".md", ".mdc", ".txt", ".toml", ".yml", ".y
 SCANNED_ROOTS = (
     "packages",
     "docs",
+    "theory",
     "tests",
     "scripts",
     ".cursor/rules",
@@ -53,6 +54,9 @@ ALLOWED = frozenset(
         ".cursor/rules/omnibias.md",
         ".cursor/skills/omnibias-dev-core-concepts/SKILL.md",
         ".claude/skills/omnibias-dev-core-concepts/SKILL.md",
+        # The research tree's honesty spec documents this guard, so it has to
+        # name the wordings the guard retires.
+        "theory/06-program/02-honesty-and-claim-boundaries.md",
         # A changelog is a historical record; past entries keep the wording they
         # shipped with. The rename is itself recorded under [Unreleased].
         "CHANGELOG.md",
