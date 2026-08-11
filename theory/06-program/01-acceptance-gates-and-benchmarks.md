@@ -220,10 +220,13 @@ def require_cost_parity(
 ) -> dict[str, Any]: ...
 
 def require_all_seeds(
-    per_seed: Sequence[dict[str, Any]], *, key: str, threshold: float,
-    direction: Literal["max", "min"], name: str,
+    per_seed: Sequence[dict[str, Any]], *, key: str, expected: float, tol: float,
+    name: str = "all_seeds", min_seeds: int = 5, direction: str | None = None,
 ) -> dict[str, Any]:
-    """Gate the worst seed. Records every seed's value in the verdict."""
+    """Gate the worst seed. Records every seed's value in the verdict.
+    Default: |value - expected| <= tol for every seed. With direction='min'
+    require value >= expected; with direction='max' require value <= expected.
+    Refuses n_seeds < min_seeds (default 5) unless overridden."""
 
 # Landed with Wave-0 falsifier A6 (04-01 G2); shared by later scaling gates.
 def require_scaling_exponent(
@@ -298,9 +301,10 @@ Not a benchmark itself. The deliverable is:
 The three helpers `require_scaling_exponent`, `require_rel_error`, and
 `require_within_stderr` landed with Wave-0 falsifier A6. The validity guard
 `require_capture_rate` (raises `RuntimeError` / `INVALID EXPERIMENT`) landed
-with Wave-0 falsifier A7. The four original extensions
-(`require_enclosure_coverage`, `require_backend_parity`, `require_cost_parity`,
-`require_all_seeds`) and the schema validator remain open.
+with Wave-0 falsifier A7. The worst-seed helper `require_all_seeds` landed with
+the A7 hardening pass (and is reused by Wave-0 A4). The three remaining
+extensions (`require_enclosure_coverage`, `require_backend_parity`,
+`require_cost_parity`) and the schema validator remain open.
 
 ## 10. Honesty and scope
 
@@ -345,8 +349,10 @@ with Wave-0 falsifier A7. The four original extensions
       `require_rel_error`, `require_within_stderr` (Wave-0 A6)
 - [x] Extend `benchmarks/_gates.py` with `require_capture_rate` (Wave-0 A7;
       raises `RuntimeError` / `INVALID EXPERIMENT`)
+- [x] Extend `benchmarks/_gates.py` with `require_all_seeds` (A7 hardening /
+      Wave-0 A4; worst-seed gate, refuses `n_seeds < 5` without override)
 - [ ] Extend `benchmarks/_gates.py` with `require_enclosure_coverage`,
-      `require_backend_parity`, `require_cost_parity`, `require_all_seeds`
+      `require_backend_parity`, `require_cost_parity`
 - [x] `tests/test_gates_protocol.py` with a deliberately-failing case per
       landed helper (path corrected: not under core tests)
 - [ ] Artifact schema validator enumerating `docs/benchmarks/*.json` in CI

@@ -7,14 +7,23 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from inverse_imaging import (
+    ALPHA_MAX,
+    BOUNDARY_RATIO_MAX,
+    JUMP,
     L2SQ_SIGMA3,
     L2SQ_SIGMA4,
+    N_SAMPLES,
+    ORDER_CONFIG,
     TAU_STAR,
     _l2_sq_from_coeffs,
+    _s_from_regime,
+    boundary_contamination_ratio,
     field_u,
+    global_localize,
     localize_batch,
     mollifier_peak_response,
     polish_peak,
+    polish_peak_batch,
     predicted_sd_rprime_discrete,
     response_from_y,
     response_kernel,
@@ -29,6 +38,13 @@ def test_l2_constants_from_core_coefficients() -> None:
     assert sigmoid_polynomial_coeffs(3)[0] == 0.0
     assert abs(_l2_sq_from_coeffs(3) - L2SQ_SIGMA3) / L2SQ_SIGMA3 < 1e-10
     assert abs(_l2_sq_from_coeffs(4) - L2SQ_SIGMA4) / L2SQ_SIGMA4 < 1e-10
+
+
+def test_derived_s_matches_recorded_constants() -> None:
+    assert ORDER_CONFIG[3]["s"] == pytest.approx(0.05)
+    assert ORDER_CONFIG[4]["s"] == pytest.approx(1e-4)
+    assert _s_from_regime(3, J=JUMP, N=N_SAMPLES, alpha_max=ALPHA_MAX) == 0.05
+    assert _s_from_regime(4, J=JUMP, N=N_SAMPLES, alpha_max=ALPHA_MAX) == 1e-4
 
 
 @pytest.mark.parametrize("n", [3, 4])
@@ -86,6 +102,33 @@ def test_newton_polish_stationarity_and_curvature_sign(n: int) -> None:
     assert np.sign(rpp) == np.sign(expected_sign * J)
 
 
+@pytest.mark.parametrize("n", [3, 4])
+def test_polish_peak_batch_matches_scalar(n: int) -> None:
+    m = n - 2
+    J = 50.0
+    alpha = 40.0
+    x = sample_grid(2000)
+    u = field_u(x, m=m, J=J)
+    rng = np.random.default_rng(0)
+    Y = u[None, :] + rng.normal(0.0, 0.01, size=(5, x.size))
+    inits = TAU_STAR + rng.normal(0.0, 0.005, size=5)
+    clamp = (TAU_STAR - 5.0 / alpha, TAU_STAR + 5.0 / alpha)
+    batch_tau, batch_rp, batch_rpp = polish_peak_batch(
+        Y, x, n=n, alpha=alpha, tau_init=inits, clamp=clamp
+    )
+    for i in range(5):
+        tau, rp, rpp = polish_peak(
+            Y[i], x, n=n, alpha=alpha, tau_init=float(inits[i]), clamp=clamp
+        )
+        # Batched vs scalar Newton share the same clamped steps; reduction-order
+        # float noise can leave the final r' at different ~1e-7 residuals, so
+        # gate on tau and stationarity rather than bit-identical derivatives.
+        assert abs(batch_tau[i] - tau) < 1e-10
+        assert abs(batch_rp[i]) < 1e-6
+        assert abs(rp) < 1e-6
+        assert abs(batch_rpp[i] - rpp) <= 1e-5 + 1e-8 * abs(rpp)
+
+
 def test_discrete_sd_rprime_matches_monte_carlo() -> None:
     n = 3
     alpha = 40.0
@@ -115,6 +158,19 @@ def test_regime_guard_raises_on_invalid_config() -> None:
         )
 
 
+def test_boundary_ratio_guard_raises_when_tau_near_edge() -> None:
+    """Moving tau* too close to the right boundary must trip the derived guard."""
+    with pytest.raises(RuntimeError, match="boundary contamination"):
+        validate_regime(
+            n=4,
+            s=1e-4,
+            J=JUMP,
+            N=N_SAMPLES,
+            alphas=np.array([20.0, 320.0]),
+            tau_star=0.95,
+        )
+
+
 def test_localize_batch_captures_clean_signal() -> None:
     n = 3
     alpha = 40.0
@@ -124,3 +180,25 @@ def test_localize_batch_captures_clean_signal() -> None:
     loc = localize_batch(Y, x, n=n, alpha=alpha)
     assert loc["n_captured"] == loc["n_total"]
     assert abs(loc["empirical_mean"] - TAU_STAR) < 1e-4
+    assert loc["seeded"] is True
+
+
+def test_global_argmax_fails_for_n4_at_large_alpha() -> None:
+    """Locks the boundary-artifact failure so the claim cannot be upgraded."""
+    x = sample_grid()
+    # Matched fields: n = m + 2.
+    u3 = field_u(x, m=1, J=JUMP)
+    u4 = field_u(x, m=2, J=JUMP)
+    Y3 = np.tile(u3, (8, 1))
+    Y4 = np.tile(u4, (8, 1))
+    # n=3: global search still finds the true peak.
+    g3 = global_localize(Y3, x, n=3, alpha=320.0)
+    assert g3["capture_rate"] == 1.0
+    # n=4 at large alpha: boundary artifact wins.
+    g4 = global_localize(Y4, x, n=4, alpha=80.0)
+    assert g4["capture_rate"] == 0.0
+    # And the contamination ratio at the design point stays below the gate.
+    assert (
+        boundary_contamination_ratio(n=4, alpha=20.0, J=JUMP, m=2)
+        <= BOUNDARY_RATIO_MAX
+    )

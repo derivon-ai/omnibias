@@ -301,11 +301,15 @@ layered inversion, and a level-set method for free boundaries.
   standard deviation is confirmed over at least a decade of `alpha`, with the
   fitted exponent within `0.1` of the prediction, for `n in {3, 4}`. This is the
   gate that validates the design rule; if it fails, the rule is withdrawn rather
-  than reworded. **Earned** — see `docs/benchmarks/inverse_imaging.json`:
-  fitted exponents `0.523` (`n=3`, expected `0.5`) and `1.532` (`n=4`,
-  expected `1.5`) over 1.2 decades; rational `||sigma'''||_2^2 = 1/42` and
+  than reworded. **Earned for the locally-seeded estimator** — see
+  `docs/benchmarks/inverse_imaging.json`: five seeds, worst-seed deviations
+  `0.016` (`n=3`, expected `0.5`) and `0.031` (`n=4`, expected `1.5`) over
+  1.2 decades; rational `||sigma'''||_2^2 = 1/42` and
   `||sigma''''||_2^2 = 1/30`; discrete `sd(r')` within 3 sigma of Monte Carlo;
-  capture rate `1.0` under the pre-registered regime.
+  capture rate `1.0` under the pre-registered regime. A `tau*`-free global
+  argmax earns the same claim for `n=3` only; for `n=4` a spurious boundary
+  maximum near `tau -> 1` dominates at large `alpha` (recorded in
+  `honesty.boundary_artifact`, not softened into a pass).
 
 ## 9. Benchmark plan
 
@@ -353,9 +357,10 @@ layered inversion, and a level-set method for free boundaries.
   the scan, and the spec should say so rather than compete on ground it loses.
 - **Falsifier.** If the `alpha^(n - 5/2)` scaling (G7) does not appear, the
   noise analysis in section 5 is wrong and the design rule must be rederived
-  before it is documented anywhere. **G7 passed**; the design rule "use the
-  smallest `alpha` the problem allows" is licensed for the logistic scan on
-  this synthetic family.
+  before it is documented anywhere. **G7 passed for the locally-seeded
+  estimator**; the design rule "use the smallest `alpha` the problem allows"
+  is licensed for the logistic scan on this synthetic family. Global
+  (unseeded) peak search remains a recorded limitation for `n=4`.
 
 ## 12. Implementation checklist
 

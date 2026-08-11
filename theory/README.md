@@ -157,7 +157,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 
 | Spec | Status | One line |
 |---|---|---|
-| [05-01 inverse problems and imaging](05-applications/01-inverse-problems-and-imaging.md) | gated | Where interfaces are and what kind of jump they carry; G7 earned (`sd ~ alpha^(n-5/2)`) |
+| [05-01 inverse problems and imaging](05-applications/01-inverse-problems-and-imaging.md) | gated | Where interfaces are and what kind of jump they carry; G7 earned for locally-seeded estimator (`sd ~ alpha^(n-5/2)`); global search earned for n=3 only |
 | [05-02 beyond-PDE applications](05-applications/02-beyond-pde-applications.md) | concept | Tabular arrangements, implicit shapes, causal transverse filters |
 
 ### 06 Program
@@ -204,6 +204,6 @@ section 12. Ambiguous outcomes count as failure.
 | Unit | Gate | Artifact | Outcome |
 |---|---|---|---|
 | A6 | 04-01 G2 (`G_{delta,delta}` exponent `2.00 +- 0.02`, prefactor `1/720`) | [`docs/benchmarks/information_geometry.json`](../docs/benchmarks/information_geometry.json) | **passed** — licenses D8; G1/G3–G5 unearned; `K>=3` Fisher recorded inapplicable (not a density) |
-| A7 | 05-01 G7 (`sd(tau_hat) ~ alpha^(n-5/2)`, tol `0.1`, `n in {3,4}`) | [`docs/benchmarks/inverse_imaging.json`](../docs/benchmarks/inverse_imaging.json) | **passed** — licenses smallest-alpha design rule; fitted `0.523` / `1.532`; G1–G6 unearned |
+| A7 | 05-01 G7 (`sd(tau_hat) ~ alpha^(n-5/2)`, tol `0.1`, `n in {3,4}`) | [`docs/benchmarks/inverse_imaging.json`](../docs/benchmarks/inverse_imaging.json) | **passed** (locally seeded; 5 seeds, worst-seed) — licenses smallest-alpha design rule; worst deviations `0.016` / `0.031`; global search earned for n=3 only (n=4 boundary artifact); G1–G6 unearned |
 | A4 | 05-02 G1 / G2 | — | not run |
 | A5 | 05-02 G5 | — | not run |

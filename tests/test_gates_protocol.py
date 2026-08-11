@@ -15,6 +15,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 from _gates import (
+    require_all_seeds,
     require_capture_rate,
     require_rel_error,
     require_scaling_exponent,
@@ -99,3 +100,64 @@ def test_require_capture_rate_passes() -> None:
 def test_require_capture_rate_raises_invalid_experiment() -> None:
     with pytest.raises(RuntimeError, match="INVALID EXPERIMENT"):
         require_capture_rate(127, 128, min_rate=1.0, name="miss")
+
+
+def test_require_all_seeds_passes() -> None:
+    rows = [{"seed": i, "fitted_exponent": 0.5 + 0.01 * (i - 2)} for i in range(5)]
+    verdict = require_all_seeds(
+        rows, key="fitted_exponent", expected=0.5, tol=0.1, name="ok"
+    )
+    assert verdict["passed"] is True
+    assert verdict["n_seeds"] == 5
+    assert verdict["worst_deviation"] <= 0.1
+
+
+def test_require_all_seeds_worst_seed_raises() -> None:
+    rows = [{"seed": i, "fitted_exponent": 0.5} for i in range(5)]
+    rows[3]["fitted_exponent"] = 0.75  # |0.75 - 0.5| = 0.25 > 0.1
+    with pytest.raises(AssertionError, match="exceeds tol"):
+        require_all_seeds(
+            rows, key="fitted_exponent", expected=0.5, tol=0.1, name="bad"
+        )
+
+
+def test_require_all_seeds_refuses_fewer_than_five() -> None:
+    rows = [{"seed": i, "v": 1.0} for i in range(4)]
+    with pytest.raises(ValueError, match="min_seeds"):
+        require_all_seeds(rows, key="v", expected=1.0, tol=0.01, name="few")
+
+
+def test_require_all_seeds_min_seeds_override() -> None:
+    rows = [{"seed": 0, "v": 1.0}, {"seed": 1, "v": 1.001}]
+    verdict = require_all_seeds(
+        rows, key="v", expected=1.0, tol=0.01, name="ok", min_seeds=2
+    )
+    assert verdict["passed"] is True
+    assert verdict["n_seeds"] == 2
+
+
+def test_require_all_seeds_direction_min_passes() -> None:
+    rows = [{"seed": i, "margin": 0.12 + 0.01 * i} for i in range(5)]
+    verdict = require_all_seeds(
+        rows,
+        key="margin",
+        expected=0.10,
+        tol=0.0,
+        direction="min",
+        name="g1",
+    )
+    assert verdict["passed"] is True
+
+
+def test_require_all_seeds_direction_min_raises() -> None:
+    rows = [{"seed": i, "margin": 0.12} for i in range(5)]
+    rows[1]["margin"] = 0.05
+    with pytest.raises(AssertionError, match="direction=min"):
+        require_all_seeds(
+            rows,
+            key="margin",
+            expected=0.10,
+            tol=0.0,
+            direction="min",
+            name="g1_fail",
+        )

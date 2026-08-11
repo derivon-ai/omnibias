@@ -15,6 +15,7 @@ JSON can never again look like a result while encoding a divergence.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
@@ -332,6 +333,95 @@ def require_capture_rate(
     return verdict
 
 
+def require_all_seeds(
+    per_seed: Sequence[dict[str, Any]],
+    *,
+    key: str,
+    expected: float,
+    tol: float,
+    name: str = "all_seeds",
+    min_seeds: int = 5,
+    direction: str | None = None,
+) -> dict[str, Any]:
+    """Gate the worst seed. Records every seed's value in the verdict.
+
+    Default (``direction is None``): require ``|value - expected| <= tol`` for
+    every seed. With ``direction="min"`` require ``value >= expected``; with
+    ``direction="max"`` require ``value <= expected`` (``tol`` unused).
+
+    Refuses fewer than ``min_seeds`` entries (default 5) unless the caller
+    overrides. Raises ``AssertionError`` on a soft-gate failure.
+    """
+    rows = list(per_seed)
+    n_seeds = len(rows)
+    if n_seeds < int(min_seeds):
+        raise ValueError(
+            f"{name}: n_seeds={n_seeds} < min_seeds={min_seeds}; "
+            "stochastic results require at least five seeds unless min_seeds "
+            "is overridden explicitly"
+        )
+    if direction is not None and direction not in ("min", "max"):
+        raise ValueError(f"{name}: direction must be None, 'min', or 'max'")
+
+    values: list[float] = []
+    deviations: list[float] = []
+    seed_ids: list[Any] = []
+    for i, row in enumerate(rows):
+        if key not in row:
+            raise KeyError(f"{name}: seed row {i} missing key {key!r}")
+        v = float(row[key])
+        if not np.isfinite(v):
+            raise AssertionError(f"{name}: non-finite value for key={key!r} at seed {i}")
+        values.append(v)
+        if direction is None:
+            deviations.append(abs(v - float(expected)))
+        elif direction == "min":
+            # Positive deviation means below the floor.
+            deviations.append(max(0.0, float(expected) - v))
+        else:
+            # Positive deviation means above the ceiling.
+            deviations.append(max(0.0, v - float(expected)))
+        seed_ids.append(row.get("seed", i))
+
+    worst_idx = int(np.argmax(deviations))
+    worst_deviation = float(deviations[worst_idx])
+    if direction is None:
+        passed = bool(worst_deviation <= float(tol))
+    else:
+        passed = bool(worst_deviation == 0.0)
+
+    verdict: dict[str, Any] = {
+        "name": name,
+        "key": key,
+        "expected": float(expected),
+        "tol": float(tol),
+        "direction": direction,
+        "n_seeds": n_seeds,
+        "min_seeds": int(min_seeds),
+        "values": values,
+        "deviations": [float(d) for d in deviations],
+        "seeds": seed_ids,
+        "worst_seed": seed_ids[worst_idx],
+        "worst_index": worst_idx,
+        "worst_value": values[worst_idx],
+        "worst_deviation": worst_deviation,
+        "passed": passed,
+    }
+    if not passed:
+        if direction is None:
+            raise AssertionError(
+                f"{name}: worst |{key} - expected| = {worst_deviation:.6g} "
+                f"(seed={seed_ids[worst_idx]}, value={values[worst_idx]:.6g}, "
+                f"expected={expected}) exceeds tol={tol}"
+            )
+        raise AssertionError(
+            f"{name}: worst seed {seed_ids[worst_idx]} has {key}="
+            f"{values[worst_idx]:.6g} failing direction={direction} "
+            f"vs expected={expected}"
+        )
+    return verdict
+
+
 # Published CCF self-similar lambda digits (DeepMind arXiv:2509.14185).
 CCF_LAMBDA_1ST_UNSTABLE = 0.6057
 CCF_LAMBDA_2ND_UNSTABLE = 0.4703
@@ -504,6 +594,7 @@ __all__ = [
     "ipm_boussinesq_scaffold_gates",
     "mse",
     "rel_l2",
+    "require_all_seeds",
     "require_reference_valid",
     "require_capture_rate",
     "require_rel_error",

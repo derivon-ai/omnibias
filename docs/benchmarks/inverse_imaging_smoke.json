@@ -1,6 +1,6 @@
 {
   "schema": "inverse-imaging-v1",
-  "generated_utc": "2026-08-11T15:39:37Z",
+  "generated_utc": "2026-08-11T16:12:29Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -35,22 +35,35 @@
       "4": 0.0001
     },
     "rho_max": 0.25,
-    "R": 128,
+    "boundary_ratio_max": 0.01,
+    "R_per_seed": 128,
     "full": false,
-    "seed": 0,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
     "exponent_tol": 0.1,
     "min_decades": 1.0,
     "anchor_alpha": 80.0,
+    "seed_halfwidth_kernels": 5.0,
+    "estimator": "locally_seeded_coarse_argmax_plus_newton",
     "g1_to_g6_earned": false,
-    "pre_registration": "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; alpha_min from alpha * min(tau*, 1-tau*) >= 7; s rounded down from the closed-form regime bound; never retuned after seeing the fit"
+    "pre_registration": "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; boundary_contamination_ratio <= 1e-2 at alpha_min and alpha_max; s = round_down_1sig(0.5 * s_max) from the closed-form regime bound; never retuned after seeing the fit; five seeds gated by worst seed"
   },
-  "rss_mb_at_start": 816.98,
+  "rss_mb_at_start": 817.18,
   "baseline": {
     "name": "continuum delta-method sd(tau_hat) ~ alpha^(n-5/2)",
-    "note": "scan is not statistically efficient; Cramer-Rao is ~10x tighter on this family (spec 05-01 section 5)"
+    "note": "scan is not statistically efficient; Cramer-Rao is ~10x tighter on this family (spec 05-01 section 5); gated estimator is locally seeded on true tau*"
   },
   "seeds": [
-    0
+    0,
+    1,
+    2,
+    3,
+    4
   ],
   "orders": [
     {
@@ -59,145 +72,1312 @@
       "J": 50.0,
       "s": 0.05,
       "expected_exponent": 0.5,
-      "fitted_exponent": 0.5159068771613536,
+      "fitted": {
+        "per_seed": [
+          0.5159068771613241,
+          0.4992418530587157,
+          0.5082431495917076,
+          0.4850201001896116,
+          0.5007705222656403
+        ],
+        "worst_deviation": 0.015906877161324107,
+        "expected": 0.5
+      },
       "regime": {
         "rho_at_alpha_max": 0.10451156235874881,
         "rho_max": 0.25,
         "design_density": 20.0,
-        "kernel_fit_at_alpha_max": 118.4
+        "boundary_ratio_at_alpha_min": 0.00017264485134091956,
+        "boundary_ratio_at_alpha_max": 0.0,
+        "boundary_ratio_max": 0.01
       },
-      "per_alpha": [
+      "per_seed": [
         {
-          "alpha": 20.0,
-          "empirical_sd": 8.733024091818383e-05,
-          "predicted_sd_continuum": 8.164965809277251e-05,
-          "empirical_mean": 0.36999040310183823,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.0016329931618554502
+          "seed": 0,
+          "rng_seed": 3,
+          "fitted_exponent": 0.5159068771613241,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 1.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 535.0975990565507,
+            "predicted_sd_rprime_discrete": 522.5169853698526,
+            "sd_of_sd": 33.57500948435236,
+            "continuum_sd_rprime": 522.5578117937438,
+            "continuum_vs_discrete_rel": 7.813415646630437e-05,
+            "empirical_sd_tau": 0.00016761107242093504
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 8.733024091821731e-05,
+              "predicted_sd_continuum": 8.164965809277251e-05,
+              "empirical_mean": 0.36999040310183823,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0016329931618554502,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 9.717825812629964e-05,
+              "predicted_sd_continuum": 9.164864246657338e-05,
+              "empirical_mean": 0.37001139384692516,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0023094010767584993,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 0.00010279530515474447,
+              "predicted_sd_continuum": 0.00010287212294780336,
+              "empirical_mean": 0.37001264924434957,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0032659863237109003,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 0.00010889102557982931,
+              "predicted_sd_continuum": 0.00011547005383792502,
+              "empirical_mean": 0.3700129369758412,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.004618802153517002,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 0.0001226975661274703,
+              "predicted_sd_continuum": 0.00012961075314931088,
+              "empirical_mean": 0.3700125625745895,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.006531972647421799,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 0.00014405302481822533,
+              "predicted_sd_continuum": 0.00014548315146289598,
+              "empirical_mean": 0.3700095364780857,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.009237604307033997,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 0.00016761107242093504,
+              "predicted_sd_continuum": 0.00016329931618554497,
+              "empirical_mean": 0.3700016440849614,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.013063945294843596,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 0.00019196464484069365,
+              "predicted_sd_continuum": 0.0001832972849331468,
+              "empirical_mean": 0.36998757444144204,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.018475208614068005,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 0.00021793201232709022,
+              "predicted_sd_continuum": 0.00020574424589560672,
+              "empirical_mean": 0.3699688971485927,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.026127890589687196,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.0002460417026745507,
+              "predicted_sd_continuum": 0.00023094010767585,
+              "empirical_mean": 0.3699528275049507,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.03695041722813598,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.0002758661475841855,
+              "predicted_sd_continuum": 0.0002592215062986217,
+              "empirical_mean": 0.3699500919166502,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05225578117937435,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.0003061609279861748,
+              "predicted_sd_continuum": 0.000290966302925792,
+              "empirical_mean": 0.369966640376815,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.073900834456272,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.0003383513583540162,
+              "predicted_sd_continuum": 0.00032659863237109006,
+              "empirical_mean": 0.3699969696538731,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10451156235874881,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         },
         {
-          "alpha": 25.198420997897458,
-          "empirical_sd": 9.717825812634415e-05,
-          "predicted_sd_continuum": 9.164864246657338e-05,
-          "empirical_mean": 0.3700113938469251,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.0023094010767584993
+          "seed": 1,
+          "rng_seed": 1003,
+          "fitted_exponent": 0.4992418530587157,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 1.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 492.94823326871233,
+            "predicted_sd_rprime_discrete": 522.5169853698526,
+            "sd_of_sd": 30.93032305970527,
+            "continuum_sd_rprime": 522.5578117937438,
+            "continuum_vs_discrete_rel": 7.813415646630437e-05,
+            "empirical_sd_tau": 0.00015388415297048813
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 8.296709026185996e-05,
+              "predicted_sd_continuum": 8.164965809277251e-05,
+              "empirical_mean": 0.36998289241976845,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0016329931618554502,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 9.515948174502132e-05,
+              "predicted_sd_continuum": 9.164864246657338e-05,
+              "empirical_mean": 0.37000392905855384,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0023094010767584993,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 0.00010641655282613449,
+              "predicted_sd_continuum": 0.00010287212294780336,
+              "empirical_mean": 0.3700046210992704,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0032659863237109003,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 0.00011537689966738329,
+              "predicted_sd_continuum": 0.00011547005383792502,
+              "empirical_mean": 0.3700039405996396,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.004618802153517002,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 0.00012456036303231893,
+              "predicted_sd_continuum": 0.00012961075314931088,
+              "empirical_mean": 0.3700029595915356,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.006531972647421799,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 0.00013699789277280182,
+              "predicted_sd_continuum": 0.00014548315146289598,
+              "empirical_mean": 0.3700006177877067,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.009237604307033997,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 0.00015388415297048813,
+              "predicted_sd_continuum": 0.00016329931618554497,
+              "empirical_mean": 0.36999702202528184,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.013063945294843596,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 0.00017538186350993893,
+              "predicted_sd_continuum": 0.0001832972849331468,
+              "empirical_mean": 0.3699947805435219,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.018475208614068005,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 0.00020078724341202517,
+              "predicted_sd_continuum": 0.00020574424589560672,
+              "empirical_mean": 0.36999709328344155,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.026127890589687196,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.00023001102986785734,
+              "predicted_sd_continuum": 0.00023094010767585,
+              "empirical_mean": 0.3700051550283713,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.03695041722813598,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.0002639532919391226,
+              "predicted_sd_continuum": 0.0002592215062986217,
+              "empirical_mean": 0.37001590994746486,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05225578117937435,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.0003002229032235356,
+              "predicted_sd_continuum": 0.000290966302925792,
+              "empirical_mean": 0.37002320081457085,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.073900834456272,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.00033328948486046716,
+              "predicted_sd_continuum": 0.00032659863237109006,
+              "empirical_mean": 0.3700240038436352,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10451156235874881,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         },
         {
-          "alpha": 31.74802103936399,
-          "empirical_sd": 0.00010279530515475553,
-          "predicted_sd_continuum": 0.00010287212294780336,
-          "empirical_mean": 0.3700126492443496,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.0032659863237109003
+          "seed": 2,
+          "rng_seed": 2003,
+          "fitted_exponent": 0.5082431495917076,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 1.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 495.83147951909535,
+            "predicted_sd_rprime_discrete": 522.5169853698526,
+            "sd_of_sd": 31.111234019449835,
+            "continuum_sd_rprime": 522.5578117937438,
+            "continuum_vs_discrete_rel": 7.813415646630437e-05,
+            "empirical_sd_tau": 0.00015459161668943908
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 7.419248811868275e-05,
+              "predicted_sd_continuum": 8.164965809277251e-05,
+              "empirical_mean": 0.36998693004643946,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0016329931618554502,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 8.230174207300023e-05,
+              "predicted_sd_continuum": 9.164864246657338e-05,
+              "empirical_mean": 0.37000789169370984,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0023094010767584993,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 9.342099623582136e-05,
+              "predicted_sd_continuum": 0.00010287212294780336,
+              "empirical_mean": 0.370009089790324,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0032659863237109003,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 0.00010918885281292865,
+              "predicted_sd_continuum": 0.00011547005383792502,
+              "empirical_mean": 0.3700078527508981,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.004618802153517002,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 0.00012764771272057474,
+              "predicted_sd_continuum": 0.00012961075314931088,
+              "empirical_mean": 0.37000334048412026,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.006531972647421799,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 0.00014369316716203928,
+              "predicted_sd_continuum": 0.00014548315146289598,
+              "empirical_mean": 0.36999541484413645,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.009237604307033997,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 0.00015459161668943908,
+              "predicted_sd_continuum": 0.00016329931618554497,
+              "empirical_mean": 0.36998694827377576,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.013063945294843596,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 0.0001668824840741807,
+              "predicted_sd_continuum": 0.0001832972849331468,
+              "empirical_mean": 0.36998187447016445,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.018475208614068005,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 0.00018967122673880176,
+              "predicted_sd_continuum": 0.00020574424589560672,
+              "empirical_mean": 0.36998250956207757,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.026127890589687196,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.0002199668626633524,
+              "predicted_sd_continuum": 0.00023094010767585,
+              "empirical_mean": 0.36998880906113546,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.03695041722813598,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.0002481645524206164,
+              "predicted_sd_continuum": 0.0002592215062986217,
+              "empirical_mean": 0.3699993194802542,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05225578117937435,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.00027305978711898997,
+              "predicted_sd_continuum": 0.000290966302925792,
+              "empirical_mean": 0.37001231384849664,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.073900834456272,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.0003021145989769608,
+              "predicted_sd_continuum": 0.00032659863237109006,
+              "empirical_mean": 0.3700255863537963,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10451156235874881,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         },
         {
-          "alpha": 40.00000000000001,
-          "empirical_sd": 0.0001088910255797903,
-          "predicted_sd_continuum": 0.00011547005383792502,
-          "empirical_mean": 0.37001293697584114,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.004618802153517002
+          "seed": 3,
+          "rng_seed": 3003,
+          "fitted_exponent": 0.4850201001896116,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 1.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 543.6659055032961,
+            "predicted_sd_rprime_discrete": 522.5169853698526,
+            "sd_of_sd": 34.11263284637367,
+            "continuum_sd_rprime": 522.5578117937438,
+            "continuum_vs_discrete_rel": 7.813415646630437e-05,
+            "empirical_sd_tau": 0.00016964735742678778
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 8.367404239790632e-05,
+              "predicted_sd_continuum": 8.164965809277251e-05,
+              "empirical_mean": 0.3699761502832426,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0016329931618554502,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 9.84250680448648e-05,
+              "predicted_sd_continuum": 9.164864246657338e-05,
+              "empirical_mean": 0.3699953641624838,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0023094010767584993,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 0.00010879991472195821,
+              "predicted_sd_continuum": 0.00010287212294780336,
+              "empirical_mean": 0.3699947335008144,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0032659863237109003,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 0.00011528986541952497,
+              "predicted_sd_continuum": 0.00011547005383792502,
+              "empirical_mean": 0.3699918337344372,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.004618802153517002,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 0.00012527176811333098,
+              "predicted_sd_continuum": 0.00012961075314931088,
+              "empirical_mean": 0.36998879000861545,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.006531972647421799,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 0.00014385255748295905,
+              "predicted_sd_continuum": 0.00014548315146289598,
+              "empirical_mean": 0.3699882080026498,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.009237604307033997,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 0.00016964735742678778,
+              "predicted_sd_continuum": 0.00016329931618554497,
+              "empirical_mean": 0.36999263716123654,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.013063945294843596,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 0.00019618381208729943,
+              "predicted_sd_continuum": 0.0001832972849331468,
+              "empirical_mean": 0.37000266738529264,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.018475208614068005,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 0.0002169818715956397,
+              "predicted_sd_continuum": 0.00020574424589560672,
+              "empirical_mean": 0.370014955882975,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.026127890589687196,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.00023359801439955377,
+              "predicted_sd_continuum": 0.00023094010767585,
+              "empirical_mean": 0.37002467617150747,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.03695041722813598,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.00025506235436699947,
+              "predicted_sd_continuum": 0.0002592215062986217,
+              "empirical_mean": 0.37003204357716823,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05225578117937435,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.00028575386984942006,
+              "predicted_sd_continuum": 0.000290966302925792,
+              "empirical_mean": 0.37004322680916635,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.073900834456272,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.00032443848090220144,
+              "predicted_sd_continuum": 0.00032659863237109006,
+              "empirical_mean": 0.37006080012504805,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10451156235874881,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         },
         {
-          "alpha": 50.39684199579492,
-          "empirical_sd": 0.00012269756612748084,
-          "predicted_sd_continuum": 0.00012961075314931088,
-          "empirical_mean": 0.3700125625745895,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.006531972647421799
-        },
-        {
-          "alpha": 63.49604207872796,
-          "empirical_sd": 0.00014405302481821725,
-          "predicted_sd_continuum": 0.00014548315146289598,
-          "empirical_mean": 0.3700095364780857,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.009237604307033997
-        },
-        {
-          "alpha": 79.99999999999999,
-          "empirical_sd": 0.00016761107242095692,
-          "predicted_sd_continuum": 0.00016329931618554497,
-          "empirical_mean": 0.37000164408496133,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.013063945294843596
-        },
-        {
-          "alpha": 100.79368399158986,
-          "empirical_sd": 0.0001919646448407003,
-          "predicted_sd_continuum": 0.0001832972849331468,
-          "empirical_mean": 0.3699875744414421,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.018475208614068005
-        },
-        {
-          "alpha": 126.99208415745593,
-          "empirical_sd": 0.0002179320123270886,
-          "predicted_sd_continuum": 0.00020574424589560672,
-          "empirical_mean": 0.3699688971485927,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.026127890589687196
-        },
-        {
-          "alpha": 159.99999999999991,
-          "empirical_sd": 0.0002460417026745771,
-          "predicted_sd_continuum": 0.00023094010767585,
-          "empirical_mean": 0.36995282750495073,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.03695041722813598
-        },
-        {
-          "alpha": 201.58736798317955,
-          "empirical_sd": 0.00027586614758418163,
-          "predicted_sd_continuum": 0.0002592215062986217,
-          "empirical_mean": 0.3699500919166502,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.05225578117937435
-        },
-        {
-          "alpha": 253.9841683149119,
-          "empirical_sd": 0.0003061609279861802,
-          "predicted_sd_continuum": 0.000290966302925792,
-          "empirical_mean": 0.36996664037681504,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.073900834456272
-        },
-        {
-          "alpha": 320.0,
-          "empirical_sd": 0.00033835135835403316,
-          "predicted_sd_continuum": 0.00032659863237109006,
-          "empirical_mean": 0.3699969696538731,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.10451156235874881
+          "seed": 4,
+          "rng_seed": 4003,
+          "fitted_exponent": 0.5007705222656403,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 1.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 502.10489029259446,
+            "predicted_sd_rprime_discrete": 522.5169853698526,
+            "sd_of_sd": 31.504862820234663,
+            "continuum_sd_rprime": 522.5578117937438,
+            "continuum_vs_discrete_rel": 7.813415646630437e-05,
+            "empirical_sd_tau": 0.00015639703273679262
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 7.972290215771185e-05,
+              "predicted_sd_continuum": 8.164965809277251e-05,
+              "empirical_mean": 0.36997907998755414,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0016329931618554502,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 9.01251450432288e-05,
+              "predicted_sd_continuum": 9.164864246657338e-05,
+              "empirical_mean": 0.36999847249981666,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0023094010767584993,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 0.00010163364853381058,
+              "predicted_sd_continuum": 0.00010287212294780336,
+              "empirical_mean": 0.36999901298853516,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0032659863237109003,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 0.00011571436559463991,
+              "predicted_sd_continuum": 0.00011547005383792502,
+              "empirical_mean": 0.3699998025203046,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.004618802153517002,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 0.00013095480207493,
+              "predicted_sd_continuum": 0.00012961075314931088,
+              "empirical_mean": 0.37000203973570484,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.006531972647421799,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 0.00014386749175381345,
+              "predicted_sd_continuum": 0.00014548315146289598,
+              "empirical_mean": 0.3700045332848254,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.009237604307033997,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 0.00015639703273679262,
+              "predicted_sd_continuum": 0.00016329931618554497,
+              "empirical_mean": 0.37000490568691285,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.013063945294843596,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 0.00017398466555858225,
+              "predicted_sd_continuum": 0.0001832972849331468,
+              "empirical_mean": 0.3700027638124816,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.018475208614068005,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 0.00019810581253774714,
+              "predicted_sd_continuum": 0.00020574424589560672,
+              "empirical_mean": 0.3700008151253518,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.026127890589687196,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.0002284447421428872,
+              "predicted_sd_continuum": 0.00023094010767585,
+              "empirical_mean": 0.370000536491226,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.03695041722813598,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.00026160196957159335,
+              "predicted_sd_continuum": 0.0002592215062986217,
+              "empirical_mean": 0.36999863079892,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05225578117937435,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.0002917157871172757,
+              "predicted_sd_continuum": 0.000290966302925792,
+              "empirical_mean": 0.36999063300752977,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.073900834456272,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.00032032538692419624,
+              "predicted_sd_continuum": 0.00032659863237109006,
+              "empirical_mean": 0.36997722987697,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10451156235874881,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         }
-      ],
-      "anchor": {
-        "alpha": 79.99999999999999,
-        "empirical_sd_rprime": 535.0975990565507,
-        "predicted_sd_rprime_discrete": 522.5169853698526,
-        "sd_of_sd": 33.57500948435236,
-        "continuum_sd_rprime": 522.5578117937438,
-        "continuum_vs_discrete_rel": 7.813415646630437e-05,
-        "empirical_sd_tau": 0.00016761107242095692
-      },
-      "capture_totals": {
-        "n_captured": 1664,
-        "n_total": 1664
-      }
+      ]
     },
     {
       "n": 4,
@@ -205,145 +1385,1312 @@
       "J": 50.0,
       "s": 0.0001,
       "expected_exponent": 1.5,
-      "fitted_exponent": 1.52537536017014,
+      "fitted": {
+        "per_seed": [
+          1.5253753599700657,
+          1.5314441561301,
+          1.5245438975913634,
+          1.5303444350267783,
+          1.5245023075733357
+        ],
+        "worst_deviation": 0.03144415613009999,
+        "expected": 1.5
+      },
       "regime": {
         "rho_at_alpha_max": 0.10083654941026965,
         "rho_max": 0.25,
         "design_density": 20.0,
-        "kernel_fit_at_alpha_max": 118.4
+        "boundary_ratio_at_alpha_min": 0.001124604182390172,
+        "boundary_ratio_at_alpha_max": 0.0,
+        "boundary_ratio_max": 0.01
       },
-      "per_alpha": [
+      "per_seed": [
         {
-          "alpha": 20.0,
-          "empirical_sd": 4.7568643824228515e-06,
-          "predicted_sd_continuum": 4.923659639173323e-06,
-          "empirical_mean": 0.36991878139763046,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 9.847319278346645e-05
+          "seed": 0,
+          "rng_seed": 4,
+          "fitted_exponent": 1.5253753599700657,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 0.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 133.88287219105533,
+            "predicted_sd_rprime_discrete": 126.03583905886771,
+            "sd_of_sd": 8.40055853648478,
+            "continuum_sd_rprime": 126.04568676283695,
+            "continuum_vs_discrete_rel": 7.813415646515463e-05,
+            "empirical_sd_tau": 4.181382921507933e-05
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 4.756864386817524e-06,
+              "predicted_sd_continuum": 4.923659639173323e-06,
+              "empirical_mean": 0.3699187813976317,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 9.847319278346645e-05,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 7.1344071740404854e-06,
+              "predicted_sd_continuum": 6.96310623822793e-06,
+              "empirical_mean": 0.37000172806903475,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.00017545928244395344,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 1.055504193409482e-05,
+              "predicted_sd_continuum": 9.847319278346646e-06,
+              "empirical_mean": 0.3700006092442655,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.000312632899630284,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 1.5060362925198383e-05,
+              "predicted_sd_continuum": 1.392621247645587e-05,
+              "empirical_mean": 0.36999912349879177,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0005570484990582349,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 2.0720484073203934e-05,
+              "predicted_sd_continuum": 1.969463855669329e-05,
+              "empirical_mean": 0.3699978532506127,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0009925475875059622,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 2.891297036975524e-05,
+              "predicted_sd_continuum": 2.7852424952911717e-05,
+              "empirical_mean": 0.3699967475003022,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.001768518746804695,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 4.181382921507933e-05,
+              "predicted_sd_continuum": 3.938927711338657e-05,
+              "empirical_mean": 0.3699958496965593,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0031511421690709252,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 5.990356001628345e-05,
+              "predicted_sd_continuum": 5.570484990582347e-05,
+              "empirical_mean": 0.36999439578166066,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.005614697038206514,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 8.397534897420318e-05,
+              "predicted_sd_continuum": 7.877855422677314e-05,
+              "empirical_mean": 0.36999189131275834,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.01000425278816908,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.00011768626047307452,
+              "predicted_sd_continuum": 0.00011140969981164684,
+              "empirical_mean": 0.36999047075553926,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.017825551969863487,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.0001688712474525735,
+              "predicted_sd_continuum": 0.00015755710845354615,
+              "empirical_mean": 0.3699938538466367,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.031761522800190733,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.00024430212009570135,
+              "predicted_sd_continuum": 0.00022281939962329382,
+              "empirical_mean": 0.37000174614592946,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05659259989775027,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.000344258355701128,
+              "predicted_sd_continuum": 0.0003151142169070927,
+              "empirical_mean": 0.37000746025953357,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10083654941026965,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         },
         {
-          "alpha": 25.198420997897458,
-          "empirical_sd": 7.134407176588912e-06,
-          "predicted_sd_continuum": 6.96310623822793e-06,
-          "empirical_mean": 0.37000172806903675,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.00017545928244395344
+          "seed": 1,
+          "rng_seed": 1004,
+          "fitted_exponent": 1.5314441561301,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 0.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 126.61464347268829,
+            "predicted_sd_rprime_discrete": 126.03583905886771,
+            "sd_of_sd": 7.944509306243652,
+            "continuum_sd_rprime": 126.04568676283695,
+            "continuum_vs_discrete_rel": 7.813415646515463e-05,
+            "empirical_sd_tau": 3.95353919913111e-05
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 4.907451880491193e-06,
+              "predicted_sd_continuum": 4.923659639173323e-06,
+              "empirical_mean": 0.36991777889714217,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 9.847319278346645e-05,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 7.138240720169771e-06,
+              "predicted_sd_continuum": 6.96310623822793e-06,
+              "empirical_mean": 0.3700008013628675,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.00017545928244395344,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 1.0219305755202047e-05,
+              "predicted_sd_continuum": 9.847319278346646e-06,
+              "empirical_mean": 0.37000002581320934,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.000312632899630284,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 1.4125378372798743e-05,
+              "predicted_sd_continuum": 1.392621247645587e-05,
+              "empirical_mean": 0.36999917735893445,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0005570484990582349,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 1.9472579011054383e-05,
+              "predicted_sd_continuum": 1.969463855669329e-05,
+              "empirical_mean": 0.36999869495930426,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0009925475875059622,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 2.7605181899979932e-05,
+              "predicted_sd_continuum": 2.7852424952911717e-05,
+              "empirical_mean": 0.36999817902359444,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.001768518746804695,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 3.95353919913111e-05,
+              "predicted_sd_continuum": 3.938927711338657e-05,
+              "empirical_mean": 0.3699976347421574,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0031511421690709252,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 5.6830370582880466e-05,
+              "predicted_sd_continuum": 5.570484990582347e-05,
+              "empirical_mean": 0.3699976525939025,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.005614697038206514,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 8.197443458017028e-05,
+              "predicted_sd_continuum": 7.877855422677314e-05,
+              "empirical_mean": 0.36999980610842265,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.01000425278816908,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.00011720965531628889,
+              "predicted_sd_continuum": 0.00011140969981164684,
+              "empirical_mean": 0.3700056824499704,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.017825551969863487,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.00016699337684119756,
+              "predicted_sd_continuum": 0.00015755710845354615,
+              "empirical_mean": 0.3700146873619858,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.031761522800190733,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.00024262840406485403,
+              "predicted_sd_continuum": 0.00022281939962329382,
+              "empirical_mean": 0.3700224019972954,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05659259989775027,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.0003526767555927464,
+              "predicted_sd_continuum": 0.0003151142169070927,
+              "empirical_mean": 0.3700214787638356,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10083654941026965,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         },
         {
-          "alpha": 31.74802103936399,
-          "empirical_sd": 1.0555041930210919e-05,
-          "predicted_sd_continuum": 9.847319278346646e-06,
-          "empirical_mean": 0.37000060924426653,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.000312632899630284
+          "seed": 2,
+          "rng_seed": 2004,
+          "fitted_exponent": 1.5245438975913634,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 0.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 134.69804565875876,
+            "predicted_sd_rprime_discrete": 126.03583905886771,
+            "sd_of_sd": 8.451707068935292,
+            "continuum_sd_rprime": 126.04568676283695,
+            "continuum_vs_discrete_rel": 7.813415646515463e-05,
+            "empirical_sd_tau": 4.2108100233896044e-05
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 4.78160753985573e-06,
+              "predicted_sd_continuum": 4.923659639173323e-06,
+              "empirical_mean": 0.3699177168047619,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 9.847319278346645e-05,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 6.395410859090471e-06,
+              "predicted_sd_continuum": 6.96310623822793e-06,
+              "empirical_mean": 0.3700003868507452,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.00017545928244395344,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 9.015296117219918e-06,
+              "predicted_sd_continuum": 9.847319278346646e-06,
+              "empirical_mean": 0.3699993174332671,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.000312632899630284,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 1.3241793165758478e-05,
+              "predicted_sd_continuum": 1.392621247645587e-05,
+              "empirical_mean": 0.3699985560603455,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0005570484990582349,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 1.992236191960816e-05,
+              "predicted_sd_continuum": 1.969463855669329e-05,
+              "empirical_mean": 0.36999883294411373,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0009925475875059622,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 2.95569110567326e-05,
+              "predicted_sd_continuum": 2.7852424952911717e-05,
+              "empirical_mean": 0.36999974930127333,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.001768518746804695,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 4.2108100233896044e-05,
+              "predicted_sd_continuum": 3.938927711338657e-05,
+              "empirical_mean": 0.3700010419942871,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0031511421690709252,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 5.9257624598263794e-05,
+              "predicted_sd_continuum": 5.570484990582347e-05,
+              "empirical_mean": 0.370002216307408,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.005614697038206514,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 8.313392354618841e-05,
+              "predicted_sd_continuum": 7.877855422677314e-05,
+              "empirical_mean": 0.37000175164559906,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.01000425278816908,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.00011396107969990248,
+              "predicted_sd_continuum": 0.00011140969981164684,
+              "empirical_mean": 0.36999699502105593,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.017825551969863487,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.00015391949102900262,
+              "predicted_sd_continuum": 0.00015755710845354615,
+              "empirical_mean": 0.36998700254379613,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.031761522800190733,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.00021341591232538405,
+              "predicted_sd_continuum": 0.00022281939962329382,
+              "empirical_mean": 0.3699769232191069,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05659259989775027,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.00031939518361811105,
+              "predicted_sd_continuum": 0.0003151142169070927,
+              "empirical_mean": 0.3699771390749843,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10083654941026965,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         },
         {
-          "alpha": 40.00000000000001,
-          "empirical_sd": 1.5060362913146491e-05,
-          "predicted_sd_continuum": 1.392621247645587e-05,
-          "empirical_mean": 0.36999912349879294,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.0005570484990582349
+          "seed": 3,
+          "rng_seed": 3004,
+          "fitted_exponent": 1.5303444350267783,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 0.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 132.28956705122553,
+            "predicted_sd_rprime_discrete": 126.03583905886771,
+            "sd_of_sd": 8.300585680550512,
+            "continuum_sd_rprime": 126.04568676283695,
+            "continuum_vs_discrete_rel": 7.813415646515463e-05,
+            "empirical_sd_tau": 4.143837420146619e-05
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 4.412041372186162e-06,
+              "predicted_sd_continuum": 4.923659639173323e-06,
+              "empirical_mean": 0.3699184468825016,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 9.847319278346645e-05,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 6.613069577505702e-06,
+              "predicted_sd_continuum": 6.96310623822793e-06,
+              "empirical_mean": 0.3700017284203008,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.00017545928244395344,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 9.89393457898461e-06,
+              "predicted_sd_continuum": 9.847319278346646e-06,
+              "empirical_mean": 0.3700014547524582,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.000312632899630284,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 1.420481553124171e-05,
+              "predicted_sd_continuum": 1.392621247645587e-05,
+              "empirical_mean": 0.370001523215477,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0005570484990582349,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 2.0143750522645605e-05,
+              "predicted_sd_continuum": 1.969463855669329e-05,
+              "empirical_mean": 0.3700026973090268,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0009925475875059622,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 2.9012226800603413e-05,
+              "predicted_sd_continuum": 2.7852424952911717e-05,
+              "empirical_mean": 0.37000496862151144,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.001768518746804695,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 4.143837420146619e-05,
+              "predicted_sd_continuum": 3.938927711338657e-05,
+              "empirical_mean": 0.37000847780909685,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0031511421690709252,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 5.735194081121738e-05,
+              "predicted_sd_continuum": 5.570484990582347e-05,
+              "empirical_mean": 0.37001307449063614,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.005614697038206514,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 7.902808587013581e-05,
+              "predicted_sd_continuum": 7.877855422677314e-05,
+              "empirical_mean": 0.3700185430911128,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.01000425278816908,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.0001124619326273981,
+              "predicted_sd_continuum": 0.00011140969981164684,
+              "empirical_mean": 0.37002489527279203,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.017825551969863487,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.00016249344230150618,
+              "predicted_sd_continuum": 0.00015755710845354615,
+              "empirical_mean": 0.3700324036827502,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.031761522800190733,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.0002313713915657393,
+              "predicted_sd_continuum": 0.00022281939962329382,
+              "empirical_mean": 0.37004126159814643,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05659259989775027,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.00032301953149944127,
+              "predicted_sd_continuum": 0.0003151142169070927,
+              "empirical_mean": 0.3700532024175942,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10083654941026965,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         },
         {
-          "alpha": 50.39684199579492,
-          "empirical_sd": 2.0720484071699877e-05,
-          "predicted_sd_continuum": 1.969463855669329e-05,
-          "empirical_mean": 0.36999785325061596,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.0009925475875059622
-        },
-        {
-          "alpha": 63.49604207872796,
-          "empirical_sd": 2.8912970370275347e-05,
-          "predicted_sd_continuum": 2.7852424952911717e-05,
-          "empirical_mean": 0.3699967475003022,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.001768518746804695
-        },
-        {
-          "alpha": 79.99999999999999,
-          "empirical_sd": 4.181382920787549e-05,
-          "predicted_sd_continuum": 3.938927711338657e-05,
-          "empirical_mean": 0.36999584969656785,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.0031511421690709252
-        },
-        {
-          "alpha": 100.79368399158986,
-          "empirical_sd": 5.990356002864027e-05,
-          "predicted_sd_continuum": 5.570484990582347e-05,
-          "empirical_mean": 0.3699943957816578,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.005614697038206514
-        },
-        {
-          "alpha": 126.99208415745593,
-          "empirical_sd": 8.397534897310914e-05,
-          "predicted_sd_continuum": 7.877855422677314e-05,
-          "empirical_mean": 0.369991891312769,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.01000425278816908
-        },
-        {
-          "alpha": 159.99999999999991,
-          "empirical_sd": 0.00011768626046309307,
-          "predicted_sd_continuum": 0.00011140969981164684,
-          "empirical_mean": 0.3699904707555321,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.017825551969863487
-        },
-        {
-          "alpha": 201.58736798317955,
-          "empirical_sd": 0.00016887124745177214,
-          "predicted_sd_continuum": 0.00015755710845354615,
-          "empirical_mean": 0.3699938538466237,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.031761522800190733
-        },
-        {
-          "alpha": 253.9841683149119,
-          "empirical_sd": 0.00024430212011418987,
-          "predicted_sd_continuum": 0.00022281939962329382,
-          "empirical_mean": 0.3700017461459274,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.05659259989775027
-        },
-        {
-          "alpha": 320.0,
-          "empirical_sd": 0.0003442583557224303,
-          "predicted_sd_continuum": 0.0003151142169070927,
-          "empirical_mean": 0.37000746025950354,
-          "n_captured": 128,
-          "n_total": 128,
-          "rho": 0.10083654941026965
+          "seed": 4,
+          "rng_seed": 4004,
+          "fitted_exponent": 1.5245023075733357,
+          "capture_totals": {
+            "n_captured": 1664,
+            "n_total": 1664
+          },
+          "global_min_capture_rate": 0.0,
+          "anchor": {
+            "alpha": 79.99999999999999,
+            "empirical_sd_rprime": 122.17476457661614,
+            "predicted_sd_rprime_discrete": 126.03583905886771,
+            "sd_of_sd": 7.6659265274985655,
+            "continuum_sd_rprime": 126.04568676283695,
+            "continuum_vs_discrete_rel": 7.813415646515463e-05,
+            "empirical_sd_tau": 3.813649740197094e-05
+          },
+          "per_alpha": [
+            {
+              "alpha": 20.0,
+              "empirical_sd": 5.066835639524669e-06,
+              "predicted_sd_continuum": 4.923659639173323e-06,
+              "empirical_mean": 0.3699182323004969,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 9.847319278346645e-05,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 25.198420997897458,
+              "empirical_sd": 7.230208562573852e-06,
+              "predicted_sd_continuum": 6.96310623822793e-06,
+              "empirical_mean": 0.3700008306396634,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.00017545928244395344,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 31.74802103936399,
+              "empirical_sd": 9.939300598669468e-06,
+              "predicted_sd_continuum": 9.847319278346646e-06,
+              "empirical_mean": 0.36999985011461745,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.000312632899630284,
+              "global_capture_rate": 1.0,
+              "global_n_captured": 128
+            },
+            {
+              "alpha": 40.00000000000001,
+              "empirical_sd": 1.3611172764782258e-05,
+              "predicted_sd_continuum": 1.392621247645587e-05,
+              "empirical_mean": 0.36999935069268003,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0005570484990582349,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 50.39684199579492,
+              "empirical_sd": 1.9081126144226337e-05,
+              "predicted_sd_continuum": 1.969463855669329e-05,
+              "empirical_mean": 0.3699995747454901,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0009925475875059622,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 63.49604207872796,
+              "empirical_sd": 2.69311330789778e-05,
+              "predicted_sd_continuum": 2.7852424952911717e-05,
+              "empirical_mean": 0.3699994729463919,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.001768518746804695,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 79.99999999999999,
+              "empirical_sd": 3.813649740197094e-05,
+              "predicted_sd_continuum": 3.938927711338657e-05,
+              "empirical_mean": 0.3699981601070311,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.0031511421690709252,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 100.79368399158986,
+              "empirical_sd": 5.560589974465647e-05,
+              "predicted_sd_continuum": 5.570484990582347e-05,
+              "empirical_mean": 0.3699947992052659,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.005614697038206514,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 126.99208415745593,
+              "empirical_sd": 8.3634129153562e-05,
+              "predicted_sd_continuum": 7.877855422677314e-05,
+              "empirical_mean": 0.36998892205242406,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.01000425278816908,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 159.99999999999991,
+              "empirical_sd": 0.00012383712061593593,
+              "predicted_sd_continuum": 0.00011140969981164684,
+              "empirical_mean": 0.3699806843501732,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.017825551969863487,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 201.58736798317955,
+              "empirical_sd": 0.00017460646622029797,
+              "predicted_sd_continuum": 0.00015755710845354615,
+              "empirical_mean": 0.3699720319210873,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.031761522800190733,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 253.9841683149119,
+              "empirical_sd": 0.00023636443418990823,
+              "predicted_sd_continuum": 0.00022281939962329382,
+              "empirical_mean": 0.3699682344488755,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.05659259989775027,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            },
+            {
+              "alpha": 320.0,
+              "empirical_sd": 0.00032153355818540435,
+              "predicted_sd_continuum": 0.0003151142169070927,
+              "empirical_mean": 0.3699739928592523,
+              "n_captured": 128,
+              "n_total": 128,
+              "rho": 0.10083654941026965,
+              "global_capture_rate": 0.0,
+              "global_n_captured": 0
+            }
+          ],
+          "global_per_alpha": [
+            {
+              "alpha": 20.0,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 25.198420997897458,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 31.74802103936399,
+              "capture_rate": 1.0,
+              "n_captured": 128,
+              "n_total": 128,
+              "n_grid": 64
+            },
+            {
+              "alpha": 40.00000000000001,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 79
+            },
+            {
+              "alpha": 50.39684199579492,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 110
+            },
+            {
+              "alpha": 63.49604207872796,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 149
+            },
+            {
+              "alpha": 79.99999999999999,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 198
+            },
+            {
+              "alpha": 100.79368399158986,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 261
+            },
+            {
+              "alpha": 126.99208415745593,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 339
+            },
+            {
+              "alpha": 159.99999999999991,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 438
+            },
+            {
+              "alpha": 201.58736798317955,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 563
+            },
+            {
+              "alpha": 253.9841683149119,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 720
+            },
+            {
+              "alpha": 320.0,
+              "capture_rate": 0.0,
+              "n_captured": 0,
+              "n_total": 128,
+              "n_grid": 918
+            }
+          ]
         }
-      ],
-      "anchor": {
-        "alpha": 79.99999999999999,
-        "empirical_sd_rprime": 133.88287219105533,
-        "predicted_sd_rprime_discrete": 126.03583905886771,
-        "sd_of_sd": 8.40055853648478,
-        "continuum_sd_rprime": 126.04568676283695,
-        "continuum_vs_discrete_rel": 7.813415646515463e-05,
-        "empirical_sd_tau": 4.181382920787549e-05
-      },
-      "capture_totals": {
-        "n_captured": 1664,
-        "n_total": 1664
-      }
+      ]
     }
   ],
   "gates": {
@@ -376,14 +2723,37 @@
       },
       {
         "name": "localization_exponent_n3",
-        "fitted_exponent": 0.5159068771613536,
+        "key": "fitted_exponent",
         "expected": 0.5,
-        "abs_error": 0.01590687716135364,
         "tol": 0.1,
-        "decades": 1.2041199826559248,
-        "min_decades": 1.0,
-        "n_points": 13,
-        "r2": 0.9920118913857837,
+        "direction": null,
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          0.5159068771613241,
+          0.4992418530587157,
+          0.5082431495917076,
+          0.4850201001896116,
+          0.5007705222656403
+        ],
+        "deviations": [
+          0.015906877161324107,
+          0.0007581469412842878,
+          0.008243149591707577,
+          0.014979899810388386,
+          0.0007705222656403388
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 0.5159068771613241,
+        "worst_deviation": 0.015906877161324107,
         "passed": true
       },
       {
@@ -397,14 +2767,37 @@
       },
       {
         "name": "localization_exponent_n4",
-        "fitted_exponent": 1.52537536017014,
+        "key": "fitted_exponent",
         "expected": 1.5,
-        "abs_error": 0.025375360170140082,
         "tol": 0.1,
-        "decades": 1.2041199826559248,
-        "min_decades": 1.0,
-        "n_points": 13,
-        "r2": 0.9996962309018709,
+        "direction": null,
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.5253753599700657,
+          1.5314441561301,
+          1.5245438975913634,
+          1.5303444350267783,
+          1.5245023075733357
+        ],
+        "deviations": [
+          0.02537535997006568,
+          0.03144415613009999,
+          0.02454389759136344,
+          0.030344435026778305,
+          0.024502307573335713
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 1,
+        "worst_index": 1,
+        "worst_value": 1.5314441561301,
+        "worst_deviation": 0.03144415613009999,
         "passed": true
       }
     ]
@@ -415,6 +2808,27 @@
     "tempering_scale_alpha": true,
     "bias_collapse": false,
     "temperature_collapse": false,
+    "locally_seeded_estimator": true,
+    "global_search_earned": {
+      "3": true,
+      "4": false
+    },
+    "boundary_artifact": {
+      "3": {
+        "alpha": 320.0,
+        "noiseless_peak": 4000.0,
+        "noiseless_abs_max": 3916.3016475787877,
+        "noiseless_argmax_tau": 0.37090625,
+        "global_min_capture_rate": 1.0
+      },
+      "4": {
+        "alpha": 320.0,
+        "noiseless_peak": 4000.0,
+        "noiseless_abs_max": 304497.7756286852,
+        "noiseless_argmax_tau": 0.978125,
+        "global_min_capture_rate": 0.0
+      }
+    },
     "g1_earned": false,
     "g2_earned": false,
     "g3_earned": false,
@@ -426,8 +2840,8 @@
     "mathlib_verified": false,
     "not_statistically_efficient": true,
     "no_pinn_inverse_module": true,
-    "pre_registered": "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; alpha_min from alpha * min(tau*, 1-tau*) >= 7; s rounded down from the closed-form regime bound; never retuned after seeing the fit",
-    "licensed_sentence": "for the logistic bias-scan localizer on this synthetic piecewise-polynomial family, the localization standard deviation scales as alpha^(n - 5/2) for n in {3, 4}, measured over 1.2 decades of tempering scale alpha"
+    "pre_registered": "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; boundary_contamination_ratio <= 1e-2 at alpha_min and alpha_max; s = round_down_1sig(0.5 * s_max) from the closed-form regime bound; never retuned after seeing the fit; five seeds gated by worst seed",
+    "licensed_sentence": "for the locally-seeded logistic bias-scan localizer on this synthetic piecewise-polynomial family, the localization standard deviation scales as alpha^(n - 5/2) for n in {3, 4}, measured over 1.2 decades of tempering scale alpha across five seeds; a tau*-free global argmax earns the same claim only for n=3 (n=4 is dominated by a boundary artifact)"
   },
-  "wall_seconds": 11.034
+  "wall_seconds": 90.333
 }

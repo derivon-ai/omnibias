@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Changed — A7 hardening (05-01 G7 protocol repair)
+
+- `benchmarks/inverse_imaging.py`: five-seed worst-case gate via
+  `require_all_seeds`; vectorized `polish_peak_batch`; derived
+  `boundary_contamination_ratio` guard and `s = round_down_1sig(0.5 * s_max)`;
+  discloses the locally-seeded coarse grid and reports a `tau*`-free global
+  argmax arm (`global_search_earned`: n=3 true, n=4 false, boundary artifact
+  recorded). Both tiers use `R = 128` per seed.
+- Gate helper `require_all_seeds` in `benchmarks/_gates.py` (worst-seed gate;
+  refuses `n_seeds < 5` without an explicit override).
+
 ### Added — Wave-0 falsifier A7: scan localization scaling (05-01 G7)
 
 - `benchmarks/inverse_imaging.py`: logistic bias-scan localizer; gates
