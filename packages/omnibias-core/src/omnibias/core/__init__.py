@@ -59,6 +59,14 @@ from omnibias.core.multi_index import (
     multiply_table,
     num_multi_indices,
 )
+from omnibias.core.multipack import (
+    MultiPackSpec,
+    PackSpec,
+    central_stencil_weights,
+    incidence_matrix,
+    is_poised,
+    polya_condition,
+)
 from omnibias.core.polynomials import (
     hermite_coeffs,
     mish_inner_coeffs,
@@ -96,7 +104,9 @@ __lineage__ = "bias collapse"
 
 __all__ = [
     "ActivationSpec",
+    "MultiPackSpec",
     "NthDerivativeFn",
+    "PackSpec",
     "TensorFn",
     "TensorT",
     "TransformIdentity",
@@ -110,6 +120,7 @@ __all__ = [
     "binary_entropy",
     "cdf_normalization",
     "central_moments_from_cumulants",
+    "central_stencil_weights",
     "central_to_raw_moments",
     "cumulants_from_raw_moments",
     "delta_method_central_moments",
@@ -119,9 +130,11 @@ __all__ = [
     "gaussian_central_moments",
     "has_cumulant_tower",
     "hermite_coeffs",
+    "incidence_matrix",
     "index_position",
     "is_cdf_activation",
     "is_log_partition_activation",
+    "is_poised",
     "make_tempered_fastpath",
     "make_tempered_transforms",
     "mish_inner_coeffs",
@@ -129,6 +142,7 @@ __all__ = [
     "multi_indices",
     "multiply_table",
     "num_multi_indices",
+    "polya_condition",
     "raw_moments_from_cumulants",
     "raw_to_central_moments",
     "registered_activations",

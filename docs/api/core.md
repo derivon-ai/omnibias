@@ -27,6 +27,11 @@ the *multivariate* (multi-index) jet kernels.
       show_root_heading: false
       heading_level: 3
 
+## Multi-pack Birkhoff support
+
+Pure-Python support algebra for heterogeneous multi-pack collapse (theory
+01-01). Documented in full at [multipack.md](multipack.md).
+
 ## ActivationSpec
 
 ::: omnibias.core.spec

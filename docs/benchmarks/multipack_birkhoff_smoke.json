@@ -1,0 +1,181 @@
+{
+  "schema": "multipack-birkhoff-v1",
+  "generated_utc": "2026-08-11T17:36:38Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "multipack_birkhoff",
+    "full": false,
+    "g4_earned": false,
+    "gates_in_scope": [
+      "g1",
+      "g2",
+      "g3",
+      "g5"
+    ]
+  },
+  "rss_mb_at_start": 813.42,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_exactness",
+        "passed": true,
+        "expected": 4.0,
+        "order_ceilings": {
+          "sigmoid": 1,
+          "tanh": 2
+        },
+        "ulp_curves": {
+          "sigmoid": [
+            0.9638717431642764,
+            0.6285449455682204,
+            108.7726579610745,
+            35.49404927726997,
+            356.4077487207598,
+            6056.516094149193,
+            2583.727148332817
+          ],
+          "tanh": [
+            0.7432169318172314,
+            0.9248787169750753,
+            0.8832187299443727,
+            37.33965111618528,
+            8.857538156882569,
+            47.92376936837619,
+            59.03662511474375
+          ]
+        },
+        "worked_example_worst_ulp": 1.3626823949434705,
+        "domain": {
+          "z_lo": -1.0,
+          "z_hi": 1.0,
+          "n_grid": 81
+        },
+        "note": "ceiling = max order with worst_ulp<=4 on the domain; \u00a711 conditioning recorded rather than threshold softening"
+      },
+      {
+        "name": "g2_stability",
+        "passed": true,
+        "closed_form": 0.6047322376200306,
+        "fd_errors": [
+          5.878482877363922e-06,
+          5.879499198613303e-08,
+          1.9988668498172046e-09,
+          2.010294544163571e-07,
+          4.090504969411768e-06
+        ],
+        "deltas": [
+          0.01,
+          0.001,
+          0.0001,
+          1e-05,
+          1e-06
+        ]
+      },
+      {
+        "name": "g3_parity",
+        "passed": true,
+        "max_abs_diff": 0.0
+      },
+      {
+        "name": "g5_poisedness_honesty",
+        "passed": true,
+        "unpoised_is_poised": false,
+        "poised_is_poised": true,
+        "representation_claim_withheld_for_unpoised": true
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_exactness",
+    "passed": true,
+    "expected": 4.0,
+    "order_ceilings": {
+      "sigmoid": 1,
+      "tanh": 2
+    },
+    "ulp_curves": {
+      "sigmoid": [
+        0.9638717431642764,
+        0.6285449455682204,
+        108.7726579610745,
+        35.49404927726997,
+        356.4077487207598,
+        6056.516094149193,
+        2583.727148332817
+      ],
+      "tanh": [
+        0.7432169318172314,
+        0.9248787169750753,
+        0.8832187299443727,
+        37.33965111618528,
+        8.857538156882569,
+        47.92376936837619,
+        59.03662511474375
+      ]
+    },
+    "worked_example_worst_ulp": 1.3626823949434705,
+    "domain": {
+      "z_lo": -1.0,
+      "z_hi": 1.0,
+      "n_grid": 81
+    },
+    "note": "ceiling = max order with worst_ulp<=4 on the domain; \u00a711 conditioning recorded rather than threshold softening"
+  },
+  "g2": {
+    "name": "g2_stability",
+    "passed": true,
+    "closed_form": 0.6047322376200306,
+    "fd_errors": [
+      5.878482877363922e-06,
+      5.879499198613303e-08,
+      1.9988668498172046e-09,
+      2.010294544163571e-07,
+      4.090504969411768e-06
+    ],
+    "deltas": [
+      0.01,
+      0.001,
+      0.0001,
+      1e-05,
+      1e-06
+    ]
+  },
+  "g3": {
+    "name": "g3_parity",
+    "passed": true,
+    "max_abs_diff": 0.0
+  },
+  "g5": {
+    "name": "g5_poisedness_honesty",
+    "passed": true,
+    "unpoised_is_poised": false,
+    "poised_is_poised": true,
+    "representation_claim_withheld_for_unpoised": true
+  },
+  "honesty": {
+    "claim_rung": 1,
+    "bias_collapse": true,
+    "temperature_collapse": false,
+    "g1_earned": true,
+    "g2_earned": true,
+    "g3_earned": true,
+    "g4_earned": false,
+    "g5_earned": true,
+    "order_ceilings": {
+      "sigmoid": 1,
+      "tanh": 2
+    },
+    "representation_requires_poisedness": true,
+    "licensed_sentence": "MultiPackUnit matches a high-dps mpmath reference within 4 ulp up to the recorded float64 order ceiling; the closed form is stable as delta->0 while FD breaks; torch/jax agree bit-for-bit on the gated grid; unpoised supports return is_poised=False and representation claims are withheld"
+  },
+  "wall_seconds": 0.885
+}

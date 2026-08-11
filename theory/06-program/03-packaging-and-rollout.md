@@ -249,6 +249,7 @@ proceeds.
 - [x] Run Wave-0 falsifiers A6 (04-01 G2), A7 (05-01 G7), and A4 (05-02 G1/G2)
       before Wave 1+; A5 still pending
 - [x] Record A6, A7, and A4 falsifier outcomes in `theory/README.md` (all passed)
+- [x] Open Wave 1 with 01-01 multipack (G1/G2/G3/G5 earned; G4 deferred)
 - [ ] Mark failed-falsifier specs `retired` with a reason
 - [ ] Written promotion criterion for `omnibias.geometry.arrangement` in its
       module docstring

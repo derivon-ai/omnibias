@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Wave-1 primitive 01-01: multipack Birkhoff collapse
+
+- `omnibias.core.multipack`: `PackSpec` / `MultiPackSpec`, Polya screen,
+  incidence matrix, `is_poised` (returns `None` when inconclusive).
+- `omnibias.torch.multipack.MultiPackUnit` (+ `BirkhoffOMBU`) and the
+  bit-identical `omnibias.jax.multipack` twin: closed-form
+  `sum_g c_g sigma^(n_g)(z + mu_g)` with shared means.
+- `benchmarks/multipack_birkhoff.py`: G1/G2/G3/G5 earned; float64 order
+  ceiling recorded (sigmoid: 1, tanh: 2 on `z in [-1,1]`); G4 deferred.
+  Smoke: `docs/benchmarks/multipack_birkhoff_smoke.json`.
+
 ### Changed — A4 hardening (05-02 protocol repair)
 
 - Removed process-global `torch.set_default_dtype` from

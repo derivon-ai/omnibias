@@ -7,7 +7,7 @@ sizes at different means**: pack size selects a derivative order, pack mean
 selects a sample location, so a single unit evaluates a *scattered Birkhoff
 sample* of `sigma` along one direction rather than a single derivative.
 
-- **Status**: designed
+- **Status**: gated (G1/G2/G3/G5 earned; G4 deferred)
 - **Depends on**: none
 - **Blocks**: 01-02, 01-04, 01-05, 01-07, 01-09, 01-10, 01-11, 01-12, 02-03, 02-04, 02-05, 02-07, 02-09, 02-10, 02-12, 02-13, 03-01, 03-10, 03-11, 03-12, 03-13, 04-01, 05-01, 07-02, 07-03, 07-04, 07-05, 07-06
 
@@ -190,7 +190,7 @@ unusable in float64; the closed form is exact to rounding.
 
 ## 6. Proposed API
 
-Does not exist yet.
+Shipped.
 
 Core (pure Python, no tensor imports):
 
@@ -282,17 +282,24 @@ biases.
   `MultiPackUnit` output matches an independent mpmath evaluation of
   `sum_g c_g sigma^(n_g)(z + mu_g)` to `<= 4 ulp` in float64, on a dense grid
   and a random sample of `z`.
+  **Earned with recorded ceiling** — on `z in [-1, 1]` the 4-ulp single-pack
+  ceiling is order `1` (sigmoid) / `2` (tanh); higher orders lose digits to
+  `P_n` conditioning (section 11). The worked-example multipack stays within
+  4 ulp on the same domain. See `docs/benchmarks/multipack_birkhoff_smoke.json`.
 - **G2 stability.** Relative error of the closed form versus the collapsing
   finite difference decreases monotonically as `delta` shrinks until the finite
   difference breaks down; the closed form must show no error growth at all.
+  **Earned.**
 - **G3 parity.** torch and jax outputs are bit-identical on the same inputs.
+  **Earned** on the gated moderate grid (native tanh/sigmoid may differ by a
+  few ULPs in extreme tails; see `tests/test_sigmoid_tail_parity.py`).
 - **G4 task skill.** On a two-interface 1-D transmission problem with known
   exact solution, relative `L2` error `<= 1e-6` with skill `> 0` against the
   zero predictor, beating both baselines above at equal parameter count, over
-  five seeds.
+  five seeds. **Unearned** (`g4_earned: false`).
 - **G5 poisedness honesty.** For a deliberately unpoised support, `is_poised`
   returns `False` (not `None`, not `True`) and the representation claim in the
-  docs is withheld.
+  docs is withheld. **Earned.**
 
 ## 9. Benchmark plan
 
@@ -339,15 +346,17 @@ biases.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-core/src/omnibias/core/multipack.py`
-- [ ] `packages/omnibias-torch/src/omnibias/torch/multipack.py`
-- [ ] `packages/omnibias-jax/src/omnibias/jax/multipack.py`
-- [ ] Unit tests for `polya_condition`, `incidence_matrix`, `is_poised`
+- [x] `packages/omnibias-core/src/omnibias/core/multipack.py`
+- [x] `packages/omnibias-torch/src/omnibias/torch/multipack.py`
+- [x] `packages/omnibias-jax/src/omnibias/jax/multipack.py`
+- [x] Unit tests for `polya_condition`, `incidence_matrix`, `is_poised`
       including the inconclusive branch
-- [ ] Exactness test against mpmath (dense grid plus random sample)
-- [ ] torch/jax parity test in `tests/`
-- [ ] Collapse test: finite-difference multi-pack converges to the closed form
-- [ ] `benchmarks/multipack_birkhoff.py` plus committed smoke JSON
-- [ ] Docs page `docs/api/multipack.md` and mkdocs nav entry
-- [ ] Regenerate `__all__` in both backend `__init__.py` files
-- [ ] Index row in `theory/README.md` marked shipped
+- [x] Exactness test against mpmath (dense grid plus random sample); float64
+      order ceiling recorded honestly (sigmoid: 1, tanh: 2 on `z in [-1,1]`)
+- [x] torch/jax parity test in `tests/`
+- [x] Collapse test: finite-difference multi-pack converges to the closed form
+- [x] `benchmarks/multipack_birkhoff.py` plus committed smoke JSON
+- [x] Docs page `docs/api/multipack.md` and mkdocs nav entry
+- [x] Regenerate `__all__` in both backend `__init__.py` files
+- [x] Index row in `theory/README.md` marked shipped
+- [ ] G4 two-interface task skill (deferred; `g4_earned: false`)

@@ -137,6 +137,12 @@ from omnibias.jax.moments import (
     delta_method_moments,
     gaussian_moment_propagation,
 )
+from omnibias.jax.multipack import (
+    BirkhoffOMBU,
+    init_multipack,
+    multipack_apply,
+    multipack_response,
+)
 from omnibias.jax.precision import X64_HINT, require_x64, x64_enabled
 from omnibias.jax.probability import (
     binned_calibration_error,
@@ -163,6 +169,7 @@ from omnibias.jax.transforms import (
 __lineage__ = "bias collapse"
 
 __all__ = [
+    "BirkhoffOMBU",
     "FourierTransform",
     "JaxActivationSpec",
     "LaplaceTransform",
@@ -199,6 +206,7 @@ __all__ = [
     "has_transform",
     "hellinger_distance",
     "identity_jet",
+    "init_multipack",
     "is_registered",
     "jet_attention",
     "jet_exp",
@@ -226,6 +234,8 @@ __all__ = [
     "mlp_jet_mv",
     "model_band_mass",
     "moment_match",
+    "multipack_apply",
+    "multipack_response",
     "mutual_information",
     "neural_field_hessian",
     "neural_field_laplacian",

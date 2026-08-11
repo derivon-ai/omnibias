@@ -96,7 +96,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 
 | Spec | Status | One line |
 |---|---|---|
-| [01-01 multipack Birkhoff collapse](01-geometry/01-multipack-birkhoff-collapse.md) | designed | Unequal pack sizes at unequal means give a scattered Birkhoff jet of `sigma` |
+| [01-01 multipack Birkhoff collapse](01-geometry/01-multipack-birkhoff-collapse.md) | gated | `MultiPackUnit` shipped; G1/G2/G3/G5 earned (float64 order ceiling recorded; G4 deferred) |
 | [01-02 bias scan](01-geometry/02-bias-scan-transverse-convolution.md) | designed | Shared pack template evaluated on a bias grid: the grid-free convolution knob |
 | [01-03 arrangement geometry](01-geometry/03-hyperplane-arrangement-geometry.md) | concept | Cells, flats, faces and tope graphs of many soft hyperplanes |
 | [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | designed | Exact rational weights for arbitrary node and order sets |

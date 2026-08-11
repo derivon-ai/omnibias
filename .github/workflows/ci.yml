@@ -273,6 +273,11 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python -m pytest tests/ -x -q
+      - name: Run multipack Birkhoff smoke (01-01 G1/G2/G3/G5)
+        run: |
+          source .venv-cross/bin/activate
+          pip install mpmath
+          JAX_PLATFORMS=cpu python benchmarks/multipack_birkhoff.py
       - name: Run the closed-form integral-transform example (smoke)
         run: |
           source .venv-cross/bin/activate

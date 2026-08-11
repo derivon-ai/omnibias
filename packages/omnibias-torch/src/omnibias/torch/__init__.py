@@ -116,6 +116,7 @@ from omnibias.torch.moments import (
     delta_method_moments,
     gaussian_moment_propagation,
 )
+from omnibias.torch.multipack import BirkhoffOMBU, MultiPackUnit, multipack_response
 from omnibias.torch.probability import (
     binned_calibration_error,
     cdf,
@@ -149,6 +150,7 @@ __all__ = [
     "ActivationSpec",
     "AnalyticGaussianConv1d",
     "AnalyticGaussianConv2d",
+    "BirkhoffOMBU",
     "FourierTransform",
     "GrowStrategy",
     "GrowableOMBU",
@@ -156,6 +158,7 @@ __all__ = [
     "LaplaceTransform",
     "LearnablePReLU",
     "MellinTransform",
+    "MultiPackUnit",
     "OMBU",
     "OperatorBlock",
     "OperatorMultiBiasUnit",
@@ -218,6 +221,7 @@ __all__ = [
     "mlp_jet_mv",
     "model_band_mass",
     "moment_match",
+    "multipack_response",
     "mutual_information",
     "region_of_convergence",
     "register_activation",
