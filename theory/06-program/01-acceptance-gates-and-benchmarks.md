@@ -243,6 +243,13 @@ def require_within_stderr(
     max_sigmas: float = 3.0, name: str,
 ) -> dict[str, Any]:
     """|measured - reference| <= max_sigmas * stderr."""
+
+# Landed with Wave-0 falsifier A7 (05-01 G7); validity guard, not a soft gate.
+def require_capture_rate(
+    n_captured: int, n_total: int, *, min_rate: float = 1.0, name: str,
+) -> dict[str, Any]:
+    """Require capture rate >= min_rate. Raises RuntimeError with
+    INVALID EXPERIMENT on failure so a broken regime cannot report an exponent."""
 ```
 
 ## 7. Practical use cases
@@ -289,10 +296,11 @@ Not a benchmark itself. The deliverable is:
 - this file referenced from `benchmarks/README.md`.
 
 The three helpers `require_scaling_exponent`, `require_rel_error`, and
-`require_within_stderr` landed with Wave-0 falsifier A6. The four original
-extensions (`require_enclosure_coverage`, `require_backend_parity`,
-`require_cost_parity`, `require_all_seeds`) and the schema validator remain
-open.
+`require_within_stderr` landed with Wave-0 falsifier A6. The validity guard
+`require_capture_rate` (raises `RuntimeError` / `INVALID EXPERIMENT`) landed
+with Wave-0 falsifier A7. The four original extensions
+(`require_enclosure_coverage`, `require_backend_parity`, `require_cost_parity`,
+`require_all_seeds`) and the schema validator remain open.
 
 ## 10. Honesty and scope
 
@@ -335,6 +343,8 @@ open.
 
 - [x] Extend `benchmarks/_gates.py` with `require_scaling_exponent`,
       `require_rel_error`, `require_within_stderr` (Wave-0 A6)
+- [x] Extend `benchmarks/_gates.py` with `require_capture_rate` (Wave-0 A7;
+      raises `RuntimeError` / `INVALID EXPERIMENT`)
 - [ ] Extend `benchmarks/_gates.py` with `require_enclosure_coverage`,
       `require_backend_parity`, `require_cost_parity`, `require_all_seeds`
 - [x] `tests/test_gates_protocol.py` with a deliberately-failing case per

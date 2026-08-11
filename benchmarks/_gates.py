@@ -294,6 +294,44 @@ def require_within_stderr(
     return verdict
 
 
+def require_capture_rate(
+    n_captured: int,
+    n_total: int,
+    *,
+    min_rate: float = 1.0,
+    name: str = "capture_rate",
+) -> dict[str, Any]:
+    """Require every realization to land in the valid peak-locating regime.
+
+    Unlike the other helpers this raises ``RuntimeError`` with the substring
+    ``INVALID EXPERIMENT`` on failure: a broken regime must refuse to report
+    an exponent rather than fail a soft gate.
+    """
+    captured = int(n_captured)
+    total = int(n_total)
+    if total <= 0:
+        raise ValueError(f"{name}: n_total must be positive")
+    if captured < 0 or captured > total:
+        raise ValueError(f"{name}: n_captured must be in [0, n_total]")
+    rate = captured / total
+    passed = bool(rate >= float(min_rate))
+    verdict = {
+        "name": name,
+        "n_captured": captured,
+        "n_total": total,
+        "rate": float(rate),
+        "min_rate": float(min_rate),
+        "passed": passed,
+    }
+    if not passed:
+        raise RuntimeError(
+            f"{name}: capture rate {rate:.4f} < min_rate={min_rate} "
+            f"({captured}/{total}); INVALID EXPERIMENT -- fix the regime "
+            "(noise / sample count / alpha sweep) before gating an exponent"
+        )
+    return verdict
+
+
 # Published CCF self-similar lambda digits (DeepMind arXiv:2509.14185).
 CCF_LAMBDA_1ST_UNSTABLE = 0.6057
 CCF_LAMBDA_2ND_UNSTABLE = 0.4703
@@ -467,6 +505,7 @@ __all__ = [
     "mse",
     "rel_l2",
     "require_reference_valid",
+    "require_capture_rate",
     "require_rel_error",
     "require_rel_l2",
     "require_scaling_exponent",

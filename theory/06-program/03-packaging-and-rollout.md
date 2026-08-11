@@ -246,8 +246,9 @@ proceeds.
 - [ ] `packages/omnibias-core/tests/test_theory_homes.py` with an empty
       `NEW_PACKAGES_ALLOWED`
 - [ ] Keep the assignment table current as specs move
-- [x] Run Wave-0 falsifier A6 (04-01 G2) before Wave 1+; A4/A5/A7 still pending
-- [x] Record A6 falsifier outcome in `theory/README.md` (passed)
+- [x] Run Wave-0 falsifiers A6 (04-01 G2) and A7 (05-01 G7) before Wave 1+;
+      A4/A5 still pending
+- [x] Record A6 and A7 falsifier outcomes in `theory/README.md` (both passed)
 - [ ] Mark failed-falsifier specs `retired` with a reason
 - [ ] Written promotion criterion for `omnibias.geometry.arrangement` in its
       module docstring

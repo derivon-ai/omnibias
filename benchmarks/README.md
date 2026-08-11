@@ -37,6 +37,7 @@ uv run python docs/img/generate_figures.py
 | `burgers_shock_conservation.py` | `docs/benchmarks/burgers_shock_conservation.json` | shock-capturing Burgers PINN, conservative flux-form cage vs non-conservative arm at identical architecture / budget / seed, swept over 6 viscosities x 5 seeds |
 | `hard_conditions_solver.py` | `docs/benchmarks/hard_conditions_solver.json` | Poisson / heat / wave with boundary + initial conditions absorbed into the ansatz vs kept as loss terms, at identical architecture / budget / seed over 5 seeds; reports boundary violation and interior relative L2 |
 | `information_geometry.py` | `docs/benchmarks/information_geometry_smoke.json` / `information_geometry.json` | Wave-0 falsifier A6 (04-01 G2): Fisher `G_{delta,delta}` exponent `2.00 +- 0.02` and prefactor `1/720` for the two-bias logistic pack vs Monte Carlo Fisher |
+| `inverse_imaging.py` | `docs/benchmarks/inverse_imaging_smoke.json` / `inverse_imaging.json` | Wave-0 falsifier A7 (05-01 G7): scan localization `sd(tau_hat) ~ alpha^(n - 5/2)` for `n in {3, 4}`; G1–G6 unearned |
 
 All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries
 `generated_utc`, `hardware_class`, library versions, and the exact config.
@@ -45,14 +46,17 @@ All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries
 
 Wave-0 kill experiments from [`theory/06-program/03-packaging-and-rollout.md`](../theory/06-program/03-packaging-and-rollout.md).
 Shared gate protocol: [`theory/06-program/01-acceptance-gates-and-benchmarks.md`](../theory/06-program/01-acceptance-gates-and-benchmarks.md).
-Helpers: `require_scaling_exponent`, `require_rel_error`, `require_within_stderr`
-in [`_gates.py`](_gates.py), self-tested in `tests/test_gates_protocol.py`.
+Helpers: `require_scaling_exponent`, `require_rel_error`, `require_within_stderr`,
+`require_capture_rate` in [`_gates.py`](_gates.py), self-tested in
+`tests/test_gates_protocol.py`.
 
 ```bash
 # CI smoke
 uv run python benchmarks/information_geometry.py
-# Multi-seed acceptance (+ copy under $OMNIBIAS_SCRATCH/infogeom/)
+uv run python benchmarks/inverse_imaging.py
+# Multi-seed / multi-realization acceptance
 uv run python benchmarks/information_geometry.py --full
+uv run python benchmarks/inverse_imaging.py --full
 ```
 
 ## PINN four-gap suite
@@ -91,7 +95,8 @@ order:
    conditioned-vs-baseline comparison)
 
 Helpers: `rel_l2`, `skill_score`, `require_reference_valid`, `gates_block`,
-`require_scaling_exponent`, `require_rel_error`, `require_within_stderr`.
+`require_scaling_exponent`, `require_rel_error`, `require_within_stderr`,
+`require_capture_rate`.
 
 ### Regenerate the four-gap artifacts
 

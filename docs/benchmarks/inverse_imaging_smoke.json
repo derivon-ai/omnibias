@@ -1,0 +1,433 @@
+{
+  "schema": "inverse-imaging-v1",
+  "generated_utc": "2026-08-11T15:39:37Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "logistic_scan_localization",
+    "orders": [
+      3,
+      4
+    ],
+    "tau_star": 0.37,
+    "domain": [
+      0.0,
+      1.0
+    ],
+    "alpha_sweep": {
+      "lo": 20.0,
+      "hi": 320.0,
+      "n": 13,
+      "decades": 1.2041199826559248
+    },
+    "N": 6400,
+    "samples_per_kernel_width": 20,
+    "J": 50.0,
+    "s_per_order": {
+      "3": 0.05,
+      "4": 0.0001
+    },
+    "rho_max": 0.25,
+    "R": 128,
+    "full": false,
+    "seed": 0,
+    "exponent_tol": 0.1,
+    "min_decades": 1.0,
+    "anchor_alpha": 80.0,
+    "g1_to_g6_earned": false,
+    "pre_registration": "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; alpha_min from alpha * min(tau*, 1-tau*) >= 7; s rounded down from the closed-form regime bound; never retuned after seeing the fit"
+  },
+  "rss_mb_at_start": 816.98,
+  "baseline": {
+    "name": "continuum delta-method sd(tau_hat) ~ alpha^(n-5/2)",
+    "note": "scan is not statistically efficient; Cramer-Rao is ~10x tighter on this family (spec 05-01 section 5)"
+  },
+  "seeds": [
+    0
+  ],
+  "orders": [
+    {
+      "n": 3,
+      "m": 1,
+      "J": 50.0,
+      "s": 0.05,
+      "expected_exponent": 0.5,
+      "fitted_exponent": 0.5159068771613536,
+      "regime": {
+        "rho_at_alpha_max": 0.10451156235874881,
+        "rho_max": 0.25,
+        "design_density": 20.0,
+        "kernel_fit_at_alpha_max": 118.4
+      },
+      "per_alpha": [
+        {
+          "alpha": 20.0,
+          "empirical_sd": 8.733024091818383e-05,
+          "predicted_sd_continuum": 8.164965809277251e-05,
+          "empirical_mean": 0.36999040310183823,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.0016329931618554502
+        },
+        {
+          "alpha": 25.198420997897458,
+          "empirical_sd": 9.717825812634415e-05,
+          "predicted_sd_continuum": 9.164864246657338e-05,
+          "empirical_mean": 0.3700113938469251,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.0023094010767584993
+        },
+        {
+          "alpha": 31.74802103936399,
+          "empirical_sd": 0.00010279530515475553,
+          "predicted_sd_continuum": 0.00010287212294780336,
+          "empirical_mean": 0.3700126492443496,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.0032659863237109003
+        },
+        {
+          "alpha": 40.00000000000001,
+          "empirical_sd": 0.0001088910255797903,
+          "predicted_sd_continuum": 0.00011547005383792502,
+          "empirical_mean": 0.37001293697584114,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.004618802153517002
+        },
+        {
+          "alpha": 50.39684199579492,
+          "empirical_sd": 0.00012269756612748084,
+          "predicted_sd_continuum": 0.00012961075314931088,
+          "empirical_mean": 0.3700125625745895,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.006531972647421799
+        },
+        {
+          "alpha": 63.49604207872796,
+          "empirical_sd": 0.00014405302481821725,
+          "predicted_sd_continuum": 0.00014548315146289598,
+          "empirical_mean": 0.3700095364780857,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.009237604307033997
+        },
+        {
+          "alpha": 79.99999999999999,
+          "empirical_sd": 0.00016761107242095692,
+          "predicted_sd_continuum": 0.00016329931618554497,
+          "empirical_mean": 0.37000164408496133,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.013063945294843596
+        },
+        {
+          "alpha": 100.79368399158986,
+          "empirical_sd": 0.0001919646448407003,
+          "predicted_sd_continuum": 0.0001832972849331468,
+          "empirical_mean": 0.3699875744414421,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.018475208614068005
+        },
+        {
+          "alpha": 126.99208415745593,
+          "empirical_sd": 0.0002179320123270886,
+          "predicted_sd_continuum": 0.00020574424589560672,
+          "empirical_mean": 0.3699688971485927,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.026127890589687196
+        },
+        {
+          "alpha": 159.99999999999991,
+          "empirical_sd": 0.0002460417026745771,
+          "predicted_sd_continuum": 0.00023094010767585,
+          "empirical_mean": 0.36995282750495073,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.03695041722813598
+        },
+        {
+          "alpha": 201.58736798317955,
+          "empirical_sd": 0.00027586614758418163,
+          "predicted_sd_continuum": 0.0002592215062986217,
+          "empirical_mean": 0.3699500919166502,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.05225578117937435
+        },
+        {
+          "alpha": 253.9841683149119,
+          "empirical_sd": 0.0003061609279861802,
+          "predicted_sd_continuum": 0.000290966302925792,
+          "empirical_mean": 0.36996664037681504,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.073900834456272
+        },
+        {
+          "alpha": 320.0,
+          "empirical_sd": 0.00033835135835403316,
+          "predicted_sd_continuum": 0.00032659863237109006,
+          "empirical_mean": 0.3699969696538731,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.10451156235874881
+        }
+      ],
+      "anchor": {
+        "alpha": 79.99999999999999,
+        "empirical_sd_rprime": 535.0975990565507,
+        "predicted_sd_rprime_discrete": 522.5169853698526,
+        "sd_of_sd": 33.57500948435236,
+        "continuum_sd_rprime": 522.5578117937438,
+        "continuum_vs_discrete_rel": 7.813415646630437e-05,
+        "empirical_sd_tau": 0.00016761107242095692
+      },
+      "capture_totals": {
+        "n_captured": 1664,
+        "n_total": 1664
+      }
+    },
+    {
+      "n": 4,
+      "m": 2,
+      "J": 50.0,
+      "s": 0.0001,
+      "expected_exponent": 1.5,
+      "fitted_exponent": 1.52537536017014,
+      "regime": {
+        "rho_at_alpha_max": 0.10083654941026965,
+        "rho_max": 0.25,
+        "design_density": 20.0,
+        "kernel_fit_at_alpha_max": 118.4
+      },
+      "per_alpha": [
+        {
+          "alpha": 20.0,
+          "empirical_sd": 4.7568643824228515e-06,
+          "predicted_sd_continuum": 4.923659639173323e-06,
+          "empirical_mean": 0.36991878139763046,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 9.847319278346645e-05
+        },
+        {
+          "alpha": 25.198420997897458,
+          "empirical_sd": 7.134407176588912e-06,
+          "predicted_sd_continuum": 6.96310623822793e-06,
+          "empirical_mean": 0.37000172806903675,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.00017545928244395344
+        },
+        {
+          "alpha": 31.74802103936399,
+          "empirical_sd": 1.0555041930210919e-05,
+          "predicted_sd_continuum": 9.847319278346646e-06,
+          "empirical_mean": 0.37000060924426653,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.000312632899630284
+        },
+        {
+          "alpha": 40.00000000000001,
+          "empirical_sd": 1.5060362913146491e-05,
+          "predicted_sd_continuum": 1.392621247645587e-05,
+          "empirical_mean": 0.36999912349879294,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.0005570484990582349
+        },
+        {
+          "alpha": 50.39684199579492,
+          "empirical_sd": 2.0720484071699877e-05,
+          "predicted_sd_continuum": 1.969463855669329e-05,
+          "empirical_mean": 0.36999785325061596,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.0009925475875059622
+        },
+        {
+          "alpha": 63.49604207872796,
+          "empirical_sd": 2.8912970370275347e-05,
+          "predicted_sd_continuum": 2.7852424952911717e-05,
+          "empirical_mean": 0.3699967475003022,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.001768518746804695
+        },
+        {
+          "alpha": 79.99999999999999,
+          "empirical_sd": 4.181382920787549e-05,
+          "predicted_sd_continuum": 3.938927711338657e-05,
+          "empirical_mean": 0.36999584969656785,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.0031511421690709252
+        },
+        {
+          "alpha": 100.79368399158986,
+          "empirical_sd": 5.990356002864027e-05,
+          "predicted_sd_continuum": 5.570484990582347e-05,
+          "empirical_mean": 0.3699943957816578,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.005614697038206514
+        },
+        {
+          "alpha": 126.99208415745593,
+          "empirical_sd": 8.397534897310914e-05,
+          "predicted_sd_continuum": 7.877855422677314e-05,
+          "empirical_mean": 0.369991891312769,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.01000425278816908
+        },
+        {
+          "alpha": 159.99999999999991,
+          "empirical_sd": 0.00011768626046309307,
+          "predicted_sd_continuum": 0.00011140969981164684,
+          "empirical_mean": 0.3699904707555321,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.017825551969863487
+        },
+        {
+          "alpha": 201.58736798317955,
+          "empirical_sd": 0.00016887124745177214,
+          "predicted_sd_continuum": 0.00015755710845354615,
+          "empirical_mean": 0.3699938538466237,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.031761522800190733
+        },
+        {
+          "alpha": 253.9841683149119,
+          "empirical_sd": 0.00024430212011418987,
+          "predicted_sd_continuum": 0.00022281939962329382,
+          "empirical_mean": 0.3700017461459274,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.05659259989775027
+        },
+        {
+          "alpha": 320.0,
+          "empirical_sd": 0.0003442583557224303,
+          "predicted_sd_continuum": 0.0003151142169070927,
+          "empirical_mean": 0.37000746025950354,
+          "n_captured": 128,
+          "n_total": 128,
+          "rho": 0.10083654941026965
+        }
+      ],
+      "anchor": {
+        "alpha": 79.99999999999999,
+        "empirical_sd_rprime": 133.88287219105533,
+        "predicted_sd_rprime_discrete": 126.03583905886771,
+        "sd_of_sd": 8.40055853648478,
+        "continuum_sd_rprime": 126.04568676283695,
+        "continuum_vs_discrete_rel": 7.813415646515463e-05,
+        "empirical_sd_tau": 4.181382920787549e-05
+      },
+      "capture_totals": {
+        "n_captured": 1664,
+        "n_total": 1664
+      }
+    }
+  ],
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "l2sq_sigma3_one_over_42",
+        "measured": 0.02380952380952399,
+        "expected": 0.023809523809523808,
+        "rel_error": 7.577272143066693e-15,
+        "max_rel": 1e-10,
+        "passed": true
+      },
+      {
+        "name": "l2sq_sigma4_one_over_30",
+        "measured": 0.03333333333333326,
+        "expected": 0.03333333333333333,
+        "rel_error": 2.2898349882893854e-15,
+        "max_rel": 1e-10,
+        "passed": true
+      },
+      {
+        "name": "discrete_sd_rprime_n3",
+        "measured": 522.5169853698526,
+        "reference": 535.0975990565507,
+        "stderr": 33.57500948435236,
+        "sigmas": 0.37470171654192214,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "localization_exponent_n3",
+        "fitted_exponent": 0.5159068771613536,
+        "expected": 0.5,
+        "abs_error": 0.01590687716135364,
+        "tol": 0.1,
+        "decades": 1.2041199826559248,
+        "min_decades": 1.0,
+        "n_points": 13,
+        "r2": 0.9920118913857837,
+        "passed": true
+      },
+      {
+        "name": "discrete_sd_rprime_n4",
+        "measured": 126.03583905886771,
+        "reference": 133.88287219105533,
+        "stderr": 8.40055853648478,
+        "sigmas": 0.9341084998225863,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "localization_exponent_n4",
+        "fitted_exponent": 1.52537536017014,
+        "expected": 1.5,
+        "abs_error": 0.025375360170140082,
+        "tol": 0.1,
+        "decades": 1.2041199826559248,
+        "min_decades": 1.0,
+        "n_points": 13,
+        "r2": 0.9996962309018709,
+        "passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "claim_rung": 1,
+    "family": "logistic_scan_localization",
+    "tempering_scale_alpha": true,
+    "bias_collapse": false,
+    "temperature_collapse": false,
+    "g1_earned": false,
+    "g2_earned": false,
+    "g3_earned": false,
+    "g4_earned": false,
+    "g5_earned": false,
+    "g6_earned": false,
+    "g7_earned": true,
+    "theorem_prover_verified": false,
+    "mathlib_verified": false,
+    "not_statistically_efficient": true,
+    "no_pinn_inverse_module": true,
+    "pre_registered": "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; alpha_min from alpha * min(tau*, 1-tau*) >= 7; s rounded down from the closed-form regime bound; never retuned after seeing the fit",
+    "licensed_sentence": "for the logistic bias-scan localizer on this synthetic piecewise-polynomial family, the localization standard deviation scales as alpha^(n - 5/2) for n in {3, 4}, measured over 1.2 decades of tempering scale alpha"
+  },
+  "wall_seconds": 11.034
+}

@@ -423,6 +423,10 @@ jobs:
         run: |
           source .venv-curv/bin/activate
           python benchmarks/information_geometry.py
+      - name: Run inverse-imaging localization scaling smoke (05-01 G7)
+        run: |
+          source .venv-curv/bin/activate
+          python benchmarks/inverse_imaging.py
 
   fields:
     name: omnibias-fields (beta)

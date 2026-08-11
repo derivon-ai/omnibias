@@ -7,9 +7,13 @@ interface** and **what kind of jump does it carry** — and those are exactly th
 two things the scan and the multi-pack answer natively, with the localization
 certifiable and the jump order explicit rather than inferred from a pixel grid.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-02, 01-06, 02-01, 02-05, 02-06, 02-11, 02-12, 03-05, 03-08, 03-09, 03-13, 04-02
 - **Blocks**: none
+
+Wave-0 falsifier G7 is recorded in
+`docs/benchmarks/inverse_imaging.json` (`all_passed: true`). Gates G1–G6 and
+the `omnibias.pinn.inverse` product API remain unearned.
 
 ## 2. Where it lands
 
@@ -31,10 +35,13 @@ package: no distinct dependency tier, no distinct audience.
 - `omnibias.core.verified.kantorovich` — radii-polynomial existence, which is
   how a recovered solution is proven to exist near the computed one.
 - `omnibias.measure` — importance reweighting, useful for non-uniform sensors.
+- `benchmarks/inverse_imaging.py` — Wave-0 G7 falsifier (gated): logistic
+  bias-scan localization scaling `alpha^(n - 5/2)` for `n in {3, 4}`.
 
 **Confirmed gap.** There is a forward solver and an operator-learning surface,
-but no inverse-problem module: no interface localization, no layered-material
-inversion, no free-boundary estimation, no sensor-placement design.
+but no inverse-problem module: no interface localization product API, no
+layered-material inversion, no free-boundary estimation, no sensor-placement
+design. The G7 falsifier measures the scaling law only.
 
 ## 4. Mathematics
 
@@ -274,32 +281,38 @@ layered inversion, and a level-set method for free boundaries.
 
 - **G1 localization accuracy.** On synthetic data with known `tau*`, the
   estimate's absolute error is at most `0.5x` that of TV deconvolution at
-  matched compute, over ten noise seeds and three noise levels.
+  matched compute, over ten noise seeds and three noise levels. **Unearned.**
 - **G2 enclosure soundness.** The certified enclosure contains the true `tau*`
   in `100%` of `1000` synthetic instances. **A single miss is a bug, not a
-  tolerance issue.**
+  tolerance issue.** **Unearned.**
 - **G3 jump-order identification.** The correct jump order is identified in at
   least `95%` of instances at signal-to-noise ratio `10` or better, with the
-  confusion matrix reported rather than only the accuracy.
+  confusion matrix reported rather than only the accuracy. **Unearned.**
 - **G4 layered inversion.** Recovers layer positions to within `1%` of layer
   thickness and contrasts to within `5%`, in fewer iterations than
-  finite-difference Levenberg-Marquardt, on a five-layer problem.
+  finite-difference Levenberg-Marquardt, on a five-layer problem. **Unearned.**
 - **G5 free-boundary tracking.** Front position error against an analytic Stefan
   solution is at most `0.3x` a level-set baseline's at matched time step.
+  **Unearned.**
 - **G6 sensor design.** D-optimal placement beats uniform placement on posterior
   volume by at least `2x`, with the `(1 - 1/e)` guarantee reported alongside the
-  achieved value.
+  achieved value. **Unearned.**
 - **G7 alpha scaling.** The predicted `alpha^(n - 5/2)` scaling of localization
   standard deviation is confirmed over at least a decade of `alpha`, with the
   fitted exponent within `0.1` of the prediction, for `n in {3, 4}`. This is the
   gate that validates the design rule; if it fails, the rule is withdrawn rather
-  than reworded.
+  than reworded. **Earned** — see `docs/benchmarks/inverse_imaging.json`:
+  fitted exponents `0.523` (`n=3`, expected `0.5`) and `1.532` (`n=4`,
+  expected `1.5`) over 1.2 decades; rational `||sigma'''||_2^2 = 1/42` and
+  `||sigma''''||_2^2 = 1/30`; discrete `sd(r')` within 3 sigma of Monte Carlo;
+  capture rate `1.0` under the pre-registered regime.
 
 ## 9. Benchmark plan
 
 - `benchmarks/inverse_imaging.py` with four families: interface localization
   (accuracy, enclosure coverage, order confusion, `alpha` sweep), layered
-  inversion, Stefan free boundary, sensor design.
+  inversion, Stefan free boundary, sensor design. **Landed so far:** the
+  `alpha`-sweep family only (Wave-0 G7); the other three families remain open.
 - Smoke JSON committed; full multi-seed under `$OMNIBIAS_SCRATCH/inverse/`.
 
 ## 10. Honesty and scope
@@ -340,7 +353,9 @@ layered inversion, and a level-set method for free boundaries.
   the scan, and the spec should say so rather than compete on ground it loses.
 - **Falsifier.** If the `alpha^(n - 5/2)` scaling (G7) does not appear, the
   noise analysis in section 5 is wrong and the design rule must be rederived
-  before it is documented anywhere.
+  before it is documented anywhere. **G7 passed**; the design rule "use the
+  smallest `alpha` the problem allows" is licensed for the logistic scan on
+  this synthetic family.
 
 ## 12. Implementation checklist
 
@@ -353,9 +368,11 @@ layered inversion, and a level-set method for free boundaries.
 - [ ] Fisher identifiability report before inversion
 - [ ] Sensor placement through `omnibias.submodular` continuous greedy
 - [ ] Jump-order confusion matrix, not just accuracy
-- [ ] `alpha` sweep fitting the exponent against the `alpha^(n - 5/2)` prediction
-- [ ] Cramér-Rao comparison reported alongside the scan estimator
+- [x] `alpha` sweep fitting the exponent against the `alpha^(n - 5/2)` prediction
+      (G7)
+- [x] Cramér-Rao comparison reported alongside the scan estimator (honesty note
+      in the G7 artifact; full numerical CR table remains open)
 - [ ] Guard preventing the enclosure and the conformal bound from merging
-- [ ] `benchmarks/inverse_imaging.py` plus smoke JSON
+- [x] `benchmarks/inverse_imaging.py` plus smoke JSON (alpha-sweep family only)
 - [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] Index row in `theory/README.md`

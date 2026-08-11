@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Wave-0 falsifier A7: scan localization scaling (05-01 G7)
+
+- `benchmarks/inverse_imaging.py`: logistic bias-scan localizer; gates
+  `sd(tau_hat) ~ alpha^(n - 5/2)` for `n in {3, 4}` (fitted exponents within
+  `0.1` over 1.2 decades), rational `||sigma'''||_2^2 = 1/42` /
+  `||sigma''''||_2^2 = 1/30`, and discrete `sd(r')` prediction. G1–G6 remain
+  unearned; no `omnibias.pinn.inverse` module.
+- Gate helper `require_capture_rate` in `benchmarks/_gates.py` (raises
+  `RuntimeError` / `INVALID EXPERIMENT` on a broken regime).
+- Artifacts: `docs/benchmarks/inverse_imaging_smoke.json` (CI) and
+  `docs/benchmarks/inverse_imaging.json` (`--full`); G7 earned. Spec 05-01
+  status `designed -> gated`.
+
 ### Added — Wave-0 falsifier A6: Fisher pack degeneracy (04-01 G2)
 
 - `benchmarks/information_geometry.py`: closed-form integrand + Monte Carlo
