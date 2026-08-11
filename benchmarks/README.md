@@ -38,6 +38,7 @@ uv run python docs/img/generate_figures.py
 | `hard_conditions_solver.py` | `docs/benchmarks/hard_conditions_solver.json` | Poisson / heat / wave with boundary + initial conditions absorbed into the ansatz vs kept as loss terms, at identical architecture / budget / seed over 5 seeds; reports boundary violation and interior relative L2 |
 | `information_geometry.py` | `docs/benchmarks/information_geometry_smoke.json` / `information_geometry.json` | Wave-0 falsifier A6 (04-01 G2): Fisher `G_{delta,delta}` exponent `2.00 +- 0.02` and prefactor `1/720` for the two-bias logistic pack vs Monte Carlo Fisher |
 | `inverse_imaging.py` | `docs/benchmarks/inverse_imaging_smoke.json` / `inverse_imaging.json` | Wave-0 falsifier A7 (05-01 G7): locally-seeded scan localization `sd(tau_hat) ~ alpha^(n - 5/2)` for `n in {3, 4}` over 5 seeds; global search earned for n=3 only; G1–G6 unearned |
+| `tabular_arrangement.py` | `docs/benchmarks/tabular_arrangement_smoke.json` / `tabular_arrangement.json` | Wave-0 falsifier A4 (05-02 G1/G2): H=2 arrangement vs tuned LightGBM on constructed oblique XOR / axis AND; G3–G7 unearned |
 
 All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries
 `generated_utc`, `hardware_class`, library versions, and the exact config.
@@ -54,9 +55,11 @@ Helpers: `require_scaling_exponent`, `require_rel_error`, `require_within_stderr
 # CI smoke
 uv run python benchmarks/information_geometry.py
 uv run python benchmarks/inverse_imaging.py
+uv run python benchmarks/tabular_arrangement.py
 # Multi-seed / multi-realization acceptance
 uv run python benchmarks/information_geometry.py --full
 uv run python benchmarks/inverse_imaging.py --full
+uv run python benchmarks/tabular_arrangement.py --full
 ```
 
 ## PINN four-gap suite

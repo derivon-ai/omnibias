@@ -57,6 +57,14 @@ from omnibias.tab._core.forward import (
 )
 from omnibias.tab._core.loss import loss_value, metric, score_grad_hess
 from omnibias.tab._core.params import TabParams, init_params
+from omnibias.tab.arrangement import (
+    arrangement_weights,
+    hard_predict_np,
+    make_axis_rule,
+    make_oblique_xor,
+    obliqueness_diagnostic,
+    predict_proba_np,
+)
 from omnibias.tab.certify import (
     RoundingGapCertificate,
     TabCertificate,
@@ -79,15 +87,21 @@ __all__ = [
     "TabParams",
     "__lineage__",
     "__version__",
+    "arrangement_weights",
     "certify_tab",
     "certify_tab_gap",
     "forward_np",
     "hard_forward_np",
+    "hard_predict_np",
     "init_params",
     "leaf_memberships",
     "loss_value",
+    "make_axis_rule",
+    "make_oblique_xor",
     "metric",
+    "obliqueness_diagnostic",
     "predict_np",
+    "predict_proba_np",
     "score_grad_hess",
     "scores_to_prob",
 ]

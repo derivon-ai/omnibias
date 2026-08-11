@@ -1275,6 +1275,8 @@ jobs:
           pip install -e packages/omnibias-curvature
           pip install -e "packages/omnibias-verify[torch,jax]"
           pip install -e packages/omnibias-discrete
+          pip install -e packages/omnibias-struct
+          pip install -e "packages/omnibias-partition[torch,jax]"
           pip install -e "packages/omnibias-tab[torch,jax,verify,curvature,gbm,test]"
       - name: Run tab tests
         run: |
@@ -1284,6 +1286,10 @@ jobs:
         run: |
           source .venv-tab/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/tab_validate.py
+      - name: Wave-0 A4 tabular arrangement smoke (05-02 G1/G2)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/tabular_arrangement.py
 
   partition:
     name: omnibias-partition (alpha)

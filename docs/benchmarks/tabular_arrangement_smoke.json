@@ -1,0 +1,506 @@
+{
+  "schema": "tabular-arrangement-v1",
+  "generated_utc": "2026-08-11T16:28:56Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "tabular_arrangement_vs_lightgbm",
+    "n_samples": 10000,
+    "n_features": 10,
+    "n_train": 6000,
+    "n_val": 2000,
+    "n_test": 2000,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "g1_min_margin": 0.1,
+    "g2_max_abs_margin": 0.02,
+    "lightgbm_grid_size": 4,
+    "full": false,
+    "g3_earned": false,
+    "g4_earned": false
+  },
+  "rss_mb_at_start": 813.72,
+  "baseline": {
+    "name": "tuned LightGBM (val-selected grid)",
+    "note": "num_leaves x learning_rate x n_estimators grid; refit on train+val with the chosen config"
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "oblique_xor": {
+    "family": "oblique_xor",
+    "per_seed": [
+      {
+        "seed": 0,
+        "arrangement_accuracy": 0.9975,
+        "lightgbm_accuracy": 0.8475,
+        "margin": 0.15000000000000002,
+        "abs_margin": 0.15000000000000002,
+        "arrangement_auc": 0.9999684004696954,
+        "lightgbm_auc": 0.9228541706956068,
+        "majority_class_rate": 0.7284999999999999,
+        "obliqueness_diagnostic": 1.0170345906483573,
+        "lightgbm_config": {
+          "num_leaves": 127,
+          "learning_rate": 0.1,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 0.99828125,
+          "val_acc": 0.998125,
+          "beta_final": 64.0,
+          "l1": 0.0,
+          "sparse_warmstart": false,
+          "n_restarts": 4,
+          "W_l1": 31.598091860226724,
+          "W_nnz_features": 10
+        },
+        "meta": {
+          "family": "oblique_xor",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 0,
+          "bayes_rate": 1.0
+        }
+      },
+      {
+        "seed": 1,
+        "arrangement_accuracy": 0.999,
+        "lightgbm_accuracy": 0.843,
+        "margin": 0.15600000000000003,
+        "abs_margin": 0.15600000000000003,
+        "arrangement_auc": 0.9999959604079584,
+        "lightgbm_auc": 0.9291091992619666,
+        "majority_class_rate": 0.5495,
+        "obliqueness_diagnostic": 0.9719501335707924,
+        "lightgbm_config": {
+          "num_leaves": 31,
+          "learning_rate": 0.1,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 0.9984375,
+          "val_acc": 0.9975,
+          "beta_final": 64.0,
+          "l1": 0.0,
+          "sparse_warmstart": false,
+          "n_restarts": 4,
+          "W_l1": 23.928136633889228,
+          "W_nnz_features": 10
+        },
+        "meta": {
+          "family": "oblique_xor",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 1,
+          "bayes_rate": 1.0
+        }
+      },
+      {
+        "seed": 2,
+        "arrangement_accuracy": 0.9995,
+        "lightgbm_accuracy": 0.871,
+        "margin": 0.12850000000000006,
+        "abs_margin": 0.12850000000000006,
+        "arrangement_auc": 0.9999969645950365,
+        "lightgbm_auc": 0.9504035064998139,
+        "majority_class_rate": 0.554,
+        "obliqueness_diagnostic": 0.967805090276267,
+        "lightgbm_config": {
+          "num_leaves": 127,
+          "learning_rate": 0.1,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 0.9990625,
+          "val_acc": 0.998125,
+          "beta_final": 64.0,
+          "l1": 0.0,
+          "sparse_warmstart": false,
+          "n_restarts": 4,
+          "W_l1": 21.21016541633672,
+          "W_nnz_features": 10
+        },
+        "meta": {
+          "family": "oblique_xor",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 2,
+          "bayes_rate": 1.0
+        }
+      },
+      {
+        "seed": 3,
+        "arrangement_accuracy": 0.998,
+        "lightgbm_accuracy": 0.8465,
+        "margin": 0.15149999999999997,
+        "abs_margin": 0.15149999999999997,
+        "arrangement_auc": 0.9999863132538238,
+        "lightgbm_auc": 0.9278834815713227,
+        "majority_class_rate": 0.612,
+        "obliqueness_diagnostic": 0.9893747445852062,
+        "lightgbm_config": {
+          "num_leaves": 127,
+          "learning_rate": 0.05,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 0.9984375,
+          "val_acc": 0.998125,
+          "beta_final": 64.0,
+          "l1": 0.0,
+          "sparse_warmstart": false,
+          "n_restarts": 4,
+          "W_l1": 28.054041135989202,
+          "W_nnz_features": 10
+        },
+        "meta": {
+          "family": "oblique_xor",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 3,
+          "bayes_rate": 1.0
+        }
+      },
+      {
+        "seed": 4,
+        "arrangement_accuracy": 0.997,
+        "lightgbm_accuracy": 0.846,
+        "margin": 0.15100000000000002,
+        "abs_margin": 0.15100000000000002,
+        "arrangement_auc": 0.9999843486535669,
+        "lightgbm_auc": 0.9341714803252141,
+        "majority_class_rate": 0.602,
+        "obliqueness_diagnostic": 0.9946535060662142,
+        "lightgbm_config": {
+          "num_leaves": 127,
+          "learning_rate": 0.1,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 0.9984375,
+          "val_acc": 0.999375,
+          "beta_final": 64.0,
+          "l1": 0.0,
+          "sparse_warmstart": false,
+          "n_restarts": 4,
+          "W_l1": 26.856547539407888,
+          "W_nnz_features": 10
+        },
+        "meta": {
+          "family": "oblique_xor",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 4,
+          "bayes_rate": 1.0
+        }
+      }
+    ],
+    "constructed_to_favour_arrangement": true
+  },
+  "axis_and": {
+    "family": "axis_and",
+    "per_seed": [
+      {
+        "seed": 0,
+        "arrangement_accuracy": 0.998,
+        "lightgbm_accuracy": 0.9995,
+        "margin": -0.0015000000000000568,
+        "abs_margin": 0.0015000000000000568,
+        "arrangement_auc": 0.9999916666666666,
+        "lightgbm_auc": 1.0,
+        "majority_class_rate": 0.9,
+        "obliqueness_diagnostic": 1.0011072664359861,
+        "lightgbm_config": {
+          "num_leaves": 31,
+          "learning_rate": 0.05,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 0.99984375,
+          "val_acc": 0.999375,
+          "beta_final": 128.0,
+          "l1": 0.02,
+          "sparse_warmstart": true,
+          "n_restarts": 10,
+          "W_l1": 1.9442167933181267,
+          "W_nnz_features": 2
+        },
+        "meta": {
+          "family": "axis_and",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 0,
+          "feature_a": 2,
+          "feature_b": 6,
+          "threshold_a": 0.5,
+          "threshold_b": 0.2,
+          "majority_class_rate": 0.9033,
+          "bayes_rate": 1.0
+        }
+      },
+      {
+        "seed": 1,
+        "arrangement_accuracy": 1.0,
+        "lightgbm_accuracy": 1.0,
+        "margin": 0.0,
+        "abs_margin": 0.0,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 1.0,
+        "majority_class_rate": 0.8995,
+        "obliqueness_diagnostic": 1.0016666666666667,
+        "lightgbm_config": {
+          "num_leaves": 31,
+          "learning_rate": 0.05,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 1.0,
+          "val_acc": 0.999375,
+          "beta_final": 128.0,
+          "l1": 0.02,
+          "sparse_warmstart": true,
+          "n_restarts": 10,
+          "W_l1": 1.9289335452307013,
+          "W_nnz_features": 2
+        },
+        "meta": {
+          "family": "axis_and",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 1,
+          "feature_a": 2,
+          "feature_b": 6,
+          "threshold_a": 0.5,
+          "threshold_b": 0.2,
+          "majority_class_rate": 0.9011,
+          "bayes_rate": 1.0
+        }
+      },
+      {
+        "seed": 2,
+        "arrangement_accuracy": 0.998,
+        "lightgbm_accuracy": 0.9995,
+        "margin": -0.0015000000000000568,
+        "abs_margin": 0.0015000000000000568,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 0.9999916294409303,
+        "majority_class_rate": 0.9005,
+        "obliqueness_diagnostic": 0.9997217971901516,
+        "lightgbm_config": {
+          "num_leaves": 31,
+          "learning_rate": 0.05,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 0.9996875,
+          "val_acc": 1.0,
+          "beta_final": 128.0,
+          "l1": 0.02,
+          "sparse_warmstart": true,
+          "n_restarts": 10,
+          "W_l1": 1.9647648078473086,
+          "W_nnz_features": 2
+        },
+        "meta": {
+          "family": "axis_and",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 2,
+          "feature_a": 2,
+          "feature_b": 6,
+          "threshold_a": 0.5,
+          "threshold_b": 0.2,
+          "majority_class_rate": 0.8988,
+          "bayes_rate": 1.0
+        }
+      },
+      {
+        "seed": 3,
+        "arrangement_accuracy": 0.9995,
+        "lightgbm_accuracy": 0.999,
+        "margin": 0.000500000000000056,
+        "abs_margin": 0.000500000000000056,
+        "arrangement_auc": 0.999997064487342,
+        "lightgbm_auc": 0.9999765158987366,
+        "majority_class_rate": 0.906,
+        "obliqueness_diagnostic": 1.0022231485341115,
+        "lightgbm_config": {
+          "num_leaves": 31,
+          "learning_rate": 0.1,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 1.0,
+          "val_acc": 0.99875,
+          "beta_final": 128.0,
+          "l1": 0.02,
+          "sparse_warmstart": true,
+          "n_restarts": 10,
+          "W_l1": 1.9242093770363673,
+          "W_nnz_features": 2
+        },
+        "meta": {
+          "family": "axis_and",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 3,
+          "feature_a": 2,
+          "feature_b": 6,
+          "threshold_a": 0.5,
+          "threshold_b": 0.2,
+          "majority_class_rate": 0.9025,
+          "bayes_rate": 1.0
+        }
+      },
+      {
+        "seed": 4,
+        "arrangement_accuracy": 0.9995,
+        "lightgbm_accuracy": 0.9995,
+        "margin": 0.0,
+        "abs_margin": 0.0,
+        "arrangement_auc": 0.9999970504172185,
+        "lightgbm_auc": 0.999994100834437,
+        "majority_class_rate": 0.9065,
+        "obliqueness_diagnostic": 0.9930671103716029,
+        "lightgbm_config": {
+          "num_leaves": 31,
+          "learning_rate": 0.05,
+          "n_estimators": 200
+        },
+        "arrangement": {
+          "train_acc": 0.99984375,
+          "val_acc": 0.99875,
+          "beta_final": 128.0,
+          "l1": 0.02,
+          "sparse_warmstart": true,
+          "n_restarts": 10,
+          "W_l1": 1.9458507360919817,
+          "W_nnz_features": 2
+        },
+        "meta": {
+          "family": "axis_and",
+          "n_samples": 10000,
+          "n_features": 10,
+          "seed": 4,
+          "feature_a": 2,
+          "feature_b": 6,
+          "threshold_a": 0.5,
+          "threshold_b": 0.2,
+          "majority_class_rate": 0.8963,
+          "bayes_rate": 1.0
+        }
+      }
+    ],
+    "constructed_to_favour_arrangement": false
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_oblique_margin",
+        "key": "margin",
+        "expected": 0.1,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          0.15000000000000002,
+          0.15600000000000003,
+          0.12850000000000006,
+          0.15149999999999997,
+          0.15100000000000002
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 0.15000000000000002,
+        "worst_deviation": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g2_axis_abs_margin",
+        "key": "abs_margin",
+        "expected": 0.0,
+        "tol": 0.02,
+        "direction": null,
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          0.0015000000000000568,
+          0.0,
+          0.0015000000000000568,
+          0.000500000000000056,
+          0.0
+        ],
+        "deviations": [
+          0.0015000000000000568,
+          0.0,
+          0.0015000000000000568,
+          0.000500000000000056,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 0.0015000000000000568,
+        "worst_deviation": 0.0015000000000000568,
+        "passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "claim_rung": 1,
+    "constructed_to_favour_arrangement": true,
+    "temperature_collapse": true,
+    "bias_collapse": false,
+    "g1_earned": true,
+    "g2_earned": true,
+    "g3_earned": false,
+    "g4_earned": false,
+    "g5_earned": false,
+    "g6_earned": false,
+    "g7_earned": false,
+    "tabular_subapplication_alive": true,
+    "theorem_prover_verified": false,
+    "mathlib_verified": false,
+    "licensed_sentence": "on the constructed oblique XOR dataset the H=2 soft hyperplane arrangement beats tuned LightGBM by at least 10 accuracy points over five seeds; on the constructed axis AND dataset it stays within 2 accuracy points"
+  },
+  "wall_seconds": 162.769
+}

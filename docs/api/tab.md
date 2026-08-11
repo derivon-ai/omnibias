@@ -64,6 +64,24 @@ claim, earned per dataset (see [Benchmarks](../benchmarks.md)), never asserted.
       show_root_heading: false
       heading_level: 3
 
+## Arrangement classifier (05-02)
+
+Hyperplane-arrangement view of tabular classification: ``H`` soft gates applied
+to every input, soft cell memberships over ``2**H`` sign patterns (reusing
+``omnibias.partition``), per-cell logits, beta anneal, and an optional ``L1`` /
+sparse warm-start path. Wave-0 gates G1/G2 are earned on constructed datasets;
+trees / LightGBM are still expected to win most real tabular benchmarks.
+
+::: omnibias.tab.arrangement
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.tab.torch.arrangement
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ## Newton-boosting driver (torch)
 
 ::: omnibias.tab.torch.boosting

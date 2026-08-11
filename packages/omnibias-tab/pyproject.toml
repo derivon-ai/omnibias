@@ -30,6 +30,7 @@ dependencies = [
     "omnibias-core>=0.2.0",
     "omnibias-discrete>=0.1.0a1",
     "omnibias-struct>=0.1.0a1",
+    "omnibias-partition>=0.1.0a1",
     "numpy>=1.24",
 ]
 
@@ -37,9 +38,9 @@ dependencies = [
 # The trainable soft-tree module + the exact second-order optimizers
 # (omnibias.torch.optim CubicNewton / TrustRegionNewtonCG / KFAC / NaturalGradient)
 # and the Newton-boosting driver need a torch backend.
-torch = ["torch>=2.0", "omnibias-torch>=0.2.0"]
+torch = ["torch>=2.0", "omnibias-torch>=0.2.0", "omnibias-partition[torch]>=0.1.0a1"]
 # The bit-identical jax forward twin + functional natural-gradient direction.
-jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0", "omnibias-partition[jax]>=0.1.0a1"]
 # Sealed / tighter certificates for the additive (depth-1) model via the
 # omnibias-verify Network (Taylor + branch-and-bound). The always-available
 # interval certificates use only omnibias-core's verified substrate, so

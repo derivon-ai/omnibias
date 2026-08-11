@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Wave-0 falsifier A4: tabular arrangement vs LightGBM (05-02 G1/G2)
+
+- `omnibias.tab.arrangement` / `omnibias.tab.torch.arrangement`: H-hyperplane
+  soft arrangement classifier on `omnibias.partition` POU weights, with beta
+  anneal, L1 on normals, and a sparse feature-pair warm-start.
+- `benchmarks/tabular_arrangement.py`: constructed oblique XOR (G1) and axis
+  AND (G2) vs a val-selected LightGBM grid over five seeds; worst-seed gates
+  via `require_all_seeds`. G1/G2 earned; G3–G7 unearned. Spec 05-02 status
+  `concept -> gated`.
+- Artifacts: `docs/benchmarks/tabular_arrangement_smoke.json` (CI) and
+  `docs/benchmarks/tabular_arrangement.json` (`--full`).
+
 ### Changed — A7 hardening (05-01 G7 protocol repair)
 
 - `benchmarks/inverse_imaging.py`: five-seed worst-case gate via

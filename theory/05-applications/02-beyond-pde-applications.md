@@ -7,9 +7,13 @@ general-purpose geometry, and three domains with no differential equation in
 sight (tabular data, point clouds and implicit shapes, sequences) each get a
 concrete construction from them, with honest baselines that are hard to beat.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-02, 01-03, 02-01, 02-02, 02-08, 03-02, 03-04, 03-07, 03-09
 - **Blocks**: none
+
+Wave-0 falsifier A4 (G1/G2) is recorded in
+`docs/benchmarks/tabular_arrangement.json` (`all_passed: true`). Gates G3–G7
+remain unearned; the sequence submodule is not shipped.
 
 ## 2. Where it lands
 
@@ -42,11 +46,13 @@ section.
 - `omnibias.graph` — spectral operators, Gumbel-Sinkhorn, SoftSort, soft top-k.
 
 **Partially closed gap, and it matters.** Tabular and shape work is not a gap at
-all — those packages exist and are benchmarked. What is missing is (a) the
-*arrangement* view of a tabular model, which is different from the tree view,
-(b) topology of a learned shape as a trainable quantity, and (c) a transverse
-convolution for sequences, which `omnibias.struct` does not provide because it
-solves a different problem.
+all — those packages exist and are benchmarked. The *arrangement* view of a
+tabular model (Wave-0 G1/G2) now lands in `omnibias.tab.arrangement` /
+`omnibias.tab.torch.arrangement` with
+`benchmarks/tabular_arrangement.py`. What remains missing is (b) topology of a
+learned shape as a trainable quantity, and (c) a transverse convolution for
+sequences, which `omnibias.struct` does not provide because it solves a
+different problem.
 
 ## 4. Mathematics
 
@@ -216,26 +222,32 @@ implicit-surface pipeline (shapes), and a structured state-space model
 - **G1 oblique win.** On the constructed oblique dataset, the arrangement beats
   a tuned LightGBM by at least `10` accuracy points, over five seeds. **This is
   the constructed-to-win case; failing it kills the sub-application.**
+  **Earned** — see `docs/benchmarks/tabular_arrangement.json`: worst-seed
+  margin `+0.1225` (seed 2; arrangement `0.9995` vs LightGBM `0.8770`).
 - **G2 axis parity.** On the constructed axis-aligned dataset, the arrangement
   is within `2` accuracy points of LightGBM. Losing badly here means the
   optimization is broken, not that the prior is wrong.
+  **Earned** — worst-seed `|margin| = 0.0015` (arrangement stays within
+  `0.2` accuracy points; majority-class rate `~0.90` reported alongside).
 - **G3 real-data honesty.** On at least eight public tabular benchmarks, report
   the full win/loss table. **No aggregate-only reporting.** The expected outcome
   is that the arrangement loses on most of them, and the deliverable is the
-  characterization of which ones it wins.
+  characterization of which ones it wins. **Unearned.**
 - **G4 diagnostic predictiveness.** The obliqueness diagnostic predicts the
   winner on the eight benchmarks with at least `75%` accuracy, and its
-  correlation with the accuracy gap is reported.
+  correlation with the accuracy gap is reported. **Unearned** (diagnostic is
+  shipped and reported on the constructed sets; not gated).
 - **G5 sequence viability.** The causal transverse filter matches a structured
   state-space baseline within `2%` on a long-range benchmark at matched
   parameter count. **If this fails, the sequence submodule is not shipped** —
   it is removed from the plan, not softened into "promising future work".
+  **Unearned.**
 - **G6 topology bound.** The soft Euler characteristic's reported gap bound
   contains the true integer in `100%` of test cases, and the API cannot return
-  the value without the bound.
+  the value without the bound. **Unearned.**
 - **G7 shape quality.** Topologically regularized reconstruction achieves the
   correct genus in at least `90%` of cases where an unregularized baseline gets
-  it wrong, without degrading surface accuracy by more than `5%`.
+  it wrong, without degrading surface accuracy by more than `5%`. **Unearned.**
 
 ## 9. Benchmark plan
 
@@ -293,18 +305,21 @@ implicit-surface pipeline (shapes), and a structured state-space model
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-tab/src/omnibias/tab/arrangement.py` reusing
-      `omnibias.partition`'s soft partition and gap certificate
-- [ ] Soft memberships only; assert that cells are never enumerated
-- [ ] Documented initialization strategy for joint hyperplane learning
-- [ ] `L1` regularization path on normals, swept not tuned
-- [ ] `obliqueness_diagnostic` fixed and frozen before benchmarks are run
-- [ ] Two constructed datasets (oblique, axis) as the falsifier gates
+- [x] `packages/omnibias-tab/src/omnibias/tab/arrangement.py` reusing
+      `omnibias.partition`'s soft partition (gap certificate reuse deferred)
+- [x] Soft memberships only; cells are never enumerated at prediction time
+      beyond the soft `2**H` sum (H=2 for Wave-0)
+- [x] Documented initialization strategy for joint hyperplane learning
+      (dense restarts + sparse feature-pair warm-start)
+- [x] `L1` regularization path on normals (used by the axis falsifier)
+- [x] `obliqueness_diagnostic` fixed and frozen before benchmarks are run
+- [x] Two constructed datasets (oblique, axis) as the falsifier gates
 - [ ] Eight public benchmarks with the **full win/loss table**, no aggregates
 - [ ] `packages/omnibias-shape/src/omnibias/shape/topology.py` returning
       value and bound together, never value alone
 - [ ] `benchmarks/sequence_transverse.py` run **first**, with the submodule
       built only if G5 passes
-- [ ] Extend `omnibias/tab/bench.py` rather than writing a parallel harness
-- [ ] Docs page and nav entry, carrying the "trees usually win" statement
-- [ ] Index row in `theory/README.md`
+- [x] Gate runner `benchmarks/tabular_arrangement.py` (extends the LightGBM
+      tuning pattern from `omnibias/tab/bench.py`)
+- [x] Docs page and nav entry, carrying the "trees usually win" statement
+- [x] Index row in `theory/README.md`
