@@ -25,6 +25,7 @@ from omnibias.partition import (
     init_params,
     partition_weights,
 )
+from omnibias.partition.certify import PartitionGapCertificate, certify_partition_gap
 from omnibias.partition.registry import combine_outputs
 
 FloatArray = np.ndarray
@@ -93,9 +94,11 @@ def make_axis_rule(
 def obliqueness_diagnostic(X: FloatArray, y: FloatArray) -> float:
     """Dense-linear-probe accuracy over best single-feature probe accuracy.
 
-    Values near 1 indicate little rotational structure; larger values favour an
-    arrangement over an axis-aligned tree. Frozen for Wave-0 (reported, not
-    gated -- G4 is out of scope).
+    Detects *linear* oblique structure (a dense probe beats axis probes). It
+    does **not** discriminate parity / XOR structure from axis rules: XOR is
+    not linearly separable, so the ratio stays near 1 on both families.
+    Frozen for Wave-0 (reported, not gated -- G4 is out of scope); do not
+    retune against the constructed G1/G2 datasets.
     """
     Xv = np.asarray(X, dtype=np.float64)
     yv = np.asarray(y, dtype=np.float64).reshape(-1)
@@ -130,13 +133,32 @@ def arrangement_params(
     t: FloatArray,
     *,
     n_features: int | None = None,
+    beta_final: float = 32.0,
 ) -> PartitionParams:
     """Wrap hyperplane normals / offsets as a :class:`PartitionParams`."""
     Ww = np.asarray(W, dtype=np.float64)
     tt = np.asarray(t, dtype=np.float64).reshape(-1)
     d = int(n_features) if n_features is not None else int(Ww.shape[1])
-    cfg = PartitionConfig(n_features=d, depth=int(Ww.shape[0]), split_kind="oblique")
+    cfg = PartitionConfig(
+        n_features=d,
+        depth=int(Ww.shape[0]),
+        split_kind="oblique",
+        beta_final=float(beta_final),
+    )
     return PartitionParams(cfg, Ww, tt)
+
+
+def certify_arrangement_gap(
+    W: FloatArray,
+    t: FloatArray,
+    X: FloatArray,
+    *,
+    beta: float,
+    n_features: int | None = None,
+) -> PartitionGapCertificate:
+    """Sound soft->hard membership gap via :func:`certify_partition_gap`."""
+    params = arrangement_params(W, t, n_features=n_features, beta_final=float(beta))
+    return certify_partition_gap(params, X, beta=float(beta))
 
 
 def arrangement_weights(
@@ -206,6 +228,7 @@ def init_arrangement(
 __all__ = [
     "arrangement_params",
     "arrangement_weights",
+    "certify_arrangement_gap",
     "hard_predict_np",
     "init_arrangement",
     "make_axis_rule",

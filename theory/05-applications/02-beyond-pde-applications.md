@@ -270,6 +270,12 @@ implicit-surface pipeline (shapes), and a structured state-space model
   Saying this before running the experiment is the difference between a result
   and a sales pitch. The contribution is the identification of the regime where
   they do not, plus the diagnostic that predicts it.
+- The Wave-0 `obliqueness_diagnostic` detects **linear** oblique structure
+  only. On the constructed XOR vs axis families the measured ranges overlap
+  (`~0.97-1.02` vs `~0.99-1.00`); XOR is not linearly separable, so the
+  dense/axis ratio cannot order those two. Artifacts record
+  `obliqueness_diagnostic_discriminates: false`. Do not retune the diagnostic
+  against G1/G2 (see section 11). G4 remains unearned.
 - The arrangement's expressiveness advantage per gate is real (Zaslavsky) and
   irrelevant to most tabular data. Quoting the cell count as evidence of
   practical superiority would be misleading.
@@ -282,7 +288,8 @@ implicit-surface pipeline (shapes), and a structured state-space model
 - The soft topology invariants are **not** the integer invariants; the gap bound
   is the whole content of the claim.
 - No certificate tier beyond what `omnibias.partition` and `omnibias.tab`
-  already provide (the sound soft-to-hard gap).
+  already provide (the sound soft-to-hard gap); the arrangement reuses
+  `certify_partition_gap` via `certify_arrangement_gap`.
 
 ## 11. Open questions and risks
 
@@ -306,13 +313,15 @@ implicit-surface pipeline (shapes), and a structured state-space model
 ## 12. Implementation checklist
 
 - [x] `packages/omnibias-tab/src/omnibias/tab/arrangement.py` reusing
-      `omnibias.partition`'s soft partition (gap certificate reuse deferred)
+      `omnibias.partition`'s soft partition and `certify_arrangement_gap`
+      (wraps `certify_partition_gap`)
 - [x] Soft memberships only; cells are never enumerated at prediction time
       beyond the soft `2**H` sum (H=2 for Wave-0)
 - [x] Documented initialization strategy for joint hyperplane learning
       (dense restarts + sparse feature-pair warm-start)
 - [x] `L1` regularization path on normals (used by the axis falsifier)
 - [x] `obliqueness_diagnostic` fixed and frozen before benchmarks are run
+      (linear oblique only; does not discriminate XOR vs axis -- recorded)
 - [x] Two constructed datasets (oblique, axis) as the falsifier gates
 - [ ] Eight public benchmarks with the **full win/loss table**, no aggregates
 - [ ] `packages/omnibias-shape/src/omnibias/shape/topology.py` returning

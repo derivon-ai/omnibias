@@ -20,7 +20,7 @@ import torch
 from omnibias.partition.torch.weights import combine, partition_weights_arrays
 from torch import Tensor, nn
 
-torch.set_default_dtype(torch.float64)
+_DTYPE = torch.float64
 
 
 class ArrangementClassifier(nn.Module):
@@ -43,9 +43,11 @@ class ArrangementClassifier(nn.Module):
         self.n_cells = 1 << self.n_hyperplanes
         self.beta = float(beta)
         scale = 1.0 / (self.n_features**0.5)
-        self.W = nn.Parameter(torch.randn(self.n_hyperplanes, self.n_features) * scale)
-        self.t = nn.Parameter(torch.zeros(self.n_hyperplanes))
-        self.cell_logits = nn.Parameter(torch.zeros(self.n_cells))
+        self.W = nn.Parameter(
+            torch.randn(self.n_hyperplanes, self.n_features, dtype=_DTYPE) * scale
+        )
+        self.t = nn.Parameter(torch.zeros(self.n_hyperplanes, dtype=_DTYPE))
+        self.cell_logits = nn.Parameter(torch.zeros(self.n_cells, dtype=_DTYPE))
 
     def forward(self, X: Tensor) -> Tensor:
         weights = partition_weights_arrays(
@@ -54,15 +56,18 @@ class ArrangementClassifier(nn.Module):
         logits = self.cell_logits.expand(X.shape[0], -1)
         return combine(weights, logits)
 
+    def _to_tensor(self, X: Tensor | np.ndarray) -> Tensor:
+        return torch.as_tensor(np.asarray(X, dtype=np.float64), dtype=_DTYPE)
+
     @torch.no_grad()
     def predict(self, X: Tensor | np.ndarray) -> np.ndarray:
-        xv = torch.as_tensor(np.asarray(X, dtype=np.float64), dtype=torch.float64)
-        return (self.forward(xv).detach().numpy() > 0.0).astype(np.float64)
+        return (self.forward(self._to_tensor(X)).detach().numpy() > 0.0).astype(
+            np.float64
+        )
 
     @torch.no_grad()
     def predict_proba(self, X: Tensor | np.ndarray) -> np.ndarray:
-        xv = torch.as_tensor(np.asarray(X, dtype=np.float64), dtype=torch.float64)
-        logits = self.forward(xv).detach().numpy()
+        logits = self.forward(self._to_tensor(X)).detach().numpy()
         return 1.0 / (1.0 + np.exp(-logits))
 
     def numpy_state(self) -> dict[str, np.ndarray]:
@@ -112,34 +117,57 @@ def _sparse_warmstarts(
     n_quantiles: int = 19,
     top_k: int = 8,
 ) -> list[tuple[np.ndarray, np.ndarray, np.ndarray, float]]:
-    """Feature-pair + threshold grid warm-starts for axis-structured data."""
+    """Feature-pair + threshold grid warm-starts for axis-structured data.
+
+    Vectorized over threshold pairs for each feature pair and sign pattern.
+    """
     if n_hyperplanes != 2:
         return []
     n, d = X.shape
+    yv = np.asarray(y, dtype=np.float64).reshape(-1)
     qs = np.linspace(0.05, 0.95, int(n_quantiles))
+    feat_thrs = [np.unique(np.quantile(X[:, j], qs)) for j in range(d)]
     scored: list[tuple[float, np.ndarray, np.ndarray, np.ndarray]] = []
     for f0, f1 in itertools.combinations(range(d), 2):
-        q0 = np.unique(np.quantile(X[:, f0], qs))
-        q1 = np.unique(np.quantile(X[:, f1], qs))
+        q0 = feat_thrs[f0]
+        q1 = feat_thrs[f1]
+        x0 = X[:, f0]
+        x1 = X[:, f1]
         best_local = -1.0
         best_pack: tuple[np.ndarray, np.ndarray, np.ndarray] | None = None
         for s0, s1 in ((1.0, 1.0), (1.0, -1.0), (-1.0, 1.0), (-1.0, -1.0)):
-            for thr0 in q0:
-                for thr1 in q1:
-                    W = np.zeros((2, d), dtype=np.float64)
-                    t = np.zeros(2, dtype=np.float64)
-                    W[0, f0] = s0
-                    t[0] = s0 * float(thr0)
-                    W[1, f1] = s1
-                    t[1] = s1 * float(thr1)
-                    logits = _hard_cell_logits(W, t, X, y)
-                    G = X @ W.T > t[None, :]
-                    idx = G[:, 0].astype(np.int64) + 2 * G[:, 1].astype(np.int64)
-                    pred = (logits[idx] > 0.0).astype(np.float64)
-                    acc = float((pred == y).mean())
-                    if acc > best_local:
-                        best_local = acc
-                        best_pack = (W, t, logits)
+            bits0 = (s0 * x0[:, None] > s0 * q0[None, :]).astype(np.int8)
+            bits1 = (s1 * x1[:, None] > s1 * q1[None, :]).astype(np.int8)
+            t0, t1 = q0.size, q1.size
+            n_pairs = t0 * t1
+            idx = (
+                bits0[:, :, None] + 2 * bits1[:, None, :]
+            ).reshape(n, n_pairs)
+            counts = np.zeros((4, n_pairs), dtype=np.float64)
+            pos = np.zeros((4, n_pairs), dtype=np.float64)
+            for c in range(4):
+                mask = idx == c
+                counts[c] = mask.sum(axis=0)
+                pos[c] = (mask * yv[:, None]).sum(axis=0)
+            rate = np.where(counts > 0.0, pos / np.maximum(counts, 1.0), 0.5)
+            rate = np.clip(rate, 1e-3, 1.0 - 1e-3)
+            logits_all = np.log(rate / (1.0 - rate))  # (4, n_pairs)
+            pred_cell = (rate > 0.5).astype(np.float64)
+            pair_ids = np.arange(n_pairs)[None, :]
+            pred = pred_cell[idx, pair_ids]
+            accs = (pred == yv[:, None]).mean(axis=0)
+            p_best = int(np.argmax(accs))
+            acc = float(accs[p_best])
+            if acc > best_local:
+                best_local = acc
+                i0, i1 = divmod(p_best, t1)
+                W = np.zeros((2, d), dtype=np.float64)
+                t = np.zeros(2, dtype=np.float64)
+                W[0, f0] = s0
+                t[0] = s0 * float(q0[i0])
+                W[1, f1] = s1
+                t[1] = s1 * float(q1[i1])
+                best_pack = (W, t, logits_all[:, p_best].copy())
         if best_pack is not None:
             scored.append((best_local, *best_pack))
     scored.sort(key=lambda row: row[0], reverse=True)
@@ -219,8 +247,8 @@ def fit_arrangement(
     tr_idx, va_idx = perm[:n_tr], perm[n_tr:]
     Xtr_np, ytr_np = Xv[tr_idx], yv[tr_idx]
     Xva_np, yva_np = Xv[va_idx], yv[va_idx]
-    Xtr = torch.as_tensor(Xtr_np)
-    ytr = torch.as_tensor(ytr_np)
+    Xtr = torch.as_tensor(Xtr_np, dtype=_DTYPE)
+    ytr = torch.as_tensor(ytr_np, dtype=_DTYPE)
     use_sparse = bool(l1 > 0.0) if sparse_warmstart is None else bool(sparse_warmstart)
 
     candidates: list[tuple[str, dict[str, Any]]] = []
@@ -240,9 +268,9 @@ def fit_arrangement(
         freeze_W = False
         if kind == "sparse":
             with torch.no_grad():
-                model.W.copy_(torch.as_tensor(cfg["W"]))
-                model.t.copy_(torch.as_tensor(cfg["t"]))
-                model.cell_logits.copy_(torch.as_tensor(cfg["logits"]))
+                model.W.copy_(torch.as_tensor(cfg["W"], dtype=_DTYPE))
+                model.t.copy_(torch.as_tensor(cfg["t"], dtype=_DTYPE))
+                model.cell_logits.copy_(torch.as_tensor(cfg["logits"], dtype=_DTYPE))
             freeze_W = True
             local_steps = max(200, int(steps) // 2)
             local_l1 = float(l1)

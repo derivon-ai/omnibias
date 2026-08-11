@@ -1,6 +1,6 @@
 {
   "schema": "tabular-arrangement-v1",
-  "generated_utc": "2026-08-11T16:28:56Z",
+  "generated_utc": "2026-08-11T17:21:34Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -27,14 +27,32 @@
     "g1_min_margin": 0.1,
     "g2_max_abs_margin": 0.02,
     "lightgbm_grid_size": 4,
+    "lightgbm_n_estimators_max": 4000,
+    "lightgbm_early_stopping_rounds": 50,
+    "arrangement_budget": {
+      "oblique_xor": {
+        "restarts": 4,
+        "steps": 350,
+        "l1": 0.0,
+        "beta_final": 64.0
+      },
+      "axis_and": {
+        "restarts": 2,
+        "steps": 250,
+        "l1": 0.02,
+        "beta_final": 128.0
+      }
+    },
+    "tier": "smoke",
+    "smoke_is_wiring_gate": true,
     "full": false,
     "g3_earned": false,
     "g4_earned": false
   },
-  "rss_mb_at_start": 813.72,
+  "rss_mb_at_start": 813.81,
   "baseline": {
-    "name": "tuned LightGBM (val-selected grid)",
-    "note": "num_leaves x learning_rate x n_estimators grid; refit on train+val with the chosen config"
+    "name": "tuned LightGBM (val-selected grid + early stopping)",
+    "note": "num_leaves x learning_rate x min_child_samples x max_depth; n_estimators via early stopping up to 4000; refit on train+val"
   },
   "seeds": [
     0,
@@ -49,18 +67,23 @@
       {
         "seed": 0,
         "arrangement_accuracy": 0.9975,
-        "lightgbm_accuracy": 0.8475,
-        "margin": 0.15000000000000002,
-        "abs_margin": 0.15000000000000002,
+        "lightgbm_accuracy": 0.837,
+        "margin": 0.1605000000000001,
+        "abs_margin": 0.1605000000000001,
         "arrangement_auc": 0.9999684004696954,
-        "lightgbm_auc": 0.9228541706956068,
+        "lightgbm_auc": 0.9137155865315219,
         "majority_class_rate": 0.7284999999999999,
         "obliqueness_diagnostic": 1.0170345906483573,
         "lightgbm_config": {
-          "num_leaves": 127,
+          "num_leaves": 31,
           "learning_rate": 0.1,
-          "n_estimators": 200
+          "n_estimators": 251,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 0.99828125,
           "val_acc": 0.998125,
@@ -69,7 +92,15 @@
           "sparse_warmstart": false,
           "n_restarts": 4,
           "W_l1": 31.598091860226724,
-          "W_nnz_features": 10
+          "W_nnz_features": 10,
+          "certificate": {
+            "max_gap": 0.8896825114723826,
+            "mean_gap": 0.0045876094640192894,
+            "gibbs_scale": 0.02166084939249829,
+            "measured_max": 0.8896825114723828,
+            "is_sound": true,
+            "soft_hard_agree": 1.0
+          }
         },
         "meta": {
           "family": "oblique_xor",
@@ -82,18 +113,23 @@
       {
         "seed": 1,
         "arrangement_accuracy": 0.999,
-        "lightgbm_accuracy": 0.843,
-        "margin": 0.15600000000000003,
-        "abs_margin": 0.15600000000000003,
+        "lightgbm_accuracy": 0.857,
+        "margin": 0.14200000000000002,
+        "abs_margin": 0.14200000000000002,
         "arrangement_auc": 0.9999959604079584,
-        "lightgbm_auc": 0.9291091992619666,
+        "lightgbm_auc": 0.9416248653048529,
         "majority_class_rate": 0.5495,
         "obliqueness_diagnostic": 0.9719501335707924,
         "lightgbm_config": {
           "num_leaves": 31,
           "learning_rate": 0.1,
-          "n_estimators": 200
+          "n_estimators": 436,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 0.9984375,
           "val_acc": 0.9975,
@@ -102,7 +138,15 @@
           "sparse_warmstart": false,
           "n_restarts": 4,
           "W_l1": 23.928136633889228,
-          "W_nnz_features": 10
+          "W_nnz_features": 10,
+          "certificate": {
+            "max_gap": 0.914410059000555,
+            "mean_gap": 0.007485344622807334,
+            "gibbs_scale": 0.02166084939249829,
+            "measured_max": 0.914410059000555,
+            "is_sound": true,
+            "soft_hard_agree": 1.0
+          }
         },
         "meta": {
           "family": "oblique_xor",
@@ -115,18 +159,23 @@
       {
         "seed": 2,
         "arrangement_accuracy": 0.9995,
-        "lightgbm_accuracy": 0.871,
-        "margin": 0.12850000000000006,
-        "abs_margin": 0.12850000000000006,
+        "lightgbm_accuracy": 0.87,
+        "margin": 0.12950000000000006,
+        "abs_margin": 0.12950000000000006,
         "arrangement_auc": 0.9999969645950365,
-        "lightgbm_auc": 0.9504035064998139,
+        "lightgbm_auc": 0.9497114341681372,
         "majority_class_rate": 0.554,
         "obliqueness_diagnostic": 0.967805090276267,
         "lightgbm_config": {
-          "num_leaves": 127,
-          "learning_rate": 0.1,
-          "n_estimators": 200
+          "num_leaves": 31,
+          "learning_rate": 0.05,
+          "n_estimators": 1056,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 0.9990625,
           "val_acc": 0.998125,
@@ -135,7 +184,15 @@
           "sparse_warmstart": false,
           "n_restarts": 4,
           "W_l1": 21.21016541633672,
-          "W_nnz_features": 10
+          "W_nnz_features": 10,
+          "certificate": {
+            "max_gap": 0.8315682394267276,
+            "mean_gap": 0.004911350054111037,
+            "gibbs_scale": 0.02166084939249829,
+            "measured_max": 0.8315682394267276,
+            "is_sound": true,
+            "soft_hard_agree": 1.0
+          }
         },
         "meta": {
           "family": "oblique_xor",
@@ -148,18 +205,23 @@
       {
         "seed": 3,
         "arrangement_accuracy": 0.998,
-        "lightgbm_accuracy": 0.8465,
-        "margin": 0.15149999999999997,
-        "abs_margin": 0.15149999999999997,
+        "lightgbm_accuracy": 0.846,
+        "margin": 0.15200000000000002,
+        "abs_margin": 0.15200000000000002,
         "arrangement_auc": 0.9999863132538238,
-        "lightgbm_auc": 0.9278834815713227,
+        "lightgbm_auc": 0.9318684303618354,
         "majority_class_rate": 0.612,
         "obliqueness_diagnostic": 0.9893747445852062,
         "lightgbm_config": {
           "num_leaves": 127,
           "learning_rate": 0.05,
-          "n_estimators": 200
+          "n_estimators": 310,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": true,
         "arrangement": {
           "train_acc": 0.9984375,
           "val_acc": 0.998125,
@@ -168,7 +230,15 @@
           "sparse_warmstart": false,
           "n_restarts": 4,
           "W_l1": 28.054041135989202,
-          "W_nnz_features": 10
+          "W_nnz_features": 10,
+          "certificate": {
+            "max_gap": 0.9177173082458335,
+            "mean_gap": 0.007557942892854377,
+            "gibbs_scale": 0.02166084939249829,
+            "measured_max": 0.9177173082458334,
+            "is_sound": true,
+            "soft_hard_agree": 1.0
+          }
         },
         "meta": {
           "family": "oblique_xor",
@@ -181,18 +251,23 @@
       {
         "seed": 4,
         "arrangement_accuracy": 0.997,
-        "lightgbm_accuracy": 0.846,
-        "margin": 0.15100000000000002,
-        "abs_margin": 0.15100000000000002,
+        "lightgbm_accuracy": 0.8435,
+        "margin": 0.15349999999999997,
+        "abs_margin": 0.15349999999999997,
         "arrangement_auc": 0.9999843486535669,
-        "lightgbm_auc": 0.9341714803252141,
+        "lightgbm_auc": 0.9254015092071654,
         "majority_class_rate": 0.602,
         "obliqueness_diagnostic": 0.9946535060662142,
         "lightgbm_config": {
-          "num_leaves": 127,
+          "num_leaves": 31,
           "learning_rate": 0.1,
-          "n_estimators": 200
+          "n_estimators": 355,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 0.9984375,
           "val_acc": 0.999375,
@@ -201,7 +276,15 @@
           "sparse_warmstart": false,
           "n_restarts": 4,
           "W_l1": 26.856547539407888,
-          "W_nnz_features": 10
+          "W_nnz_features": 10,
+          "certificate": {
+            "max_gap": 0.9957300672473418,
+            "mean_gap": 0.007303379758614193,
+            "gibbs_scale": 0.02166084939249829,
+            "measured_max": 0.9957300672473417,
+            "is_sound": true,
+            "soft_hard_agree": 1.0
+          }
         },
         "meta": {
           "family": "oblique_xor",
@@ -212,7 +295,11 @@
         }
       }
     ],
-    "constructed_to_favour_arrangement": true
+    "constructed_to_favour_arrangement": true,
+    "obliqueness_diagnostic_range": [
+      0.967805090276267,
+      1.0170345906483573
+    ]
   },
   "axis_and": {
     "family": "axis_and",
@@ -230,8 +317,13 @@
         "lightgbm_config": {
           "num_leaves": 31,
           "learning_rate": 0.05,
-          "n_estimators": 200
+          "n_estimators": 106,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 0.99984375,
           "val_acc": 0.999375,
@@ -240,7 +332,15 @@
           "sparse_warmstart": true,
           "n_restarts": 10,
           "W_l1": 1.9442167933181267,
-          "W_nnz_features": 2
+          "W_nnz_features": 2,
+          "certificate": {
+            "max_gap": 1.4908507134455173,
+            "mean_gap": 0.04630911209820318,
+            "gibbs_scale": 0.010830424696249145,
+            "measured_max": 1.2282881792369267,
+            "is_sound": true,
+            "soft_hard_agree": 0.997
+          }
         },
         "meta": {
           "family": "axis_and",
@@ -268,8 +368,13 @@
         "lightgbm_config": {
           "num_leaves": 31,
           "learning_rate": 0.05,
-          "n_estimators": 200
+          "n_estimators": 249,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 1.0,
           "val_acc": 0.999375,
@@ -278,7 +383,15 @@
           "sparse_warmstart": true,
           "n_restarts": 10,
           "W_l1": 1.9289335452307013,
-          "W_nnz_features": 2
+          "W_nnz_features": 2,
+          "certificate": {
+            "max_gap": 0.9765698200203403,
+            "mean_gap": 0.043970186406225,
+            "gibbs_scale": 0.010830424696249145,
+            "measured_max": 0.9765632286313406,
+            "is_sound": true,
+            "soft_hard_agree": 0.9995
+          }
         },
         "meta": {
           "family": "axis_and",
@@ -306,8 +419,13 @@
         "lightgbm_config": {
           "num_leaves": 31,
           "learning_rate": 0.05,
-          "n_estimators": 200
+          "n_estimators": 104,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 0.9996875,
           "val_acc": 1.0,
@@ -316,7 +434,15 @@
           "sparse_warmstart": true,
           "n_restarts": 10,
           "W_l1": 1.9647648078473086,
-          "W_nnz_features": 2
+          "W_nnz_features": 2,
+          "certificate": {
+            "max_gap": 1.837570554615283,
+            "mean_gap": 0.05107063107825445,
+            "gibbs_scale": 0.010830424696249145,
+            "measured_max": 1.4175009513304584,
+            "is_sound": true,
+            "soft_hard_agree": 0.9985
+          }
         },
         "meta": {
           "family": "axis_and",
@@ -338,14 +464,19 @@
         "margin": 0.000500000000000056,
         "abs_margin": 0.000500000000000056,
         "arrangement_auc": 0.999997064487342,
-        "lightgbm_auc": 0.9999765158987366,
+        "lightgbm_auc": 0.9999897257056972,
         "majority_class_rate": 0.906,
         "obliqueness_diagnostic": 1.0022231485341115,
         "lightgbm_config": {
           "num_leaves": 31,
-          "learning_rate": 0.1,
-          "n_estimators": 200
+          "learning_rate": 0.05,
+          "n_estimators": 113,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 1.0,
           "val_acc": 0.99875,
@@ -354,7 +485,15 @@
           "sparse_warmstart": true,
           "n_restarts": 10,
           "W_l1": 1.9242093770363673,
-          "W_nnz_features": 2
+          "W_nnz_features": 2,
+          "certificate": {
+            "max_gap": 1.129228783131602,
+            "mean_gap": 0.0456257594675776,
+            "gibbs_scale": 0.010830424696249145,
+            "measured_max": 1.0053741551691524,
+            "is_sound": true,
+            "soft_hard_agree": 0.9975
+          }
         },
         "meta": {
           "family": "axis_and",
@@ -376,14 +515,19 @@
         "margin": 0.0,
         "abs_margin": 0.0,
         "arrangement_auc": 0.9999970504172185,
-        "lightgbm_auc": 0.999994100834437,
+        "lightgbm_auc": 0.9999970504172185,
         "majority_class_rate": 0.9065,
         "obliqueness_diagnostic": 0.9930671103716029,
         "lightgbm_config": {
           "num_leaves": 31,
           "learning_rate": 0.05,
-          "n_estimators": 200
+          "n_estimators": 154,
+          "min_child_samples": 20,
+          "max_depth": -1,
+          "n_estimators_max": 4000,
+          "early_stopping_rounds": 50
         },
+        "lightgbm_config_at_grid_boundary": false,
         "arrangement": {
           "train_acc": 0.99984375,
           "val_acc": 0.99875,
@@ -392,7 +536,15 @@
           "sparse_warmstart": true,
           "n_restarts": 10,
           "W_l1": 1.9458507360919817,
-          "W_nnz_features": 2
+          "W_nnz_features": 2,
+          "certificate": {
+            "max_gap": 1.0496097141574636,
+            "mean_gap": 0.04437774480571564,
+            "gibbs_scale": 0.010830424696249145,
+            "measured_max": 0.9967326030218462,
+            "is_sound": true,
+            "soft_hard_agree": 1.0
+          }
         },
         "meta": {
           "family": "axis_and",
@@ -408,7 +560,11 @@
         }
       }
     ],
-    "constructed_to_favour_arrangement": false
+    "constructed_to_favour_arrangement": false,
+    "obliqueness_diagnostic_range": [
+      0.9930671103716029,
+      1.0022231485341115
+    ]
   },
   "gates": {
     "all_passed": true,
@@ -422,11 +578,11 @@
         "n_seeds": 5,
         "min_seeds": 5,
         "values": [
-          0.15000000000000002,
-          0.15600000000000003,
-          0.12850000000000006,
-          0.15149999999999997,
-          0.15100000000000002
+          0.1605000000000001,
+          0.14200000000000002,
+          0.12950000000000006,
+          0.15200000000000002,
+          0.15349999999999997
         ],
         "deviations": [
           0.0,
@@ -444,7 +600,7 @@
         ],
         "worst_seed": 0,
         "worst_index": 0,
-        "worst_value": 0.15000000000000002,
+        "worst_value": 0.1605000000000001,
         "worst_deviation": 0.0,
         "passed": true
       },
@@ -490,6 +646,19 @@
     "constructed_to_favour_arrangement": true,
     "temperature_collapse": true,
     "bias_collapse": false,
+    "smoke_is_wiring_gate": true,
+    "obliqueness_diagnostic_discriminates": false,
+    "obliqueness_diagnostic_ranges": {
+      "oblique_xor": [
+        0.967805090276267,
+        1.0170345906483573
+      ],
+      "axis_and": [
+        0.9930671103716029,
+        1.0022231485341115
+      ]
+    },
+    "obliqueness_diagnostic_reason": "detects linear oblique structure only; XOR is not linearly separable so dense/axis ratio overlaps the axis family (do not retune on G1/G2 datasets)",
     "g1_earned": true,
     "g2_earned": true,
     "g3_earned": false,
@@ -497,10 +666,11 @@
     "g5_earned": false,
     "g6_earned": false,
     "g7_earned": false,
+    "gap_certificate_wired": true,
     "tabular_subapplication_alive": true,
     "theorem_prover_verified": false,
     "mathlib_verified": false,
     "licensed_sentence": "on the constructed oblique XOR dataset the H=2 soft hyperplane arrangement beats tuned LightGBM by at least 10 accuracy points over five seeds; on the constructed axis AND dataset it stays within 2 accuracy points"
   },
-  "wall_seconds": 162.769
+  "wall_seconds": 84.731
 }

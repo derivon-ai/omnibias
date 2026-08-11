@@ -68,9 +68,11 @@ claim, earned per dataset (see [Benchmarks](../benchmarks.md)), never asserted.
 
 Hyperplane-arrangement view of tabular classification: ``H`` soft gates applied
 to every input, soft cell memberships over ``2**H`` sign patterns (reusing
-``omnibias.partition``), per-cell logits, beta anneal, and an optional ``L1`` /
-sparse warm-start path. Wave-0 gates G1/G2 are earned on constructed datasets;
-trees / LightGBM are still expected to win most real tabular benchmarks.
+``omnibias.partition``), per-cell logits, beta anneal, an optional ``L1`` /
+sparse warm-start path, and ``certify_arrangement_gap`` (partition soft->hard
+gap). Wave-0 gates G1/G2 are earned on constructed datasets; trees / LightGBM
+are still expected to win most real tabular benchmarks. The obliqueness
+diagnostic detects linear oblique structure only (not XOR parity).
 
 ::: omnibias.tab.arrangement
     options:

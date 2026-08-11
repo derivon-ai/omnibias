@@ -58,7 +58,9 @@ from omnibias.tab._core.forward import (
 from omnibias.tab._core.loss import loss_value, metric, score_grad_hess
 from omnibias.tab._core.params import TabParams, init_params
 from omnibias.tab.arrangement import (
+    arrangement_params,
     arrangement_weights,
+    certify_arrangement_gap,
     hard_predict_np,
     make_axis_rule,
     make_oblique_xor,
@@ -87,7 +89,9 @@ __all__ = [
     "TabParams",
     "__lineage__",
     "__version__",
+    "arrangement_params",
     "arrangement_weights",
+    "certify_arrangement_gap",
     "certify_tab",
     "certify_tab_gap",
     "forward_np",

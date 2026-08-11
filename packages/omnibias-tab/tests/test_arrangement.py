@@ -17,8 +17,6 @@ from omnibias.tab.arrangement import (
 )
 from omnibias.tab.torch.arrangement import ArrangementClassifier, fit_arrangement
 
-torch.set_default_dtype(torch.float64)
-
 
 def test_dataset_determinism() -> None:
     X1, y1, m1 = make_oblique_xor(seed=3, n_samples=200)
@@ -55,17 +53,18 @@ def test_numpy_torch_membership_parity() -> None:
     beta = 3.5
     np_w = arrangement_weights(W, t, X, beta)
     model = ArrangementClassifier(6, 2, beta=beta)
+    dtype = torch.float64
     with torch.no_grad():
-        model.W.copy_(torch.as_tensor(W))
-        model.t.copy_(torch.as_tensor(t))
+        model.W.copy_(torch.as_tensor(W, dtype=dtype))
+        model.t.copy_(torch.as_tensor(t, dtype=dtype))
         torch_w = partition_weights_arrays(
-            model.W, model.t, torch.as_tensor(X), beta, 2
+            model.W, model.t, torch.as_tensor(X, dtype=dtype), beta, 2
         ).numpy()
     assert np.allclose(np_w, torch_w, atol=1e-12)
 
 
-def test_obliqueness_diagnostic_orders_linear_oblique_above_axis() -> None:
-    """Dense probe beats axis probes on a single oblique hyperplane label."""
+def test_obliqueness_diagnostic_detects_linear_not_parity_structure() -> None:
+    """Detects linear oblique lift; does not separate XOR from axis (parity)."""
     rng = np.random.default_rng(0)
     X = rng.normal(size=(3000, 10))
     w = rng.normal(size=10)
@@ -75,10 +74,12 @@ def test_obliqueness_diagnostic_orders_linear_oblique_above_axis() -> None:
     da = obliqueness_diagnostic(Xa, ya)
     assert do > da
     assert do > 1.05
-    # Constructed XOR is not linearly separable; diagnostic stays near 1 and
-    # is reported (not gated) for Wave-0 honesty.
+    # XOR is not linearly separable; dense/axis ratio stays near 1 and does
+    # not order above the axis family -- reported, not gated (Wave-0 honesty).
     Xo, yo, _ = make_oblique_xor(seed=1, n_samples=3000)
-    assert obliqueness_diagnostic(Xo, yo) == pytest.approx(1.0, abs=0.15)
+    dx = obliqueness_diagnostic(Xo, yo)
+    assert dx == pytest.approx(1.0, abs=0.15)
+    assert abs(dx - da) < 0.08
 
 
 def test_l1_recovers_sparse_normals_on_axis() -> None:
@@ -124,6 +125,33 @@ def test_fit_oblique_beats_majority() -> None:
     te = slice(2400, 3000)
     acc = _accuracy(result.model.predict(X[te]), y[te])
     assert acc > 0.95
+
+
+def test_certify_arrangement_gap_sound_and_soft_hard_agree() -> None:
+    from omnibias.partition._core.verified import weight_rounding_gap
+    from omnibias.tab.arrangement import arrangement_params, certify_arrangement_gap
+
+    X, y, meta = make_oblique_xor(seed=0, n_samples=800)
+    W = np.stack([meta["w1"], meta["w2"]])
+    t = np.zeros(2)
+    logits = np.array(
+        [10.0 if ((r & 1) ^ ((r >> 1) & 1)) else -10.0 for r in range(4)],
+        dtype=np.float64,
+    )
+    beta = 64.0
+    cert = certify_arrangement_gap(W, t, X, beta=beta)
+    assert cert.is_sound
+    assert cert.max_gap >= cert.measured_max - 1e-9
+    soft = (predict_proba_np(W, t, logits, X, beta) >= 0.5).astype(np.float64)
+    hard = hard_predict_np(W, t, logits, X)
+    params = arrangement_params(W, t, beta_final=beta)
+    bound, _measured = weight_rounding_gap(params, X, beta)
+    # Soft decision margin in probability space; where the certified membership
+    # gap is below that margin, soft and hard labels must agree.
+    margin = np.abs(predict_proba_np(W, t, logits, X, beta) - 0.5)
+    safe = bound < margin
+    assert safe.any()
+    assert np.all(soft[safe] == hard[safe])
 
 
 def _accuracy(pred: np.ndarray, y: np.ndarray) -> float:

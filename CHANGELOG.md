@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Changed — A4 hardening (05-02 protocol repair)
+
+- Removed process-global `torch.set_default_dtype` from
+  `omnibias.tab.torch.arrangement` (module constant `_DTYPE` instead).
+- LightGBM baseline: extended grid + early stopping; `--full` refuses a
+  selected config on the grid boundary before reading G1/G2.
+- `obliqueness_diagnostic` honesty: records that it does not discriminate
+  XOR from axis (linear oblique only); not retuned on G1/G2.
+- Wired `certify_arrangement_gap` (partition soft->hard gap reuse); tie-aware
+  AUC; vectorized sparse warm-starts; arrangement budget recorded per tier
+  (smoke = wiring gate).
+
 ### Added — Wave-0 falsifier A4: tabular arrangement vs LightGBM (05-02 G1/G2)
 
 - `omnibias.tab.arrangement` / `omnibias.tab.torch.arrangement`: H-hyperplane
