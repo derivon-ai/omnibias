@@ -159,9 +159,12 @@ testpaths = [
 # sys.path, so the handful of shared `_`-prefixed test helpers have to be
 # registered explicitly. Their basenames must stay globally unique across these
 # directories (guarded by `tests/test_test_layout.py`), otherwise one package's
-# helper would silently shadow another's.
+# helper would silently shadow another's. `benchmarks/` holds `_common.py` and
+# `_gates.py`, shared by the benchmark scripts and by root / pinn tests that
+# import those helpers by bare module name.
 pythonpath = [
     "tests",
+    "benchmarks",
     "packages/omnibias-dynamics/tests",
     "packages/omnibias-fields/tests",
     "packages/omnibias-geometry/tests/gauge",
