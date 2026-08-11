@@ -1,0 +1,490 @@
+{
+  "schema": "information-geometry-v1",
+  "generated_utc": "2026-08-11T15:32:29Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "two_bias_logistic_pack",
+    "predicted_exponent": 2.0,
+    "predicted_prefactor": 0.001388888888888889,
+    "quad_nodes": 200,
+    "delta_sweep": {
+      "lo": 1e-06,
+      "hi": 1.0,
+      "n": 25
+    },
+    "mc_n": 200000,
+    "mc_deltas": [
+      1.0,
+      0.1,
+      0.01
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "full": false,
+    "prefactor_delta": 0.0001,
+    "prefactor_max_rel": 1e-06,
+    "exponent_tol": 0.02,
+    "min_decades": 3.0
+  },
+  "rss_mb_at_start": 813.52,
+  "baseline": {
+    "name": "Monte Carlo Fisher estimator",
+    "sampler": "x = logit(U1) + delta*(U2 - 1/2)",
+    "n_per_seed": 200000,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ]
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "per_seed": [
+    {
+      "delta": 1.0,
+      "seed": 0,
+      "G_closed": 0.0013251505385593388,
+      "G_mc": 0.0013222935869037838,
+      "stderr": 3.1888457104271124e-06,
+      "sigmas": 0.8959203156844949
+    },
+    {
+      "delta": 1.0,
+      "seed": 1,
+      "G_closed": 0.0013251505385593388,
+      "G_mc": 0.00132129302020522,
+      "stderr": 3.1930593603040217e-06,
+      "sigmas": 1.2080947827263626
+    },
+    {
+      "delta": 1.0,
+      "seed": 2,
+      "G_closed": 0.0013251505385593388,
+      "G_mc": 0.001324499640465877,
+      "stderr": 3.2008807243213953e-06,
+      "sigmas": 0.20334968701460493
+    },
+    {
+      "delta": 1.0,
+      "seed": 3,
+      "G_closed": 0.0013251505385593388,
+      "G_mc": 0.0013239356761782436,
+      "stderr": 3.1951085985574406e-06,
+      "sigmas": 0.3802256929995018
+    },
+    {
+      "delta": 1.0,
+      "seed": 4,
+      "G_closed": 0.0013251505385593388,
+      "G_mc": 0.001322295900630652,
+      "stderr": 3.1796248623347726e-06,
+      "sigmas": 0.8977907936569552
+    },
+    {
+      "delta": 0.1,
+      "seed": 0,
+      "G_closed": 1.3882277611598731e-05,
+      "G_mc": 1.385845913213442e-05,
+      "stderr": 3.308430171982137e-08,
+      "sigmas": 0.7199329659734524
+    },
+    {
+      "delta": 0.1,
+      "seed": 1,
+      "G_closed": 1.3882277611598731e-05,
+      "G_mc": 1.3833918302362526e-05,
+      "stderr": 3.311228513847179e-08,
+      "sigmas": 1.4604642667811092
+    },
+    {
+      "delta": 0.1,
+      "seed": 2,
+      "G_closed": 1.3882277611598731e-05,
+      "G_mc": 1.3876607874709404e-05,
+      "stderr": 3.3212564710893134e-08,
+      "sigmas": 0.1707106012041144
+    },
+    {
+      "delta": 0.1,
+      "seed": 3,
+      "G_closed": 1.3882277611598731e-05,
+      "G_mc": 1.3892246632361428e-05,
+      "stderr": 3.317067711892913e-08,
+      "sigmas": 0.30053714993379244
+    },
+    {
+      "delta": 0.1,
+      "seed": 4,
+      "G_closed": 1.3882277611598731e-05,
+      "G_mc": 1.3842646794615046e-05,
+      "stderr": 3.301204379312626e-08,
+      "sigmas": 1.2004957109604066
+    },
+    {
+      "delta": 0.01,
+      "seed": 0,
+      "G_closed": 1.388882275157045e-07,
+      "G_mc": 1.3865930451137085e-07,
+      "stderr": 3.309708750545457e-10,
+      "sigmas": 0.6916711456738043
+    },
+    {
+      "delta": 0.01,
+      "seed": 1,
+      "G_closed": 1.388882275157045e-07,
+      "G_mc": 1.3839530277777188e-07,
+      "stderr": 3.312326666329462e-10,
+      "sigmas": 1.4881525513268283
+    },
+    {
+      "delta": 0.01,
+      "seed": 2,
+      "G_closed": 1.388882275157045e-07,
+      "G_mc": 1.388408510569804e-07,
+      "stderr": 3.322415230753475e-10,
+      "sigmas": 0.14259644094322413
+    },
+    {
+      "delta": 0.01,
+      "seed": 3,
+      "G_closed": 1.388882275157045e-07,
+      "G_mc": 1.390082725305072e-07,
+      "stderr": 3.318426565343174e-10,
+      "sigmas": 0.361752813988483
+    },
+    {
+      "delta": 0.01,
+      "seed": 4,
+      "G_closed": 1.388882275157045e-07,
+      "G_mc": 1.3848587545579495e-07,
+      "stderr": 3.3027452794117843e-10,
+      "sigmas": 1.2182352130443415
+    }
+  ],
+  "closed_form_arm": {
+    "deterministic": true,
+    "seeds": null,
+    "method_labels": {
+      "derivative_path": "CLOSED_FORM",
+      "expectation_path": "NUMERICAL",
+      "leading_coefficient": "CLOSED_FORM"
+    },
+    "deltas": [
+      1e-06,
+      1.7782794100389227e-06,
+      3.162277660168379e-06,
+      5.623413251903491e-06,
+      9.999999999999999e-06,
+      1.778279410038923e-05,
+      3.1622776601683795e-05,
+      5.623413251903491e-05,
+      0.0001,
+      0.00017782794100389227,
+      0.00031622776601683794,
+      0.0005623413251903491,
+      0.001,
+      0.0017782794100389228,
+      0.0031622776601683794,
+      0.005623413251903491,
+      0.01,
+      0.01778279410038923,
+      0.03162277660168379,
+      0.056234132519034905,
+      0.1,
+      0.1778279410038923,
+      0.31622776601683794,
+      0.5623413251903491,
+      1.0
+    ],
+    "G_delta_delta": [
+      1.3888888888887894e-15,
+      4.392052305788651e-15,
+      1.3888888888881952e-14,
+      4.3920523057827005e-14,
+      1.3888888888822429e-13,
+      4.3920523057231787e-13,
+      1.3888888888227199e-12,
+      4.392052305127938e-12,
+      1.3888888882274807e-11,
+      4.392052299175555e-11,
+      1.3888888822750998e-10,
+      4.3920522396517493e-10,
+      1.3888888227512936e-09,
+      4.3920516444137305e-09,
+      1.3888882275134438e-08,
+      4.3920456920405435e-08,
+      1.388882275157045e-07,
+      4.3919861690074635e-07,
+      1.3888227538027941e-06,
+      4.391391008549092e-06,
+      1.3882277611598731e-05,
+      4.38544638378375e-05,
+      0.00013822998506187825,
+      0.0004326690766758422,
+      0.0013251505385593388
+    ],
+    "ratio_to_delta2": [
+      0.0013888888888887894,
+      0.0013888888888886472,
+      0.0013888888888881953,
+      0.001388888888886765,
+      0.0013888888888822432,
+      0.0013888888888679428,
+      0.0013888888888227199,
+      0.0013888888886797114,
+      0.0013888888882274807,
+      0.0013888888867974025,
+      0.0013888888822750998,
+      0.0013888888679743222,
+      0.0013888888227512935,
+      0.0013888886797435336,
+      0.0013888882275134436,
+      0.001388886797437858,
+      0.0013888822751570449,
+      0.0013888679746020803,
+      0.0013888227538027943,
+      0.0013886797683399085,
+      0.0013882277611598729,
+      0.0013867999129305556,
+      0.0013822998506187825,
+      0.0013682197554176954,
+      0.0013251505385593388
+    ],
+    "prefactor_at_1e-4": {
+      "G": 1.3888888882274807e-11,
+      "ratio_to_delta2": 0.0013888888882274807,
+      "predicted": 0.001388888888888889
+    },
+    "six_decade_fitted_exponent": 1.9989376285238207,
+    "median_time_ms": 3.7086060037836432
+  },
+  "cost": {
+    "closed_form_median_ms": 3.7086060037836432,
+    "monte_carlo_median_ms_at_n": {
+      "n": 50000,
+      "ms": 2.2215090575627983
+    },
+    "note": "cost reported, never gated; 04-01 G1 remains unearned"
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "fisher_prefactor_720",
+        "measured": 1.3888888882274807e-11,
+        "expected": 1.388888888888889e-11,
+        "rel_error": 4.762139661790985e-10,
+        "max_rel": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "exponent_asymptotic",
+        "fitted_exponent": 1.999999996319067,
+        "expected": 2.0,
+        "abs_error": 3.6809328918252504e-09,
+        "tol": 0.02,
+        "decades": 3.0,
+        "min_decades": 3.0,
+        "n_points": 13,
+        "r2": 1.0,
+        "passed": true
+      },
+      {
+        "name": "exponent_mid",
+        "fitted_exponent": 1.9999631947317886,
+        "expected": 2.0,
+        "abs_error": 3.6805268211370645e-05,
+        "tol": 0.02,
+        "decades": 3.0,
+        "min_decades": 3.0,
+        "n_points": 13,
+        "r2": 0.9999999994490987,
+        "passed": true
+      },
+      {
+        "name": "exponent_coarse",
+        "fitted_exponent": 1.996359141747307,
+        "expected": 2.0,
+        "abs_error": 0.0036408582526930022,
+        "tol": 0.02,
+        "decades": 3.0,
+        "min_decades": 3.0,
+        "n_points": 13,
+        "r2": 0.9999946249337467,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_1.0_seed_0",
+        "measured": 0.0013251505385593388,
+        "reference": 0.0013222935869037838,
+        "stderr": 3.1888457104271124e-06,
+        "sigmas": 0.8959203156844949,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_1.0_seed_1",
+        "measured": 0.0013251505385593388,
+        "reference": 0.00132129302020522,
+        "stderr": 3.1930593603040217e-06,
+        "sigmas": 1.2080947827263626,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_1.0_seed_2",
+        "measured": 0.0013251505385593388,
+        "reference": 0.001324499640465877,
+        "stderr": 3.2008807243213953e-06,
+        "sigmas": 0.20334968701460493,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_1.0_seed_3",
+        "measured": 0.0013251505385593388,
+        "reference": 0.0013239356761782436,
+        "stderr": 3.1951085985574406e-06,
+        "sigmas": 0.3802256929995018,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_1.0_seed_4",
+        "measured": 0.0013251505385593388,
+        "reference": 0.001322295900630652,
+        "stderr": 3.1796248623347726e-06,
+        "sigmas": 0.8977907936569552,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.1_seed_0",
+        "measured": 1.3882277611598731e-05,
+        "reference": 1.385845913213442e-05,
+        "stderr": 3.308430171982137e-08,
+        "sigmas": 0.7199329659734524,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.1_seed_1",
+        "measured": 1.3882277611598731e-05,
+        "reference": 1.3833918302362526e-05,
+        "stderr": 3.311228513847179e-08,
+        "sigmas": 1.4604642667811092,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.1_seed_2",
+        "measured": 1.3882277611598731e-05,
+        "reference": 1.3876607874709404e-05,
+        "stderr": 3.3212564710893134e-08,
+        "sigmas": 0.1707106012041144,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.1_seed_3",
+        "measured": 1.3882277611598731e-05,
+        "reference": 1.3892246632361428e-05,
+        "stderr": 3.317067711892913e-08,
+        "sigmas": 0.30053714993379244,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.1_seed_4",
+        "measured": 1.3882277611598731e-05,
+        "reference": 1.3842646794615046e-05,
+        "stderr": 3.301204379312626e-08,
+        "sigmas": 1.2004957109604066,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.01_seed_0",
+        "measured": 1.388882275157045e-07,
+        "reference": 1.3865930451137085e-07,
+        "stderr": 3.309708750545457e-10,
+        "sigmas": 0.6916711456738043,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.01_seed_1",
+        "measured": 1.388882275157045e-07,
+        "reference": 1.3839530277777188e-07,
+        "stderr": 3.312326666329462e-10,
+        "sigmas": 1.4881525513268283,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.01_seed_2",
+        "measured": 1.388882275157045e-07,
+        "reference": 1.388408510569804e-07,
+        "stderr": 3.322415230753475e-10,
+        "sigmas": 0.14259644094322413,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.01_seed_3",
+        "measured": 1.388882275157045e-07,
+        "reference": 1.390082725305072e-07,
+        "stderr": 3.318426565343174e-10,
+        "sigmas": 0.361752813988483,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "fisher_mc_agreement_delta_0.01_seed_4",
+        "measured": 1.388882275157045e-07,
+        "reference": 1.3848587545579495e-07,
+        "stderr": 3.3027452794117843e-10,
+        "sigmas": 1.2182352130443415,
+        "max_sigmas": 3.0,
+        "passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "claim_rung": 1,
+    "family": "two_bias_logistic_pack",
+    "bias_collapse": true,
+    "temperature_collapse": false,
+    "k_ge_3_fisher": "inapplicable_not_a_density",
+    "g1_earned": false,
+    "g2_earned": true,
+    "g3_earned": false,
+    "g4_earned": false,
+    "g5_earned": false,
+    "theorem_prover_verified": false,
+    "mathlib_verified": false,
+    "pre_registered": "analytic prediction delta^2/720 derived in theory/04-bridges/01-information-geometry-exponential-family.md section 5 and confirmed before the gate was written",
+    "licensed_sentence": "for the two-bias logistic pack family, the Fisher information in the spread direction vanishes as delta^2 with leading coefficient 1/720, measured over three decades against a Monte Carlo estimator"
+  },
+  "wall_seconds": 0.286
+}

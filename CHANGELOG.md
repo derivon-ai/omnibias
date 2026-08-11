@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Wave-0 falsifier A6: Fisher pack degeneracy (04-01 G2)
+
+- `benchmarks/information_geometry.py`: closed-form integrand + Monte Carlo
+  Fisher for the two-bias logistic pack; gates exponent `2.00 +- 0.02` over
+  three decades of pack spread `delta` and prefactor `1/720`.
+- Gate helpers `require_scaling_exponent`, `require_rel_error`,
+  `require_within_stderr` in `benchmarks/_gates.py`, self-tested in
+  `tests/test_gates_protocol.py`.
+- Artifacts: `docs/benchmarks/information_geometry_smoke.json` (CI) and
+  `docs/benchmarks/information_geometry.json` (`--full`); G2 earned, G1/G3–G5
+  remain unearned. Spec 04-01 status `concept -> gated`.
+
 ### Fixed — Phase-0 CCF reproduce audit (P0 honesty / warm / anti-ghost)
 
 - Warm-start: architecture mismatch rebuilds a fresh net (`strict=True`); no

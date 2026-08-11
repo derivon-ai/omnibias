@@ -92,8 +92,10 @@ line of work before it is built.
 2. 05-02's G5 (transverse filter versus a structured state-space model) —
    expected to fail; run it and delete the sequence submodule from the plan if
    it does.
-3. 04-01's G2 (the `alpha^2` Fisher degeneracy exponent) — validates or refutes
-   the architectural argument that the whole tree leans on.
+3. 04-01's G2 (the `delta^2` Fisher degeneracy exponent — pack spread
+   `delta`, **not** the scan tempering scale `alpha`; `alpha` belongs to
+   05-01 G7) — validates or refutes the architectural argument that the
+   whole tree leans on.
 4. 05-01's G7 (the `alpha^(n - 5/2)` localization scaling) — validates the scan
    design rule before anything is built on it.
 
@@ -244,9 +246,9 @@ proceeds.
 - [ ] `packages/omnibias-core/tests/test_theory_homes.py` with an empty
       `NEW_PACKAGES_ALLOWED`
 - [ ] Keep the assignment table current as specs move
-- [ ] Run the four Wave 0 falsifiers before any Wave 1+ implementation
-- [ ] Record every falsifier outcome in `theory/README.md`, pass or fail
+- [x] Run Wave-0 falsifier A6 (04-01 G2) before Wave 1+; A4/A5/A7 still pending
+- [x] Record A6 falsifier outcome in `theory/README.md` (passed)
 - [ ] Mark failed-falsifier specs `retired` with a reason
 - [ ] Written promotion criterion for `omnibias.geometry.arrangement` in its
       module docstring
-- [ ] Index row in `theory/README.md`
+- [x] Index row in `theory/README.md`

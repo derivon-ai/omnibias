@@ -224,6 +224,25 @@ def require_all_seeds(
     direction: Literal["max", "min"], name: str,
 ) -> dict[str, Any]:
     """Gate the worst seed. Records every seed's value in the verdict."""
+
+# Landed with Wave-0 falsifier A6 (04-01 G2); shared by later scaling gates.
+def require_scaling_exponent(
+    x, y, *, expected: float, tol: float, min_decades: float, name: str,
+) -> dict[str, Any]:
+    """Least-squares slope of log(y) vs log(x). Raises if decades < min_decades,
+    if any value is non-positive/non-finite, or if |fitted - expected| > tol.
+    Reports decades, n_points and r2 (never gated jointly)."""
+
+def require_rel_error(
+    measured: float, expected: float, *, max_rel: float, name: str,
+) -> dict[str, Any]:
+    """Scalar |measured - expected| / |expected| <= max_rel."""
+
+def require_within_stderr(
+    measured: float, reference: float, stderr: float, *,
+    max_sigmas: float = 3.0, name: str,
+) -> dict[str, Any]:
+    """|measured - reference| <= max_sigmas * stderr."""
 ```
 
 ## 7. Practical use cases
@@ -262,10 +281,18 @@ opinion.
 Not a benchmark itself. The deliverable is:
 
 - extended `benchmarks/_gates.py` with self-tests in
-  `packages/omnibias-core/tests/test_gates_protocol.py` (core owns the
-  repository-invariant tests),
+  `tests/test_gates_protocol.py` (lives under root `tests/`, **not**
+  `packages/omnibias-core/tests/`: `_gates.py` imports numpy at module scope,
+  core declares no numpy dependency, and the only CI job that runs core tests
+  is the numpy-free `core` job — a core-tests path would skip everywhere),
 - a schema validator run over `docs/benchmarks/*.json` in CI,
 - this file referenced from `benchmarks/README.md`.
+
+The three helpers `require_scaling_exponent`, `require_rel_error`, and
+`require_within_stderr` landed with Wave-0 falsifier A6. The four original
+extensions (`require_enclosure_coverage`, `require_backend_parity`,
+`require_cost_parity`, `require_all_seeds`) and the schema validator remain
+open.
 
 ## 10. Honesty and scope
 
@@ -306,15 +333,17 @@ Not a benchmark itself. The deliverable is:
 
 ## 12. Implementation checklist
 
+- [x] Extend `benchmarks/_gates.py` with `require_scaling_exponent`,
+      `require_rel_error`, `require_within_stderr` (Wave-0 A6)
 - [ ] Extend `benchmarks/_gates.py` with `require_enclosure_coverage`,
       `require_backend_parity`, `require_cost_parity`, `require_all_seeds`
-- [ ] `packages/omnibias-core/tests/test_gates_protocol.py` with a
-      deliberately-failing case per helper
+- [x] `tests/test_gates_protocol.py` with a deliberately-failing case per
+      landed helper (path corrected: not under core tests)
 - [ ] Artifact schema validator enumerating `docs/benchmarks/*.json` in CI
 - [ ] Reject `baseline` blocks without a `name`
 - [ ] Backfill `seeds` / `per_seed` / `baseline` into existing artifacts, or
       record why an artifact is exempt
-- [ ] Reference this file from `benchmarks/README.md`
+- [x] Reference this file from `benchmarks/README.md`
 - [ ] Threshold-audit script diffing gate constants against their introducing
       commit
-- [ ] Index row in `theory/README.md`
+- [x] Index row in `theory/README.md`

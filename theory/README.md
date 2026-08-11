@@ -150,7 +150,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 
 | Spec | Status | One line |
 |---|---|---|
-| [04-01 information geometry](04-bridges/01-information-geometry-exponential-family.md) | concept | OMBU outputs as sufficient statistics with closed-form Fisher structure |
+| [04-01 information geometry](04-bridges/01-information-geometry-exponential-family.md) | gated | OMBU outputs as sufficient statistics with closed-form Fisher structure; G2 earned (`G_{delta,delta} ~ delta^2/720`) |
 | [04-02 uncertainty and conformal slabs](04-bridges/02-uncertainty-calibration-and-conformal-slabs.md) | designed | Slab masses as calibrated, certifiable probabilities |
 
 ### 05 Applications
@@ -195,3 +195,15 @@ external parent and states why the parent stays external.
    local result from being read as a claim it does not support.
 4. Follow [`_TEMPLATE.md`](_TEMPLATE.md) when adding a new spec, and add a row to
    the index above.
+
+## Wave-0 falsifier outcomes
+
+Recorded per [`06-program/03-packaging-and-rollout.md`](06-program/03-packaging-and-rollout.md)
+section 12. Ambiguous outcomes count as failure.
+
+| Unit | Gate | Artifact | Outcome |
+|---|---|---|---|
+| A6 | 04-01 G2 (`G_{delta,delta}` exponent `2.00 +- 0.02`, prefactor `1/720`) | [`docs/benchmarks/information_geometry.json`](../docs/benchmarks/information_geometry.json) | **passed** — licenses D8; G1/G3–G5 unearned; `K>=3` Fisher recorded inapplicable (not a density) |
+| A4 | 05-02 G1 / G2 | — | not run |
+| A5 | 05-02 G5 | — | not run |
+| A7 | 05-01 G7 | — | not run |

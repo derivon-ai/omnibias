@@ -7,9 +7,13 @@ because the tower is exact, that metric is **closed form**, which turns natural
 gradient, model distinguishability, and the geometry of the collapse limit into
 computable objects rather than estimated ones.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-01, 01-10
 - **Blocks**: 03-01, 04-02
+
+Wave-0 falsifier G2 is recorded in
+`docs/benchmarks/information_geometry.json` (`all_passed: true`). The
+section-6 product API and gates G1 / G3 / G4 / G5 remain unearned.
 
 ## 2. Where it lands
 
@@ -20,7 +24,11 @@ side in `omnibias.geometry` where a metric is a first-class object.
 ## 3. Prior art in omnibias
 
 - `packages/omnibias-curvature/` — closed-form Hessian, Fisher and KFAC, with
-  `NaturalGradient` in `omnibias.torch.optim`.
+  `NaturalGradient` in `omnibias.torch.optim`. The existing Fisher symbols
+  (`omnibias.curvature.fisher_information_metric`, `glm_fisher`, and
+  `omnibias.{torch,jax}.information.fisher_information`) are the **scalar
+  exponential-family Fisher** `A''(theta)` — a different object from the
+  pack-parameter metric this spec measures.
 - `omnibias-geometry` — metric, Christoffel symbols, covariant derivative,
   curvature, geodesics, and the pullback metric of a learned chart
   `g = J^T h J`. Everything needed to treat a Fisher metric as a Riemannian
@@ -29,10 +37,15 @@ side in `omnibias.geometry` where a metric is a first-class object.
   reweighting.
 - `omnibias.score` — score functions, the Itô generator, Fokker-Planck; the
   score is the object whose covariance is the Fisher metric.
+- `benchmarks/information_geometry.py` — Wave-0 G2 falsifier (gated):
+  cancellation-free two-bias logistic pack density, closed-form integrand
+  quadrature, Monte Carlo score^2 baseline.
 
 **Confirmed gap.** Fisher information exists as a *curvature object for
-optimization*. It has never been treated as a **metric on the pack parameter
-manifold**, and the geometry of the collapse limit has never been examined.
+optimization* and as a *scalar GLM Fisher*. It has never been treated as a
+**metric on the pack parameter manifold** beyond the G2 degeneracy measurement,
+and the section-6 API (`fisher_metric`, geodesics, distinguishability) is not
+implemented.
 
 ## 4. Mathematics
 
@@ -167,6 +180,23 @@ factor of `100`. To estimate `delta` to the same relative precision then require
 statistical fact about the collapse limit rather than an implementation
 weakness.
 
+**The exact leading coefficient.** Substituting `t = sigma(x)` and taking
+`delta -> 0` with `f -> sigma'` gives
+
+```
+E[(sigma''' / f)^2] -> int_0^1 (1 - 6t + 6t^2)^2 dt = 1/5
+```
+
+so with the prefactor `1/144` from `(delta / 12)^2`:
+
+```
+G_{delta delta} = delta^2 / 720 + O(delta^4)
+```
+
+Measured at `delta = 1e-4`: `G / delta^2 = 1.388888888227e-03` versus
+`1/720 = 1.388888888889e-03` (relative deviation `4.8e-10`). Gate G2 of this
+spec records the exponent; the prefactor is a sharpening of the same claim.
+
 **The contrast.** The order parameter `n` is discrete and changing it changes the
 function by an `O(1)` amount (from `sigma'` to `sigma''` is a completely
 different shape). So the order coordinate carries `O(1)` information where the
@@ -221,19 +251,25 @@ gradients.
 
 - **G1 closed-form correctness.** The closed-form metric matches a
   high-precision Monte Carlo estimate to within the estimate's own standard
-  error, on a randomized suite, and is `1000x` faster.
+  error, on a randomized suite, and is `1000x` faster. **Unearned** — the
+  Monte Carlo agreement arm of the G2 artifact covers the two-bias family
+  only; the randomized mixture suite is D8.
 - **G2 degeneracy exponent.** The measured scaling of `G_{delta delta}` with
   `delta` has exponent `2.00 +- 0.02` over at least three decades of `delta`.
   **This is the spec's central claim and must be measured, not derived only.**
+  **Earned** — see `docs/benchmarks/information_geometry.json`: three overlapping
+  3-decade windows fit to `1.999999996`, `1.99996`, `1.99636`; prefactor
+  `1/720` within `1e-6` relative at `delta = 1e-4`; Monte Carlo agreement
+  within 3 sigma on every seed.
 - **G3 metric properties.** `G` is symmetric positive semi-definite everywhere
   tested, and positive definite away from the degeneracy, to numerical
-  tolerance.
+  tolerance. **Unearned.**
 - **G4 distinguishability calibration.** The predicted sample count for
   distinguishing two parameter settings matches an empirical hypothesis test's
-  requirement within a factor of `2`.
+  requirement within a factor of `2`. **Unearned.**
 - **G5 natural-gradient improvement.** Damping by the degeneracy report improves
   convergence on a problem with a near-collapse parameter, versus undamped
-  natural gradient, over five seeds.
+  natural gradient, over five seeds. **Unearned.**
 
 ## 9. Benchmark plan
 
@@ -260,28 +296,35 @@ gradients.
 
 ## 11. Open questions and risks
 
-- **The `K`-bias exponent.** For `K` biases collapsing to `sigma^(K-1)`, the
-  leading correction is `O(delta^2)` again by symmetry, but the *rank* of the
-  degeneracy grows with `K`. Compute it; do not guess.
+- **The `K`-bias exponent.** For `K >= 3` a central pack collapses toward
+  `sigma^(K-1)`, which **changes sign**, so the pack is not a probability
+  density and the Fisher metric does not apply. Recorded as *inapplicable*
+  (not unmeasured) in the G2 artifact's `honesty.k_ge_3_fisher` field. The
+  honest generalization needs a different object — an `L^2` Gram metric or a
+  normalized mixture family — and belongs to the full D8 implementation. Do
+  not guess an exponent.
 - **Positive definiteness in practice.** Near-degenerate metrics are numerically
   singular; the implementation needs a principled pseudo-inverse rather than a
   tolerance chosen to make tests pass.
 - **Non-normalized families.** The Fisher metric requires a probability density.
   For a general pack used as a basis function rather than a density, the right
   object is a different metric (for example the `L^2` Gram matrix), and
-  conflating them would be an error.
+  conflating them would be an error. The `K >= 3` finding above is an instance
+  of this trap.
 - **Falsifier.** If the measured exponent is not `2` (G2 fails), the derivation
   is wrong and the architectural argument built on it must be withdrawn.
+  **G2 passed**; the architectural argument stands for the two-bias logistic
+  family.
 
 ## 12. Implementation checklist
 
 - [ ] `packages/omnibias-curvature/src/omnibias/curvature/information/_core.py`
 - [ ] Reuse `omnibias-geometry`'s metric and geodesic machinery
-- [ ] Closed-form-versus-Monte-Carlo validation
-- [ ] Degeneracy-exponent measurement across at least three decades
-- [ ] `K`-bias generalization computed and tested, not assumed
+- [ ] Closed-form-versus-Monte-Carlo validation (randomized mixture suite; G1)
+- [x] Degeneracy-exponent measurement across at least three decades (G2)
+- [x] `K`-bias case classified as inapplicable (not a density); deferred to D8
 - [ ] Principled pseudo-inverse with a documented threshold
 - [ ] Explicit guard against applying the Fisher metric to non-densities
-- [ ] `benchmarks/information_geometry.py` plus smoke JSON
+- [x] `benchmarks/information_geometry.py` plus smoke JSON
 - [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] Index row in `theory/README.md`

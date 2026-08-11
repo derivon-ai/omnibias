@@ -165,6 +165,135 @@ def gates_block(entries: list[dict[str, Any]]) -> dict[str, Any]:
     }
 
 
+def require_scaling_exponent(
+    x: Any,
+    y: Any,
+    *,
+    expected: float,
+    tol: float,
+    min_decades: float,
+    name: str = "scaling_exponent",
+) -> dict[str, Any]:
+    """Require the log-log slope of ``y`` vs ``x`` to match ``expected``.
+
+    Raises if the sweep spans fewer than ``min_decades`` decades, if any value
+    is non-positive / non-finite, or if ``|fitted - expected| > tol``. Reports
+    decades, ``n_points`` and ``r2`` in the verdict but never gates them.
+    """
+    xs = np.asarray(x, dtype=float).reshape(-1)
+    ys = np.asarray(y, dtype=float).reshape(-1)
+    if xs.shape != ys.shape:
+        raise ValueError(f"{name}: x/y shape mismatch {xs.shape} vs {ys.shape}")
+    if xs.size < 2:
+        raise AssertionError(f"{name}: need at least two points to fit a slope")
+    if not (np.isfinite(xs).all() and np.isfinite(ys).all()):
+        raise AssertionError(f"{name}: non-finite values in x or y")
+    if np.any(xs <= 0.0) or np.any(ys <= 0.0):
+        raise AssertionError(f"{name}: all x and y must be strictly positive")
+    decades = float(np.log10(float(np.max(xs)) / float(np.min(xs))))
+    if decades < float(min_decades):
+        raise AssertionError(
+            f"{name}: sweep spans {decades:.4f} decades < min_decades={min_decades}"
+        )
+    log_x = np.log(xs)
+    log_y = np.log(ys)
+    slope, intercept = np.polyfit(log_x, log_y, 1)
+    fitted = float(slope)
+    pred = intercept + slope * log_x
+    ss_res = float(np.sum((log_y - pred) ** 2))
+    ss_tot = float(np.sum((log_y - float(np.mean(log_y))) ** 2))
+    r2 = 1.0 - ss_res / ss_tot if ss_tot > 0.0 else 1.0
+    err = abs(fitted - float(expected))
+    passed = bool(err <= float(tol))
+    verdict = {
+        "name": name,
+        "fitted_exponent": fitted,
+        "expected": float(expected),
+        "abs_error": err,
+        "tol": float(tol),
+        "decades": decades,
+        "min_decades": float(min_decades),
+        "n_points": int(xs.size),
+        "r2": float(r2),
+        "passed": passed,
+    }
+    if not passed:
+        raise AssertionError(
+            f"{name}: fitted exponent {fitted:.6f} differs from "
+            f"{expected} by {err:.6f} > tol={tol}"
+        )
+    return verdict
+
+
+def require_rel_error(
+    measured: float,
+    expected: float,
+    *,
+    max_rel: float,
+    name: str = "rel_error",
+) -> dict[str, Any]:
+    """Require ``|measured - expected| / |expected| <= max_rel`` for scalars."""
+    m = float(measured)
+    e = float(expected)
+    if not (np.isfinite(m) and np.isfinite(e)):
+        raise AssertionError(f"{name}: non-finite measured or expected")
+    if abs(e) < 1e-30:
+        raise ValueError(f"{name}: expected near zero; pick a nontrivial reference")
+    rel = abs(m - e) / abs(e)
+    passed = bool(rel <= float(max_rel))
+    verdict = {
+        "name": name,
+        "measured": m,
+        "expected": e,
+        "rel_error": float(rel),
+        "max_rel": float(max_rel),
+        "passed": passed,
+    }
+    if not passed:
+        raise AssertionError(
+            f"{name}: rel_error={rel:.4e} exceeds max_rel={max_rel:.4e}"
+        )
+    return verdict
+
+
+def require_within_stderr(
+    measured: float,
+    reference: float,
+    stderr: float,
+    *,
+    max_sigmas: float = 3.0,
+    name: str = "within_stderr",
+) -> dict[str, Any]:
+    """Require ``|measured - reference| <= max_sigmas * stderr``."""
+    m = float(measured)
+    r = float(reference)
+    se = float(stderr)
+    if not (np.isfinite(m) and np.isfinite(r) and np.isfinite(se)):
+        raise AssertionError(f"{name}: non-finite measured, reference, or stderr")
+    if se < 0.0:
+        raise ValueError(f"{name}: stderr must be non-negative")
+    if se == 0.0:
+        sigmas = 0.0 if abs(m - r) == 0.0 else float("inf")
+    else:
+        sigmas = abs(m - r) / se
+    passed = bool(sigmas <= float(max_sigmas))
+    verdict = {
+        "name": name,
+        "measured": m,
+        "reference": r,
+        "stderr": se,
+        "sigmas": float(sigmas),
+        "max_sigmas": float(max_sigmas),
+        "passed": passed,
+    }
+    if not passed:
+        raise AssertionError(
+            f"{name}: |measured-reference|/stderr = {sigmas:.4f} "
+            f"> max_sigmas={max_sigmas}"
+        )
+    return verdict
+
+
 # Published CCF self-similar lambda digits (DeepMind arXiv:2509.14185).
 CCF_LAMBDA_1ST_UNSTABLE = 0.6057
 CCF_LAMBDA_2ND_UNSTABLE = 0.4703
@@ -322,6 +451,7 @@ def ipm_boussinesq_scaffold_gates(
 
 
 __all__ = [
+    "BOUSSINESQ_SCAFFOLD_RESIDUAL_GATE",
     "CCF_LAMBDA_1ST_UNSTABLE",
     "CCF_LAMBDA_2ND_UNSTABLE",
     "CCF_RESIDUAL_GATE_1ST_UNSTABLE",
@@ -329,7 +459,6 @@ __all__ = [
     "CCF_RESIDUAL_GATE_STABLE",
     "CCF_STRETCH_RESIDUAL_GATE",
     "IPM_SCAFFOLD_RESIDUAL_GATE",
-    "BOUSSINESQ_SCAFFOLD_RESIDUAL_GATE",
     "ccf_absolute_gates",
     "ccf_lambda_digits_gate",
     "ccf_residual_gate",
@@ -338,7 +467,10 @@ __all__ = [
     "mse",
     "rel_l2",
     "require_reference_valid",
+    "require_rel_error",
     "require_rel_l2",
+    "require_scaling_exponent",
     "require_skill",
+    "require_within_stderr",
     "skill_score",
 ]
