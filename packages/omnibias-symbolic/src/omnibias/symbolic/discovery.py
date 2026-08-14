@@ -261,6 +261,10 @@ class NeuralJetDiscoverer:
     alphas: tuple[float, ...] = (1e-10, 1e-8, 1e-6, 1e-4)
     thresholds: tuple[float, ...] = (1e-7, 1e-5, 1e-4, 1e-3)
     complexity_weight: float = 2e-3
+    #: Include the independent variable ``x`` in the polynomial library. Default
+    #: ``True`` preserves existing callers. Set ``False`` when ``x`` is collinear
+    #: with ``y`` on a short interval (per-leaf ODE identities ``dy ≈ c y``).
+    include_x: bool = True
     #: Probability-operator features: CDF bases mixed into the jet library. Empty
     #: (the default) keeps the pure polynomial behaviour; set e.g.
     #: ``("sigmoid", "tanh")`` to also discover saturating differential laws.
@@ -368,16 +372,19 @@ class NeuralJetDiscoverer:
                 train,
                 lhs_order=lhs_order,
                 max_degree=self.max_library_degree,
+                include_x=self.include_x,
             )
             val_design, _ = build_jet_relation_library(
                 val,
                 lhs_order=lhs_order,
                 max_degree=self.max_library_degree,
+                include_x=self.include_x,
             )
             test_design, _ = build_jet_relation_library(
                 test,
                 lhs_order=lhs_order,
                 max_degree=self.max_library_degree,
+                include_x=self.include_x,
             )
             if self.cdf_feature_bases:
                 per_locs, per_scales = fit_jet_cdf_plan(
@@ -528,13 +535,19 @@ class NeuralJetDiscoverer:
             # the residual_mi objective).
             val_feat = np.stack(
                 _jet_relation_variables(
-                    val, lhs_order=lhs_order, include_x=True, lower_order_only=True
+                    val,
+                    lhs_order=lhs_order,
+                    include_x=self.include_x,
+                    lower_order_only=True,
                 )[0],
                 axis=1,
             )
             test_feat = np.stack(
                 _jet_relation_variables(
-                    test, lhs_order=lhs_order, include_x=True, lower_order_only=True
+                    test,
+                    lhs_order=lhs_order,
+                    include_x=self.include_x,
+                    lower_order_only=True,
                 )[0],
                 axis=1,
             )

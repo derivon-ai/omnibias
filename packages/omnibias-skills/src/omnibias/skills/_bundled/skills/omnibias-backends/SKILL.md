@@ -46,8 +46,10 @@ backend imports the coefficients from `omnibias.core.polynomials`.
 - **`n < 0` raises `ValueError`; genuinely unimplemented orders raise `NotImplementedError`.** Catch them; do not paper over the contract.
 - **A jet only carries partials up to the order you request.** Ask for `order=2` for a Hessian, `order=3` for third derivatives; higher orders cost nothing extra per point but must be requested.
 - **Keras uses `keras.ops.*` only** and is backend-agnostic; select the backend with `KERAS_BACKEND=jax|tensorflow|torch`.
+- **Tab heads as layers.** `as_head(z, kind)` moves the head to `z.device` / `z.dtype`; logits are `(..., k)`. Keras tab layers live in `omnibias.tab.keras` (not `omnibias-keras`) and use `keras.ops`; `learnable_beta` on `ArrangementBoosted` is member-`beta` (ensemble `learning_rate` / `base` stay frozen). Equinox wrappers are an optional `[equinox]` extra (`omnibias.tab.jax.equinox_head`); tab CI **fails** if the extra is missing when `CI` is set (local `importorskip`).
 
 ## More detail
 
-- API: [torch](https://github.com/derivon-ai/omnibias/blob/main/docs/api/torch.md), [jax](https://github.com/derivon-ai/omnibias/blob/main/docs/api/jax.md), [core](https://github.com/derivon-ai/omnibias/blob/main/docs/api/core.md)
+- API: [torch](https://github.com/derivon-ai/omnibias/blob/main/docs/api/torch.md), [jax](https://github.com/derivon-ai/omnibias/blob/main/docs/api/jax.md), [core](https://github.com/derivon-ai/omnibias/blob/main/docs/api/core.md), [tab](https://github.com/derivon-ai/omnibias/blob/main/docs/api/tab.md)
+- Cookbook: [tab as a layer](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/tab-as-layer.md)
 - Theory: [closed-form derivatives](https://github.com/derivon-ai/omnibias/blob/main/docs/theory.md); [activation dictionary](https://github.com/derivon-ai/omnibias/blob/main/docs/activations.md)

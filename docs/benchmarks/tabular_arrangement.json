@@ -1,6 +1,6 @@
 {
   "schema": "tabular-arrangement-v1",
-  "generated_utc": "2026-08-11T17:23:06Z",
+  "generated_utc": "2026-08-13T19:48:54Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -29,19 +29,32 @@
     "lightgbm_grid_size": 32,
     "lightgbm_n_estimators_max": 4000,
     "lightgbm_early_stopping_rounds": 50,
+    "arrangement_patience": 50,
     "arrangement_budget": {
       "oblique_xor": {
         "restarts": 8,
-        "steps": 600,
+        "steps": 5000,
         "l1": 0.0,
-        "beta_final": 64.0
+        "beta_final": 64.0,
+        "patience": 50,
+        "min_delta": 0.0001
       },
       "axis_and": {
         "restarts": 4,
-        "steps": 400,
+        "steps": 5000,
         "l1": 0.02,
-        "beta_final": 128.0
+        "beta_final": 128.0,
+        "patience": 50,
+        "min_delta": 0.0001
       }
+    },
+    "fair_protocol": {
+      "train_on": "Xtr",
+      "early_stop_on": "Xva",
+      "score_on": "Xte",
+      "no_train_val_refit": true,
+      "arrangement_stop_metric": "val_bce",
+      "lightgbm_stop_metric": "binary_logloss"
     },
     "tier": "full",
     "smoke_is_wiring_gate": false,
@@ -49,10 +62,10 @@
     "g3_earned": false,
     "g4_earned": false
   },
-  "rss_mb_at_start": 813.96,
+  "rss_mb_at_start": 814.33,
   "baseline": {
     "name": "tuned LightGBM (val-selected grid + early stopping)",
-    "note": "num_leaves x learning_rate x min_child_samples x max_depth; n_estimators via early stopping up to 4000; refit on train+val"
+    "note": "num_leaves x learning_rate x min_child_samples x max_depth; n_estimators via early stopping up to 4000; train on Xtr only (no train+val refit); arrangement early-stops on val BCE with the same patience and no train+val refit"
   },
   "seeds": [
     0,
@@ -66,12 +79,12 @@
     "per_seed": [
       {
         "seed": 0,
-        "arrangement_accuracy": 0.998,
-        "lightgbm_accuracy": 0.8485,
-        "margin": 0.14949999999999997,
-        "abs_margin": 0.14949999999999997,
-        "arrangement_auc": 0.9999747203757563,
-        "lightgbm_auc": 0.9169159869607698,
+        "arrangement_accuracy": 0.9995,
+        "lightgbm_accuracy": 0.838,
+        "margin": 0.1615000000000001,
+        "abs_margin": 0.1615000000000001,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 0.8989118385744315,
         "majority_class_rate": 0.7284999999999999,
         "obliqueness_diagnostic": 1.0170345906483573,
         "lightgbm_config": {
@@ -84,20 +97,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.843,
+          "train_val_gap": 0.15700000000000003,
+          "best_iteration": 167,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.99890625,
-          "val_acc": 0.998125,
+          "train_acc": 0.9998333333333334,
+          "val_acc": 0.9985,
+          "train_bce": 0.0040250757382732745,
+          "val_bce": 0.006805726974395446,
+          "train_val_gap": 0.0013333333333332975,
+          "steps_run": 575,
+          "best_step": 525,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 8,
-          "W_l1": 39.4012963556272,
+          "W_l1": 24.72004148579395,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.6847640247970693,
-            "mean_gap": 0.00236540029091519,
+            "max_gap": 0.9189487522730427,
+            "mean_gap": 0.005859492341919582,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.6847640247970692,
+            "measured_max": 0.9189487522730428,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -112,12 +139,12 @@
       },
       {
         "seed": 1,
-        "arrangement_accuracy": 0.9965,
-        "lightgbm_accuracy": 0.857,
-        "margin": 0.13950000000000007,
-        "abs_margin": 0.13950000000000007,
-        "arrangement_auc": 0.9999757624477504,
-        "lightgbm_auc": 0.9416248653048529,
+        "arrangement_accuracy": 0.9985,
+        "lightgbm_accuracy": 0.8515,
+        "margin": 0.14700000000000002,
+        "abs_margin": 0.14700000000000002,
+        "arrangement_auc": 0.9999767723457608,
+        "lightgbm_auc": 0.9383669343233026,
         "majority_class_rate": 0.5495,
         "obliqueness_diagnostic": 0.9719501335707924,
         "lightgbm_config": {
@@ -130,20 +157,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
-        "arrangement": {
+        "lightgbm": {
           "train_acc": 1.0,
-          "val_acc": 0.999375,
+          "val_acc": 0.8625,
+          "train_val_gap": 0.13749999999999996,
+          "best_iteration": 436,
+          "stopped_early": true
+        },
+        "arrangement": {
+          "train_acc": 0.9998333333333334,
+          "val_acc": 0.9985,
+          "train_bce": 0.0017689921032928932,
+          "val_bce": 0.005057418789468941,
+          "train_val_gap": 0.0013333333333332975,
+          "steps_run": 685,
+          "best_step": 635,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 8,
-          "W_l1": 30.09485648849925,
+          "W_l1": 16.979030964956213,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.9934305459460887,
-            "mean_gap": 0.0071767954296483435,
+            "max_gap": 0.9177947806152021,
+            "mean_gap": 0.011192580675303364,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.9934305459460888,
+            "measured_max": 0.917794780615202,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -158,12 +199,12 @@
       },
       {
         "seed": 2,
-        "arrangement_accuracy": 0.9995,
-        "lightgbm_accuracy": 0.87,
-        "margin": 0.12950000000000006,
-        "abs_margin": 0.12950000000000006,
-        "arrangement_auc": 1.0,
-        "lightgbm_auc": 0.9497114341681372,
+        "arrangement_accuracy": 0.999,
+        "lightgbm_accuracy": 0.8575,
+        "margin": 0.14149999999999996,
+        "abs_margin": 0.14149999999999996,
+        "arrangement_auc": 0.999997976396691,
+        "lightgbm_auc": 0.9442122921759402,
         "majority_class_rate": 0.554,
         "obliqueness_diagnostic": 0.967805090276267,
         "lightgbm_config": {
@@ -176,20 +217,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.8685,
+          "train_val_gap": 0.13149999999999995,
+          "best_iteration": 1056,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.999375,
-          "val_acc": 0.999375,
+          "train_acc": 0.9981666666666666,
+          "val_acc": 0.998,
+          "train_bce": 0.008680663841372513,
+          "val_bce": 0.00515052566159083,
+          "train_val_gap": 0.0001666666666666483,
+          "steps_run": 780,
+          "best_step": 730,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 8,
-          "W_l1": 30.4985290065434,
+          "W_l1": 20.819275588186528,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.9585005004194921,
-            "mean_gap": 0.0036009412681731407,
+            "max_gap": 0.999412423538126,
+            "mean_gap": 0.005114541085931594,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.958500500419492,
+            "measured_max": 0.9994124235381259,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -204,12 +259,12 @@
       },
       {
         "seed": 3,
-        "arrangement_accuracy": 0.9955,
-        "lightgbm_accuracy": 0.846,
-        "margin": 0.14950000000000008,
-        "abs_margin": 0.14950000000000008,
-        "arrangement_auc": 0.9992967118118725,
-        "lightgbm_auc": 0.9318684303618354,
+        "arrangement_accuracy": 0.9975,
+        "lightgbm_accuracy": 0.8475,
+        "margin": 0.15000000000000002,
+        "abs_margin": 0.15000000000000002,
+        "arrangement_auc": 0.9999705208543899,
+        "lightgbm_auc": 0.9244733761202075,
         "majority_class_rate": 0.612,
         "obliqueness_diagnostic": 0.9893747445852062,
         "lightgbm_config": {
@@ -222,22 +277,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.8455,
+          "train_val_gap": 0.15449999999999997,
+          "best_iteration": 310,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.99875,
-          "val_acc": 0.99875,
+          "train_acc": 0.9988333333333334,
+          "val_acc": 0.9985,
+          "train_bce": 0.004924097171562005,
+          "val_bce": 0.005906630793342639,
+          "train_val_gap": 0.0003333333333332966,
+          "steps_run": 530,
+          "best_step": 480,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 8,
-          "W_l1": 35.1932767729079,
+          "W_l1": 20.849300415413236,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.9548117887331762,
-            "mean_gap": 0.005370916084605227,
+            "max_gap": 0.9798249403087821,
+            "mean_gap": 0.009468029089566189,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.9548117887331764,
+            "measured_max": 0.9798249403087822,
             "is_sound": true,
-            "soft_hard_agree": 1.0
+            "soft_hard_agree": 0.9995
           }
         },
         "meta": {
@@ -250,12 +319,12 @@
       },
       {
         "seed": 4,
-        "arrangement_accuracy": 0.998,
-        "lightgbm_accuracy": 0.8405,
-        "margin": 0.15749999999999997,
-        "abs_margin": 0.15749999999999997,
-        "arrangement_auc": 0.9999947828845223,
-        "lightgbm_auc": 0.9231247600126881,
+        "arrangement_accuracy": 0.9975,
+        "lightgbm_accuracy": 0.8395,
+        "margin": 0.15800000000000003,
+        "abs_margin": 0.15800000000000003,
+        "arrangement_auc": 0.9999801749611846,
+        "lightgbm_auc": 0.9209481794353829,
         "majority_class_rate": 0.602,
         "obliqueness_diagnostic": 0.9946535060662142,
         "lightgbm_config": {
@@ -268,22 +337,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.8425,
+          "train_val_gap": 0.15749999999999997,
+          "best_iteration": 730,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.99796875,
-          "val_acc": 1.0,
+          "train_acc": 0.9993333333333333,
+          "val_acc": 0.999,
+          "train_bce": 0.003832935668660017,
+          "val_bce": 0.003918971322706325,
+          "train_val_gap": 0.0003333333333332966,
+          "steps_run": 535,
+          "best_step": 485,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 8,
-          "W_l1": 34.14164071321793,
+          "W_l1": 21.65828866783634,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.9784658332814473,
-            "mean_gap": 0.00500679024590967,
+            "max_gap": 0.8255902625646565,
+            "mean_gap": 0.006891540986723478,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.9784658332814473,
+            "measured_max": 0.8255902625646565,
             "is_sound": true,
-            "soft_hard_agree": 0.9995
+            "soft_hard_agree": 1.0
           }
         },
         "meta": {
@@ -306,12 +389,12 @@
     "per_seed": [
       {
         "seed": 0,
-        "arrangement_accuracy": 0.998,
-        "lightgbm_accuracy": 0.9995,
-        "margin": -0.0015000000000000568,
-        "abs_margin": 0.0015000000000000568,
-        "arrangement_auc": 0.9999916666666666,
-        "lightgbm_auc": 0.9999888888888889,
+        "arrangement_accuracy": 1.0,
+        "lightgbm_accuracy": 0.999,
+        "margin": 0.0010000000000000009,
+        "abs_margin": 0.0010000000000000009,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 0.9999916666666666,
         "majority_class_rate": 0.9,
         "obliqueness_diagnostic": 1.0011072664359861,
         "lightgbm_config": {
@@ -324,22 +407,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.999,
+          "train_val_gap": 0.0010000000000000009,
+          "best_iteration": 109,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.99984375,
-          "val_acc": 0.999375,
+          "train_acc": 0.9996666666666667,
+          "val_acc": 0.9985,
+          "train_bce": 0.0027193416393599557,
+          "val_bce": 0.0035209393370934585,
+          "train_val_gap": 0.0011666666666666492,
+          "steps_run": 345,
+          "best_step": 295,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 128.0,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 12,
-          "W_l1": 1.9442167933181267,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 1.4908507134455173,
-            "mean_gap": 0.04630911209820318,
+            "max_gap": 1.336297640527406,
+            "mean_gap": 0.04433080898548179,
             "gibbs_scale": 0.010830424696249145,
-            "measured_max": 1.2282881792369267,
+            "measured_max": 1.1245372450838105,
             "is_sound": true,
-            "soft_hard_agree": 0.997
+            "soft_hard_agree": 0.999
           }
         },
         "meta": {
@@ -375,22 +472,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
-        "arrangement": {
+        "lightgbm": {
           "train_acc": 1.0,
-          "val_acc": 0.999375,
+          "val_acc": 1.0,
+          "train_val_gap": 0.0,
+          "best_iteration": 249,
+          "stopped_early": true
+        },
+        "arrangement": {
+          "train_acc": 0.9998333333333334,
+          "val_acc": 0.9995,
+          "train_bce": 0.0030506085079103525,
+          "val_bce": 0.003378184519431515,
+          "train_val_gap": 0.0003333333333332966,
+          "steps_run": 315,
+          "best_step": 265,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 128.0,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 12,
-          "W_l1": 1.9289335452307013,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 0.9765698200203403,
-            "mean_gap": 0.043970186406225,
+            "max_gap": 1.0629572155458327,
+            "mean_gap": 0.041997665350608844,
             "gibbs_scale": 0.010830424696249145,
-            "measured_max": 0.9765632286313406,
+            "measured_max": 0.9919558806443463,
             "is_sound": true,
-            "soft_hard_agree": 0.9995
+            "soft_hard_agree": 0.999
           }
         },
         "meta": {
@@ -408,12 +519,12 @@
       },
       {
         "seed": 2,
-        "arrangement_accuracy": 0.998,
-        "lightgbm_accuracy": 0.9995,
-        "margin": -0.0015000000000000568,
-        "abs_margin": 0.0015000000000000568,
-        "arrangement_auc": 1.0,
-        "lightgbm_auc": 0.9999888392545738,
+        "arrangement_accuracy": 0.9975,
+        "lightgbm_accuracy": 0.9985,
+        "margin": -0.0010000000000000009,
+        "abs_margin": 0.0010000000000000009,
+        "arrangement_auc": 0.9999944196272869,
+        "lightgbm_auc": 0.9967884955036147,
         "majority_class_rate": 0.9005,
         "obliqueness_diagnostic": 0.9997217971901516,
         "lightgbm_config": {
@@ -426,22 +537,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.999,
+          "train_val_gap": 0.0010000000000000009,
+          "best_iteration": 106,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.9996875,
-          "val_acc": 1.0,
+          "train_acc": 1.0,
+          "val_acc": 0.999,
+          "train_bce": 0.0020504844669214832,
+          "val_bce": 0.0026885918475062715,
+          "train_val_gap": 0.0010000000000000009,
+          "steps_run": 390,
+          "best_step": 340,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 128.0,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 12,
-          "W_l1": 1.9647648078473086,
+          "W_l1": 2.0074315962749667,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 1.837570554615283,
-            "mean_gap": 0.05107063107825445,
+            "max_gap": 1.5110981103528291,
+            "mean_gap": 0.050072806647655066,
             "gibbs_scale": 0.010830424696249145,
-            "measured_max": 1.4175009513304584,
+            "measured_max": 1.2279441407993037,
             "is_sound": true,
-            "soft_hard_agree": 0.9985
+            "soft_hard_agree": 0.9995
           }
         },
         "meta": {
@@ -460,11 +585,11 @@
       {
         "seed": 3,
         "arrangement_accuracy": 0.9995,
-        "lightgbm_accuracy": 0.999,
-        "margin": 0.000500000000000056,
-        "abs_margin": 0.000500000000000056,
-        "arrangement_auc": 0.999997064487342,
-        "lightgbm_auc": 0.9999941289746841,
+        "lightgbm_accuracy": 0.998,
+        "margin": 0.0015000000000000568,
+        "abs_margin": 0.0015000000000000568,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 0.9999677093607627,
         "majority_class_rate": 0.906,
         "obliqueness_diagnostic": 1.0022231485341115,
         "lightgbm_config": {
@@ -477,22 +602,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
-        "arrangement": {
+        "lightgbm": {
           "train_acc": 1.0,
-          "val_acc": 0.99875,
+          "val_acc": 0.999,
+          "train_val_gap": 0.0010000000000000009,
+          "best_iteration": 59,
+          "stopped_early": true
+        },
+        "arrangement": {
+          "train_acc": 0.9991666666666666,
+          "val_acc": 1.0,
+          "train_bce": 0.0024361495777622507,
+          "val_bce": 0.0020014132908373725,
+          "train_val_gap": -0.0008333333333333526,
+          "steps_run": 330,
+          "best_step": 280,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 128.0,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 12,
-          "W_l1": 1.9242093770363673,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 1.129228783131602,
-            "mean_gap": 0.0456257594675776,
+            "max_gap": 1.1375945301066477,
+            "mean_gap": 0.04403466580307008,
             "gibbs_scale": 0.010830424696249145,
-            "measured_max": 1.0053741551691524,
+            "measured_max": 1.0050717507156237,
             "is_sound": true,
-            "soft_hard_agree": 0.9975
+            "soft_hard_agree": 0.9995
           }
         },
         "meta": {
@@ -511,11 +650,11 @@
       {
         "seed": 4,
         "arrangement_accuracy": 0.9995,
-        "lightgbm_accuracy": 0.9995,
-        "margin": 0.0,
-        "abs_margin": 0.0,
-        "arrangement_auc": 0.9999970504172185,
-        "lightgbm_auc": 0.999994100834437,
+        "lightgbm_accuracy": 1.0,
+        "margin": -0.0004999999999999449,
+        "abs_margin": 0.0004999999999999449,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 1.0,
         "majority_class_rate": 0.9065,
         "obliqueness_diagnostic": 0.9930671103716029,
         "lightgbm_config": {
@@ -528,20 +667,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.9985,
+          "train_val_gap": 0.0014999999999999458,
+          "best_iteration": 198,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.99984375,
-          "val_acc": 0.99875,
+          "train_acc": 0.9991666666666666,
+          "val_acc": 0.9995,
+          "train_bce": 0.0026275240341932654,
+          "val_bce": 0.0029904267745897227,
+          "train_val_gap": -0.00033333333333340764,
+          "steps_run": 345,
+          "best_step": 295,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 128.0,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 12,
-          "W_l1": 1.9458507360919817,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 1.0496097141574636,
-            "mean_gap": 0.04437774480571564,
+            "max_gap": 1.0029952183871436,
+            "mean_gap": 0.04269554459542096,
             "gibbs_scale": 0.010830424696249145,
-            "measured_max": 0.9967326030218462,
+            "measured_max": 0.9972295350267921,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -578,11 +731,11 @@
         "n_seeds": 5,
         "min_seeds": 5,
         "values": [
-          0.14949999999999997,
-          0.13950000000000007,
-          0.12950000000000006,
-          0.14950000000000008,
-          0.15749999999999997
+          0.1615000000000001,
+          0.14700000000000002,
+          0.14149999999999996,
+          0.15000000000000002,
+          0.15800000000000003
         ],
         "deviations": [
           0.0,
@@ -600,7 +753,7 @@
         ],
         "worst_seed": 0,
         "worst_index": 0,
-        "worst_value": 0.14949999999999997,
+        "worst_value": 0.1615000000000001,
         "worst_deviation": 0.0,
         "passed": true
       },
@@ -613,18 +766,18 @@
         "n_seeds": 5,
         "min_seeds": 5,
         "values": [
-          0.0015000000000000568,
+          0.0010000000000000009,
           0.0,
+          0.0010000000000000009,
           0.0015000000000000568,
-          0.000500000000000056,
-          0.0
+          0.0004999999999999449
         ],
         "deviations": [
-          0.0015000000000000568,
+          0.0010000000000000009,
           0.0,
+          0.0010000000000000009,
           0.0015000000000000568,
-          0.000500000000000056,
-          0.0
+          0.0004999999999999449
         ],
         "seeds": [
           0,
@@ -633,8 +786,8 @@
           3,
           4
         ],
-        "worst_seed": 0,
-        "worst_index": 0,
+        "worst_seed": 3,
+        "worst_index": 3,
         "worst_value": 0.0015000000000000568,
         "worst_deviation": 0.0015000000000000568,
         "passed": true
@@ -672,5 +825,5 @@
     "mathlib_verified": false,
     "licensed_sentence": "on the constructed oblique XOR dataset the H=2 soft hyperplane arrangement beats tuned LightGBM by at least 10 accuracy points over five seeds; on the constructed axis AND dataset it stays within 2 accuracy points"
   },
-  "wall_seconds": 280.896
+  "wall_seconds": 367.633
 }

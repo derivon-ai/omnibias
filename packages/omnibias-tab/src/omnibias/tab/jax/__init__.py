@@ -4,6 +4,12 @@
 
 from __future__ import annotations
 
+from omnibias.tab.jax.arrangement import arrangement_forward, boosted_forward
+from omnibias.tab.jax.jet import (
+    extract_arrangement_jet,
+    extract_tree_jet,
+    extract_tree_jet_directional,
+)
 from omnibias.tab.jax.model import (
     fit_natural_gradient,
     forward,
@@ -12,6 +18,11 @@ from omnibias.tab.jax.model import (
 )
 
 __all__ = [
+    "arrangement_forward",
+    "boosted_forward",
+    "extract_arrangement_jet",
+    "extract_tree_jet",
+    "extract_tree_jet_directional",
     "fit_natural_gradient",
     "forward",
     "forward_arrays",

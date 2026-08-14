@@ -38,7 +38,9 @@ uv run python docs/img/generate_figures.py
 | `hard_conditions_solver.py` | `docs/benchmarks/hard_conditions_solver.json` | Poisson / heat / wave with boundary + initial conditions absorbed into the ansatz vs kept as loss terms, at identical architecture / budget / seed over 5 seeds; reports boundary violation and interior relative L2 |
 | `information_geometry.py` | `docs/benchmarks/information_geometry_smoke.json` / `information_geometry.json` | Wave-0 falsifier A6 (04-01 G2): Fisher `G_{delta,delta}` exponent `2.00 +- 0.02` and prefactor `1/720` for the two-bias logistic pack vs Monte Carlo Fisher |
 | `inverse_imaging.py` | `docs/benchmarks/inverse_imaging_smoke.json` / `inverse_imaging.json` | Wave-0 falsifier A7 (05-01 G7): locally-seeded scan localization `sd(tau_hat) ~ alpha^(n - 5/2)` for `n in {3, 4}` over 5 seeds; global search earned for n=3 only; G1–G6 unearned |
-| `tabular_arrangement.py` | `docs/benchmarks/tabular_arrangement_smoke.json` / `tabular_arrangement.json` | Wave-0 falsifier A4 (05-02 G1/G2): H=2 arrangement vs tuned LightGBM on constructed oblique XOR / axis AND; G3–G7 unearned |
+| `tabular_arrangement.py` | `docs/benchmarks/tabular_arrangement_smoke.json` / `tabular_arrangement.json` | Wave-0 falsifier A4 (05-02 G1/G2): H=2 arrangement vs tuned LightGBM on constructed oblique XOR / axis AND; fair early-stop protocol (train Xtr, stop Xva, score Xte, no train+val refit) |
+| `tabular_arrangement_public.py` | `docs/benchmarks/tabular_arrangement_public_smoke.json` / `tabular_arrangement_public.json` | 05-02 G3: same fair protocol on eight public binary datasets (full win/loss table; G4 reported, not retuned) |
+| `tabular_arrangement_capacity.py` | `docs/benchmarks/tabular_arrangement_capacity_smoke.json` / `tabular_arrangement_capacity.json` | 05-02 G3b: capacity/optimizer ablations; G3 frozen; primary `boost_h2` not-worse on 4/8 (need >=6/8; unearned) |
 | `multipack_birkhoff.py` | `docs/benchmarks/multipack_birkhoff_smoke.json` | Wave-1 primitive 01-01: MultiPackUnit G1/G2/G3/G5; float64 order ceiling recorded; G4 deferred |
 
 All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries
@@ -57,11 +59,15 @@ Helpers: `require_scaling_exponent`, `require_rel_error`, `require_within_stderr
 uv run python benchmarks/information_geometry.py
 uv run python benchmarks/inverse_imaging.py
 uv run python benchmarks/tabular_arrangement.py
+uv run python benchmarks/tabular_arrangement_public.py
+uv run python benchmarks/tabular_arrangement_capacity.py
 uv run python benchmarks/multipack_birkhoff.py
 # Multi-seed / multi-realization acceptance
 uv run python benchmarks/information_geometry.py --full
 uv run python benchmarks/inverse_imaging.py --full
 uv run python benchmarks/tabular_arrangement.py --full
+uv run python benchmarks/tabular_arrangement_public.py --full
+uv run python benchmarks/tabular_arrangement_capacity.py --full
 uv run python benchmarks/multipack_birkhoff.py --full
 ```
 

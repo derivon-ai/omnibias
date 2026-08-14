@@ -304,10 +304,21 @@ hardened `if w·x > t` switch conditions, packaged as a `HybridAutomaton`.
 `fit_piecewise_ode_law` is the end-to-end neural-ODE twin (recovering both laws
 and the switch surface of a switched dynamical system).
 
-**Honesty label.** STLSQ stays numpy / non-differentiable (a differentiable
-piecewise-discovery path is future work); the `beta -> inf` hardened switch is
-the feasibility / temperature sense of "collapse", never the founding
-`delta -> 0` bias collapse. Per-region laws are validated on held-out data.
+**Honesty label.** STLSQ polish stays numpy / non-differentiable; **gates and
+per-cell coefficients** are differentiable (Adam on the soft-weighted residual
+``F = sum_l w_l(x) (xi_l · phi(u))``, then harden + STLSQ). The `beta -> inf`
+hardened switch is the feasibility / temperature sense of "collapse", never the
+founding `delta -> 0` bias collapse. Per-region laws are validated on held-out
+data. Vector systems share gates and print `k` formulas in `report()`;
+`fit_learned_piecewise_ode` learns those gates (no oracle partition). A
+depth-1 SoftTree or `H=1` Arrangement trained on the trajectory's
+finite-difference `du` can be hardened via `tree_params` /
+`arrangement_params` from the **fitted** split and fed to
+`fit_piecewise_law` on a field jet -- that is a tab head, not the
+learned-gate ansatz. The Arrangement constructor is **unplanted** (random
+`W`, no `e_0` axis init); that path does not call `_refine_split_threshold`.
+STLSQ still uses the field jet. Recipe:
+[`cookbook/piecewise-hybrid-automaton.md`](../cookbook/piecewise-hybrid-automaton.md).
 
 ::: omnibias.symbolic.piecewise
     options:
@@ -318,8 +329,10 @@ the feasibility / temperature sense of "collapse", never the founding
         - HybridAutomaton
         - fit_piecewise_law
         - fit_piecewise_ode_law
+        - fit_learned_piecewise_ode
         - global_sparse_law
         - polynomial_value_library
+        - polynomial_vector_library
 
 ## Differential geometry
 

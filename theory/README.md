@@ -158,7 +158,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | Spec | Status | One line |
 |---|---|---|
 | [05-01 inverse problems and imaging](05-applications/01-inverse-problems-and-imaging.md) | gated | Where interfaces are and what kind of jump they carry; G7 earned for locally-seeded estimator (`sd ~ alpha^(n-5/2)`); global search earned for n=3 only |
-| [05-02 beyond-PDE applications](05-applications/02-beyond-pde-applications.md) | gated | Tabular arrangements (G1/G2 earned), implicit shapes, causal transverse filters (G5 unearned) |
+| [05-02 beyond-PDE applications](05-applications/02-beyond-pde-applications.md) | gated | Tabular arrangements (G1/G2/G3 earned; G4 reported unearned), implicit shapes, causal transverse filters (G5 unearned) |
 
 ### 06 Program
 
@@ -205,5 +205,5 @@ section 12. Ambiguous outcomes count as failure.
 |---|---|---|---|
 | A6 | 04-01 G2 (`G_{delta,delta}` exponent `2.00 +- 0.02`, prefactor `1/720`) | [`docs/benchmarks/information_geometry.json`](../docs/benchmarks/information_geometry.json) | **passed** — licenses D8; G1/G3–G5 unearned; `K>=3` Fisher recorded inapplicable (not a density) |
 | A7 | 05-01 G7 (`sd(tau_hat) ~ alpha^(n-5/2)`, tol `0.1`, `n in {3,4}`) | [`docs/benchmarks/inverse_imaging.json`](../docs/benchmarks/inverse_imaging.json) | **passed** (locally seeded; 5 seeds, worst-seed) — licenses smallest-alpha design rule; worst deviations `0.016` / `0.031`; global search earned for n=3 only (n=4 boundary artifact); G1–G6 unearned |
-| A4 | 05-02 G1 / G2 | [`docs/benchmarks/tabular_arrangement.json`](../docs/benchmarks/tabular_arrangement.json) | **passed** — worst-seed oblique margin `+0.1225`; axis `|margin| <= 0.0015`; G3–G7 unearned |
+| A4 | 05-02 G1 / G2 / G3 / G3b | [`docs/benchmarks/tabular_arrangement.json`](../docs/benchmarks/tabular_arrangement.json), [`docs/benchmarks/tabular_arrangement_public.json`](../docs/benchmarks/tabular_arrangement_public.json), [`docs/benchmarks/tabular_arrangement_capacity.json`](../docs/benchmarks/tabular_arrangement_capacity.json) | **passed** G1–G3 (G3 frozen W/L/T `2/5/1`); **G3b unearned** (`boost_h2` not-worse `4/8`, need `>=6/8`); G4 unearned; G5–G7 unearned |
 | A5 | 05-02 G5 | — | not run |

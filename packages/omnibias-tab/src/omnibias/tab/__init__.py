@@ -66,10 +66,13 @@ from omnibias.tab.arrangement import (
     make_oblique_xor,
     obliqueness_diagnostic,
     predict_proba_np,
+    tree_params,
 )
 from omnibias.tab.certify import (
+    ComposedCertificate,
     RoundingGapCertificate,
     TabCertificate,
+    certify_composed,
     certify_tab,
     certify_tab_gap,
 )
@@ -83,6 +86,7 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
 __lineage__ = "both"
 
 __all__ = [
+    "ComposedCertificate",
     "RoundingGapCertificate",
     "SoftTreeConfig",
     "TabCertificate",
@@ -92,6 +96,7 @@ __all__ = [
     "arrangement_params",
     "arrangement_weights",
     "certify_arrangement_gap",
+    "certify_composed",
     "certify_tab",
     "certify_tab_gap",
     "forward_np",
@@ -108,4 +113,5 @@ __all__ = [
     "predict_proba_np",
     "score_grad_hess",
     "scores_to_prob",
+    "tree_params",
 ]

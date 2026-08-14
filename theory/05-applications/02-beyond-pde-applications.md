@@ -12,8 +12,13 @@ concrete construction from them, with honest baselines that are hard to beat.
 - **Blocks**: none
 
 Wave-0 falsifier A4 (G1/G2) is recorded in
-`docs/benchmarks/tabular_arrangement.json` (`all_passed: true`). Gates G3–G7
-remain unearned; the sequence submodule is not shipped.
+`docs/benchmarks/tabular_arrangement.json` (`all_passed: true`). Gate G3
+(public win/loss table) is recorded in
+`docs/benchmarks/tabular_arrangement_public.json` and stays frozen. Gate G3b
+(capacity suite, primary `boost_h2`) is recorded in
+`docs/benchmarks/tabular_arrangement_capacity.json` (`g3b_earned: false`;
+not-worse on `4/8`). Gates G4–G7 remain unearned; the sequence submodule is
+not shipped.
 
 ## 2. Where it lands
 
@@ -222,8 +227,9 @@ implicit-surface pipeline (shapes), and a structured state-space model
 - **G1 oblique win.** On the constructed oblique dataset, the arrangement beats
   a tuned LightGBM by at least `10` accuracy points, over five seeds. **This is
   the constructed-to-win case; failing it kills the sub-application.**
-  **Earned** — see `docs/benchmarks/tabular_arrangement.json`: worst-seed
-  margin `+0.1225` (seed 2; arrangement `0.9995` vs LightGBM `0.8770`).
+  **Earned** — see `docs/benchmarks/tabular_arrangement.json` (fair early-stop
+  protocol): worst-seed margin `+0.1415` (seed 2; arrangement `0.9990` vs
+  LightGBM `0.8575`).
 - **G2 axis parity.** On the constructed axis-aligned dataset, the arrangement
   is within `2` accuracy points of LightGBM. Losing badly here means the
   optimization is broken, not that the prior is wrong.
@@ -232,11 +238,29 @@ implicit-surface pipeline (shapes), and a structured state-space model
 - **G3 real-data honesty.** On at least eight public tabular benchmarks, report
   the full win/loss table. **No aggregate-only reporting.** The expected outcome
   is that the arrangement loses on most of them, and the deliverable is the
-  characterization of which ones it wins. **Unearned.**
+  characterization of which ones it wins. Protocol: both arms train on `Xtr`,
+  early-stop + restore best on `Xva`, score `Xte` (no train+val refit);
+  arrangement stops on val BCE, LightGBM on binary logloss. **Earned** — see
+  `docs/benchmarks/tabular_arrangement_public.json`: arrangement / LightGBM /
+  tie = `2 / 5 / 1` under the fair protocol (arrangement wins on
+  `breast_cancer` and `blood_transfusion`; tie on `banknote`; LightGBM wins
+  the other five).
+- **G3b capacity (optional, remaining).** Newton-boosted H=2 arrangements
+  (`boost_h2`, predeclared) are not-worse than the **same** fair LightGBM on
+  at least `6/8` public binary sets. Ablations (`h2_newton`, `h3`/`h4`,
+  `tab_boost`, `tab_joint`) are reported; they cannot relicense the gate after
+  seeing test. G3 stays frozen. See
+  `docs/benchmarks/tabular_arrangement_capacity.json`. **Unearned** —
+  `boost_h2` not-worse on `4/8` (W/L/T `4/4/0`: wins on `breast_cancer`,
+  `banknote`, `blood_transfusion`, `sonar`). `tab_boost` is also `4/8` (no
+  relicense finding). Other arms: `h2_adam` `3/8` (matches frozen G3 `2/5/1`),
+  `h2_newton` `3/8`, `h3_adam`/`h4_adam` `4/8`, `tab_joint` `3/8`.
 - **G4 diagnostic predictiveness.** The obliqueness diagnostic predicts the
   winner on the eight benchmarks with at least `75%` accuracy, and its
-  correlation with the accuracy gap is reported. **Unearned** (diagnostic is
-  shipped and reported on the constructed sets; not gated).
+  correlation with the accuracy gap is reported. **Unearned** — frozen
+  threshold `diag > 1.0` predicts arrangement on all eight (predictiveness
+  `0.25`); `corr(diag, margin) ≈ -0.13`. Expected miss: diagnostic is linear
+  oblique only; not retuned on these datasets.
 - **G5 sequence viability.** The causal transverse filter matches a structured
   state-space baseline within `2%` on a long-range benchmark at matched
   parameter count. **If this fails, the sequence submodule is not shipped** —
@@ -275,7 +299,9 @@ implicit-surface pipeline (shapes), and a structured state-space model
   (`~0.97-1.02` vs `~0.99-1.00`); XOR is not linearly separable, so the
   dense/axis ratio cannot order those two. Artifacts record
   `obliqueness_diagnostic_discriminates: false`. Do not retune the diagnostic
-  against G1/G2 (see section 11). G4 remains unearned.
+  against G1/G2 (see section 11). On the eight public binary sets the frozen
+  `diag > 1.0` rule scores `0.25` predictiveness with
+  `corr(diag, margin) ≈ -0.09` — G4 remains unearned.
 - The arrangement's expressiveness advantage per gate is real (Zaslavsky) and
   irrelevant to most tabular data. Quoting the cell count as evidence of
   practical superiority would be misleading.
@@ -323,7 +349,12 @@ implicit-surface pipeline (shapes), and a structured state-space model
 - [x] `obliqueness_diagnostic` fixed and frozen before benchmarks are run
       (linear oblique only; does not discriminate XOR vs axis -- recorded)
 - [x] Two constructed datasets (oblique, axis) as the falsifier gates
-- [ ] Eight public benchmarks with the **full win/loss table**, no aggregates
+- [x] Eight public benchmarks with the **full win/loss table**, no aggregates
+      (`benchmarks/tabular_arrangement_public.py`; artifact
+      `docs/benchmarks/tabular_arrangement_public.json`)
+- [x] Capacity suite runner `benchmarks/tabular_arrangement_capacity.py`
+      (G3 frozen; G3b earned only if predeclared `boost_h2` is not-worse
+      on >=6/8)
 - [ ] `packages/omnibias-shape/src/omnibias/shape/topology.py` returning
       value and bound together, never value alone
 - [ ] `benchmarks/sequence_transverse.py` run **first**, with the submodule

@@ -188,6 +188,361 @@ def certify_tab(
     )
 
 
+@dataclass(frozen=True)
+class ComposedCertificate:
+    r"""Local-box certificate of ``head(encoder(x))``.
+
+    ``method`` is ``ibp+tab`` / ``verify_fused`` / ``ibp_fused`` / ``ibp+arrangement``
+    when the encoder ingests as ``Linear`` + ``ReLU`` / ``Tanh`` / ``Sigmoid`` /
+    ``GELU`` (a ``Sequential`` or a flattenable ``ModuleList`` wrapper);
+    ``tab+tab`` / ``ibp+tab+tab`` / ``arrangement+tab`` when the encoder is (or
+    ends with) a SoftTree / Arrangement whose output is enclosed by interval
+    bounds. Otherwise ``method="sampled_latent"``: the head is certified on the
+    axis-aligned hull of ``encoder`` evaluated on a grid **and** a random sample
+    of ``feature_box``. That hull is **not** a sound enclosure of ``E(box)``.
+    """
+
+    beta: float
+    method: str
+    output_bounds: tuple[tuple[float, float], ...]
+    latent_bounds: tuple[tuple[float, float], ...]
+    tab: TabCertificate | None = None
+
+
+def _box_array(ivs: tuple[object, ...] | list[object]) -> np.ndarray:
+    lo = np.array([float(iv.lo) for iv in ivs], dtype=np.float64)
+    hi = np.array([float(iv.hi) for iv in ivs], dtype=np.float64)
+    return np.stack([lo, hi])
+
+
+def _arrangement_output_intervals(
+    W: np.ndarray,
+    t: np.ndarray,
+    cell_logits: np.ndarray,
+    z_box: np.ndarray,
+    beta: float,
+) -> tuple[tuple[float, float], ...]:
+    from omnibias.core.verified import Interval
+    from omnibias.partition._core.verified import interval_weight_bounds
+    from omnibias.tab.arrangement import arrangement_params
+
+    cell = np.asarray(cell_logits, dtype=np.float64)
+    if cell.ndim == 1:
+        cell = cell.reshape(-1, 1)
+    part = arrangement_params(W, t, beta_final=float(beta))
+    w_iv = interval_weight_bounds(part, z_box, float(beta))
+    bounds: list[tuple[float, float]] = []
+    for k in range(int(cell.shape[-1])):
+        acc = Interval.point(0.0)
+        for ell, weight in enumerate(w_iv):
+            acc = acc + weight * float(cell[ell, k])
+        bounds.append((float(acc.lo), float(acc.hi)))
+    return tuple(bounds)
+
+
+_INGEST_NAMES = frozenset({"Linear", "ReLU", "Tanh", "Sigmoid", "GELU"})
+
+
+def _flatten_ingest_layers(module: object) -> list[object] | None:
+    """Linear / activation list for IBP, or ``None`` if a layer is unsupported."""
+    from torch import nn
+
+    def from_iterable(mods: list[object]) -> list[object] | None:
+        out: list[object] = []
+        for sub in mods:
+            name = type(sub).__name__
+            if name in _INGEST_NAMES:
+                out.append(sub)
+            elif isinstance(sub, (nn.Sequential, nn.ModuleList)):
+                inner = from_iterable(list(sub))
+                if inner is None:
+                    return None
+                out.extend(inner)
+            else:
+                return None
+        return out if out else None
+
+    if isinstance(module, nn.Sequential):
+        return from_iterable(list(module))
+    if isinstance(module, nn.ModuleList):
+        return from_iterable(list(module))
+    if isinstance(module, nn.Module):
+        kids = list(module.children())
+        if len(kids) == 1 and isinstance(kids[0], (nn.Sequential, nn.ModuleList)):
+            return from_iterable(list(kids[0]))
+    return None
+
+
+def _first_linear_in_features(layers: list[object]) -> int | None:
+    for sub in layers:
+        if type(sub).__name__ == "Linear" and hasattr(sub, "in_features"):
+            return int(sub.in_features)
+    return None
+
+
+def _sampled_feature_points(
+    box: np.ndarray, *, per_axis: int = 4, n_rand: int = 80, seed: int = 0
+) -> np.ndarray:
+    import itertools
+
+    d = int(box.shape[1])
+    lo = np.asarray(box[0], dtype=np.float64)
+    hi = np.asarray(box[1], dtype=np.float64)
+    axes = [np.linspace(lo[f], hi[f], per_axis) for f in range(d)]
+    grid = np.array(list(itertools.product(*axes)))
+    rng = np.random.default_rng(seed)
+    rand = rng.uniform(lo, hi, size=(n_rand, d))
+    parts = [grid, rand]
+    if d <= 10:
+        corners = np.array(list(itertools.product(*zip(lo.tolist(), hi.tolist(), strict=True))))
+        parts.append(corners)
+    return np.vstack(parts)
+
+
+def _eval_module(module: object, X: np.ndarray, *, dtype: object, device: object) -> np.ndarray:
+    import torch
+
+    xt = torch.as_tensor(np.asarray(X, dtype=np.float64), dtype=dtype, device=device)
+    with torch.no_grad():
+        z = module(xt)  # type: ignore[operator]
+    arr = z.detach().cpu().numpy()
+    if arr.ndim == 1:
+        arr = arr.reshape(-1, 1)
+    return np.asarray(arr, dtype=np.float64)
+
+
+def _unwrap_head(head: object) -> object:
+    try:
+        from omnibias.tab.torch.plugin import TabHead
+    except ImportError:
+        return head
+    if isinstance(head, TabHead):
+        return head.module
+    return head
+
+
+def _lohi_to_arr(bounds: tuple[tuple[float, float], ...]) -> np.ndarray:
+    lo = np.array([a for a, _b in bounds], dtype=np.float64)
+    hi = np.array([b for _a, b in bounds], dtype=np.float64)
+    return np.stack([lo, hi])
+
+
+def _tab_encoder_kind(module: object) -> tuple[str | None, object | None]:
+    from omnibias.tab.torch.arrangement import ArrangementClassifier
+    from omnibias.tab.torch.model import SoftTreeEnsemble
+
+    inner = _unwrap_head(module)
+    if isinstance(inner, SoftTreeEnsemble):
+        return "tab", inner
+    if isinstance(inner, ArrangementClassifier):
+        return "arrangement", inner
+    return None, None
+
+
+def _split_tab_encoder(
+    encoder: object,
+) -> tuple[list[object] | None, object | None, str | None]:
+    """Prefix ingest layers + a trailing tab module, or ``(None, None, None)``."""
+    from torch import nn
+
+    kind, mod = _tab_encoder_kind(encoder)
+    if kind is not None:
+        return None, mod, kind
+    if not isinstance(encoder, nn.Sequential):
+        return None, None, None
+    kids = list(encoder)
+    if not kids:
+        return None, None, None
+    kind, mod = _tab_encoder_kind(kids[-1])
+    if kind is None:
+        return None, None, None
+    prefix = kids[:-1]
+    if not prefix:
+        return None, mod, kind
+    layers = _flatten_ingest_layers(nn.Sequential(*prefix))
+    if layers is None:
+        return None, None, None
+    return layers, mod, kind
+
+
+def _tab_encoder_box(
+    module: object, kind: str, box: object, *, beta: float
+) -> tuple[np.ndarray, tuple[tuple[float, float], ...]]:
+    if kind == "tab":
+        ivs = interval_output_bounds(module.to_params(), box, float(beta))
+        bounds = tuple((float(iv.lo), float(iv.hi)) for iv in ivs)
+        return _box_array(ivs), bounds
+    state = module.numpy_state()
+    raw = np.asarray(box, dtype=np.float64)
+    if raw.ndim != 2 or raw.shape[0] != 2:
+        d = int(module.n_features)
+        raw = _box_array(normalize_box(box, d))
+    bounds = _arrangement_output_intervals(
+        state["W"], state["t"], state["cell_logits"], raw, float(beta)
+    )
+    return _lohi_to_arr(bounds), bounds
+
+
+def certify_composed(
+    encoder: object,
+    head: object,
+    feature_box: object,
+    *,
+    beta: float | None = None,
+    X: np.ndarray | None = None,
+    use_verify: bool = True,
+) -> ComposedCertificate:
+    r"""Certify ``head(encoder(x))`` over ``feature_box``.
+
+    Tries IBP ingest of ``Linear`` + supported activations (a ``Sequential`` or a
+    flattenable ``ModuleList`` wrapper). A trailing SoftTree / Arrangement encoder
+    is enclosed with interval output bounds (optionally after IBP of a Linear
+    prefix). On success, certifies the tab head on the latent box (depth-1
+    SoftTree may fuse a pure Linear ingest). Otherwise evaluates the encoder on a
+    grid and a random sample, takes the axis-aligned hull of ``z``, and certifies
+    the head on that hull with ``method="sampled_latent"`` — **not** a sound
+    enclosure of ``E(box)``.
+    """
+    import torch
+    from omnibias.tab._core.verified import normalize_box
+    from omnibias.tab.torch.arrangement import ArrangementClassifier
+    from omnibias.tab.torch.model import SoftTreeEnsemble
+    from omnibias.verify import interval_propagate
+    from omnibias.verify.torch import network_from_sequential
+    from torch import nn
+
+    if not isinstance(encoder, nn.Module):
+        raise TypeError(
+            f"encoder must be a torch.nn.Module, got {type(encoder).__name__}"
+        )
+    head = _unwrap_head(head)
+
+    prefix_layers, tab_enc, tab_kind = _split_tab_encoder(encoder)
+    ingest_layers = _flatten_ingest_layers(encoder)
+    d_lin = _first_linear_in_features(ingest_layers) if ingest_layers is not None else None
+    x_iv: list[object] | None = None
+    layers: list[object] | None = ingest_layers
+    enc_tag = "sampled_latent"
+
+    if tab_enc is not None:
+        mid_box: object = feature_box
+        tag_parts: list[str] = []
+        if prefix_layers is not None:
+            d_pre = _first_linear_in_features(prefix_layers)
+            if d_pre is None:
+                prefix_layers = None
+            else:
+                net_p = network_from_sequential(prefix_layers)
+                pre_iv = normalize_box(feature_box, d_pre)
+                mid = interval_propagate(net_p, pre_iv).output
+                mid_box = _box_array(mid)
+                tag_parts.append("ibp")
+        enc_beta = (
+            float(tab_enc.config.beta_final)
+            if tab_kind == "tab"
+            else float(tab_enc.beta)
+        )
+        z_arr, latent_bounds = _tab_encoder_box(
+            tab_enc, str(tab_kind), mid_box, beta=enc_beta
+        )
+        tag_parts.append(str(tab_kind))
+        enc_tag = "+".join(tag_parts)
+        layers = None
+        x_iv = None
+    elif ingest_layers is not None and d_lin is not None:
+        net = network_from_sequential(ingest_layers)
+        x_iv = normalize_box(feature_box, d_lin)
+        latent = interval_propagate(net, x_iv).output
+        z_arr = _box_array(latent)
+        latent_bounds = tuple((float(iv.lo), float(iv.hi)) for iv in latent)
+        enc_tag = "ibp"
+        layers = ingest_layers
+    else:
+        raw = np.asarray(feature_box, dtype=np.float64)
+        d_in = int(raw.shape[-1])
+        box_np = _box_array(normalize_box(feature_box, d_in))
+        pts = _sampled_feature_points(box_np)
+        try:
+            ref = next(encoder.parameters())
+            dtype, device = ref.dtype, ref.device
+        except StopIteration:
+            dtype, device = torch.float64, torch.device("cpu")
+        z = _eval_module(encoder, pts, dtype=dtype, device=device)
+        z_arr = np.stack([z.min(axis=0), z.max(axis=0)])
+        latent_bounds = tuple(
+            (float(z_arr[0, i]), float(z_arr[1, i])) for i in range(int(z_arr.shape[1]))
+        )
+
+    if isinstance(head, SoftTreeEnsemble):
+        b = float(head.config.beta_final if beta is None else beta)
+        fused_bounds: tuple[tuple[float, float], ...] | None = None
+        method = "sampled_latent" if enc_tag == "sampled_latent" else f"{enc_tag}+tab"
+        can_fuse = (
+            enc_tag == "ibp"
+            and head.config.depth == 1
+            and layers is not None
+            and x_iv is not None
+        )
+        if can_fuse:
+            try:
+                seq_head = head.to_additive_sequential(b)
+                fused = nn.Sequential(*layers, *list(seq_head.children()))
+                net_f = network_from_sequential(fused)
+                if use_verify:
+                    from omnibias.verify import reachable_box
+
+                    ob = reachable_box(net_f, x_iv)
+                    fused_bounds = tuple((float(iv.lo), float(iv.hi)) for iv in ob)
+                    method = "verify_fused"
+                else:
+                    ob = interval_propagate(net_f, x_iv).output
+                    fused_bounds = tuple((float(iv.lo), float(iv.hi)) for iv in ob)
+                    method = "ibp_fused"
+            except TypeError:
+                fused_bounds = None
+        tab_cert = certify_tab(
+            head.to_params(), z_arr, X=X, beta=b, use_verify=use_verify
+        )
+        output_bounds = fused_bounds if fused_bounds is not None else tab_cert.output_bounds
+        return ComposedCertificate(
+            beta=b,
+            method=method,
+            output_bounds=output_bounds,
+            latent_bounds=latent_bounds,
+            tab=tab_cert,
+        )
+
+    if isinstance(head, ArrangementClassifier):
+        b = float(head.beta if beta is None else beta)
+        state = head.numpy_state()
+        output_bounds = _arrangement_output_intervals(
+            state["W"], state["t"], state["cell_logits"], z_arr, b
+        )
+        if X is not None:
+            from omnibias.tab.arrangement import certify_arrangement_gap
+
+            z_np = encoder(
+                torch.as_tensor(np.asarray(X, dtype=np.float64), dtype=torch.float64)
+            )
+            _ = certify_arrangement_gap(
+                state["W"], state["t"], z_np.detach().cpu().numpy(), beta=b
+            )
+        method = (
+            "sampled_latent" if enc_tag == "sampled_latent" else f"{enc_tag}+arrangement"
+        )
+        return ComposedCertificate(
+            beta=b,
+            method=method,
+            output_bounds=output_bounds,
+            latent_bounds=latent_bounds,
+            tab=None,
+        )
+
+    raise TypeError(
+        f"head must be SoftTreeEnsemble or ArrangementClassifier, got {type(head).__name__}"
+    )
+
+
 def certify_tab_gap(
     params: TabParams,
     X: np.ndarray,
@@ -212,8 +567,10 @@ def certify_tab_gap(
 
 
 __all__ = [
+    "ComposedCertificate",
     "RoundingGapCertificate",
     "TabCertificate",
+    "certify_composed",
     "certify_tab",
     "certify_tab_gap",
 ]

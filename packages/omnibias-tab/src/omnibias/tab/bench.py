@@ -51,6 +51,42 @@ FULL_SUITE: tuple[str, ...] = (
     "higgs",
 )
 
+# Eight binary public datasets for theory 05-02 G3 (arrangement vs LightGBM).
+# Only breast_cancer is guaranteed offline; the rest use OpenML and may skip.
+ARRANGEMENT_PUBLIC_SUITE: tuple[str, ...] = (
+    "breast_cancer",
+    "adult",
+    "higgs",
+    "banknote",
+    "blood_transfusion",
+    "ionosphere",
+    "sonar",
+    "spambase",
+)
+
+# Default row caps for the arrangement public suite (None = use all rows).
+ARRANGEMENT_PUBLIC_MAX_ROWS: dict[str, int | None] = {
+    "breast_cancer": None,
+    "adult": 20_000,
+    "higgs": 20_000,
+    "banknote": None,
+    "blood_transfusion": None,
+    "ionosphere": None,
+    "sonar": None,
+    "spambase": None,
+}
+
+# OpenML (name_or_id, version) for the arrangement public suite extras.
+_OPENML_BINARY: dict[str, tuple[str, int]] = {
+    "adult": ("adult", 2),
+    "higgs": ("higgs", 1),
+    "banknote": ("banknote-authentication", 1),
+    "blood_transfusion": ("blood-transfusion-service-center", 1),
+    "ionosphere": ("ionosphere", 1),
+    "sonar": ("sonar", 1),
+    "spambase": ("spambase", 1),
+}
+
 
 @dataclass
 class Dataset:
@@ -63,8 +99,68 @@ class Dataset:
     n_outputs: int
 
 
+def _encode_openml_xy(data: Any, target: Any) -> tuple[np.ndarray, np.ndarray]:
+    """Convert OpenML ``data`` / ``target`` to float64 ``X`` and binary ``{0,1}`` ``y``.
+
+    Object / string feature columns are ordinal-encoded (sorted category order).
+    Works without pandas (``as_frame=False`` path); OpenML adult v2 already ships
+    numeric features under that path.
+    """
+    raw = np.asarray(data)
+    if raw.dtype == object or raw.dtype.kind in "OUS":
+        cols: list[np.ndarray] = []
+        for j in range(raw.shape[1]):
+            col = raw[:, j]
+            if col.dtype == object or getattr(col, "dtype", None) is not None and col.dtype.kind in "OUS":
+                # Mixed object column: try numeric, else factorize strings.
+                try:
+                    cols.append(np.asarray(col, dtype=np.float64))
+                except (TypeError, ValueError):
+                    classes, codes = np.unique(col.astype(str), return_inverse=True)
+                    cols.append(codes.astype(np.float64))
+            else:
+                cols.append(np.asarray(col, dtype=np.float64))
+        X = np.column_stack(cols)
+    else:
+        X = np.asarray(raw, dtype=np.float64)
+    X = np.nan_to_num(X, nan=0.0)
+
+    yt = np.asarray(target)
+    if yt.dtype.kind in "OU" or yt.dtype == object:
+        classes, y = np.unique(yt.astype(str), return_inverse=True)
+    else:
+        classes, y = np.unique(np.asarray(yt, dtype=np.float64), return_inverse=True)
+    if classes.size != 2:
+        raise ValueError(f"expected binary target, got {classes.size} classes: {classes}")
+    return X, y.astype(np.float64)
+
+
+def _fetch_openml_binary(name: str) -> tuple[np.ndarray, np.ndarray]:
+    """Fetch a known OpenML binary set; raise ``RuntimeError`` on failure."""
+    if name not in _OPENML_BINARY:
+        raise ValueError(f"unknown OpenML binary dataset {name!r}")
+    oml_name, version = _OPENML_BINARY[name]
+    try:
+        from sklearn.datasets import fetch_openml
+
+        # as_frame=False keeps the dependency surface free of pandas; adult v2
+        # is already numerically encoded on this path.
+        d = fetch_openml(
+            oml_name,
+            version=version,
+            as_frame=False,
+            parser="liac-arff",
+        )
+    except Exception as exc:  # pragma: no cover - network dependent
+        raise RuntimeError(f"could not fetch OpenML {name}: {exc}") from exc
+    try:
+        return _encode_openml_xy(d.data, d.target)
+    except Exception as exc:
+        raise RuntimeError(f"could not encode OpenML {name}: {exc}") from exc
+
+
 def load_dataset(name: str, *, max_rows: int | None = None, seed: int = 0) -> Dataset:
-    r"""Load a benchmark dataset by name (see :data:`FULL_SUITE`).
+    r"""Load a benchmark dataset by name (see :data:`FULL_SUITE` / :data:`ARRANGEMENT_PUBLIC_SUITE`).
 
     ``max_rows`` optionally subsamples (deterministically, by ``seed``) for a faster loop;
     the network-only datasets raise :class:`RuntimeError` when they cannot be fetched so the
@@ -90,19 +186,12 @@ def load_dataset(name: str, *, max_rows: int | None = None, seed: int = 0) -> Da
         except Exception as exc:  # pragma: no cover - network dependent
             raise RuntimeError(f"could not fetch california_housing: {exc}") from exc
         X, y, task, k = d.data, d.target, "regression", 1
-    elif name in ("adult", "higgs"):
-        oml = {"adult": ("adult", 2), "higgs": ("higgs", 1)}[name]
-        try:
-            from sklearn.datasets import fetch_openml
-
-            d = fetch_openml(oml[0], version=1, as_frame=False, parser="liac-arff")
-        except Exception as exc:  # pragma: no cover - network dependent
-            raise RuntimeError(f"could not fetch OpenML {name}: {exc}") from exc
-        X = np.asarray(d.data, dtype=np.float64)
-        classes, y = np.unique(np.asarray(d.target), return_inverse=True)
+    elif name in _OPENML_BINARY:
+        X, y = _fetch_openml_binary(name)
         task, k = "binary", 1
     else:
-        raise ValueError(f"unknown dataset {name!r}; choose from {FULL_SUITE}")
+        known = sorted(set(FULL_SUITE) | set(ARRANGEMENT_PUBLIC_SUITE))
+        raise ValueError(f"unknown dataset {name!r}; choose from {known}")
 
     X = np.asarray(X, dtype=np.float64)
     y = np.asarray(y, dtype=np.float64)
@@ -135,6 +224,52 @@ def train_test_split(
     )
     scaler = StandardScaler().fit(Xtr)
     return scaler.transform(Xtr), scaler.transform(Xte), ytr, yte
+
+
+def train_val_test_split(
+    ds: Dataset,
+    *,
+    seed: int,
+    train_frac: float = 0.6,
+    val_frac: float = 0.2,
+) -> dict[str, np.ndarray]:
+    """Stratified 60/20/20 (by default) split with StandardScaler fit on train only.
+
+    Returns keys ``Xtr``, ``ytr``, ``Xva``, ``yva``, ``Xte``, ``yte``.
+    """
+    from sklearn.model_selection import train_test_split as _split
+    from sklearn.preprocessing import StandardScaler
+
+    if ds.task == "regression":
+        raise ValueError("train_val_test_split is for classification tasks")
+    test_frac = 1.0 - float(train_frac) - float(val_frac)
+    if test_frac <= 0.0 or train_frac <= 0.0 or val_frac <= 0.0:
+        raise ValueError("train_frac, val_frac, and test_frac must all be positive")
+    X_rest, Xte, y_rest, yte = _split(
+        ds.X,
+        ds.y,
+        test_size=test_frac,
+        random_state=seed,
+        stratify=ds.y,
+    )
+    # val share of the remaining mass
+    val_of_rest = float(val_frac) / (float(train_frac) + float(val_frac))
+    Xtr, Xva, ytr, yva = _split(
+        X_rest,
+        y_rest,
+        test_size=val_of_rest,
+        random_state=seed + 17,
+        stratify=y_rest,
+    )
+    scaler = StandardScaler().fit(Xtr)
+    return {
+        "Xtr": scaler.transform(Xtr),
+        "ytr": np.asarray(ytr, dtype=np.float64),
+        "Xva": scaler.transform(Xva),
+        "yva": np.asarray(yva, dtype=np.float64),
+        "Xte": scaler.transform(Xte),
+        "yte": np.asarray(yte, dtype=np.float64),
+    }
 
 
 # ---------------------------------------------------------------------------- #
@@ -390,6 +525,8 @@ def run_suite(
 
 
 __all__ = [
+    "ARRANGEMENT_PUBLIC_MAX_ROWS",
+    "ARRANGEMENT_PUBLIC_SUITE",
     "Dataset",
     "FULL_SUITE",
     "HeadToHead",
@@ -402,4 +539,5 @@ __all__ = [
     "run_suite",
     "score_predictions",
     "train_test_split",
+    "train_val_test_split",
 ]

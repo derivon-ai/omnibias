@@ -33,7 +33,8 @@ dependencies = ["omnibias-core>=0.2.0", "numpy>=1.24"]
 torch = ["torch>=2.0"]
 # The bit-identical jax weight twin (jit / grad / vmap traceable).
 jax = ["jax>=0.4.30", "jaxlib>=0.4.30"]
-all = ["omnibias-partition[torch,jax]"]
+keras = ["keras>=3.0"]
+all = ["omnibias-partition[torch,jax,keras]"]
 test = ["pytest>=7.0", "numpy>=1.24"]
 dev = ["omnibias-partition[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
 

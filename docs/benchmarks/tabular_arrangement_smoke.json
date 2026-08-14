@@ -1,6 +1,6 @@
 {
   "schema": "tabular-arrangement-v1",
-  "generated_utc": "2026-08-11T17:21:34Z",
+  "generated_utc": "2026-08-13T19:34:26Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -29,19 +29,30 @@
     "lightgbm_grid_size": 4,
     "lightgbm_n_estimators_max": 4000,
     "lightgbm_early_stopping_rounds": 50,
+    "arrangement_patience": 50,
     "arrangement_budget": {
       "oblique_xor": {
         "restarts": 4,
         "steps": 350,
         "l1": 0.0,
-        "beta_final": 64.0
+        "beta_final": 64.0,
+        "patience": 30
       },
       "axis_and": {
         "restarts": 2,
         "steps": 250,
         "l1": 0.02,
-        "beta_final": 128.0
+        "beta_final": 128.0,
+        "patience": 30
       }
+    },
+    "fair_protocol": {
+      "train_on": "Xtr",
+      "early_stop_on": "Xva",
+      "score_on": "Xte",
+      "no_train_val_refit": true,
+      "arrangement_stop_metric": "val_bce",
+      "lightgbm_stop_metric": "binary_logloss"
     },
     "tier": "smoke",
     "smoke_is_wiring_gate": true,
@@ -49,10 +60,10 @@
     "g3_earned": false,
     "g4_earned": false
   },
-  "rss_mb_at_start": 813.81,
+  "rss_mb_at_start": 814.38,
   "baseline": {
     "name": "tuned LightGBM (val-selected grid + early stopping)",
-    "note": "num_leaves x learning_rate x min_child_samples x max_depth; n_estimators via early stopping up to 4000; refit on train+val"
+    "note": "num_leaves x learning_rate x min_child_samples x max_depth; n_estimators via early stopping up to 4000; train on Xtr only (no train+val refit); arrangement early-stops on val BCE with the same patience and no train+val refit"
   },
   "seeds": [
     0,
@@ -66,12 +77,12 @@
     "per_seed": [
       {
         "seed": 0,
-        "arrangement_accuracy": 0.9975,
-        "lightgbm_accuracy": 0.837,
-        "margin": 0.1605000000000001,
-        "abs_margin": 0.1605000000000001,
-        "arrangement_auc": 0.9999684004696954,
-        "lightgbm_auc": 0.9137155865315219,
+        "arrangement_accuracy": 0.999,
+        "lightgbm_accuracy": 0.8365,
+        "margin": 0.16249999999999998,
+        "abs_margin": 0.16249999999999998,
+        "arrangement_auc": 0.9999936800939391,
+        "lightgbm_auc": 0.9078431298197184,
         "majority_class_rate": 0.7284999999999999,
         "obliqueness_diagnostic": 1.0170345906483573,
         "lightgbm_config": {
@@ -84,20 +95,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 0.998,
+          "val_acc": 0.8375,
+          "train_val_gap": 0.16049999999999998,
+          "best_iteration": 251,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.99828125,
-          "val_acc": 0.998125,
+          "train_acc": 0.9998333333333334,
+          "val_acc": 0.998,
+          "train_bce": 0.006222368251025235,
+          "val_bce": 0.00958688995094126,
+          "train_val_gap": 0.0018333333333333535,
+          "steps_run": 350,
+          "best_step": 345,
+          "stopped_early": false,
+          "at_step_cap": true,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 4,
-          "W_l1": 31.598091860226724,
+          "W_l1": 17.98148804542013,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.8896825114723826,
-            "mean_gap": 0.0045876094640192894,
+            "max_gap": 0.8789180834325355,
+            "mean_gap": 0.008576242902941658,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.8896825114723828,
+            "measured_max": 0.8789180834325356,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -112,12 +137,12 @@
       },
       {
         "seed": 1,
-        "arrangement_accuracy": 0.999,
-        "lightgbm_accuracy": 0.857,
-        "margin": 0.14200000000000002,
-        "abs_margin": 0.14200000000000002,
-        "arrangement_auc": 0.9999959604079584,
-        "lightgbm_auc": 0.9416248653048529,
+        "arrangement_accuracy": 0.9985,
+        "lightgbm_accuracy": 0.8515,
+        "margin": 0.14700000000000002,
+        "abs_margin": 0.14700000000000002,
+        "arrangement_auc": 0.999979802039792,
+        "lightgbm_auc": 0.9383669343233026,
         "majority_class_rate": 0.5495,
         "obliqueness_diagnostic": 0.9719501335707924,
         "lightgbm_config": {
@@ -130,20 +155,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.8625,
+          "train_val_gap": 0.13749999999999996,
+          "best_iteration": 436,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.9984375,
-          "val_acc": 0.9975,
+          "train_acc": 0.9998333333333334,
+          "val_acc": 0.9985,
+          "train_bce": 0.003453847666825809,
+          "val_bce": 0.006562968338544515,
+          "train_val_gap": 0.0013333333333332975,
+          "steps_run": 350,
+          "best_step": 350,
+          "stopped_early": false,
+          "at_step_cap": true,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 4,
-          "W_l1": 23.928136633889228,
+          "W_l1": 17.61202040100129,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.914410059000555,
-            "mean_gap": 0.007485344622807334,
+            "max_gap": 0.9646725659658902,
+            "mean_gap": 0.010979785515626818,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.914410059000555,
+            "measured_max": 0.9646725659658901,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -158,12 +197,12 @@
       },
       {
         "seed": 2,
-        "arrangement_accuracy": 0.9995,
-        "lightgbm_accuracy": 0.87,
-        "margin": 0.12950000000000006,
-        "abs_margin": 0.12950000000000006,
+        "arrangement_accuracy": 0.999,
+        "lightgbm_accuracy": 0.8575,
+        "margin": 0.14149999999999996,
+        "abs_margin": 0.14149999999999996,
         "arrangement_auc": 0.9999969645950365,
-        "lightgbm_auc": 0.9497114341681372,
+        "lightgbm_auc": 0.9442122921759402,
         "majority_class_rate": 0.554,
         "obliqueness_diagnostic": 0.967805090276267,
         "lightgbm_config": {
@@ -176,20 +215,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.8685,
+          "train_val_gap": 0.13149999999999995,
+          "best_iteration": 1056,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.9990625,
-          "val_acc": 0.998125,
+          "train_acc": 1.0,
+          "val_acc": 0.9975,
+          "train_bce": 0.003718055795510518,
+          "val_bce": 0.00827082483663551,
+          "train_val_gap": 0.0024999999999999467,
+          "steps_run": 350,
+          "best_step": 350,
+          "stopped_early": false,
+          "at_step_cap": true,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 4,
-          "W_l1": 21.21016541633672,
+          "W_l1": 20.226621295455782,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.8315682394267276,
-            "mean_gap": 0.004911350054111037,
+            "max_gap": 0.9554367611273171,
+            "mean_gap": 0.005419133631913153,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.8315682394267276,
+            "measured_max": 0.9554367611273171,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -204,12 +257,12 @@
       },
       {
         "seed": 3,
-        "arrangement_accuracy": 0.998,
-        "lightgbm_accuracy": 0.846,
-        "margin": 0.15200000000000002,
-        "abs_margin": 0.15200000000000002,
-        "arrangement_auc": 0.9999863132538238,
-        "lightgbm_auc": 0.9318684303618354,
+        "arrangement_accuracy": 0.9985,
+        "lightgbm_accuracy": 0.8475,
+        "margin": 0.15100000000000002,
+        "abs_margin": 0.15100000000000002,
+        "arrangement_auc": 0.9999842076005659,
+        "lightgbm_auc": 0.9244733761202075,
         "majority_class_rate": 0.612,
         "obliqueness_diagnostic": 0.9893747445852062,
         "lightgbm_config": {
@@ -222,20 +275,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": true,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.8455,
+          "train_val_gap": 0.15449999999999997,
+          "best_iteration": 310,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.9984375,
-          "val_acc": 0.998125,
+          "train_acc": 1.0,
+          "val_acc": 0.9985,
+          "train_bce": 0.004184979699977619,
+          "val_bce": 0.007484041330529589,
+          "train_val_gap": 0.0014999999999999458,
+          "steps_run": 350,
+          "best_step": 350,
+          "stopped_early": false,
+          "at_step_cap": true,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 4,
-          "W_l1": 28.054041135989202,
+          "W_l1": 20.680781966778913,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.9177173082458335,
-            "mean_gap": 0.007557942892854377,
+            "max_gap": 0.9561053568327984,
+            "mean_gap": 0.00869760022764326,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.9177173082458334,
+            "measured_max": 0.9561053568327984,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -250,12 +317,12 @@
       },
       {
         "seed": 4,
-        "arrangement_accuracy": 0.997,
-        "lightgbm_accuracy": 0.8435,
-        "margin": 0.15349999999999997,
-        "abs_margin": 0.15349999999999997,
-        "arrangement_auc": 0.9999843486535669,
-        "lightgbm_auc": 0.9254015092071654,
+        "arrangement_accuracy": 0.9985,
+        "lightgbm_accuracy": 0.8415,
+        "margin": 0.15700000000000003,
+        "abs_margin": 0.15700000000000003,
+        "arrangement_auc": 0.9999853920766624,
+        "lightgbm_auc": 0.9238509824871868,
         "majority_class_rate": 0.602,
         "obliqueness_diagnostic": 0.9946535060662142,
         "lightgbm_config": {
@@ -268,20 +335,34 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 0.9998333333333334,
+          "val_acc": 0.839,
+          "train_val_gap": 0.16083333333333338,
+          "best_iteration": 355,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.9984375,
-          "val_acc": 0.999375,
+          "train_acc": 1.0,
+          "val_acc": 0.9985,
+          "train_bce": 0.004232362169338494,
+          "val_bce": 0.0068016791912389836,
+          "train_val_gap": 0.0014999999999999458,
+          "steps_run": 350,
+          "best_step": 350,
+          "stopped_early": false,
+          "at_step_cap": true,
           "beta_final": 64.0,
           "l1": 0.0,
           "sparse_warmstart": false,
           "n_restarts": 4,
-          "W_l1": 26.856547539407888,
+          "W_l1": 21.098958913015647,
           "W_nnz_features": 10,
           "certificate": {
-            "max_gap": 0.9957300672473418,
-            "mean_gap": 0.007303379758614193,
+            "max_gap": 0.9226412403809892,
+            "mean_gap": 0.0077457361758941565,
             "gibbs_scale": 0.02166084939249829,
-            "measured_max": 0.9957300672473417,
+            "measured_max": 0.9226412403809892,
             "is_sound": true,
             "soft_hard_agree": 1.0
           }
@@ -306,12 +387,12 @@
     "per_seed": [
       {
         "seed": 0,
-        "arrangement_accuracy": 0.998,
-        "lightgbm_accuracy": 0.9995,
-        "margin": -0.0015000000000000568,
-        "abs_margin": 0.0015000000000000568,
-        "arrangement_auc": 0.9999916666666666,
-        "lightgbm_auc": 1.0,
+        "arrangement_accuracy": 0.9995,
+        "lightgbm_accuracy": 0.999,
+        "margin": 0.000500000000000056,
+        "abs_margin": 0.000500000000000056,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 0.9999972222222222,
         "majority_class_rate": 0.9,
         "obliqueness_diagnostic": 1.0011072664359861,
         "lightgbm_config": {
@@ -324,22 +405,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.999,
+          "train_val_gap": 0.0010000000000000009,
+          "best_iteration": 106,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.99984375,
-          "val_acc": 0.999375,
-          "beta_final": 128.0,
+          "train_acc": 0.999,
+          "val_acc": 0.999,
+          "train_bce": 0.0035238131014160984,
+          "val_bce": 0.004224581710317604,
+          "train_val_gap": 0.0,
+          "steps_run": 230,
+          "best_step": 200,
+          "stopped_early": true,
+          "at_step_cap": false,
+          "beta_final": 111.35287328708625,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 10,
-          "W_l1": 1.9442167933181267,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 1.4908507134455173,
-            "mean_gap": 0.04630911209820318,
-            "gibbs_scale": 0.010830424696249145,
-            "measured_max": 1.2282881792369267,
+            "max_gap": 1.3298773384234943,
+            "mean_gap": 0.05099182960030475,
+            "gibbs_scale": 0.012449560753998622,
+            "measured_max": 1.1116531455821441,
             "is_sound": true,
-            "soft_hard_agree": 0.997
+            "soft_hard_agree": 0.999
           }
         },
         "meta": {
@@ -357,10 +452,10 @@
       },
       {
         "seed": 1,
-        "arrangement_accuracy": 1.0,
+        "arrangement_accuracy": 0.9995,
         "lightgbm_accuracy": 1.0,
-        "margin": 0.0,
-        "abs_margin": 0.0,
+        "margin": -0.0004999999999999449,
+        "abs_margin": 0.0004999999999999449,
         "arrangement_auc": 1.0,
         "lightgbm_auc": 1.0,
         "majority_class_rate": 0.8995,
@@ -375,22 +470,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
-        "arrangement": {
+        "lightgbm": {
           "train_acc": 1.0,
-          "val_acc": 0.999375,
+          "val_acc": 1.0,
+          "train_val_gap": 0.0,
+          "best_iteration": 249,
+          "stopped_early": true
+        },
+        "arrangement": {
+          "train_acc": 0.9985,
+          "val_acc": 1.0,
+          "train_bce": 0.0038015582300028024,
+          "val_bce": 0.0034887815199797488,
+          "train_val_gap": -0.0014999999999999458,
+          "steps_run": 230,
+          "best_step": 200,
+          "stopped_early": true,
+          "at_step_cap": false,
           "beta_final": 128.0,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 10,
-          "W_l1": 1.9289335452307013,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 0.9765698200203403,
-            "mean_gap": 0.043970186406225,
+            "max_gap": 1.120460395605513,
+            "mean_gap": 0.041687316725766026,
             "gibbs_scale": 0.010830424696249145,
-            "measured_max": 0.9765632286313406,
+            "measured_max": 1.0015636626520719,
             "is_sound": true,
-            "soft_hard_agree": 0.9995
+            "soft_hard_agree": 0.999
           }
         },
         "meta": {
@@ -408,12 +517,12 @@
       },
       {
         "seed": 2,
-        "arrangement_accuracy": 0.998,
-        "lightgbm_accuracy": 0.9995,
-        "margin": -0.0015000000000000568,
-        "abs_margin": 0.0015000000000000568,
+        "arrangement_accuracy": 0.9995,
+        "lightgbm_accuracy": 0.9985,
+        "margin": 0.0010000000000000009,
+        "abs_margin": 0.0010000000000000009,
         "arrangement_auc": 1.0,
-        "lightgbm_auc": 0.9999916294409303,
+        "lightgbm_auc": 0.9970856503505869,
         "majority_class_rate": 0.9005,
         "obliqueness_diagnostic": 0.9997217971901516,
         "lightgbm_config": {
@@ -426,22 +535,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.999,
+          "train_val_gap": 0.0010000000000000009,
+          "best_iteration": 104,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.9996875,
-          "val_acc": 1.0,
-          "beta_final": 128.0,
+          "train_acc": 0.9996666666666667,
+          "val_acc": 0.998,
+          "train_bce": 0.0025463772711518157,
+          "val_bce": 0.004334399831748615,
+          "train_val_gap": 0.0016666666666667052,
+          "steps_run": 230,
+          "best_step": 200,
+          "stopped_early": true,
+          "at_step_cap": false,
+          "beta_final": 111.35287328708625,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 10,
-          "W_l1": 1.9647648078473086,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 1.837570554615283,
-            "mean_gap": 0.05107063107825445,
-            "gibbs_scale": 0.010830424696249145,
-            "measured_max": 1.4175009513304584,
+            "max_gap": 1.5666511508220005,
+            "mean_gap": 0.05703051703221078,
+            "gibbs_scale": 0.012449560753998622,
+            "measured_max": 1.2619439315249625,
             "is_sound": true,
-            "soft_hard_agree": 0.9985
+            "soft_hard_agree": 0.9995
           }
         },
         "meta": {
@@ -459,12 +582,12 @@
       },
       {
         "seed": 3,
-        "arrangement_accuracy": 0.9995,
-        "lightgbm_accuracy": 0.999,
-        "margin": 0.000500000000000056,
-        "abs_margin": 0.000500000000000056,
-        "arrangement_auc": 0.999997064487342,
-        "lightgbm_auc": 0.9999897257056972,
+        "arrangement_accuracy": 1.0,
+        "lightgbm_accuracy": 0.998,
+        "margin": 0.0020000000000000018,
+        "abs_margin": 0.0020000000000000018,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 0.9999794514113944,
         "majority_class_rate": 0.906,
         "obliqueness_diagnostic": 1.0022231485341115,
         "lightgbm_config": {
@@ -477,22 +600,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
-        "arrangement": {
+        "lightgbm": {
           "train_acc": 1.0,
-          "val_acc": 0.99875,
-          "beta_final": 128.0,
+          "val_acc": 0.998,
+          "train_val_gap": 0.0020000000000000018,
+          "best_iteration": 113,
+          "stopped_early": true
+        },
+        "arrangement": {
+          "train_acc": 0.9988333333333334,
+          "val_acc": 1.0,
+          "train_bce": 0.0034024899119696884,
+          "val_bce": 0.002856967262576596,
+          "train_val_gap": -0.0011666666666666492,
+          "steps_run": 230,
+          "best_step": 200,
+          "stopped_early": true,
+          "at_step_cap": false,
+          "beta_final": 96.87079991632724,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 10,
-          "W_l1": 1.9242093770363673,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 1.129228783131602,
-            "mean_gap": 0.0456257594675776,
-            "gibbs_scale": 0.010830424696249145,
-            "measured_max": 1.0053741551691524,
+            "max_gap": 1.2706352574831263,
+            "mean_gap": 0.05827817970760522,
+            "gibbs_scale": 0.014310755793462127,
+            "measured_max": 1.0927692494255283,
             "is_sound": true,
-            "soft_hard_agree": 0.9975
+            "soft_hard_agree": 0.999
           }
         },
         "meta": {
@@ -510,12 +647,12 @@
       },
       {
         "seed": 4,
-        "arrangement_accuracy": 0.9995,
-        "lightgbm_accuracy": 0.9995,
-        "margin": 0.0,
-        "abs_margin": 0.0,
-        "arrangement_auc": 0.9999970504172185,
-        "lightgbm_auc": 0.9999970504172185,
+        "arrangement_accuracy": 0.999,
+        "lightgbm_accuracy": 1.0,
+        "margin": -0.0010000000000000009,
+        "abs_margin": 0.0010000000000000009,
+        "arrangement_auc": 1.0,
+        "lightgbm_auc": 1.0,
         "majority_class_rate": 0.9065,
         "obliqueness_diagnostic": 0.9930671103716029,
         "lightgbm_config": {
@@ -528,22 +665,36 @@
           "early_stopping_rounds": 50
         },
         "lightgbm_config_at_grid_boundary": false,
+        "lightgbm": {
+          "train_acc": 1.0,
+          "val_acc": 0.9985,
+          "train_val_gap": 0.0014999999999999458,
+          "best_iteration": 154,
+          "stopped_early": true
+        },
         "arrangement": {
-          "train_acc": 0.99984375,
-          "val_acc": 0.99875,
-          "beta_final": 128.0,
+          "train_acc": 0.9986666666666667,
+          "val_acc": 0.999,
+          "train_bce": 0.0033031823154075954,
+          "val_bce": 0.0037373628553939663,
+          "train_val_gap": -0.0003333333333332966,
+          "steps_run": 230,
+          "best_step": 200,
+          "stopped_early": true,
+          "at_step_cap": false,
+          "beta_final": 111.35287328708625,
           "l1": 0.02,
           "sparse_warmstart": true,
           "n_restarts": 10,
-          "W_l1": 1.9458507360919817,
+          "W_l1": 2.0,
           "W_nnz_features": 2,
           "certificate": {
-            "max_gap": 1.0496097141574636,
-            "mean_gap": 0.04437774480571564,
-            "gibbs_scale": 0.010830424696249145,
-            "measured_max": 0.9967326030218462,
+            "max_gap": 1.0331295426452396,
+            "mean_gap": 0.04866249798343818,
+            "gibbs_scale": 0.012449560753998622,
+            "measured_max": 0.9979814969604082,
             "is_sound": true,
-            "soft_hard_agree": 1.0
+            "soft_hard_agree": 0.9995
           }
         },
         "meta": {
@@ -578,11 +729,11 @@
         "n_seeds": 5,
         "min_seeds": 5,
         "values": [
-          0.1605000000000001,
-          0.14200000000000002,
-          0.12950000000000006,
-          0.15200000000000002,
-          0.15349999999999997
+          0.16249999999999998,
+          0.14700000000000002,
+          0.14149999999999996,
+          0.15100000000000002,
+          0.15700000000000003
         ],
         "deviations": [
           0.0,
@@ -600,7 +751,7 @@
         ],
         "worst_seed": 0,
         "worst_index": 0,
-        "worst_value": 0.1605000000000001,
+        "worst_value": 0.16249999999999998,
         "worst_deviation": 0.0,
         "passed": true
       },
@@ -613,18 +764,18 @@
         "n_seeds": 5,
         "min_seeds": 5,
         "values": [
-          0.0015000000000000568,
-          0.0,
-          0.0015000000000000568,
           0.000500000000000056,
-          0.0
+          0.0004999999999999449,
+          0.0010000000000000009,
+          0.0020000000000000018,
+          0.0010000000000000009
         ],
         "deviations": [
-          0.0015000000000000568,
-          0.0,
-          0.0015000000000000568,
           0.000500000000000056,
-          0.0
+          0.0004999999999999449,
+          0.0010000000000000009,
+          0.0020000000000000018,
+          0.0010000000000000009
         ],
         "seeds": [
           0,
@@ -633,10 +784,10 @@
           3,
           4
         ],
-        "worst_seed": 0,
-        "worst_index": 0,
-        "worst_value": 0.0015000000000000568,
-        "worst_deviation": 0.0015000000000000568,
+        "worst_seed": 3,
+        "worst_index": 3,
+        "worst_value": 0.0020000000000000018,
+        "worst_deviation": 0.0020000000000000018,
         "passed": true
       }
     ]
@@ -672,5 +823,5 @@
     "mathlib_verified": false,
     "licensed_sentence": "on the constructed oblique XOR dataset the H=2 soft hyperplane arrangement beats tuned LightGBM by at least 10 accuracy points over five seeds; on the constructed axis AND dataset it stays within 2 accuracy points"
   },
-  "wall_seconds": 84.731
+  "wall_seconds": 106.474
 }

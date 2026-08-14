@@ -9,13 +9,18 @@ Constructed datasets (D=10, n=10_000, binary labels):
 * Axis AND (G2): ``y = 1[x_3 > 0.5] AND 1[x_7 < 0.2]``. Arrangement must reach
   parity (within 2 accuracy points) of tuned LightGBM.
 
+Fair protocol (same for both arms): train on ``Xtr``, early-stop + restore best
+on ``Xva``, score ``Xte`` -- **no train+val refit**. LightGBM early-stops on val
+logloss; arrangement early-stops on val BCE. ``--full`` rejects LightGBM
+grid-boundary configs and arrangement fits that hit the Adam step cap.
+
 Gates (five seeds, worst-seed via ``require_all_seeds``):
 
 * G1: ``arrangement_acc - lightgbm_acc >= 0.10`` on every seed.
 * G2: ``|arrangement_acc - lightgbm_acc| <= 0.02`` on every seed.
 
 Smoke is a wiring gate (smaller LightGBM grid + lighter arrangement budget);
-``--full`` is the acceptance experiment. G3/G4 remain unearned.
+``--full`` is the acceptance experiment. G3/G4 remain unearned here.
 """
 
 from __future__ import annotations
@@ -67,14 +72,43 @@ LGBM_GRID_SMOKE: list[tuple[int, float, int, int]] = list(
     itertools.product([31, 127], [0.05, 0.1], [20], [-1])
 )
 
+ARRANGEMENT_PATIENCE = 50
 ARRANGEMENT_BUDGET = {
     "full": {
-        "oblique_xor": {"restarts": 8, "steps": 600, "l1": 0.0, "beta_final": 64.0},
-        "axis_and": {"restarts": 4, "steps": 400, "l1": 0.02, "beta_final": 128.0},
+        "oblique_xor": {
+            "restarts": 8,
+            "steps": 5000,
+            "l1": 0.0,
+            "beta_final": 64.0,
+            "patience": ARRANGEMENT_PATIENCE,
+            "min_delta": 1e-4,
+        },
+        "axis_and": {
+            "restarts": 4,
+            "steps": 5000,
+            "l1": 0.02,
+            "beta_final": 128.0,
+            "patience": ARRANGEMENT_PATIENCE,
+            "min_delta": 1e-4,
+        },
     },
     "smoke": {
-        "oblique_xor": {"restarts": 4, "steps": 350, "l1": 0.0, "beta_final": 64.0},
-        "axis_and": {"restarts": 2, "steps": 250, "l1": 0.02, "beta_final": 128.0},
+        "oblique_xor": {
+            "restarts": 4,
+            "steps": 350,
+            "l1": 0.0,
+            "beta_final": 64.0,
+            "patience": 30,
+            "min_delta": 1e-4,
+        },
+        "axis_and": {
+            "restarts": 2,
+            "steps": 250,
+            "l1": 0.02,
+            "beta_final": 128.0,
+            "patience": 30,
+            "min_delta": 1e-4,
+        },
     },
 }
 
@@ -147,6 +181,7 @@ def _fit_lightgbm(
     best_cfg: tuple[int, float, int, int] | None = None
     best_val = -1.0
     best_n_est = 0
+    best_model = None
     with warnings.catch_warnings():
         warnings.filterwarnings("ignore", message="X does not have valid feature names")
         warnings.filterwarnings("ignore", category=UserWarning)
@@ -172,31 +207,22 @@ def _fit_lightgbm(
                 ],
             )
             n_est = int(getattr(model, "best_iteration_", None) or model.n_estimators_)
-            pred = model.predict(split["Xva"]).astype(np.float64)
-            acc = _accuracy(pred, split["yva"])
+            pred_va = model.predict(split["Xva"]).astype(np.float64)
+            acc = _accuracy(pred_va, split["yva"])
             if acc > best_val:
                 best_val = acc
                 best_cfg = (leaves, lr, min_child, max_depth)
                 best_n_est = n_est
-        assert best_cfg is not None
+                best_model = model
+        assert best_cfg is not None and best_model is not None
         leaves, lr, min_child, max_depth = best_cfg
-        # Refit on train+val with the chosen hyperparameters and early-stop
-        # iteration count (no further growth past the selected n_est).
-        model = lgb.LGBMClassifier(
-            num_leaves=leaves,
-            learning_rate=lr,
-            n_estimators=max(best_n_est, 1),
-            min_child_samples=min_child,
-            max_depth=max_depth,
-            random_state=seed,
-            verbose=-1,
-            n_jobs=1,
+        # Fair protocol: keep the early-stopped Xtr model (no train+val refit).
+        pred = best_model.predict(split["Xte"]).astype(np.float64)
+        proba = best_model.predict_proba(split["Xte"])[:, 1]
+        train_acc = _accuracy(
+            best_model.predict(split["Xtr"]).astype(np.float64), split["ytr"]
         )
-        Xfit = np.vstack([split["Xtr"], split["Xva"]])
-        yfit = np.concatenate([split["ytr"], split["yva"]])
-        model.fit(Xfit, yfit.astype(np.int64))
-        pred = model.predict(split["Xte"]).astype(np.float64)
-        proba = model.predict_proba(split["Xte"])[:, 1]
+        val_acc = float(best_val)
     cfg = {
         "num_leaves": leaves,
         "learning_rate": lr,
@@ -218,11 +244,16 @@ def _fit_lightgbm(
             f"(config={cfg}, leaf_choices={leaf_choices}). Extend the grid "
             "or raise n_estimators_max before reading G1/G2."
         )
+    stopped_early = int(best_n_est) < int(LGBM_N_ESTIMATORS_MAX)
     return {
         "accuracy": _accuracy(pred, split["yte"]),
         "auc": _auc(proba, split["yte"]),
         "config": cfg,
-        "val_accuracy": best_val,
+        "train_acc": float(train_acc),
+        "val_acc": val_acc,
+        "train_val_gap": float(train_acc - val_acc),
+        "best_iteration": int(best_n_est),
+        "stopped_early": bool(stopped_early),
         "at_grid_boundary": at_boundary,
     }
 
@@ -233,25 +264,33 @@ def _fit_arrangement(
     seed: int,
     family: str,
     budget: dict[str, Any],
+    require_converged: bool,
 ) -> dict[str, Any]:
     from omnibias.tab.arrangement import certify_arrangement_gap, hard_predict_np
     from omnibias.tab.torch.arrangement import fit_arrangement
 
-    Xfit = np.vstack([split["Xtr"], split["Xva"]])
-    yfit = np.concatenate([split["ytr"], split["yva"]])
     sparse = family == "axis_and"
     result = fit_arrangement(
-        Xfit,
-        yfit,
+        split["Xtr"],
+        split["ytr"],
+        X_val=split["Xva"],
+        y_val=split["yva"],
         n_hyperplanes=2,
         l1=float(budget["l1"]),
         restarts=int(budget["restarts"]),
         steps=int(budget["steps"]),
         beta_final=float(budget["beta_final"]),
         seed=seed,
-        val_fraction=0.2,
+        patience=int(budget.get("patience", ARRANGEMENT_PATIENCE)),
+        min_delta=float(budget.get("min_delta", 1e-4)),
         sparse_warmstart=sparse,
     )
+    if require_converged and bool(result.at_step_cap):
+        raise RuntimeError(
+            "INVALID EXPERIMENT: arrangement hit the Adam step cap without "
+            f"early-stopping (family={family}, steps_run={result.steps_run}, "
+            f"budget={budget}). Raise steps before reading G1/G2."
+        )
     pred = result.model.predict(split["Xte"])
     proba = result.model.predict_proba(split["Xte"])
     state = result.model.numpy_state()
@@ -272,6 +311,13 @@ def _fit_arrangement(
         "auc": _auc(proba, split["yte"]),
         "train_acc": result.train_acc,
         "val_acc": result.val_acc,
+        "train_bce": result.train_bce,
+        "val_bce": result.val_bce,
+        "train_val_gap": result.train_val_gap,
+        "steps_run": result.steps_run,
+        "best_step": result.best_step,
+        "stopped_early": result.stopped_early,
+        "at_step_cap": result.at_step_cap,
         "beta_final": result.beta_final,
         "l1": result.l1,
         "sparse_warmstart": result.sparse_warmstart,
@@ -314,7 +360,13 @@ def _run_family(
         lgbm = _fit_lightgbm(
             split, seed=seed, grid=grid, require_interior=full
         )
-        arr = _fit_arrangement(split, seed=seed, family=family, budget=budget)
+        arr = _fit_arrangement(
+            split,
+            seed=seed,
+            family=family,
+            budget=budget,
+            require_converged=full,
+        )
         margin = float(arr["accuracy"] - lgbm["accuracy"])
         majority = float(max(split["yte"].mean(), 1.0 - split["yte"].mean()))
         row = {
@@ -329,11 +381,25 @@ def _run_family(
             "obliqueness_diagnostic": float(diag),
             "lightgbm_config": lgbm["config"],
             "lightgbm_config_at_grid_boundary": bool(lgbm["at_grid_boundary"]),
+            "lightgbm": {
+                "train_acc": lgbm["train_acc"],
+                "val_acc": lgbm["val_acc"],
+                "train_val_gap": lgbm["train_val_gap"],
+                "best_iteration": lgbm["best_iteration"],
+                "stopped_early": lgbm["stopped_early"],
+            },
             "arrangement": {
                 k: arr[k]
                 for k in (
                     "train_acc",
                     "val_acc",
+                    "train_bce",
+                    "val_bce",
+                    "train_val_gap",
+                    "steps_run",
+                    "best_step",
+                    "stopped_early",
+                    "at_step_cap",
                     "beta_final",
                     "l1",
                     "sparse_warmstart",
@@ -353,7 +419,8 @@ def _run_family(
         print(
             f"  {family} seed={seed}: arr={arr['accuracy']:.4f} "
             f"lgbm={lgbm['accuracy']:.4f} margin={margin:+.4f} "
-            f"diag={diag:.3f} boundary={lgbm['at_grid_boundary']}"
+            f"diag={diag:.3f} boundary={lgbm['at_grid_boundary']} "
+            f"arr_es={arr['stopped_early']}"
         )
     diags = [float(r["obliqueness_diagnostic"]) for r in per_seed]
     return {
@@ -393,7 +460,16 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "lightgbm_grid_size": len(grid),
         "lightgbm_n_estimators_max": LGBM_N_ESTIMATORS_MAX,
         "lightgbm_early_stopping_rounds": LGBM_EARLY_STOPPING,
+        "arrangement_patience": ARRANGEMENT_PATIENCE,
         "arrangement_budget": budgets,
+        "fair_protocol": {
+            "train_on": "Xtr",
+            "early_stop_on": "Xva",
+            "score_on": "Xte",
+            "no_train_val_refit": True,
+            "arrangement_stop_metric": "val_bce",
+            "lightgbm_stop_metric": "binary_logloss",
+        },
         "tier": tier,
         "smoke_is_wiring_gate": not full,
         "full": full,
@@ -440,7 +516,9 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "note": (
                     "num_leaves x learning_rate x min_child_samples x max_depth; "
                     "n_estimators via early stopping up to "
-                    f"{LGBM_N_ESTIMATORS_MAX}; refit on train+val"
+                    f"{LGBM_N_ESTIMATORS_MAX}; train on Xtr only (no train+val "
+                    "refit); arrangement early-stops on val BCE with the same "
+                    "patience and no train+val refit"
                 ),
             },
             "seeds": list(SEEDS),

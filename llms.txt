@@ -326,7 +326,20 @@ the founding `delta -> 0` bias collapse (its gate / model penalty files are regi
 `PENALTY_FILES`). The model is an ensemble of oblivious soft trees whose `depth == 1` tier
 is a pure sum-of-sigmoids (additive, directly certifiable) and whose `depth >= 2` tier
 multiplies gates into `2**depth` leaf memberships (native feature interactions), with
-bit-identical torch + jax forwards. It ships three trainers -- an exact joint second-order
+bit-identical torch + jax forwards. `forward` is a neural-net layer on `(..., d)`
+features (`as_head(z, kind)` returns a `TabHead` on `z.device` / `z.dtype`;
+`fit_joint` trains encoder+head; optional `encoder=` on `fit_first_order` /
+`fit_second_order` / `fit_arrangement` keeps the G3 tabular path as the default). Keras 3 twins live in `omnibias.tab.keras` (`ArrangementBoosted`; `learnable_beta` on Boosted is member-`beta`).
+Optional Equinox wrappers live in `omnibias.tab.jax.equinox_head` (`[equinox]` extra); tab CI fails if the extra is missing when `CI` is set (local `importorskip`).
+`certify_composed` IBP-certifies `encoder ∘ tree` on supported Linear/activation
+encoders, uses interval output bounds when the encoder is (or ends with) a
+SoftTree / Arrangement (`tab+tab` / `ibp+tab+tab`), else `sampled_latent` (not a
+sound enclosure of `E(box)`). Soft-tree jets
+(`extract_tree_jet` / `extract_tree_jet_directional`) are exact for the **soft**
+surrogate (`delta -> 0`); depth-1 uses `mlp_jet_mv` / `mlp_jet`; hardening
+remains `beta -> inf`. Keras CI smokes jax, tensorflow, and torch on
+`test_keras.py`. Equinox wrappers include `BoostedHead`.
+It ships three trainers -- an exact joint second-order
 driver over `omnibias.torch.optim` (`CubicNewton` / `TrustRegionNewtonCG` / `KFAC` /
 `NaturalGradient`), a first-order Adam baseline, and a stagewise **Newton-boosting** driver
 (the GBM-mirror: closed-form per-stage loss gradient + Hessian from the Riccati tower) --
@@ -352,7 +365,11 @@ one `combine(X, beta) = sum_l w_l * out_l` engine is shared by four bridges as s
 of existing packages -- `omnibias.pinn.partition` (discontinuity-capturing PINN,
 `u = sum_l w_l u_l`), `omnibias.geometry.atlas` (region-wise metric `g = sum_l w_l G_l`,
 convex-combo-of-SPD stays SPD), `omnibias.symbolic.piecewise` (per-region SINDy +
-hybrid-automaton switch), and `omnibias.struct.decision` + `omnibias.tab.decision` (a
+hybrid-automaton switch; learned gates via `fit_learned_piecewise_ode`; a tab
+head can be trained on the trajectory's finite-difference ``du`` then
+hardened from the fitted split -- Arrangement is unplanted, random ``W``, no
+``e_0``; vector
+cells), and `omnibias.struct.decision` + `omnibias.tab.decision` (a)
 certified `log(N)/beta` differentiable decision layer). Depends only on `omnibias-core`
 (+ optional torch/jax); products of sigmoids are differentiated by autodiff, not the
 closed-form tower.

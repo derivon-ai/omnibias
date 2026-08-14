@@ -10,10 +10,13 @@ import pytest
 pytest.importorskip("sklearn")
 
 from omnibias.tab.bench import (  # noqa: E402
+    ARRANGEMENT_PUBLIC_MAX_ROWS,
+    ARRANGEMENT_PUBLIC_SUITE,
     HeadToHead,
     load_dataset,
     score_predictions,
     train_test_split,
+    train_val_test_split,
 )
 
 
@@ -73,3 +76,37 @@ def test_tiny_head_to_head_runs_end_to_end() -> None:
     s = h.summary()
     assert 0.0 <= s["tab_mean_primary"] <= 1.0 and 0.0 <= s["lgbm_mean_primary"] <= 1.0
     assert isinstance(s["not_worse"], bool)
+
+
+def test_arrangement_public_suite_is_eight_binary_names() -> None:
+    assert len(ARRANGEMENT_PUBLIC_SUITE) == 8
+    assert ARRANGEMENT_PUBLIC_SUITE[0] == "breast_cancer"
+    assert set(ARRANGEMENT_PUBLIC_MAX_ROWS) == set(ARRANGEMENT_PUBLIC_SUITE)
+
+
+@pytest.mark.parametrize("name", ARRANGEMENT_PUBLIC_SUITE)
+def test_arrangement_public_loader_binary_or_skip(name: str) -> None:
+    """Every suite name loads as binary offline, or skips cleanly on OpenML failure."""
+    max_rows = ARRANGEMENT_PUBLIC_MAX_ROWS.get(name)
+    # Keep OpenML fetches small in CI when the cache is warm.
+    row_cap = 500 if max_rows is None else min(500, max_rows)
+    try:
+        ds = load_dataset(name, max_rows=row_cap, seed=0)
+    except RuntimeError as exc:
+        if name == "breast_cancer":
+            raise
+        pytest.skip(f"OpenML unavailable for {name}: {exc}")
+    assert ds.task == "binary"
+    assert ds.n_outputs == 1
+    assert ds.X.ndim == 2 and ds.y.ndim == 1
+    assert ds.X.shape[0] == ds.y.shape[0] <= row_cap
+    assert set(np.unique(ds.y).tolist()).issubset({0.0, 1.0})
+
+
+def test_train_val_test_split_60_20_20() -> None:
+    ds = load_dataset("breast_cancer", max_rows=200, seed=0)
+    split = train_val_test_split(ds, seed=0, train_frac=0.6, val_frac=0.2)
+    n = ds.X.shape[0]
+    assert split["Xtr"].shape[0] + split["Xva"].shape[0] + split["Xte"].shape[0] == n
+    assert abs(split["Xtr"].shape[0] / n - 0.6) < 0.05
+    assert np.allclose(split["Xtr"].mean(axis=0), 0.0, atol=1e-9)

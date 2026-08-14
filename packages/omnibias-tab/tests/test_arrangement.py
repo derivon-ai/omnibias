@@ -127,6 +127,184 @@ def test_fit_oblique_beats_majority() -> None:
     assert acc > 0.95
 
 
+def test_outer_val_split_is_used() -> None:
+    """Explicit X_val/y_val must be the monitored split (not an inner reshuffle)."""
+    X, y, _ = make_oblique_xor(seed=5, n_samples=800)
+    Xtr, ytr = X[:480], y[:480]
+    Xva, yva = X[480:640], y[480:640]
+    Xte, yte = X[640:], y[640:]
+    result = fit_arrangement(
+        Xtr,
+        ytr,
+        X_val=Xva,
+        y_val=yva,
+        n_hyperplanes=2,
+        l1=0.0,
+        restarts=2,
+        steps=200,
+        beta_final=32.0,
+        seed=5,
+        sparse_warmstart=False,
+        patience=30,
+        eval_every=5,
+    )
+    # Val metrics must match scoring the provided Xva (outer split).
+    import torch
+    from omnibias.tab.torch.arrangement import _bce_logits
+
+    Xva_t = torch.as_tensor(Xva, dtype=torch.float64)
+    yva_t = torch.as_tensor(yva, dtype=torch.float64)
+    assert result.val_acc == pytest.approx(
+        _accuracy(result.model.predict(Xva), yva), abs=1e-12
+    )
+    assert result.val_bce == pytest.approx(
+        _bce_logits(result.model, Xva_t, yva_t), abs=1e-12
+    )
+    assert _accuracy(result.model.predict(Xte), yte) > 0.9
+
+
+def test_early_stop_restores_best_checkpoint() -> None:
+    """Patience stop restores a checkpoint no worse than the last step."""
+    rng = np.random.default_rng(0)
+    # Tiny train / noise labels encourage late overfitting under a large step cap.
+    n, d = 40, 8
+    X = rng.normal(size=(n, d))
+    y = (rng.random(n) > 0.5).astype(np.float64)
+    Xva = rng.normal(size=(20, d))
+    yva = (rng.random(20) > 0.5).astype(np.float64)
+    result = fit_arrangement(
+        X,
+        y,
+        X_val=Xva,
+        y_val=yva,
+        n_hyperplanes=2,
+        l1=0.0,
+        restarts=1,
+        steps=400,
+        beta_final=64.0,
+        seed=0,
+        sparse_warmstart=False,
+        patience=10,
+        eval_every=5,
+        min_delta=1e-4,
+    )
+    assert result.stopped_early
+    assert result.best_step < result.steps_run
+    assert not result.at_step_cap
+    # Restored checkpoint's val BCE is the recorded best.
+    import torch
+    from omnibias.tab.torch.arrangement import _bce_logits
+
+    Xva_t = torch.as_tensor(Xva, dtype=torch.float64)
+    yva_t = torch.as_tensor(yva, dtype=torch.float64)
+    assert result.val_bce == pytest.approx(
+        _bce_logits(result.model, Xva_t, yva_t), abs=1e-12
+    )
+
+
+def test_at_step_cap_when_patience_exceeds_budget() -> None:
+    X, y, _ = make_oblique_xor(seed=1, n_samples=400)
+    result = fit_arrangement(
+        X[:240],
+        y[:240],
+        X_val=X[240:320],
+        y_val=y[240:320],
+        n_hyperplanes=2,
+        l1=0.0,
+        restarts=1,
+        steps=30,
+        beta_final=16.0,
+        seed=1,
+        sparse_warmstart=False,
+        patience=10_000,
+        eval_every=5,
+    )
+    assert result.at_step_cap
+    assert not result.stopped_early
+    assert result.steps_run == 30
+
+
+def test_h3_has_eight_cells() -> None:
+    model = ArrangementClassifier(4, 3, beta=2.0)
+    assert model.n_cells == 8
+    X = np.zeros((5, 4), dtype=np.float64)
+    logits = model.forward(torch.as_tensor(X, dtype=torch.float64))
+    assert logits.shape == (5, 1)
+
+
+def test_newton_early_stop_restores_checkpoint() -> None:
+    X, y, _ = make_oblique_xor(seed=3, n_samples=800)
+    result = fit_arrangement(
+        X[:480],
+        y[:480],
+        X_val=X[480:640],
+        y_val=y[480:640],
+        n_hyperplanes=2,
+        l1=0.0,
+        restarts=2,
+        steps=25,
+        beta_init=8.0,
+        beta_final=32.0,
+        beta_anneal_steps=5,
+        seed=3,
+        sparse_warmstart=False,
+        patience=12,
+        eval_every=1,
+        optimizer="trust_region",
+    )
+    assert result.optimizer == "trust_region"
+    te = slice(640, 800)
+    assert _accuracy(result.model.predict(X[te]), y[te]) > 0.8
+
+
+def test_cubic_newton_runs() -> None:
+    X, y, _ = make_oblique_xor(seed=5, n_samples=400)
+    result = fit_arrangement(
+        X[:240],
+        y[:240],
+        X_val=X[240:320],
+        y_val=y[240:320],
+        n_hyperplanes=2,
+        l1=0.0,
+        restarts=1,
+        steps=8,
+        beta_init=8.0,
+        beta_final=16.0,
+        beta_anneal_steps=3,
+        seed=5,
+        sparse_warmstart=False,
+        patience=6,
+        eval_every=1,
+        optimizer="cubic",
+    )
+    assert result.optimizer == "cubic"
+    assert result.steps_run >= 1
+
+
+def test_boosted_stages_reduce_train_bce() -> None:
+    from omnibias.tab.torch.arrangement import fit_arrangement_boosted
+
+    X, y, _ = make_oblique_xor(seed=4, n_samples=800)
+    result = fit_arrangement_boosted(
+        X[:480],
+        y[:480],
+        X_val=X[480:640],
+        y_val=y[480:640],
+        n_hyperplanes=2,
+        n_stages_max=8,
+        learning_rate=0.5,
+        stage_patience=4,
+        weak_restarts=2,
+        weak_steps=80,
+        weak_patience=25,
+        seed=4,
+    )
+    assert result.n_stages >= 1
+    assert result.history[0] >= result.val_bce - 1e-9
+    acc = _accuracy(result.model.predict(X[640:]), y[640:])
+    assert acc > 0.7
+
+
 def test_certify_arrangement_gap_sound_and_soft_hard_agree() -> None:
     from omnibias.partition._core.verified import weight_rounding_gap
     from omnibias.tab.arrangement import arrangement_params, certify_arrangement_gap
@@ -165,3 +343,28 @@ def test_labels_are_binary(family: str) -> None:
     else:
         _, y, _ = make_axis_rule(seed=0, n_samples=500)
     assert set(np.unique(y).tolist()) <= {0.0, 1.0}
+
+
+def test_fit_arrangement_multiclass_forward_shape() -> None:
+    rng = np.random.default_rng(4)
+    X = rng.standard_normal((120, 3))
+    y = (X[:, 0] > 0).astype(np.int64) + (X[:, 1] > 0).astype(np.int64)
+    y = np.clip(y, 0, 2)
+    result = fit_arrangement(
+        X[:80],
+        y[:80],
+        X_val=X[80:],
+        y_val=y[80:],
+        n_hyperplanes=2,
+        n_outputs=3,
+        task="multiclass",
+        restarts=1,
+        steps=40,
+        patience=20,
+        seed=4,
+        sparse_warmstart=False,
+    )
+    logits = result.model(torch.as_tensor(X[:10], dtype=torch.float64))
+    assert logits.shape == (10, 3)
+    pred = result.model.predict(X[:10])
+    assert pred.shape == (10,)

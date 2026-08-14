@@ -20,6 +20,7 @@ through a trained net and seals tamper-evident certificates. Everything is
 | Proof-carrying training | `omnibias.verify` | `certify_trained_network`, `certify_trained_min`, `certify_trained_global_min`, `param_jet` |
 | SDE operator residuals | `omnibias.verify` | `certify_fokker_planck_residual`, `certify_ito_generator_residual` |
 | Validated ODE dynamics | `omnibias.dynamics` | `variational_flow`, `prove_periodic_orbit`, `certified_lyapunov_exponent` |
+| Composed encoder + tab head | `omnibias.tab` | `certify_composed` (IBP / `tab+tab` when ingest works; else `sampled_latent`) |
 
 ## Minimal example (verified)
 
@@ -42,6 +43,7 @@ box = [Interval(-0.4, 0.4), Interval(-0.4, 0.4)]
 - **Soundness, not completeness.** The verifier returns *inconclusive* rather than over-claim when branch-and-bound runs out of budget; enclosures are reported honestly, never silently widened.
 - **State the scope.** These are rigorous **local** (small net, low-dimensional box, `tanh`/`sigmoid`/`gaussian`) or **global-over-a-box** proofs -- not continuum or global-regularity-grade claims. `certify_trained_min` is local; `certify_trained_global_min` is global over a parameter box; the stochastic residuals are local (finite-box).
 - **`theorem_prover_verified` is earned, not asserted.** It is set only on a genuine Lean `lake build` pass and degrades gracefully (stays `False`) with no toolchain.
+- **`certify_composed` is IBP / `tab+tab` when ingest works.** SoftTree / Arrangement encoders (optional Linear IBP prefix) get a sound interval latent box. An arbitrary encoder `E` falls back to `sampled_latent`, which is **not** a sound enclosure of `E(box)`.
 
 ## More detail
 

@@ -245,6 +245,8 @@ nav:
       - CmbNet on MNIST: cookbook/cmbnet-mnist.md
       - CvxLogistic: cookbook/cvxlogistic.md
       - Operator-block discovery: cookbook/operator-block-discovery.md
+      - Tab layers as neural heads: cookbook/tab-as-layer.md
+      - Piecewise hybrid automaton: cookbook/piecewise-hybrid-automaton.md
   - Examples: examples.md
   - Benchmarks: benchmarks.md
   - PINN four-gap matrix: benchmarks/pinn_four_gap_matrix.md

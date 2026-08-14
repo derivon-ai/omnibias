@@ -17,8 +17,12 @@ consumers -- this package answers a **yes-if** rather than claiming the impossib
 
 Even at accuracy parity with LightGBM, a `tab` model is a different object:
 
-1. **End-to-end differentiable trees** -- composable, fine-tunable, stackable with any
-   torch/jax model. GBM trees are not differentiable.
+1. **End-to-end differentiable trees** -- `forward` is a tensor-in / tensor-out
+   layer on `(..., d)` features. Compose with any torch encoder
+   (`.to(device, dtype)` then the user's optimizer); JAX kernels
+   (`forward_arrays`, `arrangement_forward`, `boosted_forward`) compose the
+   same way (`as_head` / `docs/examples/tab_as_layer.py` and
+   `tab_as_layer_jax.py`). GBM trees are not differentiable.
 2. **Exact second-order training of the *whole* model** (splits included) via
    `omnibias.torch.optim` (`CubicNewton` / `TrustRegionNewtonCG` / `KFAC` /
    `NaturalGradient`) -- not just a per-leaf Newton step. A stagewise **Newton-boosting**
@@ -62,11 +66,32 @@ print(cert.output_bounds, cert.lipschitz, cert.monotone_ok, cert.rounding_gap)
 - **`SoftTreeConfig`** -- ensemble shape: `n_trees`, `depth` (`1` = additive
   sum-of-sigmoids; `>=2` = multiplicative oblivious soft trees), `task`
   (`"binary"` / `"multiclass"` / `"regression"`), and the `beta` anneal schedule.
-- **`SoftTreeEnsemble` (torch) / `forward` (jax)** -- bit-identical soft-tree forward.
-- **`fit_second_order` / `fit_first_order` / `fit_boosted`** -- the exact-curvature joint
-  trainer, an Adam baseline, and the stagewise Newton-boosting (GBM-mirror) driver.
-- **`certify_tab(params, feature_box, ...)`** -- a `TabCertificate`
-  (`output_bounds`, `lipschitz`, `monotone_ok`, `rounding_gap`, `.is_sound`).
+- **`SoftTreeEnsemble` (torch) / `forward` (jax)** -- bit-identical soft-tree forward;
+  plugin `forward` on `(..., d)` after `.to(device, dtype)`.
+- **`ArrangementClassifier` / `ArrangementBoosted` (torch)** -- hyperplane
+  arrangement layer and autograd-preserving boosted ensemble; JAX
+  `arrangement_forward` / `boosted_forward`.
+- **`fit_second_order` / `fit_first_order` / `fit_boosted` / `fit_joint`** -- the
+  exact-curvature joint trainer, an Adam baseline, the stagewise Newton-boosting
+  (GBM-mirror) driver, and a plugin `encoder ∘ head` trainer. Optional `encoder=`
+  on `fit_first_order` / `fit_second_order` / `fit_arrangement` (G3 `fit_*`
+  signatures stay tabular). Stagewise boosted trainers reject `encoder`.
+- **`as_head(z, kind)`** -- returns a `TabHead` wrapping SoftTree / Arrangement /
+  Boosted on `z.device` / `z.dtype`. Keras 3 twins live in `omnibias.tab.keras`
+  (`[keras]` extra), including `ArrangementBoosted`; `learnable_beta` on Boosted
+  is member-`beta` (ensemble `learning_rate` / `base` stay frozen). Optional
+  Equinox wrappers: `omnibias.tab.jax.equinox_head` (`[equinox]` extra;
+  `ArrangementHead` / `SoftTreeHead` / `BoostedHead`). Equinox tests **fail**
+  when `CI` is set and the extra is missing; local runs still `importorskip`.
+- **`certify_tab(params, feature_box, ...)`** / **`certify_composed`** -- a
+  `TabCertificate` (`output_bounds`, `lipschitz`, `monotone_ok`, `rounding_gap`,
+  `.is_sound`); composed IBP of a supported Linear/activation encoder then the
+  tab head on the latent box; SoftTree / Arrangement encoders use interval
+  output bounds (`tab+tab` / `ibp+tab+tab`); otherwise `sampled_latent` (not a
+  sound enclosure of `E(box)`).
+- **`extract_tree_jet`** -- depth-1 `mlp_jet_mv` (multivariate) / `mlp_jet`
+  (directional); depth `>= 2` Leibniz product of sigmoid jets of the **soft**
+  surrogate (`delta -> 0`); hardening remains `beta -> inf`.
 
 ## Honest scope
 

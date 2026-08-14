@@ -43,8 +43,8 @@ collapse** -- the multi-bias `delta → 0` limit to the closed-form derivative `
 
 ## Bit-identical backend twins
 
-The same weights under torch (autograd-friendly, embeddable) and jax (`jit` / `grad` /
-`vmap`), parity `~1e-9` (float64).
+The same weights under torch (autograd-friendly, embeddable), jax (`jit` / `grad` /
+`vmap`), and Keras 3 (`keras.ops`, optional `[keras]` extra), parity `~1e-9` (float64).
 
 ::: omnibias.partition.torch.weights
     options:
@@ -52,6 +52,11 @@ The same weights under torch (autograd-friendly, embeddable) and jax (`jit` / `g
       heading_level: 3
 
 ::: omnibias.partition.jax.weights
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.partition.keras.weights
     options:
       show_root_heading: false
       heading_level: 3
@@ -88,6 +93,9 @@ each region weight over an input box, plus the closed-form soft→hard L1 gap. I
 - [`omnibias.pinn.partition`](pinn.md) -- discontinuity-capturing PINN (`u = Σ_l w_l u_l`).
 - [`omnibias.geometry.atlas`](geometry.md) -- region-wise Riemannian metric (`g = Σ_l w_l G_l`).
 - [`omnibias.symbolic.piecewise`](symbolic.md) -- per-region symbolic law discovery.
+  The tab-head harden path (SoftTree / Arrangement trained on finite-difference
+  `du`) is **unplanted** for Arrangement (constructor random `W`, no `e_0`);
+  STLSQ still uses the field jet.
 - [`omnibias.struct.decision`](struct.md) + [`omnibias.tab.decision`](tab.md) -- a certified
   differentiable decision layer.
 

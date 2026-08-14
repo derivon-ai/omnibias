@@ -1,0 +1,540 @@
+{
+  "schema": "tabular-arrangement-public-v1",
+  "generated_utc": "2026-08-13T19:48:29Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "tabular_arrangement_public_vs_lightgbm",
+    "suite": [
+      "breast_cancer",
+      "adult",
+      "higgs",
+      "banknote",
+      "blood_transfusion",
+      "ionosphere",
+      "sonar",
+      "spambase"
+    ],
+    "datasets_run": [
+      "breast_cancer"
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "split": {
+      "train": 0.6,
+      "val": 0.2,
+      "test": 0.2
+    },
+    "tie_band_accuracy_points": 0.005,
+    "n_hyperplanes": 2,
+    "lightgbm_grid_size": 4,
+    "lightgbm_n_estimators_max": 4000,
+    "lightgbm_early_stopping_rounds": 50,
+    "arrangement_patience": 50,
+    "arrangement_budget": {
+      "dense": {
+        "restarts": 2,
+        "steps": 200,
+        "l1": 0.0,
+        "beta_final": 32.0,
+        "patience": 20,
+        "min_delta": 0.0001
+      },
+      "sparse": {
+        "restarts": 1,
+        "steps": 150,
+        "l1": 0.02,
+        "beta_final": 64.0,
+        "patience": 20,
+        "min_delta": 0.0001
+      }
+    },
+    "fair_protocol": {
+      "train_on": "Xtr",
+      "early_stop_on": "Xva",
+      "score_on": "Xte",
+      "no_train_val_refit": true,
+      "arrangement_stop_metric": "val_bce",
+      "lightgbm_stop_metric": "binary_logloss"
+    },
+    "g4_diag_threshold": 1.0,
+    "g4_min_accuracy": 0.75,
+    "tier": "smoke",
+    "smoke_is_wiring_gate": true,
+    "full": false
+  },
+  "rss_mb_at_start": 820.71,
+  "baseline": {
+    "name": "tuned LightGBM (val-selected grid + early stopping)",
+    "note": "num_leaves x learning_rate x min_child_samples x max_depth; n_estimators via early stopping up to 4000; train on Xtr only (no train+val refit); arrangement early-stops on val BCE with the same patience and no train+val refit"
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "datasets": {
+    "breast_cancer": {
+      "dataset": "breast_cancer",
+      "status": "completed",
+      "n_rows": 400,
+      "n_features": 30,
+      "max_rows": 400,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.95,
+          "lightgbm_accuracy": 0.95,
+          "margin": 0.0,
+          "abs_margin": 0.0,
+          "arrangement_auc": 0.9986477349560514,
+          "lightgbm_auc": 0.9898580121703854,
+          "majority_class_rate": 0.6375,
+          "obliqueness_diagnostic": 1.0439189189189189,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 62,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.95,
+            "train_val_gap": 0.050000000000000044,
+            "best_iteration": 62,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 1.0,
+            "val_acc": 0.95,
+            "train_bce": 0.04753033009513966,
+            "val_bce": 0.16355948820891839,
+            "train_val_gap": 0.050000000000000044,
+            "steps_run": 100,
+            "best_step": 80,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 9.07066330486047,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 9,
+            "budget": {
+              "restarts": 1,
+              "steps": 150,
+              "l1": 0.02,
+              "beta_final": 64.0,
+              "patience": 20,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9375,
+                "val_bce": 0.17953118177765318,
+                "accuracy": 0.9625,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 105,
+                "best_step": 85
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.95,
+                "val_bce": 0.16355948820891839,
+                "accuracy": 0.95,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 100,
+                "best_step": 80
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 0.9875,
+          "lightgbm_accuracy": 0.9625,
+          "margin": 0.025000000000000022,
+          "abs_margin": 0.025000000000000022,
+          "arrangement_auc": 0.9972954699121027,
+          "lightgbm_auc": 0.9898580121703854,
+          "majority_class_rate": 0.6375,
+          "obliqueness_diagnostic": 1.0301003344481605,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 59,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9625,
+            "train_val_gap": 0.03749999999999998,
+            "best_iteration": 59,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9875,
+            "val_acc": 0.9875,
+            "train_bce": 0.05460226241152879,
+            "val_bce": 0.055743035216053796,
+            "train_val_gap": 0.0,
+            "steps_run": 115,
+            "best_step": 95,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 13.786983166599118,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 9,
+            "budget": {
+              "restarts": 1,
+              "steps": 150,
+              "l1": 0.02,
+              "beta_final": 64.0,
+              "patience": 20,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9625,
+                "val_bce": 0.10520080578006097,
+                "accuracy": 0.975,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 125,
+                "best_step": 105
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9875,
+                "val_bce": 0.055743035216053796,
+                "accuracy": 0.9875,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 115,
+                "best_step": 95
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.9875,
+          "lightgbm_accuracy": 0.9375,
+          "margin": 0.050000000000000044,
+          "abs_margin": 0.050000000000000044,
+          "arrangement_auc": 0.9979716024340771,
+          "lightgbm_auc": 0.9878296146044625,
+          "majority_class_rate": 0.6375,
+          "obliqueness_diagnostic": 1.0616438356164384,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 122,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9625,
+            "train_val_gap": 0.03749999999999998,
+            "best_iteration": 122,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9833333333333333,
+            "val_acc": 1.0,
+            "train_bce": 0.03238153238407067,
+            "val_bce": 0.017191761339277828,
+            "train_val_gap": -0.01666666666666672,
+            "steps_run": 160,
+            "best_step": 160,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 9,
+            "budget": {
+              "restarts": 1,
+              "steps": 150,
+              "l1": 0.02,
+              "beta_final": 64.0,
+              "patience": 20,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9875,
+                "val_bce": 0.05277734847984794,
+                "accuracy": 0.9625,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 170,
+                "best_step": 150
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 1.0,
+                "val_bce": 0.017191761339277828,
+                "accuracy": 0.9875,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 160,
+                "best_step": 160
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.95,
+          "lightgbm_accuracy": 0.9375,
+          "margin": 0.012499999999999956,
+          "abs_margin": 0.012499999999999956,
+          "arrangement_auc": 0.991210277214334,
+          "lightgbm_auc": 0.9885057471264368,
+          "majority_class_rate": 0.6375,
+          "obliqueness_diagnostic": 1.0612244897959184,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 96,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.975,
+            "train_val_gap": 0.025000000000000022,
+            "best_iteration": 96,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9916666666666667,
+            "val_acc": 0.9875,
+            "train_bce": 0.052940768302925954,
+            "val_bce": 0.04761972572530213,
+            "train_val_gap": 0.004166666666666652,
+            "steps_run": 70,
+            "best_step": 50,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 9,
+            "budget": {
+              "restarts": 1,
+              "steps": 150,
+              "l1": 0.02,
+              "beta_final": 64.0,
+              "patience": 20,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.975,
+                "val_bce": 0.11762132933624865,
+                "accuracy": 1.0,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 155,
+                "best_step": 135
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9875,
+                "val_bce": 0.04761972572530213,
+                "accuracy": 0.95,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 70,
+                "best_step": 50
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 0.9375,
+          "lightgbm_accuracy": 0.925,
+          "margin": 0.012499999999999956,
+          "abs_margin": 0.012499999999999956,
+          "arrangement_auc": 0.9885057471264368,
+          "lightgbm_auc": 0.9864773495605138,
+          "majority_class_rate": 0.6375,
+          "obliqueness_diagnostic": 1.0472972972972971,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 101,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9625,
+            "train_val_gap": 0.03749999999999998,
+            "best_iteration": 101,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9833333333333333,
+            "val_acc": 0.9875,
+            "train_bce": 0.06114290794528087,
+            "val_bce": 0.07863327325748315,
+            "train_val_gap": -0.004166666666666763,
+            "steps_run": 60,
+            "best_step": 40,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 9,
+            "budget": {
+              "restarts": 1,
+              "steps": 150,
+              "l1": 0.02,
+              "beta_final": 64.0,
+              "patience": 20,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9625,
+                "val_bce": 0.15897086986983122,
+                "accuracy": 0.975,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 85,
+                "best_step": 65
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9875,
+                "val_bce": 0.07863327325748315,
+                "accuracy": 0.9375,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 60,
+                "best_step": 40
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.9625,
+      "mean_lightgbm_accuracy": 0.9425000000000001,
+      "mean_margin": 0.019999999999999997,
+      "mean_obliqueness_diagnostic": 1.0488369752153468,
+      "winner": "arrangement",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": true,
+      "wall_seconds": 17.737
+    }
+  },
+  "win_loss_table": [
+    {
+      "dataset": "breast_cancer",
+      "status": "completed",
+      "winner": "arrangement",
+      "mean_arrangement_accuracy": 0.9625,
+      "mean_lightgbm_accuracy": 0.9425000000000001,
+      "mean_margin": 0.019999999999999997,
+      "mean_obliqueness_diagnostic": 1.0488369752153468,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": true,
+      "skip_reason": null
+    }
+  ],
+  "win_loss_counts": {
+    "arrangement": 1,
+    "lightgbm": 0,
+    "tie": 0,
+    "completed": 1,
+    "skipped": 0
+  },
+  "g4": {
+    "diag_threshold": 1.0,
+    "rule": "predict arrangement if mean_obliqueness_diagnostic > threshold else lightgbm",
+    "predictiveness": 1.0,
+    "corr_diag_margin": NaN,
+    "n_scored": 1,
+    "retuned": false
+  },
+  "honesty": {
+    "claim_rung": 1,
+    "trees_expected_to_win_most": true,
+    "no_aggregate_only_headline": true,
+    "temperature_collapse": true,
+    "bias_collapse": false,
+    "smoke_is_wiring_gate": true,
+    "obliqueness_diagnostic_retuned": false,
+    "g3_earned": false,
+    "g4_earned": false,
+    "theorem_prover_verified": false,
+    "mathlib_verified": false,
+    "licensed_sentence": "smoke wiring only: breast_cancer exercise of the public arrangement vs LightGBM path; G3 not earned"
+  },
+  "g3_earned": false,
+  "g4_earned": false,
+  "wall_seconds": 17.738
+}

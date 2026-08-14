@@ -52,6 +52,8 @@ curvature = ["omnibias-curvature>=0.1.0a1"]
 # The named gradient-boosting baseline + tabular dataset loaders for the
 # benchmark harness (kept out of the core deps; the refine loop needs them).
 gbm = ["lightgbm>=4.0", "scikit-learn>=1.2", "openml>=0.14"]
+keras = ["keras>=3.0", "omnibias-partition[keras]>=0.1.0a1"]
+equinox = ["omnibias-tab[jax]", "equinox"]
 all = ["omnibias-tab[torch,jax,verify,curvature]"]
 test = ["pytest>=7.0", "numpy>=1.24"]
 dev = ["omnibias-tab[all,test,gbm]", "ruff>=0.1.0", "mypy>=1.5"]

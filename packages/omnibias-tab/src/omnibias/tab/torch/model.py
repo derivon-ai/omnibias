@@ -5,7 +5,10 @@ r"""Trainable PyTorch soft decision-tree ensemble (bit-identical to the numpy / 
 :class:`SoftTreeEnsemble` is an ``nn.Module`` whose parameters are exactly the arrays of
 :class:`omnibias.tab._core.params.TabParams`, so a model trained here round-trips to numpy
 for certification (:mod:`omnibias.tab.certify`) and to the jax twin
-(:mod:`omnibias.tab.jax.model`). The forward is differentiable in every parameter -- the
+(:mod:`omnibias.tab.jax.model`). ``forward`` is a tensor-in / tensor-out layer
+(``X`` shape ``(..., d)`` -> scores ``(..., n_outputs)``) and composes with any
+encoder; constructors stay float64 CPU, so call ``.to(device, dtype)`` before
+plugging into a host net. The forward is differentiable in every parameter -- the
 oblique directions ``W``, the thresholds ``t`` and the leaves -- so the whole tree
 (splits included) is trained by the exact-curvature optimizers in
 :mod:`omnibias.tab.torch.train`.
@@ -40,7 +43,13 @@ class SoftTreeEnsemble(nn.Module):
         ensemble is randomly initialised from ``config.seed``.
     """
 
-    def __init__(self, config: SoftTreeConfig, params: TabParams | None = None) -> None:
+    def __init__(
+        self,
+        config: SoftTreeConfig,
+        params: TabParams | None = None,
+        *,
+        learnable_beta: bool = False,
+    ) -> None:
         super().__init__()
         self.config = config
         p = params if params is not None else init_params(config)
@@ -50,21 +59,35 @@ class SoftTreeEnsemble(nn.Module):
         self.b0 = nn.Parameter(torch.as_tensor(p.b0, dtype=_DTYPE))
         codes = torch.as_tensor(leaf_code_matrix(config.depth), dtype=_DTYPE)
         self.register_buffer("_codes", codes)
-        self._beta: float = float(config.beta_final)
+        beta0 = torch.tensor(float(config.beta_final), dtype=_DTYPE)
+        if learnable_beta:
+            self._beta = nn.Parameter(beta0)
+        else:
+            self.register_buffer("_beta", beta0, persistent=True)
 
     # ----- beta (gate sharpness) ---------------------------------------- #
     @property
     def beta(self) -> float:
-        return self._beta
+        return float(self._beta.detach().cpu().item())
 
     def set_beta(self, beta: float) -> None:
-        self._beta = float(beta)
+        with torch.no_grad():
+            self._beta.fill_(float(beta))
 
     # ----- forward ------------------------------------------------------ #
     def forward(self, X: Tensor, beta: float | None = None) -> Tensor:
-        r"""Raw ensemble scores ``F`` of shape ``(n, n_outputs)``."""
-        b = self._beta if beta is None else float(beta)
-        z = torch.einsum("nd,mjd->nmj", X, self.W) - self.t.unsqueeze(0)
+        r"""Raw ensemble scores ``F`` of shape ``(..., n_outputs)``.
+
+        ``X`` may have leading batch dims ``(..., d)``. Plugin use: call
+        ``.to(device=z.device, dtype=z.dtype)`` then ``forward(z)`` inside the
+        host graph. Constructors stay float64 CPU for certify / G3 parity.
+        """
+        b = self._beta if beta is None else X.new_tensor(float(beta), dtype=self.W.dtype)
+        if X.ndim < 2:
+            raise ValueError("X must have shape (..., n_features)")
+        leading = tuple(int(s) for s in X.shape[:-1])
+        rows = X.reshape(-1, X.shape[-1])
+        z = torch.einsum("nd,mjd->nmj", rows, self.W) - self.t.unsqueeze(0)
         g = torch.sigmoid(b * z)  # (n, T, D)
         codes = self._codes  # (L, D)
         assert isinstance(codes, Tensor)  # a registered buffer (narrow the nn.Module union)
@@ -72,11 +95,14 @@ class SoftTreeEnsemble(nn.Module):
         bexp = codes.view(1, 1, codes.shape[0], codes.shape[1])  # (1, 1, L, D)
         factors = bexp * gexp + (1.0 - bexp) * (1.0 - gexp)  # (n, T, L, D)
         memberships = factors.prod(dim=-1)  # (n, T, L)
-        return torch.einsum("nml,mlk->nk", memberships, self.leaves) + self.b0.unsqueeze(0)
+        out = torch.einsum("nml,mlk->nk", memberships, self.leaves) + self.b0.unsqueeze(0)
+        return out.reshape(*leading, out.shape[-1])
 
     # ----- numpy conveniences ------------------------------------------- #
     def _to_tensor(self, X: np.ndarray) -> Tensor:
-        return torch.as_tensor(np.asarray(X, dtype=np.float64), dtype=_DTYPE)
+        return torch.as_tensor(
+            np.asarray(X, dtype=np.float64), dtype=self.W.dtype, device=self.W.device
+        )
 
     def score(self, X: np.ndarray, beta: float | None = None) -> np.ndarray:
         with torch.no_grad():
@@ -121,7 +147,7 @@ class SoftTreeEnsemble(nn.Module):
         """
         if self.config.depth != 1:
             raise ValueError("to_additive_sequential requires depth == 1 (the additive tier)")
-        b = self._beta if beta is None else float(beta)
+        b = float(self._beta.detach().cpu().item()) if beta is None else float(beta)
         d, T, k = self.config.n_features, self.config.n_trees, self.config.n_outputs
         lin1 = nn.Linear(d, T).to(_DTYPE)
         lin2 = nn.Linear(T, k).to(_DTYPE)
@@ -160,11 +186,12 @@ class SoftTreeEnsemble(nn.Module):
 
     def load_params(self, params: TabParams) -> None:
         r"""Copy a numpy :class:`TabParams` into the module's parameters (in place)."""
+        dt = self.W.dtype
         with torch.no_grad():
-            self.W.copy_(torch.as_tensor(params.W, dtype=_DTYPE))
-            self.t.copy_(torch.as_tensor(params.t, dtype=_DTYPE))
-            self.leaves.copy_(torch.as_tensor(params.leaves, dtype=_DTYPE))
-            self.b0.copy_(torch.as_tensor(params.b0, dtype=_DTYPE))
+            self.W.copy_(torch.as_tensor(params.W, dtype=dt, device=self.W.device))
+            self.t.copy_(torch.as_tensor(params.t, dtype=dt, device=self.t.device))
+            self.leaves.copy_(torch.as_tensor(params.leaves, dtype=dt, device=self.leaves.device))
+            self.b0.copy_(torch.as_tensor(params.b0, dtype=dt, device=self.b0.device))
 
 
 __all__ = ["SoftTreeEnsemble"]

@@ -24,6 +24,9 @@ and runs on CPU in seconds (the QPINN demo in well under a minute).
 | [`pinn_sdf_geometry.py`](examples/pinn_sdf_geometry.py) | PyTorch | Curved-boundary hard Dirichlet on a disk via `omnibias.pinn.domain.torch.DistanceConstrainedField` |
 | [`pinn_fbpinn.py`](examples/pinn_fbpinn.py) | PyTorch | FBPINN multi-window field smoke + `ntk_eigenspectrum` / `spectral_bias_index` |
 | [`transforms_closed_form.py`](examples/transforms_closed_form.py) | PyTorch + JAX | closed-form Laplace / Fourier / Mellin transforms of activations: quadrature oracle, the honest gaps, and a trainable transform layer |
+| [`tab_as_layer.py`](examples/tab_as_layer.py) | PyTorch | encoder + `as_head` SoftTree / Arrangement / Boosted heads; joint Adam updates both sides; recipe [`cookbook/tab-as-layer.md`](cookbook/tab-as-layer.md) |
+| [`tab_as_layer_jax.py`](examples/tab_as_layer_jax.py) | JAX | encoder arrays + `arrangement_forward` / `forward_arrays`; optional Equinox `eqx.Module` wrappers; recipe [`cookbook/tab-as-layer.md`](cookbook/tab-as-layer.md) |
+| [`piecewise_discovery.py`](examples/piecewise_discovery.py) | PyTorch | learned-partition hybrid automaton: gates from data, harden, STLSQ; oracle partition is the control; recipe [`cookbook/piecewise-hybrid-automaton.md`](cookbook/piecewise-hybrid-automaton.md) |
 
 | [`qpinn_tise_qho.py`](examples/qpinn_tise_qho.py) | PyTorch | quantum harmonic-oscillator ground state (TISE) |
 | [`variational_harmonic_oscillator.py`](examples/variational_harmonic_oscillator.py) | PyTorch | least action: EL residual, energy conservation, action is minimized at the true path |

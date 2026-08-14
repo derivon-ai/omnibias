@@ -32,7 +32,8 @@ dependencies = ["omnibias-core>=0.2.0", "omnibias-difference>=0.1.0a1", "omnibia
 [project.optional-dependencies]
 jax = ["omnibias-jax>=0.2.0", "jax>=0.4.30", "jaxlib>=0.4.30"]
 sklearn = ["scikit-learn>=1.2"]
-all = ["omnibias-symbolic[jax,sklearn]"]
+tab = ["omnibias-tab[torch,jax]>=0.1.0a1"]
+all = ["omnibias-symbolic[jax,sklearn,tab]"]
 test = [
     "pytest>=7.0",
     "numpy>=1.24",

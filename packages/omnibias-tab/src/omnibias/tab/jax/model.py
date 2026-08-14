@@ -24,15 +24,20 @@ from omnibias.tab._core.params import TabParams, leaf_code_matrix
 def forward_arrays(
     W: Any, t: Any, leaves: Any, b0: Any, X: Any, beta: float, depth: int
 ) -> Any:
-    r"""Raw scores ``F`` ``(n, k)`` from raw arrays -- the ``jax``-traceable kernel."""
+    r"""Raw scores ``F`` ``(..., k)`` from raw arrays -- the ``jax``-traceable kernel."""
+    if X.ndim < 2:
+        raise ValueError("X must have shape (..., n_features)")
+    leading = X.shape[:-1]
+    rows = X.reshape((-1, X.shape[-1]))
     codes = jnp.asarray(leaf_code_matrix(depth))  # (L, D)
-    z = jnp.einsum("nd,mjd->nmj", X, W) - t[None, :, :]
+    z = jnp.einsum("nd,mjd->nmj", rows, W) - t[None, :, :]
     g = jax.nn.sigmoid(beta * z)  # (n, T, D)
     gexp = g[:, :, None, :]  # (n, T, 1, D)
     bexp = codes[None, None, :, :]  # (1, 1, L, D)
     factors = bexp * gexp + (1.0 - bexp) * (1.0 - gexp)  # (n, T, L, D)
     memberships = jnp.prod(factors, axis=-1)  # (n, T, L)
-    return jnp.einsum("nml,mlk->nk", memberships, leaves) + b0[None, :]
+    out = jnp.einsum("nml,mlk->nk", memberships, leaves) + b0[None, :]
+    return out.reshape(leading + (out.shape[-1],))
 
 
 def forward(params: TabParams, X: Any, beta: float) -> Any:

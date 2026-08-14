@@ -324,10 +324,12 @@ from omnibias.symbolic.navier_stokes import (
 from omnibias.symbolic.piecewise import (
     HybridAutomaton,
     PiecewiseLaw,
+    fit_learned_piecewise_ode,
     fit_piecewise_law,
     fit_piecewise_ode_law,
     global_sparse_law,
     polynomial_value_library,
+    polynomial_vector_library,
 )
 from omnibias.symbolic.selection import (
     CRITERIA,
@@ -501,6 +503,7 @@ __all__ = [
     "fit_information_library_plan",
     "fit_jet_cdf_plan",
     "fit_jet_info_plan",
+    "fit_learned_piecewise_ode",
     "fit_neural_field_1d",
     "fit_neural_field_nd",
     "fit_piecewise_law",
@@ -557,6 +560,7 @@ __all__ = [
     "periodic_hilbert",
     "polynomial_from_samples",
     "polynomial_value_library",
+    "polynomial_vector_library",
     "pressure_poisson_residual_periodic",
     "primitive_residual_periodic",
     "pullback_metric_field",

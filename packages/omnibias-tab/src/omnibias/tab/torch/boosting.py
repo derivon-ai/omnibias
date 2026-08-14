@@ -99,12 +99,24 @@ def fit_boosted(
     inner_steps: int = 60,
     inner_lr: float = 0.05,
     val: tuple[np.ndarray, np.ndarray] | None = None,
+    patience: int | None = None,
+    encoder: object | None = None,
 ) -> tuple[SoftTreeEnsemble, BoostResult]:
     r"""Fit a Newton-boosted soft-tree ensemble; returns ``(model, BoostResult)``.
 
     ``config`` describes **one stage** (its ``n_trees`` / ``depth`` are the weak-learner
     shape); the returned :class:`SoftTreeEnsemble` holds ``n_stages * config.n_trees`` trees.
+    Optional ``patience`` (with ``val``) keeps the prefix with best validation loss.
+
+    ``encoder`` is rejected: stagewise numpy boosting does not jointly train an
+    encoder. Use :func:`~omnibias.tab.torch.train.fit_joint` or
+    :func:`~omnibias.tab.torch.train.fit_second_order`.
     """
+    if encoder is not None:
+        raise TypeError(
+            "encoder= is not supported on the stagewise GBM-mirror trainers; "
+            "use fit_joint or fit_second_order"
+        )
     task, k = config.task, config.n_outputs
     Xtr = np.asarray(X, dtype=np.float64)
     n = Xtr.shape[0]
@@ -119,7 +131,11 @@ def fit_boosted(
     t_parts: list[np.ndarray] = []
     leaf_parts: list[np.ndarray] = []
     b0 = base.copy()
+    b0_parts: list[np.ndarray] = []
     history: list[float] = []
+    best_val = None if val is None else loss_value(Fval, val[1], task)
+    best_n = 0
+    stall = 0
 
     for stage in range(n_stages):
         g, h = score_grad_hess(F, y, task)  # (n, k)
@@ -131,16 +147,36 @@ def fit_boosted(
         W_parts.append(wp.W)
         t_parts.append(wp.t)
         leaf_parts.append(learning_rate * wp.leaves)
-        b0 = b0 + learning_rate * wp.b0
+        b0_delta = learning_rate * wp.b0
+        b0_parts.append(b0_delta)
+        b0 = b0 + b0_delta
 
         F = F + learning_rate * weak.score(Xtr)
         if val is not None and Fval is not None:
             Fval = Fval + learning_rate * weak.score(val[0])
         history.append(loss_value(F, y, task))
+        if val is not None and Fval is not None and patience is not None:
+            cur = loss_value(Fval, val[1], task)
+            if best_val is None or cur < best_val - 1e-12:
+                best_val = cur
+                best_n = stage + 1
+                stall = 0
+            else:
+                stall += 1
+                if stall >= max(1, int(patience)):
+                    break
 
+    keep = best_n if (val is not None and patience is not None and best_n > 0) else len(W_parts)
+    keep = max(1, min(keep, len(W_parts)))
+    W_parts = W_parts[:keep]
+    t_parts = t_parts[:keep]
+    leaf_parts = leaf_parts[:keep]
+    b0 = base.copy()
+    for delta in b0_parts[:keep]:
+        b0 = b0 + delta
     total_cfg = SoftTreeConfig(
         n_features=config.n_features,
-        n_trees=n_stages * config.n_trees,
+        n_trees=keep * config.n_trees,
         depth=config.depth,
         task=task,
         n_outputs=k,
@@ -160,11 +196,11 @@ def fit_boosted(
     model.set_beta(config.beta_final)
 
     val_metric = None
-    if val is not None and Fval is not None:
-        val_metric = _metric(Fval, np.asarray(val[1]), task)
+    if val is not None:
+        val_metric = _metric(model.score(val[0]), np.asarray(val[1]), task)
 
     return model, BoostResult(
-        n_stages=n_stages,
+        n_stages=keep,
         learning_rate=learning_rate,
         train_loss=history[-1] if history else float("nan"),
         val_metric=val_metric,

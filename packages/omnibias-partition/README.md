@@ -17,7 +17,8 @@ weights `w_l(x)` that are
 On top of the weights it ships:
 
 1. **`partition_weights`** -- the numpy reference plus **bit-identical torch / jax twins**
-   (parity `~1e-9`, float64), so the same partition trains under any backend.
+   (parity `~1e-9`, float64) and a **keras.ops** twin (`[keras]` extra), so the same
+   partition trains under any backend.
 2. **`hard_assignment` / `hardened_rules`** -- the crisp region index and the exported
    human-readable `if w·x > t` boundaries (`axis` mode gives single-feature rules).
 3. **A sound certificate** (`certify_partition_gap`): an outward-rounded
@@ -41,6 +42,7 @@ founding bias collapse (the multi-bias `delta → 0` limit to the closed-form de
 pip install -e packages/omnibias-partition            # numpy core + certificate
 pip install -e "packages/omnibias-partition[torch]"   # + torch weight twin
 pip install -e "packages/omnibias-partition[jax]"      # + jax weight twin
+pip install -e "packages/omnibias-partition[keras]"    # + keras.ops weight twin
 ```
 
 ## Scope / honesty

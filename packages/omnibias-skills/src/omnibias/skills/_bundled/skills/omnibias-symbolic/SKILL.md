@@ -20,6 +20,8 @@ Read the dense cheat-sheet first:
 | Fit a smooth field + its jet | `fit_neural_field_1d`, `fit_neural_field_nd`, `extract_field_jet` |
 | Gradient / Hessian / Laplacian of a fitted field | `field_gradient`, `field_laplacian` |
 | Discover a PDE (heat / wave / Burgers / Laplace) | `FieldLawDiscoverer`, `discover_field_pde_law`, `make_heat_field_split` |
+| Piecewise / hybrid automaton (oracle partition) | `fit_piecewise_law`, `fit_piecewise_ode_law`, `HybridAutomaton` |
+| Learn gates from data, then harden + STLSQ | `fit_learned_piecewise_ode` |
 | Curvature / metric on learned charts | `MetricField`, `laplace_beltrami`, `pullback_metric_field`, `scalar_curvature` |
 
 ## Minimal example (verified)
@@ -37,8 +39,12 @@ print(result.formula())            # -> "dy = 1*y"
 - **A random-feature field is only accurate inside the support of its training points.** Use `n_features` in the hundreds for smooth targets and keep evaluation points inside the training box; extrapolation breaks the (exact-for-the-fitted-field) derivatives.
 - **Request the order you need.** A jet carries partials up to its `max_order`; a Hessian needs `order=2`.
 - **Pass `random_state=<int>`** to every `fit_*` / `make_*` / discoverer for bit-reproducible fields, jets, and discovered equations on a given platform.
+- **Learned gates vs unplanted tab-head.** `fit_learned_piecewise_ode` trains soft weights then hardens and STLSQ-polishes (it calls `_refine_split_threshold`). A SoftTree / Arrangement tab head is trained on the trajectory's finite-difference `du` (kinked; the field-jet `du` is smoothed), then `tree_params` / `arrangement_params` take the **fitted** split -- Arrangement is unplanted (random `W`, no `e_0`) and that path does **not** call `_refine_split_threshold`. STLSQ on the field jet is numpy / non-differentiable either way.
+- **`sampled_latent` is not IBP through an arbitrary encoder `E`.** `omnibias.tab.certify_composed` is sound IBP / `tab+tab` when ingest works; otherwise the latent box is sampled, not a sound enclosure of `E(box)`.
+- **`beta -> inf` vs `delta -> 0`.** Gate hardening (soft indicator -> 0/1 step) is the feasibility / temperature sense of collapse. Jets of a tree surrogate are the founding `delta -> 0` register. Do not conflate them.
 
 ## More detail
 
 - API: [symbolic](https://github.com/derivon-ai/omnibias/blob/main/docs/api/symbolic.md)
+- Cookbook: [piecewise hybrid automaton](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/piecewise-hybrid-automaton.md)
 - Handbook chapters 1-7 (neural-jet discovery through information geometry): [handbook index](https://github.com/derivon-ai/omnibias/blob/main/docs/handbook/index.md)

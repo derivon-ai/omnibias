@@ -17,10 +17,16 @@ with ``u`` continuous (so ``du`` has a kink at ``x = 0``), fits ONE global omnib
 ``(x, u)``, reads off the exact closed-form ``(u, du)`` jet, and shows the piecewise automaton
 recovers both laws + the boundary and beats the global average.
 
-Honesty: the STLSQ fit is numpy / non-differentiable; near the switch surface the single
-global field smooths the kink, so the per-region fits are approximate (the boundary itself is
-recovered exactly from the partition). The ``beta -> inf`` gate hardening is the feasibility /
-temperature sense of "collapse", distinct from the founding ``delta -> 0`` bias collapse.
+Honesty: STLSQ polish is numpy / non-differentiable; gates and per-cell
+coefficients are trained by Adam on the soft-weighted residual, then hardened.
+The learned split is fit on the closed-form field jet ``(x, u, du)`` (not the
+oracle switched law). The oracle axis partition is the control. A tab SoftTree
+or Arrangement trained on the trajectory's finite-difference ``du`` can be
+hardened from the **fitted** split as the partition (distinct from
+``fit_learned_piecewise_ode``). The Arrangement constructor is unplanted
+(random ``W``, no ``e_0``); that path does not call ``_refine_split_threshold``.
+The ``beta -> inf`` gate hardening is the feasibility / temperature sense of
+"collapse", distinct from the founding ``delta -> 0`` bias collapse.
 """
 
 from __future__ import annotations
@@ -48,8 +54,9 @@ def main() -> None:
     from omnibias.partition import PartitionConfig
     from omnibias.partition._core.params import PartitionParams
     from omnibias.symbolic.discovery import rmse
-    from omnibias.symbolic.field_discovery import extract_field_jet
+    from omnibias.symbolic.field_discovery import extract_field_jet, fit_neural_field_nd
     from omnibias.symbolic.piecewise import (
+        fit_learned_piecewise_ode,
         fit_piecewise_ode_law,
         global_sparse_law,
         polynomial_value_library,
@@ -59,14 +66,31 @@ def main() -> None:
     sel = np.linspace(0, xs.size - 1, 400).astype(int)
     x = xs[sel].reshape(-1, 1)
     y = u[sel]
+    field_learned = fit_neural_field_nd(x, y, hidden=200, seed=0)
+    jet_learned = extract_field_jet(field_learned, x, max_order=1)
+    u_jet, du_jet = jet_learned.value(), jet_learned.partial((1,))
+    learned, state = fit_learned_piecewise_ode(
+        x,
+        u_jet,
+        du_jet,
+        n_gates=1,
+        degree=1,
+        steps=200,
+        seed=0,
+        alpha=1e-12,
+        threshold=1e-5,
+    )
+    print("=== learned partition (gates from data) ===")
+    print(learned.report())
+    print(f"learned threshold t = {float(np.asarray(state['t']).reshape(-1)[0]):.3f}")
 
     cfg = PartitionConfig(n_features=1, depth=1, split_kind="axis", beta_final=32.0, anneal_steps=1)
     partition = PartitionParams(cfg, W=np.array([[1.0]]), t=np.array([0.0]))
 
-    # degree=1: discover an affine law du = a + b*u per region (matches the true linear regimes).
+    # Oracle partition (control): degree=1 affine law per region.
     automaton, field = fit_piecewise_ode_law(x, y, partition, degree=1, hidden=200, seed=0)
 
-    print("=== piecewise symbolic discovery of a switched ODE ===")
+    print("\n=== oracle partition (control) ===")
     print(f"fitted global field train_rmse = {field.train_rmse:.3e}")
     print(f"\nswitch surface: {automaton.switch_conditions()[0]}")
     print("\nrecovered hybrid automaton (piecewise laws):")

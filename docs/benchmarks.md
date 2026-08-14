@@ -55,7 +55,9 @@ These are verified in CI on every push (counts captured on a CPU-dev host):
 | Spectral bias / FBPINN | [`benchmarks/spectral_bias_fbpinn.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/spectral_bias_fbpinn.py) | equal-param arms + one-shot `lstsq`; smoke [`spectral_bias_fbpinn_smoke.json`](benchmarks/spectral_bias_fbpinn_smoke.json); full [`spectral_bias_fbpinn.json`](benchmarks/spectral_bias_fbpinn.json) |
 | Fisher pack degeneracy (04-01 G2) | [`benchmarks/information_geometry.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/information_geometry.py) | two-bias logistic pack: `G_{delta,delta}` exponent `2.00 +- 0.02` over three decades, prefactor `1/720`; smoke [`information_geometry_smoke.json`](benchmarks/information_geometry_smoke.json); full [`information_geometry.json`](benchmarks/information_geometry.json) |
 | Scan localization scaling (05-01 G7) | [`benchmarks/inverse_imaging.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/inverse_imaging.py) | locally-seeded logistic bias-scan: `sd(tau_hat) ~ alpha^(n - 5/2)` for `n in {3, 4}` over 1.2 decades / 5 seeds; global search earned for n=3 only; smoke [`inverse_imaging_smoke.json`](benchmarks/inverse_imaging_smoke.json); full [`inverse_imaging.json`](benchmarks/inverse_imaging.json) |
-| Tabular arrangement vs LightGBM (05-02 G1/G2) | [`benchmarks/tabular_arrangement.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/tabular_arrangement.py) | H=2 soft arrangement beats tuned LightGBM by ≥10 pts on constructed oblique XOR; within 2 pts on axis AND; smoke [`tabular_arrangement_smoke.json`](benchmarks/tabular_arrangement_smoke.json); full [`tabular_arrangement.json`](benchmarks/tabular_arrangement.json) |
+| Tabular arrangement vs LightGBM (05-02 G1/G2) | [`benchmarks/tabular_arrangement.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/tabular_arrangement.py) | Fair protocol: train on Xtr, early-stop on Xva, score Xte (no train+val refit) for both arms; H=2 soft arrangement beats tuned LightGBM by ≥10 pts on constructed oblique XOR; within 2 pts on axis AND; smoke [`tabular_arrangement_smoke.json`](benchmarks/tabular_arrangement_smoke.json); full [`tabular_arrangement.json`](benchmarks/tabular_arrangement.json) |
+| Tabular arrangement public (05-02 G3) | [`benchmarks/tabular_arrangement_public.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/tabular_arrangement_public.py) | Same fair early-stop protocol; eight public binary datasets; full win/loss table (no aggregate-only headline); trees expected to win most; G4 diagnostic reported frozen; smoke [`tabular_arrangement_public_smoke.json`](benchmarks/tabular_arrangement_public_smoke.json); full [`tabular_arrangement_public.json`](benchmarks/tabular_arrangement_public.json) |
+| Tabular arrangement capacity (05-02 G3b) | [`benchmarks/tabular_arrangement_capacity.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/tabular_arrangement_capacity.py) | G3 frozen; parallel capacity/optimizer arms vs the same LightGBM; primary arm `boost_h2` predeclared; G3b unearned (`boost_h2` not-worse 4/8, need >=6/8); smoke [`tabular_arrangement_capacity_smoke.json`](benchmarks/tabular_arrangement_capacity_smoke.json); full [`tabular_arrangement_capacity.json`](benchmarks/tabular_arrangement_capacity.json) |
 | Multipack Birkhoff (01-01 G1/G2/G3/G5) | [`benchmarks/multipack_birkhoff.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/multipack_birkhoff.py) | closed-form multi-pack vs mpmath with recorded float64 order ceiling; FD collapse stability; torch/jax parity; poisedness honesty; smoke [`multipack_birkhoff_smoke.json`](benchmarks/multipack_birkhoff_smoke.json); G4 deferred |
 
 Four-gap status matrix (capability / empirical / structural / certified):
@@ -757,10 +759,12 @@ baseline's own `±0.0059` seed noise).
 | digits | multiclass | accuracy | 0.9742 ± 0.0038 | 0.9747 ± 0.0059 | yes (tie, within noise) |
 | diabetes | regression | RMSE (lower) | **58.93 ± 1.36** | 61.67 ± 2.46 | yes (win) |
 
-The deterministic CI smoke (`tab_validate.py`) additionally checks, on every push: bit-identical
-torch<->jax forward (`<= 1e-9`, float64); a *proved* per-feature monotone constraint plus a
-sound output enclosure and a certified soft->hard rounding gap; and the **exact second-order
-trainer strictly beating a tuned Adam baseline** on held-out data at a matched step budget.
+The deterministic CI smoke (`tab_validate.py`) additionally checks, on every push:
+bit-identical torch<->jax forward (`<= 1e-9`, float64); a *proved* per-feature monotone
+constraint plus a sound output enclosure and a certified soft->hard rounding gap; and the
+**exact second-order trainer strictly beating a tuned Adam baseline** on held-out data at
+a matched step budget. `tab_as_layer.py` checks that `SoftTreeEnsemble` /
+`ArrangementBoosted` compose with an encoder and that joint Adam updates both sides.
 
 !!! note
     The four datasets above are the offline, network-free suite (reproducible anywhere). The
@@ -792,6 +796,8 @@ Tabular head-to-head (CPU smoke + the full cluster sweep):
 ```bash
 pip install -e "packages/omnibias-tab[torch,jax,verify,gbm]"
 python docs/examples/tab_validate.py                       # deterministic CPU smoke (CI)
+python docs/examples/tab_as_layer.py                       # encoder + tab head plugin (CI)
+python docs/examples/tab_as_layer_jax.py                   # JAX encoder + arrangement/tree kernels (CI)
 python packages/omnibias-tab/bench/sweep.py --seeds 8      # full multi-seed suite (cluster)
 ```
 

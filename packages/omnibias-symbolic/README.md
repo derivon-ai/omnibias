@@ -28,6 +28,15 @@ named function generated the data.
   (`build_jet_fractional_features_closed_form`, the analytic-class twin of the
   Grünwald–Letnikov `build_jet_fractional_features`) from the jet tower and
   selecting by STLSQ; exact on polynomial signals.
+- **Piecewise / hybrid-automaton discovery** (`omnibias.symbolic.piecewise`) —
+  per-region STLSQ on a partition of unity; `fit_learned_piecewise_ode` learns
+  the gates (differentiable soft-weighted residual) then hardens + polishes.
+  A SoftTree or Arrangement trained on the trajectory's finite-difference
+  ``du`` can be hardened from the **fitted** split as the partition (distinct
+  from the learned-gate path). The Arrangement constructor is **unplanted**
+  (random ``W``, no ``e_0`` axis init); STLSQ still uses the field jet. Vector
+  systems share gates; the learned vector hybrid does not take an oracle
+  partition. Oracle partitions remain the control.
 - **High-dimensional sparse recovery** in many irrelevant dimensions.
 - **Blasius boundary layer** (`omnibias.symbolic.blasius`) — shooting solve,
   recovery of `f''' = -0.5 f f''` from numerical and *blind neural* jets, and

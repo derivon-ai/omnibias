@@ -6,6 +6,161 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equinox CI, unplanted Arrangement, Keras Boosted beta
+
+- Equinox wrapper tests **fail** when ``CI`` is set and the extra is missing
+  (local runs still ``importorskip``). CUDA AMP stays skip-if-no-CUDA.
+- Arrangement tab-head on the switched ODE is unplanted (constructor random
+  ``W``, no ``e_0`` axis init); fitted ``W``/``t`` still recover both field-jet
+  laws.
+- Keras ``ArrangementBoosted(learnable_beta=True)`` tape: member ``beta`` is
+  trainable and has nonzero grad through the ensemble forward. The layer
+  implements ``build()`` so Keras 3 does not warn on first call.
+- Cookbook recipes ``tab-as-layer`` and ``piecewise-hybrid-automaton``; plugin /
+  piecewise honesty in API, READMEs, and consumer skills.
+
+### Added — four remaining test / coverage gaps
+
+- Tab-head switched-ODE path trains SoftTree **and** Arrangement (``H=1``
+  regression) on the trajectory's finite-difference ``du`` (kinked; the
+  field-jet ``du`` is smoothed), then hardens the **fitted** ``W``/``t``
+  (no ``_refine_split_threshold`` polish). STLSQ still uses the field jet.
+  ``fit_learned_piecewise_ode`` still polishes its own learned gates.
+- Per-leaf ``NeuralJetDiscoverer`` requires both regimes on the **same**
+  two-sided tree; identity-passing far leaves with enough jet variation
+  must recover ``c_y`` (compact leaves stay unidentified).
+- ``torch.compile`` on all three heads is required when ``CI`` is set (CPU
+  inductor); local runs still skip if inductor is missing. CUDA AMP stays
+  skip-if-no-CUDA.
+
+### Added — seven remaining honesty / coverage nits
+
+- Tab-head switched-ODE path (superseded below): a depth-1 SoftTree can be
+  hardened via ``tree_params`` and fed to ``fit_piecewise_law`` on a field jet.
+  ``fit_learned_piecewise_ode`` stays the differentiable-partition control.
+- ``certify_composed``: SoftTree / Arrangement encoders (optional Linear IBP
+  prefix) get a sound interval latent box (``tab+tab`` / ``ibp+tab+tab``);
+  arbitrary modules stay ``sampled_latent`` (not a sound enclosure of ``E(box)``).
+- Tab CI smokes ``KERAS_BACKEND=torch`` on ``test_keras.py`` (torch already in
+  the tab job; TensorFlow stays a dedicated step, not a required dep). Keras
+  ``ops.prod`` on the torch backend dropped float64; ``prod_last_axis`` keeps dtype.
+- Depth-1 ``extract_tree_jet_directional`` uses ``mlp_jet``; depth ``>= 2`` keeps
+  the Leibniz product.
+- Equinox ``BoostedHead`` wrapping ``boosted_forward``; ``import omnibias.tab.jax``
+  stays Equinox-free.
+- Learned vector hybrid (``fit_learned_piecewise_ode`` on two-component ``u``)
+  without an oracle partition; oracle vector test stays the control.
+- Per-leaf NeuralJetDiscoverer scans every tree's ``hard_assignment`` after an
+  unplanted fit (not planted tree 0).
+
+### Added — eight remaining honesty / coverage gaps
+
+- `NeuralJetDiscoverer.include_x` (default ``True``); per-leaf two-regime gate
+  uses the sparse equation's ``c_y``, not an ``lstsq`` of the jet.
+- Learned trajectory split is fit on a closed-form field jet
+  (``fit_neural_field_nd`` + ``extract_field_jet``); algebraic i.i.d. samples
+  and the example's oracle partition stay controls.
+- ``as_head`` returns ``TabHead`` (logits ``(..., k)``; attributes forward to
+  the inner module).
+- Keras ``ArrangementBoosted`` (stacked ``keras.ops`` combine),
+  ``learnable_beta`` on SoftTree / Arrangement, and a TensorFlow smoke of
+  ``test_keras.py`` (TensorFlow is not a required dep).
+- ``certify_composed``: IBP when Linear/activation ingest works (including a
+  flattenable ``ModuleList``); otherwise ``method="sampled_latent"`` (not a
+  sound enclosure of ``E(box)``).
+- Depth-1 ``extract_tree_jet`` uses ``mlp_jet_mv`` (additive Linear-sigmoid-
+  Linear); depth ``>= 2`` keeps the Leibniz product.
+- ``fit_first_order(..., encoder=)`` joint-Adam test; always-on CPU AMP
+  (bfloat16) over all three heads; ``torch.compile`` skips only if inductor
+  is missing.
+
+### Added — remaining plugin / discovery gaps
+
+- AMP and `torch.compile` parametrized over SoftTree / Arrangement / Boosted
+  (CPU AMP always-on; CUDA AMP skip if no CUDA; compile skip if no inductor).
+- `learnable_beta` tests: `_beta` is an `nn.Parameter` with nonzero grad and
+  follows `.to(dtype)` on SoftTree and Arrangement.
+- Per-leaf NeuralJetDiscoverer gate on a two-regime `exp` / `exp(-2x)` **soft-tree
+  jet** (`delta -> 0`); `extract_tree_jet` vs autodiff. Switches remain
+  `beta -> inf`.
+- Learned partition on the switched-ODE **trajectory**
+  (`fit_learned_piecewise_ode`); algebraic i.i.d. samples stay the control.
+- Optional Equinox extra: `omnibias.tab.jax.equinox_head` (`eqx.Module`);
+  `import omnibias.tab.jax` stays Equinox-free. CI `pip install equinox` next
+  to Keras.
+- Optional keyword-only `encoder=` on `fit_first_order` / `fit_second_order` /
+  `fit_arrangement` (default `None` is the tabular G3 path). Stagewise
+  `fit_boosted` / `fit_arrangement_boosted` raise `TypeError` pointing at
+  `fit_joint` / `fit_second_order`. G3 JSON untouched.
+
+### Added — tab plugin completion + if-else neural-jet discovery
+
+- `as_head(z, kind)` returns a `TabHead` wrapping SoftTree / Arrangement /
+  Boosted on `z.device` / `z.dtype`; arrangement logits are `(..., k)` with numpy
+  `predict` squeezing `k=1`; `beta` / `lr` are buffers; batched
+  `ArrangementBoosted.forward`; `fit_joint(encoder, head, X, y)` without
+  changing G3 `fit_*` signatures; multiclass / regression `cell_logits`.
+- Keras 3 layers in `omnibias.tab.keras` and `omnibias.partition.keras`
+  (`keras.ops`, not `omnibias-keras`), including `ArrangementBoosted` and
+  `learnable_beta`.
+- `certify_composed(encoder, head, box)`: IBP the encoder when ingest works,
+  else `sampled_latent` (not a sound enclosure of `E(box)`); grid+random
+  soundness on composed samples.
+- Soft-tree jets: `extract_tree_jet` / `extract_arrangement_jet`. Depth-1 uses
+  `mlp_jet_mv`; depth `>= 2` is the Leibniz product of sigmoid jets (exact for
+  the **soft** surrogate).
+- Learned-partition piecewise discovery: `fit_learned_piecewise_ode` trains
+  differentiable soft-weighted per-cell models then STLSQ-polishes; vector
+  `HybridAutomaton` with shared gates. Oracle partitions stay the control.
+
+### Added — tab layers as neural-net heads (plugin contract)
+
+- `ArrangementBoosted` is an `nn.Module`: `forward` is `base + lr * sum members`
+  with autograd through every weak learner (no `detach` / numpy).
+- `ArrangementClassifier`, `ArrangementBoosted`, and `SoftTreeEnsemble`
+  `forward` accept leading dims `(..., d)` and compose with any encoder;
+  constructors stay float64 CPU (certify / G3). Plugin use is
+  `.to(device=z.device, dtype=z.dtype)` then the user's optimizer.
+- JAX twins: `omnibias.tab.jax.arrangement_forward` /
+  `boosted_forward` (float64 parity `~1e-9`).
+- Gate: `packages/omnibias-tab/tests/test_plugin.py` plus
+  `docs/examples/tab_as_layer.py` and `tab_as_layer_jax.py` (CI).
+
+### Changed — fair early-stop protocol for arrangement vs LightGBM
+
+- `fit_arrangement` now early-stops on validation BCE with best-checkpoint
+  restore (`patience` / `eval_every` / optional outer `X_val`); `steps` is a
+  max cap. Both G1/G2 and G3 runners train on `Xtr` only for arrangement and
+  LightGBM (no train+val refit); `--full` rejects arrangement arms that hit
+  the Adam step cap without plateauing.
+- Regenerated smoke + full artifacts under the fair protocol (previous G3
+  win/loss numbers are not comparable).
+
+### Added — 05-02 G3b capacity suite (G3 frozen)
+
+- `fit_arrangement(..., optimizer="trust_region"|"cubic")` and
+  `fit_arrangement_boosted` (Newton-boosted H=2 arrangements, stage-wise
+  val-BCE early stop).
+- `benchmarks/tabular_arrangement_capacity.py`: parallel arms (`h2_adam`,
+  `h2_newton`, `h3_adam`, `h4_adam`, primary `boost_h2`, `tab_boost`,
+  `tab_joint`) vs the same fair LightGBM. G3b earned only if predeclared
+  `boost_h2` is not-worse on >=6/8 public sets. Smoke:
+  `docs/benchmarks/tabular_arrangement_capacity_smoke.json` (CI); `--full`
+  writes `docs/benchmarks/tabular_arrangement_capacity.json`
+  (`g3b_earned: false`; primary not-worse on 4/8).
+
+### Added — 05-02 G3: public arrangement vs LightGBM win/loss table
+
+- `omnibias.tab.bench.ARRANGEMENT_PUBLIC_SUITE`: eight binary public datasets
+  (breast_cancer offline; adult / higgs / banknote / blood_transfusion /
+  ionosphere / sonar / spambase via OpenML with skip-on-fail); adult encoding
+  fixed; `train_val_test_split` for stratified 60/20/20.
+- `benchmarks/tabular_arrangement_public.py`: tuned LightGBM + H=2
+  `fit_arrangement` (dense + sparse arms); per-dataset win/loss table; G4
+  diagnostic predictiveness reported with a frozen threshold (not retuned).
+- Artifacts: `docs/benchmarks/tabular_arrangement_public_smoke.json` (CI) and
+  `docs/benchmarks/tabular_arrangement_public.json` (`--full`).
+
 ### Added — Wave-1 primitive 01-01: multipack Birkhoff collapse
 
 - `omnibias.core.multipack`: `PackSpec` / `MultiPackSpec`, Polya screen,

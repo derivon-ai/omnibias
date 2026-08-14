@@ -1283,18 +1283,49 @@ jobs:
           pip install -e packages/omnibias-struct
           pip install -e "packages/omnibias-partition[torch,jax]"
           pip install -e "packages/omnibias-tab[torch,jax,verify,curvature,gbm,test]"
+          pip install keras
+          pip install equinox
       - name: Run tab tests
         run: |
           source .venv-tab/bin/activate
-          JAX_PLATFORMS=cpu python -m pytest packages/omnibias-tab/tests -q
+          JAX_PLATFORMS=cpu JAX_ENABLE_X64=1 python -m pytest packages/omnibias-tab/tests -q
+      - name: Keras jax smoke (tab + partition layers)
+        run: |
+          source .venv-tab/bin/activate
+          KERAS_BACKEND=jax JAX_PLATFORMS=cpu JAX_ENABLE_X64=1 python -m pytest packages/omnibias-tab/tests/test_keras.py packages/omnibias-partition/tests/test_keras_weights.py -q
+      - name: Keras tensorflow smoke (tab layers)
+        run: |
+          source .venv-tab/bin/activate
+          pip install tensorflow-cpu
+          KERAS_BACKEND=tensorflow python -m pytest packages/omnibias-tab/tests/test_keras.py -q
+      - name: Keras torch smoke (tab layers)
+        run: |
+          source .venv-tab/bin/activate
+          KERAS_BACKEND=torch python -m pytest packages/omnibias-tab/tests/test_keras.py -q
       - name: Run the certified soft-tree example (smoke)
         run: |
           source .venv-tab/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/tab_validate.py
+      - name: Tab layers as neural heads (plugin smoke)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python docs/examples/tab_as_layer.py
+      - name: Tab layers as neural heads (JAX plugin smoke)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu JAX_ENABLE_X64=1 python docs/examples/tab_as_layer_jax.py
       - name: Wave-0 A4 tabular arrangement smoke (05-02 G1/G2)
         run: |
           source .venv-tab/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/tabular_arrangement.py
+      - name: Tabular arrangement public smoke (05-02 G3 wiring)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/tabular_arrangement_public.py
+      - name: Tabular arrangement capacity smoke (05-02 G3b wiring)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/tabular_arrangement_capacity.py
 
   partition:
     name: omnibias-partition (alpha)
@@ -1556,6 +1587,9 @@ jobs:
           pip install -e packages/omnibias-fractional
           pip install -e "packages/omnibias-symbolic[jax,sklearn,test]"
           pip install -e "packages/omnibias-struct[torch,jax]"
+          pip install -e packages/omnibias-discrete
+          pip install -e "packages/omnibias-partition[torch,jax]"
+          pip install -e "packages/omnibias-tab[torch,jax]"
           pip install pandas
       - name: Lint the symbolic package and recovered examples
         run: |
@@ -1574,6 +1608,10 @@ jobs:
         run: |
           source .venv-sym/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/dp_recurrence_discovery.py
+      - name: Learned-partition piecewise discovery example
+        run: |
+          source .venv-sym/bin/activate
+          JAX_PLATFORMS=cpu JAX_ENABLE_X64=1 python docs/examples/piecewise_discovery.py
 
   keras:
     name: omnibias-keras (${{ matrix.keras_backend }} / py${{ matrix.python-version }})

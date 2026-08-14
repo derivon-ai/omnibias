@@ -128,6 +128,17 @@ def obliqueness_diagnostic(X: FloatArray, y: FloatArray) -> float:
     return float(dense_acc / best_axis)
 
 
+def tree_params(
+    W: FloatArray,
+    t: FloatArray,
+    *,
+    n_features: int | None = None,
+    beta_final: float = 32.0,
+) -> PartitionParams:
+    """Wrap a single tree's gates ``W[m]``, ``t[m]`` as a :class:`PartitionParams`."""
+    return arrangement_params(W, t, n_features=n_features, beta_final=beta_final)
+
+
 def arrangement_params(
     W: FloatArray,
     t: FloatArray,
@@ -179,12 +190,25 @@ def predict_proba_np(
     X: FloatArray,
     beta: float,
 ) -> FloatArray:
-    """Soft arrangement probabilities ``sigmoid(sum_cell w_cell * logit_cell)``."""
+    """Soft arrangement probabilities from blended cell logits.
+
+    Binary (``cell_logits`` shape ``(2**H,)`` or ``(2**H, 1)``) returns a 1-D
+    sigmoid. Multiclass ``(2**H, k)`` with ``k > 1`` returns softmax over ``k``.
+    """
     weights = arrangement_weights(W, t, X, beta)
-    logits = combine_outputs(
-        weights, np.broadcast_to(np.asarray(cell_logits, dtype=np.float64), weights.shape)
-    )
-    # Numerically stable sigmoid.
+    cell = np.asarray(cell_logits, dtype=np.float64)
+    if cell.ndim == 1:
+        logits = combine_outputs(weights, np.broadcast_to(cell, weights.shape))
+    else:
+        logits = combine_outputs(
+            weights, np.broadcast_to(cell, (weights.shape[0],) + cell.shape)
+        )
+        if cell.shape[-1] == 1:
+            logits = logits.reshape(-1)
+    if logits.ndim == 2 and logits.shape[-1] > 1:
+        z = logits - logits.max(axis=-1, keepdims=True)
+        e = np.exp(np.clip(z, -40.0, 40.0))
+        return e / np.clip(e.sum(axis=-1, keepdims=True), 1e-12, None)
     out = np.empty_like(logits)
     pos = logits >= 0.0
     out[pos] = 1.0 / (1.0 + np.exp(-logits[pos]))
@@ -202,8 +226,13 @@ def hard_predict_np(
     """Crisp ``beta -> inf`` prediction from hard cell assignment."""
     params = arrangement_params(W, t)
     idx = hard_assignment(params, X)
-    logits = np.asarray(cell_logits, dtype=np.float64).reshape(-1)
-    return (logits[idx] > 0.0).astype(np.float64)
+    cell = np.asarray(cell_logits, dtype=np.float64)
+    picked = cell[idx]
+    if picked.ndim == 1:
+        return (picked > 0.0).astype(np.float64)
+    if picked.shape[-1] == 1:
+        return (picked.reshape(-1) > 0.0).astype(np.float64)
+    return np.argmax(picked, axis=-1).astype(np.float64)
 
 
 def init_arrangement(
@@ -235,4 +264,5 @@ __all__ = [
     "make_oblique_xor",
     "obliqueness_diagnostic",
     "predict_proba_np",
+    "tree_params",
 ]

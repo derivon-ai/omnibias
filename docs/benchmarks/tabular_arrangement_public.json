@@ -1,0 +1,3445 @@
+{
+  "schema": "tabular-arrangement-public-v1",
+  "generated_utc": "2026-08-13T19:48:54Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "tabular_arrangement_public_vs_lightgbm",
+    "suite": [
+      "breast_cancer",
+      "adult",
+      "higgs",
+      "banknote",
+      "blood_transfusion",
+      "ionosphere",
+      "sonar",
+      "spambase"
+    ],
+    "datasets_run": [
+      "breast_cancer",
+      "adult",
+      "higgs",
+      "banknote",
+      "blood_transfusion",
+      "ionosphere",
+      "sonar",
+      "spambase"
+    ],
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "split": {
+      "train": 0.6,
+      "val": 0.2,
+      "test": 0.2
+    },
+    "tie_band_accuracy_points": 0.005,
+    "n_hyperplanes": 2,
+    "lightgbm_grid_size": 32,
+    "lightgbm_n_estimators_max": 4000,
+    "lightgbm_early_stopping_rounds": 50,
+    "arrangement_patience": 50,
+    "arrangement_budget": {
+      "dense": {
+        "restarts": 6,
+        "steps": 5000,
+        "l1": 0.0,
+        "beta_final": 64.0,
+        "patience": 50,
+        "min_delta": 0.0001
+      },
+      "sparse": {
+        "restarts": 4,
+        "steps": 5000,
+        "l1": 0.02,
+        "beta_final": 128.0,
+        "patience": 50,
+        "min_delta": 0.0001
+      }
+    },
+    "fair_protocol": {
+      "train_on": "Xtr",
+      "early_stop_on": "Xva",
+      "score_on": "Xte",
+      "no_train_val_refit": true,
+      "arrangement_stop_metric": "val_bce",
+      "lightgbm_stop_metric": "binary_logloss"
+    },
+    "g4_diag_threshold": 1.0,
+    "g4_min_accuracy": 0.75,
+    "tier": "full",
+    "smoke_is_wiring_gate": false,
+    "full": true
+  },
+  "rss_mb_at_start": 820.58,
+  "baseline": {
+    "name": "tuned LightGBM (val-selected grid + early stopping)",
+    "note": "num_leaves x learning_rate x min_child_samples x max_depth; n_estimators via early stopping up to 4000; train on Xtr only (no train+val refit); arrangement early-stops on val BCE with the same patience and no train+val refit"
+  },
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "datasets": {
+    "breast_cancer": {
+      "dataset": "breast_cancer",
+      "status": "completed",
+      "n_rows": 569,
+      "n_features": 30,
+      "max_rows": null,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.9736842105263158,
+          "lightgbm_accuracy": 0.9298245614035088,
+          "margin": 0.04385964912280704,
+          "abs_margin": 0.04385964912280704,
+          "arrangement_auc": 0.9751984126984127,
+          "lightgbm_auc": 0.9603174603174603,
+          "majority_class_rate": 0.631578947368421,
+          "obliqueness_diagnostic": 1.05,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 78,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9736842105263158,
+            "train_val_gap": 0.02631578947368418,
+            "best_iteration": 78,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 0.9941348973607038,
+            "val_acc": 0.9912280701754386,
+            "train_bce": 0.0341277481101363,
+            "val_bce": 0.04771600446434113,
+            "train_val_gap": 0.0029068271852652483,
+            "steps_run": 850,
+            "best_step": 800,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9912280701754386,
+                "val_bce": 0.04771600446434113,
+                "accuracy": 0.9736842105263158,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 850,
+                "best_step": 800
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9912280701754386,
+                "val_bce": 0.051263771293294735,
+                "accuracy": 0.9736842105263158,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 220,
+                "best_step": 170
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 0.9824561403508771,
+          "lightgbm_accuracy": 0.9824561403508771,
+          "margin": 0.0,
+          "abs_margin": 0.0,
+          "arrangement_auc": 0.9990079365079365,
+          "lightgbm_auc": 0.9927248677248677,
+          "majority_class_rate": 0.631578947368421,
+          "obliqueness_diagnostic": 1.060096153846154,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 277,
+            "min_child_samples": 20,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9912280701754386,
+            "train_val_gap": 0.00877192982456143,
+            "best_iteration": 277,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9882697947214076,
+            "val_acc": 1.0,
+            "train_bce": 0.06143035624684941,
+            "val_bce": 0.01537304445897032,
+            "train_val_gap": -0.011730205278592365,
+            "steps_run": 215,
+            "best_step": 165,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9912280701754386,
+                "val_bce": 0.06383073974928764,
+                "accuracy": 0.9736842105263158,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 180,
+                "best_step": 130
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 1.0,
+                "val_bce": 0.01537304445897032,
+                "accuracy": 0.9824561403508771,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 215,
+                "best_step": 165
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.9649122807017544,
+          "lightgbm_accuracy": 0.9649122807017544,
+          "margin": 0.0,
+          "abs_margin": 0.0,
+          "arrangement_auc": 0.998015873015873,
+          "lightgbm_auc": 0.9933862433862434,
+          "majority_class_rate": 0.631578947368421,
+          "obliqueness_diagnostic": 1.0576923076923077,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 47,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9736842105263158,
+            "train_val_gap": 0.02631578947368418,
+            "best_iteration": 47,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9853372434017595,
+            "val_acc": 0.9824561403508771,
+            "train_bce": 0.07690078552095536,
+            "val_bce": 0.05864506011593846,
+            "train_val_gap": 0.0028811030508824054,
+            "steps_run": 205,
+            "best_step": 155,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 42.72727566544488,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9736842105263158,
+                "val_bce": 0.07660104864722768,
+                "accuracy": 0.9736842105263158,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 305,
+                "best_step": 255
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9824561403508771,
+                "val_bce": 0.05864506011593846,
+                "accuracy": 0.9649122807017544,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 205,
+                "best_step": 155
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.9824561403508771,
+          "lightgbm_accuracy": 0.9649122807017544,
+          "margin": 0.01754385964912275,
+          "abs_margin": 0.01754385964912275,
+          "arrangement_auc": 0.9993386243386243,
+          "lightgbm_auc": 0.9900793650793651,
+          "majority_class_rate": 0.631578947368421,
+          "obliqueness_diagnostic": 1.0552884615384617,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 121,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9736842105263158,
+            "train_val_gap": 0.02631578947368418,
+            "best_iteration": 121,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9853372434017595,
+            "val_acc": 0.9824561403508771,
+            "train_bce": 0.06239110388561577,
+            "val_bce": 0.046879697769386455,
+            "train_val_gap": 0.0028811030508824054,
+            "steps_run": 185,
+            "best_step": 135,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 26.237672458866527,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9912280701754386,
+                "val_bce": 0.05016464254679074,
+                "accuracy": 0.9824561403508771,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 750,
+                "best_step": 700
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9824561403508771,
+                "val_bce": 0.046879697769386455,
+                "accuracy": 0.9824561403508771,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 185,
+                "best_step": 135
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 0.9736842105263158,
+          "lightgbm_accuracy": 0.956140350877193,
+          "margin": 0.01754385964912286,
+          "abs_margin": 0.01754385964912286,
+          "arrangement_auc": 0.9923941798941799,
+          "lightgbm_auc": 0.9861111111111112,
+          "majority_class_rate": 0.631578947368421,
+          "obliqueness_diagnostic": 1.0502392344497609,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 102,
+            "min_child_samples": 5,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.956140350877193,
+            "train_val_gap": 0.04385964912280704,
+            "best_iteration": 102,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9853372434017595,
+            "val_acc": 0.9912280701754386,
+            "train_bce": 0.07661042288685907,
+            "val_bce": 0.05827803684779977,
+            "train_val_gap": -0.005890826773679025,
+            "steps_run": 180,
+            "best_step": 130,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9736842105263158,
+                "val_bce": 0.10491630726004408,
+                "accuracy": 0.9736842105263158,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 155,
+                "best_step": 105
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9912280701754386,
+                "val_bce": 0.05827803684779977,
+                "accuracy": 0.9736842105263158,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 180,
+                "best_step": 130
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.9754385964912281,
+      "mean_lightgbm_accuracy": 0.9596491228070174,
+      "mean_margin": 0.01578947368421053,
+      "mean_obliqueness_diagnostic": 1.0546632315053368,
+      "winner": "arrangement",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": true,
+      "wall_seconds": 68.255
+    },
+    "adult": {
+      "dataset": "adult",
+      "status": "completed",
+      "n_rows": 20000,
+      "n_features": 14,
+      "max_rows": 20000,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.839,
+          "lightgbm_accuracy": 0.8645,
+          "margin": -0.025500000000000078,
+          "abs_margin": 0.025500000000000078,
+          "arrangement_auc": 0.884855694564206,
+          "lightgbm_auc": 0.920161061825606,
+          "majority_class_rate": 0.75825,
+          "obliqueness_diagnostic": 1.0245971822215303,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 202,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.9034166666666666,
+            "val_acc": 0.87,
+            "train_val_gap": 0.03341666666666665,
+            "best_iteration": 202,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.8458333333333333,
+            "val_acc": 0.84125,
+            "train_bce": 0.34057274555962624,
+            "val_bce": 0.33569942106816514,
+            "train_val_gap": 0.004583333333333273,
+            "steps_run": 410,
+            "best_step": 360,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.83725,
+                "val_bce": 0.35542699596908245,
+                "accuracy": 0.8365,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 145,
+                "best_step": 95
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.84125,
+                "val_bce": 0.33569942106816514,
+                "accuracy": 0.839,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 410,
+                "best_step": 360
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 0.844,
+          "lightgbm_accuracy": 0.86075,
+          "margin": -0.016750000000000043,
+          "abs_margin": 0.016750000000000043,
+          "arrangement_auc": 0.8929606114880404,
+          "lightgbm_auc": 0.9167264195879111,
+          "majority_class_rate": 0.75825,
+          "obliqueness_diagnostic": 1.0243655612642069,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 127,
+            "learning_rate": 0.1,
+            "n_estimators": 53,
+            "min_child_samples": 5,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.8965,
+            "val_acc": 0.86425,
+            "train_val_gap": 0.03225,
+            "best_iteration": 53,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.8469166666666667,
+            "val_acc": 0.84025,
+            "train_bce": 0.3375297344629567,
+            "val_bce": 0.3455881347406178,
+            "train_val_gap": 0.006666666666666599,
+            "steps_run": 385,
+            "best_step": 335,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.83825,
+                "val_bce": 0.3569605002115612,
+                "accuracy": 0.8435,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 145,
+                "best_step": 95
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.84025,
+                "val_bce": 0.3455881347406178,
+                "accuracy": 0.844,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 385,
+                "best_step": 335
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.839,
+          "lightgbm_accuracy": 0.87425,
+          "margin": -0.035250000000000004,
+          "abs_margin": 0.035250000000000004,
+          "arrangement_auc": 0.893021302044283,
+          "lightgbm_auc": 0.9266217079209018,
+          "majority_class_rate": 0.75825,
+          "obliqueness_diagnostic": 1.024192921042396,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 67,
+            "min_child_samples": 20,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.88725,
+            "val_acc": 0.86375,
+            "train_val_gap": 0.023499999999999965,
+            "best_iteration": 67,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.83975,
+            "val_acc": 0.84225,
+            "train_bce": 0.3472089211243042,
+            "val_bce": 0.3496791322556584,
+            "train_val_gap": -0.0025000000000000577,
+            "steps_run": 350,
+            "best_step": 300,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8475,
+                "val_bce": 0.35908070000242187,
+                "accuracy": 0.84425,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 210,
+                "best_step": 160
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.84225,
+                "val_bce": 0.3496791322556584,
+                "accuracy": 0.839,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 350,
+                "best_step": 300
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.84075,
+          "lightgbm_accuracy": 0.867,
+          "margin": -0.026249999999999996,
+          "abs_margin": 0.026249999999999996,
+          "arrangement_auc": 0.8941171416384609,
+          "lightgbm_auc": 0.9209684507985411,
+          "majority_class_rate": 0.75825,
+          "obliqueness_diagnostic": 1.024219297562495,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 172,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.89625,
+            "val_acc": 0.86975,
+            "train_val_gap": 0.026499999999999968,
+            "best_iteration": 172,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.8439166666666666,
+            "val_acc": 0.84575,
+            "train_bce": 0.34089623396310365,
+            "val_bce": 0.3400807706586201,
+            "train_val_gap": -0.0018333333333333535,
+            "steps_run": 350,
+            "best_step": 300,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.84675,
+                "val_bce": 0.3562260417236985,
+                "accuracy": 0.84,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 140,
+                "best_step": 90
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.84575,
+                "val_bce": 0.3400807706586201,
+                "accuracy": 0.84075,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 350,
+                "best_step": 300
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 0.8425,
+          "lightgbm_accuracy": 0.872,
+          "margin": -0.02949999999999997,
+          "abs_margin": 0.02949999999999997,
+          "arrangement_auc": 0.8961986913343092,
+          "lightgbm_auc": 0.9292296970484273,
+          "majority_class_rate": 0.75825,
+          "obliqueness_diagnostic": 1.024557573867623,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 126,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.89,
+            "val_acc": 0.869,
+            "train_val_gap": 0.02100000000000002,
+            "best_iteration": 126,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.8404166666666667,
+            "val_acc": 0.839,
+            "train_bce": 0.34765465433579723,
+            "val_bce": 0.3431122357699597,
+            "train_val_gap": 0.0014166666666667327,
+            "steps_run": 365,
+            "best_step": 315,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.846,
+                "val_bce": 0.35137430528931857,
+                "accuracy": 0.847,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 145,
+                "best_step": 95
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.839,
+                "val_bce": 0.3431122357699597,
+                "accuracy": 0.8425,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 365,
+                "best_step": 315
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.8410499999999999,
+      "mean_lightgbm_accuracy": 0.8676999999999999,
+      "mean_margin": -0.026650000000000017,
+      "mean_obliqueness_diagnostic": 1.0243865071916503,
+      "winner": "lightgbm",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "wall_seconds": 150.849
+    },
+    "higgs": {
+      "dataset": "higgs",
+      "status": "completed",
+      "n_rows": 20000,
+      "n_features": 28,
+      "max_rows": 20000,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.677,
+          "lightgbm_accuracy": 0.72275,
+          "margin": -0.04574999999999996,
+          "abs_margin": 0.04574999999999996,
+          "arrangement_auc": 0.7254114706719418,
+          "lightgbm_auc": 0.7907264271197855,
+          "majority_class_rate": 0.523,
+          "obliqueness_diagnostic": 1.0698181818181818,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 93,
+            "min_child_samples": 5,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.8458333333333333,
+            "val_acc": 0.70275,
+            "train_val_gap": 0.14308333333333334,
+            "best_iteration": 93,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.6805833333333333,
+            "val_acc": 0.66475,
+            "train_bce": 0.6043565935855427,
+            "val_bce": 0.6142600956503083,
+            "train_val_gap": 0.015833333333333366,
+            "steps_run": 400,
+            "best_step": 350,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.66175,
+                "val_bce": 0.6179465663585756,
+                "accuracy": 0.67975,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 120,
+                "best_step": 70
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.66475,
+                "val_bce": 0.6142600956503083,
+                "accuracy": 0.677,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 400,
+                "best_step": 350
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 0.68,
+          "lightgbm_accuracy": 0.71575,
+          "margin": -0.03574999999999995,
+          "abs_margin": 0.03574999999999995,
+          "arrangement_auc": 0.7365077002938217,
+          "lightgbm_auc": 0.7886477786997286,
+          "majority_class_rate": 0.523,
+          "obliqueness_diagnostic": 1.0606562467653453,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 71,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.8234166666666667,
+            "val_acc": 0.7015,
+            "train_val_gap": 0.12191666666666667,
+            "best_iteration": 71,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.6754166666666667,
+            "val_acc": 0.6745,
+            "train_bce": 0.6088486739006248,
+            "val_bce": 0.6149104705966715,
+            "train_val_gap": 0.0009166666666666767,
+            "steps_run": 375,
+            "best_step": 325,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.6685,
+                "val_bce": 0.6226578953697827,
+                "accuracy": 0.67175,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 185,
+                "best_step": 135
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.6745,
+                "val_bce": 0.6149104705966715,
+                "accuracy": 0.68,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 375,
+                "best_step": 325
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.6625,
+          "lightgbm_accuracy": 0.708,
+          "margin": -0.045499999999999985,
+          "abs_margin": 0.045499999999999985,
+          "arrangement_auc": 0.7150695872466138,
+          "lightgbm_auc": 0.7763793186382385,
+          "majority_class_rate": 0.523,
+          "obliqueness_diagnostic": 1.0665565989062016,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 189,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.8516666666666667,
+            "val_acc": 0.71975,
+            "train_val_gap": 0.13191666666666668,
+            "best_iteration": 189,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.681,
+            "val_acc": 0.67875,
+            "train_bce": 0.6049247134006812,
+            "val_bce": 0.6098821552657502,
+            "train_val_gap": 0.0022500000000000853,
+            "steps_run": 345,
+            "best_step": 295,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.655,
+                "val_bce": 0.6142645212547663,
+                "accuracy": 0.64075,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 155,
+                "best_step": 105
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.67875,
+                "val_bce": 0.6098821552657502,
+                "accuracy": 0.6625,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 345,
+                "best_step": 295
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.66825,
+          "lightgbm_accuracy": 0.71325,
+          "margin": -0.04500000000000004,
+          "abs_margin": 0.04500000000000004,
+          "arrangement_auc": 0.7288538798096773,
+          "lightgbm_auc": 0.7839145131097403,
+          "majority_class_rate": 0.523,
+          "obliqueness_diagnostic": 1.0639867040614936,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 340,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.9225,
+            "val_acc": 0.71625,
+            "train_val_gap": 0.20624999999999993,
+            "best_iteration": 340,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.6775,
+            "val_acc": 0.6735,
+            "train_bce": 0.6069124173330406,
+            "val_bce": 0.6105988727441186,
+            "train_val_gap": 0.0040000000000000036,
+            "steps_run": 320,
+            "best_step": 270,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.67225,
+                "val_bce": 0.6113024143466187,
+                "accuracy": 0.67425,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 130,
+                "best_step": 80
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.6735,
+                "val_bce": 0.6105988727441186,
+                "accuracy": 0.66825,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 320,
+                "best_step": 270
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 0.67425,
+          "lightgbm_accuracy": 0.712,
+          "margin": -0.03774999999999995,
+          "abs_margin": 0.03774999999999995,
+          "arrangement_auc": 0.73317828024099,
+          "lightgbm_auc": 0.7894201630650456,
+          "majority_class_rate": 0.523,
+          "obliqueness_diagnostic": 1.0652603138314456,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 153,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.83125,
+            "val_acc": 0.72275,
+            "train_val_gap": 0.10850000000000004,
+            "best_iteration": 153,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.6765,
+            "val_acc": 0.68125,
+            "train_bce": 0.6105013271606667,
+            "val_bce": 0.6041773706940872,
+            "train_val_gap": -0.004750000000000032,
+            "steps_run": 385,
+            "best_step": 335,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.68375,
+                "val_bce": 0.6066659021942484,
+                "accuracy": 0.6775,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 135,
+                "best_step": 85
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.68125,
+                "val_bce": 0.6041773706940872,
+                "accuracy": 0.67425,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 385,
+                "best_step": 335
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.6724,
+      "mean_lightgbm_accuracy": 0.7143499999999999,
+      "mean_margin": -0.04194999999999997,
+      "mean_obliqueness_diagnostic": 1.0652556090765335,
+      "winner": "lightgbm",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "wall_seconds": 627.819
+    },
+    "banknote": {
+      "dataset": "banknote",
+      "status": "completed",
+      "n_rows": 1372,
+      "n_features": 4,
+      "max_rows": null,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.9963636363636363,
+          "lightgbm_accuracy": 0.9927272727272727,
+          "margin": 0.0036363636363636598,
+          "abs_margin": 0.0036363636363636598,
+          "arrangement_auc": 1.0,
+          "lightgbm_auc": 0.9998392799742848,
+          "majority_class_rate": 0.5563636363636364,
+          "obliqueness_diagnostic": 1.1542610571736784,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 158,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 1.0,
+            "train_val_gap": 0.0,
+            "best_iteration": 158,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 1.0,
+            "val_acc": 1.0,
+            "train_bce": 0.0010422633849383582,
+            "val_bce": 0.000935626854083461,
+            "train_val_gap": 0.0,
+            "steps_run": 815,
+            "best_step": 765,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 1.0,
+                "val_bce": 0.000935626854083461,
+                "accuracy": 0.9963636363636363,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 815,
+                "best_step": 765
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 1.0,
+                "val_bce": 0.003850114974134651,
+                "accuracy": 0.9963636363636363,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 420,
+                "best_step": 370
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 1.0,
+          "lightgbm_accuracy": 1.0,
+          "margin": 0.0,
+          "abs_margin": 0.0,
+          "arrangement_auc": 1.0,
+          "lightgbm_auc": 1.0,
+          "majority_class_rate": 0.5563636363636364,
+          "obliqueness_diagnostic": 1.1480686695278968,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 104,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 1.0,
+            "train_val_gap": 0.0,
+            "best_iteration": 104,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 1.0,
+            "val_acc": 1.0,
+            "train_bce": 0.0010933388968559614,
+            "val_bce": 0.0010767547956814915,
+            "train_val_gap": 0.0,
+            "steps_run": 805,
+            "best_step": 755,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 1.0,
+                "val_bce": 0.0010767547956814915,
+                "accuracy": 1.0,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 805,
+                "best_step": 755
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 1.0,
+                "val_bce": 0.0015877564457444063,
+                "accuracy": 1.0,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 600,
+                "best_step": 550
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.9890909090909091,
+          "lightgbm_accuracy": 0.9890909090909091,
+          "margin": 0.0,
+          "abs_margin": 0.0,
+          "arrangement_auc": 0.999946426658095,
+          "lightgbm_auc": 0.9995178399228544,
+          "majority_class_rate": 0.5563636363636364,
+          "obliqueness_diagnostic": 1.1475935828877006,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 62,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9890909090909091,
+            "train_val_gap": 0.010909090909090868,
+            "best_iteration": 62,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 0.9927007299270073,
+            "val_acc": 0.9927272727272727,
+            "train_bce": 0.015088494195687195,
+            "val_bce": 0.014342295155932312,
+            "train_val_gap": -2.6542800265372257e-05,
+            "steps_run": 250,
+            "best_step": 200,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9927272727272727,
+                "val_bce": 0.014342295155932312,
+                "accuracy": 0.9890909090909091,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 250,
+                "best_step": 200
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9963636363636363,
+                "val_bce": 0.017644502470899562,
+                "accuracy": 0.9854545454545455,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 295,
+                "best_step": 245
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.9963636363636363,
+          "lightgbm_accuracy": 0.9963636363636363,
+          "margin": 0.0,
+          "abs_margin": 0.0,
+          "arrangement_auc": 1.0,
+          "lightgbm_auc": 1.0,
+          "majority_class_rate": 0.5563636363636364,
+          "obliqueness_diagnostic": 1.1641304347826087,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 168,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9963636363636363,
+            "train_val_gap": 0.0036363636363636598,
+            "best_iteration": 168,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 0.9975669099756691,
+            "val_acc": 0.9963636363636363,
+            "train_bce": 0.0068080509837809364,
+            "val_bce": 0.007433108112806817,
+            "train_val_gap": 0.0012032736120327625,
+            "steps_run": 860,
+            "best_step": 810,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9963636363636363,
+                "val_bce": 0.007433108112806817,
+                "accuracy": 0.9963636363636363,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 860,
+                "best_step": 810
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9963636363636363,
+                "val_bce": 0.012272069884287133,
+                "accuracy": 0.9963636363636363,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 285,
+                "best_step": 235
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 1.0,
+          "lightgbm_accuracy": 0.9890909090909091,
+          "margin": 0.010909090909090868,
+          "abs_margin": 0.010909090909090868,
+          "arrangement_auc": 1.0,
+          "lightgbm_auc": 0.9998928533161898,
+          "majority_class_rate": 0.5563636363636364,
+          "obliqueness_diagnostic": 1.1517761033369214,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 229,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 1.0,
+            "train_val_gap": 0.0,
+            "best_iteration": 229,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 1.0,
+            "val_acc": 1.0,
+            "train_bce": 0.0010001799180195349,
+            "val_bce": 0.0010192498694808882,
+            "train_val_gap": 0.0,
+            "steps_run": 810,
+            "best_step": 760,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 1.0,
+                "val_bce": 0.0010192498694808882,
+                "accuracy": 1.0,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 810,
+                "best_step": 760
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 1.0,
+                "val_bce": 0.01051369244991683,
+                "accuracy": 0.9890909090909091,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 245,
+                "best_step": 195
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.9963636363636363,
+      "mean_lightgbm_accuracy": 0.9934545454545456,
+      "mean_margin": 0.0029090909090909054,
+      "mean_obliqueness_diagnostic": 1.1531659695417613,
+      "winner": "tie",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "wall_seconds": 41.332
+    },
+    "blood_transfusion": {
+      "dataset": "blood_transfusion",
+      "status": "completed",
+      "n_rows": 748,
+      "n_features": 4,
+      "max_rows": null,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.78,
+          "lightgbm_accuracy": 0.76,
+          "margin": 0.020000000000000018,
+          "abs_margin": 0.020000000000000018,
+          "arrangement_auc": 0.7312378167641326,
+          "lightgbm_auc": 0.6697124756335283,
+          "majority_class_rate": 0.76,
+          "obliqueness_diagnostic": 1.0065502183406114,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 5,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.7633928571428571,
+            "val_acc": 0.76,
+            "train_val_gap": 0.0033928571428570864,
+            "best_iteration": 5,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 0.8125,
+            "val_acc": 0.78,
+            "train_bce": 0.44509078215137204,
+            "val_bce": 0.49066959657909254,
+            "train_val_gap": 0.03249999999999997,
+            "steps_run": 95,
+            "best_step": 45,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 2.5081665762604537,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.78,
+                "val_bce": 0.49066959657909254,
+                "accuracy": 0.78,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 95,
+                "best_step": 45
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.76,
+                "val_bce": 0.49068254816356055,
+                "accuracy": 0.76,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 185,
+                "best_step": 135
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 0.7666666666666667,
+          "lightgbm_accuracy": 0.7533333333333333,
+          "margin": 0.01333333333333342,
+          "abs_margin": 0.01333333333333342,
+          "arrangement_auc": 0.7441520467836257,
+          "lightgbm_auc": 0.7178362573099415,
+          "majority_class_rate": 0.76,
+          "obliqueness_diagnostic": 1.0087527352297594,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 10,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.8080357142857143,
+            "val_acc": 0.7866666666666666,
+            "train_val_gap": 0.021369047619047676,
+            "best_iteration": 10,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.78125,
+            "val_acc": 0.78,
+            "train_bce": 0.4793311930661763,
+            "val_bce": 0.46004101338708664,
+            "train_val_gap": 0.0012499999999999734,
+            "steps_run": 215,
+            "best_step": 165,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 54.52493428984312,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 10,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8066666666666666,
+                "val_bce": 0.46600287939700386,
+                "accuracy": 0.7866666666666666,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 105,
+                "best_step": 55
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.78,
+                "val_bce": 0.46004101338708664,
+                "accuracy": 0.7666666666666667,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 215,
+                "best_step": 165
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.7933333333333333,
+          "lightgbm_accuracy": 0.78,
+          "margin": 0.013333333333333308,
+          "abs_margin": 0.013333333333333308,
+          "arrangement_auc": 0.771807992202729,
+          "lightgbm_auc": 0.7720516569200779,
+          "majority_class_rate": 0.76,
+          "obliqueness_diagnostic": 1.013157894736842,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 24,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.7879464285714286,
+            "val_acc": 0.7733333333333333,
+            "train_val_gap": 0.014613095238095286,
+            "best_iteration": 24,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.8013392857142857,
+            "val_acc": 0.8066666666666666,
+            "train_bce": 0.459928514868491,
+            "val_bce": 0.4641461220475535,
+            "train_val_gap": -0.0053273809523809446,
+            "steps_run": 285,
+            "best_step": 235,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 10,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.7933333333333333,
+                "val_bce": 0.468156384130216,
+                "accuracy": 0.82,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 135,
+                "best_step": 85
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8066666666666666,
+                "val_bce": 0.4641461220475535,
+                "accuracy": 0.7933333333333333,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 285,
+                "best_step": 235
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.7466666666666667,
+          "lightgbm_accuracy": 0.7466666666666667,
+          "margin": 0.0,
+          "abs_margin": 0.0,
+          "arrangement_auc": 0.6366959064327485,
+          "lightgbm_auc": 0.6503411306042886,
+          "majority_class_rate": 0.76,
+          "obliqueness_diagnostic": 1.0043196544276458,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 21,
+            "min_child_samples": 5,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.8638392857142857,
+            "val_acc": 0.8266666666666667,
+            "train_val_gap": 0.03717261904761904,
+            "best_iteration": 21,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 0.7924107142857143,
+            "val_acc": 0.8466666666666667,
+            "train_bce": 0.4569678185463451,
+            "val_bce": 0.4045879071279279,
+            "train_val_gap": -0.05425595238095238,
+            "steps_run": 130,
+            "best_step": 80,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 5.212261795438618,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8466666666666667,
+                "val_bce": 0.4045879071279279,
+                "accuracy": 0.7466666666666667,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 130,
+                "best_step": 80
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8333333333333334,
+                "val_bce": 0.4083329482731426,
+                "accuracy": 0.7533333333333333,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 280,
+                "best_step": 230
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 0.7866666666666666,
+          "lightgbm_accuracy": 0.8,
+          "margin": -0.01333333333333342,
+          "abs_margin": 0.01333333333333342,
+          "arrangement_auc": 0.7397660818713451,
+          "lightgbm_auc": 0.714303118908382,
+          "majority_class_rate": 0.76,
+          "obliqueness_diagnostic": 1.0109170305676856,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 24,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.8549107142857143,
+            "val_acc": 0.7866666666666666,
+            "train_val_gap": 0.06824404761904768,
+            "best_iteration": 24,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 0.8035714285714286,
+            "val_acc": 0.8133333333333334,
+            "train_bce": 0.4551118744616852,
+            "val_bce": 0.42432906561676276,
+            "train_val_gap": -0.00976190476190475,
+            "steps_run": 270,
+            "best_step": 220,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8133333333333334,
+                "val_bce": 0.42432906561676276,
+                "accuracy": 0.7866666666666666,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 270,
+                "best_step": 220
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8,
+                "val_bce": 0.4306196475089866,
+                "accuracy": 0.7,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 125,
+                "best_step": 75
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.7746666666666667,
+      "mean_lightgbm_accuracy": 0.768,
+      "mean_margin": 0.006666666666666665,
+      "mean_obliqueness_diagnostic": 1.008739506660509,
+      "winner": "arrangement",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": true,
+      "wall_seconds": 13.719
+    },
+    "ionosphere": {
+      "dataset": "ionosphere",
+      "status": "completed",
+      "n_rows": 351,
+      "n_features": 34,
+      "max_rows": null,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.8450704225352113,
+          "lightgbm_accuracy": 0.9014084507042254,
+          "margin": -0.05633802816901412,
+          "abs_margin": 0.05633802816901412,
+          "arrangement_auc": 0.7269565217391304,
+          "lightgbm_auc": 0.9695652173913043,
+          "majority_class_rate": 0.647887323943662,
+          "obliqueness_diagnostic": 1.0978723404255317,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 34,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.9952380952380953,
+            "val_acc": 0.9285714285714286,
+            "train_val_gap": 0.06666666666666665,
+            "best_iteration": 34,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 0.9571428571428572,
+            "val_acc": 0.9142857142857143,
+            "train_bce": 0.14533499906341013,
+            "val_bce": 0.24454033094093738,
+            "train_val_gap": 0.04285714285714293,
+            "steps_run": 430,
+            "best_step": 380,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 64.0,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9142857142857143,
+                "val_bce": 0.24454033094093738,
+                "accuracy": 0.8450704225352113,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 430,
+                "best_step": 380
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8857142857142857,
+                "val_bce": 0.3016960785058163,
+                "accuracy": 0.8309859154929577,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 110,
+                "best_step": 60
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 0.8873239436619719,
+          "lightgbm_accuracy": 0.9577464788732394,
+          "margin": -0.07042253521126751,
+          "abs_margin": 0.07042253521126751,
+          "arrangement_auc": 0.8295652173913044,
+          "lightgbm_auc": 0.98,
+          "majority_class_rate": 0.647887323943662,
+          "obliqueness_diagnostic": 1.0805084745762712,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 79,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.8857142857142857,
+            "train_val_gap": 0.11428571428571432,
+            "best_iteration": 79,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.8904761904761904,
+            "val_acc": 0.8857142857142857,
+            "train_bce": 0.38338060358575476,
+            "val_bce": 0.3224072436223365,
+            "train_val_gap": 0.004761904761904745,
+            "steps_run": 115,
+            "best_step": 65,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8714285714285714,
+                "val_bce": 0.37098254470912523,
+                "accuracy": 0.8309859154929577,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 105,
+                "best_step": 55
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8857142857142857,
+                "val_bce": 0.3224072436223365,
+                "accuracy": 0.8873239436619719,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 115,
+                "best_step": 65
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.8591549295774648,
+          "lightgbm_accuracy": 0.9577464788732394,
+          "margin": -0.09859154929577463,
+          "abs_margin": 0.09859154929577463,
+          "arrangement_auc": 0.9008695652173913,
+          "lightgbm_auc": 0.9678260869565217,
+          "majority_class_rate": 0.647887323943662,
+          "obliqueness_diagnostic": 1.0772532188841202,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 76,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9285714285714286,
+            "train_val_gap": 0.0714285714285714,
+            "best_iteration": 76,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9095238095238095,
+            "val_acc": 0.9142857142857143,
+            "train_bce": 0.26509977429527015,
+            "val_bce": 0.2542456133455895,
+            "train_val_gap": -0.004761904761904745,
+            "steps_run": 350,
+            "best_step": 300,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8428571428571429,
+                "val_bce": 0.4327645388563566,
+                "accuracy": 0.8732394366197183,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 85,
+                "best_step": 35
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9142857142857143,
+                "val_bce": 0.2542456133455895,
+                "accuracy": 0.8591549295774648,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 350,
+                "best_step": 300
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.8873239436619719,
+          "lightgbm_accuracy": 0.9014084507042254,
+          "margin": -0.014084507042253502,
+          "abs_margin": 0.014084507042253502,
+          "arrangement_auc": 0.84,
+          "lightgbm_auc": 0.9460869565217391,
+          "majority_class_rate": 0.647887323943662,
+          "obliqueness_diagnostic": 1.0847457627118644,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 129,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9285714285714286,
+            "train_val_gap": 0.0714285714285714,
+            "best_iteration": 129,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9523809523809523,
+            "val_acc": 0.9428571428571428,
+            "train_bce": 0.1763013332207389,
+            "val_bce": 0.20042241563481475,
+            "train_val_gap": 0.00952380952380949,
+            "steps_run": 245,
+            "best_step": 195,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8714285714285714,
+                "val_bce": 0.3364936387690826,
+                "accuracy": 0.8169014084507042,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 90,
+                "best_step": 40
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9428571428571428,
+                "val_bce": 0.20042241563481475,
+                "accuracy": 0.8873239436619719,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 245,
+                "best_step": 195
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 0.8732394366197183,
+          "lightgbm_accuracy": 0.9014084507042254,
+          "margin": -0.028169014084507116,
+          "abs_margin": 0.028169014084507116,
+          "arrangement_auc": 0.8556521739130435,
+          "lightgbm_auc": 0.9356521739130435,
+          "majority_class_rate": 0.647887323943662,
+          "obliqueness_diagnostic": 1.0948275862068966,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 99,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9857142857142858,
+            "train_val_gap": 0.014285714285714235,
+            "best_iteration": 99,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.8952380952380953,
+            "val_acc": 0.9571428571428572,
+            "train_bce": 0.3027803699102441,
+            "val_bce": 0.1593381596418578,
+            "train_val_gap": -0.06190476190476191,
+            "steps_run": 330,
+            "best_step": 280,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9142857142857143,
+                "val_bce": 0.2940936570243885,
+                "accuracy": 0.8873239436619719,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 195,
+                "best_step": 145
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9571428571428572,
+                "val_bce": 0.1593381596418578,
+                "accuracy": 0.8732394366197183,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 330,
+                "best_step": 280
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.8704225352112676,
+      "mean_lightgbm_accuracy": 0.923943661971831,
+      "mean_margin": -0.05352112676056338,
+      "mean_obliqueness_diagnostic": 1.0870414765609369,
+      "winner": "lightgbm",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "wall_seconds": 26.902
+    },
+    "sonar": {
+      "dataset": "sonar",
+      "status": "completed",
+      "n_rows": 208,
+      "n_features": 60,
+      "max_rows": null,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.8095238095238095,
+          "lightgbm_accuracy": 0.7380952380952381,
+          "margin": 0.0714285714285714,
+          "abs_margin": 0.0714285714285714,
+          "arrangement_auc": 0.7522727272727273,
+          "lightgbm_auc": 0.8636363636363636,
+          "majority_class_rate": 0.5238095238095238,
+          "obliqueness_diagnostic": 1.2265625,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 362,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.9523809523809523,
+            "train_val_gap": 0.04761904761904767,
+            "best_iteration": 362,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "dense",
+            "train_acc": 0.9758064516129032,
+            "val_acc": 0.9047619047619048,
+            "train_bce": 0.15791807932397556,
+            "val_bce": 0.3198987114822678,
+            "train_val_gap": 0.07104454685099848,
+            "steps_run": 100,
+            "best_step": 50,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 2.7844394776494332,
+            "l1": 0.0,
+            "sparse_warmstart": false,
+            "n_restarts": 6,
+            "budget": {
+              "restarts": 6,
+              "steps": 5000,
+              "l1": 0.0,
+              "beta_final": 64.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9047619047619048,
+                "val_bce": 0.3198987114822678,
+                "accuracy": 0.8095238095238095,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 100,
+                "best_step": 50
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8333333333333334,
+                "val_bce": 0.34387432487983005,
+                "accuracy": 0.7142857142857143,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 100,
+                "best_step": 50
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 0.7142857142857143,
+          "lightgbm_accuracy": 0.7142857142857143,
+          "margin": 0.0,
+          "abs_margin": 0.0,
+          "arrangement_auc": 0.725,
+          "lightgbm_auc": 0.8818181818181818,
+          "majority_class_rate": 0.5238095238095238,
+          "obliqueness_diagnostic": 1.1968503937007875,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 48,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.7619047619047619,
+            "train_val_gap": 0.23809523809523814,
+            "best_iteration": 48,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9112903225806451,
+            "val_acc": 0.8809523809523809,
+            "train_bce": 0.26979362461115874,
+            "val_bce": 0.36543563379398286,
+            "train_val_gap": 0.030337941628264198,
+            "steps_run": 215,
+            "best_step": 165,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8095238095238095,
+                "val_bce": 0.3958824641327532,
+                "accuracy": 0.7142857142857143,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 100,
+                "best_step": 50
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8809523809523809,
+                "val_bce": 0.36543563379398286,
+                "accuracy": 0.7142857142857143,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 215,
+                "best_step": 165
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.7619047619047619,
+          "lightgbm_accuracy": 0.7857142857142857,
+          "margin": -0.023809523809523836,
+          "abs_margin": 0.023809523809523836,
+          "arrangement_auc": 0.7761363636363636,
+          "lightgbm_auc": 0.8613636363636363,
+          "majority_class_rate": 0.5238095238095238,
+          "obliqueness_diagnostic": 1.2195121951219512,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 90,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.8095238095238095,
+            "train_val_gap": 0.19047619047619047,
+            "best_iteration": 90,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.7903225806451613,
+            "val_acc": 0.8333333333333334,
+            "train_bce": 0.5067922565013949,
+            "val_bce": 0.4529748766076849,
+            "train_val_gap": -0.043010752688172116,
+            "steps_run": 115,
+            "best_step": 65,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8095238095238095,
+                "val_bce": 0.46103978387072886,
+                "accuracy": 0.8571428571428571,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 105,
+                "best_step": 55
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8333333333333334,
+                "val_bce": 0.4529748766076849,
+                "accuracy": 0.7619047619047619,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 115,
+                "best_step": 65
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.7142857142857143,
+          "lightgbm_accuracy": 0.7619047619047619,
+          "margin": -0.04761904761904756,
+          "abs_margin": 0.04761904761904756,
+          "arrangement_auc": 0.7875,
+          "lightgbm_auc": 0.8431818181818181,
+          "majority_class_rate": 0.5238095238095238,
+          "obliqueness_diagnostic": 1.2421875,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 31,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.8095238095238095,
+            "train_val_gap": 0.19047619047619047,
+            "best_iteration": 31,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.8306451612903226,
+            "val_acc": 0.8571428571428571,
+            "train_bce": 0.3588239854708917,
+            "val_bce": 0.2502044130373764,
+            "train_val_gap": -0.026497695852534475,
+            "steps_run": 255,
+            "best_step": 205,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8333333333333334,
+                "val_bce": 0.45400522588221676,
+                "accuracy": 0.7380952380952381,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 80,
+                "best_step": 30
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8571428571428571,
+                "val_bce": 0.2502044130373764,
+                "accuracy": 0.7142857142857143,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 255,
+                "best_step": 205
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 0.6428571428571429,
+          "lightgbm_accuracy": 0.7619047619047619,
+          "margin": -0.11904761904761896,
+          "abs_margin": 0.11904761904761896,
+          "arrangement_auc": 0.6261363636363636,
+          "lightgbm_auc": 0.8636363636363636,
+          "majority_class_rate": 0.5238095238095238,
+          "obliqueness_diagnostic": 1.1515151515151514,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 204,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 1.0,
+            "val_acc": 0.8809523809523809,
+            "train_val_gap": 0.11904761904761907,
+            "best_iteration": 204,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.7983870967741935,
+            "val_acc": 0.8333333333333334,
+            "train_bce": 0.46995523649046106,
+            "val_bce": 0.38165756758325353,
+            "train_val_gap": -0.034946236559139865,
+            "steps_run": 215,
+            "best_step": 165,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 39.16402904606995,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.8095238095238095,
+                "val_bce": 0.4602671180751784,
+                "accuracy": 0.7857142857142857,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 90,
+                "best_step": 40
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.8333333333333334,
+                "val_bce": 0.38165756758325353,
+                "accuracy": 0.6428571428571429,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 215,
+                "best_step": 165
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.7285714285714285,
+      "mean_lightgbm_accuracy": 0.7523809523809524,
+      "mean_margin": -0.02380952380952379,
+      "mean_obliqueness_diagnostic": 1.207325548067578,
+      "winner": "lightgbm",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "wall_seconds": 35.826
+    },
+    "spambase": {
+      "dataset": "spambase",
+      "status": "completed",
+      "n_rows": 4601,
+      "n_features": 57,
+      "max_rows": null,
+      "per_seed": [
+        {
+          "seed": 0,
+          "arrangement_accuracy": 0.9381107491856677,
+          "lightgbm_accuracy": 0.9554831704668838,
+          "margin": -0.017372421281216077,
+          "abs_margin": 0.017372421281216077,
+          "arrangement_auc": 0.9706226487751415,
+          "lightgbm_auc": 0.9889362836576913,
+          "majority_class_rate": 0.6058631921824105,
+          "obliqueness_diagnostic": 1.1227350427350427,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 252,
+            "min_child_samples": 20,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.9978260869565218,
+            "val_acc": 0.9445652173913044,
+            "train_val_gap": 0.05326086956521736,
+            "best_iteration": 252,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9351449275362319,
+            "val_acc": 0.9282608695652174,
+            "train_bce": 0.19047249319066925,
+            "val_bce": 0.20245167530567487,
+            "train_val_gap": 0.0068840579710145455,
+            "steps_run": 165,
+            "best_step": 115,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 16.1118499913045,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9304347826086956,
+                "val_bce": 0.22321163634463173,
+                "accuracy": 0.9467969598262758,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 160,
+                "best_step": 110
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9282608695652174,
+                "val_bce": 0.20245167530567487,
+                "accuracy": 0.9381107491856677,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 165,
+                "best_step": 115
+              }
+            ]
+          }
+        },
+        {
+          "seed": 1,
+          "arrangement_accuracy": 0.9283387622149837,
+          "lightgbm_accuracy": 0.9533116178067318,
+          "margin": -0.02497285559174811,
+          "abs_margin": 0.02497285559174811,
+          "arrangement_auc": 0.9791808604125319,
+          "lightgbm_auc": 0.9833032179073234,
+          "majority_class_rate": 0.6058631921824105,
+          "obliqueness_diagnostic": 1.1141583818992116,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.1,
+            "n_estimators": 67,
+            "min_child_samples": 5,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.9989130434782608,
+            "val_acc": 0.95,
+            "train_val_gap": 0.048913043478260865,
+            "best_iteration": 67,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.941304347826087,
+            "val_acc": 0.9119565217391304,
+            "train_bce": 0.15132610825909493,
+            "val_bce": 0.21494298920102106,
+            "train_val_gap": 0.02934782608695652,
+            "steps_run": 460,
+            "best_step": 410,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.925,
+                "val_bce": 0.2410384779025486,
+                "accuracy": 0.9359391965255157,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 160,
+                "best_step": 110
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9119565217391304,
+                "val_bce": 0.21494298920102106,
+                "accuracy": 0.9283387622149837,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 460,
+                "best_step": 410
+              }
+            ]
+          }
+        },
+        {
+          "seed": 2,
+          "arrangement_accuracy": 0.9218241042345277,
+          "lightgbm_accuracy": 0.9435396308360477,
+          "margin": -0.021715526601520097,
+          "abs_margin": 0.021715526601520097,
+          "arrangement_auc": 0.9706596759382683,
+          "lightgbm_auc": 0.9888029858704346,
+          "majority_class_rate": 0.6058631921824105,
+          "obliqueness_diagnostic": 1.1245710363761154,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 135,
+            "min_child_samples": 20,
+            "max_depth": -1,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.9967391304347826,
+            "val_acc": 0.9510869565217391,
+            "train_val_gap": 0.04565217391304344,
+            "best_iteration": 135,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9384057971014492,
+            "val_acc": 0.9315217391304348,
+            "train_bce": 0.15626174219564432,
+            "val_bce": 0.18358289209931683,
+            "train_val_gap": 0.0068840579710144345,
+            "steps_run": 290,
+            "best_step": 240,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9380434782608695,
+                "val_bce": 0.21002813202142356,
+                "accuracy": 0.9294245385450597,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 135,
+                "best_step": 85
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9315217391304348,
+                "val_bce": 0.18358289209931683,
+                "accuracy": 0.9218241042345277,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 290,
+                "best_step": 240
+              }
+            ]
+          }
+        },
+        {
+          "seed": 3,
+          "arrangement_accuracy": 0.9348534201954397,
+          "lightgbm_accuracy": 0.9598262757871878,
+          "margin": -0.02497285559174811,
+          "abs_margin": 0.02497285559174811,
+          "arrangement_auc": 0.9809482903324546,
+          "lightgbm_auc": 0.9885906968018405,
+          "majority_class_rate": 0.6058631921824105,
+          "obliqueness_diagnostic": 1.12041166380789,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 127,
+            "learning_rate": 0.1,
+            "n_estimators": 104,
+            "min_child_samples": 20,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.9934782608695653,
+            "val_acc": 0.9630434782608696,
+            "train_val_gap": 0.0304347826086957,
+            "best_iteration": 104,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9358695652173913,
+            "val_acc": 0.9369565217391305,
+            "train_bce": 0.1562427439311726,
+            "val_bce": 0.16493346438246143,
+            "train_val_gap": -0.0010869565217391797,
+            "steps_run": 550,
+            "best_step": 500,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.941304347826087,
+                "val_bce": 0.1935391819289582,
+                "accuracy": 0.9402823018458197,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 280,
+                "best_step": 230
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9369565217391305,
+                "val_bce": 0.16493346438246143,
+                "accuracy": 0.9348534201954397,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 550,
+                "best_step": 500
+              }
+            ]
+          }
+        },
+        {
+          "seed": 4,
+          "arrangement_accuracy": 0.9120521172638436,
+          "lightgbm_accuracy": 0.9511400651465798,
+          "margin": -0.039087947882736174,
+          "abs_margin": 0.039087947882736174,
+          "arrangement_auc": 0.9699487544062324,
+          "lightgbm_auc": 0.9856285237516909,
+          "majority_class_rate": 0.6058631921824105,
+          "obliqueness_diagnostic": 1.1281786941580756,
+          "predicted_winner": "arrangement",
+          "lightgbm_config": {
+            "num_leaves": 31,
+            "learning_rate": 0.05,
+            "n_estimators": 209,
+            "min_child_samples": 20,
+            "max_depth": 8,
+            "n_estimators_max": 4000,
+            "early_stopping_rounds": 50
+          },
+          "lightgbm_config_at_grid_boundary": false,
+          "lightgbm": {
+            "train_acc": 0.9952898550724638,
+            "val_acc": 0.9597826086956521,
+            "train_val_gap": 0.035507246376811685,
+            "best_iteration": 209,
+            "stopped_early": true
+          },
+          "arrangement": {
+            "arm": "sparse",
+            "train_acc": 0.9434782608695652,
+            "val_acc": 0.9380434782608695,
+            "train_bce": 0.15123183953928168,
+            "val_bce": 0.17500381639384457,
+            "train_val_gap": 0.005434782608695676,
+            "steps_run": 290,
+            "best_step": 240,
+            "stopped_early": true,
+            "at_step_cap": false,
+            "beta_final": 128.0,
+            "l1": 0.02,
+            "sparse_warmstart": true,
+            "n_restarts": 12,
+            "budget": {
+              "restarts": 4,
+              "steps": 5000,
+              "l1": 0.02,
+              "beta_final": 128.0,
+              "patience": 50,
+              "min_delta": 0.0001
+            },
+            "arms": [
+              {
+                "arm": "dense",
+                "val_acc": 0.9478260869565217,
+                "val_bce": 0.19494988461008836,
+                "accuracy": 0.9185667752442996,
+                "l1": 0.0,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 225,
+                "best_step": 175
+              },
+              {
+                "arm": "sparse",
+                "val_acc": 0.9380434782608695,
+                "val_bce": 0.17500381639384457,
+                "accuracy": 0.9120521172638436,
+                "l1": 0.02,
+                "stopped_early": true,
+                "at_step_cap": false,
+                "steps_run": 290,
+                "best_step": 240
+              }
+            ]
+          }
+        }
+      ],
+      "mean_arrangement_accuracy": 0.9270358306188925,
+      "mean_lightgbm_accuracy": 0.9526601520086861,
+      "mean_margin": -0.025624321389793713,
+      "mean_obliqueness_diagnostic": 1.122010963795267,
+      "winner": "lightgbm",
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "wall_seconds": 148.813
+    }
+  },
+  "win_loss_table": [
+    {
+      "dataset": "breast_cancer",
+      "status": "completed",
+      "winner": "arrangement",
+      "mean_arrangement_accuracy": 0.9754385964912281,
+      "mean_lightgbm_accuracy": 0.9596491228070174,
+      "mean_margin": 0.01578947368421053,
+      "mean_obliqueness_diagnostic": 1.0546632315053368,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": true,
+      "skip_reason": null
+    },
+    {
+      "dataset": "adult",
+      "status": "completed",
+      "winner": "lightgbm",
+      "mean_arrangement_accuracy": 0.8410499999999999,
+      "mean_lightgbm_accuracy": 0.8676999999999999,
+      "mean_margin": -0.026650000000000017,
+      "mean_obliqueness_diagnostic": 1.0243865071916503,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "skip_reason": null
+    },
+    {
+      "dataset": "higgs",
+      "status": "completed",
+      "winner": "lightgbm",
+      "mean_arrangement_accuracy": 0.6724,
+      "mean_lightgbm_accuracy": 0.7143499999999999,
+      "mean_margin": -0.04194999999999997,
+      "mean_obliqueness_diagnostic": 1.0652556090765335,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "skip_reason": null
+    },
+    {
+      "dataset": "banknote",
+      "status": "completed",
+      "winner": "tie",
+      "mean_arrangement_accuracy": 0.9963636363636363,
+      "mean_lightgbm_accuracy": 0.9934545454545456,
+      "mean_margin": 0.0029090909090909054,
+      "mean_obliqueness_diagnostic": 1.1531659695417613,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "skip_reason": null
+    },
+    {
+      "dataset": "blood_transfusion",
+      "status": "completed",
+      "winner": "arrangement",
+      "mean_arrangement_accuracy": 0.7746666666666667,
+      "mean_lightgbm_accuracy": 0.768,
+      "mean_margin": 0.006666666666666665,
+      "mean_obliqueness_diagnostic": 1.008739506660509,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": true,
+      "skip_reason": null
+    },
+    {
+      "dataset": "ionosphere",
+      "status": "completed",
+      "winner": "lightgbm",
+      "mean_arrangement_accuracy": 0.8704225352112676,
+      "mean_lightgbm_accuracy": 0.923943661971831,
+      "mean_margin": -0.05352112676056338,
+      "mean_obliqueness_diagnostic": 1.0870414765609369,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "skip_reason": null
+    },
+    {
+      "dataset": "sonar",
+      "status": "completed",
+      "winner": "lightgbm",
+      "mean_arrangement_accuracy": 0.7285714285714285,
+      "mean_lightgbm_accuracy": 0.7523809523809524,
+      "mean_margin": -0.02380952380952379,
+      "mean_obliqueness_diagnostic": 1.207325548067578,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "skip_reason": null
+    },
+    {
+      "dataset": "spambase",
+      "status": "completed",
+      "winner": "lightgbm",
+      "mean_arrangement_accuracy": 0.9270358306188925,
+      "mean_lightgbm_accuracy": 0.9526601520086861,
+      "mean_margin": -0.025624321389793713,
+      "mean_obliqueness_diagnostic": 1.122010963795267,
+      "predicted_winner": "arrangement",
+      "diagnostic_correct": false,
+      "skip_reason": null
+    }
+  ],
+  "win_loss_counts": {
+    "arrangement": 2,
+    "lightgbm": 5,
+    "tie": 1,
+    "completed": 8,
+    "skipped": 0
+  },
+  "g4": {
+    "diag_threshold": 1.0,
+    "rule": "predict arrangement if mean_obliqueness_diagnostic > threshold else lightgbm",
+    "predictiveness": 0.25,
+    "corr_diag_margin": -0.1337165849860534,
+    "n_scored": 8,
+    "retuned": false
+  },
+  "honesty": {
+    "claim_rung": 1,
+    "trees_expected_to_win_most": true,
+    "no_aggregate_only_headline": true,
+    "temperature_collapse": true,
+    "bias_collapse": false,
+    "smoke_is_wiring_gate": false,
+    "obliqueness_diagnostic_retuned": false,
+    "g3_earned": true,
+    "g4_earned": false,
+    "theorem_prover_verified": false,
+    "mathlib_verified": false,
+    "licensed_sentence": "on 8 public binary datasets the H=2 soft hyperplane arrangement vs tuned LightGBM win/loss/tie is 2/5/1 (per-dataset table in win_loss_table; trees expected to win most)"
+  },
+  "g3_earned": true,
+  "g4_earned": false,
+  "wall_seconds": 1113.516
+}
