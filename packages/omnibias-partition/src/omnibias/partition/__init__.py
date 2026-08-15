@@ -62,6 +62,13 @@ from omnibias.partition._core.weights import (
     partition_weights,
     region_rule,
 )
+from omnibias.partition.arrangement import (
+    Arrangement,
+    CellGapCertificate,
+    certify_cell_gap,
+    max_cells,
+    soft_membership,
+)
 from omnibias.partition.certify import PartitionGapCertificate, certify_partition_gap
 from omnibias.partition.registry import RegionModels, combine_outputs
 
@@ -74,12 +81,15 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
 __lineage__ = "temperature collapse"
 
 __all__ = [
+    "Arrangement",
+    "CellGapCertificate",
     "PartitionConfig",
     "PartitionGapCertificate",
     "PartitionParams",
     "RegionModels",
     "__lineage__",
     "__version__",
+    "certify_cell_gap",
     "certify_partition_gap",
     "combine_outputs",
     "gate_activations",
@@ -87,7 +97,9 @@ __all__ = [
     "hard_weights",
     "hardened_rules",
     "init_params",
+    "max_cells",
     "partition_weights",
     "region_code_matrix",
     "region_rule",
+    "soft_membership",
 ]

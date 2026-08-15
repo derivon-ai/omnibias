@@ -1,0 +1,61 @@
+{
+  "schema": "omnibias.benchmark.conjugate_hilbert.v1",
+  "generated_utc": "2026-08-15T16:37:46Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke"
+  },
+  "rss_mb_at_start": 822.65,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_n1_interval_equal",
+        "passed": true,
+        "p1_mid": -0.27467102836695245,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g2_worked_n2",
+        "passed": true,
+        "p2_mid": 0.12067392241979678,
+        "note": "50-digit mpmath table vs diff is the unit-test G2; smoke checks the worked example",
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_enclosure",
+        "passed": true,
+        "violations": 0,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g4_commutation",
+        "passed": true,
+        "in_ci_all_passed": true
+      }
+    ]
+  },
+  "g5_capacity": {
+    "name": "g5_dictionary_capacity",
+    "passed": true,
+    "small_defect": 0.12683072574014304,
+    "enlarged_defect": 1.567580422032911e-16,
+    "reduction_ratio": 809085926039208.0,
+    "note": "synthetic even profile; not CCF_STRETCH_RESIDUAL_GATE",
+    "in_ci_all_passed": false
+  },
+  "honesty": {
+    "line_hilbert_only": true,
+    "commutation_needs_alpha_gt_0": true,
+    "clears_ccf_stretch_gate": false,
+    "g5_in_all_passed": false
+  }
+}

@@ -35,7 +35,7 @@ def test_package_docstring_labels_both_axes() -> None:
     assert "conflat" in doc.lower()
 
 
-@pytest.mark.parametrize("rel", ["torch/soft_dp.py", "jax/soft_dp.py"])
+@pytest.mark.parametrize("rel", ["torch/soft_dp.py", "jax/soft_dp.py", "_core/tropical.py"])
 def test_soft_dp_docstrings_cross_reference_the_founding_sense(rel: str) -> None:
     text = _pkg_source(rel)
     assert "founding bias collapse" in text, f"{rel} missing the disambiguation cross-ref"

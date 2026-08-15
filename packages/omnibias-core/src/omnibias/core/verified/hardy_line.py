@@ -275,6 +275,130 @@ def hardy_odd_deriv_matrix(
     return _matrix(hardy_odd_deriv, y_nodes, a_values, alpha)
 
 
+def pochhammer(alpha: float, n: int) -> float:
+    """Rising factorial ``(alpha)_n``. Exact for integer ``alpha``; float otherwise."""
+    if n < 0:
+        raise ValueError(f"Pochhammer order n must be >= 0, got {n}")
+    acc = 1.0
+    for k in range(n):
+        acc *= alpha + k
+    return acc
+
+
+def pochhammer_iv(alpha: float, n: int) -> Interval:
+    """Outward-rounded enclosure of ``(alpha)_n``."""
+    if n < 0:
+        raise ValueError(f"Pochhammer order n must be >= 0, got {n}")
+    acc = Interval.point(1.0)
+    for k in range(n):
+        acc = acc * Interval.point(alpha + float(k))
+    return acc
+
+
+def _table_kind(n: int) -> tuple[int, str, int, str]:
+    """Signs and P/Q kinds for ``(P^(n), Q^(n))`` from ``n mod 4``."""
+    r = n % 4
+    if r == 0:
+        return 1, "even", 1, "odd"
+    if r == 1:
+        return -1, "odd", 1, "even"
+    if r == 2:
+        return -1, "even", -1, "odd"
+    return 1, "odd", -1, "even"
+
+
+def _eval_pq(kind: str, y: float, a: float, alpha: float) -> Interval:
+    if kind == "even":
+        return hardy_even(y, a, alpha)
+    return hardy_odd(y, a, alpha)
+
+
+def _eval_pq_iv(kind: str, y: Interval, a: float, alpha: float) -> Interval:
+    if kind == "even":
+        return hardy_even_iv(y, a, alpha)
+    return hardy_odd_iv(y, a, alpha)
+
+
+def hardy_even_deriv_n(y: float, a: float, alpha: float, n: int) -> Interval:
+    """Closed-form ``P^(n)`` via the Hardy table. ``n = 1`` matches ``hardy_even_deriv``."""
+    if n < 0:
+        raise ValueError(f"derivative order n must be >= 0, got {n}")
+    if n == 1:
+        return hardy_even_deriv(y, a, alpha)
+    if n == 0:
+        return hardy_even(y, a, alpha)
+    _validate_scale_alpha(a, alpha)
+    p_sign, p_kind, _, _ = _table_kind(n)
+    factor = pochhammer_iv(alpha, n)
+    atom = _eval_pq(p_kind, y, a, alpha + float(n))
+    return (Interval.point(-1.0) * factor * atom) if p_sign < 0 else (factor * atom)
+
+
+def hardy_odd_deriv_n(y: float, a: float, alpha: float, n: int) -> Interval:
+    """Closed-form ``Q^(n)`` via the Hardy table. ``n = 1`` matches ``hardy_odd_deriv``."""
+    if n < 0:
+        raise ValueError(f"derivative order n must be >= 0, got {n}")
+    if n == 1:
+        return hardy_odd_deriv(y, a, alpha)
+    if n == 0:
+        return hardy_odd(y, a, alpha)
+    _validate_scale_alpha(a, alpha)
+    _, _, q_sign, q_kind = _table_kind(n)
+    factor = pochhammer_iv(alpha, n)
+    atom = _eval_pq(q_kind, y, a, alpha + float(n))
+    return (Interval.point(-1.0) * factor * atom) if q_sign < 0 else (factor * atom)
+
+
+def hardy_even_deriv_n_iv(y: Interval, a: float, alpha: float, n: int) -> Interval:
+    """Interval-``y`` enclosure of ``P^(n)``."""
+    if n < 0:
+        raise ValueError(f"derivative order n must be >= 0, got {n}")
+    if n == 1:
+        return hardy_even_deriv_iv(y, a, alpha)
+    if n == 0:
+        return hardy_even_iv(y, a, alpha)
+    _validate_scale_alpha(a, alpha)
+    p_sign, p_kind, _, _ = _table_kind(n)
+    factor = pochhammer_iv(alpha, n)
+    atom = _eval_pq_iv(p_kind, y, a, alpha + float(n))
+    return (Interval.point(-1.0) * factor * atom) if p_sign < 0 else (factor * atom)
+
+
+def hardy_odd_deriv_n_iv(y: Interval, a: float, alpha: float, n: int) -> Interval:
+    """Interval-``y`` enclosure of ``Q^(n)``."""
+    if n < 0:
+        raise ValueError(f"derivative order n must be >= 0, got {n}")
+    if n == 1:
+        return hardy_odd_deriv_iv(y, a, alpha)
+    if n == 0:
+        return hardy_odd_iv(y, a, alpha)
+    _validate_scale_alpha(a, alpha)
+    _, _, q_sign, q_kind = _table_kind(n)
+    factor = pochhammer_iv(alpha, n)
+    atom = _eval_pq_iv(q_kind, y, a, alpha + float(n))
+    return (Interval.point(-1.0) * factor * atom) if q_sign < 0 else (factor * atom)
+
+
+def hilbert_of_hardy_even_deriv_n(y: float, a: float, alpha: float, n: int) -> Interval:
+    """Exact line Hilbert: ``H[P^(n)] = Q^(n)``. Commutation needs ``alpha > 0``."""
+    if not (alpha > 0.0):
+        raise ValueError(
+            "Hilbert-derivative commutation needs decay (alpha > 0); "
+            f"got alpha={alpha!r}"
+        )
+    return hardy_odd_deriv_n(y, a, alpha, n)
+
+
+def hilbert_of_hardy_odd_deriv_n(y: float, a: float, alpha: float, n: int) -> Interval:
+    """Exact line Hilbert: ``H[Q^(n)] = -P^(n)``. Commutation needs ``alpha > 0``."""
+    if not (alpha > 0.0):
+        raise ValueError(
+            "Hilbert-derivative commutation needs decay (alpha > 0); "
+            f"got alpha={alpha!r}"
+        )
+    return -hardy_even_deriv_n(y, a, alpha, n)
+
+
 __all__ = [
     "hardy_angle",
     "hardy_angle_iv",
@@ -283,6 +407,8 @@ __all__ = [
     "hardy_even_deriv",
     "hardy_even_deriv_iv",
     "hardy_even_deriv_matrix",
+    "hardy_even_deriv_n",
+    "hardy_even_deriv_n_iv",
     "hardy_even_iv",
     "hardy_even_matrix",
     "hardy_even_profile",
@@ -292,6 +418,8 @@ __all__ = [
     "hardy_odd_deriv",
     "hardy_odd_deriv_iv",
     "hardy_odd_deriv_matrix",
+    "hardy_odd_deriv_n",
+    "hardy_odd_deriv_n_iv",
     "hardy_odd_iv",
     "hardy_odd_matrix",
     "hardy_pair",
@@ -301,5 +429,9 @@ __all__ = [
     "hilbert_hardy_even_profile",
     "hilbert_hardy_even_profile_deriv",
     "hilbert_of_hardy_even",
+    "hilbert_of_hardy_even_deriv_n",
     "hilbert_of_hardy_odd",
+    "hilbert_of_hardy_odd_deriv_n",
+    "pochhammer",
+    "pochhammer_iv",
 ]

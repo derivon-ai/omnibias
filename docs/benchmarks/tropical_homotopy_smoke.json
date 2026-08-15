@@ -1,0 +1,41 @@
+{
+  "schema": "omnibias.benchmark.tropical_homotopy.v1",
+  "generated_utc": "2026-08-15T17:28:26Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke"
+  },
+  "rss_mb_at_start": 816.68,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_gap",
+        "passed": true,
+        "bound": 0.5364793041447001,
+        "measured": 0.4015962449533587,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g2_subdivision",
+        "passed": true,
+        "n_cells": 4,
+        "n_vertices": 4,
+        "in_ci_all_passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "collapse": "beta -> inf (temperature); not delta -> 0",
+    "p_vs_np": false,
+    "g4_path_following": "full only"
+  }
+}

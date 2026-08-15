@@ -109,6 +109,17 @@ from omnibias.struct._core.semiring import (
     soft_value,
 )
 from omnibias.struct._core.trellis import DAG, ChainTrellis, CTCLattice, count_paths
+from omnibias.struct._core.tropical import (
+    TropicalGapCertificate,
+    TropicalLinear,
+    certify_tropical_gap,
+    dual_subdivision,
+    homotopy_gap_bound,
+    newton_polytope,
+    relaxed_value,
+    relaxed_weights,
+    tropical_value,
+)
 
 __all__ = [
     "AcyclicMDP",
@@ -127,6 +138,8 @@ __all__ = [
     "MaxPlusSemiring",
     "SelectionCertificate",
     "Semiring",
+    "TropicalGapCertificate",
+    "TropicalLinear",
     "argmax_stability_margin",
     "best_derivation",
     "best_parse_tree",
@@ -159,6 +172,7 @@ __all__ = [
     "build_local_dag",
     "certify_argmax",
     "certify_soft_dp",
+    "certify_tropical_gap",
     "count_alignments",
     "count_arborescences",
     "count_derivations",
@@ -168,6 +182,7 @@ __all__ = [
     "ctc_best",
     "ctc_best_alignment",
     "derivation_weight",
+    "dual_subdivision",
     "eisner_hypergraph",
     "enumerate_derivations",
     "from_dag",
@@ -181,6 +196,7 @@ __all__ = [
     "hard_matrix_tree",
     "hard_value",
     "hard_value_iteration",
+    "homotopy_gap_bound",
     "iter_arborescences",
     "iter_projective_trees",
     "kbest_derivations",
@@ -190,6 +206,9 @@ __all__ = [
     "matrix_tree_marginals",
     "matrix_tree_partition",
     "max_arborescence",
+    "newton_polytope",
+    "relaxed_value",
+    "relaxed_weights",
     "sample_derivations",
     "seal_selection_certificate",
     "semiring_value",
@@ -198,5 +217,6 @@ __all__ = [
     "soft_eisner",
     "soft_value",
     "stepwise_gap_bound",
+    "tropical_value",
     "viterbi",
 ]

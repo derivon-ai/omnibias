@@ -157,7 +157,7 @@ def test_g4_poisedness_curated_set() -> None:
     for req in unpoised:
         assert solve_irregular_stencil(req) is None
     for req in poised:
-        assert not (polya_screen(req) is False)
+        assert polya_screen(req) is not False
 
 
 def test_request_rejects_duplicate_nodes() -> None:

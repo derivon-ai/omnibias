@@ -64,6 +64,15 @@ from omnibias.difference._core.generating import (
     transfer_theorem,
     zeta_int_enclosure,
 )
+from omnibias.difference._core.identities import (
+    RationalIdentityVerdict,
+    bernoulli_recurrence_identity,
+    bernoulli_sign_certificate,
+    check_identity_certificate,
+    euler_recurrence_identity,
+    rational_value_identity,
+    zeta_negative_odd_identity,
+)
 from omnibias.difference._core.irregular import (
     IrregularStencil,
     StencilRequest,
@@ -73,15 +82,6 @@ from omnibias.difference._core.irregular import (
     physical_weights,
     polya_screen,
     solve_irregular_stencil,
-)
-from omnibias.difference._core.identities import (
-    RationalIdentityVerdict,
-    bernoulli_recurrence_identity,
-    bernoulli_sign_certificate,
-    check_identity_certificate,
-    euler_recurrence_identity,
-    rational_value_identity,
-    zeta_negative_odd_identity,
 )
 from omnibias.difference._core.pade import (
     pade_approximant,
