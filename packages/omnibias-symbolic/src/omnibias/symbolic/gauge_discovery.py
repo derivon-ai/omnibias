@@ -44,6 +44,10 @@ try:
         is_scalar_integral_column_name,
         refuse_scalar_integral_as_ym_weak_form,
     )
+    from omnibias.geometry.gauge._core.ensemble_language import (
+        is_ensemble_atom_name,
+        refuse_ensemble_as_covariant_jet,
+    )
     from omnibias.geometry.gauge._core.instanton import bpst_instanton_arrays
     from omnibias.geometry.gauge._core.invariants import (
         GaugeInvariantDictionary,
@@ -118,6 +122,9 @@ def _merge_singlets(
     loop_banned = [name for name in extra if is_loop_atom_name(name)]
     if loop_banned:
         refuse_loop_as_covariant_jet(loop_banned)
+    ensemble_banned = [name for name in extra if is_ensemble_atom_name(name)]
+    if ensemble_banned:
+        refuse_ensemble_as_covariant_jet(ensemble_banned)
     green_banned = [name for name in extra if is_green_column_name(name)]
     if green_banned:
         refuse_green_as_jet_atom(green_banned)

@@ -404,6 +404,8 @@ __all__ = [
     "RecurrenceRelation",
     "SparseEquation",
     "SplitData",
+    "StatisticalLawDiscoverer",
+    "StatisticalLawResult",
     "__lineage__",
     "__version__",
     "aic",
@@ -468,6 +470,10 @@ __all__ = [
     "discover_latent_ode",
     "discover_pde_operator_law",
     "discover_planted_area_law",
+    "discover_planted_area_perimeter",
+    "discover_planted_order_parameter_scaling",
+    "discover_planted_polyakov_mass",
+    "discover_planted_spectral_density",
     "discover_recurrence",
     "discover_recurrence_least_squares",
     "discover_wilson_plaquette_law",
@@ -570,6 +576,10 @@ __all__ = [
     "periodic_flow_residual_sups",
     "periodic_hilbert",
     "planted_area_law_table",
+    "planted_area_perimeter_table",
+    "planted_order_parameter_table",
+    "planted_polyakov_correlator_table",
+    "planted_spectral_density_table",
     "polynomial_from_samples",
     "polynomial_value_library",
     "polynomial_vector_library",
@@ -676,6 +686,20 @@ _LOOP_EXPORTS = frozenset(
         "planted_area_law_table",
     }
 )
+_ENSEMBLE_EXPORTS = frozenset(
+    {
+        "StatisticalLawDiscoverer",
+        "StatisticalLawResult",
+        "discover_planted_area_perimeter",
+        "discover_planted_order_parameter_scaling",
+        "discover_planted_polyakov_mass",
+        "discover_planted_spectral_density",
+        "planted_area_perimeter_table",
+        "planted_order_parameter_table",
+        "planted_polyakov_correlator_table",
+        "planted_spectral_density_table",
+    }
+)
 
 
 def __getattr__(name: str) -> object:
@@ -687,5 +711,9 @@ def __getattr__(name: str) -> object:
         from omnibias.symbolic import loop_discovery as _loop_discovery
 
         return getattr(_loop_discovery, name)
+    if name in _ENSEMBLE_EXPORTS:
+        from omnibias.symbolic import ensemble_discovery as _ensemble_discovery
+
+        return getattr(_ensemble_discovery, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 

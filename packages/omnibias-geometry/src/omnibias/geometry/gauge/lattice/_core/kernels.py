@@ -242,6 +242,83 @@ def polyakov_loop_field(xp: Any, links: Any, *, t_dir: int = 3) -> Any:
     return loop[..., 0]
 
 
+def polyakov_correlator_spatial(
+    xp: Any, links: Any, *, t_dir: int = 3, r_max: int | None = None
+) -> Any:
+    """Connected spatial Polyakov correlator ``C_P(r)``, ``r = 0 .. r_max``.
+
+    Uses ``_roll`` on the scalar Polyakov field (never :func:`shift`, whose
+    last-axis ``== 4`` heuristic collides with a ``4^4`` lattice).
+    """
+    field = polyakov_loop_field(xp, links, t_dir=t_dir)
+    spatial = tuple(mu for mu in range(4) if mu != t_dir)
+    if r_max is None:
+        r_max = min(int(field.shape[mu]) for mu in spatial) // 2
+    if r_max < 0:
+        raise ValueError(f"r_max must be >= 0, got {r_max}")
+    p_mean = _mean(xp, field, (0, 1, 2, 3))
+    rows = []
+    n_dir = float(len(spatial))
+    for radius in range(r_max + 1):
+        acc = None
+        for mu in spatial:
+            prod = field * _roll(xp, field, -radius, mu)
+            part = _mean(xp, prod, (0, 1, 2, 3))
+            acc = part if acc is None else acc + part
+        rows.append(acc / n_dir - p_mean * p_mean)
+    return _stack(xp, rows, 0)
+
+
+def algebra_from_links(xp: Any, links: Any) -> Any:
+    """Lattice ``A_mu^a = 2 q^{a+1}`` from ``(U - U^dagger)/(2i) = q · sigma``.
+
+    This is a gauge-fixed lattice field, not a :class:`GaugeCovariantJet`.
+    """
+    return 2.0 * links[..., 1:4]
+
+
+def quat_power(xp: Any, q: Any, power: float) -> Any:
+    """Raise a unit quaternion to a real power (axis-angle)."""
+    w = q[..., 0]
+    vec = q[..., 1:4]
+    w_c = xp.clamp(w, -1.0, 1.0) if _is_torch(xp) else xp.clip(w, -1.0, 1.0)
+    half = xp.arccos(w_c)
+    sine = xp.sin(half)
+    safe = _clamp_min(xp, sine, 1e-30)
+    axis = vec / safe[..., None]
+    new_half = half * float(power)
+    out = _concat(xp, (xp.cos(new_half)[..., None], axis * xp.sin(new_half)[..., None]), -1)
+    small = (sine < 1e-12)[..., None]
+    return xp.where(small, q, out)
+
+
+def landau_gauge_overrelax(
+    xp: Any, links: Any, *, n_steps: int, omega: float = 1.0
+) -> Any:
+    """Jacobi Landau-gauge overrelaxation on SU(2) quaternion links.
+
+    Maximizes ``sum_{x,mu} Re tr(g(x) U_mu(x) g(x+mu)^dagger) / 2``. Each sweep
+    sets ``g(x) = normalize(sum_mu [U_mu(x) + U_mu(x-mu)^dagger])^omega`` and
+    applies it simultaneously. Identity links are a fixed point.
+    """
+    if n_steps < 0:
+        raise ValueError(f"n_steps must be >= 0, got {n_steps}")
+    cur = links
+    for _ in range(int(n_steps)):
+        acc = None
+        for mu in range(4):
+            fwd = cur[mu]
+            bwd = quat_conj(xp, shift(xp, cur[mu], mu, 1))
+            part = fwd + bwd
+            acc = part if acc is None else acc + part
+        # Maximize (g * w)_0 = Re tr(g w)/2, so g = w^dagger / |w|.
+        gauge = quat_conj(xp, normalize_quaternion(xp, acc))
+        if abs(float(omega) - 1.0) > 1e-15:
+            gauge = normalize_quaternion(xp, quat_power(xp, gauge, float(omega)))
+        cur = gauge_transform_links(xp, cur, gauge)
+    return cur
+
+
 # ---------------------------------------------------------------------------
 # APE smearing + 0++ glueball operator
 # ---------------------------------------------------------------------------
@@ -511,6 +588,7 @@ def gauge_orbit_distance(xp: Any, links_a: Any, links_b: Any) -> float:
 
 
 __all__ = [
+    "algebra_from_links",
     "ape_smear_spatial_links",
     "connected_correlator_ensemble",
     "connected_correlator_matrix_ensemble",
@@ -520,13 +598,16 @@ __all__ = [
     "gevp_ground_lambda",
     "gevp_plateau",
     "glueball_operator_timeslice",
+    "landau_gauge_overrelax",
     "langevin_link_step",
     "matrix_to_quat",
     "normalize_quaternion",
     "plaquette_trace",
+    "polyakov_correlator_spatial",
     "polyakov_loop_field",
     "quat_conj",
     "quat_mul",
+    "quat_power",
     "quat_to_matrix",
     "raw_cross_correlator_batch",
     "raw_periodic_correlator_batch",

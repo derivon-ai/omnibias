@@ -72,6 +72,36 @@ def test_loop_discoverer_rejects_jet_before_stlsq() -> None:
     assert called["stlsq"] is False
 
 
+@pytest.mark.parametrize("illegal", ["abs_P", "rho", "G_p2"])
+def test_ensemble_extra_on_loop_discoverer_raises_before_stlsq(illegal: str) -> None:
+    table = planted_area_law_table(n_rows=12)
+    table = type(table)(
+        values={**table.values, LOOP_PLAQUETTE: np.ones(12)},
+        source="lattice_links",
+    )
+    counts = (6, 3, 3)
+    from omnibias.symbolic.loop_discovery import _split_table
+
+    train, val, test = _split_table(table, counts)
+
+    def extra(_tab):
+        return {illegal: np.ones(train.values[LOOP_W11].shape[0])}
+
+    called = {"stlsq": False}
+
+    def _boom(*_args, **_kwargs):
+        called["stlsq"] = True
+        raise AssertionError("fit_sparse_equation must not run")
+
+    disc = LoopLawDiscoverer()
+    with patch("omnibias.symbolic.loop_discovery.fit_sparse_equation", _boom):
+        with pytest.raises(ValueError, match="ensemble"):
+            disc.discover(
+                train, val, test, lhs_name=LOOP_W11, extra_columns_fn=extra
+            )
+    assert called["stlsq"] is False
+
+
 @pytest.mark.parametrize("illegal", ["tr(F^2)", "inverse_laplacian"])
 def test_loop_extra_raises_before_stlsq(illegal: str) -> None:
     table = planted_area_law_table(n_rows=12)

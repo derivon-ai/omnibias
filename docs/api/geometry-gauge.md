@@ -187,6 +187,32 @@ derived identity on those traces. GEVP and `gauge.transfer` stay certificates
 (`yang_mills_claim` / `continuum_claim` remain false). This is not a continuum
 mass-gap claim.
 
+## Ensemble language (Path B)
+
+Path B changes the object. Rows are ensemble statistics versus control
+parameters -- `|P|`, `χ_P`, `C_P(r)`, Landau-gauge `G(p^2)`, a planted
+spectral density -- not a jet of `A` and not a per-configuration loop table.
+One `LatticeLinkField` is not an ensemble. GEVP / transfer-gap stay
+certificates. The Euclidean `G → ρ` step is a **named regularized inverse**
+of a finite Källén–Lehmann kernel; the only acceptance gate is planted-`ρ`
+recovery. `yang_mills_claim` / `continuum_claim` remain false. This is not a
+continuum mass-gap claim.
+
+::: omnibias.geometry.gauge._core.ensemble_language
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.geometry.gauge._core.landau_gluon
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.geometry.gauge._core.spectral_density
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ::: omnibias.geometry.gauge._core.loop_language
     options:
       show_root_heading: false

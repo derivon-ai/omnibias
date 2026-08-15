@@ -162,6 +162,26 @@ except ValueError as exc:
 assert loop_raised
 ```
 
+Path B changes the object again: ensemble statistics, not a jet and not a
+per-config holonomy table. The planted order-parameter slope is a finite
+identity, not a continuum exponent.
+
+```python
+from omnibias.geometry.gauge import refuse_jet_as_ensemble_source
+from omnibias.symbolic import discover_planted_order_parameter_scaling
+
+scaling = discover_planted_order_parameter_scaling()
+assert scaling["passed"]
+assert scaling["yang_mills_claim"] is False
+assert scaling["continuum_claim"] is False
+ens_raised = False
+try:
+    refuse_jet_as_ensemble_source(jet)
+except ValueError as exc:
+    ens_raised = "ensemble" in str(exc).lower()
+assert ens_raised
+```
+
 !!! note "Scope"
     `omnibias.geometry.gauge` ships the full **continuum** primitive set **and** an SU(2)
     lattice Monte-Carlo engine (`omnibias.geometry.gauge.lattice`, torch + JAX): heat-bath,

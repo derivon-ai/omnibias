@@ -32,6 +32,10 @@ try:
         GaugeCovariantJet,
     )
     from omnibias.geometry.gauge._core.data_paths import LatticeLinkField
+    from omnibias.geometry.gauge._core.ensemble_language import (
+        is_ensemble_atom_name,
+        refuse_ensemble_as_loop_source,
+    )
     from omnibias.geometry.gauge._core.loop_language import (
         LEGAL_LOOP_ATOMS,
         LOOP_PLAQUETTE,
@@ -96,6 +100,9 @@ def _merge_loop_atoms(
     extra = extra_columns_fn(table)
     if any(name in LEGAL_SINGLET_ATOMS for name in extra):
         refuse_jet_as_loop_source(extra)
+    ensemble_banned = [name for name in extra if is_ensemble_atom_name(name)]
+    if ensemble_banned:
+        refuse_ensemble_as_loop_source(ensemble_banned)
     green = [name for name in extra if is_green_column_name(name)]
     if green:
         refuse_green_as_jet_atom(green)

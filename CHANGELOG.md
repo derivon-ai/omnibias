@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — gauge ensemble language (Path B)
+
+- `EnsembleObservableTable` / `LEGAL_ENSEMBLE_ATOMS` are the third language:
+  ensemble statistics (`|P|`, `χ_P`, `C_P(r)`, Landau `G(p^2)`, planted `ρ`),
+  not a jet and not a per-config loop table. One `LatticeLinkField` raises.
+- `landau_gauge_fix` / `gluon_propagator_p2` evaluate a lattice Landau 2-point.
+  `reconstruct_spectral_density` is a Tikhonov inverse of a finite
+  Källén–Lehmann kernel; planted-`ρ` recovery is the only gate.
+  Unregularized inversion and mass-gap claims raise.
+- `StatisticalLawDiscoverer` recovers planted scaling / Polyakov-mass /
+  area-perimeter / spectral laws. GEVP / transfer-gap stay certificates.
+  Not a continuum or Yang-Mills mass-gap claim.
+
 ### Added — gauge loop language (language trap)
 
 - `LEGAL_LOOP_ATOMS` / `LoopObservableTable` / `evaluate_loop_atoms` evaluate

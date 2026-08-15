@@ -343,8 +343,10 @@ identities (BPST: `tr(F^2) ~ 8 pi^2 tr(F*Ftilde)`). Complexity is
 representation-theoretic (mass dimension + traces). `weak_ym_columns` is an
 identity check, not a predict-zero STLSQ headline; 1-D integral features are
 not the 4-D Yang-Mills weak form. Wilson / Polyakov traces are a second
-language (`LoopLawDiscoverer` on links), not an expanded jet. Not a
-Yang-Mills mass-gap claim.
+language (`LoopLawDiscoverer` on links), not an expanded jet. Ensemble
+statistics (`StatisticalLawDiscoverer`) are a third language: planted
+scaling / Polyakov-mass / area-perimeter / spectral laws, never a jet and
+never a GEVP column. Not a Yang-Mills mass-gap claim.
 
 ::: omnibias.symbolic.gauge_discovery
     options:
@@ -370,6 +372,22 @@ Yang-Mills mass-gap claim.
         - discover_planted_area_law
         - evaluate_loop_gauge_invariance
         - planted_area_law_table
+
+::: omnibias.symbolic.ensemble_discovery
+    options:
+      show_root_heading: false
+      heading_level: 4
+      members:
+        - StatisticalLawDiscoverer
+        - StatisticalLawResult
+        - discover_planted_order_parameter_scaling
+        - discover_planted_polyakov_mass
+        - discover_planted_area_perimeter
+        - discover_planted_spectral_density
+        - planted_order_parameter_table
+        - planted_polyakov_correlator_table
+        - planted_area_perimeter_table
+        - planted_spectral_density_table
 
 ## Differential geometry
 
