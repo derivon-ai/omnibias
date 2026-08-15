@@ -32,8 +32,14 @@ a green build is meaningful.
 - **Newton-Kantorovich / Krawczyk contraction** -- a `radii_polynomial` (also the
   `quadratic_radii` route) or `krawczyk` payload: the genuine rational *polynomial*
   inequalities `p(r) < 0`, `κ(r) < 1`, and strict box containment that the integer
-  kernel cannot even state. Reusable capability lemmas live in
+  kernel cannot even state. Existence remains a trusted input for these classes.
+  Reusable capability lemmas live in
   `OmnibiasAnalytic/Check/{Positivity,Kantorovich}.lean`.
+- **NK / Krawczyk existence** -- an `nk_existence` payload from
+  `omnibias.formal.nk.nk_existence_certificate`: the locked quadratic plant
+  `x² - 2` on `[5/4, 7/4]`. The generated obligation applies a sorry-free Check
+  theorem that concludes a unique real root (Banach on the Newton operator).
+  This is a compact-interval statement, not a continuum PDE.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived
@@ -57,11 +63,12 @@ implies `unproven_claim`.
 
 ## Scope
 
-Every module in `formal/omnibias-analytic/` is `sorry`-free, and the track's
-scope is *finite, rational* obligations discharged against Mathlib. Infinite
-analytic statements -- limits, continuum regularity, asymptotics -- are not
-expressed here at all, so they can never be silently discharged here either. A
-green build certifies the emitted obligation and nothing beyond it.
+Every module in `formal/omnibias-analytic/` is `sorry`-free. The track discharges
+finite rational inequalities and, for a named 1-D map, a unique root on a
+compact interval. Infinite analytic statements -- continuum regularity,
+asymptotics -- are not expressed here at all, so they can never be silently
+discharged here either. A green build certifies the emitted obligation and
+nothing beyond it.
 
 ## Driving the loop
 
@@ -83,6 +90,13 @@ implies `unproven_claim`. With no Lean toolchain present it degrades gracefully
 ## Bridge
 
 ::: omnibias.formal.mathlib_check
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## NK / Krawczyk existence
+
+::: omnibias.formal.nk
     options:
       show_root_heading: false
       heading_level: 3

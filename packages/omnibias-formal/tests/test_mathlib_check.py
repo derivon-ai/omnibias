@@ -25,6 +25,7 @@ from omnibias.formal import (
     check_certificate,
     generate_obligation,
     mathlib_check_available,
+    nk_existence_certificate,
     tower_coeffs_certificate,
 )
 
@@ -114,6 +115,7 @@ def test_generate_radii_polynomial_obligation() -> None:
     assert "^ 2" in src  # the r^2 term of the radii polynomial
     assert "< 0" in src  # p(r) < 0
     assert "< 1" in src  # kappa < 1
+    assert "ExistsUnique" not in src and "∃!" not in src
     assert "refine" in src and "norm_num" in src
     assert "0x" not in src and "e-" not in src  # exact rationals, never a float literal
 
@@ -160,6 +162,7 @@ def test_generate_krawczyk_obligation() -> None:
     assert "-" in src  # center - r < lo terms
     assert "refine" in src and "norm_num" in src
     assert "0.5" not in src  # radius 0.5 emitted as the exact rational 1/2
+    assert "ExistsUnique" not in src and "∃!" not in src
 
 
 def test_krawczyk_not_contracting_yields_none() -> None:
@@ -257,6 +260,92 @@ def test_tower_coeffs_unknown_family_yields_none() -> None:
         payload={"type": "tower_coeffs", "family": "mish", "n": 0, "coeffs": [1]},
     )
     assert generate_obligation(cert) is None
+
+
+def test_generate_nk_existence_obligation() -> None:
+    cert = nk_existence_certificate("radii")
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "import OmnibiasAnalytic.Check.Kantorovich.Plant" in src
+    assert "quadratic_plant_radii_unique_zero" in src
+    assert "quadraticPlant" in src
+    assert "Icc (5 / 4) (7 / 4)" in src
+
+
+def test_generate_nk_existence_krawczyk_route() -> None:
+    cert = nk_existence_certificate("krawczyk")
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "quadratic_plant_krawczyk_unique_zero" in src
+
+
+def test_nk_existence_mismatch_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={
+            "type": "nk_existence",
+            "family": "quadratic",
+            "route": "radii",
+            "center": [3, 2],
+            "radius": [1, 4],
+            "A": [1, 3],
+            "Y0": [1, 11],
+            "Z0": [0, 1],
+            "Z1": [0, 1],
+            "Z2": [2, 3],
+        },
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_nk_existence_unknown_route_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={
+            "type": "nk_existence",
+            "family": "quadratic",
+            "route": "dottie",
+            "center": [3, 2],
+            "radius": [1, 4],
+            "A": [1, 3],
+            "Y0": [1, 12],
+            "Z0": [0, 1],
+            "Z1": [0, 1],
+            "Z2": [2, 3],
+        },
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_nk_existence_unknown_family_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={
+            "type": "nk_existence",
+            "family": "dottie",
+            "route": "radii",
+            "center": [3, 2],
+            "radius": [1, 4],
+            "A": [1, 3],
+            "Y0": [1, 12],
+            "Z0": [0, 1],
+            "Z1": [0, 1],
+            "Z2": [2, 3],
+        },
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_check_certificate_nk_existence_radii() -> None:
+    cert = nk_existence_certificate("radii")
+    result = check_certificate(cert)
+    assert "quadratic_plant_radii_unique_zero" in result.obligation
+    if not mathlib_check_available():
+        assert result.available is False
+        assert result.verified is False
+    else:  # pragma: no cover - only on a machine with Lean + Mathlib
+        assert result.available is True
+        assert result.verified is True
 
 
 def test_check_certificate_tower_sigmoid_two() -> None:

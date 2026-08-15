@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — NK / Krawczyk existence in Lean
+
+- `OmnibiasAnalytic.Check` proves 1-D Banach / Newton-operator unique-root
+  theorems on a compact interval, plus a planted unique root of `x² - 2` in
+  `[5/4, 7/4]` (radii and Krawczyk routes). Not a continuum PDE claim.
+- `nk_existence_certificate` seals the locked plant. The Mathlib bridge
+  re-derives the rational contraction facts and applies the Check lemma
+  (`nk_existence` obligation class). Existing `radii_polynomial` / `krawczyk`
+  classes still certify only `p(r) < 0` / containment.
+
 ### Added — Riccati / Eulerian tower in Lean
 
 - `OmnibiasAnalytic.Tower` proves the sigmoid / tanh / sech / Hermite

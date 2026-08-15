@@ -13,7 +13,8 @@ The `Check/**` modules are the sound, `sorry`-free certificate checkers:
 | --- | --- |
 | `OmnibiasAnalytic/Check/EnclosedSign.lean` | Rational enclosed-sign lemmas (`enclosed_pos`, `enclosed_neg`) over `ℚ` -- the Mathlib analogue of the integer `ZInterval` sign obligations, with **no integer-scaling hack**. |
 | `OmnibiasAnalytic/Check/Positivity.lean` | Sum-of-squares / positivity capability lemmas (`sq_add_sq_nonneg`, `quad_pos` via `positivity` / `nlinarith`) the integer kernel cannot express. |
-| `OmnibiasAnalytic/Check/Kantorovich.lean` | Newton-Kantorovich / Krawczyk finite-obligation lemmas (radii polynomial self-map, contraction, strict box containment) over `ℚ`. |
+| `OmnibiasAnalytic/Check/Kantorovich.lean` | Newton-Kantorovich / Krawczyk finite-obligation lemmas over `ℚ`, plus 1-D Banach / Newton-operator existence on a compact interval. |
+| `OmnibiasAnalytic/Check/Kantorovich/Plant.lean` | Planted unique root of `x² - 2` in `[5/4, 7/4]` (radii and 1-D Krawczyk routes). A compact-interval theorem, not a continuum PDE. |
 | `OmnibiasAnalytic/Tower/` | Riccati / Eulerian / sech / Hermite recurrences on `ℤ[X]`, first-derivative identities, and `iteratedDeriv` link theorems. Pointwise `C^∞` / algebraic identities; not a finite-difference collapse. |
 | `OmnibiasAnalytic/Generated.lean` | Placeholder overwritten by the Python bridge (`omnibias.formal.mathlib_check`) with the certificate under test. |
 

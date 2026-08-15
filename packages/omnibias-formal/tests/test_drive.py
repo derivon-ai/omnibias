@@ -27,6 +27,7 @@ from omnibias.formal import (
     drive_obligation,
     generate_obligation,
     mathlib_check_available,
+    nk_existence_certificate,
     tower_coeffs_certificate,
 )
 from omnibias.formal.drive import _summarize_lake_failure
@@ -71,6 +72,10 @@ def test_classify_tower_coeffs() -> None:
     assert classify_obligation(tower_coeffs_certificate("sigmoid", 2)) == "tower_coeffs"
 
 
+def test_classify_nk_existence() -> None:
+    assert classify_obligation(nk_existence_certificate("radii")) == "nk_existence"
+
+
 def test_classify_none_for_straddling_interval() -> None:
     assert classify_obligation(interval_certificate("q", Interval(-1.0, 1.0))) is None
 
@@ -88,6 +93,7 @@ def test_classify_agrees_with_generate_obligation() -> None:
         positive_definite_certificate("pd", [Interval(1.0, 1.5)]),
         _krawczyk_cert(),
         tower_coeffs_certificate("sigmoid", 2),
+        nk_existence_certificate("radii"),
         {"foo": "bar"},
     ]
     for cert in certs:
