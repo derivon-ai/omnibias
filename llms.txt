@@ -24,6 +24,18 @@ deferred), `BiasScan` / `BankSpec` (01-02; interior lattice shift along `w`,
 not a circular wrap of `tanh'`; soft-argmax `gamma` is not `delta -> 0`),
 and exact-`Q` irregular Birkhoff stencils in `omnibias.difference` (01-04).
 
+Wave-3 algebra + architectures (gated, no new packages): `MollifierSpec` /
+`tail_bound` (01-05; certified exponential tails, not compact support;
+higher-order kernels take negative values), `BandPlan` / `peak_frequency`
+(01-07; pack order is a band selector; 01-06 wavelet frames stay concept),
+`ScanNet` (02-01; per-layer on-lattice equivariance, not `R^D`), `JetKAN`
+(02-03; exactness of the model jet; KA theorem does not justify),
+`omnibias.fields.weak` (02-04; exact integrals only for polynomial coeffs
+on boxes; boundary bound on by default), `omnibias.pinn.interface` (02-05;
+`alpha -> inf` is interface sharpening, neither collapse; parallel
+interfaces only; not the XPINN `omnibias.pinn._core.interface`). Cost /
+wall-time gates are smoke-earned, not in CI `all_passed`.
+
 The dictionary also carries **closed-form integral transforms** of the
 activations whose transform is itself elementary
 (`omnibias.{torch,jax}.transforms`; the identity table, the regions of

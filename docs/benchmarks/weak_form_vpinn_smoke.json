@@ -1,0 +1,108 @@
+{
+  "schema": "weak-form-vpinn-v1",
+  "generated_utc": "2026-08-15T10:19:12Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "weak_form_vpinn",
+    "full": false,
+    "gates_in_scope": [
+      "g1",
+      "g2",
+      "g3",
+      "g5"
+    ],
+    "g4_is_unit_test": true
+  },
+  "rss_mb_at_start": 1269.55,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_exact_integral",
+        "passed": true,
+        "rel_vs_high_gauss": 7.619227876711719e-15,
+        "gauss2_abs_err": 0.09102079211809425,
+        "gauss48_abs_err": 1.887379141862766e-15,
+        "g4_deferred_from_01_05": true
+      },
+      {
+        "name": "g2_boundary_honesty",
+        "passed": true,
+        "loss_with_bound": 0.00023159994651794237,
+        "loss_without_bound": 5.000847170727047e-05
+      },
+      {
+        "name": "g3_discontinuous_coeff",
+        "passed": true,
+        "rel_l2_weak_ansatz": 7.955749435925706e-17,
+        "rel_l2_strong_cubic": 0.03668387097370936,
+        "skill": 1.0,
+        "n_seeds": 1,
+        "note": "smoke uses 1 seed / closed-form ramp; --full repeats the same check"
+      },
+      {
+        "name": "g5_parity",
+        "passed": true,
+        "max_abs": 0.0,
+        "paths": [
+          "exact",
+          "exact",
+          "exact",
+          "exact",
+          "exact",
+          "exact"
+        ]
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_exact_integral",
+    "passed": true,
+    "rel_vs_high_gauss": 7.619227876711719e-15,
+    "gauss2_abs_err": 0.09102079211809425,
+    "gauss48_abs_err": 1.887379141862766e-15,
+    "g4_deferred_from_01_05": true
+  },
+  "g2": {
+    "name": "g2_boundary_honesty",
+    "passed": true,
+    "loss_with_bound": 0.00023159994651794237,
+    "loss_without_bound": 5.000847170727047e-05
+  },
+  "g3": {
+    "name": "g3_discontinuous_coeff",
+    "passed": true,
+    "rel_l2_weak_ansatz": 7.955749435925706e-17,
+    "rel_l2_strong_cubic": 0.03668387097370936,
+    "skill": 1.0,
+    "n_seeds": 1,
+    "note": "smoke uses 1 seed / closed-form ramp; --full repeats the same check"
+  },
+  "g5": {
+    "name": "g5_parity",
+    "passed": true,
+    "max_abs": 0.0,
+    "paths": [
+      "exact",
+      "exact",
+      "exact",
+      "exact",
+      "exact",
+      "exact"
+    ]
+  },
+  "honesty": {
+    "exact_only_for_polynomial_on_boxes": true,
+    "boundary_terms_dropped": false,
+    "boundary_bound_default_on": true,
+    "sdf_domains_claimed": false
+  }
+}

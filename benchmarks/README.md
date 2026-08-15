@@ -44,6 +44,12 @@ uv run python docs/img/generate_figures.py
 | `multipack_birkhoff.py` | `docs/benchmarks/multipack_birkhoff_smoke.json` | Wave-1 primitive 01-01: MultiPackUnit G1/G2/G3/G5; float64 order ceiling recorded; G4 deferred |
 | `irregular_stencils.py` | `docs/benchmarks/irregular_stencils_smoke.json` | Wave-1 primitive 01-04: exact-Q Birkhoff weights G1–G4 |
 | `bias_scan.py` | `docs/benchmarks/bias_scan_smoke.json` | Wave-1 primitive 01-02: BiasScan G1/G2/G3 CI-gated; G4 earned on smoke (not in CI `all_passed`; wall time) |
+| `mollifier_calculus.py` | `docs/benchmarks/mollifier_calculus_smoke.json` | Wave-3 primitive 01-05: MollifierSpec G1–G3; G4 deferred to VPINN; certified exponential tails, not compact support |
+| `spectral_design.py` | `docs/benchmarks/spectral_design_smoke.json` | Wave-3 primitive 01-07: BandPlan G1/G2/G4; G3 not in CI `all_passed`; pack order is a band selector, 01-06 frames stay concept |
+| `scannet.py` | `docs/benchmarks/scannet_smoke.json` | Wave-3 architecture 02-01: ScanNet G1/G2/G5; G3 cost and G4 k-NN recorded, not in CI `all_passed`; on-lattice equivariance |
+| `jetkan.py` | `docs/benchmarks/jetkan_smoke.json` | Wave-3 architecture 02-03: JetKAN G1/G3/G5; G2 timing not in CI `all_passed`; model-jet exactness, KA theorem does not justify |
+| `weak_form_vpinn.py` | `docs/benchmarks/weak_form_vpinn_smoke.json` | Wave-3 architecture 02-04: exact on polynomial boxes; boundary bound on by default |
+| `multi_interface_pinn.py` | `docs/benchmarks/multi_interface_pinn_smoke.json` | Wave-3 architecture 02-05: parallel interfaces; `alpha -> inf` is sharpening, neither collapse |
 
 All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries
 `generated_utc`, `hardware_class`, library versions, and the exact config.
@@ -75,6 +81,12 @@ uv run python benchmarks/tabular_arrangement_capacity.py --full
 uv run python benchmarks/multipack_birkhoff.py --full
 uv run python benchmarks/irregular_stencils.py --full
 uv run python benchmarks/bias_scan.py --full
+uv run python benchmarks/mollifier_calculus.py --full
+uv run python benchmarks/spectral_design.py --full
+uv run python benchmarks/scannet.py --full
+uv run python benchmarks/jetkan.py --full
+uv run python benchmarks/weak_form_vpinn.py --full
+uv run python benchmarks/multi_interface_pinn.py --full
 ```
 
 ## PINN four-gap suite

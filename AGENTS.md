@@ -463,6 +463,22 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.{torch,jax}.scan` (01-02); `omnibias.difference` irregular
   stencils (01-04). Docs: [`docs/api/multipack.md`](docs/api/multipack.md),
   [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md).
+- Wave-3 gated algebra + architectures (not shipped): `omnibias.core.mollifier`
+  (01-05; certified exponential tails, not compact support) /
+  `omnibias.core.spectral_design` (01-07; pack order is a band selector;
+  01-06 frames stay concept); `omnibias.{torch,jax}.architectures` Scan-Net
+  (02-01; on-lattice equivariance) and Jet-KAN (02-03; model-jet exactness,
+  KA theorem does not justify); `omnibias.fields.weak` (02-04; exact on
+  polynomial boxes, boundary bound on by default);
+  `omnibias.pinn.interface` (02-05; interface sharpening, not collapse;
+  distinct from XPINN `omnibias.pinn._core.interface`). Docs:
+  [`docs/api/mollifier.md`](docs/api/mollifier.md),
+  [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
+  [`docs/api/scannet.md`](docs/api/scannet.md),
+  [`docs/api/jetkan.md`](docs/api/jetkan.md),
+  [`docs/api/weak.md`](docs/api/weak.md),
+  [`docs/api/interface.md`](docs/api/interface.md). Cost / wall-time gates
+  are smoke-earned, not in CI `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.
 - Manifold geometry / exterior calculus: `omnibias.geometry`.
 - Fractional / score-SDE: `omnibias.fractional`, `omnibias.score`.

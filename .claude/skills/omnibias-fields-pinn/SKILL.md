@@ -22,6 +22,8 @@ across PyTorch and JAX. `omnibias-pinn` / `omnibias-qpinn` build PINNs on top.
 | Operator learning | `omnibias.pinn.operator` | DeepONet / FNO with multi-head conditioning |
 | Multilevel FBPINN / NTK | `omnibias.pinn.torch.fields` / `.losses` | spectral-bias arms + diagnostics (JAX twins) |
 | Quantum PINNs | `omnibias.qpinn` | TISE / TDSE / Gross-Pitaevskii |
+| Weak-form VPINN (gated 02-04) | `omnibias.fields.weak` | `TestFunctionSpace`, `exact_moment`, `weak_residual`; exact integrals only for polynomial coeffs on boxes; boundary bound on by default |
+| Transmission PINN (gated 02-05) | `omnibias.pinn.interface` | `Interface` / `TransmissionInterface`, `MultiInterfaceField`; `alpha -> inf` is sharpening, neither collapse; **not** XPINN `omnibias.pinn._core.interface` |
 
 `omnibias.pinn._core` and `omnibias.pinn.<backend>.ops` are transparent
 re-export shims of the moved `omnibias-fields` substrate -- do not duplicate it.
@@ -52,5 +54,5 @@ and validity guards are what make the win undeniable.
 
 ## More detail
 
-- API: [fields](https://github.com/derivon-ai/omnibias/blob/main/docs/api/fields.md), [pinn](https://github.com/derivon-ai/omnibias/blob/main/docs/api/pinn.md), [qpinn](https://github.com/derivon-ai/omnibias/blob/main/docs/api/qpinn.md)
+- API: [fields](https://github.com/derivon-ai/omnibias/blob/main/docs/api/fields.md), [pinn](https://github.com/derivon-ai/omnibias/blob/main/docs/api/pinn.md), [qpinn](https://github.com/derivon-ai/omnibias/blob/main/docs/api/qpinn.md), [weak form](https://github.com/derivon-ai/omnibias/blob/main/docs/api/weak.md), [transmission interface](https://github.com/derivon-ai/omnibias/blob/main/docs/api/interface.md)
 - Handbook: [vector calculus & PDE](https://github.com/derivon-ai/omnibias/blob/main/docs/handbook/02-vector-calculus-pde.md)

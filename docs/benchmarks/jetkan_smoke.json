@@ -1,0 +1,90 @@
+{
+  "schema": "jetkan-v1",
+  "generated_utc": "2026-08-15T10:08:56Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "jetkan",
+    "full": false,
+    "g2_in_all_passed": false,
+    "gates_in_scope": [
+      "g1",
+      "g3",
+      "g5"
+    ]
+  },
+  "rss_mb_at_start": 1302.6,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_derivative_accuracy",
+        "passed": true,
+        "rel_l2_jet_k2": 1.7978679307028867e-16,
+        "rel_l2_spline_k2": 0.087878518944564,
+        "ratio_spline_over_jet_k2": 488792961061424.5,
+        "spline_k4_identically_zero": true,
+        "jet_k4_finite": true,
+        "note": "exactness is of the model jet (tanh edge), not a fitted target"
+      },
+      {
+        "name": "g3_fit_parity",
+        "passed": true,
+        "mse_jetkan_additive": 0.22343497591351527,
+        "mse_spline_additive": 0.17805119084671928,
+        "ratio_jet_over_spline": 1.2548917805658824,
+        "note": "1-layer additive LS on exp(sin(pi x1)+x2^2); KA theorem does not justify depth"
+      },
+      {
+        "name": "g5_parity",
+        "passed": true,
+        "worst_ulp": 0.0
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_derivative_accuracy",
+    "passed": true,
+    "rel_l2_jet_k2": 1.7978679307028867e-16,
+    "rel_l2_spline_k2": 0.087878518944564,
+    "ratio_spline_over_jet_k2": 488792961061424.5,
+    "spline_k4_identically_zero": true,
+    "jet_k4_finite": true,
+    "note": "exactness is of the model jet (tanh edge), not a fitted target"
+  },
+  "g2": {
+    "name": "g2_jet_cost",
+    "passed": false,
+    "in_ci_all_passed": false,
+    "jet_seconds": 0.009641258977353573,
+    "autodiff_seconds": 0.03902299504261464,
+    "autodiff_over_jet": 4.047499930691215,
+    "note": "jet vs autodiff timing smoke-earned, not in CI all_passed"
+  },
+  "g3": {
+    "name": "g3_fit_parity",
+    "passed": true,
+    "mse_jetkan_additive": 0.22343497591351527,
+    "mse_spline_additive": 0.17805119084671928,
+    "ratio_jet_over_spline": 1.2548917805658824,
+    "note": "1-layer additive LS on exp(sin(pi x1)+x2^2); KA theorem does not justify depth"
+  },
+  "g5": {
+    "name": "g5_parity",
+    "passed": true,
+    "worst_ulp": 0.0
+  },
+  "honesty": {
+    "ka_theorem_justifies_architecture": false,
+    "exactness_is_model_jet": true,
+    "g2_in_ci_all_passed": false,
+    "full_pack_birth_death_03_13": false
+  }
+}

@@ -169,6 +169,31 @@ Three extensions of this geometry have code and CI smoke, still **gated**:
   Birkhoff weights for arbitrary nodes and per-node orders. Order is
   asymptotic in the node scale `h`. G1–G4 earned.
 
+### Wave-3 gated architectures (not shipped)
+
+Algebra plus stacked consumers of Wave-1, still **gated**. Cost / wall-time
+gates are earned on smoke, not in CI `all_passed`.
+
+- **Mollifier** ([01-05](api/mollifier.md)): `MollifierSpec` / `tail_bound`.
+  Analytic bases have certified exponential tails, not compact support;
+  higher-order kernels take **negative** values. G1–G3 CI-gated; G4 deferred
+  to VPINN.
+- **Spectral design** ([01-07](api/spectral_design.md)): `BandPlan` /
+  `peak_frequency`. Pack order is a **band selector**; 01-06 wavelet frames
+  stay concept. G1–G2 CI-gated; G3 not in CI `all_passed`.
+- **Scan-Net** ([02-01](api/scannet.md)): stacked `BiasScan` banks. Equivariance
+  is per-layer, per-direction, on-lattice; `gamma` is not `delta -> 0`.
+  G1/G2/G5 CI-gated; G3 cost and G4 k-NN recorded.
+- **Jet-KAN** ([02-03](api/jetkan.md)): univariate multi-pack edges. Exactness
+  is of the **model jet**, not the target; the KA theorem does **not**
+  justify the architecture. G2 cost not in CI `all_passed`.
+- **Weak-form VPINN** ([02-04](api/weak.md)): exact integrals only for
+  polynomial coeffs on boxes; path recorded; boundary bound **on by default**.
+- **Transmission PINN** ([02-05](api/interface.md)): parallel interfaces;
+  `alpha -> inf` is **interface sharpening**, neither collapse. Import
+  `Interface` from `omnibias.pinn.interface`, not the XPINN glue in
+  `omnibias.pinn._core.interface`.
+
 ## Two senses of "collapse" (do not conflate)
 
 "Collapse" names two *different* limits in this codebase. Only the first --

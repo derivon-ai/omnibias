@@ -100,9 +100,9 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [01-02 bias scan](01-geometry/02-bias-scan-transverse-convolution.md) | gated | `BiasScan` / `BankSpec`; G1–G3 earned; G4 earned on smoke (not CI-gated) |
 | [01-03 arrangement geometry](01-geometry/03-hyperplane-arrangement-geometry.md) | concept | Cells, flats, faces and tope graphs of many soft hyperplanes |
 | [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | gated | Exact-`Q` weights in `omnibias.difference`; G1–G4 earned |
-| [01-05 mollifier calculus](01-geometry/05-mollifier-distribution-calculus.md) | designed | Packs as mollifiers converging to derivatives of the Dirac functional |
+| [01-05 mollifier calculus](01-geometry/05-mollifier-distribution-calculus.md) | gated | `MollifierSpec` / `tail_bound`; certified exponential tails, not compact support; G1–G3 earned; G4 deferred to VPINN |
 | [01-06 OMBU wavelet frames](01-geometry/06-ombu-wavelet-frames.md) | concept | `sigma'` as mother wavelet; bias translates, tempering dilates |
-| [01-07 order as frequency](01-geometry/07-order-as-frequency-spectral-design.md) | designed | `sigma^(n)` has spectrum `(i xi)^n` times the base: order selects a band |
+| [01-07 order as frequency](01-geometry/07-order-as-frequency-spectral-design.md) | gated | `BandPlan` / `peak_frequency`; pack order is a band selector; G1–G2 earned; G3 not in CI `all_passed`; 01-06 frames stay concept |
 | [01-08 tropical-log homotopy](01-geometry/08-tropical-log-homotopy.md) | concept | A differentiable path between the log and max-plus semirings |
 | [01-09 equality-locus calculus](01-geometry/09-equality-locus-and-intersection-calculus.md) | designed | Forcing outputs equal: the shared level set and its closed-form Jacobian |
 | [01-10 jet-bundle formalization](01-geometry/10-jet-bundle-formalization.md) | concept | The formal language: sections, prolongation, fibers, stratification |
@@ -113,11 +113,11 @@ API settled, gates named), **gated** (an acceptance gate exists in
 
 | Spec | Status | One line |
 |---|---|---|
-| [02-01 scan-net](02-architectures/01-scan-net-gridless-cnn.md) | concept | Stacked scan banks: convolution without a pixel grid |
+| [02-01 scan-net](02-architectures/01-scan-net-gridless-cnn.md) | gated | Stacked scan banks; equivariance per-layer, on-lattice, not `R^D`; G1/G2/G5 earned; G3 cost and G4 k-NN recorded, not CI `all_passed` |
 | [02-02 arrangement graph network](02-architectures/02-arrangement-graph-network.md) | concept | Message passing on the face lattice, then decode and certify |
-| [02-03 jet-KAN](02-architectures/03-jet-kan-univariate-basis.md) | designed | Edge-wise univariate bases with exact derivative towers |
-| [02-04 weak-form VPINN](02-architectures/04-weak-form-vpinn-closed-test-functions.md) | designed | Test functions with closed-form antiderivatives: exact integration by parts |
-| [02-05 multi-interface PINN](02-architectures/05-multi-interface-transmission-pinn.md) | designed | Value, flux and curvature conditions at several parallel interfaces |
+| [02-03 jet-KAN](02-architectures/03-jet-kan-univariate-basis.md) | gated | Edge-wise univariate bases; exactness of the model jet, not the target; KA theorem does not justify; G2 cost not CI-gated |
+| [02-04 weak-form VPINN](02-architectures/04-weak-form-vpinn-closed-test-functions.md) | gated | Exact integrals only for polynomial coeffs on boxes; boundary bound on by default |
+| [02-05 multi-interface PINN](02-architectures/05-multi-interface-transmission-pinn.md) | gated | Parallel interfaces; `alpha -> inf` is sharpening, neither collapse |
 | [02-06 potential theory and BEM-net](02-architectures/06-potential-theory-and-bem-net.md) | concept | Layer potentials from the antiderivative window |
 | [02-07 hierarchical pack tree](02-architectures/07-hierarchical-pack-tree-fmm.md) | concept | Near and far field split for large scan banks |
 | [02-08 equivariant and manifold scan](02-architectures/08-equivariant-and-manifold-scan.md) | concept | Orientation orbits and scanning in chart coordinates |

@@ -50,6 +50,8 @@ print(hermite_coeffs(5))             # probabilist's Hermite (Gaussian)
 | `omnibias.core.spec` | `ActivationSpec` — shared activation metadata |
 | `omnibias.core.multipack` | `PackSpec` / `MultiPackSpec` — heterogeneous Birkhoff support (theory 01-01, **gated**) |
 | `omnibias.core.scan` | `BankSpec` — offset / scale bank for the bias scan (theory 01-02, **gated**) |
+| `omnibias.core.mollifier` | `MollifierSpec` / `tail_bound` — pack-as-mollifier algebra; certified exponential tails, not compact support (theory 01-05, **gated**) |
+| `omnibias.core.spectral_design` | `BandPlan` / `peak_frequency` — order as a band selector; 01-06 frames stay concept (theory 01-07, **gated**) |
 | `omnibias.core.bell` | Bell polynomials / Faà di Bruno combinatorics |
 | `omnibias.core.multi_index` | Multi-index ordering + Cauchy product for multivariate jets |
 | `omnibias.core.verified` | Rigorous numerics: `Interval`, Taylor models, Kantorovich, Lohner, … |

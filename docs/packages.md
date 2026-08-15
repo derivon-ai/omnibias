@@ -13,12 +13,12 @@ Published first and held to the [API-stability contract](stability.md).
 
 | Package | Version | Status | Scope |
 |---|---|---|---|
-| omnibias-core | 0.4.0 | Beta | Pure-Python closed-form n-th derivative core: Eulerian / Legendre / Hermite coefficient generators, the backend-agnostic `ActivationSpec`, plus gated Wave-1 algebra (`MultiPackSpec`, `BankSpec`). |
-| omnibias-torch | 0.4.0 | Beta | PyTorch backend: OMBU, operator-typed blocks, closed-form activation-derivative kernels, reference PINN / CmbNet / CvxLayer architectures; gated `MultiPackUnit` / `BiasScan`. |
-| omnibias-jax | 0.4.0 | Beta | JAX backend: closed-form n-th derivative kernels, neural-field Laplacian / Hessian, Born-Oppenheimer derivative tools for VMC; gated `init_multipack` / `bias_scan` twins. |
+| omnibias-core | 0.4.0 | Beta | Pure-Python closed-form n-th derivative core: Eulerian / Legendre / Hermite coefficient generators, the backend-agnostic `ActivationSpec`, plus gated Wave-1 algebra (`MultiPackSpec`, `BankSpec`) and Wave-3 `MollifierSpec` / `BandPlan`. |
+| omnibias-torch | 0.4.0 | Beta | PyTorch backend: OMBU, operator-typed blocks, closed-form activation-derivative kernels, reference PINN / CmbNet / CvxLayer architectures; gated `MultiPackUnit` / `BiasScan` / `ScanNet` / `JetKAN`. |
+| omnibias-jax | 0.4.0 | Beta | JAX backend: closed-form n-th derivative kernels, neural-field Laplacian / Hessian, Born-Oppenheimer derivative tools for VMC; gated `init_multipack` / `bias_scan` / Scan-Net / Jet-KAN twins. |
 | omnibias-ferminet | 0.2.0 | Beta | FermiNet bridge: folx-compatible Laplacian, restricted Tier-2 ansatz, analytic nuclear Hessian / Born-Oppenheimer primitives. |
-| omnibias-fields | 0.1.0 | Beta | Backend-agnostic field substrate (`FieldState`, attribute-DSL views, sigma^(n) cache) and the closed-form differential-operator surface (grad / div / curl / laplacian / hessian / jacobian, integration, Sobolev norms). |
-| omnibias-pinn | 0.1.0 | Beta | Physics-informed neural networks: typed fields, hard-conservation cages, PDE residuals, diagnostics; alpha `train` / `domain` / `operator` / `solver` (four-gap gated). |
+| omnibias-fields | 0.1.0 | Beta | Backend-agnostic field substrate (`FieldState`, attribute-DSL views, sigma^(n) cache) and the closed-form differential-operator surface (grad / div / curl / laplacian / hessian / jacobian, integration, Sobolev norms); gated weak-form VPINN (`omnibias.fields.weak`). |
+| omnibias-pinn | 0.1.0 | Beta | Physics-informed neural networks: typed fields, hard-conservation cages, PDE residuals, diagnostics; alpha `train` / `domain` / `operator` / `solver` (four-gap gated); gated `omnibias.pinn.interface` transmission PINN (not XPINN `_core.interface`). |
 | omnibias-geometry | 0.2.0 | Beta | Differential geometry: metric, Christoffel, covariant derivative, Laplace-Beltrami, Riemann / Ricci / scalar curvature, geodesics, exterior calculus, learned-chart pullback metric. |
 | omnibias-keras | 0.0.1a1 | Alpha | Keras 3 unified backend: OMBU, operator blocks, and drop-in `cmbDense` / `cmbConv` layers on TensorFlow / JAX / PyTorch. |
 

@@ -16,6 +16,12 @@ Three families:
   form through ``jet_attention``.
 - :mod:`cmbnet`: operator-typed CNN where each convolution layer carries
   an explicit operator role (gradient / Laplacian / band / integral).
+- :mod:`scannet`: gated grid-free stacked bias-scan banks (theory 02-01).
+  Equivariance is per-layer, on-lattice, not the translation group of
+  ``R^D``. Templates reuse the six ``OperatorBlock`` roles.
+- :mod:`jetkan`: gated univariate multi-pack edges (theory 02-03). Exactness
+  is of the model jet; the Kolmogorov-Arnold theorem does not justify the
+  architecture.
 - :mod:`cvxlayer`: differentiable embedded convex solvers (LASSO, logistic)
   unrolled as depth-T multi-bias networks where each layer is one solver
   iteration realised by a K=2 collapse.
@@ -32,6 +38,12 @@ from omnibias.torch.architectures.hardbc import (
     dirichlet_interval,
     homogeneous_box,
     initial_value,
+)
+from omnibias.torch.architectures.jetkan import (
+    JetKAN,
+    JetKANConfig,
+    edge_functions,
+    jetkan_from_band_plan,
 )
 from omnibias.torch.architectures.joint_operator import (
     FittedJointOperatorRegressor,
@@ -51,6 +63,7 @@ from omnibias.torch.architectures.pinn import (
     PINNHeat,
     make_siren,
 )
+from omnibias.torch.architectures.scannet import ScanNet, ScanNetConfig, scannet_from_band_plan
 
 __all__ = [
     "AdaptiveActivation",
@@ -66,14 +79,21 @@ __all__ = [
     "FittedJointOperatorRegressor",
     "FourierFeatureMLP",
     "HardConstraintField",
+    "JetKAN",
+    "JetKANConfig",
     "JetMLP",
     "JointOperatorRegressor",
     "MscaleMLP",
     "OperatorMetadata",
     "PINNHeat",
+    "ScanNet",
+    "ScanNetConfig",
     "dirichlet_interval",
+    "edge_functions",
     "fit_joint_operator_regressor",
     "homogeneous_box",
     "initial_value",
+    "jetkan_from_band_plan",
     "make_siren",
+    "scannet_from_band_plan",
 ]

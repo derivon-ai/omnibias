@@ -6,6 +6,32 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Wave-3 gated algebra + architectures (01-05, 01-07, 02-01, 02-03, 02-04, 02-05)
+
+- Mollifier calculus in `omnibias.core.mollifier` (`MollifierSpec`,
+  `tail_bound`). Analytic bases have certified exponential tails, not
+  compact support; higher-order kernels take negative values. Gated
+  (G1–G3 earned; G4 deferred to VPINN).
+- Spectral design in `omnibias.core.spectral_design` (`BandPlan`,
+  `peak_frequency`). Pack order is a band selector; 01-06 wavelet frames
+  stay concept. Gated (G1–G2 CI-gated; G3 not in CI `all_passed`).
+- Scan-Net torch `nn.Module` + jax pytree twins. Equivariance is
+  per-layer, per-direction, on-lattice, not translation on `R^D`; `gamma`
+  is not `delta -> 0`. Templates reuse the six `OperatorBlock` roles.
+  Gated (G1/G2/G5 CI-gated; G3 cost and G4 k-NN recorded, not in CI
+  `all_passed`).
+- Jet-KAN twins. Exactness is of the model jet, not the target; the
+  Kolmogorov-Arnold theorem does not justify the architecture. Gated
+  (G1/G3/G5 CI-gated; G2 jet-vs-autodiff timing smoke-earned, not in CI
+  `all_passed`).
+- Weak-form VPINN in `omnibias.fields.weak`. Exact integrals only for
+  polynomial coefficients on boxes; path recorded; boundary bound on by
+  default. Gated.
+- Multi-interface transmission PINN in `omnibias.pinn.interface` (alias
+  `TransmissionInterface`). `alpha -> inf` is interface sharpening,
+  neither collapse; parallel interfaces only. Distinct from XPINN
+  `omnibias.pinn._core.interface`. Gated.
+
 ### Added — Wave-1 primitives (01-04 irregular stencils, 01-02 bias scan)
 
 - Exact rational irregular / Birkhoff finite-difference weights in

@@ -20,6 +20,9 @@
 * :class:`~omnibias.jax.architectures.attention.AttentionJetMLP` -- the first
   *non-local* block on the substrate: a softmax mixture over a trainable memory,
   whose coordinate derivatives stay closed form through ``jet_attention``.
+* gated :mod:`~omnibias.jax.architectures.scannet` / :mod:`~omnibias.jax.architectures.jetkan`
+  -- Scan-Net (on-lattice equivariance, not ``R^D``) and Jet-KAN (model-jet
+  exactness; the Kolmogorov-Arnold theorem does not justify).
 """
 
 from omnibias.jax.architectures.attention import (
@@ -34,6 +37,17 @@ from omnibias.jax.architectures.hardbc import (
     dirichlet_interval,
     homogeneous_box,
     initial_value,
+)
+from omnibias.jax.architectures.jetkan import (
+    JetKANConfig,
+    JetKANParams,
+    init_jet_kan,
+    jet_kan_apply,
+    jet_kan_from_torch_state,
+    jet_kan_jet,
+    jet_kan_jet_mv,
+    jetkan_from_band_plan,
+    refine_pack,
 )
 from omnibias.jax.architectures.multiscale import (
     AdaptiveActivation,
@@ -50,6 +64,14 @@ from omnibias.jax.architectures.pinn import (
     make_jet_mlp,
     make_siren,
 )
+from omnibias.jax.architectures.scannet import (
+    ScanNetConfig,
+    ScanNetParams,
+    init_scan_net,
+    scan_net_apply,
+    scan_net_from_torch_state,
+    scannet_from_band_plan,
+)
 
 __all__ = [
     "AdaptiveActivation",
@@ -60,11 +82,22 @@ __all__ = [
     "BoundaryMask",
     "FourierFeatureMLP",
     "HardConstraintField",
+    "JetKANConfig",
+    "JetKANParams",
     "JetMLP",
     "MscaleMLP",
+    "ScanNetConfig",
+    "ScanNetParams",
     "dirichlet_interval",
     "homogeneous_box",
+    "init_jet_kan",
+    "init_scan_net",
     "initial_value",
+    "jet_kan_apply",
+    "jet_kan_from_torch_state",
+    "jet_kan_jet",
+    "jet_kan_jet_mv",
+    "jetkan_from_band_plan",
     "make_adaptive_activation",
     "make_adaptive_jet_mlp",
     "make_attention_jet_mlp",
@@ -72,4 +105,8 @@ __all__ = [
     "make_jet_mlp",
     "make_mscale_mlp",
     "make_siren",
+    "refine_pack",
+    "scan_net_apply",
+    "scan_net_from_torch_state",
+    "scannet_from_band_plan",
 ]

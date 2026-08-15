@@ -22,6 +22,8 @@ Public API:
   combinatorics for the *multivariate* (multi-index) jet primitive.
 * :class:`ActivationSpec` -- generic activation descriptor.
 * :class:`BankSpec` -- offset / scale bank for the bias scan (theory 01-02).
+* :class:`MollifierSpec` -- pack-as-mollifier algebra and certified tails (theory 01-05).
+* :class:`BandPlan` -- order-as-frequency spectral design (theory 01-07).
 
 There are no framework dependencies in this package.
 """
@@ -41,6 +43,13 @@ from omnibias.core.information import (
     binary_entropy,
     has_cumulant_tower,
     is_log_partition_activation,
+)
+from omnibias.core.mollifier import (
+    MollifierSpec,
+    design_order,
+    is_admissible,
+    moments,
+    tail_bound,
 )
 from omnibias.core.moments import (
     central_moments_from_cumulants,
@@ -80,6 +89,14 @@ from omnibias.core.probability import (
     is_cdf_activation,
 )
 from omnibias.core.scan import BankSpec
+from omnibias.core.spectral_design import (
+    BandPlan,
+    alpha_for_peak,
+    design_band_plan,
+    peak_frequency,
+    relative_bandwidth,
+    response_profile,
+)
 from omnibias.core.spec import (
     ActivationSpec,
     NthDerivativeFn,
@@ -106,7 +123,9 @@ __lineage__ = "bias collapse"
 
 __all__ = [
     "ActivationSpec",
+    "BandPlan",
     "BankSpec",
+    "MollifierSpec",
     "MultiPackSpec",
     "NthDerivativeFn",
     "PackSpec",
@@ -117,6 +136,7 @@ __all__ = [
     "TransformName",
     "__lineage__",
     "__version__",
+    "alpha_for_peak",
     "bell_complete",
     "bell_number",
     "bell_partial",
@@ -128,6 +148,8 @@ __all__ = [
     "cumulants_from_raw_moments",
     "delta_method_central_moments",
     "delta_method_from_cumulants",
+    "design_band_plan",
+    "design_order",
     "dkw_epsilon",
     "faa_di_bruno_terms",
     "gaussian_central_moments",
@@ -135,22 +157,28 @@ __all__ = [
     "hermite_coeffs",
     "incidence_matrix",
     "index_position",
+    "is_admissible",
     "is_cdf_activation",
     "is_log_partition_activation",
     "is_poised",
     "make_tempered_fastpath",
     "make_tempered_transforms",
     "mish_inner_coeffs",
+    "moments",
     "multi_index_factorial",
     "multi_indices",
     "multiply_table",
     "num_multi_indices",
+    "peak_frequency",
     "polya_condition",
     "raw_moments_from_cumulants",
     "raw_to_central_moments",
     "registered_activations",
+    "relative_bandwidth",
+    "response_profile",
     "second_order_delta",
     "sigmoid_polynomial_coeffs",
+    "tail_bound",
     "tanh_polynomial_coeffs",
     "tempered",
 ]

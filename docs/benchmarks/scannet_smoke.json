@@ -1,0 +1,140 @@
+{
+  "schema": "scannet-v1",
+  "generated_utc": "2026-08-15T10:08:54Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "scannet",
+    "full": false,
+    "g3_in_all_passed": false,
+    "gates_in_scope": [
+      "g1",
+      "g2",
+      "g5"
+    ]
+  },
+  "rss_mb_at_start": 1340.65,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_layer_equivariance",
+        "passed": true,
+        "worst_ulp": 0.0,
+        "expected": 4.0,
+        "note": "per-layer, per-direction, on-lattice; not R^D translation"
+      },
+      {
+        "name": "g2_grid_free_win",
+        "passed": true,
+        "mae_scan": 0.23233336681782113,
+        "mae_voxel_cmb": 0.2923151208513361,
+        "skill_vs_midpoint": 0.21273154489497748,
+        "n_seeds": 5,
+        "per_seed": [
+          {
+            "scan_mae": 0.1824237539663624,
+            "voxel_mae": 0.0574237539663624
+          },
+          {
+            "scan_mae": 0.3032963107438518,
+            "voxel_mae": 0.36815720184607115
+          },
+          {
+            "scan_mae": 0.24303185137472105,
+            "voxel_mae": 0.631968148625279
+          },
+          {
+            "scan_mae": 0.2601742009178713,
+            "voxel_mae": 0.0858689510609586
+          },
+          {
+            "scan_mae": 0.1727407170862991,
+            "voxel_mae": 0.3181575487580094
+          }
+        ],
+        "note": "voxelized cmbConv1d is the 1-D reduction of binned CmbNet"
+      },
+      {
+        "name": "g5_parity",
+        "passed": true,
+        "worst_ulp": 0.5
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_layer_equivariance",
+    "passed": true,
+    "worst_ulp": 0.0,
+    "expected": 4.0,
+    "note": "per-layer, per-direction, on-lattice; not R^D translation"
+  },
+  "g2": {
+    "name": "g2_grid_free_win",
+    "passed": true,
+    "mae_scan": 0.23233336681782113,
+    "mae_voxel_cmb": 0.2923151208513361,
+    "skill_vs_midpoint": 0.21273154489497748,
+    "n_seeds": 5,
+    "per_seed": [
+      {
+        "scan_mae": 0.1824237539663624,
+        "voxel_mae": 0.0574237539663624
+      },
+      {
+        "scan_mae": 0.3032963107438518,
+        "voxel_mae": 0.36815720184607115
+      },
+      {
+        "scan_mae": 0.24303185137472105,
+        "voxel_mae": 0.631968148625279
+      },
+      {
+        "scan_mae": 0.2601742009178713,
+        "voxel_mae": 0.0858689510609586
+      },
+      {
+        "scan_mae": 0.1727407170862991,
+        "voxel_mae": 0.3181575487580094
+      }
+    ],
+    "note": "voxelized cmbConv1d is the 1-D reduction of binned CmbNet"
+  },
+  "g3": {
+    "name": "g3_cost_vs_n",
+    "passed": false,
+    "in_ci_all_passed": false,
+    "seconds_per_point": {
+      "32": 2.8819727049267385e-06,
+      "128": 1.958979453320353e-06,
+      "512": 4.110463862616598e-07
+    },
+    "ratio_512_over_32": 0.14262674506214965,
+    "note": "wall/point vs N recorded; not in CI all_passed (wall time)"
+  },
+  "g4": {
+    "name": "g4_knn_density_boundary",
+    "passed": true,
+    "knn_won": true,
+    "scan_mse": 6446.7626478838665,
+    "note": "k-NN is allowed to win on spatial density; reported, not omitted"
+  },
+  "g5": {
+    "name": "g5_parity",
+    "passed": true,
+    "worst_ulp": 0.5
+  },
+  "honesty": {
+    "rd_translation_equivariance": false,
+    "gamma_is_delta_collapse": false,
+    "seventh_operatorblock_role": false,
+    "g3_in_ci_all_passed": false
+  }
+}

@@ -1,0 +1,158 @@
+{
+  "schema": "multi-interface-pinn-v1",
+  "generated_utc": "2026-08-15T10:09:01Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "multi_interface_pinn",
+    "full": false,
+    "gates_in_scope": [
+      "g1",
+      "g2",
+      "g3",
+      "g4",
+      "g5"
+    ]
+  },
+  "rss_mb_at_start": 1296.2,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_sharp_limit",
+        "passed": true,
+        "rel_l2": 1.0192989050975358e-16
+      },
+      {
+        "name": "g2_smoothing_rate",
+        "passed": true,
+        "rows": [
+          {
+            "alpha": 20.0,
+            "err": 0.010397207708399137,
+            "bound_hi": 0.010397207708399187,
+            "covered": true
+          },
+          {
+            "alpha": 40.0,
+            "err": 0.005198603854199568,
+            "bound_hi": 0.005198603854199593,
+            "covered": true
+          },
+          {
+            "alpha": 80.0,
+            "err": 0.002599301927099784,
+            "bound_hi": 0.0025993019270997967,
+            "covered": true
+          },
+          {
+            "alpha": 160.0,
+            "err": 0.001299650963549892,
+            "bound_hi": 0.0012996509635498984,
+            "covered": true
+          }
+        ],
+        "err_times_alpha": [
+          0.20794415416798273,
+          0.20794415416798273,
+          0.20794415416798273,
+          0.20794415416798273
+        ]
+      },
+      {
+        "name": "g3_mixed_vs_baselines",
+        "passed": true,
+        "rel_l2": 2.8882358259772394e-08,
+        "rel_l2_linear_mlp_standin": 0.240596877953189,
+        "skill": 0.9999999999999991,
+        "n_seeds": 1,
+        "note": "PartitionedField/FBPINN matched-param training is --full; smoke uses linear stand-in"
+      },
+      {
+        "name": "g4_hard_vs_penalized",
+        "passed": true,
+        "hard_residual": 1.3504219453785993e-07,
+        "zero_coeff_residual": 0.6
+      },
+      {
+        "name": "g5_parity",
+        "passed": true,
+        "max_abs": 0.0
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_sharp_limit",
+    "passed": true,
+    "rel_l2": 1.0192989050975358e-16
+  },
+  "g2": {
+    "name": "g2_smoothing_rate",
+    "passed": true,
+    "rows": [
+      {
+        "alpha": 20.0,
+        "err": 0.010397207708399137,
+        "bound_hi": 0.010397207708399187,
+        "covered": true
+      },
+      {
+        "alpha": 40.0,
+        "err": 0.005198603854199568,
+        "bound_hi": 0.005198603854199593,
+        "covered": true
+      },
+      {
+        "alpha": 80.0,
+        "err": 0.002599301927099784,
+        "bound_hi": 0.0025993019270997967,
+        "covered": true
+      },
+      {
+        "alpha": 160.0,
+        "err": 0.001299650963549892,
+        "bound_hi": 0.0012996509635498984,
+        "covered": true
+      }
+    ],
+    "err_times_alpha": [
+      0.20794415416798273,
+      0.20794415416798273,
+      0.20794415416798273,
+      0.20794415416798273
+    ]
+  },
+  "g3": {
+    "name": "g3_mixed_vs_baselines",
+    "passed": true,
+    "rel_l2": 2.8882358259772394e-08,
+    "rel_l2_linear_mlp_standin": 0.240596877953189,
+    "skill": 0.9999999999999991,
+    "n_seeds": 1,
+    "note": "PartitionedField/FBPINN matched-param training is --full; smoke uses linear stand-in"
+  },
+  "g4": {
+    "name": "g4_hard_vs_penalized",
+    "passed": true,
+    "hard_residual": 1.3504219453785993e-07,
+    "zero_coeff_residual": 0.6
+  },
+  "g5": {
+    "name": "g5_parity",
+    "passed": true,
+    "max_abs": 0.0
+  },
+  "honesty": {
+    "alpha_inf_is_collapse": false,
+    "alpha_inf_is_interface_sharpening": true,
+    "exact_transmission_at_finite_alpha": false,
+    "parallel_interfaces_only": true
+  }
+}

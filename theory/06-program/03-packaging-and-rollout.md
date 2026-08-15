@@ -46,10 +46,10 @@ Almost everything lands in an existing package.
 
 | Home | Specs |
 |---|---|
-| `omnibias-core` | 01-04 stencils, 01-10 jet bundle (docs), 01-11 Lean obligations, 03-06 quadrature |
-| `omnibias-torch` / `omnibias-jax` (twins) | 01-01 multi-pack, 01-02 scan, 01-07 order-as-frequency, 02-01 Scan-Net, 02-03 Jet-KAN, 02-08 equivariant scan, 03-12 line search, 03-13 refinement |
-| `omnibias-fields` | 01-05 mollifier calculus, 02-07 pack tree |
-| `omnibias-pinn` | 02-04 weak-form VPINN, 02-05 transmission PINN, 02-06 BEM-Net, 02-12 equality-intersection layers, 02-13 linearizing transforms, 05-01 inverse problems |
+| `omnibias-core` | 01-04 stencils, 01-05 mollifier algebra, 01-07 spectral design, 01-10 jet bundle (docs), 01-11 Lean obligations, 03-06 quadrature |
+| `omnibias-torch` / `omnibias-jax` (twins) | 01-01 multi-pack, 01-02 scan, 02-01 Scan-Net, 02-03 Jet-KAN, 02-08 equivariant scan, 03-12 line search, 03-13 refinement |
+| `omnibias-fields` | 02-04 weak-form VPINN, 02-07 pack tree |
+| `omnibias-pinn` | 02-05 transmission PINN, 02-06 BEM-Net, 02-12 equality-intersection layers, 02-13 linearizing transforms, 05-01 inverse problems |
 | `omnibias-geometry` | 01-03 arrangements (geometry side), 02-14 Wilson-line band (`geometry.gauge`) |
 | `omnibias-verify` | 03-08 certified localization, 04-02 uncertainty |
 | `omnibias-curvature` | 04-01 information geometry |
@@ -252,6 +252,10 @@ proceeds.
 - [x] Open Wave 1 with 01-01 multipack (G1/G2/G3/G5 earned; G4 deferred)
 - [x] Wave-1 01-04 irregular stencils (G1–G4 earned) and 01-02 bias scan
       (G1–G3 CI-gated; G4 earned on smoke, not in CI all_passed)
+- [x] Open Wave 3 with 01-05 mollifier / 01-07 spectral design plus 02-01
+      Scan-Net, 02-03 Jet-KAN, 02-04 VPINN, 02-05 transmission PINN (gated;
+      cost / wall-time gates smoke-earned, not in CI all_passed; no new
+      packages)
 - [ ] Mark failed-falsifier specs `retired` with a reason
 - [ ] Written promotion criterion for `omnibias.geometry.arrangement` in its
       module docstring

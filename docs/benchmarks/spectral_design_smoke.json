@@ -1,0 +1,85 @@
+{
+  "schema": "spectral-design-v1",
+  "generated_utc": "2026-08-15T09:41:15Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "spectral_design",
+    "full": false,
+    "g3_in_all_passed": false,
+    "gates_in_scope": [
+      "g1",
+      "g2",
+      "g4"
+    ]
+  },
+  "rss_mb_at_start": 822.04,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_peak_frequency",
+        "passed": true,
+        "worst_rel": 2.19190887961209e-08,
+        "expected": 1e-06,
+        "n": 48
+      },
+      {
+        "name": "g2_transfer_magnitude",
+        "passed": true,
+        "worst_median_rel": 1.966327591552883e-16,
+        "expected": 0.02,
+        "n": 6,
+        "note": "median relative |DFT - R| on a neighbourhood of xi_peak; alpha=1"
+      },
+      {
+        "name": "g4_hole_detection",
+        "passed": true,
+        "hole_flatness": 1.8492354877556403,
+        "dense_flatness": 1.5304979673835393,
+        "note": "01-06 wavelet frames stay concept; flatness is a hole diagnostic"
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_peak_frequency",
+    "passed": true,
+    "worst_rel": 2.19190887961209e-08,
+    "expected": 1e-06,
+    "n": 48
+  },
+  "g2": {
+    "name": "g2_transfer_magnitude",
+    "passed": true,
+    "worst_median_rel": 1.966327591552883e-16,
+    "expected": 0.02,
+    "n": 6,
+    "note": "median relative |DFT - R| on a neighbourhood of xi_peak; alpha=1"
+  },
+  "g3": {
+    "name": "g3_spectral_bias_steps",
+    "passed": false,
+    "in_ci_all_passed": false,
+    "note": "2x fewer steps vs MscaleMLP on spectral_bias_fbpinn is --full / smoke-attempted and is not in CI all_passed (wall time). The four-gap benchmark gates are not mutated."
+  },
+  "g4": {
+    "name": "g4_hole_detection",
+    "passed": true,
+    "hole_flatness": 1.8492354877556403,
+    "dense_flatness": 1.5304979673835393,
+    "note": "01-06 wavelet frames stay concept; flatness is a hole diagnostic"
+  },
+  "honesty": {
+    "wavelet_frame_claim": false,
+    "littlewood_paley_claim": false,
+    "g3_in_ci_all_passed": false,
+    "collapse": "delta -> 0; pack order is a band selector"
+  }
+}

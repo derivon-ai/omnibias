@@ -53,6 +53,12 @@ from omnibias.fields._core import (
     operator_names,
     ops_registry,
 )
+from omnibias.fields.weak import (
+    TestFunctionSpace,
+    WeakForm,
+    boundary_bound,
+    exact_moment,
+)
 
 try:
     __version__ = _pkg_version("omnibias-fields")
@@ -73,10 +79,14 @@ __all__ = [
     "OperatorInfo",
     "READOUT_INDEPENDENT_ATTR",
     "SigmaCache",
+    "TestFunctionSpace",
     "VectorView",
+    "WeakForm",
     "__lineage__",
     "__version__",
+    "boundary_bound",
     "did_you_mean",
+    "exact_moment",
     "get_operator",
     "list_operators",
     "operator_names",

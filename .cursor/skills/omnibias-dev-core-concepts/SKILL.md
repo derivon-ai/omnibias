@@ -30,6 +30,8 @@ coefficients.
 | Multi-pack (gated 01-01) | heterogeneous Birkhoff sample `sum_g c_g sigma^(n_g)(z+mu_g)` | `omnibias.core.multipack`; `omnibias.{torch,jax}.multipack`; `docs/api/multipack.md` |
 | Bias scan (gated 01-02) | shared template on a bank of offsets along `w` | `omnibias.core.scan`; `omnibias.{torch,jax}.scan`; `docs/api/scan.md` |
 | Irregular stencils (gated 01-04) | exact-`Q` Birkhoff weights; order asymptotic in `h` | `omnibias.difference._core.irregular`; `docs/api/difference.md` |
+| Mollifier (gated 01-05) | pack as a test-function generator; certified exponential tails, **not** compact support; higher-order kernels take **negative** values | `omnibias.core.mollifier`; `docs/api/mollifier.md` |
+| Band plan (gated 01-07) | pack order is a **band selector** (`BandPlan`, `peak_frequency`); 01-06 wavelet frames stay concept | `omnibias.core.spectral_design`; `docs/api/spectral_design.md` |
 
 ## Bias collapse -- the founding definition (canonical)
 
@@ -77,6 +79,11 @@ Wave-1 gated extensions of this geometry (not shipped): heterogeneous packs
 (`MultiPackUnit`), the position knob (`BiasScan` — interior shift along `w`;
 `gamma` is not `delta -> 0`), and exact-`Q` irregular stencils. `BiasScan`
 templates reuse the six `OperatorBlock` roles; it is not a seventh role.
+Wave-3 knobs on the same geometry: a pack as a mollifier (`MollifierSpec` /
+`tail_bound`; tails, not compact support) and pack order as a frequency
+selector (`BandPlan`; not a Littlewood-Paley frame). Stacked consumers
+(`ScanNet`, `JetKAN`, `fields.weak`, `pinn.interface`) stay gated; `alpha -> inf`
+at an interface is sharpening, neither collapse.
 
 **Guard the boundary.** "Single hyperplane" alone does **not** identify bias
 collapse: `sigma(beta (w . x - t))` also has one hyperplane as its decision

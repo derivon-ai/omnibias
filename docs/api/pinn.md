@@ -656,6 +656,7 @@ for the hard-cage + `ic_fn` pattern. The acceptance artifact is
 | [`omnibias.pinn.train`](pinn-train.md) | Causal `march_solve`, causality / trivial-solution diagnostics |
 | [`omnibias.pinn.domain`](pinn-domain.md) | SDF / R-function geometry, `DistanceConstrainedField` |
 | [`omnibias.pinn.operator`](pinn-operator.md) | DeepONet / FNO + multi-head conditioning, ETDRK4 references |
+| [`omnibias.pinn.interface`](interface.md) | Gated transmission PINN (02-05); `alpha -> inf` is sharpening. **Not** the XPINN seam glue in `omnibias.pinn._core.interface` |
 
 ### Interface residuals: gluing subdomains back together
 

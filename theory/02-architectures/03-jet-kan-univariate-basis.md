@@ -8,7 +8,7 @@ tower to arbitrary order at no extra activation cost**, which removes the main
 practical objection to KANs in scientific settings: their derivatives are only
 as good as their spline basis.
 
-- **Status**: designed
+- **Status**: gated (G1/G3/G5 earned; G2 cost smoke-earned, not CI `all_passed`; KA theorem does not justify)
 - **Depends on**: 01-01, 03-13
 - **Blocks**: 02-05, 03-11
 

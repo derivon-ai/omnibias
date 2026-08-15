@@ -53,7 +53,10 @@ instead of the derivative direction. See
 
 The gated Wave-1 `BiasScan` ([scan.md](api/scan.md)) templates reuse these
 same six roles; it is not a seventh `OperatorBlock` role. Equivariance is an
-interior shift along `w` only.
+interior shift along `w` only. Gated Wave-3 `ScanNet`
+([scannet.md](api/scannet.md)) stacks those templates; equivariance stays
+**per-layer, per-direction, on-lattice**, not the translation group of
+`R^D`.
 
 ## The antiderivative kernel `S` (why `integral` is closed form)
 

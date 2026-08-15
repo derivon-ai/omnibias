@@ -151,6 +151,12 @@ nav:
       - omnibias-core: api/core.md
       - multipack Birkhoff (01-01): api/multipack.md
       - bias scan (01-02): api/scan.md
+      - mollifier calculus (01-05): api/mollifier.md
+      - spectral design (01-07): api/spectral_design.md
+      - Scan-Net (02-01): api/scannet.md
+      - Jet-KAN (02-03): api/jetkan.md
+      - weak-form VPINN (02-04): api/weak.md
+      - transmission PINN (02-05): api/interface.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md

@@ -65,6 +65,11 @@ Alpha submodules (still under Beta `omnibias-pinn`, not separate wheels):
 * **`omnibias.pinn.operator`** — DeepONet / FNO + multi-head conditioning.
 * **`omnibias.pinn.partition`** — discontinuity / interface PINNs on the soft
   partition-of-unity substrate.
+* **`omnibias.pinn.interface`** — gated multi-interface transmission PINN
+  (02-05). `alpha -> inf` is interface sharpening, neither collapse;
+  parallel interfaces only. Import `Interface` / `TransmissionInterface`
+  from here, **not** from `omnibias.pinn._core.interface` (XPINN penalty
+  glue).
 
 Four-gap acceptance matrix (smoke vs `--full`):
 [`docs/benchmarks/pinn_four_gap_matrix.md`](../../docs/benchmarks/pinn_four_gap_matrix.md).

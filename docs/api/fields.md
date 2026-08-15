@@ -26,6 +26,12 @@ through transparent back-compat shims, so existing `omnibias.pinn._core` and
       show_root_heading: false
       heading_level: 3
 
+## Weak-form VPINN (gated 02-04)
+
+Petrov-Galerkin test functions with closed-form antiderivatives. Exact
+integrals hold only for polynomial coefficient data on boxes; the certified
+boundary bound is on by default. Documented in full at [weak.md](weak.md).
+
 ## Finite-strain solid mechanics
 
 Alongside the small-strain fluid / linear-elastic ops, the surface carries

@@ -7,7 +7,7 @@ benefits of a convolutional network — weight sharing, translation equivariance
 a multiscale hierarchy — on inputs that have **no grid at all**: point clouds,
 collocation sets, scattered sensors, implicit fields.
 
-- **Status**: concept
+- **Status**: gated (G1/G2/G5 earned; G3 cost and G4 k-NN recorded, not CI `all_passed`)
 - **Depends on**: 01-02, 01-06, 01-07
 - **Blocks**: 02-07, 05-01, 05-02
 

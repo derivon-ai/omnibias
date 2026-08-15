@@ -37,6 +37,18 @@ Pure-Python support algebra for heterogeneous multi-pack collapse (theory
 Offset / scale bank algebra for the transverse bias scan (theory 01-02).
 Documented in full at [scan.md](scan.md).
 
+## Mollifier calculus
+
+Pack-as-mollifier algebra with certified exponential tails (theory 01-05).
+Analytic bases are not compactly supported; higher-order kernels take
+negative values. Documented in full at [mollifier.md](mollifier.md).
+
+## Spectral design
+
+Order-as-frequency band plans (theory 01-07). Pack order is a band
+selector; 01-06 wavelet frames stay concept. Documented in full at
+[spectral_design.md](spectral_design.md).
+
 ## ActivationSpec
 
 ::: omnibias.core.spec

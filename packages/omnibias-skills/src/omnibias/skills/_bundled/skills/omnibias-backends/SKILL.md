@@ -17,6 +17,8 @@ backend imports the coefficients from `omnibias.core.polynomials`.
 | Heterogeneous Birkhoff packs (gated 01-01) | `omnibias.torch` / `omnibias.jax` / `omnibias.core` | `MultiPackUnit`, `init_multipack` / `multipack_apply`, `MultiPackSpec` |
 | Transverse bias scan (gated 01-02) | `omnibias.torch` / `omnibias.jax` / `omnibias.core` | `BiasScan`, `init_bias_scan` / `bias_scan`, `BankSpec` |
 | Exact-Q irregular stencils (gated 01-04) | `omnibias.difference` | `solve_irregular_stencil`, `is_poised_exact`, `certified_irregular_error` |
+| Scan-Net (gated 02-01) | `omnibias.torch.architectures` / `omnibias.jax.architectures` | `ScanNet`, `init_scan_net` / `scan_net_apply`; on-lattice equivariance, not `R^D`; `gamma` is not `delta -> 0` |
+| Jet-KAN (gated 02-03) | `omnibias.torch.architectures` / `omnibias.jax.architectures` | `JetKAN`, `init_jet_kan` / `jet_kan_apply`; exactness of the model jet; KA theorem does not justify |
 | Activation registry | `omnibias.torch` / `omnibias.jax` | `get_activation`, `list_activations`, `register_activation` |
 | Closed-form field value / laplacian / hessian (JAX) | `omnibias.jax` | `neural_field_value`, `neural_field_laplacian`, `neural_field_hessian`, `neural_field_value_grad_hessian` |
 | Directional Taylor jets (deep composition) | `omnibias.torch` / `omnibias.jax` | `mlp_jet`, `layer_jet`, `compose_jet`, `tower_to_jet`, `jet_to_tower` |
@@ -35,7 +37,7 @@ backend imports the coefficients from `omnibias.core.polynomials`.
 
 `grad` / `laplacian` / `derivative` need a base with a `fastpath` kernel; `integral` needs an antiderivative kernel; `OperatorBlock` raises `TypeError` otherwise.
 
-The gated `BiasScan` templates reuse these six roles; it is **not** a seventh `OperatorBlock` role. Equivariance is an interior lattice shift along `w`, not a circular wrap. Soft-argmax `gamma` is not founding `delta -> 0` (driving `gamma` to infinity would be temperature collapse). Wave-1 status is **gated**, not shipped: see `docs/api/multipack.md`, `docs/api/scan.md`, `docs/api/difference.md`.
+The gated `BiasScan` templates reuse these six roles; it is **not** a seventh `OperatorBlock` role. Equivariance is an interior lattice shift along `w`, not a circular wrap. Soft-argmax `gamma` is not founding `delta -> 0` (driving `gamma` to infinity would be temperature collapse). Wave-1 status is **gated**, not shipped: see `docs/api/multipack.md`, `docs/api/scan.md`, `docs/api/difference.md`. Wave-3 `ScanNet` stacks those templates with the same six roles and the same on-lattice equivariance (not the translation group of `R^D`). Wave-3 `JetKAN` edges are multi-packs whose **model** jet is exact; the Kolmogorov-Arnold theorem does not justify the architecture. Cost / wall-time gates are smoke-earned, not in CI `all_passed`. See `docs/api/scannet.md`, `docs/api/jetkan.md`.
 
 **"Integral" has three distinct senses -- do not conflate:** (1) the activation antiderivative window above (`OperatorBlock(op="integral")`, closed form); (2) domain quadrature `sum_q w_q u(x_q)` (`omnibias.fields` `integrate` / `l2_norm` / `sobolev_norm`, numerical); (3) the measure integral `integral f dmu` (`omnibias.measure`, numerical; certified variant in `omnibias.verify`). Ground any capability claim in the canonical operator-surface matrix (`docs/operator-surface.md`), never in memory.
 

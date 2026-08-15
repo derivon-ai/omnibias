@@ -8,7 +8,7 @@ curvature); a heterogeneous multi-pack unit supplies exactly those jet
 coordinates at exactly those locations, so the interface structure is built into
 the basis instead of being learned.
 
-- **Status**: designed
+- **Status**: gated (`alpha -> inf` is sharpening, neither collapse; parallel interfaces only)
 - **Depends on**: 01-01, 01-07, 02-03, 02-04
 - **Blocks**: 02-11, 05-01, 07-02
 

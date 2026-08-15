@@ -282,6 +282,22 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/bias_scan.py
+      - name: Run mollifier-calculus smoke (01-05 G1/G2/G3; G4 deferred)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/mollifier_calculus.py
+      - name: Run spectral-design smoke (01-07 G1/G2/G4; G3 not all_passed)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/spectral_design.py
+      - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/scannet.py
+      - name: Run Jet-KAN smoke (02-03 G1/G3/G5; G2 cost not all_passed)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/jetkan.py
       - name: Run the closed-form integral-transform example (smoke)
         run: |
           source .venv-cross/bin/activate
@@ -316,6 +332,10 @@ jobs:
         run: |
           source .venv-pinn/bin/activate
           python -m pytest packages/omnibias-pinn/tests -q -m "not needs_research and not gpu and not slow_gpu"
+      - name: Run multi-interface transmission PINN smoke (02-05)
+        run: |
+          source .venv-pinn/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/multi_interface_pinn.py
       - name: Run the second-order solver-training example (smoke)
         run: |
           source .venv-pinn/bin/activate
@@ -461,6 +481,10 @@ jobs:
         run: |
           source .venv-fields/bin/activate
           python -m pytest packages/omnibias-fields/tests -q
+      - name: Run weak-form VPINN smoke (02-04)
+        run: |
+          source .venv-fields/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/weak_form_vpinn.py
 
   geometry:
     name: omnibias-geometry (beta)
