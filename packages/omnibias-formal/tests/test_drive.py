@@ -23,6 +23,7 @@ from omnibias.core.verified.kantorovich import radii_polynomial_certificate
 from omnibias.formal import (
     MATHLIB_CLAIM_KEY,
     DriveReport,
+    casimir_certificate,
     classify_obligation,
     compact_box_certificate,
     drive_obligation,
@@ -91,6 +92,10 @@ def test_classify_compact_box() -> None:
     assert classify_obligation(compact_box_certificate("ns_box")) == "compact_box"
 
 
+def test_classify_casimir() -> None:
+    assert classify_obligation(casimir_certificate("su2_fund")) == "casimir"
+
+
 def test_classify_none_for_straddling_interval() -> None:
     assert classify_obligation(interval_certificate("q", Interval(-1.0, 1.0))) is None
 
@@ -112,6 +117,7 @@ def test_classify_agrees_with_generate_obligation() -> None:
         enclosure_trace_certificate("nk"),
         named_zero_certificate("circle_line"),
         compact_box_certificate("ns_box"),
+        casimir_certificate("su2_fund"),
         {"foo": "bar"},
     ]
     for cert in certs:

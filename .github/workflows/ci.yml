@@ -569,6 +569,10 @@ jobs:
         run: |
           source .venv-geom/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/holonomy_band.py
+      - name: Run holonomy-trial gap smoke (07-04 G1–G6)
+        run: |
+          source .venv-geom/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/gauge_holonomy_gap.py
 
   binary:
     name: omnibias-binary (alpha)

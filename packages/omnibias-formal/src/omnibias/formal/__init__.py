@@ -31,6 +31,10 @@ from omnibias.formal.mathlib_check import (
     generate_obligation,
     mathlib_check_available,
 )
+from omnibias.formal.casimir import (
+    LEGAL_CASIMIR_FAMILIES,
+    casimir_certificate,
+)
 from omnibias.formal.compact import (
     LEGAL_COMPACT_FAMILIES,
     compact_box_certificate,
@@ -64,6 +68,7 @@ __lineage__ = "exempt: infrastructure"
 
 __all__ = [
     "DriveReport",
+    "LEGAL_CASIMIR_FAMILIES",
     "LEGAL_COMPACT_FAMILIES",
     "LEGAL_NAMED_FAMILIES",
     "LEGAL_NK_FAMILIES",
@@ -76,6 +81,7 @@ __all__ = [
     "__lineage__",
     "__version__",
     "analytic_root",
+    "casimir_certificate",
     "check_certificate",
     "compact_box_certificate",
     "classify_obligation",

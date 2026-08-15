@@ -136,13 +136,17 @@ transfer-matrix prover lives in its own registry rather than the default machine
 | `kind` | Certificate | Can DISPROVE? |
 |---|---|---|
 | `transfer_matrix_spectral_gap` | `certified_transfer_matrix_gap` (`omnibias.geometry.gauge.transfer`) | No — a gap below the requested threshold → `BLOCKED` |
+| `strong_coupling_glueball_gap` | `certified_strong_coupling_glueball_bound` (crude polymer count at one `β`) | No — out of domain or a gap below the requested threshold → `BLOCKED` |
 
 ```python
 from omnibias.core.proof import Conjecture
 from omnibias.geometry.gauge.proofmachine import build_gauge_machine
 
 gauge = build_gauge_machine()
-assert sorted(gauge.kinds()) == ["transfer_matrix_spectral_gap"]
+assert sorted(gauge.kinds()) == [
+    "strong_coupling_glueball_gap",
+    "transfer_matrix_spectral_gap",
+]
 
 verdict = gauge.evaluate(
     Conjecture(

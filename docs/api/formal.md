@@ -56,6 +56,10 @@ a green build is meaningful.
   residual on `[1/2, 1]²`, or the characteristic polynomial of
   `[[13/2, 3/2], [3/2, 13/2]]` (ratio `5/8`). Finite named data, not a
   continuum regularity theorem or a continuum gauge claim.
+- **Casimir** -- a `casimir` payload from
+  `omnibias.formal.casimir.casimir_certificate`: the locked SU(2)
+  fundamental gap `C2(1)-C2(0)=3/4` or the SU(3) fundamental `C2(1,0)=4/3`.
+  Finite rational identities, not a continuum gauge claim.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived
@@ -81,8 +85,8 @@ implies `unproven_claim`.
 
 Every module in `formal/omnibias-analytic/` is `sorry`-free. The track discharges
 finite rational inequalities, a unique root of a named polynomial on a compact
-box, replay of a planted rational enclosure DAG, and named compact-box residual
-/ finite-matrix gap plants. Infinite analytic
+box, replay of a planted rational enclosure DAG, named compact-box residual
+/ finite-matrix gap plants, and named SU(2) / SU(3) Casimir identities. Infinite analytic
 statements -- continuum regularity, asymptotics -- are not expressed here at
 all, so they can never be silently discharged here either. A green build
 certifies the emitted obligation and nothing beyond it.

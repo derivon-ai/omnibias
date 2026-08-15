@@ -33,15 +33,24 @@ from dataclasses import dataclass, field
 from omnibias.core.verified.eig import (
     certified_perron_spectral_gap,
     certified_symmetric_spectral_gap,
+    symmetric_eigenvalue_residual_enclosure,
 )
+from omnibias.core.verified.eig_operator import certified_spectral_gap, ritz_upper_bound
 from omnibias.core.verified.interval import Interval
-from omnibias.core.verified.linalg import IntervalMatrix, matmul, to_interval_matrix
+from omnibias.core.verified.linalg import (
+    IntervalMatrix,
+    inf_norm_matrix,
+    matmul,
+    to_interval_matrix,
+)
 from omnibias.core.verified.transcend import ln_iv
 from omnibias.geometry.gauge.transfer.matrices import TransferMatrix
+from omnibias.geometry.gauge.transfer.trial import TrialSpace
 
 #: Method tags a gap result can carry.
 SYMMETRIC_METHOD = "symmetric_power_sum_partner_chain"
 BIRKHOFF_METHOD = "birkhoff_hopf_projective_contraction"
+LEHMANN_METHOD = "lehmann_maehly_holonomy_trial"
 
 
 @dataclass(frozen=True)
@@ -75,6 +84,9 @@ class TransferGapResult:
     lattice_spacing: float
     partners_deflated: int
     candidates: tuple[GapCandidate, ...] = field(default_factory=tuple)
+    trial_gram_condition: float | None = None
+    trial_flagged: bool = False
+    trial_remainder_width: float = 0.0
 
     @property
     def certified(self) -> bool:
@@ -139,11 +151,108 @@ def _birkhoff_candidate(matrix: IntervalMatrix, spacing: float) -> GapCandidate:
     )
 
 
+def _goerisch_grams(
+    operator: IntervalMatrix, vectors: Sequence[Sequence[float]]
+) -> tuple[list[list[Interval]], list[list[Interval]], list[list[Interval]]]:
+    """Goerisch Gram matrices ``A0=<w,w>``, ``A1=<Aw,w>``, ``A2=<Aw,Aw>``."""
+    applied = [
+        [
+            sum((operator[i][j] * Interval.point(vec[j]) for j in range(len(vec))), Interval.point(0.0))
+            for i in range(len(operator))
+        ]
+        for vec in vectors
+    ]
+    size = len(vectors)
+    a0 = [[Interval.point(0.0) for _ in range(size)] for _ in range(size)]
+    a1 = [[Interval.point(0.0) for _ in range(size)] for _ in range(size)]
+    a2 = [[Interval.point(0.0) for _ in range(size)] for _ in range(size)]
+    for i in range(size):
+        left = [Interval.point(x) for x in vectors[i]]
+        for j in range(size):
+            right = [Interval.point(x) for x in vectors[j]]
+            a0[i][j] = sum((left[k] * right[k] for k in range(len(left))), Interval.point(0.0))
+            a1[i][j] = sum(
+                (applied[i][k] * right[k] for k in range(len(right))), Interval.point(0.0)
+            )
+            a2[i][j] = sum(
+                (applied[i][k] * applied[j][k] for k in range(len(applied[j]))),
+                Interval.point(0.0),
+            )
+    return a0, a1, a2
+
+
+def _lehmann_candidate(
+    matrix: IntervalMatrix,
+    trial: TrialSpace,
+    spacing: float,
+) -> GapCandidate:
+    """Lehmann-Maehly gap of ``A = μ I - T`` from holonomy trials."""
+    if trial.flagged:
+        return GapCandidate(
+            method=LEHMANN_METHOD,
+            subdominant_ratio_upper=float("inf"),
+            spectral_gap_lower=0.0,
+            detail=f"trial Gram flagged (cond={trial.gram_condition:.3g})",
+        )
+    if len(trial.vectors) < 2:
+        return GapCandidate(
+            method=LEHMANN_METHOD,
+            subdominant_ratio_upper=float("inf"),
+            spectral_gap_lower=0.0,
+            detail="need at least two trial vectors",
+        )
+    try:
+        mu = inf_norm_matrix(matrix)
+        identity_minus = [
+            [
+                (Interval.point(mu) if row == col else Interval.point(0.0)) - matrix[row][col]
+                for col in range(len(matrix))
+            ]
+            for row in range(len(matrix))
+        ]
+        vecs = list(trial.vectors[: min(4, len(trial.vectors))])
+        a0, a1, a2 = _goerisch_grams(identity_minus, vecs)
+        lam1_up = ritz_upper_bound(identity_minus, vecs[0]).hi
+        first = symmetric_eigenvalue_residual_enclosure(identity_minus, vecs[0])
+        second = symmetric_eigenvalue_residual_enclosure(identity_minus, vecs[1])
+        if first.hi >= second.lo:
+            raise ValueError("trial residual enclosures overlap; cannot place rho")
+        rho = 0.5 * (first.hi + second.lo)
+        if rho < lam1_up:
+            rho = lam1_up + 0.25 * max(second.lo - lam1_up, 0.0)
+        cert = certified_spectral_gap(a0, a1, a2, rho, lam1_up)
+        if not cert.certified:
+            raise ValueError("Lehmann gap not certified")
+        if mu <= 0.0:
+            raise ValueError("non-positive infinity-norm bound")
+        ratio = 1.0 - cert.gap_lower / mu
+        if trial.remainder_width > 0.0:
+            ratio = min(1.0, ratio + trial.remainder_width)
+        if not 0.0 <= ratio < 1.0:
+            raise ValueError(f"ratio bound {ratio} not in [0, 1)")
+        gap = float((-ln_iv(Interval.point(ratio))).lo)
+        return GapCandidate(
+            method=LEHMANN_METHOD,
+            subdominant_ratio_upper=float(ratio),
+            spectral_gap_lower=gap,
+            partners_deflated=max(0, len(vecs) - 1),
+            detail=f"gram_cond={trial.gram_condition:.3g} remainder={trial.remainder_width:.3g}",
+        )
+    except (ValueError, TypeError, ZeroDivisionError) as exc:
+        return GapCandidate(
+            method=LEHMANN_METHOD,
+            subdominant_ratio_upper=float("inf"),
+            spectral_gap_lower=0.0,
+            detail=f"not applicable: {exc}",
+        )
+
+
 def certified_transfer_matrix_gap(
     transfer: TransferMatrix,
     *,
     lattice_spacing: float | None = None,
     deflate: bool = True,
+    trial: TrialSpace | None = None,
 ) -> TransferGapResult:
     r"""Certify a lower bound on ``m a = -ln(|lambda_1| / lambda_0)`` for a fixed matrix.
 
@@ -159,6 +268,10 @@ def certified_transfer_matrix_gap(
     * Birkhoff-Hopf applies only to an **entrywise-positive** matrix (so, of the
       constructions here, the ``angle``-basis circulant).  It assumes nothing about
       symmetry, and is deliberately conservative.
+    * An optional holonomy :class:`~.trial.TrialSpace` adds a Lehmann-Maehly
+      candidate on ``μ I - T`` and, when not flagged, also feeds the trial
+      vectors to the symmetric engine.  Existing callers that omit ``trial``
+      are unchanged.
 
     Taking the max is sound because each candidate is independently a valid lower
     bound; picking the largest of several valid lower bounds is still valid.
@@ -170,8 +283,36 @@ def certified_transfer_matrix_gap(
         symmetric = _symmetric_candidate(matrix, transfer, spacing, deflate)
         if symmetric is not None:
             candidates.append(symmetric)
+        if trial is not None and not trial.flagged and trial.vectors:
+            try:
+                holonomy_sym = certified_symmetric_spectral_gap(
+                    matrix,
+                    list(trial.vectors[0]),
+                    subdominant_vectors=[list(vec) for vec in trial.vectors[1:]] or None,
+                    lattice_spacing=spacing,
+                )
+                candidates.append(
+                    GapCandidate(
+                        method=SYMMETRIC_METHOD + "_holonomy_trial",
+                        subdominant_ratio_upper=float(holonomy_sym.subdominant_ratio_upper),
+                        spectral_gap_lower=float(holonomy_sym.spectral_gap_lower),
+                        partners_deflated=int(holonomy_sym.partners_deflated),
+                        detail=f"gram_cond={trial.gram_condition:.3g}",
+                    )
+                )
+            except ValueError as exc:
+                candidates.append(
+                    GapCandidate(
+                        method=SYMMETRIC_METHOD + "_holonomy_trial",
+                        subdominant_ratio_upper=float("inf"),
+                        spectral_gap_lower=0.0,
+                        detail=f"not applicable: {exc}",
+                    )
+                )
     if transfer.entrywise_positive:
         candidates.append(_birkhoff_candidate(matrix, spacing))
+    if trial is not None:
+        candidates.append(_lehmann_candidate(matrix, trial, spacing))
     if not candidates:
         raise ValueError(
             "no certified gap engine applies: the matrix is neither marked "
@@ -190,6 +331,9 @@ def certified_transfer_matrix_gap(
         lattice_spacing=spacing,
         partners_deflated=best.partners_deflated,
         candidates=tuple(candidates),
+        trial_gram_condition=None if trial is None else trial.gram_condition,
+        trial_flagged=False if trial is None else trial.flagged,
+        trial_remainder_width=0.0 if trial is None else trial.remainder_width,
     )
 
 
@@ -436,6 +580,7 @@ def heat_kernel_gap_scaling_report(
 
 __all__ = [
     "BIRKHOFF_METHOD",
+    "LEHMANN_METHOD",
     "EffectiveMassCurve",
     "EffectiveMassPoint",
     "GapCandidate",

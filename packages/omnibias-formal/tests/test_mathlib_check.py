@@ -22,6 +22,7 @@ from omnibias.core.verified.taylor_model import TaylorModel
 from omnibias.formal import (
     MATHLIB_CLAIM_KEY,
     analytic_root,
+    casimir_certificate,
     check_certificate,
     compact_box_certificate,
     enclosure_trace_certificate,
@@ -470,6 +471,47 @@ def test_compact_box_unknown_family_yields_none() -> None:
         },
     )
     assert generate_obligation(cert) is None
+
+
+def test_generate_casimir_su2() -> None:
+    src = generate_obligation(casimir_certificate("su2_fund")) or ""
+    assert "import OmnibiasAnalytic.Check.Casimir" in src
+    assert "su2_casimir_fund_gap" in src
+    assert "casimirSU2" in src
+
+
+def test_generate_casimir_su3() -> None:
+    src = generate_obligation(casimir_certificate("su3_fund")) or ""
+    assert "su3_casimir_fund" in src
+    assert "casimirSU3" in src
+
+
+def test_casimir_mismatch_yields_none() -> None:
+    cert = casimir_certificate("su2_fund")
+    payload = dict(cert["payload"])
+    payload["value"] = [1, 2]
+    bogus = make_certificate(claim="bogus", payload=payload)
+    assert generate_obligation(bogus) is None
+
+
+def test_casimir_unknown_family_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={"type": "casimir", "family": "dottie", "value": [3, 4]},
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_check_certificate_casimir_su2() -> None:
+    cert = casimir_certificate("su2_fund")
+    result = check_certificate(cert)
+    assert "su2_casimir_fund_gap" in result.obligation
+    if not mathlib_check_available():
+        assert result.available is False
+        assert result.verified is False
+    else:  # pragma: no cover - only on a machine with Lean + Mathlib
+        assert result.available is True
+        assert result.verified is True
 
 
 def test_check_certificate_compact_box_ns() -> None:

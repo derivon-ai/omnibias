@@ -82,6 +82,7 @@ These are verified in CI on every push (counts captured on a CPU-dev host):
 | Equality intersection (02-12) | [`benchmarks/equality_intersection.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/equality_intersection.py) | always `branch` / `condition` / `converged`; G4 Burgers RH smoke/`--full`; smoke [`equality_intersection_smoke.json`](benchmarks/equality_intersection_smoke.json) |
 | Linearizing transforms (02-13) | [`benchmarks/linearizing_transforms.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/linearizing_transforms.py) | named maps only; 03-11 search not claimed; smoke [`linearizing_transforms_smoke.json`](benchmarks/linearizing_transforms_smoke.json) |
 | Holonomy band (02-14) | [`benchmarks/holonomy_band.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/holonomy_band.py) | abelian + transverse-constant closed form; no YM / mass gap; smoke [`holonomy_band_smoke.json`](benchmarks/holonomy_band_smoke.json) |
+| Holonomy transfer gap (07-04) | [`benchmarks/gauge_holonomy_gap.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/gauge_holonomy_gap.py) | holonomy trials on one fixed matrix; G1 factor measured; no YM / continuum; smoke [`gauge_holonomy_gap_smoke.json`](benchmarks/gauge_holonomy_gap_smoke.json) |
 
 Four-gap status matrix (capability / empirical / structural / certified):
 [`benchmarks/pinn_four_gap_matrix.md`](benchmarks/pinn_four_gap_matrix.md).

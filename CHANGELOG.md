@@ -6,6 +6,36 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — holonomy trial spaces on finite transfer matrices
+
+- `holonomy_trial_space` builds gauge-invariant character trials on the
+  dense `angle` / class-angle grid. `certified_transfer_matrix_gap(...,
+  trial=)` adds a Lehmann–Maehly candidate; existing callers are unchanged.
+  Gram condition numbers are sealed and flagged above a stated threshold.
+  Certificates stay `continuum_claim=False` / `yang_mills_claim=False`.
+- `benchmarks/gauge_holonomy_gap.py` records the measured G1 tightness
+  factor (not a claimed `5x`) for one fixed matrix at one spacing.
+
+### Added — crude strong-coupling polymer bound (fixed β)
+
+- `certified_strong_coupling_glueball_bound` interval-certifies
+  `m a ≥ -ln(C u(β))` for SU(2) Wilson at one coupling, with locked
+  coordination `C = 8(d-1)` and `u = I₂/I₁`. `certified=True` only when
+  `C u < 1`. Method tag `crude_polymer_count`; not a continuum claim.
+- `certified_wilson_character_gap` encloses `-ln(I₂/I₁)` for the infinite
+  character-basis Wilson transfer (0+1-D). Sealed
+  `verified-strong-coupling-gap-1` certificates register on the gauge
+  proof machine as `strong_coupling_glueball_gap`.
+
+### Added — named SU(2) / SU(3) Casimir identities in Lean
+
+- `OmnibiasAnalytic.Check.Casimir` proves the locked Freudenthal evaluations
+  `C2(1)-C2(0)=3/4` (SU(2)) and `C2(1,0)=4/3` (SU(3)). Finite rational
+  identities, not a continuum gauge claim.
+- `casimir_certificate` seals a locked family. The Mathlib bridge
+  re-derives the rationals and applies the Check theorem (`casimir`
+  obligation class). Existing leaf classes stay leaf-only.
+
 ### Added — compact-box residual and finite-matrix gap in Lean
 
 - `OmnibiasAnalytic.Check.Compact` proves a named incompressible residual

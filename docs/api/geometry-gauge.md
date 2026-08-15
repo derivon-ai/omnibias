@@ -398,6 +398,30 @@ contraction (sound but deliberately conservative, and it needs an entrywise
 positive matrix). Every candidate it considered is kept on the result, including
 the losing ones.
 
+Optional `trial=` feeds a holonomy trial space (characters of closed loops on
+the dense `angle` / class-angle grid) into Lehmann–Maehly and the symmetric
+engine. Character-basis heat-kernel matrices are already diagonal in this
+basis, so the lever is the dense constructors. A badly conditioned Gram is
+flagged rather than silently trusted. This is still one fixed matrix; the
+continuum limit is not taken.
+
+```python
+from omnibias.geometry.gauge.transfer import (
+    certified_transfer_matrix_gap,
+    holonomy_trial_space,
+    su2_class_angle_transfer,
+)
+
+dense = su2_class_angle_transfer(0.8, max_dynkin=4)
+trial = holonomy_trial_space(dense)
+holonomy_gap = certified_transfer_matrix_gap(dense, trial=trial)
+assert holonomy_gap.certified
+assert holonomy_gap.trial_flagged is False
+assert holonomy_gap.trial_gram_condition is not None
+# su(2) exact lattice-unit gap is 3t/4 = 0.6; a lower bound cannot exceed it.
+assert holonomy_gap.spectral_gap_lower <= 0.6 + 1e-9
+```
+
 ### Sandwiching the true gap
 
 `certified_effective_mass_curve` gives rigorous **upper** bounds from the
@@ -476,6 +500,37 @@ assert check.agrees_with_exact     # and the MC brackets the closed-form gap
 `consistent` is one-sided and the estimator's residual bias helps it pass;
 `agrees_with_exact` is the two-sided test with teeth. Both are **evidence** —
 only the interval arithmetic is proof.
+
+### Crude strong-coupling polymer bound
+
+`certified_strong_coupling_glueball_bound` is a **self-contained** lower bound
+on a 4-D SU(2) Wilson glueball mass at one fixed `β`, using the character
+activity `u(β) = I₂(β)/I₁(β)` and a locked plaquette-surface counting majorant
+`C = 8(d-1)` (`C = 24` in four dimensions). The bound is
+`m a ≥ -ln(C u)` and is `certified=True` only when the interval product
+`C u` is strictly less than 1. Out of that domain the leading activity is
+still returned and must not be sealed as proved.
+
+This is crude counting at one coupling and one spacing. It is **not** a
+continuum claim and **not** a formalization of Osterwalder-Seiler.
+
+```python
+from omnibias.geometry.gauge.transfer import (
+    BETA_LOCK,
+    certified_strong_coupling_glueball_bound,
+    certified_wilson_character_gap,
+)
+
+polymer = certified_strong_coupling_glueball_bound(BETA_LOCK)
+assert polymer.certified
+assert polymer.spectral_gap_lower > 0.0
+assert polymer.method == "crude_polymer_count"
+
+# Infinite character-basis Wilson transfer (0+1-D, still not 4-D YM).
+wilson = certified_wilson_character_gap(BETA_LOCK)
+assert wilson.certified
+assert wilson.spectral_gap_lower > polymer.spectral_gap_lower
+```
 
 ### Scaling across spacings, honestly
 

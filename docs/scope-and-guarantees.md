@@ -295,6 +295,15 @@ the relevant op:
   `certified_gap_versus_monte_carlo` cross-checks the bound against a Monte Carlo
   of the *same* matrix's path measure — an independent oracle, still evidence
   rather than proof; only the interval arithmetic is proof.
+  Optional holonomy `trial=` spaces are characters of closed loops on a dense
+  angle / class-angle grid; they may tighten a variational bound for that
+  matrix. They do not take a continuum limit.
+- **`certified_strong_coupling_glueball_bound`** is a **crude polymer-count**
+  lower bound for SU(2) Wilson at **one fixed `β`** and spacing
+  (`m a ≥ -ln(C u)` with locked `C = 8(d-1)`). `certified=True` only inside
+  the interval-certified domain `C u < 1`. It is **not** a continuum claim,
+  **not** a uniform-in-spacing bound, and **not** the Yang-Mills mass gap.
+  The method tag is `crude_polymer_count`.
 - **`omnibias-qpinn` Bloch cage** supports orders ≤ 2 on a **single axis** in
   v0.0.1; multi-axis mixed partials need the Leibniz expansion (planned).
 - **Random-feature fields** are accurate only inside the support of their

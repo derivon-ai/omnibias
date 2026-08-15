@@ -8,11 +8,12 @@ The machine is the repo's common *prove / disprove* front door: a
 schema gate, an independent replay, the honesty gate, and the optional Lean-kernel
 gate applied uniformly.
 
-============================  ====================================================
-kind                          prover
-============================  ====================================================
-``transfer_matrix_spectral_gap``  :func:`omnibias.geometry.gauge.transfer.certified_transfer_matrix_gap`
-============================  ====================================================
+====================================  ====================================================
+kind                                  prover
+====================================  ====================================================
+``transfer_matrix_spectral_gap``      :func:`omnibias.geometry.gauge.transfer.certified_transfer_matrix_gap`
+``strong_coupling_glueball_gap``      :func:`omnibias.geometry.gauge.transfer.certified_strong_coupling_glueball_bound`
+====================================  ====================================================
 
 The certificate is **sealed**, so:
 
@@ -34,6 +35,7 @@ registry per package is the established pattern -- see
 from __future__ import annotations
 
 from collections.abc import Mapping
+from fractions import Fraction
 from typing import Any
 
 from omnibias.core.proof import (
@@ -43,13 +45,20 @@ from omnibias.core.proof import (
     ProofMachine,
 )
 from omnibias.geometry.gauge.transfer.certificates import (
+    STRONG_COUPLING_KIND,
     TRANSFER_GAP_KIND,
+    replay_strong_coupling_gap,
     replay_transfer_matrix_gap,
+    seal_strong_coupling_certificate,
     seal_transfer_gap_certificate,
+    strong_coupling_schema_errors,
     transfer_gap_schema_errors,
 )
 from omnibias.geometry.gauge.transfer.gap import certified_transfer_matrix_gap
 from omnibias.geometry.gauge.transfer.matrices import rebuild
+from omnibias.geometry.gauge.transfer.strong_coupling import (
+    certified_strong_coupling_glueball_bound,
+)
 
 
 def _blocked(detail: str) -> ProofAttempt:
@@ -96,6 +105,38 @@ def _prove_transfer_matrix_gap(conjecture: Conjecture) -> ProofAttempt:
     return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
 
 
+def _prove_strong_coupling_gap(conjecture: Conjecture) -> ProofAttempt:
+    """Certify the crude polymer bound named by the conjecture."""
+    data: Mapping[str, Any] = conjecture.data
+    beta = data.get("beta")
+    if isinstance(beta, bool) or not isinstance(beta, int | float | Fraction) or float(beta) <= 0.0:
+        return _blocked("conjecture data must carry a positive numeric 'beta'")
+    dim = data.get("spacetime_dim", 4)
+    if not isinstance(dim, int) or isinstance(dim, bool) or dim < 2:
+        return _blocked("spacetime_dim must be an integer >= 2")
+    try:
+        result = certified_strong_coupling_glueball_bound(beta, spacetime_dim=dim)
+    except (ValueError, TypeError) as exc:
+        return _blocked(f"could not certify a polymer bound: {exc}")
+    if not result.certified:
+        return _blocked(
+            f"no certified polymer bound at beta={float(beta):.6g} "
+            f"(C u bound {result.subdominant_ratio_upper:.6g} >= 1)"
+        )
+    minimum = data.get("min_spectral_gap")
+    if isinstance(minimum, int | float) and result.spectral_gap_lower < float(minimum):
+        return _blocked(
+            f"certified gap {result.spectral_gap_lower:.6g} is below the requested "
+            f"threshold {float(minimum):.6g}"
+        )
+    sealed = seal_strong_coupling_certificate(result, claim=conjecture.name)
+    detail = (
+        f"su2_wilson_polymer (d={result.spacetime_dim}, C={result.coordination}): "
+        f"m a >= {result.spectral_gap_lower:.6g} via {result.method}"
+    )
+    return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
+
+
 def gauge_provers() -> list[FunctionProver]:
     """The gauge provers registered by :func:`build_gauge_machine`."""
     return [
@@ -105,6 +146,13 @@ def gauge_provers() -> list[FunctionProver]:
             prove_fn=_prove_transfer_matrix_gap,
             schema_fn=transfer_gap_schema_errors,
             replay_fn=replay_transfer_matrix_gap,
+        ),
+        FunctionProver(
+            name="strong_coupling_glueball_gap",
+            kinds=frozenset({STRONG_COUPLING_KIND}),
+            prove_fn=_prove_strong_coupling_gap,
+            schema_fn=strong_coupling_schema_errors,
+            replay_fn=replay_strong_coupling_gap,
         ),
     ]
 
@@ -118,6 +166,7 @@ def build_gauge_machine() -> ProofMachine:
 
 
 __all__ = [
+    "STRONG_COUPLING_KIND",
     "TRANSFER_GAP_KIND",
     "build_gauge_machine",
     "gauge_provers",

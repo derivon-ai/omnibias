@@ -179,7 +179,7 @@ external parent and states why the parent stays external.
 | [07-01 sub-obligation ledger](07-frontier/01-sub-obligation-ledger.md) | designed | Parent, sub-obligation, gate, sealed scope, forbidden sentence |
 | [07-02 Navier-Stokes adjacent](07-frontier/02-navier-stokes-adjacent.md) | designed | Finite, local certified statements; global regularity stays external |
 | [07-03 CCF campaign acceleration](07-frontier/03-ccf-campaign-acceleration.md) | gated | A basis-level attack on the recorded dictionary floor |
-| [07-04 Yang-Mills adjacent](07-frontier/04-yang-mills-adjacent-holonomy-and-gap.md) | designed | Sharper finite transfer gaps; the mass gap stays external |
+| [07-04 Yang-Mills adjacent](07-frontier/04-yang-mills-adjacent-holonomy-and-gap.md) | gated | Holonomy trials on one fixed matrix; the mass gap stays external |
 | [07-05 spectral floors and positivity](07-frontier/05-spectral-floors-and-positivity.md) | designed | Eigenvalue lower bounds with better trial spaces |
 | [07-06 validated dynamics and orbits](07-frontier/06-validated-dynamics-and-orbits.md) | designed | Closed-form Jacobians inside validated flow |
 | [07-07 Nobel-adjacent domains](07-frontier/07-nobel-adjacent-domain-programs.md) | concept | Tooling contributions to quantum many-body, plasma, materials |

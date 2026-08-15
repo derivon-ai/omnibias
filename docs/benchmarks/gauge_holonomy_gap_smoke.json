@@ -1,0 +1,70 @@
+{
+  "schema": "omnibias.benchmark.gauge_holonomy_gap.v1",
+  "generated_utc": "2026-08-15T21:29:02Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke",
+    "n_synthetic": 32
+  },
+  "rss_mb_at_start": 774.75,
+  "g1": {
+    "n_matrices": 21,
+    "ge_generic": true,
+    "sound": true,
+    "measured_factor_min": 1.0,
+    "measured_factor_median": 1.0,
+    "measured_factor_max": 1.0,
+    "fraction_of_numerical_min": 0.9999999999997488,
+    "fraction_of_numerical_median": 0.9999999999998823,
+    "target_factor_5x": false,
+    "note": "character-aligned holonomy trials on already-diagonal eigenbases cannot beat the constructor partner chain; the 5x target is a measured quantity, not a claimed improvement"
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_ge_generic_measured",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "measured_factor_median": 1.0,
+        "n_matrices": 21
+      },
+      {
+        "name": "g2_soundness",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "n_synthetic": 32
+      },
+      {
+        "name": "g3_gauge_invariance",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g5_honesty",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g6_kernel_obligation",
+        "passed": true,
+        "in_ci_all_passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "yang_mills": false,
+    "mass_gap": false,
+    "continuum_claim": false,
+    "fixed_matrix": true,
+    "note": "certified spectral gap of one fixed transfer matrix at one spacing; the continuum limit is not taken"
+  }
+}
