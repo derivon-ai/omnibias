@@ -334,6 +334,24 @@ STLSQ still uses the field jet. Recipe:
         - polynomial_value_library
         - polynomial_vector_library
 
+## Gauge-covariant singlet discovery
+
+Optional extra `omnibias-symbolic[gauge]`. Searches Weyl singlets of a
+`GaugeCovariantJet` -- never a coordinate `FieldJet` of `A_mu^a`. Recovers
+classical local identities (BPST: `tr(F^2) ~ 8 pi^2 tr(F*Ftilde)`). Not
+Wilson / Polyakov language and not a Yang-Mills mass-gap claim.
+
+::: omnibias.symbolic.gauge_discovery
+    options:
+      show_root_heading: false
+      heading_level: 4
+      members:
+        - GaugeLawDiscoverer
+        - GaugeLawResult
+        - discover_yang_mills_singlet_law
+        - make_yang_mills_bpst_split
+        - make_yang_mills_polynomial_split
+
 ## Differential geometry
 
 Riemannian metric fields, the Levi-Civita connection, curvature tensors, and

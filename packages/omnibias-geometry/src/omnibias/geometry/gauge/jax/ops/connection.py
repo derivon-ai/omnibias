@@ -91,6 +91,32 @@ def field_strength_from_arrays(
     return kernels.field_strength(jnp, A, dA, f, coupling)
 
 
+def covariant_derivative_field_strength(
+    state: FieldState,
+    conn: GaugeConnectionSpec,
+) -> Array:
+    r"""Covariant derivative ``(D_rho F_{mu nu})^a`` of shape ``(B, rho, mu, nu, a)``."""
+    a = connection_value(state, conn)
+    da = connection_partials(state, conn)
+    dda = connection_second_partials(state, conn)
+    return covariant_derivative_field_strength_from_arrays(
+        a, da, dda, algebra=conn.algebra, coupling=conn.coupling
+    )
+
+
+def covariant_derivative_field_strength_from_arrays(
+    A: Array,
+    dA: Array,
+    ddA: Array,
+    *,
+    algebra: LieAlgebra,
+    coupling: float,
+) -> Array:
+    r"""``(D_rho F_{mu nu})^a`` from explicit ``A``, ``dA``, ``ddA`` arrays."""
+    f = structure_constants(algebra, dtype=A.dtype)
+    return kernels.covariant_derivative_field_strength(jnp, A, dA, ddA, f, coupling)
+
+
 def covariant_divergence(
     state: FieldState,
     conn: GaugeConnectionSpec,
@@ -256,6 +282,8 @@ __all__ = [
     "connection_partials",
     "connection_second_partials",
     "connection_value",
+    "covariant_derivative_field_strength",
+    "covariant_derivative_field_strength_from_arrays",
     "covariant_divergence",
     "covariant_divergence_from_arrays",
     "field_strength",

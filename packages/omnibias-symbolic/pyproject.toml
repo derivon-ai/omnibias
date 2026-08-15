@@ -33,12 +33,14 @@ dependencies = ["omnibias-core>=0.2.0", "omnibias-difference>=0.1.0a1", "omnibia
 jax = ["omnibias-jax>=0.2.0", "jax>=0.4.30", "jaxlib>=0.4.30"]
 sklearn = ["scikit-learn>=1.2"]
 tab = ["omnibias-tab[torch,jax]>=0.1.0a1"]
-all = ["omnibias-symbolic[jax,sklearn,tab]"]
+gauge = ["omnibias-geometry>=0.2.0"]
+all = ["omnibias-symbolic[jax,sklearn,tab,gauge]"]
 test = [
     "pytest>=7.0",
     "numpy>=1.24",
     "omnibias-jax>=0.2.0",
     "omnibias-fractional>=0.1.0",
+    "omnibias-geometry>=0.2.0",
     # Only the integral-column builders need it, and only lazily, so it stays out
     # of the runtime dependencies: a discovery run that never asks for a Fredholm
     # column must not have to install a quadrature package.

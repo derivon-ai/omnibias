@@ -100,7 +100,9 @@ Burgers).
   [`build_field_relation_library`](02-vector-calculus-pde.md#build_field_relation_library) ·
   [`field_operator_columns`](02-vector-calculus-pde.md#field_operator_columns) ·
   [`field_partial_name`](02-vector-calculus-pde.md#field_partial_name) ·
-  [`discover_field_pde_law`](02-vector-calculus-pde.md#discover_field_pde_law)
+  [`discover_field_pde_law`](02-vector-calculus-pde.md#discover_field_pde_law) ·
+  gauge singlets: [`discover_yang_mills_singlet_law`](../api/symbolic.md#omnibias.symbolic.gauge_discovery.discover_yang_mills_singlet_law)
+  (optional `omnibias-symbolic[gauge]`; not a `FieldJet` of `A`)
 - Canonical PDE datasets: [`make_laplace_field_split`](02-vector-calculus-pde.md#canonical-pde-datasets)
   and the heat / wave / Burgers / 2-D heat twins.
 

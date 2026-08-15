@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — gauge-covariant jet wrapper (coordinate trap)
+
+- `omnibias.geometry.gauge._core.covariant_jet.GaugeCovariantJet` stores
+  `F` and `D_rho F` only. `LEGAL_SINGLET_ATOMS` is a closed allowlist;
+  `assert_library_gauge_legal` and `evaluate_gauge_law_gate` are fail-closed.
+  New kernel `covariant_derivative_field_strength` (torch / jax twins).
+  Public `bpst_instanton_arrays`.
+- Optional `omnibias.symbolic.gauge_discovery.GaugeLawDiscoverer` (extra
+  `omnibias-symbolic[gauge]`) recovers classical local singlet identities
+  (BPST `tr(F^2) ~ 8 pi^2 tr(F*Ftilde)`). Not a `FieldJet` of `A`, not
+  Wilson / Polyakov language, not a continuum mass-gap claim.
+
 ### Added — remaining Group 02 gated architectures (01-03, 01-06, 01-08–01-10, 01-12, 02-02, 02-06–02-14)
 
 - Arrangement geometry in `omnibias.partition.arrangement`. Cell membership

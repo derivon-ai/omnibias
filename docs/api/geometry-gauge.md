@@ -144,6 +144,24 @@ residual, topological charge `Q -> 1`, finite action `S -> 8 pi^2 / g^2`, the
 Bianchi identity at machine precision, gauge invariance of the action, and
 torch <-> jax parity to `rtol = 1e-9` in float64.
 
+## Gauge-covariant jet (coordinate trap)
+
+`GaugeCovariantJet` is the only legal input for Yang-Mills singlet discovery.
+It stores `F_{mu nu}^a` and `(D_rho F_{mu nu})^a` and drops `A` / `dA` / `ddA`
+after construction. The searchable library is the frozen allowlist
+`LEGAL_SINGLET_ATOMS` (`tr(F^2)`, `tr(F*Ftilde)`, `|D*F|^2`, `|Bianchi|^2`,
+`|F-*F|^2`). Flattened adjoint components such as `F_01_2` are rejected:
+they are still a color-basis coordinate chart.
+
+`assert_library_gauge_legal` and `evaluate_gauge_law_gate` are fail-closed.
+This is **not** a `FieldJet` of the connection components, not a Wilson /
+Polyakov language, and not a continuum mass-gap claim.
+
+::: omnibias.geometry.gauge._core.covariant_jet
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ## Schemas
 
 ::: omnibias.geometry.gauge._core

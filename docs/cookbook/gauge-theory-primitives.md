@@ -65,6 +65,43 @@ Each row is asserted in the package's own test suite against an analytic numpy
 BPST reference built directly from the closed-form instanton field strength, and
 the torch and jax backends agree with each other to `rtol = 1e-9` in float64.
 
+## Gauge-covariant jet (no coordinate trap)
+
+Symbolic regression must not see `partial_rho A_nu^a`. Build a
+`GaugeCovariantJet` from the connection arrays; the public fibers are `F` and
+`D F` only, and STLSQ is restricted to the Weyl-singlet allowlist. This is a
+classical local identity, not a Wilson-loop language and not a mass-gap claim.
+
+```python
+import numpy as np
+from omnibias.geometry.gauge import (
+    LEGAL_SINGLET_ATOMS,
+    GaugeCovariantJet,
+    bpst_instanton_arrays,
+    su,
+)
+
+rng = np.random.default_rng(0)
+x = rng.uniform(-1.2, 1.2, size=(16, 4))
+A, dA, ddA = bpst_instanton_arrays(x)
+jet = GaugeCovariantJet.from_arrays(
+    A, dA, ddA, algebra=su(2), coupling=1.0, signature=(1, 1, 1, 1)
+)
+assert set(jet.singlets()) == LEGAL_SINGLET_ATOMS
+assert not hasattr(jet, "A")
+```
+
+```python
+from omnibias.symbolic.gauge_discovery import (
+    discover_yang_mills_singlet_law,
+    make_yang_mills_bpst_split,
+)
+
+train, val, test, conns, _pts = make_yang_mills_bpst_split(seed=0, counts=(24, 12, 12))
+out = discover_yang_mills_singlet_law(train, val, test, conns)
+assert out["diagnostics"]["gauge_equivariance"]["passed"]
+```
+
 !!! note "Scope"
     `omnibias.geometry.gauge` ships the full **continuum** primitive set **and** an SU(2)
     lattice Monte-Carlo engine (`omnibias.geometry.gauge.lattice`, torch + JAX): heat-bath,

@@ -79,6 +79,20 @@ def test_action_and_charge_parity(fields) -> None:
     _assert_parity(TOPS.dual_field_strength(Ft, signature=SIG), JOPS.dual_field_strength(Fj, signature=SIG))
 
 
+def test_covariant_derivative_field_strength_parity(fields) -> None:
+    a, da, dda = fields
+    su2 = la.su(2)
+    t = TOPS.covariant_derivative_field_strength_from_arrays(
+        torch.as_tensor(a), torch.as_tensor(da), torch.as_tensor(dda),
+        algebra=su2, coupling=0.8,
+    )
+    j = JOPS.covariant_derivative_field_strength_from_arrays(
+        jnp.asarray(a), jnp.asarray(da), jnp.asarray(dda),
+        algebra=su2, coupling=0.8,
+    )
+    _assert_parity(t, j)
+
+
 def test_structure_constants_parity() -> None:
     for n in (2, 3, 4):
         su = la.su(n)

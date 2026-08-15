@@ -381,6 +381,8 @@ __all__ = [
     "FieldLawDiscoverer",
     "FieldLawResult",
     "FractionalOrderDiscoveryResult",
+    "GaugeLawDiscoverer",
+    "GaugeLawResult",
     "HybridAutomaton",
     "JetBundle",
     "JetDiscoveryResult",
@@ -465,6 +467,7 @@ __all__ = [
     "discover_pde_operator_law",
     "discover_recurrence",
     "discover_recurrence_least_squares",
+    "discover_yang_mills_singlet_law",
     "divergence_objective_term",
     "electromagnetic_field_2form",
     "equation_information_criterion",
@@ -546,6 +549,8 @@ __all__ = [
     "make_laplace_field_split",
     "make_symbolic_regression_dataset",
     "make_wave_field_split",
+    "make_yang_mills_bpst_split",
+    "make_yang_mills_polynomial_split",
     "mdl",
     "measure_integral_columns",
     "metric_determinant",
@@ -641,3 +646,22 @@ __all__ = [
     "write_artifacts",
     "write_blasius_artifacts",
 ]
+
+_GAUGE_EXPORTS = frozenset(
+    {
+        "GaugeLawDiscoverer",
+        "GaugeLawResult",
+        "discover_yang_mills_singlet_law",
+        "make_yang_mills_bpst_split",
+        "make_yang_mills_polynomial_split",
+    }
+)
+
+
+def __getattr__(name: str) -> object:
+    if name in _GAUGE_EXPORTS:
+        from omnibias.symbolic import gauge_discovery as _gauge_discovery
+
+        return getattr(_gauge_discovery, name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+

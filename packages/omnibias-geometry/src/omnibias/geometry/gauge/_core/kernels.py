@@ -51,6 +51,28 @@ def field_strength_partials(
     return exterior + coupling * (term1 + term2)
 
 
+def covariant_derivative_field_strength(
+    xp: Any, A: Any, dA: Any, ddA: Any, f: Any, coupling: float
+) -> Any:
+    r"""``(D_rho F_{mu nu})^a`` of shape ``(B, rho, mu, nu, a)``.
+
+    The gauge-covariant derivative of the adjoint 2-form,
+
+    .. math::
+
+        (D_\rho F_{\mu\nu})^a
+        = \partial_\rho F_{\mu\nu}^a + g\,f^{abc}\,A_\rho^b F_{\mu\nu}^c.
+
+    This is the uncontracted fiber of a first-order covariant jet. The Yang-Mills
+    operator :func:`covariant_divergence` is its metric contraction
+    ``eta^{rho mu} eta^{nu lambda} (D_rho F_{mu lambda})^a``.
+    """
+    dF = field_strength_partials(xp, A, dA, ddA, f, coupling)
+    fld = field_strength(xp, A, dA, f, coupling)
+    bracket = coupling * xp.einsum("pqa,Brp,Bmnq->Brmna", f, A, fld)
+    return dF + bracket
+
+
 def covariant_divergence(
     xp: Any, A: Any, dA: Any, ddA: Any, f: Any, coupling: float, eta: Any
 ) -> Any:
@@ -259,6 +281,7 @@ __all__ = [
     "bianchi",
     "covariant_derivative_adjoint",
     "covariant_derivative_commutator",
+    "covariant_derivative_field_strength",
     "covariant_divergence",
     "curvature_action_on_adjoint",
     "dual_field_strength",
