@@ -342,7 +342,8 @@ of `A_mu^a` and never the 480-component SU(3) 2-jet. Recovers classical local
 identities (BPST: `tr(F^2) ~ 8 pi^2 tr(F*Ftilde)`). Complexity is
 representation-theoretic (mass dimension + traces). `weak_ym_columns` is an
 identity check, not a predict-zero STLSQ headline; 1-D integral features are
-not the 4-D Yang-Mills weak form. Not Wilson / Polyakov language and not a
+not the 4-D Yang-Mills weak form. Wilson / Polyakov traces are a second
+language (`LoopLawDiscoverer` on links), not an expanded jet. Not a
 Yang-Mills mass-gap claim.
 
 ::: omnibias.symbolic.gauge_discovery
@@ -357,6 +358,18 @@ Yang-Mills mass-gap claim.
         - make_yang_mills_bpst_split
         - make_yang_mills_polynomial_split
         - weak_ym_columns
+
+::: omnibias.symbolic.loop_discovery
+    options:
+      show_root_heading: false
+      heading_level: 4
+      members:
+        - LoopLawDiscoverer
+        - LoopLawResult
+        - discover_wilson_plaquette_law
+        - discover_planted_area_law
+        - evaluate_loop_gauge_invariance
+        - planted_area_law_table
 
 ## Differential geometry
 

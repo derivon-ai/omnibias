@@ -140,6 +140,28 @@ except ValueError as exc:
 assert raised
 ```
 
+Holonomy is a second language: evaluate Wilson / Polyakov on links, never
+by enlarging the local jet.
+
+```python
+from omnibias.geometry.gauge import (
+    LatticeLinkField,
+    evaluate_loop_atoms,
+    identity_numpy_links,
+    refuse_jet_as_loop_source,
+)
+
+table = evaluate_loop_atoms(LatticeLinkField(links=identity_numpy_links((2, 2, 2, 2))))
+assert table.values["Polyakov"].item() == 1.0
+assert table.values["W(1,1)"].item() == 1.0
+loop_raised = False
+try:
+    refuse_jet_as_loop_source(jet)
+except ValueError as exc:
+    loop_raised = "holonomy" in str(exc).lower()
+assert loop_raised
+```
+
 !!! note "Scope"
     `omnibias.geometry.gauge` ships the full **continuum** primitive set **and** an SU(2)
     lattice Monte-Carlo engine (`omnibias.geometry.gauge.lattice`, torch + JAX): heat-bath,

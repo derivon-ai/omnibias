@@ -53,6 +53,12 @@ try:
         refuse_flattened_adjoint_library,
     )
     from omnibias.geometry.gauge._core.lie_algebra import LieAlgebra, su
+    from omnibias.geometry.gauge._core.loop_language import (
+        is_green_column_name,
+        is_loop_atom_name,
+        refuse_green_as_jet_atom,
+        refuse_loop_as_covariant_jet,
+    )
     from omnibias.geometry.gauge._core.weak_ym import (
         AdjointTestBank,
         gaussian_adjoint_test_bank,
@@ -109,6 +115,12 @@ def _merge_singlets(
     banned = [name for name in extra if is_scalar_integral_column_name(name)]
     if banned:
         refuse_scalar_integral_as_ym_weak_form(banned)
+    loop_banned = [name for name in extra if is_loop_atom_name(name)]
+    if loop_banned:
+        refuse_loop_as_covariant_jet(loop_banned)
+    green_banned = [name for name in extra if is_green_column_name(name)]
+    if green_banned:
+        refuse_green_as_jet_atom(green_banned)
     if any(name in LEGAL_ADJOINT_1FORM_ATOMS for name in extra):
         raise TypeError(
             "adjoint 1-form atoms cannot be mixed into the singlet discoverer; "

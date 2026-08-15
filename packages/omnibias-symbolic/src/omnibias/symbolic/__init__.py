@@ -390,6 +390,8 @@ __all__ = [
     "LatentODEResult",
     "LibrarySpec",
     "LinearAutoencoder",
+    "LoopLawDiscoverer",
+    "LoopLawResult",
     "MLPAutoencoder",
     "MetricField",
     "NeuralField1D",
@@ -465,8 +467,10 @@ __all__ = [
     "discover_interpretable_surrogate",
     "discover_latent_ode",
     "discover_pde_operator_law",
+    "discover_planted_area_law",
     "discover_recurrence",
     "discover_recurrence_least_squares",
+    "discover_wilson_plaquette_law",
     "discover_yang_mills_invariant_law",
     "discover_yang_mills_singlet_law",
     "divergence_objective_term",
@@ -479,6 +483,7 @@ __all__ = [
     "evaluate_field_pde_discovery",
     "evaluate_geometric_discovery",
     "evaluate_high_dim_sparse_validation",
+    "evaluate_loop_gauge_invariance",
     "evaluate_poc",
     "evaluate_real_world_tabular_validation",
     "exact_activation_field_1d",
@@ -564,6 +569,7 @@ __all__ = [
     "one_form",
     "periodic_flow_residual_sups",
     "periodic_hilbert",
+    "planted_area_law_table",
     "polynomial_from_samples",
     "polynomial_value_library",
     "polynomial_vector_library",
@@ -660,6 +666,16 @@ _GAUGE_EXPORTS = frozenset(
         "weak_ym_columns",
     }
 )
+_LOOP_EXPORTS = frozenset(
+    {
+        "LoopLawDiscoverer",
+        "LoopLawResult",
+        "discover_planted_area_law",
+        "discover_wilson_plaquette_law",
+        "evaluate_loop_gauge_invariance",
+        "planted_area_law_table",
+    }
+)
 
 
 def __getattr__(name: str) -> object:
@@ -667,5 +683,9 @@ def __getattr__(name: str) -> object:
         from omnibias.symbolic import gauge_discovery as _gauge_discovery
 
         return getattr(_gauge_discovery, name)
+    if name in _LOOP_EXPORTS:
+        from omnibias.symbolic import loop_discovery as _loop_discovery
+
+        return getattr(_loop_discovery, name)
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 

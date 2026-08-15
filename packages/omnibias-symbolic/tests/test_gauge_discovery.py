@@ -217,6 +217,28 @@ def test_flattened_component_names_raise_before_stlsq(illegal: str) -> None:
     assert called["stlsq"] is False
 
 
+@pytest.mark.parametrize("illegal", ["W(2,2)", "Polyakov"])
+def test_loop_extra_on_gauge_discoverer_raises_before_stlsq(illegal: str) -> None:
+    train, val, test, conns, _pts = make_yang_mills_bpst_split(seed=16, counts=(8, 4, 4))
+
+    def extra(jet):
+        return {illegal: np.ones(jet.batch)}
+
+    called = {"stlsq": False}
+
+    def _boom(*_args, **_kwargs):
+        called["stlsq"] = True
+        raise AssertionError("fit_sparse_equation must not run")
+
+    disc = GaugeLawDiscoverer()
+    with patch("omnibias.symbolic.gauge_discovery.fit_sparse_equation", _boom):
+        with pytest.raises(ValueError, match="language split"):
+            disc.discover(
+                train, val, test, connections=conns, extra_columns_fn=extra
+            )
+    assert called["stlsq"] is False
+
+
 @pytest.mark.parametrize("illegal", ["I(v)", "fredholm_K", "volterra_causal"])
 def test_scalar_integral_extra_raises_before_stlsq(illegal: str) -> None:
     train, val, test, conns, _pts = make_yang_mills_bpst_split(seed=14, counts=(8, 4, 4))

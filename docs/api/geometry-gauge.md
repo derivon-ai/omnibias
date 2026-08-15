@@ -178,6 +178,20 @@ refused. 1-D Fredholm / Volterra columns are not the 4-D Yang-Mills weak
 form. A typical Monte Carlo vacuum does not satisfy `D*F = 0`; this is not
 a mass-gap claim.
 
+## Loop language (language trap)
+
+A finite-order jet of `A` -- even `F` and `D F` -- cannot see path-ordered
+holonomy. Wilson / Polyakov traces are a **second language** on
+`LatticeLinkField`, not an expansion of `GaugeCovariantJet`. Creutz is a
+derived identity on those traces. GEVP and `gauge.transfer` stay certificates
+(`yang_mills_claim` / `continuum_claim` remain false). This is not a continuum
+mass-gap claim.
+
+::: omnibias.geometry.gauge._core.loop_language
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ::: omnibias.geometry.gauge._core.data_paths
     options:
       show_root_heading: false

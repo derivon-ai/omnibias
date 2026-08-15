@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — gauge loop language (language trap)
+
+- `LEGAL_LOOP_ATOMS` / `LoopObservableTable` / `evaluate_loop_atoms` evaluate
+  plaquette, `W(R,T)`, and Polyakov on `LatticeLinkField`. Creutz is a
+  derived identity. `LoopLawDiscoverer` recovers `W(1,1) = plaquette` and a
+  planted area law. Mixing a jet with loop atoms (or a Green function into
+  a jet) raises. Not a continuum mass-gap claim.
+
 ### Added — gauge data paths (noise amplification)
 
 - `ConnectionSource` / `LatticeLinkField` name the legal sources. Path D
