@@ -20,10 +20,13 @@ from omnibias.geometry.gauge.transfer.certificates import (
 )
 from omnibias.geometry.gauge.transfer.strong_coupling import (
     BETA_LOCK,
+    BETA_LOCK_CRUDE,
+    CRUDE_POLYMER_METHOD,
     POLYMER_METHOD,
     certified_strong_coupling_glueball_bound,
     certified_wilson_character_gap,
     polymer_coordination,
+    polymer_coordination_backtrack,
     su2_wilson_activity,
 )
 
@@ -41,8 +44,12 @@ def _bessel_i(order: int, z: float, terms: int = 40) -> float:
 def test_coordination_is_locked_and_documented() -> None:
     assert polymer_coordination(4) == 24
     assert polymer_coordination(3) == 16
+    assert polymer_coordination_backtrack(4) == 15
+    assert polymer_coordination_backtrack(3) == 9
     with pytest.raises(ValueError, match="spacetime_dim"):
         polymer_coordination(1)
+    with pytest.raises(ValueError, match="spacetime_dim"):
+        polymer_coordination_backtrack(1)
 
 
 def test_locked_beta_is_in_domain_and_positive() -> None:
@@ -50,11 +57,25 @@ def test_locked_beta_is_in_domain_and_positive() -> None:
     assert result.in_convergence_domain is True
     assert result.certified is True
     assert result.method == POLYMER_METHOD
-    assert result.coordination == 24
+    assert result.counting == "backtrack"
+    assert result.coordination == 15
     assert result.spacetime_dim == 4
     assert result.spectral_gap_lower > 0.0
     assert 0.0 < result.subdominant_ratio_upper < 1.0
     assert result.tail_bound is not None
+
+
+def test_crude_lock_still_certifies_only_the_overcount() -> None:
+    crude = certified_strong_coupling_glueball_bound(
+        BETA_LOCK_CRUDE, counting="crude"
+    )
+    assert crude.certified is True
+    assert crude.method == CRUDE_POLYMER_METHOD
+    assert crude.coordination == 24
+    at_quarter = certified_strong_coupling_glueball_bound(
+        BETA_LOCK, counting="crude"
+    )
+    assert at_quarter.certified is False
 
 
 def test_out_of_domain_is_not_certified_and_must_not_seal() -> None:
@@ -91,7 +112,8 @@ def test_seal_replay_and_honesty_flags() -> None:
     assert cert["honesty"]["unproven_claim"] is False
     assert cert["honesty"]["fixed_spacing"] is True
     assert cert["method"] == POLYMER_METHOD
-    assert "crude_polymer_count" in cert["honesty"]["note"]
+    assert cert["counting"] == "backtrack"
+    assert "backtrack_polymer_count" in cert["honesty"]["note"]
     assert "NOT" in cert["honesty"]["note"]
     assert strong_coupling_schema_errors(cert) == []
     assert verify_certificate_digest(cert)

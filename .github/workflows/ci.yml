@@ -573,6 +573,10 @@ jobs:
         run: |
           source .venv-geom/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/gauge_holonomy_gap.py
+      - name: Run two-plaquette Hamiltonian gap smoke
+        run: |
+          source .venv-geom/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/gauge_two_plaquette_gap.py
 
   binary:
     name: omnibias-binary (alpha)

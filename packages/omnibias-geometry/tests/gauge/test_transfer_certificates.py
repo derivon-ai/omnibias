@@ -24,6 +24,7 @@ from omnibias.core.proof.certificate import verify_certificate_digest
 from omnibias.core.proof.lean_check import check_certificate, generate_obligation
 from omnibias.geometry.gauge.proofmachine import build_gauge_machine, gauge_provers
 from omnibias.geometry.gauge.transfer.certificates import (
+    HAMILTONIAN_GAP_KIND,
     STRONG_COUPLING_KIND,
     TRANSFER_GAP_KIND,
     TRANSFER_GAP_SCHEMA_VERSION,
@@ -60,10 +61,15 @@ def test_the_gauge_machine_registers_exactly_the_expected_kinds(
     machine: ProofMachine,
 ) -> None:
     """Frozen so a new prover cannot slip in unannounced."""
-    assert sorted(machine.kinds()) == [STRONG_COUPLING_KIND, TRANSFER_GAP_KIND]
+    assert sorted(machine.kinds()) == [
+        STRONG_COUPLING_KIND,
+        TRANSFER_GAP_KIND,
+        HAMILTONIAN_GAP_KIND,
+    ]
     assert [p.name for p in gauge_provers()] == [
         "transfer_matrix_spectral_gap",
         "strong_coupling_glueball_gap",
+        "two_plaquette_hamiltonian_gap",
     ]
 
 

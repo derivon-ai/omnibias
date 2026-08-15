@@ -13,6 +13,7 @@ kind                                  prover
 ====================================  ====================================================
 ``transfer_matrix_spectral_gap``      :func:`omnibias.geometry.gauge.transfer.certified_transfer_matrix_gap`
 ``strong_coupling_glueball_gap``      :func:`omnibias.geometry.gauge.transfer.certified_strong_coupling_glueball_bound`
+``two_plaquette_hamiltonian_gap``     :func:`omnibias.geometry.gauge.transfer.certified_hamiltonian_gap`
 ====================================  ====================================================
 
 The certificate is **sealed**, so:
@@ -45,10 +46,14 @@ from omnibias.core.proof import (
     ProofMachine,
 )
 from omnibias.geometry.gauge.transfer.certificates import (
+    HAMILTONIAN_GAP_KIND,
     STRONG_COUPLING_KIND,
     TRANSFER_GAP_KIND,
+    hamiltonian_gap_schema_errors,
+    replay_hamiltonian_gap,
     replay_strong_coupling_gap,
     replay_transfer_matrix_gap,
+    seal_hamiltonian_gap_certificate,
     seal_strong_coupling_certificate,
     seal_transfer_gap_certificate,
     strong_coupling_schema_errors,
@@ -114,8 +119,13 @@ def _prove_strong_coupling_gap(conjecture: Conjecture) -> ProofAttempt:
     dim = data.get("spacetime_dim", 4)
     if not isinstance(dim, int) or isinstance(dim, bool) or dim < 2:
         return _blocked("spacetime_dim must be an integer >= 2")
+    counting = data.get("counting", "backtrack")
+    if counting not in ("backtrack", "crude"):
+        return _blocked("counting must be 'backtrack' or 'crude'")
     try:
-        result = certified_strong_coupling_glueball_bound(beta, spacetime_dim=dim)
+        result = certified_strong_coupling_glueball_bound(
+            beta, spacetime_dim=dim, counting=counting
+        )
     except (ValueError, TypeError) as exc:
         return _blocked(f"could not certify a polymer bound: {exc}")
     if not result.certified:
@@ -137,6 +147,50 @@ def _prove_strong_coupling_gap(conjecture: Conjecture) -> ProofAttempt:
     return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
 
 
+def _prove_hamiltonian_gap(conjecture: Conjecture) -> ProofAttempt:
+    """Certify ``λ1-λ0`` of the two-plaquette Hamiltonian named by the conjecture."""
+    from omnibias.geometry.gauge.transfer.hamiltonian import (
+        certified_hamiltonian_gap,
+        plaquette_holonomy_trial_space,
+        su2_two_plaquette_hamiltonian,
+    )
+
+    data: Mapping[str, Any] = conjecture.data
+    coupling = data.get("coupling")
+    if isinstance(coupling, bool) or not isinstance(coupling, int | float | Fraction) or float(coupling) <= 0.0:
+        return _blocked("conjecture data must carry a positive numeric 'coupling'")
+    j_max = data.get("j_max", 1)
+    if not isinstance(j_max, int) or isinstance(j_max, bool) or j_max < 1:
+        return _blocked("j_max must be an integer >= 1")
+    try:
+        hamiltonian = su2_two_plaquette_hamiltonian(coupling, j_max=j_max)
+        trial = (
+            plaquette_holonomy_trial_space(hamiltonian)
+            if bool(data.get("trial", False))
+            else None
+        )
+        result = certified_hamiltonian_gap(hamiltonian, trial=trial)
+    except (ValueError, TypeError) as exc:
+        return _blocked(f"could not certify a Hamiltonian gap: {exc}")
+    if not result.certified:
+        return _blocked(
+            f"no positive λ1-λ0 certified for {result.model} "
+            f"(gap lower {result.spectral_gap_lower:.6g})"
+        )
+    minimum = data.get("min_spectral_gap")
+    if isinstance(minimum, int | float) and result.spectral_gap_lower < float(minimum):
+        return _blocked(
+            f"certified gap {result.spectral_gap_lower:.6g} is below the requested "
+            f"threshold {float(minimum):.6g}"
+        )
+    sealed = seal_hamiltonian_gap_certificate(result, hamiltonian, claim=conjecture.name)
+    detail = (
+        f"{result.model} (j_max={result.j_max}, dim {result.dimension}): "
+        f"λ1-λ0 >= {result.spectral_gap_lower:.6g} via {result.method}"
+    )
+    return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
+
+
 def gauge_provers() -> list[FunctionProver]:
     """The gauge provers registered by :func:`build_gauge_machine`."""
     return [
@@ -154,6 +208,13 @@ def gauge_provers() -> list[FunctionProver]:
             schema_fn=strong_coupling_schema_errors,
             replay_fn=replay_strong_coupling_gap,
         ),
+        FunctionProver(
+            name="two_plaquette_hamiltonian_gap",
+            kinds=frozenset({HAMILTONIAN_GAP_KIND}),
+            prove_fn=_prove_hamiltonian_gap,
+            schema_fn=hamiltonian_gap_schema_errors,
+            replay_fn=replay_hamiltonian_gap,
+        ),
     ]
 
 
@@ -166,6 +227,7 @@ def build_gauge_machine() -> ProofMachine:
 
 
 __all__ = [
+    "HAMILTONIAN_GAP_KIND",
     "STRONG_COUPLING_KIND",
     "TRANSFER_GAP_KIND",
     "build_gauge_machine",

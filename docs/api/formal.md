@@ -60,6 +60,10 @@ a green build is meaningful.
   `omnibias.formal.casimir.casimir_certificate`: the locked SU(2)
   fundamental gap `C2(1)-C2(0)=3/4` or the SU(3) fundamental `C2(1,0)=4/3`.
   Finite rational identities, not a continuum gauge claim.
+- **Polymer** -- a `polymer` payload from
+  `omnibias.formal.polymer.polymer_certificate`: the locked backtrack
+  coordination `3(2*4-3)=15` or the crude overcount `8(4-1)=24`. Finite
+  arithmetic, not a continuum gauge claim and not Osterwalder-Seiler.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived

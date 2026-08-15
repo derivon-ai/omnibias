@@ -547,6 +547,71 @@ def su2_wilson_transfer(
     )
 
 
+def su3_wilson_transfer(
+    beta: float,
+    *,
+    max_dynkin: int = 1,
+    n_cells: int = 10,
+    lattice_spacing: float = 1.0,
+) -> TransferMatrix:
+    r"""Diagonal SU(3) Wilson transfer from enclosed Haar character coefficients.
+
+    The Wilson weight ``exp((β/3) Re χ_fund)`` is expanded on SU(3) characters
+    by integrating against the Weyl measure on the maximal torus.  Each
+    coefficient is an interval enclosure of that integral on a finite box
+    partition of ``[0, 2π]²`` (cellwise interval range times cell area; see
+    :func:`~omnibias.geometry.gauge.transfer.su3_wilson.su3_wilson_haar_coefficient`).
+    The matrix **is** the ``(p, q)`` truncation with ``p, q <= max_dynkin``.
+
+    ``max_dynkin`` is locked at ``1`` so every character in the integrand is
+    an explicit trigonometric identity, not a guessed product of ordinary
+    Bessel functions.  This is one coupling and one truncation -- not 4-D
+    SU(3) Yang-Mills.
+    """
+    if max_dynkin != 1:
+        raise ValueError(
+            f"su3_wilson_transfer locks max_dynkin=1 (Haar characters), got {max_dynkin}"
+        )
+    if float(beta) <= 0.0:
+        raise ValueError(f"beta must be > 0, got {beta}")
+    from omnibias.geometry.gauge.transfer.su3_wilson import su3_wilson_haar_coefficient
+
+    irreps = [
+        Irrep(n=3, dynkin=(p, q))
+        for p in range(max_dynkin + 1)
+        for q in range(max_dynkin + 1)
+    ]
+    coefficients = tuple(
+        su3_wilson_haar_coefficient(rep.dynkin, beta, n_cells=n_cells) for rep in irreps
+    )
+    ordered = sorted(
+        zip(irreps, coefficients, strict=True),
+        key=lambda item: (quadratic_casimir(item[0]), item[0].dynkin),
+    )
+    eigenvalues = tuple(coeff for _rep, coeff in ordered)
+    labels = tuple(
+        f"{rep.dynkin} (dim {dimension(rep)})" for rep, _coeff in ordered
+    )
+    return TransferMatrix(
+        model="su3_wilson",
+        basis="character",
+        entries=_diagonal(eigenvalues),
+        mode_labels=labels,
+        exact_eigenvalues=eigenvalues,
+        parameters={
+            "builder": "su3_wilson_transfer",
+            "beta": float(beta),
+            "max_dynkin": int(max_dynkin),
+            "n_cells": int(n_cells),
+            "n_irreps": len(ordered),
+            "lattice_spacing": float(lattice_spacing),
+        },
+        perron_vector=_standard_basis(len(ordered))[0],
+        subdominant_vectors=_standard_basis(len(ordered))[1:],
+        symmetric=True,
+    )
+
+
 #: Constructor name (as recorded in ``TransferMatrix.parameters["builder"]``) to the
 #: callable, so a sealed certificate can be replayed by rebuilding its matrix.
 BUILDERS: Mapping[str, object] = {
@@ -555,6 +620,7 @@ BUILDERS: Mapping[str, object] = {
     "su2_class_angle_transfer": su2_class_angle_transfer,
     "su3_heat_kernel_transfer": su3_heat_kernel_transfer,
     "su2_wilson_transfer": su2_wilson_transfer,
+    "su3_wilson_transfer": su3_wilson_transfer,
 }
 
 
@@ -596,5 +662,6 @@ __all__ = [
     "su2_heat_kernel_transfer",
     "su2_wilson_transfer",
     "su3_heat_kernel_transfer",
+    "su3_wilson_transfer",
     "u1_heat_kernel_transfer",
 ]

@@ -1,0 +1,76 @@
+{
+  "schema": "omnibias.benchmark.gauge_two_plaquette_gap.v1",
+  "generated_utc": "2026-08-15T21:49:24Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke",
+    "j_max": 1
+  },
+  "rss_mb_at_start": 779.34,
+  "g1": {
+    "n_hamiltonians": 4,
+    "j_max": 1,
+    "ge_generic": true,
+    "sound": true,
+    "certified_at_lock": true,
+    "measured_factor_min": 1.0,
+    "measured_factor_median": 1.0,
+    "measured_factor_max": 1.0,
+    "fraction_of_numerical_min": 0.9999999999999721,
+    "fraction_of_numerical_median": 0.9999999999999816,
+    "target_factor_5x": false,
+    "note": "G1 compares plaquette-character trials to the computational standard basis on a non-diagonal Hamiltonian; the factor is measured, not a claimed 5x"
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_ge_generic_measured",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "measured_factor_median": 1.0,
+        "n_hamiltonians": 4
+      },
+      {
+        "name": "g2_soundness",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_gauss_law_and_trace",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g5_honesty",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g6_kernel_obligation",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "certified_gap_at_lock",
+        "passed": true,
+        "in_ci_all_passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "yang_mills": false,
+    "mass_gap": false,
+    "continuum_claim": false,
+    "fixed_hamiltonian": true,
+    "note": "certified spectral gap of one two-plaquette Hamiltonian at one coupling; the continuum limit is not taken"
+  }
+}

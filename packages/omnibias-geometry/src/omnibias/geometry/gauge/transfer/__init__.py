@@ -26,12 +26,17 @@ nothing here is a claim about the Yang-Mills mass gap.
 from __future__ import annotations
 
 from omnibias.geometry.gauge.transfer.certificates import (
+    HAMILTONIAN_GAP_KIND,
+    HAMILTONIAN_GAP_SCHEMA_VERSION,
     STRONG_COUPLING_KIND,
     STRONG_COUPLING_SCHEMA_VERSION,
     TRANSFER_GAP_KIND,
     TRANSFER_GAP_SCHEMA_VERSION,
+    hamiltonian_gap_schema_errors,
+    replay_hamiltonian_gap,
     replay_strong_coupling_gap,
     replay_transfer_matrix_gap,
+    seal_hamiltonian_gap_certificate,
     seal_strong_coupling_certificate,
     seal_transfer_gap_certificate,
     strong_coupling_schema_errors,
@@ -53,12 +58,22 @@ from omnibias.geometry.gauge.transfer.gap import (
     certified_transfer_matrix_gap,
     heat_kernel_gap_scaling_report,
 )
+from omnibias.geometry.gauge.transfer.hamiltonian import (
+    COUPLING_LOCK,
+    GaugeHamiltonian,
+    HamiltonianGapResult,
+    certified_hamiltonian_gap,
+    plaquette_holonomy_trial_space,
+    standard_basis_trial_space,
+    su2_two_plaquette_hamiltonian,
+)
 from omnibias.geometry.gauge.transfer.matrices import (
     TransferMatrix,
     su2_class_angle_transfer,
     su2_heat_kernel_transfer,
     su2_wilson_transfer,
     su3_heat_kernel_transfer,
+    su3_wilson_transfer,
     u1_heat_kernel_transfer,
 )
 from omnibias.geometry.gauge.transfer.montecarlo import (
@@ -69,6 +84,8 @@ from omnibias.geometry.gauge.transfer.montecarlo import (
 )
 from omnibias.geometry.gauge.transfer.strong_coupling import (
     BETA_LOCK,
+    BETA_LOCK_CRUDE,
+    CRUDE_POLYMER_METHOD,
     POLYMER_METHOD,
     WILSON_CHARACTER_METHOD,
     StrongCouplingGapResult,
@@ -76,6 +93,7 @@ from omnibias.geometry.gauge.transfer.strong_coupling import (
     certified_strong_coupling_glueball_bound,
     certified_wilson_character_gap,
     polymer_coordination,
+    polymer_coordination_backtrack,
     su2_wilson_activity,
 )
 from omnibias.geometry.gauge.transfer.trial import (
@@ -88,8 +106,13 @@ from omnibias.geometry.gauge.transfer.trial import (
 
 __all__ = [
     "BETA_LOCK",
+    "BETA_LOCK_CRUDE",
     "BIRKHOFF_METHOD",
+    "COUPLING_LOCK",
+    "CRUDE_POLYMER_METHOD",
     "GRAM_COND_THRESHOLD",
+    "HAMILTONIAN_GAP_KIND",
+    "HAMILTONIAN_GAP_SCHEMA_VERSION",
     "LEHMANN_METHOD",
     "POLYMER_METHOD",
     "STRONG_COUPLING_KIND",
@@ -101,6 +124,8 @@ __all__ = [
     "EffectiveMassCurve",
     "EffectiveMassPoint",
     "GapCandidate",
+    "GaugeHamiltonian",
+    "HamiltonianGapResult",
     "Loop",
     "MonteCarloGapCheck",
     "MultistepGapResult",
@@ -114,25 +139,34 @@ __all__ = [
     "WilsonCharacterGapResult",
     "certified_effective_mass_curve",
     "certified_gap_versus_monte_carlo",
+    "certified_hamiltonian_gap",
     "certified_multistep_gap_refinement",
     "certified_strong_coupling_glueball_bound",
     "certified_transfer_matrix_gap",
     "certified_wilson_character_gap",
+    "hamiltonian_gap_schema_errors",
     "heat_kernel_gap_scaling_report",
     "holonomy_trial_space",
+    "plaquette_holonomy_trial_space",
     "polymer_coordination",
+    "polymer_coordination_backtrack",
+    "replay_hamiltonian_gap",
     "replay_strong_coupling_gap",
     "replay_transfer_matrix_gap",
     "sample_transfer_path_ensemble",
+    "seal_hamiltonian_gap_certificate",
     "seal_strong_coupling_certificate",
     "seal_transfer_gap_certificate",
+    "standard_basis_trial_space",
     "strong_coupling_schema_errors",
     "su2_class_angle_transfer",
     "su2_heat_kernel_transfer",
     "su2_holonomy_trace",
+    "su2_two_plaquette_hamiltonian",
     "su2_wilson_activity",
     "su2_wilson_transfer",
     "su3_heat_kernel_transfer",
+    "su3_wilson_transfer",
     "transfer_gap_schema_errors",
     "u1_heat_kernel_transfer",
 ]

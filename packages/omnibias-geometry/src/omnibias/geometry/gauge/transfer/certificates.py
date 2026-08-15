@@ -36,6 +36,7 @@ from omnibias.core.proof import Certificate, seal_certificate, verify_certificat
 from omnibias.geometry.gauge.transfer.gap import TransferGapResult
 from omnibias.geometry.gauge.transfer.matrices import TransferMatrix, rebuild
 from omnibias.geometry.gauge.transfer.strong_coupling import (
+    CRUDE_POLYMER_METHOD,
     POLYMER_METHOD,
     StrongCouplingGapResult,
     certified_strong_coupling_glueball_bound,
@@ -60,9 +61,10 @@ STRONG_COUPLING_SCHEMA_VERSION = "verified-strong-coupling-gap-1"
 STRONG_COUPLING_KIND = "strong_coupling_glueball_gap"
 
 _STRONG_COUPLING_NOTE = (
-    "crude polymer-count lower bound for SU(2) Wilson at one fixed beta and "
-    "spacing; method is crude_polymer_count, NOT a continuum-limit, "
-    "infinite-volume, or Yang-Mills mass-gap claim"
+    "polymer-count lower bound for SU(2) Wilson at one fixed beta and "
+    "spacing; method is backtrack_polymer_count or crude_polymer_count, "
+    "NOT Osterwalder-Seiler, NOT a continuum-limit, infinite-volume, or "
+    "Yang-Mills mass-gap claim"
 )
 
 
@@ -249,6 +251,7 @@ def seal_strong_coupling_certificate(
             "beta": float(result.beta),
             "spacetime_dim": int(result.spacetime_dim),
             "coordination": int(result.coordination),
+            "counting": result.counting,
             "subdominant_ratio_upper": float(result.subdominant_ratio_upper),
             "spectral_gap_lower": float(result.spectral_gap_lower),
             "in_convergence_domain": True,
@@ -291,8 +294,10 @@ def strong_coupling_schema_errors(cert: Certificate) -> list[str]:
         errors.append(f"schema_version must be {STRONG_COUPLING_SCHEMA_VERSION!r}")
     if cert.get("continuum_claim", True):
         errors.append("continuum_claim must be False")
-    if cert.get("method") != POLYMER_METHOD:
-        errors.append(f"method must be {POLYMER_METHOD!r}")
+    if cert.get("method") not in (POLYMER_METHOD, CRUDE_POLYMER_METHOD):
+        errors.append(
+            f"method must be {POLYMER_METHOD!r} or {CRUDE_POLYMER_METHOD!r}"
+        )
     if cert.get("in_convergence_domain") is not True:
         errors.append("in_convergence_domain must be True")
     honesty = cert.get("honesty", {})
@@ -325,8 +330,13 @@ def replay_strong_coupling_gap(cert: Certificate) -> bool | None:
     dim = cert.get("spacetime_dim")
     if beta is None or not isinstance(dim, int) or isinstance(dim, bool):
         return None
+    counting = cert.get("counting", "backtrack")
+    if counting not in ("backtrack", "crude"):
+        return False
     try:
-        fresh = certified_strong_coupling_glueball_bound(beta, spacetime_dim=dim)
+        fresh = certified_strong_coupling_glueball_bound(
+            beta, spacetime_dim=dim, counting=counting
+        )
     except (ValueError, TypeError):
         return False
     if not fresh.certified:
@@ -341,13 +351,165 @@ def replay_strong_coupling_gap(cert: Certificate) -> bool | None:
     return not sealed_gap > fresh.spectral_gap_lower + tolerance
 
 
+#: Schema version of the sealed two-plaquette Hamiltonian gap certificate.
+HAMILTONIAN_GAP_SCHEMA_VERSION = "verified-hamiltonian-gap-1"
+
+#: The :class:`~omnibias.core.proof.Conjecture` kind this certificate answers.
+HAMILTONIAN_GAP_KIND = "two_plaquette_hamiltonian_gap"
+
+_HAMILTONIAN_NOTE = (
+    "certified spectral gap of one finite two-plaquette SU(2) Kogut-Susskind "
+    "Hamiltonian at one coupling and one spin truncation; NOT a continuum-limit, "
+    "infinite-volume, or Yang-Mills mass-gap claim"
+)
+
+
+def seal_hamiltonian_gap_certificate(
+    result: Any,
+    hamiltonian: Any,
+    *,
+    claim: str = "",
+) -> Certificate:
+    """Seal a :class:`~.hamiltonian.HamiltonianGapResult`.  Refuses an uncertified gap."""
+    if not result.certified:
+        raise ValueError(
+            "refusing to seal an uncertified Hamiltonian gap "
+            "(non-positive λ1-λ0 lower bound)"
+        )
+    return seal_certificate(
+        {
+            "schema_version": HAMILTONIAN_GAP_SCHEMA_VERSION,
+            "claim": claim or f"{result.model} Hamiltonian gap",
+            "observable": HAMILTONIAN_GAP_KIND,
+            "model": result.model,
+            "method": result.method,
+            "dimension": int(result.dimension),
+            "coupling": float(result.coupling),
+            "j_max": int(result.j_max),
+            "subdominant_ratio_upper": float(result.subdominant_ratio_upper),
+            "spectral_gap_lower": float(result.spectral_gap_lower),
+            "lambda0_upper": float(result.lambda0_upper),
+            "lambda1_lower": float(result.lambda1_lower),
+            "parameters": dict(hamiltonian.parameters),
+            "trial_gram_condition": result.trial_gram_condition,
+            "trial_flagged": bool(result.trial_flagged),
+            "trial_remainder_width": float(result.trial_remainder_width),
+            "continuum_claim": False,
+            "honesty": {
+                "unproven_claim": False,
+                "continuum_claim": False,
+                "fixed_spacing": True,
+                "finite_truncation": True,
+                "interval_verified": True,
+                "yang_mills_claim": False,
+                "note": _HAMILTONIAN_NOTE,
+            },
+        }
+    )
+
+
+def hamiltonian_gap_schema_errors(cert: Certificate) -> list[str]:
+    """Validate a ``verified-hamiltonian-gap-1`` certificate."""
+    errors: list[str] = []
+    required = (
+        "schema_version",
+        "observable",
+        "model",
+        "method",
+        "dimension",
+        "coupling",
+        "j_max",
+        "subdominant_ratio_upper",
+        "spectral_gap_lower",
+        "parameters",
+        "trial_gram_condition",
+        "trial_flagged",
+        "trial_remainder_width",
+        "continuum_claim",
+        "honesty",
+        "digest",
+    )
+    for key in required:
+        if key not in cert:
+            errors.append(f"missing top-level key: {key!r}")
+    if cert.get("schema_version") != HAMILTONIAN_GAP_SCHEMA_VERSION:
+        errors.append(f"schema_version must be {HAMILTONIAN_GAP_SCHEMA_VERSION!r}")
+    if cert.get("continuum_claim", True):
+        errors.append("continuum_claim must be False")
+    if cert.get("observable") != HAMILTONIAN_GAP_KIND:
+        errors.append(f"observable must be {HAMILTONIAN_GAP_KIND!r}")
+    honesty = cert.get("honesty", {})
+    if not isinstance(honesty, Mapping):
+        errors.append("honesty must be a mapping")
+        honesty = {}
+    if honesty.get("unproven_claim", True):
+        errors.append("honesty.unproven_claim must be False")
+    if honesty.get("continuum_claim", True):
+        errors.append("honesty.continuum_claim must be False")
+    if honesty.get("yang_mills_claim", True):
+        errors.append("honesty.yang_mills_claim must be False")
+    ratio = _as_float(cert.get("subdominant_ratio_upper"))
+    if ratio is None or not 0.0 <= ratio < 1.0:
+        errors.append("subdominant_ratio_upper must lie in [0, 1)")
+    gap = _as_float(cert.get("spectral_gap_lower"))
+    if gap is None or gap <= 0.0:
+        errors.append("spectral_gap_lower must be > 0")
+    coupling = _as_float(cert.get("coupling"))
+    if coupling is None or coupling <= 0.0:
+        errors.append("coupling must be > 0")
+    j_max = cert.get("j_max")
+    if not isinstance(j_max, int) or isinstance(j_max, bool) or j_max < 1:
+        errors.append("j_max must be an integer >= 1")
+    if "digest" in cert and not verify_certificate_digest(cert):
+        errors.append("digest does not match the certificate body (tampered/stale)")
+    return errors
+
+
+def replay_hamiltonian_gap(cert: Certificate) -> bool | None:
+    """Independently re-derive the Hamiltonian gap from ``(coupling, j_max)``."""
+    from omnibias.geometry.gauge.transfer.hamiltonian import (
+        certified_hamiltonian_gap,
+        plaquette_holonomy_trial_space,
+        rebuild_hamiltonian,
+    )
+
+    parameters = cert.get("parameters")
+    if not isinstance(parameters, Mapping) or not parameters:
+        return None
+    try:
+        hamiltonian = rebuild_hamiltonian(parameters)
+        trial = (
+            plaquette_holonomy_trial_space(hamiltonian)
+            if cert.get("trial_gram_condition") is not None
+            else None
+        )
+        fresh = certified_hamiltonian_gap(hamiltonian, trial=trial)
+    except (ValueError, TypeError, KeyError):
+        return False
+    if not fresh.certified:
+        return False
+    sealed_ratio = _as_float(cert.get("subdominant_ratio_upper"))
+    sealed_gap = _as_float(cert.get("spectral_gap_lower"))
+    if sealed_ratio is None or sealed_gap is None:
+        return False
+    tolerance = 1e-9
+    if sealed_ratio < fresh.subdominant_ratio_upper - tolerance:
+        return False
+    return not sealed_gap > fresh.spectral_gap_lower + tolerance
+
+
 __all__ = [
+    "HAMILTONIAN_GAP_KIND",
+    "HAMILTONIAN_GAP_SCHEMA_VERSION",
     "STRONG_COUPLING_KIND",
     "STRONG_COUPLING_SCHEMA_VERSION",
     "TRANSFER_GAP_KIND",
     "TRANSFER_GAP_SCHEMA_VERSION",
+    "hamiltonian_gap_schema_errors",
+    "replay_hamiltonian_gap",
     "replay_strong_coupling_gap",
     "replay_transfer_matrix_gap",
+    "seal_hamiltonian_gap_certificate",
     "seal_strong_coupling_certificate",
     "seal_transfer_gap_certificate",
     "strong_coupling_schema_errors",

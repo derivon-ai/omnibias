@@ -137,6 +137,7 @@ transfer-matrix prover lives in its own registry rather than the default machine
 |---|---|---|
 | `transfer_matrix_spectral_gap` | `certified_transfer_matrix_gap` (`omnibias.geometry.gauge.transfer`) | No — a gap below the requested threshold → `BLOCKED` |
 | `strong_coupling_glueball_gap` | `certified_strong_coupling_glueball_bound` (crude polymer count at one `β`) | No — out of domain or a gap below the requested threshold → `BLOCKED` |
+| `two_plaquette_hamiltonian_gap` | `certified_hamiltonian_gap` (finite two-plaquette KS `λ1-λ0`) | No — a gap below the requested threshold → `BLOCKED` |
 
 ```python
 from omnibias.core.proof import Conjecture
@@ -146,6 +147,7 @@ gauge = build_gauge_machine()
 assert sorted(gauge.kinds()) == [
     "strong_coupling_glueball_gap",
     "transfer_matrix_spectral_gap",
+    "two_plaquette_hamiltonian_gap",
 ]
 
 verdict = gauge.evaluate(

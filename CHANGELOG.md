@@ -6,6 +6,32 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — two-plaquette SU(2) Hamiltonian gap
+
+- `su2_two_plaquette_hamiltonian` and `certified_hamiltonian_gap` certify
+  `λ1-λ0` of one finite Kogut–Susskind operator on Gauss-law triples
+  `|j1,j2,js⟩`. Holonomy trials are measured against the standard basis
+  (G1 factor is recorded, not invented). Sealed
+  `verified-hamiltonian-gap-1` registers as `two_plaquette_hamiltonian_gap`.
+  Not a continuum or Yang-Mills claim.
+
+### Added — SU(3) Wilson transfer via enclosed Haar
+
+- `su3_wilson_transfer` builds a diagonal character-basis matrix whose
+  eigenvalues are interval enclosures of the Wilson Haar integrals on the
+  SU(3) torus (`(p,q)≤1` truncation). Not a product of ordinary `I_n`,
+  not 4-D SU(3) Yang-Mills.
+
+### Added — backtrack polymer majorant and named coordination identities
+
+- `certified_strong_coupling_glueball_bound` defaults to the
+  backtrack-excluding tree count `C = 3(2d-3)` (`15` in 4-D) and locks
+  `BETA_LOCK = 1/4`. The older `C = 24` overcount stays available as
+  `counting="crude"`. Method tag `backtrack_polymer_count`; still not
+  Osterwalder-Seiler and not a continuum claim.
+- `OmnibiasAnalytic.Check.Polymer` proves `3*(2*4-3)=15` and `15<24`.
+  `polymer_certificate` seals a locked family (`polymer` obligation class).
+
 ### Added — holonomy trial spaces on finite transfer matrices
 
 - `holonomy_trial_space` builds gauge-invariant character trials on the

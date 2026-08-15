@@ -298,12 +298,22 @@ the relevant op:
   Optional holonomy `trial=` spaces are characters of closed loops on a dense
   angle / class-angle grid; they may tighten a variational bound for that
   matrix. They do not take a continuum limit.
-- **`certified_strong_coupling_glueball_bound`** is a **crude polymer-count**
+- **`certified_strong_coupling_glueball_bound`** is a **polymer-count**
   lower bound for SU(2) Wilson at **one fixed `β`** and spacing
-  (`m a ≥ -ln(C u)` with locked `C = 8(d-1)`). `certified=True` only inside
-  the interval-certified domain `C u < 1`. It is **not** a continuum claim,
-  **not** a uniform-in-spacing bound, and **not** the Yang-Mills mass gap.
-  The method tag is `crude_polymer_count`.
+  (`m a ≥ -ln(C u)` with default backtrack `C = 3(2d-3)`). `certified=True`
+  only inside the interval-certified domain `C u < 1`. It is **not** a
+  continuum claim, **not** a uniform-in-spacing bound, and **not** the
+  Yang-Mills mass gap. The default method tag is `backtrack_polymer_count`.
+- **`su3_wilson_transfer`** encloses SU(3) Wilson character coefficients
+  by interval Haar quadrature on the maximal torus at **one fixed `β`**.
+  The matrix is the `(p, q) ≤ 1` truncation. It is **not** a product of
+  ordinary Bessel functions, **not** 4-D SU(3) Yang-Mills, and **not** a
+  continuum claim.
+- **`certified_hamiltonian_gap`** is a sound lower bound on `λ1 - λ0` of
+  **one finite two-plaquette SU(2) Kogut–Susskind Hamiltonian** at one
+  coupling and one spin truncation. It is **not** a continuum claim,
+  **not** a uniform-in-spacing bound, and **not** the Yang-Mills mass
+  gap.
 - **`omnibias-qpinn` Bloch cage** supports orders ≤ 2 on a **single axis** in
   v0.0.1; multi-axis mixed partials need the Leibniz expansion (planned).
 - **Random-feature fields** are accurate only inside the support of their

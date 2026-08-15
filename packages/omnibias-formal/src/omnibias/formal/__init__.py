@@ -48,6 +48,10 @@ from omnibias.formal.nk import (
     LEGAL_NK_ROUTES,
     nk_existence_certificate,
 )
+from omnibias.formal.polymer import (
+    LEGAL_POLYMER_FAMILIES,
+    polymer_certificate,
+)
 from omnibias.formal.tower import (
     LEGAL_TOWER_FAMILIES,
     tower_coeffs,
@@ -73,6 +77,7 @@ __all__ = [
     "LEGAL_NAMED_FAMILIES",
     "LEGAL_NK_FAMILIES",
     "LEGAL_NK_ROUTES",
+    "LEGAL_POLYMER_FAMILIES",
     "LEGAL_TOWER_FAMILIES",
     "LEGAL_TRACE_FAMILIES",
     "MATHLIB_CLAIM_KEY",
@@ -92,6 +97,7 @@ __all__ = [
     "mathlib_check_available",
     "named_zero_certificate",
     "nk_existence_certificate",
+    "polymer_certificate",
     "tower_coeffs",
     "tower_coeffs_certificate",
 ]

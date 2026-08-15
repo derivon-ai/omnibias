@@ -372,9 +372,13 @@ continuum limit or a claim about the Yang-Mills mass gap.
 | `su2_class_angle_transfer` | `angle` | the same `su(2)` spectrum, in a **dense, entrywise-positive** basis that can be sampled |
 | `su3_heat_kernel_transfer` | `character` | `e^{-t C₂(p,q)}`; the conjugate pair `(p,q) ↔ (q,p)` makes the subdominant mode doubly degenerate |
 | `su2_wilson_transfer` | `character` | `I_m(β)` via `besseli_iv`; the slowly-decaying tail the partner-chain deflation exists for |
+| `su3_wilson_transfer` | `character` | Haar-integral enclosures of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤1` truncation, not a product of ordinary `I_n` |
 
-Because the spectrum is known in closed form for all of them, a certified bound
-can be checked against the exact answer rather than merely believed.
+Heat-kernel and SU(2) Wilson spectra are known in closed form, so a certified
+bound can be checked against the exact answer. SU(3) Wilson eigenvalues are
+interval enclosures of a Haar integral at one coupling; a numerical sample of
+each coefficient must lie in its enclosure. Neither constructor is 4-D
+Yang-Mills.
 
 ```python
 from omnibias.geometry.gauge.transfer import (
@@ -505,13 +509,14 @@ only the interval arithmetic is proof.
 
 `certified_strong_coupling_glueball_bound` is a **self-contained** lower bound
 on a 4-D SU(2) Wilson glueball mass at one fixed `β`, using the character
-activity `u(β) = I₂(β)/I₁(β)` and a locked plaquette-surface counting majorant
-`C = 8(d-1)` (`C = 24` in four dimensions). The bound is
-`m a ≥ -ln(C u)` and is `certified=True` only when the interval product
-`C u` is strictly less than 1. Out of that domain the leading activity is
-still returned and must not be sealed as proved.
+activity `u(β) = I₂(β)/I₁(β)` and a locked plaquette-surface counting majorant.
+The default is the backtrack-excluding tree count `C = 3(2d-3)` (`C = 15`
+in four dimensions). The older overcount `C = 8(d-1)` remains available as
+`counting="crude"`. The bound is `m a ≥ -ln(C u)` and is `certified=True`
+only when the interval product `C u` is strictly less than 1. Out of that
+domain the leading activity is still returned and must not be sealed as proved.
 
-This is crude counting at one coupling and one spacing. It is **not** a
+This is counting at one coupling and one spacing. It is **not** a
 continuum claim and **not** a formalization of Osterwalder-Seiler.
 
 ```python
@@ -524,12 +529,35 @@ from omnibias.geometry.gauge.transfer import (
 polymer = certified_strong_coupling_glueball_bound(BETA_LOCK)
 assert polymer.certified
 assert polymer.spectral_gap_lower > 0.0
-assert polymer.method == "crude_polymer_count"
+assert polymer.method == "backtrack_polymer_count"
+assert polymer.coordination == 15
 
 # Infinite character-basis Wilson transfer (0+1-D, still not 4-D YM).
 wilson = certified_wilson_character_gap(BETA_LOCK)
 assert wilson.certified
 assert wilson.spectral_gap_lower > polymer.spectral_gap_lower
+```
+
+### Two-plaquette Kogut–Susskind Hamiltonian
+
+`su2_two_plaquette_hamiltonian` is a **multi-link** SU(2) operator on the
+Gauss-law triples `|j1, j2, js⟩`. Its spectrum is not known in closed form,
+so a holonomy trial space is not secretly the eigenbasis.
+`certified_hamiltonian_gap` lower-bounds `λ1 - λ0` of **this** finite
+matrix at one `g²` and one `j_max`. It is not 4-D Yang-Mills and the
+continuum limit is not taken.
+
+```python
+from omnibias.geometry.gauge.transfer import (
+    COUPLING_LOCK,
+    certified_hamiltonian_gap,
+    su2_two_plaquette_hamiltonian,
+)
+
+hamiltonian = su2_two_plaquette_hamiltonian(COUPLING_LOCK, j_max=1)
+h_gap = certified_hamiltonian_gap(hamiltonian)
+assert h_gap.certified
+assert h_gap.spectral_gap_lower > 0.0
 ```
 
 ### Scaling across spacings, honestly

@@ -210,6 +210,13 @@ output, and the Monte Carlo comparison already implemented.
   eigenbasis, so the measured factor in
   `docs/benchmarks/gauge_holonomy_gap_smoke.json` is `1.0` (and the bound
   recovers essentially all of the closed-form gap). Do not invent `5x`.
+  The two-plaquette Kogut–Susskind Hamiltonian
+  (`benchmarks/gauge_two_plaquette_gap.py`) is the non-diagonal object:
+  holonomy trials are not the eigenbasis. Its official engine is a
+  complete residual cover of `λ1-λ0`, so the recorded G1 factor in
+  `docs/benchmarks/gauge_two_plaquette_gap_smoke.json` is also measured
+  (not a claimed `5x`). That gap is one finite matrix. It is not a Clay
+  / continuum claim.
 - **G2 soundness.** The certified bound never exceeds the true gap, verified
   against high-precision eigenvalues on `1000` synthetic matrices. **A single
   violation is a bug.**

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-r"""Crude strong-coupling polymer bound for 4-D SU(2) Wilson at fixed ``β``.
+r"""Strong-coupling polymer bound for 4-D SU(2) Wilson at fixed ``β``.
 
 Two finite objects, neither of which is continuum Yang-Mills:
 
@@ -10,33 +10,39 @@ Two finite objects, neither of which is continuum Yang-Mills:
   ``n_modes`` truncation of that series).
 * :func:`certified_strong_coupling_glueball_bound` turns the same activity
   ``u(β) = I₂(β)/I₁(β)`` into a **self-contained** lower bound
-  ``m a ≥ -ln(C u)`` on a 4-D lattice glueball mass, using a locked
-  plaquette-surface counting majorant ``C = 8(d-1)``.  ``certified=True``
-  only when the interval-certified product ``C u`` is strictly less than 1.
+  ``m a ≥ -ln(C u)`` on a 4-D lattice glueball mass.  The default majorant
+  is the backtrack-excluding tree count ``C = 3(2d-3)`` (15 in four
+  dimensions).  The older overcount ``C = 8(d-1)`` remains available as
+  ``counting="crude"``.  ``certified=True`` only when ``C u.hi < 1``.
 
-The counting constant is derived in :func:`polymer_coordination` and is
-deliberately crude (it overcounts backtracking).  The method tag is
-``crude_polymer_count``, not a formalization of Osterwalder-Seiler.  Every
-result is one coupling, one spacing, one group; ``continuum_claim`` stays
-false.
+Neither count is a formalization of Osterwalder-Seiler.  Every result is
+one coupling, one spacing, one group; ``continuum_claim`` stays false.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass
 from fractions import Fraction
+from typing import Literal
 
 from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.series import geometric_tail_enclosure
 from omnibias.core.verified.transcend import besseli_iv, ln_iv
 
 Scalar = float | int | Fraction
+Counting = Literal["backtrack", "crude"]
 
-#: Locked test coupling that interval-certifies ``C u < 1`` for ``d = 4``.
-BETA_LOCK = Fraction(1, 8)
+#: Locked test coupling that interval-certifies ``C u < 1`` for backtrack, ``d=4``.
+BETA_LOCK = Fraction(1, 4)
 
-#: Method tag on a certified polymer bound (not a literature theorem name).
-POLYMER_METHOD = "crude_polymer_count"
+#: Locked coupling that interval-certifies the cruder ``C = 24`` majorant.
+BETA_LOCK_CRUDE = Fraction(1, 8)
+
+#: Default method tag (not a literature theorem name).
+POLYMER_METHOD = "backtrack_polymer_count"
+
+#: Older overcounting majorant.
+CRUDE_POLYMER_METHOD = "crude_polymer_count"
 
 #: Method tag on the infinite-character Wilson gap.
 WILSON_CHARACTER_METHOD = "wilson_character_bessel_ratio"
@@ -54,6 +60,23 @@ def polymer_coordination(spacetime_dim: int) -> int:
     if spacetime_dim < 2:
         raise ValueError(f"spacetime_dim must be >= 2, got {spacetime_dim}")
     return 8 * (int(spacetime_dim) - 1)
+
+
+def polymer_coordination_backtrack(spacetime_dim: int) -> int:
+    """Backtrack-excluding tree majorant ``C = 3(2d - 3)``.
+
+    A connected n-plaquette surface through a fixed plaquette is majorized
+    by rooted trees (trees overcount surfaces that have cycles).  Each new
+    plaquette attaches along one edge and has 3 free edges; each free edge
+    has at most ``2(d-1)-1 = 2d-3`` other plaquettes (no immediate
+    backtrack through the attachment).  Hence ``N_n ≤ C^{n-1}`` with
+    ``C = 3(2d-3)``.  For ``d = 4`` this is ``C = 15``.
+
+    Still a counting majorant, not Osterwalder-Seiler.
+    """
+    if spacetime_dim < 2:
+        raise ValueError(f"spacetime_dim must be >= 2, got {spacetime_dim}")
+    return 3 * (2 * int(spacetime_dim) - 3)
 
 
 def su2_wilson_activity(beta: Scalar) -> Interval:
@@ -85,11 +108,12 @@ class WilsonCharacterGapResult:
 
 @dataclass(frozen=True)
 class StrongCouplingGapResult:
-    """Crude polymer lower bound on a 4-D SU(2) Wilson glueball mass at one ``β``."""
+    """Polymer lower bound on a 4-D SU(2) Wilson glueball mass at one ``β``."""
 
     beta: float
     spacetime_dim: int
     coordination: int
+    counting: str
     activity: Interval
     activity_times_c: Interval
     tail_bound: Interval | None
@@ -134,14 +158,22 @@ def certified_strong_coupling_glueball_bound(
     beta: Scalar,
     *,
     spacetime_dim: int = 4,
+    counting: Counting = "backtrack",
 ) -> StrongCouplingGapResult:
-    """Crude polymer lower bound ``m a ≥ -ln(C u(β))`` at one fixed ``β``.
+    """Polymer lower bound ``m a ≥ -ln(C u(β))`` at one fixed ``β``.
 
     ``certified=True`` only when ``C u.hi < 1``.  Out of domain the leading
     activity is still returned and ``certified`` stays ``False`` -- do not
     seal that result as proved.
     """
-    coordination = polymer_coordination(spacetime_dim)
+    if counting == "backtrack":
+        coordination = polymer_coordination_backtrack(spacetime_dim)
+        method = POLYMER_METHOD
+    elif counting == "crude":
+        coordination = polymer_coordination(spacetime_dim)
+        method = CRUDE_POLYMER_METHOD
+    else:
+        raise ValueError(f"counting must be 'backtrack' or 'crude', got {counting!r}")
     activity = su2_wilson_activity(beta)
     product = Interval.from_value(coordination) * activity
     in_domain = product.hi < 1.0
@@ -151,29 +183,35 @@ def certified_strong_coupling_glueball_bound(
             beta=float(beta),
             spacetime_dim=int(spacetime_dim),
             coordination=coordination,
+            counting=counting,
             activity=activity,
             activity_times_c=product,
             tail_bound=None,
             spectral_gap_lower=0.0,
             subdominant_ratio_upper=float(product.hi),
             in_convergence_domain=False,
+            method=method,
         )
     gap = -ln_iv(product)
     return StrongCouplingGapResult(
         beta=float(beta),
         spacetime_dim=int(spacetime_dim),
         coordination=coordination,
+        counting=counting,
         activity=activity,
         activity_times_c=product,
         tail_bound=tail,
         spectral_gap_lower=float(gap.lo),
         subdominant_ratio_upper=float(product.hi),
         in_convergence_domain=True,
+        method=method,
     )
 
 
 __all__ = [
     "BETA_LOCK",
+    "BETA_LOCK_CRUDE",
+    "CRUDE_POLYMER_METHOD",
     "POLYMER_METHOD",
     "WILSON_CHARACTER_METHOD",
     "StrongCouplingGapResult",
@@ -181,5 +219,6 @@ __all__ = [
     "certified_strong_coupling_glueball_bound",
     "certified_wilson_character_gap",
     "polymer_coordination",
+    "polymer_coordination_backtrack",
     "su2_wilson_activity",
 ]
