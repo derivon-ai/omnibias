@@ -30,6 +30,14 @@ from omnibias.geometry.gauge._core.covariant_jet import (
     global_gauge_transform_connection,
     random_special_unitary,
 )
+from omnibias.geometry.gauge._core.data_paths import (
+    ConnectionSource,
+    LatticeLinkField,
+    is_scalar_integral_column_name,
+    refuse_connection_jet_from_links,
+    refuse_lattice_random_feature_jet,
+    refuse_scalar_integral_as_ym_weak_form,
+)
 from omnibias.geometry.gauge._core.forms import (
     LieAlgebraValuedForm,
     hodge_star_flat,
@@ -89,10 +97,21 @@ from omnibias.geometry.gauge._core.representation import (
     trivial,
     weight_multiplicities,
 )
+from omnibias.geometry.gauge._core.weak_ym import (
+    WEAK_YM_FLOOR,
+    AdjointTestBank,
+    AdjointTestOneForm,
+    evaluate_weak_ym_identity,
+    gaussian_adjoint_test_bank,
+    weak_yang_mills_residuals,
+)
 
 __all__ = [
     "ADJOINT_BIANCHI",
     "ADJOINT_YM",
+    "AdjointTestBank",
+    "AdjointTestOneForm",
+    "ConnectionSource",
     "EUCLIDEAN_4D",
     "GaugeConnectionSpec",
     "GaugeCovariantJet",
@@ -102,6 +121,7 @@ __all__ = [
     "Irrep",
     "LEGAL_ADJOINT_1FORM_ATOMS",
     "LEGAL_SINGLET_ATOMS",
+    "LatticeLinkField",
     "LieAlgebra",
     "LieAlgebraValuedForm",
     "MAX_SEARCHABLE_DIM6_SU3",
@@ -118,6 +138,7 @@ __all__ = [
     "SU3_4D_DF_BIANCHI_REDUCED",
     "SU3_4D_DF_RAW",
     "SU3_4D_F",
+    "WEAK_YM_FLOOR",
     "adjoint",
     "adjoint_rep_matrices",
     "antisymmetric_power",
@@ -136,12 +157,15 @@ __all__ = [
     "enumerate_gauge_invariants",
     "evaluate_gauge_law_gate",
     "evaluate_named_invariants",
+    "evaluate_weak_ym_identity",
     "fundamental",
+    "gaussian_adjoint_test_bank",
     "gauge_connection_spec",
     "gauge_equivariance_defect",
     "global_gauge_transform_connection",
     "hodge_star_flat",
     "irrep",
+    "is_scalar_integral_column_name",
     "levi_civita_symbol",
     "permutation_sign",
     "quadratic_casimir",
@@ -149,8 +173,11 @@ __all__ = [
     "raw_connection_jet_dimension",
     "raw_covariant_fiber_dimension",
     "refuse_component_fiber_library",
+    "refuse_connection_jet_from_links",
     "refuse_coordinate_jet_library",
     "refuse_flattened_adjoint_library",
+    "refuse_lattice_random_feature_jet",
+    "refuse_scalar_integral_as_ym_weak_form",
     "representation_complexity",
     "sorted_index_sets",
     "su",
@@ -161,6 +188,7 @@ __all__ = [
     "thooft_eta",
     "trivial",
     "u1",
+    "weak_yang_mills_residuals",
     "wedge",
     "weight_multiplicities",
 ]

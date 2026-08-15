@@ -243,6 +243,24 @@ class GaugeCovariantJet:
             signature=tuple(int(s) for s in signature),
         )
 
+    @classmethod
+    def from_lattice_links(cls, links: object, **_kwargs: object) -> GaugeCovariantJet:
+        """Refused: never form ``partial^k A`` from lattice links."""
+        from omnibias.geometry.gauge._core.data_paths import (
+            refuse_connection_jet_from_links,
+        )
+
+        refuse_connection_jet_from_links(links)
+
+    @classmethod
+    def from_neural_fields(cls, fields: object, **_kwargs: object) -> GaugeCovariantJet:
+        """Refused: a random-feature interpolant is not a gauge-field jet."""
+        from omnibias.geometry.gauge._core.data_paths import (
+            refuse_lattice_random_feature_jet,
+        )
+
+        refuse_lattice_random_feature_jet(fields)
+
     @property
     def batch(self) -> int:
         return int(self.F.shape[0])

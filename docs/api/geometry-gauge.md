@@ -167,6 +167,27 @@ Default search atoms at mass dimension 4 are `tr(F^2)` and `tr(F*Ftilde)`.
 Bianchi is an identity, not a feature. Flattened `F_01_2` / `D^k F` component
 libraries raise. This is not a Hilbert-series completeness claim.
 
+## Data paths (noise amplification)
+
+High-order `partial^k` on a lattice or mesh is a high-pass filter. The legal
+continuum path is closed-form `A, dA, ddA` (analytic / spectral) or a weak
+Yang-Mills residual against a bank of smooth adjoint test 1-forms. Lattice
+links stay links: the legal local atom is a plaquette, never `partial^k A`.
+Interpolating links with a random-feature field and then reading a jet is
+refused. 1-D Fredholm / Volterra columns are not the 4-D Yang-Mills weak
+form. A typical Monte Carlo vacuum does not satisfy `D*F = 0`; this is not
+a mass-gap claim.
+
+::: omnibias.geometry.gauge._core.data_paths
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.geometry.gauge._core.weak_ym
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ::: omnibias.geometry.gauge._core.invariants
     options:
       show_root_heading: false

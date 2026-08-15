@@ -121,6 +121,25 @@ dictionary = GaugeInvariantDictionary.build(
 assert len(dictionary.legal_names) == 2
 ```
 
+The legal continuum path is analytic arrays or a weak residual against
+adjoint test 1-forms, never a random-feature interpolant of lattice links.
+
+```python
+from omnibias.geometry.gauge import evaluate_weak_ym_identity
+
+report = evaluate_weak_ym_identity(jet, x, atol=1e-7, n_tests=6)
+assert report["passed"]
+assert report["yang_mills_claim"] is False
+assert report["continuum_claim"] is False
+raised = False
+try:
+    GaugeCovariantJet.from_lattice_links(None)
+except ValueError as exc:
+    text = str(exc).lower()
+    raised = "lattice" in text
+assert raised
+```
+
 !!! note "Scope"
     `omnibias.geometry.gauge` ships the full **continuum** primitive set **and** an SU(2)
     lattice Monte-Carlo engine (`omnibias.geometry.gauge.lattice`, torch + JAX): heat-bath,

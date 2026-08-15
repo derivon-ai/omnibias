@@ -40,6 +40,10 @@ try:
         assert_library_gauge_legal,
         evaluate_gauge_law_gate,
     )
+    from omnibias.geometry.gauge._core.data_paths import (
+        is_scalar_integral_column_name,
+        refuse_scalar_integral_as_ym_weak_form,
+    )
     from omnibias.geometry.gauge._core.instanton import bpst_instanton_arrays
     from omnibias.geometry.gauge._core.invariants import (
         GaugeInvariantDictionary,
@@ -49,6 +53,11 @@ try:
         refuse_flattened_adjoint_library,
     )
     from omnibias.geometry.gauge._core.lie_algebra import LieAlgebra, su
+    from omnibias.geometry.gauge._core.weak_ym import (
+        AdjointTestBank,
+        gaussian_adjoint_test_bank,
+        weak_yang_mills_residuals,
+    )
 except ImportError as exc:  # pragma: no cover - optional extra
     raise ImportError(_GAUGE_EXTRA_HINT) from exc
 
@@ -97,6 +106,9 @@ def _merge_singlets(
     if extra_columns_fn is None:
         return cols
     extra = extra_columns_fn(jet)
+    banned = [name for name in extra if is_scalar_integral_column_name(name)]
+    if banned:
+        refuse_scalar_integral_as_ym_weak_form(banned)
     if any(name in LEGAL_ADJOINT_1FORM_ATOMS for name in extra):
         raise TypeError(
             "adjoint 1-form atoms cannot be mixed into the singlet discoverer; "
@@ -451,6 +463,29 @@ def discover_yang_mills_invariant_law(
     }
 
 
+def weak_ym_columns(
+    jet: GaugeCovariantJet,
+    points: np.ndarray,
+    *,
+    n_tests: int = 8,
+    rng: np.random.Generator | None = None,
+    bank: AdjointTestBank | None = None,
+) -> np.ndarray:
+    """Weak Yang-Mills residual vector. Identity check, not a STLSQ headline."""
+    _reject_field_jet(jet, "jet")
+    tests = (
+        bank
+        if bank is not None
+        else gaussian_adjoint_test_bank(
+            points,
+            n_tests=n_tests,
+            algebra=jet.algebra,
+            rng=rng if rng is not None else np.random.default_rng(0),
+        )
+    )
+    return weak_yang_mills_residuals(jet, tests)
+
+
 __all__ = [
     "ConnectionArrays",
     "GaugeLawDiscoverer",
@@ -460,4 +495,5 @@ __all__ = [
     "discover_yang_mills_singlet_law",
     "make_yang_mills_bpst_split",
     "make_yang_mills_polynomial_split",
+    "weak_ym_columns",
 ]

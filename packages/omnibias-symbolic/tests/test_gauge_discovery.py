@@ -29,6 +29,7 @@ from omnibias.symbolic.gauge_discovery import (  # noqa: E402
     discover_yang_mills_singlet_law,
     make_yang_mills_bpst_split,
     make_yang_mills_polynomial_split,
+    weak_ym_columns,
 )
 
 BPST_RMSE_FLOOR = 1e-6
@@ -214,3 +215,36 @@ def test_flattened_component_names_raise_before_stlsq(illegal: str) -> None:
         with pytest.raises(ValueError, match="allowlisted"):
             disc.discover(train, val, test, connections=conns, extra_columns_fn=extra)
     assert called["stlsq"] is False
+
+
+@pytest.mark.parametrize("illegal", ["I(v)", "fredholm_K", "volterra_causal"])
+def test_scalar_integral_extra_raises_before_stlsq(illegal: str) -> None:
+    train, val, test, conns, _pts = make_yang_mills_bpst_split(seed=14, counts=(8, 4, 4))
+
+    def extra(jet):
+        return {illegal: np.ones(jet.batch)}
+
+    called = {"stlsq": False}
+
+    def _boom(*_args, **_kwargs):
+        called["stlsq"] = True
+        raise AssertionError("fit_sparse_equation must not run")
+
+    disc = GaugeLawDiscoverer()
+    with patch("omnibias.symbolic.gauge_discovery.fit_sparse_equation", _boom):
+        with pytest.raises(ValueError, match="Yang-Mills weak form"):
+            disc.discover(
+                train, val, test, connections=conns, extra_columns_fn=extra
+            )
+    assert called["stlsq"] is False
+
+
+def test_weak_ym_columns_are_identity_check_not_stlsq() -> None:
+    train, _val, _test, _conns, pts = make_yang_mills_bpst_split(
+        seed=15, counts=(16, 8, 8)
+    )
+    residuals = weak_ym_columns(
+        train, pts[0], n_tests=6, rng=np.random.default_rng(15)
+    )
+    assert residuals.shape == (6,)
+    assert float(np.max(np.abs(residuals))) < 1e-7

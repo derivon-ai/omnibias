@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — gauge data paths (noise amplification)
+
+- `ConnectionSource` / `LatticeLinkField` name the legal sources. Path D
+  (lattice or mesh links interpolated by a random-feature field, then
+  jetted) raises, as do `GaugeCovariantJet.from_lattice_links` /
+  `from_neural_fields` and 1-D Fredholm/Volterra-as-YM-weak-form.
+- `weak_yang_mills_residuals` / `evaluate_weak_ym_identity` contract
+  `D*F` against a Gaussian adjoint test 1-form bank. Identity check, not
+  a continuum or mass-gap claim. TV / GP are not product features.
+
 ### Added — gauge-invariant dictionary (search-space trap)
 
 - `GaugeInvariantDictionary` / `enumerate_gauge_invariants` generate

@@ -643,6 +643,7 @@ __all__ = [
     "warped_product_metric_field",
     "wasserstein2_to_gaussian",
     "wasserstein_to_gaussian",
+    "weak_ym_columns",
     "wedge",
     "write_artifacts",
     "write_blasius_artifacts",
@@ -656,6 +657,7 @@ _GAUGE_EXPORTS = frozenset(
         "discover_yang_mills_singlet_law",
         "make_yang_mills_bpst_split",
         "make_yang_mills_polynomial_split",
+        "weak_ym_columns",
     }
 )
 
