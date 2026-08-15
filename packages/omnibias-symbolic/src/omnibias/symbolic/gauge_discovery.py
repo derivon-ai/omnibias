@@ -41,6 +41,13 @@ try:
         evaluate_gauge_law_gate,
     )
     from omnibias.geometry.gauge._core.instanton import bpst_instanton_arrays
+    from omnibias.geometry.gauge._core.invariants import (
+        GaugeInvariantDictionary,
+        representation_complexity,
+    )
+    from omnibias.geometry.gauge._core.jet_dimension import (
+        refuse_flattened_adjoint_library,
+    )
     from omnibias.geometry.gauge._core.lie_algebra import LieAlgebra, su
 except ImportError as exc:  # pragma: no cover - optional extra
     raise ImportError(_GAUGE_EXTRA_HINT) from exc
@@ -63,13 +70,31 @@ def _reject_field_jet(obj: object, label: str) -> None:
         )
 
 
+def _resolve_dictionary(
+    dictionary: GaugeInvariantDictionary | None,
+    jet: GaugeCovariantJet,
+    mass_dimension: int,
+) -> GaugeInvariantDictionary:
+    if dictionary is not None:
+        return dictionary
+    return GaugeInvariantDictionary.build(
+        mass_dimension=mass_dimension,
+        max_cov_order=1,
+        algebra=jet.algebra,
+        roles=("search",),
+    )
+
+
 def _merge_singlets(
     jet: GaugeCovariantJet,
     extra_columns_fn: ExtraColumnsFn | None,
+    dictionary: GaugeInvariantDictionary,
 ) -> dict[str, np.ndarray]:
-    cols = dict(jet.singlets())
+    allow = dictionary.legal_names
+    cols = dictionary.evaluate(jet)
+    refuse_flattened_adjoint_library(cols)
+    assert_library_gauge_legal(cols, allow=allow)
     if extra_columns_fn is None:
-        assert_library_gauge_legal(cols)
         return cols
     extra = extra_columns_fn(jet)
     if any(name in LEGAL_ADJOINT_1FORM_ATOMS for name in extra):
@@ -77,10 +102,12 @@ def _merge_singlets(
             "adjoint 1-form atoms cannot be mixed into the singlet discoverer; "
             f"rejected {sorted(set(extra) & LEGAL_ADJOINT_1FORM_ATOMS)}"
         )
-    assert_library_gauge_legal(extra)
+    refuse_flattened_adjoint_library(extra)
+    assert_library_gauge_legal(extra, allow=allow)
     for name, col in extra.items():
         cols[name] = np.asarray(col, dtype=float).reshape(-1)
-    assert_library_gauge_legal(cols)
+    refuse_flattened_adjoint_library(cols)
+    assert_library_gauge_legal(cols, allow=allow)
     return cols
 
 
@@ -106,10 +133,12 @@ class GaugeLawResult:
 
 @dataclass(frozen=True)
 class GaugeLawDiscoverer:
-    """STLSQ over Weyl singlets of a :class:`GaugeCovariantJet`.
+    """STLSQ over a generated Weyl-singlet dictionary.
 
-    Never builds a coordinate library of ``partial^alpha A``. ``extra_columns_fn``
-    may only return allowlisted singlet names.
+    Never builds a coordinate library of ``partial^alpha A``. The default
+    dictionary is mass dimension 4, ``role=search`` only. Complexity is
+    representation-theoretic (mass dimension + number of traces), not a raw
+    monomial count.
     """
 
     max_degree: int = 1
@@ -118,6 +147,10 @@ class GaugeLawDiscoverer:
     complexity_weight: float = 2e-3
     random_state: int = 0
     gate_atol: float = 1e-10
+    mass_dimension: int = 4
+    dictionary: GaugeInvariantDictionary | None = None
+    selection_criterion: str | None = None
+    stability: bool = False
 
     def discover(
         self,
@@ -135,12 +168,16 @@ class GaugeLawDiscoverer:
         _reject_field_jet(test, "test")
         if self.max_degree != 1:
             raise ValueError("GaugeLawDiscoverer ships max_degree=1 only")
-        assert_library_gauge_legal([lhs_name])
+        dictionary = _resolve_dictionary(self.dictionary, train, self.mass_dimension)
+        allow = dictionary.legal_names
+        refuse_flattened_adjoint_library([lhs_name])
+        assert_library_gauge_legal([lhs_name], allow=allow)
+        atom_map = dictionary.atom_map()
 
         def _library(
             jet: GaugeCovariantJet,
         ) -> tuple[np.ndarray, np.ndarray, list[str]]:
-            cols = _merge_singlets(jet, extra_columns_fn)
+            cols = _merge_singlets(jet, extra_columns_fn, dictionary)
             names = [name for name in sorted(cols) if name != lhs_name]
             if not names:
                 raise ValueError("singlet library has no RHS atoms after dropping LHS")
@@ -166,8 +203,24 @@ class GaugeLawDiscoverer:
                 )
                 val_pred = equation.predict(val_design)
                 val_rmse = rmse(target_val, val_pred)
-                active_count = len(equation.active_terms())
-                score = val_rmse / scale + self.complexity_weight * active_count
+                active_names = [str(row["name"]) for row in equation.active_terms()]
+                if self.selection_criterion is None:
+                    score = (
+                        val_rmse / scale
+                        + self.complexity_weight
+                        * representation_complexity(active_names, atom_map)
+                    )
+                else:
+                    from omnibias.symbolic.selection import information_criterion
+
+                    train_resid = target_train - equation.predict(train_design)
+                    score = information_criterion(
+                        self.selection_criterion,
+                        int(target_train.shape[0]),
+                        float(train_resid @ train_resid),
+                        len(active_names) + 1,
+                        n_candidates=len(names),
+                    )
                 test_pred = equation.predict(test_design)
                 result = GaugeLawResult(
                     lhs_name=lhs_name,
@@ -181,14 +234,26 @@ class GaugeLawDiscoverer:
                     best = result
         assert best is not None
 
+        diagnostics: dict[str, object] = {
+            "dictionary_names": tuple(sorted(allow)),
+            "mass_dimension": dictionary.mass_dimension,
+        }
+        if self.stability:
+            from omnibias.symbolic.selection import stability_selection
+
+            diagnostics["stability_selection"] = stability_selection(
+                train_design,
+                target_train,
+                names,
+                seed=self.random_state,
+            )
+
         if connections is None:
-            diagnostics: dict[str, object] = {
-                "gauge_equivariance": {
-                    "passed": False,
-                    "reason": "connections_required",
-                    "yang_mills_claim": False,
-                    "continuum_claim": False,
-                }
+            diagnostics["gauge_equivariance"] = {
+                "passed": False,
+                "reason": "connections_required",
+                "yang_mills_claim": False,
+                "continuum_claim": False,
             }
             return GaugeLawResult(
                 lhs_name=best.lhs_name,
@@ -220,6 +285,7 @@ class GaugeLawDiscoverer:
                 "gauge-equivariance gate failed; refusing a gauge-variant law "
                 f"(residual_defect={gate['residual_defect']})"
             )
+        diagnostics["gauge_equivariance"] = gate
         return GaugeLawResult(
             lhs_name=best.lhs_name,
             equation=best.equation,
@@ -227,7 +293,7 @@ class GaugeLawDiscoverer:
             test_rmse=best.test_rmse,
             selection_score=best.selection_score,
             target_scale=best.target_scale,
-            diagnostics={"gauge_equivariance": gate},
+            diagnostics=diagnostics,
         )
 
 
@@ -340,7 +406,34 @@ def discover_yang_mills_singlet_law(
     random_state: int = 0,
 ) -> dict[str, object]:
     """Recover a sparse singlet law (BPST: ``tr(F^2) ~ 8 pi^2 tr(F*Ftilde)``)."""
-    discoverer = GaugeLawDiscoverer(random_state=random_state)
+    return discover_yang_mills_invariant_law(
+        train,
+        val,
+        test,
+        connections,
+        lhs_name=lhs_name,
+        random_state=random_state,
+        mass_dimension=4,
+    )
+
+
+def discover_yang_mills_invariant_law(
+    train: GaugeCovariantJet,
+    val: GaugeCovariantJet,
+    test: GaugeCovariantJet,
+    connections: tuple[ConnectionArrays, ConnectionArrays, ConnectionArrays],
+    *,
+    lhs_name: str = SINGLET_TR_F2,
+    random_state: int = 0,
+    mass_dimension: int = 4,
+    selection_criterion: str | None = None,
+) -> dict[str, object]:
+    """Dictionary-path discovery truncated by ``mass_dimension``."""
+    discoverer = GaugeLawDiscoverer(
+        random_state=random_state,
+        mass_dimension=mass_dimension,
+        selection_criterion=selection_criterion,
+    )
     result = discoverer.discover(
         train, val, test, lhs_name=lhs_name, connections=connections
     )
@@ -354,6 +447,7 @@ def discover_yang_mills_singlet_law(
         "lhs_name": result.lhs_name,
         "expected_self_dual_coefficient": SELF_DUAL_ACTION_OVER_TOPOLOGICAL,
         "self_dual_rhs": SINGLET_TR_F_FTILDE,
+        "mass_dimension": mass_dimension,
     }
 
 
@@ -362,6 +456,7 @@ __all__ = [
     "GaugeLawDiscoverer",
     "GaugeLawResult",
     "_GAUGE_EXTRA_HINT",
+    "discover_yang_mills_invariant_law",
     "discover_yang_mills_singlet_law",
     "make_yang_mills_bpst_split",
     "make_yang_mills_polynomial_split",

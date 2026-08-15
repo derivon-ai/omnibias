@@ -12,13 +12,20 @@ import pytest
 geometry = pytest.importorskip("omnibias.geometry")
 from omnibias.geometry.gauge._core.covariant_jet import (  # noqa: E402
     SELF_DUAL_ACTION_OVER_TOPOLOGICAL,
-    SINGLET_TR_F2,
     SINGLET_TR_F_FTILDE,
 )
+from omnibias.geometry.gauge._core.invariants import (  # noqa: E402
+    SINGLET_BIANCHI_SQ,
+    SINGLET_TR_F2,
+    GaugeInvariantDictionary,
+    representation_complexity,
+)
+from omnibias.geometry.gauge._core.lie_algebra import su  # noqa: E402
 from omnibias.symbolic.field_discovery import FieldJet  # noqa: E402
 from omnibias.symbolic.gauge_discovery import (  # noqa: E402
     _GAUGE_EXTRA_HINT,
     GaugeLawDiscoverer,
+    discover_yang_mills_invariant_law,
     discover_yang_mills_singlet_law,
     make_yang_mills_bpst_split,
     make_yang_mills_polynomial_split,
@@ -145,3 +152,65 @@ def test_lazy_export_from_package_root() -> None:
     from omnibias.symbolic import GaugeLawDiscoverer as exported
 
     assert exported is GaugeLawDiscoverer
+
+
+def test_default_dictionary_excludes_bianchi() -> None:
+    train, val, test, conns, _pts = make_yang_mills_bpst_split(seed=10, counts=(8, 4, 4))
+    out = GaugeLawDiscoverer().discover(train, val, test, connections=conns)
+    names = out.diagnostics["dictionary_names"]
+    assert SINGLET_BIANCHI_SQ not in names
+    assert SINGLET_TR_F2 in names
+
+
+def test_dim6_bpst_still_recovers_self_dual() -> None:
+    train, val, test, conns, _pts = make_yang_mills_bpst_split(seed=11)
+    out = discover_yang_mills_invariant_law(
+        train, val, test, conns, random_state=11, mass_dimension=6
+    )
+    assert out["diagnostics"]["gauge_equivariance"]["passed"] is True
+    assert float(out["test_rmse"]) < BPST_RMSE_FLOOR
+    terms = out["selected_terms"]
+    assert len(terms) == 1
+    assert terms[0]["name"] == SINGLET_TR_F_FTILDE
+
+
+def test_complexity_prior_unit() -> None:
+    dictionary = GaugeInvariantDictionary.build(
+        mass_dimension=6, max_cov_order=1, algebra=su(3)
+    )
+    atoms = dictionary.atom_map()
+    assert representation_complexity(["tr(F^2)"], atoms) < representation_complexity(
+        ["|DF|^2"], atoms
+    )
+
+
+def test_mdl_and_stability_on_reduced_dictionary() -> None:
+    train, val, test, conns, _pts = make_yang_mills_bpst_split(seed=12, counts=(16, 8, 8))
+    disc = GaugeLawDiscoverer(
+        mass_dimension=4, selection_criterion="mdl", stability=True, random_state=12
+    )
+    out = disc.discover(train, val, test, connections=conns)
+    assert out.diagnostics["gauge_equivariance"]["passed"] is True
+    assert "stability_selection" in out.diagnostics
+    ranking = out.diagnostics["stability_selection"]["ranking"]
+    assert ranking[0][0] == SINGLET_TR_F_FTILDE
+
+
+@pytest.mark.parametrize("illegal", ["A_0_0", "DF_0_12_1"])
+def test_flattened_component_names_raise_before_stlsq(illegal: str) -> None:
+    train, val, test, conns, _pts = make_yang_mills_bpst_split(seed=13, counts=(8, 4, 4))
+
+    def extra(jet):
+        return {illegal: np.ones(jet.batch)}
+
+    called = {"stlsq": False}
+
+    def _boom(*_args, **_kwargs):
+        called["stlsq"] = True
+        raise AssertionError("fit_sparse_equation must not run")
+
+    disc = GaugeLawDiscoverer()
+    with patch("omnibias.symbolic.gauge_discovery.fit_sparse_equation", _boom):
+        with pytest.raises(ValueError, match="allowlisted"):
+            disc.discover(train, val, test, connections=conns, extra_columns_fn=extra)
+    assert called["stlsq"] is False

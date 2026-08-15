@@ -157,6 +157,26 @@ they are still a color-basis coordinate chart.
 This is **not** a `FieldJet` of the connection components, not a Wilson /
 Polyakov language, and not a continuum mass-gap claim.
 
+## Gauge-invariant dictionary (search-space trap)
+
+A raw 2-jet of `A_mu^a` in 4D SU(3) has 480 real components. STLSQ / MDL /
+stability selection cannot survive that count: they sparsify inside a design
+matrix, they do not create representation theory. `GaugeInvariantDictionary`
+generates Weyl singlets of `F` and `D F`, truncated by **mass dimension**.
+Default search atoms at mass dimension 4 are `tr(F^2)` and `tr(F*Ftilde)`.
+Bianchi is an identity, not a feature. Flattened `F_01_2` / `D^k F` component
+libraries raise. This is not a Hilbert-series completeness claim.
+
+::: omnibias.geometry.gauge._core.invariants
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.geometry.gauge._core.jet_dimension
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ::: omnibias.geometry.gauge._core.covariant_jet
     options:
       show_root_heading: false

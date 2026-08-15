@@ -389,20 +389,32 @@ def evaluate_gauge_law_gate(
     requires the residual to be unchanged. Illegal extras are rejected before
     any residual is computed.
     """
+    from omnibias.geometry.gauge._core.invariants import (
+        IMPLEMENTED_INVARIANT_NAMES,
+        evaluate_named_invariants,
+    )
+
     names = list(equation.term_names)
     if extra_columns:
         names = names + list(extra_columns)
-    assert_library_gauge_legal(names)
-    assert_library_gauge_legal([lhs_name])
+    allow = LEGAL_SINGLET_ATOMS | IMPLEMENTED_INVARIANT_NAMES
+    assert_library_gauge_legal(names, allow=allow)
+    assert_library_gauge_legal([lhs_name], allow=allow)
 
     def _library(
         jet: GaugeCovariantJet,
     ) -> tuple[np.ndarray, np.ndarray, list[str]]:
-        cols = jet.singlets()
-        if extra_columns:
-            cols = {**cols, **{k: np.asarray(v, dtype=float).reshape(-1) for k, v in extra_columns.items()}}
-        target = cols[lhs_name]
         term_names = list(equation.term_names)
+        cols = evaluate_named_invariants(jet, [*term_names, lhs_name])
+        if extra_columns:
+            cols = {
+                **cols,
+                **{
+                    key: np.asarray(val, dtype=float).reshape(-1)
+                    for key, val in extra_columns.items()
+                },
+            }
+        target = cols[lhs_name]
         design = np.stack([cols[name] for name in term_names], axis=1)
         return design, target, term_names
 

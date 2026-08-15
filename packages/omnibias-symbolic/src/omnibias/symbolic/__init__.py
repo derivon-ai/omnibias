@@ -467,6 +467,7 @@ __all__ = [
     "discover_pde_operator_law",
     "discover_recurrence",
     "discover_recurrence_least_squares",
+    "discover_yang_mills_invariant_law",
     "discover_yang_mills_singlet_law",
     "divergence_objective_term",
     "electromagnetic_field_2form",
@@ -651,6 +652,7 @@ _GAUGE_EXPORTS = frozenset(
     {
         "GaugeLawDiscoverer",
         "GaugeLawResult",
+        "discover_yang_mills_invariant_law",
         "discover_yang_mills_singlet_law",
         "make_yang_mills_bpst_split",
         "make_yang_mills_polynomial_split",

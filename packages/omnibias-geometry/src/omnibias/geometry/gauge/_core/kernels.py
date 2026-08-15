@@ -255,6 +255,27 @@ def from_matrix(xp: Any, A_mat: Any, generators: Any) -> Any:
     return xp.real(comps) if hasattr(xp, "real") else comps.real
 
 
+def df_square_density(xp: Any, DF: Any, eta: Any) -> Any:
+    r"""Full contraction ``|DF|^2 = eta^{rho lambda} eta^{mu sigma} eta^{nu tau}
+    (D_rho F_{mu nu})^a (D_lambda F_{sigma tau})^a`` -> ``(B,)``.
+
+    On a diagonal metric this is ``sum_{rho,mu,nu,a} eta_rho eta_mu eta_nu
+    (DF)_{rho mu nu}^a (DF)_{rho mu nu}^a``.
+    """
+    return xp.einsum("r,m,n,Brmna,Brmna->B", eta, eta, eta, DF, DF)
+
+
+def cubic_casimir_density(xp: Any, F: Any, d_abc: Any, eta: Any) -> Any:
+    r"""Cyclic ``d^{abc} F_{mu nu}^a F^{nu rho, b} F_rho^{mu, c}``.
+
+    In 4D this is a syzygy: it vanishes for any antisymmetric 2-form
+    (``su(2)`` also has ``d^{abc} = 0``). Shape ``(B,)``.
+    """
+    f_up = xp.einsum("n,r,Bnrb->Bnrb", eta, eta, F)
+    f_mixed = xp.einsum("m,Brmc->Brmc", eta, F)
+    return xp.einsum("abc,Bmna,Bnrb,Brmc->B", d_abc, F, f_up, f_mixed)
+
+
 def wilson_line_exponents(
     xp: Any, A_path: Any, tangents: Any, generators: Any, coupling: float, dt: float
 ) -> Any:
@@ -283,7 +304,9 @@ __all__ = [
     "covariant_derivative_commutator",
     "covariant_derivative_field_strength",
     "covariant_divergence",
+    "cubic_casimir_density",
     "curvature_action_on_adjoint",
+    "df_square_density",
     "dual_field_strength",
     "field_strength",
     "field_strength_partials",

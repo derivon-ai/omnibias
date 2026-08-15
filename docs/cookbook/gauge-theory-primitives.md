@@ -102,6 +102,25 @@ out = discover_yang_mills_singlet_law(train, val, test, conns)
 assert out["diagnostics"]["gauge_equivariance"]["passed"]
 ```
 
+The search space is the generated singlet dictionary, not the index count of
+`A` or `D^k F`. In 4D SU(3) the coordinate 2-jet has 480 components; the
+default mass-dimension-4 dictionary has two searchable singlets.
+
+```python
+from omnibias.geometry.gauge import (
+    SU3_4D_COORDINATE_2JET,
+    GaugeInvariantDictionary,
+    raw_connection_jet_dimension,
+    su,
+)
+
+assert raw_connection_jet_dimension(4, 8, 2) == SU3_4D_COORDINATE_2JET == 480
+dictionary = GaugeInvariantDictionary.build(
+    mass_dimension=4, max_cov_order=1, algebra=su(3)
+)
+assert len(dictionary.legal_names) == 2
+```
+
 !!! note "Scope"
     `omnibias.geometry.gauge` ships the full **continuum** primitive set **and** an SU(2)
     lattice Monte-Carlo engine (`omnibias.geometry.gauge.lattice`, torch + JAX): heat-bath,

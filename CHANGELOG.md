@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — gauge-invariant dictionary (search-space trap)
+
+- `GaugeInvariantDictionary` / `enumerate_gauge_invariants` generate
+  mass-dimension-graded Weyl singlets of `F` and `D F` before STLSQ.
+  Named SU(3) census: coordinate 2-jet is 480; searchable dim-4 singlets
+  are 2. Bianchi is an identity; `|F-*F|^2` is a Euclidean syzygy.
+  Flattened `D^k F` component libraries raise. Complexity is
+  representation-theoretic. Not a Hilbert-series completeness claim.
+
 ### Added — gauge-covariant jet wrapper (coordinate trap)
 
 - `omnibias.geometry.gauge._core.covariant_jet.GaugeCovariantJet` stores
