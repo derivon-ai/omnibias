@@ -23,6 +23,7 @@ from omnibias.formal import (
     MATHLIB_CLAIM_KEY,
     analytic_root,
     check_certificate,
+    enclosure_trace_certificate,
     generate_obligation,
     mathlib_check_available,
     nk_existence_certificate,
@@ -334,6 +335,60 @@ def test_nk_existence_unknown_family_yields_none() -> None:
         },
     )
     assert generate_obligation(cert) is None
+
+
+def test_generate_enclosure_trace_obligation() -> None:
+    cert = enclosure_trace_certificate("nk")
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "import OmnibiasAnalytic.Check.Enclosure.Plant" in src
+    assert "open OmnibiasAnalytic.Check QInterval Set" in src
+    assert "nk_trace_unique_zero" in src
+    assert "evalTrace nkBoundOps" in src
+    assert "quadraticPlant" in src
+
+
+def test_generate_enclosure_trace_other_families() -> None:
+    assert "tower_horner_result" in (generate_obligation(enclosure_trace_certificate("tower")) or "")
+    assert "bernoulli_b2_zetaNeg1" in (
+        generate_obligation(enclosure_trace_certificate("bernoulli")) or ""
+    )
+    assert "ldlt_plant_pivots_pos" in (
+        generate_obligation(enclosure_trace_certificate("ldlt")) or ""
+    )
+
+
+def test_enclosure_trace_mismatch_yields_none() -> None:
+    cert = enclosure_trace_certificate("tower")
+    payload = dict(cert["payload"])
+    payload["result"] = {"lo": [1, 1], "hi": [1, 1]}
+    bogus = make_certificate(claim="bogus", payload=payload)
+    assert generate_obligation(bogus) is None
+
+
+def test_enclosure_trace_unknown_family_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={
+            "type": "enclosure_trace",
+            "family": "dottie",
+            "ops": [],
+            "result": {"lo": [0, 1], "hi": [0, 1]},
+        },
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_check_certificate_enclosure_trace_nk() -> None:
+    cert = enclosure_trace_certificate("nk")
+    result = check_certificate(cert)
+    assert "nk_trace_unique_zero" in result.obligation
+    if not mathlib_check_available():
+        assert result.available is False
+        assert result.verified is False
+    else:  # pragma: no cover - only on a machine with Lean + Mathlib
+        assert result.available is True
+        assert result.verified is True
 
 
 def test_check_certificate_nk_existence_radii() -> None:

@@ -41,6 +41,10 @@ from omnibias.formal.tower import (
     tower_coeffs,
     tower_coeffs_certificate,
 )
+from omnibias.formal.trace import (
+    LEGAL_TRACE_FAMILIES,
+    enclosure_trace_certificate,
+)
 
 try:
     __version__ = _pkg_version("omnibias-formal")
@@ -55,6 +59,7 @@ __all__ = [
     "LEGAL_NK_FAMILIES",
     "LEGAL_NK_ROUTES",
     "LEGAL_TOWER_FAMILIES",
+    "LEGAL_TRACE_FAMILIES",
     "MATHLIB_CLAIM_KEY",
     "MathlibCheckResult",
     "MathlibVerdict",
@@ -64,6 +69,7 @@ __all__ = [
     "check_certificate",
     "classify_obligation",
     "drive_obligation",
+    "enclosure_trace_certificate",
     "evaluate_with_mathlib",
     "generate_obligation",
     "mathlib_check_available",

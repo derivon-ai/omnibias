@@ -40,6 +40,11 @@ a green build is meaningful.
   `x² - 2` on `[5/4, 7/4]`. The generated obligation applies a sorry-free Check
   theorem that concludes a unique real root (Banach on the Newton operator).
   This is a compact-interval statement, not a continuum PDE.
+- **Enclosure trace** -- an `enclosure_trace` payload from
+  `omnibias.formal.trace.enclosure_trace_certificate`: a locked rational DAG
+  (`tower` Horner, `nk` bounds plus unique root, `bernoulli` / named `zetaNeg1`,
+  or 2×2 `ldlt`) that Lean replays. Finite `ℚ`-interval arithmetic, not a
+  transcendental enclosure or analytic continuation.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived
@@ -64,11 +69,11 @@ implies `unproven_claim`.
 ## Scope
 
 Every module in `formal/omnibias-analytic/` is `sorry`-free. The track discharges
-finite rational inequalities and, for a named 1-D map, a unique root on a
-compact interval. Infinite analytic statements -- continuum regularity,
-asymptotics -- are not expressed here at all, so they can never be silently
-discharged here either. A green build certifies the emitted obligation and
-nothing beyond it.
+finite rational inequalities, a unique root of a named 1-D map on a compact
+interval, and replay of a planted rational enclosure DAG. Infinite analytic
+statements -- continuum regularity, asymptotics -- are not expressed here at
+all, so they can never be silently discharged here either. A green build
+certifies the emitted obligation and nothing beyond it.
 
 ## Driving the loop
 
@@ -97,6 +102,13 @@ implies `unproven_claim`. With no Lean toolchain present it degrades gracefully
 ## NK / Krawczyk existence
 
 ::: omnibias.formal.nk
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Enclosure traces
+
+::: omnibias.formal.trace
     options:
       show_root_heading: false
       heading_level: 3

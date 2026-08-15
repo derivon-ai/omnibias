@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — enclosure-trace replay in Lean
+
+- `OmnibiasAnalytic.Check.Enclosure` replays a finite rational
+  `+ − × abs recip` DAG (`QInterval` / `evalTrace`). Locked plants cover
+  tower Horner, NK bounds plus the unique root of `x² - 2`, `B₂` / named
+  `zetaNeg1`, and a 2×2 LDLᵀ. Not a transcendental enclosure or analytic
+  continuation.
+- `enclosure_trace_certificate` seals a locked family. The Mathlib bridge
+  re-derives the DAG and applies the Check plant theorem
+  (`enclosure_trace` obligation class). Existing leaf classes stay leaf-only.
+
 ### Added — NK / Krawczyk existence in Lean
 
 - `OmnibiasAnalytic.Check` proves 1-D Banach / Newton-operator unique-root

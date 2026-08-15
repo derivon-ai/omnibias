@@ -25,6 +25,7 @@ from omnibias.formal import (
     DriveReport,
     classify_obligation,
     drive_obligation,
+    enclosure_trace_certificate,
     generate_obligation,
     mathlib_check_available,
     nk_existence_certificate,
@@ -76,6 +77,10 @@ def test_classify_nk_existence() -> None:
     assert classify_obligation(nk_existence_certificate("radii")) == "nk_existence"
 
 
+def test_classify_enclosure_trace() -> None:
+    assert classify_obligation(enclosure_trace_certificate("nk")) == "enclosure_trace"
+
+
 def test_classify_none_for_straddling_interval() -> None:
     assert classify_obligation(interval_certificate("q", Interval(-1.0, 1.0))) is None
 
@@ -94,6 +99,7 @@ def test_classify_agrees_with_generate_obligation() -> None:
         _krawczyk_cert(),
         tower_coeffs_certificate("sigmoid", 2),
         nk_existence_certificate("radii"),
+        enclosure_trace_certificate("nk"),
         {"foo": "bar"},
     ]
     for cert in certs:
