@@ -28,6 +28,7 @@ from omnibias.formal import (
     enclosure_trace_certificate,
     generate_obligation,
     mathlib_check_available,
+    named_zero_certificate,
     nk_existence_certificate,
     tower_coeffs_certificate,
 )
@@ -81,6 +82,10 @@ def test_classify_enclosure_trace() -> None:
     assert classify_obligation(enclosure_trace_certificate("nk")) == "enclosure_trace"
 
 
+def test_classify_named_zero() -> None:
+    assert classify_obligation(named_zero_certificate("circle_line")) == "named_zero"
+
+
 def test_classify_none_for_straddling_interval() -> None:
     assert classify_obligation(interval_certificate("q", Interval(-1.0, 1.0))) is None
 
@@ -100,6 +105,7 @@ def test_classify_agrees_with_generate_obligation() -> None:
         tower_coeffs_certificate("sigmoid", 2),
         nk_existence_certificate("radii"),
         enclosure_trace_certificate("nk"),
+        named_zero_certificate("circle_line"),
         {"foo": "bar"},
     ]
     for cert in certs:

@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — named NK unique-zero instances in Lean
+
+- `OmnibiasAnalytic.Check.Kantorovich.Named` proves unique roots of three
+  named polynomials on explicit compact boxes: circle ∩ line on
+  `[5/8, 7/8]²`, Hopf radial `r(1-r²)` on `[3/4, 5/4]`, and Chebyshev
+  `T₃` on `[3/4, 1]`. Not a continuum PDE, Lohner return map, or
+  continuum CCF blow-up.
+- `named_zero_certificate` seals a locked family. The Mathlib bridge
+  re-derives the rational box and applies the Check theorem
+  (`named_zero` obligation class). Existing leaf classes stay leaf-only.
+
 ### Added — enclosure-trace replay in Lean
 
 - `OmnibiasAnalytic.Check.Enclosure` replays a finite rational

@@ -31,6 +31,10 @@ from omnibias.formal.mathlib_check import (
     generate_obligation,
     mathlib_check_available,
 )
+from omnibias.formal.named import (
+    LEGAL_NAMED_FAMILIES,
+    named_zero_certificate,
+)
 from omnibias.formal.nk import (
     LEGAL_NK_FAMILIES,
     LEGAL_NK_ROUTES,
@@ -56,6 +60,7 @@ __lineage__ = "exempt: infrastructure"
 
 __all__ = [
     "DriveReport",
+    "LEGAL_NAMED_FAMILIES",
     "LEGAL_NK_FAMILIES",
     "LEGAL_NK_ROUTES",
     "LEGAL_TOWER_FAMILIES",
@@ -73,6 +78,7 @@ __all__ = [
     "evaluate_with_mathlib",
     "generate_obligation",
     "mathlib_check_available",
+    "named_zero_certificate",
     "nk_existence_certificate",
     "tower_coeffs",
     "tower_coeffs_certificate",

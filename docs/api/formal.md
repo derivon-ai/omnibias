@@ -45,6 +45,12 @@ a green build is meaningful.
   (`tower` Horner, `nk` bounds plus unique root, `bernoulli` / named `zetaNeg1`,
   or 2×2 `ldlt`) that Lean replays. Finite `ℚ`-interval arithmetic, not a
   transcendental enclosure or analytic continuation.
+- **Named unique zero** -- a `named_zero` payload from
+  `omnibias.formal.named.named_zero_certificate`: a locked named polynomial
+  (circle ∩ line on `[5/8, 7/8]²`, Hopf radial `r(1-r²)` on `[3/4, 5/4]`, or
+  Chebyshev `T₃` on `[3/4, 1]`). The generated obligation applies a sorry-free
+  Check theorem that concludes a unique real root on that compact box. Not a
+  continuum PDE, Lohner return map, or continuum CCF blow-up.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived
@@ -69,8 +75,8 @@ implies `unproven_claim`.
 ## Scope
 
 Every module in `formal/omnibias-analytic/` is `sorry`-free. The track discharges
-finite rational inequalities, a unique root of a named 1-D map on a compact
-interval, and replay of a planted rational enclosure DAG. Infinite analytic
+finite rational inequalities, a unique root of a named polynomial on a compact
+box, and replay of a planted rational enclosure DAG. Infinite analytic
 statements -- continuum regularity, asymptotics -- are not expressed here at
 all, so they can never be silently discharged here either. A green build
 certifies the emitted obligation and nothing beyond it.
@@ -109,6 +115,13 @@ implies `unproven_claim`. With no Lean toolchain present it degrades gracefully
 ## Enclosure traces
 
 ::: omnibias.formal.trace
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Named unique zeros
+
+::: omnibias.formal.named
     options:
       show_root_heading: false
       heading_level: 3

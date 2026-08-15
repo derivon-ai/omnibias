@@ -26,6 +26,7 @@ from omnibias.formal import (
     enclosure_trace_certificate,
     generate_obligation,
     mathlib_check_available,
+    named_zero_certificate,
     nk_existence_certificate,
     tower_coeffs_certificate,
 )
@@ -383,6 +384,59 @@ def test_check_certificate_enclosure_trace_nk() -> None:
     cert = enclosure_trace_certificate("nk")
     result = check_certificate(cert)
     assert "nk_trace_unique_zero" in result.obligation
+    if not mathlib_check_available():
+        assert result.available is False
+        assert result.verified is False
+    else:  # pragma: no cover - only on a machine with Lean + Mathlib
+        assert result.available is True
+        assert result.verified is True
+
+
+def test_generate_named_zero_circle_line() -> None:
+    cert = named_zero_certificate("circle_line")
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "import OmnibiasAnalytic.Check.Kantorovich.Named" in src
+    assert "open OmnibiasAnalytic.Check Set" in src
+    assert "circle_line_unique_zero" in src
+    assert "circleLine" in src
+    assert "×ˢ" in src
+
+
+def test_generate_named_zero_other_families() -> None:
+    hopf = generate_obligation(named_zero_certificate("hopf_radial")) or ""
+    assert "hopf_radial_unique_zero" in hopf
+    assert "hopfRadial" in hopf
+    ccf = generate_obligation(named_zero_certificate("ccf_chebyshev")) or ""
+    assert "ccf_chebyshev_unique_zero" in ccf
+    assert "ccfChebyshev" in ccf
+
+
+def test_named_zero_mismatch_yields_none() -> None:
+    cert = named_zero_certificate("circle_line")
+    payload = dict(cert["payload"])
+    payload["radius"] = [1, 4]
+    bogus = make_certificate(claim="bogus", payload=payload)
+    assert generate_obligation(bogus) is None
+
+
+def test_named_zero_unknown_family_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={
+            "type": "named_zero",
+            "family": "dottie",
+            "center": [3, 4],
+            "radius": [1, 8],
+        },
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_check_certificate_named_zero_circle_line() -> None:
+    cert = named_zero_certificate("circle_line")
+    result = check_certificate(cert)
+    assert "circle_line_unique_zero" in result.obligation
     if not mathlib_check_available():
         assert result.available is False
         assert result.verified is False

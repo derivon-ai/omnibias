@@ -15,6 +15,7 @@ The `Check/**` modules are the sound, `sorry`-free certificate checkers:
 | `OmnibiasAnalytic/Check/Positivity.lean` | Sum-of-squares / positivity capability lemmas (`sq_add_sq_nonneg`, `quad_pos` via `positivity` / `nlinarith`) the integer kernel cannot express. |
 | `OmnibiasAnalytic/Check/Kantorovich.lean` | Newton-Kantorovich / Krawczyk finite-obligation lemmas over `ℚ`, plus 1-D Banach / Newton-operator existence on a compact interval. |
 | `OmnibiasAnalytic/Check/Kantorovich/Plant.lean` | Planted unique root of `x² - 2` in `[5/4, 7/4]` (radii and 1-D Krawczyk routes). A compact-interval theorem, not a continuum PDE. |
+| `OmnibiasAnalytic/Check/Kantorovich/Named.lean` | Named unique zeros: circle ∩ line on `[5/8, 7/8]²`, Hopf radial `r(1-r²)` on `[3/4, 5/4]`, Chebyshev `T₃` on `[3/4, 1]`. Named polynomials on compact boxes, not a continuum PDE or Lohner return map. |
 | `OmnibiasAnalytic/Check/Enclosure.lean` | Rational `QInterval` arithmetic and `evalTrace` replay of a finite `+ − × abs recip` DAG. Not a transcendental enclosure. |
 | `OmnibiasAnalytic/Check/Enclosure/Plant.lean` | Locked traces: tower Horner, NK bounds plus unique root, `B₂` / named `zetaNeg1`, 2×2 LDLᵀ. Planted rationals, not a general engine. |
 | `OmnibiasAnalytic/Tower/` | Riccati / Eulerian / sech / Hermite recurrences on `ℤ[X]`, first-derivative identities, and `iteratedDeriv` link theorems. Pointwise `C^∞` / algebraic identities; not a finite-difference collapse. |
