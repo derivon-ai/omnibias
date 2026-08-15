@@ -179,8 +179,12 @@ gates are earned on smoke, not in CI `all_passed`.
   higher-order kernels take **negative** values. G1–G3 CI-gated; G4 deferred
   to VPINN.
 - **Spectral design** ([01-07](api/spectral_design.md)): `BandPlan` /
-  `peak_frequency`. Pack order is a **band selector**; 01-06 wavelet frames
-  stay concept. G1–G2 CI-gated; G3 not in CI `all_passed`.
+  `peak_frequency`. Pack order is a **band selector**, not a Littlewood-Paley
+  completeness claim. G1–G2 CI-gated; G3 not in CI `all_passed`.
+- **OMBU frames** ([01-06](api/frames.md)): `FrameSpec` /
+  `admissibility_constant`. `sigma'` is **not** admissible; frames are not
+  orthonormal and not compactly supported. G1–G3 CI-gated; G4 denoising
+  smoke-earned, not in CI `all_passed`.
 - **Scan-Net** ([02-01](api/scannet.md)): stacked `BiasScan` banks. Equivariance
   is per-layer, per-direction, on-lattice; `gamma` is not `delta -> 0`.
   G1/G2/G5 CI-gated; G3 cost and G4 k-NN recorded.
@@ -193,6 +197,39 @@ gates are earned on smoke, not in CI `all_passed`.
   `alpha -> inf` is **interface sharpening**, neither collapse. Import
   `Interface` from `omnibias.pinn.interface`, not the XPINN glue in
   `omnibias.pinn._core.interface`.
+- **Arrangement geometry** ([01-03](api/arrangement.md)): cells / tope graph /
+  `soft_membership`. `beta -> inf` is temperature collapse, not founding
+  `delta -> 0`. Sampling is a subgraph. Sound gap, not P vs NP.
+- **Tropical homotopy** ([01-08](api/tropical.md)): log / max-plus path;
+  reuses `logsumexp_gap_bound`. G4 path-following is `--full` only.
+- **Equality locus** ([01-09](api/locus.md) / [02-12](api/locus.md)):
+  constraint manifold, not a general PDE solver. Always returns
+  `branch` / `condition` / `converged`.
+- **Jet vocabulary** ([01-10](api/jets.md)): dictionary and contact test,
+  not a discovery and not a package.
+- **Conjugate Hilbert** ([01-12](api/conjugate.md)): line Hilbert only;
+  G5 is a projection defect, not a stretch-gate clearing.
+- **Face-Net** ([02-02](api/facenet.md)): sampled tope subgraph; temperature
+  collapse; sound gap, not P vs NP.
+- **BEM-Net** ([02-06](api/bem.md)): PDE exact off-surface; BC approximated;
+  linear constant-coeff homogeneous only.
+- **Pack tree** ([02-07](api/hierarchy.md)): 1-D offsets; `eta=0` bit-identical
+  to dense; far-field is a truncation with a bound. G3 complexity
+  smoke-recorded.
+- **Equivariant scan** ([02-08](api/equivariant_scan.md)): gaussian-family
+  steering only; discrete `C_L`, not SO(2)/SO(3).
+- **Soliton tanh-method** ([02-09](api/travelling.md)): tanh algebra, not a
+  collapse; multi-kink is not the n-soliton formula.
+- **Hermite ladder** ([02-10](api/ladder.md)): raw tower is not the QHO
+  eigenbasis; Rodrigues reweight required. Anharmonic G5 may lose.
+- **Layered transfer** ([02-11](api/layered.md)): 1-D only;
+  `continuum_claim=False`; distinct from `geometry.gauge.transfer`.
+- **Linearizing transforms** ([02-13](api/transforms_pde.md)): named Cole-Hopf
+  / Miura / Bäcklund / Darboux; exactness to jet order N; 03-11 search
+  stays designed.
+- **Holonomy band** ([02-14](api/holonomy_band.md)): closed form only abelian
+  + transverse-constant; open lines gauge-dependent; no Yang-Mills / mass
+  gap / continuum claim.
 
 ## Two senses of "collapse" (do not conflate)
 

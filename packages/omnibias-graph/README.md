@@ -19,6 +19,10 @@ orderings, each with bit-identical torch and jax backends:
 
 **Alpha (0.1.0a1).** API may shift between alpha releases.
 
+Gated Face-Net (`omnibias.graph.arrangement`) message-passes on a **sampled
+subgraph** of an arrangement tope graph. `beta -> inf` is temperature
+collapse, not founding `delta -> 0`. Sound gap, not P vs NP.
+
 ## Install
 
 ```bash

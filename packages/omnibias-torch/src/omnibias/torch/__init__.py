@@ -56,7 +56,9 @@ from omnibias.torch.blocks import (
     cmbConv2d,
     cmbLinear,
 )
+from omnibias.torch.conjugate import hardy_atoms, hilbert_coeffs
 from omnibias.torch.growable import GrowableOperatorMultiBiasUnit, GrowStrategy
+from omnibias.torch.hierarchy import hierarchical_scan
 from omnibias.torch.information import (
     chi_squared_divergence,
     cross_entropy,
@@ -126,6 +128,7 @@ from omnibias.torch.probability import (
     soft_histogram,
 )
 from omnibias.torch.scan import BankSpec, BiasScan, scan_response, soft_argmax_offset
+from omnibias.torch.scan_equivariant import EquivariantScan, steerable_basis
 from omnibias.torch.tempered_blocks import LearnablePReLU, TemperedActivation
 from omnibias.torch.transforms import (
     FourierTransform,
@@ -154,6 +157,7 @@ __all__ = [
     "BankSpec",
     "BiasScan",
     "BirkhoffOMBU",
+    "EquivariantScan",
     "FourierTransform",
     "GrowStrategy",
     "GrowableOMBU",
@@ -197,8 +201,11 @@ __all__ = [
     "get_activation",
     "glm_mean",
     "glm_variance",
+    "hardy_atoms",
     "has_transform",
     "hellinger_distance",
+    "hierarchical_scan",
+    "hilbert_coeffs",
     "identity_jet",
     "is_registered",
     "jet_attention",
@@ -236,6 +243,7 @@ __all__ = [
     "sliced_wasserstein",
     "soft_argmax_offset",
     "soft_histogram",
+    "steerable_basis",
     "total_variation_distance",
     "tower_to_jet",
     "tsallis_entropy",

@@ -70,6 +70,8 @@ from omnibias.jax.bo_derivatives import (
     make_local_energy,
     vibrational_frequencies,
 )
+from omnibias.jax.conjugate import hardy_atoms, hilbert_coeffs
+from omnibias.jax.hierarchy import hierarchical_scan
 from omnibias.jax.information import (
     chi_squared_divergence,
     cross_entropy,
@@ -159,6 +161,7 @@ from omnibias.jax.scan import (
     scan_response,
     soft_argmax_offset,
 )
+from omnibias.jax.scan_equivariant import equivariant_scan_apply, steerable_basis
 from omnibias.jax.transforms import (
     FourierTransform,
     LaplaceTransform,
@@ -202,6 +205,7 @@ __all__ = [
     "derivative_jet",
     "empirical_band_mass",
     "entropy",
+    "equivariant_scan_apply",
     "exponential_family_cumulants",
     "f_divergence",
     "fermi_dirac_mellin",
@@ -212,8 +216,11 @@ __all__ = [
     "get_activation",
     "glm_mean",
     "glm_variance",
+    "hardy_atoms",
     "has_transform",
     "hellinger_distance",
+    "hierarchical_scan",
+    "hilbert_coeffs",
     "identity_jet",
     "init_bias_scan",
     "init_multipack",
@@ -264,6 +271,7 @@ __all__ = [
     "sliced_wasserstein",
     "soft_argmax_offset",
     "soft_histogram",
+    "steerable_basis",
     "total_variation_distance",
     "tower_to_jet",
     "tsallis_entropy",

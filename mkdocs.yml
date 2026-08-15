@@ -138,6 +138,7 @@ nav:
       - "7. Information geometry & natural gradient": handbook/07-information-geometry.md
   - Theory:
       - Closed-form derivatives: theory.md
+      - Jet-bundle vocabulary (01-10): theory-jets.md
       - Operator surface (capability matrix): operator-surface.md
       - Differentiable binarization: theory-binary.md
       - Activation dictionary: activations.md
@@ -157,6 +158,21 @@ nav:
       - Jet-KAN (02-03): api/jetkan.md
       - weak-form VPINN (02-04): api/weak.md
       - transmission PINN (02-05): api/interface.md
+      - OMBU frames (01-06): api/frames.md
+      - arrangement geometry (01-03): api/arrangement.md
+      - tropical homotopy (01-08): api/tropical.md
+      - equality locus (01-09 / 02-12): api/locus.md
+      - jet vocabulary (01-10): api/jets.md
+      - conjugate Hilbert (01-12): api/conjugate.md
+      - Face-Net (02-02): api/facenet.md
+      - BEM-Net (02-06): api/bem.md
+      - pack tree (02-07): api/hierarchy.md
+      - equivariant scan (02-08): api/equivariant_scan.md
+      - soliton tanh-method (02-09): api/travelling.md
+      - Hermite ladder (02-10): api/ladder.md
+      - layered transfer (02-11): api/layered.md
+      - linearizing transforms (02-13): api/transforms_pde.md
+      - holonomy band (02-14): api/holonomy_band.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md

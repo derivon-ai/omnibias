@@ -7,7 +7,7 @@ facets as edges — run message passing on it, then decode a discrete answer and
 **certify the gap**, giving a graph neural network whose graph is learned
 geometry rather than given data.
 
-- **Status**: concept
+- **Status**: gated (G1/G2 CI on `n<=12`; G3 smoke/`--full`; sampled subgraph; temperature collapse)
 - **Depends on**: 01-03, 01-08
 - **Blocks**: 03-02, 03-09, 05-02
 

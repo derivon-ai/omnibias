@@ -2,8 +2,9 @@
 
 Pack order is a **band selector**: differentiation multiplies the
 Fourier transform by `(i ξ)^n`. This is a design calculator
-(`BandPlan`, `peak_frequency`), not a Littlewood-Paley frame.
-Theory 01-06 wavelet frames stay **concept**.
+(`BandPlan`, `peak_frequency`), not a Littlewood-Paley completeness
+claim. Frames live in [frames.md](frames.md): `sigma'` is not
+admissible.
 
 G1–G2 are CI-gated. G3 (steps vs `MscaleMLP` on the spectral-bias arm)
 is smoke-attempted and **not** in CI `all_passed`. Status is **gated**,

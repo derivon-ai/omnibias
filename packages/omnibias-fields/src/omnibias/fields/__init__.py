@@ -53,6 +53,14 @@ from omnibias.fields._core import (
     operator_names,
     ops_registry,
 )
+from omnibias.fields.locus import (
+    AffineSet,
+    EqualitySystem,
+    NewtonResult,
+    UnitTerm,
+    affine_locus,
+    certify_locus_point,
+)
 from omnibias.fields.weak import (
     TestFunctionSpace,
     WeakForm,
@@ -69,22 +77,28 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
 __lineage__ = "bias collapse"
 
 __all__ = [
+    "AffineSet",
     "ComponentSpec",
     "ComponentView",
     "CoordinateSpec",
     "DISPATCH_ATTR",
     "DOMAINS",
+    "EqualitySystem",
     "FieldBase",
     "FieldState",
+    "NewtonResult",
     "OperatorInfo",
     "READOUT_INDEPENDENT_ATTR",
     "SigmaCache",
     "TestFunctionSpace",
+    "UnitTerm",
     "VectorView",
     "WeakForm",
     "__lineage__",
     "__version__",
+    "affine_locus",
     "boundary_bound",
+    "certify_locus_point",
     "did_you_mean",
     "exact_moment",
     "get_operator",

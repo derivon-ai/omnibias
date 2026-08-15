@@ -7,7 +7,7 @@ single-layer potential: a boundary-integral network that solves exterior
 Laplace and Helmholtz problems by learning **densities on surfaces** rather than
 fields in volumes, with the layer potentials evaluated in closed form.
 
-- **Status**: concept
+- **Status**: gated (off-surface exact; BC approximated; linear constant-coeff homogeneous; G2/G3 smoke/`--full`)
 - **Depends on**: 01-05, 01-12, 02-07
 - **Blocks**: 05-01
 

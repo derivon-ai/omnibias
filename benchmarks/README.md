@@ -45,7 +45,22 @@ uv run python docs/img/generate_figures.py
 | `irregular_stencils.py` | `docs/benchmarks/irregular_stencils_smoke.json` | Wave-1 primitive 01-04: exact-Q Birkhoff weights G1–G4 |
 | `bias_scan.py` | `docs/benchmarks/bias_scan_smoke.json` | Wave-1 primitive 01-02: BiasScan G1/G2/G3 CI-gated; G4 earned on smoke (not in CI `all_passed`; wall time) |
 | `mollifier_calculus.py` | `docs/benchmarks/mollifier_calculus_smoke.json` | Wave-3 primitive 01-05: MollifierSpec G1–G3; G4 deferred to VPINN; certified exponential tails, not compact support |
-| `spectral_design.py` | `docs/benchmarks/spectral_design_smoke.json` | Wave-3 primitive 01-07: BandPlan G1/G2/G4; G3 not in CI `all_passed`; pack order is a band selector, 01-06 frames stay concept |
+| `spectral_design.py` | `docs/benchmarks/spectral_design_smoke.json` | Wave-3 primitive 01-07: BandPlan G1/G2/G4; G3 not in CI `all_passed`; pack order is a band selector |
+| `arrangement_geometry.py` | `docs/benchmarks/arrangement_geometry_smoke.json` | Gated 01-03: temperature collapse; sampled subgraph |
+| `ombu_frames.py` | `docs/benchmarks/ombu_frames_smoke.json` | Gated 01-06: `sigma'` not admissible; G4 not in CI `all_passed` |
+| `tropical_homotopy.py` | `docs/benchmarks/tropical_homotopy_smoke.json` | Gated 01-08: reuses `logsumexp_gap_bound`; G4 `--full` |
+| `equality_locus.py` | `docs/benchmarks/equality_locus_smoke.json` | Gated 01-09: constraint manifold, not a PDE solver |
+| `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Gated 01-12: line Hilbert; G5 not in CI `all_passed` |
+| `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Gated 02-02 Face-Net: sampled subgraph |
+| `bem_net.py` | `docs/benchmarks/bem_net_smoke.json` | Gated 02-06: off-surface exact; BC approximated |
+| `pack_tree.py` | `docs/benchmarks/pack_tree_smoke.json` | Gated 02-07: 1-D offsets; G3 cost not in CI `all_passed` |
+| `equivariant_scan.py` | `docs/benchmarks/equivariant_scan_smoke.json` | Gated 02-08: gaussian steering; discrete `C_L` |
+| `soliton_tanh_method.py` | `docs/benchmarks/soliton_tanh_method_smoke.json` | Gated 02-09: tanh algebra, not a collapse |
+| `hermite_ladder.py` | `docs/benchmarks/hermite_ladder_smoke.json` | Gated 02-10: Rodrigues reweight; G4 `--full` |
+| `layered_transfer.py` | `docs/benchmarks/layered_transfer_smoke.json` | Gated 02-11: `continuum_claim=False` |
+| `equality_intersection.py` | `docs/benchmarks/equality_intersection_smoke.json` | Gated 02-12: not a general PDE solver |
+| `linearizing_transforms.py` | `docs/benchmarks/linearizing_transforms_smoke.json` | Gated 02-13: named transforms; 03-11 stays designed |
+| `holonomy_band.py` | `docs/benchmarks/holonomy_band_smoke.json` | Gated 02-14: no YM / mass-gap claim |
 | `scannet.py` | `docs/benchmarks/scannet_smoke.json` | Wave-3 architecture 02-01: ScanNet G1/G2/G5; G3 cost and G4 k-NN recorded, not in CI `all_passed`; on-lattice equivariance |
 | `jetkan.py` | `docs/benchmarks/jetkan_smoke.json` | Wave-3 architecture 02-03: JetKAN G1/G3/G5; G2 timing not in CI `all_passed`; model-jet exactness, KA theorem does not justify |
 | `weak_form_vpinn.py` | `docs/benchmarks/weak_form_vpinn_smoke.json` | Wave-3 architecture 02-04: exact on polynomial boxes; boundary bound on by default |

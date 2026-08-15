@@ -23,6 +23,10 @@ the temperature `tau -> 0`.
     *lower bound* on the discrete optimum; the discrete rounding step is the
     caller's responsibility and is where combinatorial hardness lives.
 
+Gated Face-Net (theory 02-02) lives in `omnibias.graph.arrangement`:
+[facenet.md](facenet.md). Sampling is a subgraph; `beta -> inf` is
+temperature collapse; sound gap, not P vs NP.
+
 ## Oracles
 
 * **Ring graph** `C_n`: the combinatorial-Laplacian spectrum is

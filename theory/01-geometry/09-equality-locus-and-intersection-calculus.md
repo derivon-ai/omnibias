@@ -7,7 +7,7 @@ Force two or more collapsed units to **agree**, and their shared level set
 Hessian the derivative tower supplies in closed form, so the locus can be
 followed by Newton without autodiff and its existence can be certified on a box.
 
-- **Status**: designed
+- **Status**: gated (G1–G5 CI; G6 parity; constraint manifold, not a PDE solver)
 - **Depends on**: 01-01
 - **Blocks**: 01-10, 02-12, 02-13, 03-03, 03-08, 07-02
 

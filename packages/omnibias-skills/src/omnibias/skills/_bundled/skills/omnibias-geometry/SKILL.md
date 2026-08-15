@@ -18,6 +18,8 @@ general-relativity layer.
 | Learned-manifold pullback metric | `omnibias.geometry` | `ChartSpec`, `metric_spec_from_chart`, `pullback_metric` (`g = J^T h J`) |
 | General relativity | `omnibias.geometry` | `einstein_tensor`, `einstein_equation_residual`, `kretschmann_scalar`, `weyl_tensor` |
 | Exterior / de Rham | `omnibias.geometry` | `exterior_derivative`, `hodge_star`, `hodge_laplacian`, `betti_number`, `gauss_bonnet_euler` |
+| Chart scan (gated 02-08) | `omnibias.geometry.scan` | `chart_scan` via pullback metric; discrete `C_L`, not SO(2)/SO(3); gaussian-family steering only |
+| Holonomy band (gated 02-14) | `omnibias.geometry.gauge.band` | `HolonomyBand`, `band_holonomy`; closed form only abelian + transverse-constant; open lines gauge-dependent; **no** Yang-Mills / mass-gap / continuum claim |
 
 ## Honesty labels (state these when you report results)
 
@@ -35,4 +37,4 @@ general-relativity layer.
 
 - Cookbook: [geometry on the sphere](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/geometry-sphere.md), [pullback metric on learned manifolds](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/pullback-learned-manifolds.md)
 - Handbook: [differential geometry](https://github.com/derivon-ai/omnibias/blob/main/docs/handbook/03-differential-geometry.md), [exterior calculus](https://github.com/derivon-ai/omnibias/blob/main/docs/handbook/04-exterior-calculus.md)
-- API: [geometry](https://github.com/derivon-ai/omnibias/blob/main/docs/api/geometry.md)
+- API: [geometry](https://github.com/derivon-ai/omnibias/blob/main/docs/api/geometry.md), [equivariant / chart scan](https://github.com/derivon-ai/omnibias/blob/main/docs/api/equivariant_scan.md), [holonomy band](https://github.com/derivon-ai/omnibias/blob/main/docs/api/holonomy_band.md)

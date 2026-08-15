@@ -22,6 +22,11 @@ collapse** -- the multi-bias `delta → 0` limit to the closed-form derivative `
 (see [Theory](../theory.md)). The bridges differentiate products of sigmoids by autodiff,
 **not** the closed-form derivative tower.
 
+Gated arrangement geometry (theory 01-03) is documented at
+[arrangement.md](arrangement.md). The binary tree is the special case
+that agrees with `partition_weights`. Cell membership is temperature
+collapse; sampling is a subgraph.
+
 ## Configuration & parameters (numpy)
 
 ::: omnibias.partition._core.config

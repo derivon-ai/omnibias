@@ -29,6 +29,11 @@ Field derivatives (`d_mu A_nu`, second partials for `D_mu F^{mu nu}`) come from
 the omnibias **closed-form** activation-derivative tower via `FieldState`, not
 autodiff or finite differences.
 
+Gated Wilson-line holonomy band (theory 02-14) wraps these transport
+primitives: [holonomy_band.md](holonomy_band.md). Closed form only
+abelian + transverse-constant; open lines are gauge-dependent; **no**
+Yang-Mills / mass-gap / continuum claim.
+
 ## Nonintegrable derivative: parallel transport, holonomy & the curvature commutator
 
 The Wu-Yang *nonintegrable phase factor* is the finite integral partner of the

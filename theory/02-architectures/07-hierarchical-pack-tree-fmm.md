@@ -7,7 +7,7 @@ splitting the bank into a **near-field / far-field hierarchy**, where far packs
 are represented by a low-order expansion of their aggregate, reduces this to
 near-linear cost with a controllable, computable error.
 
-- **Status**: concept
+- **Status**: gated (1-D offsets; `eta=0` bit-identical; G3 complexity smoke-recorded, not in CI `all_passed`)
 - **Depends on**: 01-01, 01-02, 01-06, 01-07, 02-01
 - **Blocks**: 02-06, 03-07
 

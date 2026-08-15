@@ -32,6 +32,12 @@ Petrov-Galerkin test functions with closed-form antiderivatives. Exact
 integrals hold only for polynomial coefficient data on boxes; the certified
 boundary bound is on by default. Documented in full at [weak.md](weak.md).
 
+## Equality locus (gated 01-09 / 02-12)
+
+Constraint-manifold Newton / IFT layer. Not a general closed-form PDE
+solver; every return carries `branch` / `condition` / `converged`.
+Documented in full at [locus.md](locus.md).
+
 ## Finite-strain solid mechanics
 
 Alongside the small-strain fluid / linear-elastic ops, the surface carries

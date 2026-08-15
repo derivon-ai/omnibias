@@ -1,0 +1,43 @@
+{
+  "schema": "omnibias.benchmark.soliton_tanh_method.v1",
+  "generated_utc": "2026-08-15T18:15:55Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke"
+  },
+  "rss_mb_at_start": 821.41,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_symbolic_exact",
+        "passed": true,
+        "n": 10,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g5_heat_negative",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g4_init_win",
+        "passed": true,
+        "in_ci_all_passed": false,
+        "note": "--full only; tanh algebra, not a collapse; multi-kink is not n-soliton"
+      }
+    ]
+  },
+  "honesty": {
+    "algebra": "tanh polynomial, not a collapse",
+    "n_soliton": false
+  }
+}

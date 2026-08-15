@@ -51,6 +51,7 @@ from omnibias.torch.architectures.joint_operator import (
     OperatorMetadata,
     fit_joint_operator_regressor,
 )
+from omnibias.torch.architectures.ladder import HermiteBasis, LadderNet
 from omnibias.torch.architectures.multiscale import (
     AdaptiveActivation,
     AdaptiveJetMLP,
@@ -79,10 +80,12 @@ __all__ = [
     "FittedJointOperatorRegressor",
     "FourierFeatureMLP",
     "HardConstraintField",
+    "HermiteBasis",
     "JetKAN",
     "JetKANConfig",
     "JetMLP",
     "JointOperatorRegressor",
+    "LadderNet",
     "MscaleMLP",
     "OperatorMetadata",
     "PINNHeat",

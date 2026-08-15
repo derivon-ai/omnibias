@@ -1,0 +1,38 @@
+{
+  "schema": "omnibias.benchmark.pack_tree.v1",
+  "generated_utc": "2026-08-15T18:16:21Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke"
+  },
+  "rss_mb_at_start": 821.34,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_eta0_bit_identical",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_complexity",
+        "passed": true,
+        "in_ci_all_passed": false,
+        "note": "1-D offset axis; far-field is a truncation with a bound",
+        "n": 16
+      }
+    ]
+  },
+  "honesty": {
+    "axis": "1-D offsets",
+    "far_field": "truncation with a bound"
+  }
+}

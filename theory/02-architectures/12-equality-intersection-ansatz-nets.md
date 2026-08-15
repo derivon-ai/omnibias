@@ -7,7 +7,7 @@ Newton and whose backward pass uses the implicit function theorem — the same
 technique `omnibias.convex.torch.qp_layer` applies to a KKT system, on a much smaller
 and better-conditioned system, because the tower supplies the Jacobian exactly.
 
-- **Status**: designed
+- **Status**: gated (layer on 01-09; always `branch` / `condition` / `converged`; not a general PDE solver)
 - **Depends on**: 01-01, 01-03, 01-09
 - **Blocks**: 05-01, 07-02
 

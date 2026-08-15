@@ -43,6 +43,7 @@ pip install "omnibias-fields[torch]"   # or [jax], or [all]
 | Torch ops | `omnibias.fields.torch.ops` | `value`, `derivative`, `gradient`, `divergence`, `laplacian`, `hessian`, `jacobian`, `curl`, `integrate`, `inner_product`, `l2_norm`, `sobolev_norm`, `tensor_divergence`, `dz`, `dzbar`, ... |
 | JAX ops | `omnibias.fields.jax.ops` | the bit-identical twin of the torch surface |
 | Weak form (gated 02-04) | `omnibias.fields.weak` | `TestFunctionSpace`, `exact_moment`, `weak_residual`; exact integrals only for polynomial coeffs on boxes; boundary bound on by default |
+| Equality locus (gated 01-09 / 02-12) | `omnibias.fields.locus` | `EqualityLocusLayer` / `LocusOutput`; constraint manifold, not a general PDE solver; always `branch` / `condition` / `converged` |
 
 ## Building on top of this
 

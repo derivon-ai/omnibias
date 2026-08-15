@@ -7,7 +7,7 @@ derivative features that transform predictably under rotation, and scan in
 **chart coordinates** using the pullback metric so the same construction works
 on a learned manifold rather than only in flat space.
 
-- **Status**: concept
+- **Status**: gated (G1–G4 CI; G5 `--full`; gaussian-family steering; discrete `C_L`, not SO(2)/SO(3))
 - **Depends on**: 01-02, 01-06
 - **Blocks**: 05-02
 

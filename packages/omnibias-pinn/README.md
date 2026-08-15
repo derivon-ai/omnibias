@@ -70,6 +70,15 @@ Alpha submodules (still under Beta `omnibias-pinn`, not separate wheels):
   parallel interfaces only. Import `Interface` / `TransmissionInterface`
   from here, **not** from `omnibias.pinn._core.interface` (XPINN penalty
   glue).
+* **`omnibias.pinn.travelling`** — gated tanh-method solitons (02-09).
+  Tanh algebra, not a collapse; a multi-kink sum is not the n-soliton
+  formula.
+* **`omnibias.pinn.layered`** — gated 1-D transfer stacks (02-11).
+  `continuum_claim=False`. Distinct from `geometry.gauge.transfer`.
+* **`omnibias.pinn.bem`** — gated BEM-Net (02-06). PDE exact off-surface;
+  BC approximated; linear constant-coeff homogeneous only.
+* **`omnibias.pinn.transform`** — gated named linearizing maps (02-13).
+  Cole-Hopf / Miura / Bäcklund / Darboux; 03-11 search stays designed.
 
 Four-gap acceptance matrix (smoke vs `--full`):
 [`docs/benchmarks/pinn_four_gap_matrix.md`](../../docs/benchmarks/pinn_four_gap_matrix.md).

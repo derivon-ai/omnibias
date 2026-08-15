@@ -35,6 +35,11 @@ recovering the round-sphere metric and `R = 2` from the standard `S^2` embedding
 See [`GEOMETRY_DERIVATIONS.md`](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-geometry/GEOMETRY_DERIVATIONS.md)
 for the index conventions and the validation against the round sphere.
 
+Gated chart scan and Wilson-line holonomy band (not shipped):
+[equivariant_scan.md](equivariant_scan.md),
+[holonomy_band.md](holonomy_band.md). Closed-form holonomy is abelian +
+transverse-constant only; no Yang-Mills / mass-gap claim.
+
 ## General relativity: Einstein tensor and curvature invariants
 
 On top of Riemann / Ricci / scalar curvature the package exposes the

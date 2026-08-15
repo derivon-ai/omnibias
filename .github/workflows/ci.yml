@@ -162,6 +162,19 @@ jobs:
           # Scoped to omnibias.core: this job installs core only.
           python -m pytest packages/omnibias-core/tests -x -q \
             --cov=omnibias.core --cov-fail-under=60
+      - name: Run equality-locus smoke (01-09 G1–G5)
+        run: |
+          source .venv-core/bin/activate
+          pip install numpy
+          python benchmarks/equality_locus.py
+      - name: Run OMBU-frames smoke (01-06 G1–G3; G4 not all_passed)
+        run: |
+          source .venv-core/bin/activate
+          python benchmarks/ombu_frames.py
+      - name: Run conjugate-Hilbert smoke (01-12 G1–G4; G5 not all_passed)
+        run: |
+          source .venv-core/bin/activate
+          python benchmarks/conjugate_hilbert.py
 
   torch:
     name: omnibias-torch
@@ -298,6 +311,18 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/jetkan.py
+      - name: Run pack-tree smoke (02-07 G1/G2/G4/G5; G3 cost not all_passed)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/pack_tree.py
+      - name: Run Hermite-ladder smoke (02-10 G1–G3/G6; G4 FermiNet --full)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/hermite_ladder.py
+      - name: Run equivariant-scan smoke (02-08 G1–G4; G5 --full)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/equivariant_scan.py
       - name: Run the closed-form integral-transform example (smoke)
         run: |
           source .venv-cross/bin/activate
@@ -336,6 +361,22 @@ jobs:
         run: |
           source .venv-pinn/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/multi_interface_pinn.py
+      - name: Run soliton tanh-method smoke (02-09 G1/G2/G3/G5; G4 --full)
+        run: |
+          source .venv-pinn/bin/activate
+          python benchmarks/soliton_tanh_method.py
+      - name: Run layered-transfer smoke (02-11 G1–G3/G6; G4 --full)
+        run: |
+          source .venv-pinn/bin/activate
+          python benchmarks/layered_transfer.py
+      - name: Run BEM-Net smoke (02-06 G1/G4/G5; G2/G3 smoke)
+        run: |
+          source .venv-pinn/bin/activate
+          python benchmarks/bem_net.py
+      - name: Run linearizing-transforms smoke (02-13 G1/G2/G4/G5/G6; G3 --full)
+        run: |
+          source .venv-pinn/bin/activate
+          python benchmarks/linearizing_transforms.py
       - name: Run the second-order solver-training example (smoke)
         run: |
           source .venv-pinn/bin/activate
@@ -485,6 +526,10 @@ jobs:
         run: |
           source .venv-fields/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/weak_form_vpinn.py
+      - name: Run equality-intersection smoke (02-12 G1–G3/G5/G6; G4 smoke)
+        run: |
+          source .venv-fields/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/equality_intersection.py
 
   geometry:
     name: omnibias-geometry (beta)
@@ -516,6 +561,14 @@ jobs:
         run: |
           source .venv-geom/bin/activate
           python docs/examples/gauge_certified_mass_gap.py
+      - name: Run equivariant / chart-scan smoke (02-08 G1–G4; G5 --full)
+        run: |
+          source .venv-geom/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/equivariant_scan.py
+      - name: Run holonomy-band smoke (02-14 G1–G5)
+        run: |
+          source .venv-geom/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/holonomy_band.py
 
   binary:
     name: omnibias-binary (alpha)
@@ -966,11 +1019,17 @@ jobs:
           pip install --upgrade pip
           pip install --index-url https://download.pytorch.org/whl/cpu torch
           pip install -e packages/omnibias-core
+          pip install -e packages/omnibias-partition
+          pip install -e packages/omnibias-struct
           pip install -e "packages/omnibias-graph[torch,jax,test]"
       - name: Run graph tests
         run: |
           source .venv-graph/bin/activate
           python -m pytest packages/omnibias-graph/tests -q
+      - name: Run Face-Net smoke (02-02 G1/G2; G3 smoke/--full)
+        run: |
+          source .venv-graph/bin/activate
+          python benchmarks/arrangement_graph.py
 
   shape:
     name: omnibias-shape (alpha)
@@ -1386,6 +1445,10 @@ jobs:
         run: |
           source .venv-partition/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/partition_quickstart.py
+      - name: Run arrangement-geometry smoke (01-03 G1–G4)
+        run: |
+          source .venv-partition/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/arrangement_geometry.py
 
   submodular:
     name: omnibias-submodular (alpha)
@@ -1596,6 +1659,10 @@ jobs:
         run: |
           source .venv-struct/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/certified_argmax.py
+      - name: Run tropical-homotopy smoke (01-08 G1–G3; G4 --full)
+        run: |
+          source .venv-struct/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/tropical_homotopy.py
 
   symbolic:
     name: omnibias-symbolic (alpha)

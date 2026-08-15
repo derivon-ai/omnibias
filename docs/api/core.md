@@ -46,8 +46,43 @@ negative values. Documented in full at [mollifier.md](mollifier.md).
 ## Spectral design
 
 Order-as-frequency band plans (theory 01-07). Pack order is a band
-selector; 01-06 wavelet frames stay concept. Documented in full at
+selector, not a Littlewood-Paley completeness claim. Frames:
+[frames.md](frames.md). Documented in full at
 [spectral_design.md](spectral_design.md).
+
+## OMBU frames
+
+Wavelet-frame reading of a bias-scan bank (theory 01-06). `sigma'` is
+not admissible; frames are not orthonormal and not compactly supported.
+Documented in full at [frames.md](frames.md).
+
+## Equality locus
+
+Constraint-manifold Newton / Krawczyk (theory 01-09). Not a general
+PDE solver. Documented in full at [locus.md](locus.md).
+
+## Jet-bundle vocabulary
+
+Contact residual / holonomy test (theory 01-10). A dictionary, not a
+discovery. Documented in full at [jets.md](jets.md) and
+[theory-jets.md](../theory-jets.md).
+
+## Conjugate Hilbert tower
+
+Line Hilbert permutation of the dictionary (theory 01-12). G5 is a
+projection defect, not a stretch-gate clearing. Documented in full at
+[conjugate.md](conjugate.md).
+
+## Hierarchical pack tree
+
+1-D near/far split (theory 02-07). `eta=0` is bit-identical to the
+dense sum. Documented in full at [hierarchy.md](hierarchy.md).
+
+## Tanh-method / ladder / transfer / linearizing maps
+
+Gated core algebra for remaining Group 02: [travelling.md](travelling.md),
+[ladder.md](ladder.md), [layered.md](layered.md),
+[transforms_pde.md](transforms_pde.md).
 
 ## ActivationSpec
 

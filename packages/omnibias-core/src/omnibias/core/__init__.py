@@ -24,6 +24,8 @@ Public API:
 * :class:`BankSpec` -- offset / scale bank for the bias scan (theory 01-02).
 * :class:`MollifierSpec` -- pack-as-mollifier algebra and certified tails (theory 01-05).
 * :class:`BandPlan` -- order-as-frequency spectral design (theory 01-07).
+* :class:`EqualitySystem` -- equality-locus residual / Jacobian (theory 01-09).
+* :class:`HardyDictionary` -- conjugate Hilbert dictionary (theory 01-12).
 
 There are no framework dependencies in this package.
 """
@@ -39,10 +41,38 @@ from omnibias.core.bell import (
     bell_partial,
     faa_di_bruno_terms,
 )
+from omnibias.core.conjugate import (
+    HardyAtom,
+    HardyDictionary,
+)
+from omnibias.core.conjugate import (
+    evaluate as evaluate_hardy_dictionary,
+)
+from omnibias.core.conjugate import (
+    hilbert as hilbert_hardy_dictionary,
+)
+from omnibias.core.frames import (
+    FrameSpec,
+    admissibility_constant,
+    compile_bank,
+    dilated_sigma_n,
+    vanishing_moments,
+)
+from omnibias.core.hierarchy import Cluster, build_pack_tree, hierarchical_value, truncation_bound
 from omnibias.core.information import (
     binary_entropy,
     has_cumulant_tower,
     is_log_partition_activation,
+)
+from omnibias.core.jets import contact_residual, is_holonomic
+from omnibias.core.ladder import Normalization, hermite_function, tower_lower, tower_raise
+from omnibias.core.locus import (
+    AffineSet,
+    EqualitySystem,
+    NewtonResult,
+    UnitTerm,
+    affine_locus,
+    certify_locus_point,
 )
 from omnibias.core.mollifier import (
     MollifierSpec,
@@ -88,15 +118,6 @@ from omnibias.core.probability import (
     dkw_epsilon,
     is_cdf_activation,
 )
-from omnibias.core.scan import BankSpec
-from omnibias.core.spectral_design import (
-    BandPlan,
-    alpha_for_peak,
-    design_band_plan,
-    peak_frequency,
-    relative_bandwidth,
-    response_profile,
-)
 from omnibias.core.spec import (
     ActivationSpec,
     NthDerivativeFn,
@@ -107,11 +128,22 @@ from omnibias.core.spec import (
     make_tempered_transforms,
     tempered,
 )
+from omnibias.core.spectral_design import (
+    BandPlan,
+    alpha_for_peak,
+    design_band_plan,
+    peak_frequency,
+    relative_bandwidth,
+    response_profile,
+)
+from omnibias.core.tanh_method import TravellingWaveAnsatz, verify_exact
+from omnibias.core.transfer import Layer, certified_band_gap
 from omnibias.core.transforms import (
     TransformIdentity,
     TransformName,
     registered_activations,
 )
+from omnibias.core.transforms_pde import LinearizingTransform, cole_hopf_u, verify_transform
 
 try:
     __version__ = _pkg_version("omnibias-core")
@@ -123,10 +155,20 @@ __lineage__ = "bias collapse"
 
 __all__ = [
     "ActivationSpec",
+    "AffineSet",
     "BandPlan",
     "BankSpec",
+    "Cluster",
+    "EqualitySystem",
+    "FrameSpec",
+    "HardyAtom",
+    "HardyDictionary",
+    "Layer",
+    "LinearizingTransform",
     "MollifierSpec",
     "MultiPackSpec",
+    "NewtonResult",
+    "Normalization",
     "NthDerivativeFn",
     "PackSpec",
     "TensorFn",
@@ -134,31 +176,47 @@ __all__ = [
     "TransformIdentity",
     "TransformKernels",
     "TransformName",
+    "TravellingWaveAnsatz",
+    "UnitTerm",
     "__lineage__",
     "__version__",
+    "admissibility_constant",
+    "affine_locus",
     "alpha_for_peak",
     "bell_complete",
     "bell_number",
     "bell_partial",
     "binary_entropy",
+    "build_pack_tree",
     "cdf_normalization",
     "central_moments_from_cumulants",
     "central_stencil_weights",
     "central_to_raw_moments",
+    "certified_band_gap",
+    "certify_locus_point",
+    "cole_hopf_u",
+    "compile_bank",
+    "contact_residual",
     "cumulants_from_raw_moments",
     "delta_method_central_moments",
     "delta_method_from_cumulants",
     "design_band_plan",
     "design_order",
+    "dilated_sigma_n",
     "dkw_epsilon",
+    "evaluate_hardy_dictionary",
     "faa_di_bruno_terms",
     "gaussian_central_moments",
     "has_cumulant_tower",
     "hermite_coeffs",
+    "hermite_function",
+    "hierarchical_value",
+    "hilbert_hardy_dictionary",
     "incidence_matrix",
     "index_position",
     "is_admissible",
     "is_cdf_activation",
+    "is_holonomic",
     "is_log_partition_activation",
     "is_poised",
     "make_tempered_fastpath",
@@ -181,4 +239,10 @@ __all__ = [
     "tail_bound",
     "tanh_polynomial_coeffs",
     "tempered",
+    "tower_lower",
+    "tower_raise",
+    "truncation_bound",
+    "vanishing_moments",
+    "verify_exact",
+    "verify_transform",
 ]

@@ -32,6 +32,10 @@ The gap is closed-form: `V* <= V_beta <= V* + log(N)/beta` (`N` = exact path cou
 self-checked against brute-force hard DP on small instances. It certifies the
 *relaxation* error (the `beta -> inf` axis), **not** model correctness.
 
+Gated tropical homotopy (theory 01-08) reuses `logsumexp_gap_bound` and
+is documented at [tropical.md](tropical.md). `beta -> inf` is
+temperature collapse; large `(n, D)` inputs are refused.
+
 ## Backend-agnostic core
 
 ::: omnibias.struct

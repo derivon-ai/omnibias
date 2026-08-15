@@ -465,20 +465,48 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md).
 - Wave-3 gated algebra + architectures (not shipped): `omnibias.core.mollifier`
   (01-05; certified exponential tails, not compact support) /
-  `omnibias.core.spectral_design` (01-07; pack order is a band selector;
-  01-06 frames stay concept); `omnibias.{torch,jax}.architectures` Scan-Net
-  (02-01; on-lattice equivariance) and Jet-KAN (02-03; model-jet exactness,
-  KA theorem does not justify); `omnibias.fields.weak` (02-04; exact on
-  polynomial boxes, boundary bound on by default);
+  `omnibias.core.spectral_design` (01-07; pack order is a band selector) /
+  `omnibias.core.frames` (01-06; `sigma'` not admissible) /
+  `omnibias.core.locus` (01-09; constraint manifold, not a PDE solver) /
+  `omnibias.core.jets` (01-10; vocabulary / contact test, not a package) /
+  `omnibias.core.conjugate` (01-12; line Hilbert; G5 not `all_passed`) /
+  `omnibias.partition.arrangement` (01-03; temperature collapse) /
+  `omnibias.struct._core.tropical` (01-08; reuses `logsumexp_gap_bound`) /
+  `omnibias.{torch,jax}.architectures` Scan-Net (02-01; on-lattice
+  equivariance) and Jet-KAN (02-03; model-jet exactness, KA theorem does
+  not justify) plus LadderNet (02-10; Rodrigues reweight) /
+  `omnibias.{torch,jax}.scan_equivariant` (02-08; gaussian steering,
+  discrete `C_L`) / `omnibias.{torch,jax}.hierarchy` (02-07; 1-D offsets) /
+  `omnibias.fields.weak` (02-04; exact on polynomial boxes, boundary bound
+  on by default) / `omnibias.fields.locus` (02-12) /
   `omnibias.pinn.interface` (02-05; interface sharpening, not collapse;
-  distinct from XPINN `omnibias.pinn._core.interface`). Docs:
-  [`docs/api/mollifier.md`](docs/api/mollifier.md),
+  distinct from XPINN `omnibias.pinn._core.interface`) /
+  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13) /
+  `omnibias.geometry.gauge.band` (02-14; abelian + transverse-constant;
+  no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02; sampled
+  subgraph). Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
+  [`docs/api/frames.md`](docs/api/frames.md),
+  [`docs/api/arrangement.md`](docs/api/arrangement.md),
+  [`docs/api/tropical.md`](docs/api/tropical.md),
+  [`docs/api/locus.md`](docs/api/locus.md),
+  [`docs/api/jets.md`](docs/api/jets.md),
+  [`docs/api/conjugate.md`](docs/api/conjugate.md),
   [`docs/api/scannet.md`](docs/api/scannet.md),
   [`docs/api/jetkan.md`](docs/api/jetkan.md),
   [`docs/api/weak.md`](docs/api/weak.md),
-  [`docs/api/interface.md`](docs/api/interface.md). Cost / wall-time gates
-  are smoke-earned, not in CI `all_passed`.
+  [`docs/api/interface.md`](docs/api/interface.md),
+  [`docs/api/facenet.md`](docs/api/facenet.md),
+  [`docs/api/bem.md`](docs/api/bem.md),
+  [`docs/api/hierarchy.md`](docs/api/hierarchy.md),
+  [`docs/api/equivariant_scan.md`](docs/api/equivariant_scan.md),
+  [`docs/api/travelling.md`](docs/api/travelling.md),
+  [`docs/api/ladder.md`](docs/api/ladder.md),
+  [`docs/api/layered.md`](docs/api/layered.md),
+  [`docs/api/transforms_pde.md`](docs/api/transforms_pde.md),
+  [`docs/api/holonomy_band.md`](docs/api/holonomy_band.md). Cost /
+  wall-time / FermiNet-many-body gates are smoke-earned, not in CI
+  `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.
 - Manifold geometry / exterior calculus: `omnibias.geometry`.
 - Fractional / score-SDE: `omnibias.fractional`, `omnibias.score`.

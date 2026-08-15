@@ -7,7 +7,7 @@ cells, flats and face lattice are the combinatorial object that every downstream
 region-based construction (constraint sets, polytopes, graph networks) actually
 uses, and the soft version is a differentiable weighting of those cells.
 
-- **Status**: concept
+- **Status**: gated (G1–G4 CI; temperature collapse, sampled subgraph; cost gates smoke-earned, not in CI `all_passed`)
 - **Depends on**: none
 - **Blocks**: 01-08, 01-10, 02-02, 02-12, 03-02, 03-03, 03-09, 04-02, 05-02, 07-05
 

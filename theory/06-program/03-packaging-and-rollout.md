@@ -46,11 +46,14 @@ Almost everything lands in an existing package.
 
 | Home | Specs |
 |---|---|
-| `omnibias-core` | 01-04 stencils, 01-05 mollifier algebra, 01-07 spectral design, 01-10 jet bundle (docs), 01-11 Lean obligations, 03-06 quadrature |
-| `omnibias-torch` / `omnibias-jax` (twins) | 01-01 multi-pack, 01-02 scan, 02-01 Scan-Net, 02-03 Jet-KAN, 02-08 equivariant scan, 03-12 line search, 03-13 refinement |
-| `omnibias-fields` | 02-04 weak-form VPINN, 02-07 pack tree |
-| `omnibias-pinn` | 02-05 transmission PINN, 02-06 BEM-Net, 02-12 equality-intersection layers, 02-13 linearizing transforms, 05-01 inverse problems |
-| `omnibias-geometry` | 01-03 arrangements (geometry side), 02-14 Wilson-line band (`geometry.gauge`) |
+| `omnibias-core` | 01-04 stencils, 01-05 mollifier algebra, 01-06 frames, 01-07 spectral design, 01-09 locus, 01-10 jet vocabulary (docs + contact tests), 01-11 Lean obligations, 01-12 conjugate Hilbert, 02-07 pack tree, 02-09 tanh-method algebra, 02-10 ladder algebra, 02-11 transfer algebra, 02-13 named transforms, 03-06 quadrature |
+| `omnibias-torch` / `omnibias-jax` (twins) | 01-01 multi-pack, 01-02 scan, 02-01 Scan-Net, 02-03 Jet-KAN, 02-07 hierarchical scan, 02-08 equivariant scan, 02-10 LadderNet, 03-12 line search, 03-13 refinement |
+| `omnibias-fields` | 02-04 weak-form VPINN, 01-09 / 02-12 equality-locus layer |
+| `omnibias-pinn` | 02-05 transmission PINN, 02-06 BEM-Net, 02-09 travelling, 02-11 layered transfer, 02-13 linearizing transforms, 05-01 inverse problems |
+| `omnibias-geometry` | 02-08 chart scan, 02-14 Wilson-line band (`geometry.gauge.band`) |
+| `omnibias-partition` | 01-03 arrangement geometry (tree is the special case of `partition_weights`) |
+| `omnibias-struct` | 01-08 tropical homotopy (reuses `MaxPlus` / `logsumexp_gap_bound`) |
+| `omnibias-graph` | 02-02 Face-Net on a sampled arrangement subgraph |
 | `omnibias-verify` | 03-08 certified localization, 04-02 uncertainty |
 | `omnibias-curvature` | 04-01 information geometry |
 | `omnibias-discrete` / `-qubo` | 03-01 evolution, 03-03 CSP |
@@ -59,9 +62,9 @@ Almost everything lands in an existing package.
 | `omnibias-tab` | 05-02 tabular part |
 | `omnibias-symbolic` | 03-10 Padé tracking, 03-11 Lie symmetry |
 | `omnibias-measure` | 03-04 sliced OT |
-| `omnibias-difference` | 01-08 tropical homotopy (algebraic side) |
+| `omnibias-difference` | 01-04 irregular stencils (gated Wave 1) |
 | `omnibias-dynamics` | 07-06 validated orbits |
-| Docs only | 01-09 equality locus (math shared by 02-12), 01-06 wavelet frames, 01-12 conjugate tower (theory; the code lands in `core.verified.hardy_line`), 06-01…06-04, 07-01 |
+| Docs only | 06-01…06-04, 07-01 |
 
 ### The one package that might be earned
 
@@ -77,10 +80,11 @@ part. Test it against the rule:
   audience.
 
 That is one clear yes and one partial. **The rule's verdict is: start as
-`omnibias.geometry.arrangement`, and promote only if two independent consumers
-outside `geometry` depend on it and the submodule exceeds roughly 2 000 lines.**
+`omnibias.partition.arrangement`, and promote only if two independent consumers
+outside `partition` depend on it and the submodule exceeds roughly 2 000 lines.**
 Recording the promotion criterion now is the point; deciding by feel later is
-how the stub packages happened.
+how the stub packages happened. Face-Net (02-02) is a second consumer in
+`omnibias.graph.arrangement`; that still does not mint `omnibias-arrangement`.
 
 ### Rollout waves, ordered by information per unit of effort
 
@@ -120,10 +124,11 @@ immediately useful to existing optimizers).
 which is a document), 07-03 (CCF, which has a live campaign and a live gate),
 then 07-02, 07-04, 07-05, 07-06, 07-07.
 
-**Wave 5 — speculative.** 02-06 BEM-Net, 02-09 solitons, 02-10 Hermite ladder,
-02-11 transfer matrices, 02-13 linearizing transforms, 03-04 sliced OT, 03-07
-scale flow. Each is interesting; none blocks anything; all should wait for
-evidence that the primitives hold up.
+**Wave 5 — remaining algorithms.** 03-04 sliced OT, 03-07 scale flow, and
+full 03-11 / 03-13. Remaining Group 02 (02-02, 02-06–02-14) plus the
+Group 01 algebra they import is **opened** as gated submodules of existing
+packages; cost / wall-time / FermiNet-many-body gates are smoke-earned,
+not in CI `all_passed`.
 
 ### What to do when a wave-0 falsifier fails
 
@@ -154,9 +159,9 @@ already has benchmarks.
 exactly this reason, and `AGENTS.md` records it. Re-creating it would repeat a
 documented mistake, so it ships as `omnibias.geometry.gauge.holonomy`.
 
-**And the honest maybe.** `omnibias.geometry.arrangement` starts as a submodule
+**And the honest maybe.** `omnibias.partition.arrangement` starts as a submodule
 with a written promotion criterion, which is the only case in the tree where a
-new distribution is even plausible.
+new distribution is even plausible. It did **not** land in `geometry`.
 
 **Net effect: 54 specs, 0 new packages at the start, at most 1 later.** If that
 number grows during implementation, the rule is being bypassed, and the tree
@@ -202,7 +207,7 @@ a justification, which is the right amount of friction.
 - **G4 deletion discipline.** Any spec whose falsifier failed is marked
   `retired` in the index within the same change that records the failure, with
   a one-line reason.
-- **G5 promotion criterion.** If `omnibias.geometry.arrangement` is promoted to
+- **G5 promotion criterion.** If `omnibias.partition.arrangement` is promoted to
   a package, the two-external-consumer and size criteria are demonstrated in the
   promoting change, not asserted.
 
@@ -256,7 +261,13 @@ proceeds.
       Scan-Net, 02-03 Jet-KAN, 02-04 VPINN, 02-05 transmission PINN (gated;
       cost / wall-time gates smoke-earned, not in CI all_passed; no new
       packages)
+- [x] Open remaining Group 02 (01-03, 01-06, 01-08–01-10, 01-12, 02-02,
+      02-06–02-14) as gated submodules of existing packages; 03-11 search
+      and full 03-13 pack birth/death stay designed; no new packages;
+      cost / wall-time / FermiNet-many-body gates smoke-earned, not in CI
+      `all_passed`
 - [ ] Mark failed-falsifier specs `retired` with a reason
-- [ ] Written promotion criterion for `omnibias.geometry.arrangement` in its
-      module docstring
+- [x] Written promotion criterion for `omnibias.partition.arrangement` in
+      this file (two external consumers + ~2 000 lines); still no
+      `omnibias-arrangement` package
 - [x] Index row in `theory/README.md`

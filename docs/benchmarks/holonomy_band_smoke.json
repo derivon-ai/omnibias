@@ -1,0 +1,44 @@
+{
+  "schema": "omnibias.benchmark.holonomy_band.v1",
+  "generated_utc": "2026-08-15T18:16:47Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke"
+  },
+  "rss_mb_at_start": 821.96,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_regime",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_magnus_bound",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g4_open_line_flagged",
+        "passed": true,
+        "in_ci_all_passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "closed_form": "abelian and transverse-constant only",
+    "open_lines": "gauge-dependent",
+    "yang_mills": false,
+    "mass_gap": false,
+    "continuum_claim": false
+  }
+}

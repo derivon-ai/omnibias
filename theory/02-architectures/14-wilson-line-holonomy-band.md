@@ -8,7 +8,7 @@ transport crosses, so the `band` and `integral` roles lift from scalars to
 operators, closed form in the abelian and transverse-constant cases and an
 explicitly finite truncation otherwise.
 
-- **Status**: concept
+- **Status**: gated (G1–G5 CI; abelian + transverse-constant closed form; no YM / mass gap / continuum claim)
 - **Depends on**: 01-05, 01-10
 - **Blocks**: 07-04
 

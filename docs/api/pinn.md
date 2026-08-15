@@ -44,6 +44,12 @@ Four alpha submodules of Beta `omnibias-pinn` host the gated research surface
 | `omnibias.pinn.domain` | SDF / R-function geometry + hard curved BCs | [pinn-domain.md](pinn-domain.md) |
 | `omnibias.pinn.operator` | DeepONet / FNO + multi-head conditioning | [pinn-operator.md](pinn-operator.md) |
 
+Gated Group 02 architectures (not shipped; cost gates smoke-earned, not
+in CI `all_passed`): [travelling.md](travelling.md) (02-09),
+[layered.md](layered.md) (02-11), [bem.md](bem.md) (02-06),
+[transforms_pde.md](transforms_pde.md) (02-13). Transmission PINN:
+[interface.md](interface.md).
+
 Four-gap acceptance matrix (smoke vs `--full`):
 [`benchmarks/pinn_four_gap_matrix.md`](../benchmarks/pinn_four_gap_matrix.md).
 

@@ -62,9 +62,15 @@ interior lattice shift, not a circular wrap. Soft-argmax `gamma` is not
 [docs/api/scan.md](../../docs/api/scan.md).
 
 Gated Wave-3 architectures (not shipped): `ScanNet` (on-lattice equivariance,
-not `R^D`) and `JetKAN` (exactness of the model jet; the KA theorem does not
-justify). See [docs/api/scannet.md](../../docs/api/scannet.md) and
-[docs/api/jetkan.md](../../docs/api/jetkan.md).
+not `R^D`), `JetKAN` (exactness of the model jet; the KA theorem does not
+justify), `LadderNet` (Rodrigues reweight required), `EquivariantScan`
+(gaussian-family steering; discrete `C_L`), and `hierarchical_scan` (1-D
+offsets; `eta=0` bit-identical to dense). See
+[docs/api/scannet.md](../../docs/api/scannet.md),
+[docs/api/jetkan.md](../../docs/api/jetkan.md),
+[docs/api/ladder.md](../../docs/api/ladder.md),
+[docs/api/equivariant_scan.md](../../docs/api/equivariant_scan.md), and
+[docs/api/hierarchy.md](../../docs/api/hierarchy.md).
 
 See [docs/theory.md](../../docs/theory.md) and the cookbook for end-to-end
 PINN, CmbNet, and CvxLayer examples.

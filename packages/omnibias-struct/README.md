@@ -82,6 +82,9 @@ pip install omnibias-struct[torch]   # or [jax], [all]
   `softmax_beta`, `logsumexp_beta_jacobian`, `logsumexp_beta_hessian`,
   `pairwise_lse`, `pairwise_lse_jet`; `soft_viterbi`, `soft_viterbi_marginals`,
   `soft_shortest_path`, `soft_shortest_path_marginals`, `soft_ctc`.
+- Gated tropical homotopy (`omnibias.struct._core.tropical`): reuses
+  `logsumexp_gap_bound`; `beta -> inf` is temperature collapse; large
+  `(n, D)` refused.
 
 ## Tests
 

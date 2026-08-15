@@ -98,35 +98,35 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [01-01 multipack Birkhoff collapse](01-geometry/01-multipack-birkhoff-collapse.md) | gated | `MultiPackUnit` shipped; G1/G2/G3/G5 earned (float64 order ceiling recorded; G4 deferred) |
 | [01-02 bias scan](01-geometry/02-bias-scan-transverse-convolution.md) | gated | `BiasScan` / `BankSpec`; G1–G3 earned; G4 earned on smoke (not CI-gated) |
-| [01-03 arrangement geometry](01-geometry/03-hyperplane-arrangement-geometry.md) | concept | Cells, flats, faces and tope graphs of many soft hyperplanes |
+| [01-03 arrangement geometry](01-geometry/03-hyperplane-arrangement-geometry.md) | gated | `omnibias.partition.arrangement`; temperature collapse, sampled subgraph, sound gap not P vs NP; G1–G4 CI; cost gates smoke-earned, not in CI `all_passed` |
 | [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | gated | Exact-`Q` weights in `omnibias.difference`; G1–G4 earned |
 | [01-05 mollifier calculus](01-geometry/05-mollifier-distribution-calculus.md) | gated | `MollifierSpec` / `tail_bound`; certified exponential tails, not compact support; G1–G3 earned; G4 deferred to VPINN |
-| [01-06 OMBU wavelet frames](01-geometry/06-ombu-wavelet-frames.md) | concept | `sigma'` as mother wavelet; bias translates, tempering dilates |
-| [01-07 order as frequency](01-geometry/07-order-as-frequency-spectral-design.md) | gated | `BandPlan` / `peak_frequency`; pack order is a band selector; G1–G2 earned; G3 not in CI `all_passed`; 01-06 frames stay concept |
-| [01-08 tropical-log homotopy](01-geometry/08-tropical-log-homotopy.md) | concept | A differentiable path between the log and max-plus semirings |
-| [01-09 equality-locus calculus](01-geometry/09-equality-locus-and-intersection-calculus.md) | designed | Forcing outputs equal: the shared level set and its closed-form Jacobian |
-| [01-10 jet-bundle formalization](01-geometry/10-jet-bundle-formalization.md) | concept | The formal language: sections, prolongation, fibers, stratification |
+| [01-06 OMBU wavelet frames](01-geometry/06-ombu-wavelet-frames.md) | gated | `FrameSpec`; `sigma'` not admissible; not orthonormal / not compactly supported; G1–G3 CI; G4 denoising smoke-earned, not in CI `all_passed` |
+| [01-07 order as frequency](01-geometry/07-order-as-frequency-spectral-design.md) | gated | `BandPlan` / `peak_frequency`; pack order is a band selector, not Littlewood-Paley completeness; G1–G2 earned; G3 not in CI `all_passed` |
+| [01-08 tropical-log homotopy](01-geometry/08-tropical-log-homotopy.md) | gated | `omnibias.struct._core.tropical`; reuses `logsumexp_gap_bound`; G4 `--full` only; cost gates smoke-earned, not in CI `all_passed` |
+| [01-09 equality-locus calculus](01-geometry/09-equality-locus-and-intersection-calculus.md) | gated | Constraint manifold, not a PDE solver; `branch` / `condition` / `converged`; G1–G5 CI; G6 parity |
+| [01-10 jet-bundle formalization](01-geometry/10-jet-bundle-formalization.md) | gated | Vocabulary / contact test, not a discovery and not a package |
 | [01-11 rational exactness](01-geometry/11-rational-exactness-and-new-lean-obligations.md) | designed | Collapse weights are rationals, so the new math is Lean-checkable |
-| [01-12 conjugate Hilbert tower](01-geometry/12-conjugate-hilbert-tower.md) | designed | `H` commutes with `d/dx`, so a closed-form conjugate tower exists |
+| [01-12 conjugate Hilbert tower](01-geometry/12-conjugate-hilbert-tower.md) | gated | Line Hilbert only; G1–G4 CI; G5 campaign-artifact, not in CI `all_passed` |
 
 ### 02 Architectures
 
 | Spec | Status | One line |
 |---|---|---|
 | [02-01 scan-net](02-architectures/01-scan-net-gridless-cnn.md) | gated | Stacked scan banks; equivariance per-layer, on-lattice, not `R^D`; G1/G2/G5 earned; G3 cost and G4 k-NN recorded, not CI `all_passed` |
-| [02-02 arrangement graph network](02-architectures/02-arrangement-graph-network.md) | concept | Message passing on the face lattice, then decode and certify |
+| [02-02 arrangement graph network](02-architectures/02-arrangement-graph-network.md) | gated | Sampled tope subgraph; temperature collapse; sound gap, not P vs NP; G3 vs k-NN smoke/`--full`; cost gates smoke-earned, not in CI `all_passed` |
 | [02-03 jet-KAN](02-architectures/03-jet-kan-univariate-basis.md) | gated | Edge-wise univariate bases; exactness of the model jet, not the target; KA theorem does not justify; G2 cost not CI-gated |
 | [02-04 weak-form VPINN](02-architectures/04-weak-form-vpinn-closed-test-functions.md) | gated | Exact integrals only for polynomial coeffs on boxes; boundary bound on by default |
 | [02-05 multi-interface PINN](02-architectures/05-multi-interface-transmission-pinn.md) | gated | Parallel interfaces; `alpha -> inf` is sharpening, neither collapse |
-| [02-06 potential theory and BEM-net](02-architectures/06-potential-theory-and-bem-net.md) | concept | Layer potentials from the antiderivative window |
-| [02-07 hierarchical pack tree](02-architectures/07-hierarchical-pack-tree-fmm.md) | concept | Near and far field split for large scan banks |
-| [02-08 equivariant and manifold scan](02-architectures/08-equivariant-and-manifold-scan.md) | concept | Orientation orbits and scanning in chart coordinates |
-| [02-09 soliton tanh-method nets](02-architectures/09-soliton-tanh-method-networks.md) | designed | Polynomials in `tanh` are exactly the classical traveling-wave ansatz |
-| [02-10 Hermite ladder nets](02-architectures/10-hermite-ladder-oscillator-net.md) | designed | The gaussian base carries an exact raising and lowering algebra |
-| [02-11 transfer-matrix layered media](02-architectures/11-transfer-matrix-layered-media.md) | concept | Parallel planes as a layered medium with scattering layers |
-| [02-12 equality-intersection nets](02-architectures/12-equality-intersection-ansatz-nets.md) | designed | An implicit layer that solves `f_i = f_j` by closed-form Newton |
-| [02-13 linearizing transforms](02-architectures/13-linearizing-transform-layers.md) | designed | Cole-Hopf, Miura, Backlund and Darboux as exact jet operations |
-| [02-14 Wilson-line holonomy band](02-architectures/14-wilson-line-holonomy-band.md) | concept | The slab as the home of a parallel transport |
+| [02-06 potential theory and BEM-net](02-architectures/06-potential-theory-and-bem-net.md) | gated | PDE exact off-surface; BC approximated; linear constant-coeff homogeneous; G3 small-N if pack-tree crossover is high |
+| [02-07 hierarchical pack tree](02-architectures/07-hierarchical-pack-tree-fmm.md) | gated | 1-D offsets; `eta=0` bit-identical to dense; G3 complexity smoke-recorded, not in CI `all_passed` |
+| [02-08 equivariant and manifold scan](02-architectures/08-equivariant-and-manifold-scan.md) | gated | Gaussian-family steering only; discrete `C_L`, not SO(2)/SO(3) |
+| [02-09 soliton tanh-method nets](02-architectures/09-soliton-tanh-method-networks.md) | gated | Tanh algebra, not a collapse; multi-kink is not the n-soliton formula; G4 `--full` |
+| [02-10 Hermite ladder nets](02-architectures/10-hermite-ladder-oscillator-net.md) | gated | Raw tower is not the QHO eigenbasis; Rodrigues reweight required; G4 FermiNet `--full`; G5 may lose |
+| [02-11 transfer-matrix layered media](02-architectures/11-transfer-matrix-layered-media.md) | gated | 1-D ABCD; `continuum_claim=False`; distinct from `geometry.gauge.transfer` |
+| [02-12 equality-intersection nets](02-architectures/12-equality-intersection-ansatz-nets.md) | gated | Layer on 01-09; always `branch` / `condition` / `converged`; not a general PDE solver |
+| [02-13 linearizing transforms](02-architectures/13-linearizing-transform-layers.md) | gated | Named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; 03-11 search stays designed |
+| [02-14 Wilson-line holonomy band](02-architectures/14-wilson-line-holonomy-band.md) | gated | Closed form abelian + transverse-constant; open lines gauge-dependent; no YM / mass gap / continuum claim |
 
 ### 03 Algorithms and paradigms
 

@@ -1,0 +1,51 @@
+{
+  "schema": "omnibias.benchmark.arrangement_graph.v1",
+  "generated_utc": "2026-08-15T18:16:49Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke"
+  },
+  "rss_mb_at_start": 823.15,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_graph",
+        "passed": true,
+        "n_cells": 9,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g2_gap_sound",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_vs_knn",
+        "passed": true,
+        "in_ci_all_passed": false,
+        "note": "smoke/--full vs k-NN GNN + RegionModels"
+      },
+      {
+        "name": "g4_scaling_cutoff",
+        "passed": true,
+        "cutoff_n": 12,
+        "cutoff_D": 4,
+        "in_ci_all_passed": false
+      }
+    ]
+  },
+  "honesty": {
+    "sampling": "subgraph / lower bound",
+    "collapse": "temperature (beta -> inf), not founding delta -> 0",
+    "p_vs_np": false
+  }
+}

@@ -6,7 +6,7 @@
 and tempering is its dilation parameter, so a bias-scan bank over `(offset,
 scale)` is a **wavelet frame with an exact derivative tower on every atom**.
 
-- **Status**: concept
+- **Status**: gated (G1–G3 CI; G4 denoising smoke-earned, not in CI `all_passed`; `sigma'` not admissible)
 - **Depends on**: 01-02, 01-05
 - **Blocks**: 01-07, 02-01, 02-07, 02-08, 02-10, 03-05, 05-01
 

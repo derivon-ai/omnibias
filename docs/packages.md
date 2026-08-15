@@ -13,13 +13,13 @@ Published first and held to the [API-stability contract](stability.md).
 
 | Package | Version | Status | Scope |
 |---|---|---|---|
-| omnibias-core | 0.4.0 | Beta | Pure-Python closed-form n-th derivative core: Eulerian / Legendre / Hermite coefficient generators, the backend-agnostic `ActivationSpec`, plus gated Wave-1 algebra (`MultiPackSpec`, `BankSpec`) and Wave-3 `MollifierSpec` / `BandPlan`. |
-| omnibias-torch | 0.4.0 | Beta | PyTorch backend: OMBU, operator-typed blocks, closed-form activation-derivative kernels, reference PINN / CmbNet / CvxLayer architectures; gated `MultiPackUnit` / `BiasScan` / `ScanNet` / `JetKAN`. |
-| omnibias-jax | 0.4.0 | Beta | JAX backend: closed-form n-th derivative kernels, neural-field Laplacian / Hessian, Born-Oppenheimer derivative tools for VMC; gated `init_multipack` / `bias_scan` / Scan-Net / Jet-KAN twins. |
+| omnibias-core | 0.4.0 | Beta | Pure-Python closed-form n-th derivative core: Eulerian / Legendre / Hermite coefficient generators, the backend-agnostic `ActivationSpec`, plus gated Wave-1 algebra (`MultiPackSpec`, `BankSpec`) and Wave-3 `MollifierSpec` / `BandPlan` / `FrameSpec` / locus / conjugate Hilbert / ladder / transfer / tanh-method. |
+| omnibias-torch | 0.4.0 | Beta | PyTorch backend: OMBU, operator-typed blocks, closed-form activation-derivative kernels, reference PINN / CmbNet / CvxLayer architectures; gated `MultiPackUnit` / `BiasScan` / `ScanNet` / `JetKAN` / `LadderNet` / `EquivariantScan` / hierarchical scan. |
+| omnibias-jax | 0.4.0 | Beta | JAX backend: closed-form n-th derivative kernels, neural-field Laplacian / Hessian, Born-Oppenheimer derivative tools for VMC; gated `init_multipack` / `bias_scan` / Scan-Net / Jet-KAN / ladder / equivariant-scan twins. |
 | omnibias-ferminet | 0.2.0 | Beta | FermiNet bridge: folx-compatible Laplacian, restricted Tier-2 ansatz, analytic nuclear Hessian / Born-Oppenheimer primitives. |
-| omnibias-fields | 0.1.0 | Beta | Backend-agnostic field substrate (`FieldState`, attribute-DSL views, sigma^(n) cache) and the closed-form differential-operator surface (grad / div / curl / laplacian / hessian / jacobian, integration, Sobolev norms); gated weak-form VPINN (`omnibias.fields.weak`). |
-| omnibias-pinn | 0.1.0 | Beta | Physics-informed neural networks: typed fields, hard-conservation cages, PDE residuals, diagnostics; alpha `train` / `domain` / `operator` / `solver` (four-gap gated); gated `omnibias.pinn.interface` transmission PINN (not XPINN `_core.interface`). |
-| omnibias-geometry | 0.2.0 | Beta | Differential geometry: metric, Christoffel, covariant derivative, Laplace-Beltrami, Riemann / Ricci / scalar curvature, geodesics, exterior calculus, learned-chart pullback metric. |
+| omnibias-fields | 0.1.0 | Beta | Backend-agnostic field substrate (`FieldState`, attribute-DSL views, sigma^(n) cache) and the closed-form differential-operator surface (grad / div / curl / laplacian / hessian / jacobian, integration, Sobolev norms); gated weak-form VPINN (`omnibias.fields.weak`) and equality-locus layer (`omnibias.fields.locus`). |
+| omnibias-pinn | 0.1.0 | Beta | Physics-informed neural networks: typed fields, hard-conservation cages, PDE residuals, diagnostics; alpha `train` / `domain` / `operator` / `solver` (four-gap gated); gated `omnibias.pinn.interface` transmission PINN (not XPINN `_core.interface`) plus gated travelling / layered / BEM / linearizing-transform submodules. |
+| omnibias-geometry | 0.2.0 | Beta | Differential geometry: metric, Christoffel, covariant derivative, Laplace-Beltrami, Riemann / Ricci / scalar curvature, geodesics, exterior calculus, learned-chart pullback metric; gated chart scan and Wilson-line holonomy band. |
 | omnibias-keras | 0.0.1a1 | Alpha | Keras 3 unified backend: OMBU, operator blocks, and drop-in `cmbDense` / `cmbConv` layers on TensorFlow / JAX / PyTorch. |
 
 ## Extended set (34, Alpha)
@@ -54,17 +54,17 @@ API-stability contract -- the public surface may shift between alpha releases.
 | omnibias-discrete | 0.1.0a1 | Alpha | Shared discrete-optimization substrate: the DiscreteProblem seam, annealed sigmoid relaxation, rounding + k-flip decoder, and a Lasserre / moment-SOS optimality-gap certificate; ships a MaxSAT front-end. |
 | omnibias-qubo | 0.1.0a1 | Alpha | Differentiable + certified QUBO / Ising: annealed relaxation, 1-flip decoder, brute-force oracle, and a spectral / SOS-Lasserre gap certificate; max-cut / MIS front-ends. |
 | omnibias-submodular | 0.1.0a1 | Alpha | Differentiable + certified submodular optimization: multilinear extension + continuous greedy, pipage / swap rounding, a (1 - 1/e) / curvature guarantee + gap sandwich, and exact P-class minimization. |
-| omnibias-struct | 0.1.0a1 | Alpha | Certified differentiable dynamic programming: soft Viterbi / shortest-path / CTC via logsumexp_beta, differentiated exactly by the softplus / sigmoid tower, with a gap certificate vs hard DP. |
+| omnibias-struct | 0.1.0a1 | Alpha | Certified differentiable dynamic programming: soft Viterbi / shortest-path / CTC via logsumexp_beta, differentiated exactly by the softplus / sigmoid tower, with a gap certificate vs hard DP; gated tropical homotopy (`omnibias.struct._core.tropical`). |
 | omnibias-combinatorics | 0.1.0a1 | Alpha | Exact differentiable matching / flow / matroid layers: entropic relaxations onto integral polytopes with a tight LP-dual optimality-gap certificate. |
 | omnibias-nphard | 0.1.0a1 | Alpha | Differentiable certified heuristics for named NP-hard families (QAP / GAP / scheduling) on omnibias-qubo, with an MCTS search track and honest (non-tight) gap certificates. |
 | omnibias-routing | 0.1.0a1 | Alpha | Certified + differentiable routing: a poly-size TSP relaxation + 2-opt decoder + Neumaier-Shcherbina LP gap certificate; decision-focused predict-then-optimize. |
 | omnibias-convex | 0.1.0a1 | Alpha | Differentiable + certified convex LP / QP: a closed-form-Hessian log-barrier interior-point solver, KKT implicit-function gradients, and verified optimality enclosures. |
 | omnibias-sos | 0.1.0a1 | Alpha | Certified positivity: Sum-of-Squares / Positivstellensatz decompositions with a rigorous interval LDL^T PSD certificate that can earn `theorem_prover_verified`. |
-| omnibias-graph | 0.1.0a1 | Alpha | Differentiable spectral graph operators (Laplacians, spectral embedding, heat kernel) and combinatorial relaxations (Gumbel-Sinkhorn, SoftSort, soft top-k). |
+| omnibias-graph | 0.1.0a1 | Alpha | Differentiable spectral graph operators (Laplacians, spectral embedding, heat kernel) and combinatorial relaxations (Gumbel-Sinkhorn, SoftSort, soft top-k); gated Face-Net on a sampled arrangement subgraph. |
 | omnibias-logic | 0.1.0a1 | Alpha | Differentiable + certified Boolean logic: weighted MaxSAT plus (weighted) #SAT / model counting with inclusion-exclusion count enclosures. |
 | omnibias-control | 0.1.0a1 | Alpha | Differentiable control with a model-relative safety certificate: a batched CBF-QP safety filter and a recoverable-set certificate. |
 | omnibias-tab | 0.1.0a1 | Alpha | Differentiable, exactly second-order-trained, certified soft decision-tree ensembles for tabular data; benchmarked against LightGBM. |
-| omnibias-partition | 0.1.0a1 | Alpha | Certified soft partition-of-unity primitive: soft-split gates hardening as beta->inf, a sound membership-gap certificate, and a shared region-model registry. |
+| omnibias-partition | 0.1.0a1 | Alpha | Certified soft partition-of-unity primitive: soft-split gates hardening as beta->inf, a sound membership-gap certificate, a shared region-model registry, and gated arrangement geometry (`omnibias.partition.arrangement`). |
 | omnibias-shape | 0.1.0a1 | Alpha | Differentiable soft shape / occupancy fields and soft-coverage (soft-OR / log-sum-exp union) operators with a closed-form derivative tower. |
 
 ### Learning primitives

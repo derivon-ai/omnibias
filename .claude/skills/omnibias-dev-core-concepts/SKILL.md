@@ -31,7 +31,11 @@ coefficients.
 | Bias scan (gated 01-02) | shared template on a bank of offsets along `w` | `omnibias.core.scan`; `omnibias.{torch,jax}.scan`; `docs/api/scan.md` |
 | Irregular stencils (gated 01-04) | exact-`Q` Birkhoff weights; order asymptotic in `h` | `omnibias.difference._core.irregular`; `docs/api/difference.md` |
 | Mollifier (gated 01-05) | pack as a test-function generator; certified exponential tails, **not** compact support; higher-order kernels take **negative** values | `omnibias.core.mollifier`; `docs/api/mollifier.md` |
-| Band plan (gated 01-07) | pack order is a **band selector** (`BandPlan`, `peak_frequency`); 01-06 wavelet frames stay concept | `omnibias.core.spectral_design`; `docs/api/spectral_design.md` |
+| Band plan (gated 01-07) | pack order is a **band selector** (`BandPlan`, `peak_frequency`), not a Littlewood-Paley completeness claim | `omnibias.core.spectral_design`; `docs/api/spectral_design.md` |
+| OMBU frames (gated 01-06) | `sigma'` is **not** admissible; frames are not orthonormal and not compactly supported | `omnibias.core.frames`; `docs/api/frames.md` |
+| Equality locus (gated 01-09 / 02-12) | constraint manifold, not a general PDE solver; always `branch` / `condition` / `converged` | `omnibias.core.locus`; `omnibias.fields.locus`; `docs/api/locus.md` |
+| Jet vocabulary (gated 01-10) | dictionary / contact test, **not** a discovery and **not** a package | `omnibias.core.jets`; `docs/theory-jets.md` |
+| Arrangement / tropical / Face-Net (gated 01-03 / 01-08 / 02-02) | `beta -> inf` is **temperature** collapse; sampling is a subgraph; sound gap, not P vs NP | `omnibias.partition.arrangement`; `omnibias.struct._core.tropical`; `omnibias.graph.arrangement` |
 
 ## Bias collapse -- the founding definition (canonical)
 
@@ -80,10 +84,16 @@ Wave-1 gated extensions of this geometry (not shipped): heterogeneous packs
 `gamma` is not `delta -> 0`), and exact-`Q` irregular stencils. `BiasScan`
 templates reuse the six `OperatorBlock` roles; it is not a seventh role.
 Wave-3 knobs on the same geometry: a pack as a mollifier (`MollifierSpec` /
-`tail_bound`; tails, not compact support) and pack order as a frequency
-selector (`BandPlan`; not a Littlewood-Paley frame). Stacked consumers
-(`ScanNet`, `JetKAN`, `fields.weak`, `pinn.interface`) stay gated; `alpha -> inf`
-at an interface is sharpening, neither collapse.
+`tail_bound`; tails, not compact support), pack order as a frequency
+selector (`BandPlan`; not a Littlewood-Paley frame), and a frame reading
+of the scan (`FrameSpec`; `sigma'` not admissible). Stacked consumers
+(`ScanNet`, `JetKAN`, `LadderNet`, `EquivariantScan`, `fields.weak`,
+`fields.locus`, `pinn.interface` / `.travelling` / `.layered` / `.bem` /
+`.transform`, `geometry.gauge.band`, `graph.arrangement`) stay gated;
+`alpha -> inf` at an interface is sharpening, neither collapse. Cell
+membership on an arrangement is temperature collapse, not founding
+`delta -> 0`. Holonomy-band closed form is abelian + transverse-constant
+only; no Yang-Mills / mass-gap claim.
 
 **Guard the boundary.** "Single hyperplane" alone does **not** identify bias
 collapse: `sigma(beta (w . x - t))` also has one hyperplane as its decision

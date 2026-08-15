@@ -9,7 +9,7 @@ simultaneously closed under differentiation *and* under `H`, which attacks the
 recorded Hilbert-and-dictionary floor at the basis level rather than by
 quadrature refinement.
 
-- **Status**: designed
+- **Status**: gated (G1–G4 CI; G5 campaign-artifact, not in CI `all_passed`; line Hilbert only)
 - **Depends on**: 01-01
 - **Blocks**: 02-06, 07-02, 07-03
 

@@ -68,8 +68,11 @@ and `init_bias_scan` / `bias_scan` / `BankSpec` (01-02). Same honesty as the
 torch modules: interior shift along `w`, `gamma` is not `delta -> 0`.
 
 Gated Wave-3 twins (not shipped): Scan-Net (`init_scan_net` / `scan_net_apply`;
-on-lattice equivariance) and Jet-KAN (`init_jet_kan` / `jet_kan_apply`;
-model-jet exactness, KA theorem does not justify).
+on-lattice equivariance), Jet-KAN (`init_jet_kan` / `jet_kan_apply`;
+model-jet exactness, KA theorem does not justify), Hermite ladder
+(`hermite_basis` / `ladder_apply`; Rodrigues reweight required),
+equivariant scan (gaussian-family steering; discrete `C_L`), and
+`hierarchical_scan` (1-D offsets).
 
 ## License
 

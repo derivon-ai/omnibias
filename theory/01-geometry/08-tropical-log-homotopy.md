@@ -7,7 +7,7 @@
 every `beta`, the whole tropical picture of a hyperplane arrangement becomes a
 differentiable object with a closed-form gap to its hard limit.
 
-- **Status**: concept
+- **Status**: gated (G1–G3 CI; G4 `--full` only; reuses `logsumexp_gap_bound`; cost gates smoke-earned, not in CI `all_passed`)
 - **Depends on**: 01-03
 - **Blocks**: 02-02, 03-01, 03-02, 03-03, 03-05
 

@@ -49,6 +49,7 @@ from omnibias.jax.architectures.jetkan import (
     jetkan_from_band_plan,
     refine_pack,
 )
+from omnibias.jax.architectures.ladder import apply_operator, hermite_basis, ladder_apply
 from omnibias.jax.architectures.multiscale import (
     AdaptiveActivation,
     AdaptiveJetMLP,
@@ -88,7 +89,9 @@ __all__ = [
     "MscaleMLP",
     "ScanNetConfig",
     "ScanNetParams",
+    "apply_operator",
     "dirichlet_interval",
+    "hermite_basis",
     "homogeneous_box",
     "init_jet_kan",
     "init_scan_net",
@@ -98,6 +101,7 @@ __all__ = [
     "jet_kan_jet",
     "jet_kan_jet_mv",
     "jetkan_from_band_plan",
+    "ladder_apply",
     "make_adaptive_activation",
     "make_adaptive_jet_mlp",
     "make_attention_jet_mlp",

@@ -8,7 +8,7 @@ logarithm, differentiate, integrate — is available exactly on jets, so a layer
 can carry a nonlinear problem into a linear one, solve it there, and map back
 with no approximation anywhere in the transform.
 
-- **Status**: designed
+- **Status**: gated (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; 03-11 search stays designed)
 - **Depends on**: 01-01, 01-09, 02-09, 03-11
 - **Blocks**: 07-02
 

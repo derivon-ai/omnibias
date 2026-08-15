@@ -6,6 +6,49 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — remaining Group 02 gated architectures (01-03, 01-06, 01-08–01-10, 01-12, 02-02, 02-06–02-14)
+
+- Arrangement geometry in `omnibias.partition.arrangement`. Cell membership
+  is temperature collapse (`beta -> inf`), not founding `delta -> 0`.
+  Sampling is a subgraph. Sound gap, not P vs NP. No new package.
+- OMBU frames in `omnibias.core.frames`. `sigma'` is not admissible;
+  frames are not orthonormal and not compactly supported. Pack order
+  remains a band selector (01-07), not a Littlewood-Paley claim.
+- Tropical homotopy in `omnibias.struct._core.tropical`, reusing
+  `logsumexp_gap_bound`. Large `(n, D)` refused. G4 path-following is
+  `--full` only.
+- Equality locus in `omnibias.core.locus` + `omnibias.fields.locus`.
+  Constraint manifold, not a general PDE solver; always returns
+  `branch` / `condition` / `converged`.
+- Jet-bundle vocabulary in `docs/theory-jets.md` + `contact_residual` /
+  `is_holonomic`. Dictionary, not a discovery; no `omnibias-jetbundle`.
+- Conjugate Hilbert tower extending `hardy_line` plus
+  `omnibias.core.conjugate` / `{torch,jax}.conjugate`. Line Hilbert only;
+  G5 is a projection defect, not a stretch-gate clearing, and is not in
+  CI `all_passed`.
+- Face-Net in `omnibias.graph.arrangement` on a sampled tope subgraph.
+- BEM-Net in `omnibias.pinn.bem`: PDE exact off-surface; BC approximated;
+  linear constant-coeff homogeneous only.
+- Hierarchical pack tree in `omnibias.core.hierarchy` +
+  `{torch,jax}.hierarchy`. 1-D offsets; `eta=0` bit-identical to dense.
+  G3 complexity smoke-recorded.
+- Equivariant / chart scan: gaussian-family steering only; discrete
+  `C_L`, not SO(2)/SO(3).
+- Tanh-method solitons: tanh algebra, not a collapse; multi-kink is not
+  the n-soliton formula.
+- Hermite ladder: raw tower is not the QHO eigenbasis; Rodrigues
+  reweight required. Anharmonic G5 may lose.
+- Layered transfer: 1-D ABCD stacks; `continuum_claim=False`; distinct
+  from `geometry.gauge.transfer`.
+- Named linearizing transforms (Cole-Hopf / Miura / Bäcklund / Darboux).
+  Exactness to jet order N. 03-11 search stays designed.
+- Holonomy band wrapping existing gauge transport. Closed form only
+  abelian + transverse-constant; open lines gauge-dependent; no
+  Yang-Mills / mass gap / continuum claim.
+
+Cost / wall-time / FermiNet-many-body gates are smoke-earned, not in CI
+`all_passed`. Zero new packages.
+
 ### Added — Wave-3 gated algebra + architectures (01-05, 01-07, 02-01, 02-03, 02-04, 02-05)
 
 - Mollifier calculus in `omnibias.core.mollifier` (`MollifierSpec`,
@@ -13,8 +56,8 @@ distributions is versioned independently under semantic versioning.
   compact support; higher-order kernels take negative values. Gated
   (G1–G3 earned; G4 deferred to VPINN).
 - Spectral design in `omnibias.core.spectral_design` (`BandPlan`,
-  `peak_frequency`). Pack order is a band selector; 01-06 wavelet frames
-  stay concept. Gated (G1–G2 CI-gated; G3 not in CI `all_passed`).
+  `peak_frequency`). Pack order is a band selector, not a Littlewood-Paley
+  completeness claim. Gated (G1–G2 CI-gated; G3 not in CI `all_passed`).
 - Scan-Net torch `nn.Module` + jax pytree twins. Equivariance is
   per-layer, per-direction, on-lattice, not translation on `R^D`; `gamma`
   is not `delta -> 0`. Templates reuse the six `OperatorBlock` roles.

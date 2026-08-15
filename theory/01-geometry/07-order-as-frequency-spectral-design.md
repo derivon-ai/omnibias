@@ -7,7 +7,7 @@ is a frequency-band selector**: choosing `n` and the tempering scale `alpha`
 places a channel's sensitivity in a known band, which converts spectral-bias
 mitigation from a heuristic into a design calculation.
 
-- **Status**: gated (G1–G2 earned; G3 not in CI `all_passed`; 01-06 frames stay concept)
+- **Status**: gated (G1–G2 earned; G3 not in CI `all_passed`; pack order is a band selector, not Littlewood-Paley completeness)
 - **Depends on**: 01-01, 01-06
 - **Blocks**: 02-01, 02-05, 02-07, 03-07, 07-03
 

@@ -31,6 +31,11 @@ On top of the weights it ships:
 `split_kind ∈ {"oblique", "axis", "sparse"}`: axis-aligned and L1-sparse splits are the
 interpretable / heterogeneous-robust lever, available from day one.
 
+Gated arrangement geometry (`omnibias.partition.arrangement`) is the many-normal
+generalisation: the binary tree is the special case that agrees with
+`partition_weights`. Cell membership is temperature collapse; sampling is a
+subgraph, never a complete face lattice.
+
 Terminology: the gate's `beta → ∞` hardening is **temperature collapse**, the
 feasibility sense (a soft indicator becoming a 0/1 step) -- **not** the
 founding bias collapse (the multi-bias `delta → 0` limit to the closed-form derivative
