@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Riccati / Eulerian tower in Lean
+
+- `OmnibiasAnalytic.Tower` proves the sigmoid / tanh / sech / Hermite
+  recurrences on `ℤ[X]`, the first-derivative Riccati identities, and the
+  `iteratedDeriv` link theorems (softplus is the shifted sigmoid tower).
+  Pointwise `C^∞` / algebraic identities; not a finite-difference collapse.
+- `tower_coeffs_certificate` seals exact integer coefficients from
+  `omnibias.core.verified.coeffs`. The Mathlib bridge re-derives the list and
+  checks it against the Lean recurrence (`tower_coeffs` obligation class).
+
 ### Added — gauge ensemble language (Path B)
 
 - `EnsembleObservableTable` / `LEGAL_ENSEMBLE_ATOMS` are the third language:

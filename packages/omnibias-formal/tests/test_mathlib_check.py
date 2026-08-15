@@ -25,6 +25,7 @@ from omnibias.formal import (
     check_certificate,
     generate_obligation,
     mathlib_check_available,
+    tower_coeffs_certificate,
 )
 
 
@@ -222,6 +223,52 @@ def test_generate_pinn_margin_obligation() -> None:
     assert src is not None
     # A positive margin (error below threshold) is an enclosed-positive obligation.
     assert "OmnibiasAnalytic.Check.enclosed_pos" in src
+
+
+# --------------------------------------------------------------------------- #
+# Tower coefficients (exact integer recurrence).
+# --------------------------------------------------------------------------- #
+def test_generate_tower_coeffs_obligation() -> None:
+    cert = tower_coeffs_certificate("sigmoid", 2)
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "import OmnibiasAnalytic.Tower" in src
+    assert "sigmoidCoeffList 2 = [0, 1, -3, 2]" in src
+    assert "native_decide" in src
+    assert "collapse" not in src.lower() or "not a collapse" in src
+
+
+def test_tower_coeffs_mismatch_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={
+            "type": "tower_coeffs",
+            "family": "sigmoid",
+            "n": 2,
+            "coeffs": [0, 1, 0, 0],
+        },
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_tower_coeffs_unknown_family_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={"type": "tower_coeffs", "family": "mish", "n": 0, "coeffs": [1]},
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_check_certificate_tower_sigmoid_two() -> None:
+    cert = tower_coeffs_certificate("sigmoid", 2)
+    result = check_certificate(cert)
+    assert "sigmoidCoeffList 2" in result.obligation
+    if not mathlib_check_available():
+        assert result.available is False
+        assert result.verified is False
+    else:  # pragma: no cover - only on a machine with Lean + Mathlib
+        assert result.available is True
+        assert result.verified is True
 
 
 def test_check_certificate_generates_radii_obligation_without_toolchain() -> None:

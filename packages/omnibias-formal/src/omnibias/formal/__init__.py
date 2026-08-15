@@ -31,6 +31,11 @@ from omnibias.formal.mathlib_check import (
     generate_obligation,
     mathlib_check_available,
 )
+from omnibias.formal.tower import (
+    LEGAL_TOWER_FAMILIES,
+    tower_coeffs,
+    tower_coeffs_certificate,
+)
 
 try:
     __version__ = _pkg_version("omnibias-formal")
@@ -42,6 +47,7 @@ __lineage__ = "exempt: infrastructure"
 
 __all__ = [
     "DriveReport",
+    "LEGAL_TOWER_FAMILIES",
     "MATHLIB_CLAIM_KEY",
     "MathlibCheckResult",
     "MathlibVerdict",
@@ -54,4 +60,6 @@ __all__ = [
     "evaluate_with_mathlib",
     "generate_obligation",
     "mathlib_check_available",
+    "tower_coeffs",
+    "tower_coeffs_certificate",
 ]

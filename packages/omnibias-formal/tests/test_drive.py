@@ -27,6 +27,7 @@ from omnibias.formal import (
     drive_obligation,
     generate_obligation,
     mathlib_check_available,
+    tower_coeffs_certificate,
 )
 from omnibias.formal.drive import _summarize_lake_failure
 
@@ -66,6 +67,10 @@ def test_classify_krawczyk() -> None:
     assert classify_obligation(_krawczyk_cert()) == "krawczyk"
 
 
+def test_classify_tower_coeffs() -> None:
+    assert classify_obligation(tower_coeffs_certificate("sigmoid", 2)) == "tower_coeffs"
+
+
 def test_classify_none_for_straddling_interval() -> None:
     assert classify_obligation(interval_certificate("q", Interval(-1.0, 1.0))) is None
 
@@ -82,6 +87,7 @@ def test_classify_agrees_with_generate_obligation() -> None:
         interval_certificate("q", Interval(-1.0, 1.0)),
         positive_definite_certificate("pd", [Interval(1.0, 1.5)]),
         _krawczyk_cert(),
+        tower_coeffs_certificate("sigmoid", 2),
         {"foo": "bar"},
     ]
     for cert in certs:

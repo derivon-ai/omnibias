@@ -54,13 +54,16 @@ def test_passthrough_without_request() -> None:
 
 def test_mathlib_check_param_records_without_gating() -> None:
     verdict = evaluate_with_mathlib(_machine(), _conj(), mathlib_check=True)
-    # The obligation is generated; without a toolchain it is unavailable and
-    # unverified, but a PROVED verdict is NOT downgraded (no claim was asserted).
+    # ``mathlib_check`` records the tier without gating: a PROVED verdict is
+    # never downgraded when the claim was not asserted.
     assert verdict.status == "PROVED"
-    assert verdict.mathlib_verified is False
     if not mathlib_check_available():
+        assert verdict.mathlib_verified is False
         assert verdict.mathlib_available is False
         assert "enclosed_pos" in verdict.mathlib_obligation
+    else:  # pragma: no cover - only on a machine with Lean + Mathlib
+        assert verdict.mathlib_available is True
+        assert verdict.mathlib_verified is True
 
 
 def test_asserted_claim_without_verification_blocks() -> None:

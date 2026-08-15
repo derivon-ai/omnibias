@@ -34,6 +34,13 @@ a green build is meaningful.
   inequalities `p(r) < 0`, `κ(r) < 1`, and strict box containment that the integer
   kernel cannot even state. Reusable capability lemmas live in
   `OmnibiasAnalytic/Check/{Positivity,Kantorovich}.lean`.
+- **Tower coefficients** -- a `tower_coeffs` payload from
+  `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
+  one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived
+  from `omnibias.core.verified.coeffs` and checked against the Lean recurrences
+  in `OmnibiasAnalytic.Tower`. This is a coefficient identity, not an
+  `iteratedDeriv` replay and not a finite-difference collapse. The link theorems
+  (`iteratedDeriv_sigmoid` and siblings) live in the Lean library itself.
 
 The bridge is tamper-evident (reuses `verify_certificate_digest`) and degrades
 gracefully when no Lean toolchain is present.
@@ -76,6 +83,13 @@ implies `unproven_claim`. With no Lean toolchain present it degrades gracefully
 ## Bridge
 
 ::: omnibias.formal.mathlib_check
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Tower coefficients
+
+::: omnibias.formal.tower
     options:
       show_root_heading: false
       heading_level: 3
