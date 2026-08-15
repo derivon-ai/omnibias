@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — compact-box residual and finite-matrix gap in Lean
+
+- `OmnibiasAnalytic.Check.Compact` proves a named incompressible residual
+  lower bound on `[1/2, 1]²` and the characteristic-polynomial gap of
+  `[[13/2, 3/2], [3/2, 13/2]]` (ratio `5/8`). Not a continuum regularity
+  theorem or a continuum gauge claim.
+- `compact_box_certificate` seals a locked family. The Mathlib bridge
+  re-derives the rationals and applies the Check theorem (`compact_box`
+  obligation class). Existing leaf classes stay leaf-only.
+
 ### Added — named NK unique-zero instances in Lean
 
 - `OmnibiasAnalytic.Check.Kantorovich.Named` proves unique roots of three

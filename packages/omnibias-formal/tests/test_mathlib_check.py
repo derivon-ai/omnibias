@@ -23,6 +23,7 @@ from omnibias.formal import (
     MATHLIB_CLAIM_KEY,
     analytic_root,
     check_certificate,
+    compact_box_certificate,
     enclosure_trace_certificate,
     generate_obligation,
     mathlib_check_available,
@@ -431,6 +432,56 @@ def test_named_zero_unknown_family_yields_none() -> None:
         },
     )
     assert generate_obligation(cert) is None
+
+
+def test_generate_compact_box_ns() -> None:
+    cert = compact_box_certificate("ns_box")
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "import OmnibiasAnalytic.Check.Compact" in src
+    assert "open OmnibiasAnalytic.Check Set" in src
+    assert "ns_box_div_and_residual" in src
+    assert "nsBoxResidual" in src
+
+
+def test_generate_compact_box_transfer() -> None:
+    src = generate_obligation(compact_box_certificate("transfer_2x2")) or ""
+    assert "transfer_plant_charpoly_and_gap" in src
+    assert "transferChar" in src
+
+
+def test_compact_box_mismatch_yields_none() -> None:
+    cert = compact_box_certificate("ns_box")
+    payload = dict(cert["payload"])
+    payload["residual_lo"] = [1, 4]
+    bogus = make_certificate(claim="bogus", payload=payload)
+    assert generate_obligation(bogus) is None
+
+
+def test_compact_box_unknown_family_yields_none() -> None:
+    cert = make_certificate(
+        claim="bogus",
+        payload={
+            "type": "compact_box",
+            "family": "dottie",
+            "lo": [1, 2],
+            "hi": [1, 1],
+            "residual_lo": [1, 2],
+        },
+    )
+    assert generate_obligation(cert) is None
+
+
+def test_check_certificate_compact_box_ns() -> None:
+    cert = compact_box_certificate("ns_box")
+    result = check_certificate(cert)
+    assert "ns_box_div_and_residual" in result.obligation
+    if not mathlib_check_available():
+        assert result.available is False
+        assert result.verified is False
+    else:  # pragma: no cover - only on a machine with Lean + Mathlib
+        assert result.available is True
+        assert result.verified is True
 
 
 def test_check_certificate_named_zero_circle_line() -> None:

@@ -51,6 +51,11 @@ a green build is meaningful.
   Chebyshev `T₃` on `[3/4, 1]`). The generated obligation applies a sorry-free
   Check theorem that concludes a unique real root on that compact box. Not a
   continuum PDE, Lohner return map, or continuum CCF blow-up.
+- **Compact box** -- a `compact_box` payload from
+  `omnibias.formal.compact.compact_box_certificate`: a named incompressible
+  residual on `[1/2, 1]²`, or the characteristic polynomial of
+  `[[13/2, 3/2], [3/2, 13/2]]` (ratio `5/8`). Finite named data, not a
+  continuum regularity theorem or a continuum gauge claim.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived
@@ -76,7 +81,8 @@ implies `unproven_claim`.
 
 Every module in `formal/omnibias-analytic/` is `sorry`-free. The track discharges
 finite rational inequalities, a unique root of a named polynomial on a compact
-box, and replay of a planted rational enclosure DAG. Infinite analytic
+box, replay of a planted rational enclosure DAG, and named compact-box residual
+/ finite-matrix gap plants. Infinite analytic
 statements -- continuum regularity, asymptotics -- are not expressed here at
 all, so they can never be silently discharged here either. A green build
 certifies the emitted obligation and nothing beyond it.
@@ -122,6 +128,13 @@ implies `unproven_claim`. With no Lean toolchain present it degrades gracefully
 ## Named unique zeros
 
 ::: omnibias.formal.named
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Compact boxes
+
+::: omnibias.formal.compact
     options:
       show_root_heading: false
       heading_level: 3

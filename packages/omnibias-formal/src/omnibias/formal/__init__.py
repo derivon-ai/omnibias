@@ -31,6 +31,10 @@ from omnibias.formal.mathlib_check import (
     generate_obligation,
     mathlib_check_available,
 )
+from omnibias.formal.compact import (
+    LEGAL_COMPACT_FAMILIES,
+    compact_box_certificate,
+)
 from omnibias.formal.named import (
     LEGAL_NAMED_FAMILIES,
     named_zero_certificate,
@@ -60,6 +64,7 @@ __lineage__ = "exempt: infrastructure"
 
 __all__ = [
     "DriveReport",
+    "LEGAL_COMPACT_FAMILIES",
     "LEGAL_NAMED_FAMILIES",
     "LEGAL_NK_FAMILIES",
     "LEGAL_NK_ROUTES",
@@ -72,6 +77,7 @@ __all__ = [
     "__version__",
     "analytic_root",
     "check_certificate",
+    "compact_box_certificate",
     "classify_obligation",
     "drive_obligation",
     "enclosure_trace_certificate",

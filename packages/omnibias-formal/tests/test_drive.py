@@ -24,6 +24,7 @@ from omnibias.formal import (
     MATHLIB_CLAIM_KEY,
     DriveReport,
     classify_obligation,
+    compact_box_certificate,
     drive_obligation,
     enclosure_trace_certificate,
     generate_obligation,
@@ -86,6 +87,10 @@ def test_classify_named_zero() -> None:
     assert classify_obligation(named_zero_certificate("circle_line")) == "named_zero"
 
 
+def test_classify_compact_box() -> None:
+    assert classify_obligation(compact_box_certificate("ns_box")) == "compact_box"
+
+
 def test_classify_none_for_straddling_interval() -> None:
     assert classify_obligation(interval_certificate("q", Interval(-1.0, 1.0))) is None
 
@@ -106,6 +111,7 @@ def test_classify_agrees_with_generate_obligation() -> None:
         nk_existence_certificate("radii"),
         enclosure_trace_certificate("nk"),
         named_zero_certificate("circle_line"),
+        compact_box_certificate("ns_box"),
         {"foo": "bar"},
     ]
     for cert in certs:
