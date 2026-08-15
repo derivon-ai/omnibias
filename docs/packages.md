@@ -13,9 +13,9 @@ Published first and held to the [API-stability contract](stability.md).
 
 | Package | Version | Status | Scope |
 |---|---|---|---|
-| omnibias-core | 0.4.0 | Beta | Pure-Python closed-form n-th derivative core: Eulerian / Legendre / Hermite coefficient generators and the backend-agnostic `ActivationSpec`. |
-| omnibias-torch | 0.4.0 | Beta | PyTorch backend: OMBU, operator-typed blocks, closed-form activation-derivative kernels, reference PINN / CmbNet / CvxLayer architectures. |
-| omnibias-jax | 0.4.0 | Beta | JAX backend: closed-form n-th derivative kernels, neural-field Laplacian / Hessian, Born-Oppenheimer derivative tools for VMC. |
+| omnibias-core | 0.4.0 | Beta | Pure-Python closed-form n-th derivative core: Eulerian / Legendre / Hermite coefficient generators, the backend-agnostic `ActivationSpec`, plus gated Wave-1 algebra (`MultiPackSpec`, `BankSpec`). |
+| omnibias-torch | 0.4.0 | Beta | PyTorch backend: OMBU, operator-typed blocks, closed-form activation-derivative kernels, reference PINN / CmbNet / CvxLayer architectures; gated `MultiPackUnit` / `BiasScan`. |
+| omnibias-jax | 0.4.0 | Beta | JAX backend: closed-form n-th derivative kernels, neural-field Laplacian / Hessian, Born-Oppenheimer derivative tools for VMC; gated `init_multipack` / `bias_scan` twins. |
 | omnibias-ferminet | 0.2.0 | Beta | FermiNet bridge: folx-compatible Laplacian, restricted Tier-2 ansatz, analytic nuclear Hessian / Born-Oppenheimer primitives. |
 | omnibias-fields | 0.1.0 | Beta | Backend-agnostic field substrate (`FieldState`, attribute-DSL views, sigma^(n) cache) and the closed-form differential-operator surface (grad / div / curl / laplacian / hessian / jacobian, integration, Sobolev norms). |
 | omnibias-pinn | 0.1.0 | Beta | Physics-informed neural networks: typed fields, hard-conservation cages, PDE residuals, diagnostics; alpha `train` / `domain` / `operator` / `solver` (four-gap gated). |
@@ -36,7 +36,7 @@ API-stability contract -- the public surface may shift between alpha releases.
 | omnibias-measure | 0.1.0a1 | Alpha | Autograd-native measure integration: a `Measure` abstraction (pushforward / product / importance reweighting) and the measure integral `int f dmu`, layer-cake / distribution-function, importance-sampling and simple-function primitives, with trainable torch / jax layers. |
 | omnibias-score | 0.1.0a1 | Alpha | Score / SDE operators: closed-form score (grad log p), the Ito generator, and the Fokker-Planck adjoint, composed from the fields grad / Hessian primitives. |
 | omnibias-variational | 0.1.0a1 | Alpha | Least-action / variational calculus: action integrals, Euler-Lagrange / Euler-Poisson functional derivatives, Hamiltonian / Noether, symplectic integrators, rigorous action enclosures. |
-| omnibias-difference | 0.1.0a1 | Alpha | The founding delta->0 register: certified finite-difference -> derivative extraction, umbral / Sheffer calculus, asymptotic-coefficient reading (Stirling / Bernoulli / Euler). |
+| omnibias-difference | 0.1.0a1 | Alpha | The founding delta->0 register: certified finite-difference -> derivative extraction, umbral / Sheffer calculus, asymptotic-coefficient reading (Stirling / Bernoulli / Euler), gated exact-Q irregular Birkhoff stencils (01-04). |
 | omnibias-qcalculus | 0.1.0a1 | Alpha | Quantum / q-calculus: q-numbers, Gaussian q-binomials, the Jackson q-derivative / q-integral, q-exponentials; the q->1 limit recovers ordinary calculus. |
 | omnibias-timescale | 0.1.0a1 | Alpha | Time-scale (Hilger) calculus unifying the continuous and discrete registers via delta / nabla derivatives; graininess mu->0 recovers the derivative tower. |
 | omnibias-holonomic | 0.1.0a1 | Alpha | D-finite / holonomic engine: Ore (skew-polynomial) algebra, Gosper + creative telescoping, and Lean-certified binomial identities. |

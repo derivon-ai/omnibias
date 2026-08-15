@@ -278,6 +278,10 @@ jobs:
           source .venv-cross/bin/activate
           pip install mpmath
           JAX_PLATFORMS=cpu python benchmarks/multipack_birkhoff.py
+      - name: Run bias-scan smoke (01-02 G1/G2/G3; G4 smoke-earned, not all_passed)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/bias_scan.py
       - name: Run the closed-form integral-transform example (smoke)
         run: |
           source .venv-cross/bin/activate
@@ -644,6 +648,10 @@ jobs:
         run: |
           source .venv-difference/bin/activate
           python -m pytest packages/omnibias-difference/tests -q
+      - name: Irregular Birkhoff stencil smoke (01-04 G1–G4)
+        run: |
+          source .venv-difference/bin/activate
+          python benchmarks/irregular_stencils.py
       - name: Example smoke (certified difference towers)
         run: |
           source .venv-difference/bin/activate

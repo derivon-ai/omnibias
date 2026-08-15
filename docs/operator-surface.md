@@ -51,6 +51,10 @@ it is the same parallel-hyperplane family, read in the antiderivative direction
 instead of the derivative direction. See
 [`theory.md` sec 4a](theory.md#4a-the-geometric-statement-what-collapses-geometrically).
 
+The gated Wave-1 `BiasScan` ([scan.md](api/scan.md)) templates reuse these
+same six roles; it is not a seventh `OperatorBlock` role. Equivariance is an
+interior shift along `w` only.
+
 ## The antiderivative kernel `S` (why `integral` is closed form)
 
 An [`ActivationSpec`](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-core/src/omnibias/core/spec.py) may

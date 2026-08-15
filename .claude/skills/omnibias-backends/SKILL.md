@@ -14,6 +14,9 @@ backend imports the coefficients from `omnibias.core.polynomials`.
 | You want | Import from | Key entry points |
 | --- | --- | --- |
 | Trainable operator layers (PyTorch) | `omnibias.torch` | `OperatorBlock`, `OperatorMultiBiasUnit` (`OMBU`), `cmbLinear`, `cmbConv1d`, `cmbConv2d` |
+| Heterogeneous Birkhoff packs (gated 01-01) | `omnibias.torch` / `omnibias.jax` / `omnibias.core` | `MultiPackUnit`, `init_multipack` / `multipack_apply`, `MultiPackSpec` |
+| Transverse bias scan (gated 01-02) | `omnibias.torch` / `omnibias.jax` / `omnibias.core` | `BiasScan`, `init_bias_scan` / `bias_scan`, `BankSpec` |
+| Exact-Q irregular stencils (gated 01-04) | `omnibias.difference` | `solve_irregular_stencil`, `is_poised_exact`, `certified_irregular_error` |
 | Activation registry | `omnibias.torch` / `omnibias.jax` | `get_activation`, `list_activations`, `register_activation` |
 | Closed-form field value / laplacian / hessian (JAX) | `omnibias.jax` | `neural_field_value`, `neural_field_laplacian`, `neural_field_hessian`, `neural_field_value_grad_hessian` |
 | Directional Taylor jets (deep composition) | `omnibias.torch` / `omnibias.jax` | `mlp_jet`, `layer_jet`, `compose_jet`, `tower_to_jet`, `jet_to_tower` |
@@ -31,6 +34,8 @@ backend imports the coefficients from `omnibias.core.polynomials`.
 - `integral` (K=2): the **closed-form antiderivative** window `S(z + b_hi) - S(z + b_lo)` with `S' = sigma` (the `ActivationSpec.integral` kernel; e.g. `sigmoid`'s antiderivative is `softplus`). omnibias has a closed-form integral operator, not only closed-form derivatives.
 
 `grad` / `laplacian` / `derivative` need a base with a `fastpath` kernel; `integral` needs an antiderivative kernel; `OperatorBlock` raises `TypeError` otherwise.
+
+The gated `BiasScan` templates reuse these six roles; it is **not** a seventh `OperatorBlock` role. Equivariance is an interior lattice shift along `w`, not a circular wrap. Soft-argmax `gamma` is not founding `delta -> 0` (driving `gamma` to infinity would be temperature collapse). Wave-1 status is **gated**, not shipped: see `docs/api/multipack.md`, `docs/api/scan.md`, `docs/api/difference.md`.
 
 **"Integral" has three distinct senses -- do not conflate:** (1) the activation antiderivative window above (`OperatorBlock(op="integral")`, closed form); (2) domain quadrature `sum_q w_q u(x_q)` (`omnibias.fields` `integrate` / `l2_norm` / `sobolev_norm`, numerical); (3) the measure integral `integral f dmu` (`omnibias.measure`, numerical; certified variant in `omnibias.verify`). Ground any capability claim in the canonical operator-surface matrix (`docs/operator-surface.md`), never in memory.
 

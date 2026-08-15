@@ -152,6 +152,23 @@ and one-dimensional. The `band` role is the finite-gap case read as a *response*
 [`operator-surface.md`](operator-surface.md) for the full role table and for the
 three distinct things "integral" can mean.
 
+### Wave-1 gated primitives (not shipped)
+
+Three extensions of this geometry have code and CI smoke, still **gated**:
+
+- **Order / packs** ([01-01](api/multipack.md)): `MultiPackUnit` evaluates a
+  heterogeneous Birkhoff sample `sum_g c_g sigma^(n_g)(z + mu_g)` along one
+  `w`. G1/G2/G3/G5 earned; G4 deferred.
+- **Position / scan** ([01-02](api/scan.md)): `BiasScan` shares one pack
+  template across a bank of offsets. Equivariance is an **interior lattice
+  shift** along `w` (`R(z+Delta)[..., :-1]` vs `R(z)[..., 1:]`), not a
+  circular wrap of `tanh'`. Soft-argmax `gamma` is a softmax readout;
+  `gamma -> inf` would be temperature collapse, not `delta -> 0`. G1–G3
+  CI-gated; G4 earned on smoke, not in CI `all_passed`.
+- **Irregular stencils** ([difference API](api/difference.md)): exact-`Q`
+  Birkhoff weights for arbitrary nodes and per-node orders. Order is
+  asymptotic in the node scale `h`. G1–G4 earned.
+
 ## Two senses of "collapse" (do not conflate)
 
 "Collapse" names two *different* limits in this codebase. Only the first --

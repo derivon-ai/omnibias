@@ -152,6 +152,13 @@ from omnibias.jax.probability import (
     model_band_mass,
     soft_histogram,
 )
+from omnibias.jax.scan import (
+    BankSpec,
+    bias_scan,
+    init_bias_scan,
+    scan_response,
+    soft_argmax_offset,
+)
 from omnibias.jax.transforms import (
     FourierTransform,
     LaplaceTransform,
@@ -169,6 +176,7 @@ from omnibias.jax.transforms import (
 __lineage__ = "bias collapse"
 
 __all__ = [
+    "BankSpec",
     "BirkhoffOMBU",
     "FourierTransform",
     "JaxActivationSpec",
@@ -181,6 +189,7 @@ __all__ = [
     "affine_jet",
     "affine_jet_mv",
     "antiderivative_jet",
+    "bias_scan",
     "binned_calibration_error",
     "cdf",
     "chi_squared_divergence",
@@ -206,6 +215,7 @@ __all__ = [
     "has_transform",
     "hellinger_distance",
     "identity_jet",
+    "init_bias_scan",
     "init_multipack",
     "is_registered",
     "jet_attention",
@@ -249,8 +259,10 @@ __all__ = [
     "renyi_divergence",
     "renyi_entropy",
     "require_x64",
+    "scan_response",
     "sinkhorn_distance",
     "sliced_wasserstein",
+    "soft_argmax_offset",
     "soft_histogram",
     "total_variation_distance",
     "tower_to_jet",

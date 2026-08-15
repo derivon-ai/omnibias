@@ -458,6 +458,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
 
 - Full package inventory (all 42, with versions + maturity): [`docs/packages.md`](docs/packages.md).
 - Activation math: `omnibias.core.polynomials`, `omnibias.core.spec`.
+- Wave-1 gated primitives (not shipped): `omnibias.core.multipack` /
+  `omnibias.{torch,jax}.multipack` (01-01); `omnibias.core.scan` /
+  `omnibias.{torch,jax}.scan` (01-02); `omnibias.difference` irregular
+  stencils (01-04). Docs: [`docs/api/multipack.md`](docs/api/multipack.md),
+  [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md).
 - Field substrate + field ops: `omnibias.fields`.
 - Manifold geometry / exterior calculus: `omnibias.geometry`.
 - Fractional / score-SDE: `omnibias.fractional`, `omnibias.score`.

@@ -150,6 +150,7 @@ nav:
       - Package index (all 42): packages.md
       - omnibias-core: api/core.md
       - multipack Birkhoff (01-01): api/multipack.md
+      - bias scan (01-02): api/scan.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md

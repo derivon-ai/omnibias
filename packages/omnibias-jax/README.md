@@ -54,6 +54,7 @@ from omnibias.jax import (
     neural_field_laplacian, neural_field_value_grad_hessian,
     coulomb_potential, make_local_energy,
     make_bo_force, make_bo_hessian, vibrational_frequencies,
+    BankSpec, init_bias_scan, bias_scan, init_multipack, multipack_apply,
 )
 ```
 
@@ -61,6 +62,10 @@ The FermiNet bridge (`folx`-compatible API, Tier-2 restricted FermiNet,
 multiblock primitives) lives in the separate `omnibias-ferminet`
 package; importing `omnibias.jax` does **not** trigger a FermiNet import,
 so the JAX core remains useful when FermiNet is absent.
+
+Gated Wave-1 twins (not shipped): `init_multipack` / `multipack_apply` (01-01)
+and `init_bias_scan` / `bias_scan` / `BankSpec` (01-02). Same honesty as the
+torch modules: interior shift along `w`, `gamma` is not `delta -> 0`.
 
 ## License
 

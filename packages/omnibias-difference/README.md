@@ -30,6 +30,10 @@ derivative*. The closed-form tower evaluates that limit **exactly**, with no
   in a tightest outward-rounded interval, with asymptotic formulas.
 - **Bit-identical torch / jax twins** for the finite-difference stencil operator
   (`omnibias.difference.torch` / `omnibias.difference.jax`).
+- **Exact rational irregular / Birkhoff stencils** (theory 01-04, **gated**):
+  `solve_irregular_stencil` over `Q`, `is_poised_exact`, `certified_irregular_error`.
+  Nodes are dimensionless `c_i` (units of `h`); order is asymptotic in `h`.
+  Scale-free weights use `A = a h^{q-p}`. See [docs/api/difference.md](../../docs/api/difference.md).
 
 ## What this is and is not
 
@@ -53,6 +57,7 @@ from omnibias.difference import (
     euler_number, eulerian_number,
     forward_difference, newton_forward_coeffs, monomial_to_falling, falling_to_monomial,
     bernoulli_asymptotic, euler_asymptotic, bell_number_asymptotic,
+    solve_irregular_stencil, is_poised_exact, certified_irregular_error,
 )
 ```
 

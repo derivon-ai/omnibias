@@ -34,6 +34,7 @@ import torch
 from omnibias.torch import (
     OMBU, OperatorBlock, cmbLinear, cmbConv1d, cmbConv2d,
     GrowableOMBU, get_activation, list_activations, register_activation,
+    BankSpec, BiasScan, MultiPackUnit,
 )
 
 # Trainable scalar-operator primitive (drop-in for an activation):
@@ -52,6 +53,13 @@ linear = cmbLinear(in_features=128, out_features=64, op="identity", base="tanh")
 # derivatives at every order:
 print(list_activations())
 ```
+
+Gated Wave-1 primitives (not shipped): `MultiPackUnit` (heterogeneous Birkhoff
+packs, 01-01) and `BiasScan` / `BankSpec` (transverse scan along `w`, 01-02).
+`BiasScan` templates reuse the six `OperatorBlock` roles; equivariance is an
+interior lattice shift, not a circular wrap. Soft-argmax `gamma` is not
+`delta -> 0`. See [docs/api/multipack.md](../../docs/api/multipack.md) and
+[docs/api/scan.md](../../docs/api/scan.md).
 
 See [docs/theory.md](../../docs/theory.md) and the cookbook for end-to-end
 PINN, CmbNet, and CvxLayer examples.

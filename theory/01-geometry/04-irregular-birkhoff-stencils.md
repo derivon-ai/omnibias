@@ -7,7 +7,7 @@ arbitrary per-node order sets** by solving a confluent Vandermonde system over
 the rationals, with a certified truncation bound, so the multi-pack construction
 has a rigorous numerical twin.
 
-- **Status**: designed
+- **Status**: gated (G1–G4 earned)
 - **Depends on**: 01-01
 - **Blocks**: 01-11, 03-06, 07-03
 
@@ -163,7 +163,10 @@ weights as exact rationals in `h`.
 
 ## 6. Proposed API
 
-Does not exist yet.
+Gated. `omnibias.difference._core.irregular`, re-exported from
+`omnibias.difference`. Scale-free weights use `A_{i,p} = a_{i,p} h^{q-p}`
+(the `A = h^q a` form in the worked-example arithmetic below only closes
+after that correction).
 
 ```python
 # omnibias/difference/_core/irregular.py
@@ -264,12 +267,12 @@ Pure Python, no tensor imports, consistent with the rest of `omnibias-difference
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-difference/src/omnibias/difference/_core/irregular.py`
-- [ ] Public re-exports from `omnibias.difference` with regenerated `__all__`
-- [ ] Reproduction test versus `signs_exact` / `offsets_exact`
-- [ ] Convergence-rate test battery
-- [ ] Certificate soundness test (dense grid plus random sample)
-- [ ] Poisedness test set from the interpolation literature
-- [ ] `benchmarks/irregular_stencils.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-difference/src/omnibias/difference/_core/irregular.py`
+- [x] Public re-exports from `omnibias.difference` with regenerated `__all__`
+- [x] Reproduction test versus `signs_exact` / `offsets_exact`
+- [x] Convergence-rate test battery
+- [x] Certificate soundness test (dense grid plus random sample)
+- [x] Poisedness test set from the interpolation literature
+- [x] `benchmarks/irregular_stencils.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

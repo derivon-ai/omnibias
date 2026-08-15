@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Wave-1 primitives (01-04 irregular stencils, 01-02 bias scan)
+
+- Exact rational irregular / Birkhoff finite-difference weights in
+  `omnibias.difference` (`solve_irregular_stencil` over ``Q``,
+  `is_poised_exact`, `certified_irregular_error`). Scale-free ``A_{i,p}``
+  satisfy ``a = A / h^{q-p}``; order is asymptotic in the node scale ``h``.
+  Gated (G1–G4 earned).
+- Transverse bias scan: `BankSpec` plus torch `BiasScan` and a jax functional
+  twin. Equivariance is an interior lattice shift along ``w``, not a circular
+  wrap; soft-argmax ``gamma`` is not ``delta -> 0``. Gated (G1–G3 CI-gated;
+  G4 earned on smoke vs voxelized ``cmbConv1d``, not in CI ``all_passed``;
+  two-interface soft-argmax bias recorded, not a win).
+
 ### Added — Equinox CI, unplanted Arrangement, Keras Boosted beta
 
 - Equinox wrapper tests **fail** when ``CI`` is set and the extra is missing

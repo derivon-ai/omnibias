@@ -27,6 +27,9 @@ coefficients.
 | OperatorBlock | typed op dispatch: `identity / grad / laplacian / derivative / band / integral` | `omnibias.torch.blocks.operator` (code of record); `docs/operator-surface.md` (capability matrix) |
 | Closed-form integral | antiderivative window `S(z+b_hi)-S(z+b_lo)`, `S'=sigma` (`OperatorBlock(op="integral")`) | `omnibias.core.spec` (`ActivationSpec.integral`); `omnibias.torch.unit` (`analytic_integral`) |
 | Jets | exact truncated Taylor propagation through compositions | `omnibias.{torch,jax}.jet`, `.jet_mv`; combinatorics in `omnibias.core.bell`, `omnibias.core.multi_index` |
+| Multi-pack (gated 01-01) | heterogeneous Birkhoff sample `sum_g c_g sigma^(n_g)(z+mu_g)` | `omnibias.core.multipack`; `omnibias.{torch,jax}.multipack`; `docs/api/multipack.md` |
+| Bias scan (gated 01-02) | shared template on a bank of offsets along `w` | `omnibias.core.scan`; `omnibias.{torch,jax}.scan`; `docs/api/scan.md` |
+| Irregular stencils (gated 01-04) | exact-`Q` Birkhoff weights; order asymptotic in `h` | `omnibias.difference._core.irregular`; `docs/api/difference.md` |
 
 ## Bias collapse -- the founding definition (canonical)
 
@@ -69,6 +72,11 @@ direction -- derivative and integral are the two directions of one construction,
 not two unrelated features. `omnibias.core.probability` already words the `band`
 case as "the probability mass of the slab between the two parallel hyperplanes".
 Canonical write-up: `docs/theory.md` sec 4a.
+
+Wave-1 gated extensions of this geometry (not shipped): heterogeneous packs
+(`MultiPackUnit`), the position knob (`BiasScan` — interior shift along `w`;
+`gamma` is not `delta -> 0`), and exact-`Q` irregular stencils. `BiasScan`
+templates reuse the six `OperatorBlock` roles; it is not a seventh role.
 
 **Guard the boundary.** "Single hyperplane" alone does **not** identify bias
 collapse: `sigma(beta (w . x - t))` also has one hyperplane as its decision

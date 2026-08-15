@@ -1,0 +1,130 @@
+{
+  "schema": "irregular-stencils-v1",
+  "generated_utc": "2026-08-14T21:17:39Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "irregular_stencils",
+    "full": false
+  },
+  "rss_mb_at_start": 815.46,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_reproduction",
+        "passed": true,
+        "n_checked": 10,
+        "n_mismatch": 0
+      },
+      {
+        "name": "g2_order_verification",
+        "passed": true,
+        "reported_accuracy": 2,
+        "fitted_rates": {
+          "exp": 2.004442247686012,
+          "sin": 1.9996828189616105,
+          "inv": 1.989303930301936
+        },
+        "tol": 0.15
+      },
+      {
+        "name": "g3_certificate_soundness",
+        "passed": true,
+        "n_instances": 24,
+        "violations": 0,
+        "worst_err_over_bound": 0.986263066101113
+      },
+      {
+        "name": "g4_poisedness",
+        "passed": true,
+        "cases": {
+          "hermite": {
+            "polya": true,
+            "poised": true
+          },
+          "worked_birkhoff": {
+            "polya": true,
+            "poised": true
+          },
+          "one_node_gap": {
+            "polya": false,
+            "poised": false
+          },
+          "polya_pass_rank_fail": {
+            "polya": true,
+            "poised": false
+          }
+        },
+        "polya_is_necessary_only": true
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_reproduction",
+    "passed": true,
+    "n_checked": 10,
+    "n_mismatch": 0
+  },
+  "g2": {
+    "name": "g2_order_verification",
+    "passed": true,
+    "reported_accuracy": 2,
+    "fitted_rates": {
+      "exp": 2.004442247686012,
+      "sin": 1.9996828189616105,
+      "inv": 1.989303930301936
+    },
+    "tol": 0.15
+  },
+  "g3": {
+    "name": "g3_certificate_soundness",
+    "passed": true,
+    "n_instances": 24,
+    "violations": 0,
+    "worst_err_over_bound": 0.986263066101113
+  },
+  "g4": {
+    "name": "g4_poisedness",
+    "passed": true,
+    "cases": {
+      "hermite": {
+        "polya": true,
+        "poised": true
+      },
+      "worked_birkhoff": {
+        "polya": true,
+        "poised": true
+      },
+      "one_node_gap": {
+        "polya": false,
+        "poised": false
+      },
+      "polya_pass_rank_fail": {
+        "polya": true,
+        "poised": false
+      }
+    },
+    "polya_is_necessary_only": true
+  },
+  "honesty": {
+    "claim_rung": 1,
+    "bias_collapse": true,
+    "temperature_collapse": false,
+    "g1_earned": true,
+    "g2_earned": true,
+    "g3_earned": true,
+    "g4_earned": true,
+    "order_is_asymptotic_in_h": true,
+    "scale_free_A_is_a_times_h_to_q_minus_p": true,
+    "licensed_sentence": "Exact rational Birkhoff weights reproduce uniform signs_exact; empirical rates match reported accuracy; the truncation certificate covers a grid and a random sample; is_poised_exact is correct on the curated set and polya_screen never rejects a poised scheme"
+  },
+  "wall_seconds": 0.047
+}

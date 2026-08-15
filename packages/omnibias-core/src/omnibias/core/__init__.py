@@ -21,6 +21,7 @@ Public API:
   :func:`index_position`, :func:`num_multi_indices` -- multi-index
   combinatorics for the *multivariate* (multi-index) jet primitive.
 * :class:`ActivationSpec` -- generic activation descriptor.
+* :class:`BankSpec` -- offset / scale bank for the bias scan (theory 01-02).
 
 There are no framework dependencies in this package.
 """
@@ -78,6 +79,7 @@ from omnibias.core.probability import (
     dkw_epsilon,
     is_cdf_activation,
 )
+from omnibias.core.scan import BankSpec
 from omnibias.core.spec import (
     ActivationSpec,
     NthDerivativeFn,
@@ -104,6 +106,7 @@ __lineage__ = "bias collapse"
 
 __all__ = [
     "ActivationSpec",
+    "BankSpec",
     "MultiPackSpec",
     "NthDerivativeFn",
     "PackSpec",

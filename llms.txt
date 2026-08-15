@@ -19,6 +19,11 @@ quadrature (`omnibias-fields`), and the measure integral `integral f dmu`
 (`omnibias-measure`, with a certified variant in `omnibias-verify`). Canonical
 capability matrix: `docs/operator-surface.md`.
 
+Wave-1 primitives (gated, no new packages): `MultiPackUnit` (01-01; G4
+deferred), `BiasScan` / `BankSpec` (01-02; interior lattice shift along `w`,
+not a circular wrap of `tanh'`; soft-argmax `gamma` is not `delta -> 0`),
+and exact-`Q` irregular Birkhoff stencils in `omnibias.difference` (01-04).
+
 The dictionary also carries **closed-form integral transforms** of the
 activations whose transform is itself elementary
 (`omnibias.{torch,jax}.transforms`; the identity table, the regions of
@@ -384,7 +389,9 @@ umbral operator layer -- shift / delta / Pincherle / umbral functional -- in the
 `omnibias.difference.umbral` namespace), and asymptotic-coefficient reading --
 Stirling (off `omnibias.core.bell`), Bernoulli (off the `tanh` tower) and Euler (off a new
 `sech` tower) numbers, exact as `int` / `Fraction` with mpmath-checked asymptotics -- plus
-bit-identical torch + jax twins of the finite-difference stencil operator. It is also the
+bit-identical torch + jax twins of the finite-difference stencil operator, plus
+exact rational irregular / Birkhoff stencil weights (`solve_irregular_stencil`
+over `Q`, `is_poised_exact`, a truncation certificate). It is also the
 home of an all-tiers **data-driven refinement program** (probes with grid+random soundness,
 an mpmath oracle, `K >= 8` seeds and a named baseline; harness in
 `omnibias.difference.validation`, umbrella smoke `docs/examples/difference_validate.py`):

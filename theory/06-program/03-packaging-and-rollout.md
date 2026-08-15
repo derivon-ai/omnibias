@@ -250,6 +250,8 @@ proceeds.
       before Wave 1+; A5 still pending
 - [x] Record A6, A7, and A4 falsifier outcomes in `theory/README.md` (all passed)
 - [x] Open Wave 1 with 01-01 multipack (G1/G2/G3/G5 earned; G4 deferred)
+- [x] Wave-1 01-04 irregular stencils (G1–G4 earned) and 01-02 bias scan
+      (G1–G3 CI-gated; G4 earned on smoke, not in CI all_passed)
 - [ ] Mark failed-falsifier specs `retired` with a reason
 - [ ] Written promotion criterion for `omnibias.geometry.arrangement` in its
       module docstring

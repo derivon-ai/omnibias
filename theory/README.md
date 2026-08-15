@@ -97,9 +97,9 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | Spec | Status | One line |
 |---|---|---|
 | [01-01 multipack Birkhoff collapse](01-geometry/01-multipack-birkhoff-collapse.md) | gated | `MultiPackUnit` shipped; G1/G2/G3/G5 earned (float64 order ceiling recorded; G4 deferred) |
-| [01-02 bias scan](01-geometry/02-bias-scan-transverse-convolution.md) | designed | Shared pack template evaluated on a bias grid: the grid-free convolution knob |
+| [01-02 bias scan](01-geometry/02-bias-scan-transverse-convolution.md) | gated | `BiasScan` / `BankSpec`; G1–G3 earned; G4 earned on smoke (not CI-gated) |
 | [01-03 arrangement geometry](01-geometry/03-hyperplane-arrangement-geometry.md) | concept | Cells, flats, faces and tope graphs of many soft hyperplanes |
-| [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | designed | Exact rational weights for arbitrary node and order sets |
+| [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | gated | Exact-`Q` weights in `omnibias.difference`; G1–G4 earned |
 | [01-05 mollifier calculus](01-geometry/05-mollifier-distribution-calculus.md) | designed | Packs as mollifiers converging to derivatives of the Dirac functional |
 | [01-06 OMBU wavelet frames](01-geometry/06-ombu-wavelet-frames.md) | concept | `sigma'` as mother wavelet; bias translates, tempering dilates |
 | [01-07 order as frequency](01-geometry/07-order-as-frequency-spectral-design.md) | designed | `sigma^(n)` has spectrum `(i xi)^n` times the base: order selects a band |
@@ -207,3 +207,9 @@ section 12. Ambiguous outcomes count as failure.
 | A7 | 05-01 G7 (`sd(tau_hat) ~ alpha^(n-5/2)`, tol `0.1`, `n in {3,4}`) | [`docs/benchmarks/inverse_imaging.json`](../docs/benchmarks/inverse_imaging.json) | **passed** (locally seeded; 5 seeds, worst-seed) — licenses smallest-alpha design rule; worst deviations `0.016` / `0.031`; global search earned for n=3 only (n=4 boundary artifact); G1–G6 unearned |
 | A4 | 05-02 G1 / G2 / G3 / G3b | [`docs/benchmarks/tabular_arrangement.json`](../docs/benchmarks/tabular_arrangement.json), [`docs/benchmarks/tabular_arrangement_public.json`](../docs/benchmarks/tabular_arrangement_public.json), [`docs/benchmarks/tabular_arrangement_capacity.json`](../docs/benchmarks/tabular_arrangement_capacity.json) | **passed** G1–G3 (G3 frozen W/L/T `2/5/1`); **G3b unearned** (`boost_h2` not-worse `4/8`, need `>=6/8`); G4 unearned; G5–G7 unearned |
 | A5 | 05-02 G5 | — | not run |
+
+## Wave-1 primitives
+
+Code now exists for all three Wave-1 primitives (no new packages). **01-01**
+is gated (G1/G2/G3/G5 earned; G4 deferred). **01-02** is gated (G1–G3 CI-gated;
+G4 earned on smoke, not in CI `all_passed`). **01-04** is gated (G1–G4 earned).

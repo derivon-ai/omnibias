@@ -125,6 +125,7 @@ from omnibias.torch.probability import (
     model_band_mass,
     soft_histogram,
 )
+from omnibias.torch.scan import BankSpec, BiasScan, scan_response, soft_argmax_offset
 from omnibias.torch.tempered_blocks import LearnablePReLU, TemperedActivation
 from omnibias.torch.transforms import (
     FourierTransform,
@@ -150,6 +151,8 @@ __all__ = [
     "ActivationSpec",
     "AnalyticGaussianConv1d",
     "AnalyticGaussianConv2d",
+    "BankSpec",
+    "BiasScan",
     "BirkhoffOMBU",
     "FourierTransform",
     "GrowStrategy",
@@ -228,8 +231,10 @@ __all__ = [
     "removable_value",
     "renyi_divergence",
     "renyi_entropy",
+    "scan_response",
     "sinkhorn_distance",
     "sliced_wasserstein",
+    "soft_argmax_offset",
     "soft_histogram",
     "total_variation_distance",
     "tower_to_jet",

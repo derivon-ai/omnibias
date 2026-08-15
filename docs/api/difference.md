@@ -62,6 +62,20 @@ the fix in with a regression test. The umbrella smoke is
       heading_level: 3
       members_order: source
 
+## Irregular / Birkhoff stencils
+
+Exact rational weights for arbitrary node and per-node order sets (theory
+01-04). Nodes in `StencilRequest` are dimensionless `c_i` (units of the
+scale `h`). Scale-free weights satisfy `A_{i,p} = a_{i,p} h^{q-p}` (the
+spec's `A = h^q a` only closes if rewritten this way). Order is asymptotic
+in `h`. `is_poised_exact` is the exact-`Q` oracle; `omnibias.core.multipack.is_poised`
+stays the numerical rank test.
+
+::: omnibias.difference._core.irregular
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ## Refinement-program validation harness
 
 Shared, pure-Python probe utilities (`enclosure_soundness`, an `mpmath` oracle

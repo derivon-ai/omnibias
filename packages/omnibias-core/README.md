@@ -48,6 +48,8 @@ print(hermite_coeffs(5))             # probabilist's Hermite (Gaussian)
 |---|---|
 | `omnibias.core.polynomials` | `sigmoid_polynomial_coeffs`, `tanh_polynomial_coeffs`, `hermite_coeffs` |
 | `omnibias.core.spec` | `ActivationSpec` — shared activation metadata |
+| `omnibias.core.multipack` | `PackSpec` / `MultiPackSpec` — heterogeneous Birkhoff support (theory 01-01, **gated**) |
+| `omnibias.core.scan` | `BankSpec` — offset / scale bank for the bias scan (theory 01-02, **gated**) |
 | `omnibias.core.bell` | Bell polynomials / Faà di Bruno combinatorics |
 | `omnibias.core.multi_index` | Multi-index ordering + Cauchy product for multivariate jets |
 | `omnibias.core.verified` | Rigorous numerics: `Interval`, Taylor models, Kantorovich, Lohner, … |

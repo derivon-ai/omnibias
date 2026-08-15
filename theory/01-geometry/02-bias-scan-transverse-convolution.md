@@ -7,7 +7,7 @@ the convolutional idea is not "slide the plane" but **share one pack template
 and evaluate it at many bias offsets**, producing a translation-equivariant
 response along `w` at the cost of one activation call per offset.
 
-- **Status**: designed
+- **Status**: gated (G1/G2/G3 earned; G4 earned on smoke, not CI-gated)
 - **Depends on**: 01-01
 - **Blocks**: 01-06, 01-10, 02-01, 02-07, 02-08, 02-11, 03-04, 03-05, 03-08, 05-01, 05-02
 
@@ -129,7 +129,9 @@ for.
 
 ## 6. Proposed API
 
-Does not exist yet.
+Gated. Algebra in `omnibias.core.scan`; torch `BiasScan` in
+`omnibias.torch.scan`; jax functional twin `init_bias_scan` / `bias_scan`
+in `omnibias.jax.scan`.
 
 ```python
 # omnibias/core/scan.py
@@ -241,13 +243,13 @@ Baseline: (a) a single fixed-bias `OperatorBlock` of the same template, and
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-core/src/omnibias/core/scan.py`
-- [ ] `packages/omnibias-torch/src/omnibias/torch/scan.py`
-- [ ] `packages/omnibias-jax/src/omnibias/jax/scan.py`
-- [ ] Equivariance regression test (on-lattice exactness, off-lattice decay)
-- [ ] Soft-argmax gradient test against finite differences
-- [ ] torch/jax parity test
-- [ ] `benchmarks/bias_scan.py` plus committed smoke JSON
-- [ ] Docs page and mkdocs nav entry
-- [ ] Regenerate `__all__` in both backends
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-core/src/omnibias/core/scan.py`
+- [x] `packages/omnibias-torch/src/omnibias/torch/scan.py`
+- [x] `packages/omnibias-jax/src/omnibias/jax/scan.py`
+- [x] Equivariance regression test (on-lattice exactness, off-lattice decay)
+- [x] Soft-argmax gradient test against finite differences
+- [x] torch/jax parity test
+- [x] `benchmarks/bias_scan.py` plus committed smoke JSON
+- [x] Docs page and mkdocs nav entry
+- [x] Regenerate `__all__` in both backends
+- [x] Index row in `theory/README.md`

@@ -32,6 +32,11 @@ the *multivariate* (multi-index) jet kernels.
 Pure-Python support algebra for heterogeneous multi-pack collapse (theory
 01-01). Documented in full at [multipack.md](multipack.md).
 
+## Bias-scan bank
+
+Offset / scale bank algebra for the transverse bias scan (theory 01-02).
+Documented in full at [scan.md](scan.md).
+
 ## ActivationSpec
 
 ::: omnibias.core.spec
