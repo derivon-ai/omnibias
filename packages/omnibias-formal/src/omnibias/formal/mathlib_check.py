@@ -790,14 +790,22 @@ def _gen_haar(cert: Mapping[str, Any]) -> str | None:
     ):
         return None
     thm = lean_haar_theorem(family)
-    comment = (
-        "Weyl volume prefactor 6*4=24 "
-        "(finite arithmetic; not a continuum Haar theorem)."
-    )
+    if family == "su3_dim_3_0":
+        comment = (
+            "SU(3) Weyl dimension (3,0)=10 "
+            "(finite arithmetic; not a continuum Haar theorem)."
+        )
+        stmt = "su3Dim 3 0 = 10"
+    else:
+        comment = (
+            "Weyl volume prefactor 6*4=24 "
+            "(finite arithmetic; not a continuum Haar theorem)."
+        )
+        stmt = "haarWeylPrefactor = 24"
     body = (
         f"/-- {comment} -/\n"
         "theorem obligation :\n"
-        "    haarWeylPrefactor = 24 :=\n"
+        f"    {stmt} :=\n"
         f"  {thm}\n"
     )
     return _wrap_haar(body)

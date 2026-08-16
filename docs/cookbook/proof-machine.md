@@ -114,6 +114,9 @@ against it by `tests/test_docs_snippets.py`, so it cannot drift again:
 
 ```python
 assert sorted(machine.kinds()) == [
+    "ccf_fractional_dissipation",
+    "ccf_hardy_wholeline_blowup",
+    "ccf_line_compactified_cap",
     "ccf_selfsimilar_blowup",
     "clm_blowup",
     "clm_multizero_blowup",
@@ -124,6 +127,7 @@ assert sorted(machine.kinds()) == [
     "navier_stokes_streamfunction_residual",
     "perron_spectral_gap",
     "pinn_aposteriori_error",
+    "viscous_perturbation_enclosure",
 ]
 ```
 
@@ -140,6 +144,7 @@ transfer-matrix prover lives in its own registry rather than the default machine
 | `two_plaquette_hamiltonian_gap` | `certified_hamiltonian_gap` (finite two-plaquette KS `λ1-λ0`) | No — a gap below the requested threshold → `BLOCKED` |
 | `three_plaquette_hamiltonian_gap` | `certified_hamiltonian_gap` (finite three-plaquette KS `λ1-λ0`) | No — a gap below the requested threshold → `BLOCKED` |
 | `strip_reflection_positivity` | `certified_strip_reflection_positivity` (RP on one strip transfer) | No — a negative quadratic-form lower end → `BLOCKED` |
+| `torus_reflection_positivity` | `certified_strip_reflection_positivity` (RP on one 2×2 torus transfer) | No — a negative quadratic-form lower end → `BLOCKED` |
 
 ```python
 from omnibias.core.proof import Conjecture
@@ -150,6 +155,7 @@ assert sorted(gauge.kinds()) == [
     "strip_reflection_positivity",
     "strong_coupling_glueball_gap",
     "three_plaquette_hamiltonian_gap",
+    "torus_reflection_positivity",
     "transfer_matrix_spectral_gap",
     "two_plaquette_hamiltonian_gap",
 ]

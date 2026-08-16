@@ -22,7 +22,7 @@ The `Check/**` modules are the sound, `sorry`-free certificate checkers:
 | `OmnibiasAnalytic/Check/Casimir.lean` | Locked Freudenthal Casimir identities: SU(2) `C2(1)-C2(0)=3/4`, SU(3) `C2(1,0)=4/3`. Finite rationals, not a continuum gauge claim. |
 | `OmnibiasAnalytic/Check/Polymer.lean` | Locked polymer coordinations: backtrack `15`, first-step `20`, and crude `24` at `d=4`. Finite arithmetic, not a continuum gauge claim. |
 | `OmnibiasAnalytic/Check/SixJ.lean` | Locked Racah 6j identities: `{1/2 1/2 0; 1/2 1/2 0} = -1/2` and the vanishing all-`1/2` triad. Finite rationals, not a continuum gauge claim. |
-| `OmnibiasAnalytic/Check/HaarVolume.lean` | Weyl-volume prefactor `6*4=24`. Finite arithmetic, not a continuum Haar theorem and not 4-D SU(3) Yang-Mills. |
+| `OmnibiasAnalytic/Check/HaarVolume.lean` | Weyl-volume prefactor `6*4=24` and SU(3) dimension `(3,0)=10`. Finite arithmetic, not a continuum Haar theorem and not 4-D SU(3) Yang-Mills. |
 | `OmnibiasAnalytic/Tower/` | Riccati / Eulerian / sech / Hermite recurrences on `ℤ[X]`, first-derivative identities, and `iteratedDeriv` link theorems. Pointwise `C^∞` / algebraic identities; not a finite-difference collapse. |
 | `OmnibiasAnalytic/Generated.lean` | Placeholder overwritten by the Python bridge (`omnibias.formal.mathlib_check`) with the certificate under test. |
 

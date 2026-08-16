@@ -28,6 +28,7 @@ from omnibias.geometry.gauge.transfer.certificates import (
     STRIP_RP_KIND,
     STRONG_COUPLING_KIND,
     THREE_PLAQUETTE_GAP_KIND,
+    TORUS_RP_KIND,
     TRANSFER_GAP_KIND,
     TRANSFER_GAP_SCHEMA_VERSION,
     replay_transfer_matrix_gap,
@@ -67,6 +68,7 @@ def test_the_gauge_machine_registers_exactly_the_expected_kinds(
         STRIP_RP_KIND,
         STRONG_COUPLING_KIND,
         THREE_PLAQUETTE_GAP_KIND,
+        TORUS_RP_KIND,
         TRANSFER_GAP_KIND,
         HAMILTONIAN_GAP_KIND,
     ]
@@ -76,6 +78,7 @@ def test_the_gauge_machine_registers_exactly_the_expected_kinds(
         "two_plaquette_hamiltonian_gap",
         "three_plaquette_hamiltonian_gap",
         "strip_reflection_positivity",
+        "torus_reflection_positivity",
     ]
 
 

@@ -578,6 +578,9 @@ def heat_kernel_gap_scaling_report(
     return ScalingReport(model=model, points=tuple(points))
 
 
+certified_gap_scaling_table = heat_kernel_gap_scaling_report
+
+
 __all__ = [
     "BIRKHOFF_METHOD",
     "LEHMANN_METHOD",
@@ -590,6 +593,7 @@ __all__ = [
     "ScalingReport",
     "TransferGapResult",
     "certified_effective_mass_curve",
+    "certified_gap_scaling_table",
     "certified_multistep_gap_refinement",
     "certified_transfer_matrix_gap",
     "heat_kernel_gap_scaling_report",

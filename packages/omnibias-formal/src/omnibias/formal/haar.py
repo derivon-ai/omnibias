@@ -16,20 +16,23 @@ from typing import Any, Literal
 
 from omnibias.core.proof.certificate import Cert, make_certificate
 
-LEGAL_HAAR_FAMILIES: tuple[str, ...] = ("weyl_prefactor_24",)
+LEGAL_HAAR_FAMILIES: tuple[str, ...] = ("weyl_prefactor_24", "su3_dim_3_0")
 
-HaarFamily = Literal["weyl_prefactor_24"]
+HaarFamily = Literal["weyl_prefactor_24", "su3_dim_3_0"]
 
 _LEAN_THMS: dict[str, str] = {
     "weyl_prefactor_24": "haar_weyl_prefactor_24",
+    "su3_dim_3_0": "su3_dim_3_0",
 }
 
 _CLAIMS: dict[str, str] = {
     "weyl_prefactor_24": "Weyl volume prefactor 6*4=24",
+    "su3_dim_3_0": "SU(3) Weyl dimension (3,0)=10",
 }
 
 _LOCKED_VALUE: dict[str, int] = {
     "weyl_prefactor_24": 24,
+    "su3_dim_3_0": 10,
 }
 
 
@@ -46,6 +49,8 @@ def family_facts_hold(family: str) -> bool:
     """Re-derive the locked Weyl-prefactor identity over ``int``."""
     if family == "weyl_prefactor_24":
         return 6 * 4 == 24
+    if family == "su3_dim_3_0":
+        return (3 + 1) * (0 + 1) * (3 + 0 + 2) // 2 == 10
     return False
 
 

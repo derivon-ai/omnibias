@@ -245,6 +245,8 @@ output, and the Monte Carlo comparison already implemented.
   magnetics; G1 measured.
 - `benchmarks/gauge_spatial_strip.py`: 2+1-D strip gap, RP, and cluster
   tail on one finite matrix.
+- `benchmarks/gauge_gap_scaling.py`: independent certified gaps at
+  several spacings; `continuum_claim` is false.
 - Smoke JSON in `docs/benchmarks/`; full under
   `$OMNIBIAS_SCRATCH/gauge_gap/`.
 

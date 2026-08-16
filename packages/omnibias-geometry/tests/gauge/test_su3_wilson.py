@@ -17,12 +17,14 @@ from omnibias.geometry.gauge.transfer.gap import certified_transfer_matrix_gap
 from omnibias.geometry.gauge.transfer.matrices import rebuild, su3_wilson_transfer
 from omnibias.geometry.gauge.transfer.su3_wilson import (
     HAAR_VOLUME,
+    su3_dimension,
     su3_wilson_haar_coefficient,
 )
 
 BETA = 1.0
 N_CELLS = 8
-DYNKIN = ((0, 0), (1, 0), (0, 1), (1, 1), (2, 0), (0, 2), (2, 1), (1, 2), (2, 2))
+LOCKED = ((0, 0), (1, 0), (0, 1), (1, 1), (2, 0), (0, 2), (2, 1), (1, 2), (2, 2))
+DYNKIN = tuple((p, q) for p in range(4) for q in range(4))
 
 
 def _haar_density(theta: np.ndarray, phi: np.ndarray) -> np.ndarray:
@@ -40,26 +42,62 @@ def _im_fund(theta: np.ndarray, phi: np.ndarray) -> np.ndarray:
     return np.sin(theta) + np.sin(phi) - np.sin(theta + phi)
 
 
-def _chi(dynkin: tuple[int, int], theta: np.ndarray, phi: np.ndarray) -> np.ndarray:
-    re_chi = _re_fund(theta, phi)
-    imag = _im_fund(theta, phi)
+def _chi_complex(
+    dynkin: tuple[int, int], theta: np.ndarray, phi: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    p, q = dynkin
+    re_f = _re_fund(theta, phi)
+    im_f = _im_fund(theta, phi)
+    zero = np.zeros_like(theta, dtype=np.float64)
+    if p < 0 or q < 0:
+        return zero, zero
     if dynkin == (0, 0):
-        return np.ones_like(theta, dtype=np.float64)
-    if dynkin in ((1, 0), (0, 1)):
-        return re_chi
+        return np.ones_like(theta, dtype=np.float64), zero
+    if dynkin == (1, 0):
+        return re_f, im_f
+    if dynkin == (0, 1):
+        return re_f, -im_f
     if dynkin == (1, 1):
-        return re_chi**2 + imag**2 - 1.0
-    if dynkin in ((2, 0), (0, 2)):
-        return re_chi**2 - imag**2 - re_chi
-    if dynkin in ((2, 1), (1, 2)):
-        amp = re_chi**2 - imag**2 - re_chi
-        bim = 2.0 * re_chi * imag + imag
-        return amp * re_chi + bim * imag - re_chi
+        return re_f**2 + im_f**2 - 1.0, zero
+    if dynkin == (2, 0):
+        return re_f**2 - im_f**2 - re_f, 2.0 * re_f * im_f + im_f
+    if dynkin == (0, 2):
+        re_c, im_c = _chi_complex((2, 0), theta, phi)
+        return re_c, -im_c
+    if dynkin == (2, 1):
+        adj_re, _adj_im = _chi_complex((1, 1), theta, phi)
+        prod_re = adj_re * re_f
+        prod_im = adj_re * im_f
+        c02_re, c02_im = _chi_complex((0, 2), theta, phi)
+        return prod_re - c02_re - re_f, prod_im - c02_im - im_f
+    if dynkin == (1, 2):
+        re_c, im_c = _chi_complex((2, 1), theta, phi)
+        return re_c, -im_c
     if dynkin == (2, 2):
-        amp = re_chi**2 - imag**2 - re_chi
-        bim = 2.0 * re_chi * imag + imag
-        return amp**2 + bim**2 - re_chi**2 - imag**2
-    raise ValueError(dynkin)
+        amp = re_f**2 - im_f**2 - re_f
+        bim = 2.0 * re_f * im_f + im_f
+        return amp**2 + bim**2 - re_f**2 - im_f**2, zero
+    if p < q:
+        re_c, im_c = _chi_complex((q, p), theta, phi)
+        return re_c, -im_c
+    if dynkin == (3, 3):
+        a_re, a_im = _chi_complex((3, 0), theta, phi)
+        b_re, b_im = _chi_complex((0, 3), theta, phi)
+        prod_re = a_re * b_re - a_im * b_im
+        c22, _ = _chi_complex((2, 2), theta, phi)
+        c11, _ = _chi_complex((1, 1), theta, phi)
+        c00, _ = _chi_complex((0, 0), theta, phi)
+        return prod_re - c22 - c11 - c00, zero
+    left_re, left_im = _chi_complex((p - 1, q), theta, phi)
+    prod_re = left_re * re_f - left_im * im_f
+    prod_im = left_re * im_f + left_im * re_f
+    sub_re, sub_im = _chi_complex((p - 2, q + 1), theta, phi)
+    last_re, last_im = _chi_complex((p - 1, q - 1), theta, phi)
+    return prod_re - sub_re - last_re, prod_im - sub_im - last_im
+
+
+def _chi(dynkin: tuple[int, int], theta: np.ndarray, phi: np.ndarray) -> np.ndarray:
+    return _chi_complex(dynkin, theta, phi)[0]
 
 
 def _numerical_haar_coefficient(
@@ -99,7 +137,7 @@ def test_locked_characters_match_weyl_bialternant_away_from_walls() -> None:
     )
     re_chi = _re_fund(np.array(theta), np.array(phi))
     imag = _im_fund(np.array(theta), np.array(phi))
-    for dynkin in DYNKIN:
+    for dynkin in LOCKED:
         if dynkin == (0, 0):
             continue
         got = character(Irrep(n=3, dynkin=dynkin), torus)
@@ -160,10 +198,56 @@ def test_max_dynkin_two_is_unlocked() -> None:
     assert len(transfer.exact_eigenvalues) == 9
 
 
+def test_max_dynkin_three_is_unlocked() -> None:
+    transfer = su3_wilson_transfer(BETA, max_dynkin=3, n_cells=N_CELLS)
+    assert transfer.exact_eigenvalues is not None
+    assert len(transfer.exact_eigenvalues) == 16
+
+
+def test_clebsch_reproduces_locked_characters() -> None:
+    from omnibias.core.verified.interval import Interval
+    from omnibias.geometry.gauge.transfer.su3_wilson import _re_character
+
+    theta, phi = 0.7, 0.4
+    th_iv = Interval.from_value(theta)
+    ph_iv = Interval.from_value(phi)
+    for dynkin in LOCKED:
+        enclosed = _re_character(dynkin, th_iv, ph_iv)
+        pred = float(_chi(dynkin, np.array(theta), np.array(phi)))
+        assert enclosed.contains(pred)
+
+
+def test_clebsch_contains_weyl_sample_at_max_dynkin_three() -> None:
+    from omnibias.core.verified.interval import Interval
+    from omnibias.geometry.gauge.transfer.su3_wilson import _re_character
+
+    theta, phi = 0.7, 0.4
+    torus = np.array(
+        [
+            np.exp(1j * theta),
+            np.exp(1j * phi),
+            np.exp(-1j * (theta + phi)),
+        ],
+        dtype=np.complex128,
+    )
+    th_iv = Interval.from_value(theta)
+    ph_iv = Interval.from_value(phi)
+    for dynkin in ((3, 0), (0, 3), (3, 1), (1, 3), (3, 2), (2, 3), (3, 3)):
+        enclosed = _re_character(dynkin, th_iv, ph_iv)
+        got = character(Irrep(n=3, dynkin=dynkin), torus).real
+        assert enclosed.contains(got), (dynkin, enclosed, got)
+
+
+def test_su3_dimension_of_three_zero_is_ten() -> None:
+    assert su3_dimension(3, 0) == 10
+    assert su3_dimension(0, 3) == 10
+    assert su3_dimension(3, 3) == 64
+
+
 def test_max_dynkin_and_beta_are_locked() -> None:
     with pytest.raises(ValueError, match="max_dynkin"):
-        su3_wilson_transfer(BETA, max_dynkin=3)
+        su3_wilson_transfer(BETA, max_dynkin=4)
     with pytest.raises(ValueError, match="beta must be > 0"):
         su3_wilson_transfer(0.0)
-    with pytest.raises(ValueError, match="p,q <= 2"):
-        su3_wilson_haar_coefficient((3, 0), BETA, n_cells=N_CELLS)
+    with pytest.raises(ValueError, match="p,q <= 3"):
+        su3_wilson_haar_coefficient((4, 0), BETA, n_cells=N_CELLS)

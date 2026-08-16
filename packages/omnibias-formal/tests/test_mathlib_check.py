@@ -552,6 +552,13 @@ def test_generate_haar_prefactor() -> None:
     assert "haarWeylPrefactor" in src
 
 
+def test_generate_su3_dim_three_zero() -> None:
+    src = generate_obligation(haar_certificate("su3_dim_3_0")) or ""
+    assert "import OmnibiasAnalytic.Check.HaarVolume" in src
+    assert "su3_dim_3_0" in src
+    assert "su3Dim 3 0 = 10" in src
+
+
 def test_haar_mismatch_yields_none() -> None:
     cert = haar_certificate("weyl_prefactor_24")
     payload = dict(cert["payload"])

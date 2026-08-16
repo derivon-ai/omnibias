@@ -305,23 +305,27 @@ the relevant op:
   only inside the interval-certified domain (enclosed ratio `< 1`). It
   is **not** a continuum claim, **not** a uniform-in-spacing bound, and
   **not** the Yang-Mills mass gap. The default method tag is
-  `two_scale_polymer_count`. Single-scale `C = 15` is **not** a bound
-  on `N_2`.
+  `two_scale_polymer_count`. `counting="cluster"` keeps the first terms
+  explicitly. Single-scale `C = 15` is **not** a bound on `N_2`.
 - **`su3_wilson_transfer`** encloses SU(3) Wilson character coefficients
   by midpoint-plus-Lipschitz Haar quadrature on the maximal torus at
-  **one fixed `β`**. The matrix is the `(p, q) ≤ 2` truncation with
-  locked trigonometric characters. It is **not** a product of ordinary
-  Bessel functions, **not** 4-D SU(3) Yang-Mills, and **not** a
-  continuum claim.
+  **one fixed `β`**. The matrix is the `(p, q) ≤ 3` truncation: locked
+  trigonometric characters through `(2,2)`, Clebsch recurrence for
+  `p, q = 3`. It is **not** a product of ordinary Bessel functions,
+  **not** 4-D SU(3) Yang-Mills, and **not** a continuum claim.
 - **`certified_hamiltonian_gap`** is a sound lower bound on `λ1 - λ0` of
   **one finite two- or three-plaquette SU(2) Kogut–Susskind Hamiltonian**
   at one coupling and one spin truncation. Default magnetics are Racah
   6j weights. It is **not** a continuum claim, **not** a
   uniform-in-spacing bound, and **not** the Yang-Mills mass gap.
 - **`su2_spatial_strip_transfer`** is one finite Euclidean-time transfer
-  on a spatial circle of SU(2) class angles. Reflection positivity is
-  checked on **this** matrix; that is not Osterwalder–Seiler
-  reconstruction and not a continuum claim.
+  on a spatial circle of SU(2) class angles. **`su2_spatial_torus_transfer`**
+  is the finite 3+1-D analogue on a 2×2 spatial torus. Reflection
+  positivity is checked on **that** matrix; that is not
+  Osterwalder–Seiler reconstruction and not a continuum claim.
+- **`certified_gap_scaling_table`** is a table of independent
+  fixed-spacing certificates. `continuum_claim` is hard-wired `False`.
+  A trend across rows is not an extrapolation.
 - **`omnibias-qpinn` Bloch cage** supports orders ≤ 2 on a **single axis** in
   v0.0.1; multi-axis mixed partials need the Leibniz expansion (planned).
 - **Random-feature fields** are accurate only inside the support of their

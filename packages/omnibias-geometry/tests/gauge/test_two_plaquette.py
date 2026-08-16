@@ -192,3 +192,14 @@ def test_matrix_is_symmetric() -> None:
     hamiltonian = su2_two_plaquette_hamiltonian(COUPLING_LOCK, j_max=1)
     mid = _midpoint(hamiltonian)
     np.testing.assert_allclose(mid, mid.T, atol=1e-14)
+
+
+def test_j_max_2_certifies_a_positive_gap() -> None:
+    hamiltonian = su2_two_plaquette_hamiltonian(COUPLING_LOCK, j_max=2)
+    assert hamiltonian.dimension > len(physical_basis(1))
+    result = certified_hamiltonian_gap(hamiltonian)
+    assert result.certified is True
+    assert result.spectral_gap_lower > 0.0
+    values = np.sort(np.linalg.eigvalsh(_midpoint(hamiltonian)))
+    numerical = float(values[1] - values[0])
+    assert result.spectral_gap_lower <= numerical + 1e-9

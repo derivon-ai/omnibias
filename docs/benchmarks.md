@@ -85,6 +85,7 @@ These are verified in CI on every push (counts captured on a CPU-dev host):
 | Holonomy transfer gap (07-04) | [`benchmarks/gauge_holonomy_gap.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/gauge_holonomy_gap.py) | holonomy trials on one fixed matrix; G1 factor measured; no YM / continuum; smoke [`gauge_holonomy_gap_smoke.json`](benchmarks/gauge_holonomy_gap_smoke.json) |
 | Two-plaquette Hamiltonian gap | [`benchmarks/gauge_two_plaquette_gap.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/gauge_two_plaquette_gap.py) | `λ1-λ0` of one finite KS Hamiltonian; G1 factor measured; no YM / continuum; smoke [`gauge_two_plaquette_gap_smoke.json`](benchmarks/gauge_two_plaquette_gap_smoke.json) |
 | Spatial-strip transfer gap | [`benchmarks/gauge_spatial_strip.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/gauge_spatial_strip.py) | finite 2+1-D strip gap + RP + cluster tail; no YM / OS / continuum; smoke [`gauge_spatial_strip_smoke.json`](benchmarks/gauge_spatial_strip_smoke.json) |
+| Gap scaling table | [`benchmarks/gauge_gap_scaling.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/gauge_gap_scaling.py) | independent certified gaps at several spacings; `continuum_claim` false; smoke [`gauge_gap_scaling_smoke.json`](benchmarks/gauge_gap_scaling_smoke.json) |
 
 Four-gap status matrix (capability / empirical / structural / certified):
 [`benchmarks/pinn_four_gap_matrix.md`](benchmarks/pinn_four_gap_matrix.md).

@@ -6,6 +6,23 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — YM-adjacent finite campaign 4
+
+- Two-plaquette `j_max=2` certifies `λ1-λ0` at the locked coupling.
+  Three-plaquette `j_max=2` is basis-only in CI.
+- Longer strip `3×3` reflection positivity, and
+  `su2_spatial_torus_transfer` on a `2×2` class-angle torus (finite
+  3+1-D, not 4-D Yang-Mills). Kind `torus_reflection_positivity`.
+- SU(3) Haar unlocks `max_dynkin=3` via Clebsch recurrence from locked
+  `p, q ≤ 2` characters. Weyl dimension `(3,0)=10` is a finite Mathlib
+  identity. Not a Bessel product.
+- Polymer `counting="cluster"` keeps the first terms and a geometric
+  tail at `BETA_LOCK`. Method tag `finite_polymer_cluster`. Still not
+  Osterwalder-Seiler.
+- `certified_gap_scaling_table` aliases the heat-kernel scaling report.
+  Smoke: `benchmarks/gauge_gap_scaling.py`. `continuum_claim` stays
+  false. The continuum limit is not taken.
+
 ### Added — YM-adjacent finite campaign 3
 
 - Default two-plaquette magnetics are Racah 6j recoupling weights

@@ -13,11 +13,12 @@ from omnibias.formal.haar import (
 
 
 def test_legal_family_is_the_prefactor_plant() -> None:
-    assert LEGAL_HAAR_FAMILIES == ("weyl_prefactor_24",)
+    assert LEGAL_HAAR_FAMILIES == ("weyl_prefactor_24", "su3_dim_3_0")
 
 
 def test_locked_facts_hold() -> None:
     assert family_facts_hold("weyl_prefactor_24")
+    assert family_facts_hold("su3_dim_3_0")
 
 
 def test_unknown_family_raises() -> None:

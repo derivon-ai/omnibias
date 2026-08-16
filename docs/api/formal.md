@@ -71,8 +71,8 @@ a green build is meaningful.
   Finite rational identities, not a continuum gauge claim.
 - **Haar volume** -- a `haar_volume` payload from
   `omnibias.formal.haar.haar_certificate`: the locked Weyl prefactor
-  `6*4=24`. Finite arithmetic, not a continuum Haar theorem and not
-  4-D SU(3) Yang-Mills.
+  `6*4=24` or the Weyl dimension `(3,0)=10`. Finite arithmetic, not a
+  continuum Haar theorem and not 4-D SU(3) Yang-Mills.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived

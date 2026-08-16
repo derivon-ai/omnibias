@@ -21,4 +21,12 @@ theorem haar_weyl_prefactor_24 : haarWeylPrefactor = 24 := by
   unfold haarWeylPrefactor
   norm_num
 
+/-- Weyl dimension `(p+1)(q+1)(p+q+2)/2`. Finite identity, not a Haar theorem. -/
+def su3Dim (p q : ℚ) : ℚ :=
+  (p + 1) * (q + 1) * (p + q + 2) / 2
+
+theorem su3_dim_3_0 : su3Dim 3 0 = 10 := by
+  unfold su3Dim
+  norm_num
+
 end OmnibiasAnalytic.Check

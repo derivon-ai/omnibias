@@ -372,7 +372,7 @@ continuum limit or a claim about the Yang-Mills mass gap.
 | `su2_class_angle_transfer` | `angle` | the same `su(2)` spectrum, in a **dense, entrywise-positive** basis that can be sampled |
 | `su3_heat_kernel_transfer` | `character` | `e^{-t C₂(p,q)}`; the conjugate pair `(p,q) ↔ (q,p)` makes the subdominant mode doubly degenerate |
 | `su2_wilson_transfer` | `character` | `I_m(β)` via `besseli_iv`; the slowly-decaying tail the partner-chain deflation exists for |
-| `su3_wilson_transfer` | `character` | Midpoint-plus-Lipschitz Haar enclosures of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤2` truncation, not a product of ordinary `I_n` |
+| `su3_wilson_transfer` | `character` | Midpoint-plus-Lipschitz Haar enclosures of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤3` truncation, not a product of ordinary `I_n` |
 
 Heat-kernel and SU(2) Wilson spectra are known in closed form, so a certified
 bound can be checked against the exact answer. SU(3) Wilson eigenvalues are
@@ -514,7 +514,8 @@ activity `u(β) = I₂(β)/I₁(β)` and a two-scale polymer remainder
 `A = 4(2d-3)` (`20` in four dimensions); later generations use the
 backtrack branching `B = 3(2d-3)` (`15` in four dimensions). Single-scale
 `counting="backtrack"` (`C = 15`, **not** a bound on `N_2`) and
-`counting="crude"` (`C = 24`) remain available. `certified=True` only when
+`counting="crude"` (`C = 24`), and `counting="cluster"` (explicit keep
+plus a geometric tail) remain available. `certified=True` only when
 the enclosed contraction ratio is strictly less than 1. Out of that
 domain the leading activity is still returned and must not be sealed as proved.
 
@@ -572,10 +573,12 @@ finite-matrix statement on `|j1,j2,j3,js12,js23⟩`.
 
 `su2_spatial_strip_transfer` is a Euclidean-time transfer on a spatial
 circle of SU(2) class angles (`2×4 → 16` in CI). Its spectrum is not
-known in closed form. `certified_strip_reflection_positivity` checks
-`⟨θv, T v⟩` on a locked angle inversion; that is RP on **this** matrix,
-not Osterwalder–Seiler reconstruction. `certified_strip_cluster_tail`
-encloses a geometric tail of a locked spatial-bond correlator.
+known in closed form. `su2_spatial_torus_transfer` is the finite 3+1-D
+analogue on a `2×2` spatial torus (`n_angles=2 → 16` in CI).
+`certified_strip_reflection_positivity` checks `⟨θv, T v⟩` on a locked
+angle inversion; that is RP on **this** matrix, not Osterwalder–Seiler
+reconstruction. `certified_strip_cluster_tail` encloses a geometric tail
+of a locked spatial-bond correlator.
 
 ```python
 from omnibias.geometry.gauge.transfer import (
@@ -598,6 +601,23 @@ assert cluster.tail.contains(cluster.sample)
 
 ### Scaling across spacings, honestly
 
-`heat_kernel_gap_scaling_report` collects certified bounds at several spacings.
-That is a record of a trend, explicitly labelled evidence, and it is never an
-extrapolation to the continuum.
+`certified_gap_scaling_table` (alias of `heat_kernel_gap_scaling_report`)
+collects certified bounds at several spacings. That is a record of a
+trend, explicitly labelled evidence, and it is never an extrapolation to
+the continuum. `continuum_claim` is hard-wired `False`.
+
+```python
+from omnibias.geometry.gauge.transfer import (
+    certified_gap_scaling_table,
+    su2_heat_kernel_transfer,
+)
+
+table = certified_gap_scaling_table(
+    su2_heat_kernel_transfer,
+    spacings=[1.0, 0.5, 0.25],
+    couplings=[0.8, 0.4, 0.2],
+    max_dynkin=4,
+)
+assert table.continuum_claim is False
+assert len(table.points) == 3
+```

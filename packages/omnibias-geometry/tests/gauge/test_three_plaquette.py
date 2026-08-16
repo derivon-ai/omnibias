@@ -103,3 +103,11 @@ def test_replay_and_machine_prove_the_locked_coupling() -> None:
 def test_unknown_magnetic_is_rejected() -> None:
     with pytest.raises(ValueError, match="magnetic"):
         su2_three_plaquette_hamiltonian(COUPLING_LOCK, magnetic="racah")  # type: ignore[arg-type]
+
+
+def test_j_max_2_basis_is_strictly_larger_and_legal() -> None:
+    small = three_plaquette_basis(1)
+    large = three_plaquette_basis(2)
+    assert len(large) > len(small)
+    for t1, t2, t3, s12, s23 in large:
+        assert legal_chain(t1, t2, t3, s12, s23, two_j_max=4)

@@ -37,6 +37,7 @@ from omnibias.geometry.gauge.transfer.gap import TransferGapResult
 from omnibias.geometry.gauge.transfer.matrices import TransferMatrix, rebuild
 from omnibias.geometry.gauge.transfer.strong_coupling import (
     BACKTRACK_POLYMER_METHOD,
+    CLUSTER_POLYMER_METHOD,
     CRUDE_POLYMER_METHOD,
     POLYMER_METHOD,
     StrongCouplingGapResult,
@@ -64,7 +65,8 @@ STRONG_COUPLING_KIND = "strong_coupling_glueball_gap"
 _STRONG_COUPLING_NOTE = (
     "polymer-count lower bound for SU(2) Wilson at one fixed beta and "
     "spacing; method is two_scale_polymer_count, backtrack_polymer_count, "
-    "or crude_polymer_count, NOT Osterwalder-Seiler, NOT a continuum-limit, "
+    "crude_polymer_count, or finite_polymer_cluster, NOT Osterwalder-Seiler, "
+    "NOT a continuum-limit, "
     "infinite-volume, or Yang-Mills mass-gap claim"
 )
 
@@ -254,6 +256,7 @@ def seal_strong_coupling_certificate(
             "coordination": int(result.coordination),
             "first_step": result.first_step,
             "counting": result.counting,
+            "n_keep": result.n_keep,
             "subdominant_ratio_upper": float(result.subdominant_ratio_upper),
             "spectral_gap_lower": float(result.spectral_gap_lower),
             "in_convergence_domain": True,
@@ -300,10 +303,11 @@ def strong_coupling_schema_errors(cert: Certificate) -> list[str]:
         POLYMER_METHOD,
         BACKTRACK_POLYMER_METHOD,
         CRUDE_POLYMER_METHOD,
+        CLUSTER_POLYMER_METHOD,
     ):
         errors.append(
             f"method must be {POLYMER_METHOD!r}, {BACKTRACK_POLYMER_METHOD!r}, "
-            f"or {CRUDE_POLYMER_METHOD!r}"
+            f"{CRUDE_POLYMER_METHOD!r}, or {CLUSTER_POLYMER_METHOD!r}"
         )
     if cert.get("in_convergence_domain") is not True:
         errors.append("in_convergence_domain must be True")
@@ -338,12 +342,16 @@ def replay_strong_coupling_gap(cert: Certificate) -> bool | None:
     if beta is None or not isinstance(dim, int) or isinstance(dim, bool):
         return None
     counting = cert.get("counting", "two_scale")
-    if counting not in ("two_scale", "backtrack", "crude"):
+    if counting not in ("two_scale", "backtrack", "crude", "cluster"):
         return False
+    keep = cert.get("n_keep", 3)
+    kwargs: dict[str, object] = {"spacetime_dim": dim, "counting": counting}
+    if counting == "cluster":
+        if not isinstance(keep, int) or isinstance(keep, bool) or keep < 2:
+            return False
+        kwargs["n_keep"] = keep
     try:
-        fresh = certified_strong_coupling_glueball_bound(
-            beta, spacetime_dim=dim, counting=counting
-        )
+        fresh = certified_strong_coupling_glueball_bound(beta, **kwargs)  # type: ignore[arg-type]
     except (ValueError, TypeError):
         return False
     if not fresh.certified:
@@ -526,11 +534,19 @@ def replay_hamiltonian_gap(cert: Certificate) -> bool | None:
 
 STRIP_RP_SCHEMA_VERSION = "verified-strip-rp-1"
 STRIP_RP_KIND = "strip_reflection_positivity"
+TORUS_RP_SCHEMA_VERSION = "verified-torus-rp-1"
+TORUS_RP_KIND = "torus_reflection_positivity"
 
 _STRIP_RP_NOTE = (
     "reflection positivity of one finite spatial-strip transfer on a locked "
     "angle inversion and test vectors; NOT Osterwalder-Seiler reconstruction, "
     "NOT a continuum-limit, infinite-volume, or Yang-Mills mass-gap claim"
+)
+_TORUS_RP_NOTE = (
+    "reflection positivity of one finite 2-D spatial-torus transfer on a "
+    "locked angle inversion and test vectors; NOT Osterwalder-Seiler "
+    "reconstruction, NOT a continuum-limit, infinite-volume, or Yang-Mills "
+    "mass-gap claim"
 )
 
 
@@ -543,11 +559,17 @@ def seal_strip_rp_certificate(
     """Seal a certified strip RP check.  Refuses an uncertified result."""
     if not result.certified:
         raise ValueError("refusing to seal an uncertified strip reflection-positivity check")
+    torus = transfer.model == "su2_spatial_torus"
     return seal_certificate(
         {
-            "schema_version": STRIP_RP_SCHEMA_VERSION,
-            "claim": claim or "spatial-strip reflection positivity",
-            "observable": STRIP_RP_KIND,
+            "schema_version": TORUS_RP_SCHEMA_VERSION if torus else STRIP_RP_SCHEMA_VERSION,
+            "claim": claim
+            or (
+                "spatial-torus reflection positivity"
+                if torus
+                else "spatial-strip reflection positivity"
+            ),
+            "observable": TORUS_RP_KIND if torus else STRIP_RP_KIND,
             "model": transfer.model,
             "method": result.method,
             "dimension": int(transfer.dimension),
@@ -561,7 +583,7 @@ def seal_strip_rp_certificate(
                 "finite_truncation": True,
                 "interval_verified": True,
                 "yang_mills_claim": False,
-                "note": _STRIP_RP_NOTE,
+                "note": _TORUS_RP_NOTE if torus else _STRIP_RP_NOTE,
             },
         }
     )
@@ -585,12 +607,21 @@ def strip_rp_schema_errors(cert: Certificate) -> list[str]:
     for key in required:
         if key not in cert:
             errors.append(f"missing top-level key: {key!r}")
-    if cert.get("schema_version") != STRIP_RP_SCHEMA_VERSION:
-        errors.append(f"schema_version must be {STRIP_RP_SCHEMA_VERSION!r}")
+    schema = cert.get("schema_version")
+    observable = cert.get("observable")
+    if schema == TORUS_RP_SCHEMA_VERSION:
+        if observable != TORUS_RP_KIND:
+            errors.append(f"observable must be {TORUS_RP_KIND!r}")
+    elif schema == STRIP_RP_SCHEMA_VERSION:
+        if observable != STRIP_RP_KIND:
+            errors.append(f"observable must be {STRIP_RP_KIND!r}")
+    else:
+        errors.append(
+            f"schema_version must be {STRIP_RP_SCHEMA_VERSION!r} or "
+            f"{TORUS_RP_SCHEMA_VERSION!r}"
+        )
     if cert.get("continuum_claim", True):
         errors.append("continuum_claim must be False")
-    if cert.get("observable") != STRIP_RP_KIND:
-        errors.append(f"observable must be {STRIP_RP_KIND!r}")
     honesty = cert.get("honesty", {})
     if not isinstance(honesty, Mapping):
         errors.append("honesty must be a mapping")
@@ -641,6 +672,8 @@ __all__ = [
     "HAMILTONIAN_GAP_SCHEMA_VERSION",
     "STRIP_RP_KIND",
     "STRIP_RP_SCHEMA_VERSION",
+    "TORUS_RP_KIND",
+    "TORUS_RP_SCHEMA_VERSION",
     "THREE_PLAQUETTE_GAP_KIND",
     "STRONG_COUPLING_KIND",
     "STRONG_COUPLING_SCHEMA_VERSION",

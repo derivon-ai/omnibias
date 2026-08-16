@@ -14,9 +14,11 @@ Two finite objects, neither of which is continuum Yang-Mills:
   ``Σ N_n u^n ≤ u + A u² / (1 - B u)`` with first-step ``A = 4(2d-3)``
   (20 in four dimensions) and subsequent branching
   ``B = 3(2d-3)`` (15 in four dimensions).  Single-scale majorants
-  ``counting="backtrack"`` (``C = 15``, **not** a bound on ``N_2``) and
-  ``counting="crude"`` (``C = 24``) remain available.  ``certified=True``
-  only when the enclosed contraction ratio is strictly less than 1.
+  ``counting="backtrack"`` (``C = 15``, **not** a bound on ``N_2``),
+  ``counting="crude"`` (``C = 24``), and a term-by-term
+  ``counting="cluster"`` (explicit keep plus geometric tail) remain
+  available.  ``certified=True`` only when the enclosed contraction
+  ratio is strictly less than 1.
 
 Neither count is a formalization of Osterwalder-Seiler.  Every result is
 one coupling, one spacing, one group; ``continuum_claim`` stays false.
@@ -33,7 +35,7 @@ from omnibias.core.verified.series import geometric_series_closed_form, geometri
 from omnibias.core.verified.transcend import besseli_iv, ln_iv
 
 Scalar = float | int | Fraction
-Counting = Literal["two_scale", "backtrack", "crude"]
+Counting = Literal["two_scale", "backtrack", "crude", "cluster"]
 
 #: Locked test coupling that interval-certifies the two-scale remainder, ``d=4``.
 BETA_LOCK = Fraction(1, 5)
@@ -49,6 +51,9 @@ BACKTRACK_POLYMER_METHOD = "backtrack_polymer_count"
 
 #: Older overcounting majorant.
 CRUDE_POLYMER_METHOD = "crude_polymer_count"
+
+#: Term-by-term keep plus geometric tail (still not Osterwalder-Seiler).
+CLUSTER_POLYMER_METHOD = "finite_polymer_cluster"
 
 #: Method tag on the infinite-character Wilson gap.
 WILSON_CHARACTER_METHOD = "wilson_character_bessel_ratio"
@@ -143,6 +148,7 @@ class StrongCouplingGapResult:
     subdominant_ratio_upper: float
     in_convergence_domain: bool
     method: str = POLYMER_METHOD
+    n_keep: int | None = None
 
     @property
     def certified(self) -> bool:
@@ -181,6 +187,7 @@ def certified_strong_coupling_glueball_bound(
     *,
     spacetime_dim: int = 4,
     counting: Counting = "two_scale",
+    n_keep: int = 3,
 ) -> StrongCouplingGapResult:
     """Polymer lower bound on ``m a`` at one fixed ``β``.
 
@@ -188,10 +195,84 @@ def certified_strong_coupling_glueball_bound(
     with ``A = polymer_first_step`` and ``B = polymer_coordination_backtrack``.
     ``certified=True`` only when that enclosure's upper end is ``< 1``.
     Single-scale ``backtrack`` / ``crude`` keep ``m a ≥ -ln(C u)`` with
-    ``C u.hi < 1``.  Out of domain the leading activity is still returned
-    and must not be sealed as proved.
+    ``C u.hi < 1``.  ``counting="cluster"`` keeps the first ``n_keep``
+    two-scale terms explicitly and encloses the rest with
+    :func:`~omnibias.core.verified.series.geometric_tail_enclosure`.
+    Out of domain the leading activity is still returned and must not be
+    sealed as proved.
     """
     activity = su2_wilson_activity(beta)
+    if counting == "cluster":
+        if n_keep < 2:
+            raise ValueError(f"n_keep must be >= 2, got {n_keep}")
+        first_step = polymer_first_step(spacetime_dim)
+        coordination = polymer_coordination_backtrack(spacetime_dim)
+        method = CLUSTER_POLYMER_METHOD
+        scale_a = Interval.from_value(first_step)
+        scale_b = Interval.from_value(coordination)
+        ratio = scale_b * activity
+        terms = [activity]
+        u_pow = activity * activity
+        terms.append(scale_a * u_pow)
+        b_pow = Interval.point(1.0)
+        for _ in range(3, n_keep + 1):
+            u_pow = u_pow * activity
+            b_pow = b_pow * scale_b
+            terms.append(scale_a * b_pow * u_pow)
+        partial = terms[0]
+        for term in terms[1:]:
+            partial = partial + term
+        if ratio.hi >= 1.0:
+            return StrongCouplingGapResult(
+                beta=float(beta),
+                spacetime_dim=int(spacetime_dim),
+                coordination=coordination,
+                first_step=first_step,
+                counting=counting,
+                activity=activity,
+                activity_times_c=partial,
+                tail_bound=None,
+                spectral_gap_lower=0.0,
+                subdominant_ratio_upper=float(max(partial.hi, ratio.hi)),
+                in_convergence_domain=False,
+                method=method,
+                n_keep=int(n_keep),
+            )
+        tail = geometric_tail_enclosure(terms[-1], ratio)
+        product = partial + tail
+        in_domain = product.hi < 1.0
+        if not in_domain:
+            return StrongCouplingGapResult(
+                beta=float(beta),
+                spacetime_dim=int(spacetime_dim),
+                coordination=coordination,
+                first_step=first_step,
+                counting=counting,
+                activity=activity,
+                activity_times_c=product,
+                tail_bound=tail,
+                spectral_gap_lower=0.0,
+                subdominant_ratio_upper=float(product.hi),
+                in_convergence_domain=False,
+                method=method,
+                n_keep=int(n_keep),
+            )
+        gap = -ln_iv(product)
+        return StrongCouplingGapResult(
+            beta=float(beta),
+            spacetime_dim=int(spacetime_dim),
+            coordination=coordination,
+            first_step=first_step,
+            counting=counting,
+            activity=activity,
+            activity_times_c=product,
+            tail_bound=tail,
+            spectral_gap_lower=float(gap.lo),
+            subdominant_ratio_upper=float(product.hi),
+            in_convergence_domain=True,
+            method=method,
+            n_keep=int(n_keep),
+        )
     if counting == "two_scale":
         first_step = polymer_first_step(spacetime_dim)
         coordination = polymer_coordination_backtrack(spacetime_dim)
@@ -261,7 +342,8 @@ def certified_strong_coupling_glueball_bound(
         first_step = None
     else:
         raise ValueError(
-            f"counting must be 'two_scale', 'backtrack', or 'crude', got {counting!r}"
+            "counting must be 'two_scale', 'backtrack', 'crude', or 'cluster', "
+            f"got {counting!r}"
         )
     product = Interval.from_value(coordination) * activity
     in_domain = product.hi < 1.0
@@ -302,6 +384,7 @@ __all__ = [
     "BACKTRACK_POLYMER_METHOD",
     "BETA_LOCK",
     "BETA_LOCK_CRUDE",
+    "CLUSTER_POLYMER_METHOD",
     "CRUDE_POLYMER_METHOD",
     "POLYMER_METHOD",
     "WILSON_CHARACTER_METHOD",

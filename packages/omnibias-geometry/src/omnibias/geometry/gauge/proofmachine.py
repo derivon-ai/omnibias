@@ -16,6 +16,7 @@ kind                                  prover
 ``two_plaquette_hamiltonian_gap``     :func:`omnibias.geometry.gauge.transfer.certified_hamiltonian_gap`
 ``three_plaquette_hamiltonian_gap``   :func:`omnibias.geometry.gauge.transfer.certified_hamiltonian_gap`
 ``strip_reflection_positivity``       :func:`omnibias.geometry.gauge.transfer.strip.certified_strip_reflection_positivity`
+``torus_reflection_positivity``       :func:`omnibias.geometry.gauge.transfer.strip.certified_strip_reflection_positivity`
 ====================================  ====================================================
 
 The certificate is **sealed**, so:
@@ -52,6 +53,7 @@ from omnibias.geometry.gauge.transfer.certificates import (
     STRIP_RP_KIND,
     STRONG_COUPLING_KIND,
     THREE_PLAQUETTE_GAP_KIND,
+    TORUS_RP_KIND,
     TRANSFER_GAP_KIND,
     hamiltonian_gap_schema_errors,
     replay_hamiltonian_gap,
@@ -127,12 +129,16 @@ def _prove_strong_coupling_gap(conjecture: Conjecture) -> ProofAttempt:
     if not isinstance(dim, int) or isinstance(dim, bool) or dim < 2:
         return _blocked("spacetime_dim must be an integer >= 2")
     counting = data.get("counting", "two_scale")
-    if counting not in ("two_scale", "backtrack", "crude"):
-        return _blocked("counting must be 'two_scale', 'backtrack', or 'crude'")
+    if counting not in ("two_scale", "backtrack", "crude", "cluster"):
+        return _blocked("counting must be 'two_scale', 'backtrack', 'crude', or 'cluster'")
+    n_keep = data.get("n_keep", 3)
     try:
-        result = certified_strong_coupling_glueball_bound(
-            beta, spacetime_dim=dim, counting=counting
-        )
+        kwargs: dict[str, object] = {"spacetime_dim": dim, "counting": counting}
+        if counting == "cluster":
+            if not isinstance(n_keep, int) or isinstance(n_keep, bool) or n_keep < 2:
+                return _blocked("n_keep must be an integer >= 2")
+            kwargs["n_keep"] = n_keep
+        result = certified_strong_coupling_glueball_bound(beta, **kwargs)  # type: ignore[arg-type]
     except (ValueError, TypeError) as exc:
         return _blocked(f"could not certify a polymer bound: {exc}")
     if not result.certified:
@@ -300,6 +306,57 @@ def _prove_strip_rp(conjecture: Conjecture) -> ProofAttempt:
     return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
 
 
+def _prove_torus_rp(conjecture: Conjecture) -> ProofAttempt:
+    """Certify reflection positivity of the spatial-torus transfer."""
+    from omnibias.geometry.gauge.transfer.strip import (
+        certified_strip_reflection_positivity,
+        su2_spatial_torus_transfer,
+    )
+
+    data: Mapping[str, Any] = conjecture.data
+    parameters = data.get("parameters")
+    if isinstance(parameters, Mapping):
+        try:
+            transfer = rebuild(parameters)
+        except (ValueError, TypeError, KeyError) as exc:
+            return _blocked(f"could not build torus transfer: {exc}")
+    else:
+        coupling = data.get("coupling")
+        if (
+            isinstance(coupling, bool)
+            or not isinstance(coupling, int | float | Fraction)
+            or float(coupling) <= 0.0
+        ):
+            return _blocked("conjecture data must carry parameters or a positive 'coupling'")
+        n_x = data.get("n_x", 2)
+        n_y = data.get("n_y", 2)
+        n_angles = data.get("n_angles", 2)
+        if not isinstance(n_x, int) or isinstance(n_x, bool) or n_x < 2:
+            return _blocked("n_x must be an integer >= 2")
+        if not isinstance(n_y, int) or isinstance(n_y, bool) or n_y < 2:
+            return _blocked("n_y must be an integer >= 2")
+        if not isinstance(n_angles, int) or isinstance(n_angles, bool) or n_angles < 2:
+            return _blocked("n_angles must be an integer >= 2")
+        try:
+            transfer = su2_spatial_torus_transfer(
+                coupling, n_x=n_x, n_y=n_y, n_angles=n_angles
+            )
+        except (ValueError, TypeError) as exc:
+            return _blocked(f"could not build torus transfer: {exc}")
+    try:
+        result = certified_strip_reflection_positivity(transfer)
+    except (ValueError, TypeError) as exc:
+        return _blocked(f"could not certify torus RP: {exc}")
+    if not result.certified:
+        return _blocked("a reflection-positivity quadratic form has a negative lower end")
+    sealed = seal_strip_rp_certificate(result, transfer, claim=conjecture.name)
+    detail = (
+        f"{transfer.model} (dim {transfer.dimension}): "
+        f"RP forms lo >= 0 via {result.method}"
+    )
+    return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
+
+
 def gauge_provers() -> list[FunctionProver]:
     """The gauge provers registered by :func:`build_gauge_machine`."""
     return [
@@ -338,6 +395,13 @@ def gauge_provers() -> list[FunctionProver]:
             schema_fn=strip_rp_schema_errors,
             replay_fn=replay_strip_rp,
         ),
+        FunctionProver(
+            name="torus_reflection_positivity",
+            kinds=frozenset({TORUS_RP_KIND}),
+            prove_fn=_prove_torus_rp,
+            schema_fn=strip_rp_schema_errors,
+            replay_fn=replay_strip_rp,
+        ),
     ]
 
 
@@ -353,6 +417,7 @@ __all__ = [
     "HAMILTONIAN_GAP_KIND",
     "STRIP_RP_KIND",
     "STRONG_COUPLING_KIND",
+    "TORUS_RP_KIND",
     "THREE_PLAQUETTE_GAP_KIND",
     "TRANSFER_GAP_KIND",
     "build_gauge_machine",

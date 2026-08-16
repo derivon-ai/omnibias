@@ -25,6 +25,7 @@ from omnibias.geometry.gauge.transfer.gap import (
     BIRKHOFF_METHOD,
     SYMMETRIC_METHOD,
     certified_effective_mass_curve,
+    certified_gap_scaling_table,
     certified_multistep_gap_refinement,
     certified_transfer_matrix_gap,
     heat_kernel_gap_scaling_report,
@@ -261,6 +262,10 @@ def test_a_negative_tau_is_refused() -> None:
 # --------------------------------------------------------------------------- #
 # the scaling report is evidence, never a limit
 # --------------------------------------------------------------------------- #
+def test_certified_gap_scaling_table_is_the_heat_kernel_alias() -> None:
+    assert certified_gap_scaling_table is heat_kernel_gap_scaling_report
+
+
 def test_the_scaling_report_never_claims_a_continuum_limit() -> None:
     report = heat_kernel_gap_scaling_report(
         su2_heat_kernel_transfer,

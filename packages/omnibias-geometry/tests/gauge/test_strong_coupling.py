@@ -22,6 +22,7 @@ from omnibias.geometry.gauge.transfer.strong_coupling import (
     BACKTRACK_POLYMER_METHOD,
     BETA_LOCK,
     BETA_LOCK_CRUDE,
+    CLUSTER_POLYMER_METHOD,
     CRUDE_POLYMER_METHOD,
     POLYMER_METHOD,
     certified_strong_coupling_glueball_bound,
@@ -79,6 +80,26 @@ def test_single_scale_backtrack_is_not_sold_as_n2() -> None:
     assert result.coordination == 15
     assert result.first_step is None
     assert result.certified is True
+
+
+def test_cluster_counting_certifies_at_the_lock() -> None:
+    result = certified_strong_coupling_glueball_bound(BETA_LOCK, counting="cluster")
+    assert result.certified is True
+    assert result.method == CLUSTER_POLYMER_METHOD
+    assert result.counting == "cluster"
+    assert result.n_keep == 3
+    assert result.first_step == 20
+    assert result.tail_bound is not None
+    activity = su2_wilson_activity(BETA_LOCK)
+    mid = 0.5 * (activity.lo + activity.hi)
+    scale_a, scale_b = 20.0, 15.0
+    terms = [mid, scale_a * mid**2, scale_a * scale_b * mid**3]
+    last = terms[-1]
+    ratio = scale_b * mid
+    sample = sum(terms) + last * ratio / (1.0 - ratio)
+    assert result.activity_times_c.contains(sample)
+    too_large = certified_strong_coupling_glueball_bound(0.25, counting="cluster")
+    assert too_large.certified is False
 
 
 def test_quarter_beta_is_too_large_for_two_scale() -> None:

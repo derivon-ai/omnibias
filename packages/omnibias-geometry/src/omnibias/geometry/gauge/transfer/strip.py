@@ -4,8 +4,10 @@ r"""Finite 2+1-D SU(2) spatial-strip transfer, reflection positivity, cluster ta
 
 A spatial circle of ``n_sites`` class angles, each discretized into
 ``n_angles`` bins, gives an ``n_angles^{n_sites}``-dimensional Euclidean
-time transfer.  CI uses ``2 × 4 → 16``.  The spectrum is **not** known
-in closed form: spatial weights couple the sites, so this is not a
+time transfer.  CI uses ``2 × 4 → 16``.  A 2-D spatial torus
+(``su2_spatial_torus_transfer``) is the finite 3+1-D analogue; CI uses
+``2×2`` sites and ``n_angles=2`` (also 16-D).  The spectrum is **not**
+known in closed form: spatial weights couple the sites, so this is not a
 tensor of heat kernels.
 
 Reflection positivity is checked on **this** matrix for a locked angle
@@ -76,32 +78,22 @@ def _spatial_sqrt_weight(
     return exp_iv(beta * action * Interval.from_value(Fraction(1, 2)))
 
 
-def su2_spatial_strip_transfer(
-    coupling: Scalar,
+def _assemble_angle_transfer(
     *,
-    n_sites: int = 2,
-    n_angles: int = 4,
-    lattice_spacing: float = 1.0,
+    model: str,
+    builder: str,
+    coupling: Scalar,
+    n_sites: int,
+    n_angles: int,
+    lattice_spacing: float,
+    extra_parameters: dict[str, object],
+    weight_fn: object,
 ) -> TransferMatrix:
-    """Euclidean-time transfer on a spatial circle of SU(2) class angles.
-
-    Entries are ``√W(α) (⊗_sites K) √W(α')`` with Wilson kernels
-    ``K(θ,φ) = exp(β cos(θ-φ))``.  The spectrum is not claimed in closed
-    form.  This is one finite matrix, not 4-D Yang-Mills.
-    """
-    if isinstance(coupling, bool) or not isinstance(coupling, int | float | Fraction):
-        raise ValueError(f"coupling must be a positive scalar, got {coupling!r}")
-    if float(coupling) <= 0.0:
-        raise ValueError(f"coupling must be > 0, got {coupling!r}")
-    if n_sites < 2:
-        raise ValueError(f"n_sites must be >= 2, got {n_sites}")
-    if n_angles < 2:
-        raise ValueError(f"n_angles must be >= 2, got {n_angles}")
     beta = Interval.from_value(coupling)
     dim = int(n_angles) ** int(n_sites)
     kernel = _temporal_kernel(beta, n_angles)
     weights = [
-        _spatial_sqrt_weight(_decode(index, n_sites, n_angles), beta, n_angles)
+        weight_fn(_decode(index, n_sites, n_angles), beta)  # type: ignore[operator]
         for index in range(dim)
     ]
     raw: list[list[Interval]] = []
@@ -127,22 +119,123 @@ def su2_spatial_strip_transfer(
     subdominant = tuple(
         tuple(float(x) for x in vectors[:, order[k]]) for k in range(1, len(order))
     )
+    parameters: dict[str, object] = {
+        "builder": builder,
+        "coupling": encode_scalar(coupling),
+        "n_angles": int(n_angles),
+        "lattice_spacing": float(lattice_spacing),
+    }
+    parameters.update(extra_parameters)
     return TransferMatrix(
-        model="su2_spatial_strip",
+        model=model,
         basis="angle",
         entries=entries,
         mode_labels=labels,
         exact_eigenvalues=None,
-        parameters={
-            "builder": "su2_spatial_strip_transfer",
-            "coupling": encode_scalar(coupling),
-            "n_sites": int(n_sites),
-            "n_angles": int(n_angles),
-            "lattice_spacing": float(lattice_spacing),
-        },
+        parameters=parameters,
         perron_vector=perron,
         subdominant_vectors=subdominant,
         symmetric=True,
+    )
+
+
+def _require_positive_coupling(coupling: Scalar) -> None:
+    if isinstance(coupling, bool) or not isinstance(coupling, int | float | Fraction):
+        raise ValueError(f"coupling must be a positive scalar, got {coupling!r}")
+    if float(coupling) <= 0.0:
+        raise ValueError(f"coupling must be > 0, got {coupling!r}")
+
+
+def su2_spatial_strip_transfer(
+    coupling: Scalar,
+    *,
+    n_sites: int = 2,
+    n_angles: int = 4,
+    lattice_spacing: float = 1.0,
+) -> TransferMatrix:
+    """Euclidean-time transfer on a spatial circle of SU(2) class angles.
+
+    Entries are ``√W(α) (⊗_sites K) √W(α')`` with Wilson kernels
+    ``K(θ,φ) = exp(β cos(θ-φ))``.  The spectrum is not claimed in closed
+    form.  This is one finite matrix, not 4-D Yang-Mills.
+    """
+    _require_positive_coupling(coupling)
+    if n_sites < 2:
+        raise ValueError(f"n_sites must be >= 2, got {n_sites}")
+    if n_angles < 2:
+        raise ValueError(f"n_angles must be >= 2, got {n_angles}")
+
+    def weight(sites: Sequence[int], beta: Interval) -> Interval:
+        return _spatial_sqrt_weight(sites, beta, n_angles)
+
+    return _assemble_angle_transfer(
+        model="su2_spatial_strip",
+        builder="su2_spatial_strip_transfer",
+        coupling=coupling,
+        n_sites=int(n_sites),
+        n_angles=int(n_angles),
+        lattice_spacing=lattice_spacing,
+        extra_parameters={"n_sites": int(n_sites)},
+        weight_fn=weight,
+    )
+
+
+def _torus_sqrt_weight(
+    sites: Sequence[int],
+    beta: Interval,
+    n_x: int,
+    n_y: int,
+    n_angles: int,
+) -> Interval:
+    action = Interval.point(0.0)
+    for y in range(n_y):
+        for x in range(n_x):
+            here = sites[y * n_x + x]
+            right = sites[y * n_x + (x + 1) % n_x]
+            up = sites[((y + 1) % n_y) * n_x + x]
+            horizontal = (PI_IV + PI_IV) * Interval.from_value(
+                Fraction(here - right, n_angles)
+            )
+            vertical = (PI_IV + PI_IV) * Interval.from_value(
+                Fraction(here - up, n_angles)
+            )
+            action = action + cos_iv(horizontal) + cos_iv(vertical)
+    return exp_iv(beta * action * Interval.from_value(Fraction(1, 2)))
+
+
+def su2_spatial_torus_transfer(
+    coupling: Scalar,
+    *,
+    n_x: int = 2,
+    n_y: int = 2,
+    n_angles: int = 2,
+    lattice_spacing: float = 1.0,
+) -> TransferMatrix:
+    """Euclidean-time transfer on a 2-D spatial torus of SU(2) class angles.
+
+    CI uses ``2×2`` sites and ``n_angles=2`` (16-D).  The spectrum is not
+    claimed in closed form.  This is one finite 3+1-D class-angle
+    transfer, not 4-D Yang-Mills.
+    """
+    _require_positive_coupling(coupling)
+    if n_x < 2 or n_y < 2:
+        raise ValueError(f"n_x and n_y must be >= 2, got n_x={n_x}, n_y={n_y}")
+    if n_angles < 2:
+        raise ValueError(f"n_angles must be >= 2, got {n_angles}")
+    n_sites = int(n_x) * int(n_y)
+
+    def weight(sites: Sequence[int], beta: Interval) -> Interval:
+        return _torus_sqrt_weight(sites, beta, int(n_x), int(n_y), int(n_angles))
+
+    return _assemble_angle_transfer(
+        model="su2_spatial_torus",
+        builder="su2_spatial_torus_transfer",
+        coupling=coupling,
+        n_sites=n_sites,
+        n_angles=int(n_angles),
+        lattice_spacing=lattice_spacing,
+        extra_parameters={"n_x": int(n_x), "n_y": int(n_y)},
+        weight_fn=weight,
     )
 
 
@@ -170,12 +263,20 @@ def _quadratic_form(
     return total
 
 
-def _test_vectors(dimension: int) -> tuple[tuple[float, ...], ...]:
+def _test_vectors(n_sites: int, n_angles: int) -> tuple[tuple[float, ...], ...]:
+    dimension = n_angles ** n_sites
     ones = tuple(1.0 for _ in range(dimension))
-    even = tuple(
-        float(np.cos(2.0 * np.pi * index / dimension)) for index in range(dimension)
-    )
-    return (ones, even)
+    even = []
+    for index in range(dimension):
+        sites = _decode(index, n_sites, n_angles)
+        even.append(
+            float(
+                np.prod(
+                    [np.cos(2.0 * np.pi * site / n_angles) for site in sites]
+                )
+            )
+        )
+    return (ones, tuple(even))
 
 
 @dataclass(frozen=True)
@@ -187,6 +288,13 @@ class StripReflectionResult:
     method: str = "strip_angle_inversion"
 
 
+def _n_sites(transfer: TransferMatrix) -> int:
+    parameters = transfer.parameters
+    if "n_sites" in parameters:
+        return int(parameters["n_sites"])
+    return int(parameters["n_x"]) * int(parameters["n_y"])
+
+
 def certified_strip_reflection_positivity(
     transfer: TransferMatrix,
 ) -> StripReflectionResult:
@@ -194,14 +302,15 @@ def certified_strip_reflection_positivity(
 
     ``certified`` requires every lower endpoint ``≥ 0``.  One negative
     ``lo`` is a bug or an uncertified matrix.  This is RP on this
-    matrix, not Osterwalder–Seiler reconstruction.
+    matrix, not Osterwalder–Seiler reconstruction.  The same angle
+    inversion is used for the spatial strip and the 2-D torus.
     """
-    n_sites = int(transfer.parameters["n_sites"])
+    n_sites = _n_sites(transfer)
     n_angles = int(transfer.parameters["n_angles"])
     dim = transfer.dimension
     perm = [_reflect_index(index, n_sites, n_angles) for index in range(dim)]
     forms: list[Interval] = []
-    for vector in _test_vectors(dim):
+    for vector in _test_vectors(n_sites, n_angles):
         reflected = tuple(vector[perm[index]] for index in range(dim))
         forms.append(_quadratic_form(transfer.entries, reflected, vector))
     certified = all(form.lo >= 0.0 for form in forms)
@@ -265,4 +374,5 @@ __all__ = [
     "certified_strip_cluster_tail",
     "certified_strip_reflection_positivity",
     "su2_spatial_strip_transfer",
+    "su2_spatial_torus_transfer",
 ]
