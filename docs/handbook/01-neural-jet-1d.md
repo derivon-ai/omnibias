@@ -47,7 +47,7 @@ nonlinear in `x` (rich enough to fit smooth targets).
 
 <!-- docs-test: signature -->
 ```python
-fit_neural_field_1d(x, y, *, hidden=192, ridge=1e-5, activation="tanh", seed=0) -> NeuralField1D
+fit_neural_field_1d(x, y, *, hidden=192, ridge=1e-5, activation="tanh", seed=0, weight_scale=1.0) -> NeuralField1D
 ```
 
 **What.** Fit a smooth field to samples `(x, y)` by ridge-solving only the output
@@ -279,7 +279,7 @@ print(out["equation"])           # e.g. "d2y = -0.98*y + ..."  (dominant term â‰
 
 <!-- docs-test: signature -->
 ```python
-fit_sparse_equation(design, target, term_names, *, alpha=1e-8, threshold=1e-4, max_iter=8) -> SparseEquation
+fit_sparse_equation(design, target, term_names, *, alpha=1e-8, threshold=1e-4, max_iter=8, loss="ridge") -> SparseEquation
 ```
 
 **What.** Sequential thresholded ridge regression (STLSQ) â€” the workhorse behind

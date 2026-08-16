@@ -10,9 +10,14 @@ distributions is versioned independently under semantic versioning.
 
 - `examples/symbolic_discovery/public_csv_discovery`: Hudson Bay lynx–hare
   table (committed, offline) plus a synthetic Lotka–Volterra orbit.
-  Interpolant jets + STLSQ on `{1, x, y, xy}` beat a finite-difference
-  baseline on the public table (`skill_vs_fd > 0`) and recover `xy` signs
-  on the synthetic orbit. Not a new law of nature.
+  Train-only cubic-spline interpolant + STLSQ on `{1, x, y, xy}` (Huber
+  on the public table, ridge on the clean orbit), scored by RK4 rollout
+  against persist-last / linear / FD. Recovers `xy` signs on both splits;
+  extra linear terms survive on the pelts. RF jet is reported; it did not
+  clear 1.25× FD on the synthetic orbit. Not a new law of nature.
+- `omnibias.symbolic.fit_sparse_equation` accepts `loss="huber"` (IRLS,
+  default remains ridge). `fit_neural_field_1d` accepts `weight_scale`
+  (default `1.0`).
 
 ### Added — Path B operator completeness
 

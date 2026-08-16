@@ -91,6 +91,53 @@ def test_sparse_equation_thresholding_is_scale_invariant() -> None:
     )
 
 
+def test_huber_stlsq_beats_ridge_on_one_outlier() -> None:
+    rng = np.random.default_rng(0)
+    x = rng.normal(size=80)
+    y = rng.normal(size=80)
+    target = 0.4 * x - 0.25 * x * y
+    design = np.column_stack([np.ones(80), x, y, x * y])
+    names = ["1", "x", "y", "xy"]
+    dirty = target.copy()
+    dirty[0] += 25.0
+    ridge = fit_sparse_equation(design, dirty, names, alpha=1e-8, threshold=1e-4)
+    huber = fit_sparse_equation(
+        design, dirty, names, alpha=1e-8, threshold=1e-4, loss="huber"
+    )
+    true = np.asarray([0.0, 0.4, 0.0, -0.25])
+    assert float(np.linalg.norm(huber.coefficients - true)) < float(
+        np.linalg.norm(ridge.coefficients - true)
+    )
+
+
+def test_huber_stlsq_keeps_ridge_signs_on_clean_data() -> None:
+    rng = np.random.default_rng(1)
+    x = rng.normal(size=60)
+    y = rng.normal(size=60)
+    target = 0.4 * x - 0.25 * x * y
+    design = np.column_stack([np.ones(60), x, y, x * y])
+    names = ["1", "x", "y", "xy"]
+    ridge = fit_sparse_equation(design, target, names, alpha=1e-8, threshold=1e-3)
+    huber = fit_sparse_equation(
+        design, target, names, alpha=1e-8, threshold=1e-3, loss="huber"
+    )
+    ridge_signs = np.sign(ridge.coefficients) * ridge.active_mask
+    huber_signs = np.sign(huber.coefficients) * huber.active_mask
+    np.testing.assert_array_equal(ridge_signs, huber_signs)
+
+
+def test_neural_field_weight_scale_default_matches_unit_scale() -> None:
+    from omnibias.symbolic.discovery import fit_neural_field_1d
+
+    t = np.linspace(0.0, 2.0, 40)
+    y = np.sin(t)
+    default = fit_neural_field_1d(t, y, hidden=16, seed=0)
+    scaled = fit_neural_field_1d(t, y, hidden=16, seed=0, weight_scale=1.0)
+    np.testing.assert_allclose(default.W, scaled.W)
+    np.testing.assert_allclose(default.c, scaled.c)
+    assert default.train_rmse == scaled.train_rmse
+
+
 def test_surrogate_automl_selects_hybrid_and_recovers_terms() -> None:
     data = make_symbolic_regression_dataset(n_samples=700, noise_std=0.0, seed=4)
     result = discover_interpretable_surrogate(data, complexity_weight=5e-4)

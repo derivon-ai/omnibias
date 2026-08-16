@@ -28,6 +28,7 @@ from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from itertools import combinations_with_replacement
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 from omnibias.symbolic.diagnostics import (
@@ -782,21 +783,31 @@ def fit_neural_field_1d(
     ridge: float = 1e-5,
     activation: str = "tanh",
     seed: int = 0,
+    weight_scale: float = 1.0,
 ) -> NeuralField1D:
-    """Fit a smooth 1D omnibias random-feature field by solving the output layer."""
+    """Fit a smooth 1D omnibias random-feature field by solving the output layer.
+
+    ``weight_scale`` multiplies the random first-layer weights (default ``1.0``
+    keeps the historical ``N(0, 1)`` draw). Values below 1 give a smoother
+    interpolant whose first jet is closer to a cubic spline on short 1-D
+    tables.
+    """
 
     jnp = _jax_numpy()
     from omnibias.jax import get_activation
 
     x = np.asarray(x, dtype=float).reshape(-1)
     y = np.asarray(y, dtype=float).reshape(-1)
+    scale = float(weight_scale)
+    if scale <= 0.0:
+        raise ValueError(f"weight_scale must be > 0, got {weight_scale}")
     x_mean = float(np.mean(x))
     x_scale = float(np.std(x))
     if x_scale < 1e-12:
         x_scale = 1.0
     xs = (x - x_mean) / x_scale
     rng = np.random.default_rng(seed)
-    W = rng.normal(0.0, 1.0, size=hidden)
+    W = rng.normal(0.0, 1.0, size=hidden) * scale
     beta = rng.normal(0.0, 0.8, size=hidden)
     spec = get_activation(activation)
     z = xs[:, None] * W[None, :] + beta[None, :]
@@ -2504,6 +2515,7 @@ def fit_sparse_equation(
     alpha: float = 1e-8,
     threshold: float = 1e-4,
     max_iter: int = 8,
+    loss: Literal["ridge", "huber"] = "ridge",
 ) -> SparseEquation:
     """Sequential thresholded ridge regression (STLSQ).
 
@@ -2515,6 +2527,11 @@ def fit_sparse_equation(
     and scaled to unit std), so ``threshold`` is a single, scale-invariant
     criterion: rescaling a library column does not change which terms survive.
     The surviving coefficients are unscaled back to raw units only at the end.
+
+    ``loss="ridge"`` is the historical solver. ``loss="huber"`` swaps the
+    inner solve for IRLS Huber weighting (``delta = 1.345`` times a MAD
+    scale) and is intended for short noisy tables; it is not a closed-form
+    identity either.
     """
 
     design = np.asarray(design, dtype=float)
@@ -2523,6 +2540,9 @@ def fit_sparse_equation(
         raise ValueError(f"design must be 2D, got shape {design.shape}")
     if design.shape[1] != len(term_names):
         raise ValueError("term_names must match design width")
+    if loss not in {"ridge", "huber"}:
+        raise ValueError(f"loss must be 'ridge' or 'huber', got {loss!r}")
+    solver = _huber_coef if loss == "huber" else _ridge_coef
 
     col_mean = design.mean(axis=0)
     col_scale = np.where(design.std(axis=0) < 1e-12, 1.0, design.std(axis=0))
@@ -2535,7 +2555,7 @@ def fit_sparse_equation(
     for _ in range(max_iter):
         if not np.any(active):
             break
-        local = _ridge_coef(xz[:, active], yz, alpha)
+        local = solver(xz[:, active], yz, alpha)
         next_active = active.copy()
         active_indices = np.flatnonzero(active)
         next_active[active_indices[np.abs(local) < threshold]] = False
@@ -2546,7 +2566,7 @@ def fit_sparse_equation(
         active = next_active
 
     if np.any(active):
-        local = _ridge_coef(xz[:, active], yz, alpha)
+        local = solver(xz[:, active], yz, alpha)
         coef_z[:] = 0.0
         coef_z[active] = local
 
@@ -3025,6 +3045,53 @@ def _load_sklearn_regression_dataset(
 def _ridge_coef(design: np.ndarray, target: np.ndarray, alpha: float) -> np.ndarray:
     reg = alpha * np.eye(design.shape[1])
     return np.linalg.solve(design.T @ design + reg, design.T @ target)
+
+
+def _mad_scale(residuals: np.ndarray, *, eps: float = 1e-12) -> float:
+    """1.4826 * MAD, falling back to RMS when the sample is degenerate."""
+    residual = np.asarray(residuals, dtype=float).reshape(-1)
+    median = float(np.median(residual))
+    mad = float(np.median(np.abs(residual - median)))
+    scale = 1.4826 * mad
+    if scale < eps:
+        return max(float(np.sqrt(np.mean(residual * residual))), eps)
+    return scale
+
+
+def _weighted_ridge_coef(
+    design: np.ndarray,
+    target: np.ndarray,
+    weights: np.ndarray,
+    alpha: float,
+) -> np.ndarray:
+    sqrt_w = np.sqrt(np.clip(np.asarray(weights, dtype=float).reshape(-1), 0.0, None))
+    return _ridge_coef(design * sqrt_w[:, None], target * sqrt_w, alpha)
+
+
+def _huber_coef(
+    design: np.ndarray,
+    target: np.ndarray,
+    alpha: float,
+    *,
+    max_irls: int = 20,
+    c: float = 1.345,
+) -> np.ndarray:
+    """IRLS Huber regression in the same column space as ``_ridge_coef``."""
+    n = int(design.shape[0])
+    weights = np.ones(n, dtype=float)
+    coef = _ridge_coef(design, target, alpha)
+    for _ in range(max_irls):
+        residual = target - design @ coef
+        delta = c * _mad_scale(residual)
+        abs_r = np.abs(residual)
+        next_w = np.ones(n, dtype=float)
+        large = abs_r > delta
+        next_w[large] = delta / np.maximum(abs_r[large], 1e-30)
+        coef = _weighted_ridge_coef(design, target, next_w, alpha)
+        if np.allclose(next_w, weights, rtol=1e-6, atol=1e-8):
+            break
+        weights = next_w
+    return coef
 
 
 def _monomial_name(combo: tuple[int, ...]) -> str:

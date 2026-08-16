@@ -12,8 +12,8 @@
       }
     ]
   },
-  "generated_utc": "2026-08-16T19:57:40Z",
-  "honesty": "Recovers a famous ecological ODE on a public table. Not a new law of nature. Not a confinement or Clay claim.",
+  "generated_utc": "2026-08-16T20:15:07Z",
+  "honesty": "Spline-interpolant STLSQ plus RK4 rollout on Hudson Bay pelts and a synthetic Lotka-Volterra orbit. Recovers LV xy signs; extra linear terms survive on the public table. Not a new law of nature. Not a confinement or Clay claim.",
   "mode": "smoke",
   "public_csv": {
     "gates": {
@@ -26,31 +26,37 @@
           "passed": true
         },
         {
-          "min_skill": 0.0,
-          "name": "bilinear_vs_zero",
+          "hare_xy": -0.033353713691175624,
+          "lynx_xy": 0.02812779752296379,
+          "name": "xy_signs",
           "passed": true,
-          "skill_score": 0.8268044624566772
+          "required": true
         },
         {
           "min_skill": 0.0,
-          "name": "bilinear_vs_linear",
-          "passed": true,
-          "skill_score": 0.036681125574493434
-        },
-        {
-          "min_skill": 0.0,
-          "name": "jet_vs_fd",
+          "name": "rollout_vs_zero",
           "passed": true,
           "required": true,
-          "skill_score": 0.23116306658886454
+          "skill_score": 0.9810189765906265
+        },
+        {
+          "min_skill": 0.0,
+          "name": "rollout_vs_linear",
+          "passed": true,
+          "required": true,
+          "skill_score": 0.9668012663284843
         }
       ]
     },
+    "huber_vs_ridge_rollout": -0.01796675810102588,
+    "interpolant": "spline",
     "n_rows": 21,
-    "skill_vs_fd": 0.23116306658886454,
-    "skill_vs_linear": 0.036681125574493434
+    "rollout_vs_linear": 0.9668012663284843,
+    "rollout_vs_zero": 0.9810189765906265,
+    "skill_vs_fd": -0.9259969731613209,
+    "xy_signs_ok": true
   },
-  "schema": "public_csv_discovery/v1",
+  "schema": "public_csv_discovery/v2",
   "synthetic": {
     "gates": {
       "all_passed": true,
@@ -62,34 +68,51 @@
           "passed": true
         },
         {
-          "min_skill": 0.0,
-          "name": "bilinear_vs_zero",
+          "chosen": "spline",
+          "fd_dot_rmse": 2.383007615215768,
+          "jet_dot_rmse": 5.918604879062177,
+          "max_ratio": 1.25,
+          "name": "interpolant_quality",
           "passed": true,
-          "skill_score": 0.7310493102659202
+          "ratio": 0.566575663093015,
+          "required": true,
+          "spline_dot_rmse": 1.350154119746578
+        },
+        {
+          "hare_xy": -0.027265590136238128,
+          "lynx_xy": 0.02508748553562678,
+          "name": "xy_signs",
+          "passed": true,
+          "required": true
         },
         {
           "min_skill": 0.0,
-          "name": "bilinear_vs_linear",
-          "passed": true,
-          "skill_score": 0.3702933988680063
-        },
-        {
-          "min_skill": 0.0,
-          "name": "jet_vs_fd",
+          "name": "rollout_vs_zero",
           "passed": true,
           "required": false,
-          "skill_score": -47.02504080575186
+          "skill_score": 0.9986763829712464
         },
         {
-          "hare_xy": -0.005358918305124631,
-          "lynx_xy": 0.0060009454246552725,
-          "name": "xy_signs",
-          "passed": true
+          "min_skill": 0.0,
+          "name": "rollout_vs_linear",
+          "passed": true,
+          "required": true,
+          "skill_score": 0.9983563634948577
         }
       ]
     },
-    "skill_vs_fd": -47.02504080575186,
-    "skill_vs_linear": 0.3702933988680063,
+    "interpolant": "spline",
+    "interpolant_knobs": {
+      "hidden": 48,
+      "mode": "spline",
+      "quality_ratio": 1.25,
+      "ridge": 1e-06,
+      "upsample": 8,
+      "weight_scale": 1.0
+    },
+    "jet_vs_fd_ratio": 2.4836701491305475,
+    "rollout_vs_linear": 0.9983563634948577,
+    "skill_vs_fd": 0.8527822625096014,
     "xy_signs_ok": true
   }
 }
