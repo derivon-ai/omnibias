@@ -34,6 +34,9 @@ Extensive, and it already contains the honesty text this spec must respect.
   `BIRKHOFF_METHOD`.
 - `omnibias.geometry.gauge.proofmachine` — the proof driver for gauge
   certificates.
+- `certified_polymer_beta_domain` / `finite_gauge_report` — the
+  majorant's dyadic-`β` domain and one sealed bundle of the existing
+  finite engines. G1 is measured. Not a Clay staircase.
 - `omnibias.core.verified.eig_operator` — `lehmann_maehly_lower_bounds`,
   `LehmannCertificate`, `certified_spectral_gap`, `SpectralGapCertificate`,
   `temple_lower_bound`, `interval_ldlt_inertia`, `ritz_upper_bound`,
@@ -247,6 +250,8 @@ output, and the Monte Carlo comparison already implemented.
   tail on one finite matrix.
 - `benchmarks/gauge_gap_scaling.py`: independent certified gaps at
   several spacings; `continuum_claim` is false.
+- `benchmarks/gauge_finite_report.py`: sealed bundle of the existing
+  engines; G1 measured; not a Clay staircase.
 - Smoke JSON in `docs/benchmarks/`; full under
   `$OMNIBIAS_SCRATCH/gauge_gap/`.
 

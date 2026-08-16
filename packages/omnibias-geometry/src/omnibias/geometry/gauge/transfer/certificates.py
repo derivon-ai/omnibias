@@ -39,8 +39,11 @@ from omnibias.geometry.gauge.transfer.strong_coupling import (
     BACKTRACK_POLYMER_METHOD,
     CLUSTER_POLYMER_METHOD,
     CRUDE_POLYMER_METHOD,
+    POLYMER_BETA_DOMAIN_METHOD,
     POLYMER_METHOD,
+    PolymerDomainResult,
     StrongCouplingGapResult,
+    certified_polymer_beta_domain,
     certified_strong_coupling_glueball_bound,
 )
 
@@ -366,6 +369,195 @@ def replay_strong_coupling_gap(cert: Certificate) -> bool | None:
     return not sealed_gap > fresh.spectral_gap_lower + tolerance
 
 
+POLYMER_DOMAIN_SCHEMA_VERSION = "verified-polymer-beta-domain-1"
+POLYMER_DOMAIN_KIND = "polymer_beta_domain"
+
+_POLYMER_DOMAIN_NOTE = (
+    "majorant domain on a locked dyadic beta grid: largest certifying "
+    "grid point and the next grid failure; NOT a physical critical "
+    "coupling, NOT Osterwalder-Seiler, NOT a continuum-limit, "
+    "infinite-volume, or Yang-Mills mass-gap claim"
+)
+
+
+def _fraction_pair(value: Any) -> list[int] | None:
+    from fractions import Fraction
+
+    if isinstance(value, Fraction):
+        return [int(value.numerator), int(value.denominator)]
+    return None
+
+
+def _as_fraction(value: Any) -> Any:
+    from fractions import Fraction
+
+    if isinstance(value, Fraction):
+        return value
+    if isinstance(value, list | tuple) and len(value) == 2:
+        num, den = value
+        if (
+            isinstance(num, int)
+            and isinstance(den, int)
+            and not isinstance(num, bool)
+            and not isinstance(den, bool)
+            and den > 0
+        ):
+            return Fraction(num, den)
+    if isinstance(value, str) and "/" in value:
+        return Fraction(value)
+    return None
+
+
+def seal_polymer_domain_certificate(
+    result: PolymerDomainResult,
+    *,
+    claim: str = "",
+) -> Certificate:
+    """Seal a certified polymer-domain grid statement.  Refuses an uncertified result."""
+    if not result.certified:
+        raise ValueError(
+            "refusing to seal an uncertified polymer-domain result "
+            "(no certifying grid point, or no larger failure)"
+        )
+    certified_pair = _fraction_pair(result.beta_certified)
+    outside_pair = _fraction_pair(result.beta_outside)
+    if certified_pair is None or outside_pair is None:
+        raise ValueError("beta_certified and beta_outside must be Fractions")
+    return seal_certificate(
+        {
+            "schema_version": POLYMER_DOMAIN_SCHEMA_VERSION,
+            "claim": claim or "SU(2) polymer majorant beta-domain",
+            "observable": POLYMER_DOMAIN_KIND,
+            "model": "su2_wilson_polymer_domain",
+            "method": result.method,
+            "counting": result.counting,
+            "spacetime_dim": int(result.spacetime_dim),
+            "n_keep": result.n_keep,
+            "grid": [_fraction_pair(item) for item in result.grid],
+            "beta_certified": certified_pair,
+            "beta_outside": outside_pair,
+            "subdominant_ratio_upper": float(result.certified_result.subdominant_ratio_upper),
+            "spectral_gap_lower": float(result.certified_result.spectral_gap_lower),
+            "in_convergence_domain": True,
+            "continuum_claim": False,
+            "honesty": {
+                "unproven_claim": False,
+                "continuum_claim": False,
+                "fixed_spacing": True,
+                "finite_truncation": True,
+                "interval_verified": True,
+                "yang_mills_claim": False,
+                "note": _POLYMER_DOMAIN_NOTE,
+            },
+        }
+    )
+
+
+def polymer_domain_schema_errors(cert: Certificate) -> list[str]:
+    """Validate a ``verified-polymer-beta-domain-1`` certificate."""
+    errors: list[str] = []
+    required = (
+        "schema_version",
+        "observable",
+        "model",
+        "method",
+        "counting",
+        "spacetime_dim",
+        "grid",
+        "beta_certified",
+        "beta_outside",
+        "subdominant_ratio_upper",
+        "spectral_gap_lower",
+        "in_convergence_domain",
+        "continuum_claim",
+        "honesty",
+        "digest",
+    )
+    for key in required:
+        if key not in cert:
+            errors.append(f"missing top-level key: {key!r}")
+    if cert.get("schema_version") != POLYMER_DOMAIN_SCHEMA_VERSION:
+        errors.append(f"schema_version must be {POLYMER_DOMAIN_SCHEMA_VERSION!r}")
+    if cert.get("observable") != POLYMER_DOMAIN_KIND:
+        errors.append(f"observable must be {POLYMER_DOMAIN_KIND!r}")
+    if cert.get("continuum_claim", True):
+        errors.append("continuum_claim must be False")
+    if cert.get("method") != POLYMER_BETA_DOMAIN_METHOD:
+        errors.append(f"method must be {POLYMER_BETA_DOMAIN_METHOD!r}")
+    if cert.get("in_convergence_domain") is not True:
+        errors.append("in_convergence_domain must be True")
+    honesty = cert.get("honesty", {})
+    if not isinstance(honesty, Mapping):
+        errors.append("honesty must be a mapping")
+        honesty = {}
+    if honesty.get("unproven_claim", True):
+        errors.append("honesty.unproven_claim must be False")
+    if honesty.get("continuum_claim", True):
+        errors.append("honesty.continuum_claim must be False")
+    if honesty.get("yang_mills_claim", True):
+        errors.append("honesty.yang_mills_claim must be False")
+    beta_star = _as_fraction(cert.get("beta_certified"))
+    beta_out = _as_fraction(cert.get("beta_outside"))
+    if beta_star is None or beta_out is None or not (beta_star < beta_out):
+        errors.append("beta_certified must be a Fraction pair strictly below beta_outside")
+    ratio = _as_float(cert.get("subdominant_ratio_upper"))
+    if ratio is None or not 0.0 <= ratio < 1.0:
+        errors.append("subdominant_ratio_upper must lie in [0, 1)")
+    gap = _as_float(cert.get("spectral_gap_lower"))
+    if gap is None or gap <= 0.0:
+        errors.append("spectral_gap_lower must be > 0")
+    if "digest" in cert and not verify_certificate_digest(cert):
+        errors.append("digest does not match the certificate body (tampered/stale)")
+    return errors
+
+
+def replay_polymer_domain(cert: Certificate) -> bool | None:
+    """Independently re-derive the majorant domain from the recorded grid."""
+    counting = cert.get("counting", "two_scale")
+    if counting not in ("two_scale", "backtrack", "crude", "cluster"):
+        return False
+    dim = cert.get("spacetime_dim")
+    if not isinstance(dim, int) or isinstance(dim, bool) or dim < 2:
+        return None
+    raw_grid = cert.get("grid")
+    if not isinstance(raw_grid, list) or len(raw_grid) < 2:
+        return None
+    grid = []
+    for item in raw_grid:
+        parsed = _as_fraction(item)
+        if parsed is None:
+            return False
+        grid.append(parsed)
+    keep = cert.get("n_keep", 3)
+    kwargs: dict[str, object] = {"counting": counting, "spacetime_dim": dim, "grid": grid}
+    if counting == "cluster":
+        if not isinstance(keep, int) or isinstance(keep, bool) or keep < 2:
+            return False
+        kwargs["n_keep"] = keep
+    try:
+        fresh = certified_polymer_beta_domain(**kwargs)  # type: ignore[arg-type]
+    except (ValueError, TypeError):
+        return False
+    if not fresh.certified:
+        return False
+    sealed_star = _as_fraction(cert.get("beta_certified"))
+    sealed_out = _as_fraction(cert.get("beta_outside"))
+    if sealed_star is None or sealed_out is None:
+        return False
+    if sealed_star > fresh.beta_certified:
+        return False
+    if sealed_star == fresh.beta_certified and sealed_out != fresh.beta_outside:
+        return False
+    sealed_ratio = _as_float(cert.get("subdominant_ratio_upper"))
+    sealed_gap = _as_float(cert.get("spectral_gap_lower"))
+    if sealed_ratio is None or sealed_gap is None:
+        return False
+    tolerance = 1e-9
+    if sealed_ratio < fresh.certified_result.subdominant_ratio_upper - tolerance:
+        return False
+    return not sealed_gap > fresh.certified_result.spectral_gap_lower + tolerance
+
+
 #: Schema version of the sealed two-plaquette Hamiltonian gap certificate.
 HAMILTONIAN_GAP_SCHEMA_VERSION = "verified-hamiltonian-gap-1"
 
@@ -667,9 +859,224 @@ def replay_strip_rp(cert: Certificate) -> bool | None:
     return True
 
 
+FINITE_GAUGE_REPORT_SCHEMA_VERSION = "verified-finite-gauge-report-1"
+FINITE_GAUGE_REPORT_KIND = "finite_gauge_report"
+
+_FINITE_GAUGE_REPORT_NOTE = (
+    "bundle of finite certificates on one named spec; NOT a continuum-limit, "
+    "infinite-volume, Osterwalder-Seiler, or Yang-Mills mass-gap claim, "
+    "and not a staircase to Clay existence"
+)
+
+
+def seal_finite_gauge_report_certificate(
+    result: Any,
+    *,
+    claim: str = "",
+) -> Certificate:
+    """Seal a certified finite-gauge report.  Refuses an uncertified bundle."""
+    from omnibias.geometry.gauge.transfer.report import finite_gauge_spec_to_mapping
+
+    if not result.certified:
+        raise ValueError(
+            "refusing to seal an uncertified finite-gauge report "
+            "(a required engine failed or honesty flags were raised)"
+        )
+    polymer_gaps = [float(item.spectral_gap_lower) for item in result.polymer]
+    polymer_ratios = [float(item.subdominant_ratio_upper) for item in result.polymer]
+    return seal_certificate(
+        {
+            "schema_version": FINITE_GAUGE_REPORT_SCHEMA_VERSION,
+            "claim": claim or f"{result.spec.name} finite gauge report",
+            "observable": FINITE_GAUGE_REPORT_KIND,
+            "model": result.spec.name,
+            "method": "finite_gauge_report",
+            "spec": finite_gauge_spec_to_mapping(result.spec),
+            "polymer_gaps": polymer_gaps,
+            "polymer_ratios": polymer_ratios,
+            "wilson_gap": float(result.wilson_character.spectral_gap_lower),
+            "domain_beta_certified": [
+                int(result.polymer_domain.beta_certified.numerator),
+                int(result.polymer_domain.beta_certified.denominator),
+            ],
+            "domain_beta_outside": [
+                int(result.polymer_domain.beta_outside.numerator),
+                int(result.polymer_domain.beta_outside.denominator),
+            ],
+            "haar_weyl_prefactor_24": result.haar.weyl_prefactor_24,
+            "haar_su3_dim_3_0": result.haar.su3_dim_3_0,
+            "su3_dimension": int(result.su3_gap.dimension),
+            "su3_gap": float(result.su3_gap.spectral_gap_lower),
+            "hamiltonian_gap": float(result.hamiltonian.spectral_gap_lower),
+            "g1_factor": float(result.g1.factor),
+            "g1_ge_generic": bool(result.g1.ge_generic),
+            "g1_target_5x": False,
+            "strip_rp": bool(result.strip_rp.certified),
+            "include_torus": bool(result.spec.include_torus),
+            "scaling_gaps": [float(point.spectral_gap_lower) for point in result.scaling.points],
+            "continuum_claim": False,
+            "honesty": {
+                "unproven_claim": False,
+                "continuum_claim": False,
+                "fixed_matrix": True,
+                "finite_truncation": True,
+                "interval_verified": True,
+                "yang_mills_claim": False,
+                "note": _FINITE_GAUGE_REPORT_NOTE,
+            },
+        }
+    )
+
+
+def finite_gauge_report_schema_errors(cert: Certificate) -> list[str]:
+    """Validate a ``verified-finite-gauge-report-1`` certificate."""
+    errors: list[str] = []
+    required = (
+        "schema_version",
+        "observable",
+        "model",
+        "method",
+        "spec",
+        "polymer_gaps",
+        "wilson_gap",
+        "domain_beta_certified",
+        "domain_beta_outside",
+        "haar_weyl_prefactor_24",
+        "haar_su3_dim_3_0",
+        "su3_dimension",
+        "su3_gap",
+        "hamiltonian_gap",
+        "g1_factor",
+        "g1_ge_generic",
+        "g1_target_5x",
+        "strip_rp",
+        "scaling_gaps",
+        "continuum_claim",
+        "honesty",
+        "digest",
+    )
+    for key in required:
+        if key not in cert:
+            errors.append(f"missing top-level key: {key!r}")
+    if cert.get("schema_version") != FINITE_GAUGE_REPORT_SCHEMA_VERSION:
+        errors.append(f"schema_version must be {FINITE_GAUGE_REPORT_SCHEMA_VERSION!r}")
+    if cert.get("observable") != FINITE_GAUGE_REPORT_KIND:
+        errors.append(f"observable must be {FINITE_GAUGE_REPORT_KIND!r}")
+    if cert.get("continuum_claim", True):
+        errors.append("continuum_claim must be False")
+    if cert.get("g1_target_5x") is not False:
+        errors.append("g1_target_5x must be False")
+    if cert.get("g1_ge_generic") is not True:
+        errors.append("g1_ge_generic must be True")
+    if cert.get("haar_weyl_prefactor_24") is not True:
+        errors.append("haar_weyl_prefactor_24 must be True")
+    if cert.get("haar_su3_dim_3_0") is not True:
+        errors.append("haar_su3_dim_3_0 must be True")
+    if cert.get("strip_rp") is not True:
+        errors.append("strip_rp must be True")
+    honesty = cert.get("honesty", {})
+    if not isinstance(honesty, Mapping):
+        errors.append("honesty must be a mapping")
+        honesty = {}
+    if honesty.get("unproven_claim", True):
+        errors.append("honesty.unproven_claim must be False")
+    if honesty.get("continuum_claim", True):
+        errors.append("honesty.continuum_claim must be False")
+    if honesty.get("yang_mills_claim", True):
+        errors.append("honesty.yang_mills_claim must be False")
+    for key in ("wilson_gap", "hamiltonian_gap", "g1_factor"):
+        value = _as_float(cert.get(key))
+        if value is None or value <= 0.0:
+            errors.append(f"{key} must be > 0")
+    su3_gap = _as_float(cert.get("su3_gap"))
+    if su3_gap is None or su3_gap < 0.0:
+        errors.append("su3_gap must be a non-negative float")
+    su3_dim = cert.get("su3_dimension")
+    if not isinstance(su3_dim, int) or isinstance(su3_dim, bool) or su3_dim < 4:
+        errors.append("su3_dimension must be an integer >= 4")
+    gaps = cert.get("polymer_gaps")
+    if not isinstance(gaps, list) or not gaps or any(
+        not isinstance(item, int | float) or isinstance(item, bool) or item <= 0.0
+        for item in gaps
+    ):
+        errors.append("polymer_gaps must be a non-empty list of positive floats")
+    scaling = cert.get("scaling_gaps")
+    if not isinstance(scaling, list) or len(scaling) < 3 or any(
+        not isinstance(item, int | float) or isinstance(item, bool) or item <= 0.0
+        for item in scaling
+    ):
+        errors.append("scaling_gaps must list at least three positive floats")
+    star = _as_fraction(cert.get("domain_beta_certified"))
+    outside = _as_fraction(cert.get("domain_beta_outside"))
+    if star is None or outside is None or not (star < outside):
+        errors.append("domain_beta_certified must be a Fraction pair strictly below domain_beta_outside")
+    if "digest" in cert and not verify_certificate_digest(cert):
+        errors.append("digest does not match the certificate body (tampered/stale)")
+    return errors
+
+
+def replay_finite_gauge_report(cert: Certificate) -> bool | None:
+    """Independently re-run the named spec and refuse a tighter sealed bundle."""
+    from omnibias.geometry.gauge.transfer.report import (
+        finite_gauge_report,
+        finite_gauge_spec_from_mapping,
+    )
+
+    raw_spec = cert.get("spec")
+    if not isinstance(raw_spec, Mapping):
+        return None
+    try:
+        spec = finite_gauge_spec_from_mapping(raw_spec)
+        fresh = finite_gauge_report(spec)
+    except (ValueError, TypeError, KeyError):
+        return False
+    if not fresh.certified:
+        return False
+    tolerance = 1e-9
+
+    def _not_tighter(sealed: Any, actual: float) -> bool:
+        value = _as_float(sealed)
+        return value is not None and not value > actual + tolerance
+
+    if not _not_tighter(cert.get("wilson_gap"), fresh.wilson_character.spectral_gap_lower):
+        return False
+    if cert.get("su3_dimension") != fresh.su3_gap.dimension:
+        return False
+    if not _not_tighter(cert.get("su3_gap"), fresh.su3_gap.spectral_gap_lower):
+        return False
+    if not _not_tighter(cert.get("hamiltonian_gap"), fresh.hamiltonian.spectral_gap_lower):
+        return False
+    sealed_gaps = cert.get("polymer_gaps")
+    if not isinstance(sealed_gaps, list) or len(sealed_gaps) != len(fresh.polymer):
+        return False
+    for claimed, item in zip(sealed_gaps, fresh.polymer, strict=True):
+        if not _not_tighter(claimed, item.spectral_gap_lower):
+            return False
+    sealed_scaling = cert.get("scaling_gaps")
+    if not isinstance(sealed_scaling, list) or len(sealed_scaling) != len(fresh.scaling.points):
+        return False
+    for claimed, point in zip(sealed_scaling, fresh.scaling.points, strict=True):
+        if not _not_tighter(claimed, point.spectral_gap_lower):
+            return False
+    sealed_star = _as_fraction(cert.get("domain_beta_certified"))
+    if sealed_star is None or sealed_star > fresh.polymer_domain.beta_certified:
+        return False
+    if cert.get("g1_ge_generic") is True and not fresh.g1.ge_generic:
+        return False
+    if cert.get("haar_weyl_prefactor_24") is True and not fresh.haar.weyl_prefactor_24:
+        return False
+    if cert.get("haar_su3_dim_3_0") is True and not fresh.haar.su3_dim_3_0:
+        return False
+    return True
+
+
 __all__ = [
+    "FINITE_GAUGE_REPORT_KIND",
+    "FINITE_GAUGE_REPORT_SCHEMA_VERSION",
     "HAMILTONIAN_GAP_KIND",
     "HAMILTONIAN_GAP_SCHEMA_VERSION",
+    "POLYMER_DOMAIN_KIND",
+    "POLYMER_DOMAIN_SCHEMA_VERSION",
     "STRIP_RP_KIND",
     "STRIP_RP_SCHEMA_VERSION",
     "TORUS_RP_KIND",
@@ -679,12 +1086,18 @@ __all__ = [
     "STRONG_COUPLING_SCHEMA_VERSION",
     "TRANSFER_GAP_KIND",
     "TRANSFER_GAP_SCHEMA_VERSION",
+    "finite_gauge_report_schema_errors",
     "hamiltonian_gap_schema_errors",
+    "polymer_domain_schema_errors",
+    "replay_finite_gauge_report",
     "replay_hamiltonian_gap",
+    "replay_polymer_domain",
     "replay_strong_coupling_gap",
     "replay_strip_rp",
     "replay_transfer_matrix_gap",
+    "seal_finite_gauge_report_certificate",
     "seal_hamiltonian_gap_certificate",
+    "seal_polymer_domain_certificate",
     "seal_strong_coupling_certificate",
     "seal_strip_rp_certificate",
     "seal_transfer_gap_certificate",

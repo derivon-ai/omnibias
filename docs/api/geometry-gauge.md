@@ -621,3 +621,41 @@ table = certified_gap_scaling_table(
 assert table.continuum_claim is False
 assert len(table.points) == 3
 ```
+
+### Polymer β-domain, and one sealed finite-gauge report
+
+`certified_polymer_beta_domain` evaluates the polymer majorant on a
+locked dyadic grid (`k/32` for `k = 1..16`). It records the largest
+certifying grid point and the next grid failure. That is the
+**majorant's** domain on that grid, not a physical critical coupling
+and not `a -> 0`.
+
+`finite_gauge_report` runs the existing engines on one named spec
+(polymer plus cluster, the β-domain, the Wilson character gap, Haar
+identities, a small SU(3) Haar transfer so the quadrature runs, the
+two-plaquette Hamiltonian with a measured G1 factor, strip reflection
+positivity, and a three-point heat-kernel scaling table). A positive
+SU(3) gap is not required at CI `n_cells`: the Lipschitz remainder is
+too wide. The bundle is still a list of finite statements.
+`continuum_claim` and `yang_mills_claim` stay false. It is not a
+staircase to Clay existence.
+
+```python
+from omnibias.geometry.gauge.transfer import (
+    certified_polymer_beta_domain,
+    finite_gauge_report,
+)
+
+domain = certified_polymer_beta_domain()
+assert domain.certified
+assert domain.beta_certified < domain.beta_outside
+assert domain.continuum_claim is False
+
+pack = finite_gauge_report()
+assert pack.certified
+assert pack.continuum_claim is False
+assert pack.yang_mills_claim is False
+assert pack.g1.ge_generic
+assert pack.g1.factor + 1e-12 >= 1.0
+assert pack.haar.certified
+```

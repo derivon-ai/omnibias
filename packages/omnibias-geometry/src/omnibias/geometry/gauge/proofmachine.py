@@ -17,6 +17,8 @@ kind                                  prover
 ``three_plaquette_hamiltonian_gap``   :func:`omnibias.geometry.gauge.transfer.certified_hamiltonian_gap`
 ``strip_reflection_positivity``       :func:`omnibias.geometry.gauge.transfer.strip.certified_strip_reflection_positivity`
 ``torus_reflection_positivity``       :func:`omnibias.geometry.gauge.transfer.strip.certified_strip_reflection_positivity`
+``polymer_beta_domain``               :func:`omnibias.geometry.gauge.transfer.certified_polymer_beta_domain`
+``finite_gauge_report``               :func:`omnibias.geometry.gauge.transfer.finite_gauge_report`
 ====================================  ====================================================
 
 The certificate is **sealed**, so:
@@ -49,18 +51,26 @@ from omnibias.core.proof import (
     ProofMachine,
 )
 from omnibias.geometry.gauge.transfer.certificates import (
+    FINITE_GAUGE_REPORT_KIND,
     HAMILTONIAN_GAP_KIND,
+    POLYMER_DOMAIN_KIND,
     STRIP_RP_KIND,
     STRONG_COUPLING_KIND,
     THREE_PLAQUETTE_GAP_KIND,
     TORUS_RP_KIND,
     TRANSFER_GAP_KIND,
+    finite_gauge_report_schema_errors,
     hamiltonian_gap_schema_errors,
+    polymer_domain_schema_errors,
+    replay_finite_gauge_report,
     replay_hamiltonian_gap,
+    replay_polymer_domain,
     replay_strip_rp,
     replay_strong_coupling_gap,
     replay_transfer_matrix_gap,
+    seal_finite_gauge_report_certificate,
     seal_hamiltonian_gap_certificate,
+    seal_polymer_domain_certificate,
     seal_strip_rp_certificate,
     seal_strong_coupling_certificate,
     seal_transfer_gap_certificate,
@@ -71,6 +81,7 @@ from omnibias.geometry.gauge.transfer.certificates import (
 from omnibias.geometry.gauge.transfer.gap import certified_transfer_matrix_gap
 from omnibias.geometry.gauge.transfer.matrices import rebuild
 from omnibias.geometry.gauge.transfer.strong_coupling import (
+    certified_polymer_beta_domain,
     certified_strong_coupling_glueball_bound,
 )
 
@@ -357,6 +368,61 @@ def _prove_torus_rp(conjecture: Conjecture) -> ProofAttempt:
     return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
 
 
+def _prove_polymer_domain(conjecture: Conjecture) -> ProofAttempt:
+    """Certify the majorant domain on the locked dyadic beta grid."""
+    data: Mapping[str, Any] = conjecture.data
+    counting = data.get("counting", "two_scale")
+    if counting not in ("two_scale", "backtrack", "crude", "cluster"):
+        return _blocked("counting must be 'two_scale', 'backtrack', 'crude', or 'cluster'")
+    dim = data.get("spacetime_dim", 4)
+    if not isinstance(dim, int) or isinstance(dim, bool) or dim < 2:
+        return _blocked("spacetime_dim must be an integer >= 2")
+    n_keep = data.get("n_keep", 3)
+    try:
+        kwargs: dict[str, object] = {"counting": counting, "spacetime_dim": dim}
+        if counting == "cluster":
+            if not isinstance(n_keep, int) or isinstance(n_keep, bool) or n_keep < 2:
+                return _blocked("n_keep must be an integer >= 2")
+            kwargs["n_keep"] = n_keep
+        result = certified_polymer_beta_domain(**kwargs)  # type: ignore[arg-type]
+    except (ValueError, TypeError) as exc:
+        return _blocked(f"could not certify a polymer-domain grid: {exc}")
+    if not result.certified:
+        return _blocked("polymer majorant domain is not certified on the locked grid")
+    sealed = seal_polymer_domain_certificate(result, claim=conjecture.name)
+    detail = (
+        f"su2_wilson_polymer_domain ({result.counting}): "
+        f"certified at {result.beta_certified}, fails at {result.beta_outside}"
+    )
+    return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
+
+
+def _prove_finite_gauge_report(conjecture: Conjecture) -> ProofAttempt:
+    """Run the named finite-gauge pack and seal the bundle."""
+    from omnibias.geometry.gauge.transfer.report import (
+        finite_gauge_report,
+        finite_gauge_spec_from_mapping,
+    )
+
+    data: Mapping[str, Any] = conjecture.data
+    raw_spec = data.get("spec", data)
+    if raw_spec is not None and not isinstance(raw_spec, Mapping):
+        return _blocked("conjecture data must carry a 'spec' mapping or spec fields")
+    try:
+        spec = finite_gauge_spec_from_mapping(raw_spec if isinstance(raw_spec, Mapping) else None)
+        result = finite_gauge_report(spec)
+    except (ValueError, TypeError, KeyError) as exc:
+        return _blocked(f"could not build a finite-gauge report: {exc}")
+    if not result.certified:
+        return _blocked("a required engine in the finite-gauge pack failed to certify")
+    sealed = seal_finite_gauge_report_certificate(result, claim=conjecture.name)
+    detail = (
+        f"{result.spec.name}: finite gauge report certified "
+        f"(G1 factor {result.g1.factor:.3g}, measured)"
+    )
+    return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
+
+
 def gauge_provers() -> list[FunctionProver]:
     """The gauge provers registered by :func:`build_gauge_machine`."""
     return [
@@ -402,6 +468,20 @@ def gauge_provers() -> list[FunctionProver]:
             schema_fn=strip_rp_schema_errors,
             replay_fn=replay_strip_rp,
         ),
+        FunctionProver(
+            name="polymer_beta_domain",
+            kinds=frozenset({POLYMER_DOMAIN_KIND}),
+            prove_fn=_prove_polymer_domain,
+            schema_fn=polymer_domain_schema_errors,
+            replay_fn=replay_polymer_domain,
+        ),
+        FunctionProver(
+            name="finite_gauge_report",
+            kinds=frozenset({FINITE_GAUGE_REPORT_KIND}),
+            prove_fn=_prove_finite_gauge_report,
+            schema_fn=finite_gauge_report_schema_errors,
+            replay_fn=replay_finite_gauge_report,
+        ),
     ]
 
 
@@ -414,7 +494,9 @@ def build_gauge_machine() -> ProofMachine:
 
 
 __all__ = [
+    "FINITE_GAUGE_REPORT_KIND",
     "HAMILTONIAN_GAP_KIND",
+    "POLYMER_DOMAIN_KIND",
     "STRIP_RP_KIND",
     "STRONG_COUPLING_KIND",
     "TORUS_RP_KIND",

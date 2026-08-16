@@ -585,6 +585,10 @@ jobs:
         run: |
           source .venv-geom/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/gauge_gap_scaling.py
+      - name: Run finite-gauge report smoke
+        run: |
+          source .venv-geom/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/gauge_finite_report.py
 
   binary:
     name: omnibias-binary (alpha)

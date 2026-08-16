@@ -65,6 +65,7 @@ uv run python docs/img/generate_figures.py
 | `gauge_two_plaquette_gap.py` | `docs/benchmarks/gauge_two_plaquette_gap_smoke.json` | Two-plaquette KS Hamiltonian `λ1-λ0`; G1 factor measured; no YM / continuum |
 | `gauge_spatial_strip.py` | `docs/benchmarks/gauge_spatial_strip_smoke.json` | Finite 2+1-D strip gap + RP + cluster tail; no YM / OS / continuum |
 | `gauge_gap_scaling.py` | `docs/benchmarks/gauge_gap_scaling_smoke.json` | Independent certified gaps vs spacing; continuum_claim false |
+| `gauge_finite_report.py` | `docs/benchmarks/gauge_finite_report_smoke.json` | Sealed finite-gauge pack; G1 measured; no YM / continuum / Clay staircase |
 | `scannet.py` | `docs/benchmarks/scannet_smoke.json` | Wave-3 architecture 02-01: ScanNet G1/G2/G5; G3 cost and G4 k-NN recorded, not in CI `all_passed`; on-lattice equivariance |
 | `jetkan.py` | `docs/benchmarks/jetkan_smoke.json` | Wave-3 architecture 02-03: JetKAN G1/G3/G5; G2 timing not in CI `all_passed`; model-jet exactness, KA theorem does not justify |
 | `weak_form_vpinn.py` | `docs/benchmarks/weak_form_vpinn_smoke.json` | Wave-3 architecture 02-04: exact on polynomial boxes; boundary bound on by default |

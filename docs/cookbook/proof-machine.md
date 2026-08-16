@@ -145,6 +145,8 @@ transfer-matrix prover lives in its own registry rather than the default machine
 | `three_plaquette_hamiltonian_gap` | `certified_hamiltonian_gap` (finite three-plaquette KS `λ1-λ0`) | No — a gap below the requested threshold → `BLOCKED` |
 | `strip_reflection_positivity` | `certified_strip_reflection_positivity` (RP on one strip transfer) | No — a negative quadratic-form lower end → `BLOCKED` |
 | `torus_reflection_positivity` | `certified_strip_reflection_positivity` (RP on one 2×2 torus transfer) | No — a negative quadratic-form lower end → `BLOCKED` |
+| `polymer_beta_domain` | `certified_polymer_beta_domain` (majorant domain on a locked dyadic `β` grid) | No — no certifying point or no larger failure → `BLOCKED` |
+| `finite_gauge_report` | `finite_gauge_report` (sealed bundle of the existing finite engines) | No — a required engine fails → `BLOCKED` |
 
 ```python
 from omnibias.core.proof import Conjecture
@@ -152,6 +154,8 @@ from omnibias.geometry.gauge.proofmachine import build_gauge_machine
 
 gauge = build_gauge_machine()
 assert sorted(gauge.kinds()) == [
+    "finite_gauge_report",
+    "polymer_beta_domain",
     "strip_reflection_positivity",
     "strong_coupling_glueball_gap",
     "three_plaquette_hamiltonian_gap",

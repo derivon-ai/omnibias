@@ -26,6 +26,7 @@ one coupling, one spacing, one group; ``continuum_claim`` stays false.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from fractions import Fraction
 from typing import Literal
@@ -57,6 +58,12 @@ CLUSTER_POLYMER_METHOD = "finite_polymer_cluster"
 
 #: Method tag on the infinite-character Wilson gap.
 WILSON_CHARACTER_METHOD = "wilson_character_bessel_ratio"
+
+#: Locked dyadic grid ``k/32`` for ``k = 1..16``.  Not a continuum interval of ``β``.
+POLYMER_BETA_GRID: tuple[Fraction, ...] = tuple(Fraction(k, 32) for k in range(1, 17))
+
+#: Method tag for the majorant domain on :data:`POLYMER_BETA_GRID`.
+POLYMER_BETA_DOMAIN_METHOD = "polymer_beta_domain_grid"
 
 
 def polymer_coordination(spacetime_dim: int) -> int:
@@ -240,7 +247,7 @@ def certified_strong_coupling_glueball_bound(
             )
         tail = geometric_tail_enclosure(terms[-1], ratio)
         product = partial + tail
-        in_domain = product.hi < 1.0
+        in_domain = product.lo > 0.0 and product.hi < 1.0
         if not in_domain:
             return StrongCouplingGapResult(
                 beta=float(beta),
@@ -301,7 +308,7 @@ def certified_strong_coupling_glueball_bound(
         tail = geometric_tail_enclosure(
             Interval.from_value(first_step) * activity * activity, ratio
         )
-        in_domain = product.hi < 1.0
+        in_domain = product.lo > 0.0 and product.hi < 1.0
         if not in_domain:
             return StrongCouplingGapResult(
                 beta=float(beta),
@@ -346,7 +353,7 @@ def certified_strong_coupling_glueball_bound(
             f"got {counting!r}"
         )
     product = Interval.from_value(coordination) * activity
-    in_domain = product.hi < 1.0
+    in_domain = product.lo > 0.0 and product.hi < 1.0
     tail = geometric_tail_enclosure(product, product) if in_domain else None
     if not in_domain:
         return StrongCouplingGapResult(
@@ -380,16 +387,109 @@ def certified_strong_coupling_glueball_bound(
     )
 
 
+@dataclass(frozen=True)
+class PolymerDomainResult:
+    """Majorant domain on a locked dyadic ``β`` grid.
+
+    ``beta_certified`` is the largest grid point whose majorant
+    interval-certifies; ``beta_outside`` is the smallest strictly larger
+    grid point that fails.  That is the majorant's domain on this grid,
+    not a physical critical coupling, not ``a -> 0``, and not
+    Osterwalder-Seiler.
+    """
+
+    counting: str
+    spacetime_dim: int
+    n_keep: int | None
+    grid: tuple[Fraction, ...]
+    beta_certified: Fraction
+    beta_outside: Fraction
+    certified_result: StrongCouplingGapResult
+    outside_result: StrongCouplingGapResult
+    method: str = POLYMER_BETA_DOMAIN_METHOD
+    continuum_claim: bool = False
+    yang_mills_claim: bool = False
+
+    @property
+    def certified(self) -> bool:
+        return (
+            self.certified_result.certified
+            and not self.outside_result.certified
+            and self.beta_certified < self.beta_outside
+            and self.continuum_claim is False
+            and self.yang_mills_claim is False
+        )
+
+
+def certified_polymer_beta_domain(
+    *,
+    counting: Counting = "two_scale",
+    spacetime_dim: int = 4,
+    n_keep: int = 3,
+    grid: Sequence[Fraction] | None = None,
+) -> PolymerDomainResult:
+    """Largest certifying dyadic ``β`` and the next grid failure.
+
+    Evaluates :func:`certified_strong_coupling_glueball_bound` on a locked
+    dyadic grid.  The claim is only about those points.  Bessel
+    monotonicity is not promoted to a continuum interval of ``β``.
+    """
+    points = tuple(Fraction(item) for item in (grid if grid is not None else POLYMER_BETA_GRID))
+    if len(points) < 2:
+        raise ValueError("grid must contain at least two positive betas")
+    if any(item <= 0 for item in points):
+        raise ValueError("grid betas must be > 0")
+    ordered = tuple(sorted(points))
+    if len(set(ordered)) != len(ordered):
+        raise ValueError("grid betas must be unique")
+    kwargs: dict[str, object] = {"spacetime_dim": spacetime_dim, "counting": counting}
+    keep: int | None = None
+    if counting == "cluster":
+        if n_keep < 2:
+            raise ValueError(f"n_keep must be >= 2, got {n_keep}")
+        kwargs["n_keep"] = int(n_keep)
+        keep = int(n_keep)
+    evaluated: list[tuple[Fraction, StrongCouplingGapResult]] = []
+    for beta in ordered:
+        evaluated.append(
+            (beta, certified_strong_coupling_glueball_bound(beta, **kwargs))  # type: ignore[arg-type]
+        )
+    certified_points = [item for item in evaluated if item[1].certified]
+    if not certified_points:
+        raise ValueError("no grid point interval-certifies the majorant")
+    beta_star, star_result = max(certified_points, key=lambda item: item[0])
+    failures = [item for item in evaluated if item[0] > beta_star and not item[1].certified]
+    if not failures:
+        raise ValueError(
+            "no larger grid point fails the majorant; cannot record a first failure"
+        )
+    beta_out, out_result = min(failures, key=lambda item: item[0])
+    return PolymerDomainResult(
+        counting=counting,
+        spacetime_dim=int(spacetime_dim),
+        n_keep=keep,
+        grid=ordered,
+        beta_certified=beta_star,
+        beta_outside=beta_out,
+        certified_result=star_result,
+        outside_result=out_result,
+    )
+
+
 __all__ = [
     "BACKTRACK_POLYMER_METHOD",
     "BETA_LOCK",
     "BETA_LOCK_CRUDE",
     "CLUSTER_POLYMER_METHOD",
     "CRUDE_POLYMER_METHOD",
+    "POLYMER_BETA_DOMAIN_METHOD",
+    "POLYMER_BETA_GRID",
     "POLYMER_METHOD",
     "WILSON_CHARACTER_METHOD",
+    "PolymerDomainResult",
     "StrongCouplingGapResult",
     "WilsonCharacterGapResult",
+    "certified_polymer_beta_domain",
     "certified_strong_coupling_glueball_bound",
     "certified_wilson_character_gap",
     "polymer_coordination",

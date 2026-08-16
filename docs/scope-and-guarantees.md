@@ -326,6 +326,15 @@ the relevant op:
 - **`certified_gap_scaling_table`** is a table of independent
   fixed-spacing certificates. `continuum_claim` is hard-wired `False`.
   A trend across rows is not an extrapolation.
+- **`certified_polymer_beta_domain`** is the polymer majorant's
+  certified domain on a **locked dyadic `β` grid** (largest certifying
+  point and the next grid failure). It is **not** a physical critical
+  coupling, **not** `a → 0`, and **not** Osterwalder–Seiler.
+- **`finite_gauge_report`** is one sealed bundle of the existing
+  finite engines on a named spec. G1 is **measured**. The bundle is
+  still a list of finite statements. It is **not** a staircase to Clay
+  existence, **not** a continuum claim, and **not** the Yang-Mills
+  mass gap.
 - **`omnibias-qpinn` Bloch cage** supports orders ≤ 2 on a **single axis** in
   v0.0.1; multi-axis mixed partials need the Leibniz expansion (planned).
 - **Random-feature fields** are accurate only inside the support of their

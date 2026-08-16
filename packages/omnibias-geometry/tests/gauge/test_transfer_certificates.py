@@ -24,7 +24,9 @@ from omnibias.core.proof.certificate import verify_certificate_digest
 from omnibias.core.proof.lean_check import check_certificate, generate_obligation
 from omnibias.geometry.gauge.proofmachine import build_gauge_machine, gauge_provers
 from omnibias.geometry.gauge.transfer.certificates import (
+    FINITE_GAUGE_REPORT_KIND,
     HAMILTONIAN_GAP_KIND,
+    POLYMER_DOMAIN_KIND,
     STRIP_RP_KIND,
     STRONG_COUPLING_KIND,
     THREE_PLAQUETTE_GAP_KIND,
@@ -65,6 +67,8 @@ def test_the_gauge_machine_registers_exactly_the_expected_kinds(
 ) -> None:
     """Frozen so a new prover cannot slip in unannounced."""
     assert sorted(machine.kinds()) == [
+        FINITE_GAUGE_REPORT_KIND,
+        POLYMER_DOMAIN_KIND,
         STRIP_RP_KIND,
         STRONG_COUPLING_KIND,
         THREE_PLAQUETTE_GAP_KIND,
@@ -79,6 +83,8 @@ def test_the_gauge_machine_registers_exactly_the_expected_kinds(
         "three_plaquette_hamiltonian_gap",
         "strip_reflection_positivity",
         "torus_reflection_positivity",
+        "polymer_beta_domain",
+        "finite_gauge_report",
     ]
 
 

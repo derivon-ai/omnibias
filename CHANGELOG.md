@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — finite gauge report and polymer β-domain
+
+- `certified_polymer_beta_domain` records the polymer majorant's
+  certified domain on a locked dyadic `β` grid (largest certifying
+  point and the next grid failure). Kind `polymer_beta_domain`.
+  Not a physical critical coupling and not `a → 0`.
+- `finite_gauge_report` seals the existing engines on one named spec
+  (polymer, Wilson character, Haar identities, a small SU(3) Haar
+  transfer, two-plaquette gap with measured G1, strip RP, scaling
+  table). Kind `finite_gauge_report`. Honesty stays hard-wired.
+  The bundle is not a staircase to Clay existence.
+- Smoke: `benchmarks/gauge_finite_report.py`.
+
 ### Added — YM-adjacent finite campaign 4
 
 - Two-plaquette `j_max=2` certifies `λ1-λ0` at the locked coupling.
