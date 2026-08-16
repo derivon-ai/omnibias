@@ -4,11 +4,12 @@ r"""SU(3) Wilson character transfer from an enclosed Haar integral.
 
 The single-link Wilson weight ``exp((β/3) Re χ_fund)`` is expanded on
 SU(3) characters by integrating against the Weyl measure on the maximal
-torus.  Coefficients use a cellwise interval range times cell area on a
-finite box partition of ``[0, 2π]²``.  The β=0 (orthogonality) piece of
-a non-trivial character is locked to zero rather than re-enclosed, so
-the interval width tracks ``exp(a)-1`` instead of a cancelling
-oscillation.
+torus.  Coefficients use a cellwise interval range intersected with a
+centered form (midpoint plus local gradient times cell displacement)
+times cell area on a finite box partition of ``[0, 2π]²``.  The β=0
+(orthogonality) piece of a non-trivial character is locked to zero
+rather than re-enclosed, so the interval width tracks ``exp(a)-1``
+instead of a cancelling oscillation.
 
 Characters with ``p, q ≤ 2`` are locked trigonometric polynomials in
 ``e^{iθ}, e^{iφ}``.  Labels with ``p, q = 3`` are obtained from those
@@ -67,6 +68,11 @@ def _cell_box(index: int, n_cells: int) -> Interval:
     left = PI_IV * Interval.from_value(Fraction(2 * index, n_cells))
     right = PI_IV * Interval.from_value(Fraction(2 * index + 2, n_cells))
     return Interval(left.lo, right.hi)
+
+
+def _center(index: int, n_cells: int) -> Interval:
+    """Cell midpoint ``π (2i+1) / n``, a rational multiple of ``π``."""
+    return PI_IV * Interval.from_value(Fraction(2 * index + 1, n_cells))
 
 
 def _haar_density(theta: Interval, phi: Interval) -> Interval:
@@ -180,6 +186,170 @@ def _weight_minus_one(beta: Interval, re_chi: Interval) -> Interval:
     return exp_iv(argument) - Interval.point(1.0)
 
 
+def _scale_a(beta: Interval) -> Interval:
+    return beta * Interval.from_value(Fraction(1, 3))
+
+
+def _h_chi(beta: Interval, re_chi: Interval) -> Interval:
+    """Tight one-argument range of ``e^{βx/3}-1`` (monotone in ``x``)."""
+    return _weight_minus_one(beta, re_chi)
+
+
+def _g_chi(beta: Interval, re_chi: Interval) -> Interval:
+    """Tight one-argument range of ``g(x) = x (e^{βx/3}-1)``.
+
+    For ``β > 0``, ``g`` is non-negative, decreasing on ``(-∞, 0]`` and
+    increasing on ``[0, ∞)``, with a minimum of ``0`` at the origin.
+    """
+    a = _scale_a(beta)
+
+    def _at(endpoint: float) -> Interval:
+        point = Interval.point(endpoint)
+        return point * (exp_iv(a * point) - Interval.point(1.0))
+
+    if re_chi.hi <= 0.0:
+        return Interval.hull(_at(re_chi.hi), _at(re_chi.lo))
+    if re_chi.lo >= 0.0:
+        return Interval.hull(_at(re_chi.lo), _at(re_chi.hi))
+    left = _at(re_chi.lo)
+    right = _at(re_chi.hi)
+    return Interval(0.0, max(left.hi, right.hi))
+
+
+def _integrand_range(
+    dynkin: tuple[int, int], beta: Interval, theta: Interval, phi: Interval
+) -> Interval:
+    """Cellwise range of ``χ_R (e^{β Re χ_f / 3}-1) ρ``.
+
+    The CI irreps share the same ``Re χ_f`` in both factors, so the
+    product is evaluated as a one-argument function of that character
+    times the density.  Other labels keep the three-factor product.
+    """
+    re_chi = _re_fund(theta, phi)
+    density = _haar_density(theta, phi)
+    if dynkin == (0, 0):
+        return _h_chi(beta, re_chi) * density
+    if dynkin in ((1, 0), (0, 1)):
+        return _g_chi(beta, re_chi) * density
+    return _re_character(dynkin, theta, phi) * _h_chi(beta, re_chi) * density
+
+
+def _fund_partials(theta: Interval, phi: Interval) -> tuple[Interval, Interval]:
+    sine_th = sin_iv(theta)
+    sine_ph = sin_iv(phi)
+    sine_sum = sin_iv(theta + phi)
+    zero = Interval.point(0.0)
+    return (zero - sine_th - sine_sum, zero - sine_ph - sine_sum)
+
+
+def _im_partials(theta: Interval, phi: Interval) -> tuple[Interval, Interval]:
+    return (
+        cos_iv(theta) - cos_iv(theta + phi),
+        cos_iv(phi) - cos_iv(theta + phi),
+    )
+
+
+def _rho_partials(theta: Interval, phi: Interval) -> tuple[Interval, Interval]:
+    half = Interval.from_value(Fraction(1, 2))
+    arg1 = (theta - phi) * half
+    arg2 = (theta + theta + phi) * half
+    arg3 = (theta + phi + phi) * half
+    sine1, cosine1 = sin_iv(arg1), cos_iv(arg1)
+    sine2, cosine2 = sin_iv(arg2), cos_iv(arg2)
+    sine3, cosine3 = sin_iv(arg3), cos_iv(arg3)
+    s1_th, s1_ph = cosine1 * half, Interval.point(0.0) - cosine1 * half
+    s2_th, s2_ph = cosine2, cosine2 * half
+    s3_th, s3_ph = cosine3 * half, cosine3
+    square1, square2, square3 = sine1 * sine1, sine2 * sine2, sine3 * sine3
+    two1, two2, two3 = sine1 + sine1, sine2 + sine2, sine3 + sine3
+    u_th, u_ph = two1 * s1_th, two1 * s1_ph
+    v_th, v_ph = two2 * s2_th, two2 * s2_ph
+    w_th, w_ph = two3 * s3_th, two3 * s3_ph
+    scale = Interval.from_value(64)
+    rho_th = scale * (u_th * square2 * square3 + square1 * v_th * square3 + square1 * square2 * w_th)
+    rho_ph = scale * (u_ph * square2 * square3 + square1 * v_ph * square3 + square1 * square2 * w_ph)
+    return rho_th, rho_ph
+
+
+def _integrand_partials(
+    dynkin: tuple[int, int], beta: Interval, theta: Interval, phi: Interval
+) -> tuple[Interval, Interval] | None:
+    """Local ``(∂_θ, ∂_φ)`` enclosure of the integrand for ``p, q ≤ 1``."""
+    if dynkin[0] > 1 or dynkin[1] > 1:
+        return None
+    scale = _scale_a(beta)
+    chi = _re_fund(theta, phi)
+    density = _haar_density(theta, phi)
+    chi_th, chi_ph = _fund_partials(theta, phi)
+    rho_th, rho_ph = _rho_partials(theta, phi)
+    exp_a = exp_iv(scale * chi)
+    shift = exp_a - Interval.point(1.0)
+    shift_prime = scale * exp_a
+    if dynkin == (0, 0):
+        return (
+            shift_prime * chi_th * density + shift * rho_th,
+            shift_prime * chi_ph * density + shift * rho_ph,
+        )
+    if dynkin in ((1, 0), (0, 1)):
+        g_val = _g_chi(beta, chi)
+        g_prime = exp_a * (Interval.point(1.0) + scale * chi) - Interval.point(1.0)
+        return (
+            g_prime * chi_th * density + g_val * rho_th,
+            g_prime * chi_ph * density + g_val * rho_ph,
+        )
+    imag = _im_fund(theta, phi)
+    imag_th, imag_ph = _im_partials(theta, phi)
+    adjoint = (chi * chi + imag * imag) - Interval.point(1.0)
+    two = Interval.from_value(2)
+    adj_th = two * chi * chi_th + two * imag * imag_th
+    adj_ph = two * chi * chi_ph + two * imag * imag_ph
+    return (
+        adj_th * shift * density
+        + adjoint * shift_prime * chi_th * density
+        + adjoint * shift * rho_th,
+        adj_ph * shift * density
+        + adjoint * shift_prime * chi_ph * density
+        + adjoint * shift * rho_ph,
+    )
+
+
+def _centered_integrand(
+    dynkin: tuple[int, int],
+    beta: Interval,
+    i: int,
+    j: int,
+    n_cells: int,
+) -> Interval | None:
+    """Midpoint plus local-gradient remainder on one Haar cell."""
+    partials = _integrand_partials(
+        dynkin, beta, _cell_box(i, n_cells), _cell_box(j, n_cells)
+    )
+    if partials is None:
+        return None
+    theta_c = _center(i, n_cells)
+    phi_c = _center(j, n_cells)
+    midpoint = _integrand_range(dynkin, beta, theta_c, phi_c)
+    d_theta = _cell_box(i, n_cells) - theta_c
+    d_phi = _cell_box(j, n_cells) - phi_c
+    return midpoint + partials[0] * d_theta + partials[1] * d_phi
+
+
+def _cell_integrand(
+    dynkin: tuple[int, int], beta: Interval, i: int, j: int, n_cells: int
+) -> Interval:
+    """Intersect the cellwise range with the centered form when both exist."""
+    theta = _cell_box(i, n_cells)
+    phi = _cell_box(j, n_cells)
+    cellwise = _integrand_range(dynkin, beta, theta, phi)
+    centered = _centered_integrand(dynkin, beta, i, j, n_cells)
+    if centered is None:
+        return cellwise
+    try:
+        return cellwise.intersect(centered)
+    except ValueError:
+        return cellwise
+
+
 def _integrand_lipschitz(beta: Interval, dynkin: tuple[int, int]) -> Interval:
     """Crude ``|∇(χ (e^a-1) ρ)|_1`` majorant, locked from derivative bounds."""
     chi_max = Interval.from_value(_chi_abs(dynkin))
@@ -200,10 +370,12 @@ def su3_wilson_haar_coefficient(
 ) -> Interval:
     """Enclose ``∫ χ_R^* (e^{(β/3) Re χ_f}-1) ρ dθ dφ`` plus the trivial volume.
 
-    Cellwise interval range of the integrand times cell area on the
-    boxes ``[2π i/n, 2π (i+1)/n]²``.  For ``R ≠ 1`` the locked
-    orthogonality ``∫ χ_R^* ρ = 0`` is used.  For the trivial
-    representation the locked volume ``24 π²`` is added.
+    Cellwise interval range of the integrand, intersected with a
+    centered form (midpoint plus local gradient times cell
+    displacement) when ``p, q ≤ 1``, times cell area on the boxes
+    ``[2π i/n, 2π (i+1)/n]²``.  For ``R ≠ 1`` the locked orthogonality
+    ``∫ χ_R^* ρ = 0`` is used.  For the trivial representation the
+    locked volume ``24 π²`` is added.
     """
     if n_cells < 2:
         raise ValueError(f"n_cells must be >= 2, got {n_cells}")
@@ -221,14 +393,8 @@ def su3_wilson_haar_coefficient(
     area = side * side
     total = Interval.point(0.0)
     for i in range(n_cells):
-        theta = _cell_box(i, n_cells)
         for j in range(n_cells):
-            phi = _cell_box(j, n_cells)
-            density = _haar_density(theta, phi)
-            re_chi = _re_fund(theta, phi)
-            shift = _weight_minus_one(argument, re_chi)
-            character = _re_character(dynkin, theta, phi)
-            total = total + character * shift * density * area
+            total = total + _cell_integrand(dynkin, argument, i, j, n_cells) * area
     if dynkin == (0, 0):
         return total + HAAR_VOLUME
     return total

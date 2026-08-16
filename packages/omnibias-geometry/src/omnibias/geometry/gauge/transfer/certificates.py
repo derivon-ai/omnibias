@@ -1090,6 +1090,7 @@ def seal_finite_gauge_report_certificate(
             "su3_dimension": int(result.su3_gap.dimension),
             "su3_gap": float(result.su3_gap.spectral_gap_lower),
             "hamiltonian_gap": float(result.hamiltonian.spectral_gap_lower),
+            "three_plaquette_gap": float(result.three_plaquette.spectral_gap_lower),
             "g1_factor": float(result.g1.factor),
             "g1_ge_generic": bool(result.g1.ge_generic),
             "g1_target_5x": False,
@@ -1131,6 +1132,7 @@ def finite_gauge_report_schema_errors(cert: Certificate) -> list[str]:
         "su3_dimension",
         "su3_gap",
         "hamiltonian_gap",
+        "three_plaquette_gap",
         "g1_factor",
         "g1_ge_generic",
         "g1_target_5x",
@@ -1169,7 +1171,7 @@ def finite_gauge_report_schema_errors(cert: Certificate) -> list[str]:
         errors.append("honesty.continuum_claim must be False")
     if honesty.get("yang_mills_claim", True):
         errors.append("honesty.yang_mills_claim must be False")
-    for key in ("wilson_gap", "hamiltonian_gap", "g1_factor"):
+    for key in ("wilson_gap", "hamiltonian_gap", "three_plaquette_gap", "g1_factor"):
         value = _as_float(cert.get(key))
         if value is None or value <= 0.0:
             errors.append(f"{key} must be > 0")
@@ -1244,6 +1246,10 @@ def replay_finite_gauge_report(cert: Certificate) -> bool | None:
     if not _not_tighter(cert.get("su3_gap"), fresh.su3_gap.spectral_gap_lower):
         return False
     if not _not_tighter(cert.get("hamiltonian_gap"), fresh.hamiltonian.spectral_gap_lower):
+        return False
+    if not _not_tighter(
+        cert.get("three_plaquette_gap"), fresh.three_plaquette.spectral_gap_lower
+    ):
         return False
     sealed_gaps = cert.get("polymer_gaps")
     if not isinstance(sealed_gaps, list) or len(sealed_gaps) != len(fresh.polymer):

@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.gauge_finite_report.v1",
-  "generated_utc": "2026-08-16T07:46:32Z",
+  "generated_utc": "2026-08-16T08:11:05Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,16 +15,16 @@
     "name": "su2_finite_gauge_pack",
     "include_torus": false
   },
-  "rss_mb_at_start": 780.31,
+  "rss_mb_at_start": 780.8,
   "g1": {
     "factor": 1.0,
     "ge_generic": true,
     "generic_gap": 0.0,
     "holonomy_gap": 0.0,
-    "official_generic": 2.321125627375693,
-    "official_holonomy": 2.321125627375693,
+    "official_generic": 2.3291600519432833,
+    "official_holonomy": 2.3291600519432833,
     "target_factor_5x": false,
-    "note": "G1 compares plaquette-character Lehmann trials to the computational standard basis on one finite Hamiltonian; the factor is measured, not a claimed 5x"
+    "note": "G1 compares plaquette-character Lehmann trials to the computational standard basis on the three-plaquette Hamiltonian; the factor is measured, not a claimed 5x"
   },
   "domain": {
     "beta_certified": [
@@ -39,10 +39,16 @@
   },
   "su3_gap": {
     "certified": true,
-    "spectral_gap_lower": 0.15106183678697574,
+    "spectral_gap_lower": 0.18918959526362275,
     "dimension": 4,
     "n_cells": 32,
     "method": "diagonal_interval_spectrum"
+  },
+  "three_plaquette": {
+    "certified": true,
+    "spectral_gap_lower": 2.3291600519432833,
+    "dimension": 41,
+    "method": "residual_complete_eigenbasis"
   },
   "wilson_domain": {
     "beta_certified": [
@@ -89,7 +95,13 @@
         "name": "su3_gap_certified",
         "passed": true,
         "in_ci_all_passed": true,
-        "spectral_gap_lower": 0.15106183678697574
+        "spectral_gap_lower": 0.18918959526362275
+      },
+      {
+        "name": "three_plaquette_gap_certified",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "spectral_gap_lower": 2.3291600519432833
       },
       {
         "name": "wilson_character_domain",

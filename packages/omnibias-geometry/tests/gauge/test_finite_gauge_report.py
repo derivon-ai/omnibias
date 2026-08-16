@@ -38,6 +38,8 @@ def test_default_pack_certifies_and_measures_g1(report: FiniteGaugeReport) -> No
     assert report.su3_gap.certified is True
     assert report.su3_gap.dimension == 4
     assert report.su3_gap.spectral_gap_lower > 0.0
+    assert report.three_plaquette.certified is True
+    assert report.three_plaquette.spectral_gap_lower > 0.0
     assert report.wilson_character_domain.certified is True
     assert report.wilson_character_domain.quarter_certified is True
     assert report.wilson_character_domain.grid_exhausted is True
@@ -68,6 +70,7 @@ def test_seal_replay_and_honesty_flags(report: FiniteGaugeReport) -> None:
     assert cert["g1_target_5x"] is False
     assert cert["g1_ge_generic"] is True
     assert cert["su3_gap"] > 0.0
+    assert cert["three_plaquette_gap"] > 0.0
     assert cert["wilson_domain_grid_exhausted"] is True
     assert cert["wilson_domain_beta_outside"] is None
     assert finite_gauge_report_schema_errors(cert) == []

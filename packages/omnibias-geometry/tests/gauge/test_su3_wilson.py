@@ -18,6 +18,7 @@ from omnibias.geometry.gauge.transfer.gap import (
     certified_transfer_matrix_gap,
 )
 from omnibias.geometry.gauge.transfer.matrices import rebuild, su3_wilson_transfer
+from omnibias.geometry.gauge.transfer.report import REPORT_SU3_N_CELLS
 from omnibias.geometry.gauge.transfer.su3_wilson import (
     HAAR_VOLUME,
     TWO_PI,
@@ -263,8 +264,10 @@ def test_cellwise_width_is_strictly_smaller_than_lipschitz() -> None:
     assert cellwise.width < lip_width
 
 
-def test_cellwise_haar_certifies_an_su3_gap_at_report_n_cells() -> None:
-    transfer = su3_wilson_transfer(BETA, max_dynkin=1, n_cells=32)
+def test_joint_centered_haar_certifies_an_su3_gap_at_report_n_cells() -> None:
+    # Joint g(χ) plus a centered form still leaves n_cells=8 overlapping.
+    assert REPORT_SU3_N_CELLS == 32
+    transfer = su3_wilson_transfer(BETA, max_dynkin=1, n_cells=REPORT_SU3_N_CELLS)
     result = certified_transfer_matrix_gap(transfer)
     assert result.certified is True
     assert result.spectral_gap_lower > 0.0

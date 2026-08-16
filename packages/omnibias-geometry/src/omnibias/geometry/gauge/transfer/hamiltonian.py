@@ -579,6 +579,7 @@ def _lehmann_gap(
     *,
     method: str,
     rho: float | None = None,
+    lambda1_upper: float | None = None,
 ) -> GapCandidate:
     if trial.flagged:
         return GapCandidate(
@@ -597,7 +598,11 @@ def _lehmann_gap(
     try:
         vecs = list(trial.vectors[: min(6, len(trial.vectors))])
         a0, a1, a2 = _goerisch_grams(matrix, vecs)
-        lam1_up = ritz_upper_bound(matrix, vecs[0]).hi
+        lam1_up = (
+            float(lambda1_upper)
+            if lambda1_upper is not None
+            else ritz_upper_bound(matrix, vecs[0]).hi
+        )
         if rho is None:
             first = symmetric_eigenvalue_residual_enclosure(matrix, vecs[0])
             second = symmetric_eigenvalue_residual_enclosure(matrix, vecs[1])
@@ -649,20 +654,33 @@ def certified_hamiltonian_gap(
     )
     candidates: list[GapCandidate] = [eigen_candidate]
     rho: float | None = None
-    if eigen_candidate.spectral_gap_lower > 0.0 and len(eigen_vectors) >= 4:
+    lambda1_upper: float | None = None
+    if eigen_candidate.spectral_gap_lower > 0.0:
         try:
             covers = [
                 symmetric_eigenvalue_residual_enclosure(matrix, vec)
                 for vec in eigen_vectors
             ]
             ordered = sorted(covers, key=lambda iv: 0.5 * (iv.lo + iv.hi))
-            if ordered[2].hi < ordered[3].lo:
+            lambda1_upper = float(ordered[0].hi)
+            # n_below=2 wants λ2 <= ρ <= λ3.  A later degeneracy (three-plaquette
+            # λ3=λ4) must not block that slot.
+            if len(ordered) >= 3 and ordered[1].hi < ordered[2].lo:
+                rho = float(ordered[1].hi)
+            elif len(ordered) >= 4 and ordered[2].hi < ordered[3].lo:
                 rho = float(ordered[2].hi)
         except (ValueError, ZeroDivisionError):
             rho = None
+            lambda1_upper = None
     standard = standard_basis_trial_space(hamiltonian, dim=2)
     candidates.append(
-        _lehmann_gap(matrix, standard, method=LEHMANN_STANDARD_METHOD, rho=rho)
+        _lehmann_gap(
+            matrix,
+            standard,
+            method=LEHMANN_STANDARD_METHOD,
+            rho=rho,
+            lambda1_upper=lambda1_upper,
+        )
     )
     candidates.append(
         _residual_gap_from_vectors(
@@ -688,7 +706,13 @@ def certified_hamiltonian_gap(
             )
         )
         candidates.append(
-            _lehmann_gap(matrix, trial, method=LEHMANN_HOLONOMY_METHOD, rho=rho)
+            _lehmann_gap(
+                matrix,
+                trial,
+                method=LEHMANN_HOLONOMY_METHOD,
+                rho=rho,
+                lambda1_upper=lambda1_upper,
+            )
         )
     winner = max(candidates, key=lambda item: item.spectral_gap_lower)
     if winner.spectral_gap_lower > 0.0:

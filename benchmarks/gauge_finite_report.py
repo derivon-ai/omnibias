@@ -68,6 +68,15 @@ def main() -> int:
             "spectral_gap_lower": report.su3_gap.spectral_gap_lower,
         },
         {
+            "name": "three_plaquette_gap_certified",
+            "passed": bool(
+                report.three_plaquette.certified
+                and report.three_plaquette.spectral_gap_lower > 0.0
+            ),
+            "in_ci_all_passed": True,
+            "spectral_gap_lower": report.three_plaquette.spectral_gap_lower,
+        },
+        {
             "name": "wilson_character_domain",
             "passed": bool(report.wilson_character_domain.certified),
             "in_ci_all_passed": True,
@@ -113,6 +122,12 @@ def main() -> int:
         "dimension": report.su3_gap.dimension,
         "n_cells": spec.su3_n_cells,
         "method": report.su3_gap.method,
+    }
+    payload["three_plaquette"] = {
+        "certified": report.three_plaquette.certified,
+        "spectral_gap_lower": report.three_plaquette.spectral_gap_lower,
+        "dimension": report.three_plaquette.dimension,
+        "method": report.three_plaquette.method,
     }
     payload["wilson_domain"] = {
         "beta_certified": [

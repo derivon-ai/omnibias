@@ -372,7 +372,7 @@ continuum limit or a claim about the Yang-Mills mass gap.
 | `su2_class_angle_transfer` | `angle` | the same `su(2)` spectrum, in a **dense, entrywise-positive** basis that can be sampled |
 | `su3_heat_kernel_transfer` | `character` | `e^{-t C₂(p,q)}`; the conjugate pair `(p,q) ↔ (q,p)` makes the subdominant mode doubly degenerate |
 | `su2_wilson_transfer` | `character` | `I_m(β)` via `besseli_iv`; the slowly-decaying tail the partner-chain deflation exists for |
-| `su3_wilson_transfer` | `character` | Cellwise interval-range Haar enclosures of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤3` truncation, not a product of ordinary `I_n` |
+| `su3_wilson_transfer` | `character` | Cellwise interval-range Haar enclosures, intersected with a centered form, of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤3` truncation, not a product of ordinary `I_n` |
 
 Heat-kernel and SU(2) Wilson spectra are known in closed form, so a certified
 bound can be checked against the exact answer. SU(3) Wilson eigenvalues are
@@ -639,14 +639,14 @@ critical coupling and not 4-D Yang-Mills.
 
 `finite_gauge_report` runs the existing engines on one named spec
 (polymer plus cluster, the β-domain, the Wilson character gap and its
-domain, Haar identities, a cellwise SU(3) Haar transfer whose gap is
-required, the two-plaquette Hamiltonian with a measured G1 factor,
-strip reflection positivity, and a three-point heat-kernel scaling
-table). The report locks `n_cells=32`, the smallest of `{16, 32}` that
-certifies a positive SU(3) gap after cellwise Haar. The bundle is
-still a list of finite statements. `continuum_claim` and
-`yang_mills_claim` stay false. It is not a staircase to Clay
-existence.
+domain, Haar identities, a joint-`g(χ)` / centered-form SU(3) Haar
+transfer whose gap is required, the two-plaquette Hamiltonian, the
+three-plaquette Hamiltonian with a measured G1 factor, strip
+reflection positivity, and a three-point heat-kernel scaling table).
+Joint `g(χ)` plus a centered form still leaves `n_cells=8` overlapping,
+so the report locks `n_cells=32`. The bundle is still a list of finite
+statements. `continuum_claim` and `yang_mills_claim` stay false. It is
+not a staircase to Clay existence.
 
 ```python
 from fractions import Fraction
@@ -676,5 +676,6 @@ assert pack.g1.ge_generic
 assert pack.g1.factor + 1e-12 >= 1.0
 assert pack.haar.certified
 assert pack.su3_gap.certified
+assert pack.three_plaquette.certified
 assert pack.wilson_character_domain.certified
 ```

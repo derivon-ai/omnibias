@@ -308,11 +308,12 @@ the relevant op:
   `two_scale_polymer_count`. `counting="cluster"` keeps the first terms
   explicitly. Single-scale `C = 15` is **not** a bound on `N_2`.
 - **`su3_wilson_transfer`** encloses SU(3) Wilson character coefficients
-  by cellwise interval-range Haar quadrature on the maximal torus at
-  **one fixed `β`**. The matrix is the `(p, q) ≤ 3` truncation: locked
-  trigonometric characters through `(2,2)`, Clebsch recurrence for
-  `p, q = 3`. It is **not** a product of ordinary Bessel functions,
-  **not** 4-D SU(3) Yang-Mills, and **not** a continuum claim.
+  by cellwise interval-range Haar quadrature, intersected with a
+  centered form, on the maximal torus at **one fixed `β`**. The matrix
+  is the `(p, q) ≤ 3` truncation: locked trigonometric characters
+  through `(2,2)`, Clebsch recurrence for `p, q = 3`. It is **not** a
+  product of ordinary Bessel functions, **not** 4-D SU(3) Yang-Mills,
+  and **not** a continuum claim.
 - **`certified_hamiltonian_gap`** is a sound lower bound on `λ1 - λ0` of
   **one finite two- or three-plaquette SU(2) Kogut–Susskind Hamiltonian**
   at one coupling and one spin truncation. Default magnetics are Racah
@@ -335,11 +336,12 @@ the relevant op:
   includes the polymer two-scale failure `1/4`. It is **not** 4-D
   Yang-Mills and **not** a physical critical coupling.
 - **`finite_gauge_report`** is one sealed bundle of the existing
-  finite engines on a named spec. G1 is **measured**. The SU(3) gap is
-  required after cellwise Haar at locked `n_cells=32`. The bundle is
-  still a list of finite statements. It is **not** a staircase to Clay
-  existence, **not** a continuum claim, and **not** the Yang-Mills
-  mass gap.
+  finite engines on a named spec. G1 is **measured** on the
+  three-plaquette Hamiltonian. The SU(3) gap is required at locked
+  `n_cells=32` (joint `g(χ)` plus a centered form still leaves 8
+  overlapping). The bundle is still a list of finite statements. It is
+  **not** a staircase to Clay existence, **not** a continuum claim, and
+  **not** the Yang-Mills mass gap.
 - **`omnibias-qpinn` Bloch cage** supports orders ≤ 2 on a **single axis** in
   v0.0.1; multi-axis mixed partials need the Leibniz expansion (planned).
 - **Random-feature fields** are accurate only inside the support of their

@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — tighter Haar and three-plaquette G1
+
+- `su3_wilson_haar_coefficient` evaluates the CI irreps as one-argument
+  functions of `Re χ_f` and intersects each cell with a centered form.
+  `n_cells=8` still overlaps, so `finite_gauge_report` stays at 32.
+  Not 4-D SU(3) Yang-Mills.
+- `certified_hamiltonian_gap` passes the residual cover's labelled
+  ground-state upper as Lehmann `λ1`. G1 is measured on the already
+  certified three-plaquette Hamiltonian (`j_max=1`). The factor is
+  recorded, not a claimed `5x`.
+
 ### Added — cellwise Haar and Wilson-character β-domain
 
 - `su3_wilson_haar_coefficient` encloses each torus cell by interval

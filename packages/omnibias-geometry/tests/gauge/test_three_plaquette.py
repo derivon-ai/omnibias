@@ -16,9 +16,13 @@ from omnibias.geometry.gauge.transfer.certificates import (
 )
 from omnibias.geometry.gauge.transfer.hamiltonian import (
     COUPLING_LOCK,
+    LEHMANN_HOLONOMY_METHOD,
+    LEHMANN_STANDARD_METHOD,
     THREE_PLAQUETTE_ELECTRIC,
+    candidate_gap,
     certified_hamiltonian_gap,
     legal_chain,
+    plaquette_holonomy_trial_space,
     su2_three_plaquette_hamiltonian,
     three_plaquette_basis,
 )
@@ -41,6 +45,20 @@ def test_every_basis_vector_obeys_both_triangles() -> None:
     assert hamiltonian.basis == three_plaquette_basis(1)
     for t1, t2, t3, s12, s23 in hamiltonian.basis:
         assert legal_chain(t1, t2, t3, s12, s23, two_j_max=2)
+
+
+def test_g1_holonomy_lehmann_is_at_least_standard() -> None:
+    hamiltonian = su2_three_plaquette_hamiltonian(COUPLING_LOCK, j_max=1)
+    generic_official = certified_hamiltonian_gap(hamiltonian)
+    trial = plaquette_holonomy_trial_space(hamiltonian)
+    holonomy = certified_hamiltonian_gap(hamiltonian, trial=trial)
+    assert holonomy.spectral_gap_lower > 0.0
+    assert (
+        holonomy.spectral_gap_lower + 1e-12 >= generic_official.spectral_gap_lower
+    )
+    generic = candidate_gap(holonomy, LEHMANN_STANDARD_METHOD)
+    holonomy_lehmann = candidate_gap(holonomy, LEHMANN_HOLONOMY_METHOD)
+    assert holonomy_lehmann + 1e-12 >= generic
 
 
 def test_locked_coupling_certifies_a_positive_gap() -> None:

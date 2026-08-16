@@ -33,6 +33,7 @@ from omnibias.geometry.gauge.transfer.hamiltonian import (
     candidate_gap,
     certified_hamiltonian_gap,
     plaquette_holonomy_trial_space,
+    su2_three_plaquette_hamiltonian,
     su2_two_plaquette_hamiltonian,
 )
 from omnibias.geometry.gauge.transfer.matrices import (
@@ -64,8 +65,9 @@ from omnibias.geometry.gauge.transfer.su3_wilson import su3_dimension
 DEFAULT_SCALING_SPACINGS: tuple[float, ...] = (1.0, 0.5, 0.25)
 DEFAULT_SCALING_COUPLINGS: tuple[float, ...] = (0.8, 0.4, 0.2)
 
-#: Smallest ``n_cells`` in ``{16, 32}`` at which cellwise Haar certifies
-#: a positive SU(3) gap for ``max_dynkin=1``, ``β=1``.  ``8`` stays too wide.
+#: Joint ``g(χ)`` plus a centered form still leaves ``n_cells=8``
+#: overlapping, so the report stays at 32 (smallest of ``{16, 32}``
+#: that separates for ``max_dynkin=1``, ``β=1``).
 REPORT_SU3_N_CELLS = 32
 
 
@@ -73,9 +75,9 @@ REPORT_SU3_N_CELLS = 32
 class FiniteGaugeSpec:
     """Locked CI-cheap pack naming the engines a report will run.
 
-    ``su3_n_cells`` defaults to :data:`REPORT_SU3_N_CELLS` (32), the
-    smallest of ``{16, 32}`` at which cellwise Haar certifies a positive
-    SU(3) gap.  The irrep truncation stays ``max_dynkin=1``.
+    ``su3_n_cells`` defaults to :data:`REPORT_SU3_N_CELLS` (32).  Joint
+    ``g(χ)`` plus a centered form still leaves ``n_cells=8`` overlapping.
+    The irrep truncation stays ``max_dynkin=1``.
     """
 
     name: str = "su2_finite_gauge_pack"
@@ -120,8 +122,8 @@ class MeasuredG1:
     official_holonomy: float
     note: str = (
         "G1 compares plaquette-character Lehmann trials to the computational "
-        "standard basis on one finite Hamiltonian; the factor is measured, "
-        "not a claimed 5x"
+        "standard basis on the three-plaquette Hamiltonian; the factor is "
+        "measured, not a claimed 5x"
     )
 
 
@@ -137,6 +139,7 @@ class FiniteGaugeReport:
     haar: HaarIdentityCheck
     su3_gap: TransferGapResult
     hamiltonian: HamiltonianGapResult
+    three_plaquette: HamiltonianGapResult
     g1: MeasuredG1
     strip_rp: StripReflectionResult
     scaling: ScalingReport
@@ -162,6 +165,7 @@ class FiniteGaugeReport:
             and self.su3_gap.certified
             and self.su3_gap.dimension >= 4
             and self.hamiltonian.certified
+            and self.three_plaquette.certified
             and self.g1.ge_generic
             and self.strip_rp.certified
             and torus_ok
@@ -298,7 +302,12 @@ def finite_gauge_report(spec: FiniteGaugeSpec | None = None) -> FiniteGaugeRepor
     )
     trial = plaquette_holonomy_trial_space(hamiltonian)
     ham_gap = certified_hamiltonian_gap(hamiltonian, trial=trial)
-    g1 = _measure_g1(hamiltonian, ham_gap)
+    three = su2_three_plaquette_hamiltonian(
+        COUPLING_LOCK, j_max=locked.hamiltonian_j_max
+    )
+    three_trial = plaquette_holonomy_trial_space(three)
+    three_gap = certified_hamiltonian_gap(three, trial=three_trial)
+    g1 = _measure_g1(three, three_gap)
     strip = su2_spatial_strip_transfer(
         STRIP_COUPLING_LOCK,
         n_sites=locked.strip_n_sites,
@@ -324,6 +333,7 @@ def finite_gauge_report(spec: FiniteGaugeSpec | None = None) -> FiniteGaugeRepor
         haar=haar,
         su3_gap=su3_gap,
         hamiltonian=ham_gap,
+        three_plaquette=three_gap,
         g1=g1,
         strip_rp=strip_rp,
         scaling=scaling,
