@@ -19,6 +19,7 @@ from omnibias.geometry.gauge.transfer.certificates import (
     strong_coupling_schema_errors,
 )
 from omnibias.geometry.gauge.transfer.strong_coupling import (
+    BACKTRACK_POLYMER_METHOD,
     BETA_LOCK,
     BETA_LOCK_CRUDE,
     CRUDE_POLYMER_METHOD,
@@ -27,6 +28,7 @@ from omnibias.geometry.gauge.transfer.strong_coupling import (
     certified_wilson_character_gap,
     polymer_coordination,
     polymer_coordination_backtrack,
+    polymer_first_step,
     su2_wilson_activity,
 )
 
@@ -46,10 +48,15 @@ def test_coordination_is_locked_and_documented() -> None:
     assert polymer_coordination(3) == 16
     assert polymer_coordination_backtrack(4) == 15
     assert polymer_coordination_backtrack(3) == 9
+    assert polymer_first_step(4) == 20
+    assert polymer_first_step(3) == 12
+    assert polymer_coordination_backtrack(4) < polymer_first_step(4)
     with pytest.raises(ValueError, match="spacetime_dim"):
         polymer_coordination(1)
     with pytest.raises(ValueError, match="spacetime_dim"):
         polymer_coordination_backtrack(1)
+    with pytest.raises(ValueError, match="spacetime_dim"):
+        polymer_first_step(1)
 
 
 def test_locked_beta_is_in_domain_and_positive() -> None:
@@ -57,12 +64,27 @@ def test_locked_beta_is_in_domain_and_positive() -> None:
     assert result.in_convergence_domain is True
     assert result.certified is True
     assert result.method == POLYMER_METHOD
-    assert result.counting == "backtrack"
+    assert result.counting == "two_scale"
     assert result.coordination == 15
+    assert result.first_step == 20
     assert result.spacetime_dim == 4
     assert result.spectral_gap_lower > 0.0
     assert 0.0 < result.subdominant_ratio_upper < 1.0
     assert result.tail_bound is not None
+
+
+def test_single_scale_backtrack_is_not_sold_as_n2() -> None:
+    result = certified_strong_coupling_glueball_bound(BETA_LOCK, counting="backtrack")
+    assert result.method == BACKTRACK_POLYMER_METHOD
+    assert result.coordination == 15
+    assert result.first_step is None
+    assert result.certified is True
+
+
+def test_quarter_beta_is_too_large_for_two_scale() -> None:
+    result = certified_strong_coupling_glueball_bound(0.25)
+    assert result.certified is False
+    assert result.subdominant_ratio_upper >= 1.0
 
 
 def test_crude_lock_still_certifies_only_the_overcount() -> None:
@@ -112,8 +134,9 @@ def test_seal_replay_and_honesty_flags() -> None:
     assert cert["honesty"]["unproven_claim"] is False
     assert cert["honesty"]["fixed_spacing"] is True
     assert cert["method"] == POLYMER_METHOD
-    assert cert["counting"] == "backtrack"
-    assert "backtrack_polymer_count" in cert["honesty"]["note"]
+    assert cert["counting"] == "two_scale"
+    assert cert["first_step"] == 20
+    assert "two_scale_polymer_count" in cert["honesty"]["note"]
     assert "NOT" in cert["honesty"]["note"]
     assert strong_coupling_schema_errors(cert) == []
     assert verify_certificate_digest(cert)

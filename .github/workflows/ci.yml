@@ -577,6 +577,10 @@ jobs:
         run: |
           source .venv-geom/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/gauge_two_plaquette_gap.py
+      - name: Run spatial-strip transfer gap smoke
+        run: |
+          source .venv-geom/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/gauge_spatial_strip.py
 
   binary:
     name: omnibias-binary (alpha)

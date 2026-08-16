@@ -6,6 +6,28 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — YM-adjacent finite campaign 3
+
+- Default two-plaquette magnetics are Racah 6j recoupling weights
+  (`magnetic="sixj"`); `magnetic="character"` keeps amplitude 1.
+  `su2_three_plaquette_hamiltonian` certifies `λ1-λ0` on the 3-square
+  chain at `j_max=1`. Kinds stay separate
+  (`two_plaquette_hamiltonian_gap`, `three_plaquette_hamiltonian_gap`).
+- Strong-coupling default is the two-scale remainder
+  `u + A u²/(1-B u)` with first-step `A=20` and subsequent `B=15` in
+  4-D. `BETA_LOCK` is `1/5`. Method tag `two_scale_polymer_count`.
+  Single-scale `C=15` is not sold as `N_2`. Still not Osterwalder-Seiler.
+- SU(3) Wilson Haar uses midpoint plus a Lipschitz remainder and unlocks
+  `max_dynkin=2` with locked trigonometric characters. Not a Bessel
+  product and not 4-D SU(3) Yang-Mills.
+- `su2_spatial_strip_transfer` is a finite 2+1-D class-angle strip.
+  `certified_strip_reflection_positivity` and
+  `certified_strip_cluster_tail` are statements about that matrix.
+  Smoke: `benchmarks/gauge_spatial_strip.py`.
+- `OmnibiasAnalytic.Check.SixJ`, `Check.HaarVolume`, and Polymer
+  `first_step_4` (`20`, `15<20`) are finite rational identities. The
+  Mathlib bridge registers them before `sign`. Not a continuum claim.
+
 ### Added — two-plaquette SU(2) Hamiltonian gap
 
 - `su2_two_plaquette_hamiltonian` and `certified_hamiltonian_gap` certify

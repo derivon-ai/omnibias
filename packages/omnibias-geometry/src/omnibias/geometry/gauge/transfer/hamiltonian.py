@@ -30,9 +30,9 @@ must recouple with it.  The locked selection rule is therefore
     M1 : (j1, js) → (j1 ± 1/2, js ± 1/2)   (independent signs)
     M2 : (j2, js) → (j2 ± 1/2, js ± 1/2)
 
-with amplitude **1** on every legal in-range target.  That is the
-character-multiplication identity projected onto the Gauss-law subspace;
-Racah 6j weights are a finer model and are not inserted here.
+Default ``magnetic="sixj"`` inserts the locked recoupling
+``phase × √[(2j+1)…] × 6j`` from :mod:`.sixj`.  ``magnetic="character"``
+keeps the older amplitude-1 operator so the two can be compared.
 
 The certified gap is ``λ1 - λ0`` of this finite matrix (not
 ``-ln(λ1/λ0)``).  Continuum existence and a uniform-in-spacing gap stay
@@ -46,6 +46,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from fractions import Fraction
 from itertools import product
+from typing import Literal
 
 import numpy as np
 from omnibias.core.verified.eig import symmetric_eigenvalue_residual_enclosure
@@ -54,6 +55,7 @@ from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.linalg import inf_norm_matrix, to_interval_matrix
 from omnibias.geometry.gauge.transfer.gap import GapCandidate
 from omnibias.geometry.gauge.transfer.matrices import Scalar, decode_scalar, encode_scalar
+from omnibias.geometry.gauge.transfer.sixj import magnetic_sixj_amplitude
 from omnibias.geometry.gauge.transfer.trial import (
     GRAM_COND_THRESHOLD,
     TrialSpace,
@@ -69,6 +71,12 @@ LEHMANN_HOLONOMY_METHOD = "lehmann_maehly_holonomy_trial"
 #: Locked small coupling ``g²`` at which the finite Hamiltonian is certified.
 COUPLING_LOCK = Fraction(1, 2)
 
+Magnetic = Literal["sixj", "character"]
+
+#: Edge census of the 3-square chain (10 geometric edges).
+#: P1 unique 3, P2 unique 2, P3 unique 3, shared s12, shared s23.
+THREE_PLAQUETTE_ELECTRIC = (3, 2, 3, 1, 1)
+
 
 @dataclass(frozen=True)
 class GaugeHamiltonian:
@@ -77,7 +85,7 @@ class GaugeHamiltonian:
     model: str
     coupling: Scalar
     j_max: int
-    basis: tuple[tuple[int, int, int], ...]
+    basis: tuple[tuple[int, ...], ...]
     entries: tuple[tuple[Interval, ...], ...]
     parameters: dict[str, object]
     mode_labels: tuple[str, ...]
@@ -142,10 +150,41 @@ def physical_basis(j_max: int) -> tuple[tuple[int, int, int], ...]:
     return tuple(states)
 
 
+def _magnetic_kind(magnetic: str) -> Magnetic:
+    if magnetic not in ("sixj", "character"):
+        raise ValueError(f"magnetic must be 'sixj' or 'character', got {magnetic!r}")
+    return magnetic  # type: ignore[return-value]
+
+
+def _directed_magnetic(
+    two_j_a: int,
+    two_j_s: int,
+    two_j_spectator: int,
+    two_j_a_prime: int,
+    two_j_s_prime: int,
+    *,
+    magnetic: Magnetic,
+) -> Interval:
+    if magnetic == "character":
+        return Interval.point(1.0)
+    return magnetic_sixj_amplitude(
+        two_j_a, two_j_s, two_j_spectator, two_j_a_prime, two_j_s_prime
+    )
+
+
+def _symmetrize(raw: list[list[Interval]]) -> tuple[tuple[Interval, ...], ...]:
+    n = len(raw)
+    half = Interval.from_value(Fraction(1, 2))
+    return tuple(
+        tuple((raw[i][j] + raw[j][i]) * half for j in range(n)) for i in range(n)
+    )
+
+
 def su2_two_plaquette_hamiltonian(
     coupling: Scalar,
     *,
     j_max: int = 1,
+    magnetic: Magnetic = "sixj",
 ) -> GaugeHamiltonian:
     """The two-plaquette SU(2) Kogut–Susskind Hamiltonian at one ``g²``.
 
@@ -153,6 +192,7 @@ def su2_two_plaquette_hamiltonian(
     ``j_max=2`` is the ``--full`` truncation.  This is one finite matrix,
     not 4-D Yang-Mills.
     """
+    kind = _magnetic_kind(magnetic)
     if isinstance(coupling, bool) or not isinstance(coupling, int | float | Fraction):
         raise ValueError(f"coupling must be a positive scalar, got {coupling!r}")
     if float(coupling) <= 0.0:
@@ -175,12 +215,14 @@ def su2_two_plaquette_hamiltonian(
             t1p, tsp = t1 + eps, ts + delta
             if legal_triple(t1p, t2, tsp, two_j_max=two_j_max):
                 j = index[(t1p, t2, tsp)]
-                raw[i][j] = raw[i][j] + magnetic_pre
+                amp = _directed_magnetic(t1, ts, t2, t1p, tsp, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * amp
             t2p, tsp = t2 + eps, ts + delta
             if legal_triple(t1, t2p, tsp, two_j_max=two_j_max):
                 j = index[(t1, t2p, tsp)]
-                raw[i][j] = raw[i][j] + magnetic_pre
-    entries = tuple(tuple(row) for row in raw)
+                amp = _directed_magnetic(t2, ts, t1, t2p, tsp, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * amp
+    entries = _symmetrize(raw)
     labels = tuple(f"|{t1}/2, {t2}/2, {ts}/2>" for t1, t2, ts in basis)
     return GaugeHamiltonian(
         model="su2_two_plaquette",
@@ -192,13 +234,120 @@ def su2_two_plaquette_hamiltonian(
             "builder": "su2_two_plaquette_hamiltonian",
             "coupling": encode_scalar(coupling),
             "j_max": int(j_max),
+            "n_plaquettes": 2,
+            "magnetic": kind,
+        },
+        mode_labels=labels,
+    )
+
+
+def legal_chain(
+    two_j1: int,
+    two_j2: int,
+    two_j3: int,
+    two_js12: int,
+    two_js23: int,
+    *,
+    two_j_max: int,
+) -> bool:
+    """Two triangle inequalities of the 3-plaquette chain."""
+    return legal_triple(two_j1, two_j2, two_js12, two_j_max=two_j_max) and legal_triple(
+        two_j2, two_j3, two_js23, two_j_max=two_j_max
+    )
+
+
+def three_plaquette_basis(j_max: int) -> tuple[tuple[int, int, int, int, int], ...]:
+    """All legal ``(2j1, 2j2, 2j3, 2js12, 2js23)`` with ``j ≤ j_max``."""
+    if j_max < 1:
+        raise ValueError(f"j_max must be >= 1, got {j_max}")
+    two_j_max = 2 * int(j_max)
+    states = [
+        (t1, t2, t3, s12, s23)
+        for t1, t2, t3, s12, s23 in product(range(two_j_max + 1), repeat=5)
+        if legal_chain(t1, t2, t3, s12, s23, two_j_max=two_j_max)
+    ]
+    return tuple(states)
+
+
+def su2_three_plaquette_hamiltonian(
+    coupling: Scalar,
+    *,
+    j_max: int = 1,
+    magnetic: Magnetic = "sixj",
+) -> GaugeHamiltonian:
+    """The three-plaquette SU(2) Kogut–Susskind Hamiltonian at one ``g²``.
+
+    Basis ``|j1, j2, j3, js12, js23⟩`` with triangles ``(j1, j2, js12)``
+    and ``(j2, j3, js23)``.  Electric weights are the locked 3-square-chain
+    census :data:`THREE_PLAQUETTE_ELECTRIC`.  CI uses ``j_max=1``;
+    ``j_max=2`` is the ``--full`` truncation only.  One finite matrix,
+    not 4-D Yang-Mills.
+    """
+    kind = _magnetic_kind(magnetic)
+    if isinstance(coupling, bool) or not isinstance(coupling, int | float | Fraction):
+        raise ValueError(f"coupling must be a positive scalar, got {coupling!r}")
+    if float(coupling) <= 0.0:
+        raise ValueError(f"coupling must be > 0, got {coupling!r}")
+    basis = three_plaquette_basis(j_max)
+    index = {state: i for i, state in enumerate(basis)}
+    two_j_max = 2 * int(j_max)
+    electric_pre = Interval.from_value(coupling) * Interval.from_value(Fraction(1, 2))
+    magnetic_pre = Interval.from_value(-2) / Interval.from_value(coupling)
+    n = len(basis)
+    raw = [[Interval.point(0.0) for _ in range(n)] for _ in range(n)]
+    w1, w2, w3, ws12, ws23 = THREE_PLAQUETTE_ELECTRIC
+    for state in basis:
+        t1, t2, t3, s12, s23 = state
+        i = index[state]
+        casimir = (
+            w1 * _casimir_jj(t1)
+            + w2 * _casimir_jj(t2)
+            + w3 * _casimir_jj(t3)
+            + ws12 * _casimir_jj(s12)
+            + ws23 * _casimir_jj(s23)
+        )
+        raw[i][i] = raw[i][i] + electric_pre * Interval.from_value(casimir)
+        for eps, delta in product((-1, 1), repeat=2):
+            t1p, s12p = t1 + eps, s12 + delta
+            if legal_chain(t1p, t2, t3, s12p, s23, two_j_max=two_j_max):
+                j = index[(t1p, t2, t3, s12p, s23)]
+                amp = _directed_magnetic(t1, s12, t2, t1p, s12p, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * amp
+            t3p, s23p = t3 + eps, s23 + delta
+            if legal_chain(t1, t2, t3p, s12, s23p, two_j_max=two_j_max):
+                j = index[(t1, t2, t3p, s12, s23p)]
+                amp = _directed_magnetic(t3, s23, t2, t3p, s23p, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * amp
+        for eps, d12, d23 in product((-1, 1), repeat=3):
+            t2p, s12p, s23p = t2 + eps, s12 + d12, s23 + d23
+            if legal_chain(t1, t2p, t3, s12p, s23p, two_j_max=two_j_max):
+                j = index[(t1, t2p, t3, s12p, s23p)]
+                left = _directed_magnetic(t2, s12, t1, t2p, s12p, magnetic=kind)
+                right = _directed_magnetic(t2, s23, t3, t2p, s23p, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * left * right
+    entries = _symmetrize(raw)
+    labels = tuple(
+        f"|{t1}/2, {t2}/2, {t3}/2, {s12}/2, {s23}/2>" for t1, t2, t3, s12, s23 in basis
+    )
+    return GaugeHamiltonian(
+        model="su2_three_plaquette",
+        coupling=coupling,
+        j_max=int(j_max),
+        basis=basis,
+        entries=entries,
+        parameters={
+            "builder": "su2_three_plaquette_hamiltonian",
+            "coupling": encode_scalar(coupling),
+            "j_max": int(j_max),
+            "n_plaquettes": 3,
+            "magnetic": kind,
         },
         mode_labels=labels,
     )
 
 
 def rebuild_hamiltonian(parameters: Mapping[str, object]) -> GaugeHamiltonian:
-    """Replay helper: rebuild from a recorded ``(coupling, j_max)`` block."""
+    """Replay helper: rebuild from ``(coupling, j_max, n_plaquettes, magnetic)``."""
     spec = dict(parameters)
     raw = spec.get("coupling")
     if raw is None:
@@ -207,7 +356,17 @@ def rebuild_hamiltonian(parameters: Mapping[str, object]) -> GaugeHamiltonian:
     j_max = spec.get("j_max", 1)
     if not isinstance(j_max, int) or isinstance(j_max, bool) or j_max < 1:
         raise ValueError(f"j_max must be an integer >= 1, got {j_max!r}")
-    return su2_two_plaquette_hamiltonian(coupling, j_max=j_max)
+    magnetic = spec.get("magnetic", "sixj")
+    if magnetic not in ("sixj", "character"):
+        raise ValueError(f"magnetic must be 'sixj' or 'character', got {magnetic!r}")
+    n_plaquettes = spec.get("n_plaquettes", 2)
+    if n_plaquettes == 3:
+        return su2_three_plaquette_hamiltonian(
+            coupling, j_max=j_max, magnetic=magnetic
+        )
+    if n_plaquettes != 2:
+        raise ValueError(f"n_plaquettes must be 2 or 3, got {n_plaquettes!r}")
+    return su2_two_plaquette_hamiltonian(coupling, j_max=j_max, magnetic=magnetic)
 
 
 def _orthonormalize(
@@ -256,12 +415,14 @@ def plaquette_holonomy_trial_space(
     """
     basis = hamiltonian.basis
     n = len(basis)
+    n_slots = len(basis[0]) if basis else 0
     family: list[tuple[float, ...]] = []
-    vacuum = tuple(1.0 if state == (0, 0, 0) else 0.0 for state in basis)
+    vacuum_state = tuple(0 for _ in range(n_slots))
+    vacuum = tuple(1.0 if state == vacuum_state else 0.0 for state in basis)
     if any(vacuum):
         family.append(vacuum)
     two_j_max = 2 * hamiltonian.j_max
-    for slot in (0, 1, 2):
+    for slot in range(n_slots):
         for two_j in range(two_j_max + 1):
             vec = tuple(1.0 if state[slot] == two_j else 0.0 for state in basis)
             if any(vec) and vec not in family:
@@ -299,8 +460,9 @@ def _residual_gap_from_vectors(
     """Residual enclosures of the supplied vectors; gap from the two lowest.
 
     When ``require_complete`` is true the vector count must equal the
-    matrix dimension and every pair of enclosures must be disjoint, so
-    the sorted pair is ``(λ0, λ1)``.  A short trial list only yields a
+    matrix dimension and the two lowest enclosures must sit strictly
+    below the rest, so they can be labelled ``(λ0, λ1)``.  Higher
+    degeneracies may overlap.  A short trial list only yields a
     variational pair and is tagged as such.
     """
     if len(vectors) < 2:
@@ -330,15 +492,20 @@ def _residual_gap_from_vectors(
                 spectral_gap_lower=0.0,
                 detail="complete eigenbasis required",
             )
-        for i, left in enumerate(ordered):
-            for right in ordered[i + 1 :]:
-                if left.hi >= right.lo:
-                    return GapCandidate(
-                        method=method,
-                        subdominant_ratio_upper=1.0,
-                        spectral_gap_lower=0.0,
-                        detail="residual enclosures overlap; cannot label λ0, λ1",
-                    )
+        if ordered[0].hi >= min(item.lo for item in ordered[1:]):
+            return GapCandidate(
+                method=method,
+                subdominant_ratio_upper=1.0,
+                spectral_gap_lower=0.0,
+                detail="residual enclosures overlap; cannot label λ0",
+            )
+        if len(ordered) > 2 and ordered[1].hi >= min(item.lo for item in ordered[2:]):
+            return GapCandidate(
+                method=method,
+                subdominant_ratio_upper=1.0,
+                spectral_gap_lower=0.0,
+                detail="residual enclosures overlap; cannot label λ1",
+            )
     else:
         return GapCandidate(
             method=method,
@@ -568,14 +735,18 @@ __all__ = [
     "RESIDUAL_EIGENBASIS_METHOD",
     "RESIDUAL_HOLONOMY_METHOD",
     "RESIDUAL_STANDARD_METHOD",
+    "THREE_PLAQUETTE_ELECTRIC",
     "GaugeHamiltonian",
     "HamiltonianGapResult",
     "candidate_gap",
     "certified_hamiltonian_gap",
+    "legal_chain",
     "legal_triple",
     "physical_basis",
     "plaquette_holonomy_trial_space",
     "rebuild_hamiltonian",
     "standard_basis_trial_space",
+    "su2_three_plaquette_hamiltonian",
     "su2_two_plaquette_hamiltonian",
+    "three_plaquette_basis",
 ]

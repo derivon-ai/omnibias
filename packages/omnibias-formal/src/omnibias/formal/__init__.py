@@ -21,7 +21,19 @@ from importlib.metadata import PackageNotFoundError as _PkgNotFound
 from importlib.metadata import version as _pkg_version
 
 from omnibias.formal.augment import MathlibVerdict, evaluate_with_mathlib
+from omnibias.formal.casimir import (
+    LEGAL_CASIMIR_FAMILIES,
+    casimir_certificate,
+)
+from omnibias.formal.compact import (
+    LEGAL_COMPACT_FAMILIES,
+    compact_box_certificate,
+)
 from omnibias.formal.drive import DriveReport, drive_obligation
+from omnibias.formal.haar import (
+    LEGAL_HAAR_FAMILIES,
+    haar_certificate,
+)
 from omnibias.formal.mathlib_check import (
     MATHLIB_CLAIM_KEY,
     MathlibCheckResult,
@@ -30,14 +42,6 @@ from omnibias.formal.mathlib_check import (
     classify_obligation,
     generate_obligation,
     mathlib_check_available,
-)
-from omnibias.formal.casimir import (
-    LEGAL_CASIMIR_FAMILIES,
-    casimir_certificate,
-)
-from omnibias.formal.compact import (
-    LEGAL_COMPACT_FAMILIES,
-    compact_box_certificate,
 )
 from omnibias.formal.named import (
     LEGAL_NAMED_FAMILIES,
@@ -51,6 +55,10 @@ from omnibias.formal.nk import (
 from omnibias.formal.polymer import (
     LEGAL_POLYMER_FAMILIES,
     polymer_certificate,
+)
+from omnibias.formal.sixj import (
+    LEGAL_SIXJ_FAMILIES,
+    sixj_certificate,
 )
 from omnibias.formal.tower import (
     LEGAL_TOWER_FAMILIES,
@@ -74,10 +82,12 @@ __all__ = [
     "DriveReport",
     "LEGAL_CASIMIR_FAMILIES",
     "LEGAL_COMPACT_FAMILIES",
+    "LEGAL_HAAR_FAMILIES",
     "LEGAL_NAMED_FAMILIES",
     "LEGAL_NK_FAMILIES",
     "LEGAL_NK_ROUTES",
     "LEGAL_POLYMER_FAMILIES",
+    "LEGAL_SIXJ_FAMILIES",
     "LEGAL_TOWER_FAMILIES",
     "LEGAL_TRACE_FAMILIES",
     "MATHLIB_CLAIM_KEY",
@@ -94,10 +104,12 @@ __all__ = [
     "enclosure_trace_certificate",
     "evaluate_with_mathlib",
     "generate_obligation",
+    "haar_certificate",
     "mathlib_check_available",
     "named_zero_certificate",
     "nk_existence_certificate",
     "polymer_certificate",
+    "sixj_certificate",
     "tower_coeffs",
     "tower_coeffs_certificate",
 ]

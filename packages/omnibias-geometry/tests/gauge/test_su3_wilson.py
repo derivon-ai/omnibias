@@ -21,8 +21,8 @@ from omnibias.geometry.gauge.transfer.su3_wilson import (
 )
 
 BETA = 1.0
-N_CELLS = 6
-DYNKIN = ((0, 0), (1, 0), (0, 1), (1, 1))
+N_CELLS = 8
+DYNKIN = ((0, 0), (1, 0), (0, 1), (1, 1), (2, 0), (0, 2), (2, 1), (1, 2), (2, 2))
 
 
 def _haar_density(theta: np.ndarray, phi: np.ndarray) -> np.ndarray:
@@ -41,13 +41,25 @@ def _im_fund(theta: np.ndarray, phi: np.ndarray) -> np.ndarray:
 
 
 def _chi(dynkin: tuple[int, int], theta: np.ndarray, phi: np.ndarray) -> np.ndarray:
+    re_chi = _re_fund(theta, phi)
+    imag = _im_fund(theta, phi)
     if dynkin == (0, 0):
         return np.ones_like(theta, dtype=np.float64)
     if dynkin in ((1, 0), (0, 1)):
-        return _re_fund(theta, phi)
-    re_chi = _re_fund(theta, phi)
-    imag = _im_fund(theta, phi)
-    return re_chi**2 + imag**2 - 1.0
+        return re_chi
+    if dynkin == (1, 1):
+        return re_chi**2 + imag**2 - 1.0
+    if dynkin in ((2, 0), (0, 2)):
+        return re_chi**2 - imag**2 - re_chi
+    if dynkin in ((2, 1), (1, 2)):
+        amp = re_chi**2 - imag**2 - re_chi
+        bim = 2.0 * re_chi * imag + imag
+        return amp * re_chi + bim * imag - re_chi
+    if dynkin == (2, 2):
+        amp = re_chi**2 - imag**2 - re_chi
+        bim = 2.0 * re_chi * imag + imag
+        return amp**2 + bim**2 - re_chi**2 - imag**2
+    raise ValueError(dynkin)
 
 
 def _numerical_haar_coefficient(
@@ -85,14 +97,17 @@ def test_locked_characters_match_weyl_bialternant_away_from_walls() -> None:
         ],
         dtype=np.complex128,
     )
-    fund = character(Irrep(n=3, dynkin=(1, 0)), torus)
-    adj = character(Irrep(n=3, dynkin=(1, 1)), torus)
     re_chi = _re_fund(np.array(theta), np.array(phi))
     imag = _im_fund(np.array(theta), np.array(phi))
+    for dynkin in DYNKIN:
+        if dynkin == (0, 0):
+            continue
+        got = character(Irrep(n=3, dynkin=dynkin), torus)
+        pred = float(_chi(dynkin, np.array(theta), np.array(phi)))
+        assert got.real == pytest.approx(pred, abs=1e-12)
+    fund = character(Irrep(n=3, dynkin=(1, 0)), torus)
     assert fund.real == pytest.approx(float(re_chi), abs=1e-12)
     assert fund.imag == pytest.approx(float(imag), abs=1e-12)
-    assert adj.real == pytest.approx(float(re_chi**2 + imag**2 - 1.0), abs=1e-12)
-    assert adj.imag == pytest.approx(0.0, abs=1e-12)
 
 
 def test_transfer_is_diagonal_character_truncation() -> None:
@@ -139,10 +154,16 @@ def test_rebuild_round_trips() -> None:
     assert again.entries == transfer.entries
 
 
+def test_max_dynkin_two_is_unlocked() -> None:
+    transfer = su3_wilson_transfer(BETA, max_dynkin=2, n_cells=N_CELLS)
+    assert transfer.exact_eigenvalues is not None
+    assert len(transfer.exact_eigenvalues) == 9
+
+
 def test_max_dynkin_and_beta_are_locked() -> None:
     with pytest.raises(ValueError, match="max_dynkin"):
-        su3_wilson_transfer(BETA, max_dynkin=2)
+        su3_wilson_transfer(BETA, max_dynkin=3)
     with pytest.raises(ValueError, match="beta must be > 0"):
         su3_wilson_transfer(0.0)
-    with pytest.raises(ValueError, match="p,q <= 1"):
-        su3_wilson_haar_coefficient((2, 0), BETA, n_cells=N_CELLS)
+    with pytest.raises(ValueError, match="p,q <= 2"):
+        su3_wilson_haar_coefficient((3, 0), BETA, n_cells=N_CELLS)

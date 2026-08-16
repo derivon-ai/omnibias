@@ -372,7 +372,7 @@ continuum limit or a claim about the Yang-Mills mass gap.
 | `su2_class_angle_transfer` | `angle` | the same `su(2)` spectrum, in a **dense, entrywise-positive** basis that can be sampled |
 | `su3_heat_kernel_transfer` | `character` | `e^{-t C₂(p,q)}`; the conjugate pair `(p,q) ↔ (q,p)` makes the subdominant mode doubly degenerate |
 | `su2_wilson_transfer` | `character` | `I_m(β)` via `besseli_iv`; the slowly-decaying tail the partner-chain deflation exists for |
-| `su3_wilson_transfer` | `character` | Haar-integral enclosures of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤1` truncation, not a product of ordinary `I_n` |
+| `su3_wilson_transfer` | `character` | Midpoint-plus-Lipschitz Haar enclosures of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤2` truncation, not a product of ordinary `I_n` |
 
 Heat-kernel and SU(2) Wilson spectra are known in closed form, so a certified
 bound can be checked against the exact answer. SU(3) Wilson eigenvalues are
@@ -505,15 +505,17 @@ assert check.agrees_with_exact     # and the MC brackets the closed-form gap
 `agrees_with_exact` is the two-sided test with teeth. Both are **evidence** —
 only the interval arithmetic is proof.
 
-### Crude strong-coupling polymer bound
+### Two-scale strong-coupling polymer bound
 
 `certified_strong_coupling_glueball_bound` is a **self-contained** lower bound
 on a 4-D SU(2) Wilson glueball mass at one fixed `β`, using the character
-activity `u(β) = I₂(β)/I₁(β)` and a locked plaquette-surface counting majorant.
-The default is the backtrack-excluding tree count `C = 3(2d-3)` (`C = 15`
-in four dimensions). The older overcount `C = 8(d-1)` remains available as
-`counting="crude"`. The bound is `m a ≥ -ln(C u)` and is `certified=True`
-only when the interval product `C u` is strictly less than 1. Out of that
+activity `u(β) = I₂(β)/I₁(β)` and a two-scale polymer remainder
+`Σ N_n u^n ≤ u + A u² / (1 - B u)`. The first attachment is
+`A = 4(2d-3)` (`20` in four dimensions); later generations use the
+backtrack branching `B = 3(2d-3)` (`15` in four dimensions). Single-scale
+`counting="backtrack"` (`C = 15`, **not** a bound on `N_2`) and
+`counting="crude"` (`C = 24`) remain available. `certified=True` only when
+the enclosed contraction ratio is strictly less than 1. Out of that
 domain the leading activity is still returned and must not be sealed as proved.
 
 This is counting at one coupling and one spacing. It is **not** a
@@ -529,7 +531,8 @@ from omnibias.geometry.gauge.transfer import (
 polymer = certified_strong_coupling_glueball_bound(BETA_LOCK)
 assert polymer.certified
 assert polymer.spectral_gap_lower > 0.0
-assert polymer.method == "backtrack_polymer_count"
+assert polymer.method == "two_scale_polymer_count"
+assert polymer.first_step == 20
 assert polymer.coordination == 15
 
 # Infinite character-basis Wilson transfer (0+1-D, still not 4-D YM).
@@ -558,6 +561,39 @@ hamiltonian = su2_two_plaquette_hamiltonian(COUPLING_LOCK, j_max=1)
 h_gap = certified_hamiltonian_gap(hamiltonian)
 assert h_gap.certified
 assert h_gap.spectral_gap_lower > 0.0
+```
+
+Default magnetics are Racah 6j recoupling weights (`magnetic="sixj"`);
+`magnetic="character"` keeps the older amplitude-1 operator. The
+three-plaquette chain `su2_three_plaquette_hamiltonian` is the same
+finite-matrix statement on `|j1,j2,j3,js12,js23⟩`.
+
+### Spatial-strip transfer
+
+`su2_spatial_strip_transfer` is a Euclidean-time transfer on a spatial
+circle of SU(2) class angles (`2×4 → 16` in CI). Its spectrum is not
+known in closed form. `certified_strip_reflection_positivity` checks
+`⟨θv, T v⟩` on a locked angle inversion; that is RP on **this** matrix,
+not Osterwalder–Seiler reconstruction. `certified_strip_cluster_tail`
+encloses a geometric tail of a locked spatial-bond correlator.
+
+```python
+from omnibias.geometry.gauge.transfer import (
+    STRIP_COUPLING_LOCK,
+    certified_strip_cluster_tail,
+    certified_strip_reflection_positivity,
+    certified_transfer_matrix_gap,
+    su2_spatial_strip_transfer,
+)
+
+strip = su2_spatial_strip_transfer(STRIP_COUPLING_LOCK, n_sites=2, n_angles=4)
+strip_gap = certified_transfer_matrix_gap(strip)
+assert strip_gap.certified
+rp = certified_strip_reflection_positivity(strip)
+assert rp.certified
+cluster = certified_strip_cluster_tail(strip, n_keep=2)
+assert cluster.certified
+assert cluster.tail.contains(cluster.sample)
 ```
 
 ### Scaling across spacings, honestly

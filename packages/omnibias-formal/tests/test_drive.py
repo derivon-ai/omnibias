@@ -24,15 +24,17 @@ from omnibias.formal import (
     MATHLIB_CLAIM_KEY,
     DriveReport,
     casimir_certificate,
-    polymer_certificate,
     classify_obligation,
     compact_box_certificate,
     drive_obligation,
     enclosure_trace_certificate,
     generate_obligation,
+    haar_certificate,
     mathlib_check_available,
     named_zero_certificate,
     nk_existence_certificate,
+    polymer_certificate,
+    sixj_certificate,
     tower_coeffs_certificate,
 )
 from omnibias.formal.drive import _summarize_lake_failure
@@ -101,6 +103,14 @@ def test_classify_polymer() -> None:
     assert classify_obligation(polymer_certificate("backtrack_4")) == "polymer"
 
 
+def test_classify_sixj() -> None:
+    assert classify_obligation(sixj_certificate("half_half_zero")) == "sixj"
+
+
+def test_classify_haar() -> None:
+    assert classify_obligation(haar_certificate("weyl_prefactor_24")) == "haar_volume"
+
+
 def test_classify_none_for_straddling_interval() -> None:
     assert classify_obligation(interval_certificate("q", Interval(-1.0, 1.0))) is None
 
@@ -124,6 +134,9 @@ def test_classify_agrees_with_generate_obligation() -> None:
         compact_box_certificate("ns_box"),
         casimir_certificate("su2_fund"),
         polymer_certificate("backtrack_4"),
+        polymer_certificate("first_step_4"),
+        sixj_certificate("half_half_zero"),
+        haar_certificate("weyl_prefactor_24"),
         {"foo": "bar"},
     ]
     for cert in certs:

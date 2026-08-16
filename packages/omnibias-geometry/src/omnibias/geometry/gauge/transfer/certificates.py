@@ -36,6 +36,7 @@ from omnibias.core.proof import Certificate, seal_certificate, verify_certificat
 from omnibias.geometry.gauge.transfer.gap import TransferGapResult
 from omnibias.geometry.gauge.transfer.matrices import TransferMatrix, rebuild
 from omnibias.geometry.gauge.transfer.strong_coupling import (
+    BACKTRACK_POLYMER_METHOD,
     CRUDE_POLYMER_METHOD,
     POLYMER_METHOD,
     StrongCouplingGapResult,
@@ -62,9 +63,9 @@ STRONG_COUPLING_KIND = "strong_coupling_glueball_gap"
 
 _STRONG_COUPLING_NOTE = (
     "polymer-count lower bound for SU(2) Wilson at one fixed beta and "
-    "spacing; method is backtrack_polymer_count or crude_polymer_count, "
-    "NOT Osterwalder-Seiler, NOT a continuum-limit, infinite-volume, or "
-    "Yang-Mills mass-gap claim"
+    "spacing; method is two_scale_polymer_count, backtrack_polymer_count, "
+    "or crude_polymer_count, NOT Osterwalder-Seiler, NOT a continuum-limit, "
+    "infinite-volume, or Yang-Mills mass-gap claim"
 )
 
 
@@ -251,6 +252,7 @@ def seal_strong_coupling_certificate(
             "beta": float(result.beta),
             "spacetime_dim": int(result.spacetime_dim),
             "coordination": int(result.coordination),
+            "first_step": result.first_step,
             "counting": result.counting,
             "subdominant_ratio_upper": float(result.subdominant_ratio_upper),
             "spectral_gap_lower": float(result.spectral_gap_lower),
@@ -294,9 +296,14 @@ def strong_coupling_schema_errors(cert: Certificate) -> list[str]:
         errors.append(f"schema_version must be {STRONG_COUPLING_SCHEMA_VERSION!r}")
     if cert.get("continuum_claim", True):
         errors.append("continuum_claim must be False")
-    if cert.get("method") not in (POLYMER_METHOD, CRUDE_POLYMER_METHOD):
+    if cert.get("method") not in (
+        POLYMER_METHOD,
+        BACKTRACK_POLYMER_METHOD,
+        CRUDE_POLYMER_METHOD,
+    ):
         errors.append(
-            f"method must be {POLYMER_METHOD!r} or {CRUDE_POLYMER_METHOD!r}"
+            f"method must be {POLYMER_METHOD!r}, {BACKTRACK_POLYMER_METHOD!r}, "
+            f"or {CRUDE_POLYMER_METHOD!r}"
         )
     if cert.get("in_convergence_domain") is not True:
         errors.append("in_convergence_domain must be True")
@@ -330,8 +337,8 @@ def replay_strong_coupling_gap(cert: Certificate) -> bool | None:
     dim = cert.get("spacetime_dim")
     if beta is None or not isinstance(dim, int) or isinstance(dim, bool):
         return None
-    counting = cert.get("counting", "backtrack")
-    if counting not in ("backtrack", "crude"):
+    counting = cert.get("counting", "two_scale")
+    if counting not in ("two_scale", "backtrack", "crude"):
         return False
     try:
         fresh = certified_strong_coupling_glueball_bound(
@@ -357,11 +364,22 @@ HAMILTONIAN_GAP_SCHEMA_VERSION = "verified-hamiltonian-gap-1"
 #: The :class:`~omnibias.core.proof.Conjecture` kind this certificate answers.
 HAMILTONIAN_GAP_KIND = "two_plaquette_hamiltonian_gap"
 
-_HAMILTONIAN_NOTE = (
-    "certified spectral gap of one finite two-plaquette SU(2) Kogut-Susskind "
-    "Hamiltonian at one coupling and one spin truncation; NOT a continuum-limit, "
-    "infinite-volume, or Yang-Mills mass-gap claim"
-)
+#: Kind for the three-plaquette chain (same schema, different observable).
+THREE_PLAQUETTE_GAP_KIND = "three_plaquette_hamiltonian_gap"
+
+_HAMILTONIAN_NOTES = {
+    HAMILTONIAN_GAP_KIND: (
+        "certified spectral gap of one finite two-plaquette SU(2) Kogut-Susskind "
+        "Hamiltonian at one coupling and one spin truncation; NOT a continuum-limit, "
+        "infinite-volume, or Yang-Mills mass-gap claim"
+    ),
+    THREE_PLAQUETTE_GAP_KIND: (
+        "certified spectral gap of one finite three-plaquette SU(2) Kogut-Susskind "
+        "Hamiltonian at one coupling and one spin truncation; NOT a continuum-limit, "
+        "infinite-volume, or Yang-Mills mass-gap claim"
+    ),
+}
+_HAMILTONIAN_NOTE = _HAMILTONIAN_NOTES[HAMILTONIAN_GAP_KIND]
 
 
 def seal_hamiltonian_gap_certificate(
@@ -376,11 +394,17 @@ def seal_hamiltonian_gap_certificate(
             "refusing to seal an uncertified Hamiltonian gap "
             "(non-positive λ1-λ0 lower bound)"
         )
+    model = getattr(hamiltonian, "model", "")
+    observable = (
+        THREE_PLAQUETTE_GAP_KIND
+        if model == "su2_three_plaquette"
+        else HAMILTONIAN_GAP_KIND
+    )
     return seal_certificate(
         {
             "schema_version": HAMILTONIAN_GAP_SCHEMA_VERSION,
             "claim": claim or f"{result.model} Hamiltonian gap",
-            "observable": HAMILTONIAN_GAP_KIND,
+            "observable": observable,
             "model": result.model,
             "method": result.method,
             "dimension": int(result.dimension),
@@ -402,7 +426,7 @@ def seal_hamiltonian_gap_certificate(
                 "finite_truncation": True,
                 "interval_verified": True,
                 "yang_mills_claim": False,
-                "note": _HAMILTONIAN_NOTE,
+                "note": _HAMILTONIAN_NOTES[observable],
             },
         }
     )
@@ -436,8 +460,10 @@ def hamiltonian_gap_schema_errors(cert: Certificate) -> list[str]:
         errors.append(f"schema_version must be {HAMILTONIAN_GAP_SCHEMA_VERSION!r}")
     if cert.get("continuum_claim", True):
         errors.append("continuum_claim must be False")
-    if cert.get("observable") != HAMILTONIAN_GAP_KIND:
-        errors.append(f"observable must be {HAMILTONIAN_GAP_KIND!r}")
+    if cert.get("observable") not in (HAMILTONIAN_GAP_KIND, THREE_PLAQUETTE_GAP_KIND):
+        errors.append(
+            f"observable must be {HAMILTONIAN_GAP_KIND!r} or {THREE_PLAQUETTE_GAP_KIND!r}"
+        )
     honesty = cert.get("honesty", {})
     if not isinstance(honesty, Mapping):
         errors.append("honesty must be a mapping")
@@ -498,9 +524,124 @@ def replay_hamiltonian_gap(cert: Certificate) -> bool | None:
     return not sealed_gap > fresh.spectral_gap_lower + tolerance
 
 
+STRIP_RP_SCHEMA_VERSION = "verified-strip-rp-1"
+STRIP_RP_KIND = "strip_reflection_positivity"
+
+_STRIP_RP_NOTE = (
+    "reflection positivity of one finite spatial-strip transfer on a locked "
+    "angle inversion and test vectors; NOT Osterwalder-Seiler reconstruction, "
+    "NOT a continuum-limit, infinite-volume, or Yang-Mills mass-gap claim"
+)
+
+
+def seal_strip_rp_certificate(
+    result: Any,
+    transfer: TransferMatrix,
+    *,
+    claim: str = "",
+) -> Certificate:
+    """Seal a certified strip RP check.  Refuses an uncertified result."""
+    if not result.certified:
+        raise ValueError("refusing to seal an uncertified strip reflection-positivity check")
+    return seal_certificate(
+        {
+            "schema_version": STRIP_RP_SCHEMA_VERSION,
+            "claim": claim or "spatial-strip reflection positivity",
+            "observable": STRIP_RP_KIND,
+            "model": transfer.model,
+            "method": result.method,
+            "dimension": int(transfer.dimension),
+            "forms_lo": [float(form.lo) for form in result.forms],
+            "parameters": dict(transfer.parameters),
+            "continuum_claim": False,
+            "honesty": {
+                "unproven_claim": False,
+                "continuum_claim": False,
+                "fixed_matrix": True,
+                "finite_truncation": True,
+                "interval_verified": True,
+                "yang_mills_claim": False,
+                "note": _STRIP_RP_NOTE,
+            },
+        }
+    )
+
+
+def strip_rp_schema_errors(cert: Certificate) -> list[str]:
+    """Validate a ``verified-strip-rp-1`` certificate."""
+    errors: list[str] = []
+    required = (
+        "schema_version",
+        "observable",
+        "model",
+        "method",
+        "dimension",
+        "forms_lo",
+        "parameters",
+        "continuum_claim",
+        "honesty",
+        "digest",
+    )
+    for key in required:
+        if key not in cert:
+            errors.append(f"missing top-level key: {key!r}")
+    if cert.get("schema_version") != STRIP_RP_SCHEMA_VERSION:
+        errors.append(f"schema_version must be {STRIP_RP_SCHEMA_VERSION!r}")
+    if cert.get("continuum_claim", True):
+        errors.append("continuum_claim must be False")
+    if cert.get("observable") != STRIP_RP_KIND:
+        errors.append(f"observable must be {STRIP_RP_KIND!r}")
+    honesty = cert.get("honesty", {})
+    if not isinstance(honesty, Mapping):
+        errors.append("honesty must be a mapping")
+        honesty = {}
+    if honesty.get("unproven_claim", True):
+        errors.append("honesty.unproven_claim must be False")
+    if honesty.get("continuum_claim", True):
+        errors.append("honesty.continuum_claim must be False")
+    if honesty.get("yang_mills_claim", True):
+        errors.append("honesty.yang_mills_claim must be False")
+    forms = cert.get("forms_lo")
+    if not isinstance(forms, list) or not forms:
+        errors.append("forms_lo must be a non-empty list")
+    elif any(not isinstance(item, int | float) or isinstance(item, bool) or item < 0.0 for item in forms):
+        errors.append("forms_lo entries must be non-negative floats")
+    if "digest" in cert and not verify_certificate_digest(cert):
+        errors.append("digest does not match the certificate body (tampered/stale)")
+    return errors
+
+
+def replay_strip_rp(cert: Certificate) -> bool | None:
+    """Independently re-derive strip RP from the recorded constructor inputs."""
+    from omnibias.geometry.gauge.transfer.strip import certified_strip_reflection_positivity
+
+    parameters = cert.get("parameters")
+    if not isinstance(parameters, Mapping) or not parameters:
+        return None
+    try:
+        transfer = rebuild(parameters)
+        fresh = certified_strip_reflection_positivity(transfer)
+    except (ValueError, TypeError, KeyError):
+        return False
+    if not fresh.certified:
+        return False
+    sealed = cert.get("forms_lo")
+    if not isinstance(sealed, list) or len(sealed) != len(fresh.forms):
+        return False
+    tolerance = 1e-9
+    for claimed, form in zip(sealed, fresh.forms, strict=True):
+        value = _as_float(claimed)
+        if value is None or value < form.lo - tolerance:
+            return False
+    return True
+
+
 __all__ = [
     "HAMILTONIAN_GAP_KIND",
     "HAMILTONIAN_GAP_SCHEMA_VERSION",
+    "STRIP_RP_KIND",
+    "STRIP_RP_SCHEMA_VERSION",
+    "THREE_PLAQUETTE_GAP_KIND",
     "STRONG_COUPLING_KIND",
     "STRONG_COUPLING_SCHEMA_VERSION",
     "TRANSFER_GAP_KIND",
@@ -508,10 +649,13 @@ __all__ = [
     "hamiltonian_gap_schema_errors",
     "replay_hamiltonian_gap",
     "replay_strong_coupling_gap",
+    "replay_strip_rp",
     "replay_transfer_matrix_gap",
     "seal_hamiltonian_gap_certificate",
     "seal_strong_coupling_certificate",
+    "seal_strip_rp_certificate",
     "seal_transfer_gap_certificate",
+    "strip_rp_schema_errors",
     "strong_coupling_schema_errors",
     "transfer_gap_schema_errors",
 ]

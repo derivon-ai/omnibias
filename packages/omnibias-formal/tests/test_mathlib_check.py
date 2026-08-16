@@ -23,14 +23,16 @@ from omnibias.formal import (
     MATHLIB_CLAIM_KEY,
     analytic_root,
     casimir_certificate,
-    polymer_certificate,
     check_certificate,
     compact_box_certificate,
     enclosure_trace_certificate,
     generate_obligation,
+    haar_certificate,
     mathlib_check_available,
     named_zero_certificate,
     nk_existence_certificate,
+    polymer_certificate,
+    sixj_certificate,
     tower_coeffs_certificate,
 )
 
@@ -514,6 +516,48 @@ def test_generate_polymer_crude() -> None:
     src = generate_obligation(polymer_certificate("crude_4")) or ""
     assert "polymer_crude_coord_4" in src
     assert "polymerCrude" in src
+
+
+def test_generate_polymer_first_step() -> None:
+    src = generate_obligation(polymer_certificate("first_step_4")) or ""
+    assert "polymer_first_step_4" in src
+    assert "polymerFirstStep" in src
+
+
+def test_generate_sixj_half() -> None:
+    src = generate_obligation(sixj_certificate("half_half_zero")) or ""
+    assert "import OmnibiasAnalytic.Check.SixJ" in src
+    assert "sixj_half_half_zero" in src
+    assert "sixjHalfHalfZero" in src
+
+
+def test_generate_sixj_vanishing() -> None:
+    src = generate_obligation(sixj_certificate("all_half_vanishes")) or ""
+    assert "sixj_all_half_vanishes" in src
+    assert "sixjAllHalf" in src
+
+
+def test_sixj_mismatch_yields_none() -> None:
+    cert = sixj_certificate("half_half_zero")
+    payload = dict(cert["payload"])
+    payload["value"] = [1, 2]
+    bogus = make_certificate(claim="bogus", payload=payload)
+    assert generate_obligation(bogus) is None
+
+
+def test_generate_haar_prefactor() -> None:
+    src = generate_obligation(haar_certificate("weyl_prefactor_24")) or ""
+    assert "import OmnibiasAnalytic.Check.HaarVolume" in src
+    assert "haar_weyl_prefactor_24" in src
+    assert "haarWeylPrefactor" in src
+
+
+def test_haar_mismatch_yields_none() -> None:
+    cert = haar_certificate("weyl_prefactor_24")
+    payload = dict(cert["payload"])
+    payload["value"] = 6
+    bogus = make_certificate(claim="bogus", payload=payload)
+    assert generate_obligation(bogus) is None
 
 
 def test_polymer_mismatch_yields_none() -> None:

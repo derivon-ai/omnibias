@@ -62,8 +62,17 @@ a green build is meaningful.
   Finite rational identities, not a continuum gauge claim.
 - **Polymer** -- a `polymer` payload from
   `omnibias.formal.polymer.polymer_certificate`: the locked backtrack
-  coordination `3(2*4-3)=15` or the crude overcount `8(4-1)=24`. Finite
-  arithmetic, not a continuum gauge claim and not Osterwalder-Seiler.
+  coordination `3(2*4-3)=15`, the first-step `4(2*4-3)=20`, or the
+  crude overcount `8(4-1)=24`. Finite arithmetic, not a continuum
+  gauge claim and not Osterwalder-Seiler.
+- **SixJ** -- a `sixj` payload from
+  `omnibias.formal.sixj.sixj_certificate`: the locked Racah value
+  `{1/2 1/2 0; 1/2 1/2 0} = -1/2` or the vanishing all-`1/2` triad.
+  Finite rational identities, not a continuum gauge claim.
+- **Haar volume** -- a `haar_volume` payload from
+  `omnibias.formal.haar.haar_certificate`: the locked Weyl prefactor
+  `6*4=24`. Finite arithmetic, not a continuum Haar theorem and not
+  4-D SU(3) Yang-Mills.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived

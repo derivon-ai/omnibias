@@ -136,8 +136,10 @@ transfer-matrix prover lives in its own registry rather than the default machine
 | `kind` | Certificate | Can DISPROVE? |
 |---|---|---|
 | `transfer_matrix_spectral_gap` | `certified_transfer_matrix_gap` (`omnibias.geometry.gauge.transfer`) | No — a gap below the requested threshold → `BLOCKED` |
-| `strong_coupling_glueball_gap` | `certified_strong_coupling_glueball_bound` (crude polymer count at one `β`) | No — out of domain or a gap below the requested threshold → `BLOCKED` |
+| `strong_coupling_glueball_gap` | `certified_strong_coupling_glueball_bound` (two-scale polymer count at one `β`) | No — out of domain or a gap below the requested threshold → `BLOCKED` |
 | `two_plaquette_hamiltonian_gap` | `certified_hamiltonian_gap` (finite two-plaquette KS `λ1-λ0`) | No — a gap below the requested threshold → `BLOCKED` |
+| `three_plaquette_hamiltonian_gap` | `certified_hamiltonian_gap` (finite three-plaquette KS `λ1-λ0`) | No — a gap below the requested threshold → `BLOCKED` |
+| `strip_reflection_positivity` | `certified_strip_reflection_positivity` (RP on one strip transfer) | No — a negative quadratic-form lower end → `BLOCKED` |
 
 ```python
 from omnibias.core.proof import Conjecture
@@ -145,7 +147,9 @@ from omnibias.geometry.gauge.proofmachine import build_gauge_machine
 
 gauge = build_gauge_machine()
 assert sorted(gauge.kinds()) == [
+    "strip_reflection_positivity",
     "strong_coupling_glueball_gap",
+    "three_plaquette_hamiltonian_gap",
     "transfer_matrix_spectral_gap",
     "two_plaquette_hamiltonian_gap",
 ]

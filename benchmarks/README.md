@@ -63,6 +63,7 @@ uv run python docs/img/generate_figures.py
 | `holonomy_band.py` | `docs/benchmarks/holonomy_band_smoke.json` | Gated 02-14: no YM / mass-gap claim |
 | `gauge_holonomy_gap.py` | `docs/benchmarks/gauge_holonomy_gap_smoke.json` | Gated 07-04: holonomy trials on one fixed matrix; G1 factor measured; no YM / continuum |
 | `gauge_two_plaquette_gap.py` | `docs/benchmarks/gauge_two_plaquette_gap_smoke.json` | Two-plaquette KS Hamiltonian `λ1-λ0`; G1 factor measured; no YM / continuum |
+| `gauge_spatial_strip.py` | `docs/benchmarks/gauge_spatial_strip_smoke.json` | Finite 2+1-D strip gap + RP + cluster tail; no YM / OS / continuum |
 | `scannet.py` | `docs/benchmarks/scannet_smoke.json` | Wave-3 architecture 02-01: ScanNet G1/G2/G5; G3 cost and G4 k-NN recorded, not in CI `all_passed`; on-lattice equivariance |
 | `jetkan.py` | `docs/benchmarks/jetkan_smoke.json` | Wave-3 architecture 02-03: JetKAN G1/G3/G5; G2 timing not in CI `all_passed`; model-jet exactness, KA theorem does not justify |
 | `weak_form_vpinn.py` | `docs/benchmarks/weak_form_vpinn_smoke.json` | Wave-3 architecture 02-04: exact on polynomial boxes; boundary bound on by default |

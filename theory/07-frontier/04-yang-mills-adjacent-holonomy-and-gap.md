@@ -215,8 +215,10 @@ output, and the Monte Carlo comparison already implemented.
   holonomy trials are not the eigenbasis. Its official engine is a
   complete residual cover of `λ1-λ0`, so the recorded G1 factor in
   `docs/benchmarks/gauge_two_plaquette_gap_smoke.json` is also measured
-  (not a claimed `5x`). That gap is one finite matrix. It is not a Clay
-  / continuum claim.
+  (not a claimed `5x`). Default magnetics are Racah 6j weights. The
+  three-plaquette chain and the 2+1-D spatial strip
+  (`benchmarks/gauge_spatial_strip.py`) are further finite matrices.
+  None of these gaps is a Clay / continuum claim.
 - **G2 soundness.** The certified bound never exceeds the true gap, verified
   against high-precision eigenvalues on `1000` synthetic matrices. **A single
   violation is a bug.**
@@ -239,6 +241,10 @@ output, and the Monte Carlo comparison already implemented.
 - `benchmarks/gauge_holonomy_gap.py`: tightness across the matrix suite,
   soundness over synthetic instances, gauge-invariance check, conditioning
   sweep, Monte Carlo cross-check.
+- `benchmarks/gauge_two_plaquette_gap.py`: finite KS `λ1-λ0` with 6j
+  magnetics; G1 measured.
+- `benchmarks/gauge_spatial_strip.py`: 2+1-D strip gap, RP, and cluster
+  tail on one finite matrix.
 - Smoke JSON in `docs/benchmarks/`; full under
   `$OMNIBIAS_SCRATCH/gauge_gap/`.
 

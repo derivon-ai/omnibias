@@ -299,21 +299,29 @@ the relevant op:
   angle / class-angle grid; they may tighten a variational bound for that
   matrix. They do not take a continuum limit.
 - **`certified_strong_coupling_glueball_bound`** is a **polymer-count**
-  lower bound for SU(2) Wilson at **one fixed `β`** and spacing
-  (`m a ≥ -ln(C u)` with default backtrack `C = 3(2d-3)`). `certified=True`
-  only inside the interval-certified domain `C u < 1`. It is **not** a
-  continuum claim, **not** a uniform-in-spacing bound, and **not** the
-  Yang-Mills mass gap. The default method tag is `backtrack_polymer_count`.
+  lower bound for SU(2) Wilson at **one fixed `β`** and spacing. The
+  default is the two-scale remainder `u + A u² / (1 - B u)` with
+  first-step `A = 20` and subsequent `B = 15` in 4-D. `certified=True`
+  only inside the interval-certified domain (enclosed ratio `< 1`). It
+  is **not** a continuum claim, **not** a uniform-in-spacing bound, and
+  **not** the Yang-Mills mass gap. The default method tag is
+  `two_scale_polymer_count`. Single-scale `C = 15` is **not** a bound
+  on `N_2`.
 - **`su3_wilson_transfer`** encloses SU(3) Wilson character coefficients
-  by interval Haar quadrature on the maximal torus at **one fixed `β`**.
-  The matrix is the `(p, q) ≤ 1` truncation. It is **not** a product of
-  ordinary Bessel functions, **not** 4-D SU(3) Yang-Mills, and **not** a
+  by midpoint-plus-Lipschitz Haar quadrature on the maximal torus at
+  **one fixed `β`**. The matrix is the `(p, q) ≤ 2` truncation with
+  locked trigonometric characters. It is **not** a product of ordinary
+  Bessel functions, **not** 4-D SU(3) Yang-Mills, and **not** a
   continuum claim.
 - **`certified_hamiltonian_gap`** is a sound lower bound on `λ1 - λ0` of
-  **one finite two-plaquette SU(2) Kogut–Susskind Hamiltonian** at one
-  coupling and one spin truncation. It is **not** a continuum claim,
-  **not** a uniform-in-spacing bound, and **not** the Yang-Mills mass
-  gap.
+  **one finite two- or three-plaquette SU(2) Kogut–Susskind Hamiltonian**
+  at one coupling and one spin truncation. Default magnetics are Racah
+  6j weights. It is **not** a continuum claim, **not** a
+  uniform-in-spacing bound, and **not** the Yang-Mills mass gap.
+- **`su2_spatial_strip_transfer`** is one finite Euclidean-time transfer
+  on a spatial circle of SU(2) class angles. Reflection positivity is
+  checked on **this** matrix; that is not Osterwalder–Seiler
+  reconstruction and not a continuum claim.
 - **`omnibias-qpinn` Bloch cage** supports orders ≤ 2 on a **single axis** in
   v0.0.1; multi-axis mixed partials need the Leibniz expansion (planned).
 - **Random-feature fields** are accurate only inside the support of their

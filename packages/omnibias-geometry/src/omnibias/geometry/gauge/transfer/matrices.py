@@ -563,14 +563,15 @@ def su3_wilson_transfer(
     :func:`~omnibias.geometry.gauge.transfer.su3_wilson.su3_wilson_haar_coefficient`).
     The matrix **is** the ``(p, q)`` truncation with ``p, q <= max_dynkin``.
 
-    ``max_dynkin`` is locked at ``1`` so every character in the integrand is
-    an explicit trigonometric identity, not a guessed product of ordinary
-    Bessel functions.  This is one coupling and one truncation -- not 4-D
-    SU(3) Yang-Mills.
+    ``max_dynkin`` is locked at ``1`` or ``2`` so every character in the
+    integrand is an explicit trigonometric identity, not a guessed product
+    of ordinary Bessel functions.  This is one coupling and one
+    truncation -- not 4-D SU(3) Yang-Mills.
     """
-    if max_dynkin != 1:
+    if max_dynkin not in (1, 2):
         raise ValueError(
-            f"su3_wilson_transfer locks max_dynkin=1 (Haar characters), got {max_dynkin}"
+            f"su3_wilson_transfer locks max_dynkin in {{1, 2}} (Haar characters), "
+            f"got {max_dynkin}"
         )
     if float(beta) <= 0.0:
         raise ValueError(f"beta must be > 0, got {beta}")
@@ -612,6 +613,12 @@ def su3_wilson_transfer(
     )
 
 
+def _strip_builder(*args: object, **kwargs: object) -> TransferMatrix:
+    from omnibias.geometry.gauge.transfer.strip import su2_spatial_strip_transfer
+
+    return su2_spatial_strip_transfer(*args, **kwargs)  # type: ignore[arg-type]
+
+
 #: Constructor name (as recorded in ``TransferMatrix.parameters["builder"]``) to the
 #: callable, so a sealed certificate can be replayed by rebuilding its matrix.
 BUILDERS: Mapping[str, object] = {
@@ -621,6 +628,7 @@ BUILDERS: Mapping[str, object] = {
     "su3_heat_kernel_transfer": su3_heat_kernel_transfer,
     "su2_wilson_transfer": su2_wilson_transfer,
     "su3_wilson_transfer": su3_wilson_transfer,
+    "su2_spatial_strip_transfer": _strip_builder,
 }
 
 
