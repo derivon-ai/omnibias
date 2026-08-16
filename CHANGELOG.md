@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — public CSV equation discovery
+
+- `examples/symbolic_discovery/public_csv_discovery`: Hudson Bay lynx–hare
+  table (committed, offline) plus a synthetic Lotka–Volterra orbit.
+  Interpolant jets + STLSQ on `{1, x, y, xy}` beat a finite-difference
+  baseline on the public table (`skill_vs_fd > 0`) and recover `xy` signs
+  on the synthetic orbit. Not a new law of nature.
+
 ### Added — Path B operator completeness
 
 - Wilson-rectangle transform `wilson_loops_to_ensemble_table` plus

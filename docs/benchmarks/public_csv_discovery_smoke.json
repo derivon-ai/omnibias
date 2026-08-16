@@ -1,0 +1,95 @@
+{
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "synthetic",
+        "passed": true
+      },
+      {
+        "name": "public_csv",
+        "passed": true
+      }
+    ]
+  },
+  "generated_utc": "2026-08-16T19:57:40Z",
+  "honesty": "Recovers a famous ecological ODE on a public table. Not a new law of nature. Not a confinement or Clay claim.",
+  "mode": "smoke",
+  "public_csv": {
+    "gates": {
+      "all_passed": true,
+      "entries": [
+        {
+          "finite": true,
+          "max_abs": 77.4,
+          "name": "reference_valid",
+          "passed": true
+        },
+        {
+          "min_skill": 0.0,
+          "name": "bilinear_vs_zero",
+          "passed": true,
+          "skill_score": 0.8268044624566772
+        },
+        {
+          "min_skill": 0.0,
+          "name": "bilinear_vs_linear",
+          "passed": true,
+          "skill_score": 0.036681125574493434
+        },
+        {
+          "min_skill": 0.0,
+          "name": "jet_vs_fd",
+          "passed": true,
+          "required": true,
+          "skill_score": 0.23116306658886454
+        }
+      ]
+    },
+    "n_rows": 21,
+    "skill_vs_fd": 0.23116306658886454,
+    "skill_vs_linear": 0.036681125574493434
+  },
+  "schema": "public_csv_discovery/v1",
+  "synthetic": {
+    "gates": {
+      "all_passed": true,
+      "entries": [
+        {
+          "finite": true,
+          "max_abs": 77.42459390832053,
+          "name": "reference_valid",
+          "passed": true
+        },
+        {
+          "min_skill": 0.0,
+          "name": "bilinear_vs_zero",
+          "passed": true,
+          "skill_score": 0.7310493102659202
+        },
+        {
+          "min_skill": 0.0,
+          "name": "bilinear_vs_linear",
+          "passed": true,
+          "skill_score": 0.3702933988680063
+        },
+        {
+          "min_skill": 0.0,
+          "name": "jet_vs_fd",
+          "passed": true,
+          "required": false,
+          "skill_score": -47.02504080575186
+        },
+        {
+          "hare_xy": -0.005358918305124631,
+          "lynx_xy": 0.0060009454246552725,
+          "name": "xy_signs",
+          "passed": true
+        }
+      ]
+    },
+    "skill_vs_fd": -47.02504080575186,
+    "skill_vs_linear": 0.3702933988680063,
+    "xy_signs_ok": true
+  }
+}

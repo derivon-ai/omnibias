@@ -21,6 +21,7 @@ baselines, dataset loaders, and tests.
 | `causal_term_discovery` | Directed parent ranking of terms (MI + NOTEARS-lite) on a known SEM | synthetic | yes |
 | `dimensional_groups` | Buckingham-Pi dimensionless groups (Reynolds, pendulum) via exact integer null-space | none (closed form) | yes |
 | `latent_ode_discovery` | Hidden oscillator law from one observed coordinate (Takens + autoencoder + FieldLawDiscoverer) | synthetic | yes |
+| `public_csv_discovery` | Lotka–Volterra `xy` terms from interpolant jets vs finite-difference STLSQ | Hudson Bay lynx–hare CSV (committed) + synthetic orbit | yes |
 
 The fully-reproducible synthetic paths are exercised by the test suite and the
 notebooks. The real-data paths require downloading the corresponding datasets.
@@ -35,6 +36,8 @@ All caches default to a git-ignored top-level `data/` directory.
   fallback).
 - NASA C-MAPSS (FD001): pulled by `cmapss_feature_discovery/benchmark.py`
   (`ensure_dataset`) into `data/cmapss_fd001`.
+- Hudson Bay lynx–hare (1900–1920): committed at
+  `public_csv_discovery/data/lynx_hare.csv` with provenance. Offline.
 - FI-2010 / DeepLOB: fetched by `financial_signal_discovery/benchmark.py`
   (`fetch_deeplob_fi2010_zip`) into `data/financial_signal_discovery`.
 
@@ -48,6 +51,7 @@ python -m examples.symbolic_discovery.joint_operator_regressor.run_demo
 python -m examples.symbolic_discovery.causal_term_discovery.run_demo
 python -m examples.symbolic_discovery.dimensional_groups.run_demo
 python -m examples.symbolic_discovery.latent_ode_discovery.run_demo
+python -m examples.symbolic_discovery.public_csv_discovery.run_demo --quick
 
 # Tests (run from the repo root so `examples.*` is importable):
 python -m pytest examples/symbolic_discovery -q
