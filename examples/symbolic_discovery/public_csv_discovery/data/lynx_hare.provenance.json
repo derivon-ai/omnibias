@@ -1,0 +1,12 @@
+{
+  "name": "hudson_bay_lynx_hare",
+  "columns": ["year", "hare", "lynx"],
+  "units": "thousands of pelts",
+  "years": "1900-1920",
+  "citation": "Hudson Bay Company pelt counts as tabulated in Howard, P., Modeling with ODE (TAMU M442 notes). Widely reproduced (Odum 1953 after MacLulich 1937; Elton & Nicholson 1942).",
+  "url": "https://github.com/stan-dev/example-models/blob/master/knitr/lotka-volterra/hudson-bay-lynx-hare.csv",
+  "source_note": "The stan-dev table lists Year, Lynx, Hare. This copy stores year,hare,lynx.",
+  "retrieved_utc": "2026-08-16T19:54:00Z",
+  "license": "historical counts; reproduced for scientific reuse",
+  "honesty": "A famous ecological table, not a new measurement. Recovering Lotka-Volterra here is a textbook check, not a new law of nature."
+}
