@@ -49,8 +49,20 @@ def run_lattice_mc(
     This is **numerical evidence** for a mass gap in the **lattice** theory at fixed
     spacing; it does not constitute a continuum Yang-Mills mass-gap proof.
     """
+    if gauge_group == "su(3)":
+        from omnibias.geometry.gauge.lattice._core.su3_montecarlo import run_su3_lattice_mc
+
+        return run_su3_lattice_mc(
+            lattice_shape=lattice_shape,
+            beta=beta,
+            n_therm=n_therm,
+            n_meas=n_meas,
+            n_sep=n_sep,
+            seed=seed,
+            r_max=r_max,
+        )
     if gauge_group != "su(2)":
-        msg = f"only gauge_group='su(2)' is implemented, got {gauge_group!r}"
+        msg = f"only gauge_group='su(2)' or 'su(3)' is implemented, got {gauge_group!r}"
         raise ValueError(msg)
 
     t0 = time.perf_counter()

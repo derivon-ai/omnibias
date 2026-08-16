@@ -53,6 +53,19 @@ def test_legal_ensemble_atoms_exclude_certificates() -> None:
         "p2",
         "rho",
         "omega",
+        "area",
+        "perimeter",
+        "log_p2",
+        "inv_p2",
+        "ghost_G",
+        "log_ghost_G",
+        "T_lat",
+        "V_r",
+        "t_wilson",
+        "creutz_chi",
+        "L_lat",
+        "F_r",
+        "sigma_lat",
     }
     assert "gevp" not in LEGAL_ENSEMBLE_ATOMS
     assert "transfer_gap" not in LEGAL_ENSEMBLE_ATOMS
@@ -108,6 +121,19 @@ def test_link_ensemble_two_random_configs() -> None:
     assert table.values["abs_P"].shape == (1,)
     assert table.values["C_P"].shape[0] == table.values["r"].shape[0]
     assert 0.0 <= float(table.values["abs_P"].item()) <= 1.0 + 1e-12
+
+
+def test_link_ensemble_records_metadata_and_finite_t() -> None:
+    fields = [
+        LatticeLinkField(links=identity_numpy_links((4, 4, 4, 2))),
+        LatticeLinkField(links=identity_numpy_links((4, 4, 4, 2))),
+    ]
+    table = ensemble_table_from_link_ensemble(fields, beta=2.3)
+    assert table.metadata.n_configs == 2
+    assert table.metadata.beta == pytest.approx(2.3)
+    assert table.metadata.lattice_shape == (4, 4, 4, 2)
+    assert table.values["T_lat"].item() == pytest.approx(0.5)
+    assert table.values["L_lat"].item() == pytest.approx(4.0)
 
 
 def test_mc_dict_adapter_without_live_mc() -> None:

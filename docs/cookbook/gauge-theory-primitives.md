@@ -182,6 +182,43 @@ except ValueError as exc:
 assert ens_raised
 ```
 
+Named IR / Wilson families are parametric fits, not extra STLSQ atoms.
+`ContinuumFitResult.continuum_claim` is fit-earned on a finite `a²` table;
+sealed transfer certificates stay `continuum_claim=False`.
+
+```python
+from omnibias.symbolic import NamedFamilyDiscoverer, planted_decoupling_table
+from omnibias.geometry.gauge import extrapolate_in_a2
+import numpy as np
+
+ir = NamedFamilyDiscoverer().fit(planted_decoupling_table(), family="decoupling")
+assert ir.passed
+assert ir.yang_mills_claim is False
+a = np.array([0.20, 0.18, 0.16, 0.14, 0.12, 0.10])
+fit = extrapolate_in_a2(a, 1.2 + 0.3 * a * a)
+assert fit.continuum_claim is True
+assert fit.yang_mills_claim is False
+```
+
+Wilson rectangles become a Path B table (area, Creutz, `V(r)`). That transform
+is the integral analogue; a jet of `A` is still refused.
+
+```python
+from omnibias.geometry.gauge import sommer_r0, wilson_loops_to_ensemble_table
+import numpy as np
+
+loops = {}
+for r in range(1, 5):
+    for t in range(1, 5):
+        loops[f"{r}x{t}"] = {"value": float(np.exp(-0.2 * r * t)), "err": 0.0}
+table = wilson_loops_to_ensemble_table(loops, lattice_shape=(8, 8, 8, 8))
+assert "V_r" in table.values
+assert "creutz_chi" in table.values
+scale = sommer_r0(np.unique(table.values["r"]), np.full(4, 0.2))
+assert scale.yang_mills_claim is False
+assert scale.value > 0.0
+```
+
 !!! note "Scope"
     `omnibias.geometry.gauge` ships the full **continuum** primitive set **and** an SU(2)
     lattice Monte-Carlo engine (`omnibias.geometry.gauge.lattice`, torch + JAX): heat-bath,

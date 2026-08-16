@@ -234,7 +234,11 @@ def _split_table(
         }
         if any(arr.shape[0] != count for arr in values.values()):
             raise ValueError(f"expected {n} rows in ensemble table")
-        parts.append(EnsembleObservableTable(values=values, source=table.source))
+        parts.append(
+            EnsembleObservableTable(
+                values=values, source=table.source, metadata=table.metadata
+            )
+        )
         start += count
     return parts[0], parts[1], parts[2]
 

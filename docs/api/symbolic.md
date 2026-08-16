@@ -387,7 +387,49 @@ never a GEVP column. Not a Yang-Mills mass-gap claim.
         - planted_order_parameter_table
         - planted_polyakov_correlator_table
         - planted_area_perimeter_table
+
+::: omnibias.symbolic.ensemble_families
+    options:
+      show_root_heading: false
+      heading_level: 4
+      members:
+        - NamedFamilyDiscoverer
+        - NamedFamilyResult
+        - JointLawDiscoverer
+        - JointLawResult
+        - CoupledConfinementDiscoverer
+        - CoupledConfinementResult
+        - planted_decoupling_table
+        - planted_gribov_stingl_table
+        - planted_wilson_area_table
+        - planted_spectrum_from_sigma
         - planted_spectral_density_table
+
+::: omnibias.symbolic.ensemble_piecewise
+    options:
+      show_root_heading: false
+      heading_level: 4
+      members:
+        - PiecewiseEnsembleDiscoverer
+        - PiecewiseEnsembleResult
+        - planted_hybrid_wilson_table
+
+::: omnibias.symbolic.ensemble_field
+    options:
+      show_root_heading: false
+      heading_level: 4
+      members:
+        - ensemble_field_law
+        - EnsembleFieldLawResult
+        - planted_static_potential_table
+
+::: omnibias.symbolic.system_discovery
+    options:
+      show_root_heading: false
+      heading_level: 4
+      members:
+        - ImplicitSystemDiscoverer
+        - ImplicitSystemResult
 
 ## Differential geometry
 

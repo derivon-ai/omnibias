@@ -404,6 +404,25 @@ __all__ = [
     "RecurrenceRelation",
     "SparseEquation",
     "SplitData",
+    "CoupledConfinementDiscoverer",
+    "CoupledConfinementResult",
+    "EnsembleFieldLawResult",
+    "ImplicitSystemDiscoverer",
+    "ImplicitSystemResult",
+    "JointLawDiscoverer",
+    "JointLawResult",
+    "NamedFamilyDiscoverer",
+    "NamedFamilyResult",
+    "PiecewiseEnsembleDiscoverer",
+    "PiecewiseEnsembleResult",
+    "discover_ensemble_field_pde",
+    "ensemble_field_law",
+    "planted_decoupling_table",
+    "planted_gribov_stingl_table",
+    "planted_hybrid_wilson_table",
+    "planted_spectrum_from_sigma",
+    "planted_static_potential_table",
+    "planted_wilson_area_table",
     "StatisticalLawDiscoverer",
     "StatisticalLawResult",
     "__lineage__",
@@ -688,16 +707,35 @@ _LOOP_EXPORTS = frozenset(
 )
 _ENSEMBLE_EXPORTS = frozenset(
     {
+        "CoupledConfinementDiscoverer",
+        "CoupledConfinementResult",
+        "EnsembleFieldLawResult",
+        "ImplicitSystemDiscoverer",
+        "ImplicitSystemResult",
+        "JointLawDiscoverer",
+        "JointLawResult",
+        "NamedFamilyDiscoverer",
+        "NamedFamilyResult",
+        "PiecewiseEnsembleDiscoverer",
+        "PiecewiseEnsembleResult",
         "StatisticalLawDiscoverer",
         "StatisticalLawResult",
+        "discover_ensemble_field_pde",
         "discover_planted_area_perimeter",
         "discover_planted_order_parameter_scaling",
         "discover_planted_polyakov_mass",
         "discover_planted_spectral_density",
+        "ensemble_field_law",
         "planted_area_perimeter_table",
+        "planted_decoupling_table",
+        "planted_gribov_stingl_table",
+        "planted_hybrid_wilson_table",
         "planted_order_parameter_table",
         "planted_polyakov_correlator_table",
         "planted_spectral_density_table",
+        "planted_spectrum_from_sigma",
+        "planted_static_potential_table",
+        "planted_wilson_area_table",
     }
 )
 
@@ -712,6 +750,42 @@ def __getattr__(name: str) -> object:
 
         return getattr(_loop_discovery, name)
     if name in _ENSEMBLE_EXPORTS:
+        if name in {
+            "CoupledConfinementDiscoverer",
+            "CoupledConfinementResult",
+            "JointLawDiscoverer",
+            "JointLawResult",
+            "NamedFamilyDiscoverer",
+            "NamedFamilyResult",
+            "planted_decoupling_table",
+            "planted_gribov_stingl_table",
+            "planted_spectrum_from_sigma",
+            "planted_wilson_area_table",
+        }:
+            from omnibias.symbolic import ensemble_families as _ensemble_families
+
+            return getattr(_ensemble_families, name)
+        if name in {
+            "PiecewiseEnsembleDiscoverer",
+            "PiecewiseEnsembleResult",
+            "planted_hybrid_wilson_table",
+        }:
+            from omnibias.symbolic import ensemble_piecewise as _ensemble_piecewise
+
+            return getattr(_ensemble_piecewise, name)
+        if name in {
+            "EnsembleFieldLawResult",
+            "discover_ensemble_field_pde",
+            "ensemble_field_law",
+            "planted_static_potential_table",
+        }:
+            from omnibias.symbolic import ensemble_field as _ensemble_field
+
+            return getattr(_ensemble_field, name)
+        if name in {"ImplicitSystemDiscoverer", "ImplicitSystemResult"}:
+            from omnibias.symbolic import system_discovery as _system_discovery
+
+            return getattr(_system_discovery, name)
         from omnibias.symbolic import ensemble_discovery as _ensemble_discovery
 
         return getattr(_ensemble_discovery, name)

@@ -51,6 +51,18 @@ class LatticeLinkField:
     spacing: float = 1.0
 
 
+@dataclass(frozen=True)
+class SU3LatticeLinkField:
+    """SU(3) link field. Not a jet and not a continuum connection.
+
+    ``links`` has shape ``(4, *lattice_shape, 3, 3)`` (complex matrices).
+    Spacing is recorded only; it is never used to form ``partial^k A``.
+    """
+
+    links: object
+    spacing: float = 1.0
+
+
 def refuse_connection_jet_from_links(
     links: object | None = None, *_args: object, **_kwargs: object
 ) -> NoReturn:
@@ -102,6 +114,7 @@ def is_scalar_integral_column_name(name: str) -> bool:
 __all__ = [
     "ConnectionSource",
     "LatticeLinkField",
+    "SU3LatticeLinkField",
     "is_scalar_integral_column_name",
     "refuse_connection_jet_from_links",
     "refuse_lattice_random_feature_jet",

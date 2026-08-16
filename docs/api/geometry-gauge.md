@@ -190,8 +190,16 @@ mass-gap claim.
 ## Ensemble language (Path B)
 
 Path B changes the object. Rows are ensemble statistics versus control
-parameters -- `|P|`, `χ_P`, `C_P(r)`, Landau-gauge `G(p^2)`, a planted
-spectral density -- not a jet of `A` and not a per-configuration loop table.
+parameters -- `|P|`, `χ_P`, `C_P(r)`, Landau-gauge `G(p^2)` / ghost `G(p^2)`,
+area / perimeter, `V(r)`, Creutz `χ(R,T)`, `L_lat`, a planted spectral density --
+not a jet of `A` and not a per-configuration loop table. Tables carry
+`LatticeMetadata` (`β`, `a`, `N`, scheme). `wilson_loops_to_ensemble_table`
+is the Wilson-rectangle transform (the Path B integral analogue).
+`gluon_propagator_ensemble` / `ghost_propagator_ensemble` require two
+or more configurations. `sommer_r0` / Wilson-flow `t0` are lattice scales.
+`extrapolate_in_a2` may earn a fit-scoped
+`continuum_claim` on `ContinuumFitResult` only; sealed transfer certificates
+stay `continuum_claim=False`.
 One `LatticeLinkField` is not an ensemble. GEVP / transfer-gap stay
 certificates. The Euclidean `G → ρ` step is a **named regularized inverse**
 of a finite Källén–Lehmann kernel; the only acceptance gate is planted-`ρ`
@@ -204,6 +212,21 @@ continuum mass-gap claim.
       heading_level: 3
 
 ::: omnibias.geometry.gauge._core.landau_gluon
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.geometry.gauge._core.ghost
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.geometry.gauge._core.continuum_fit
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.geometry.gauge._core.scale_setting
     options:
       show_root_heading: false
       heading_level: 3

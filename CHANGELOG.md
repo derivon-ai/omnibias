@@ -6,6 +6,34 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Path B operator completeness
+
+- Wilson-rectangle transform `wilson_loops_to_ensemble_table` plus
+  `static_potential_from_wilson`. New legal atoms: `V_r`, `t_wilson`,
+  `creutz_chi`, `L_lat`, `F_r`, `sigma_lat`. `ensemble_table_from_mc_dict`
+  now ingests `wilson_loops`.
+- Lattice scale setting: `sommer_r0` (`r² F(r) = 1.65`) and SU(2) Luscher
+  Wilson flow (`t0` / `w0` from `t² E(t)`). Not an `a→0` theorem.
+- `PiecewiseEnsembleDiscoverer` (partition else-if on `T_lat`),
+  `ensemble_field_law` (interpolant jet, not a jet of `A`),
+  `ImplicitSystemDiscoverer`, and `CoupledConfinementDiscoverer`.
+  `yang_mills_claim` stays false.
+
+### Added — Path B confinement primitives
+
+- `LatticeMetadata` on `EnsembleObservableTable` (`β`, `a`, shape, scheme,
+  `already_inverse`, `n_configs`). New legal atoms: `area`, `perimeter`,
+  `log_p2`, `inv_p2`, `ghost_G`, `log_ghost_G`, `T_lat`.
+- `NamedFamilyDiscoverer` / `JointLawDiscoverer` in `omnibias.symbolic`
+  (decoupling, Gribov–Stingl, area–perimeter, Lüscher; shared `σ`).
+- `gluon_propagator_ensemble` and Landau ghost `ghost_propagator_p2` /
+  `ghost_propagator_ensemble` (plane-wave Rayleigh; not Kugo–Ojima).
+- `SU3LatticeLinkField`, Cabibbo–Marinari `run_lattice_mc(gauge_group="su(3)")`
+  on 4⁴ smoke volumes, `finite_t_scan_table`.
+- `extrapolate_in_a2` / `ContinuumFitResult`: fit-earned `continuum_claim`
+  on a finite multi-spacing table. Sealed YM / transfer certificates stay
+  `continuum_claim=False`. `yang_mills_claim` stays false.
+
 ### Added — tighter Haar and three-plaquette G1
 
 - `su3_wilson_haar_coefficient` evaluates the CI irreps as one-argument

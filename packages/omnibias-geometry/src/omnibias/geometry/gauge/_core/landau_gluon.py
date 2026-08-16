@@ -12,15 +12,21 @@ is false for the 2-point itself.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
 from omnibias.geometry.gauge._core.data_paths import LatticeLinkField
 from omnibias.geometry.gauge._core.ensemble_language import (
     ENSEMBLE_G_P2,
+    ENSEMBLE_INV_P2,
+    ENSEMBLE_LOG_P2,
     ENSEMBLE_P2,
     EnsembleObservableTable,
+    LatticeMetadata,
+    refuse_single_config_as_ensemble,
 )
+from omnibias.geometry.gauge.lattice._core.stats import ensemble_mean_jackknife
 from omnibias.geometry.gauge.lattice._core.kernels import (
     algebra_from_links,
     gauge_transform_links,
@@ -203,13 +209,106 @@ def gluon_propagator_p2(
     denom = float(np.sqrt(np.mean(np.abs(dressing) ** 2))) + 1e-30
     transverse = float(np.sqrt(np.mean(contracted[mask]))) / denom if np.any(mask) else 0.0
     report["transverse_residual"] = transverse
+    p2_flat = np.asarray(p2[mask], dtype=np.float64).reshape(-1)
     table = EnsembleObservableTable(
         values={
-            ENSEMBLE_P2: np.asarray(p2[mask], dtype=np.float64).reshape(-1),
+            ENSEMBLE_P2: p2_flat,
             ENSEMBLE_G_P2: np.asarray(g_p2[mask], dtype=np.float64).reshape(-1),
+            ENSEMBLE_LOG_P2: np.log(np.maximum(p2_flat, 1e-30)),
+            ENSEMBLE_INV_P2: 1.0 / np.maximum(p2_flat, 1e-30),
         },
         source="landau_gluon",
+        metadata=LatticeMetadata(
+            lattice_shape=lattice,
+            scheme="landau",
+            n_configs=1,
+        ),
     )
+    return table, report
+
+
+def _bin_p2(p2: np.ndarray, values: np.ndarray, *, n_bins: int) -> tuple[np.ndarray, np.ndarray]:
+    p2 = np.asarray(p2, dtype=np.float64).reshape(-1)
+    values = np.asarray(values, dtype=np.float64).reshape(-1)
+    edges = np.linspace(float(p2.min()), float(p2.max()) + 1e-15, n_bins + 1)
+    centers = 0.5 * (edges[:-1] + edges[1:])
+    binned = np.full(n_bins, np.nan, dtype=np.float64)
+    for index in range(n_bins):
+        mask = (p2 >= edges[index]) & (p2 < edges[index + 1])
+        if index == n_bins - 1:
+            mask = (p2 >= edges[index]) & (p2 <= edges[index + 1])
+        if np.any(mask):
+            binned[index] = float(np.mean(values[mask]))
+    keep = np.isfinite(binned)
+    return centers[keep], binned[keep]
+
+
+def gluon_propagator_ensemble(
+    fields: Sequence[LatticeLinkField],
+    *,
+    already_fixed: bool = False,
+    n_steps: int = DEFAULT_LANDAU_STEPS,
+    omega: float = DEFAULT_LANDAU_OMEGA,
+    n_bins: int = 12,
+) -> tuple[EnsembleObservableTable, dict[str, Any]]:
+    """Jackknifed Landau ``G(p²)`` from two or more configurations.
+
+    One configuration is refused. Not a continuum gluon propagator.
+    """
+    if len(fields) < 2:
+        refuse_single_config_as_ensemble(fields[0] if fields else None)
+    per_config: list[tuple[np.ndarray, np.ndarray]] = []
+    residuals: list[float] = []
+    for field in fields:
+        table, report = gluon_propagator_p2(
+            field, already_fixed=already_fixed, n_steps=n_steps, omega=omega
+        )
+        per_config.append(
+            (
+                np.asarray(table.values[ENSEMBLE_P2], dtype=np.float64),
+                np.asarray(table.values[ENSEMBLE_G_P2], dtype=np.float64),
+            )
+        )
+        residuals.append(float(report.get("residual") or 0.0))
+    centers_ref, _ = _bin_p2(per_config[0][0], per_config[0][1], n_bins=n_bins)
+    stacked: list[np.ndarray] = []
+    for p2, green in per_config:
+        centers, binned = _bin_p2(p2, green, n_bins=n_bins)
+        if centers.shape != centers_ref.shape:
+            aligned = np.interp(centers_ref, centers, binned, left=np.nan, right=np.nan)
+            stacked.append(aligned)
+        else:
+            stacked.append(binned)
+    matrix = np.stack(stacked, axis=0)
+    means = np.zeros(centers_ref.shape[0], dtype=np.float64)
+    errs = np.zeros(centers_ref.shape[0], dtype=np.float64)
+    for col in range(centers_ref.shape[0]):
+        sample = [float(row[col]) for row in matrix if np.isfinite(row[col])]
+        means[col], errs[col] = ensemble_mean_jackknife(sample)
+    keep = np.isfinite(means)
+    p2_out = centers_ref[keep]
+    g_out = means[keep]
+    table = EnsembleObservableTable(
+        values={
+            ENSEMBLE_P2: p2_out,
+            ENSEMBLE_G_P2: g_out,
+            ENSEMBLE_LOG_P2: np.log(np.maximum(p2_out, 1e-30)),
+            ENSEMBLE_INV_P2: 1.0 / np.maximum(p2_out, 1e-30),
+        },
+        source="landau_gluon",
+        metadata=LatticeMetadata(
+            scheme="landau",
+            n_configs=len(fields),
+        ),
+    )
+    report = {
+        "n_configs": len(fields),
+        "g_err": errs[keep],
+        "residual_mean": float(np.mean(residuals)),
+        "yang_mills_claim": False,
+        "continuum_claim": False,
+        "ill_posed": False,
+    }
     return table, report
 
 
@@ -234,6 +333,7 @@ __all__ = [
     "LANDAU_RESIDUAL_ATOL",
     "LANDAU_TRANSVERSE_ATOL",
     "gauge_transform_numpy",
+    "gluon_propagator_ensemble",
     "gluon_propagator_p2",
     "landau_gauge_fix",
     "landau_gauge_overrelax_sequential",
