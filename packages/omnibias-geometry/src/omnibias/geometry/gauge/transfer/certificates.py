@@ -41,10 +41,13 @@ from omnibias.geometry.gauge.transfer.strong_coupling import (
     CRUDE_POLYMER_METHOD,
     POLYMER_BETA_DOMAIN_METHOD,
     POLYMER_METHOD,
+    WILSON_CHARACTER_BETA_DOMAIN_METHOD,
     PolymerDomainResult,
     StrongCouplingGapResult,
+    WilsonCharacterDomainResult,
     certified_polymer_beta_domain,
     certified_strong_coupling_glueball_bound,
+    certified_wilson_character_beta_domain,
 )
 
 #: Schema version of the sealed transfer-matrix gap certificate.
@@ -859,6 +862,170 @@ def replay_strip_rp(cert: Certificate) -> bool | None:
     return True
 
 
+WILSON_CHARACTER_DOMAIN_SCHEMA_VERSION = "verified-wilson-character-beta-domain-1"
+WILSON_CHARACTER_DOMAIN_KIND = "wilson_character_beta_domain"
+
+_WILSON_CHARACTER_DOMAIN_NOTE = (
+    "0+1-D infinite character-basis Wilson gap on a locked beta grid "
+    "that includes the polymer two-scale failure 1/4; NOT 4-D Yang-Mills, "
+    "NOT a physical critical coupling, NOT a continuum-limit, "
+    "infinite-volume, or mass-gap claim"
+)
+
+
+def seal_wilson_character_domain_certificate(
+    result: WilsonCharacterDomainResult,
+    *,
+    claim: str = "",
+) -> Certificate:
+    """Seal a certified Wilson-character domain.  Refuses an uncertified result."""
+    if not result.certified:
+        raise ValueError(
+            "refusing to seal an uncertified Wilson-character domain "
+            "(1/4 must certify, and at least one strictly larger grid point)"
+        )
+    certified_pair = _fraction_pair(result.beta_certified)
+    if certified_pair is None:
+        raise ValueError("beta_certified must be a Fraction")
+    outside_pair = (
+        None if result.beta_outside is None else _fraction_pair(result.beta_outside)
+    )
+    if result.beta_outside is not None and outside_pair is None:
+        raise ValueError("beta_outside must be a Fraction when the grid is not exhausted")
+    return seal_certificate(
+        {
+            "schema_version": WILSON_CHARACTER_DOMAIN_SCHEMA_VERSION,
+            "claim": claim or "SU(2) Wilson character beta-domain",
+            "observable": WILSON_CHARACTER_DOMAIN_KIND,
+            "model": "su2_wilson_character_domain",
+            "method": result.method,
+            "grid": [_fraction_pair(item) for item in result.grid],
+            "beta_certified": certified_pair,
+            "beta_outside": outside_pair,
+            "grid_exhausted": bool(result.grid_exhausted),
+            "quarter_certified": bool(result.quarter_certified),
+            "subdominant_ratio_upper": float(result.certified_result.subdominant_ratio_upper),
+            "spectral_gap_lower": float(result.certified_result.spectral_gap_lower),
+            "continuum_claim": False,
+            "honesty": {
+                "unproven_claim": False,
+                "continuum_claim": False,
+                "fixed_spacing": True,
+                "finite_truncation": True,
+                "interval_verified": True,
+                "yang_mills_claim": False,
+                "note": _WILSON_CHARACTER_DOMAIN_NOTE,
+            },
+        }
+    )
+
+
+def wilson_character_domain_schema_errors(cert: Certificate) -> list[str]:
+    """Validate a ``verified-wilson-character-beta-domain-1`` certificate."""
+    errors: list[str] = []
+    required = (
+        "schema_version",
+        "observable",
+        "model",
+        "method",
+        "grid",
+        "beta_certified",
+        "beta_outside",
+        "grid_exhausted",
+        "quarter_certified",
+        "subdominant_ratio_upper",
+        "spectral_gap_lower",
+        "continuum_claim",
+        "honesty",
+        "digest",
+    )
+    for key in required:
+        if key not in cert:
+            errors.append(f"missing top-level key: {key!r}")
+    if cert.get("schema_version") != WILSON_CHARACTER_DOMAIN_SCHEMA_VERSION:
+        errors.append(f"schema_version must be {WILSON_CHARACTER_DOMAIN_SCHEMA_VERSION!r}")
+    if cert.get("observable") != WILSON_CHARACTER_DOMAIN_KIND:
+        errors.append(f"observable must be {WILSON_CHARACTER_DOMAIN_KIND!r}")
+    if cert.get("continuum_claim", True):
+        errors.append("continuum_claim must be False")
+    if cert.get("method") != WILSON_CHARACTER_BETA_DOMAIN_METHOD:
+        errors.append(f"method must be {WILSON_CHARACTER_BETA_DOMAIN_METHOD!r}")
+    if cert.get("quarter_certified") is not True:
+        errors.append("quarter_certified must be True")
+    honesty = cert.get("honesty", {})
+    if not isinstance(honesty, Mapping):
+        errors.append("honesty must be a mapping")
+        honesty = {}
+    if honesty.get("unproven_claim", True):
+        errors.append("honesty.unproven_claim must be False")
+    if honesty.get("continuum_claim", True):
+        errors.append("honesty.continuum_claim must be False")
+    if honesty.get("yang_mills_claim", True):
+        errors.append("honesty.yang_mills_claim must be False")
+    beta_star = _as_fraction(cert.get("beta_certified"))
+    if beta_star is None:
+        errors.append("beta_certified must be a Fraction pair")
+    exhausted = cert.get("grid_exhausted")
+    if exhausted is True:
+        if cert.get("beta_outside") is not None:
+            errors.append("beta_outside must be null when grid_exhausted is True")
+    elif exhausted is False:
+        beta_out = _as_fraction(cert.get("beta_outside"))
+        if beta_star is None or beta_out is None or not (beta_star < beta_out):
+            errors.append(
+                "beta_certified must be a Fraction pair strictly below beta_outside"
+            )
+    else:
+        errors.append("grid_exhausted must be a bool")
+    ratio = _as_float(cert.get("subdominant_ratio_upper"))
+    if ratio is None or not 0.0 <= ratio < 1.0:
+        errors.append("subdominant_ratio_upper must lie in [0, 1)")
+    gap = _as_float(cert.get("spectral_gap_lower"))
+    if gap is None or gap <= 0.0:
+        errors.append("spectral_gap_lower must be > 0")
+    if "digest" in cert and not verify_certificate_digest(cert):
+        errors.append("digest does not match the certificate body (tampered/stale)")
+    return errors
+
+
+def replay_wilson_character_domain(cert: Certificate) -> bool | None:
+    """Independently re-derive the Wilson-character domain from the recorded grid."""
+    raw_grid = cert.get("grid")
+    if not isinstance(raw_grid, list) or len(raw_grid) < 2:
+        return None
+    grid = []
+    for item in raw_grid:
+        parsed = _as_fraction(item)
+        if parsed is None:
+            return False
+        grid.append(parsed)
+    try:
+        fresh = certified_wilson_character_beta_domain(grid=grid)
+    except (ValueError, TypeError):
+        return False
+    if not fresh.certified:
+        return False
+    sealed_star = _as_fraction(cert.get("beta_certified"))
+    if sealed_star is None or sealed_star > fresh.beta_certified:
+        return False
+    if cert.get("quarter_certified") is True and not fresh.quarter_certified:
+        return False
+    if cert.get("grid_exhausted") is True and not fresh.grid_exhausted:
+        return False
+    if fresh.beta_outside is not None:
+        sealed_out = _as_fraction(cert.get("beta_outside"))
+        if sealed_star == fresh.beta_certified and sealed_out != fresh.beta_outside:
+            return False
+    sealed_ratio = _as_float(cert.get("subdominant_ratio_upper"))
+    sealed_gap = _as_float(cert.get("spectral_gap_lower"))
+    if sealed_ratio is None or sealed_gap is None:
+        return False
+    tolerance = 1e-9
+    if sealed_ratio < fresh.certified_result.subdominant_ratio_upper - tolerance:
+        return False
+    return not sealed_gap > fresh.certified_result.spectral_gap_lower + tolerance
+
+
 FINITE_GAUGE_REPORT_SCHEMA_VERSION = "verified-finite-gauge-report-1"
 FINITE_GAUGE_REPORT_KIND = "finite_gauge_report"
 
@@ -903,6 +1070,21 @@ def seal_finite_gauge_report_certificate(
                 int(result.polymer_domain.beta_outside.numerator),
                 int(result.polymer_domain.beta_outside.denominator),
             ],
+            "wilson_domain_beta_certified": [
+                int(result.wilson_character_domain.beta_certified.numerator),
+                int(result.wilson_character_domain.beta_certified.denominator),
+            ],
+            "wilson_domain_beta_outside": (
+                None
+                if result.wilson_character_domain.beta_outside is None
+                else [
+                    int(result.wilson_character_domain.beta_outside.numerator),
+                    int(result.wilson_character_domain.beta_outside.denominator),
+                ]
+            ),
+            "wilson_domain_grid_exhausted": bool(
+                result.wilson_character_domain.grid_exhausted
+            ),
             "haar_weyl_prefactor_24": result.haar.weyl_prefactor_24,
             "haar_su3_dim_3_0": result.haar.su3_dim_3_0,
             "su3_dimension": int(result.su3_gap.dimension),
@@ -941,6 +1123,9 @@ def finite_gauge_report_schema_errors(cert: Certificate) -> list[str]:
         "wilson_gap",
         "domain_beta_certified",
         "domain_beta_outside",
+        "wilson_domain_beta_certified",
+        "wilson_domain_beta_outside",
+        "wilson_domain_grid_exhausted",
         "haar_weyl_prefactor_24",
         "haar_su3_dim_3_0",
         "su3_dimension",
@@ -989,8 +1174,8 @@ def finite_gauge_report_schema_errors(cert: Certificate) -> list[str]:
         if value is None or value <= 0.0:
             errors.append(f"{key} must be > 0")
     su3_gap = _as_float(cert.get("su3_gap"))
-    if su3_gap is None or su3_gap < 0.0:
-        errors.append("su3_gap must be a non-negative float")
+    if su3_gap is None or su3_gap <= 0.0:
+        errors.append("su3_gap must be > 0")
     su3_dim = cert.get("su3_dimension")
     if not isinstance(su3_dim, int) or isinstance(su3_dim, bool) or su3_dim < 4:
         errors.append("su3_dimension must be an integer >= 4")
@@ -1010,6 +1195,20 @@ def finite_gauge_report_schema_errors(cert: Certificate) -> list[str]:
     outside = _as_fraction(cert.get("domain_beta_outside"))
     if star is None or outside is None or not (star < outside):
         errors.append("domain_beta_certified must be a Fraction pair strictly below domain_beta_outside")
+    wilson_star = _as_fraction(cert.get("wilson_domain_beta_certified"))
+    if wilson_star is None:
+        errors.append("wilson_domain_beta_certified must be a Fraction pair")
+    if cert.get("wilson_domain_grid_exhausted") is True:
+        if cert.get("wilson_domain_beta_outside") is not None:
+            errors.append("wilson_domain_beta_outside must be null when the Wilson grid is exhausted")
+    elif cert.get("wilson_domain_grid_exhausted") is False:
+        wilson_out = _as_fraction(cert.get("wilson_domain_beta_outside"))
+        if wilson_star is None or wilson_out is None or not (wilson_star < wilson_out):
+            errors.append(
+                "wilson_domain_beta_certified must sit strictly below wilson_domain_beta_outside"
+            )
+    else:
+        errors.append("wilson_domain_grid_exhausted must be a bool")
     if "digest" in cert and not verify_certificate_digest(cert):
         errors.append("digest does not match the certificate body (tampered/stale)")
     return errors
@@ -1061,6 +1260,9 @@ def replay_finite_gauge_report(cert: Certificate) -> bool | None:
     sealed_star = _as_fraction(cert.get("domain_beta_certified"))
     if sealed_star is None or sealed_star > fresh.polymer_domain.beta_certified:
         return False
+    wilson_star = _as_fraction(cert.get("wilson_domain_beta_certified"))
+    if wilson_star is None or wilson_star > fresh.wilson_character_domain.beta_certified:
+        return False
     if cert.get("g1_ge_generic") is True and not fresh.g1.ge_generic:
         return False
     if cert.get("haar_weyl_prefactor_24") is True and not fresh.haar.weyl_prefactor_24:
@@ -1086,6 +1288,8 @@ __all__ = [
     "STRONG_COUPLING_SCHEMA_VERSION",
     "TRANSFER_GAP_KIND",
     "TRANSFER_GAP_SCHEMA_VERSION",
+    "WILSON_CHARACTER_DOMAIN_KIND",
+    "WILSON_CHARACTER_DOMAIN_SCHEMA_VERSION",
     "finite_gauge_report_schema_errors",
     "hamiltonian_gap_schema_errors",
     "polymer_domain_schema_errors",
@@ -1095,13 +1299,16 @@ __all__ = [
     "replay_strong_coupling_gap",
     "replay_strip_rp",
     "replay_transfer_matrix_gap",
+    "replay_wilson_character_domain",
     "seal_finite_gauge_report_certificate",
     "seal_hamiltonian_gap_certificate",
     "seal_polymer_domain_certificate",
     "seal_strong_coupling_certificate",
     "seal_strip_rp_certificate",
     "seal_transfer_gap_certificate",
+    "seal_wilson_character_domain_certificate",
     "strip_rp_schema_errors",
     "strong_coupling_schema_errors",
     "transfer_gap_schema_errors",
+    "wilson_character_domain_schema_errors",
 ]

@@ -146,6 +146,7 @@ transfer-matrix prover lives in its own registry rather than the default machine
 | `strip_reflection_positivity` | `certified_strip_reflection_positivity` (RP on one strip transfer) | No — a negative quadratic-form lower end → `BLOCKED` |
 | `torus_reflection_positivity` | `certified_strip_reflection_positivity` (RP on one 2×2 torus transfer) | No — a negative quadratic-form lower end → `BLOCKED` |
 | `polymer_beta_domain` | `certified_polymer_beta_domain` (majorant domain on a locked dyadic `β` grid) | No — no certifying point or no larger failure → `BLOCKED` |
+| `wilson_character_beta_domain` | `certified_wilson_character_beta_domain` (Wilson character gap on a grid past the polymer cutoff) | No — `1/4` or a larger point fails → `BLOCKED` |
 | `finite_gauge_report` | `finite_gauge_report` (sealed bundle of the existing finite engines) | No — a required engine fails → `BLOCKED` |
 
 ```python
@@ -162,6 +163,7 @@ assert sorted(gauge.kinds()) == [
     "torus_reflection_positivity",
     "transfer_matrix_spectral_gap",
     "two_plaquette_hamiltonian_gap",
+    "wilson_character_beta_domain",
 ]
 
 verdict = gauge.evaluate(

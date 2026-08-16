@@ -18,6 +18,7 @@ kind                                  prover
 ``strip_reflection_positivity``       :func:`omnibias.geometry.gauge.transfer.strip.certified_strip_reflection_positivity`
 ``torus_reflection_positivity``       :func:`omnibias.geometry.gauge.transfer.strip.certified_strip_reflection_positivity`
 ``polymer_beta_domain``               :func:`omnibias.geometry.gauge.transfer.certified_polymer_beta_domain`
+``wilson_character_beta_domain``      :func:`omnibias.geometry.gauge.transfer.certified_wilson_character_beta_domain`
 ``finite_gauge_report``               :func:`omnibias.geometry.gauge.transfer.finite_gauge_report`
 ====================================  ====================================================
 
@@ -59,6 +60,7 @@ from omnibias.geometry.gauge.transfer.certificates import (
     THREE_PLAQUETTE_GAP_KIND,
     TORUS_RP_KIND,
     TRANSFER_GAP_KIND,
+    WILSON_CHARACTER_DOMAIN_KIND,
     finite_gauge_report_schema_errors,
     hamiltonian_gap_schema_errors,
     polymer_domain_schema_errors,
@@ -68,21 +70,25 @@ from omnibias.geometry.gauge.transfer.certificates import (
     replay_strip_rp,
     replay_strong_coupling_gap,
     replay_transfer_matrix_gap,
+    replay_wilson_character_domain,
     seal_finite_gauge_report_certificate,
     seal_hamiltonian_gap_certificate,
     seal_polymer_domain_certificate,
     seal_strip_rp_certificate,
     seal_strong_coupling_certificate,
     seal_transfer_gap_certificate,
+    seal_wilson_character_domain_certificate,
     strip_rp_schema_errors,
     strong_coupling_schema_errors,
     transfer_gap_schema_errors,
+    wilson_character_domain_schema_errors,
 )
 from omnibias.geometry.gauge.transfer.gap import certified_transfer_matrix_gap
 from omnibias.geometry.gauge.transfer.matrices import rebuild
 from omnibias.geometry.gauge.transfer.strong_coupling import (
     certified_polymer_beta_domain,
     certified_strong_coupling_glueball_bound,
+    certified_wilson_character_beta_domain,
 )
 
 
@@ -397,6 +403,38 @@ def _prove_polymer_domain(conjecture: Conjecture) -> ProofAttempt:
     return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
 
 
+def _prove_wilson_character_domain(conjecture: Conjecture) -> ProofAttempt:
+    """Certify the Wilson-character gap on the locked grid past the polymer cutoff."""
+    data: Mapping[str, Any] = conjecture.data
+    raw_grid = data.get("grid")
+    kwargs: dict[str, object] = {}
+    if raw_grid is not None:
+        if not isinstance(raw_grid, list | tuple) or isinstance(raw_grid, str | bytes):
+            return _blocked("grid must be a sequence of positive betas")
+        try:
+            kwargs["grid"] = tuple(Fraction(item) for item in raw_grid)
+        except (TypeError, ValueError) as exc:
+            return _blocked(f"could not parse Wilson-character grid: {exc}")
+    try:
+        result = certified_wilson_character_beta_domain(**kwargs)  # type: ignore[arg-type]
+    except (ValueError, TypeError) as exc:
+        return _blocked(f"could not certify a Wilson-character domain: {exc}")
+    if not result.certified:
+        return _blocked(
+            "Wilson character domain is not certified at 1/4 and a larger grid point"
+        )
+    sealed = seal_wilson_character_domain_certificate(result, claim=conjecture.name)
+    detail = (
+        f"su2_wilson_character_domain: certified at {result.beta_certified}"
+        + (
+            ", grid exhausted"
+            if result.grid_exhausted
+            else f", fails at {result.beta_outside}"
+        )
+    )
+    return ProofAttempt(status="PROVED", certificate=sealed, detail=detail)
+
+
 def _prove_finite_gauge_report(conjecture: Conjecture) -> ProofAttempt:
     """Run the named finite-gauge pack and seal the bundle."""
     from omnibias.geometry.gauge.transfer.report import (
@@ -476,6 +514,13 @@ def gauge_provers() -> list[FunctionProver]:
             replay_fn=replay_polymer_domain,
         ),
         FunctionProver(
+            name="wilson_character_beta_domain",
+            kinds=frozenset({WILSON_CHARACTER_DOMAIN_KIND}),
+            prove_fn=_prove_wilson_character_domain,
+            schema_fn=wilson_character_domain_schema_errors,
+            replay_fn=replay_wilson_character_domain,
+        ),
+        FunctionProver(
             name="finite_gauge_report",
             kinds=frozenset({FINITE_GAUGE_REPORT_KIND}),
             prove_fn=_prove_finite_gauge_report,
@@ -502,6 +547,7 @@ __all__ = [
     "TORUS_RP_KIND",
     "THREE_PLAQUETTE_GAP_KIND",
     "TRANSFER_GAP_KIND",
+    "WILSON_CHARACTER_DOMAIN_KIND",
     "build_gauge_machine",
     "gauge_provers",
 ]

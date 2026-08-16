@@ -372,7 +372,7 @@ continuum limit or a claim about the Yang-Mills mass gap.
 | `su2_class_angle_transfer` | `angle` | the same `su(2)` spectrum, in a **dense, entrywise-positive** basis that can be sampled |
 | `su3_heat_kernel_transfer` | `character` | `e^{-t C₂(p,q)}`; the conjugate pair `(p,q) ↔ (q,p)` makes the subdominant mode doubly degenerate |
 | `su2_wilson_transfer` | `character` | `I_m(β)` via `besseli_iv`; the slowly-decaying tail the partner-chain deflation exists for |
-| `su3_wilson_transfer` | `character` | Midpoint-plus-Lipschitz Haar enclosures of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤3` truncation, not a product of ordinary `I_n` |
+| `su3_wilson_transfer` | `character` | Cellwise interval-range Haar enclosures of the Wilson character coefficients on the SU(3) torus; the matrix **is** the `(p,q)≤3` truncation, not a product of ordinary `I_n` |
 
 Heat-kernel and SU(2) Wilson spectra are known in closed form, so a certified
 bound can be checked against the exact answer. SU(3) Wilson eigenvalues are
@@ -630,19 +630,30 @@ certifying grid point and the next grid failure. That is the
 **majorant's** domain on that grid, not a physical critical coupling
 and not `a -> 0`.
 
+`certified_wilson_character_beta_domain` evaluates the infinite
+character-basis Wilson gap on a wider locked grid
+(`1/4, 1/2, 1, 2, 4`). It certifies at `1/4`, where the 4-D polymer
+two-scale majorant already fails, and at larger points. That is a
+0+1-D character-transfer statement on those points, not a physical
+critical coupling and not 4-D Yang-Mills.
+
 `finite_gauge_report` runs the existing engines on one named spec
-(polymer plus cluster, the β-domain, the Wilson character gap, Haar
-identities, a small SU(3) Haar transfer so the quadrature runs, the
-two-plaquette Hamiltonian with a measured G1 factor, strip reflection
-positivity, and a three-point heat-kernel scaling table). A positive
-SU(3) gap is not required at CI `n_cells`: the Lipschitz remainder is
-too wide. The bundle is still a list of finite statements.
-`continuum_claim` and `yang_mills_claim` stay false. It is not a
-staircase to Clay existence.
+(polymer plus cluster, the β-domain, the Wilson character gap and its
+domain, Haar identities, a cellwise SU(3) Haar transfer whose gap is
+required, the two-plaquette Hamiltonian with a measured G1 factor,
+strip reflection positivity, and a three-point heat-kernel scaling
+table). The report locks `n_cells=32`, the smallest of `{16, 32}` that
+certifies a positive SU(3) gap after cellwise Haar. The bundle is
+still a list of finite statements. `continuum_claim` and
+`yang_mills_claim` stay false. It is not a staircase to Clay
+existence.
 
 ```python
+from fractions import Fraction
+
 from omnibias.geometry.gauge.transfer import (
     certified_polymer_beta_domain,
+    certified_wilson_character_beta_domain,
     finite_gauge_report,
 )
 
@@ -651,6 +662,12 @@ assert domain.certified
 assert domain.beta_certified < domain.beta_outside
 assert domain.continuum_claim is False
 
+wilson_domain = certified_wilson_character_beta_domain()
+assert wilson_domain.certified
+assert wilson_domain.quarter_certified
+assert wilson_domain.beta_certified > Fraction(1, 4)
+assert wilson_domain.continuum_claim is False
+
 pack = finite_gauge_report()
 assert pack.certified
 assert pack.continuum_claim is False
@@ -658,4 +675,6 @@ assert pack.yang_mills_claim is False
 assert pack.g1.ge_generic
 assert pack.g1.factor + 1e-12 >= 1.0
 assert pack.haar.certified
+assert pack.su3_gap.certified
+assert pack.wilson_character_domain.certified
 ```

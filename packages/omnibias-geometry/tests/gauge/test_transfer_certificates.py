@@ -33,6 +33,7 @@ from omnibias.geometry.gauge.transfer.certificates import (
     TORUS_RP_KIND,
     TRANSFER_GAP_KIND,
     TRANSFER_GAP_SCHEMA_VERSION,
+    WILSON_CHARACTER_DOMAIN_KIND,
     replay_transfer_matrix_gap,
     seal_transfer_gap_certificate,
     transfer_gap_schema_errors,
@@ -75,6 +76,7 @@ def test_the_gauge_machine_registers_exactly_the_expected_kinds(
         TORUS_RP_KIND,
         TRANSFER_GAP_KIND,
         HAMILTONIAN_GAP_KIND,
+        WILSON_CHARACTER_DOMAIN_KIND,
     ]
     assert [p.name for p in gauge_provers()] == [
         "transfer_matrix_spectral_gap",
@@ -84,6 +86,7 @@ def test_the_gauge_machine_registers_exactly_the_expected_kinds(
         "strip_reflection_positivity",
         "torus_reflection_positivity",
         "polymer_beta_domain",
+        "wilson_character_beta_domain",
         "finite_gauge_report",
     ]
 

@@ -65,6 +65,23 @@ POLYMER_BETA_GRID: tuple[Fraction, ...] = tuple(Fraction(k, 32) for k in range(1
 #: Method tag for the majorant domain on :data:`POLYMER_BETA_GRID`.
 POLYMER_BETA_DOMAIN_METHOD = "polymer_beta_domain_grid"
 
+#: Wider locked grid for the infinite character-basis Wilson gap.
+#: Starts at the polymer two-scale failure ``1/4`` and continues past
+#: :data:`POLYMER_BETA_GRID` (which stops at ``1/2``).
+WILSON_CHARACTER_BETA_GRID: tuple[Fraction, ...] = (
+    Fraction(1, 4),
+    Fraction(1, 2),
+    Fraction(1),
+    Fraction(2),
+    Fraction(4),
+)
+
+#: Method tag for the Wilson-character domain on :data:`WILSON_CHARACTER_BETA_GRID`.
+WILSON_CHARACTER_BETA_DOMAIN_METHOD = "wilson_character_beta_domain_grid"
+
+#: Polymer two-scale failure used as the Wilson-domain contrast point.
+WILSON_CHARACTER_CONTRAST_BETA = Fraction(1, 4)
+
 
 def polymer_coordination(spacetime_dim: int) -> int:
     """Locked surface-counting majorant ``C = 8(d - 1)``.
@@ -476,6 +493,106 @@ def certified_polymer_beta_domain(
     )
 
 
+@dataclass(frozen=True)
+class WilsonCharacterDomainResult:
+    """Wilson-character gap on a locked ``β`` grid wider than the polymer cutoff.
+
+    ``beta_certified`` is the largest certifying grid point.
+    ``beta_outside`` is ``None`` and ``grid_exhausted`` is ``True`` when
+    every grid point certifies (the typical case: ``I₂/I₁ < 1`` at every
+    finite ``β`` with a tight Bessel enclosure).  If a large-``β``
+    enclosure ever has ``activity.hi >= 1``, that failure is recorded
+    the same way as the polymer domain.
+
+    This is the 0+1-D infinite character transfer on this grid.  It is
+    not 4-D Yang-Mills and not a physical critical coupling.
+    """
+
+    grid: tuple[Fraction, ...]
+    beta_certified: Fraction
+    beta_outside: Fraction | None
+    grid_exhausted: bool
+    quarter_certified: bool
+    certified_result: WilsonCharacterGapResult
+    outside_result: WilsonCharacterGapResult | None
+    method: str = WILSON_CHARACTER_BETA_DOMAIN_METHOD
+    continuum_claim: bool = False
+    yang_mills_claim: bool = False
+
+    @property
+    def certified(self) -> bool:
+        exhausted_ok = self.grid_exhausted and self.beta_outside is None
+        failure_ok = (
+            not self.grid_exhausted
+            and self.beta_outside is not None
+            and self.outside_result is not None
+            and not self.outside_result.certified
+            and self.beta_certified < self.beta_outside
+        )
+        return (
+            self.certified_result.certified
+            and self.quarter_certified
+            and self.beta_certified > WILSON_CHARACTER_CONTRAST_BETA
+            and (exhausted_ok or failure_ok)
+            and self.continuum_claim is False
+            and self.yang_mills_claim is False
+        )
+
+
+def certified_wilson_character_beta_domain(
+    *,
+    grid: Sequence[Fraction] | None = None,
+) -> WilsonCharacterDomainResult:
+    """Largest certifying Wilson-character ``β`` on a grid past the polymer cutoff.
+
+    The locked grid includes ``1/4``, where the 4-D polymer two-scale
+    majorant already fails, and continues to ``4``.  ``certified=True``
+    only when Wilson certifies at ``1/4`` and at least one strictly
+    larger grid point.  Bessel monotonicity is not promoted to a
+    continuum interval of ``β``.
+    """
+    points = tuple(
+        Fraction(item) for item in (grid if grid is not None else WILSON_CHARACTER_BETA_GRID)
+    )
+    if len(points) < 2:
+        raise ValueError("grid must contain at least two positive betas")
+    if any(item <= 0 for item in points):
+        raise ValueError("grid betas must be > 0")
+    ordered = tuple(sorted(points))
+    if len(set(ordered)) != len(ordered):
+        raise ValueError("grid betas must be unique")
+    if WILSON_CHARACTER_CONTRAST_BETA not in ordered:
+        raise ValueError(
+            "grid must include 1/4 (the polymer two-scale failure used as contrast)"
+        )
+    evaluated: list[tuple[Fraction, WilsonCharacterGapResult]] = []
+    for beta in ordered:
+        evaluated.append((beta, certified_wilson_character_gap(beta)))
+    certified_points = [item for item in evaluated if item[1].certified]
+    if not certified_points:
+        raise ValueError("no grid point interval-certifies the Wilson character gap")
+    beta_star, star_result = max(certified_points, key=lambda item: item[0])
+    failures = [item for item in evaluated if item[0] > beta_star and not item[1].certified]
+    if failures:
+        beta_out, out_result = min(failures, key=lambda item: item[0])
+        exhausted = False
+    else:
+        beta_out, out_result = None, None
+        exhausted = True
+    quarter_certified = any(
+        item[0] == WILSON_CHARACTER_CONTRAST_BETA and item[1].certified for item in evaluated
+    )
+    return WilsonCharacterDomainResult(
+        grid=ordered,
+        beta_certified=beta_star,
+        beta_outside=beta_out,
+        grid_exhausted=exhausted,
+        quarter_certified=quarter_certified,
+        certified_result=star_result,
+        outside_result=out_result,
+    )
+
+
 __all__ = [
     "BACKTRACK_POLYMER_METHOD",
     "BETA_LOCK",
@@ -485,12 +602,17 @@ __all__ = [
     "POLYMER_BETA_DOMAIN_METHOD",
     "POLYMER_BETA_GRID",
     "POLYMER_METHOD",
+    "WILSON_CHARACTER_BETA_DOMAIN_METHOD",
+    "WILSON_CHARACTER_BETA_GRID",
+    "WILSON_CHARACTER_CONTRAST_BETA",
     "WILSON_CHARACTER_METHOD",
     "PolymerDomainResult",
     "StrongCouplingGapResult",
+    "WilsonCharacterDomainResult",
     "WilsonCharacterGapResult",
     "certified_polymer_beta_domain",
     "certified_strong_coupling_glueball_bound",
+    "certified_wilson_character_beta_domain",
     "certified_wilson_character_gap",
     "polymer_coordination",
     "polymer_coordination_backtrack",

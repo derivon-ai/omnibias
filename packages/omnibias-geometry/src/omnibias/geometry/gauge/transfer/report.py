@@ -52,9 +52,11 @@ from omnibias.geometry.gauge.transfer.strong_coupling import (
     BETA_LOCK,
     PolymerDomainResult,
     StrongCouplingGapResult,
+    WilsonCharacterDomainResult,
     WilsonCharacterGapResult,
     certified_polymer_beta_domain,
     certified_strong_coupling_glueball_bound,
+    certified_wilson_character_beta_domain,
     certified_wilson_character_gap,
 )
 from omnibias.geometry.gauge.transfer.su3_wilson import su3_dimension
@@ -62,10 +64,19 @@ from omnibias.geometry.gauge.transfer.su3_wilson import su3_dimension
 DEFAULT_SCALING_SPACINGS: tuple[float, ...] = (1.0, 0.5, 0.25)
 DEFAULT_SCALING_COUPLINGS: tuple[float, ...] = (0.8, 0.4, 0.2)
 
+#: Smallest ``n_cells`` in ``{16, 32}`` at which cellwise Haar certifies
+#: a positive SU(3) gap for ``max_dynkin=1``, ``β=1``.  ``8`` stays too wide.
+REPORT_SU3_N_CELLS = 32
+
 
 @dataclass(frozen=True)
 class FiniteGaugeSpec:
-    """Locked CI-cheap pack naming the engines a report will run."""
+    """Locked CI-cheap pack naming the engines a report will run.
+
+    ``su3_n_cells`` defaults to :data:`REPORT_SU3_N_CELLS` (32), the
+    smallest of ``{16, 32}`` at which cellwise Haar certifies a positive
+    SU(3) gap.  The irrep truncation stays ``max_dynkin=1``.
+    """
 
     name: str = "su2_finite_gauge_pack"
     include_torus: bool = False
@@ -75,7 +86,7 @@ class FiniteGaugeSpec:
     strip_n_sites: int = 2
     strip_n_angles: int = 4
     su3_max_dynkin: int = 1
-    su3_n_cells: int = 8
+    su3_n_cells: int = REPORT_SU3_N_CELLS
     su3_beta: float = 1.0
     scaling_spacings: tuple[float, ...] = DEFAULT_SCALING_SPACINGS
     scaling_couplings: tuple[float, ...] = DEFAULT_SCALING_COUPLINGS
@@ -122,6 +133,7 @@ class FiniteGaugeReport:
     polymer: tuple[StrongCouplingGapResult, ...]
     polymer_domain: PolymerDomainResult
     wilson_character: WilsonCharacterGapResult
+    wilson_character_domain: WilsonCharacterDomainResult
     haar: HaarIdentityCheck
     su3_gap: TransferGapResult
     hamiltonian: HamiltonianGapResult
@@ -145,7 +157,9 @@ class FiniteGaugeReport:
             all(item.certified for item in self.polymer)
             and self.polymer_domain.certified
             and self.wilson_character.certified
+            and self.wilson_character_domain.certified
             and self.haar.certified
+            and self.su3_gap.certified
             and self.su3_gap.dimension >= 4
             and self.hamiltonian.certified
             and self.g1.ge_generic
@@ -214,7 +228,9 @@ def finite_gauge_spec_from_mapping(data: Mapping[str, Any] | None) -> FiniteGaug
         strip_n_sites=_require_int(data.get("strip_n_sites", 2), "strip_n_sites", 2),
         strip_n_angles=_require_int(data.get("strip_n_angles", 4), "strip_n_angles", 2),
         su3_max_dynkin=_require_int(data.get("su3_max_dynkin", 1), "su3_max_dynkin", 1),
-        su3_n_cells=_require_int(data.get("su3_n_cells", 8), "su3_n_cells", 2),
+        su3_n_cells=_require_int(
+            data.get("su3_n_cells", REPORT_SU3_N_CELLS), "su3_n_cells", 2
+        ),
         su3_beta=float(data.get("su3_beta", 1.0)),
         scaling_spacings=tuple(float(item) for item in spacings),
         scaling_couplings=tuple(float(item) for item in couplings),
@@ -269,6 +285,7 @@ def finite_gauge_report(spec: FiniteGaugeSpec | None = None) -> FiniteGaugeRepor
         counting=locked.polymer_countings[0]  # type: ignore[arg-type]
     )
     wilson = certified_wilson_character_gap(locked.polymer_beta)
+    wilson_domain = certified_wilson_character_beta_domain()
     haar = _haar_identities()
     su3 = su3_wilson_transfer(
         locked.su3_beta,
@@ -303,6 +320,7 @@ def finite_gauge_report(spec: FiniteGaugeSpec | None = None) -> FiniteGaugeRepor
         polymer=polymer,
         polymer_domain=domain,
         wilson_character=wilson,
+        wilson_character_domain=wilson_domain,
         haar=haar,
         su3_gap=su3_gap,
         hamiltonian=ham_gap,
@@ -316,6 +334,7 @@ def finite_gauge_report(spec: FiniteGaugeSpec | None = None) -> FiniteGaugeRepor
 __all__ = [
     "DEFAULT_SCALING_COUPLINGS",
     "DEFAULT_SCALING_SPACINGS",
+    "REPORT_SU3_N_CELLS",
     "FiniteGaugeReport",
     "FiniteGaugeSpec",
     "HaarIdentityCheck",

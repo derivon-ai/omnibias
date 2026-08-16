@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.gauge_finite_report.v1",
-  "generated_utc": "2026-08-16T07:30:48Z",
+  "generated_utc": "2026-08-16T07:46:32Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,7 +15,7 @@
     "name": "su2_finite_gauge_pack",
     "include_torus": false
   },
-  "rss_mb_at_start": 780.36,
+  "rss_mb_at_start": 780.31,
   "g1": {
     "factor": 1.0,
     "ge_generic": true,
@@ -36,6 +36,22 @@
       4
     ],
     "counting": "two_scale"
+  },
+  "su3_gap": {
+    "certified": true,
+    "spectral_gap_lower": 0.15106183678697574,
+    "dimension": 4,
+    "n_cells": 32,
+    "method": "diagonal_interval_spectrum"
+  },
+  "wilson_domain": {
+    "beta_certified": [
+      4,
+      1
+    ],
+    "beta_outside": null,
+    "grid_exhausted": true,
+    "quarter_certified": true
   },
   "honesty": {
     "yang_mills": false,
@@ -68,6 +84,22 @@
         "name": "haar_identities",
         "passed": true,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "su3_gap_certified",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "spectral_gap_lower": 0.15106183678697574
+      },
+      {
+        "name": "wilson_character_domain",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "beta_certified": [
+          4,
+          1
+        ],
+        "grid_exhausted": true
       }
     ]
   }

@@ -13,10 +13,15 @@ from omnibias.geometry.gauge.transfer.certificates import (
     seal_transfer_gap_certificate,
     transfer_gap_schema_errors,
 )
-from omnibias.geometry.gauge.transfer.gap import certified_transfer_matrix_gap
+from omnibias.geometry.gauge.transfer.gap import (
+    DIAGONAL_SPECTRUM_METHOD,
+    certified_transfer_matrix_gap,
+)
 from omnibias.geometry.gauge.transfer.matrices import rebuild, su3_wilson_transfer
 from omnibias.geometry.gauge.transfer.su3_wilson import (
     HAAR_VOLUME,
+    TWO_PI,
+    _integrand_lipschitz,
     su3_dimension,
     su3_wilson_haar_coefficient,
 )
@@ -242,6 +247,29 @@ def test_su3_dimension_of_three_zero_is_ten() -> None:
     assert su3_dimension(3, 0) == 10
     assert su3_dimension(0, 3) == 10
     assert su3_dimension(3, 3) == 64
+
+
+def test_cellwise_width_is_strictly_smaller_than_lipschitz() -> None:
+    from fractions import Fraction
+
+    from omnibias.core.verified.interval import Interval
+
+    n_cells = 8
+    cellwise = su3_wilson_haar_coefficient((1, 0), BETA, n_cells=n_cells)
+    side = TWO_PI * Interval.from_value(Fraction(1, n_cells))
+    area = side * side
+    rem_hi = (_integrand_lipschitz(Interval.from_value(BETA), (1, 0)) * side * area).hi
+    lip_width = 2.0 * rem_hi * n_cells * n_cells
+    assert cellwise.width < lip_width
+
+
+def test_cellwise_haar_certifies_an_su3_gap_at_report_n_cells() -> None:
+    transfer = su3_wilson_transfer(BETA, max_dynkin=1, n_cells=32)
+    result = certified_transfer_matrix_gap(transfer)
+    assert result.certified is True
+    assert result.spectral_gap_lower > 0.0
+    assert result.method == DIAGONAL_SPECTRUM_METHOD
+    assert result.dimension == 4
 
 
 def test_max_dynkin_and_beta_are_locked() -> None:

@@ -308,7 +308,7 @@ the relevant op:
   `two_scale_polymer_count`. `counting="cluster"` keeps the first terms
   explicitly. Single-scale `C = 15` is **not** a bound on `N_2`.
 - **`su3_wilson_transfer`** encloses SU(3) Wilson character coefficients
-  by midpoint-plus-Lipschitz Haar quadrature on the maximal torus at
+  by cellwise interval-range Haar quadrature on the maximal torus at
   **one fixed `β`**. The matrix is the `(p, q) ≤ 3` truncation: locked
   trigonometric characters through `(2,2)`, Clebsch recurrence for
   `p, q = 3`. It is **not** a product of ordinary Bessel functions,
@@ -330,8 +330,13 @@ the relevant op:
   certified domain on a **locked dyadic `β` grid** (largest certifying
   point and the next grid failure). It is **not** a physical critical
   coupling, **not** `a → 0`, and **not** Osterwalder–Seiler.
+- **`certified_wilson_character_beta_domain`** is the 0+1-D infinite
+  character-basis Wilson gap on a **wider locked `β` grid** that
+  includes the polymer two-scale failure `1/4`. It is **not** 4-D
+  Yang-Mills and **not** a physical critical coupling.
 - **`finite_gauge_report`** is one sealed bundle of the existing
-  finite engines on a named spec. G1 is **measured**. The bundle is
+  finite engines on a named spec. G1 is **measured**. The SU(3) gap is
+  required after cellwise Haar at locked `n_cells=32`. The bundle is
   still a list of finite statements. It is **not** a staircase to Clay
   existence, **not** a continuum claim, and **not** the Yang-Mills
   mass gap.

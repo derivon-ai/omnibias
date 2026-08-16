@@ -4,11 +4,11 @@ r"""SU(3) Wilson character transfer from an enclosed Haar integral.
 
 The single-link Wilson weight ``exp((β/3) Re χ_fund)`` is expanded on
 SU(3) characters by integrating against the Weyl measure on the maximal
-torus.  Coefficients use a midpoint rule plus a locked Lipschitz
-remainder on a finite box partition of ``[0, 2π]²``.  The β=0
-(orthogonality) piece of a non-trivial character is locked to zero
-rather than re-enclosed, so the interval width tracks ``exp(a)-1``
-instead of a cancelling oscillation.
+torus.  Coefficients use a cellwise interval range times cell area on a
+finite box partition of ``[0, 2π]²``.  The β=0 (orthogonality) piece of
+a non-trivial character is locked to zero rather than re-enclosed, so
+the interval width tracks ``exp(a)-1`` instead of a cancelling
+oscillation.
 
 Characters with ``p, q ≤ 2`` are locked trigonometric polynomials in
 ``e^{iθ}, e^{iφ}``.  Labels with ``p, q = 3`` are obtained from those
@@ -62,9 +62,11 @@ _RHO_GRAD = 256
 _RE_FUND_GRAD = 4
 
 
-def _center(index: int, n_cells: int) -> Interval:
-    """Cell midpoint ``π (2i+1) / n``, a rational multiple of ``π``."""
-    return PI_IV * Interval.from_value(Fraction(2 * index + 1, n_cells))
+def _cell_box(index: int, n_cells: int) -> Interval:
+    """Closed cell ``[2π i/n, 2π (i+1)/n]``, rational multiples of ``π``."""
+    left = PI_IV * Interval.from_value(Fraction(2 * index, n_cells))
+    right = PI_IV * Interval.from_value(Fraction(2 * index + 2, n_cells))
+    return Interval(left.lo, right.hi)
 
 
 def _haar_density(theta: Interval, phi: Interval) -> Interval:
@@ -198,9 +200,9 @@ def su3_wilson_haar_coefficient(
 ) -> Interval:
     """Enclose ``∫ χ_R^* (e^{(β/3) Re χ_f}-1) ρ dθ dφ`` plus the trivial volume.
 
-    Midpoint evaluation at rational multiples of ``π``, plus a Lipschitz
-    remainder ``Lip × (cell side) × area`` per cell.  For ``R ≠ 1`` the
-    locked orthogonality ``∫ χ_R^* ρ = 0`` is used.  For the trivial
+    Cellwise interval range of the integrand times cell area on the
+    boxes ``[2π i/n, 2π (i+1)/n]²``.  For ``R ≠ 1`` the locked
+    orthogonality ``∫ χ_R^* ρ = 0`` is used.  For the trivial
     representation the locked volume ``24 π²`` is added.
     """
     if n_cells < 2:
@@ -217,19 +219,16 @@ def su3_wilson_haar_coefficient(
         raise ValueError(f"beta must be > 0, got {beta!r}")
     side = TWO_PI * Interval.from_value(Fraction(1, n_cells))
     area = side * side
-    lip = _integrand_lipschitz(argument, dynkin)
-    rem_hi = (lip * side * area).hi
-    remainder = Interval(-rem_hi, rem_hi)
     total = Interval.point(0.0)
     for i in range(n_cells):
-        theta = _center(i, n_cells)
+        theta = _cell_box(i, n_cells)
         for j in range(n_cells):
-            phi = _center(j, n_cells)
+            phi = _cell_box(j, n_cells)
             density = _haar_density(theta, phi)
             re_chi = _re_fund(theta, phi)
             shift = _weight_minus_one(argument, re_chi)
             character = _re_character(dynkin, theta, phi)
-            total = total + character * shift * density * area + remainder
+            total = total + character * shift * density * area
     if dynkin == (0, 0):
         return total + HAAR_VOLUME
     return total

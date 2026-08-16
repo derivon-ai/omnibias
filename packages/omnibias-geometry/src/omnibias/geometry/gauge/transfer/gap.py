@@ -51,6 +51,7 @@ from omnibias.geometry.gauge.transfer.trial import TrialSpace
 SYMMETRIC_METHOD = "symmetric_power_sum_partner_chain"
 BIRKHOFF_METHOD = "birkhoff_hopf_projective_contraction"
 LEHMANN_METHOD = "lehmann_maehly_holonomy_trial"
+DIAGONAL_SPECTRUM_METHOD = "diagonal_interval_spectrum"
 
 
 @dataclass(frozen=True)
@@ -247,6 +248,48 @@ def _lehmann_candidate(
         )
 
 
+def _diagonal_spectrum_candidate(transfer: TransferMatrix) -> GapCandidate | None:
+    """Gap from the spectrum of a diagonal interval matrix.
+
+    Off-diagonal entries must be the exact point ``0``.  The eigenvalues
+    are then the diagonal enclosures, so
+    ``|lambda_1| / lambda_0 <= max_{i>0} ||lambda_i||_∞ / lambda_0.lo``.
+    Used only as a fallback on ``su3_wilson`` when the power-sum engine
+    cannot separate a wide but already-disjoint Haar spectrum.  Not a
+    continuum claim.
+    """
+    entries = transfer.entries
+    if len(entries) < 2:
+        return None
+    for i, row in enumerate(entries):
+        if len(row) != len(entries):
+            return None
+        for j, cell in enumerate(row):
+            if i != j and (cell.lo != 0.0 or cell.hi != 0.0):
+                return None
+    dominant = entries[0][0]
+    if dominant.lo <= 0.0:
+        return None
+    sub_hi = 0.0
+    for i in range(1, len(entries)):
+        ev = entries[i][i]
+        sub_hi = max(sub_hi, abs(ev.lo), abs(ev.hi))
+    if sub_hi <= 0.0:
+        return None
+    ratio = sub_hi / dominant.lo
+    if not 0.0 < ratio < 1.0:
+        return None
+    gap = float((-ln_iv(Interval.point(ratio))).lo)
+    if gap <= 0.0:
+        return None
+    return GapCandidate(
+        method=DIAGONAL_SPECTRUM_METHOD,
+        subdominant_ratio_upper=float(ratio),
+        spectral_gap_lower=gap,
+        detail="diagonal interval spectrum; not a power-sum bound",
+    )
+
+
 def certified_transfer_matrix_gap(
     transfer: TransferMatrix,
     *,
@@ -319,6 +362,11 @@ def certified_transfer_matrix_gap(
             "symmetric nor certifiably entrywise positive"
         )
     best = max(candidates, key=lambda c: c.spectral_gap_lower)
+    if best.spectral_gap_lower <= 0.0 and transfer.model == "su3_wilson":
+        diagonal = _diagonal_spectrum_candidate(transfer)
+        if diagonal is not None:
+            candidates.append(diagonal)
+            best = diagonal
     gap = best.spectral_gap_lower
     return TransferGapResult(
         model=transfer.model,
@@ -583,6 +631,7 @@ certified_gap_scaling_table = heat_kernel_gap_scaling_report
 
 __all__ = [
     "BIRKHOFF_METHOD",
+    "DIAGONAL_SPECTRUM_METHOD",
     "LEHMANN_METHOD",
     "EffectiveMassCurve",
     "EffectiveMassPoint",

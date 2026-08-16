@@ -61,6 +61,22 @@ def main() -> int:
             "passed": bool(report.haar.certified),
             "in_ci_all_passed": True,
         },
+        {
+            "name": "su3_gap_certified",
+            "passed": bool(report.su3_gap.certified and report.su3_gap.spectral_gap_lower > 0.0),
+            "in_ci_all_passed": True,
+            "spectral_gap_lower": report.su3_gap.spectral_gap_lower,
+        },
+        {
+            "name": "wilson_character_domain",
+            "passed": bool(report.wilson_character_domain.certified),
+            "in_ci_all_passed": True,
+            "beta_certified": [
+                int(report.wilson_character_domain.beta_certified.numerator),
+                int(report.wilson_character_domain.beta_certified.denominator),
+            ],
+            "grid_exhausted": report.wilson_character_domain.grid_exhausted,
+        },
     ]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.gauge_finite_report.v1",
@@ -90,6 +106,22 @@ def main() -> int:
             int(report.polymer_domain.beta_outside.denominator),
         ],
         "counting": report.polymer_domain.counting,
+    }
+    payload["su3_gap"] = {
+        "certified": report.su3_gap.certified,
+        "spectral_gap_lower": report.su3_gap.spectral_gap_lower,
+        "dimension": report.su3_gap.dimension,
+        "n_cells": spec.su3_n_cells,
+        "method": report.su3_gap.method,
+    }
+    payload["wilson_domain"] = {
+        "beta_certified": [
+            int(report.wilson_character_domain.beta_certified.numerator),
+            int(report.wilson_character_domain.beta_certified.denominator),
+        ],
+        "beta_outside": None,
+        "grid_exhausted": report.wilson_character_domain.grid_exhausted,
+        "quarter_certified": report.wilson_character_domain.quarter_certified,
     }
     payload["honesty"] = {
         "yang_mills": False,

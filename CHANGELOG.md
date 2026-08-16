@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — cellwise Haar and Wilson-character β-domain
+
+- `su3_wilson_haar_coefficient` encloses each torus cell by interval
+  range times cell area. The locked Lipschitz majorant stays only as a
+  width comparison. `finite_gauge_report` now requires a certified
+  SU(3) gap and locks `n_cells=32` (smallest of `{16, 32}` that
+  separates). Not 4-D SU(3) Yang-Mills.
+- `certified_wilson_character_beta_domain` records the infinite
+  character-basis Wilson gap on `(1/4, 1/2, 1, 2, 4)`, including the
+  polymer two-scale failure `1/4`. Kind `wilson_character_beta_domain`.
+  Not a physical critical coupling.
+
 ### Added — finite gauge report and polymer β-domain
 
 - `certified_polymer_beta_domain` records the polymer majorant's
