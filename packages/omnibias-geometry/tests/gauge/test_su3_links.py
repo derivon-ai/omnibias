@@ -71,3 +71,19 @@ def test_su3_mc_smoke_4_cubed() -> None:
     )
     assert dispatched["gauge_group"] == "su(3)"
     _ = random_su3_links((2, 2, 2, 2), np.random.default_rng(0))
+
+
+def test_su3_mc_physical_plaquette_beta_5p7() -> None:
+    """SU(3) Wilson at β=5.7 has ⟨P⟩ ≈ 0.55, not a disordered 0.03."""
+    out = run_su3_lattice_mc(
+        lattice_shape=(4, 4, 4, 4),
+        beta=5.7,
+        n_therm=80,
+        n_meas=20,
+        n_sep=1,
+        seed=0,
+        cold_start=True,
+    )
+    plaq = float(out["avg_plaquette"])
+    assert 0.45 <= plaq <= 0.65
+    assert out["yang_mills_claim"] is False

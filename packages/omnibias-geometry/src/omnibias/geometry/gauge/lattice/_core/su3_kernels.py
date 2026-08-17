@@ -178,15 +178,40 @@ def _sample_q0(a: np.ndarray, beta: float, rng: np.random.Generator) -> np.ndarr
     return np.where(accepted, q0, cand)
 
 
+def _su2_project(block: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """Project a 2×2 block to (radius, SU(2) polar factor)."""
+    a = block[..., 0, 0]
+    b = block[..., 0, 1]
+    c = block[..., 1, 0]
+    d = block[..., 1, 1]
+    q = np.stack(
+        (
+            np.real(a + d),
+            np.imag(b + c),
+            np.real(b - c),
+            np.imag(a - d),
+        ),
+        axis=-1,
+    )
+    radius = np.linalg.norm(q, axis=-1)
+    unit = q / np.maximum(radius[..., None], 1e-30)
+    return radius, _quat_to_matrix(unit)
+
+
 def _heatbath_su2(staple2: np.ndarray, beta: float, rng: np.random.Generator) -> np.ndarray:
-    mag = np.sqrt(np.maximum(np.real(np.einsum("...ij,...ij->...", staple2, np.conjugate(staple2))), 1e-30))
-    u_hat = staple2 / mag[..., None, None]
-    q0 = _sample_q0(mag, beta, rng)
-    sphere = rng.normal(size=(*mag.shape, 3))
+    """SU(2) factor ``A`` for a right-multiply ``U ← U A`` maximizing ``Re Tr(U† Σ)``.
+
+    ``staple2`` is the 2×2 block of ``U† Σ``. Cooling would set ``A = h`` (polar
+    factor); the heat-bath draws ``A = h g†`` with ``g`` Kennedy–Pendleton near
+    the identity. ``beta`` is the SU(3) Wilson coupling.
+    """
+    radius, u_hat = _su2_project(staple2)
+    q0 = _sample_q0(radius, float(beta) / 3.0, rng)
+    sphere = rng.normal(size=(*radius.shape, 3))
     sphere = sphere / np.maximum(np.linalg.norm(sphere, axis=-1, keepdims=True), 1e-30)
     radial = np.sqrt(np.maximum(1.0 - q0 * q0, 0.0))
     v = np.concatenate((q0[..., None], sphere * radial[..., None]), axis=-1)
-    return _mul(_quat_to_matrix(v), u_hat)
+    return _mul(u_hat, _dag(_quat_to_matrix(v)))
 
 
 def _extract_block(mat: np.ndarray, i: int, j: int) -> np.ndarray:
@@ -205,13 +230,29 @@ def _embed_su2(block: np.ndarray, i: int, j: int) -> np.ndarray:
     return eye
 
 
+def _parity_mask(lattice_shape: Sequence[int], parity: int) -> np.ndarray:
+    grids = np.meshgrid(*(np.arange(size) for size in lattice_shape), indexing="ij")
+    return (sum(grids) % 2) == int(parity)
+
+
 def cabibbo_marinari_update(
-    links: np.ndarray, mu: int, beta: float, rng: np.random.Generator
+    links: np.ndarray,
+    mu: int,
+    beta: float,
+    rng: np.random.Generator,
+    *,
+    mask: np.ndarray | None = None,
 ) -> np.ndarray:
-    """One Cabibbo–Marinari heat-bath hit on direction ``mu``."""
+    """One Cabibbo–Marinari heat-bath hit on direction ``mu``.
+
+    ``mask`` selects a checkerboard subset. Same-direction staples depend on
+    neighboring ``U_μ``, so a full-lattice hit does not satisfy detailed balance.
+    """
     staple = su3_staple(links, mu)
-    u = links[mu]
-    w = _mul(u, staple)
+    u = np.array(links[mu], copy=True)
+    # Same staple convention as the working SU(2) kernel: the Wilson weight is
+    # exp((β/3) Re Tr(U† Σ)), so the Cabibbo–Marinari matrix is W = U† Σ.
+    w = _mul(_dag(u), staple)
     for i, j in _SU2_PAIRS:
         block = np.stack(
             (
@@ -222,29 +263,37 @@ def cabibbo_marinari_update(
         )
         heat = _heatbath_su2(block, beta, rng)
         embed = _embed_su2(heat, i, j)
-        u = _mul(embed, u)
-        w = _mul(u, staple)
+        updated = _mul(u, embed)
+        if mask is None:
+            u = updated
+        else:
+            u = np.where(mask[..., None, None], updated, u)
+        w = _mul(_dag(u), staple)
     out = np.array(links, copy=True)
     out[mu] = reunitarize(u)
     return out
 
 
 def su3_sweep(
-    links: np.ndarray, beta: float, rng: np.random.Generator, *, n_overrelax: int = 1
+    links: np.ndarray, beta: float, rng: np.random.Generator, *, n_overrelax: int = 0
 ) -> np.ndarray:
     cur = links
+    lattice_shape = tuple(int(size) for size in links.shape[1:5])
     for mu in range(4):
-        cur = cabibbo_marinari_update(cur, mu, beta, rng)
+        for parity in (0, 1):
+            cur = cabibbo_marinari_update(
+                cur, mu, beta, rng, mask=_parity_mask(lattice_shape, parity)
+            )
     for _ in range(n_overrelax):
         for mu in range(4):
-            staple = su3_staple(cur, mu)
-            u = cur[mu]
-            # Reflection-style overrelax in the staple polar factor.
-            polar = reunitarize(staple)
-            updated = _mul(_mul(polar, _dag(u)), polar)
-            nxt = np.array(cur, copy=True)
-            nxt[mu] = reunitarize(updated)
-            cur = nxt
+            for parity in (0, 1):
+                mask = _parity_mask(lattice_shape, parity)
+                staple = su3_staple(cur, mu)
+                polar = reunitarize(staple)
+                updated = _mul(_mul(polar, _dag(cur[mu])), polar)
+                nxt = np.array(cur, copy=True)
+                nxt[mu] = reunitarize(np.where(mask[..., None, None], updated, cur[mu]))
+                cur = nxt
     return cur
 
 
