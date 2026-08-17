@@ -40,6 +40,7 @@ ENSEMBLE_AREA = "area"
 ENSEMBLE_PERIMETER = "perimeter"
 ENSEMBLE_LOG_P2 = "log_p2"
 ENSEMBLE_INV_P2 = "inv_p2"
+ENSEMBLE_INV_P2_SQ = "inv_p2_sq"
 ENSEMBLE_GHOST_G = "ghost_G"
 ENSEMBLE_LOG_GHOST_G = "log_ghost_G"
 ENSEMBLE_T_LAT = "T_lat"
@@ -49,6 +50,23 @@ ENSEMBLE_CREUTZ_CHI = "creutz_chi"
 ENSEMBLE_L_LAT = "L_lat"
 ENSEMBLE_F_R = "F_r"
 ENSEMBLE_SIGMA_LAT = "sigma_lat"
+ENSEMBLE_LAMBDA_QCD = "Lambda_QCD"
+ENSEMBLE_R0 = "r0"
+ENSEMBLE_T0 = "t0"
+ENSEMBLE_A_LAT = "a_lat"
+ENSEMBLE_LOG_P2_OVER_L2 = "log_p2_over_L2"
+ENSEMBLE_P2_G025 = "p2_g025"
+ENSEMBLE_P2_G05 = "p2_g05"
+ENSEMBLE_P2_G075 = "p2_g075"
+ENSEMBLE_P2_G1 = "p2_g1"
+ENSEMBLE_LOG_P2_G025 = "log_p2_g025"
+ENSEMBLE_LOG_P2_G05 = "log_p2_g05"
+ENSEMBLE_LOG_P2_G075 = "log_p2_g075"
+ENSEMBLE_LOG_P2_G1 = "log_p2_g1"
+ENSEMBLE_LI2_Z = "Li2_z"
+ENSEMBLE_LI3_Z = "Li3_z"
+ENSEMBLE_F21_Z = "F21_z"
+ENSEMBLE_GLUEBALL_MASS = "glueball_mass"
 
 LEGAL_ENSEMBLE_ATOMS: frozenset[str] = frozenset(
     {
@@ -67,6 +85,7 @@ LEGAL_ENSEMBLE_ATOMS: frozenset[str] = frozenset(
         ENSEMBLE_PERIMETER,
         ENSEMBLE_LOG_P2,
         ENSEMBLE_INV_P2,
+        ENSEMBLE_INV_P2_SQ,
         ENSEMBLE_GHOST_G,
         ENSEMBLE_LOG_GHOST_G,
         ENSEMBLE_T_LAT,
@@ -76,6 +95,23 @@ LEGAL_ENSEMBLE_ATOMS: frozenset[str] = frozenset(
         ENSEMBLE_L_LAT,
         ENSEMBLE_F_R,
         ENSEMBLE_SIGMA_LAT,
+        ENSEMBLE_LAMBDA_QCD,
+        ENSEMBLE_R0,
+        ENSEMBLE_T0,
+        ENSEMBLE_A_LAT,
+        ENSEMBLE_LOG_P2_OVER_L2,
+        ENSEMBLE_P2_G025,
+        ENSEMBLE_P2_G05,
+        ENSEMBLE_P2_G075,
+        ENSEMBLE_P2_G1,
+        ENSEMBLE_LOG_P2_G025,
+        ENSEMBLE_LOG_P2_G05,
+        ENSEMBLE_LOG_P2_G075,
+        ENSEMBLE_LOG_P2_G1,
+        ENSEMBLE_LI2_Z,
+        ENSEMBLE_LI3_Z,
+        ENSEMBLE_F21_Z,
+        ENSEMBLE_GLUEBALL_MASS,
     }
 )
 
@@ -129,6 +165,7 @@ def is_ensemble_atom_name(name: str) -> bool:
         "perimeter",
         "log_p2",
         "inv_p2",
+        "inv_p2_sq",
         "ghost_g",
         "log_ghost_g",
         "t_lat",
@@ -138,6 +175,23 @@ def is_ensemble_atom_name(name: str) -> bool:
         "l_lat",
         "f_r",
         "sigma_lat",
+        "lambda_qcd",
+        "r0",
+        "t0",
+        "a_lat",
+        "log_p2_over_l2",
+        "p2_g025",
+        "p2_g05",
+        "p2_g075",
+        "p2_g1",
+        "log_p2_g025",
+        "log_p2_g05",
+        "log_p2_g075",
+        "log_p2_g1",
+        "li2_z",
+        "li3_z",
+        "f21_z",
+        "glueball_mass",
     }
 
 
@@ -627,23 +681,41 @@ __all__ = [
     "ENSEMBLE_AREA",
     "ENSEMBLE_CHI_P",
     "ENSEMBLE_C_P",
+    "ENSEMBLE_A_LAT",
     "ENSEMBLE_CREUTZ_CHI",
+    "ENSEMBLE_F21_Z",
     "ENSEMBLE_F_R",
     "ENSEMBLE_GHOST_G",
+    "ENSEMBLE_GLUEBALL_MASS",
     "ENSEMBLE_G_P2",
     "ENSEMBLE_INV_P2",
+    "ENSEMBLE_INV_P2_SQ",
+    "ENSEMBLE_LAMBDA_QCD",
+    "ENSEMBLE_LI2_Z",
+    "ENSEMBLE_LI3_Z",
     "ENSEMBLE_L_LAT",
     "ENSEMBLE_LOG_ABS_P",
     "ENSEMBLE_LOG_ABS_T",
     "ENSEMBLE_LOG_C_P",
     "ENSEMBLE_LOG_GHOST_G",
     "ENSEMBLE_LOG_P2",
+    "ENSEMBLE_LOG_P2_G025",
+    "ENSEMBLE_LOG_P2_G05",
+    "ENSEMBLE_LOG_P2_G075",
+    "ENSEMBLE_LOG_P2_G1",
+    "ENSEMBLE_LOG_P2_OVER_L2",
     "ENSEMBLE_OMEGA",
     "ENSEMBLE_P2",
+    "ENSEMBLE_P2_G025",
+    "ENSEMBLE_P2_G05",
+    "ENSEMBLE_P2_G075",
+    "ENSEMBLE_P2_G1",
     "ENSEMBLE_PERIMETER",
     "ENSEMBLE_R",
+    "ENSEMBLE_R0",
     "ENSEMBLE_RHO",
     "ENSEMBLE_SIGMA_LAT",
+    "ENSEMBLE_T0",
     "ENSEMBLE_T_LAT",
     "ENSEMBLE_T_WILSON",
     "ENSEMBLE_V_R",

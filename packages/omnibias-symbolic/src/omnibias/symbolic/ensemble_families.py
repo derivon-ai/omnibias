@@ -27,7 +27,7 @@ from omnibias.geometry.gauge._core.ensemble_language import (
     EnsembleObservableTable,
 )
 
-FamilyName = Literal["decoupling", "gribov_stingl", "area_perimeter", "luscher"]
+FamilyName = Literal["decoupling", "gribov_stingl", "gribov_dressing", "area_perimeter", "luscher"]
 
 
 def _rmse(target: np.ndarray, pred: np.ndarray) -> float:
@@ -83,6 +83,8 @@ class NamedFamilyDiscoverer:
             return self._decoupling(table)
         if family == "gribov_stingl":
             return self._gribov_stingl(table)
+        if family == "gribov_dressing":
+            return self._gribov_dressing(table)
         if family == "area_perimeter":
             return self._area_perimeter(table, luscher=False)
         if family == "luscher":
@@ -126,12 +128,53 @@ class NamedFamilyDiscoverer:
         z0 = 1.0 / float(coef[1]) if abs(coef[1]) > 1e-15 else float("nan")
         mass2 = float(np.sqrt(max(float(coef[2]) * z0, 0.0)))
         b2 = float(coef[0]) * z0 - 2.0 * mass2
-        passed = bool(skill > 0.0 and np.isfinite(skill) and z0 > 0.0)
+        passed = bool(
+            skill > 0.0
+            and np.isfinite(skill)
+            and z0 > 0.0
+            and mass2 > 0.0
+            and b2 > 0.0
+        )
         return NamedFamilyResult(
             family="gribov_stingl",
             parameters={"Z": float(z0), "M2": float(mass2), "b2": float(b2)},
             formula=(
                 f"D = {z0:.4g} p2 / ((p2 + {mass2:.4g})^2 + {b2:.4g} p2)"
+            ),
+            skill=float(skill),
+            model_rmse=_rmse(dressing[test], pred),
+            baseline_rmse=_rmse(dressing[test], baseline),
+            passed=passed,
+        )
+
+    def _gribov_dressing(self, table: EnsembleObservableTable) -> NamedFamilyResult:
+        """Dressing Z = p^2 D: 1/Z ≈ α + β/p^2 + γ/p^4."""
+        p2, dressing = _dressing(table)
+        inverse = 1.0 / np.maximum(dressing, 1e-30)
+        inv_p2 = 1.0 / np.maximum(p2, 1e-30)
+        inv_p2_sq = inv_p2**2
+        train, test = _split(p2.shape[0])
+        design = np.column_stack([np.ones_like(p2), inv_p2, inv_p2_sq])
+        coef, *_ = np.linalg.lstsq(design[train], inverse[train], rcond=None)
+        pred_inv = design[test] @ coef
+        pred = 1.0 / np.maximum(pred_inv, 1e-30)
+        baseline = 1.0 / np.maximum(p2[test], 1e-30)
+        skill = _skill(dressing[test], pred, baseline)
+        z0 = 1.0 / float(coef[0]) if abs(coef[0]) > 1e-15 else float("nan")
+        mass2 = float(np.sqrt(max(float(coef[2]) * z0, 0.0))) if np.isfinite(z0) else float("nan")
+        b2 = float(coef[1]) * z0 - 2.0 * mass2 if np.isfinite(z0) else float("nan")
+        passed = bool(
+            skill > 0.0
+            and np.isfinite(skill)
+            and z0 > 0.0
+            and mass2 > 0.0
+            and b2 > 0.0
+        )
+        return NamedFamilyResult(
+            family="gribov_dressing",
+            parameters={"Z": float(z0), "M2": float(mass2), "b2": float(b2)},
+            formula=(
+                f"Z = {z0:.4g} p2^2 / ((p2 + {mass2:.4g})^2 + {b2:.4g} p2)"
             ),
             skill=float(skill),
             model_rmse=_rmse(dressing[test], pred),
@@ -284,6 +327,19 @@ def planted_gribov_stingl_table(
     )
 
 
+def planted_gribov_dressing_table(
+    *, z0: float = 1.0, mass2: float = 0.4, b2: float = 0.2, n_rows: int = 32
+) -> EnsembleObservableTable:
+    """Planted dressing Z = p^2 D_Gribov."""
+    p2 = np.linspace(0.08, 3.5, n_rows, dtype=np.float64)
+    prop = z0 * p2 / ((p2 + mass2) ** 2 + b2 * p2)
+    dressing = p2 * prop
+    return EnsembleObservableTable(
+        values={ENSEMBLE_P2: p2, ENSEMBLE_G_P2: dressing, ENSEMBLE_INV_P2: 1.0 / p2},
+        source="planted",
+    )
+
+
 def planted_wilson_area_table(
     *,
     sigma: float = 0.2,
@@ -421,6 +477,7 @@ __all__ = [
     "NamedFamilyDiscoverer",
     "NamedFamilyResult",
     "planted_decoupling_table",
+    "planted_gribov_dressing_table",
     "planted_gribov_stingl_table",
     "planted_spectrum_from_sigma",
     "planted_wilson_area_table",

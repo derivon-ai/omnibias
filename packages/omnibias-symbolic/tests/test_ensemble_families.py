@@ -8,6 +8,7 @@ import pytest
 from omnibias.symbolic.ensemble_families import (
     NamedFamilyDiscoverer,
     planted_decoupling_table,
+    planted_gribov_dressing_table,
     planted_gribov_stingl_table,
     planted_wilson_area_table,
 )
@@ -28,7 +29,32 @@ def test_gribov_stingl_recovers_planted() -> None:
     )
     assert out.passed is True
     assert out.parameters["Z"] == pytest.approx(1.0, rel=1e-1)
+    assert out.parameters["b2"] > 0.0
+    assert out.parameters["M2"] > 0.0
     assert out.skill > 0.0
+
+
+def test_gribov_negative_b2_is_not_passed() -> None:
+    stingl = NamedFamilyDiscoverer().fit(
+        planted_gribov_stingl_table(b2=-0.11), family="gribov_stingl"
+    )
+    assert stingl.parameters["b2"] < 0.0
+    assert stingl.passed is False
+    dressing = NamedFamilyDiscoverer().fit(
+        planted_gribov_dressing_table(b2=-0.11), family="gribov_dressing"
+    )
+    assert dressing.parameters["b2"] < 0.0
+    assert dressing.passed is False
+
+
+def test_gribov_dressing_recovers_planted() -> None:
+    out = NamedFamilyDiscoverer().fit(
+        planted_gribov_dressing_table(), family="gribov_dressing"
+    )
+    assert out.passed is True
+    assert out.parameters["Z"] == pytest.approx(1.0, rel=1e-1)
+    assert out.skill > 0.0
+    assert out.formula.startswith("Z =")
 
 
 def test_area_perimeter_recovers_sigma() -> None:
