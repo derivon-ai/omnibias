@@ -21,7 +21,7 @@ baselines, dataset loaders, and tests.
 | `causal_term_discovery` | Directed parent ranking of terms (MI + NOTEARS-lite) on a known SEM | synthetic | yes |
 | `dimensional_groups` | Buckingham-Pi dimensionless groups (Reynolds, pendulum) via exact integer null-space | none (closed form) | yes |
 | `latent_ode_discovery` | Hidden oscillator law from one observed coordinate (Takens + autoencoder + FieldLawDiscoverer) | synthetic | yes |
-| `public_csv_discovery` | Lotka–Volterra `xy` signs from a train-only cubic-spline interpolant + Huber/ridge STLSQ, scored by RK4 rollout (RF jet reported; FD / linear are named baselines) | Hudson Bay lynx–hare CSV (committed) + synthetic orbit | yes |
+| `public_csv_discovery` | Lotka–Volterra `xy` signs from a train-only interpolant (spline-collocated jet if it beats 1.25× FD, else cubic spline) + Huber/ridge STLSQ, scored by RK4 rollout | Hudson Bay lynx–hare CSV (committed) + synthetic orbit | yes |
 
 The fully-reproducible synthetic paths are exercised by the test suite and the
 notebooks. The real-data paths require downloading the corresponding datasets.

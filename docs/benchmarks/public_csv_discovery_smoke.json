@@ -12,8 +12,8 @@
       }
     ]
   },
-  "generated_utc": "2026-08-16T20:15:07Z",
-  "honesty": "Spline-interpolant STLSQ plus RK4 rollout on Hudson Bay pelts and a synthetic Lotka-Volterra orbit. Recovers LV xy signs; extra linear terms survive on the public table. Not a new law of nature. Not a confinement or Clay claim.",
+  "generated_utc": "2026-08-16T20:30:12Z",
+  "honesty": "Train-only interpolant (spline-collocated jet if it beats 1.25\u00d7 FD, else cubic spline) plus STLSQ and RK4 rollout on Hudson Bay pelts and a synthetic Lotka-Volterra orbit. Recovers LV xy signs; extra linear terms survive on the public table. Not a new law of nature. Not a confinement or Clay claim.",
   "mode": "smoke",
   "public_csv": {
     "gates": {
@@ -68,19 +68,19 @@
           "passed": true
         },
         {
-          "chosen": "spline",
+          "chosen": "jet",
           "fd_dot_rmse": 2.383007615215768,
-          "jet_dot_rmse": 5.918604879062177,
+          "jet_dot_rmse": 1.3077971644199298,
           "max_ratio": 1.25,
           "name": "interpolant_quality",
           "passed": true,
-          "ratio": 0.566575663093015,
+          "ratio": 0.5488010848431619,
           "required": true,
           "spline_dot_rmse": 1.350154119746578
         },
         {
-          "hare_xy": -0.027265590136238128,
-          "lynx_xy": 0.02508748553562678,
+          "hare_xy": -0.027273321705838634,
+          "lynx_xy": 0.024562774841381634,
           "name": "xy_signs",
           "passed": true,
           "required": true
@@ -90,29 +90,30 @@
           "name": "rollout_vs_zero",
           "passed": true,
           "required": false,
-          "skill_score": 0.9986763829712464
+          "skill_score": 0.9995783595233606
         },
         {
           "min_skill": 0.0,
           "name": "rollout_vs_linear",
           "passed": true,
           "required": true,
-          "skill_score": 0.9983563634948577
+          "skill_score": 0.999394466402897
         }
       ]
     },
-    "interpolant": "spline",
+    "interpolant": "jet",
     "interpolant_knobs": {
+      "deriv_weight": 30.0,
       "hidden": 48,
-      "mode": "spline",
+      "mode": "auto",
       "quality_ratio": 1.25,
-      "ridge": 1e-06,
+      "ridge": 1e-08,
       "upsample": 8,
       "weight_scale": 1.0
     },
-    "jet_vs_fd_ratio": 2.4836701491305475,
-    "rollout_vs_linear": 0.9983563634948577,
-    "skill_vs_fd": 0.8527822625096014,
+    "jet_vs_fd_ratio": 0.5488010848431619,
+    "rollout_vs_linear": 0.999394466402897,
+    "skill_vs_fd": 0.9509987407406362,
     "xy_signs_ok": true
   }
 }

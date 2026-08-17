@@ -30,9 +30,15 @@ from omnibias.symbolic.discovery import (
     evaluate_real_world_tabular_validation,
     exact_activation_field_1d,
     extract_neural_jets,
+    fit_cubic_spline_1d,
+    fit_field_jets_1d,
+    fit_neural_field_1d,
     fit_sparse_equation,
     jet_name,
     make_symbolic_regression_dataset,
+    rollout_levels,
+    rollout_skill,
+    spline_values_and_deriv,
     write_artifacts,
 )
 from omnibias.symbolic.expressions import (
@@ -127,8 +133,6 @@ def test_huber_stlsq_keeps_ridge_signs_on_clean_data() -> None:
 
 
 def test_neural_field_weight_scale_default_matches_unit_scale() -> None:
-    from omnibias.symbolic.discovery import fit_neural_field_1d
-
     t = np.linspace(0.0, 2.0, 40)
     y = np.sin(t)
     default = fit_neural_field_1d(t, y, hidden=16, seed=0)
@@ -136,6 +140,84 @@ def test_neural_field_weight_scale_default_matches_unit_scale() -> None:
     np.testing.assert_allclose(default.W, scaled.W)
     np.testing.assert_allclose(default.c, scaled.c)
     assert default.train_rmse == scaled.train_rmse
+    assert default.train_deriv_rmse is None
+
+
+def test_cubic_spline_interpolant_is_exact_on_a_line() -> None:
+    t = np.linspace(0.0, 2.0, 21)
+    interpolant = fit_cubic_spline_1d(t, 3.0 * t + 1.0)
+    np.testing.assert_allclose(interpolant.deriv(t), np.full_like(t, 3.0), rtol=1e-10, atol=1e-10)
+
+
+def test_cubic_spline_derivative_beats_fd_on_a_cubic() -> None:
+    t = np.linspace(0.0, 2.0, 21)
+    values = t**3
+    _, deriv = spline_values_and_deriv(t, values, t)
+    true = 3.0 * t**2
+    fd = np.gradient(values, t)
+    spline_rmse = float(np.sqrt(np.mean((deriv - true) ** 2)))
+    fd_rmse = float(np.sqrt(np.mean((fd - true) ** 2)))
+    assert spline_rmse < fd_rmse
+
+
+def _lotka_volterra_orbit(n: int = 41) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    alpha, beta, delta, gamma = 0.55, 0.028, 0.026, 0.84
+    t = np.linspace(0.0, 20.0, n)
+    dt = float(t[1] - t[0])
+    x = np.empty(n)
+    y = np.empty(n)
+    x[0], y[0] = 30.0, 4.0
+    for i in range(n - 1):
+        def rhs(xx: float, yy: float) -> tuple[float, float]:
+            return alpha * xx - beta * xx * yy, delta * xx * yy - gamma * yy
+
+        k1x, k1y = rhs(x[i], y[i])
+        k2x, k2y = rhs(x[i] + 0.5 * dt * k1x, y[i] + 0.5 * dt * k1y)
+        k3x, k3y = rhs(x[i] + 0.5 * dt * k2x, y[i] + 0.5 * dt * k2y)
+        k4x, k4y = rhs(x[i] + dt * k3x, y[i] + dt * k3y)
+        x[i + 1] = x[i] + (dt / 6.0) * (k1x + 2.0 * k2x + 2.0 * k3x + k4x)
+        y[i + 1] = y[i] + (dt / 6.0) * (k1y + 2.0 * k2y + 2.0 * k3y + k4y)
+    true_x = alpha * x - beta * x * y
+    return t, x, true_x
+
+
+def test_collocated_jet_matches_fd_on_lotka_volterra() -> None:
+    t, x, true_x = _lotka_volterra_orbit(41)
+    n_fit = max(t.shape[0] // 2, 8) + max((t.shape[0] - max(t.shape[0] // 2, 8)) // 2, 4)
+    t_fit, x_fit, true_fit = t[:n_fit], x[:n_fit], true_x[:n_fit]
+    field = fit_neural_field_1d(
+        t_fit, x_fit, hidden=96, ridge=1e-8, seed=0, deriv="spline", deriv_weight=30.0
+    )
+    jet = extract_neural_jets(field, t_fit, max_order=1).jets[:, 1]
+    fd = np.gradient(x_fit, t_fit)
+    jet_rmse = float(np.sqrt(np.mean((jet - true_fit) ** 2)))
+    fd_rmse = float(np.sqrt(np.mean((fd - true_fit) ** 2)))
+    assert jet_rmse <= 1.25 * fd_rmse
+    assert field.train_deriv_rmse is not None
+
+
+def test_fit_field_jets_1d_rejects_extrapolation() -> None:
+    t = np.linspace(0.0, 1.0, 11)
+    y = np.sin(t)
+    try:
+        fit_field_jets_1d(t, y, fit_idx=np.arange(8), eval_idx=np.arange(11))
+    except ValueError as exc:
+        assert "outside the fit support" in str(exc)
+    else:
+        raise AssertionError("expected extrapolation to raise")
+
+
+def test_rollout_skill_beats_persist_on_known_ode() -> None:
+    t = np.linspace(0.0, 1.0, 6)
+
+    def rhs(x: float, y: float) -> tuple[float, float]:
+        return -x, -y
+
+    pred_x, pred_y = rollout_levels(0.0, 1.0, 1.0, t[1:], rhs)
+    target = np.concatenate([np.exp(-t[1:]), np.exp(-t[1:])])
+    persist = np.ones(target.shape[0])
+    pred = np.concatenate([pred_x, pred_y])
+    assert rollout_skill(pred, target, persist) > 0.9
 
 
 def test_surrogate_automl_selects_hybrid_and_recovers_terms() -> None:

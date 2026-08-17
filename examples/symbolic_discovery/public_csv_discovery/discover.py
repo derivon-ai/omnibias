@@ -19,7 +19,14 @@ from pathlib import Path
 from typing import Any, Literal
 
 import numpy as np
-from omnibias.symbolic import extract_neural_jets, fit_neural_field_1d, fit_sparse_equation
+from omnibias.symbolic import (
+    extract_neural_jets,
+    fit_neural_field_1d,
+    fit_sparse_equation,
+    rollout_levels,
+    rollout_skill,
+    spline_values_and_deriv,
+)
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 if str(_REPO_ROOT) not in sys.path:
@@ -32,24 +39,23 @@ CSV_PATH = DATA_DIR / "lynx_hare.csv"
 PROVENANCE_PATH = DATA_DIR / "lynx_hare.provenance.json"
 TERM_NAMES = ("1", "x", "y", "xy")
 LINEAR_NAMES = ("1", "x", "y")
-# Locked after a local synthetic sweep (n=41/81, hidden in {48,96,192},
-# ridge in {1e-6,1e-4,1e-2}, weight_scale in {0.2,0.35,0.5,1.0},
-# upsample in {1,4,8}). Analytic cubic-spline d/dt beat np.gradient
-# (spline/fd ≈ 0.46 on n=81). The RF jet cleared 1.25× FD only at
-# hidden=192, ridge=1e-6, weight_scale=1.0, upsample=8 on n=41, and
-# missed on n=81 (jet/fd ≈ 3.0). STLSQ therefore uses the spline;
-# the jet remains a reported arm with those best-effort knobs.
-INTERPOLANT_RIDGE = 1e-6
+# Locked after a local synthetic sweep. Value-only RF jets lose to FD.
+# Spline-collocated jets clear 1.25× FD on n=41 (hidden>=48, ridge=1e-8,
+# deriv_weight=30) and on n=81 at hidden=256. ``auto`` uses the jet when
+# it beats that ratio and falls back to the named cubic spline.
+INTERPOLANT_RIDGE = 1e-8
 INTERPOLANT_WEIGHT_SCALE = 1.0
 INTERPOLANT_UPSAMPLE = 8
+INTERPOLANT_DERIV_WEIGHT = 30.0
 INTERPOLANT_QUALITY_RATIO = 1.25
-INTERPOLANT_MODE: Literal["auto", "jet", "spline"] = "spline"
+INTERPOLANT_MODE: Literal["auto", "jet", "spline"] = "auto"
 SCHEMA = "public_csv_discovery/v2"
 HONESTY = (
-    "Spline-interpolant STLSQ plus RK4 rollout on Hudson Bay pelts and a "
-    "synthetic Lotka-Volterra orbit. Recovers LV xy signs; extra linear "
-    "terms survive on the public table. Not a new law of nature. Not a "
-    "confinement or Clay claim."
+    "Train-only interpolant (spline-collocated jet if it beats 1.25× FD, "
+    "else cubic spline) plus STLSQ and RK4 rollout on Hudson Bay pelts "
+    "and a synthetic Lotka-Volterra orbit. Recovers LV xy signs; extra "
+    "linear terms survive on the public table. Not a new law of nature. "
+    "Not a confinement or Clay claim."
 )
 
 
@@ -142,73 +148,6 @@ def _library(hare: np.ndarray, lynx: np.ndarray, *, linear: bool = False) -> np.
     return np.column_stack([ones, hare, lynx, hare * lynx])
 
 
-def _natural_cubic_coeffs(
-    x: np.ndarray, y: np.ndarray
-) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
-    """Natural cubic spline coefficients on strictly increasing knots."""
-    knots = np.asarray(x, dtype=float).reshape(-1)
-    values = np.asarray(y, dtype=float).reshape(-1)
-    n = int(knots.shape[0])
-    if n < 2:
-        raise ValueError("cubic spline needs at least 2 knots")
-    h = np.diff(knots)
-    if np.any(h <= 0.0):
-        raise ValueError("spline knots must be strictly increasing")
-    a = values.copy()
-    b = np.zeros(n - 1, dtype=float)
-    c = np.zeros(n, dtype=float)
-    d = np.zeros(n - 1, dtype=float)
-    if n == 2:
-        b[0] = (a[1] - a[0]) / h[0]
-        return a, b, c, d
-    alpha = np.zeros(n, dtype=float)
-    for i in range(1, n - 1):
-        alpha[i] = 3.0 * ((a[i + 1] - a[i]) / h[i] - (a[i] - a[i - 1]) / h[i - 1])
-    ell = np.ones(n, dtype=float)
-    mu = np.zeros(n, dtype=float)
-    z = np.zeros(n, dtype=float)
-    for i in range(1, n - 1):
-        ell[i] = 2.0 * (knots[i + 1] - knots[i - 1]) - h[i - 1] * mu[i - 1]
-        mu[i] = h[i] / ell[i]
-        z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / ell[i]
-    for j in range(n - 2, -1, -1):
-        c[j] = z[j] - mu[j] * c[j + 1]
-        b[j] = (a[j + 1] - a[j]) / h[j] - h[j] * (c[j + 1] + 2.0 * c[j]) / 3.0
-        d[j] = (c[j + 1] - c[j]) / (3.0 * h[j])
-    return a, b, c, d
-
-
-def _eval_cubic_spline(
-    knots: np.ndarray,
-    a: np.ndarray,
-    b: np.ndarray,
-    c: np.ndarray,
-    d: np.ndarray,
-    query: np.ndarray,
-    *,
-    derivative: int = 0,
-) -> np.ndarray:
-    x = np.asarray(knots, dtype=float).reshape(-1)
-    q = np.asarray(query, dtype=float).reshape(-1)
-    idx = np.clip(np.searchsorted(x, q, side="right") - 1, 0, x.shape[0] - 2)
-    dx = q - x[idx]
-    if derivative == 0:
-        return a[idx] + b[idx] * dx + c[idx] * dx**2 + d[idx] * dx**3
-    if derivative == 1:
-        return b[idx] + 2.0 * c[idx] * dx + 3.0 * d[idx] * dx**2
-    raise ValueError(f"unsupported spline derivative {derivative}")
-
-
-def spline_values_and_deriv(
-    t_fit: np.ndarray, values: np.ndarray, t_eval: np.ndarray
-) -> tuple[np.ndarray, np.ndarray]:
-    """Analytic natural-cubic values and first derivatives (numpy, no scipy)."""
-    a, b, c, d = _natural_cubic_coeffs(t_fit, values)
-    level = _eval_cubic_spline(t_fit, a, b, c, d, t_eval, derivative=0)
-    deriv = _eval_cubic_spline(t_fit, a, b, c, d, t_eval, derivative=1)
-    return level, deriv
-
-
 def _jet_deriv(
     t_fit: np.ndarray,
     values: np.ndarray,
@@ -219,6 +158,7 @@ def _jet_deriv(
     ridge: float = INTERPOLANT_RIDGE,
     weight_scale: float = INTERPOLANT_WEIGHT_SCALE,
     upsample: int = INTERPOLANT_UPSAMPLE,
+    deriv_weight: float = INTERPOLANT_DERIV_WEIGHT,
 ) -> np.ndarray:
     """Exact jet of a train-only random-feature field, optionally spline-upsampled."""
     t_rf = np.asarray(t_fit, dtype=float).reshape(-1)
@@ -234,6 +174,8 @@ def _jet_deriv(
         ridge=ridge,
         seed=seed,
         weight_scale=weight_scale,
+        deriv="spline",
+        deriv_weight=deriv_weight,
     )
     return extract_neural_jets(field, t_eval, max_order=1).jets[:, 1]
 
@@ -287,39 +229,6 @@ def _ode_rhs(hare_fit: ChannelFit, lynx_fit: ChannelFit):
     return rhs
 
 
-def rollout_levels(
-    t0: float,
-    x0: float,
-    y0: float,
-    t_out: np.ndarray,
-    rhs,
-    *,
-    max_step: float = 0.05,
-) -> tuple[np.ndarray, np.ndarray]:
-    """RK4 from ``(t0, x0, y0)`` onto increasing ``t_out``."""
-    times = np.asarray(t_out, dtype=float).reshape(-1)
-    xs = np.empty(times.shape[0], dtype=float)
-    ys = np.empty(times.shape[0], dtype=float)
-    t_cur = float(t0)
-    x = float(x0)
-    y = float(y0)
-    for i, t_next in enumerate(times):
-        dt = float(t_next) - t_cur
-        n_sub = max(1, int(np.ceil(abs(dt) / max_step)))
-        h = dt / n_sub
-        for _ in range(n_sub):
-            k1x, k1y = rhs(x, y)
-            k2x, k2y = rhs(x + 0.5 * h * k1x, y + 0.5 * h * k1y)
-            k3x, k3y = rhs(x + 0.5 * h * k2x, y + 0.5 * h * k2y)
-            k4x, k4y = rhs(x + h * k3x, y + h * k3y)
-            x = x + (h / 6.0) * (k1x + 2.0 * k2x + 2.0 * k3x + k4x)
-            y = y + (h / 6.0) * (k1y + 2.0 * k2y + 2.0 * k3y + k4y)
-        t_cur = float(t_next)
-        xs[i] = x
-        ys[i] = y
-    return xs, ys
-
-
 def _rollout_pair(
     t_fit: np.ndarray,
     hare: np.ndarray,
@@ -356,6 +265,7 @@ def interpolant_knobs(*, hidden: int) -> dict[str, Any]:
         "ridge": INTERPOLANT_RIDGE,
         "weight_scale": INTERPOLANT_WEIGHT_SCALE,
         "upsample": INTERPOLANT_UPSAMPLE,
+        "deriv_weight": INTERPOLANT_DERIV_WEIGHT,
         "quality_ratio": INTERPOLANT_QUALITY_RATIO,
         "mode": INTERPOLANT_MODE,
     }
@@ -515,8 +425,7 @@ def discover_table(
     mse_rollout = mse(rollout_interp, target_levels)
     mse_rollout_fd = mse(rollout_fd, target_levels)
     mse_rollout_lin = mse(rollout_lin, target_levels)
-    mse_persist = mse(persist, target_levels)
-    rollout_vs_zero = 1.0 - mse_rollout / max(mse_persist, 1e-30)
+    rollout_vs_zero = rollout_skill(rollout_interp, target_levels, persist)
     rollout_vs_linear = 1.0 - mse_rollout / max(mse_rollout_lin, 1e-30)
     rollout_vs_fd = 1.0 - mse_rollout / max(mse_rollout_fd, 1e-30)
     xy_signs_ok = bool(hare_interp.xy_coefficient < 0.0 and lynx_interp.xy_coefficient > 0.0)
@@ -665,7 +574,7 @@ def evaluate_public_csv(*, hidden: int = 96, seed: int = 0) -> dict[str, Any]:
 
 
 def evaluate_benchmark(*, quick: bool = False, seed: int = 0) -> dict[str, Any]:
-    hidden = 48 if quick else 96
+    hidden = 48 if quick else 256
     n = 41 if quick else 81
     synthetic = evaluate_synthetic(hidden=hidden, n=n, seed=seed)
     public = evaluate_public_csv(hidden=hidden, seed=seed)

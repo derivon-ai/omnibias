@@ -32,7 +32,7 @@ Validated by `packages/omnibias-symbolic/tests/test_symbolic_discovery.py`
 | joint_operator_regressor (synthetic) | rank `x1^2, x2*x3, sin(x4)`; near dictionary | top operators `x2*x3, x1^2, sin(x4)`; RMSE 0.083 (= noise floor 0.08) vs raw ridge 4.51 |
 | cmapss_feature_discovery | structural feature pipeline | tests pass on synthetic FD table |
 | financial_signal_discovery | FI-2010 pipeline | tests pass on synthetic FI-2010 zip |
-| public_csv_discovery | recover LV `xy` signs; interpolant ≤ 1.25× FD; rollout beats linear; public rollout gates | synthetic signs + spline interpolant + Hudson Bay smoke JSON |
+| public_csv_discovery | recover LV `xy` signs; interpolant ≤ 1.25× FD; rollout beats linear; public rollout gates | synthetic signs + auto interpolant + Hudson Bay smoke JSON |
 
 Validated by `examples/symbolic_discovery/**/tests` (49 tests). Real-data
 reproductions (Severson battery, NASA C-MAPSS, FI-2010) require downloading the

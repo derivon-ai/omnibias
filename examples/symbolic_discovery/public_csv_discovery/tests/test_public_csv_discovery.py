@@ -38,8 +38,10 @@ def test_synthetic_recovers_xy_signs_and_rollout() -> None:
     assert result["xy_signs_ok"] is True
     assert result["hare"]["xy"] < 0.0
     assert result["lynx"]["xy"] > 0.0
-    assert result["interpolant"] == "spline"
-    assert result["spline_dot_rmse"] <= INTERPOLANT_QUALITY_RATIO * result["fd_dot_rmse"]
+    assert result["interpolant"] in {"jet", "spline"}
+    assert result["interpolant_quality_ok"] is True
+    chosen = result["jet_dot_rmse"] if result["interpolant"] == "jet" else result["spline_dot_rmse"]
+    assert chosen <= INTERPOLANT_QUALITY_RATIO * result["fd_dot_rmse"]
     assert result["rollout_vs_linear"] > 0.0
     assert result["gates"]["all_passed"] is True
 
@@ -55,5 +57,5 @@ def test_public_csv_loads_offline_and_passes_rollout_gates() -> None:
     assert result["rollout_vs_zero"] > 0.0
     assert result["rollout_vs_linear"] > 0.0
     assert result["gates"]["all_passed"] is True
-    assert result["honesty"].startswith("Spline-interpolant STLSQ")
+    assert result["honesty"].startswith("Train-only interpolant")
     assert result["xy_signs_ok"] is True

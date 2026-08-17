@@ -13,11 +13,19 @@ distributions is versioned independently under semantic versioning.
   Train-only cubic-spline interpolant + STLSQ on `{1, x, y, xy}` (Huber
   on the public table, ridge on the clean orbit), scored by RK4 rollout
   against persist-last / linear / FD. Recovers `xy` signs on both splits;
-  extra linear terms survive on the pelts. RF jet is reported; it did not
-  clear 1.25× FD on the synthetic orbit. Not a new law of nature.
+  extra linear terms survive on the pelts. A spline-collocated RF jet
+  takes the STLSQ seat when it clears 1.25× FD; otherwise the named
+  cubic spline is the interpolant. Not a new law of nature.
 - `omnibias.symbolic.fit_sparse_equation` accepts `loss="huber"` (IRLS,
   default remains ridge). `fit_neural_field_1d` accepts `weight_scale`
-  (default `1.0`).
+  (default `1.0`) and optional first-jet collocation (`deriv="spline"|"fd"`
+  or `y_prime`; default value-only).
+- `fit_field_jets_1d` fits a 1-D field on `fit_idx` only and refuses
+  in-support claims outside that interval. `rollout_levels` /
+  `rollout_skill` score an ODE by RK4 vs persist-last.
+- `Interpolant1D` / `fit_cubic_spline_1d` is a named cubic-spline
+  baseline (analytic `y'`), not a `NeuralField1D`. Spline-collocated
+  jets can take the lynx–hare STLSQ seat when they clear 1.25× FD.
 
 ### Added — Path B operator completeness
 

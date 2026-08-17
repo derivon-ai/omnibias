@@ -21,8 +21,7 @@ from pathlib import Path
 import numpy as np
 from omnibias.symbolic.discovery import (
     JetBundle,
-    extract_neural_jets,
-    fit_neural_field_1d,
+    fit_field_jets_1d,
     fit_sparse_equation,
     rmse,
 )
@@ -173,22 +172,24 @@ def discover_blasius_from_neural_surrogate(
 
     if solution is None:
         solution = solve_blasius()
-    field = fit_neural_field_1d(
+    indices = np.arange(solution.eta.shape[0])
+    train = indices[indices % 3 == 0]
+    test = indices[indices % 3 == 2]
+    fit_idx = np.unique(np.concatenate(([0, int(indices[-1])], train)))
+    field, bundle = fit_field_jets_1d(
         solution.eta,
         solution.f,
+        fit_idx=fit_idx,
+        eval_idx=indices,
+        max_order=3,
         hidden=hidden,
         ridge=ridge,
         activation="tanh",
         seed=seed,
     )
-    bundle = extract_neural_jets(field, solution.eta, max_order=3)
     design = (bundle.jets[:, 0] * bundle.jets[:, 2])[:, None]
     names = ["f*d2f"]
     target = bundle.jets[:, 3]
-
-    indices = np.arange(solution.eta.shape[0])
-    train = indices[indices % 3 == 0]
-    test = indices[indices % 3 == 2]
     equation = fit_sparse_equation(
         design[train],
         target[train],

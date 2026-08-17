@@ -47,11 +47,13 @@ nonlinear in `x` (rich enough to fit smooth targets).
 
 <!-- docs-test: signature -->
 ```python
-fit_neural_field_1d(x, y, *, hidden=192, ridge=1e-5, activation="tanh", seed=0, weight_scale=1.0) -> NeuralField1D
+fit_neural_field_1d(x, y, *, hidden=192, ridge=1e-5, activation="tanh", seed=0, weight_scale=1.0, y_prime=None, deriv="none", deriv_weight=1.0) -> NeuralField1D
 ```
 
-**What.** Fit a smooth field to samples `(x, y)` by ridge-solving only the output
-layer. **When.** You have noisy 1-D observations and want a differentiable
+**What.** Fit a smooth field to samples `(x, y)` by ridge-solving the output
+layer. Optional ``deriv="spline"`` / ``y_prime`` collocates the closed-form
+first jet; the default is value-only and bit-identical to the historical
+solve. **When.** You have noisy 1-D observations and want a differentiable
 closed-form surrogate to read derivatives off.
 
 **Theory.** Random features \(\phi_h(x) = \sigma(W_h\tilde x + \beta_h)\) with

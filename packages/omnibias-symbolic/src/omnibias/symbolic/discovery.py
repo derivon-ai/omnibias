@@ -185,6 +185,9 @@ class NeuralField1D:
     x_scale: float
     activation: str
     train_rmse: float = 0.0
+    #: RMSE of the collocated first jet against the 1-jet target, or ``None``
+    #: when the field was fit on values only.
+    train_deriv_rmse: float | None = None
 
 
 @dataclass(frozen=True)
@@ -775,6 +778,105 @@ def evaluate_high_dim_sparse_validation(
     }
 
 
+@dataclass(frozen=True)
+class Interpolant1D:
+    """Named 1-D natural cubic spline with an analytic first derivative.
+
+    This is a **baseline interpolant**, not a :class:`NeuralField1D`. Exact
+    jets of a random-feature field must beat this object's ``y'`` on a named
+    gate before replacing it as a STLSQ left-hand side.
+    """
+
+    knots: np.ndarray
+    a: np.ndarray
+    b: np.ndarray
+    c: np.ndarray
+    d: np.ndarray
+
+    def value(self, x: np.ndarray) -> np.ndarray:
+        return _eval_cubic_spline(self.knots, self.a, self.b, self.c, self.d, x, derivative=0)
+
+    def deriv(self, x: np.ndarray) -> np.ndarray:
+        return _eval_cubic_spline(self.knots, self.a, self.b, self.c, self.d, x, derivative=1)
+
+
+def _natural_cubic_coeffs(
+    x: np.ndarray, y: np.ndarray
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Natural cubic spline coefficients on strictly increasing knots."""
+    knots = np.asarray(x, dtype=float).reshape(-1)
+    values = np.asarray(y, dtype=float).reshape(-1)
+    n = int(knots.shape[0])
+    if n < 2:
+        raise ValueError("cubic spline needs at least 2 knots")
+    h = np.diff(knots)
+    if np.any(h <= 0.0):
+        raise ValueError("spline knots must be strictly increasing")
+    a = values.copy()
+    b = np.zeros(n - 1, dtype=float)
+    c = np.zeros(n, dtype=float)
+    d = np.zeros(n - 1, dtype=float)
+    if n == 2:
+        b[0] = (a[1] - a[0]) / h[0]
+        return a, b, c, d
+    alpha = np.zeros(n, dtype=float)
+    for i in range(1, n - 1):
+        alpha[i] = 3.0 * ((a[i + 1] - a[i]) / h[i] - (a[i] - a[i - 1]) / h[i - 1])
+    ell = np.ones(n, dtype=float)
+    mu = np.zeros(n, dtype=float)
+    z = np.zeros(n, dtype=float)
+    for i in range(1, n - 1):
+        ell[i] = 2.0 * (knots[i + 1] - knots[i - 1]) - h[i - 1] * mu[i - 1]
+        mu[i] = h[i] / ell[i]
+        z[i] = (alpha[i] - h[i - 1] * z[i - 1]) / ell[i]
+    for j in range(n - 2, -1, -1):
+        c[j] = z[j] - mu[j] * c[j + 1]
+        b[j] = (a[j + 1] - a[j]) / h[j] - h[j] * (c[j + 1] + 2.0 * c[j]) / 3.0
+        d[j] = (c[j + 1] - c[j]) / (3.0 * h[j])
+    return a, b, c, d
+
+
+def _eval_cubic_spline(
+    knots: np.ndarray,
+    a: np.ndarray,
+    b: np.ndarray,
+    c: np.ndarray,
+    d: np.ndarray,
+    query: np.ndarray,
+    *,
+    derivative: int = 0,
+) -> np.ndarray:
+    x = np.asarray(knots, dtype=float).reshape(-1)
+    q = np.asarray(query, dtype=float).reshape(-1)
+    idx = np.clip(np.searchsorted(x, q, side="right") - 1, 0, x.shape[0] - 2)
+    dx = q - x[idx]
+    if derivative == 0:
+        return a[idx] + b[idx] * dx + c[idx] * dx**2 + d[idx] * dx**3
+    if derivative == 1:
+        return b[idx] + 2.0 * c[idx] * dx + 3.0 * d[idx] * dx**2
+    raise ValueError(f"unsupported spline derivative {derivative}")
+
+
+def fit_cubic_spline_1d(x: np.ndarray, y: np.ndarray) -> Interpolant1D:
+    """Fit a natural cubic spline. Not a neural field and not a closed-form jet."""
+    a, b, c, d = _natural_cubic_coeffs(x, y)
+    return Interpolant1D(
+        knots=np.asarray(x, dtype=float).reshape(-1).copy(),
+        a=a,
+        b=b,
+        c=c,
+        d=d,
+    )
+
+
+def spline_values_and_deriv(
+    t_fit: np.ndarray, values: np.ndarray, t_eval: np.ndarray
+) -> tuple[np.ndarray, np.ndarray]:
+    """Analytic natural-cubic values and first derivatives (numpy, no scipy)."""
+    interpolant = fit_cubic_spline_1d(t_fit, values)
+    return interpolant.value(t_eval), interpolant.deriv(t_eval)
+
+
 def fit_neural_field_1d(
     x: np.ndarray,
     y: np.ndarray,
@@ -784,13 +886,21 @@ def fit_neural_field_1d(
     activation: str = "tanh",
     seed: int = 0,
     weight_scale: float = 1.0,
+    y_prime: np.ndarray | None = None,
+    deriv: Literal["none", "spline", "fd"] = "none",
+    deriv_weight: float = 1.0,
 ) -> NeuralField1D:
     """Fit a smooth 1D omnibias random-feature field by solving the output layer.
 
     ``weight_scale`` multiplies the random first-layer weights (default ``1.0``
-    keeps the historical ``N(0, 1)`` draw). Values below 1 give a smoother
-    interpolant whose first jet is closer to a cubic spline on short 1-D
-    tables.
+    keeps the historical ``N(0, 1)`` draw). For a derivative-accurate 1-D
+    table prefer ``deriv="spline"`` (or a supplied ``y_prime``) over shrinking
+    ``weight_scale``: the default solve is value-only and its exact 1-jet can
+    lose to a cubic spline.
+
+    ``deriv`` / ``y_prime`` are off by default so existing callers stay
+    bit-identical. When set, the readout also collocates the closed-form
+    first jet against a named 1-jet target.
     """
 
     jnp = _jax_numpy()
@@ -801,6 +911,11 @@ def fit_neural_field_1d(
     scale = float(weight_scale)
     if scale <= 0.0:
         raise ValueError(f"weight_scale must be > 0, got {weight_scale}")
+    if deriv not in {"none", "spline", "fd"}:
+        raise ValueError(f"deriv must be 'none', 'spline', or 'fd', got {deriv!r}")
+    weight = float(deriv_weight)
+    if weight < 0.0:
+        raise ValueError(f"deriv_weight must be >= 0, got {deriv_weight}")
     x_mean = float(np.mean(x))
     x_scale = float(np.std(x))
     if x_scale < 1e-12:
@@ -815,8 +930,32 @@ def fit_neural_field_1d(
     design = np.concatenate([phi, np.ones((phi.shape[0], 1))], axis=1)
     reg = ridge * np.eye(design.shape[1])
     reg[-1, -1] = 0.0
-    coef = np.linalg.solve(design.T @ design + reg, design.T @ y)
-    pred = design @ coef
+    y_dot: np.ndarray | None
+    if y_prime is not None:
+        y_dot = np.asarray(y_prime, dtype=float).reshape(-1)
+        if y_dot.shape[0] != x.shape[0]:
+            raise ValueError("y_prime must match x")
+    elif deriv == "spline":
+        _, y_dot = spline_values_and_deriv(x, y, x)
+    elif deriv == "fd":
+        y_dot = np.gradient(y, x)
+    else:
+        y_dot = None
+    train_deriv_rmse: float | None = None
+    if y_dot is None:
+        coef = np.linalg.solve(design.T @ design + reg, design.T @ y)
+        pred = design @ coef
+    else:
+        if spec.fastpath is None:
+            raise TypeError(f"activation {activation!r} does not expose a derivative fastpath")
+        sigma_1 = np.asarray(spec.fastpath(jnp.asarray(z), 1))
+        dphi = sigma_1 * (W / x_scale)[None, :]
+        design_x = np.concatenate([dphi, np.zeros((dphi.shape[0], 1))], axis=1)
+        gram = design.T @ design + weight * (design_x.T @ design_x) + reg
+        rhs = design.T @ y + weight * (design_x.T @ y_dot)
+        coef = np.linalg.solve(gram, rhs)
+        pred = design @ coef
+        train_deriv_rmse = rmse(y_dot, design_x @ coef)
     return NeuralField1D(
         W=W,
         beta=beta,
@@ -826,6 +965,7 @@ def fit_neural_field_1d(
         x_scale=x_scale,
         activation=activation,
         train_rmse=rmse(y, pred),
+        train_deriv_rmse=train_deriv_rmse,
     )
 
 
@@ -868,6 +1008,94 @@ def extract_neural_jets(field: NeuralField1D, x: np.ndarray, *, max_order: int =
             values = sigma_n @ (field.c * chain)
         jets.append(np.asarray(values, dtype=float))
     return JetBundle(x=xs_raw, jets=np.stack(jets, axis=1))
+
+
+def fit_field_jets_1d(
+    x: np.ndarray,
+    y: np.ndarray,
+    *,
+    fit_idx: np.ndarray,
+    eval_idx: np.ndarray | None = None,
+    allow_extrapolation: bool = False,
+    max_order: int = 1,
+    **fit_kwargs: object,
+) -> tuple[NeuralField1D, JetBundle]:
+    """Fit a 1-D field on ``fit_idx`` only, then extract jets at ``eval_idx``.
+
+    Evaluation points must lie in the closed fit-support interval unless
+    ``allow_extrapolation=True``. That flag is an explicit opt-in; in-support
+    jets are the default contract.
+    """
+    xs = np.asarray(x, dtype=float).reshape(-1)
+    ys = np.asarray(y, dtype=float).reshape(-1)
+    fit = np.asarray(fit_idx, dtype=int).reshape(-1)
+    ev = fit if eval_idx is None else np.asarray(eval_idx, dtype=int).reshape(-1)
+    if fit.size < 2:
+        raise ValueError("fit_field_jets_1d needs at least 2 fit indices")
+    x_fit = xs[fit]
+    y_fit = ys[fit]
+    x_eval = xs[ev]
+    lo = float(np.min(x_fit))
+    hi = float(np.max(x_fit))
+    if not allow_extrapolation and (
+        np.any(x_eval < lo - 1e-12) or np.any(x_eval > hi + 1e-12)
+    ):
+        raise ValueError(
+            "eval x is outside the fit support; pass allow_extrapolation=True to opt in"
+        )
+    field = fit_neural_field_1d(x_fit, y_fit, **fit_kwargs)  # type: ignore[arg-type]
+    return field, extract_neural_jets(field, x_eval, max_order=max_order)
+
+
+def rollout_levels(
+    t0: float,
+    x0: float,
+    y0: float,
+    t_out: np.ndarray,
+    rhs: Callable[[float, float], tuple[float, float]],
+    *,
+    max_step: float = 0.05,
+) -> tuple[np.ndarray, np.ndarray]:
+    """RK4 from ``(t0, x0, y0)`` onto increasing ``t_out``."""
+    times = np.asarray(t_out, dtype=float).reshape(-1)
+    xs = np.empty(times.shape[0], dtype=float)
+    ys = np.empty(times.shape[0], dtype=float)
+    t_cur = float(t0)
+    x = float(x0)
+    y = float(y0)
+    for i, t_next in enumerate(times):
+        dt = float(t_next) - t_cur
+        n_sub = max(1, int(np.ceil(abs(dt) / max_step)))
+        h = dt / n_sub
+        for _ in range(n_sub):
+            k1x, k1y = rhs(x, y)
+            k2x, k2y = rhs(x + 0.5 * h * k1x, y + 0.5 * h * k1y)
+            k3x, k3y = rhs(x + 0.5 * h * k2x, y + 0.5 * h * k2y)
+            k4x, k4y = rhs(x + h * k3x, y + h * k3y)
+            x = x + (h / 6.0) * (k1x + 2.0 * k2x + 2.0 * k3x + k4x)
+            y = y + (h / 6.0) * (k1y + 2.0 * k2y + 2.0 * k3y + k4y)
+        t_cur = float(t_next)
+        xs[i] = x
+        ys[i] = y
+    return xs, ys
+
+
+def rollout_skill(
+    pred: np.ndarray,
+    target: np.ndarray,
+    persist: np.ndarray,
+    *,
+    eps: float = 1e-30,
+) -> float:
+    """Nash–Sutcliffe skill of a rollout against a persist-last baseline."""
+    prediction = np.asarray(pred, dtype=float).reshape(-1)
+    truth = np.asarray(target, dtype=float).reshape(-1)
+    baseline = np.asarray(persist, dtype=float).reshape(-1)
+    mse_pred = float(np.mean((prediction - truth) ** 2))
+    mse_base = float(np.mean((baseline - truth) ** 2))
+    if mse_base < eps:
+        raise ValueError("rollout_skill: persist baseline energy near zero")
+    return 1.0 - mse_pred / mse_base
 
 
 def split_x_grid(
@@ -2009,15 +2237,19 @@ def discover_from_noisy_observations(
     rng = np.random.default_rng(seed)
     x_train, x_val, x_test = split_x_grid(xmin=-math.pi, xmax=math.pi, n_train=220, n_val=140, n_test=140)
     y_train = np.sin(x_train) + rng.normal(0.0, noise_std, size=x_train.shape)
-    field = fit_neural_field_1d(
+    fit_idx = np.arange(x_train.shape[0])
+    field, train = fit_field_jets_1d(
         x_train,
         y_train,
+        fit_idx=fit_idx,
+        eval_idx=fit_idx,
+        max_order=3,
         hidden=hidden,
         ridge=1e-4,
         activation="tanh",
         seed=seed,
+        deriv="spline",
     )
-    train = extract_neural_jets(field, x_train, max_order=3)
     val = extract_neural_jets(field, x_val, max_order=3)
     test = extract_neural_jets(field, x_test, max_order=3)
     result = NeuralJetDiscoverer(
