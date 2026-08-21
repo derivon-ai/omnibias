@@ -46,10 +46,12 @@ from fractions import Fraction
 from typing import Any
 
 from omnibias.core.proof import (
+    CatalogEntry,
     Conjecture,
     FunctionProver,
     ProofAttempt,
     ProofMachine,
+    register_catalog,
 )
 from omnibias.geometry.gauge.transfer.certificates import (
     FINITE_GAUGE_REPORT_KIND,
@@ -536,6 +538,35 @@ def build_gauge_machine() -> ProofMachine:
     for prover in gauge_provers():
         machine.register(prover)
     return machine
+
+
+def _register() -> None:
+    for kind in (
+        TRANSFER_GAP_KIND,
+        STRONG_COUPLING_KIND,
+        HAMILTONIAN_GAP_KIND,
+        THREE_PLAQUETTE_GAP_KIND,
+        STRIP_RP_KIND,
+        TORUS_RP_KIND,
+        POLYMER_DOMAIN_KIND,
+        WILSON_CHARACTER_DOMAIN_KIND,
+        FINITE_GAUGE_REPORT_KIND,
+    ):
+        register_catalog(
+            CatalogEntry(
+                kind=kind,
+                obligation="a finite-truncation gauge certificate (not a mass-gap proof)",
+                parent="Yang-Mills mass gap",
+                parent_status="open",
+                package="omnibias.geometry.gauge",
+                mode="enclosure",
+                complete=True,
+            ),
+            lambda kind=kind, **_k: {"kind": kind, "mode": "enclosure"},
+        )
+
+
+_register()
 
 
 __all__ = [

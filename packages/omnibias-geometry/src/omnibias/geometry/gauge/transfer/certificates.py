@@ -570,6 +570,9 @@ HAMILTONIAN_GAP_KIND = "two_plaquette_hamiltonian_gap"
 #: Kind for the three-plaquette chain (same schema, different observable).
 THREE_PLAQUETTE_GAP_KIND = "three_plaquette_hamiltonian_gap"
 
+#: Kind for the four-plaquette chain (same schema, different observable).
+FOUR_PLAQUETTE_GAP_KIND = "four_plaquette_hamiltonian_gap"
+
 _HAMILTONIAN_NOTES = {
     HAMILTONIAN_GAP_KIND: (
         "certified spectral gap of one finite two-plaquette SU(2) Kogut-Susskind "
@@ -578,6 +581,11 @@ _HAMILTONIAN_NOTES = {
     ),
     THREE_PLAQUETTE_GAP_KIND: (
         "certified spectral gap of one finite three-plaquette SU(2) Kogut-Susskind "
+        "Hamiltonian at one coupling and one spin truncation; NOT a continuum-limit, "
+        "infinite-volume, or Yang-Mills mass-gap claim"
+    ),
+    FOUR_PLAQUETTE_GAP_KIND: (
+        "certified spectral gap of one finite four-plaquette SU(2) Kogut-Susskind "
         "Hamiltonian at one coupling and one spin truncation; NOT a continuum-limit, "
         "infinite-volume, or Yang-Mills mass-gap claim"
     ),
@@ -598,11 +606,12 @@ def seal_hamiltonian_gap_certificate(
             "(non-positive λ1-λ0 lower bound)"
         )
     model = getattr(hamiltonian, "model", "")
-    observable = (
-        THREE_PLAQUETTE_GAP_KIND
-        if model == "su2_three_plaquette"
-        else HAMILTONIAN_GAP_KIND
-    )
+    if model == "su2_four_plaquette":
+        observable = FOUR_PLAQUETTE_GAP_KIND
+    elif model == "su2_three_plaquette":
+        observable = THREE_PLAQUETTE_GAP_KIND
+    else:
+        observable = HAMILTONIAN_GAP_KIND
     return seal_certificate(
         {
             "schema_version": HAMILTONIAN_GAP_SCHEMA_VERSION,
@@ -663,9 +672,15 @@ def hamiltonian_gap_schema_errors(cert: Certificate) -> list[str]:
         errors.append(f"schema_version must be {HAMILTONIAN_GAP_SCHEMA_VERSION!r}")
     if cert.get("continuum_claim", True):
         errors.append("continuum_claim must be False")
-    if cert.get("observable") not in (HAMILTONIAN_GAP_KIND, THREE_PLAQUETTE_GAP_KIND):
+    if cert.get("observable") not in (
+        HAMILTONIAN_GAP_KIND,
+        THREE_PLAQUETTE_GAP_KIND,
+        FOUR_PLAQUETTE_GAP_KIND,
+    ):
         errors.append(
-            f"observable must be {HAMILTONIAN_GAP_KIND!r} or {THREE_PLAQUETTE_GAP_KIND!r}"
+            "observable must be "
+            f"{HAMILTONIAN_GAP_KIND!r}, {THREE_PLAQUETTE_GAP_KIND!r}, "
+            f"or {FOUR_PLAQUETTE_GAP_KIND!r}"
         )
     honesty = cert.get("honesty", {})
     if not isinstance(honesty, Mapping):
@@ -1289,6 +1304,7 @@ __all__ = [
     "STRIP_RP_SCHEMA_VERSION",
     "TORUS_RP_KIND",
     "TORUS_RP_SCHEMA_VERSION",
+    "FOUR_PLAQUETTE_GAP_KIND",
     "THREE_PLAQUETTE_GAP_KIND",
     "STRONG_COUPLING_KIND",
     "STRONG_COUPLING_SCHEMA_VERSION",

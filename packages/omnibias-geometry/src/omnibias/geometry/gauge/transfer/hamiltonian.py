@@ -77,6 +77,10 @@ Magnetic = Literal["sixj", "character"]
 #: P1 unique 3, P2 unique 2, P3 unique 3, shared s12, shared s23.
 THREE_PLAQUETTE_ELECTRIC = (3, 2, 3, 1, 1)
 
+#: Edge census of the 4-square chain (13 geometric edges).
+#: P1 unique 3, P2 unique 2, P3 unique 2, P4 unique 3, shared s12, s23, s34.
+FOUR_PLAQUETTE_ELECTRIC = (3, 2, 2, 3, 1, 1, 1)
+
 
 @dataclass(frozen=True)
 class GaugeHamiltonian:
@@ -346,6 +350,125 @@ def su2_three_plaquette_hamiltonian(
     )
 
 
+def legal_chain4(
+    two_j1: int,
+    two_j2: int,
+    two_j3: int,
+    two_j4: int,
+    two_js12: int,
+    two_js23: int,
+    two_js34: int,
+    *,
+    two_j_max: int,
+) -> bool:
+    """Three triangle inequalities of the 4-plaquette chain."""
+    return (
+        legal_triple(two_j1, two_j2, two_js12, two_j_max=two_j_max)
+        and legal_triple(two_j2, two_j3, two_js23, two_j_max=two_j_max)
+        and legal_triple(two_j3, two_j4, two_js34, two_j_max=two_j_max)
+    )
+
+
+def four_plaquette_basis(
+    j_max: int,
+) -> tuple[tuple[int, int, int, int, int, int, int], ...]:
+    """All legal ``(2j1, 2j2, 2j3, 2j4, 2js12, 2js23, 2js34)`` with ``j ≤ j_max``."""
+    if j_max < 1:
+        raise ValueError(f"j_max must be >= 1, got {j_max}")
+    two_j_max = 2 * int(j_max)
+    states = [
+        (t1, t2, t3, t4, s12, s23, s34)
+        for t1, t2, t3, t4, s12, s23, s34 in product(range(two_j_max + 1), repeat=7)
+        if legal_chain4(t1, t2, t3, t4, s12, s23, s34, two_j_max=two_j_max)
+    ]
+    return tuple(states)
+
+
+def su2_four_plaquette_hamiltonian(
+    coupling: Scalar,
+    *,
+    j_max: int = 1,
+    magnetic: Magnetic = "sixj",
+) -> GaugeHamiltonian:
+    """The four-plaquette SU(2) Kogut–Susskind Hamiltonian at one ``g²``.
+
+    Basis ``|j1, j2, j3, j4, js12, js23, js34⟩``.  Electric weights are
+    :data:`FOUR_PLAQUETTE_ELECTRIC`.  CI uses ``j_max=1`` (153 states).
+    Certified gap of this matrix is a finite L2 probe, not 4-D Yang-Mills
+    and not an ``L → ∞`` statement.
+    """
+    kind = _magnetic_kind(magnetic)
+    if isinstance(coupling, bool) or not isinstance(coupling, int | float | Fraction):
+        raise ValueError(f"coupling must be a positive scalar, got {coupling!r}")
+    if float(coupling) <= 0.0:
+        raise ValueError(f"coupling must be > 0, got {coupling!r}")
+    basis = four_plaquette_basis(j_max)
+    index = {state: i for i, state in enumerate(basis)}
+    two_j_max = 2 * int(j_max)
+    electric_pre = Interval.from_value(coupling) * Interval.from_value(Fraction(1, 2))
+    magnetic_pre = Interval.from_value(-2) / Interval.from_value(coupling)
+    n = len(basis)
+    raw = [[Interval.point(0.0) for _ in range(n)] for _ in range(n)]
+    w1, w2, w3, w4, ws12, ws23, ws34 = FOUR_PLAQUETTE_ELECTRIC
+    for state in basis:
+        t1, t2, t3, t4, s12, s23, s34 = state
+        i = index[state]
+        casimir = (
+            w1 * _casimir_jj(t1)
+            + w2 * _casimir_jj(t2)
+            + w3 * _casimir_jj(t3)
+            + w4 * _casimir_jj(t4)
+            + ws12 * _casimir_jj(s12)
+            + ws23 * _casimir_jj(s23)
+            + ws34 * _casimir_jj(s34)
+        )
+        raw[i][i] = raw[i][i] + electric_pre * Interval.from_value(casimir)
+        for eps, delta in product((-1, 1), repeat=2):
+            t1p, s12p = t1 + eps, s12 + delta
+            if legal_chain4(t1p, t2, t3, t4, s12p, s23, s34, two_j_max=two_j_max):
+                j = index[(t1p, t2, t3, t4, s12p, s23, s34)]
+                amp = _directed_magnetic(t1, s12, t2, t1p, s12p, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * amp
+            t4p, s34p = t4 + eps, s34 + delta
+            if legal_chain4(t1, t2, t3, t4p, s12, s23, s34p, two_j_max=two_j_max):
+                j = index[(t1, t2, t3, t4p, s12, s23, s34p)]
+                amp = _directed_magnetic(t4, s34, t3, t4p, s34p, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * amp
+        for eps, d_left, d_right in product((-1, 1), repeat=3):
+            t2p, s12p, s23p = t2 + eps, s12 + d_left, s23 + d_right
+            if legal_chain4(t1, t2p, t3, t4, s12p, s23p, s34, two_j_max=two_j_max):
+                j = index[(t1, t2p, t3, t4, s12p, s23p, s34)]
+                left = _directed_magnetic(t2, s12, t1, t2p, s12p, magnetic=kind)
+                right = _directed_magnetic(t2, s23, t3, t2p, s23p, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * left * right
+            t3p, s23p, s34p = t3 + eps, s23 + d_left, s34 + d_right
+            if legal_chain4(t1, t2, t3p, t4, s12, s23p, s34p, two_j_max=two_j_max):
+                j = index[(t1, t2, t3p, t4, s12, s23p, s34p)]
+                left = _directed_magnetic(t3, s23, t2, t3p, s23p, magnetic=kind)
+                right = _directed_magnetic(t3, s34, t4, t3p, s34p, magnetic=kind)
+                raw[i][j] = raw[i][j] + magnetic_pre * left * right
+    entries = _symmetrize(raw)
+    labels = tuple(
+        f"|{t1}/2, {t2}/2, {t3}/2, {t4}/2, {s12}/2, {s23}/2, {s34}/2>"
+        for t1, t2, t3, t4, s12, s23, s34 in basis
+    )
+    return GaugeHamiltonian(
+        model="su2_four_plaquette",
+        coupling=coupling,
+        j_max=int(j_max),
+        basis=basis,
+        entries=entries,
+        parameters={
+            "builder": "su2_four_plaquette_hamiltonian",
+            "coupling": encode_scalar(coupling),
+            "j_max": int(j_max),
+            "n_plaquettes": 4,
+            "magnetic": kind,
+        },
+        mode_labels=labels,
+    )
+
+
 def rebuild_hamiltonian(parameters: Mapping[str, object]) -> GaugeHamiltonian:
     """Replay helper: rebuild from ``(coupling, j_max, n_plaquettes, magnetic)``."""
     spec = dict(parameters)
@@ -360,12 +483,16 @@ def rebuild_hamiltonian(parameters: Mapping[str, object]) -> GaugeHamiltonian:
     if magnetic not in ("sixj", "character"):
         raise ValueError(f"magnetic must be 'sixj' or 'character', got {magnetic!r}")
     n_plaquettes = spec.get("n_plaquettes", 2)
+    if n_plaquettes == 4:
+        return su2_four_plaquette_hamiltonian(
+            coupling, j_max=j_max, magnetic=magnetic
+        )
     if n_plaquettes == 3:
         return su2_three_plaquette_hamiltonian(
             coupling, j_max=j_max, magnetic=magnetic
         )
     if n_plaquettes != 2:
-        raise ValueError(f"n_plaquettes must be 2 or 3, got {n_plaquettes!r}")
+        raise ValueError(f"n_plaquettes must be 2, 3, or 4, got {n_plaquettes!r}")
     return su2_two_plaquette_hamiltonian(coupling, j_max=j_max, magnetic=magnetic)
 
 
@@ -759,17 +886,21 @@ __all__ = [
     "RESIDUAL_EIGENBASIS_METHOD",
     "RESIDUAL_HOLONOMY_METHOD",
     "RESIDUAL_STANDARD_METHOD",
+    "FOUR_PLAQUETTE_ELECTRIC",
     "THREE_PLAQUETTE_ELECTRIC",
     "GaugeHamiltonian",
     "HamiltonianGapResult",
     "candidate_gap",
     "certified_hamiltonian_gap",
+    "four_plaquette_basis",
     "legal_chain",
+    "legal_chain4",
     "legal_triple",
     "physical_basis",
     "plaquette_holonomy_trial_space",
     "rebuild_hamiltonian",
     "standard_basis_trial_space",
+    "su2_four_plaquette_hamiltonian",
     "su2_three_plaquette_hamiltonian",
     "su2_two_plaquette_hamiltonian",
     "three_plaquette_basis",
