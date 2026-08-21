@@ -196,6 +196,10 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/jet_world.py",
     "packages/omnibias-dynamics/src/omnibias/dynamics/_core/jet_world.py",
     "packages/omnibias-holonomic/src/omnibias/holonomic/_core/export.py",
+    "packages/omnibias-core/src/omnibias/core/parameter_jets.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/operator/_core/parameter_jets.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/operator/torch/parameter_jets.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/operator/jax/parameter_jets.py",
 )
 
 

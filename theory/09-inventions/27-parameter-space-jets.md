@@ -6,7 +6,7 @@ Treat a PDE parameter `μ` as a **jet coordinate** so one forward
 pass yields mixed partials `∂^{α,β} u / ∂x^α ∂μ^β`, not only
 query-coordinate derivatives at a frozen `μ`.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-10, 09-01
 - **Blocks**: none
 
@@ -153,12 +153,12 @@ loop over mixed multi-indices.
 
 ## 12. Implementation checklist
 
-- [ ] Jet path for `parameters` in `omnibias.pinn.operator`
-- [ ] Method-label guard test
-- [ ] Fourier-mode G1 test
-- [ ] `benchmarks/parameter_space_jets.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Jet path for `parameters` in `omnibias.pinn.operator`
+- [x] Method-label guard test
+- [x] Fourier-mode G1 test
+- [x] `benchmarks/parameter_space_jets.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

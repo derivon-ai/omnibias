@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Parameter-space jets (theory 09-27)
+
+- `omnibias.core.parameter_jets` plus `omnibias.pinn.operator`
+  twins: mixed `x`–`μ` jets. `closed_form` only if `μ` is on the
+  jet trunk.
+- G1–G5 CI-gated. Not a ParamPINN package. Not NS. Not CCF stretch.
+- Docs: `docs/api/parameter_space_jets.md`,
+  `docs/cookbook/parameter-space-jets.md`.
+  Smoke: `docs/benchmarks/parameter_space_jets_smoke.json`.
+
+
+
 ### Added — Net-to-annihilator (theory 09-26)
 
 - `omnibias.holonomic._core.export`: Ore JSON export plus an optional

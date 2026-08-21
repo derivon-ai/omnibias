@@ -1,0 +1,56 @@
+{
+  "schema": "omnibias.benchmarks.parameter_space_jets.v1",
+  "generated_utc": "2026-08-21T21:24:36Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "parameter_space_jets",
+    "full": false,
+    "honesty": {
+      "parampinn_package": false,
+      "ns_claim": false,
+      "stretch_claim": false,
+      "continuum_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 808.77,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "abs_sum": 0.0,
+        "u": 0.36787944117144233
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "jet_mae": 2.5386914792591143e-13,
+        "fd_mae": 6.251153317204938e-09,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_method",
+        "passed": true,
+        "closed_form_refused_without_trunk": true
+      },
+      {
+        "name": "g4_honesty",
+        "passed": true,
+        "parampinn_package": false,
+        "ns_claim": false
+      }
+    ]
+  },
+  "disclaimer": "mixed x-mu jets; closed_form iff mu is on the jet trunk; not a ParamPINN package, not NS, not CCF stretch",
+  "wall_seconds": 1.4957134629948996
+}

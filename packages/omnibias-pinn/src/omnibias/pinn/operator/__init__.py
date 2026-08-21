@@ -45,11 +45,13 @@ from omnibias.pinn.operator._core import (
     volterra_apply,
     worked_example,
 )
+from omnibias.pinn.operator._core.parameter_jets import ParameterJetSpec, mixed_jet
 
 __all__ = [
     "ConditioningSpec",
     "IntegralKernelConfig",
     "OperatorSpec",
+    "ParameterJetSpec",
     "SensorGrid",
     "branch_coefficient_box",
     "certify_heat_residual",
@@ -57,6 +59,7 @@ __all__ = [
     "honesty_payload",
     "integral_cell",
     "integral_kernel_apply",
+    "mixed_jet",
     "sample_fourier_ics",
     "volterra_apply",
     "worked_example",

@@ -638,7 +638,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.jet_world` + `omnibias.dynamics._core.jet_world`
   (09-25; next N-jet + Lohner; G1–G4 CI; not NS global regularity) /
   `omnibias.holonomic._core.export`
-  (09-26; Ore export; G1–G4 CI; finite rational Lean only).
+  (09-26; Ore export; G1–G4 CI; finite rational Lean only) /
+  `omnibias.core.parameter_jets` + `omnibias.pinn.operator`
+  (09-27; mixed `x`–`μ` jets; G1–G5 CI; not a ParamPINN package).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -709,7 +711,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/inverse_design.md`](docs/api/inverse_design.md),
   [`docs/api/sharpness_regularizer.md`](docs/api/sharpness_regularizer.md),
   [`docs/api/world_model_jet.md`](docs/api/world_model_jet.md),
-  [`docs/api/net_to_annihilator.md`](docs/api/net_to_annihilator.md). Cost /
+  [`docs/api/net_to_annihilator.md`](docs/api/net_to_annihilator.md),
+  [`docs/api/parameter_space_jets.md`](docs/api/parameter_space_jets.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.
