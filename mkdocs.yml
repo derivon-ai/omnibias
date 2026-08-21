@@ -210,6 +210,7 @@ nav:
       - Pack-MoE (09-07): api/pack_moe.md
       - remainder training (09-18): api/remainder_training.md
       - Frame-UNet (09-04): api/frame_unet.md
+      - Characteristic-Net (09-08): api/characteristic_net.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -294,6 +295,7 @@ nav:
       - Pack-MoE: cookbook/pack-moe.md
       - Remainder training: cookbook/remainder-training.md
       - Frame-UNet: cookbook/frame-unet.md
+      - Characteristic-Net: cookbook/characteristic-net.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

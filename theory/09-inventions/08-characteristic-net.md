@@ -7,7 +7,7 @@ solution along characteristics using the closed-form time `integral`
 cell, so 1-D conservation laws are method-of-characteristics layers
 rather than collocation hopes.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 02-13, 09-01, 09-03
 - **Blocks**: none
 
@@ -117,11 +117,11 @@ def characteristic_eval(x, t, v_fn, u0_fn, *, config: CharacteristicConfig):
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.pinn` characteristic twins
-- [ ] Shock-flag test
-- [ ] `benchmarks/characteristic_net.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.pinn` characteristic twins
+- [x] Shock-flag test
+- [x] `benchmarks/characteristic_net.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

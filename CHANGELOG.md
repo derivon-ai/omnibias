@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Characteristic-Net (theory 09-08)
+
+- `omnibias.pinn.characteristic` plus
+  `omnibias.pinn.{torch,jax}.characteristic`: transport along a
+  learned `v` with a closed-form time integral and a shock flag.
+- G1–G4 CI-gated. Jets of `v` are founding bias collapse
+  (`delta -> 0`), not temperature collapse. Not 02-13. Not NS.
+  Not a unique post-shock solution.
+- Docs: `docs/api/characteristic_net.md`,
+  `docs/cookbook/characteristic-net.md`.
+  Smoke: `docs/benchmarks/characteristic_net_smoke.json`.
+
+
 ### Added — Frame-UNet (theory 09-04)
 
 - `omnibias.core.frame_unet` plus

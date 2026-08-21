@@ -150,6 +150,9 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/frame_unet.py",
     "packages/omnibias-torch/src/omnibias/torch/architectures/frame_unet.py",
     "packages/omnibias-jax/src/omnibias/jax/architectures/frame_unet.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/characteristic.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/torch/characteristic.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/jax/characteristic.py",
 )
 
 

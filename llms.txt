@@ -136,7 +136,10 @@ hook; G1–G4 CI; founding bias collapse, not temperature collapse;
 not 03-10),
 Frame-UNet (09-04; order encoder + integral decoder; G1–G4 CI;
 founding bias collapse, not temperature collapse; band skip is
-not a collapse head; `sigma'` not admissible). Cost / wall-time / FermiNet-many-body gates are
+not a collapse head; `sigma'` not admissible),
+Characteristic-Net (09-08; transport along learned `v`; G1–G4 CI;
+founding bias collapse, not temperature collapse; shock flag;
+not 02-13). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

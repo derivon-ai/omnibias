@@ -226,7 +226,7 @@ operator floor.
 | [09-05 Taylor-model neuron](09-inventions/05-taylor-model-neuron.md) | gated | Unit output is a `TaylorModel`; G1–G4 CI; remainder sound, not a deep-net certificate; founding bias collapse, not temperature collapse |
 | [09-06 coupling Jet-Flow](09-inventions/06-coupling-jet-flow.md) | gated | Finite couplings; closed-form `sum log sigma'`; G1–G3 CI; not `integrate_cnf`; founding bias collapse, not temperature collapse |
 | [09-07 Pack-MoE](09-inventions/07-pack-moe.md) | gated | Slab-mass router over pack experts; G1–G3 CI; not softmax; founding bias collapse, not temperature collapse |
-| [09-08 Characteristic-Net](09-inventions/08-characteristic-net.md) | concept | Transport along learned `v` with a closed-form time integral |
+| [09-08 Characteristic-Net](09-inventions/08-characteristic-net.md) | gated | Transport along learned `v` with a time integral; G1–G4 CI; shock flag; not 02-13; founding bias collapse, not temperature collapse |
 | [09-09 sheaf-atlas net](09-inventions/09-sheaf-atlas-net.md) | concept | Jet transition maps; cocycle residual to order N |
 | [09-10 Riccati flow net](09-inventions/10-riccati-flow-net.md) | concept | Depth is Riccati time; not DEQ and not CNF |
 | [09-11 Collapse-Net](09-inventions/11-collapse-net.md) | concept | Train stencils; infer by founding `delta -> 0` collapse |

@@ -610,7 +610,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.frame_unet` + `omnibias.{torch,jax}.architectures.frame_unet`
   (09-04; order encoder + integral decoder; G1–G4 CI; founding
   bias collapse, not temperature collapse; band skip is not a
-  collapse head; `sigma'` not admissible).
+  collapse head; `sigma'` not admissible) /
+  `omnibias.pinn.characteristic` + `omnibias.pinn.{torch,jax}.characteristic`
+  (09-08; transport along learned `v`; G1–G4 CI; founding bias
+  collapse, not temperature collapse; shock flag; not 02-13).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -667,7 +670,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/coupling_jet_flow.md`](docs/api/coupling_jet_flow.md),
   [`docs/api/pack_moe.md`](docs/api/pack_moe.md),
   [`docs/api/remainder_training.md`](docs/api/remainder_training.md),
-  [`docs/api/frame_unet.md`](docs/api/frame_unet.md). Cost /
+  [`docs/api/frame_unet.md`](docs/api/frame_unet.md),
+  [`docs/api/characteristic_net.md`](docs/api/characteristic_net.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

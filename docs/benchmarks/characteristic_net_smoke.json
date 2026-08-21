@@ -1,0 +1,52 @@
+{
+  "schema": "omnibias.benchmarks.characteristic_net.v1",
+  "generated_utc": "2026-08-21T20:13:29Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "characteristic_net",
+    "full": false,
+    "honesty": {
+      "is_02_13": false,
+      "ns_claim": false,
+      "unique_after_shock_claimed": false,
+      "stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 814.16,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_constant_v",
+        "passed": true,
+        "u": 0.9607894391523232,
+        "err": 0.0
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "char_median": 1.2212453270876722e-15,
+        "pinn_median": 0.17037364724310644,
+        "v_dev_median": 8.104628079763643e-15,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_shock_flag",
+        "passed": true,
+        "crossed_any": true,
+        "unique_after_shock_claimed": false
+      }
+    ]
+  },
+  "disclaimer": "characteristic transport with a time-integral window; not 02-13, not a shock-capturing theorem, not NS, and not CCF stretch",
+  "wall_seconds": 1.542314998980146
+}
