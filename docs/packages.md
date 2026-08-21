@@ -65,7 +65,7 @@ API-stability contract -- the public surface may shift between alpha releases.
 | omnibias-control | 0.1.0a1 | Alpha | Differentiable control with a model-relative safety certificate: a batched CBF-QP safety filter and a recoverable-set certificate. |
 | omnibias-tab | 0.1.0a1 | Alpha | Differentiable, exactly second-order-trained, certified soft decision-tree ensembles for tabular data; benchmarked against LightGBM. |
 | omnibias-partition | 0.1.0a1 | Alpha | Certified soft partition-of-unity primitive: soft-split gates hardening as beta->inf, a sound membership-gap certificate, a shared region-model registry, and gated arrangement geometry (`omnibias.partition.arrangement`). |
-| omnibias-shape | 0.1.0a1 | Alpha | Differentiable soft shape / occupancy fields and soft-coverage (soft-OR / log-sum-exp union) operators with a closed-form derivative tower. |
+| omnibias-shape | 0.1.0a1 | Alpha | Differentiable soft shape / occupancy fields, soft-coverage (soft-OR / log-sum-exp union), and gated 03-05 morphology (`logsumexp_beta` dilation / erosion with a composition-aware gap). |
 
 ### Learning primitives
 

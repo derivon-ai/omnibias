@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — differentiable morphology (theory 03-05)
+
+- `omnibias.shape.morphology`: soft dilation / erosion via
+  `logsumexp_beta`, composition-aware `log(N)/beta` gap,
+  learnable pack structuring elements, soft max-pool, and a
+  soft Euclidean distance transform.
+- G1–G6 CI-gated. Soft max is temperature collapse
+  (`beta -> inf`, feasibility), not founding bias collapse
+  (`delta -> 0`). The gap is worst-case. Not a seventh
+  `OperatorBlock` role.
+- Docs: `docs/api/morphology.md`, `docs/cookbook/morphology.md`.
+  Smoke: `docs/benchmarks/morphology_smoke.json`.
+
 ### Added — sliced optimal transport (theory 03-04)
 
 - `omnibias.measure.transport`: exact 1-D `W_1` between

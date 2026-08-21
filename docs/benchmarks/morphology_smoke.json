@@ -1,0 +1,100 @@
+{
+  "schema": "omnibias.benchmarks.morphology.v1",
+  "generated_utc": "2026-08-21T17:48:01Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "morphology",
+    "full": false,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "honesty": {
+      "seventh_operator_role": false,
+      "gap_is_worst_case": true,
+      "temperature_collapse": true,
+      "founding_bias_collapse_builds_pack_se": true
+    }
+  },
+  "rss_mb_at_start": 1291.45,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_rate",
+        "passed": true,
+        "devs": [
+          0.549306144334055,
+          0.2746530721670273,
+          0.13732653608351386,
+          0.06866326804175671,
+          0.034331634020878354
+        ],
+        "ratios": [
+          0.4999999999999996,
+          0.5000000000000008,
+          0.4999999999999984,
+          0.5
+        ],
+        "worked_center": 3.0179881498740966,
+        "detail": "four doublings on a constant window; predicted 1/beta"
+      },
+      {
+        "name": "g2_bound",
+        "passed": true,
+        "violations": 0,
+        "bound": 0.3662040962227033,
+        "detail": "dilation >= hard, erosion <= hard, gap holds"
+      },
+      {
+        "name": "g3_composition",
+        "passed": true,
+        "one": 0.7324081924454066,
+        "two": 1.4648163848908131,
+        "opening_bound": 1.4648163848908131,
+        "grad_dev": 1.4648163848908133,
+        "detail": "composition count 2; single-operator bound is violated by the gradient"
+      },
+      {
+        "name": "g4_learned_se",
+        "passed": true,
+        "mean_skill": 0.837281491289952,
+        "skills": [
+          0.7984774212828678,
+          0.7984774212828678,
+          0.9924977713182886,
+          0.7984774212828678,
+          0.7984774212828678
+        ],
+        "detail": "learned 5-tap opening vs flat-5 on width-2 salt"
+      },
+      {
+        "name": "g5_distance",
+        "passed": true,
+        "gap_bound": 0.17328679513998632,
+        "max_dev": 0.0045374819794524734,
+        "detail": "soft DT is a lower bound within log(N_obj)/beta"
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "torch_equal": true,
+        "jax_equal": true,
+        "worked": 3.0179881498740966,
+        "detail": "torch / jax dilate match numpy"
+      }
+    ]
+  },
+  "wall_seconds": 3.227512094017584
+}

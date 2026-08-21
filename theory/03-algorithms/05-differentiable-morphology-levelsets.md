@@ -7,7 +7,7 @@ homotopy of spec 01-08 makes the whole morphological algebra — opening, closin
 top-hat, skeletons, distance transforms — differentiable with exact derivatives
 and a `log(N)/beta` gap to the hard operator.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-02, 01-06, 01-08
 - **Blocks**: 03-09, 05-01
 
@@ -338,15 +338,15 @@ parameter count.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-shape/src/omnibias/shape/morphology/_core.py`
-- [ ] torch and jax twins with a parity test
-- [ ] Reuse `logsumexp_beta` and `logsumexp_gap_bound`; fork neither
-- [ ] Shifted `logsumexp` with an overflow test at high `beta`
-- [ ] One-sidedness test (exact inequality, not approximate)
-- [ ] Composition-accounting test that would fail with a single-operator bound
-- [ ] Distance-transform accuracy test against the exact transform
-- [ ] Terminology cross-reference note plus `PENALTY_FILES` registration
-- [ ] `benchmarks/morphology.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] `soft_max_pool` + `StructuringElement.scores` → `soft_top_k`
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-shape/src/omnibias/shape/morphology/_core.py`
+- [x] torch and jax twins with a parity test
+- [x] Reuse `logsumexp_beta` and `logsumexp_gap_bound`; fork neither
+- [x] Shifted `logsumexp` with an overflow test at high `beta`
+- [x] One-sidedness test (exact inequality, not approximate)
+- [x] Composition-accounting test that would fail with a single-operator bound
+- [x] Distance-transform accuracy test against the exact transform
+- [x] Terminology cross-reference note plus `PENALTY_FILES` registration
+- [x] `benchmarks/morphology.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] `soft_max_pool` + `StructuringElement.scores` → `soft_top_k`
+- [x] Index row in `theory/README.md`

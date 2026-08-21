@@ -45,4 +45,7 @@ match the torch backend to `atol=1e-10` in float64 (cross-backend parity tests).
 come from the same pure-Python Riccati tower in `omnibias-core`, so parity holds by
 construction.
 
-Status: Alpha (`0.1.0a1`).
+Status: Alpha (`0.1.0a1`). Gated 03-05 morphology lives in
+`omnibias.shape.morphology` (`docs/api/morphology.md`): soft
+dilation / erosion via `logsumexp_beta`, temperature collapse
+not founding bias collapse, not a seventh `OperatorBlock` role.

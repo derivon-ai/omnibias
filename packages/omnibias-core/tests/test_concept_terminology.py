@@ -100,6 +100,10 @@ PENALTY_FILES = (
     "packages/omnibias-measure/src/omnibias/measure/transport/torch.py",
     "packages/omnibias-measure/src/omnibias/measure/transport/jax.py",
     "packages/omnibias-measure/src/omnibias/measure/transport/__init__.py",
+    "packages/omnibias-shape/src/omnibias/shape/morphology/_core.py",
+    "packages/omnibias-shape/src/omnibias/shape/morphology/torch.py",
+    "packages/omnibias-shape/src/omnibias/shape/morphology/jax.py",
+    "packages/omnibias-shape/src/omnibias/shape/morphology/__init__.py",
 )
 
 
