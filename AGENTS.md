@@ -552,7 +552,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.verify.localization` (03-08; Krawczyk unique-peak
   enclosure of a scan response; G1–G6 CI; founding bias
   collapse, not temperature collapse; `Inconclusive` is
-  first-class; `local_box`; not `theorem_prover_verified`).
+  first-class; `local_box`; not `theorem_prover_verified`) /
+  `omnibias.shape.topology` (03-09; soft Euler / component
+  counts + 1-D Morse persistence; G1–G6 CI; temperature
+  collapse, not founding bias collapse; no differentiable
+  Betti number; `Inconclusive` when the gap does not separate).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -592,7 +596,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/morphology.md`](docs/api/morphology.md),
   [`docs/api/neural_quadrature.md`](docs/api/neural_quadrature.md),
   [`docs/api/scale_flow.md`](docs/api/scale_flow.md),
-  [`docs/api/certified_localization.md`](docs/api/certified_localization.md). Cost /
+  [`docs/api/certified_localization.md`](docs/api/certified_localization.md),
+  [`docs/api/differentiable_topology.md`](docs/api/differentiable_topology.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

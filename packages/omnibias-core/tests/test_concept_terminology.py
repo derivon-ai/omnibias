@@ -110,6 +110,10 @@ PENALTY_FILES = (
     "packages/omnibias-fields/src/omnibias/fields/scale.py",
     "packages/omnibias-verify/src/omnibias/verify/_core/localization.py",
     "packages/omnibias-verify/src/omnibias/verify/localization.py",
+    "packages/omnibias-shape/src/omnibias/shape/topology/_core.py",
+    "packages/omnibias-shape/src/omnibias/shape/topology/torch.py",
+    "packages/omnibias-shape/src/omnibias/shape/topology/jax.py",
+    "packages/omnibias-shape/src/omnibias/shape/topology/__init__.py",
 )
 
 

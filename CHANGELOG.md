@@ -6,6 +6,20 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — differentiable topology (theory 03-09)
+
+- `omnibias.shape.topology`: soft Euler characteristic and
+  soft component counts with a certified spectral integer
+  route, plus 1-D Morse persistence and a persistence loss.
+- G1–G6 CI-gated. No differentiable function equals a Betti
+  number. `beta -> inf` is temperature collapse, not founding
+  bias collapse. `Inconclusive` when the spectral gap does
+  not separate. Persistence is differentiable almost
+  everywhere.
+- Docs: `docs/api/differentiable_topology.md`,
+  `docs/cookbook/differentiable-topology.md`.
+  Smoke: `docs/benchmarks/differentiable_topology_smoke.json`.
+
 ### Added — certified scan localization (theory 03-08)
 
 - `omnibias.verify.localization`: Krawczyk unique-peak

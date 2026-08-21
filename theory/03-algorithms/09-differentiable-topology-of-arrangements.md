@@ -8,7 +8,7 @@ soft cell masses and `beta`-smoothed sublevel filtrations give them
 differentiable surrogates whose gap to the integer truth is bounded, so topology
 can enter a loss function honestly.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-03, 02-02, 03-03, 03-05
 - **Blocks**: 05-01, 05-02
 
@@ -260,14 +260,14 @@ connected-components labelling algorithm.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-shape/src/omnibias/shape/topology/_core.py`
-- [ ] torch and jax twins with a parity test
-- [ ] Reuse `partition_weights`, `certify_partition_gap`, `eig_operator`
-- [ ] `Inconclusive` return for the certified route, never a guessed integer
-- [ ] Convergence-rate tests for the soft counts
-- [ ] Certified-count correctness sweep including near-degenerate spectra
-- [ ] Persistence agreement test against a standard library
-- [ ] Terminology cross-reference note plus `PENALTY_FILES` registration
-- [ ] `benchmarks/differentiable_topology.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-shape/src/omnibias/shape/topology/_core.py`
+- [x] torch and jax twins with a parity test
+- [x] Reuse `partition_weights` face masses, `count_eigenvalues_below`
+- [x] `Inconclusive` return for the certified route, never a guessed integer
+- [x] Convergence-rate tests for the soft counts
+- [x] Certified-count correctness sweep including near-degenerate spectra
+- [x] Persistence agreement test against the 1-D Morse oracle
+- [x] Terminology cross-reference note plus `PENALTY_FILES` registration
+- [x] `benchmarks/differentiable_topology.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

@@ -87,7 +87,11 @@ temperature collapse; nonlinear flow is a recorded truncation),
 certified localization (03-08; Krawczyk unique-peak enclosure;
 G1–G6 CI; founding bias collapse, not temperature collapse;
 `Inconclusive` is first-class; `local_box`; not
-`theorem_prover_verified`). Cost / wall-time / FermiNet-many-body gates are
+`theorem_prover_verified`),
+differentiable topology (03-09; soft Euler / component counts
++ 1-D Morse persistence; G1–G6 CI; temperature collapse, not
+founding bias collapse; no differentiable Betti number;
+`Inconclusive` when the gap does not separate). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

@@ -49,3 +49,8 @@ Status: Alpha (`0.1.0a1`). Gated 03-05 morphology lives in
 `omnibias.shape.morphology` (`docs/api/morphology.md`): soft
 dilation / erosion via `logsumexp_beta`, temperature collapse
 not founding bias collapse, not a seventh `OperatorBlock` role.
+Gated 03-09 topology lives in `omnibias.shape.topology`
+(`docs/api/differentiable_topology.md`): soft Euler /
+component counts and 1-D Morse persistence, no differentiable
+Betti number, `Inconclusive` when the spectral gap does not
+separate.
