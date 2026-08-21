@@ -234,7 +234,7 @@ operator floor.
 | [09-13 jet-Hopfield](09-inventions/13-jet-hopfield.md) | concept | Memories are germs; contact match, not vector Hopfield |
 | [09-14 integral-kernel operator](09-inventions/14-integral-kernel-operator.md) | concept | Volumetric DeepONet kernel is an OMBU `integral`; not BEM-Net |
 | [09-15 q-OMBU / timescale](09-inventions/15-q-ombu-timescale.md) | concept | Hybrid q / Hilger layers; named `q -> 1` / `mu -> 0` limit |
-| [09-16 exact MAML](09-inventions/16-exact-maml.md) | concept | Inner exact GN / HVP; meta-grad is IFT through inner KKT |
+| [09-16 exact MAML](09-inventions/16-exact-maml.md) | gated | Inner exact GN / HVP; IFT meta-grad; G1–G3 CI; not ImageNet; founding bias collapse, not temperature collapse |
 | [09-17 dual-FTC training](09-inventions/17-dual-ftc-training.md) | gated | Dual `r_D`/`r_I` on the 09-03 cell; G1–G3 CI; not a VPINN; founding bias collapse, not temperature collapse |
 | [09-18 remainder training](09-inventions/18-remainder-training.md) | concept | Loss is `R_N`; may trigger 03-13 birth; not 03-10 alone |
 | [09-19 jet distillation](09-inventions/19-jet-distillation.md) | gated | Student matches a teacher N-jet; G1–G3 CI; not ImageNet KD; founding bias collapse, not temperature collapse |

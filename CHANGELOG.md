@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — exact MAML (theory 09-16)
+
+- `omnibias.core.exact_maml` plus `omnibias.{torch,jax}.optim_maml`:
+  one inner Newton / GN step; meta-grad is IFT on inner
+  stationarity (the chain rule).
+- G1–G3 CI-gated. Jets are founding bias collapse (`delta -> 0`),
+  not temperature collapse. Not ImageNet few-shot. Not CCF stretch.
+- Docs: `docs/api/exact_maml.md`, `docs/cookbook/exact-maml.md`.
+  Smoke: `docs/benchmarks/exact_maml_smoke.json`.
+
+
+
 ### Added — jet-token transformer and jet distillation (theory 09-02 / 09-19)
 
 - `omnibias.core.jet_token` plus torch / jax `architectures.jet_token`

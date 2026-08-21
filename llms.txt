@@ -119,7 +119,10 @@ residuals; G1–G3 CI; founding bias collapse, not temperature
 collapse; not a VPINN),
 jet-token / jet-distill (09-02 / 09-19; `compose_jet` mix +
 teacher N-jet match; G1–G3 CI; founding bias collapse, not
-temperature collapse; not ImageNet). Cost / wall-time / FermiNet-many-body gates are
+temperature collapse; not ImageNet),
+exact MAML (09-16; inner Newton + IFT meta-grad; G1–G3 CI;
+founding bias collapse, not temperature collapse; not
+ImageNet). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

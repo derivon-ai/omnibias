@@ -133,6 +133,9 @@ PENALTY_FILES = (
     "packages/omnibias-jax/src/omnibias/jax/architectures/jet_token.py",
     "packages/omnibias-torch/src/omnibias/torch/jet_distill.py",
     "packages/omnibias-jax/src/omnibias/jax/jet_distill.py",
+    "packages/omnibias-core/src/omnibias/core/exact_maml.py",
+    "packages/omnibias-torch/src/omnibias/torch/optim_maml.py",
+    "packages/omnibias-jax/src/omnibias/jax/optim_maml.py",
 )
 
 

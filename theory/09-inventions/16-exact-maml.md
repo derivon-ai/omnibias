@@ -6,7 +6,7 @@ Model-agnostic meta-learning whose **inner step uses exact HVPs /
 Gauss–Newton** and whose **meta-gradient is IFT through the inner KKT
 system**, not a finite-difference unrolling of Adam.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 08-01, 09-01
 - **Blocks**: none
 
@@ -108,11 +108,11 @@ JAX: inner loop is `lax.scan`; IFT is one linear solve.
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.{torch,jax}.optim` exact MAML
-- [ ] Quadratic IFT test
-- [ ] `benchmarks/exact_maml.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.{torch,jax}.optim` exact MAML
+- [x] Quadratic IFT test
+- [x] `benchmarks/exact_maml.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

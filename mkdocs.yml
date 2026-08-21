@@ -203,6 +203,7 @@ nav:
       - domain programs (07-07): api/domain_programs.md
       - FTC-Net / dual-FTC (09-03 / 09-17): api/ftc_net.md
       - jet-token / jet-distill (09-02 / 09-19): api/jet_token.md
+      - exact MAML (09-16): api/exact_maml.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -281,6 +282,7 @@ nav:
       - Domain programs (quantum / plasma / stack): cookbook/domain-programs.md
       - FTC-Net: cookbook/ftc-net.md
       - Jet-token mix: cookbook/jet-token.md
+      - Exact MAML: cookbook/exact-maml.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md
