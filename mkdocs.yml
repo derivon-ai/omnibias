@@ -176,6 +176,7 @@ nav:
       - holonomy band (02-14): api/holonomy_band.md
       - jet line search (03-12): api/line_search.md
       - adaptive pack refinement (03-13): api/refine.md
+      - composed curvature (08-02): api/composed_curvature.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -228,6 +229,7 @@ nav:
       - Faà di Bruno multi-layer jets: cookbook/faa-di-bruno-jets.md
       - Exact jet line search: cookbook/jet-line-search.md
       - Adaptive pack refinement: cookbook/adaptive-pack-refinement.md
+      - Composed-curvature joint Newton: cookbook/composed-curvature.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

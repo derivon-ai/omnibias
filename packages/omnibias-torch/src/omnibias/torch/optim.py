@@ -81,6 +81,12 @@ from omnibias.torch.line_search import (
     jet_line_search,
     jet_line_search_on_ray,
 )
+from omnibias.torch.optim_composed import (
+    ComposedCurvatureConfig,
+    ComposedCurvatureReport,
+    composed_block_hessian,
+    composed_curvature_step,
+)
 
 import torch
 import torch.nn as nn
@@ -3738,6 +3744,8 @@ class KFAC(torch.optim.Optimizer):
 
 __all__ = [
     "Closure",
+    "ComposedCurvatureConfig",
+    "ComposedCurvatureReport",
     "ConformalSymplectic",
     "CubicGaussNewton",
     "CubicNewton",
@@ -3764,6 +3772,8 @@ __all__ = [
     "StochasticNewtonCG",
     "TrustRegionNewtonCG",
     "cgls",
+    "composed_block_hessian",
+    "composed_curvature_step",
     "conjugate_gradient",
     "cubic_regularized_newton_step",
     "functional_residual_fn",

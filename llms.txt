@@ -45,7 +45,8 @@ each API page), exact jet line search (03-12; certified Lagrange
 radius + `verify=True` never-worse; G4/G5 recorded, not in CI
 `all_passed`), adaptive pack refinement (03-13; birth/growth
 bit-identical; death reports a bound; G4 recorded, not in CI
-`all_passed`). Cost / wall-time / FermiNet-many-body gates are
+`all_passed`), composed-curvature joint Newton (08-02; slice
+escape on the order-2 chain rule; G1–G4 CI; not a global min). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

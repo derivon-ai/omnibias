@@ -125,6 +125,12 @@ from omnibias.torch.moments import (
     gaussian_moment_propagation,
 )
 from omnibias.torch.multipack import BirkhoffOMBU, MultiPackUnit, multipack_response
+from omnibias.torch.optim_composed import (
+    ComposedCurvatureConfig,
+    ComposedCurvatureReport,
+    composed_block_hessian,
+    composed_curvature_step,
+)
 from omnibias.torch.probability import (
     binned_calibration_error,
     cdf,
@@ -165,6 +171,8 @@ __all__ = [
     "BankSpec",
     "BiasScan",
     "BirkhoffOMBU",
+    "ComposedCurvatureConfig",
+    "ComposedCurvatureReport",
     "EquivariantScan",
     "FourierTransform",
     "GrowStrategy",
@@ -195,6 +203,8 @@ __all__ = [
     "cmbLinear",
     "compose_jet",
     "compose_jet_mv",
+    "composed_block_hessian",
+    "composed_curvature_step",
     "cross_entropy",
     "delta_method_gaussian",
     "delta_method_moments",

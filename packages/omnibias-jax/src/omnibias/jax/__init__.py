@@ -151,6 +151,12 @@ from omnibias.jax.multipack import (
     multipack_apply,
     multipack_response,
 )
+from omnibias.jax.optim_composed import (
+    ComposedCurvatureConfig,
+    ComposedCurvatureReport,
+    composed_block_hessian,
+    composed_curvature_step,
+)
 from omnibias.jax.precision import X64_HINT, require_x64, x64_enabled
 from omnibias.jax.probability import (
     binned_calibration_error,
@@ -194,6 +200,8 @@ __all__ = [
     "AdaptivePackBank",
     "BankSpec",
     "BirkhoffOMBU",
+    "ComposedCurvatureConfig",
+    "ComposedCurvatureReport",
     "FourierTransform",
     "JaxActivationSpec",
     "JetLineSearchConfig",
@@ -214,6 +222,8 @@ __all__ = [
     "chi_squared_divergence",
     "compose_jet",
     "compose_jet_mv",
+    "composed_block_hessian",
+    "composed_curvature_step",
     "coulomb_potential",
     "cross_entropy",
     "delta_method_gaussian",

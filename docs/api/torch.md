@@ -161,6 +161,12 @@ radius.
 
 Birth / growth / death of tempered packs. See [refine.md](refine.md).
 
+## Composed-curvature joint Newton (08-02)
+
+Joint Hessian of consecutive layers from the order-2 chain rule. See
+[composed_curvature.md](composed_curvature.md). Re-exported from
+`omnibias.torch.optim`.
+
 ## Fastpath kernels
 
 ::: omnibias.torch.fastpath

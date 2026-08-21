@@ -86,6 +86,13 @@ Birth / growth / death of tempered packs (theory 03-13). Birth and
 growth are bit-identical; death reports a bound. G4 is recorded, not
 in CI `all_passed`. Documented in full at [refine.md](refine.md).
 
+## Composed-curvature joint Newton
+
+Order-2 chain rule on consecutive layers (theory 08-02). Escape is from
+a slice critical point when the joint block is indefinite. G1–G4 CI.
+Not a global min and not CCF stretch. Documented in full at
+[composed_curvature.md](composed_curvature.md).
+
 ## Hierarchical pack tree
 
 1-D near/far split (theory 02-07). `eta=0` is bit-identical to the

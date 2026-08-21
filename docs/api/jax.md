@@ -90,6 +90,9 @@ Exact jet line search (theory 03-12) lives in `omnibias.jax.line_search`
 and is re-exported here; see [line_search.md](line_search.md).
 Adaptive pack refinement (theory 03-13) lives in `omnibias.jax.refine`;
 see [refine.md](refine.md).
+Composed-curvature joint Newton (theory 08-02) lives in
+`omnibias.jax.optim_composed` and is re-exported here; see
+[composed_curvature.md](composed_curvature.md).
 
 ::: omnibias.jax.optim
     options:

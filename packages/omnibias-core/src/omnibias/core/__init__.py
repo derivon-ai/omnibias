@@ -30,6 +30,8 @@ Public API:
   jet line-search algebra (theory 03-12).
 * :class:`RefinePolicy`, :func:`refine_bank` -- adaptive pack
   refinement algebra (theory 03-13).
+* :class:`ComposedCurvatureConfig`, :func:`select_composed_step` --
+  composed-curvature joint Newton algebra (theory 08-02).
 
 There are no framework dependencies in this package.
 """
@@ -44,6 +46,18 @@ from omnibias.core.bell import (
     bell_number,
     bell_partial,
     faa_di_bruno_terms,
+)
+from omnibias.core.composed_curvature import (
+    ComposedCurvatureConfig,
+    ComposedCurvatureReport,
+    chain_rule_mse_blocks,
+    eigh_symmetric,
+    eval_tanh_derivative,
+    reject_full_parameter_jacobian,
+    scalar_nest_hessian,
+    select_composed_step,
+    solve_dense,
+    symmetrize,
 )
 from omnibias.core.conjugate import (
     HardyAtom,
@@ -183,6 +197,8 @@ __all__ = [
     "BandPlan",
     "BankSpec",
     "Cluster",
+    "ComposedCurvatureConfig",
+    "ComposedCurvatureReport",
     "EqualitySystem",
     "FrameSpec",
     "HardyAtom",
@@ -226,6 +242,7 @@ __all__ = [
     "certified_band_gap",
     "certified_truncation_radius",
     "certify_locus_point",
+    "chain_rule_mse_blocks",
     "cole_hopf_u",
     "compile_bank",
     "contact_residual",
@@ -236,8 +253,9 @@ __all__ = [
     "design_order",
     "dilated_sigma_n",
     "dkw_epsilon",
+    "eigh_symmetric",
+    "eval_tanh_derivative",
     "evaluate_hardy_dictionary",
-    "faa_di_bruno_terms",
     "gaussian_central_moments",
     "hardy_conjugate_dictionary",
     "has_cumulant_tower",
@@ -269,12 +287,17 @@ __all__ = [
     "raw_to_central_moments",
     "refine_bank",
     "registered_activations",
+    "reject_full_parameter_jacobian",
     "relative_bandwidth",
     "response_profile",
     "run_model_line_search",
+    "scalar_nest_hessian",
     "second_order_delta",
+    "select_composed_step",
     "select_model_step",
     "sigmoid_polynomial_coeffs",
+    "solve_dense",
+    "symmetrize",
     "tail_bound",
     "tanh_polynomial_coeffs",
     "taylor_coeffs_from_derivatives",

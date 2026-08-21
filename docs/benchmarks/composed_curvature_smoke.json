@@ -1,0 +1,71 @@
+{
+  "schema": "omnibias.benchmarks.composed_curvature.v1",
+  "generated_utc": "2026-08-21T15:35:23Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "composed_curvature",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "ccf_stretch_cleared": false,
+      "global_min_claim": false,
+      "temperature_collapse": false
+    }
+  },
+  "rss_mb_at_start": 1223.7,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_identity",
+        "passed": true,
+        "worst_rel": 0.0,
+        "expected": 1e-10,
+        "blocks": {
+          "H_ww": 0.046424482096496855,
+          "H_wv": -0.9231057496635497,
+          "H_vv": 0.0389570170338834
+        }
+      },
+      {
+        "name": "g2_escape",
+        "passed": true,
+        "n_seeds": 1,
+        "rows": [
+          {
+            "w": 3.0,
+            "skill": 0.18381594478082863,
+            "lambda_min_slice": 575.9233731543488,
+            "lambda_min_joint": -51.00391373663513,
+            "escaped": true,
+            "loss_before": 386.28187295746307,
+            "loss_after": 179.7708389842763,
+            "decreased": true,
+            "step_norm": 1.0
+          }
+        ],
+        "note": "Equivalent constructed residual: closed-form u_xx of v tanh(w x) on -u_xx = pi^2 sin(pi x). Skill is vs u=0 at the stalled slice min. Not a global min and not CCF stretch."
+      },
+      {
+        "name": "g3_parity",
+        "passed": true,
+        "worst_ulp": 0.0625,
+        "expected": 4.0
+      },
+      {
+        "name": "g4_no_flood",
+        "passed": true,
+        "note": "n_directions >= n_params without allow_full raises ValueError"
+      }
+    ]
+  },
+  "wall_seconds": 3.350514521007426
+}

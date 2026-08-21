@@ -7,7 +7,7 @@ exact coupling between consecutive layers, so a Newton step on the **joint**
 block `(W_{ell-1}, W_ell)` can leave a critical point that is a minimum of
 the current-layer slice and a saddle of the pair.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-10, 08-01
 - **Blocks**: none
 
@@ -240,15 +240,15 @@ for G2 (the field must beat `u = 0`).
 
 ## 12. Implementation checklist
 
-- [ ] `composed_block_hessian` / `composed_curvature_step` in
+- [x] `composed_block_hessian` / `composed_curvature_step` in
       `omnibias.{torch,jax}.optim` (or `optim_composed`)
-- [ ] Reuse `layer_jet` order 2; no new jet arithmetic
-- [ ] Raise on full-parameter Jacobian
-- [ ] Tests: G1 FD match, G2 escape or honest fail, G3 parity
-- [ ] `benchmarks/composed_curvature.py` plus smoke JSON
-- [ ] Docs page only after a gate passes
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Reuse `layer_jet` order 2; no new jet arithmetic
+- [x] Raise on full-parameter Jacobian
+- [x] Tests: G1 FD match, G2 escape or honest fail, G3 parity
+- [x] `benchmarks/composed_curvature.py` plus smoke JSON
+- [x] Docs page only after a gate passes
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

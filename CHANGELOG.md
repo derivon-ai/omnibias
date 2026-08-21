@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — composed-curvature joint Newton (theory 08-02)
+
+- `omnibias.core.composed_curvature` plus
+  `omnibias.{torch,jax}.optim_composed` twins: order-2 chain rule
+  Hessian of consecutive layers, slice-vs-joint eigenvalues, damped
+  joint Newton or a negative-mode escape. Length uses the 03-12 jet
+  line search (`verify=True`). `n_directions >= n_params` raises unless
+  `allow_full=True`. Re-exported from `omnibias.{torch,jax}.optim`.
+- G1–G4 CI-gated. Escape is from a slice critical point on a local
+  Poisson residual, not a global min and not CCF stretch. `sigma''`
+  comes from bias collapse (`delta -> 0`).
+- Docs: `docs/api/composed_curvature.md`,
+  `docs/cookbook/composed-curvature.md`.
+  Smoke: `docs/benchmarks/composed_curvature_smoke.json`.
+
 ### Added — adaptive pack refinement (theory 03-13)
 
 - `omnibias.core.refine` plus bit-identical

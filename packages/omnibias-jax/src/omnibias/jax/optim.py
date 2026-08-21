@@ -57,6 +57,12 @@ from omnibias.jax.line_search import (
     jet_line_search,
     jet_line_search_on_ray,
 )
+from omnibias.jax.optim_composed import (
+    ComposedCurvatureConfig,
+    ComposedCurvatureReport,
+    composed_block_hessian,
+    composed_curvature_step,
+)
 
 ResidualFn = Callable[[Array], Array]
 MatVec = Callable[[Array], Array]
@@ -918,6 +924,8 @@ def grad_norm_weights(
 
 
 __all__ = [
+    "ComposedCurvatureConfig",
+    "ComposedCurvatureReport",
     "CubicRegularizedGNConfig",
     "GNSolver",
     "GaussNewtonState",
@@ -930,6 +938,8 @@ __all__ = [
     "ResidualFn",
     "cgls",
     "champ_barrier_residual",
+    "composed_block_hessian",
+    "composed_curvature_step",
     "cubic_regularized_gauss_newton_minimize",
     "gauss_newton_direction",
     "gauss_newton_direction_cgls",

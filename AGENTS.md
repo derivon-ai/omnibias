@@ -492,7 +492,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `verify=True` never-worse; G4/G5 recorded, not in CI `all_passed`) /
   `omnibias.core.refine` / `omnibias.{torch,jax}.refine` (03-13; birth and
   growth bit-identical; death reports a bound; G4 recorded, not in CI
-  `all_passed`).
+  `all_passed`) /
+  `omnibias.core.composed_curvature` /
+  `omnibias.{torch,jax}.optim_composed` (08-02; joint two-layer Newton;
+  G1–G4 CI; slice escape, not a global min).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -515,7 +518,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/transforms_pde.md`](docs/api/transforms_pde.md),
   [`docs/api/holonomy_band.md`](docs/api/holonomy_band.md),
   [`docs/api/line_search.md`](docs/api/line_search.md),
-  [`docs/api/refine.md`](docs/api/refine.md). Cost /
+  [`docs/api/refine.md`](docs/api/refine.md),
+  [`docs/api/composed_curvature.md`](docs/api/composed_curvature.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.
