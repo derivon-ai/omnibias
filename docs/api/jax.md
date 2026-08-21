@@ -88,6 +88,8 @@ in `theta`) and the **geometry pullback** `g = J^T h J`
 (`omnibias.geometry.jax.ops.pullback_metric`).
 Exact jet line search (theory 03-12) lives in `omnibias.jax.line_search`
 and is re-exported here; see [line_search.md](line_search.md).
+Adaptive pack refinement (theory 03-13) lives in `omnibias.jax.refine`;
+see [refine.md](refine.md).
 
 ::: omnibias.jax.optim
     options:

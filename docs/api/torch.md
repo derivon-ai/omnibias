@@ -157,6 +157,10 @@ Certified-radius directional line search, re-exported from
 `taylor_line_min` is the older order-2/3 helper without a certified
 radius.
 
+## Adaptive pack refinement (03-13)
+
+Birth / growth / death of tempered packs. See [refine.md](refine.md).
+
 ## Fastpath kernels
 
 ::: omnibias.torch.fastpath

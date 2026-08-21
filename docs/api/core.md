@@ -80,6 +80,12 @@ radius when a `|phi^(N+1)|` bound is supplied; `verify=True` is the
 never-worse backstop. G4/G5 are recorded, not in CI `all_passed`.
 Documented in full at [line_search.md](line_search.md).
 
+## Adaptive pack refinement
+
+Birth / growth / death of tempered packs (theory 03-13). Birth and
+growth are bit-identical; death reports a bound. G4 is recorded, not
+in CI `all_passed`. Documented in full at [refine.md](refine.md).
+
 ## Hierarchical pack tree
 
 1-D near/far split (theory 02-07). `eta=0` is bit-identical to the

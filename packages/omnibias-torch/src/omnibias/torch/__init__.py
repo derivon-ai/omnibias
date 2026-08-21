@@ -133,6 +133,7 @@ from omnibias.torch.probability import (
     model_band_mass,
     soft_histogram,
 )
+from omnibias.torch.refine import AdaptivePackBank, grow_ombu, refine
 from omnibias.torch.scan import BankSpec, BiasScan, scan_response, soft_argmax_offset
 from omnibias.torch.scan_equivariant import EquivariantScan, steerable_basis
 from omnibias.torch.tempered_blocks import LearnablePReLU, TemperedActivation
@@ -158,6 +159,7 @@ __lineage__ = "bias collapse"
 
 __all__ = [
     "ActivationSpec",
+    "AdaptivePackBank",
     "AnalyticGaussianConv1d",
     "AnalyticGaussianConv2d",
     "BankSpec",
@@ -209,6 +211,7 @@ __all__ = [
     "get_activation",
     "glm_mean",
     "glm_variance",
+    "grow_ombu",
     "hardy_atoms",
     "has_transform",
     "hellinger_distance",
@@ -243,6 +246,7 @@ __all__ = [
     "moment_match",
     "multipack_response",
     "mutual_information",
+    "refine",
     "region_of_convergence",
     "register_activation",
     "removable_value",

@@ -150,7 +150,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [03-10 jet-Pade singularity tracking](03-algorithms/10-jet-pade-singularity-tracking.md) | designed | High-order jets locate the nearest complex singularity |
 | [03-11 Lie symmetry discovery](03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md) | designed | Prolongations are jets, so symmetry search is a linear solve |
 | [03-12 exact jet line search](03-algorithms/12-exact-jet-line-search.md) | gated | Certified radius + `verify=True` never-worse; G1/G2/G3/G6 CI; G4/G5 recorded, not CI `all_passed` |
-| [03-13 adaptive pack refinement](03-algorithms/13-adaptive-pack-refinement.md) | designed | Residual-driven birth, promotion and death of packs |
+| [03-13 adaptive pack refinement](03-algorithms/13-adaptive-pack-refinement.md) | gated | Birth/growth bit-identical; death reports a bound; G1/G2/G3/G5/G6 CI; G4 recorded, not CI `all_passed` |
 
 ### 04 Cross-domain bridges
 

@@ -160,6 +160,12 @@ from omnibias.jax.probability import (
     model_band_mass,
     soft_histogram,
 )
+from omnibias.jax.refine import (
+    AdaptivePackBank,
+    bank_forward,
+    init_pack_bank,
+    refine,
+)
 from omnibias.jax.scan import (
     BankSpec,
     bias_scan,
@@ -185,6 +191,7 @@ from omnibias.jax.transforms import (
 __lineage__ = "bias collapse"
 
 __all__ = [
+    "AdaptivePackBank",
     "BankSpec",
     "BirkhoffOMBU",
     "FourierTransform",
@@ -200,6 +207,7 @@ __all__ = [
     "affine_jet",
     "affine_jet_mv",
     "antiderivative_jet",
+    "bank_forward",
     "bias_scan",
     "binned_calibration_error",
     "cdf",
@@ -232,6 +240,7 @@ __all__ = [
     "identity_jet",
     "init_bias_scan",
     "init_multipack",
+    "init_pack_bank",
     "is_registered",
     "jet_attention",
     "jet_exp",
@@ -270,6 +279,7 @@ __all__ = [
     "neural_field_value_and_laplacian",
     "neural_field_value_grad_hessian",
     "neural_field_value_grad_laplacian",
+    "refine",
     "region_of_convergence",
     "register_activation",
     "removable_value",

@@ -6,6 +6,20 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — adaptive pack refinement (theory 03-13)
+
+- `omnibias.core.refine` plus bit-identical
+  `omnibias.{torch,jax}.refine` twins: birth (`c = 0`) and collapsed
+  *p*-type growth are bit-identical; death reports
+  `death_perturbation`. `GrowableOMBU.grow` remains the literal-`K`
+  path (torch). Scale `alpha` is the founding scaling law, not
+  temperature collapse. Singularity / scale-flow indicators use
+  Domb-Sykes and jet ratios, not the full 03-10 / 03-07 modules.
+- G1/G2/G3/G5/G6 CI-gated. G4 (10x vs a fixed bank) earned on the
+  smoke lstsq reconstruction and is recorded, not in CI `all_passed`.
+- Docs: `docs/api/refine.md`, `docs/cookbook/adaptive-pack-refinement.md`.
+  Smoke: `docs/benchmarks/adaptive_refinement_smoke.json`.
+
 ### Added — exact jet line search (theory 03-12)
 
 - `omnibias.core.line_search` plus bit-identical

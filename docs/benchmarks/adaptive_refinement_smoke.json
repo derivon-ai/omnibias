@@ -1,0 +1,104 @@
+{
+  "schema": "omnibias.benchmarks.adaptive_refinement.v1",
+  "generated_utc": "2026-08-21T15:20:42Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "adaptive_refinement",
+    "full": false,
+    "g4_earned": true,
+    "honesty": {
+      "temperature_collapse": false,
+      "death_is_exact_zero": false,
+      "ccf_stretch_cleared": false
+    }
+  },
+  "rss_mb_at_start": 1063.56,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_zero_perturbation",
+        "passed": true,
+        "birth_ok": true,
+        "grow_ombu_ok": true,
+        "note": "Birth c=0 and GrowableOMBU.grow('pair') are bit-identical"
+      },
+      {
+        "name": "g2_death_accounting",
+        "passed": true,
+        "measured": 0.013348480566077675,
+        "reported": 0.013348480566077677,
+        "violations": 0,
+        "note": "reported death_perturbation upper-bounds measured ||\u0394u|| / ||u||"
+      },
+      {
+        "name": "g3_indicator_quality",
+        "passed": true,
+        "residual_scale": 2.0,
+        "singularity_scale": -100.0,
+        "scale_flow_scale": -100.0,
+        "note": "BL jet at x=0.005; residual inherits alpha=2, jet indicators propose ~-100"
+      },
+      {
+        "name": "g5_budget_stability",
+        "passed": true,
+        "counts": [
+          3,
+          2,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1
+        ],
+        "max_count": 3,
+        "note": "min_age + death keep the slot count from running away"
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "worst_ulp": 0.9570997858794978,
+        "expected": 4.0,
+        "torch_scale": -100.0,
+        "jax_scale": -100.0
+      }
+    ]
+  },
+  "g4": {
+    "name": "g4_efficiency_win",
+    "passed": false,
+    "earned": true,
+    "fixed_rmse": 0.0886469782286847,
+    "adaptive_rmse": 2.5912650776736846e-17,
+    "fixed_over_adaptive": 3420992278731582.5,
+    "expected": 10.0,
+    "n_seeds": 1,
+    "note": "Matched 3-pack lstsq on exp(-100x). Recorded, not in CI all_passed."
+  },
+  "wall_seconds": 1.8237743850331753
+}

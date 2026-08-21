@@ -28,6 +28,8 @@ Public API:
 * :class:`HardyDictionary` -- conjugate Hilbert dictionary (theory 01-12).
 * :class:`JetLineSearchConfig`, :func:`run_model_line_search` -- exact
   jet line-search algebra (theory 03-12).
+* :class:`RefinePolicy`, :func:`refine_bank` -- adaptive pack
+  refinement algebra (theory 03-13).
 
 There are no framework dependencies in this package.
 """
@@ -130,6 +132,16 @@ from omnibias.core.probability import (
     dkw_epsilon,
     is_cdf_activation,
 )
+from omnibias.core.refine import (
+    Indicator,
+    RefinedPack,
+    RefinePolicy,
+    RefineReport,
+    assert_zero_perturbation,
+    hp_decision,
+    local_scale_from_derivatives,
+    refine_bank,
+)
 from omnibias.core.spec import (
     ActivationSpec,
     NthDerivativeFn,
@@ -175,6 +187,7 @@ __all__ = [
     "FrameSpec",
     "HardyAtom",
     "HardyDictionary",
+    "Indicator",
     "JetLineSearchConfig",
     "Layer",
     "LineSearchResult",
@@ -185,6 +198,9 @@ __all__ = [
     "Normalization",
     "NthDerivativeFn",
     "PackSpec",
+    "RefinePolicy",
+    "RefineReport",
+    "RefinedPack",
     "TensorFn",
     "TensorT",
     "TransformIdentity",
@@ -197,6 +213,7 @@ __all__ = [
     "admissibility_constant",
     "affine_locus",
     "alpha_for_peak",
+    "assert_zero_perturbation",
     "bell_complete",
     "bell_number",
     "bell_partial",
@@ -228,6 +245,7 @@ __all__ = [
     "hermite_function",
     "hierarchical_value",
     "hilbert_hardy_dictionary",
+    "hp_decision",
     "incidence_matrix",
     "index_position",
     "is_admissible",
@@ -235,6 +253,7 @@ __all__ = [
     "is_holonomic",
     "is_log_partition_activation",
     "is_poised",
+    "local_scale_from_derivatives",
     "make_tempered_fastpath",
     "make_tempered_transforms",
     "mish_inner_coeffs",
@@ -248,6 +267,7 @@ __all__ = [
     "polynomial_wolfe",
     "raw_moments_from_cumulants",
     "raw_to_central_moments",
+    "refine_bank",
     "registered_activations",
     "relative_bandwidth",
     "response_profile",

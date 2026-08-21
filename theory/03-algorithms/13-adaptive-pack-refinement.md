@@ -7,14 +7,15 @@ residual demands it), **growth** (raise a pack's order), and **death** (prune a
 pack that stopped earning its parameters) — each of which preserves the current
 fit exactly, so refinement can never undo learning.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 03-01, 03-06, 03-07, 03-10, 03-12
 - **Blocks**: 02-03, 05-01
 
 ## 2. Where it lands
 
+`packages/omnibias-core/src/omnibias/core/refine.py` (shared algebra) plus
 `packages/omnibias-torch/src/omnibias/torch/refine.py` and the jax twin, beside
-`growable.py` which already implements one of the three moves.
+`growable.py` which already implements literal-`K` growth.
 
 ## 3. Prior art in omnibias
 
@@ -30,8 +31,12 @@ fit exactly, so refinement can never undo learning.
 - `omnibias.difference` — certified truncation, for bounding what a refinement
   can gain.
 
-**Confirmed gap.** Growth exists on one axis (`K` within a pack). There is no
-birth (adding packs), no death (pruning), and no indicator-driven policy.
+**Closed for the three moves.** `omnibias.core.refine` plus the torch/jax
+twins implement birth (`c = 0`), collapsed *p*-type growth (higher-order
+sibling with `c = 0`), and death with a reported bound. Literal-`K`
+growth still goes through `GrowableOMBU.grow` (torch). Singularity /
+scale-flow indicators use Domb-Sykes and jet-ratio estimators; they are
+not the full 03-10 Padé tracker or the 03-07 RG beta-function.
 
 ## 4. Mathematics
 
@@ -269,15 +274,15 @@ refinement, and `FBPINNField` with hand-tuned windows.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-torch/src/omnibias/torch/refine.py`
-- [ ] `packages/omnibias-jax/src/omnibias/jax/refine.py`
-- [ ] Reuse `GrowableOperatorMultiBiasUnit` for the growth move; do not
+- [x] `packages/omnibias-torch/src/omnibias/torch/refine.py`
+- [x] `packages/omnibias-jax/src/omnibias/jax/refine.py`
+- [x] Reuse `GrowableOperatorMultiBiasUnit` for the growth move; do not
       reimplement it
-- [ ] Bit-identical zero-perturbation assertions for birth and growth
-- [ ] `death_perturbation` bound with a soundness test
-- [ ] Indicator comparison including the negative result for plain residual
-- [ ] `min_age` and hysteresis to prevent oscillation, with a long-run test
-- [ ] Documented optimizer-state policy on parameter addition
-- [ ] `benchmarks/adaptive_refinement.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] Bit-identical zero-perturbation assertions for birth and growth
+- [x] `death_perturbation` bound with a soundness test
+- [x] Indicator comparison including the negative result for plain residual
+- [x] `min_age` and hysteresis to prevent oscillation, with a long-run test
+- [x] Documented optimizer-state policy on parameter addition
+- [x] `benchmarks/adaptive_refinement.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

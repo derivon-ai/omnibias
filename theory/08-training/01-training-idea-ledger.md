@@ -62,7 +62,8 @@ Shipped trainers and jets — Group 08 must not re-derive them.
   certified radius).
 - Spec 03-10 — jet–Padé singularity tracking. Diagnostic, not a step rule.
 - Spec 03-11 — Lie symmetry. Constrains the hypothesis class.
-- Spec 03-13 — adaptive pack refinement. Architecture as the learner.
+- Spec 03-13 — adaptive pack refinement (gated: `omnibias.core.refine` plus
+  torch/jax twins; birth/growth bit-identical; death reports a bound).
 - Spec 04-01 — closed-form Fisher / natural gradient (G2 earned).
 - Spec 05-02 — arrangement / temperature collapse. A different hypothesis
   class, not a generic-MLP trainer.

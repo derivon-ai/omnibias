@@ -175,6 +175,7 @@ nav:
       - linearizing transforms (02-13): api/transforms_pde.md
       - holonomy band (02-14): api/holonomy_band.md
       - jet line search (03-12): api/line_search.md
+      - adaptive pack refinement (03-13): api/refine.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -226,6 +227,7 @@ nav:
   - Cookbook:
       - Faà di Bruno multi-layer jets: cookbook/faa-di-bruno-jets.md
       - Exact jet line search: cookbook/jet-line-search.md
+      - Adaptive pack refinement: cookbook/adaptive-pack-refinement.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md
