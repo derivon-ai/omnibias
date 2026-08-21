@@ -6,7 +6,7 @@ After training, **emit an Ore / jet description** plus a *finite
 rational* Lean obligation — an export format, not a better loss.
 Infinite analytic obligations stay out of Lean.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-11, 09-01, 09-12
 - **Blocks**: none
 
@@ -111,11 +111,11 @@ def export_annihilator(layer, *, emit_lean: bool = False) -> AnnihilatorExport:
 
 ## 12. Implementation checklist
 
-- [ ] Export helpers in `omnibias.holonomic` + formal bridge
-- [ ] Forbidden-claim string tests
-- [ ] `benchmarks/net_to_annihilator.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Export helpers in `omnibias.holonomic` + formal bridge
+- [x] Forbidden-claim string tests
+- [x] `benchmarks/net_to_annihilator.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

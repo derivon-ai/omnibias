@@ -529,6 +529,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/world_model_jet.py
+      - name: Run net-to-annihilator smoke (09-26 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/net_to_annihilator.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate
@@ -1088,6 +1092,10 @@ jobs:
         run: |
           source .venv-holonomic/bin/activate
           python benchmarks/holonomic_layer.py
+      - name: Run net-to-annihilator smoke (09-26 G1–G3)
+        run: |
+          source .venv-holonomic/bin/activate
+          python benchmarks/net_to_annihilator.py
 
   sos:
     name: omnibias-sos (alpha)

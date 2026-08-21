@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Net-to-annihilator (theory 09-26)
+
+- `omnibias.holonomic._core.export`: Ore JSON export plus an optional
+  finite-rational Lean readout. Verified flags stay false.
+- G1–G4 CI-gated. Continuum / `sorry` Lean is refused. Not a
+  continuum PDE. Not CCF stretch.
+- Docs: `docs/api/net_to_annihilator.md`,
+  `docs/cookbook/net-to-annihilator.md`.
+  Smoke: `docs/benchmarks/net_to_annihilator_smoke.json`.
+
+
 ### Added — World-model-as-jet (theory 09-25)
 
 - `omnibias.core.jet_world` plus `omnibias.dynamics._core.jet_world`:

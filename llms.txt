@@ -164,7 +164,9 @@ G1–G4 CI; not 08-03; not a global inverse),
 sharpness regularizer (09-23; `L + mu * ritz`; G1–G4 CI;
 not 08-06 schedule),
 world-model-as-jet (09-25; next N-jet + Lohner remainder;
-G1–G4 CI; not NS global regularity). Cost /
+G1–G4 CI; not NS global regularity),
+net-to-annihilator (09-26; Ore export; G1–G4 CI; finite
+rational Lean only; flags future-earned). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

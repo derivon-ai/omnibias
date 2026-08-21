@@ -125,6 +125,7 @@ from omnibias.holonomic._core import (
     wz_pair,
     zeilberger,
 )
+from omnibias.holonomic._core.export import AnnihilatorExport, export_annihilator
 from omnibias.holonomic._core.layer import HolonomicLayerSpec, fit_holonomic_layer, holonomic_jet
 from omnibias.holonomic.jacobian_n2 import (
     JacobianN2DegreeFamily,
@@ -153,6 +154,7 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
 __lineage__ = "exempt: D-finite Ore algebra"
 
 __all__ = [
+    "AnnihilatorExport",
     "AsymptoticEstimate",
     "DFinite",
     "GosperResult",
@@ -190,6 +192,7 @@ __all__ = [
     "dispersion_set",
     "empirical_rate",
     "escalate_n2_result",
+    "export_annihilator",
     "fiber_report",
     "fit_holonomic_layer",
     "gabber_n2_test",

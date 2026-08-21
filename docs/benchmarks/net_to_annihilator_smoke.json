@@ -1,0 +1,51 @@
+{
+  "schema": "omnibias.benchmarks.net_to_annihilator.v1",
+  "generated_utc": "2026-08-21T21:21:01Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "net_to_annihilator",
+    "full": false,
+    "honesty": {
+      "theorem_prover_verified": false,
+      "mathlib_verified": false,
+      "continuum_claim": false,
+      "navier_stokes_proof_claim": false,
+      "stretch_claim": false
+    }
+  },
+  "rss_mb_at_start": 810.97,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "order": 1,
+        "match": true
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "flags_false": true,
+        "continuum_raised": true,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "theorem_prover_verified": false,
+        "mathlib_verified": false
+      }
+    ]
+  },
+  "disclaimer": "Ore annihilator export; finite rational Lean only; verified flags future-earned; not a continuum PDE, not CCF stretch",
+  "wall_seconds": 1.721789579023607
+}

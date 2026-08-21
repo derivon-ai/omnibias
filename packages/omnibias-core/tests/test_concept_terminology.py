@@ -195,6 +195,7 @@ PENALTY_FILES = (
     "packages/omnibias-jax/src/omnibias/jax/optim_sharp_loss.py",
     "packages/omnibias-core/src/omnibias/core/jet_world.py",
     "packages/omnibias-dynamics/src/omnibias/dynamics/_core/jet_world.py",
+    "packages/omnibias-holonomic/src/omnibias/holonomic/_core/export.py",
 )
 
 
