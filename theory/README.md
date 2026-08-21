@@ -224,7 +224,7 @@ operator floor.
 | [09-03 FTC-Net](09-inventions/03-ftc-net.md) | gated | Integral cell + collapse head; G1–G3 CI; not a VPINN; founding bias collapse, not temperature collapse |
 | [09-04 Frame-UNet](09-inventions/04-frame-unet.md) | concept | Order encoder + integral decoder; band skip is not a collapse head |
 | [09-05 Taylor-model neuron](09-inventions/05-taylor-model-neuron.md) | gated | Unit output is a `TaylorModel`; G1–G4 CI; remainder sound, not a deep-net certificate; founding bias collapse, not temperature collapse |
-| [09-06 coupling Jet-Flow](09-inventions/06-coupling-jet-flow.md) | concept | Finite couplings; `log|det| = sum log sigma'`; Newton inverse |
+| [09-06 coupling Jet-Flow](09-inventions/06-coupling-jet-flow.md) | gated | Finite couplings; closed-form `sum log sigma'`; G1–G3 CI; not `integrate_cnf`; founding bias collapse, not temperature collapse |
 | [09-07 Pack-MoE](09-inventions/07-pack-moe.md) | concept | Experts are packs; router is slab mass, not softmax |
 | [09-08 Characteristic-Net](09-inventions/08-characteristic-net.md) | concept | Transport along learned `v` with a closed-form time integral |
 | [09-09 sheaf-atlas net](09-inventions/09-sheaf-atlas-net.md) | concept | Jet transition maps; cocycle residual to order N |

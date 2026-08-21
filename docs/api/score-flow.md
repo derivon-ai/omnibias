@@ -36,3 +36,10 @@ operations, so this is looser than the bit-identical kernels).
 
 Status: Alpha submodule (`omnibias.score.flow`) of the alpha `omnibias-score`
 package (folded from the former `omnibias-flow` `0.1.0a1`).
+
+## Coupling jet-flow (09-06)
+
+Finite couplings with a closed-form `sum log sigma'` live in
+`omnibias.core.coupling_flow` and
+`omnibias.score.flow.{torch,jax}.jet_flow`. That stack is not
+`integrate_cnf`. See [coupling jet-flow](coupling_jet_flow.md).

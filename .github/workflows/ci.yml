@@ -289,6 +289,8 @@ jobs:
           pip install -e packages/omnibias-symbolic
           pip install -e packages/omnibias-pinn
           pip install -e "packages/omnibias-sos[test]"
+          pip install -e packages/omnibias-verify
+          pip install -e "packages/omnibias-score[torch,jax]"
           pip install pytest
       - name: Run cross-backend parity tests
         run: |
@@ -455,6 +457,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/proof_carrying_forward.py
+      - name: Run coupling-jet-flow smoke (09-06 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/coupling_jet_flow.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

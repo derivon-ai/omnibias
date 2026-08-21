@@ -6,7 +6,7 @@ A finite-depth coupling flow whose Jacobian determinant is
 `sum log sigma'(z_i)` in closed form and whose inverse is Newton with
 exact `sigma'`.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 09-01
 - **Blocks**: none
 
@@ -118,11 +118,11 @@ JAX: inverse is a `lax.while_loop` with a fixed max step count.
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.score.flow` jet-flow twins
-- [ ] Round-trip and log-det tests
-- [ ] `benchmarks/coupling_jet_flow.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.score.flow` jet-flow twins
+- [x] Round-trip and log-det tests
+- [x] `benchmarks/coupling_jet_flow.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

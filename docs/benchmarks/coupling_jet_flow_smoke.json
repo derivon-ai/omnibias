@@ -1,0 +1,55 @@
+{
+  "schema": "omnibias.benchmarks.coupling_jet_flow.v1",
+  "generated_utc": "2026-08-21T19:51:47Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "coupling_jet_flow",
+    "full": false,
+    "honesty": {
+      "imagenet_claim": false,
+      "stretch_claim": false,
+      "rewrites_integrate_cnf": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 808.87,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_det",
+        "passed": true,
+        "log_det_err": 0.0,
+        "inv_err": 0.0
+      },
+      {
+        "name": "g2_invert",
+        "passed": true,
+        "roundtrip": 2.7755575615628914e-16
+      },
+      {
+        "name": "g3_skill",
+        "passed": true,
+        "flow_mean": 0.9224225510992714,
+        "iso_mean": 2.563573289961003,
+        "cnf_mean": 2.846339745629233,
+        "skill": 0.6401809323293023
+      },
+      {
+        "name": "g4_honesty",
+        "passed": true,
+        "imagenet_claim": false
+      }
+    ]
+  },
+  "disclaimer": "finite coupling + closed-form log-det; not integrate_cnf, not ImageNet, not CCF stretch",
+  "wall_seconds": 1.2909327740198933
+}

@@ -206,6 +206,7 @@ nav:
       - exact MAML (09-16): api/exact_maml.md
       - Taylor-model neuron (09-05): api/tm_neuron.md
       - proof-carrying forward (09-24): api/pci.md
+      - coupling jet-flow (09-06): api/coupling_jet_flow.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -286,6 +287,7 @@ nav:
       - Jet-token mix: cookbook/jet-token.md
       - Exact MAML: cookbook/exact-maml.md
       - Taylor-model neuron: cookbook/tm-neuron.md
+      - Coupling jet-flow: cookbook/coupling-jet-flow.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

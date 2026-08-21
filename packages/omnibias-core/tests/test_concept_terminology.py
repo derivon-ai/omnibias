@@ -138,6 +138,9 @@ PENALTY_FILES = (
     "packages/omnibias-jax/src/omnibias/jax/optim_maml.py",
     "packages/omnibias-core/src/omnibias/core/verified/tm_neuron.py",
     "packages/omnibias-verify/src/omnibias/verify/_core/pci.py",
+    "packages/omnibias-core/src/omnibias/core/coupling_flow.py",
+    "packages/omnibias-score/src/omnibias/score/flow/torch/jet_flow.py",
+    "packages/omnibias-score/src/omnibias/score/flow/jax/jet_flow.py",
 )
 
 

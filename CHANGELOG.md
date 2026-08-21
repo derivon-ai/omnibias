@@ -6,6 +6,20 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — coupling jet-flow (theory 09-06)
+
+- `omnibias.core.coupling_flow` plus
+  `omnibias.score.flow.{torch,jax}.jet_flow`: finite couplings whose
+  log-det is `sum log|s| + sum log sigma'`, inverted by Newton.
+- G1–G3 CI-gated. Jets are founding bias collapse (`delta -> 0`),
+  not temperature collapse. Not `integrate_cnf`. Not ImageNet.
+  Not CCF stretch.
+- Docs: `docs/api/coupling_jet_flow.md`,
+  `docs/cookbook/coupling-jet-flow.md`.
+  Smoke: `docs/benchmarks/coupling_jet_flow_smoke.json`.
+
+
+
 ### Added — Taylor-model neuron and proof-carrying forward (theory 09-05 / 09-24)
 
 - `omnibias.core.verified.tm_neuron` plus `omnibias.verify._core.pci`:
