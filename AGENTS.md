@@ -568,7 +568,12 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.pinn.certified.weak_form` (07-02; weak-form
   width split + exact-jet Lohner; G1–G6 CI; founding bias
   collapse, not temperature collapse; not a continuum
-  regularity claim).
+  regularity claim) /
+  `omnibias.core.verified.trial_spaces` (07-05; multi-pack
+  spectral floors + `omnibias.sos` arrangement-adapted
+  bases; G1–G6 CI; founding bias collapse, not temperature
+  collapse; not a continuum spectral gap or Yang-Mills mass
+  gap).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -612,7 +617,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/differentiable_topology.md`](docs/api/differentiable_topology.md),
   [`docs/api/singularity_tracking.md`](docs/api/singularity_tracking.md),
   [`docs/api/symmetry_discovery.md`](docs/api/symmetry_discovery.md),
-  [`docs/api/ns_weak_form.md`](docs/api/ns_weak_form.md). Cost /
+  [`docs/api/ns_weak_form.md`](docs/api/ns_weak_form.md),
+  [`docs/api/trial_spaces.md`](docs/api/trial_spaces.md),
+  [`docs/api/sos_adapted_basis.md`](docs/api/sos_adapted_basis.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

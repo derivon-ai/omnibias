@@ -26,7 +26,7 @@ from collections.abc import Sequence
 from fractions import Fraction
 
 from omnibias.core.verified.eig_operator import interval_ldlt_pivots
-from omnibias.sos.monomials import SOSProblem, gram_products
+from omnibias.sos.monomials import MonomialBasis, SOSProblem, gram_products
 from omnibias.sos.problem import Exponent, Polynomial, RationalPolynomial, SOSCertificate
 from omnibias.sos.rounding import (
     CoefficientSource,
@@ -73,24 +73,32 @@ def _run_certification(
     half_degree: int | None,
     denominators: Sequence[int],
     external: GramProposer | None,
+    basis: Sequence[Exponent] | MonomialBasis | None = None,
 ) -> SOSCertificate:
     """Shared propose -> round -> prove loop; ``source`` supplies the exact targets."""
     n = float_poly.n_vars
-    basis = SOSProblem.for_polynomial(float_poly, half_degree=half_degree).basis.exponents
-    if not set(source.support) <= set(gram_products(basis)):
+    if basis is None:
+        exponents: tuple[Exponent, ...] = SOSProblem.for_polynomial(
+            float_poly, half_degree=half_degree
+        ).basis.exponents
+    elif isinstance(basis, MonomialBasis):
+        exponents = basis.exponents
+    else:
+        exponents = tuple(basis)
+    if not set(source.support) <= set(gram_products(exponents)):
         return _inconclusive(
-            n, basis,
+            n, exponents,
             "polynomial has a monomial no basis product can build; it is not SOS in this basis",
         )
 
-    proposal = solve_sos_gram(float_poly, basis, external=external)
+    proposal = solve_sos_gram(float_poly, exponents, external=external)
     if proposal.status != "solved" or proposal.gram is None:
-        return _inconclusive(n, basis, f"SDP proposer: {proposal.detail}")
+        return _inconclusive(n, exponents, f"SDP proposer: {proposal.detail}")
 
     gram_float = [[float(v) for v in row] for row in proposal.gram]
     for denominator in denominators:
-        rational = project_to_exact_gram(gram_float, source, basis, denominator=denominator)
-        if exact_coefficient_residual(rational, source, basis) != 0:
+        rational = project_to_exact_gram(gram_float, source, exponents, denominator=denominator)
+        if exact_coefficient_residual(rational, source, exponents) != 0:
             continue  # projection did not match exactly (should not happen); stay sound
         pivots = interval_ldlt_pivots(rational)
         if pivots is None or not all(p.lo > 0.0 for p in pivots):
@@ -99,7 +107,7 @@ def _run_certification(
         return SOSCertificate(
             status="proved",
             n_vars=n,
-            basis=tuple(basis),
+            basis=tuple(exponents),
             gram=_gram_to_strings(rational),
             pivots=tuple((p.lo, p.hi) for p in pivots),
             pd_margin=margin,
@@ -111,7 +119,7 @@ def _run_certification(
         )
 
     return _inconclusive(
-        n, basis,
+        n, exponents,
         "rational rounding could not certify a positive-definite Gram at the tried "
         "denominators (the polynomial may be SOS only with a rank-deficient Gram, or not SOS)",
     )
@@ -123,6 +131,7 @@ def certify_sos(
     half_degree: int | None = None,
     denominators: Sequence[int] = DEFAULT_DENOMINATORS,
     external: GramProposer | None = None,
+    basis: Sequence[Exponent] | MonomialBasis | None = None,
 ) -> SOSCertificate:
     r"""Rigorously certify ``polynomial(x) >= 0`` for all ``x`` via an SOS proof.
 
@@ -140,6 +149,9 @@ def certify_sos(
         Optional external SDP backend forwarded to
         :func:`omnibias.sos.solve.solve_sos_gram` (advisory; never trusted for the
         proof).
+    basis:
+        Optional monomial vector. When omitted, the total-degree basis up
+        to ``half_degree`` (or ``ceil(deg(p)/2)``) is used.
 
     Returns
     -------
@@ -151,6 +163,7 @@ def certify_sos(
     return _run_certification(
         polynomial, polynomial,
         half_degree=half_degree, denominators=denominators, external=external,
+        basis=basis,
     )
 
 
@@ -179,6 +192,67 @@ def is_sos(polynomial: Polynomial, *, half_degree: int | None = None) -> bool:
     return certify_sos(polynomial, half_degree=half_degree).certified
 
 
+def named_adapted_problems() -> tuple[dict[str, object], ...]:
+    """Named positivity problems for the arrangement-adapted G5 suite."""
+    def _pure(n_vars: int, axis: int, power: int, const: float = 1.0) -> Polynomial:
+        exp = [0] * n_vars
+        exp[axis] = power
+        return Polynomial.monomial(tuple(exp), 1.0) + Polynomial.constant(const, n_vars)
+
+    x4 = _pure(2, 0, 4)
+    y4 = _pure(2, 1, 4) - Polynomial.constant(1.0, 2)
+    x6y2 = _pure(2, 0, 6) + Polynomial.monomial((0, 2), 1.0)
+    return (
+        {"name": "x6_plus_one", "polynomial": _pure(1, 0, 6), "arrangement": ((1.0,),)},
+        {"name": "x8_plus_one", "polynomial": _pure(1, 0, 8), "arrangement": ((1.0,),)},
+        {
+            "name": "x4_plus_y4_plus_one",
+            "polynomial": x4 + y4,
+            "arrangement": ((1.0, 0.0), (0.0, 1.0)),
+        },
+        {"name": "x10_plus_one", "polynomial": _pure(1, 0, 10), "arrangement": ((1.0,),)},
+        {"name": "x6_plus_y2_plus_one", "polynomial": x6y2, "arrangement": ((1.0, 0.0),)},
+        {
+            "name": "x4_plus_2x2_plus_one",
+            "polynomial": _pure(1, 0, 4) + Polynomial.monomial((2,), 2.0),
+            "arrangement": ((1.0,),),
+        },
+    )
+
+
+def degree_reduction_report(*, max_degree: int = 6) -> list[dict[str, object]]:
+    """Compare total-degree vs arrangement-adapted certifying degrees (G5)."""
+    from omnibias.sos.monomials import arrangement_adapted_basis
+
+    out: list[dict[str, object]] = []
+    for spec in named_adapted_problems():
+        poly = spec["polynomial"]
+        assert isinstance(poly, Polynomial)
+        arrangement = spec["arrangement"]
+        total = None
+        adapted = None
+        for deg in range(0, int(max_degree) + 1):
+            if total is None and certify_sos(poly, half_degree=deg).certified:
+                total = deg
+            if adapted is None:
+                basis = arrangement_adapted_basis(poly, arrangement, degree=deg)
+                if certify_sos(poly, basis=basis).certified:
+                    adapted = deg
+            if total is not None and adapted is not None:
+                break
+        drop = None if total is None or adapted is None else int(total) - int(adapted)
+        out.append(
+            {
+                "name": spec["name"],
+                "total_degree": total,
+                "adapted_degree": adapted,
+                "drop": drop,
+                "win": drop is not None and drop >= 2,
+            }
+        )
+    return out
+
+
 def rational_gram(certificate: SOSCertificate) -> RationalGram | None:
     """Recover the exact rational Gram matrix from a proved certificate."""
     if certificate.gram is None:
@@ -190,6 +264,8 @@ __all__ = [
     "DEFAULT_DENOMINATORS",
     "certify_sos",
     "certify_sos_rational",
+    "degree_reduction_report",
     "is_sos",
+    "named_adapted_problems",
     "rational_gram",
 ]

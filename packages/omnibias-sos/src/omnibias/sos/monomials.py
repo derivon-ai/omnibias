@@ -49,6 +49,48 @@ def monomial_basis(n_vars: int, degree: int) -> tuple[Exponent, ...]:
     return tuple(out)
 
 
+def arrangement_adapted_basis(
+    polynomial: Polynomial,
+    arrangement: Sequence[Sequence[float]],
+    *,
+    degree: int,
+) -> MonomialBasis:
+    """Sparse monomial basis concentrated on an axis-aligned arrangement.
+
+    Ambient total-degree monomials up to ``degree`` are kept. Each
+    hyperplane ``a·x + b = 0`` contributes extra pure powers of its
+    dominant coordinate up to half the polynomial's degree in that
+    variable, so a well that is a high even power of one arrangement
+    form can be certified at a *lower* ambient degree than the
+    total-degree basis.
+
+    This chooses tightness, never soundness. Failures are reported
+    (theory 07-05 G5), not excluded.
+    """
+    if degree < 0:
+        raise ValueError(f"degree must be >= 0, got {degree}")
+    n = polynomial.n_vars
+    exponents = set(monomial_basis(n, degree))
+    max_power = [0] * n
+    for exp in polynomial.support:
+        for i, power in enumerate(exp):
+            if power > max_power[i]:
+                max_power[i] = int(power)
+    for form in arrangement:
+        coords = [float(c) for c in form]
+        if len(coords) < n:
+            raise ValueError("each arrangement form must have at least n_vars coefficients")
+        # Dominant coordinate of a·x (+ optional offset).
+        axis = max(range(n), key=lambda i: abs(coords[i]))
+        half = (max_power[axis] + 1) // 2
+        for power in range(degree + 1, half + 1):
+            exp = [0] * n
+            exp[axis] = power
+            exponents.add(tuple(exp))
+    ordered = tuple(sorted(exponents, key=lambda e: (sum(e), e)))
+    return MonomialBasis(n, ordered)
+
+
 @dataclass(frozen=True)
 class MonomialBasis:
     """The monomial vector ``z(x)`` used to build a Gram matrix."""
@@ -141,6 +183,7 @@ class SOSProblem:
 __all__ = [
     "MonomialBasis",
     "SOSProblem",
+    "arrangement_adapted_basis",
     "gram_products",
     "gram_to_poly",
     "monomial_basis",

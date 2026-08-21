@@ -288,6 +288,7 @@ jobs:
           pip install -e packages/omnibias-difference
           pip install -e packages/omnibias-symbolic
           pip install -e packages/omnibias-pinn
+          pip install -e "packages/omnibias-sos[test]"
           pip install pytest
       - name: Run cross-backend parity tests
         run: |
@@ -402,6 +403,14 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/ns_weak_form_enclosure.py
+      - name: Run spectral-trial-spaces smoke (07-05 G1–G4/G6)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/spectral_trial_spaces.py
+      - name: Run SOS-adapted-basis smoke (07-05 G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/sos_adapted_basis.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

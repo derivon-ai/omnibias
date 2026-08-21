@@ -6,6 +6,24 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — spectral floors and adapted SOS bases (theory 07-05)
+
+- `omnibias.core.verified.trial_spaces`: multi-pack trial
+  spaces, alignment-required Temple / Lehmann floors, and
+  residual birth / growth. `omnibias.sos.monomials` grows
+  `arrangement_adapted_basis` so a named positivity set can
+  certify at a lower ambient degree.
+- G1–G6 CI-gated. Jets are founding bias collapse
+  (`delta -> 0`), not temperature collapse. Fixed operator,
+  one domain, one discretization. Not a continuum spectral
+  gap and not a Yang-Mills mass gap.
+- Docs: `docs/api/trial_spaces.md`,
+  `docs/api/sos_adapted_basis.md`,
+  `docs/cookbook/spectral-floors.md`.
+  Smoke: `docs/benchmarks/spectral_trial_spaces_smoke.json`,
+  `docs/benchmarks/sos_adapted_basis_smoke.json`.
+
+
 ### Added — weak-form NS-adjacent enclosures (theory 07-02)
 
 - `omnibias.pinn.certified.weak_form`: a width decomposition

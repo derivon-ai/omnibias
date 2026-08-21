@@ -1,0 +1,97 @@
+{
+  "schema": "omnibias.benchmarks.spectral_trial_spaces.v1",
+  "generated_utc": "2026-08-21T19:06:18Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "spectral_trial_spaces",
+    "full": false,
+    "honesty": {
+      "unproven_claim": false,
+      "yang_mills_mass_gap": false,
+      "continuum_spectral_gap_claim": false,
+      "p_equals_np": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 809.94,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_alignment",
+        "passed": true,
+        "alignment": 1.0
+      },
+      {
+        "name": "g2_dimension_reduction",
+        "passed": true,
+        "n": 10,
+        "wins": 10,
+        "pack_alignments": [
+          0.02026071242136039,
+          0.026449446272719276,
+          0.06507558752091094,
+          0.07394008595467212,
+          0.05278828298691373,
+          0.04937267405916785,
+          0.038001594719843504,
+          0.06615602867373004,
+          0.014625058334161565,
+          0.014289539683185153
+        ],
+        "condition_numbers": [
+          31.215413494677335,
+          47.598704694417705,
+          29.53650923226317,
+          89.96024001750209,
+          31.71564106161537,
+          29.188329777061423,
+          43.44282169171264,
+          133.2322035442799,
+          40.46507467084745,
+          76.71327906029227
+        ]
+      },
+      {
+        "name": "g3_adversarial",
+        "passed": true,
+        "rows": [
+          {
+            "name": "particle_in_a_box",
+            "kind": "oscillatory",
+            "within_5pct": false
+          },
+          {
+            "name": "v_shape_corner",
+            "kind": "corner",
+            "within_5pct": true
+          },
+          {
+            "name": "step_coefficient",
+            "kind": "discontinuous",
+            "within_5pct": false
+          }
+        ]
+      },
+      {
+        "name": "g4_soundness",
+        "passed": true,
+        "n": 1000,
+        "misses": 0
+      },
+      {
+        "name": "g6_honesty",
+        "passed": true
+      }
+    ]
+  },
+  "wall_seconds": 3.711374578997493
+}

@@ -7,7 +7,7 @@ workhorses behind almost every rigorous claim in mathematical physics, and both
 are variational — so both are limited by the trial space, which is exactly what
 multi-pack and arrangement bases are good at supplying.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-03, 01-11, 07-01
 - **Blocks**: 07-04, 07-06
 
@@ -265,20 +265,20 @@ dimension, and the standard total-degree monomial basis for SOS.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-core/src/omnibias/core/verified/trial_spaces.py`,
+- [x] `packages/omnibias-core/src/omnibias/core/verified/trial_spaces.py`,
       pure Python
-- [ ] `trial_space_alignment` reported in every bound
-- [ ] Adaptive refinement reusing spec 03-13's birth and growth moves
-- [ ] `10`-problem localized suite plus `3` adversarial problems, none excluded
-- [ ] `1000`-problem soundness test against known spectra
-- [ ] Condition numbers reported; interval LDL^T failure handled as a safe
+- [x] `trial_space_alignment` reported in every bound
+- [x] Adaptive refinement reusing spec 03-13's birth and growth moves
+- [x] `10`-problem localized suite plus `3` adversarial problems, none excluded
+- [x] `1000`-problem soundness test against known spectra
+- [x] Condition numbers reported; interval LDL^T failure handled as a safe
       outcome, not an error to suppress
-- [ ] `arrangement_adapted_basis` in `packages/omnibias-sos/src/omnibias/sos/monomials.py`
-- [ ] Kernel obligation wired with a test that the flag cannot be forged
-- [ ] `benchmarks/spectral_trial_spaces.py` and `benchmarks/sos_adapted_basis.py`
+- [x] `arrangement_adapted_basis` in `packages/omnibias-sos/src/omnibias/sos/monomials.py`
+- [x] Kernel obligation wired with a test that the flag cannot be forged
+- [x] `benchmarks/spectral_trial_spaces.py` and `benchmarks/sos_adapted_basis.py`
       plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`
 
 ## 13. Parent problem and the exact reason it stays an external obligation
 

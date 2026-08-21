@@ -1,0 +1,74 @@
+{
+  "schema": "omnibias.benchmarks.sos_adapted_basis.v1",
+  "generated_utc": "2026-08-21T19:06:49Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "sos_adapted_basis",
+    "full": false
+  },
+  "rss_mb_at_start": 817.73,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g5_degree_reduction",
+        "passed": true,
+        "wins": 5,
+        "n": 6,
+        "rows": [
+          {
+            "name": "x6_plus_one",
+            "total_degree": 3,
+            "adapted_degree": 0,
+            "drop": 3,
+            "win": true
+          },
+          {
+            "name": "x8_plus_one",
+            "total_degree": 4,
+            "adapted_degree": 0,
+            "drop": 4,
+            "win": true
+          },
+          {
+            "name": "x4_plus_y4_plus_one",
+            "total_degree": 2,
+            "adapted_degree": 0,
+            "drop": 2,
+            "win": true
+          },
+          {
+            "name": "x10_plus_one",
+            "total_degree": 5,
+            "adapted_degree": 0,
+            "drop": 5,
+            "win": true
+          },
+          {
+            "name": "x6_plus_y2_plus_one",
+            "total_degree": null,
+            "adapted_degree": 1,
+            "drop": null,
+            "win": false
+          },
+          {
+            "name": "x4_plus_2x2_plus_one",
+            "total_degree": 2,
+            "adapted_degree": 0,
+            "drop": 2,
+            "win": true
+          }
+        ]
+      }
+    ]
+  },
+  "wall_seconds": 30.94059485697653
+}
