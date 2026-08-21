@@ -1,13 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-r"""Residual-vector Gauss-Newton with Martens-Grosse schedules (jax discovery).
+r"""Residual-vector Gauss-Newton for jax discovery.
 
-Thin pytree wrapper around
-:func:`omnibias.jax.optim.martens_grosse_gauss_newton_minimize`:
+Thin pytree wrapper around the JAX second-order drivers:
 
-* damped Gauss-Newton with **QR** (non-squaring) by default
-* Martens-Grosse closed-form LR / momentum via **exact** :func:`jax.jvp`
-  (no finite-difference probes)
+* :func:`omnibias.jax.optim.martens_grosse_gauss_newton_minimize` -- damped
+  Gauss-Newton (QR by default) plus Martens–Grosse closed-form LR / momentum
+  via exact :func:`jax.jvp`
+* :func:`omnibias.jax.optim.cubic_regularized_gauss_newton_minimize` -- ARC on
+  the PSD Gauss-Newton model (``method="cubic"``)
 
 Used by DeepMind-style unstable-singularity PINNs on the Hardy-Ω residual.
 """
@@ -16,14 +17,22 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Literal
 
+import jax
 import jax.numpy as jnp
 from jax import Array
 from jax.flatten_util import ravel_pytree
+
+jax.config.update("jax_enable_x64", True)
 from omnibias.jax.optim import (  # noqa: E402
+    CubicRegularizedGNConfig,
     MartensGrosseGNConfig,
+    cubic_regularized_gauss_newton_minimize,
     martens_grosse_gauss_newton_minimize,
 )
+
+GNMethod = Literal["martens_grosse", "cubic"]
 
 
 @dataclass(frozen=True)
@@ -41,6 +50,10 @@ class GNConfig:
     # Non-squaring QR is the earn-path default; dense / cgls available for ablations.
     solver: str = "qr"
     seed: int = 0  # retained for API compatibility; unused (deterministic GN)
+    method: GNMethod = "martens_grosse"
+    cubic_sigma: float = 1.0
+    # None = full parameter dimension (do not truncate ARC on wide hops).
+    krylov_dim: int | None = None
 
 
 def gauss_newton_minimize(
@@ -49,7 +62,7 @@ def gauss_newton_minimize(
     *,
     config: GNConfig | None = None,
 ) -> tuple[object, Array]:
-    """Minimise ``0.5 ||r(params)||^2`` by damped Gauss-Newton + Martens-Grosse.
+    """Minimise ``0.5 ||r(params)||^2`` by damped or cubic-regularised Gauss-Newton.
 
     Parameters
     ----------
@@ -58,7 +71,7 @@ def gauss_newton_minimize(
     params0
         Initial parameter pytree.
     config
-        Step / damping / Martens-Grosse / solver schedule.
+        Step / damping / Martens-Grosse / cubic / solver schedule.
 
     Returns
     -------
@@ -69,6 +82,22 @@ def gauss_newton_minimize(
 
     def r_flat(vec: Array) -> Array:
         return residual_fn(unravel(vec))
+
+    method = str(cfg.method)
+    if method == "cubic":
+        cubic_cfg = CubicRegularizedGNConfig(
+            steps=int(cfg.steps),
+            sigma=float(cfg.cubic_sigma),
+            krylov_dim=cfg.krylov_dim,
+        )
+        flat1, losses = cubic_regularized_gauss_newton_minimize(
+            r_flat, flat0, config=cubic_cfg
+        )
+        return unravel(flat1), jnp.asarray(losses, dtype=jnp.float64)
+    if method != "martens_grosse":
+        raise ValueError(
+            f"method must be 'martens_grosse' or 'cubic', got {method!r}"
+        )
 
     solver = str(cfg.solver)
     if solver not in ("dense", "qr", "cgls"):
@@ -89,4 +118,4 @@ def gauss_newton_minimize(
     return unravel(flat1), jnp.asarray(losses, dtype=jnp.float64)
 
 
-__all__ = ["GNConfig", "gauss_newton_minimize"]
+__all__ = ["GNConfig", "GNMethod", "gauss_newton_minimize"]

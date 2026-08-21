@@ -22,6 +22,8 @@ import jax.numpy as jnp  # noqa: E402
 from jax import Array  # noqa: E402
 from omnibias.jax.architectures import make_jet_mlp  # noqa: E402
 from omnibias.jax.optim import (  # noqa: E402
+    CubicRegularizedGNConfig,
+    cubic_regularized_gauss_newton_minimize,
     gauss_newton_direction,
     gauss_newton_fisher,
     gauss_newton_minimize,
@@ -78,6 +80,108 @@ def test_gauss_newton_recovers_nonlinear_least_squares() -> None:
     assert history[-1] < 1e-16
     assert jnp.allclose(state.params, true, atol=1e-6)
     assert all(history[i + 1] <= history[i] + 1e-18 for i in range(len(history) - 1))
+
+
+def test_cubic_gn_recovers_linear_least_squares() -> None:
+    rng = np.random.RandomState(0)
+    mat = jnp.asarray(rng.randn(20, 5))
+    b = jnp.asarray(rng.randn(20))
+
+    def residual_fn(p: Array) -> Array:
+        return mat @ p - b
+
+    p_star, _, _, _ = jnp.linalg.lstsq(mat, b, rcond=None)
+    p, _hist = cubic_regularized_gauss_newton_minimize(
+        residual_fn,
+        jnp.zeros(5),
+        config=CubicRegularizedGNConfig(steps=40, sigma=1.0, krylov_dim=5),
+    )
+    assert jnp.allclose(p, p_star, atol=1e-6)
+
+
+def test_cubic_gn_recovers_nonlinear_least_squares() -> None:
+    t = jnp.linspace(0.0, 1.0, 24)
+    true = jnp.array([2.0, -0.7])
+    y = true[0] * jnp.exp(true[1] * t)
+
+    def residual_fn(p: Array) -> Array:
+        return p[0] * jnp.exp(p[1] * t) - y
+
+    p, history = cubic_regularized_gauss_newton_minimize(
+        residual_fn,
+        jnp.array([1.0, 0.0]),
+        config=CubicRegularizedGNConfig(steps=60, sigma=1.0, krylov_dim=2),
+    )
+    assert float(history[-1]) < 1e-12
+    assert jnp.allclose(p, true, atol=1e-5)
+    assert all(history[i + 1] <= history[i] + 1e-14 for i in range(len(history) - 1))
+
+
+def test_cubic_gn_rejects_at_minimum() -> None:
+    t = jnp.linspace(0.0, 1.0, 16)
+    y = 1.5 * jnp.exp(-0.3 * t)
+
+    def residual_fn(p: Array) -> Array:
+        return p[0] * jnp.exp(p[1] * t) - y
+
+    p_star = jnp.array([1.5, -0.3])
+    p1, hist = cubic_regularized_gauss_newton_minimize(
+        residual_fn,
+        p_star,
+        config=CubicRegularizedGNConfig(steps=1, sigma=1e-4, krylov_dim=2),
+    )
+    assert jnp.allclose(p1, p_star, atol=1e-12)
+    assert float(hist[-1]) <= float(hist[0]) + 1e-18
+
+
+def test_cubic_gn_config_validation() -> None:
+    with pytest.raises(ValueError):
+        CubicRegularizedGNConfig(sigma=0.0)
+    with pytest.raises(ValueError):
+        CubicRegularizedGNConfig(krylov_dim=0)
+
+
+def test_cubic_gn_default_krylov_is_full_dimension() -> None:
+    rng = np.random.RandomState(2)
+    mat = jnp.asarray(rng.randn(40, 18))
+    b = jnp.asarray(rng.randn(40))
+
+    def residual_fn(p: Array) -> Array:
+        return mat @ p - b
+
+    p_star, _, _, _ = jnp.linalg.lstsq(mat, b, rcond=None)
+    p, _hist = cubic_regularized_gauss_newton_minimize(
+        residual_fn,
+        jnp.zeros(18),
+        config=CubicRegularizedGNConfig(steps=20, sigma=1.0),
+    )
+    assert jnp.allclose(p, p_star, atol=1e-6)
+
+
+def test_cubic_gn_truncated_krylov_is_weaker_than_full() -> None:
+    rng = np.random.RandomState(3)
+    mat = jnp.asarray(rng.randn(32, 16))
+    b = jnp.asarray(rng.randn(32))
+
+    def residual_fn(p: Array) -> Array:
+        return mat @ p - b
+
+    p0 = jnp.zeros(16)
+    p_star, _, _, _ = jnp.linalg.lstsq(mat, b, rcond=None)
+    p_full, _ = cubic_regularized_gauss_newton_minimize(
+        residual_fn,
+        p0,
+        config=CubicRegularizedGNConfig(steps=4, sigma=1.0, krylov_dim=16),
+    )
+    p_trunc, _ = cubic_regularized_gauss_newton_minimize(
+        residual_fn,
+        p0,
+        config=CubicRegularizedGNConfig(steps=4, sigma=1.0, krylov_dim=3),
+    )
+    err_full = float(jnp.linalg.norm(p_full - p_star))
+    err_trunc = float(jnp.linalg.norm(p_trunc - p_star))
+    assert err_full < 1e-3
+    assert err_trunc > 5.0 * err_full
 
 
 # --- PINN: GN beats Adam by orders of magnitude ---------------------------
@@ -326,4 +430,60 @@ def test_martens_grosse_gauss_newton_minimize_recovers_nonlinear_ls() -> None:
     )
     assert float(hist[-1]) < 1e-16
     assert jnp.allclose(p1, true, atol=1e-6)
+
+
+def test_homotopy_gn_tracks_linear_coupling() -> None:
+    from omnibias.jax.optim import HomotopyGNConfig, homotopy_gauss_newton_minimize
+
+    def residual_fn(p: Array, t: float) -> Array:
+        return p - (1.0 + t)
+
+    p1, info = homotopy_gauss_newton_minimize(
+        residual_fn,
+        jnp.asarray([0.0]),
+        config=HomotopyGNConfig(
+            stages=(0.0, 0.5, 1.0),
+            steps_per_stage=4,
+            method="martens_grosse",
+            damping=1e-8,
+        ),
+    )
+    assert float(jnp.abs(p1[0] - 2.0)) < 1e-8
+    assert info["stages"][-1]["t"] == 1.0
+
+
+def test_peak_weighted_residual_preserves_zeros() -> None:
+    from omnibias.jax.optim import peak_weighted_residual
+
+    r = jnp.asarray([0.0, -0.2, 0.5])
+    w = peak_weighted_residual(r, 3.0)
+    assert float(w[0]) == 0.0
+    assert float(jnp.sign(w[1])) == float(jnp.sign(r[1]))
+
+
+def test_champ_barrier_residual_holds_zeros_and_tau() -> None:
+    from omnibias.jax.optim import champ_barrier_residual
+
+    r = jnp.asarray([0.0, 0.01, -0.02, 0.018])
+    out = champ_barrier_residual(r, 0.021, barrier_weight=10.0, peak_power=2.0)
+    n = int(r.size)
+    peak, barrier = out[:n], out[n:]
+    assert float(peak[0]) == 0.0
+    assert float(jnp.max(jnp.abs(barrier))) == 0.0
+    walked = champ_barrier_residual(r, 0.015, barrier_weight=10.0, peak_power=2.0)
+    assert float(jnp.max(jnp.abs(walked[n:]))) > 0.0
+
+
+def test_linearized_linf_direction_is_exact_on_one_column() -> None:
+    from omnibias.jax.optim import linearized_linf_direction
+
+    jac = jnp.ones((3, 1))
+    res = jnp.asarray([1.0, -0.2, 0.4])
+    step = linearized_linf_direction(jac, res)
+    # min_c max_i |r_i + c| is the mid-range shift.
+    assert float(step[0]) == pytest.approx(-0.4, abs=1e-8)
+    linf = float(jnp.max(jnp.abs(res + jac @ step)))
+    assert linf == pytest.approx(0.6, abs=1e-8)
+    boxed = linearized_linf_direction(jac, res, box=0.1)
+    assert abs(float(boxed[0])) <= 0.1 + 1e-12
 

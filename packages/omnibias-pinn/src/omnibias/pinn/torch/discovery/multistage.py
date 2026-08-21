@@ -15,8 +15,14 @@ linearization does not expose a clean residual vector for Gauss–Newton).
 Optional ``optimizer="gauss_newton"`` runs a **corr-matching quadratic proxy**
 (``gauss_newton_corr_proxy``): fit ``Φ₁ ≈ -R₀/ε`` via
 :class:`~omnibias.torch.optim.GaussNewton`. That is **not** linearized Wang
-``R₀ + ε D[Φ₀]Φ₁`` Gauss–Newton — do not claim Martens–Grosse stage-2.
-Neither mode forges Rung-1; reproduction gates on dense Wang residual only.
+``R₀ + ε D[Φ₀]Φ₁`` Gauss–Newton.
+
+``optimizer="wang_linearized_gn"`` is the eq. 19 residual-vector path. It
+requires ``residual_fn_torch`` (tensor in, tensor out) so ``D[Phi0]`` stays
+on the torch graph. Numpy-only residuals must keep the labeled proxy or
+Adam. For the CCF 1601-pt L∞ stretch metric, the measured winner is
+the epigraph L∞ LP / ``linearized_linf_direction``, not L2 GN.
+Neither mode forges Rung-1 or stretch.
 """
 
 from __future__ import annotations
@@ -35,7 +41,7 @@ from omnibias.pinn.jax.discovery.multistage import (
 )
 from torch import Tensor
 
-Stage2Optimizer = Literal["adam", "gauss_newton"]
+Stage2Optimizer = Literal["adam", "gauss_newton", "wang_linearized_gn"]
 
 
 class _FourierCorrector(nn.Module):
@@ -70,6 +76,43 @@ def linearized_operator_action_numpy(
     rp = np.asarray(residual_fn(stage1 + eps * direction), dtype=float)
     rm = np.asarray(residual_fn(stage1 - eps * direction), dtype=float)
     return (rp - rm) / (2.0 * eps)
+
+
+def linearized_operator_action_torch(
+    residual_fn_torch: Callable[[Tensor], Tensor],
+    stage1: Tensor,
+    direction: Tensor,
+    *,
+    fd_eps: float,
+) -> Tensor:
+    """``D[Phi0] Phi1`` on the torch graph (JVP, else one FD of ``corr``)."""
+    try:
+        _, tang = torch.func.jvp(residual_fn_torch, (stage1,), (direction,))
+        return tang
+    except (RuntimeError, TypeError, ValueError):
+        eps = float(fd_eps)
+        rp = residual_fn_torch(stage1 + eps * direction)
+        rm = residual_fn_torch(stage1 - eps * direction)
+        return (rp - rm) / (2.0 * eps)
+
+
+def wang_linearized_residual_torch(
+    residual_fn_torch: Callable[[Tensor], Tensor],
+    stage1: Tensor,
+    direction: Tensor,
+    *,
+    r0: Tensor,
+    eps: float,
+    fd_eps: float,
+    linearized: bool = True,
+) -> Tensor:
+    """Paper eq. 19 residual vector with ``corr`` still on the graph."""
+    if linearized:
+        d_action = linearized_operator_action_torch(
+            residual_fn_torch, stage1, direction, fd_eps=fd_eps
+        )
+        return r0 + float(eps) * d_action
+    return residual_fn_torch(stage1 + float(eps) * direction)
 
 
 def _stage2_loss_tensors(
@@ -120,6 +163,7 @@ def correct_profile(
     omega_y0: np.ndarray | None = None,
     stage2_grad_norm_eps: float = 1e-6,
     optimizer: Stage2Optimizer = "adam",
+    residual_fn_torch: Callable[[Tensor], Tensor] | None = None,
 ) -> dict[str, Any]:
     """Run linearized Fourier stage-2 correction on a numpy profile."""
     cfg = cfg or MultiStageConfig(steps=80, hidden=24, n_fourier=12)
@@ -133,6 +177,7 @@ def correct_profile(
 
     y_t = torch.as_tensor(y_np.copy(), dtype=torch.float64)
     r0_t = torch.as_tensor(r0.copy(), dtype=torch.float64)
+    stage1_t = torch.as_tensor(stage1_np.copy(), dtype=torch.float64)
     norm_np = None
     if omega_y0 is not None:
         omy = np.asarray(omega_y0, dtype=float).reshape(-1)
@@ -145,7 +190,56 @@ def correct_profile(
         seed=cfg.seed,
     )
     losses: list[float] = []
-    if optimizer == "gauss_newton":
+    if optimizer == "wang_linearized_gn":
+        if residual_fn_torch is None:
+            raise ValueError(
+                "optimizer='wang_linearized_gn' requires residual_fn_torch "
+                "(tensor in, tensor out) so D[Phi0] stays on the torch graph. "
+                "Numpy-only residuals must use optimizer='gauss_newton' "
+                "(labeled gauss_newton_corr_proxy) or 'adam'."
+            )
+        from omnibias.torch.optim import GaussNewton, functional_residual_fn
+
+        r0_const = residual_fn_torch(stage1_t).detach()
+        norm_t = None
+        if norm_np is not None:
+            norm_t = torch.as_tensor(norm_np.copy(), dtype=torch.float64)
+
+        class _Wang(nn.Module):
+            def __init__(self) -> None:
+                super().__init__()
+                self.model = model
+
+            def forward(self) -> Tensor:
+                corr = self.model(y_t)
+                r = wang_linearized_residual_torch(
+                    residual_fn_torch,
+                    stage1_t,
+                    corr,
+                    r0=r0_const,
+                    eps=eps,
+                    fd_eps=fd,
+                    linearized=cfg.linearized,
+                )
+                if norm_t is not None:
+                    r = r / norm_t
+                return r.reshape(-1)
+
+        wang = _Wang()
+        flat0, residual_vec_fn = functional_residual_fn(wang)
+        gn = GaussNewton(solver="qr", damping=1e-3, use_martens_grosse=False)
+        params = flat0
+        for _ in range(int(cfg.steps)):
+            params, info = gn.step(residual_vec_fn, params)
+            losses.append(float(info.loss))
+        offset = 0
+        with torch.no_grad():
+            for p in wang.parameters():
+                n = p.numel()
+                p.copy_(params[offset : offset + n].reshape(p.shape))
+                offset += n
+        optimizer_label = "wang_linearized_gn"
+    elif optimizer == "gauss_newton":
         from omnibias.torch.optim import GaussNewton, functional_residual_fn
 
         class _Proxy(nn.Module):
@@ -174,7 +268,7 @@ def correct_profile(
                 p.copy_(params[offset : offset + n].reshape(p.shape))
                 offset += n
         optimizer_label = "gauss_newton_corr_proxy"
-    else:
+    elif optimizer == "adam":
         opt = torch.optim.Adam(model.parameters(), lr=float(cfg.lr))
         for _ in range(int(cfg.steps)):
             opt.zero_grad(set_to_none=True)
@@ -194,6 +288,11 @@ def correct_profile(
             loss.backward()
             opt.step()
         optimizer_label = "stage2_heuristic_adam"
+    else:
+        raise ValueError(
+            "optimizer must be 'adam', 'gauss_newton', or 'wang_linearized_gn', "
+            f"got {optimizer!r}"
+        )
 
     with torch.no_grad():
         corr_np = model(y_t).detach().cpu().numpy()
@@ -235,6 +334,7 @@ def iterate_multistage(
     omega_y0: np.ndarray | None = None,
     optimizer: Stage2Optimizer = "adam",
     improvement_tol: float = 0.98,
+    residual_fn_torch: Callable[[Tensor], Tensor] | None = None,
 ) -> dict[str, Any]:
     """Iterate stage-2 correction until residual plateaus."""
     profile = np.asarray(stage1, dtype=float).reshape(-1)
@@ -251,6 +351,7 @@ def iterate_multistage(
             cfg=cfg,
             omega_y0=omy,
             optimizer=optimizer,
+            residual_fn_torch=residual_fn_torch,
         )
         r_after = float(last["max_abs_residual_after"])
         history.append(
@@ -284,4 +385,6 @@ __all__ = [
     "dominant_residual_frequency",
     "iterate_multistage",
     "linearized_operator_action_numpy",
+    "linearized_operator_action_torch",
+    "wang_linearized_residual_torch",
 ]

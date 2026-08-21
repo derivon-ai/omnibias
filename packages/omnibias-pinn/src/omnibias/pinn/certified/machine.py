@@ -54,11 +54,13 @@ from collections.abc import Sequence
 from typing import Any
 
 from omnibias.core.proof import (
+    CatalogEntry,
     Certificate,
     Conjecture,
     FunctionProver,
     ProofAttempt,
     ProofMachine,
+    register_catalog,
     seal_certificate,
     verify_certificate_digest,
 )
@@ -618,6 +620,63 @@ def build_default_machine() -> ProofMachine:
     for prover in default_provers():
         machine.register(prover)
     return machine
+
+
+def _register() -> None:
+    enclosure = (
+        "clm_blowup",
+        "clm_multizero_blowup",
+        "ccf_selfsimilar_blowup",
+        "ccf_hardy_wholeline_blowup",
+        "ccf_fractional_dissipation",
+        "ccf_line_compactified_cap",
+        "viscous_perturbation_enclosure",
+        "gclm_selfsimilar_blowup",
+        "gclm_gradient_amplification",
+        "perron_spectral_gap",
+        "pinn_aposteriori_error",
+        "navier_stokes_periodic_residual",
+        "navier_stokes_streamfunction_residual",
+        "navier_stokes_rollout_diagnostics",
+    )
+    for kind in enclosure:
+        register_catalog(
+            CatalogEntry(
+                kind=kind,
+                obligation="a certified PINN / fluids enclosure (not NS global regularity)",
+                parent="Navier-Stokes global regularity",
+                parent_status="open",
+                package="omnibias.pinn.certified",
+                mode="enclosure",
+                complete=True,
+            ),
+            lambda kind=kind, **_k: {
+                "kind": kind,
+                "mode": "enclosure",
+                "honesty": {"navier_stokes_proof_claim": False},
+            },
+        )
+    for kind in ("ccf_residual_discovery", "boussinesq_residual_discovery"):
+        register_catalog(
+            CatalogEntry(
+                kind=kind,
+                obligation="a residual-minimizing profile (empirical; not ExactCheck)",
+                parent="Navier-Stokes global regularity",
+                parent_status="open",
+                package="omnibias.pinn.jax.discovery",
+                mode="empirical",
+                complete=False,
+            ),
+            lambda kind=kind, **_k: {
+                "kind": kind,
+                "mode": "empirical",
+                "note": "residual loop; not ExactCheck",
+                "honesty": {"navier_stokes_proof_claim": False},
+            },
+        )
+
+
+_register()
 
 
 __all__ = [

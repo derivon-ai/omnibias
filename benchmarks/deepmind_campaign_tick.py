@@ -63,7 +63,12 @@ def _stage_from_status(
 def run_tick(*, smoke: bool = True, family: str = "1st_unstable") -> dict:
     """Run one campaign tick and write scratch status JSON."""
     t0 = time.perf_counter()
-    from reproduce_deepmind_ccf import STRETCH, escalate_loop, run_once  # noqa: E402
+    from reproduce_deepmind_ccf import (  # noqa: E402
+        STRETCH,
+        escalate_loop,
+        run_conjugate_once,
+        run_once,
+    )
 
     if smoke:
         repro = run_once(smoke=True, multistage_rounds=0)
@@ -72,6 +77,9 @@ def run_tick(*, smoke: bool = True, family: str = "1st_unstable") -> dict:
 
     stretch_cleared = bool(repro.get("gates", {}).get("stretch_1e-13_cleared"))
     residual = float(repro["metrics"]["reproduction_dense_max_abs_for_gate"])
+    conjugate = run_conjugate_once(smoke=smoke, max_order=1 if smoke else 0, seed=0)
+    conjugate_raw = float(conjugate["metrics"]["dense_max_abs"])
+    conjugate_orders = float(conjugate["metrics"]["orders_to_stretch_raw"])
     status = None
     adapter_ok = True
 
@@ -104,6 +112,10 @@ def run_tick(*, smoke: bool = True, family: str = "1st_unstable") -> dict:
         "optimizer": repro.get("config", {}).get("optimizer"),
         "train_hilbert": repro.get("config", {}).get("train_hilbert"),
         "navier_stokes_proof_claim": False,
+        "conjugate_max_order": int(conjugate["config"]["max_order"]),
+        "conjugate_dense_max_abs": conjugate_raw,
+        "conjugate_orders_to_stretch": conjugate_orders,
+        "conjugate_anti_ghost_fired": bool(conjugate["metrics"]["anti_ghost_fired"]),
     }
     if stretch_cleared and status is not None:
         diagnosis["rung1_earned"] = status["gates"]["rung1_earned"]
@@ -139,6 +151,13 @@ def run_tick(*, smoke: bool = True, family: str = "1st_unstable") -> dict:
         "wall_seconds": time.perf_counter() - t0,
         "stage": stage,
         "reproduction": repro,
+        "conjugate": {
+            "max_order": int(conjugate["config"]["max_order"]),
+            "dense_max_abs": conjugate_raw,
+            "orders_to_stretch": conjugate_orders,
+            "anti_ghost_fired": bool(conjugate["metrics"]["anti_ghost_fired"]),
+            "stretch_1e-13_cleared": bool(conjugate["gates"]["stretch_1e-13_cleared"]),
+        },
         "status": status,
         "diagnosis": diagnosis,
         "adapter_smoke_ok": adapter_ok,

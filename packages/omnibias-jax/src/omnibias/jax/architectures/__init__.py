@@ -23,6 +23,8 @@
 * gated :mod:`~omnibias.jax.architectures.scannet` / :mod:`~omnibias.jax.architectures.jetkan`
   -- Scan-Net (on-lattice equivariance, not ``R^D``) and Jet-KAN (model-jet
   exactness; the Kolmogorov-Arnold theorem does not justify).
+* :mod:`~omnibias.jax.architectures.piratenet` -- jaxpi α-skip
+  (``α=0`` is identity). Not ImageNet / ViT and not CCF stretch.
 """
 
 from omnibias.jax.architectures.attention import (
@@ -65,6 +67,12 @@ from omnibias.jax.architectures.pinn import (
     make_jet_mlp,
     make_siren,
 )
+from omnibias.jax.architectures.piratenet import (
+    PirateNetConfig,
+    init_pirate_params,
+    pirate_apply,
+    pirate_features,
+)
 from omnibias.jax.architectures.scannet import (
     ScanNetConfig,
     ScanNetParams,
@@ -87,6 +95,7 @@ __all__ = [
     "JetKANParams",
     "JetMLP",
     "MscaleMLP",
+    "PirateNetConfig",
     "ScanNetConfig",
     "ScanNetParams",
     "apply_operator",
@@ -94,6 +103,7 @@ __all__ = [
     "hermite_basis",
     "homogeneous_box",
     "init_jet_kan",
+    "init_pirate_params",
     "init_scan_net",
     "initial_value",
     "jet_kan_apply",
@@ -109,6 +119,8 @@ __all__ = [
     "make_jet_mlp",
     "make_mscale_mlp",
     "make_siren",
+    "pirate_apply",
+    "pirate_features",
     "refine_pack",
     "scan_net_apply",
     "scan_net_from_torch_state",

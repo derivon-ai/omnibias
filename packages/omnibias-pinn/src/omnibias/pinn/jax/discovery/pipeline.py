@@ -122,6 +122,8 @@ class CCFHardyAdapter:
     name: str = "ccf_hardy"
     n_scales: int = 4
     n_gamma_multiples: int = 2
+    n_terms: int | None = None  # legacy alias for n_scales
+    max_order: int = 0
     n_grid: int = 65
     steps: int = 20
     lam_init: float = CCF_RUNG1_LAMBDA
@@ -136,11 +138,18 @@ class CCFHardyAdapter:
                 "CCFHardyAdapter earn path forbids Adam/SGD; use Martens–Grosse GN "
                 f"(got optimizer={optimizer!r})"
             )
+        n_scales = int(
+            kwargs.get(
+                "n_scales",
+                self.n_terms if self.n_terms is not None else self.n_scales,
+            )
+        )
         cfg = ccf_vorticity.CCFVorticityDiscoveryConfig(
-            n_scales=int(kwargs.get("n_scales", self.n_scales)),
+            n_scales=n_scales,
             n_gamma_multiples=int(
                 kwargs.get("n_gamma_multiples", self.n_gamma_multiples)
             ),
+            max_order=int(kwargs.get("max_order", self.max_order)),
             n_grid=int(kwargs.get("n_grid", self.n_grid)),
             y_max=float(kwargs.get("y_max", self.y_max)),
             lam=float(kwargs.get("lam_init", self.lam_init)),
@@ -148,11 +157,18 @@ class CCFHardyAdapter:
             gn_steps=int(kwargs.get("steps", self.steps)),
         )
         result = ccf_vorticity.run_ccf_vorticity_discovery(cfg)
+        orders = result.extra.get("orders")
+        parities = result.extra.get("parities")
         return {
             "lam": float(result.lam),
             "coeffs": np.asarray(result.coeffs, dtype=float).tolist(),
             "scales": np.asarray(result.scales, dtype=float).tolist(),
             "gammas": np.asarray(result.alphas, dtype=float).tolist(),
+            "orders": None if orders is None else np.asarray(orders, dtype=int).tolist(),
+            "parities": (
+                None if parities is None else np.asarray(parities, dtype=int).tolist()
+            ),
+            "max_order": int(result.extra.get("max_order", 0)),
             "max_abs_residual": float(
                 result.diagnostics["dense_max_abs_vorticity"]
             ),
@@ -170,12 +186,16 @@ class CCFHardyAdapter:
 
         gate = float(kwargs.get("residual_gate", CCF_RUNG1_RESIDUAL_GATE))
         gammas = discovery.get("gammas")
+        orders = discovery.get("orders")
+        parities = discovery.get("parities")
         return certified_ccf_hardy_wholeline_blowup_attempt(
             coeffs=list(discovery["coeffs"]),
             scales=list(discovery["scales"]),
             lam=float(discovery["lam"]),
             form="vorticity",
             gammas=list(gammas) if gammas is not None else None,
+            orders=list(orders) if orders is not None else None,
+            parities=list(parities) if parities is not None else None,
             residual_gate=gate,
             velocity_sign=-1.0,
         )

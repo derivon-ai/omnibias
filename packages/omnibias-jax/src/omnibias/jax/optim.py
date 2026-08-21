@@ -25,6 +25,9 @@ This module provides
 * :func:`martens_grosse_combine` / :func:`martens_grosse_gauss_newton_minimize` --
   damped GN plus Martens–Grosse closed-form LR / momentum via **exact**
   :func:`jax.jvp` (no finite-difference probes). Default solver is ``"qr"``.
+* :func:`cubic_regularized_gauss_newton_minimize` -- ARC on the PSD Gauss-Newton
+  model (Lanczos cubic subproblem). Twin of
+  :class:`omnibias.torch.optim.CubicRegularizedGaussNewton`.
 * :func:`gauss_newton_step` / :func:`gauss_newton_minimize` -- an adaptive-damping LM
   loop driven by a ``residual_fn``.
 * :func:`grad_norm_weights` -- self-adaptive loss weights that equalise the per-term
@@ -38,6 +41,7 @@ PINNs from ``1e-3`` to near machine precision.
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any, Literal, cast
@@ -310,6 +314,404 @@ def martens_grosse_gauss_newton_minimize(
     return params, jnp.asarray(losses, dtype=jnp.float64)
 
 
+def lanczos_tridiag(
+    matvec: MatVec, b: Array, k: int, *, tol: float = 1e-10
+) -> tuple[Array, Array]:
+    r"""``k``-step Lanczos on a symmetric operator with full reorthogonalisation.
+
+    Twin of :func:`omnibias.torch.optim.lanczos_tridiag`. Returns ``(Q, T)`` with
+    ``Q`` (``n x m``) orthonormal (first column ``b/||b||``) and ``T = Q^T A Q``
+    symmetric tridiagonal (``m <= min(k, n)``).
+    """
+    n = int(b.shape[0])
+    m_max = min(int(k), n)
+    beta0 = float(jnp.linalg.norm(b))
+    if beta0 == 0.0:
+        q = jnp.zeros_like(b).at[0].set(1.0)
+    else:
+        q = b / beta0
+    qs: list[Array] = [q]
+    alphas: list[Array] = []
+    betas: list[Array] = []
+    q_prev = jnp.zeros_like(b)
+    beta_prev = jnp.zeros((), dtype=b.dtype)
+    for _j in range(m_max):
+        w = matvec(qs[-1])
+        alpha = jnp.vdot(w, qs[-1])
+        alphas.append(alpha)
+        w = w - alpha * qs[-1] - beta_prev * q_prev
+        for qi in qs:
+            w = w - jnp.vdot(w, qi) * qi
+        beta = jnp.linalg.norm(w)
+        if float(beta) <= tol:
+            break
+        betas.append(beta)
+        q_prev = qs[-1]
+        beta_prev = beta
+        qs.append(w / beta)
+    m = len(alphas)
+    q_basis = jnp.stack(qs[:m], axis=1)
+    tri = jnp.diag(jnp.stack(alphas))
+    if m > 1:
+        off = jnp.stack(betas[: m - 1])
+        tri = tri + jnp.diag(off, 1) + jnp.diag(off, -1)
+    return q_basis, tri
+
+
+def _solve_cubic_subproblem(tri: Array, c: Array, sigma: float, *, iters: int = 100) -> Array:
+    r"""Global minimiser of ``c^T y + 0.5 y^T T y + (sigma/3) ||y||^3``.
+
+    Twin of :func:`omnibias.torch.optim._solve_cubic_subproblem`.
+    """
+    theta, vecs = jnp.linalg.eigh(tri)
+    chat = vecs.T @ c
+    lam_lo = max(0.0, -float(theta[0]))
+    eps = 1e-12 + 1e-9 * max(1.0, abs(float(theta[-1])))
+
+    def z_of(lam: float) -> Array:
+        return -chat / (theta + lam)
+
+    def phi(lam: float) -> float:
+        return float(jnp.linalg.norm(z_of(lam))) - lam / sigma
+
+    lo = lam_lo + eps
+    if phi(lo) <= 0.0:
+        return vecs @ z_of(lo)
+    hi = max(2.0 * lo, 1.0)
+    for _ in range(200):
+        if phi(hi) < 0.0:
+            break
+        hi *= 2.0
+    for _ in range(iters):
+        mid = 0.5 * (lo + hi)
+        if phi(mid) > 0.0:
+            lo = mid
+        else:
+            hi = mid
+    return vecs @ z_of(0.5 * (lo + hi))
+
+
+def _cubic_arc_step(
+    params: Array,
+    g: Array,
+    hess_matvec: MatVec,
+    f0: float,
+    eval_f: Callable[[Array], float],
+    sigma: float,
+    *,
+    krylov_dim: int,
+    max_line_search: int,
+    eta_accept: float,
+    eta_success: float,
+    sigma_increase: float,
+    sigma_decrease: float,
+    min_sigma: float,
+    max_sigma: float,
+) -> tuple[Array, bool, float, float, float]:
+    r"""Shared ARC acceptance loop (twin of the torch cubic-GN core)."""
+    gnorm = float(jnp.linalg.norm(g))
+    if gnorm == 0.0:
+        return params, False, sigma, 0.0, f0
+    q_basis, tri = lanczos_tridiag(hess_matvec, g, krylov_dim)
+    c = jnp.zeros((tri.shape[0],), dtype=params.dtype).at[0].set(gnorm)
+    rho = 0.0
+    for _ in range(max_line_search):
+        y = _solve_cubic_subproblem(tri, c, sigma)
+        s = q_basis @ y
+        model_dec = -(
+            float(jnp.vdot(c, y))
+            + 0.5 * float(jnp.vdot(y, tri @ y))
+            + (sigma / 3.0) * float(jnp.linalg.norm(y)) ** 3
+        )
+        if model_dec <= 0.0:
+            sigma = min(sigma * sigma_increase, max_sigma)
+            continue
+        f1 = eval_f(params + s)
+        rho = (f0 - f1) / model_dec if math.isfinite(f1) else float("-inf")
+        if math.isfinite(f1) and rho >= eta_accept:
+            new_sigma = max(sigma / sigma_decrease, min_sigma) if rho >= eta_success else sigma
+            return params + s, True, new_sigma, rho, f1
+        sigma = min(sigma * sigma_increase, max_sigma)
+    return params, False, sigma, rho, f0
+
+
+HomotopyResidualFn = Callable[[Array, float], Array]
+
+
+@dataclass(frozen=True)
+class HomotopyGNConfig:
+    """Stage-wise GN on ``r(theta, t)`` for a coupling homotopy ``t`` in ``[0, 1]``.
+
+    Each stage freezes ``t`` and runs Martens–Grosse or cubic GN. Designed for
+    residuals that split as ``L + t Quad`` (nonlocal quadratic coupling).
+    Does not weaken any downstream residual gate.
+    """
+
+    stages: tuple[float, ...] = (0.0, 0.25, 0.5, 0.75, 1.0)
+    steps_per_stage: int = 20
+    method: Literal["martens_grosse", "cubic"] = "cubic"
+    damping: float = 1e-3
+    cubic_sigma: float = 1.0
+    solver: GNSolver = "qr"
+    krylov_dim: int | None = None
+
+    def __post_init__(self) -> None:
+        if not self.stages:
+            raise ValueError("stages must be non-empty")
+        if any(not 0.0 <= float(t) <= 1.0 for t in self.stages):
+            raise ValueError(f"every stage t must lie in [0, 1], got {self.stages}")
+        if self.steps_per_stage < 1:
+            raise ValueError(f"steps_per_stage must be >= 1, got {self.steps_per_stage}")
+        if self.method not in ("martens_grosse", "cubic"):
+            raise ValueError(f"method must be martens_grosse or cubic, got {self.method!r}")
+
+
+def peak_weighted_residual(res: Array, power: float) -> Array:
+    """Emphasize residual peaks without changing the zero set.
+
+    ``r |r|^p`` is still zero iff ``r`` is. Used as a differentiable L^∞ proxy
+    so Gauss–Newton cannot hide a large max-norm behind a small L2.
+    """
+    if power == 0.0:
+        return res
+    return res * jnp.power(1.0 + jnp.abs(res), float(power))
+
+
+def linearized_linf_direction(
+    jac: Array,
+    res: Array,
+    *,
+    box: float | None = None,
+    irls_iters: int = 16,
+) -> Array:
+    """Minimax (Chebyshev) step on the linearized residual ``res + jac @ c``.
+
+    One column is exact: bisection on the epigraph radius ``t`` with interval
+    intersection. Several columns use Lawson IRLS (reweighted least squares),
+    which is the L^∞ successor of :func:`gauss_newton_direction` when L2
+    Newton raises ``max|r|``. Optional ``box`` clips the step.
+    """
+    if jac.ndim != 2:
+        raise ValueError(f"jac must be 2-D (N, P), got shape {jac.shape}")
+    n, p = jac.shape
+    if res.shape != (n,):
+        raise ValueError(f"res must have shape ({n},) matching jac rows, got {res.shape}")
+    if p == 1:
+        j = jac[:, 0]
+        lo = jnp.array(0.0, dtype=res.dtype)
+        hi = jnp.max(jnp.abs(res))
+        c_star = jnp.array(0.0, dtype=res.dtype)
+
+        def body(carry, _):
+            lo_, hi_, c_ = carry
+            t = 0.5 * (lo_ + hi_)
+            # For each row, c in an interval so |r + j c| <= t.
+            # Skip near-zero j: those rows only constrain t >= |r|.
+            nz = jnp.abs(j) > 1e-15
+            left = jnp.where(j >= 0.0, (-t - res) / (j + 1e-30), (t - res) / (j + 1e-30))
+            right = jnp.where(j >= 0.0, (t - res) / (j + 1e-30), (-t - res) / (j + 1e-30))
+            left = jnp.where(nz, left, -jnp.inf)
+            right = jnp.where(nz, right, jnp.inf)
+            c_lo = jnp.max(left)
+            c_hi = jnp.min(right)
+            feasible = (c_lo <= c_hi) & (jnp.max(jnp.abs(res) * (1.0 - nz.astype(res.dtype))) <= t)
+            c_mid = 0.5 * (c_lo + c_hi)
+            if box is not None:
+                c_mid = jnp.clip(c_mid, -float(box), float(box))
+                feasible = feasible & (c_lo <= float(box)) & (c_hi >= -float(box))
+            lo_n = jnp.where(feasible, lo_, t)
+            hi_n = jnp.where(feasible, t, hi_)
+            c_n = jnp.where(feasible, c_mid, c_)
+            return (lo_n, hi_n, c_n), None
+
+        (_, _, c_star), _ = jax.lax.scan(body, (lo, hi, c_star), xs=None, length=48)
+        step = c_star.reshape((1,))
+    else:
+        w = jnp.ones_like(res)
+        c = jnp.zeros((p,), dtype=res.dtype)
+
+        def irls(carry, _):
+            w_, _c = carry
+            sw = jnp.sqrt(w_)
+            c_n, _, _, _ = jnp.linalg.lstsq(jac * sw[:, None], -res * sw, rcond=None)
+            if box is not None:
+                c_n = jnp.clip(c_n, -float(box), float(box))
+            resid = res + jac @ c_n
+            w_n = w_ * (jnp.abs(resid) + 1e-15)
+            w_n = w_n / jnp.mean(w_n)
+            return (w_n, c_n), None
+
+        (_, c), _ = jax.lax.scan(irls, (w, c), xs=None, length=int(irls_iters))
+        step = c
+    return step
+
+
+def champ_barrier_residual(
+    res: Array,
+    tau: float,
+    *,
+    barrier_weight: float = 20.0,
+    peak_power: float = 4.0,
+    peak_frac: float = 0.85,
+) -> Array:
+    """Active-set L^∞ residual that cannot raise already-small entries above ``tau``.
+
+    Rows with ``|r| >= peak_frac * max|r|`` are peak-weighted so Gauss–Newton
+    works the current spike. One-sided excess ``relu(|r| - tau)`` is a barrier
+    against walking past a known champ. The peak block is zero wherever
+    ``res`` is; the barrier block is zero whenever ``|r| <= tau``.
+    """
+    ar = jnp.abs(res)
+    rmax = jnp.max(ar)
+    peak_mask = ar >= (float(peak_frac) * rmax)
+    peak = jnp.where(
+        peak_mask,
+        peak_weighted_residual(res, peak_power),
+        jnp.zeros_like(res),
+    )
+    excess = jnp.maximum(ar - float(tau), 0.0) * jnp.sign(res)
+    return jnp.concatenate([peak, float(barrier_weight) * excess])
+
+
+def homotopy_gauss_newton_minimize(
+    residual_fn: HomotopyResidualFn,
+    params0: Array,
+    *,
+    config: HomotopyGNConfig | None = None,
+) -> tuple[Array, dict[str, Any]]:
+    """Minimise ``0.5 ||r(theta, t)||^2`` at increasing coupling ``t``.
+
+    ``residual_fn(theta, t)`` must already include every constraint that
+    belongs in the Jacobian (hard gauge, anti-ghost). Extra Newton on a
+    residual that omits the gauge will collapse amplitude.
+    """
+    cfg = HomotopyGNConfig() if config is None else config
+    params = params0
+    history: list[dict[str, float]] = []
+    for t in cfg.stages:
+
+        def r_t(vec: Array, t_frozen: float = float(t)) -> Array:
+            return residual_fn(vec, t_frozen)
+
+        if cfg.method == "cubic":
+            cubic_cfg = CubicRegularizedGNConfig(
+                steps=int(cfg.steps_per_stage),
+                sigma=float(cfg.cubic_sigma),
+                krylov_dim=cfg.krylov_dim,
+            )
+            params, losses = cubic_regularized_gauss_newton_minimize(
+                r_t, params, config=cubic_cfg
+            )
+        else:
+            mg_cfg = MartensGrosseGNConfig(
+                steps=int(cfg.steps_per_stage),
+                damping=float(cfg.damping),
+                solver=cfg.solver,
+            )
+            params, losses = martens_grosse_gauss_newton_minimize(
+                r_t, params, config=mg_cfg
+            )
+        r_end = residual_fn(params, float(t))
+        history.append(
+            {
+                "t": float(t),
+                "loss0": float(losses[0]),
+                "loss1": float(losses[-1]),
+                "max_abs": float(jnp.max(jnp.abs(r_end))),
+            }
+        )
+    return params, {"stages": history, "method": cfg.method}
+
+
+@dataclass(frozen=True)
+class CubicRegularizedGNConfig:
+    """Hyper-parameters for :func:`cubic_regularized_gauss_newton_minimize`."""
+
+    steps: int = 50
+    sigma: float = 1.0
+    eta_accept: float = 0.1
+    eta_success: float = 0.9
+    sigma_increase: float = 2.0
+    sigma_decrease: float = 2.0
+    min_sigma: float = 1e-8
+    max_sigma: float = 1e16
+    # None = full parameter dimension. A small default (e.g. 20) silently
+    # truncates ARC on anything wider than a toy residual.
+    krylov_dim: int | None = None
+    max_line_search: int = 12
+
+    def __post_init__(self) -> None:
+        if self.sigma <= 0.0:
+            raise ValueError(f"sigma must be > 0, got {self.sigma}")
+        if not 0.0 < self.eta_accept <= self.eta_success < 1.0:
+            raise ValueError(
+                f"need 0 < eta_accept <= eta_success < 1, got "
+                f"{self.eta_accept}, {self.eta_success}"
+            )
+        if self.sigma_increase <= 1.0:
+            raise ValueError(f"sigma_increase must be > 1, got {self.sigma_increase}")
+        if self.sigma_decrease <= 1.0:
+            raise ValueError(f"sigma_decrease must be > 1, got {self.sigma_decrease}")
+        if self.krylov_dim is not None and self.krylov_dim < 1:
+            raise ValueError(f"krylov_dim must be >= 1 or None, got {self.krylov_dim}")
+        if self.max_line_search < 1:
+            raise ValueError(f"max_line_search must be >= 1, got {self.max_line_search}")
+
+
+def cubic_regularized_gauss_newton_minimize(
+    residual_fn: ResidualFn,
+    params0: Array,
+    *,
+    config: CubicRegularizedGNConfig | None = None,
+) -> tuple[Array, Array]:
+    r"""Minimise ``0.5 ||r(params)||^2`` by cubic-regularised Gauss-Newton (ARC).
+
+    Matrix-free twin of :class:`omnibias.torch.optim.CubicRegularizedGaussNewton`:
+    each step minimises ``g^T s + 0.5 s^T (J^T J) s + (sigma/3)||s||^3`` with
+    ``g = J^T r`` in a Lanczos subspace, then accepts by the ARC ratio test.
+    Loss history matches :func:`martens_grosse_gauss_newton_minimize` (value at
+    the start of each step, then the final value).
+    """
+    cfg = CubicRegularizedGNConfig() if config is None else config
+    params = params0
+    sigma = float(cfg.sigma)
+    n_params = int(params0.size)
+    krylov = n_params if cfg.krylov_dim is None else min(int(cfg.krylov_dim), n_params)
+    losses: list[float] = []
+
+    for _ in range(int(cfg.steps)):
+        res, jt, jvec = _linearize_gn(residual_fn, params)
+        g = jt(res)
+        f0 = _half_sum_sq(res)
+        losses.append(f0)
+
+        def matvec(v: Array, jt_fn: MatVec = jt, jvec_fn: MatVec = jvec) -> Array:
+            return jt_fn(jvec_fn(v))
+
+        def eval_f(trial: Array) -> float:
+            return _half_sum_sq(residual_fn(trial))
+
+        params, _accepted, sigma, _rho, _f1 = _cubic_arc_step(
+            params,
+            g,
+            matvec,
+            f0,
+            eval_f,
+            sigma,
+            krylov_dim=krylov,
+            max_line_search=int(cfg.max_line_search),
+            eta_accept=float(cfg.eta_accept),
+            eta_success=float(cfg.eta_success),
+            sigma_increase=float(cfg.sigma_increase),
+            sigma_decrease=float(cfg.sigma_decrease),
+            min_sigma=float(cfg.min_sigma),
+            max_sigma=float(cfg.max_sigma),
+        )
+
+    losses.append(_half_sum_sq(residual_fn(params)))
+    return params, jnp.asarray(losses, dtype=jnp.float64)
+
+
 def natural_gradient_direction(metric: Array, grad: Array, *, damping: float = 1e-3) -> Array:
     r"""Natural-gradient direction ``delta = (M + damping I)^{-1} grad``.
 
@@ -509,23 +911,32 @@ def grad_norm_weights(
 
 
 __all__ = [
+    "CubicRegularizedGNConfig",
     "GNSolver",
     "GaussNewtonState",
+    "HomotopyGNConfig",
+    "HomotopyResidualFn",
     "MartensGrosseGNConfig",
     "MatVec",
     "ResidualFn",
     "cgls",
+    "champ_barrier_residual",
+    "cubic_regularized_gauss_newton_minimize",
     "gauss_newton_direction",
     "gauss_newton_direction_cgls",
     "gauss_newton_fisher",
     "gauss_newton_minimize",
     "gauss_newton_step",
     "grad_norm_weights",
+    "homotopy_gauss_newton_minimize",
     "init_gauss_newton_state",
+    "lanczos_tridiag",
+    "linearized_linf_direction",
     "lstsq_gauss_newton_direction",
     "make_residual_fn",
     "martens_grosse_combine",
     "martens_grosse_gauss_newton_minimize",
     "natural_gradient_direction",
     "natural_gradient_step",
+    "peak_weighted_residual",
 ]

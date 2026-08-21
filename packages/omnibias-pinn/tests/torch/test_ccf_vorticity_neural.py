@@ -55,6 +55,34 @@ def test_hilbert_pv_line_finite_and_odd_to_even() -> None:
     assert float(torch.max(torch.abs(h - h.flip(0)))) < 1e-8
 
 
+def test_hilbert_pv_mapped_tail_recovers_hardy_q() -> None:
+    """Mapped |t|>Y tail beats truncated PV on a planted Hardy Q (H[Q]=-P)."""
+    from omnibias.pinn.torch.equations.ccf_compactified import hardy_even, hardy_odd
+
+    y = torch.linspace(-40.0, 40.0, 401, dtype=torch.float64)
+    a, g = 1.3, 1.0 / (1.0 + 0.6057)
+    omega = hardy_odd(y, a, g)
+    h_exact = -hardy_even(y, a, g)
+    h_pv = cvn.hilbert_pv_line(y, omega)
+    h_tail = cvn.hilbert_pv_mapped_tail(
+        y,
+        omega,
+        decay_power=g,
+        omega_pos_fn=lambda t: hardy_odd(t, a, g),
+        n_quad=64,
+        n_gl=96,
+    )
+    core = y.abs() <= 0.9 * 40.0
+    err_pv = float(torch.max(torch.abs((h_pv - h_exact)[core])))
+    err_tail = float(torch.max(torch.abs((h_tail - h_exact)[core])))
+    assert torch.isfinite(h_tail).all()
+    assert float(torch.max(torch.abs(h_tail - h_tail.flip(0)))) < 1e-8
+    # Junction |y|~Y is excluded. GL interior + mapped tail is spectral.
+    assert err_pv > 0.05  # truncation floor on the core
+    assert err_tail < 2e-3
+    assert err_tail < 0.05 * err_pv
+
+
 def test_hardy_corrected_hilbert_matches_exact_atom() -> None:
     """On a pure Hardy atom the corrected Hilbert recovers H[Q]=-P to ~1e-10."""
     from omnibias.pinn.torch.equations.ccf_compactified import hardy_even, hardy_odd
@@ -195,6 +223,73 @@ def test_linearized_msnn_smoke() -> None:
     assert out["composed"].shape == stage1.shape
 
 
+def test_wang_linearized_gn_requires_torch_residual() -> None:
+    y = np.linspace(-2.0, 2.0, 17)
+    stage1 = 0.1 * y
+
+    def residual_fn(phi: np.ndarray) -> np.ndarray:
+        return 2.0 * phi + 0.3
+
+    with pytest.raises(ValueError, match="residual_fn_torch"):
+        ms.correct_profile(
+            y,
+            stage1,
+            residual_fn,
+            cfg=ms.MultiStageConfig(steps=2, hidden=4, n_fourier=3, linearized=True),
+            optimizer="wang_linearized_gn",
+        )
+
+
+def test_wang_linearized_residual_matches_exact_affine_d() -> None:
+    import torch
+
+    stage1 = torch.linspace(-1.0, 1.0, 16, dtype=torch.float64)
+    corr = torch.sin(stage1)
+
+    def residual_fn_torch(phi: torch.Tensor) -> torch.Tensor:
+        return 2.0 * phi + 0.3
+
+    r0 = residual_fn_torch(stage1)
+    r_lin = ms.wang_linearized_residual_torch(
+        residual_fn_torch,
+        stage1,
+        corr,
+        r0=r0,
+        eps=0.01,
+        fd_eps=1e-6,
+        linearized=True,
+    )
+    expected = r0 + 0.01 * 2.0 * corr
+    assert torch.allclose(r_lin, expected, atol=1e-10)
+    proxy = corr + r0 / 0.01
+    assert float(torch.max(torch.abs(r_lin - proxy))) > 1.0
+
+
+def test_wang_linearized_gn_reduces_affine() -> None:
+    import torch
+
+    y = np.linspace(-1.0, 1.0, 31)
+    stage1 = np.zeros_like(y)
+    target = np.sin(2.0 * np.pi * y)
+
+    def residual_fn(phi: np.ndarray) -> np.ndarray:
+        return 2.0 * phi - target
+
+    def residual_fn_torch(phi: torch.Tensor) -> torch.Tensor:
+        return 2.0 * phi - torch.as_tensor(target, dtype=torch.float64)
+
+    out = ms.correct_profile(
+        y,
+        stage1,
+        residual_fn,
+        cfg=ms.MultiStageConfig(steps=5, hidden=8, n_fourier=6, eps=1.0, linearized=True),
+        optimizer="wang_linearized_gn",
+        residual_fn_torch=residual_fn_torch,
+    )
+    assert out["optimizer"] == "wang_linearized_gn"
+    assert out["max_abs_residual_after"] < out["max_abs_residual_before"]
+
+
 def test_iterate_multistage_labels_optimizer() -> None:
     y = np.linspace(-3.0, 3.0, 31)
     stage1 = 0.02 * y * np.exp(-0.2 * y * y)
@@ -212,6 +307,75 @@ def test_iterate_multistage_labels_optimizer() -> None:
     )
     assert out["rounds_run"] >= 1
     assert "stage2_heuristic" in str(out["optimizer"]) or out["optimizer"] == "adam"
+
+
+def test_deepmind_paper_and_signed_configs_keep_honesty_flags() -> None:
+    paper = cvn.deepmind_paper_architecture_config(n_grid=17, hidden=8)
+    signed = cvn.deepmind_signed_hat_config(n_grid=17, hidden=8)
+    assert paper.exp_core is True
+    assert signed.exp_core is False
+    assert paper.optimizer == "martens_grosse"
+    assert signed.optimizer == "martens_grosse"
+    assert paper.use_grad_norm is True
+    assert paper.train_hilbert == "wholeline_hp"
+    assert paper.adam_warmup_steps == 0
+
+
+def test_pv_mapped_tail_neural_smoke_finite() -> None:
+    """Free-Ω mapped-tail Hilbert path stays finite (not a stretch claim)."""
+    cfg = cvn.reproduce_deepmind_config(
+        n_grid=21,
+        hidden=6,
+        mg_steps=2,
+        qr_gn_steps=0,
+        adam_warmup_steps=1,
+        dense_n_val=41,
+        y_max=5.0,
+        n_scales=2,
+        n_gamma_multiples=1,
+        d2_weight=0.0,
+        resample_every=0,
+        seed=2,
+        train_hilbert="pv_mapped_tail",
+        proj_defect_weight=0.0,
+        hilbert_n_aux=65,
+        hilbert_n_quad=16,
+        omega_peak_floor=0.02,
+        nontrivial_weight=5.0,
+    )
+    result = cvn.run_ccf_vorticity_neural_discovery(cfg)
+    assert result.extra["train_hilbert"] == "pv_mapped_tail"
+    assert np.isfinite(result.diagnostics["reproduction_dense_max_abs"])
+    assert np.isfinite(result.diagnostics["max_abs_vorticity_residual"])
+
+
+def test_wholeline_hp_neural_smoke_finite() -> None:
+    """Free-Ω hp Hilbert path stays finite (not a stretch claim)."""
+    cfg = cvn.reproduce_deepmind_config(
+        n_grid=21,
+        hidden=6,
+        mg_steps=2,
+        qr_gn_steps=0,
+        adam_warmup_steps=1,
+        dense_n_val=41,
+        y_max=5.0,
+        n_scales=2,
+        n_gamma_multiples=1,
+        d2_weight=0.0,
+        resample_every=0,
+        seed=3,
+        train_hilbert="wholeline_hp",
+        proj_defect_weight=0.0,
+        hilbert_n_aux=32,
+        hilbert_n_quad=16,
+        hilbert_y_near=1.0,
+        omega_peak_floor=0.02,
+        nontrivial_weight=5.0,
+    )
+    result = cvn.run_ccf_vorticity_neural_discovery(cfg)
+    assert result.extra["train_hilbert"] == "wholeline_hp"
+    assert np.isfinite(result.diagnostics["reproduction_dense_max_abs"])
+    assert np.isfinite(result.diagnostics["max_abs_vorticity_residual"])
 
 
 def test_martens_grosse_neural_smoke_decreases_or_finite() -> None:
@@ -332,6 +496,11 @@ def test_campaign_tick_phase0_while_stretch_uncleared() -> None:
     assert tick["gates"]["stretch_1e-13_cleared"] is False
     assert tick["honesty"]["navier_stokes_proof_claim"] is False
     assert np.isfinite(tick["diagnosis"]["reproduction_dense_residual"])
+    assert np.isfinite(tick["diagnosis"]["conjugate_orders_to_stretch"])
+    assert tick["conjugate"]["stretch_1e-13_cleared"] is False
+    assert tick["diagnosis"]["conjugate_orders_to_stretch"] == pytest.approx(
+        tick["conjugate"]["orders_to_stretch"]
+    )
 
 
 def test_vorticity_cap_does_not_forge_whole_line() -> None:
@@ -366,3 +535,50 @@ def test_acceptance_config_rejects_multi_alpha_collapse_flag() -> None:
         Path(__file__).resolve().parents[4]
         / "packages/omnibias-pinn/src/omnibias/pinn/torch/discovery/ccf_vorticity_neural.py"
     ).read_text(encoding="utf-8")
+
+
+def test_max_order_zero_projection_matches_legacy_planted_atom() -> None:
+    """``max_order=0`` recovers a planted Q atom to ~1e-12 (legacy path)."""
+    from omnibias.pinn.torch.equations.ccf_compactified import hardy_odd
+
+    y = torch.linspace(-8.0, 8.0, 161, dtype=torch.float64)
+    a, g = 1.3, 1.0 / (1.0 + 0.6057)
+    omega = 0.4 * hardy_odd(y, a, g)
+    scales = np.array([a], dtype=float)
+    gammas = np.array([g], dtype=float)
+    c0, d0, f0 = cvn.project_omega_hardy(y, omega, scales=scales, gammas=gammas)
+    c1, d1, f1 = cvn.project_omega_hardy(
+        y,
+        omega,
+        scales=scales,
+        gammas=gammas,
+        orders=np.array([0], dtype=int),
+        parities=np.array([1], dtype=int),
+    )
+    assert d0 < 1e-12
+    assert d1 < 1e-12
+    np.testing.assert_allclose(c0, c1, atol=1e-12)
+    np.testing.assert_allclose(f0["H"], f1["H"], atol=1e-12)
+    np.testing.assert_allclose(f0["U"], f1["U"], atol=1e-12)
+
+
+def test_max_order_recovers_planted_q2_atom() -> None:
+    """Spatially odd ``Q^{(2)}`` is in the N=2 span and projects to ~1e-10."""
+    from omnibias.core.conjugate import hardy_q_deriv_n
+
+    y = np.linspace(-8.0, 8.0, 201)
+    a, g = 1.3, 1.0 / (1.0 + 0.6057)
+    omega = np.asarray([hardy_q_deriv_n(float(yy), a, g, 2) for yy in y], dtype=float)
+    scales, gammas, orders, parities = cvn.hardy_dictionary_ordered(
+        lam=0.6057, n_scales=1, n_gamma_multiples=1, max_order=2
+    )
+    coeffs, defect, fields = cvn.project_omega_hardy(
+        y, omega, scales=scales, gammas=gammas, orders=orders, parities=parities
+    )
+    assert defect < 1e-10
+    assert fields["H"].shape == y.shape
+    assert coeffs.shape[0] == scales.shape[0]
+    # The Q^{(2)} column (order 2, odd) should carry the mass.
+    hit = np.where((orders == 2) & (parities == 1))[0]
+    assert hit.size == 1
+    assert abs(float(coeffs[hit[0]])) > 0.5

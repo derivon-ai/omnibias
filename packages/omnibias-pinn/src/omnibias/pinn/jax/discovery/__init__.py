@@ -6,6 +6,8 @@ Ships:
 
 * periodic CCF (:mod:`omnibias.pinn.jax.discovery.ccf`)
 * line / compactified CCF (:mod:`omnibias.pinn.jax.discovery.ccf_line`)
+* signed-hat homotopy (:mod:`omnibias.pinn.jax.discovery.ccf_hat_homotopy`)
+* signed PirateNet hat (:mod:`omnibias.pinn.jax.discovery.pirate_hat`)
 * funnel ``lambda`` inference (:mod:`omnibias.pinn.jax.discovery.funnel`)
 * Gauss-Newton trainer (:mod:`omnibias.pinn.jax.discovery.train_gn`)
 * multi-stage correction (:mod:`omnibias.pinn.jax.discovery.multistage`)
@@ -13,7 +15,7 @@ Ships:
 
 Import explicitly::
 
-    from omnibias.pinn.jax.discovery import ccf, ccf_line, cap, funnel, multistage
+    from omnibias.pinn.jax.discovery import ccf, ccf_line, cap, funnel, multistage, pirate_hat
 """
 
 from __future__ import annotations
@@ -22,6 +24,7 @@ from omnibias.pinn.jax.discovery import (
     boussinesq,
     cap,
     ccf,
+    ccf_hat_homotopy,
     ccf_line,
     ccf_vorticity,
     euler3d_axisym,
@@ -31,6 +34,7 @@ from omnibias.pinn.jax.discovery import (
     multistage,
     phase5_beyond,
     pipeline,
+    pirate_hat,
     polish_mp,
     spectrum,
     train_gn,
@@ -40,6 +44,7 @@ __all__ = [
     "boussinesq",
     "cap",
     "ccf",
+    "ccf_hat_homotopy",
     "ccf_line",
     "ccf_vorticity",
     "euler3d_axisym",
@@ -49,6 +54,7 @@ __all__ = [
     "multistage",
     "phase5_beyond",
     "pipeline",
+    "pirate_hat",
     "polish_mp",
     "spectrum",
     "train_gn",

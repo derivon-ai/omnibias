@@ -17,6 +17,10 @@ Ansatz (far-field corrected)
 ``U = -Q_{a, γ-1}/(γ-1)`` (``γ ≠ 1``). Leading decay is ``|y|^{-α}``, which
 cancels the linear far-field operator (``1 - (1+λ)α = 0``).
 
+``max_order>0`` enlarges the spatially odd span with ``Q^{(even)}`` and
+``P^{(odd)}`` (closed-form ``U`` from ``U'=HΩ``). ``max_order=0`` is this
+Q-only path.
+
 The older Θ-even sum ``Θ = Σ c P`` produced ``Ω = Θ' ∼ |y|^{-(α+1)}`` and is
 retained only as :func:`hardy_theta_profile` for diagnostics / back-compat.
 """
@@ -42,6 +46,10 @@ from omnibias.pinn.jax.equations.ccf_compactified import (  # noqa: E402
     hardy_odd,
     hardy_odd_deriv,
 )
+from omnibias.pinn.jax.hilbert_line import (  # noqa: E402
+    hilbert_wholeline_hp,
+    integrate_velocity_from_hilbert,
+)
 
 
 @dataclass(frozen=True)
@@ -50,6 +58,7 @@ class CCFVorticityDiscoveryConfig:
 
     n_scales: int = 8
     n_gamma_multiples: int = 4  # γ ≈ k*α for k=1..K
+    max_order: int = 0  # conjugate-tower orders; 0 is today's Q_{a,kα} span
     n_grid: int = 401
     y_max: float = 40.0
     lam: float = 0.6057
@@ -115,20 +124,148 @@ def _dictionary(
     return scales, alphas, alpha0
 
 
+def _hardy_pq_jax(y: Array, a: Array, alpha: Array) -> tuple[Array, Array]:
+    rr = jnp.hypot(a, y)
+    phi = jnp.arctan2(y, a)
+    p = (rr ** (-alpha)) * jnp.cos(alpha * phi)
+    q = (rr ** (-alpha)) * jnp.sin(alpha * phi)
+    return p, q
+
+
+def _pochhammer_jax(alpha: Array, n: int) -> Array:
+    acc = jnp.ones_like(alpha)
+    for k in range(int(n)):
+        acc = acc * (alpha + float(k))
+    return acc
+
+
+def _p_deriv_n_jax(y: Array, a: Array, alpha: Array, n: int) -> Array:
+    if n == 0:
+        p, _ = _hardy_pq_jax(y, a, alpha)
+        return p
+    factor = _pochhammer_jax(alpha, n)
+    p, q = _hardy_pq_jax(y, a, alpha + float(n))
+    rem = n % 4
+    if rem == 0:
+        return factor * p
+    if rem == 1:
+        return -factor * q
+    if rem == 2:
+        return -factor * p
+    return factor * q
+
+
+def _q_deriv_n_jax(y: Array, a: Array, alpha: Array, n: int) -> Array:
+    if n == 0:
+        _, q = _hardy_pq_jax(y, a, alpha)
+        return q
+    factor = _pochhammer_jax(alpha, n)
+    p, q = _hardy_pq_jax(y, a, alpha + float(n))
+    rem = n % 4
+    if rem == 0:
+        return factor * q
+    if rem == 1:
+        return factor * p
+    if rem == 2:
+        return -factor * q
+    return -factor * p
+
+
+def _integrate_p_jax(y: Array, a: Array, beta: Array) -> Array:
+    near = jnp.abs(beta - 1.0) < 1e-12
+    atan = jnp.arctan(y / a)
+    _p, q = _hardy_pq_jax(y, a, beta - 1.0)
+    gen = q / (beta - 1.0)
+    return jnp.where(near, atan, gen)
+
+
+def _integrate_q_jax(y: Array, a: Array, beta: Array) -> Array:
+    near = jnp.abs(beta - 1.0) < 1e-12
+    logt = jnp.log(jnp.hypot(a, y) / a)
+    p, _q = _hardy_pq_jax(y, a, beta - 1.0)
+    p0 = a ** (-(beta - 1.0))
+    gen = -(p - p0) / (beta - 1.0)
+    return jnp.where(near, logt, gen)
+
+
+def _velocity_atom_jax(y: Array, a: Array, alpha: Array, n: int, *, odd: bool) -> Array:
+    factor = _pochhammer_jax(alpha, n)
+    beta = alpha + float(n)
+    rem = n % 4
+    if odd:
+        if rem in (0, 2):
+            integ = _integrate_p_jax(y, a, beta)
+            return -factor * integ if rem == 0 else factor * integ
+        integ = _integrate_q_jax(y, a, beta)
+        return factor * integ if rem == 1 else -factor * integ
+    if rem in (0, 2):
+        integ = _integrate_q_jax(y, a, beta)
+        return factor * integ if rem == 0 else -factor * integ
+    integ = _integrate_p_jax(y, a, beta)
+    return factor * integ if rem == 1 else -factor * integ
+
+
+def _hardy_omega_profile_ordered(
+    y: Array,
+    coeffs: Array,
+    scales: Array,
+    gammas: Array,
+    orders: Array,
+    parities: Array | None,
+    max_order: int,
+) -> tuple[Array, Array, Array, Array]:
+    """Spatially odd conjugate-tower Ω sum (orders ``0..max_order``)."""
+    yy = y[:, None]
+    aa = scales[None, :]
+    gg = gammas[None, :]
+    cc = coeffs[None, :]
+    orders = jnp.asarray(orders, dtype=jnp.int32).reshape(-1)
+    if parities is None:
+        par = jnp.where(orders % 2 == 0, 1, 0)
+    else:
+        par = jnp.asarray(parities, dtype=jnp.int32).reshape(-1)
+    om = jnp.zeros(y.shape, dtype=jnp.float64)
+    omy = jnp.zeros(y.shape, dtype=jnp.float64)
+    u = jnp.zeros(y.shape, dtype=jnp.float64)
+    uy = jnp.zeros(y.shape, dtype=jnp.float64)
+    for n in range(int(max_order) + 1):
+        mask_q = (orders == n) & (par == 1)
+        mask_p = (orders == n) & (par == 0)
+        w_q = cc * mask_q[None, :].astype(jnp.float64)
+        w_p = cc * mask_p[None, :].astype(jnp.float64)
+        om = om + jnp.sum(w_q * _q_deriv_n_jax(yy, aa, gg, n), axis=1)
+        om = om + jnp.sum(w_p * _p_deriv_n_jax(yy, aa, gg, n), axis=1)
+        omy = omy + jnp.sum(w_q * _q_deriv_n_jax(yy, aa, gg, n + 1), axis=1)
+        omy = omy + jnp.sum(w_p * _p_deriv_n_jax(yy, aa, gg, n + 1), axis=1)
+        uy = uy + jnp.sum(w_q * (-_p_deriv_n_jax(yy, aa, gg, n)), axis=1)
+        uy = uy + jnp.sum(w_p * _q_deriv_n_jax(yy, aa, gg, n), axis=1)
+        u = u + jnp.sum(w_q * _velocity_atom_jax(yy, aa, gg, n, odd=True), axis=1)
+        u = u + jnp.sum(w_p * _velocity_atom_jax(yy, aa, gg, n, odd=False), axis=1)
+    return om, omy, u, uy
+
+
 def hardy_omega_profile(
     y: Array,
     coeffs: Array,
     scales: Array,
     gammas: Array,
+    orders: Array | None = None,
+    parities: Array | None = None,
+    max_order: int = 0,
 ) -> tuple[Array, Array, Array, Array]:
     """Return ``(Omega, Omega_y, U, U_y=HOmega)`` for an odd Hardy-Ω sum.
 
     Vectorized over atoms (broadcast ``y[:,None]`` against atom axes).
+    ``max_order=0`` / ``orders is None`` is the current Q-only path.
     """
     y = jnp.asarray(y, dtype=jnp.float64).reshape(-1)
     coeffs = jnp.asarray(coeffs, dtype=jnp.float64).reshape(-1)
     scales = jnp.asarray(scales, dtype=jnp.float64).reshape(-1)
     gammas = jnp.asarray(gammas, dtype=jnp.float64).reshape(-1)
+    if orders is not None and int(max_order) > 0:
+        return _hardy_omega_profile_ordered(
+            y, coeffs, scales, gammas, orders, parities, int(max_order)
+        )
     # Shapes: y (N,), atoms (M,) → fields (N, M)
     yy = y[:, None]
     aa = scales[None, :]
@@ -226,15 +363,87 @@ def vorticity_residual_samples(
     scales: Array,
     alphas: Array,
     lam: float,
+    orders: Array | None = None,
+    parities: Array | None = None,
+    max_order: int = 0,
 ) -> tuple[Array, dict[str, Array]]:
     """Wang vorticity residual on samples (exact Hardy-Ω Hilbert)."""
-    om, omy, u, uy = hardy_omega_profile(y, coeffs, scales, alphas)
-    r = om + ((1.0 + lam) * y - u) * omy - om * uy
+    om, omy, u, uy = hardy_omega_profile(
+        y,
+        coeffs,
+        scales,
+        alphas,
+        orders=orders,
+        parities=parities,
+        max_order=max_order,
+    )
+    r = wang_residual(y, om, omy, u, uy, lam=lam)
     th = jnp.zeros_like(om)
     return r, {
         "theta": th,
         "omega": om,
         "omega_y": omy,
+        "U": u,
+        "U_y": uy,
+    }
+
+
+def wang_residual(
+    y: Array,
+    omega: Array,
+    omega_y: Array,
+    u: Array,
+    uy: Array,
+    *,
+    lam: float,
+) -> Array:
+    """Wang vorticity residual ``Ω + ((1+λ)y - U) Ω_y - Ω U_y``.
+
+    JAX twin of ``omnibias.pinn.torch.discovery.ccf_vorticity_neural.wang_residual``.
+    Requires a classical ``Ω_y`` (do not pass ``jnp.gradient`` on a profile
+    that is not ``C^1``).
+    """
+    return omega + ((1.0 + lam) * y - u) * omega_y - omega * uy
+
+
+def free_omega_vorticity_residual(
+    y: Array,
+    omega: Array,
+    omega_y: Array,
+    omega_fn,
+    *,
+    lam: float,
+    y_trunc: float | None = None,
+    gauge_point: float | None = None,
+    gauge_value: float | None = None,
+) -> tuple[Array, dict[str, Array]]:
+    """Wang residual for a free odd ``Ω`` with analytic ``Ω_y``.
+
+    Hilbert is ``hilbert_wholeline_hp``; velocity is
+    ``integrate_velocity_from_hilbert``. This is the official free-Ω score
+    path. It is not Hardy closed-form ``H``/``U`` and not a CAP. Score
+    ``max|r|`` on ``|y| < y_trunc`` — the hp tail is not exact on the
+    truncation nodes.
+    """
+    y = jnp.asarray(y, dtype=jnp.float64).reshape(-1)
+    omega = jnp.asarray(omega, dtype=jnp.float64).reshape(-1)
+    omega_y = jnp.asarray(omega_y, dtype=jnp.float64).reshape(-1)
+    decay = float(alpha_from_lambda(lam))
+    uy = hilbert_wholeline_hp(
+        y, omega, omega_fn, decay_power=decay, y_trunc=y_trunc
+    )
+    u = integrate_velocity_from_hilbert(y, uy)
+    if gauge_point is not None and gauge_value is not None:
+        g = jnp.interp(float(gauge_point), y, omega)
+        scale = float(gauge_value) / (float(g) + 1e-30)
+        omega = scale * omega
+        omega_y = scale * omega_y
+        u = scale * u
+        uy = scale * uy
+    r = wang_residual(y, omega, omega_y, u, uy, lam=float(lam))
+    return r, {
+        "omega": omega,
+        "omega_y": omega_y,
         "U": u,
         "U_y": uy,
     }
@@ -287,6 +496,9 @@ def dense_vorticity_residual(
     *,
     n_val: int = 4001,
     y_max: float = 40.0,
+    orders: Array | np.ndarray | None = None,
+    parities: Array | np.ndarray | None = None,
+    max_order: int = 0,
 ) -> dict[str, float]:
     """Dense fixed-grid vorticity residual (Rung-1 metric)."""
     n = max(int(n_val), 51)
@@ -299,6 +511,9 @@ def dense_vorticity_residual(
         jnp.asarray(scales, dtype=jnp.float64),
         jnp.asarray(alphas, dtype=jnp.float64),
         float(lam),
+        orders=None if orders is None else jnp.asarray(orders),
+        parities=None if parities is None else jnp.asarray(parities),
+        max_order=int(max_order),
     )
     return {
         "dense_max_abs_vorticity": float(jnp.max(jnp.abs(r))),
@@ -313,18 +528,20 @@ def dense_vorticity_residual(
 
 def init_params(cfg: CCFVorticityDiscoveryConfig) -> dict[str, Array]:
     key = jax.random.PRNGKey(cfg.seed)
+    n_rep = max(int(cfg.max_order), 0) + 1
     if cfg.independent_terms:
-        n = int(cfg.n_terms)
+        n_base = int(cfg.n_terms)
+        n = n_base * n_rep
         k1, k2 = jax.random.split(key)
         coeffs = jax.random.normal(k1, (n,), dtype=jnp.float64) * 0.05
         coeffs = coeffs.at[0].add(0.35)
         # Scales spread across [scale_lo, scale_hi]
-        t = jnp.linspace(0.0, 1.0, n, dtype=jnp.float64)
+        t = jnp.linspace(0.0, 1.0, n_base, dtype=jnp.float64)
         scales0 = cfg.scale_lo * (cfg.scale_hi / cfg.scale_lo) ** t
         log_scales = jnp.log(scales0)
         # γ_0 = α; others start near 2α, 3α, ...
         alpha0 = alpha_from_lambda(cfg.lam)
-        gamma0 = alpha0 * jnp.arange(1, n + 1, dtype=jnp.float64)
+        gamma0 = alpha0 * jnp.arange(1, n_base + 1, dtype=jnp.float64)
         # Store log(γ/α) with first frozen via expand
         log_gamma_over_alpha = jnp.log(jnp.maximum(gamma0 / alpha0, 1e-8))
         return {
@@ -333,8 +550,9 @@ def init_params(cfg: CCFVorticityDiscoveryConfig) -> dict[str, Array]:
             "log_gamma_over_alpha": log_gamma_over_alpha,
         }
     scales, _alphas, _ = _dictionary(cfg)
-    coeffs = jax.random.normal(key, (scales.shape[0],), dtype=jnp.float64) * 0.05
-    coeffs = coeffs.at[:: cfg.n_gamma_multiples].add(0.3)
+    n_atoms = int(scales.shape[0]) * n_rep
+    coeffs = jax.random.normal(key, (n_atoms,), dtype=jnp.float64) * 0.05
+    coeffs = coeffs.at[:: cfg.n_gamma_multiples * n_rep].add(0.3)
     log_scales = jnp.log(jnp.asarray(scales[:: cfg.n_gamma_multiples], dtype=jnp.float64))
     params: dict[str, Array] = {"coeffs": coeffs, "log_scales_base": log_scales}
     if cfg.free_gamma_offsets and cfg.n_gamma_multiples > 1:
@@ -346,7 +564,7 @@ def init_params(cfg: CCFVorticityDiscoveryConfig) -> dict[str, Array]:
 
 def _expand(
     params: dict[str, Array], cfg: CCFVorticityDiscoveryConfig
-) -> tuple[Array, Array, Array]:
+) -> tuple[Array, Array, Array, Array | None, Array | None]:
     alpha0 = alpha_from_lambda(cfg.lam)
     if cfg.independent_terms:
         log_lo = math.log(max(float(cfg.scale_lo), 1e-8))
@@ -378,12 +596,29 @@ def _expand(
         gammas = jnp.tile(gammas, cfg.n_scales)
         coeffs = params["coeffs"]
     alphas = gammas
+    orders: Array | None = None
+    parities: Array | None = None
+    n_rep = max(int(cfg.max_order), 0) + 1
+    if n_rep > 1:
+        n_base = scales.shape[0]
+        scales = jnp.repeat(scales, n_rep)
+        alphas = jnp.repeat(alphas, n_rep)
+        orders = jnp.tile(jnp.arange(n_rep, dtype=jnp.int32), n_base)
+        parities = jnp.where(orders % 2 == 0, 1, 0)
     if cfg.hard_gauge_rescale:
         y_g = jnp.asarray([cfg.gauge_point], dtype=jnp.float64)
-        om_g, _, _, _ = hardy_omega_profile(y_g, coeffs, scales, alphas)
+        om_g, _, _, _ = hardy_omega_profile(
+            y_g,
+            coeffs,
+            scales,
+            alphas,
+            orders=orders,
+            parities=parities,
+            max_order=int(cfg.max_order),
+        )
         scale = cfg.gauge_value / (om_g[0] + 1e-30)
         coeffs = coeffs * scale
-    return coeffs, scales, alphas
+    return coeffs, scales, alphas, orders, parities
 
 
 def residual_vector(
@@ -391,8 +626,17 @@ def residual_vector(
     y: Array,
     cfg: CCFVorticityDiscoveryConfig,
 ) -> Array:
-    coeffs, scales, alphas = _expand(params, cfg)
-    r, fields = vorticity_residual_samples(y, coeffs, scales, alphas, cfg.lam)
+    coeffs, scales, alphas, orders, parities = _expand(params, cfg)
+    r, fields = vorticity_residual_samples(
+        y,
+        coeffs,
+        scales,
+        alphas,
+        cfg.lam,
+        orders=orders,
+        parities=parities,
+        max_order=int(cfg.max_order),
+    )
     if cfg.near_field_power > 0.0:
         r = r * jnp.power(1.0 + jnp.abs(y), -float(cfg.near_field_power))
     if cfg.peak_weight_power > 0.0:
@@ -506,10 +750,17 @@ def run_ccf_vorticity_discovery(
             break
         # Resample toward residual peaks on a dense probe pool.
         export_cfg = cfg if cfg.hard_gauge_rescale else replace(cfg, hard_gauge_rescale=True)
-        c_tmp, s_tmp, g_tmp = _expand(trained, export_cfg)
+        c_tmp, s_tmp, g_tmp, o_tmp, p_tmp = _expand(trained, export_cfg)
         y_pool = np.linspace(-float(cfg.y_max), float(cfg.y_max), max(int(cfg.n_grid) * 4, 401))
         r_pool, _ = vorticity_residual_samples(
-            jnp.asarray(y_pool), c_tmp, s_tmp, g_tmp, cfg.lam
+            jnp.asarray(y_pool),
+            c_tmp,
+            s_tmp,
+            g_tmp,
+            cfg.lam,
+            orders=o_tmp,
+            parities=p_tmp,
+            max_order=int(cfg.max_order),
         )
         weights = np.abs(np.asarray(r_pool, dtype=float)) ** float(cfg.adaptive_power)
         y = _collocation_grid(
@@ -520,9 +771,27 @@ def run_ccf_vorticity_discovery(
         )
 
     export_cfg = cfg if cfg.hard_gauge_rescale else replace(cfg, hard_gauge_rescale=True)
-    coeffs, scales, alphas = _expand(trained, export_cfg)
-    r, fields = vorticity_residual_samples(y, coeffs, scales, alphas, cfg.lam)
-    dense = dense_vorticity_residual(coeffs, scales, alphas, cfg.lam, y_max=cfg.y_max)
+    coeffs, scales, alphas, orders, parities = _expand(trained, export_cfg)
+    r, fields = vorticity_residual_samples(
+        y,
+        coeffs,
+        scales,
+        alphas,
+        cfg.lam,
+        orders=orders,
+        parities=parities,
+        max_order=int(cfg.max_order),
+    )
+    dense = dense_vorticity_residual(
+        coeffs,
+        scales,
+        alphas,
+        cfg.lam,
+        y_max=cfg.y_max,
+        orders=orders,
+        parities=parities,
+        max_order=int(cfg.max_order),
+    )
     ff = leading_mode_far_field_cancel(lam=cfg.lam)
     diagnostics = {
         "max_abs_vorticity_residual": float(jnp.max(jnp.abs(r))),
@@ -554,6 +823,9 @@ def run_ccf_vorticity_discovery(
             "optimizer": "martens_grosse_gn",
             "gn_solver": "qr",
             "adaptive_collocation": bool(cfg.adaptive_rounds > 0),
+            "max_order": int(cfg.max_order),
+            "orders": None if orders is None else np.asarray(orders),
+            "parities": None if parities is None else np.asarray(parities),
         },
         params={k: np.asarray(v) for k, v in trained.items()},
     )
@@ -563,6 +835,7 @@ __all__ = [
     "CCFVorticityDiscoveryConfig",
     "CCFVorticityDiscoveryResult",
     "dense_vorticity_residual",
+    "free_omega_vorticity_residual",
     "hardy_odd_profile",
     "hardy_omega_profile",
     "hardy_theta_profile",
@@ -572,4 +845,5 @@ __all__ = [
     "residual_vector",
     "run_ccf_vorticity_discovery",
     "vorticity_residual_samples",
+    "wang_residual",
 ]

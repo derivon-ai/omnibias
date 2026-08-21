@@ -22,6 +22,8 @@ Three families:
 - :mod:`jetkan`: gated univariate multi-pack edges (theory 02-03). Exactness
   is of the model jet; the Kolmogorov-Arnold theorem does not justify the
   architecture.
+- :mod:`piratenet`: jaxpi α-skip (``α=0`` is identity). Not ImageNet / ViT
+  and not CCF stretch.
 - :mod:`cvxlayer`: differentiable embedded convex solvers (LASSO, logistic)
   unrolled as depth-T multi-bias networks where each layer is one solver
   iteration realised by a K=2 collapse.
@@ -64,6 +66,13 @@ from omnibias.torch.architectures.pinn import (
     PINNHeat,
     make_siren,
 )
+from omnibias.torch.architectures.piratenet import (
+    PirateNet,
+    PirateNetConfig,
+    init_pirate_params,
+    pirate_apply,
+    pirate_features,
+)
 from omnibias.torch.architectures.scannet import ScanNet, ScanNetConfig, scannet_from_band_plan
 
 __all__ = [
@@ -89,14 +98,19 @@ __all__ = [
     "MscaleMLP",
     "OperatorMetadata",
     "PINNHeat",
+    "PirateNet",
+    "PirateNetConfig",
     "ScanNet",
     "ScanNetConfig",
     "dirichlet_interval",
     "edge_functions",
     "fit_joint_operator_regressor",
     "homogeneous_box",
+    "init_pirate_params",
     "initial_value",
     "jetkan_from_band_plan",
     "make_siren",
+    "pirate_apply",
+    "pirate_features",
     "scannet_from_band_plan",
 ]

@@ -69,6 +69,34 @@ def test_boussinesq_lambda_inference_relation() -> None:
     assert float(infer_lambda_from_streamfunction_u1_y1(0.5)) == -4.0
 
 
+def test_boussinesq_compactified_omega_odd_and_discovery() -> None:
+    from omnibias.pinn.jax.equations.boussinesq_compactified import (
+        affine_hat_jet,
+        compactify_yb_lambda,
+        compose_boussinesq_envelope_fields,
+    )
+
+    y1 = jnp.array([0.3, -0.3, 0.5], dtype=jnp.float64)
+    y2 = jnp.array([0.1, 0.1, -0.2], dtype=jnp.float64)
+    lam = 1.5
+    q, beta, _r2 = compactify_yb_lambda(y1, y2, lam)
+    assert float(q[0]) < 1.0
+    hat = affine_hat_jet(q, beta, 0.4, 0.1, -0.05)
+    fields = compose_boussinesq_envelope_fields(
+        y1, y2, lam, hat_omega=hat, hat_theta=hat, hat_psi=hat
+    )
+    # Pair (0.3, 0.1) with (-0.3, 0.1): Ω must flip sign.
+    assert abs(float(fields["omega"][0] + fields["omega"][1])) < 1e-14
+    out = boussinesq.run_boussinesq_discovery(
+        boussinesq.BoussinesqDiscoveryConfig(n=6, steps=3, compactified=True)
+    )
+    assert out["honesty"]["navier_stokes_proof_claim"] is False
+    assert out["honesty"]["compactified_envelope"] is True
+    assert out["honesty"]["deepmind_residual_claim"] is False
+    assert np.isfinite(out["max_abs_residual_omega"])
+    assert float(infer_lambda_from_streamfunction_u1_y1(0.0)) == -3.0
+
+
 def test_boussinesq_residual_shapes() -> None:
     y1 = jnp.linspace(0, 1, 5)
     y2 = jnp.linspace(0, 1, 5)

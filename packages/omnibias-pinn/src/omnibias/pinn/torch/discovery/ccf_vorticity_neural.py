@@ -21,6 +21,7 @@ CPU smoke configs stay small; ``--full`` / submit uses richer budgets.
 from __future__ import annotations
 
 import math
+from collections.abc import Callable
 from dataclasses import dataclass, field, replace
 from typing import Any, Literal
 
@@ -34,6 +35,7 @@ from omnibias.pinn.torch.equations.ccf_compactified import (
     hardy_odd,
     hilbert_transform_truncated_line,
 )
+from omnibias.pinn.torch.hilbert_line import hilbert_wholeline_hp
 from omnibias.torch.activations.registry import get_activation
 from omnibias.torch.architectures.pinn import PINNOMBU, JetMLP
 from omnibias.torch.optim import (
@@ -49,7 +51,10 @@ TrainHilbert = Literal[
     "hardy_projection",
     "pv_line",
     "hardy_corrected_pv",
+    "pv_mapped_tail",
+    "wholeline_hp",
 ]
+_FREE_OMEGA_HILBERT = frozenset({"pv_mapped_tail", "wholeline_hp"})
 OptimizerName = Literal["cubic_gauss_newton", "martens_grosse"]
 ArmName = Literal["earn", "reproduce"]
 
@@ -66,6 +71,7 @@ class CCFVorticityNeuralConfig:
     activation: str = "tanh"
     n_scales: int = 8
     n_gamma_multiples: int = 4
+    max_order: int = 0  # conjugate-tower orders; 0 is today's Q_{a,kα} span
     gauge_point: float = 0.5
     gauge_value: float = 0.05
     gauge_weight: float = 40.0
@@ -98,6 +104,10 @@ class CCFVorticityNeuralConfig:
     # hardy_corrected_pv via reproduce_deepmind_config (spectral/PV are diagnostic).
     train_hilbert: TrainHilbert = "hardy_projection"
     hilbert_n_uniform: int | None = None
+    hilbert_n_quad: int = 48  # mapped-tail / hp tail GL nodes
+    hilbert_n_aux: int = 128  # GL near-panel (hp) or [-Y,Y] (pv_mapped_tail)
+    hilbert_core_frac: float = 0.9  # mask Wang residual on the |y|~Y junction
+    hilbert_y_near: float = 2.0  # hp origin-centered panel half-width
     dense_n_val: int = 4001
     device: str = "cpu"  # "cuda" when available; T1200 supports float64
     # Random Fourier features of compactified q (depth>=2 JetMLP only).
@@ -132,6 +142,38 @@ def reproduce_deepmind_config(**overrides: Any) -> CCFVorticityNeuralConfig:
         device=device,
     )
     return replace(base, **overrides) if overrides else base
+
+
+def deepmind_paper_architecture_config(**overrides: Any) -> CCFVorticityNeuralConfig:
+    """Wang et al. (arXiv:2509.14185) stack: compactified tanh MLP + exp-adjacent hat + MG.
+
+    Matches the paper Methods: small tanh MLP, exponential / exponential-adjacent
+    last layer (``exp_core=True``), envelope lift, gradient-normalized residual
+    (arXiv:2511.22819). Hilbert defaults to ``wholeline_hp`` (omnibias free-Ω
+    operator). Stage-2 is a separate :func:`deepmind_multistage_config` call.
+    Does not flip stretch or start Rung-1.
+    """
+    kw: dict[str, Any] = {
+        "exp_core": True,
+        "use_grad_norm": True,
+        "optimizer": "martens_grosse",
+        "train_hilbert": "wholeline_hp",
+        "adam_warmup_steps": 0,
+        "hidden": 32,
+        "depth": 2,
+    }
+    kw.update(overrides)
+    return reproduce_deepmind_config(**kw)
+
+
+def deepmind_signed_hat_config(**overrides: Any) -> CCFVorticityNeuralConfig:
+    """Same paper stack with a *signed* hat (no softplus).
+
+    Use when a positive-only exp-adjacent core cannot represent the profile
+    (official ``exp_core=True`` ghosted at raw ``Ω ~ 1e-6``). Not a silent
+    change of :func:`reproduce_deepmind_config`.
+    """
+    return deepmind_paper_architecture_config(exp_core=False, **overrides)
 
 
 @dataclass
@@ -253,8 +295,13 @@ def hardy_dictionary(
     lam: float,
     n_scales: int,
     n_gamma_multiples: int,
+    max_order: int = 0,
 ) -> tuple[np.ndarray, np.ndarray]:
-    """Sparse scales × ``γ = k α`` ladder (Ω-primary)."""
+    """Sparse scales × ``γ = k α`` ladder (Ω-primary).
+
+    ``max_order=0`` is the current span. ``max_order>0`` expands each pair
+    into spatially odd conjugate-tower atoms (``Q^{(even)}``, ``P^{(odd)}``).
+    """
     alpha0 = float(1.0 / (1.0 + float(lam)))
     if n_scales == 1:
         scales_base = np.array([1.3], dtype=float)
@@ -263,7 +310,174 @@ def hardy_dictionary(
     gammas = alpha0 * np.arange(1, int(n_gamma_multiples) + 1, dtype=float)
     scales = np.repeat(scales_base, int(n_gamma_multiples))
     gs = np.tile(gammas, int(n_scales))
-    return scales, gs
+    if int(max_order) <= 0:
+        return scales, gs
+    from omnibias.core.conjugate import spatial_odd_omega_atoms
+
+    s, g, _orders, _parities = spatial_odd_omega_atoms(
+        scales.tolist(), gs.tolist(), max_order=int(max_order)
+    )
+    return np.asarray(s, dtype=float), np.asarray(g, dtype=float)
+
+
+def hardy_dictionary_ordered(
+    *,
+    lam: float,
+    n_scales: int,
+    n_gamma_multiples: int,
+    max_order: int = 0,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    """Like :func:`hardy_dictionary` plus ``orders`` and parity codes (1=odd)."""
+    alpha0 = float(1.0 / (1.0 + float(lam)))
+    if n_scales == 1:
+        scales_base = np.array([1.3], dtype=float)
+    else:
+        scales_base = np.linspace(0.6, 3.5, int(n_scales))
+    gammas = alpha0 * np.arange(1, int(n_gamma_multiples) + 1, dtype=float)
+    scales = np.repeat(scales_base, int(n_gamma_multiples))
+    gs = np.tile(gammas, int(n_scales))
+    from omnibias.core.conjugate import spatial_odd_omega_atoms
+
+    s, g, orders, parities = spatial_odd_omega_atoms(
+        scales.tolist(), gs.tolist(), max_order=int(max_order)
+    )
+    parity_code = np.asarray([1 if p == "odd" else 0 for p in parities], dtype=int)
+    return (
+        np.asarray(s, dtype=float),
+        np.asarray(g, dtype=float),
+        np.asarray(orders, dtype=int),
+        parity_code,
+    )
+
+
+def _n0_odd_only(orders: Tensor | None, parities: Tensor | None) -> bool:
+    if orders is None:
+        return True
+    if bool(torch.any(orders != 0)):
+        return False
+    if parities is None:
+        return True
+    return bool(torch.all(parities == 1))
+
+
+def _hardy_pq_torch(y: Tensor, a: Tensor, alpha: Tensor) -> tuple[Tensor, Tensor]:
+    rr = torch.sqrt(a * a + y * y)
+    phi = torch.atan(y / a)
+    p = torch.pow(rr, -alpha) * torch.cos(alpha * phi)
+    q = torch.pow(rr, -alpha) * torch.sin(alpha * phi)
+    return p, q
+
+
+def _pochhammer_torch(alpha: Tensor, n: int) -> Tensor:
+    acc = torch.ones_like(alpha)
+    for k in range(int(n)):
+        acc = acc * (alpha + float(k))
+    return acc
+
+
+def _p_deriv_n_torch(y: Tensor, a: Tensor, alpha: Tensor, n: int) -> Tensor:
+    if n == 0:
+        p, _ = _hardy_pq_torch(y, a, alpha)
+        return p
+    factor = _pochhammer_torch(alpha, n)
+    p, q = _hardy_pq_torch(y, a, alpha + float(n))
+    rem = n % 4
+    if rem == 0:
+        return factor * p
+    if rem == 1:
+        return -factor * q
+    if rem == 2:
+        return -factor * p
+    return factor * q
+
+
+def _q_deriv_n_torch(y: Tensor, a: Tensor, alpha: Tensor, n: int) -> Tensor:
+    if n == 0:
+        _, q = _hardy_pq_torch(y, a, alpha)
+        return q
+    factor = _pochhammer_torch(alpha, n)
+    p, q = _hardy_pq_torch(y, a, alpha + float(n))
+    rem = n % 4
+    if rem == 0:
+        return factor * q
+    if rem == 1:
+        return factor * p
+    if rem == 2:
+        return -factor * q
+    return -factor * p
+
+
+def _integrate_p_torch(y: Tensor, a: Tensor, beta: Tensor) -> Tensor:
+    near = torch.abs(beta - 1.0) < 1e-12
+    atan = torch.atan(y / a)
+    p, q = _hardy_pq_torch(y, a, beta - 1.0)
+    del p
+    gen = q / (beta - 1.0)
+    return torch.where(near, atan, gen)
+
+
+def _integrate_q_torch(y: Tensor, a: Tensor, beta: Tensor) -> Tensor:
+    near = torch.abs(beta - 1.0) < 1e-12
+    logt = torch.log(torch.sqrt(a * a + y * y) / a)
+    p, _q = _hardy_pq_torch(y, a, beta - 1.0)
+    p0 = torch.pow(a, -(beta - 1.0))
+    gen = -(p - p0) / (beta - 1.0)
+    return torch.where(near, logt, gen)
+
+
+def _velocity_atom_torch(
+    y: Tensor, a: Tensor, alpha: Tensor, n: int, *, odd: bool
+) -> Tensor:
+    factor = _pochhammer_torch(alpha, n)
+    beta = alpha + float(n)
+    rem = n % 4
+    if odd:
+        # U for Q^{(n)}: -p_sign * (α)_n * ∫K, K from P^{(n)} table
+        if rem in (0, 2):
+            integ = _integrate_p_torch(y, a, beta)
+            signed = -factor * integ if rem == 0 else factor * integ
+        else:
+            integ = _integrate_q_torch(y, a, beta)
+            signed = factor * integ if rem == 1 else -factor * integ
+        return signed
+    # U for P^{(n)}: q_sign * (α)_n * ∫K
+    if rem in (0, 2):
+        integ = _integrate_q_torch(y, a, beta)
+        return factor * integ if rem == 0 else -factor * integ
+    integ = _integrate_p_torch(y, a, beta)
+    return factor * integ if rem == 1 else -factor * integ
+
+
+def _omega_atom_columns_torch(
+    y: Tensor,
+    scales: Tensor,
+    gammas: Tensor,
+    orders: Tensor,
+    parities: Tensor,
+) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+    """Return ``(phi, phi_y, H, U)`` columns shaped ``(N, M)``."""
+    n_pts = int(y.shape[0])
+    n_atoms = int(scales.shape[0])
+    phi = y.new_zeros((n_pts, n_atoms))
+    omy = y.new_zeros((n_pts, n_atoms))
+    h = y.new_zeros((n_pts, n_atoms))
+    u = y.new_zeros((n_pts, n_atoms))
+    yy = y.reshape(-1)
+    for j in range(n_atoms):
+        n = int(orders[j].item())
+        odd = bool(int(parities[j].item()) == 1)
+        a = scales[j]
+        g = gammas[j]
+        if odd:
+            phi[:, j] = _q_deriv_n_torch(yy, a, g, n)
+            omy[:, j] = _q_deriv_n_torch(yy, a, g, n + 1)
+            h[:, j] = -_p_deriv_n_torch(yy, a, g, n)
+        else:
+            phi[:, j] = _p_deriv_n_torch(yy, a, g, n)
+            omy[:, j] = _p_deriv_n_torch(yy, a, g, n + 1)
+            h[:, j] = _q_deriv_n_torch(yy, a, g, n)
+        u[:, j] = _velocity_atom_torch(yy, a, g, n, odd=odd)
+    return phi, omy, h, u
 
 
 def _build_phi(y: Tensor, scales: Tensor, gammas: Tensor) -> Tensor:
@@ -281,9 +495,18 @@ def project_omega_hardy_torch(
     gammas: Tensor,
     ridge: float = 1e-12,
     coeff_cap: float = 1e3,
+    orders: Tensor | None = None,
+    parities: Tensor | None = None,
 ) -> tuple[Tensor, Tensor, dict[str, Tensor]]:
     """Differentiable LS projection; exact ``H[Q]=-P`` and ``U=∫H`` on coeffs."""
-    phi = _build_phi(y, scales, gammas)
+    use_n0 = _n0_odd_only(orders, parities)
+    if use_n0:
+        phi = _build_phi(y, scales, gammas)
+    else:
+        assert orders is not None and parities is not None
+        phi, omy_cols, h_cols, u_cols = _omega_atom_columns_torch(
+            y, scales, gammas, orders, parities
+        )
     # Prefer ridge solve: overlapping Hardy atoms make plain gels fragile (DGELS).
     ata = phi.T @ phi
     n = int(ata.shape[0])
@@ -300,21 +523,27 @@ def project_omega_hardy_torch(
         coeffs = torch.clamp(coeffs, min=-float(coeff_cap), max=float(coeff_cap))
     om_hat = (phi @ coeffs.reshape(-1, 1)).reshape(-1)
     defect = torch.max(torch.abs(om_hat - omega))
-    # Vectorized exact Hardy fields (matches jax hardy_omega_profile).
-    yy = y.reshape(-1, 1)
-    aa = scales.reshape(1, -1)
-    gg = gammas.reshape(1, -1)
-    cc = coeffs.reshape(1, -1)
-    rr = torch.sqrt(aa * aa + yy * yy)
-    phi_ang = torch.atan2(yy, aa)
-    h = torch.sum(cc * (-(rr ** (-gg)) * torch.cos(gg * phi_ang)), dim=1)
-    omy = torch.sum(
-        cc * gg * (rr ** (-(gg + 1.0))) * torch.cos((gg + 1.0) * phi_ang), dim=1
-    )
-    near1 = torch.abs(gg - 1.0) < 1e-12
-    u_gen = -(rr ** (-(gg - 1.0))) * torch.sin((gg - 1.0) * phi_ang) / (gg - 1.0)
-    u_g1 = -torch.atan(yy / aa)
-    u = torch.sum(cc * torch.where(near1, u_g1, u_gen), dim=1)
+    if use_n0:
+        # Vectorized exact Hardy fields (matches jax hardy_omega_profile).
+        yy = y.reshape(-1, 1)
+        aa = scales.reshape(1, -1)
+        gg = gammas.reshape(1, -1)
+        cc = coeffs.reshape(1, -1)
+        rr = torch.sqrt(aa * aa + yy * yy)
+        phi_ang = torch.atan2(yy, aa)
+        h = torch.sum(cc * (-(rr ** (-gg)) * torch.cos(gg * phi_ang)), dim=1)
+        omy = torch.sum(
+            cc * gg * (rr ** (-(gg + 1.0))) * torch.cos((gg + 1.0) * phi_ang), dim=1
+        )
+        near1 = torch.abs(gg - 1.0) < 1e-12
+        u_gen = -(rr ** (-(gg - 1.0))) * torch.sin((gg - 1.0) * phi_ang) / (gg - 1.0)
+        u_g1 = -torch.atan(yy / aa)
+        u = torch.sum(cc * torch.where(near1, u_g1, u_gen), dim=1)
+    else:
+        cc = coeffs.reshape(-1, 1)
+        omy = (omy_cols @ cc).reshape(-1)
+        h = (h_cols @ cc).reshape(-1)
+        u = (u_cols @ cc).reshape(-1)
     return coeffs, defect, {"omega_proj": om_hat, "H": h, "U": u, "omega_y_proj": omy}
 
 
@@ -324,6 +553,8 @@ def project_omega_hardy(
     *,
     scales: np.ndarray,
     gammas: np.ndarray,
+    orders: np.ndarray | None = None,
+    parities: np.ndarray | None = None,
 ) -> tuple[np.ndarray, float, dict[str, np.ndarray]]:
     """NumPy convenience wrapper around :func:`project_omega_hardy_torch`."""
     y_t = torch.as_tensor(y, dtype=torch.float64).reshape(-1)
@@ -332,9 +563,19 @@ def project_omega_hardy(
     )
     sc = torch.as_tensor(scales, dtype=torch.float64).reshape(-1)
     gs = torch.as_tensor(gammas, dtype=torch.float64).reshape(-1)
+    ord_t = (
+        None
+        if orders is None
+        else torch.as_tensor(orders, dtype=torch.int64).reshape(-1)
+    )
+    par_t = (
+        None
+        if parities is None
+        else torch.as_tensor(parities, dtype=torch.int64).reshape(-1)
+    )
     with torch.no_grad():
         coeffs, defect, fields = project_omega_hardy_torch(
-            y_t, om_t, scales=sc, gammas=gs
+            y_t, om_t, scales=sc, gammas=gs, orders=ord_t, parities=par_t
         )
     out_fields = {k: v.detach().cpu().numpy() for k, v in fields.items()}
     return coeffs.detach().cpu().numpy(), float(defect.item()), out_fields
@@ -428,12 +669,228 @@ def pv_hu_from_omega(y: Tensor, omega: Tensor) -> tuple[Tensor, Tensor]:
     return h, u
 
 
+def _interp1d_sorted(x_new: Tensor, x: Tensor, y: Tensor) -> Tensor:
+    """Linear interpolation of sorted ``(x, y)`` at ``x_new``."""
+    x = x.reshape(-1)
+    y = y.reshape(-1)
+    x_new = x_new.reshape(-1)
+    n = x.numel()
+    idx = torch.searchsorted(x, x_new, right=True).clamp(1, n - 1)
+    x0 = x[idx - 1]
+    x1 = x[idx]
+    y0 = y[idx - 1]
+    y1 = y[idx]
+    t = (x_new - x0) / torch.clamp(x1 - x0, min=1e-30)
+    return y0 + t * (y1 - y0)
+
+
+_GL01_CACHE: dict[int, tuple[np.ndarray, np.ndarray]] = {}
+_GLPM1_CACHE: dict[int, tuple[np.ndarray, np.ndarray]] = {}
+
+
+def _gauss_legendre_01(n: int) -> tuple[np.ndarray, np.ndarray]:
+    """Gauss–Legendre nodes/weights on ``(0, 1]`` (``u=0`` clipped)."""
+    n = int(n)
+    cached = _GL01_CACHE.get(n)
+    if cached is None:
+        x, w = np.polynomial.legendre.leggauss(n)
+        u = np.clip(0.5 * (x + 1.0), 1e-15, 1.0)
+        w = 0.5 * w
+        cached = (u.astype(np.float64), w.astype(np.float64))
+        _GL01_CACHE[n] = cached
+    return cached
+
+
+def _gauss_legendre_pm1(n: int) -> tuple[np.ndarray, np.ndarray]:
+    """Gauss–Legendre nodes/weights on ``[-1, 1]``."""
+    n = int(n)
+    cached = _GLPM1_CACHE.get(n)
+    if cached is None:
+        x, w = np.polynomial.legendre.leggauss(n)
+        cached = (x.astype(np.float64), w.astype(np.float64))
+        _GLPM1_CACHE[n] = cached
+    return cached
+
+
+def hilbert_gl_interval(
+    y: Tensor,
+    values: Tensor,
+    omega_fn: Callable[[Tensor], Tensor],
+    *,
+    y_trunc: float,
+    n_gl: int = 96,
+) -> Tensor:
+    r"""Finite-interval PV Hilbert via Gauss–Legendre on the subtracted kernel.
+
+    ``Hf(x)=(1/π)[∫_{-Y}^{Y} (f(t)-f(x))/(x-t) dt + f(x) log|(x+Y)/(Y-x)|]``.
+    The integrand is analytic when ``f`` is; GL is spectral in ``n_gl``.
+    Planted Hardy ``Q`` plus the mapped tail reaches ``~1e-3`` at ``n_gl=96``
+    and ``~3e-4`` at ``128`` on the core ``|x|≤0.9 Y``.
+    """
+    y = torch.as_tensor(y).reshape(-1)
+    values = torch.as_tensor(values).reshape(-1)
+    Y = float(y_trunc)
+    if Y <= 0.0:
+        raise ValueError(f"y_trunc must be > 0, got {Y}")
+    xi_np, w_np = _gauss_legendre_pm1(int(n_gl))
+    xi = torch.as_tensor(xi_np, dtype=y.dtype, device=y.device)
+    w = torch.as_tensor(w_np, dtype=y.dtype, device=y.device)
+    t = torch.as_tensor(Y, dtype=y.dtype, device=y.device) * xi
+    f_t = omega_fn(t).reshape(-1)
+    dt = y.unsqueeze(1) - t.unsqueeze(0)
+    near = dt.abs() < 1e-14
+    dt_safe = torch.where(near, torch.ones_like(dt), dt)
+    kern = (f_t.unsqueeze(0) - values.unsqueeze(1)) / dt_safe
+    kern = torch.where(near, torch.zeros_like(kern), kern)
+    integ = Y * (kern * w.unsqueeze(0)).sum(dim=1)
+    log_term = values * torch.log(
+        torch.clamp(y + Y, min=1e-12) / torch.clamp(Y - y, min=1e-12)
+    )
+    return (integ + log_term) / math.pi
+
+
+def hilbert_pv_mapped_tail(
+    y: Tensor,
+    values: Tensor,
+    *,
+    decay_power: float,
+    omega_pos_fn: Callable[[Tensor], Tensor] | None = None,
+    n_quad: int = 48,
+    n_gl: int = 96,
+    y_trunc: float | None = None,
+) -> Tensor:
+    r"""Truncated PV Hilbert plus a mapped ``|t|>Y`` tail (odd ``Ω``).
+
+    Interior: Gauss–Legendre on the subtracted kernel when ``omega_pos_fn``
+    is set (spectral for analytic ``Ω``); otherwise trapezoid ``hilbert_pv_line``.
+    Tail: ``H_tail(x) = -(2/π) ∫_0^1 [Ω(Y/u)/u] / (1 - ξ² u²) du``, ``ξ=x/Y``.
+
+    Honesty: numerical whole-line Hilbert, **not** a closed-form Hardy
+    transform and **not** a certificate. Trapezoid-only training walked off
+    a Hardy basin (``0.089 → 0.133``). GL+tail planted core is ``~1e-3`` at
+    ``n_gl=96``.
+    """
+    y = torch.as_tensor(y).reshape(-1)
+    values = torch.as_tensor(values).reshape(-1)
+    p = float(decay_power)
+    if p <= 0.0:
+        raise ValueError(f"decay_power must be > 0, got {p}")
+    Y = float(y_trunc) if y_trunc is not None else float(torch.max(torch.abs(y)))
+    if Y <= 0.0:
+        raise ValueError(f"y_trunc must be > 0, got {Y}")
+    if omega_pos_fn is not None and int(n_gl) >= 4:
+        h_core = hilbert_gl_interval(
+            y, values, omega_pos_fn, y_trunc=Y, n_gl=int(n_gl)
+        )
+    else:
+        h_core = hilbert_pv_line(y, values)
+    u_np, w_np = _gauss_legendre_01(int(n_quad))
+    u = torch.as_tensor(u_np, dtype=y.dtype, device=y.device)
+    w = torch.as_tensor(w_np, dtype=y.dtype, device=y.device)
+    t_pos = torch.as_tensor(Y, dtype=y.dtype, device=y.device) / u
+    if omega_pos_fn is not None:
+        omega_pos = omega_pos_fn(t_pos).reshape(-1)
+    else:
+        order = torch.argsort(y)
+        y_s = y[order]
+        v_s = values[order]
+        y_hi = torch.clamp(torch.abs(y_s[-1]), min=1e-12)
+        y_lo = torch.clamp(torch.abs(y_s[0]), min=1e-12)
+        c_hi = v_s[-1] * torch.pow(y_hi, p)
+        c_lo = -v_s[0] * torch.pow(y_lo, p)
+        c_fit = 0.5 * (c_hi + c_lo)
+        omega_pos = c_fit * torch.pow(t_pos, -p)
+    xi = torch.clamp(y / Y, min=-1.0 + 1e-8, max=1.0 - 1e-8)
+    den = torch.clamp(1.0 - (xi.unsqueeze(1) ** 2) * (u.unsqueeze(0) ** 2), min=1e-18)
+    integ = ((omega_pos / u) / den * w.unsqueeze(0)).sum(dim=1)
+    h_tail = (-2.0 / math.pi) * integ
+    return h_core + h_tail
+
+
+def pv_mapped_tail_hu_from_omega(
+    y: Tensor,
+    omega: Tensor,
+    *,
+    decay_power: float,
+    omega_pos_fn: Callable[[Tensor], Tensor] | None = None,
+    n_quad: int = 48,
+    y_trunc: float | None = None,
+    n_aux: int = 0,
+) -> tuple[Tensor, Tensor]:
+    """Mapped-tail PV ``HΩ`` and ``U=∫_0^y HΩ``.
+
+    ``n_aux`` is the Gauss–Legendre interior node count when
+    ``omega_pos_fn`` is set (``0`` falls back to trapezoid on ``y``).
+    """
+    h = hilbert_pv_mapped_tail(
+        y,
+        omega,
+        decay_power=decay_power,
+        omega_pos_fn=omega_pos_fn,
+        n_quad=n_quad,
+        n_gl=int(n_aux) if int(n_aux) >= 4 else 0,
+        y_trunc=y_trunc,
+    )
+    u = _integrate_from_zero(y, h)
+    return h, u
+
+
+def wholeline_hp_hu_from_omega(
+    y: Tensor,
+    omega: Tensor,
+    *,
+    decay_power: float,
+    omega_fn: Callable[[Tensor], Tensor],
+    y_trunc: float | None = None,
+    n_near: int = 128,
+    n_far: int = 64,
+    n_tail: int = 96,
+    y_near: float = 2.0,
+) -> tuple[Tensor, Tensor]:
+    """hp whole-line ``HΩ`` and ``U=∫_0^y HΩ`` for a free (non-Hardy) ``Ω``.
+
+    Honesty: planted ``H[Q]=-P`` can sit near ``1e-14``. Stretch ``1e-13``
+    is still unearned on a trained Wang net.
+    """
+    h = hilbert_wholeline_hp(
+        y,
+        omega,
+        omega_fn,
+        decay_power=decay_power,
+        y_trunc=y_trunc,
+        y_near=y_near,
+        n_near=int(n_near),
+        n_far=int(n_far),
+        n_tail=int(n_tail),
+    )
+    u = _integrate_from_zero(y, h)
+    return h, u
+
+
+def _omega_pos_fn_from_net(
+    net: CompactifiedOmegaOMBU,
+    *,
+    lam: float,
+    exp_core: bool,
+    scale: float = 1.0,
+) -> Callable[[Tensor], Tensor]:
+    def _fn(t: Tensor) -> Tensor:
+        om, _, _, _ = omega_from_net(net, t, lam=lam, exp_core=exp_core)
+        if scale != 1.0:
+            return om * float(scale)
+        return om
+
+    return _fn
+
+
 def hardy_corrected_hu_from_omega(
     y: Tensor,
     omega: Tensor,
     *,
     scales: Tensor,
     gammas: Tensor,
+    orders: Tensor | None = None,
+    parities: Tensor | None = None,
 ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
     """Exact Hardy ``H`` on the L2 projection + PV Hilbert on the remainder.
 
@@ -443,7 +900,7 @@ def hardy_corrected_hu_from_omega(
     Hardy defect is small — the regime needed for a 1e-13 Wang residual.
     """
     coeffs, defect, fields = project_omega_hardy_torch(
-        y, omega, scales=scales, gammas=gammas
+        y, omega, scales=scales, gammas=gammas, orders=orders, parities=parities
     )
     om_h = fields["omega_proj"]
     h_exact = fields["H"]
@@ -547,11 +1004,19 @@ def vorticity_fields(
     gammas: Tensor,
     train_hilbert: TrainHilbert,
     hilbert_n_uniform: int | None,
+    orders: Tensor | None = None,
+    parities: Tensor | None = None,
+    omega_pos_fn: Callable[[Tensor], Tensor] | None = None,
+    hilbert_n_quad: int = 48,
+    hilbert_n_aux: int = 0,
+    hilbert_core_frac: float = 0.9,
+    hilbert_y_near: float = 2.0,
+    y_trunc: float | None = None,
 ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
     """Return ``(r_abs, defect, coeffs, uy)`` for the chosen Hilbert mode."""
     if train_hilbert == "hardy_projection":
         coeffs, defect, fields = project_omega_hardy_torch(
-            y, omega, scales=scales, gammas=gammas
+            y, omega, scales=scales, gammas=gammas, orders=orders, parities=parities
         )
         # Consistent projected fields (exact H/U on the Hardy image).
         omega_r = fields["omega_proj"]
@@ -561,12 +1026,43 @@ def vorticity_fields(
         return r, defect, coeffs, uy
     if train_hilbert == "hardy_corrected_pv":
         h, u, coeffs, defect = hardy_corrected_hu_from_omega(
-            y, omega, scales=scales, gammas=gammas
+            y, omega, scales=scales, gammas=gammas, orders=orders, parities=parities
         )
         uy = h
         r = wang_residual(y, omega, omega_y, u, uy, lam=lam)
         return r, defect, coeffs, uy
-    if train_hilbert == "pv_line":
+    if train_hilbert == "pv_mapped_tail":
+        decay = float(alpha_from_lambda(lam))
+        uy, u = pv_mapped_tail_hu_from_omega(
+            y,
+            omega,
+            decay_power=decay,
+            omega_pos_fn=omega_pos_fn,
+            n_quad=int(hilbert_n_quad),
+            y_trunc=y_trunc,
+            n_aux=int(hilbert_n_aux),
+        )
+        coeffs = torch.zeros(scales.shape[0], dtype=y.dtype, device=y.device)
+        defect = torch.zeros((), dtype=y.dtype, device=y.device)
+    elif train_hilbert == "wholeline_hp":
+        if omega_pos_fn is None:
+            raise ValueError("train_hilbert='wholeline_hp' requires omega_pos_fn")
+        decay = float(alpha_from_lambda(lam))
+        n_near = int(hilbert_n_aux) if int(hilbert_n_aux) >= 4 else 128
+        n_tail = int(hilbert_n_quad) if int(hilbert_n_quad) >= 8 else 96
+        uy, u = wholeline_hp_hu_from_omega(
+            y,
+            omega,
+            decay_power=decay,
+            omega_fn=omega_pos_fn,
+            y_trunc=y_trunc,
+            n_near=n_near,
+            n_tail=n_tail,
+            y_near=float(hilbert_y_near),
+        )
+        coeffs = torch.zeros(scales.shape[0], dtype=y.dtype, device=y.device)
+        defect = torch.zeros((), dtype=y.dtype, device=y.device)
+    elif train_hilbert == "pv_line":
         uy, u = pv_hu_from_omega(y, omega)
         coeffs = torch.zeros(scales.shape[0], dtype=y.dtype, device=y.device)
         defect = torch.zeros((), dtype=y.dtype, device=y.device)
@@ -575,6 +1071,10 @@ def vorticity_fields(
         coeffs = torch.zeros(scales.shape[0], dtype=y.dtype, device=y.device)
         defect = torch.zeros((), dtype=y.dtype, device=y.device)
     r = wang_residual(y, omega, omega_y, u, uy, lam=lam)
+    if train_hilbert == "pv_mapped_tail":
+        Y = float(y_trunc) if y_trunc is not None else float(torch.max(torch.abs(y)))
+        core = float(hilbert_core_frac) * Y
+        r = torch.where(torch.abs(y) > core, torch.zeros_like(r), r)
     return r, defect, coeffs, uy
 
 
@@ -585,6 +1085,8 @@ def residual_vector(
     cfg: CCFVorticityNeuralConfig,
     scales: Tensor,
     gammas: Tensor,
+    orders: Tensor | None = None,
+    parities: Tensor | None = None,
 ) -> Tensor:
     """Stacked residual for CubicGaussNewton."""
     omega, omega_y, _, nn_core = omega_from_net(
@@ -599,6 +1101,18 @@ def residual_vector(
         gammas=gammas,
         train_hilbert=cfg.train_hilbert,
         hilbert_n_uniform=cfg.hilbert_n_uniform,
+        orders=orders,
+        parities=parities,
+        omega_pos_fn=(
+            _omega_pos_fn_from_net(net, lam=cfg.lam, exp_core=cfg.exp_core)
+            if cfg.train_hilbert in _FREE_OMEGA_HILBERT
+            else None
+        ),
+        hilbert_n_quad=int(cfg.hilbert_n_quad),
+        hilbert_n_aux=int(cfg.hilbert_n_aux),
+        hilbert_core_frac=float(cfg.hilbert_core_frac),
+        hilbert_y_near=float(cfg.hilbert_y_near),
+        y_trunc=float(cfg.y_max),
     )
     r_train = (
         gradient_normalize(
@@ -685,6 +1199,8 @@ class _ResidualModule(nn.Module):
         scales: Tensor,
         gammas: Tensor,
         cfg: CCFVorticityNeuralConfig,
+        orders: Tensor | None = None,
+        parities: Tensor | None = None,
     ) -> None:
         super().__init__()
         self.net = net
@@ -692,6 +1208,12 @@ class _ResidualModule(nn.Module):
         self.register_buffer("scales", scales)
         self.register_buffer("gammas", gammas)
         self.cfg = cfg
+        self.orders = orders
+        self.parities = parities
+        if orders is not None:
+            self.register_buffer("orders_buf", orders)
+        if parities is not None:
+            self.register_buffer("parities_buf", parities)
 
     def set_y(self, y: Tensor) -> None:
         self.y = y.to(dtype=self.y.dtype, device=self.y.device)
@@ -703,6 +1225,8 @@ class _ResidualModule(nn.Module):
             cfg=self.cfg,
             scales=self.scales,
             gammas=self.gammas,
+            orders=getattr(self, "orders_buf", self.orders),
+            parities=getattr(self, "parities_buf", self.parities),
         )
 
 
@@ -735,9 +1259,15 @@ def dense_neural_vorticity_residual(
     n_val: int = 4001,
     exp_core: bool = True,
     hilbert_n_uniform: int | None = None,
+    hilbert_n_quad: int = 48,
+    hilbert_n_aux: int = 128,
+    hilbert_core_frac: float = 0.9,
+    hilbert_y_near: float = 2.0,
     gauge_point: float = 0.5,
     gauge_value: float = 0.05,
     dtype: torch.dtype = torch.float64,
+    orders: Tensor | None = None,
+    parities: Tensor | None = None,
 ) -> dict[str, float]:
     """Dense Wang residual on the **neural** profile with matched train Hilbert.
 
@@ -754,6 +1284,7 @@ def dense_neural_vorticity_residual(
     om_np0 = omega.detach().cpu().numpy()
     g_raw = float(np.interp(gauge_point, y_np0, om_np0))
     omega_max_raw = float(np.max(np.abs(om_np0)))
+    scale = 1.0
     if abs(g_raw) > 1e-14:
         scale = float(gauge_value) / g_raw
         omega = omega * scale
@@ -767,6 +1298,18 @@ def dense_neural_vorticity_residual(
         gammas=gammas,
         train_hilbert=train_hilbert,
         hilbert_n_uniform=hilbert_n_uniform,
+        orders=orders,
+        parities=parities,
+        omega_pos_fn=(
+            _omega_pos_fn_from_net(net, lam=lam, exp_core=exp_core, scale=scale)
+            if train_hilbert in _FREE_OMEGA_HILBERT
+            else None
+        ),
+        hilbert_n_quad=int(hilbert_n_quad),
+        hilbert_n_aux=int(hilbert_n_aux),
+        hilbert_core_frac=float(hilbert_core_frac),
+        hilbert_y_near=float(hilbert_y_near),
+        y_trunc=float(y_max),
     )
     r_np = r.detach().cpu().numpy()
     om_np = omega.detach().cpu().numpy()
@@ -827,6 +1370,18 @@ def _resample_collocation(
             gammas=gammas,
             train_hilbert=cfg.train_hilbert,
             hilbert_n_uniform=cfg.hilbert_n_uniform,
+            orders=getattr(residual_mod, "orders_buf", residual_mod.orders),
+            parities=getattr(residual_mod, "parities_buf", residual_mod.parities),
+            omega_pos_fn=(
+                _omega_pos_fn_from_net(net, lam=cfg.lam, exp_core=cfg.exp_core)
+                if cfg.train_hilbert in _FREE_OMEGA_HILBERT
+                else None
+            ),
+            hilbert_n_quad=int(cfg.hilbert_n_quad),
+            hilbert_n_aux=int(cfg.hilbert_n_aux),
+            hilbert_core_frac=float(cfg.hilbert_core_frac),
+            hilbert_y_near=float(cfg.hilbert_y_near),
+            y_trunc=float(cfg.y_max),
         )
         r_w = (
             gradient_normalize(
@@ -895,11 +1450,23 @@ def run_ccf_vorticity_neural_discovery(
         rng=rng,
     )
     y = torch.as_tensor(y_np, dtype=cfg.dtype, device=device)
-    scales_np, gammas_np = hardy_dictionary(
-        lam=cfg.lam,
-        n_scales=cfg.n_scales,
-        n_gamma_multiples=cfg.n_gamma_multiples,
-    )
+    if int(cfg.max_order) > 0:
+        scales_np, gammas_np, orders_np, parities_np = hardy_dictionary_ordered(
+            lam=cfg.lam,
+            n_scales=cfg.n_scales,
+            n_gamma_multiples=cfg.n_gamma_multiples,
+            max_order=int(cfg.max_order),
+        )
+        orders_t = torch.as_tensor(orders_np, dtype=torch.int64, device=device)
+        parities_t = torch.as_tensor(parities_np, dtype=torch.int64, device=device)
+    else:
+        scales_np, gammas_np = hardy_dictionary(
+            lam=cfg.lam,
+            n_scales=cfg.n_scales,
+            n_gamma_multiples=cfg.n_gamma_multiples,
+        )
+        orders_t = None
+        parities_t = None
     scales = torch.as_tensor(scales_np, dtype=cfg.dtype, device=device)
     gammas = torch.as_tensor(gammas_np, dtype=cfg.dtype, device=device)
     def _new_net() -> CompactifiedOmegaOMBU:
@@ -936,7 +1503,15 @@ def run_ccf_vorticity_neural_discovery(
     if not warm_ok:
         warm_state_dict = None
         _cold_bias_fill(net)
-    residual_mod = _ResidualModule(net, y=y, scales=scales, gammas=gammas, cfg=cfg)
+    residual_mod = _ResidualModule(
+        net,
+        y=y,
+        scales=scales,
+        gammas=gammas,
+        cfg=cfg,
+        orders=orders_t,
+        parities=parities_t,
+    )
 
     # Skip Adam when warm-starting — continue second-order from the prior basin.
     adam_steps = 0 if warm_state_dict is not None else int(cfg.adam_warmup_steps)
@@ -1106,6 +1681,7 @@ def run_ccf_vorticity_neural_discovery(
     om_np = omega.detach().cpu().numpy()
     omy_np = omega_y.detach().cpu().numpy()
     g_sample = float(np.interp(cfg.gauge_point, y_np, om_np))
+    scale = 1.0
     if abs(g_sample) > 1e-14:
         scale = float(cfg.gauge_value) / g_sample
         om_np = om_np * scale
@@ -1122,10 +1698,29 @@ def run_ccf_vorticity_neural_discovery(
             gammas=gammas,
             train_hilbert=cfg.train_hilbert,
             hilbert_n_uniform=cfg.hilbert_n_uniform,
+            orders=orders_t,
+            parities=parities_t,
+            omega_pos_fn=(
+                _omega_pos_fn_from_net(
+                    net, lam=cfg.lam, exp_core=cfg.exp_core, scale=scale
+                )
+                if cfg.train_hilbert in _FREE_OMEGA_HILBERT
+                else None
+            ),
+            hilbert_n_quad=int(cfg.hilbert_n_quad),
+            hilbert_n_aux=int(cfg.hilbert_n_aux),
+            hilbert_core_frac=float(cfg.hilbert_core_frac),
+            hilbert_y_near=float(cfg.hilbert_y_near),
+            y_trunc=float(cfg.y_max),
         )
         try:
             coeffs, defect, _ = project_omega_hardy_torch(
-                y_eval, omega, scales=scales, gammas=gammas
+                y_eval,
+                omega,
+                scales=scales,
+                gammas=gammas,
+                orders=orders_t,
+                parities=parities_t,
             )
         except RuntimeError:
             coeffs = torch.zeros(scales.shape[0], dtype=cfg.dtype, device=device)
@@ -1141,9 +1736,15 @@ def run_ccf_vorticity_neural_discovery(
         n_val=int(cfg.dense_n_val),
         exp_core=cfg.exp_core,
         hilbert_n_uniform=cfg.hilbert_n_uniform,
+        hilbert_n_quad=int(cfg.hilbert_n_quad),
+        hilbert_n_aux=int(cfg.hilbert_n_aux),
+        hilbert_core_frac=float(cfg.hilbert_core_frac),
+        hilbert_y_near=float(cfg.hilbert_y_near),
         gauge_point=cfg.gauge_point,
         gauge_value=cfg.gauge_value,
         dtype=cfg.dtype,
+        orders=orders_t,
+        parities=parities_t,
     )
 
     r_np = r_train_h.detach().cpu().numpy()
@@ -1182,6 +1783,17 @@ def run_ccf_vorticity_neural_discovery(
             "train_history_max_abs": history,
             "rung_metric_uses_fft": cfg.train_hilbert == "truncated_line_spectral",
             "net": net,
+            "max_order": int(cfg.max_order),
+            "orders": (
+                None
+                if orders_t is None
+                else orders_t.detach().cpu().numpy().astype(int)
+            ),
+            "parities": (
+                None
+                if parities_t is None
+                else parities_t.detach().cpu().numpy().astype(int)
+            ),
         },
     )
 
@@ -1213,16 +1825,24 @@ __all__ = [
     "CCFVorticityNeuralConfig",
     "CCFVorticityNeuralResult",
     "CompactifiedOmegaOMBU",
+    "deepmind_paper_architecture_config",
+    "deepmind_signed_hat_config",
     "dense_neural_vorticity_residual",
     "grad_norm_downweights_peak",
     "gradient_normalize",
     "hardy_corrected_hu_from_omega",
     "hardy_dictionary",
+    "hardy_dictionary_ordered",
+    "hilbert_gl_interval",
     "hilbert_pv_line",
+    "hilbert_pv_mapped_tail",
+    "hilbert_wholeline_hp",
     "omega_from_net",
     "project_omega_hardy",
     "project_omega_hardy_torch",
     "pv_hu_from_omega",
+    "pv_mapped_tail_hu_from_omega",
+    "wholeline_hp_hu_from_omega",
     "reproduce_deepmind_config",
     "residual_vector",
     "run_ccf_vorticity_neural_discovery",

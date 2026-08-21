@@ -12,8 +12,10 @@ Never weakens ``CCF_STRETCH_RESIDUAL_GATE`` (1e-13) or Rung-1 (1e-11).
 
 Known stretch blocker (audit): spectral/PV Hilbert alone err at O(1e-1); with
 high ``proj_defect_weight`` the neural Ω is pulled into a Hardy span that itself
-floors near ~1e-1 under MG. Stretch remains unearned until Hilbert/dictionary
-capacity improves — more MG alone does not clear 1e-13.
+floors near ~1e-1 under MG. Dictionary enrichment on the same ``{P,Q}`` family
+was tried. The open fork is ``train_hilbert="wholeline_hp"`` (planted
+``H[Q]=-P`` can sit near 1e-14). Stretch remains unearned on a trained Wang
+net — more MG alone does not clear 1e-13.
 """
 
 from __future__ import annotations
@@ -76,6 +78,12 @@ def _next_actions(residual: float, *, hilbert: str, hidden: int, mg_steps: int) 
         actions.append("increase_hardy_dictionary_for_corrected_hilbert")
     if residual > 1e-2 and hilbert == "hardy_corrected_pv":
         actions.append("hilbert_dictionary_catch22_enrich_dict_or_free_omega_hilbert")
+        actions.append("free_omega_wholeline_hp")
+    if residual > 1e-2 and hilbert == "pv_mapped_tail":
+        actions.append("mapped_tail_free_omega_still_above_stretch")
+        actions.append("switch_train_hilbert_wholeline_hp")
+    if residual > 1e-2 and hilbert == "wholeline_hp":
+        actions.append("wholeline_hp_free_omega_still_above_stretch")
     if residual > STRETCH:
         actions.append(f"orders_to_stretch={math.log10(max(residual, 1e-300) / STRETCH):.2f}")
     actions.append(f"current_hidden={hidden}")
@@ -330,6 +338,128 @@ def run_once(
     return payload
 
 
+def _anti_ghost_fired(omega_gauge: float, omega_max: float, *, gauge_value: float = 0.05) -> bool:
+    return abs(float(omega_gauge) - float(gauge_value)) > 0.01 or float(omega_max) < 0.02
+
+
+def run_conjugate_once(
+    *,
+    smoke: bool = True,
+    max_order: int = 0,
+    seed: int = 0,
+    n_scales: int | None = None,
+    n_gamma_multiples: int | None = None,
+    n_grid: int | None = None,
+    gn_steps: int | None = None,
+    y_max: float = 8.0,
+) -> dict[str, Any]:
+    """Linear Hardy-Ω conjugate-tower arm (exact H). Compare on raw dense residual."""
+    from omnibias.pinn.jax.discovery.ccf_vorticity import (
+        CCFVorticityDiscoveryConfig,
+        run_ccf_vorticity_discovery,
+    )
+
+    if smoke:
+        n_scales = 2 if n_scales is None else n_scales
+        n_gamma_multiples = 1 if n_gamma_multiples is None else n_gamma_multiples
+        n_grid = 17 if n_grid is None else n_grid
+        gn_steps = 4 if gn_steps is None else gn_steps
+        y_max = min(float(y_max), 8.0)
+    else:
+        n_scales = 8 if n_scales is None else n_scales
+        n_gamma_multiples = 2 if n_gamma_multiples is None else n_gamma_multiples
+        n_grid = 65 if n_grid is None else n_grid
+        gn_steps = 40 if gn_steps is None else gn_steps
+
+    t0 = time.perf_counter()
+    cfg = CCFVorticityDiscoveryConfig(
+        n_scales=int(n_scales),
+        n_gamma_multiples=int(n_gamma_multiples),
+        max_order=int(max_order),
+        n_grid=int(n_grid),
+        y_max=float(y_max),
+        lam=LAM,
+        seed=int(seed),
+        gn_steps=int(gn_steps),
+    )
+    result = run_ccf_vorticity_discovery(cfg)
+    raw = float(result.diagnostics["dense_max_abs_vorticity"])
+    gauge = float(result.diagnostics["omega_gauge_sample"])
+    omax = float(result.diagnostics["omega_max_abs"])
+    ghost = _anti_ghost_fired(gauge, omax)
+    gate_metric = max(raw, 1.0) if ghost else raw
+    lam_gate = ccf_lambda_digits_gate(result.lam, LAM, name="ccf_lambda_conjugate")
+    stretch_gate = ccf_residual_gate(
+        gate_metric, STRETCH, name="ccf_stretch_1e-13_conjugate"
+    )
+    rung1_report = ccf_residual_gate(gate_metric, RUNG1, name="ccf_rung1_1e-11_conjugate")
+    orders = result.extra.get("orders")
+    parities = result.extra.get("parities")
+    return {
+        "benchmark": "reproduce_deepmind_ccf",
+        "tier": "cpu_smoke" if smoke else "full",
+        "wall_seconds": time.perf_counter() - t0,
+        "config": {
+            "arm": "conjugate",
+            "dictionary": "conjugate",
+            "max_order": int(max_order),
+            "lam": float(result.lam),
+            "n_scales": int(n_scales),
+            "n_gamma_multiples": int(n_gamma_multiples),
+            "n_grid": int(n_grid),
+            "gn_steps": int(gn_steps),
+            "y_max": float(y_max),
+            "seed": int(seed),
+            "optimizer": "martens_grosse_gn",
+            "train_hilbert": "hardy_exact_omega",
+            "n_atoms": int(np.asarray(result.coeffs).size),
+        },
+        "profile": {
+            "coeffs": np.asarray(result.coeffs, dtype=float).tolist(),
+            "scales": np.asarray(result.scales, dtype=float).tolist(),
+            "gammas": np.asarray(result.alphas, dtype=float).tolist(),
+            "orders": None if orders is None else np.asarray(orders, dtype=int).tolist(),
+            "parities": (
+                None if parities is None else np.asarray(parities, dtype=int).tolist()
+            ),
+        },
+        "metrics": {
+            "reproduction_dense_max_abs_for_gate": gate_metric,
+            "reproduction_dense_max_abs": raw,
+            "dense_max_abs": raw,
+            "omega_gauge_sample": gauge,
+            "omega_max_abs": omax,
+            "anti_ghost_fired": ghost,
+            "collocation_max_abs": float(result.diagnostics["max_abs_vorticity_residual"]),
+            "orders_to_stretch": float(math.log10(max(gate_metric, 1e-300) / STRETCH)),
+            "orders_to_stretch_raw": float(math.log10(max(raw, 1e-300) / STRETCH)),
+        },
+        "gates": {
+            "lambda_ok": bool(lam_gate["passed"]),
+            "stretch_1e-13_cleared": bool(stretch_gate["passed"]),
+            "rung1_1e-11_report": bool(rung1_report["passed"]),
+            "entries": [lam_gate, stretch_gate, rung1_report],
+        },
+        "diagnosis": {
+            "residual": raw,
+            "next_actions": _next_actions(
+                raw,
+                hilbert="hardy_exact_omega",
+                hidden=0,
+                mg_steps=int(gn_steps),
+            ),
+        },
+        "honesty": {
+            "navier_stokes_proof_claim": False,
+            "continuum_claim": False,
+            "arm": "conjugate",
+            "hardy_cap_deferred_until_stretch": not bool(stretch_gate["passed"]),
+            "metric": "wang_vorticity_dense_hardy_omega_raw",
+            "compare_arms_on": "dense_max_abs",
+        },
+    }
+
+
 def escalate_loop(
     *,
     max_rounds: int = 8,
@@ -582,9 +712,23 @@ def main(argv: list[str] | None = None) -> int:
             "hardy_projection",
             "truncated_line_spectral",
             "pv_line",
+            "pv_mapped_tail",
+            "wholeline_hp",
         ],
     )
     p.add_argument("--multistage-rounds", type=int, default=0)
+    p.add_argument(
+        "--dictionary",
+        choices=["neural", "conjugate"],
+        default="neural",
+        help="neural compactified Ω-PINN, or linear Hardy conjugate-tower",
+    )
+    p.add_argument(
+        "--max-order",
+        type=int,
+        default=0,
+        help="conjugate-tower max derivative order (N); 0 is today's Q span",
+    )
     p.add_argument(
         "--write-docs",
         action="store_true",
@@ -595,6 +739,16 @@ def main(argv: list[str] | None = None) -> int:
     if args.escalate:
         payload = escalate_loop(max_rounds=args.max_rounds, smoke=not args.full)
         name = "reproduce_ccf_escalate.json"
+    elif args.dictionary == "conjugate":
+        payload = run_conjugate_once(
+            smoke=not args.full,
+            max_order=int(args.max_order),
+            seed=args.seed,
+        )
+        name = (
+            f"reproduce_ccf_conjugate_N{int(args.max_order)}_"
+            f"{'full' if args.full else 'smoke'}.json"
+        )
     else:
         payload = run_once(
             smoke=not args.full,
@@ -609,7 +763,12 @@ def main(argv: list[str] | None = None) -> int:
 
     out = _scratch() / name
     out.write_text(json.dumps(payload, indent=2, default=str) + "\n", encoding="utf-8")
-    if args.write_docs and not args.full and not args.escalate:
+    if (
+        args.write_docs
+        and not args.full
+        and not args.escalate
+        and args.dictionary == "neural"
+    ):
         docs = ROOT / "docs" / "benchmarks" / "reproduce_deepmind_ccf_smoke.json"
         docs.parent.mkdir(parents=True, exist_ok=True)
         # Infrastructure-only doc artifact (gates may be unearned).
