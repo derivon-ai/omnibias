@@ -573,7 +573,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   spectral floors + `omnibias.sos` arrangement-adapted
   bases; G1–G6 CI; founding bias collapse, not temperature
   collapse; not a continuum spectral gap or Yang-Mills mass
-  gap).
+  gap) /
+  `omnibias.core.verified.jet_flow` (07-06; exact-Jacobian
+  jet Lohner + `WidthBudget`; G1–G6 CI; founding bias
+  collapse, not temperature collapse; finite horizon, not a
+  continuum existence theorem).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -619,7 +623,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/symmetry_discovery.md`](docs/api/symmetry_discovery.md),
   [`docs/api/ns_weak_form.md`](docs/api/ns_weak_form.md),
   [`docs/api/trial_spaces.md`](docs/api/trial_spaces.md),
-  [`docs/api/sos_adapted_basis.md`](docs/api/sos_adapted_basis.md). Cost /
+  [`docs/api/sos_adapted_basis.md`](docs/api/sos_adapted_basis.md),
+  [`docs/api/validated_dynamics.md`](docs/api/validated_dynamics.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

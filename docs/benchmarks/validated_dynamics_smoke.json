@@ -1,0 +1,124 @@
+{
+  "schema": "omnibias.benchmarks.validated_dynamics.v1",
+  "generated_utc": "2026-08-21T19:18:58Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "validated_dynamics",
+    "full": false,
+    "honesty": {
+      "unproven_claim": false,
+      "continuum_existence_claim": false,
+      "attractor_claim": false,
+      "navier_stokes_regularity_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 810.39,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_width_budget",
+        "passed": true,
+        "dominant": "jacobian",
+        "budget": {
+          "truncation": 2.1899347110384705e-14,
+          "jacobian": 0.0013365427922440098,
+          "wrapping": 2.220446049250313e-16,
+          "rounding": 2.3325328199887887e-15,
+          "dominant": "jacobian",
+          "total": 0.0013365427922684637
+        }
+      },
+      {
+        "name": "g2_jacobian_containment",
+        "passed": true,
+        "checked": 10000,
+        "misses": 0,
+        "fields": 10
+      },
+      {
+        "name": "g3_horizon_extension",
+        "passed": true,
+        "n": 10,
+        "wins": 10,
+        "ratios": [
+          5.0,
+          5.0,
+          5.0,
+          5.0,
+          5.077360916137695,
+          5.0,
+          5.0,
+          5.0,
+          5.0,
+          5.0
+        ],
+        "names": [
+          "rotation",
+          "slow_rotation",
+          "contracting_spiral",
+          "contracting_spiral2",
+          "radial_hopf",
+          "decay",
+          "mid_decay",
+          "fast_decay",
+          "clock",
+          "frozen"
+        ]
+      },
+      {
+        "name": "g4_orbit_recovery",
+        "passed": true,
+        "n": 3,
+        "recovered": 3,
+        "names": [
+          "radial_mu_1",
+          "radial_mu_0.5",
+          "radial_mu_0.25"
+        ]
+      },
+      {
+        "name": "g5_step_controller",
+        "passed": true,
+        "steps": [
+          0.4999999999999999,
+          0.76459662944297,
+          1.0
+        ],
+        "names": [
+          "riccati",
+          "tan",
+          "exp"
+        ]
+      },
+      {
+        "name": "g6_no_regression",
+        "passed": true,
+        "snapshot": {
+          "width": 0.0027635465814590536,
+          "x_lo": 0.5389205325774128,
+          "x_hi": 0.5416840791588671,
+          "y_lo": 0.8400892115171675,
+          "y_hi": 0.8428527580986266
+        },
+        "arithmetic": {
+          "choice": "interval",
+          "box_over_point": 559752690113696.4,
+          "tm_required": false,
+          "justification": "interval Taylor coefficients on the 07-06 suite keep the order-12 remainder finite; Taylor models are not required to pass G3"
+        }
+      }
+    ]
+  },
+  "disclaimer": "finite-horizon enclosure of one trajectory from one initial box; not a continuum existence theorem, not an attractor statement, and not a Navier-Stokes global regularity result",
+  "wall_seconds": 8.29161292599747
+}

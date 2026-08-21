@@ -7,7 +7,7 @@ quality of the Jacobian enclosure — and the derivative tower fixes the second
 exactly, while high-order jets attack the first by letting each step be longer
 at the same width.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 03-10, 03-11, 07-01, 07-05
 - **Blocks**: none
 
@@ -272,19 +272,20 @@ Jacobians, and `naive_interval_flow` as the floor.
 
 ## 12. Implementation checklist
 
-- [ ] `tower_jacobian` and `lohner_step_jet` in
-      `packages/omnibias-core/src/omnibias/core/verified/lohner.py`
-- [ ] `WidthBudget` emitted by every validated run
-- [ ] `1000`-box Jacobian containment test over `10` fields
-- [ ] `adaptive_step_from_singularity` with the soundness check of G5
-- [ ] Affine or Taylor-model arithmetic evaluated for the high-order
+- [x] `tower_jacobian` and `lohner_step_jet` in
+      `packages/omnibias-core/src/omnibias/core/verified/jet_flow.py`
+      (sibling of `lohner.py` so the existing flow stays bit-unchanged)
+- [x] `WidthBudget` emitted by every validated run
+- [x] `1000`-box Jacobian containment test over `10` fields
+- [x] `adaptive_step_from_singularity` with the soundness check of G5
+- [x] Affine or Taylor-model arithmetic evaluated for the high-order
       coefficients, with the choice justified by measurement
-- [ ] `10`-field horizon suite with per-field reporting
-- [ ] Three previously failing orbit proofs, with replayable certificates
-- [ ] Bit-unchanged regression test for existing `lohner_flow` paths
-- [ ] `benchmarks/validated_dynamics.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `10`-field horizon suite with per-field reporting
+- [x] Three previously failing orbit proofs, with replayable certificates
+- [x] Bit-unchanged regression test for existing `lohner_flow` paths
+- [x] `benchmarks/validated_dynamics.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`
 
 ## 13. Parent problem and the exact reason it stays an external obligation
 

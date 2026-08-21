@@ -105,7 +105,11 @@ spectral trial spaces and adapted SOS bases (07-05;
 alignment-required floors + arrangement-adapted degree
 drop; G1–G6 CI; founding bias collapse, not temperature
 collapse; not a continuum spectral gap or Yang-Mills mass
-gap). Cost / wall-time / FermiNet-many-body gates are
+gap),
+validated dynamics and orbits (07-06; exact-Jacobian jet
+Lohner + width budget; G1–G6 CI; founding bias collapse,
+not temperature collapse; finite horizon, not a continuum
+existence theorem). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — validated dynamics and orbits (theory 07-06)
+
+- `omnibias.core.verified.jet_flow`: exact-Jacobian
+  `tower_jacobian`, order-`p` `lohner_step_jet`, a
+  `WidthBudget` on every run, and a singularity-radius
+  step suggestion. Existing `lohner_flow` is unchanged.
+- G1–G6 CI-gated. Jets are founding bias collapse
+  (`delta -> 0`), not temperature collapse. One field, one
+  box, one finite horizon. Not a continuum existence
+  theorem and not an attractor statement.
+- Docs: `docs/api/validated_dynamics.md`,
+  `docs/cookbook/validated-dynamics.md`.
+  Smoke: `docs/benchmarks/validated_dynamics_smoke.json`.
+
+
 ### Added — spectral floors and adapted SOS bases (theory 07-05)
 
 - `omnibias.core.verified.trial_spaces`: multi-pack trial

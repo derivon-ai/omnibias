@@ -199,6 +199,7 @@ nav:
       - weak-form NS enclosure (07-02): api/ns_weak_form.md
       - spectral trial spaces (07-05): api/trial_spaces.md
       - SOS adapted bases (07-05): api/sos_adapted_basis.md
+      - validated dynamics (07-06): api/validated_dynamics.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -273,6 +274,7 @@ nav:
       - Lie symmetry discovery: cookbook/symmetry-discovery.md
       - Weak-form NS enclosure: cookbook/ns-weak-form.md
       - Spectral floors and adapted SOS: cookbook/spectral-floors.md
+      - Validated dynamics and orbits: cookbook/validated-dynamics.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md
