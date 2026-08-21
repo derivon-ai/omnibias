@@ -108,6 +108,8 @@ PENALTY_FILES = (
     "packages/omnibias-fields/src/omnibias/fields/_core/quadrature.py",
     "packages/omnibias-core/src/omnibias/core/scale.py",
     "packages/omnibias-fields/src/omnibias/fields/scale.py",
+    "packages/omnibias-verify/src/omnibias/verify/_core/localization.py",
+    "packages/omnibias-verify/src/omnibias/verify/localization.py",
 )
 
 

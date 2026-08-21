@@ -1,0 +1,75 @@
+{
+  "schema": "omnibias.benchmarks.certified_localization.v1",
+  "generated_utc": "2026-08-21T18:15:43Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "certified_localization",
+    "full": false,
+    "honesty": {
+      "scope": "local_box",
+      "sound_not_complete": true,
+      "conditional_on_data": true,
+      "theorem_prover_verified": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false
+    }
+  },
+  "rss_mb_at_start": 812.2,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_soundness",
+        "passed": true,
+        "n": 297,
+        "violations": 0,
+        "detail": "grid + random; enclosure contains the analytic peak"
+      },
+      {
+        "name": "g2_uniqueness",
+        "passed": true,
+        "two_peak": "second_derivative_indeterminate",
+        "detail": "never a false unique peak"
+      },
+      {
+        "name": "g3_tightness",
+        "passed": true,
+        "ratio": 1232.6808759091743,
+        "k_width": 4.0561998630117564e-05,
+        "bab_width": 0.05000000000000005
+      },
+      {
+        "name": "g4_quadratic",
+        "passed": true,
+        "widths": [
+          0.20000000000000004,
+          0.15438718115052041,
+          0.0786035093953963,
+          0.011750313025576721,
+          4.0561998630117564e-05
+        ],
+        "detail": "width squares over three contractions"
+      },
+      {
+        "name": "g5_degenerate",
+        "passed": true,
+        "flat": "second_derivative_indeterminate",
+        "inflect": "second_derivative_indeterminate"
+      },
+      {
+        "name": "g6_seal",
+        "passed": true,
+        "detail": "digest + tamper; no theorem_prover_verified"
+      }
+    ]
+  },
+  "wall_seconds": 2.911696939030662
+}

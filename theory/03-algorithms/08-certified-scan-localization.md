@@ -7,7 +7,7 @@ closed-form function of one variable, so interval arithmetic on the response can
 produce a **sound enclosure of the peak location** — a certified answer to
 "where is the interface", not an estimate.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-02, 01-09
 - **Blocks**: 04-02, 05-01, 07-02
 
@@ -266,15 +266,15 @@ Baselines: gradient-based peak finding, and interval branch-and-bound alone.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-verify/src/omnibias/verify/localization.py`
-- [ ] Reuse `krawczyk_certificate` and the existing `Interval` / `TaylorModel`
+- [x] `packages/omnibias-verify/src/omnibias/verify/localization.py`
+- [x] Reuse `krawczyk_certificate` and the existing `Interval` / `TaylorModel`
       machinery; fork nothing
-- [ ] `Inconclusive` as a distinct return type, not a sentinel interval
-- [ ] Soundness sweep with dense grid **and** random sample
-- [ ] Uniqueness correctness test including deliberate two-peak cases
-- [ ] Contraction-rate test
-- [ ] Degenerate-case refusal test
-- [ ] Seal and tamper tests against `verify_certificate_digest`
-- [ ] `benchmarks/certified_localization.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `Inconclusive` as a distinct return type, not a sentinel interval
+- [x] Soundness sweep with dense grid **and** random sample
+- [x] Uniqueness correctness test including deliberate two-peak cases
+- [x] Contraction-rate test
+- [x] Degenerate-case refusal test
+- [x] Seal and tamper tests against `verify_certificate_digest`
+- [x] `benchmarks/certified_localization.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

@@ -6,6 +6,20 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — certified scan localization (theory 03-08)
+
+- `omnibias.verify.localization`: Krawczyk unique-peak
+  enclosure of a closed-form scan response, with
+  `Inconclusive` as a first-class refusal and a hash-sealed
+  v1 certificate.
+- G1–G6 CI-gated. The template is founding bias collapse
+  (`delta -> 0`), not temperature collapse. Scope is
+  `local_box`. Not `theorem_prover_verified`. A deterministic
+  enclosure of noisy data is conditional on the data.
+- Docs: `docs/api/certified_localization.md`,
+  `docs/cookbook/certified-localization.md`.
+  Smoke: `docs/benchmarks/certified_localization_smoke.json`.
+
 ### Added — scale flow and coarse-graining (theory 03-07)
 
 - `omnibias.core.scale` plus `omnibias.fields.scale`: exact
