@@ -148,7 +148,9 @@ CNF),
 Collapse-Net (09-11; stencil train, founding `delta -> 0`
 collapse at eval; G1–G4 CI; not a continuum PDE),
 holonomic layer (09-12; Ore annihilator jet; G1–G4 CI;
-D-finite class only). Cost /
+D-finite class only),
+Jet-Hopfield (09-13; germ memories; G1–G4 CI; contact match,
+not vector Hopfield). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

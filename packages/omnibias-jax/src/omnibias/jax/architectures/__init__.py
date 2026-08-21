@@ -49,6 +49,7 @@ from omnibias.jax.architectures.hardbc import (
     homogeneous_box,
     initial_value,
 )
+from omnibias.jax.architectures.jet_hopfield import JetHopfieldConfig, jet_hopfield_retrieve
 from omnibias.jax.architectures.jet_token import (
     JetTokenConfig,
     jet_token_forward,
@@ -112,6 +113,7 @@ __all__ = [
     "FourierFeatureMLP",
     "FrameUNetConfig",
     "HardConstraintField",
+    "JetHopfieldConfig",
     "JetKANConfig",
     "JetKANParams",
     "JetMLP",
@@ -134,6 +136,7 @@ __all__ = [
     "init_pirate_params",
     "init_scan_net",
     "initial_value",
+    "jet_hopfield_retrieve",
     "jet_kan_apply",
     "jet_kan_from_torch_state",
     "jet_kan_jet",

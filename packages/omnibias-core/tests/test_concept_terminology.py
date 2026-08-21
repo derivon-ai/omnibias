@@ -162,6 +162,11 @@ PENALTY_FILES = (
     "packages/omnibias-jax/src/omnibias/jax/architectures/collapse_net.py",
     "packages/omnibias-difference/src/omnibias/difference/_core/collapse_net.py",
     "packages/omnibias-holonomic/src/omnibias/holonomic/_core/layer.py",
+    "packages/omnibias-core/src/omnibias/core/jet_hopfield.py",
+    "packages/omnibias-torch/src/omnibias/torch/architectures/jet_hopfield.py",
+    "packages/omnibias-jax/src/omnibias/jax/architectures/jet_hopfield.py",
+    "packages/omnibias-hopfield/src/omnibias/hopfield/torch/ops/jet_hopfield.py",
+    "packages/omnibias-hopfield/src/omnibias/hopfield/jax/ops/jet_hopfield.py",
 )
 
 

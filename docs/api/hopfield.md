@@ -7,6 +7,10 @@ single softmax update of the Ramsauer et al. energy; `attention` is its
 `K = V`, multi-query generalization, exposing the well-known duality between
 modern Hopfield retrieval and dot-product attention.
 
+Jet memories (theory 09-13) live in
+[`jet_hopfield.md`](jet_hopfield.md): germs retrieved by contact,
+not a rewrite of the vector update below.
+
 ## Ops (torch)
 
 ::: omnibias.hopfield.torch.ops

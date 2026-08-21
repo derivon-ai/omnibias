@@ -50,6 +50,7 @@ from omnibias.torch.architectures.hardbc import (
     homogeneous_box,
     initial_value,
 )
+from omnibias.torch.architectures.jet_hopfield import JetHopfieldConfig, jet_hopfield_retrieve
 from omnibias.torch.architectures.jet_token import (
     JetTokenConfig,
     jet_token_forward,
@@ -111,6 +112,7 @@ __all__ = [
     "FrameUNetConfig",
     "HardConstraintField",
     "HermiteBasis",
+    "JetHopfieldConfig",
     "JetKAN",
     "JetKANConfig",
     "JetMLP",
@@ -136,6 +138,7 @@ __all__ = [
     "homogeneous_box",
     "init_pirate_params",
     "initial_value",
+    "jet_hopfield_retrieve",
     "jet_token_forward",
     "jetkan_from_band_plan",
     "make_siren",

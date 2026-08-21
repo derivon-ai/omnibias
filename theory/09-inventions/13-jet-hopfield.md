@@ -5,7 +5,7 @@
 Store and retrieve **germs** (value plus derivatives), not vectors, so
 associative memory matches contact.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-10, 09-01
 - **Blocks**: none
 
@@ -112,11 +112,11 @@ def jet_hopfield_retrieve(query_jet, memory_jets, *, config: JetHopfieldConfig):
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.hopfield` jet retrieve twins
-- [ ] Contact-vs-value split test
-- [ ] `benchmarks/jet_hopfield.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.hopfield` jet retrieve twins
+- [x] Contact-vs-value split test
+- [x] `benchmarks/jet_hopfield.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

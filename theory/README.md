@@ -231,7 +231,7 @@ operator floor.
 | [09-10 Riccati flow net](09-inventions/10-riccati-flow-net.md) | gated | Depth is Riccati time; G1–G4 CI; not DEQ and not CNF; founding bias collapse only for jets in `s0` |
 | [09-11 Collapse-Net](09-inventions/11-collapse-net.md) | gated | Train stencils; infer by founding `delta -> 0` collapse; G1–G4 CI; not a continuum PDE |
 | [09-12 holonomic layer](09-inventions/12-holonomic-layer.md) | gated | Block is an Ore annihilator; G1–G4 CI; D-finite class only |
-| [09-13 jet-Hopfield](09-inventions/13-jet-hopfield.md) | concept | Memories are germs; contact match, not vector Hopfield |
+| [09-13 jet-Hopfield](09-inventions/13-jet-hopfield.md) | gated | Memories are germs; G1–G4 CI; contact match, not vector Hopfield |
 | [09-14 integral-kernel operator](09-inventions/14-integral-kernel-operator.md) | concept | Volumetric DeepONet kernel is an OMBU `integral`; not BEM-Net |
 | [09-15 q-OMBU / timescale](09-inventions/15-q-ombu-timescale.md) | concept | Hybrid q / Hilger layers; named `q -> 1` / `mu -> 0` limit |
 | [09-16 exact MAML](09-inventions/16-exact-maml.md) | gated | Inner exact GN / HVP; IFT meta-grad; G1–G3 CI; not ImageNet; founding bias collapse, not temperature collapse |

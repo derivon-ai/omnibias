@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-Hopfield (theory 09-13)
+
+- `omnibias.core.jet_hopfield` plus architecture and hopfield twins:
+  memories are germs; retrieve by contact mismatch.
+- G1–G4 CI-gated. Temperature collapse only if `beta -> inf`. Not
+  vector Hopfield. Not ImageNet. Not CCF stretch.
+- Docs: `docs/api/jet_hopfield.md`,
+  `docs/cookbook/jet-hopfield.md`.
+  Smoke: `docs/benchmarks/jet_hopfield_smoke.json`.
+
+
 ### Added — Holonomic layer (theory 09-12)
 
 - `omnibias.holonomic._core.layer`: the block is an Ore annihilator;

@@ -1,0 +1,62 @@
+{
+  "schema": "omnibias.benchmarks.jet_hopfield.v1",
+  "generated_utc": "2026-08-21T20:40:22Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "jet_hopfield",
+    "full": false,
+    "honesty": {
+      "temperature_collapse_used": false,
+      "imagenet_claim": false,
+      "stretch_claim": false,
+      "theorem_prover_verified": false
+    },
+    "lam": 1.0
+  },
+  "rss_mb_at_start": 808.86,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_near_j1",
+        "passed": true,
+        "retrieved_value": 0.9999999974825013,
+        "value_err": 2.5174986539866495e-09
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "lam": 1.0,
+        "jet_indices": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "value_indices": [
+          2,
+          2,
+          2,
+          2,
+          2
+        ]
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "temperature_collapse_used": false
+      }
+    ]
+  },
+  "disclaimer": "Jet-Hopfield stores germs and retrieves by contact; not vector Hopfield, not ImageNet, and not CCF stretch",
+  "wall_seconds": 1.2440071309683844
+}
