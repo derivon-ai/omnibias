@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Sharpness regularizer (theory 09-23)
+
+- `omnibias.core.sharp_loss` plus
+  `omnibias.{torch,jax}.optim_sharp_loss`: `L + mu * ritz` from
+  exact HVPs. Distinct from the 08-06 step-size schedule.
+- G1–G4 CI-gated. Ritz is a lower estimate. Not ImageNet SAM.
+  Not CCF stretch.
+- Docs: `docs/api/sharpness_regularizer.md`,
+  `docs/cookbook/sharpness-regularizer.md`.
+  Smoke: `docs/benchmarks/sharpness_regularizer_smoke.json`.
+
+
 ### Added — Inverse design (theory 09-22)
 
 - `omnibias.core.inverse_design` plus

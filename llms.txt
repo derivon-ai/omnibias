@@ -160,7 +160,9 @@ G1–G4 CI; empty ball is a halt),
 exact score matching (09-21; Hyvärinen on an OMBU score;
 G1–G4 CI; CNF exact `div` is prior art),
 inverse design (09-22; Newton-on-`x` with exact `sigma'`;
-G1–G4 CI; not 08-03; not a global inverse). Cost /
+G1–G4 CI; not 08-03; not a global inverse),
+sharpness regularizer (09-23; `L + mu * ritz`; G1–G4 CI;
+not 08-06 schedule). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

@@ -90,6 +90,7 @@ from omnibias.jax.optim_kantorovich import (
     polynomial_sqrt2_maps,
     select_accepted_params,
 )
+from omnibias.jax.optim_sharp_loss import SharpnessLossConfig, sharpness_augmented_loss
 from omnibias.jax.optim_sharpness import (
     SharpnessReport,
     SharpnessSchedule,
@@ -1017,6 +1018,7 @@ __all__ = [
     "MartensGrosseGNConfig",
     "MatVec",
     "ResidualFn",
+    "SharpnessLossConfig",
     "SharpnessReport",
     "SharpnessSchedule",
     "approximate_inverse_jacobian",
@@ -1058,6 +1060,7 @@ __all__ = [
     "peak_weighted_residual",
     "polynomial_sqrt2_maps",
     "select_accepted_params",
+    "sharpness_augmented_loss",
     "sharpness_lambda_max",
     "sharpness_scheduled_minimize",
     "sharpness_scheduled_step",

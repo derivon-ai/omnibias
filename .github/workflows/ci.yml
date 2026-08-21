@@ -521,6 +521,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/inverse_design.py
+      - name: Run sharpness-regularizer smoke (09-23 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/sharpness_regularizer.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

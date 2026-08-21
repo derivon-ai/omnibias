@@ -190,6 +190,9 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/inverse_design.py",
     "packages/omnibias-torch/src/omnibias/torch/optim_inverse.py",
     "packages/omnibias-jax/src/omnibias/jax/optim_inverse.py",
+    "packages/omnibias-core/src/omnibias/core/sharp_loss.py",
+    "packages/omnibias-torch/src/omnibias/torch/optim_sharp_loss.py",
+    "packages/omnibias-jax/src/omnibias/jax/optim_sharp_loss.py",
 )
 
 

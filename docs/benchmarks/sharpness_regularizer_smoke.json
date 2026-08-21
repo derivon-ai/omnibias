@@ -1,0 +1,53 @@
+{
+  "schema": "omnibias.benchmarks.sharpness_regularizer.v1",
+  "generated_utc": "2026-08-21T21:13:50Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "sharpness_regularizer",
+    "full": false,
+    "honesty": {
+      "is_08_06_schedule": false,
+      "schedule_only": false,
+      "imagenet_sam_claim": false,
+      "stretch_claim": false,
+      "ritz_is_lower_bound": true,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 809.13,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "hvp": 10.0,
+        "aug": 1.0
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "finite": 5,
+        "skill_pos": 5,
+        "vs_0806_required": false,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "is_08_06_schedule": false,
+        "schedule_only": false
+      }
+    ]
+  },
+  "disclaimer": "L + mu * ritz; not 08-06 schedule-only, not ImageNet SAM, not CCF stretch",
+  "wall_seconds": 1.3564592550392263
+}

@@ -121,6 +121,7 @@ from omnibias.torch.optim_kantorovich import (
     polynomial_sqrt2_maps,
     select_accepted_params,
 )
+from omnibias.torch.optim_sharp_loss import SharpnessLossConfig, sharpness_augmented_loss
 from omnibias.torch.optim_sharpness import (
     SharpnessReport,
     sharpness_lambda_max,
@@ -3881,6 +3882,7 @@ __all__ = [
     "NaturalGradient",
     "ResidualFn",
     "ScalarFn",
+    "SharpnessLossConfig",
     "SharpnessReport",
     "SharpnessSchedule",
     "StochasticNewtonCG",
@@ -3918,6 +3920,7 @@ __all__ = [
     "polynomial_sqrt2_maps",
     "quadrature_loss",
     "select_accepted_params",
+    "sharpness_augmented_loss",
     "sharpness_lambda_max",
     "sharpness_scheduled_minimize",
     "sharpness_scheduled_step",

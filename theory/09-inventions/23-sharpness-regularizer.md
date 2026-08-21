@@ -6,7 +6,7 @@ Add exact `lambda_max(H)` or `Tr(H)` to the **loss**, using exact
 HVPs — distinct from 08-06, which only *schedules* the cubic step
 size.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 08-06, 09-01
 - **Blocks**: none
 
@@ -99,11 +99,11 @@ def sharpness_augmented_loss(loss_fn, theta, *, config: SharpnessLossConfig):
 
 ## 12. Implementation checklist
 
-- [ ] Sharpness-augmented loss twins
-- [ ] G1 quadratic test
-- [ ] `benchmarks/sharpness_regularizer.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Sharpness-augmented loss twins
+- [x] G1 quadratic test
+- [x] `benchmarks/sharpness_regularizer.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

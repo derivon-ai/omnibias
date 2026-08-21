@@ -632,7 +632,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.score_matching` + `omnibias.score.{torch,jax}.score_matching`
   (09-21; Hyvärinen / DSM; G1–G4 CI; CNF exact `div` is prior art) /
   `omnibias.core.inverse_design` + `omnibias.{torch,jax}.optim_inverse`
-  (09-22; Newton-on-`x`; G1–G4 CI; not 08-03; not a global inverse).
+  (09-22; Newton-on-`x`; G1–G4 CI; not 08-03; not a global inverse) /
+  `omnibias.core.sharp_loss` + `omnibias.{torch,jax}.optim_sharp_loss`
+  (09-23; `L + mu * ritz`; G1–G4 CI; not 08-06 schedule).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -700,7 +702,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/q_ombu_timescale.md`](docs/api/q_ombu_timescale.md),
   [`docs/api/homotopy_continuation.md`](docs/api/homotopy_continuation.md),
   [`docs/api/exact_score_matching.md`](docs/api/exact_score_matching.md),
-  [`docs/api/inverse_design.md`](docs/api/inverse_design.md). Cost /
+  [`docs/api/inverse_design.md`](docs/api/inverse_design.md),
+  [`docs/api/sharpness_regularizer.md`](docs/api/sharpness_regularizer.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.
