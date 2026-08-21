@@ -343,6 +343,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/certified_step.py
+      - name: Run rational-stencil smoke (01-11 G1 algebra / G2–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/rational_stencil.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate
@@ -985,7 +989,8 @@ jobs:
           source .venv-lean/bin/activate
           pip install --upgrade pip
           pip install -e packages/omnibias-core[test]
-          python -m pytest packages/omnibias-core/tests/test_lean_check.py -q
+          python -m pytest packages/omnibias-core/tests/test_lean_check.py \
+            packages/omnibias-core/tests/test_rational_stencil.py -q
 
   spiking:
     name: omnibias-spiking (alpha)

@@ -7,7 +7,7 @@ rationals**, which is exactly the payload class the existing Lean bridge already
 discharges, so `theorem_prover_verified` becomes reachable for the new
 mathematics itself rather than only for downstream numerical enclosures.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-04
 - **Blocks**: 07-01, 07-05
 
@@ -255,13 +255,13 @@ Both go into `docs/benchmarks/rational_stencil_smoke.json`.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-core/src/omnibias/core/proof/obligations/rational_stencil.py`
-- [ ] Lean lemma file in `formal/omnibias-verified-kernel/`, `sorry`-free
-- [ ] Wire into the existing `lake build` target and CI kernel check
-- [ ] Curated obligation set (uniform, irregular, Birkhoff) as a test fixture
-- [ ] Negative-control test asserting the Lean build fails on corrupted weights
-- [ ] No-toolchain degradation test
-- [ ] Tamper-evidence test on the sealed certificate
-- [ ] Tier-separation test asserting `mathlib_verified` stays `False`
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-core/src/omnibias/core/proof/obligations/rational_stencil.py`
+- [x] Lean lemma file in `formal/omnibias-verified-kernel/`, `sorry`-free
+- [x] Wire into the existing `lake build` target and CI kernel check
+- [x] Curated obligation set (uniform, irregular, Birkhoff) as a test fixture
+- [x] Negative-control test asserting the Lean build fails on corrupted weights
+- [x] No-toolchain degradation test
+- [x] Tamper-evidence test on the sealed certificate
+- [x] Tier-separation test asserting `mathlib_verified` stays `False`
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

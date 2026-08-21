@@ -14,7 +14,11 @@ hence kernel-checkable here, sorry-free:
 * **a rational equality** -- a special-number identity `p/q = r/s` (a Bernoulli
   recurrence, `ζ(1−2m) = −B₂ₘ/(2m)`, ...), scaled to a common positive `Int`
   denominator, reduces to `p·s − r·q = 0`, i.e. that difference lies in the point
-  interval `[0, 0]`, discharged by `enclosed_quantity_eq`.
+  interval `[0, 0]`, discharged by `enclosed_quantity_eq`;
+* **stencil consistency / poisedness** -- a finite conjunction of those same
+  rational equalities (`C_j` moments and a reported `C_N`) plus integer Polya
+  comparisons and a nonzero determinant witness, discharged by
+  `allRatEq` / `allIntGe` / `ratNez` in `Omnibias.RationalStencil`.
 
 Rational data is scaled to a common positive `Int` denominator by the Python
 bridge before instantiating these lemmas, so each obligation becomes an exact

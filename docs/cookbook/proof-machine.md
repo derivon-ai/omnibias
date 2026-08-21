@@ -277,6 +277,8 @@ omnibias runs one derivative tower in three registers — **differentiable**,
 machine connects the last two: a certificate's *finite, rational* obligation can
 be re-checked by a **Mathlib-free Lean 4 kernel** (`formal/omnibias-verified-kernel`),
 and only a genuine `lake` pass sets `Verdict.theorem_prover_verified`.
+Stencil consistency / poisedness (theory 01-11) is the same finite
+algebra; see [rational stencil obligations](rational-stencil.md).
 
 ```python
 from omnibias.core.proof import (

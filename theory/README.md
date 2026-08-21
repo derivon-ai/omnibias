@@ -111,7 +111,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [01-08 tropical-log homotopy](01-geometry/08-tropical-log-homotopy.md) | gated | `omnibias.struct._core.tropical`; reuses `logsumexp_gap_bound`; G4 `--full` only; cost gates smoke-earned, not in CI `all_passed` |
 | [01-09 equality-locus calculus](01-geometry/09-equality-locus-and-intersection-calculus.md) | gated | Constraint manifold, not a PDE solver; `branch` / `condition` / `converged`; G1–G5 CI; G6 parity |
 | [01-10 jet-bundle formalization](01-geometry/10-jet-bundle-formalization.md) | gated | Vocabulary / contact test, not a discovery and not a package |
-| [01-11 rational exactness](01-geometry/11-rational-exactness-and-new-lean-obligations.md) | designed | Collapse weights are rationals, so the new math is Lean-checkable |
+| [01-11 rational exactness](01-geometry/11-rational-exactness-and-new-lean-obligations.md) | gated | Collapse weights are rationals; `C_j` / poisedness are Lean-checkable; G1–G5 earned (kernel pass in the Lean job); algebra only, not the collapse |
 | [01-12 conjugate Hilbert tower](01-geometry/12-conjugate-hilbert-tower.md) | gated | Line Hilbert only; G1–G4 CI; G5 campaign-artifact, not in CI `all_passed` |
 | [01-13 operator family](01-geometry/13-operator-family.md) | designed | Scan of the six roles; catalog + rejects; not a seventh `op`; first spend is `BiasScan(op="integral")` |
 

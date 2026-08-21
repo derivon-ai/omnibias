@@ -29,6 +29,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from fractions import Fraction
 from math import factorial
+from typing import Any
 
 from omnibias.core.verified.interval import Interval
 from omnibias.difference._core.extraction import FiniteDifferenceCertificate
@@ -119,6 +120,24 @@ class IrregularStencil:
     accuracy: int
     leading_coeff: Fraction
     weight_magnitude: Fraction
+
+    def to_rational_stencil(self, *, name: str = "irregular") -> Any:
+        """Exact-``Q`` view for theory 01-11 Lean obligations.
+
+        ``leading_coeff`` on the returned stencil is omitted so the
+        sealer certifies the computed ``C_N`` moment, not a later
+        unmatched residual.
+        """
+        from omnibias.core.proof.obligations.rational_stencil import RationalStencil
+
+        return RationalStencil(
+            self.request.nodes,
+            self.request.orders,
+            self.weights,
+            self.request.target_order,
+            leading_coeff=None,
+            name=name,
+        )
 
 
 def _conditions(request: StencilRequest) -> list[tuple[int, int]]:

@@ -1,0 +1,200 @@
+{
+  "schema": "omnibias.benchmarks.rational_stencil.v1",
+  "generated_utc": "2026-08-21T17:04:01Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "rational_stencil",
+    "full": false,
+    "collapse": "bias_collapse",
+    "honesty": {
+      "unproven_claim": false,
+      "collapse_limit_in_lean": false,
+      "taylor_theorem_in_lean": false,
+      "function_class_in_lean": false,
+      "mathlib_path_used": false,
+      "navier_stokes_proof_claim": false
+    }
+  },
+  "rss_mb_at_start": 809.75,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_algebra_emission",
+        "passed": true,
+        "n_stencils": 22,
+        "sizes": [
+          {
+            "name": "fwd1_2",
+            "n": 2,
+            "max_abs_int": 2,
+            "holds": true
+          },
+          {
+            "name": "bwd1_2",
+            "n": 2,
+            "max_abs_int": 2,
+            "holds": true
+          },
+          {
+            "name": "ctr1_2",
+            "n": 2,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "fwd1_3",
+            "n": 3,
+            "max_abs_int": 3,
+            "holds": true
+          },
+          {
+            "name": "bwd1_3",
+            "n": 3,
+            "max_abs_int": 3,
+            "holds": true
+          },
+          {
+            "name": "ctr2_3",
+            "n": 3,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "fwd2_3",
+            "n": 3,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "bwd2_3",
+            "n": 3,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "ctr1_4",
+            "n": 4,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "fwd1_4",
+            "n": 4,
+            "max_abs_int": 4,
+            "holds": true
+          },
+          {
+            "name": "ctr2_5",
+            "n": 5,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "ctr4_5",
+            "n": 5,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "fwd3_4",
+            "n": 4,
+            "max_abs_int": 3,
+            "holds": true
+          },
+          {
+            "name": "interp2",
+            "n": 2,
+            "max_abs_int": 2,
+            "holds": true
+          },
+          {
+            "name": "interp3",
+            "n": 3,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "birkhoff_spec",
+            "n": 3,
+            "max_abs_int": 18,
+            "holds": true
+          },
+          {
+            "name": "irr_half",
+            "n": 3,
+            "max_abs_int": 12,
+            "holds": true
+          },
+          {
+            "name": "irr_spread",
+            "n": 4,
+            "max_abs_int": 24,
+            "holds": true
+          },
+          {
+            "name": "birk_right",
+            "n": 3,
+            "max_abs_int": 6,
+            "holds": true
+          },
+          {
+            "name": "fwd1_5",
+            "n": 5,
+            "max_abs_int": 5,
+            "holds": true
+          },
+          {
+            "name": "ctr3_4",
+            "n": 4,
+            "max_abs_int": 1,
+            "holds": true
+          },
+          {
+            "name": "hermite_q1",
+            "n": 3,
+            "max_abs_int": 1,
+            "holds": true
+          }
+        ],
+        "detail": "curated C_j identities hold and Lean source is emitted"
+      },
+      {
+        "name": "g2_negative_control",
+        "passed": true,
+        "algebra_holds": false,
+        "lake_failed": true,
+        "detail": "corrupted weights fail C_j; lake rejects when present"
+      },
+      {
+        "name": "g3_no_toolchain_or_kernel",
+        "passed": true,
+        "lean_available": true,
+        "theorem_prover_verified": true,
+        "wall_seconds": 0.7530489509808831,
+        "detail": "no lake -> flag stays false; lake -> genuine pass"
+      },
+      {
+        "name": "g4_tamper_evidence",
+        "passed": true,
+        "detail": "editing a sealed field invalidates the digest"
+      },
+      {
+        "name": "g5_tier_separation",
+        "passed": true,
+        "mathlib_verified": false,
+        "detail": "mathlib_verified stays false; collapse is not in Lean"
+      }
+    ]
+  },
+  "wall_seconds": 4.070541454013437,
+  "max_abs_int": 24
+}

@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — rational stencil Lean obligations (theory 01-11)
+
+- `omnibias.core.proof.obligations.rational_stencil`: seal
+  `C_j` consistency and Birkhoff poisedness as finite rational
+  identities. The Mathlib-free kernel decides them with
+  `allRatEq` / `allIntGe` / `ratNez`.
+  `theorem_prover_verified` is earned only by a genuine
+  `lake build`. `mathlib_verified` stays false.
+- G1–G5 CI-gated (kernel pass in the Lean job). Lean
+  certifies the algebra, not the collapse, not Taylor's
+  theorem, and not a function-class remainder.
+- Docs: `docs/api/rational_stencil.md`,
+  `docs/cookbook/rational-stencil.md`.
+  Smoke: `docs/benchmarks/rational_stencil_smoke.json`.
+
 ### Added — certified step (theory 08-09)
 
 - `omnibias.verify.train_step`: accept a trial `theta'` only when a

@@ -163,3 +163,23 @@ def test_g4_poisedness_curated_set() -> None:
 def test_request_rejects_duplicate_nodes() -> None:
     with pytest.raises(ValueError, match="distinct"):
         StencilRequest((Fraction(0), Fraction(0)), ((0,), (1,)), 0)
+
+
+def test_to_rational_stencil_seals_consistency() -> None:
+    """01-04 generator output is a 01-11 rational obligation."""
+    from omnibias.core.proof import seal_stencil_certificate, stencil_consistency_obligation
+
+    req = StencilRequest(
+        (Fraction(-1), Fraction(0), Fraction(1)),
+        ((0,), (0,), (1,)),
+        target_order=1,
+    )
+    st = solve_irregular_stencil(req)
+    assert st is not None
+    rat = st.to_rational_stencil(name="birkhoff_from_generator")
+    obl = stencil_consistency_obligation(rat)
+    assert obl.holds
+    assert rat.computed_leading() == Fraction(5, 18)
+    report = seal_stencil_certificate(rat, run_lean=False)
+    assert report.mathlib_verified is False
+    assert report.certificate["payload"]["type"] == "rational_stencil_consistency"

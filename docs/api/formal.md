@@ -14,6 +14,8 @@ finite obligations against Mathlib.
     **`mathlib_verified`** (this package) is earned by the **Mathlib-backed**
     project over `ℚ` / `ℝ` -- a larger, honestly-labelled trust base. It never sets
     `theorem_prover_verified`, and a green build never implies `unproven_claim`.
+    Stencil consistency / poisedness (theory 01-11) is a **kernel-tier**
+    obligation (`allRatEq` / `allIntGe`); this package does not produce it.
 
 ## Obligation classes
 

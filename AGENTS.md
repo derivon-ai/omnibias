@@ -518,7 +518,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   exact-`sigma'` IFT; G1–G3 CI; not unrolled BPTT, not CCF stretch) /
   `omnibias.verify.train_step` (08-09; accept `theta'` only if a
   Lipschitz / output-box enclosure stays in cap; G1–G3 CI; empty is
-  a reject, not robustness; not imported by T1 torch/jax).
+  a reject, not robustness; not imported by T1 torch/jax) /
+  `omnibias.core.proof.obligations.rational_stencil` (01-11;
+  `C_j` / poisedness as finite rational Lean obligations; G1–G5 CI;
+  algebra only, not the collapse; `mathlib_verified` stays false).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -549,7 +552,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/local_jet.md`](docs/api/local_jet.md),
   [`docs/api/depth_residual.md`](docs/api/depth_residual.md),
   [`docs/api/implicit.md`](docs/api/implicit.md),
-  [`docs/api/certified_step.md`](docs/api/certified_step.md). Cost /
+  [`docs/api/certified_step.md`](docs/api/certified_step.md),
+  [`docs/api/rational_stencil.md`](docs/api/rational_stencil.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

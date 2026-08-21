@@ -10,6 +10,7 @@ discharged by the Lean kernel itself rather than a numpy twin.
 
 import Omnibias.Certificate
 import Omnibias.LDLT
+import Omnibias.RationalStencil
 
 namespace Omnibias.Golden
 
@@ -142,5 +143,37 @@ theorem golden_zeta_neg_one_identity :
   have hx : ZInterval.Mem zetaNegOneIdentity ⟨0, 0⟩ := by
     simp only [ZInterval.Mem, zetaNegOneIdentity]; omega
   exact ZInterval.eq_of_mem_point hx (by decide)
+
+/-! ### Golden Birkhoff stencil consistency (theory 01-11)
+
+Nodes `(-1, 0, 1)`, orders `({0}, {0}, {1})`, target `q = 1`, weights
+`(-2/3, 2/3, 1/3)`. The three consistency identities and the leading
+moment `C_3 = 5/18` are exact `Rat` equalities, transported as
+cross-multiplications. The collapse itself is not stated. -/
+
+def birkhoffConditions : List (Int × Int × Int × Int) :=
+  [((0 : Int), 1, 0, 1), (1, 1, 1, 1), (0, 1, 0, 1), (5, 18, 5, 18)]
+
+theorem golden_birkhoff_stencil_conditions :
+    allRatEq birkhoffConditions = true := by
+  unfold birkhoffConditions
+  decide
+
+theorem golden_birkhoff_leading_pair :
+    (5 : Int) * 18 = 5 * 18 ∧ (18 : Int) ≠ 0 := by
+  have hmem : ((5 : Int), 18, 5, 18) ∈ birkhoffConditions := by
+    simp [birkhoffConditions]
+  exact ⟨(allRatEq_sound birkhoffConditions golden_birkhoff_stencil_conditions hmem).1,
+         (allRatEq_sound birkhoffConditions golden_birkhoff_stencil_conditions hmem).2.1⟩
+
+/-- Polya counts `(have, need)` and determinant witness `3/2 ≠ 0` for the
+same Birkhoff support. -/
+def birkhoffPolya : List (Int × Int) := [((2 : Int), 1), (3, 2)]
+
+theorem golden_birkhoff_polya : allIntGe birkhoffPolya = true := by
+  unfold birkhoffPolya
+  decide
+
+theorem golden_birkhoff_det_nez : ratNez (3 : Int) 2 = true := by decide
 
 end Omnibias.Golden

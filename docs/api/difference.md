@@ -69,7 +69,9 @@ Exact rational weights for arbitrary node and per-node order sets (theory
 scale `h`). Scale-free weights satisfy `A_{i,p} = a_{i,p} h^{q-p}` (the
 spec's `A = h^q a` only closes if rewritten this way). Order is asymptotic
 in `h`. `is_poised_exact` is the exact-`Q` oracle; `omnibias.core.multipack.is_poised`
-stays the numerical rank test.
+stays the numerical rank test. `IrregularStencil.to_rational_stencil`
+feeds the 01-11 Lean obligation
+([`docs/api/rational_stencil.md`](rational_stencil.md)).
 
 ::: omnibias.difference._core.irregular
     options:
