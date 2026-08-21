@@ -182,6 +182,11 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/homotopy.py",
     "packages/omnibias-torch/src/omnibias/torch/optim_homotopy.py",
     "packages/omnibias-jax/src/omnibias/jax/optim_homotopy.py",
+    "packages/omnibias-core/src/omnibias/core/score_matching.py",
+    "packages/omnibias-score/src/omnibias/score/torch/score_matching.py",
+    "packages/omnibias-score/src/omnibias/score/jax/score_matching.py",
+    "packages/omnibias-score/src/omnibias/score/flow/torch/score_matching.py",
+    "packages/omnibias-score/src/omnibias/score/flow/jax/score_matching.py",
 )
 
 

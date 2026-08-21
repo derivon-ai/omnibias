@@ -628,7 +628,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `mu -> 0`, not a continuum PDE) /
   `omnibias.core.homotopy` + `omnibias.{torch,jax}.optim_homotopy`
   (09-20; 08-04 filter on a `tau`-path; G1–G4 CI; empty ball is a
-  halt, not a continuum PDE).
+  halt, not a continuum PDE) /
+  `omnibias.core.score_matching` + `omnibias.score.{torch,jax}.score_matching`
+  (09-21; Hyvärinen / DSM; G1–G4 CI; CNF exact `div` is prior art).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -694,7 +696,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/jet_hopfield.md`](docs/api/jet_hopfield.md),
   [`docs/api/integral_kernel.md`](docs/api/integral_kernel.md),
   [`docs/api/q_ombu_timescale.md`](docs/api/q_ombu_timescale.md),
-  [`docs/api/homotopy_continuation.md`](docs/api/homotopy_continuation.md). Cost /
+  [`docs/api/homotopy_continuation.md`](docs/api/homotopy_continuation.md),
+  [`docs/api/exact_score_matching.md`](docs/api/exact_score_matching.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

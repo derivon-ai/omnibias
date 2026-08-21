@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Exact score matching (theory 09-21)
+
+- `omnibias.core.score_matching` plus `omnibias.score.{torch,jax}`
+  and `omnibias.score.flow.{torch,jax}` twins: Hyvärinen / DSM
+  with Hutchinson-free `div` on an OMBU score.
+- G1–G4 CI-gated. Exact CNF `div` is prior art. Not ImageNet.
+  Not CCF stretch.
+- Docs: `docs/api/exact_score_matching.md`,
+  `docs/cookbook/exact-score-matching.md`.
+  Smoke: `docs/benchmarks/exact_score_matching_smoke.json`.
+
+
 ### Added — Homotopy continuation (theory 09-20)
 
 - `omnibias.core.homotopy` plus `omnibias.{torch,jax}.optim_homotopy`:

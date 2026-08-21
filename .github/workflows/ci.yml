@@ -513,6 +513,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/homotopy_continuation.py
+      - name: Run exact-score-matching smoke (09-21 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/exact_score_matching.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

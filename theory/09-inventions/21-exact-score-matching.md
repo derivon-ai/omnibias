@@ -6,7 +6,7 @@ Hyvärinen / denoising score matching on an **OMBU score** whose
 **Hessian trace is closed form**. This is a *training objective*, not
 a claim that omnibias lacks divergence.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 09-01
 - **Blocks**: none
 
@@ -106,11 +106,11 @@ def exact_score_matching_loss(score_fn, xs, *, config: ExactSMConfig):
 
 ## 12. Implementation checklist
 
-- [ ] Exact SM loss twins
-- [ ] Zero-variance vs Hutchinson test
-- [ ] `benchmarks/exact_score_matching.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Exact SM loss twins
+- [x] Zero-variance vs Hutchinson test
+- [x] `benchmarks/exact_score_matching.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 
