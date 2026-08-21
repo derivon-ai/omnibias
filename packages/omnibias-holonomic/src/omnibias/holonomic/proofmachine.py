@@ -8,6 +8,7 @@ kind                             prover
 ``keller_alpoge_replay``         :func:`omnibias.holonomic.keller.verify_alpoge_map`
 ``keller_tangent_sweep``         :func:`omnibias.holonomic.keller_search.search_tangent_sweep` (deg 2)
 ``keller_tangent_sweep_deg3``    deg-3 sweep via :func:`omnibias.core.proof.run_discovery`
+``jacobian_n2_degree_box``       finite universal ``C_box`` via :class:`JacobianN2DegreeFamily`
 ===============================  ==========================================
 
 ``PROVED`` certifies the **finite obligation** (Jacobian identity, or a
@@ -18,6 +19,7 @@ conjecture is solved. ``parent_status`` is ``already_false`` for ``n>=3``.
 from __future__ import annotations
 
 from collections.abc import Mapping
+from typing import Any
 
 from omnibias.core.proof import (
     CatalogEntry,
@@ -38,6 +40,13 @@ from omnibias.holonomic.families import (
     fibonacci_samples,
     linear_series,
 )
+from omnibias.holonomic.jacobian_n2 import (
+    CI_COEFF_HEIGHT,
+    CI_MAX_DEGREE,
+    JACOBIAN_N2_KIND,
+    JacobianN2DegreeFamily,
+    n2_counterexample_earned,
+)
 from omnibias.holonomic.keller import (
     search_hit_certificate,
     verify_alpoge_map,
@@ -53,6 +62,7 @@ HOLONOMIC_DFINITE_GUESS = "holonomic_dfinite_guess"
 HOLONOMIC_ALGEBRAIC_GUESS = "holonomic_algebraic_guess"
 CONDITION_ORE = "condition_ore"
 CONDITION_DFINITE = "condition_dfinite"
+JACOBIAN_N2_DEGREE_BOX = JACOBIAN_N2_KIND
 
 FAMILY_CATALOG: dict[str, dict[str, str]] = {
     KELLER_ALPOGE_REPLAY: {
@@ -82,6 +92,15 @@ FAMILY_CATALOG: dict[str, dict[str, str]] = {
     HOLONOMIC_ALGEBRAIC_GUESS: {
         "parent_status": "already_true",
         "obligation": "a prefix-verified algebraic equation P(x, y)=0 in the degree box",
+        "complete": "True",
+    },
+    JACOBIAN_N2_DEGREE_BOX: {
+        "parent_status": "open",
+        "obligation": (
+            "every integer-coefficient map in the CI n=2 degree/height box "
+            "either has det JF not identically a nonzero constant or has no "
+            "G-collision; a miss is not the Jacobian conjecture"
+        ),
         "complete": "True",
     },
 }
@@ -130,11 +149,15 @@ def _schema_errors(certificate: Certificate) -> list[str]:
         return ["honesty must be a mapping"]
     for key in (
         "jacobian_conjecture_proof_claim",
-        "jacobian_n2_claim",
         "navier_stokes_proof_claim",
     ):
         if honesty.get(key):
             errors.append(f"{key} must be False")
+    if honesty.get("jacobian_n2_claim"):
+        inner = certificate.get("payload")
+        payload = inner if isinstance(inner, Mapping) else certificate
+        if not n2_counterexample_earned(payload):
+            errors.append("jacobian_n2_claim requires an exact n=2 violator payload")
     return errors
 
 
@@ -203,6 +226,28 @@ def _prove_dfinite_guess(conjecture: Conjecture) -> ProofAttempt:
     return _from_discovery(run_discovery(family.statement, family, proposer, budget=budget))
 
 
+def _jacobian_n2_family(**kwargs: Any) -> JacobianN2DegreeFamily:
+    return JacobianN2DegreeFamily(
+        max_degree=int(kwargs.get("max_degree", CI_MAX_DEGREE)),
+        coeff_height=int(kwargs.get("coeff_height", CI_COEFF_HEIGHT)),
+    )
+
+
+def _discover_jacobian_n2(**kwargs: Any) -> object:
+    family = _jacobian_n2_family(**kwargs)
+    budget = int(kwargs.get("budget", family.cardinality() + 8))
+    return run_discovery(
+        family.statement,
+        family,
+        str(kwargs.get("proposer", "score_guided")),
+        budget=budget,
+    )
+
+
+def _prove_jacobian_n2(conjecture: Conjecture) -> ProofAttempt:
+    return _from_discovery(_discover_jacobian_n2(**dict(conjecture.data)))
+
+
 def _prove_algebraic_guess(conjecture: Conjecture) -> ProofAttempt:
     family = HolonomicAlgebraicGuessFamily(
         series=linear_series(),
@@ -252,6 +297,15 @@ def holonomic_provers() -> list[FunctionProver]:
             replay_fn=lambda c: bool(c.get("replay_ok")),
         ),
         FunctionProver(
+            name=JACOBIAN_N2_DEGREE_BOX,
+            kinds=frozenset({JACOBIAN_N2_DEGREE_BOX}),
+            prove_fn=_prove_jacobian_n2,
+            schema_fn=_schema_errors,
+            replay_fn=lambda c: bool(c.get("replay_ok")) and not c.get("honesty", {}).get(
+                "jacobian_conjecture_proof_claim"
+            ),
+        ),
+        FunctionProver(
             name=HOLONOMIC_ALGEBRAIC_GUESS,
             kinds=frozenset({HOLONOMIC_ALGEBRAIC_GUESS}),
             prove_fn=_prove_algebraic_guess,
@@ -276,6 +330,7 @@ def _register() -> None:
         HOLONOMIC_RECURRENCE_GUESS: "exact_search",
         HOLONOMIC_DFINITE_GUESS: "exact_search",
         HOLONOMIC_ALGEBRAIC_GUESS: "exact_search",
+        JACOBIAN_N2_DEGREE_BOX: "exact_search",
     }
     parents = {
         KELLER_ALPOGE_REPLAY: "Jacobian conjecture n>=3",
@@ -284,6 +339,7 @@ def _register() -> None:
         HOLONOMIC_RECURRENCE_GUESS: "P-recursive sequences",
         HOLONOMIC_DFINITE_GUESS: "D-finite functions",
         HOLONOMIC_ALGEBRAIC_GUESS: "algebraic functions",
+        JACOBIAN_N2_DEGREE_BOX: "jacobian_conjecture_n2",
     }
     factories = {
         KELLER_ALPOGE_REPLAY: lambda **_k: verify_alpoge_map().as_dict(),
@@ -310,6 +366,7 @@ def _register() -> None:
             "score_guided",
             budget=int(kwargs.get("budget", 6)),
         ),
+        JACOBIAN_N2_DEGREE_BOX: _discover_jacobian_n2,
     }
     for kind, meta in FAMILY_CATALOG.items():
         register_catalog(
@@ -370,6 +427,7 @@ __all__ = [
     "HOLONOMIC_ALGEBRAIC_GUESS",
     "HOLONOMIC_DFINITE_GUESS",
     "HOLONOMIC_RECURRENCE_GUESS",
+    "JACOBIAN_N2_DEGREE_BOX",
     "KELLER_ALPOGE_REPLAY",
     "KELLER_TANGENT_SWEEP",
     "KELLER_TANGENT_SWEEP_DEG3",

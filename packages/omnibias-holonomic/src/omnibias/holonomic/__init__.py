@@ -125,6 +125,11 @@ from omnibias.holonomic._core import (
     wz_pair,
     zeilberger,
 )
+from omnibias.holonomic.jacobian_n2 import (
+    JacobianN2DegreeFamily,
+    escalate_n2_result,
+    jacobian_n2_box_statement,
+)
 from omnibias.holonomic.keller import (
     alpoge_map,
     fiber_report,
@@ -148,6 +153,7 @@ __all__ = [
     "DFinite",
     "GosperResult",
     "HolonomicProof",
+    "JacobianN2DegreeFamily",
     "OreAlgebra",
     "OreDivision",
     "OrePolynomial",
@@ -177,6 +183,7 @@ __all__ = [
     "diff_algebra",
     "dispersion_set",
     "empirical_rate",
+    "escalate_n2_result",
     "fiber_report",
     "gallagher_map",
     "gcrd",
@@ -189,6 +196,7 @@ __all__ = [
     "guess_recurrence",
     "hyper",
     "jacobian_det",
+    "jacobian_n2_box_statement",
     "lclm",
     "ore_divmod",
     "peval",

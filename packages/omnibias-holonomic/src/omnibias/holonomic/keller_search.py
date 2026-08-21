@@ -20,7 +20,7 @@ from typing import Literal
 from omnibias.core.proof.discovery import ExactCheck, Statement, run_discovery
 from omnibias.holonomic._core.factor import rational_roots
 from omnibias.holonomic._core.linalg import solve_exact
-from omnibias.holonomic._core.poly_n import PolyN, q_from_p
+from omnibias.holonomic._core.poly_n import PolyN, identical_jacobian_constant, q_from_p
 from omnibias.holonomic._core.rational_poly import Poly, peval, to_poly
 
 ComponentOrder = Literal["alpoge", "sweep"]
@@ -208,27 +208,15 @@ def build_sweep_map(
 
 
 def _eval_jacobian_constant(components: Sequence[PolyN]) -> Fraction | None:
-    """Return the Jacobian determinant if it is constant on a probe set."""
-    partials = [[f.partial(j) for j in range(3)] for f in components]
-    probes = (
-        (Fraction(1), Fraction(0), Fraction(0)),
-        (Fraction(0), Fraction(1), Fraction(1)),
-        (Fraction(2), Fraction(-1), Fraction(1)),
-        (Fraction(-1), Fraction(2), Fraction(-2)),
-    )
+    """Return ``det JF`` if it is an identically nonzero constant polynomial.
 
-    def det_at(point: tuple[Fraction, Fraction, Fraction]) -> Fraction:
-        m = [[entry.eval(point) for entry in row] for row in partials]
-        return (
-            m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
-            - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
-            + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
-        )
-
-    values = [det_at(pt) for pt in probes]
-    if any(v != values[0] for v in values) or values[0] == 0:
+    Probe samples are not a certificate. A zero constant is rejected the
+    same way a non-constant determinant is.
+    """
+    value = identical_jacobian_constant(components)
+    if value is None or value == 0:
         return None
-    return values[0]
+    return value
 
 
 def _lift_sweep_preimages(
@@ -478,6 +466,7 @@ class SweepFamily:
             "gamma0": str(gamma0),
             "a": str(a),
             "b": str(b),
+            "jacobian_identity": "identical",
             "jacobian_constant": "" if constant is None else str(constant),
             "generic_fiber": fiber,
             "witness": [] if not witness else [[str(c) for c in pt] for pt in witness],

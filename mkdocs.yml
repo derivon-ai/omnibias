@@ -256,6 +256,7 @@ nav:
       - Prove/disprove machine: cookbook/proof-machine.md
       - Finite discovery engine: cookbook/discovery-loop.md
       - Keller Jacobian replay: cookbook/keller-jacobian.md
+      - Jacobian n=2 finite box: cookbook/jacobian-n2-box.md
       - Unsplittable-flow cost separation: cookbook/unsplittable-flow.md
       - Finite Ramsey colouring: cookbook/finite-ramsey-colouring.md
       - Extremal graph templates: cookbook/extremal-graph-replay.md

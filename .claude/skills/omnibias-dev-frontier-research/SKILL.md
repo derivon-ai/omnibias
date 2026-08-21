@@ -48,7 +48,7 @@ Smoke JSON is not a multi-seed claim.
 | Blow-up / singularity | CAP / radii-polynomial existence on a self-similar ansatz |
 | Gauge theory | `omnibias.geometry.gauge` transfer / curvature primitives with sealed scope |
 | Spectral geometry | Lehmann-Maehly-Goerisch lower bounds; SOS positivity certificates |
-| Jacobian conjecture (`n>=3` already false) | Exact `Q` Alpöge replay + blind deg-2 / deg-3 tangent sweep via `run_discovery` in `omnibias.holonomic.keller`. `n=2` stays external |
+| Jacobian conjecture (`n>=3` already false) | Exact `Q` Alpöge replay + blind deg-2 / deg-3 tangent sweep via `run_discovery` in `omnibias.holonomic.keller`. `n=2` is the finite universal `C_box` in `omnibias.holonomic.jacobian_n2` (identical Jac + grid collision). A miss is not the parent |
 | DGG / Goemans cost (already false) | AFP / Rybin H* replay + blind H* box + capped DAG ≤6 in `omnibias.combinatorics.unsplittable`. Congestion theorem stays true. A larger-family miss is `BLOCKED` |
 | Erdős 183 (`R_k(3)=k^{Θ(k)}`) | Triangle-free colouring + tiny `IsSaturated` smoke only. Not the `Θ` theorem |
 | Erdős 146 / 180 (compactness / degeneracy) | `C4`/`C6`/`jTemplate`/`kTemplate`/`pairGraph(4,2)` structural checks. Not the `atTop` inequalities |
@@ -66,7 +66,7 @@ Restate these disclaimers from their canonical sources; never weaken them:
 | Lean discharged an infinite / continuum obligation | `formal/omnibias-verified-kernel`; certificates discharge **finite rational** obligations only |
 | `theorem_prover_verified` without a kernel pass | `omnibias.core.proof` -- flag is earned, never forged |
 | `mathlib_verified` conflated with `theorem_prover_verified` | AGENTS.md formal-loop section |
-| omnibias refuted Keller / the Jacobian conjecture | `omnibias.holonomic.keller`; engine found a map **in the sweep family** |
+| omnibias refuted Keller / the Jacobian conjecture | `omnibias.holonomic.keller`; engine found a map **in the sweep family**. An `n=2` claim is only `escalate_n2_result` on an exact violator |
 | omnibias disproved Goemans / DGG congestion | congestion theorem stays true; cost separator is a family stress-test |
 | Erdős 183 / 146 / 180 solved | finite colouring / template predicates only |
 | `ten_proofs_formalization_claim` | we did not `lake build` openai/ten-proofs Lean |

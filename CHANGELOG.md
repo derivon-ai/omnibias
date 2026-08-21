@@ -6,6 +6,24 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jacobian n=2 counterexample box
+
+- `omnibias.holonomic.jacobian_n2` names the finite universal
+  `C_box(d, h, G)`: every integer-coefficient map `Q^2 -> Q^2` of
+  degree `<= d` and height `<= h` either has `det JF` not identically a
+  nonzero constant, or has no two points of a rational grid `G` sharing
+  an image. Polarity is universal. A hit would be a genuine `n=2`
+  counterexample. A miss is not injectivity on `Q^2` and not the parent.
+- `identical_jacobian_constant` is an identity in `Q[x]`, not a probe
+  sample. The n=3 tangent-sweep gate now uses it (`1+z` agrees on the
+  plane `z=0` and is not constant). Breakthrough: axis probes can lie.
+- CI exhausts the complete degree-1 / height-1 affine box (729 maps)
+  and the degree-0 box (9 maps). Both prove `C_box` only.
+  `escalate_n2_result` sets `jacobian_n2_claim` only on an earned
+  violator. `jacobian_conjecture_proof_claim` stays False.
+- Catalog kind `jacobian_n2_degree_box`. Degree `>= 2` is an incomplete
+  structured slice. Cookbook: `docs/cookbook/jacobian-n2-box.md`.
+
 ### Added — autonomy engineering stack
 
 - `omnibias.symbolic.ingest` packs jets / design / sequence / graph /
@@ -182,7 +200,11 @@ distributions is versioned independently under semantic versioning.
   (LP pred earn `~3.6e-5`; line search raised L∞).
   Unfreezing stage-3 MSNN Fourier frequencies did not
   promote (LP pred earn `~3.4e-6`; line search raised
-  L∞). Paper L2 / grad-norm / exp-mult raised L∞
+  L∞).   Unfreezing the PirateNet skip-gate `α` did not
+  promote (LP pred earn `~8e-9`). Identity-init tanh
+  on an asinh chart did not promote (LP pred earn
+  `~1.7e-6`; line search raised L∞). Paper L2 /
+  grad-norm / exp-mult raised L∞
   at this basin. Stretch stays unearned.
 
 ### Added — signed PirateNet hat (jaxpi block, official envelope)
@@ -249,6 +271,10 @@ distributions is versioned independently under semantic versioning.
   (LP pred earn `~3.6e-5`).
   Unfreezing stage-3 MSNN Fourier frequencies did not
   promote (LP pred earn `~3.4e-6`).
+  Unfreezing the PirateNet skip-gate `α` did not
+  promote (LP pred earn `~8e-9`).
+  Identity-init tanh on an asinh chart did not
+  promote (LP pred earn `~1.7e-6`).
   Paper L2 / grad-norm /
   exp-adjacent multiplicative raised 1601-pt L∞ on that
   family. A same-Jacobian bake-off ranked epigraph L∞ first;

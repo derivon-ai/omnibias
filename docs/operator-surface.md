@@ -159,6 +159,7 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | Multilevel FBPINN spectral-bias mitigation | hierarchy + partition combine / POU | numerical | `omnibias.pinn.{torch,jax}.fields.FBPINNField` |
 | NTK eigenspectrum / spectral-bias index | empirical Jacobian + Lanczos / mode LRs | measurement | `omnibias.pinn.{torch,jax}.losses.ntk` |
 | Keller n=3 Jacobian identity (Alpöge / Gallagher) | exact `Q` 3×3 Jacobian + witness eval | exact rational | `omnibias.holonomic.keller` (not a Jacobian-conjecture proof; `n=2` open) |
+| Jacobian n=2 finite box `C_box(d,h,G)` | identical `det JF` + rational grid collision | exact rational | `omnibias.holonomic.jacobian_n2` (miss is not the parent; `jacobian_n2_claim` only on a violator) |
 | Blind deg-2 tangent-sweep Keller search | side conditions + constant-Jac 3-to-1 fiber | exact rational | `omnibias.holonomic.keller_search` |
 | Deg-3 tangent-sweep + finite discovery loop | `run_discovery` + score-guided walk; exact `Q` checker | exact rational | `omnibias.core.proof.discovery` / `keller_search` (family witness, not a parent proof) |
 | Discovery catalog / characterization | statement → family → proposer → exact check; box-scoped uniqueness | exact rational or honest `BLOCKED` | `omnibias.core.proof.catalog` / `discovery` (not a parent proof) |

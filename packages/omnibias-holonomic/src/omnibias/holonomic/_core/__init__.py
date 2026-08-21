@@ -71,6 +71,8 @@ from omnibias.holonomic._core.qholonomic import (
 )
 from omnibias.holonomic._core.poly_n import (
     PolyN,
+    eval_map,
+    identical_jacobian_constant,
     jacobian_det,
     q_from_p,
     sylvester_resultant,
@@ -131,6 +133,7 @@ __all__ = [
     "diff_algebra",
     "dispersion_set",
     "empirical_rate",
+    "eval_map",
     "gcrd",
     "geometric_k",
     "gosper_definite_sum",
@@ -140,6 +143,7 @@ __all__ = [
     "guess_dfinite",
     "guess_recurrence",
     "hyper",
+    "identical_jacobian_constant",
     "jacobian_det",
     "lclm",
     "ore_divmod",

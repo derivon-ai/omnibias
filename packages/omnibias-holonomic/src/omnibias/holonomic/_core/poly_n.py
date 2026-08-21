@@ -3,9 +3,9 @@
 r"""Sparse n-variate polynomials over :class:`~fractions.Fraction`.
 
 A :class:`PolyN` is a finite map from exponent tuples to rational coefficients.
-Arithmetic is exact. The 3×3 Jacobian determinant and the univariate Sylvester
-resultant are the only consumers needed by the Keller replay / tangent-sweep
-gates; there is no Groebner basis.
+Arithmetic is exact. The Jacobian determinant (``n <= 3``) and the univariate
+Sylvester resultant are the algebra used by Keller replay / tangent-sweep and
+the ``n=2`` finite lie; there is no Groebner basis.
 """
 
 from __future__ import annotations
@@ -207,6 +207,24 @@ def jacobian_det(components: Sequence[PolyN]) -> PolyN:
     d, e, f = matrix[1]
     g, h, i = matrix[2]
     return a * (e * i - f * h) - b * (d * i - f * g) + c * (d * h - e * g)
+
+
+def identical_jacobian_constant(components: Sequence[PolyN]) -> Fraction | None:
+    """``det JF`` if it is a constant polynomial (possibly zero), else ``None``.
+
+    This is an identity in ``Q[x]``, not a probe sample. A zero constant is
+    returned as ``Fraction(0)`` so callers can reject singular maps.
+    """
+
+    return jacobian_det(components).constant_value()
+
+
+def eval_map(
+    components: Sequence[PolyN], point: Sequence[Rational]
+) -> tuple[Fraction, ...]:
+    """Evaluate every component at ``point``."""
+
+    return tuple(component.eval(point) for component in components)
 
 
 def sylvester_resultant(p: Poly, q: Poly) -> Fraction:

@@ -5,7 +5,8 @@ Alpöge's 2026 map is a finite exact-`Q` identity: a polynomial
 one image. This page replays that identity and runs a **blind** deg-2
 tangent-sweep search (Gao arXiv:2608.00222). Finding a map is a stress-test
 of the engine. It is **not** a claim that omnibias refuted the Jacobian
-conjecture, and it says nothing about the still-open `n = 2` case.
+conjecture. Dimension `n = 2` is a separate finite box:
+[Jacobian n=2 finite box](jacobian-n2-box.md).
 
 The closed-form `σ^(n)` tower is not used here. The work is exact rational
 algebra in `omnibias-holonomic`.

@@ -28,7 +28,9 @@ The discovery engine is `omnibias.core.proof.discovery` plus
    (`AnnealDescentProposer()`).
 7. Budget: cheap in CI. `budget == 0` must be `search_incomplete`.
 8. Honesty keys that stay False if present:
-   `jacobian_conjecture_proof_claim`, `jacobian_n2_claim`,
+   `jacobian_conjecture_proof_claim`,
+   `jacobian_n2_claim` (unless `escalate_n2_result` earned an exact
+   `n=2` violator),
    `dgg_congestion_theorem_refuted`, `erdos_183_claim`,
    `erdos_146_claim`, `erdos_180_claim`,
    `ten_proofs_formalization_claim`, `navier_stokes_proof_claim`,

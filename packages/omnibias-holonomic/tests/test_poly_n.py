@@ -31,6 +31,15 @@ def test_jacobian_det_linear() -> None:
     assert det.constant_value() == Fraction(2)
 
 
+def test_identical_jacobian_constant_n2_rejects_probes() -> None:
+    from omnibias.holonomic._core.poly_n import identical_jacobian_constant
+
+    x, y = PolyN.var(2, 0), PolyN.var(2, 1)
+    assert identical_jacobian_constant((x + y, y)) == 1
+    assert identical_jacobian_constant((x + x * y, y)) is None
+    assert identical_jacobian_constant((x, PolyN.zero(2))) == 0
+
+
 def test_q_from_p_alpoge_curve() -> None:
     q = q_from_p(to_poly([0, 4, -3]))
     assert q == to_poly([0, 0, 1, -1])

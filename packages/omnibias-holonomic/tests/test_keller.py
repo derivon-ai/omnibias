@@ -8,7 +8,7 @@ import ast
 from pathlib import Path
 
 from omnibias.core.proof import Conjecture
-from omnibias.holonomic._core.poly_n import jacobian_det
+from omnibias.holonomic._core.poly_n import PolyN, jacobian_det
 from omnibias.holonomic._core.rational_poly import to_poly
 from omnibias.holonomic.keller import (
     alpoge_map,
@@ -71,6 +71,19 @@ def test_fiber_degree_alpoge() -> None:
     assert report["leading_coeff_constant"] is True
     w = tangency_polynomial(to_poly([0, 4, -3]), 0, 0)
     assert len(w) - 1 == 3
+
+
+def test_sweep_jacobian_gate_is_identical_not_probes() -> None:
+    from omnibias.holonomic.keller_search import _eval_jacobian_constant
+
+    assert _eval_jacobian_constant(alpoge_map()) == -2
+    x, y, z = PolyN.var(3, 0), PolyN.var(3, 1), PolyN.var(3, 2)
+    # det = 1+z is 1 on the plane z=0; probes there would lie.
+    assert _eval_jacobian_constant((x + x * z, y, z)) is None
+    text = Path(__file__).resolve().parents[1] / "src/omnibias/holonomic/keller_search.py"
+    source = text.read_text(encoding="utf-8")
+    assert "identical_jacobian_constant" in source
+    assert "def det_at" not in source
 
 
 def test_blind_sweep_recovers_a_map() -> None:
