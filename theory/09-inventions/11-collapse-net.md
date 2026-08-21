@@ -6,7 +6,7 @@ Train on a lattice with umbral / irregular Birkhoff stencils (01-04)
 and **infer by founding bias collapse** `delta -> 0` to `sigma^(K-1)`,
 so the continuum limit is a named map, not a hope.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-04, 09-01
 - **Blocks**: none
 
@@ -109,11 +109,11 @@ def collapse_net_forward(x, params, *, config: CollapseNetConfig):
 
 ## 12. Implementation checklist
 
-- [ ] Collapse-Net wrappers on `omnibias.difference`
-- [ ] Remainder regression test
-- [ ] `benchmarks/collapse_net.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Collapse-Net wrappers on `omnibias.difference`
+- [x] Remainder regression test
+- [x] `benchmarks/collapse_net.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

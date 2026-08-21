@@ -31,6 +31,7 @@ from omnibias.jax.architectures.attention import (
     AttentionJetMLP,
     make_attention_jet_mlp,
 )
+from omnibias.jax.architectures.collapse_net import CollapseNetConfig, collapse_net_forward
 from omnibias.jax.architectures.frame_unet import FrameUNetConfig, frame_unet_forward
 from omnibias.jax.architectures.ftc_net import (
     DualFTCConfig,
@@ -104,6 +105,7 @@ __all__ = [
     "AffineLift",
     "AttentionJetMLP",
     "BoundaryMask",
+    "CollapseNetConfig",
     "DualFTCConfig",
     "FTCNet",
     "FTCNetConfig",
@@ -121,6 +123,7 @@ __all__ = [
     "ScanNetConfig",
     "ScanNetParams",
     "apply_operator",
+    "collapse_net_forward",
     "dirichlet_interval",
     "dual_ftc_loss",
     "frame_unet_forward",

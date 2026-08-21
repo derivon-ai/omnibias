@@ -1,0 +1,50 @@
+{
+  "schema": "omnibias.benchmarks.collapse_net.v1",
+  "generated_utc": "2026-08-21T20:28:20Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "collapse_net",
+    "full": false,
+    "honesty": {
+      "continuum_pde_claimed": false,
+      "temperature_collapse_used": false,
+      "stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 808.91,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_remainder",
+        "passed": true,
+        "remainder": 0.00020812521059987432,
+        "rel_err": 0.0
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "max_err": 2.7755575615628914e-16,
+        "skill": 0.9999999999999999,
+        "collapsed_probe_max": 3.3306690738754696e-16,
+        "stencil_probe_max": 0.0016658335317220052
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "continuum_pde_claimed": false
+      }
+    ]
+  },
+  "disclaimer": "Collapse-Net trains a stencil and infers by founding bias collapse; not a continuum PDE and not CCF stretch",
+  "wall_seconds": 1.4663603700464591
+}

@@ -31,6 +31,7 @@ Three families:
 
 from omnibias.torch.architectures.attention import AttentionJetMLP
 from omnibias.torch.architectures.cmbnet import CmbNet
+from omnibias.torch.architectures.collapse_net import CollapseNetConfig, collapse_net_forward
 from omnibias.torch.architectures.cvxlayer import CvxLasso, CvxLogistic
 from omnibias.torch.architectures.frame_unet import FrameUNetConfig, frame_unet_forward
 from omnibias.torch.architectures.ftc_net import (
@@ -98,6 +99,7 @@ __all__ = [
     "AttentionJetMLP",
     "BoundaryMask",
     "CmbNet",
+    "CollapseNetConfig",
     "CvxLasso",
     "CvxLogistic",
     "DeepPINNHeat",
@@ -124,6 +126,7 @@ __all__ = [
     "RiccatiFlowConfig",
     "ScanNet",
     "ScanNetConfig",
+    "collapse_net_forward",
     "dirichlet_interval",
     "dual_ftc_loss",
     "edge_functions",

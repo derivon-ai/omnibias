@@ -144,7 +144,10 @@ sheaf-atlas net (09-09; jet cocycle on partition charts; G1–G4
 CI; founding bias collapse, not temperature collapse; not a
 sheaf theorem),
 Riccati flow net (09-10; Riccati time flow; G1–G4 CI; not DEQ /
-CNF). Cost / wall-time / FermiNet-many-body gates are
+CNF),
+Collapse-Net (09-11; stencil train, founding `delta -> 0`
+collapse at eval; G1–G4 CI; not a continuum PDE). Cost /
+wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

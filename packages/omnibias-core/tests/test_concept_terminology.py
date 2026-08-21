@@ -157,6 +157,10 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/riccati_flow.py",
     "packages/omnibias-torch/src/omnibias/torch/architectures/riccati_flow.py",
     "packages/omnibias-jax/src/omnibias/jax/architectures/riccati_flow.py",
+    "packages/omnibias-core/src/omnibias/core/collapse_net.py",
+    "packages/omnibias-torch/src/omnibias/torch/architectures/collapse_net.py",
+    "packages/omnibias-jax/src/omnibias/jax/architectures/collapse_net.py",
+    "packages/omnibias-difference/src/omnibias/difference/_core/collapse_net.py",
 )
 
 

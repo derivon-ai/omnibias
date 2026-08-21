@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Collapse-Net (theory 09-11)
+
+- `omnibias.core.collapse_net` plus
+  `omnibias.{torch,jax}.architectures.collapse_net` and
+  `omnibias.difference._core.collapse_net`: train a founding
+  stencil, infer by `delta -> 0` collapse.
+- G1–G4 CI-gated. Founding bias collapse only. Not a continuum
+  PDE. Not CCF stretch.
+- Docs: `docs/api/collapse_net.md`,
+  `docs/cookbook/collapse-net.md`.
+  Smoke: `docs/benchmarks/collapse_net_smoke.json`.
+
+
 ### Added — Riccati flow net (theory 09-10)
 
 - `omnibias.core.riccati_flow` plus
