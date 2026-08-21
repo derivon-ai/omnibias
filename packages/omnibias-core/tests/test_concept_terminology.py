@@ -88,6 +88,10 @@ PENALTY_FILES = (
     "packages/omnibias-discrete/src/omnibias/discrete/evolution/torch.py",
     "packages/omnibias-discrete/src/omnibias/discrete/evolution/jax.py",
     "packages/omnibias-discrete/src/omnibias/discrete/evolution/__init__.py",
+    "packages/omnibias-convex/src/omnibias/convex/arrangement/_core.py",
+    "packages/omnibias-convex/src/omnibias/convex/arrangement/torch.py",
+    "packages/omnibias-convex/src/omnibias/convex/arrangement/jax.py",
+    "packages/omnibias-convex/src/omnibias/convex/arrangement/__init__.py",
 )
 
 

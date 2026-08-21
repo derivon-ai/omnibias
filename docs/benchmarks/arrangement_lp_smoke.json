@@ -1,0 +1,168 @@
+{
+  "schema": "omnibias.benchmarks.arrangement_lp.v1",
+  "generated_utc": "2026-08-21T17:25:30Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "arrangement_lp",
+    "full": false,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "honesty": {
+      "new_lp_algorithm": false,
+      "uncorrected_float_dual": false,
+      "p_equals_np_claim": false,
+      "vertex_enum_is_exponential": true,
+      "selection_is_temperature_collapse": true,
+      "founding_bias_collapse_in_selection": false
+    },
+    "vertex_enum_cutoff": {
+      "D": 4,
+      "n": 16
+    }
+  },
+  "rss_mb_at_start": 1454.1,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_solver_agreement",
+        "passed": true,
+        "max_abs_err": 0.0,
+        "n_instances": 8,
+        "vertex_enum_cutoff": {
+          "D": 4,
+          "n": 16
+        },
+        "detail": "solve_lp active-set crossover matches vertex-enum value to 1e-10"
+      },
+      {
+        "name": "g2_sound_bound",
+        "passed": true,
+        "violations": 0,
+        "rows": [
+          {
+            "i": 0,
+            "lower": -3.000000000000004,
+            "opt": -3.0
+          },
+          {
+            "i": 1,
+            "lower": -1.1729081740033365,
+            "opt": -1.1729081740033338
+          },
+          {
+            "i": 2,
+            "lower": -0.2939250072630315,
+            "opt": -0.29392500726303106
+          },
+          {
+            "i": 3,
+            "lower": -2.3140484933855006,
+            "opt": -2.314048493385494
+          },
+          {
+            "i": 4,
+            "lower": -1.0435558755382677,
+            "opt": -1.0435558755382632
+          },
+          {
+            "i": 5,
+            "lower": -1.9176986587762574,
+            "opt": -1.9176986587762508
+          },
+          {
+            "i": 6,
+            "lower": -3.587790138933655,
+            "opt": -3.5877901389336477
+          },
+          {
+            "i": 7,
+            "lower": -1.199999995000002,
+            "opt": -1.19999999
+          }
+        ],
+        "detail": "Neumaier-Shcherbina lo never exceeds the exact vertex optimum"
+      },
+      {
+        "name": "g3_degeneracy",
+        "passed": true,
+        "degenerate": true,
+        "kkt_usable": false,
+        "soft_jac_norm": 3.022262644248644,
+        "detail": "SOFT Jacobian is finite on the named optimal edge; KKT is not"
+      },
+      {
+        "name": "g4_predict_then_optimize",
+        "passed": true,
+        "mean_skill": 1.0,
+        "seeds": [
+          {
+            "seed": 0,
+            "regret_e2e": 0.0,
+            "regret_two_stage": 6.0,
+            "skill": 1.0,
+            "w": 6.031166497076807
+          },
+          {
+            "seed": 1,
+            "regret_e2e": 0.0,
+            "regret_two_stage": 8.0,
+            "skill": 1.0,
+            "w": 6.031166497076807
+          },
+          {
+            "seed": 2,
+            "regret_e2e": 0.0,
+            "regret_two_stage": 8.0,
+            "skill": 1.0,
+            "w": 6.031166497076807
+          },
+          {
+            "seed": 3,
+            "regret_e2e": 0.0,
+            "regret_two_stage": 8.0,
+            "skill": 1.0,
+            "w": 6.031166497076807
+          },
+          {
+            "seed": 4,
+            "regret_e2e": 0.0,
+            "regret_two_stage": 10.0,
+            "skill": 1.0,
+            "w": 6.031166497076807
+          }
+        ],
+        "detail": "e2e SOFT layer beats feature-blind two-stage on knapsack regret"
+      },
+      {
+        "name": "g5_duality_convention",
+        "passed": true,
+        "dual_value": -3.0,
+        "primal_value": -3.0,
+        "detail": "A^T y = -c and -b\u00b7y equals the named primal optimum -3"
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "torch_equal": true,
+        "jax_equal": true,
+        "weight": 0.42654708817987147,
+        "detail": "torch / jax soft_membership match numpy at the named midpoint"
+      }
+    ]
+  },
+  "wall_seconds": 23.3984914959874
+}

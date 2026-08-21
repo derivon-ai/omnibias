@@ -91,4 +91,14 @@ Bit-identical JAX and torch twins. See the
 A worked walkthrough is in the
 [differentiable + certified LP cookbook](../cookbook/differentiable-certified-lp.md).
 
+## Arrangement LP / learned facets (03-02)
+
+See [`docs/api/arrangement_lp.md`](arrangement_lp.md). Soft membership is
+temperature collapse, not founding bias collapse.
+
+::: omnibias.convex.arrangement
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 Status: Alpha (`0.1.0a1`).

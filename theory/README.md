@@ -139,7 +139,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | Spec | Status | One line |
 |---|---|---|
 | [03-01 soft-population evolution](03-algorithms/01-soft-population-evolution.md) | gated | Softmax selection + `log(P)/beta` gap; geometry mutation; exact-curvature polish; certify-loop stop; G1–G6 CI; temperature collapse, not founding bias collapse; not P vs NP |
-| [03-02 arrangement LP](03-algorithms/02-arrangement-lp-and-learned-facets.md) | designed | Learned facets feeding an existing certified argmin |
+| [03-02 arrangement LP](03-algorithms/02-arrangement-lp-and-learned-facets.md) | gated | Learned-facet front end on `solve_lp` + NS bound; G1–G5 CI; temperature collapse, not founding bias collapse; not a new LP algorithm |
 | [03-03 constraint satisfaction collapse](03-algorithms/03-constraint-satisfaction-collapse.md) | designed | Systems of equalities and inequalities by temperature collapse |
 | [03-04 sliced optimal transport](03-algorithms/04-sliced-optimal-transport-cdf.md) | designed | Closed-form directional quantiles make sliced transport exact |
 | [03-05 morphology and level sets](03-algorithms/05-differentiable-morphology-levelsets.md) | designed | Layer cake plus scan gives dilation, erosion and level-set flow |

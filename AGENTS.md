@@ -525,7 +525,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.discrete.evolution` (03-01; softmax selection +
   `log(P)/beta` gap; geometry mutation; exact-curvature polish;
   certify-loop stop; G1–G6 CI; temperature collapse, not founding
-  bias collapse; not P vs NP).
+  bias collapse; not P vs NP) /
+  `omnibias.convex.arrangement` (03-02; learned-facet LP front end
+  on `solve_lp` + Neumaier-Shcherbina; G1–G5 CI; not a new LP
+  algorithm; temperature collapse, not founding bias collapse).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -558,7 +561,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/implicit.md`](docs/api/implicit.md),
   [`docs/api/certified_step.md`](docs/api/certified_step.md),
   [`docs/api/rational_stencil.md`](docs/api/rational_stencil.md),
-  [`docs/api/soft_evolution.md`](docs/api/soft_evolution.md). Cost /
+  [`docs/api/soft_evolution.md`](docs/api/soft_evolution.md),
+  [`docs/api/arrangement_lp.md`](docs/api/arrangement_lp.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

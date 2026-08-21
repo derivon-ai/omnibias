@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — arrangement LP / learned facets (theory 03-02)
+
+- `omnibias.convex.arrangement`: a learned-facet front end on
+  `solve_lp` and the Neumaier-Shcherbina `lp_dual_lower_bound`.
+  Soft cell membership is temperature collapse; KKT is exact
+  where the active set is stable. Vertex enumeration is a
+  small-instance check only (`D<=4`, `n<=16`).
+- G1–G5 CI-gated. Not a new LP algorithm. No uncorrected float
+  dual path. Not P vs NP.
+- Docs: `docs/api/arrangement_lp.md`,
+  `docs/cookbook/arrangement-lp.md`.
+  Smoke: `docs/benchmarks/arrangement_lp_smoke.json`.
+
 ### Added — soft-population evolution (theory 03-01)
 
 - `omnibias.discrete.evolution`: softmax selection

@@ -7,7 +7,7 @@ learned arrangement is a learned polytope: the constraints become trainable, the
 vertex structure is the tope graph, and the existing interior-point and duality
 machinery supplies both the solve and the certificate.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-03, 01-08, 02-02
 - **Blocks**: 05-02
 
@@ -273,14 +273,14 @@ a soft-constraint penalty formulation.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-convex/src/omnibias/convex/arrangement/_core.py`
-- [ ] torch and jax twins with a parity test
-- [ ] Reuse `solve_lp`, `lp_dual_lower_bound`, `qp_layer`; fork nothing
-- [ ] Vertex-enumeration cross-check for small instances
-- [ ] Bound soundness test against exact rational LP solutions
-- [ ] Duality sign-convention test with a known dual
-- [ ] Infeasibility detection and reporting test
-- [ ] Terminology cross-reference note plus `PENALTY_FILES` registration
-- [ ] `benchmarks/arrangement_lp.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-convex/src/omnibias/convex/arrangement/_core.py`
+- [x] torch and jax twins with a parity test
+- [x] Reuse `solve_lp`, `lp_dual_lower_bound`, `qp_layer`; fork nothing
+- [x] Vertex-enumeration cross-check for small instances
+- [x] Bound soundness test against exact rational LP solutions
+- [x] Duality sign-convention test with a known dual
+- [x] Infeasibility detection and reporting test
+- [x] Terminology cross-reference note plus `PENALTY_FILES` registration
+- [x] `benchmarks/arrangement_lp.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`
