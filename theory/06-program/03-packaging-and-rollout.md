@@ -121,7 +121,8 @@ the guards exist will be described in whatever language its author reached for.
 **Wave 3 — architectures with the strongest independent motivation.** 02-04
 weak-form VPINN and 02-05 transmission PINN (both plug into an existing,
 benchmarked PINN surface), 02-03 Jet-KAN (a well-defined comparison against
-spline KANs), 03-12 line search and 03-13 refinement (small, self-contained,
+spline KANs), 03-12 line search (**gated**: certified radius +
+`verify=True`; G4/G5 recorded) and 03-13 refinement (small, self-contained,
 immediately useful to existing optimizers). Group 08 (tower-native trainers)
 is specified in this wave and implemented after 03-12 exists as code: 08-02
 (2-layer PINN escape ablation) is the cheap falsifier; 08-04 / 08-06 / 08-07

@@ -6,14 +6,16 @@ A directional jet of the loss gives the exact Taylor polynomial along a search
 direction in **one** forward pass, so the line-search subproblem becomes root
 finding on a known polynomial instead of a sequence of trial evaluations.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01
 - **Blocks**: 03-01, 03-13
 
 ## 2. Where it lands
 
-`packages/omnibias-torch/src/omnibias/torch/optim/line_search.py` and the jax
-twin, beside the existing optimizers.
+`omnibias.core.line_search` (shared algebra) plus
+`omnibias.{torch,jax}.line_search` twins, re-exported from
+`omnibias.{torch,jax}.optim`. `optim` is a module, not a package, so the
+twins sit beside it rather than at `optim/line_search.py`.
 
 ## 3. Prior art in omnibias
 
@@ -26,9 +28,10 @@ twin, beside the existing optimizers.
 - `omnibias.difference` — certified truncation and Padé remainders, for bounding
   the jet's own truncation error.
 
-**Confirmed gap.** `JetSubspaceTensor` uses jets for a *subspace* model. No
-optimizer uses a directional jet as a **line-search** model, and there is no
-line-search module at all.
+**Closed.** `omnibias.core.line_search` plus the torch/jax twins are the
+directional line-search model. `JetSubspaceTensor` remains the subspace
+model; `taylor_line_min` remains the order-2/3 helper without a certified
+radius.
 
 ## 4. Mathematics
 
@@ -179,10 +182,10 @@ win, and the benchmark's job is to decide whether it pays for the jet's cost.
 
 ## 6. Proposed API
 
-Does not exist yet.
+Shipped as `omnibias.core.line_search` / `omnibias.{torch,jax}.line_search`.
 
 ```python
-# omnibias/torch/optim/line_search.py  (and jax twin)
+# omnibias/torch/line_search.py  (and jax twin)
 @dataclass(frozen=True)
 class JetLineSearchConfig:
     order: int = 4
@@ -287,14 +290,17 @@ fixed step size.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-torch/src/omnibias/torch/optim/line_search.py`
-- [ ] `packages/omnibias-jax/src/omnibias/jax/optim/line_search.py`
-- [ ] Reuse `mlp_jet` and `compose_jet`; no new jet arithmetic
-- [ ] Certified truncation radius via `omnibias.difference`
-- [ ] `verify=True` default with a never-worse assertion test
-- [ ] Certified root isolation option for clustered roots
-- [ ] Cost-crossover table in the benchmark, favourable and unfavourable regimes
-- [ ] Integration test with `CubicNewton` and `TrustRegionNewtonCG`
-- [ ] `benchmarks/jet_line_search.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-core/src/omnibias/core/line_search.py` (shared algebra)
+- [x] `packages/omnibias-torch/src/omnibias/torch/line_search.py`
+- [x] `packages/omnibias-jax/src/omnibias/jax/line_search.py`
+- [x] Reuse `mlp_jet` and `compose_jet` on the input-ray path; no new jet arithmetic
+- [x] Certified truncation radius via the Lagrange identity in the verified register
+      (core cannot import `omnibias.difference`; same remainder as
+      `certified_fd_error_general`)
+- [x] `verify=True` default with a never-worse assertion test
+- [x] Certified root isolation option (`isolate_roots`, interval Newton)
+- [x] Cost-crossover table in the benchmark, favourable and unfavourable regimes
+- [x] Integration test with `CubicNewton` and `TrustRegionNewtonCG`
+- [x] `benchmarks/jet_line_search.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

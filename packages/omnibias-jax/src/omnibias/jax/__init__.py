@@ -98,6 +98,12 @@ from omnibias.jax.information import (
     wasserstein2_gaussian,
     wassersteinp,
 )
+from omnibias.jax.line_search import (
+    JetLineSearchConfig,
+    LineSearchResult,
+    jet_line_search,
+    jet_line_search_on_ray,
+)
 from omnibias.jax.jet import (
     affine_jet,
     antiderivative_jet,
@@ -183,7 +189,9 @@ __all__ = [
     "BirkhoffOMBU",
     "FourierTransform",
     "JaxActivationSpec",
+    "JetLineSearchConfig",
     "LaplaceTransform",
+    "LineSearchResult",
     "MellinTransform",
     "TransformBlock",
     "X64_HINT",
@@ -229,6 +237,8 @@ __all__ = [
     "jet_exp",
     "jet_gradient",
     "jet_hessian",
+    "jet_line_search",
+    "jet_line_search_on_ray",
     "jet_multiply",
     "jet_partials",
     "jet_reciprocal",

@@ -26,6 +26,8 @@ Public API:
 * :class:`BandPlan` -- order-as-frequency spectral design (theory 01-07).
 * :class:`EqualitySystem` -- equality-locus residual / Jacobian (theory 01-09).
 * :class:`HardyDictionary` -- conjugate Hilbert dictionary (theory 01-12).
+* :class:`JetLineSearchConfig`, :func:`run_model_line_search` -- exact
+  jet line-search algebra (theory 03-12).
 
 There are no framework dependencies in this package.
 """
@@ -67,6 +69,15 @@ from omnibias.core.information import (
 )
 from omnibias.core.jets import contact_residual, is_holonomic
 from omnibias.core.ladder import Normalization, hermite_function, tower_lower, tower_raise
+from omnibias.core.line_search import (
+    JetLineSearchConfig,
+    LineSearchResult,
+    certified_truncation_radius,
+    polynomial_wolfe,
+    run_model_line_search,
+    select_model_step,
+    taylor_coeffs_from_derivatives,
+)
 from omnibias.core.locus import (
     AffineSet,
     EqualitySystem,
@@ -164,8 +175,9 @@ __all__ = [
     "FrameSpec",
     "HardyAtom",
     "HardyDictionary",
-    "hardy_conjugate_dictionary",
+    "JetLineSearchConfig",
     "Layer",
+    "LineSearchResult",
     "LinearizingTransform",
     "MollifierSpec",
     "MultiPackSpec",
@@ -195,6 +207,7 @@ __all__ = [
     "central_stencil_weights",
     "central_to_raw_moments",
     "certified_band_gap",
+    "certified_truncation_radius",
     "certify_locus_point",
     "cole_hopf_u",
     "compile_bank",
@@ -209,6 +222,7 @@ __all__ = [
     "evaluate_hardy_dictionary",
     "faa_di_bruno_terms",
     "gaussian_central_moments",
+    "hardy_conjugate_dictionary",
     "has_cumulant_tower",
     "hermite_coeffs",
     "hermite_function",
@@ -231,15 +245,19 @@ __all__ = [
     "num_multi_indices",
     "peak_frequency",
     "polya_condition",
+    "polynomial_wolfe",
     "raw_moments_from_cumulants",
     "raw_to_central_moments",
     "registered_activations",
     "relative_bandwidth",
     "response_profile",
+    "run_model_line_search",
     "second_order_delta",
+    "select_model_step",
     "sigmoid_polynomial_coeffs",
     "tail_bound",
     "tanh_polynomial_coeffs",
+    "taylor_coeffs_from_derivatives",
     "tempered",
     "tower_lower",
     "tower_raise",

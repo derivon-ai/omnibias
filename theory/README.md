@@ -149,7 +149,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [03-09 differentiable topology](03-algorithms/09-differentiable-topology-of-arrangements.md) | concept | Euler characteristic and persistence of a soft arrangement |
 | [03-10 jet-Pade singularity tracking](03-algorithms/10-jet-pade-singularity-tracking.md) | designed | High-order jets locate the nearest complex singularity |
 | [03-11 Lie symmetry discovery](03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md) | designed | Prolongations are jets, so symmetry search is a linear solve |
-| [03-12 exact jet line search](03-algorithms/12-exact-jet-line-search.md) | designed | The step comes from rooting a Taylor polynomial, not backtracking |
+| [03-12 exact jet line search](03-algorithms/12-exact-jet-line-search.md) | gated | Certified radius + `verify=True` never-worse; G1/G2/G3/G6 CI; G4/G5 recorded, not CI `all_passed` |
 | [03-13 adaptive pack refinement](03-algorithms/13-adaptive-pack-refinement.md) | designed | Residual-driven birth, promotion and death of packs |
 
 ### 04 Cross-domain bridges

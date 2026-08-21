@@ -73,6 +73,13 @@ Line Hilbert permutation of the dictionary (theory 01-12). G5 is a
 projection defect, not a stretch-gate clearing. Documented in full at
 [conjugate.md](conjugate.md).
 
+## Exact jet line search
+
+Taylor-polynomial line search (theory 03-12). Certified Lagrange
+radius when a `|phi^(N+1)|` bound is supplied; `verify=True` is the
+never-worse backstop. G4/G5 are recorded, not in CI `all_passed`.
+Documented in full at [line_search.md](line_search.md).
+
 ## Hierarchical pack tree
 
 1-D near/far split (theory 02-07). `eta=0` is bit-identical to the

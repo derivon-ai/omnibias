@@ -1,0 +1,119 @@
+{
+  "schema": "omnibias.benchmarks.jet_line_search.v1",
+  "generated_utc": "2026-08-21T15:08:16Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "jet_line_search",
+    "full": false,
+    "g4_earned": false,
+    "g5_reported": true,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "ccf_stretch_cleared": false,
+      "global_min_claim": false
+    }
+  },
+  "rss_mb_at_start": 1191.99,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_model_exactness",
+        "passed": true,
+        "worst_rel": 0.0,
+        "expected": 1e-10,
+        "note": "phi(s)=exp(3s); phi^(k)(0)=3^k for orders 0..6"
+      },
+      {
+        "name": "g2_truncation_radius_soundness",
+        "passed": true,
+        "radius": 0.14873281613122508,
+        "remainder_hi": 9.999999999999995e-07,
+        "worst_model_error": 6.218913277677984e-07,
+        "violations": 0,
+        "n_grid": 41,
+        "n_random": 24,
+        "note": "exp on [0, r]; M=e^r is a sound |phi^(N+1)| bound"
+      },
+      {
+        "name": "g3_never_worse",
+        "passed": true,
+        "n": 32,
+        "worse": 0,
+        "note": "verify=True; 100 percent of a randomized suite"
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "worst_ulp": 0.0,
+        "expected": 4.0,
+        "torch_step": 0.4094585631861239,
+        "jax_step": 0.4094585631861239
+      }
+    ]
+  },
+  "g4": {
+    "name": "g4_step_count_win",
+    "passed": false,
+    "earned": false,
+    "jet_mean_units": 4.0,
+    "wolfe_mean_units": 6.0,
+    "wolfe_over_jet": 1.5,
+    "expected": 2.0,
+    "n_seeds": 2,
+    "note": "jet counted as order nested grads + value + verify; Armijo backtracking counted as true evals. Not in CI all_passed."
+  },
+  "g5": {
+    "name": "g5_cost_crossover_table",
+    "passed": true,
+    "earned": true,
+    "rows": [
+      {
+        "width": 8,
+        "order": 2,
+        "wall_seconds": 0.0006936650024726987,
+        "model_cost_units": 3.0
+      },
+      {
+        "width": 8,
+        "order": 4,
+        "wall_seconds": 0.002786643977742642,
+        "model_cost_units": 5.0
+      },
+      {
+        "width": 8,
+        "order": 6,
+        "wall_seconds": 0.01637475099414587,
+        "model_cost_units": 7.0
+      },
+      {
+        "width": 32,
+        "order": 2,
+        "wall_seconds": 0.000640365993604064,
+        "model_cost_units": 3.0
+      },
+      {
+        "width": 32,
+        "order": 4,
+        "wall_seconds": 0.00293693202547729,
+        "model_cost_units": 5.0
+      },
+      {
+        "width": 32,
+        "order": 6,
+        "wall_seconds": 0.015760815993417054,
+        "model_cost_units": 7.0
+      }
+    ],
+    "note": "Published favourable (small width, modest order) and costlier regimes. Not a claim that the jet always beats backtracking. Not in CI all_passed."
+  },
+  "wall_seconds": 3.53976077697007
+}

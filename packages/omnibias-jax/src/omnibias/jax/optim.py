@@ -51,6 +51,13 @@ import jax.numpy as jnp
 from jax import Array
 from jax.flatten_util import ravel_pytree
 
+from omnibias.jax.line_search import (
+    JetLineSearchConfig,
+    LineSearchResult,
+    jet_line_search,
+    jet_line_search_on_ray,
+)
+
 ResidualFn = Callable[[Array], Array]
 MatVec = Callable[[Array], Array]
 GNSolver = Literal["dense", "qr", "cgls"]
@@ -916,6 +923,8 @@ __all__ = [
     "GaussNewtonState",
     "HomotopyGNConfig",
     "HomotopyResidualFn",
+    "JetLineSearchConfig",
+    "LineSearchResult",
     "MartensGrosseGNConfig",
     "MatVec",
     "ResidualFn",
@@ -930,6 +939,8 @@ __all__ = [
     "grad_norm_weights",
     "homotopy_gauss_newton_minimize",
     "init_gauss_newton_state",
+    "jet_line_search",
+    "jet_line_search_on_ray",
     "lanczos_tridiag",
     "linearized_linf_direction",
     "lstsq_gauss_newton_direction",

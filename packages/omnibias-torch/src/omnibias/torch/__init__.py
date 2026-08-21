@@ -85,6 +85,12 @@ from omnibias.torch.information import (
     wasserstein2_gaussian,
     wassersteinp,
 )
+from omnibias.torch.line_search import (
+    JetLineSearchConfig,
+    LineSearchResult,
+    jet_line_search,
+    jet_line_search_on_ray,
+)
 from omnibias.torch.jet import (
     affine_jet,
     antiderivative_jet,
@@ -162,8 +168,10 @@ __all__ = [
     "GrowStrategy",
     "GrowableOMBU",
     "GrowableOperatorMultiBiasUnit",
+    "JetLineSearchConfig",
     "LaplaceTransform",
     "LearnablePReLU",
+    "LineSearchResult",
     "MellinTransform",
     "MultiPackUnit",
     "OMBU",
@@ -212,6 +220,8 @@ __all__ = [
     "jet_exp",
     "jet_gradient",
     "jet_hessian",
+    "jet_line_search",
+    "jet_line_search_on_ray",
     "jet_multiply",
     "jet_partials",
     "jet_reciprocal",

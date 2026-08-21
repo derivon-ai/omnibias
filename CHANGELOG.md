@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — exact jet line search (theory 03-12)
+
+- `omnibias.core.line_search` plus bit-identical
+  `omnibias.{torch,jax}.line_search` twins: directional Taylor model,
+  certified Lagrange truncation radius when a `|phi^(N+1)|` bound is
+  supplied, Wolfe-as-interval, interval-Newton root isolation, and a
+  `verify=True` never-worse backstop. Input-ray path reuses `mlp_jet`
+  and `compose_jet`. Re-exported from `omnibias.{torch,jax}.optim`.
+- G1/G2/G3/G6 CI-gated. G4 (step-count vs Wolfe) and G5 (cost-crossover
+  table) are recorded, not in CI `all_passed`. The polynomial is a
+  model, not the loss. `taylor_line_min` is unchanged. CCF stretch and
+  a global min of a deep nest stay unearned.
+- Docs: `docs/api/line_search.md`, `docs/cookbook/jet-line-search.md`.
+  Smoke: `docs/benchmarks/jet_line_search_smoke.json`.
+
 ### Changed — Phase-0 reproduce Hilbert is `wholeline_hp`
 
 - `reproduce_deepmind_config` / `benchmarks/reproduce_deepmind_ccf.py`

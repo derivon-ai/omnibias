@@ -57,8 +57,9 @@ Shipped trainers and jets — Group 08 must not re-derive them.
   already exists as a *model*, not as a new Group 08 trainer.
 - `omnibias.verify` — `lipschitz_bound`, `taylor_output_bounds`. Input-output
   certificates for 08-09.
-- Spec 03-12 — exact jet line search (designed, unbuilt as a module; `taylor_line_min`
-  is a related but not certified-radius implementation).
+- Spec 03-12 — exact jet line search (gated: `omnibias.core.line_search` plus
+  torch/jax twins; `taylor_line_min` remains the order-2/3 helper without a
+  certified radius).
 - Spec 03-10 — jet–Padé singularity tracking. Diagnostic, not a step rule.
 - Spec 03-11 — Lie symmetry. Constrains the hypothesis class.
 - Spec 03-13 — adaptive pack refinement. Architecture as the learner.

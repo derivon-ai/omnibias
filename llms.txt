@@ -41,7 +41,9 @@ interface sharpening, neither collapse; parallel interfaces only; not the
 XPINN `omnibias.pinn._core.interface`), BEM-Net / pack tree / equivariant
 scan / tanh-method / Hermite ladder / layered transfer / named linearizing
 transforms / holonomy band (02-06–02-11, 02-13, 02-14; see honesty on
-each API page). Cost / wall-time / FermiNet-many-body gates are
+each API page), exact jet line search (03-12; certified Lagrange
+radius + `verify=True` never-worse; G4/G5 recorded, not in CI
+`all_passed`). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

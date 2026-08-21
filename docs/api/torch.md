@@ -150,6 +150,13 @@ scale here (no LLM-scale claim).
       show_root_heading: false
       heading_level: 3
 
+## Exact jet line search (03-12)
+
+Certified-radius directional line search, re-exported from
+`omnibias.torch.line_search`. See [line_search.md](line_search.md).
+`taylor_line_min` is the older order-2/3 helper without a certified
+radius.
+
 ## Fastpath kernels
 
 ::: omnibias.torch.fastpath

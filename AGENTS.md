@@ -487,7 +487,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13) /
   `omnibias.geometry.gauge.band` (02-14; abelian + transverse-constant;
   no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02; sampled
-  subgraph). Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
+  subgraph) / `omnibias.core.line_search` /
+  `omnibias.{torch,jax}.line_search` (03-12; certified Lagrange radius +
+  `verify=True` never-worse; G4/G5 recorded, not in CI `all_passed`).
+  Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
   [`docs/api/arrangement.md`](docs/api/arrangement.md),
@@ -507,7 +510,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/ladder.md`](docs/api/ladder.md),
   [`docs/api/layered.md`](docs/api/layered.md),
   [`docs/api/transforms_pde.md`](docs/api/transforms_pde.md),
-  [`docs/api/holonomy_band.md`](docs/api/holonomy_band.md). Cost /
+  [`docs/api/holonomy_band.md`](docs/api/holonomy_band.md),
+  [`docs/api/line_search.md`](docs/api/line_search.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

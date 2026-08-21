@@ -46,6 +46,10 @@ This module provides
   i.e. Levenberg-Marquardt with the ``mu I`` damping replaced by ``(sigma/3)||s||^3`` for
   automatic step control and global convergence. This is the recommended higher-order PINN
   optimiser (the GN metric beats the full Hessian on a least-squares objective).
+* :func:`omnibias.torch.line_search.jet_line_search` -- theory 03-12: certified
+  truncation radius, Wolfe-as-interval, ``verify=True`` never-worse backstop
+  (re-exported below). :func:`taylor_line_min` remains the order-2/3 autodiff
+  helper without a certified radius.
 * :func:`taylor_line_min` -- an **exact high-order line search**: the along-direction
   derivatives of ``phi(a)=loss(theta+a d)`` are taken exactly by nested higher-order autodiff,
   and the truncated Taylor model is minimised in closed form (a near-optimal step in one shot).
@@ -71,6 +75,12 @@ from dataclasses import dataclass
 from typing import Any, Literal, cast
 
 from omnibias.core.verified.conditioning import certified_damping, conditioning_certificate
+from omnibias.torch.line_search import (
+    JetLineSearchConfig,
+    LineSearchResult,
+    jet_line_search,
+    jet_line_search_on_ray,
+)
 
 import torch
 import torch.nn as nn
@@ -3741,9 +3751,11 @@ __all__ = [
     "GradNormBalancer",
     "JetLBFGS",
     "JetLBFGSOptimizer",
+    "JetLineSearchConfig",
     "JetSubspaceTensor",
     "KFAC",
     "LBFGSInfo",
+    "LineSearchResult",
     "MatVec",
     "MetricProvider",
     "NaturalGradient",
@@ -3761,6 +3773,8 @@ __all__ = [
     "gauss_newton_fisher",
     "gauss_newton_fisher_matvec",
     "hvp",
+    "jet_line_search",
+    "jet_line_search_on_ray",
     "lanczos_tridiag",
     "lstsq_gauss_newton_direction",
     "martens_grosse_combine",
