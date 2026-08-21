@@ -2,7 +2,7 @@
 
 ## 1. Thesis and status
 
-The fifty-four specs are not a list — they are one argument told in the wrong
+The ninety-three specs are not a list — they are one argument told in the wrong
 order, and this file puts them in the right one: **collapse selects order, gap
 selects window, scan selects position, arrangement selects region, equality
 selects the solution locus.** Five choices on one primitive, and everything else
@@ -119,7 +119,19 @@ exploit)*
 
 18. Search and evolution (03-01).
 19. Optimization and geometry: LP, CSP, line search, refinement (03-02, 03-03,
-    03-12, 03-13).
+    03-12, 03-13). Training is not a sixth geometric knob — it is a
+    **consequence of the jet** (Group 08): composed Hessians, depth-causal
+    local residuals, Kantorovich accept/reject, sharpness schedules, block
+    search, DEQ IFT, and certified I/O steps. Those chapters may be written
+    only after the corresponding 08 gates have run. Tower inventions
+    (Group 09) are likewise a **jet / integral / enclosure consequence**,
+    not a sixth OMBU knob: jet-valued state, FTC-first cells, Taylor-model
+    neurons, and finite annihilator export. Those chapters wait on 09
+    gates and must not be written as a new geometry. The **public primitive
+    and citation path** is spec 06-05: publish-and-use order for the
+    already-shipped object, not a sixth OMBU knob and not the first
+    chapter of the book until those document gates are treated as the
+    rollout order.
 20. Measure and integration: sliced OT, quadrature, scale flow (03-04, 03-06,
     03-07).
 21. Shape and topology: morphology, differentiable topology (03-05, 03-09).
@@ -165,7 +177,7 @@ than no book, and the repository already has the machinery to prevent it.
 ## 7. Practical use cases
 
 1. **A coherent account** for a reader who should not have to reconstruct the
-   argument from fifty-four specs and forty-two packages.
+   argument from ninety-three specs and forty-two packages.
 2. **Teaching.** Parts I and II are a graduate course; Part V is a second one.
 3. **Onboarding.** The five-choice spine is the fastest correct mental model of
    the library.

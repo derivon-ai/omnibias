@@ -2,11 +2,15 @@
 
 ## 1. Thesis and status
 
-The running CCF campaign is stalled at a documented **Hilbert-by-dictionary
-floor near `1e-1`** against a stretch gate of `1e-13`, and the campaign's own
-audit says more optimizer steps will not clear it — so the only path is to
-enlarge the function class, which is precisely what the closed-form conjugate
-tower does.
+The running CCF campaign is stalled against stretch `1e-13`. Dictionary
+enrichment on the same `{P,Q}` family was tried and did not clear it.
+The open fork named by `_next_actions` is a **high-accuracy whole-line
+Hilbert on free neural Ω** (`hilbert_wholeline_hp` /
+`train_hilbert="wholeline_hp"`): planted `H[Q]=-P` can sit near `1e-14`,
+but a trained Wang residual is still unearned. A perfect PINN cannot beat
+Hilbert error. 03-10 jet–Padé locates a singularity; it is not a residual.
+The conjugate tower, GN, and certificates are in place — they are not the
+missing piece.
 
 - **Status**: gated
 - **Depends on**: 01-01, 01-04, 01-07, 01-12, 03-10, 07-01
@@ -47,11 +51,13 @@ live and its blocker is written down.
   `deepmind_campaign_tick.py`.
 - `.cursor/rules/deepmind-campaign.mdc` — the claim rules for this campaign.
 
-**Confirmed gap.** The dictionary is finite and its Hilbert transform is applied
-either spectrally (error `O(1e-1)`) or by projection onto a Hardy span whose own
-approximation floor is `O(1e-1)`. There is no dictionary that is **closed under
-both differentiation and the Hilbert transform**, which is exactly the object
-spec 01-12 constructs.
+**Confirmed gap (updated).** Spectral / PV Hilbert on a free net sat at
+`O(1e-1)`–`O(1e-3)`. `hilbert_wholeline_hp` moves the *planted* `H[Q]=-P`
+floor to `~1e-14` / `1e-13`. That is a quadrature result, not a trained
+stretch residual. Dictionary enrichment on the same `{P,Q}` family was
+tried and did not clear `1e-13`. A qualitatively richer dictionary
+(01-01 / 01-04) remains a second-rank bet if the profile is not in the
+Cauchy–Hardy algebra. 03-10 jet–Padé does not clear stretch.
 
 ## 4. Mathematics
 

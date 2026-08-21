@@ -214,7 +214,9 @@ silently return a worse point is a bug factory.
 ## 7. Practical use cases
 
 1. **Second-order optimizers** in `omnibias.torch.optim` that currently need a
-   step rule.
+   step rule. Recommended stack (spec 08-01): `CubicNewton` / `GaussNewton`
+   pick the direction, this spec picks the length, spec 08-04 accepts or
+   rejects on a unique-zero ball, spec 08-06 may set the cubic `lambda`.
 2. **Memetic evolution** (spec 03-01), where the polish step's cost directly
    determines whether the hybrid is worthwhile.
 3. **PINN training**, where loss landscapes are badly conditioned and step-size

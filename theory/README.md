@@ -1,6 +1,6 @@
 # omnibias theory program
 
-This tree is the **forward-looking research program**: 54 implementation-ready
+This tree is the **forward-looking research program**: 93 implementation-ready
 specs that extend the omnibias primitive beyond what ships today.
 
 It is not the shipped documentation. [`docs/theory.md`](../docs/theory.md) is the
@@ -84,6 +84,11 @@ flowchart TD
   Conjugate --> Frontier
   Holonomy --> Frontier
   Certify --> Frontier
+  Multipack --> Training["tower-native trainers: jets / joint Hessian / certified step"]
+  Certify --> Training
+  Multipack --> Inventions["tower inventions: jet state / integral cell / three registers"]
+  Gap --> Inventions
+  Certify --> Inventions
 ```
 
 ## Index
@@ -108,6 +113,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [01-10 jet-bundle formalization](01-geometry/10-jet-bundle-formalization.md) | gated | Vocabulary / contact test, not a discovery and not a package |
 | [01-11 rational exactness](01-geometry/11-rational-exactness-and-new-lean-obligations.md) | designed | Collapse weights are rationals, so the new math is Lean-checkable |
 | [01-12 conjugate Hilbert tower](01-geometry/12-conjugate-hilbert-tower.md) | gated | Line Hilbert only; G1–G4 CI; G5 campaign-artifact, not in CI `all_passed` |
+| [01-13 operator family](01-geometry/13-operator-family.md) | designed | Scan of the six roles; catalog + rejects; not a seventh `op`; first spend is `BiasScan(op="integral")` |
 
 ### 02 Architectures
 
@@ -168,6 +174,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | designed | The claim ladder and the forbidden-claims register |
 | [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | designed | Where each spec lands and in what order |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | The monograph spine |
+| [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | designed | Publish-and-use order for the shipped object; CCF and Group 09 are not the public face |
 
 ### 07 Frontier sub-obligations
 
@@ -183,6 +190,63 @@ external parent and states why the parent stays external.
 | [07-05 spectral floors and positivity](07-frontier/05-spectral-floors-and-positivity.md) | designed | Eigenvalue lower bounds with better trial spaces |
 | [07-06 validated dynamics and orbits](07-frontier/06-validated-dynamics-and-orbits.md) | designed | Closed-form Jacobians inside validated flow |
 | [07-07 Nobel-adjacent domains](07-frontier/07-nobel-adjacent-domain-programs.md) | concept | Tooling contributions to quantum many-body, plasma, materials |
+
+### 08 Tower-native training
+
+Optimizers (how to step `theta` given `L`) and learning rules (what a layer
+may use before `L` is known). The tower is Faà di Bruno — not a skip of the
+chain rule, and not a global solver. CCF stretch stays an operator floor.
+
+| Spec | Status | One line |
+|---|---|---|
+| [08-01 training-idea ledger](08-training/01-training-idea-ledger.md) | designed | Taxonomy, rejects, recommended stack; trainers do not clear Hilbert stretch |
+| [08-02 composed-curvature joint Newton](08-training/02-composed-curvature-joint-newton.md) | designed | Order-2 chain rule on `(W_{ell-1}, W_ell)`; escape a slice min if the joint block is indefinite |
+| [08-03 depth-causal local jet](08-training/03-depth-causal-local-jet.md) | designed | Forward `layer_jet` + local GN; `k` directions only; warm-start, not ImageNet |
+| [08-04 Kantorovich-accepted Newton](08-training/04-kantorovich-accepted-newton.md) | designed | Take a GN/cubic step only if a unique-zero ball is nonempty |
+| [08-05 depth-causal residual](08-training/05-depth-causal-residual.md) | designed | March the PDE residual in network depth; not CCF Hilbert |
+| [08-06 sharpness-scheduled step](08-training/06-sharpness-scheduled-step.md) | designed | Exact HVP `lambda_max` sets cubic `lambda` / lr |
+| [08-07 block exact search](08-training/07-block-exact-search.md) | designed | Structured 03-12: OMBU / last linear / arrangement coordinate |
+| [08-08 implicit DEQ Newton](08-training/08-implicit-deq-newton.md) | designed | `u = sigma(W u + x)` with exact-`sigma'` IFT; no unrolled BPTT |
+| [08-09 certified step](08-training/09-certified-step.md) | designed | Accept `theta'` only if a verify Lipschitz / output box stays in cap |
+
+### 09 Tower inventions
+
+Architectures, learning rules, and exports that spend the unused `integral`
+role, jet-valued state, or the three-register algebra, and that are not already
+first-class specs in Groups 02–05 or 08. Concept status except the ledger.
+Trainers that step `theta` given `L` stay in Group 08. CCF stretch stays an
+operator floor.
+
+| Spec | Status | One line |
+|---|---|---|
+| [09-01 invention ledger](09-inventions/01-invention-ledger.md) | designed | Already-specified map, rejects, first-bet ranking; inventions do not clear Hilbert stretch |
+| [09-02 jet-token transformer](09-inventions/02-jet-token-transformer.md) | concept | Residual stream is an N-jet; mix with `compose_jet`, not vector attention |
+| [09-03 FTC-Net](09-inventions/03-ftc-net.md) | concept | Cell is the `integral` role; collapse heads are the same pack |
+| [09-04 Frame-UNet](09-inventions/04-frame-unet.md) | concept | Order encoder + integral decoder; band skip is not a collapse head |
+| [09-05 Taylor-model neuron](09-inventions/05-taylor-model-neuron.md) | concept | Unit output is a `TaylorModel`; enclosure explosion is the floor |
+| [09-06 coupling Jet-Flow](09-inventions/06-coupling-jet-flow.md) | concept | Finite couplings; `log|det| = sum log sigma'`; Newton inverse |
+| [09-07 Pack-MoE](09-inventions/07-pack-moe.md) | concept | Experts are packs; router is slab mass, not softmax |
+| [09-08 Characteristic-Net](09-inventions/08-characteristic-net.md) | concept | Transport along learned `v` with a closed-form time integral |
+| [09-09 sheaf-atlas net](09-inventions/09-sheaf-atlas-net.md) | concept | Jet transition maps; cocycle residual to order N |
+| [09-10 Riccati flow net](09-inventions/10-riccati-flow-net.md) | concept | Depth is Riccati time; not DEQ and not CNF |
+| [09-11 Collapse-Net](09-inventions/11-collapse-net.md) | concept | Train stencils; infer by founding `delta -> 0` collapse |
+| [09-12 holonomic layer](09-inventions/12-holonomic-layer.md) | concept | Block is an Ore annihilator; D-finite class only |
+| [09-13 jet-Hopfield](09-inventions/13-jet-hopfield.md) | concept | Memories are germs; contact match, not vector Hopfield |
+| [09-14 integral-kernel operator](09-inventions/14-integral-kernel-operator.md) | concept | Volumetric DeepONet kernel is an OMBU `integral`; not BEM-Net |
+| [09-15 q-OMBU / timescale](09-inventions/15-q-ombu-timescale.md) | concept | Hybrid q / Hilger layers; named `q -> 1` / `mu -> 0` limit |
+| [09-16 exact MAML](09-inventions/16-exact-maml.md) | concept | Inner exact GN / HVP; meta-grad is IFT through inner KKT |
+| [09-17 dual-FTC training](09-inventions/17-dual-ftc-training.md) | concept | Derivative residual and closed-form integral must agree |
+| [09-18 remainder training](09-inventions/18-remainder-training.md) | concept | Loss is `R_N`; may trigger 03-13 birth; not 03-10 alone |
+| [09-19 jet distillation](09-inventions/19-jet-distillation.md) | concept | Student matches teacher N-jet; SSL matches 1-jets across views |
+| [09-20 homotopy continuation](09-inventions/20-homotopy-continuation.md) | concept | Path of problems; each step 08-04-accepted |
+| [09-21 exact score matching](09-inventions/21-exact-score-matching.md) | concept | Hyvärinen on an OMBU score; CNF exact `div` is prior art |
+| [09-22 inverse-design](09-inventions/22-inverse-design.md) | concept | Newton-on-`x` with exact `sigma'`; not 08-03 layer invert |
+| [09-23 sharpness regularizer](09-inventions/23-sharpness-regularizer.md) | concept | Exact `lambda_max` / `Tr(H)` in the loss; not 08-06 schedule |
+| [09-24 proof-carrying forward](09-inventions/24-proof-carrying-forward.md) | concept | Forward returns `(y, certificate)`; not 08-09 step filter |
+| [09-25 world-model-as-jet](09-inventions/25-world-model-jet.md) | concept | Next N-jet + Lohner remainder; not global regularity |
+| [09-26 net-to-annihilator](09-inventions/26-net-to-annihilator.md) | concept | Ore export + finite rational Lean only; flags future-earned |
+| [09-27 parameter-space jets](09-inventions/27-parameter-space-jets.md) | concept | Mixed `∂^{α,β} u / ∂x^α ∂μ^β`; closed form iff `μ` enters the tower; not a ParamPINN package |
+| [09-28 sliced-jet encoder](09-inventions/28-sliced-jet-encoder.md) | concept | Tokens are scan jets + named energy; not a ViT; not `R^D` |
 
 ## How to use a spec
 

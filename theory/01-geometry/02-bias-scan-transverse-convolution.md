@@ -9,7 +9,7 @@ response along `w` at the cost of one activation call per offset.
 
 - **Status**: gated (G1/G2/G3 earned; G4 earned on smoke, not CI-gated)
 - **Depends on**: 01-01
-- **Blocks**: 01-06, 01-10, 02-01, 02-07, 02-08, 02-11, 03-04, 03-05, 03-08, 05-01, 05-02
+- **Blocks**: 01-06, 01-10, 01-13, 02-01, 02-07, 02-08, 02-11, 03-04, 03-05, 03-08, 05-01, 05-02
 
 ## 2. Where it lands
 

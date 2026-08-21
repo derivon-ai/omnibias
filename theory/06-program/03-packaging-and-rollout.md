@@ -2,7 +2,7 @@
 
 ## 1. Thesis and status
 
-Fifty-four specs would be thirty new packages if each were shipped the obvious
+Ninety-three specs would be thirty-odd new packages if each were shipped the obvious
 way, and the repository has already learned that lesson the expensive way — so
 this file assigns every spec a home under the "earn independent existence" rule
 and sequences them so that the cheap falsifiers run before the expensive builds.
@@ -46,15 +46,15 @@ Almost everything lands in an existing package.
 
 | Home | Specs |
 |---|---|
-| `omnibias-core` | 01-04 stencils, 01-05 mollifier algebra, 01-06 frames, 01-07 spectral design, 01-09 locus, 01-10 jet vocabulary (docs + contact tests), 01-11 Lean obligations, 01-12 conjugate Hilbert, 02-07 pack tree, 02-09 tanh-method algebra, 02-10 ladder algebra, 02-11 transfer algebra, 02-13 named transforms, 03-06 quadrature |
-| `omnibias-torch` / `omnibias-jax` (twins) | 01-01 multi-pack, 01-02 scan, 02-01 Scan-Net, 02-03 Jet-KAN, 02-07 hierarchical scan, 02-08 equivariant scan, 02-10 LadderNet, 03-12 line search, 03-13 refinement |
+| `omnibias-core` | 01-04 stencils, 01-05 mollifier algebra, 01-06 frames, 01-07 spectral design, 01-09 locus, 01-10 jet vocabulary (docs + contact tests), 01-11 Lean obligations, 01-12 conjugate Hilbert, 02-07 pack tree, 02-09 tanh-method algebra, 02-10 ladder algebra, 02-11 transfer algebra, 02-13 named transforms, 03-06 quadrature, 09-05 Taylor-model neuron |
+| `omnibias-torch` / `omnibias-jax` (twins) | 01-01 multi-pack, 01-02 scan, 02-01 Scan-Net, 02-03 Jet-KAN, 02-07 hierarchical scan, 02-08 equivariant scan, 02-10 LadderNet, 03-12 line search, 03-13 refinement, 08-02 composed curvature, 08-03 local jet, 08-04 Kantorovich accept, 08-06 sharpness, 08-07 block search, 08-08 `implicit` DEQ, 09-02 jet-token, 09-03 FTC-Net, 09-04 Frame-UNet, 09-07 Pack-MoE, 09-10 Riccati flow, 09-11 Collapse-Net wrappers, 09-16 exact MAML, 09-18 remainder, 09-19 jet distill, 09-20 homotopy, 09-22 inverse-design, 09-23 sharpness loss, 09-28 sliced-jet encoder |
 | `omnibias-fields` | 02-04 weak-form VPINN, 01-09 / 02-12 equality-locus layer |
-| `omnibias-pinn` | 02-05 transmission PINN, 02-06 BEM-Net, 02-09 travelling, 02-11 layered transfer, 02-13 linearizing transforms, 05-01 inverse problems |
-| `omnibias-geometry` | 02-08 chart scan, 02-14 Wilson-line band (`geometry.gauge.band`) |
+| `omnibias-pinn` | 02-05 transmission PINN, 02-06 BEM-Net, 02-09 travelling, 02-11 layered transfer, 02-13 linearizing transforms, 05-01 inverse problems, 08-05 depth-causal residual, 09-08 Characteristic-Net, 09-14 integral-kernel operator, 09-17 dual-FTC, 09-27 parameter-space jets |
+| `omnibias-geometry` | 02-08 chart scan, 02-14 Wilson-line band (`geometry.gauge.band`), 09-09 sheaf-atlas cocycle |
 | `omnibias-partition` | 01-03 arrangement geometry (tree is the special case of `partition_weights`) |
 | `omnibias-struct` | 01-08 tropical homotopy (reuses `MaxPlus` / `logsumexp_gap_bound`) |
 | `omnibias-graph` | 02-02 Face-Net on a sampled arrangement subgraph |
-| `omnibias-verify` | 03-08 certified localization, 04-02 uncertainty |
+| `omnibias-verify` | 03-08 certified localization, 04-02 uncertainty, 08-09 certified step, 09-24 proof-carrying forward |
 | `omnibias-curvature` | 04-01 information geometry |
 | `omnibias-discrete` / `-qubo` | 03-01 evolution, 03-03 CSP |
 | `omnibias-convex` | 03-02 arrangement LP |
@@ -62,9 +62,13 @@ Almost everything lands in an existing package.
 | `omnibias-tab` | 05-02 tabular part |
 | `omnibias-symbolic` | 03-10 Padé tracking, 03-11 Lie symmetry |
 | `omnibias-measure` | 03-04 sliced OT |
-| `omnibias-difference` | 01-04 irregular stencils (gated Wave 1) |
-| `omnibias-dynamics` | 07-06 validated orbits |
-| Docs only | 06-01…06-04, 07-01 |
+| `omnibias-difference` | 01-04 irregular stencils (gated Wave 1), 09-11 Collapse-Net |
+| `omnibias-dynamics` | 07-06 validated orbits, 09-25 world-model-as-jet |
+| `omnibias-score` | 09-06 Jet-Flow, 09-21 exact score matching |
+| `omnibias-hopfield` | 09-13 jet-Hopfield |
+| `omnibias-holonomic` | 09-12 holonomic layer, 09-26 annihilator export |
+| `omnibias-qcalculus` / `-timescale` | 09-15 q-OMBU hybrid |
+| Docs only | 01-13, 06-01…06-05, 07-01, 08-01, 09-01 |
 
 ### The one package that might be earned
 
@@ -118,7 +122,20 @@ the guards exist will be described in whatever language its author reached for.
 weak-form VPINN and 02-05 transmission PINN (both plug into an existing,
 benchmarked PINN surface), 02-03 Jet-KAN (a well-defined comparison against
 spline KANs), 03-12 line search and 03-13 refinement (small, self-contained,
-immediately useful to existing optimizers).
+immediately useful to existing optimizers). Group 08 (tower-native trainers)
+is specified in this wave and implemented after 03-12 exists as code: 08-02
+(2-layer PINN escape ablation) is the cheap falsifier; 08-04 / 08-06 / 08-07
+hook shipped `optim.py`; 08-05 lands in `pinn.train`; 08-08 is
+`omnibias.{torch,jax}.implicit`; 08-09 is a `verify` callback. No new
+packages. Trainers do not clear CCF stretch (08-01). Spec 06-05 (public
+primitive and citation path) is **documents now, extract later**: freeze
+the shipped `PUBLIC_SURFACE`, then paper, then jet-vs-AD on a local PDE,
+then one external user. CCF and Group 09 are not that path. Group 09 (tower
+inventions) is **concept** in this wave's documents and is implemented
+only after 03-12 exists as code and after 09-01's first-bet ranking:
+09-03+09-17, then 09-02+09-19, then 09-16, 09-05+09-24, 09-06, 09-07,
+09-18. Inventions do not clear CCF stretch (09-01). Still no new
+packages.
 
 **Wave 4 — the frontier program.** Group 07, in the order 07-01 (the ledger,
 which is a document), 07-03 (CCF, which has a live campaign and a live gate),
@@ -128,7 +145,8 @@ then 07-02, 07-04, 07-05, 07-06, 07-07.
 full 03-11 / 03-13. Remaining Group 02 (02-02, 02-06–02-14) plus the
 Group 01 algebra they import is **opened** as gated submodules of existing
 packages; cost / wall-time / FermiNet-many-body gates are smoke-earned,
-not in CI `all_passed`.
+not in CI `all_passed`. Remaining Group 09 concept specs (09-04,
+09-08…09-15, 09-20…09-23, 09-25…09-28) wait on a first-bet gate.
 
 ### What to do when a wave-0 falsifier fails
 
@@ -163,7 +181,7 @@ documented mistake, so it ships as `omnibias.geometry.gauge.holonomy`.
 with a written promotion criterion, which is the only case in the tree where a
 new distribution is even plausible. It did **not** land in `geometry`.
 
-**Net effect: 54 specs, 0 new packages at the start, at most 1 later.** If that
+**Net effect: 93 specs, 0 new packages at the start, at most 1 later.** If that
 number grows during implementation, the rule is being bypassed, and the tree
 inventory in `AGENTS.md` is the place it will show.
 

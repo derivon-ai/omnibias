@@ -29,10 +29,16 @@ the operator algebra on them.
   set-theoretic operations.
 - `omnibias.torch.blocks.conv` — `cmbConv1d`, `cmbConv2d`, the grid convolution
   path a morphological operator mirrors.
+- `omnibias.verify` — `MaxPoolLayer` is a **hard** max-pool for sound
+  Taylor-model / interval propagation, not a training layer.
+- `omnibias.graph` — `soft_top_k`, SoftSort, Gumbel–Sinkhorn (temperature
+  collapse of a support).
 
 **Confirmed gap.** Soft-OR unions exist, and the max-plus semiring exists in the
 dynamic-programming context. Nobody has connected them into a morphological
 operator algebra: no dilation, erosion, opening, closing or distance transform.
+Soft max-pool and index-sparse structuring elements are the same algebra
+(named below), not a seventh `OperatorBlock` role.
 
 ## 4. Mathematics
 
@@ -111,6 +117,44 @@ pack means:
 Learnable structuring elements are the practical selling point: classical
 morphology requires hand-designing them.
 
+### Soft max-pool (flat dilation)
+
+Hard max-pool is dilation by a **flat** structuring element `b = 0`
+(or `-inf` off the window):
+
+```
+pool(x)[p] = max_{y in window(p)} x[y]
+```
+
+The soft wrapper is the same homotopy as dilation:
+
+```
+soft_max_pool_beta(x)[p] = (1/beta) log sum_{y in window(p)} exp(beta x[y])
+```
+
+- `beta -> inf` is **temperature collapse** to hard max-pool, gap
+  `log(N)/beta`.
+- `beta -> 0+` is average-pool.
+- Not a seventh `OperatorBlock` role. Not `scan(role)`.
+- Hard max-pool stays a **verify** object (`MaxPoolLayer`). Training
+  uses `soft_max_pool`. A learnable `beta` interpolates avg ↔ max.
+
+### Index / dependency patterns
+
+Two objects, easy to conflate:
+
+- **Shape.** `b(y) = pack(offset)` (above). The pattern is a function
+  of the index; that is already the pack SE.
+- **Support.** Which sites in a larger window participate. That is a
+  mask, obtained by `soft_top_k` / Gumbel–Sinkhorn on per-offset
+  scores (`omnibias.graph`). `beta -> inf` (or temperature → 0 in
+  the graph API) is **temperature collapse** to a k-set and must be
+  labelled.
+
+Do not introduce a free "kernel index" parameter or a seventh role.
+Irregular **continuous** node positions with certified FD weights are
+spec 01-04, not this file.
+
 ### Distance transforms
 
 The Euclidean distance transform is an erosion by a paraboloid in the max-plus
@@ -183,8 +227,13 @@ Does not exist yet.
 class StructuringElement:
     offsets: FloatArray               # neighbourhood positions
     values: FloatArray | PackSpec     # flat array, or a learnable pack
+    scores: FloatArray | None = None  # optional; soft_top_k -> support
     @property
     def size(self) -> int: ...
+
+def soft_support(scores: FloatArray, *, k: int, temperature: float) -> FloatArray:
+    """Delegate to omnibias.graph.soft_top_k. Temperature collapse."""
+    ...
 
 def morphology_gap_bound(*, size: int, beta: float, compositions: int = 1) -> float:
     """compositions * log(size) / beta. Composite operators must pass their
@@ -200,6 +249,9 @@ def closing(f, se, *, beta: float) -> Tensor: ...
 def top_hat(f, se, *, beta: float, dual: bool = False) -> Tensor: ...
 def morphological_gradient(f, se, *, beta: float) -> Tensor: ...
 def soft_distance_transform(occupancy, *, beta: float, metric="euclidean") -> Tensor: ...
+def soft_max_pool(f, *, kernel: int | tuple[int, ...], stride: int, beta: float) -> Tensor:
+    """Flat-SE dilation on unfold patches. Reuse logsumexp_beta."""
+    ...
 
 @dataclass
 class MorphResult:
@@ -225,6 +277,8 @@ throws away the conservative-safety property.
    so a coverage guarantee survives the relaxation.
 5. **Topological feature extraction** (spec 03-09): morphological granulometry
    is a classical route to size distributions.
+6. **Soft max-pool** as a drop-in for `MaxPool*d` when `beta` or the
+   support must train; certify the hard pool with `MaxPoolLayer`.
 
 ## 8. Acceptance gates
 
@@ -294,4 +348,5 @@ parameter count.
 - [ ] Terminology cross-reference note plus `PENALTY_FILES` registration
 - [ ] `benchmarks/morphology.py` plus smoke JSON
 - [ ] Docs page and nav entry
+- [ ] `soft_max_pool` + `StructuringElement.scores` → `soft_top_k`
 - [ ] Index row in `theory/README.md`

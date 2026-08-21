@@ -3,7 +3,7 @@
 ## 1. Thesis and status
 
 Every spec in this tree carries acceptance gates, and this file is the single
-definition of what a gate *is* — so that fifty-four specs cannot each invent a
+definition of what a gate *is* — so that ninety-three specs cannot each invent a
 weaker standard, and so that a reader can tell a result from a demo by looking
 at one JSON block.
 
