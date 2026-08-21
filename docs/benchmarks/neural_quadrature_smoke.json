@@ -1,0 +1,101 @@
+{
+  "schema": "omnibias.benchmarks.neural_quadrature.v1",
+  "generated_utc": "2026-08-21T17:58:50Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "neural_quadrature",
+    "full": false,
+    "seeds": [
+      0.05,
+      0.07,
+      0.09,
+      0.11,
+      0.13
+    ],
+    "honesty": {
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "non_product_cubature": false,
+      "smoothing_bias_cancelled": true,
+      "refuses_without_deriv_bound": true
+    }
+  },
+  "rss_mb_at_start": 810.71,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_recovery",
+        "passed": true,
+        "worst": 1.1796119636642288e-15,
+        "detail": "GL nodes/weights n=2..12"
+      },
+      {
+        "name": "g2_moments",
+        "passed": true,
+        "detail": "point + cancelled pack m0/m2"
+      },
+      {
+        "name": "g3_peano",
+        "passed": true,
+        "true_err": -0.1777777777777779,
+        "bound_mag": 0.30277777777784803,
+        "detail": "x^4 attained; refuse without bound"
+      },
+      {
+        "name": "g4_design",
+        "passed": true,
+        "mean_ratio": 38.630735676460354,
+        "ratios": [
+          18.179560366389737,
+          22.84557472491182,
+          30.2840450779411,
+          44.01037367800801,
+          77.83412453505109
+        ],
+        "detail": "x^4+a x^6 vs GL-2"
+      },
+      {
+        "name": "g5_scope",
+        "passed": true,
+        "table": [
+          [
+            1,
+            8
+          ],
+          [
+            2,
+            64
+          ],
+          [
+            3,
+            512
+          ],
+          [
+            4,
+            4096
+          ],
+          [
+            5,
+            32768
+          ],
+          [
+            6,
+            262144
+          ]
+        ],
+        "prohibitive_dim": 5,
+        "detail": "n=8 tensor exceeds 4096 at D=5; no non-product cubature"
+      }
+    ]
+  },
+  "wall_seconds": 1.332155694020912
+}

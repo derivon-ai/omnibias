@@ -539,7 +539,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.shape.morphology` (03-05; soft dilation / erosion
   via `logsumexp_beta`; G1–G6 CI; temperature collapse, not
   founding bias collapse; gap is worst-case; not a seventh
-  OperatorBlock role).
+  OperatorBlock role) /
+  `omnibias.core.cubature` (03-06; moment-solved quadrature +
+  Peano enclosure; G1–G5 CI; founding bias collapse, not
+  temperature collapse; refuses without a derivative bound;
+  no non-product cubature).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -576,7 +580,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/arrangement_lp.md`](docs/api/arrangement_lp.md),
   [`docs/api/csp.md`](docs/api/csp.md),
   [`docs/api/sliced_ot.md`](docs/api/sliced_ot.md),
-  [`docs/api/morphology.md`](docs/api/morphology.md). Cost /
+  [`docs/api/morphology.md`](docs/api/morphology.md),
+  [`docs/api/neural_quadrature.md`](docs/api/neural_quadrature.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

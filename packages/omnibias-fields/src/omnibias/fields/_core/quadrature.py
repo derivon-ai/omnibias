@@ -13,6 +13,12 @@ numerical primitive, not a deep-learning backend, consistent with the
 ``omnibias-fields`` package boundary (the stricter "no numpy" rule applies only
 to ``omnibias-core``).
 
+Certified integration (theory 03-06) returns an enclosure. Pack
+functionals come from the founding bias collapse (``delta -> 0``).
+Temperature collapse (``beta -> inf``, feasibility) does not appear.
+Do not conflate the two. The call is refused without a bound on
+``f^(d+1)``. Non-product cubature is out of scope.
+
 Rules
 -----
 - :func:`gauss_legendre` -- tensor-product Gauss-Legendre on a box; exact for
@@ -21,6 +27,7 @@ Rules
   ``N(mean, scale**2)``; ``sum(weights) == 1``.
 - :func:`monte_carlo` -- seeded uniform Monte-Carlo over a box.
 - :func:`tensor_product` -- outer product of one-dimensional rules.
+- :func:`integrate_certified` -- Peano enclosure; refuses without ``f^(d+1)``.
 """
 
 from __future__ import annotations
@@ -230,6 +237,53 @@ def monte_carlo(
     return QuadratureSpec("monte_carlo", nodes, weights, bnds)
 
 
+def integrate_certified(
+    values: object,
+    rule: object,
+    *,
+    deriv_bound: object | None,
+    degree: int | None = None,
+) -> object:
+    """Enclosure of ``sum w_i f(x_i)`` plus a Peano remainder.
+
+    ``deriv_bound`` must enclose ``f^{(d+1)}`` on the rule interval. The
+    call is refused when that bound is missing -- the tower supplies it
+    for an omnibias field; an arbitrary integrand does not.
+    """
+    from omnibias.core.cubature import QuadratureRule, certified_error
+    from omnibias.core.verified.interval import Interval
+
+    if deriv_bound is None:
+        raise ValueError("integrate_certified refuses without a bound on f^(d+1)")
+    if not isinstance(rule, QuadratureRule):
+        raise TypeError("rule must be a cubature QuadratureRule")
+    vals = np.asarray(values, dtype=np.float64).reshape(-1)
+    if vals.size != rule.n_nodes:
+        raise ValueError("values must match the rule nodes")
+    main = Interval.point(rule.apply(vals))
+    deg = int(degree) if degree is not None else int(rule.degree)
+    return main + certified_error(rule, deriv_bound=deriv_bound, degree=deg)
+
+
+def rule_from_spec(spec: QuadratureSpec) -> object:
+    """Lift a 1-D ``QuadratureSpec`` into a cubature ``QuadratureRule``."""
+    from omnibias.core.cubature import QuadratureRule
+
+    if spec.dim != 1:
+        raise ValueError("certified integration is 1-D; tensor cost is recorded, not claimed")
+    lo_hi = spec.bounds[0] if spec.bounds else (-1.0, 1.0)
+    return QuadratureRule(
+        nodes=tuple(float(x) for x in spec.nodes[:, 0]),
+        weights=tuple(float(w) for w in spec.weights),
+        degree=max(spec.n_nodes - 1, 0),
+        functional="point",
+        pack_scale=None,
+        bias_cancelled=False,
+        measure=spec.rule,
+        interval=lo_hi,
+    )
+
+
 def tensor_product(*rules_1d: QuadratureSpec) -> QuadratureSpec:
     """Outer-product several one-dimensional rules into a multi-dim rule."""
     if not rules_1d:
@@ -246,6 +300,8 @@ __all__ = [
     "QuadratureSpec",
     "gauss_hermite",
     "gauss_legendre",
+    "integrate_certified",
     "monte_carlo",
+    "rule_from_spec",
     "tensor_product",
 ]

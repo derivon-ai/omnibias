@@ -76,7 +76,10 @@ G1–G6 CI; founding bias collapse, not temperature collapse; exact
 per slice, not sample-free; not Wasserstein), morphology (03-05;
 soft dilation / erosion via `logsumexp_beta`; G1–G6 CI;
 temperature collapse, not founding bias collapse; gap is
-worst-case; not a seventh OperatorBlock role). Cost / wall-time / FermiNet-many-body gates are
+worst-case; not a seventh OperatorBlock role), neural
+quadrature (03-06; moment-solved rule + Peano enclosure;
+G1–G5 CI; founding bias collapse, not temperature collapse;
+refuses without a derivative bound; no non-product cubature). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

@@ -143,7 +143,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [03-03 constraint satisfaction collapse](03-algorithms/03-constraint-satisfaction-collapse.md) | gated | Finite-domain CSP + two `beta` schedules + soft AC; G1–G6 CI; temperature collapse, not founding bias collapse; not a complete solver; not P vs NP |
 | [03-04 sliced optimal transport](03-algorithms/04-sliced-optimal-transport-cdf.md) | gated | Exact 1-D `W_1` of activation mixtures + sliced average; G1–G6 CI; founding bias collapse, not temperature collapse; exact per slice, not sample-free; not Wasserstein |
 | [03-05 morphology and level sets](03-algorithms/05-differentiable-morphology-levelsets.md) | gated | Soft dilation / erosion via `logsumexp_beta`; G1–G6 CI; temperature collapse, not founding bias collapse; gap is worst-case; not a seventh OperatorBlock role |
-| [03-06 neural quadrature](03-algorithms/06-neural-quadrature-and-cubature.md) | designed | Learned rules whose error is certified, not hoped for |
+| [03-06 neural quadrature](03-algorithms/06-neural-quadrature-and-cubature.md) | gated | Moment-solved quadrature + Peano enclosure; G1–G5 CI; founding bias collapse, not temperature collapse; refuses without a derivative bound; no non-product cubature |
 | [03-07 scale flow and coarse-graining](03-algorithms/07-scale-flow-and-coarse-graining.md) | concept | Free energy, scale space, and schedules as geodesics |
 | [03-08 certified scan localization](03-algorithms/08-certified-scan-localization.md) | designed | Sound "the feature is in this slab" statements |
 | [03-09 differentiable topology](03-algorithms/09-differentiable-topology-of-arrangements.md) | concept | Euler characteristic and persistence of a soft arrangement |

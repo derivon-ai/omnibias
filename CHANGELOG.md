@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — neural quadrature (theory 03-06)
+
+- `omnibias.core.cubature`: moment-solved Gauss / pack quadrature
+  with a Peano `certified_error` enclosure, plus
+  `integrate_certified` on the fields quadrature surface.
+- G1–G5 CI-gated. Pack moments are founding bias collapse
+  (`delta -> 0`), not temperature collapse. The enclosure is
+  refused without a bound on `f^(d+1)`. Non-product cubature
+  is out of scope.
+- Docs: `docs/api/neural_quadrature.md`,
+  `docs/cookbook/neural-quadrature.md`.
+  Smoke: `docs/benchmarks/neural_quadrature_smoke.json`.
+
 ### Added — differentiable morphology (theory 03-05)
 
 - `omnibias.shape.morphology`: soft dilation / erosion via

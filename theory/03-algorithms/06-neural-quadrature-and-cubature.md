@@ -7,7 +7,7 @@ nodes and weights can be *solved* for exactness on a prescribed function space
 — and, unlike a classical rule, the resulting rule is differentiable in its own
 design parameters.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-04, 01-05, 02-04
 - **Blocks**: 03-13, 07-02
 
@@ -277,14 +277,14 @@ grids, all at matched node count.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-core/src/omnibias/core/cubature.py`
-- [ ] Extend `omnibias/fields/_core/quadrature.py` with `integrate_certified`
-- [ ] Reuse spec 01-04's confluent Vandermonde solver; do not fork it
-- [ ] Classical-recovery test against tabulated Gauss-Legendre values
-- [ ] Certified-error soundness test, including the extremal attainment case
-- [ ] Smoothing-bias cancellation test for the pack-functional path
-- [ ] Refusal path when no derivative bound is available
-- [ ] Dimension-scaling table in the benchmark
-- [ ] `benchmarks/neural_quadrature.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-core/src/omnibias/core/cubature.py`
+- [x] Extend `omnibias/fields/_core/quadrature.py` with `integrate_certified`
+- [x] Reuse spec 01-04's confluent Vandermonde solver; do not fork it
+- [x] Classical-recovery test against tabulated Gauss-Legendre values
+- [x] Certified-error soundness test, including the extremal attainment case
+- [x] Smoothing-bias cancellation test for the pack-functional path
+- [x] Refusal path when no derivative bound is available
+- [x] Dimension-scaling table in the benchmark
+- [x] `benchmarks/neural_quadrature.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

@@ -40,6 +40,8 @@ Public API:
   local jet flood forbid and invert-and-match (theory 08-03).
 * :class:`DEQConfig`, :class:`DEQNotContractive` -- implicit DEQ
   contraction raise and Newton / Banach budget (theory 08-08).
+* :class:`MomentSystem`, :func:`solve_rule` -- neural quadrature
+  from pack moments with a Peano enclosure (theory 03-06).
 
 There are no framework dependencies in this package.
 """
@@ -88,6 +90,17 @@ from omnibias.core.conjugate import (
 )
 from omnibias.core.conjugate import (
     hilbert as hilbert_hardy_dictionary,
+)
+from omnibias.core.cubature import (
+    MomentSystem,
+    QuadratureRule,
+    apply_rule,
+    certified_error,
+    design_rule,
+    pack_moment,
+    peano_kernel,
+    solve_rule,
+    target_moments,
 )
 from omnibias.core.frames import (
     FrameSpec,
@@ -260,11 +273,13 @@ __all__ = [
     "LocalJetForbidden",
     "LocalJetReport",
     "MollifierSpec",
+    "MomentSystem",
     "MultiPackSpec",
     "NewtonResult",
     "Normalization",
     "NthDerivativeFn",
     "PackSpec",
+    "QuadratureRule",
     "RefinePolicy",
     "RefineReport",
     "RefinedPack",
@@ -283,6 +298,7 @@ __all__ = [
     "affine_locus",
     "alpha_for_peak",
     "apply_block_step",
+    "apply_rule",
     "arrangement_w_block",
     "assert_zero_perturbation",
     "bell_complete",
@@ -295,6 +311,7 @@ __all__ = [
     "central_stencil_weights",
     "central_to_raw_moments",
     "certified_band_gap",
+    "certified_error",
     "certified_truncation_radius",
     "certify_locus_point",
     "chain_rule_mse_blocks",
@@ -307,6 +324,7 @@ __all__ = [
     "delta_method_from_cumulants",
     "design_band_plan",
     "design_order",
+    "design_rule",
     "dilated_sigma_n",
     "dkw_epsilon",
     "eigh_symmetric",
@@ -342,7 +360,9 @@ __all__ = [
     "multiply_table",
     "num_multi_indices",
     "ombu_bias_block",
+    "pack_moment",
     "peak_frequency",
+    "peano_kernel",
     "polya_condition",
     "polynomial_wolfe",
     "raw_moments_from_cumulants",
@@ -365,10 +385,12 @@ __all__ = [
     "select_model_step",
     "sigmoid_polynomial_coeffs",
     "solve_dense",
+    "solve_rule",
     "spectral_radius_inf_bound",
     "symmetrize",
     "tail_bound",
     "tanh_polynomial_coeffs",
+    "target_moments",
     "taylor_coeffs_from_derivatives",
     "tempered",
     "tower_lower",
