@@ -217,3 +217,61 @@ def test_near_null_profile_is_not_a_rung1_win() -> None:
     )
     assert g["earned"] is False
     assert residual_for_gate >= 1.0
+
+
+def test_jax_ordered_profile_matches_core_q2() -> None:
+    from omnibias.core.conjugate import (
+        hardy_omega_hilbert_atom,
+        hardy_omega_velocity_atom,
+        hardy_q_deriv_n,
+    )
+    from omnibias.pinn.jax.discovery import ccf_vorticity
+
+    y = jnp.linspace(-5.0, 5.0, 41, dtype=jnp.float64)
+    a, g = 1.3, 1.0 / (1.0 + 0.6057)
+    om, _omy, u, uy = ccf_vorticity.hardy_omega_profile(
+        y,
+        jnp.asarray([1.0], dtype=jnp.float64),
+        jnp.asarray([a], dtype=jnp.float64),
+        jnp.asarray([g], dtype=jnp.float64),
+        orders=jnp.asarray([2], dtype=jnp.int32),
+        parities=jnp.asarray([1], dtype=jnp.int32),
+        max_order=2,
+    )
+    om_ref = np.asarray([hardy_q_deriv_n(float(yy), a, g, 2) for yy in np.asarray(y)])
+    u_ref = np.asarray(
+        [hardy_omega_velocity_atom(float(yy), a, g, 2, parity="odd") for yy in np.asarray(y)]
+    )
+    h_ref = np.asarray(
+        [hardy_omega_hilbert_atom(float(yy), a, g, 2, parity="odd") for yy in np.asarray(y)]
+    )
+    np.testing.assert_allclose(np.asarray(om), om_ref, atol=1e-12)
+    np.testing.assert_allclose(np.asarray(u), u_ref, atol=1e-12)
+    np.testing.assert_allclose(np.asarray(uy), h_ref, atol=1e-12)
+
+
+def test_max_order_zero_hardy_omega_profile_bit_identical() -> None:
+    """JAX ``max_order=0`` / ``orders is None`` matches the current Q-only path."""
+    from omnibias.pinn.jax.discovery import ccf_vorticity
+
+    y = jnp.linspace(-6.0, 6.0, 81, dtype=jnp.float64)
+    coeffs = jnp.asarray([0.3, -0.1], dtype=jnp.float64)
+    scales = jnp.asarray([1.1, 1.8], dtype=jnp.float64)
+    alphas = jnp.asarray([0.6228, 1.2456], dtype=jnp.float64)
+    a = ccf_vorticity.hardy_omega_profile(y, coeffs, scales, alphas)
+    b = ccf_vorticity.hardy_omega_profile(
+        y, coeffs, scales, alphas, orders=None, parities=None, max_order=0
+    )
+    for left, right in zip(a, b, strict=True):
+        np.testing.assert_array_equal(np.asarray(left), np.asarray(right))
+
+
+def test_gate_constants_unmoved() -> None:
+    import sys
+    from pathlib import Path
+
+    sys.path.insert(0, str(Path(__file__).resolve().parents[4] / "benchmarks"))
+    from _gates import CCF_RESIDUAL_GATE_1ST_UNSTABLE, CCF_STRETCH_RESIDUAL_GATE
+
+    assert CCF_STRETCH_RESIDUAL_GATE == 1e-13
+    assert CCF_RESIDUAL_GATE_1ST_UNSTABLE == 1e-11

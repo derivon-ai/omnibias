@@ -44,6 +44,7 @@ from omnibias.core.bell import (
 from omnibias.core.conjugate import (
     HardyAtom,
     HardyDictionary,
+    hardy_conjugate_dictionary,
 )
 from omnibias.core.conjugate import (
     evaluate as evaluate_hardy_dictionary,
@@ -163,6 +164,7 @@ __all__ = [
     "FrameSpec",
     "HardyAtom",
     "HardyDictionary",
+    "hardy_conjugate_dictionary",
     "Layer",
     "LinearizingTransform",
     "MollifierSpec",

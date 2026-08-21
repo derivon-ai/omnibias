@@ -399,6 +399,99 @@ def hilbert_of_hardy_odd_deriv_n(y: float, a: float, alpha: float, n: int) -> In
     return -hardy_even_deriv_n(y, a, alpha, n)
 
 
+def _integrate_p_point(y: float, a: float, beta: float) -> Interval:
+    """Antiderivative of ``P_{a,beta}`` vanishing at 0."""
+    if abs(beta - 1.0) < 1e-12:
+        return atan_iv(Interval.point(y) * Interval.point(a).reciprocal())
+    return hardy_odd(y, a, beta - 1.0) / Interval.point(beta - 1.0)
+
+
+def _integrate_q_point(y: float, a: float, beta: float) -> Interval:
+    """Antiderivative of ``Q_{a,beta}`` vanishing at 0."""
+    if abs(beta - 1.0) < 1e-12:
+        return ln_iv(hardy_radius(y, a)) - ln_iv(Interval.point(a))
+    p_y = hardy_even(y, a, beta - 1.0)
+    p_0 = exp_iv(Interval.point(-(beta - 1.0)) * ln_iv(Interval.point(a)))
+    return -(p_y - p_0) / Interval.point(beta - 1.0)
+
+
+def _integrate_p_iv(y: Interval, a: float, beta: float) -> Interval:
+    if abs(beta - 1.0) < 1e-12:
+        return atan_iv(y * Interval.point(a).reciprocal())
+    return hardy_odd_iv(y, a, beta - 1.0) / Interval.point(beta - 1.0)
+
+
+def _integrate_q_iv(y: Interval, a: float, beta: float) -> Interval:
+    if abs(beta - 1.0) < 1e-12:
+        return ln_iv(hardy_radius_iv(y, a)) - ln_iv(Interval.point(a))
+    p_y = hardy_even_iv(y, a, beta - 1.0)
+    p_0 = exp_iv(Interval.point(-(beta - 1.0)) * ln_iv(Interval.point(a)))
+    return -(p_y - p_0) / Interval.point(beta - 1.0)
+
+
+def hardy_omega_velocity_atom(
+    y: float, a: float, alpha: float, n: int, *, parity: str = "odd"
+) -> Interval:
+    """Interval ``U`` for one Hardy-Ω atom with ``U'=HΩ`` and ``U(0)=0``."""
+    if n < 0:
+        raise ValueError(f"derivative order n must be >= 0, got {n}")
+    _validate_scale_alpha(a, alpha)
+    if not (alpha > 0.0):
+        raise ValueError(
+            "Hilbert-derivative commutation needs decay (alpha > 0); "
+            f"got alpha={alpha!r}"
+        )
+    if parity not in ("even", "odd"):
+        raise ValueError(f"parity must be 'even' or 'odd', got {parity!r}")
+    factor = pochhammer_iv(alpha, n)
+    beta = alpha + float(n)
+    if parity == "odd":
+        p_sign, p_kind, _, _ = _table_kind(n)
+        integ = (
+            _integrate_p_point(y, a, beta)
+            if p_kind == "even"
+            else _integrate_q_point(y, a, beta)
+        )
+        signed = -factor * integ if p_sign > 0 else factor * integ
+        return signed
+    _, _, q_sign, q_kind = _table_kind(n)
+    integ = (
+        _integrate_p_point(y, a, beta)
+        if q_kind == "even"
+        else _integrate_q_point(y, a, beta)
+    )
+    return factor * integ if q_sign > 0 else -factor * integ
+
+
+def hardy_omega_velocity_atom_iv(
+    y: Interval, a: float, alpha: float, n: int, *, parity: str = "odd"
+) -> Interval:
+    """Interval-``y`` enclosure of the Hardy-Ω velocity atom."""
+    if n < 0:
+        raise ValueError(f"derivative order n must be >= 0, got {n}")
+    _validate_scale_alpha(a, alpha)
+    if not (alpha > 0.0):
+        raise ValueError(
+            "Hilbert-derivative commutation needs decay (alpha > 0); "
+            f"got alpha={alpha!r}"
+        )
+    if parity not in ("even", "odd"):
+        raise ValueError(f"parity must be 'even' or 'odd', got {parity!r}")
+    factor = pochhammer_iv(alpha, n)
+    beta = alpha + float(n)
+    if parity == "odd":
+        p_sign, p_kind, _, _ = _table_kind(n)
+        integ = (
+            _integrate_p_iv(y, a, beta) if p_kind == "even" else _integrate_q_iv(y, a, beta)
+        )
+        return -factor * integ if p_sign > 0 else factor * integ
+    _, _, q_sign, q_kind = _table_kind(n)
+    integ = (
+        _integrate_p_iv(y, a, beta) if q_kind == "even" else _integrate_q_iv(y, a, beta)
+    )
+    return factor * integ if q_sign > 0 else -factor * integ
+
+
 __all__ = [
     "hardy_angle",
     "hardy_angle_iv",
@@ -432,6 +525,8 @@ __all__ = [
     "hilbert_of_hardy_even_deriv_n",
     "hilbert_of_hardy_odd",
     "hilbert_of_hardy_odd_deriv_n",
+    "hardy_omega_velocity_atom",
+    "hardy_omega_velocity_atom_iv",
     "pochhammer",
     "pochhammer_iv",
 ]

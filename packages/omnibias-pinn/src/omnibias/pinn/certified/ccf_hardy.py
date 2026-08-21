@@ -21,11 +21,21 @@ from collections.abc import Sequence
 from typing import Any
 
 import numpy as np
+from omnibias.core.conjugate import (
+    hardy_omega_atom,
+    hardy_omega_deriv_atom,
+    hardy_omega_hilbert_atom,
+)
+from omnibias.core.conjugate import (
+    hardy_omega_velocity_atom as hardy_omega_velocity_atom_float,
+)
 from omnibias.core.verified.hardy_line import (
     hardy_even,
     hardy_even_dalpha,
     hardy_even_deriv,
     hardy_even_deriv_iv,
+    hardy_even_deriv_n,
+    hardy_even_deriv_n_iv,
     hardy_even_iv,
     hardy_even_profile,
     hardy_even_profile_deriv,
@@ -33,10 +43,16 @@ from omnibias.core.verified.hardy_line import (
     hardy_odd_dalpha,
     hardy_odd_deriv,
     hardy_odd_deriv_iv,
+    hardy_odd_deriv_n,
+    hardy_odd_deriv_n_iv,
     hardy_odd_iv,
+    hardy_omega_velocity_atom,
+    hardy_omega_velocity_atom_iv,
     hardy_tail_constant,
     hilbert_hardy_even_profile,
     hilbert_hardy_even_profile_deriv,
+    hilbert_of_hardy_even_deriv_n,
+    hilbert_of_hardy_odd_deriv_n,
 )
 from omnibias.core.verified.interval import Interval, sum_intervals
 from omnibias.core.verified.kantorovich import radii_polynomial_certificate
@@ -73,28 +89,73 @@ def alpha_from_lambda(lam: float) -> float:
     return 1.0 / (1.0 + float(lam))
 
 
+def _normalize_vorticity_atoms(
+    n: int,
+    orders: Sequence[int] | None,
+    parities: Sequence[int] | None,
+) -> tuple[list[int], list[int], bool]:
+    """Return ``(orders, parity codes, n0_odd_only)``.
+
+    ``orders is None`` is today's Q-only span (all zeros, all odd).
+    """
+    if orders is None:
+        return [0] * n, [1] * n, True
+    ords = [int(o) for o in orders]
+    if len(ords) != n:
+        raise ValueError("orders length must match coeffs")
+    if parities is None:
+        pars = [1 if o % 2 == 0 else 0 for o in ords]
+    else:
+        pars = [int(p) for p in parities]
+        if len(pars) != n:
+            raise ValueError("parities length must match coeffs")
+    n0 = all(o == 0 for o in ords) and all(p == 1 for p in pars)
+    return ords, pars, n0
+
+
 def _omega_fields_point(
     y: float,
     coeffs: Sequence[float],
     scales: Sequence[float],
     gammas: Sequence[float],
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
 ) -> tuple[Interval, Interval, Interval, Interval]:
     """Interval ``(Omega, Omega_y, U, U_y)`` for odd Hardy-Ω sum at a point."""
+    ords, pars, n0 = _normalize_vorticity_atoms(len(coeffs), orders, parities)
     om = Interval.point(0.0)
     omy = Interval.point(0.0)
     u = Interval.point(0.0)
     uy = Interval.point(0.0)
-    for c, a, g in zip(coeffs, scales, gammas, strict=True):
-        c_iv = Interval.point(float(c))
-        om = om + c_iv * hardy_odd(y, float(a), float(g))
-        omy = omy + c_iv * Interval.point(float(g)) * hardy_even(y, float(a), float(g) + 1.0)
-        uy = uy + c_iv * (-hardy_even(y, float(a), float(g)))
-        if abs(float(g) - 1.0) < 1e-12:
-            u = u + c_iv * (-Interval.point(math.atan(y / float(a))))
-        else:
-            u = u + c_iv * (
-                -hardy_odd(y, float(a), float(g) - 1.0) / Interval.point(float(g) - 1.0)
+    if n0:
+        for c, a, g in zip(coeffs, scales, gammas, strict=True):
+            c_iv = Interval.point(float(c))
+            om = om + c_iv * hardy_odd(y, float(a), float(g))
+            omy = omy + c_iv * Interval.point(float(g)) * hardy_even(
+                y, float(a), float(g) + 1.0
             )
+            uy = uy + c_iv * (-hardy_even(y, float(a), float(g)))
+            if abs(float(g) - 1.0) < 1e-12:
+                u = u + c_iv * (-Interval.point(math.atan(y / float(a))))
+            else:
+                u = u + c_iv * (
+                    -hardy_odd(y, float(a), float(g) - 1.0)
+                    / Interval.point(float(g) - 1.0)
+                )
+        return om, omy, u, uy
+    for c, a, g, n_ord, par in zip(coeffs, scales, gammas, ords, pars, strict=True):
+        c_iv = Interval.point(float(c))
+        aa, gg, nn = float(a), float(g), int(n_ord)
+        if par == 1:
+            om = om + c_iv * hardy_odd_deriv_n(y, aa, gg, nn)
+            omy = omy + c_iv * hardy_odd_deriv_n(y, aa, gg, nn + 1)
+            uy = uy + c_iv * hilbert_of_hardy_odd_deriv_n(y, aa, gg, nn)
+            u = u + c_iv * hardy_omega_velocity_atom(y, aa, gg, nn, parity="odd")
+        else:
+            om = om + c_iv * hardy_even_deriv_n(y, aa, gg, nn)
+            omy = omy + c_iv * hardy_even_deriv_n(y, aa, gg, nn + 1)
+            uy = uy + c_iv * hilbert_of_hardy_even_deriv_n(y, aa, gg, nn)
+            u = u + c_iv * hardy_omega_velocity_atom(y, aa, gg, nn, parity="even")
     return om, omy, u, uy
 
 
@@ -104,8 +165,12 @@ def _vorticity_residual_interval(
     gammas: Sequence[float],
     lam: float,
     y: float,
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
 ) -> Interval:
-    om, omy, u, uy = _omega_fields_point(y, coeffs, scales, gammas)
+    om, omy, u, uy = _omega_fields_point(
+        y, coeffs, scales, gammas, orders=orders, parities=parities
+    )
     y_iv = Interval.point(y)
     lam_iv = Interval.point(lam)
     return om + ((Interval.point(1.0) + lam_iv) * y_iv - u) * omy - om * uy
@@ -119,11 +184,15 @@ def _hardy_residual_interval(
     form: str,
     s: float,
     gammas: Sequence[float] | None = None,
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
 ) -> Interval:
     if form == "vorticity":
         alpha = alpha_from_lambda(lam)
         gs = list(gammas) if gammas is not None else [alpha] * len(coeffs)
-        return _vorticity_residual_interval(coeffs, scales, gs, lam, y)
+        return _vorticity_residual_interval(
+            coeffs, scales, gs, lam, y, orders=orders, parities=parities
+        )
     alpha = alpha_from_lambda(lam)
     th = hardy_even_profile(y, coeffs, scales, alpha)
     thp = hardy_even_profile_deriv(y, coeffs, scales, alpha)
@@ -248,34 +317,60 @@ def _hardy_residual_over_y_interval(
     form: str,
     s: float,
     gammas: Sequence[float] | None = None,
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
 ) -> Interval:
     """Sound enclosure of ``E(y)`` for all ``y`` in ``y_iv`` (interval arithmetic)."""
     if form == "vorticity":
         alpha = alpha_from_lambda(lam)
         gs = list(gammas) if gammas is not None else [alpha] * len(coeffs)
+        ords, pars, n0 = _normalize_vorticity_atoms(len(coeffs), orders, parities)
         om = Interval.point(0.0)
         omy = Interval.point(0.0)
         u = Interval.point(0.0)
         uy = Interval.point(0.0)
-        for c, a, g in zip(coeffs, scales, gs, strict=True):
-            cc = Interval.point(float(c))
-            gg = float(g)
-            aa = float(a)
-            om = om + cc * hardy_odd_iv(y_iv, aa, gg)
-            omy = omy + cc * Interval.point(gg) * hardy_even_iv(y_iv, aa, gg + 1.0)
-            uy = uy + cc * (-hardy_even_iv(y_iv, aa, gg))
-            if abs(gg - 1.0) < 1e-12:
-                # atan(y/a) over y_iv: outbound via endpoints
-                lo = float(y_iv.lo)
-                hi = float(y_iv.hi)
-                atan_lo = math.atan(lo / aa)
-                atan_hi = math.atan(hi / aa)
-                atan_iv = Interval.hull(atan_lo, atan_hi)
-                u = u + cc * (-atan_iv)
-            else:
-                u = u + cc * (
-                    -hardy_odd_iv(y_iv, aa, gg - 1.0) / Interval.point(gg - 1.0)
-                )
+        if n0:
+            for c, a, g in zip(coeffs, scales, gs, strict=True):
+                cc = Interval.point(float(c))
+                gg = float(g)
+                aa = float(a)
+                om = om + cc * hardy_odd_iv(y_iv, aa, gg)
+                omy = omy + cc * Interval.point(gg) * hardy_even_iv(y_iv, aa, gg + 1.0)
+                uy = uy + cc * (-hardy_even_iv(y_iv, aa, gg))
+                if abs(gg - 1.0) < 1e-12:
+                    # atan(y/a) over y_iv: outbound via endpoints
+                    lo = float(y_iv.lo)
+                    hi = float(y_iv.hi)
+                    atan_lo = math.atan(lo / aa)
+                    atan_hi = math.atan(hi / aa)
+                    atan_iv = Interval.hull(atan_lo, atan_hi)
+                    u = u + cc * (-atan_iv)
+                else:
+                    u = u + cc * (
+                        -hardy_odd_iv(y_iv, aa, gg - 1.0) / Interval.point(gg - 1.0)
+                    )
+        else:
+            for c, a, g, n_ord, par in zip(
+                coeffs, scales, gs, ords, pars, strict=True
+            ):
+                cc = Interval.point(float(c))
+                gg = float(g)
+                aa = float(a)
+                nn = int(n_ord)
+                if par == 1:
+                    om = om + cc * hardy_odd_deriv_n_iv(y_iv, aa, gg, nn)
+                    omy = omy + cc * hardy_odd_deriv_n_iv(y_iv, aa, gg, nn + 1)
+                    uy = uy + cc * (-hardy_even_deriv_n_iv(y_iv, aa, gg, nn))
+                    u = u + cc * hardy_omega_velocity_atom_iv(
+                        y_iv, aa, gg, nn, parity="odd"
+                    )
+                else:
+                    om = om + cc * hardy_even_deriv_n_iv(y_iv, aa, gg, nn)
+                    omy = omy + cc * hardy_even_deriv_n_iv(y_iv, aa, gg, nn + 1)
+                    uy = uy + cc * hardy_odd_deriv_n_iv(y_iv, aa, gg, nn)
+                    u = u + cc * hardy_omega_velocity_atom_iv(
+                        y_iv, aa, gg, nn, parity="even"
+                    )
         lam_iv = Interval.point(lam)
         return om + ((Interval.point(1.0) + lam_iv) * y_iv - u) * omy - om * uy
     alpha = alpha_from_lambda(lam)
@@ -311,6 +406,8 @@ def _certified_residual_sup(
     max_depth: int = 6,
     width_tol: float = 1e-12,
     gammas: Sequence[float] | None = None,
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
 ) -> tuple[float, float, float, int, bool]:
     """Return ``(core_sup, far_hi, certified_sup, leaves, between_node_certified)``.
 
@@ -326,7 +423,15 @@ def _certified_residual_sup(
         probe = max(
             probe,
             _hardy_residual_interval(
-                coeffs, scales, lam, y, form, s, gammas=gammas
+                coeffs,
+                scales,
+                lam,
+                y,
+                form,
+                s,
+                gammas=gammas,
+                orders=orders,
+                parities=parities,
             ).mag,
         )
     cells = n_cells if probe < 1e-4 else min(n_cells, 32)
@@ -342,7 +447,15 @@ def _certified_residual_sup(
         y_iv = Interval.hull(lo, hi)
         try:
             e_iv = _hardy_residual_over_y_interval(
-                coeffs, scales, lam, y_iv, form, s, gammas=gammas
+                coeffs,
+                scales,
+                lam,
+                y_iv,
+                form,
+                s,
+                gammas=gammas,
+                orders=orders,
+                parities=parities,
             )
         except (ValueError, ZeroDivisionError):
             if depth >= depth_cap:
@@ -350,10 +463,26 @@ def _certified_residual_sup(
                 core = max(
                     core,
                     _hardy_residual_interval(
-                        coeffs, scales, lam, lo, form, s, gammas=gammas
+                        coeffs,
+                        scales,
+                        lam,
+                        lo,
+                        form,
+                        s,
+                        gammas=gammas,
+                        orders=orders,
+                        parities=parities,
                     ).mag,
                     _hardy_residual_interval(
-                        coeffs, scales, lam, hi, form, s, gammas=gammas
+                        coeffs,
+                        scales,
+                        lam,
+                        hi,
+                        form,
+                        s,
+                        gammas=gammas,
+                        orders=orders,
+                        parities=parities,
                     ).mag,
                 )
                 leaves += 1
@@ -380,20 +509,37 @@ def _certified_residual_sup(
             far = max(
                 far,
                 _hardy_residual_over_y_interval(
-                    coeffs, scales, lam, y_iv, form, s, gammas=gammas
+                    coeffs,
+                    scales,
+                    lam,
+                    y_iv,
+                    form,
+                    s,
+                    gammas=gammas,
+                    orders=orders,
+                    parities=parities,
                 ).mag,
             )
         except (ValueError, ZeroDivisionError):
             far = max(
                 far,
                 _hardy_residual_interval(
-                    coeffs, scales, lam, y, form, s, gammas=gammas
+                    coeffs,
+                    scales,
+                    lam,
+                    y,
+                    form,
+                    s,
+                    gammas=gammas,
+                    orders=orders,
+                    parities=parities,
                 ).mag,
             )
     alpha = alpha_from_lambda(lam)
     if form == "vorticity":
         gs = list(gammas) if gammas is not None else [alpha] * len(coeffs)
-        p_res = 2.0 * min(gs)
+        ords, _pars, _n0 = _normalize_vorticity_atoms(len(coeffs), orders, parities)
+        p_res = 2.0 * min(g + float(o) for g, o in zip(gs, ords, strict=True))
         c_tail = float(sum(abs(float(c)) for c in coeffs))
         majorant = float(Interval.point(c_tail).hi * (yt ** (-p_res)))
     else:
@@ -423,6 +569,8 @@ def refine_ccf_hardy_profile(
     min_scale: float = 0.05,
     max_scale: float = 40.0,
     gammas: Sequence[float] | None = None,
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
 ) -> dict[str, Any]:
     """Float Newton / LS find-step for a Hardy CCF candidate (not a proof).
 
@@ -453,6 +601,7 @@ def refine_ccf_hardy_profile(
     )
     if len(gs0) != n:
         raise ValueError("gammas length must match coeffs")
+    ords0, pars0, n0_odd = _normalize_vorticity_atoms(n, orders, parities)
     if free_scales:
         n_free = (n - 1) + n + (1 if free_lam else 0)
         default_nodes = [
@@ -507,16 +656,47 @@ def refine_ccf_hardy_profile(
             omy = np.zeros_like(y)
             U = np.zeros_like(y)
             uy = np.zeros_like(y)
-            for c, a, g in zip(full, scales_v, gs, strict=True):
-                r = np.hypot(a, y)
-                phi = np.arctan2(y, a)
-                om += c * (r ** (-g)) * np.sin(g * phi)
-                omy += c * g * (r ** (-(g + 1))) * np.cos((g + 1) * phi)
-                uy += c * (-(r ** (-g)) * np.cos(g * phi))
-                if abs(g - 1.0) < 1e-12:
-                    U += c * (-np.arctan(y / a))
-                else:
-                    U += c * (-(r ** (-(g - 1))) * np.sin((g - 1) * phi) / (g - 1))
+            if n0_odd:
+                for c, a, g in zip(full, scales_v, gs, strict=True):
+                    r = np.hypot(a, y)
+                    phi = np.arctan2(y, a)
+                    om += c * (r ** (-g)) * np.sin(g * phi)
+                    omy += c * g * (r ** (-(g + 1))) * np.cos((g + 1) * phi)
+                    uy += c * (-(r ** (-g)) * np.cos(g * phi))
+                    if abs(g - 1.0) < 1e-12:
+                        U += c * (-np.arctan(y / a))
+                    else:
+                        U += c * (
+                            -(r ** (-(g - 1))) * np.sin((g - 1) * phi) / (g - 1)
+                        )
+            else:
+                for c, a, g, n_ord, par in zip(
+                    full, scales_v, gs, ords0, pars0, strict=True
+                ):
+                    parity = "odd" if par == 1 else "even"
+                    om += c * np.asarray(
+                        [hardy_omega_atom(float(yy), a, g, n_ord, parity=parity) for yy in y]
+                    )
+                    omy += c * np.asarray(
+                        [
+                            hardy_omega_deriv_atom(float(yy), a, g, n_ord, parity=parity)
+                            for yy in y
+                        ]
+                    )
+                    uy += c * np.asarray(
+                        [
+                            hardy_omega_hilbert_atom(float(yy), a, g, n_ord, parity=parity)
+                            for yy in y
+                        ]
+                    )
+                    U += c * np.asarray(
+                        [
+                            hardy_omega_velocity_atom_float(
+                                float(yy), a, g, n_ord, parity=parity
+                            )
+                            for yy in y
+                        ]
+                    )
             r = om + ((1.0 + lam_v) * y - U) * omy - om * uy
             om_for_gauge = om
         else:
@@ -586,6 +766,8 @@ def refine_ccf_hardy_profile(
         "coeffs": full,
         "scales": scales_v,
         "gammas": gs_out,
+        "orders": list(ords0),
+        "parities": list(pars0),
         "lam": lam_v,
         "nodes": tuple(ynodes),
         "form": form,
@@ -609,6 +791,8 @@ def certified_ccf_hardy_wholeline_blowup_attempt(
     nu: float = 1.05,
     residual_gate: float = 1e-11,
     gammas: Sequence[float] | None = None,
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
 ) -> dict[str, Any]:
     """Attempt a whole-line Hardy CAP; report quantified gap if it does not close."""
     if form not in _FORMS:
@@ -632,6 +816,7 @@ def certified_ccf_hardy_wholeline_blowup_attempt(
     )
     if gs is not None and len(gs) != n:
         raise ValueError("gammas length must match coeffs")
+    ords, pars, _n0 = _normalize_vorticity_atoms(n, orders, parities)
     ynodes = list(
         default_ccf_collocation_nodes(n) if nodes is None else [float(y) for y in nodes]
     )
@@ -648,7 +833,9 @@ def certified_ccf_hardy_wholeline_blowup_attempt(
 
         def vort_at(cfull: list[float], y: float) -> float:
             return float(
-                _vorticity_residual_interval(cfull, as_, gs, lam_f, y).mid
+                _vorticity_residual_interval(
+                    cfull, as_, gs, lam_f, y, orders=ords, parities=pars
+                ).mid
             )
 
         for y in ynodes:
@@ -701,12 +888,12 @@ def certified_ccf_hardy_wholeline_blowup_attempt(
         else 2.0 * max(max(ynodes), max(as_)) + 1.0
     )
     core_sup, far_hi, residual_certified_sup, leaves, between_ok = _certified_residual_sup(
-        cs, as_, lam_f, form, s, yt, gammas=gs
+        cs, as_, lam_f, form, s, yt, gammas=gs, orders=ords, parities=pars
     )
     if form == "vorticity":
         assert gs is not None
         c_tail = float(sum(abs(c) for c in cs))
-        p_tail = float(min(gs))
+        p_tail = float(min(g + float(o) for g, o in zip(gs, ords, strict=True)))
     else:
         c_tail, p_tail = hardy_tail_constant(cs, as_, alpha)
     core_radius = max(ynodes)
@@ -785,6 +972,8 @@ def certified_ccf_hardy_wholeline_blowup_attempt(
         "coeffs": cs,
         "scales": as_,
         "gammas": list(gs) if gs is not None else None,
+        "orders": list(ords),
+        "parities": list(pars),
         "alpha": alpha,
         "n_terms": int(n),
         "collocation_nodes": [float(y) for y in ynodes],

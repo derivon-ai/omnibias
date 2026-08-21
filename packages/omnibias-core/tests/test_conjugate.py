@@ -4,6 +4,7 @@
 
 from __future__ import annotations
 
+import math
 import random
 
 import pytest
@@ -144,3 +145,103 @@ def test_alpha_nonpositive_refused() -> None:
     d = HardyDictionary((HardyAtom(1.0, 0.0, 0, "even"), HardyAtom(1.0, 0.0, 0, "odd")))
     with pytest.raises(ValueError, match="alpha"):
         d.hilbert_permutation()
+
+
+def test_hardy_conjugate_dictionary_is_h_closed() -> None:
+    from omnibias.core.conjugate import hardy_conjugate_dictionary, is_spatial_odd
+
+    d = hardy_conjugate_dictionary([1.2, 0.8], [0.6, 0.9], max_order=2)
+    perm = d.hilbert_permutation()
+    assert len(perm) == 12  # 2 pairs × 3 orders × 2 parities
+    assert all(is_spatial_odd(a) or not is_spatial_odd(a) for a in d.atoms)
+    odds = [a for a in d.atoms if is_spatial_odd(a)]
+    assert len(odds) == 6
+    with pytest.raises(ValueError, match="alpha"):
+        hardy_conjugate_dictionary([1.0], [0.0], max_order=0)
+
+
+def test_spatial_odd_omega_atoms_n0_matches_input() -> None:
+    from omnibias.core.conjugate import spatial_odd_omega_atoms
+
+    scales, alphas, orders, parities = spatial_odd_omega_atoms(
+        [1.3, 2.0], [0.622, 1.244], max_order=0
+    )
+    assert scales == (1.3, 2.0)
+    assert alphas == pytest.approx((0.622, 1.244))
+    assert orders == (0, 0)
+    assert parities == ("odd", "odd")
+
+
+def test_n0_velocity_matches_existing_hardy_omega_u() -> None:
+    from omnibias.core.conjugate import hardy_omega_velocity_atom, hardy_q
+
+    y, a, alpha = 0.7, 1.3, 0.622
+    got = hardy_omega_velocity_atom(y, a, alpha, 0, parity="odd")
+    want = -hardy_q(y, a, alpha - 1.0) / (alpha - 1.0)
+    assert got == pytest.approx(want, rel=1e-12, abs=1e-12)
+    a1 = 0.9
+    got1 = hardy_omega_velocity_atom(0.4, a1, 1.0, 0, parity="odd")
+    assert got1 == pytest.approx(-math.atan(0.4 / a1), rel=1e-12, abs=1e-12)
+
+
+def test_velocity_u_prime_is_h_omega_and_u0_zero() -> None:
+    import math as _math
+
+    from omnibias.core.conjugate import (
+        hardy_omega_hilbert_atom,
+        hardy_omega_velocity_atom,
+        is_spatial_odd,
+        HardyAtom,
+    )
+
+    a, alpha = 1.1, 0.7
+    ys = [i * 0.25 for i in range(-8, 9) if i != 0]
+    h = 1e-6
+    for n in range(0, 5):
+        for parity in ("odd", "even"):
+            atom = HardyAtom(a, alpha, n, parity)  # type: ignore[arg-type]
+            assert hardy_omega_velocity_atom(0.0, a, alpha, n, parity=parity) == pytest.approx(
+                0.0, abs=1e-12
+            )
+            for y in ys:
+                u_p = (
+                    hardy_omega_velocity_atom(y + h, a, alpha, n, parity=parity)
+                    - hardy_omega_velocity_atom(y - h, a, alpha, n, parity=parity)
+                ) / (2.0 * h)
+                h_om = hardy_omega_hilbert_atom(y, a, alpha, n, parity=parity)
+                assert u_p == pytest.approx(h_om, rel=2e-5, abs=2e-6)
+            _ = is_spatial_odd(atom)
+            _ = _math.hypot(a, 1.0)
+
+
+def test_interval_velocity_contains_float() -> None:
+    from omnibias.core.conjugate import hardy_omega_velocity_atom as u_float
+    from omnibias.core.verified.hardy_line import (
+        hardy_omega_velocity_atom as u_iv,
+        hardy_omega_velocity_atom_iv,
+    )
+
+    y, a, alpha = 0.35, 1.2, 0.8
+    for n in range(0, 5):
+        for parity in ("odd", "even"):
+            iv = u_iv(y, a, alpha, n, parity=parity)
+            assert iv.contains(u_float(y, a, alpha, n, parity=parity))
+            box = Interval(y - 1e-8, y + 1e-8)
+            boxed = hardy_omega_velocity_atom_iv(box, a, alpha, n, parity=parity)
+            assert boxed.contains(u_float(y, a, alpha, n, parity=parity))
+
+
+def test_odd_gram_condition_number_is_finite() -> None:
+    import numpy as np
+    from omnibias.core.conjugate import (
+        hardy_conjugate_dictionary,
+        odd_profile_design_matrix,
+    )
+
+    d = hardy_conjugate_dictionary([1.0, 1.6], [0.6, 1.2], max_order=2)
+    ys = [i * 0.3 for i in range(-10, 11)]
+    phi = np.asarray(odd_profile_design_matrix(d, ys), dtype=float)
+    gram = phi.T @ phi
+    cond = float(np.linalg.cond(gram))
+    assert math.isfinite(cond)
+    assert cond > 0.0

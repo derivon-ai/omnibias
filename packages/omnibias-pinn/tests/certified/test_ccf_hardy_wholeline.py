@@ -4,6 +4,8 @@
 
 from __future__ import annotations
 
+import json
+
 import numpy as np
 import pytest
 from omnibias.core.proof import Conjecture
@@ -102,3 +104,84 @@ def test_pipeline_smoke() -> None:
     assert result.honesty["navier_stokes_proof_claim"] is False
     assert result.certificate["schema_version"].startswith("navier-stokes-ccf-hardy")
     assert np.isfinite(result.discovery["max_abs_residual"])
+
+
+def test_vorticity_n0_orders_match_legacy_residual() -> None:
+    kwargs = dict(
+        coeffs=[1.0, -0.2],
+        scales=[0.7, 1.4],
+        gammas=[0.62, 1.24],
+        lam=0.6057,
+        form="vorticity",
+        residual_gate=1e-6,
+        velocity_sign=-1.0,
+    )
+    a = certified_ccf_hardy_wholeline_blowup_attempt(**kwargs)
+    b = certified_ccf_hardy_wholeline_blowup_attempt(
+        **kwargs, orders=[0, 0], parities=[1, 1]
+    )
+    assert a["closure_report"]["residual_certified_sup"] == pytest.approx(
+        b["closure_report"]["residual_certified_sup"], rel=0.0, abs=0.0
+    )
+    assert a["honesty"]["navier_stokes_proof_claim"] is False
+    assert b["honesty"]["navier_stokes_proof_claim"] is False
+    for cert in (a, b):
+        residual_ok = (
+            cert["closure_report"]["residual_certified_sup"] <= 1e-6
+        )
+        earned = bool(
+            residual_ok
+            and cert["collocation_closure_certified"]
+            and cert["sequence_space_closure_certified"]
+        )
+        assert cert["honesty"]["whole_line_certified"] is earned
+
+
+def test_conjugate_sweep_smoke_honesty() -> None:
+    from pathlib import Path
+
+    path = (
+        Path(__file__).resolve().parents[4]
+        / "docs"
+        / "benchmarks"
+        / "ccf_conjugate_sweep_smoke.json"
+    )
+    assert path.is_file(), "run: python benchmarks/ccf_conjugate_sweep.py --write-docs"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    assert payload["honesty"]["navier_stokes_proof_claim"] is False
+    assert payload["gates"]["stretch_gate"] == 1e-13
+    assert payload["gates"]["rung1_gate"] == 1e-11
+    residual_ok = bool(payload["best"]["dense_max_abs"] <= 1e-11)
+    both_nk = bool(
+        payload["cap"]["collocation_closed"] and payload["cap"]["sequence_space_closed"]
+    )
+    earned = residual_ok and both_nk
+    assert payload["cap"]["whole_line_certified"] is earned
+    assert payload["gates"]["whole_line_certified"] is earned
+    if not earned:
+        assert payload["honesty"]["rung2_unearned"] is True
+
+
+def test_vorticity_orders_honesty_locks() -> None:
+    cert = certified_ccf_hardy_wholeline_blowup_attempt(
+        coeffs=[0.4, -0.1],
+        scales=[0.8, 1.5],
+        gammas=[0.62, 1.24],
+        orders=[0, 2],
+        parities=[1, 1],
+        lam=0.6057,
+        form="vorticity",
+        residual_gate=1e-11,
+        velocity_sign=-1.0,
+    )
+    assert certified_ccf_hardy_wholeline_blowup_attempt_schema_errors(cert) == []
+    assert cert["honesty"]["navier_stokes_proof_claim"] is False
+    residual_ok = cert["closure_report"]["residual_certified_sup"] <= 1e-11
+    earned = bool(
+        residual_ok
+        and cert["collocation_closure_certified"]
+        and cert["sequence_space_closure_certified"]
+    )
+    assert cert["honesty"]["whole_line_certified"] is earned
+    if not earned:
+        assert cert["honesty"]["whole_line_certified"] is False

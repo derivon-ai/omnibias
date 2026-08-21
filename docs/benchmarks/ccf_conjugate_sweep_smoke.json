@@ -1,0 +1,113 @@
+{
+  "benchmark": "ccf_conjugate_sweep",
+  "tier": "cpu_smoke",
+  "wall_seconds": 41.70818000799045,
+  "config": {
+    "orders": [
+      0,
+      1
+    ],
+    "n_scales": 2,
+    "n_gamma_multiples": 1,
+    "n_grid": 17,
+    "gn_steps": 4,
+    "y_max": 8.0,
+    "seed": 0,
+    "lam": 0.6057,
+    "matched_width": {
+      "max_order": 1,
+      "n_scales": 1,
+      "n_gamma_multiples": 1
+    }
+  },
+  "rows": [
+    {
+      "max_order": 0,
+      "span": 1,
+      "n_atoms": 2,
+      "dense_max_abs": 0.0856715478179377,
+      "reproduction_dense_max_abs_for_gate": 0.0856715478179377,
+      "omega_gauge_sample": 0.05,
+      "omega_max_abs": 0.05172532173136658,
+      "anti_ghost_fired": false,
+      "orders_to_stretch_raw": 11.93283661331986,
+      "gram_cond": 68.96933276567026,
+      "stretch_1e-13_cleared": false,
+      "rung1_1e-11_report": false
+    },
+    {
+      "max_order": 1,
+      "span": 2,
+      "n_atoms": 4,
+      "dense_max_abs": 0.08891038334983543,
+      "reproduction_dense_max_abs_for_gate": 0.08891038334983543,
+      "omega_gauge_sample": 0.05,
+      "omega_max_abs": 0.05199180204310688,
+      "anti_ghost_fired": false,
+      "orders_to_stretch_raw": 11.948952482772365,
+      "gram_cond": 231780.18064880688,
+      "stretch_1e-13_cleared": false,
+      "rung1_1e-11_report": false
+    }
+  ],
+  "matched_width": {
+    "max_order": 1,
+    "span": 2,
+    "n_atoms": 2,
+    "n_scales": 1,
+    "dense_max_abs": 0.08757518307761564,
+    "omega_gauge_sample": 0.049999999999999996,
+    "omega_max_abs": 0.052091986794478254,
+    "anti_ghost_fired": false,
+    "orders_to_stretch_raw": 11.942381053891701,
+    "gram_cond": 5.006824011199118,
+    "control": "matched_width"
+  },
+  "empirical_p": {
+    "p": -0.05353575950781006,
+    "intercept": -2.457234505958729,
+    "n_points": 2.0
+  },
+  "best": {
+    "max_order": 0,
+    "dense_max_abs": 0.0856715478179377,
+    "orders_to_stretch_raw": 11.93283661331986,
+    "ratio_vs_n0": 1.0,
+    "anti_ghost_fired": false
+  },
+  "cap": {
+    "whole_line_certified": false,
+    "navier_stokes_proof_claim": false,
+    "residual_certified_sup": 0.10087151783751239,
+    "residual_gap": 0.10087151782751239,
+    "collocation_closed": false,
+    "sequence_space_closed": false,
+    "status": "BLOCKED",
+    "schema_ok": true
+  },
+  "g2_measurement": {
+    "matched_width_ratio_vs_n0": 0.9782628457882778,
+    "ten_x": false,
+    "note": "measurement, not a merge blocker"
+  },
+  "gates": {
+    "stretch_gate": 1e-13,
+    "rung1_gate": 1e-11,
+    "stretch_1e-13_cleared": false,
+    "rung1_1e-11_cleared": false,
+    "whole_line_certified": false,
+    "navier_stokes_proof_claim": false,
+    "lambda_unmoved": true,
+    "passed": true
+  },
+  "honesty": {
+    "navier_stokes_proof_claim": false,
+    "continuum_claim": false,
+    "stretch_unearned": true,
+    "rung1_unearned": true,
+    "rung2_unearned": true,
+    "compare_arms_on": "dense_max_abs",
+    "not_progress_toward_stretch": true,
+    "note": "N>0 is a measured dictionary-order experiment. A flat G2 means the catch-22 is not dictionary order. Not 3D NS."
+  }
+}

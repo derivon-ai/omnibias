@@ -164,13 +164,172 @@ def hilbert(dictionary: HardyDictionary, coeffs: Sequence[float]) -> tuple[float
     return tuple(out)
 
 
+def hardy_conjugate_dictionary(
+    scales: Sequence[float],
+    alphas: Sequence[float],
+    *,
+    max_order: int,
+) -> HardyDictionary:
+    """H-closed Cauchy-Hardy span: both parities, orders ``0..max_order``.
+
+    ``H`` is a signed permutation. Every ``alpha`` must be ``> 0`` so
+    derivative commutation holds. Spatially odd atoms (``Q^{(even)}`` and
+    ``P^{(odd)}``) are the CCF-Ω subspace; even partners exist so ``H``
+    stays inside the dictionary.
+    """
+    if max_order < 0:
+        raise ValueError(f"max_order must be >= 0, got {max_order}")
+    if len(scales) != len(alphas):
+        raise ValueError("scales and alphas must have the same length")
+    if not scales:
+        raise ValueError("need at least one (scale, alpha) pair")
+    atoms: list[HardyAtom] = []
+    for scale, alpha in zip(scales, alphas, strict=True):
+        if not (float(alpha) > 0.0):
+            raise ValueError(
+                "Hilbert-derivative commutation needs decay (alpha > 0); "
+                f"got alpha={alpha!r}"
+            )
+        for order in range(int(max_order) + 1):
+            atoms.append(HardyAtom(float(scale), float(alpha), order, "even"))
+            atoms.append(HardyAtom(float(scale), float(alpha), order, "odd"))
+    return HardyDictionary(tuple(atoms))
+
+
+def is_spatial_odd(atom: HardyAtom) -> bool:
+    """True when the atom is an odd function of ``y``.
+
+    ``Q^{(n)}`` is odd iff ``n`` is even; ``P^{(n)}`` is odd iff ``n`` is odd.
+    CCF vorticity ``Ω`` lives in this subspace.
+    """
+    if atom.parity == "odd":
+        return atom.order % 2 == 0
+    return atom.order % 2 == 1
+
+
+def spatial_odd_omega_atoms(
+    scales: Sequence[float],
+    alphas: Sequence[float],
+    *,
+    max_order: int,
+) -> tuple[tuple[float, ...], tuple[float, ...], tuple[int, ...], tuple[Parity, ...]]:
+    """Spatially odd ``Ω`` atoms for orders ``0..max_order``.
+
+    ``max_order=0`` returns the input ``(scales, alphas)`` with orders 0
+    and parity ``odd`` — the current CCF Hardy-Ω span.
+    """
+    dictionary = hardy_conjugate_dictionary(scales, alphas, max_order=max_order)
+    odds = tuple(atom for atom in dictionary.atoms if is_spatial_odd(atom))
+    return (
+        tuple(atom.scale for atom in odds),
+        tuple(atom.exponent for atom in odds),
+        tuple(atom.order for atom in odds),
+        tuple(atom.parity for atom in odds),
+    )
+
+
+def _integrate_p(y: float, a: float, beta: float) -> float:
+    """Antiderivative of ``P_{a,beta}`` that vanishes at ``y=0`` (odd)."""
+    if abs(beta - 1.0) < 1e-12:
+        return math.atan(y / a)
+    return hardy_q(y, a, beta - 1.0) / (beta - 1.0)
+
+
+def _integrate_q(y: float, a: float, beta: float) -> float:
+    """Antiderivative of ``Q_{a,beta}`` that vanishes at ``y=0`` (even)."""
+    if abs(beta - 1.0) < 1e-12:
+        return math.log(math.hypot(a, y) / a)
+    p_y = hardy_p(y, a, beta - 1.0)
+    p_0 = a ** (-(beta - 1.0))
+    return -(p_y - p_0) / (beta - 1.0)
+
+
+def hardy_omega_atom(
+    y: float, a: float, alpha: float, n: int, *, parity: Parity
+) -> float:
+    """One CCF-Ω atom: ``Q^{(n)}`` or ``P^{(n)}``."""
+    if parity == "odd":
+        return hardy_q_deriv_n(y, a, alpha, n)
+    return hardy_p_deriv_n(y, a, alpha, n)
+
+
+def hardy_omega_deriv_atom(
+    y: float, a: float, alpha: float, n: int, *, parity: Parity
+) -> float:
+    """``Ω_y`` of one atom (next derivative)."""
+    if parity == "odd":
+        return hardy_q_deriv_n(y, a, alpha, n + 1)
+    return hardy_p_deriv_n(y, a, alpha, n + 1)
+
+
+def hardy_omega_hilbert_atom(
+    y: float, a: float, alpha: float, n: int, *, parity: Parity
+) -> float:
+    """Exact ``HΩ``: ``H[Q^{(n)}]=-P^{(n)}``, ``H[P^{(n)}]=Q^{(n)}``."""
+    if not (alpha > 0.0):
+        raise ValueError(
+            "Hilbert-derivative commutation needs decay (alpha > 0); "
+            f"got alpha={alpha!r}"
+        )
+    if parity == "odd":
+        return -hardy_p_deriv_n(y, a, alpha, n)
+    return hardy_q_deriv_n(y, a, alpha, n)
+
+
+def hardy_omega_velocity_atom(
+    y: float, a: float, alpha: float, n: int, *, parity: Parity = "odd"
+) -> float:
+    """Closed-form ``U`` for one atom with ``U'=HΩ`` and ``U(0)=0``.
+
+    For ``n=0`` and ``parity='odd'`` this is the existing Hardy-Ω formula
+    ``U=-Q_{a,α-1}/(α-1)`` (or ``-arctan(y/a)`` when ``α=1``).
+    """
+    _validate_atom(a, alpha, n)
+    if not (alpha > 0.0):
+        raise ValueError(
+            "Hilbert-derivative commutation needs decay (alpha > 0); "
+            f"got alpha={alpha!r}"
+        )
+    if parity not in ("even", "odd"):
+        raise ValueError(f"parity must be 'even' or 'odd', got {parity!r}")
+    factor = pochhammer(alpha, n)
+    beta = alpha + float(n)
+    if parity == "odd":
+        p_sign, p_kind, _, _ = _table_kind(n)
+        integ = (
+            _integrate_p(y, a, beta) if p_kind == "even" else _integrate_q(y, a, beta)
+        )
+        return -float(p_sign) * factor * integ
+    _, _, q_sign, q_kind = _table_kind(n)
+    integ = _integrate_p(y, a, beta) if q_kind == "even" else _integrate_q(y, a, beta)
+    return float(q_sign) * factor * integ
+
+
+def odd_profile_design_matrix(
+    dictionary: HardyDictionary, y_nodes: Sequence[float]
+) -> tuple[tuple[float, ...], ...]:
+    """Rows are spatially odd atom values at each ``y`` (Gram / projection)."""
+    odds = tuple(atom for atom in dictionary.atoms if is_spatial_odd(atom))
+    if not odds:
+        raise ValueError("dictionary has no spatially odd atoms")
+    return tuple(tuple(atom.evaluate(float(y)) for atom in odds) for y in y_nodes)
+
+
 __all__ = [
     "HardyAtom",
     "HardyDictionary",
     "evaluate",
+    "hardy_conjugate_dictionary",
+    "hardy_omega_atom",
+    "hardy_omega_deriv_atom",
+    "hardy_omega_hilbert_atom",
+    "hardy_omega_velocity_atom",
     "hardy_p",
     "hardy_p_deriv_n",
     "hardy_q",
     "hardy_q_deriv_n",
     "hilbert",
+    "is_spatial_odd",
+    "odd_profile_design_matrix",
+    "spatial_odd_omega_atoms",
 ]
