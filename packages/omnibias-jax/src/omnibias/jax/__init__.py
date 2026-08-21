@@ -167,6 +167,14 @@ from omnibias.jax.optim_kantorovich import (
     polynomial_sqrt2_maps,
     select_accepted_params,
 )
+from omnibias.jax.optim_sharpness import (
+    SharpnessReport,
+    SharpnessSchedule,
+    scheduled_value,
+    sharpness_lambda_max,
+    sharpness_scheduled_minimize,
+    sharpness_scheduled_step,
+)
 from omnibias.jax.precision import X64_HINT, require_x64, x64_enabled
 from omnibias.jax.probability import (
     binned_calibration_error,
@@ -221,6 +229,8 @@ __all__ = [
     "LaplaceTransform",
     "LineSearchResult",
     "MellinTransform",
+    "SharpnessReport",
+    "SharpnessSchedule",
     "TransformBlock",
     "X64_HINT",
     "__lineage__",
@@ -314,7 +324,11 @@ __all__ = [
     "renyi_entropy",
     "require_x64",
     "scan_response",
+    "scheduled_value",
     "select_accepted_params",
+    "sharpness_lambda_max",
+    "sharpness_scheduled_minimize",
+    "sharpness_scheduled_step",
     "sinkhorn_distance",
     "sliced_wasserstein",
     "soft_argmax_offset",

@@ -46,6 +46,11 @@ This module provides
   i.e. Levenberg-Marquardt with the ``mu I`` damping replaced by ``(sigma/3)||s||^3`` for
   automatic step control and global convergence. This is the recommended higher-order PINN
   optimiser (the GN metric beats the full Hessian on a least-squares objective).
+* :func:`sharpness_lambda_max` / optional ``sharpness=`` on
+  :class:`CubicNewton` and :class:`CubicRegularizedNewton` -- theory 08-06:
+  exact-HVP Lanczos ``lambda_max`` sets cubic ``sigma`` each step. Hutchinson
+  is not the method; sharpness is a step-size signal, not a generalization
+  claim.
 * :func:`omnibias.torch.line_search.jet_line_search` -- theory 03-12: certified
   truncation radius, Wolfe-as-interval, ``verify=True`` never-worse backstop
   (re-exported below). :func:`taylor_line_min` remains the order-2/3 autodiff
@@ -74,6 +79,7 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal, cast
 
+from omnibias.core.sharpness import SharpnessSchedule, scheduled_value
 from omnibias.core.verified.conditioning import certified_damping, conditioning_certificate
 from omnibias.torch.line_search import (
     JetLineSearchConfig,
@@ -96,6 +102,12 @@ from omnibias.torch.optim_kantorovich import (
     kantorovich_gated_gauss_newton_step,
     polynomial_sqrt2_maps,
     select_accepted_params,
+)
+from omnibias.torch.optim_sharpness import (
+    SharpnessReport,
+    sharpness_lambda_max,
+    sharpness_scheduled_minimize,
+    sharpness_scheduled_step,
 )
 
 import torch
@@ -958,6 +970,31 @@ def lanczos_tridiag(matvec: MatVec, b: Tensor, k: int, *, tol: float = 1e-10) ->
     return q_basis, tri
 
 
+def _schedule_cubic_sigma(
+    matvec: MatVec,
+    g: Tensor,
+    schedule: SharpnessSchedule,
+    *,
+    min_sigma: float,
+    max_sigma: float,
+) -> tuple[float, float]:
+    """Set cubic ``sigma`` from the largest Ritz value of ``matvec`` (theory 08-06)."""
+    probe = g
+    if float(torch.linalg.vector_norm(probe)) == 0.0:
+        probe = torch.zeros_like(g)
+        probe = probe.clone()
+        probe[0] = 1.0
+    _q_basis, tri = lanczos_tridiag(matvec, probe, int(schedule.n_lanczos))
+    ell = float(torch.max(torch.linalg.eigvalsh(tri)))
+    sigma = scheduled_value(ell, schedule)
+    if not math.isfinite(sigma) or sigma <= 0.0:
+        raise ValueError(
+            "sharpness schedule produced a non-finite or non-positive cubic "
+            f"sigma {sigma!r} from ell_k={ell!r}; refusing the step"
+        )
+    return max(float(min_sigma), min(sigma, float(max_sigma))), ell
+
+
 def _solve_cubic_subproblem(tri: Tensor, c: Tensor, sigma: float, *, iters: int = 100) -> Tensor:
     r"""Global minimiser of ``c^T y + 0.5 y^T T y + (sigma/3) ||y||^3`` (the ARC subproblem).
 
@@ -1105,6 +1142,10 @@ class _CubicArcOptimizer:
         Lanczos subspace dimension (number of curvature-vector products per step).
     max_line_search:
         Max ``sigma`` increases attempted within one :meth:`step` before giving up.
+    sharpness:
+        Optional theory 08-06 schedule. When set, each step measures a Ritz
+        ``lambda_max`` with exact HVPs and replaces ``sigma`` before the ARC
+        subproblem. ``target`` must be ``"cubic_sigma"``.
     """
 
     def __init__(
@@ -1119,6 +1160,7 @@ class _CubicArcOptimizer:
         max_sigma: float = 1e16,
         krylov_dim: int = 20,
         max_line_search: int = 12,
+        sharpness: SharpnessSchedule | None = None,
     ) -> None:
         if sigma <= 0.0:
             raise ValueError(f"sigma must be > 0, got {sigma}")
@@ -1134,6 +1176,11 @@ class _CubicArcOptimizer:
             raise ValueError(f"krylov_dim must be >= 1, got {krylov_dim}")
         if max_line_search < 1:
             raise ValueError(f"max_line_search must be >= 1, got {max_line_search}")
+        if sharpness is not None and sharpness.target != "cubic_sigma":
+            raise ValueError(
+                "CubicRegularizedNewton.sharpness.target must be 'cubic_sigma', "
+                f"got {sharpness.target!r}"
+            )
         self.sigma = float(sigma)
         self.eta_accept = float(eta_accept)
         self.eta_success = float(eta_success)
@@ -1143,6 +1190,8 @@ class _CubicArcOptimizer:
         self.max_sigma = float(max_sigma)
         self.krylov_dim = int(krylov_dim)
         self.max_line_search = int(max_line_search)
+        self.sharpness = sharpness
+        self.last_ell_k: float | None = None
         self.n_iter = 0
 
     def _arc(
@@ -1203,6 +1252,15 @@ class CubicRegularizedNewton(_CubicArcOptimizer):
 
         def matvec(v: Tensor) -> Tensor:
             return cast(Tensor, jvp(grad_fn, (params,), (v,))[1])
+
+        if self.sharpness is not None:
+            self.sigma, self.last_ell_k = _schedule_cubic_sigma(
+                matvec,
+                g,
+                self.sharpness,
+                min_sigma=self.min_sigma,
+                max_sigma=self.max_sigma,
+            )
 
         f0 = float(fn(params))
         new_params, accepted, self.sigma, rho, loss = self._arc(
@@ -1903,6 +1961,9 @@ class CubicNewton(_CurvatureOptimizer):
     saddle-escaping -- there is no learning rate. Best for general smooth nonconvex objectives;
     for a least-squares / PINN residual prefer :class:`CubicGaussNewton`.
 
+    Pass ``sharpness=SharpnessSchedule(...)`` to set cubic ``sigma`` from exact-HVP
+    Lanczos ``lambda_max`` each step (theory 08-06).
+
     Usage (a one-line swap for Adam)::
 
         opt = CubicNewton(model.parameters())
@@ -1925,6 +1986,7 @@ class CubicNewton(_CurvatureOptimizer):
         max_sigma: float = 1e16,
         krylov_dim: int = 20,
         max_line_search: int = 12,
+        sharpness: SharpnessSchedule | None = None,
     ) -> None:
         if sigma <= 0.0:
             raise ValueError(f"sigma must be > 0, got {sigma}")
@@ -1936,6 +1998,11 @@ class CubicNewton(_CurvatureOptimizer):
             raise ValueError(f"krylov_dim must be >= 1, got {krylov_dim}")
         if max_line_search < 1:
             raise ValueError(f"max_line_search must be >= 1, got {max_line_search}")
+        if sharpness is not None and sharpness.target != "cubic_sigma":
+            raise ValueError(
+                "CubicNewton.sharpness.target must be 'cubic_sigma', "
+                f"got {sharpness.target!r}"
+            )
         super().__init__(params, {})
         self._sigma = float(sigma)
         self.eta_accept = float(eta_accept)
@@ -1946,6 +2013,8 @@ class CubicNewton(_CurvatureOptimizer):
         self.max_sigma = float(max_sigma)
         self.krylov_dim = int(krylov_dim)
         self.max_line_search = int(max_line_search)
+        self.sharpness = sharpness
+        self.last_ell_k: float | None = None
         self.n_iter = 0
 
     def step(self, closure: Closure | None = None) -> Tensor:  # type: ignore[override]
@@ -1958,6 +2027,15 @@ class CubicNewton(_CurvatureOptimizer):
 
         def matvec(v: Tensor) -> Tensor:
             return self._hvp(g_list, v)
+
+        if self.sharpness is not None:
+            self._sigma, self.last_ell_k = _schedule_cubic_sigma(
+                matvec,
+                g,
+                self.sharpness,
+                min_sigma=self.min_sigma,
+                max_sigma=self.max_sigma,
+            )
 
         def eval_f(trial: Tensor) -> float:
             self._write_flat(trial)
@@ -3782,6 +3860,8 @@ __all__ = [
     "NaturalGradient",
     "ResidualFn",
     "ScalarFn",
+    "SharpnessReport",
+    "SharpnessSchedule",
     "StochasticNewtonCG",
     "TrustRegionNewtonCG",
     "approximate_inverse_jacobian",
@@ -3809,6 +3889,9 @@ __all__ = [
     "polynomial_sqrt2_maps",
     "quadrature_loss",
     "select_accepted_params",
+    "sharpness_lambda_max",
+    "sharpness_scheduled_minimize",
+    "sharpness_scheduled_step",
     "solve_subspace_trust_region",
     "steihaug_cg",
     "taylor_line_min",

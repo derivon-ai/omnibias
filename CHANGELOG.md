@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — sharpness-scheduled curvature step (theory 08-06)
+
+- `omnibias.core.sharpness` plus
+  `omnibias.{torch,jax}.optim_sharpness` twins: exact-HVP Lanczos
+  `lambda_max` sets cubic `sigma` (or a learning rate) each step.
+  Hooked on `CubicNewton` / `CubicRegularizedNewton` via
+  `sharpness=`. A non-positive schedule refuses the step. Re-exported
+  from `omnibias.{torch,jax}.optim`.
+- G1–G3 CI-gated. Sharpness is a step-size signal, not a
+  generalization claim and not CCF stretch. Hutchinson is not the
+  method. Bias collapse (`delta -> 0`) makes HVPs exact.
+- Docs: `docs/api/sharpness_schedule.md`,
+  `docs/cookbook/sharpness-schedule.md`.
+  Smoke: `docs/benchmarks/sharpness_schedule_smoke.json`.
+
 ### Added — Kantorovich-accepted Newton (theory 08-04)
 
 - `kantorovich_accept_step` on

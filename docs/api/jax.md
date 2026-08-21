@@ -93,6 +93,9 @@ see [refine.md](refine.md).
 Composed-curvature joint Newton (theory 08-02) lives in
 `omnibias.jax.optim_composed` and is re-exported here; see
 [composed_curvature.md](composed_curvature.md).
+Sharpness-scheduled step (theory 08-06) lives in
+`omnibias.jax.optim_sharpness` and is re-exported here; see
+[sharpness_schedule.md](sharpness_schedule.md).
 
 ::: omnibias.jax.optim
     options:

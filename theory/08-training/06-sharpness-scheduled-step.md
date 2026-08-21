@@ -7,7 +7,7 @@ Hessian (or GN matrix) in closed form, so the cubic penalty or learning
 rate can be set from **measured sharpness** instead of a fixed
 hyperparameter or a Hutchinson estimate.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 08-01
 - **Blocks**: none
 
@@ -78,23 +78,21 @@ must still show 100% finite for scheduled).
 
 ## 6. Proposed API
 
-Does not exist yet.
+Gated. Shared algebra in `omnibias.core.sharpness`; tensor twins in
+`omnibias.{torch,jax}.optim_sharpness`, re-exported from
+`omnibias.{torch,jax}.optim`. `CubicNewton` /
+`CubicRegularizedNewton` take optional `sharpness=`.
 
 ```python
-# omnibias/torch/optim.py  (and jax twin) — proposed
-@dataclass(frozen=True)
-class SharpnessSchedule:
-    n_lanczos: int = 4
-    c: float = 1.0
-    ell_min: float = 1e-6
-    target: str = "cubic_sigma"   # cubic_sigma | lr
+from omnibias.core.sharpness import SharpnessSchedule, scheduled_value
+from omnibias.torch.optim import sharpness_lambda_max, sharpness_scheduled_step
 
-def sharpness_lambda_max(loss_fn, params, *, n_lanczos: int) -> float:
-    """Largest Ritz value from exact HVPs. Does not exist yet as a
-    public helper (lanczos_tridiag already exists internally)."""
+schedule = SharpnessSchedule(n_lanczos=4, c=1e-3, ell_min=1e-6)
+ell = sharpness_lambda_max(loss_fn, params, n_lanczos=schedule.n_lanczos)
 ```
 
-Default dtype; jax: `loss_fn` must be jit-compatible.
+Default dtype; jax: `loss_fn` must be jit-compatible. A non-positive
+scheduled value refuses the step.
 
 ## 7. Practical use cases
 
@@ -137,11 +135,11 @@ Default dtype; jax: `loss_fn` must be jit-compatible.
 
 ## 12. Implementation checklist
 
-- [ ] Public `sharpness_lambda_max` + CubicNewton hook
-- [ ] Tests: stiff quadratic, G1 five seeds, G3 parity
-- [ ] `benchmarks/sharpness_schedule.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Public `sharpness_lambda_max` + CubicNewton hook
+- [x] Tests: stiff quadratic, G1 five seeds, G3 parity
+- [x] `benchmarks/sharpness_schedule.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

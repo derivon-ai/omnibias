@@ -93,6 +93,13 @@ a slice critical point when the joint block is indefinite. G1–G4 CI.
 Not a global min and not CCF stretch. Documented in full at
 [composed_curvature.md](composed_curvature.md).
 
+## Sharpness-scheduled step
+
+Map a Ritz `lambda_max` from exact HVPs to cubic `sigma` or a
+learning rate (theory 08-06). Sharpness is a step-size signal, not a
+generalization claim. Documented in full at
+[sharpness_schedule.md](sharpness_schedule.md).
+
 ## Hierarchical pack tree
 
 1-D near/far split (theory 02-07). `eta=0` is bit-identical to the

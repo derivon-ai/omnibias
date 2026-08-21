@@ -167,6 +167,12 @@ Joint Hessian of consecutive layers from the order-2 chain rule. See
 [composed_curvature.md](composed_curvature.md). Re-exported from
 `omnibias.torch.optim`.
 
+## Sharpness-scheduled step (08-06)
+
+Exact-HVP Lanczos `lambda_max` sets cubic `sigma`. See
+[sharpness_schedule.md](sharpness_schedule.md). Re-exported from
+`omnibias.torch.optim`.
+
 ## Fastpath kernels
 
 ::: omnibias.torch.fastpath

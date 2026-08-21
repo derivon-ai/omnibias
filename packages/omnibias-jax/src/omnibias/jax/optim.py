@@ -28,6 +28,11 @@ This module provides
 * :func:`cubic_regularized_gauss_newton_minimize` -- ARC on the PSD Gauss-Newton
   model (Lanczos cubic subproblem). Twin of
   :class:`omnibias.torch.optim.CubicRegularizedGaussNewton`.
+* :func:`hvp` / :func:`cubic_regularized_newton_step` -- exact Hessian-vector
+  product and one full-Hessian cubic step (twins of the torch helpers).
+* :func:`sharpness_lambda_max` -- theory 08-06: largest Ritz value from
+  exact HVPs; :func:`sharpness_scheduled_step` sets cubic ``sigma`` or a
+  learning rate from that value. Hutchinson is not the method.
 * :func:`gauss_newton_step` / :func:`gauss_newton_minimize` -- an adaptive-damping LM
   loop driven by a ``residual_fn``.
 * :func:`grad_norm_weights` -- self-adaptive loss weights that equalise the per-term
@@ -67,6 +72,13 @@ from omnibias.jax.optim_kantorovich import (
     kantorovich_gated_gauss_newton_step,
     polynomial_sqrt2_maps,
     select_accepted_params,
+)
+from omnibias.jax.optim_sharpness import (
+    SharpnessReport,
+    SharpnessSchedule,
+    sharpness_lambda_max,
+    sharpness_scheduled_minimize,
+    sharpness_scheduled_step,
 )
 
 import jax
@@ -379,6 +391,42 @@ def lanczos_tridiag(
         off = jnp.stack(betas[: m - 1])
         tri = tri + jnp.diag(off, 1) + jnp.diag(off, -1)
     return q_basis, tri
+
+
+def hvp(loss_fn: Callable[[Array], Array], params: Array, v: Array) -> Array:
+    r"""Hessian-vector product ``H v`` of a scalar ``loss_fn`` at ``params``.
+
+    Twin of :func:`omnibias.torch.optim.hvp`: the JVP of the gradient map
+    in direction ``v``. Exact through the closed-form ``sigma''`` tower.
+    """
+    return cast(Array, jax.jvp(jax.grad(loss_fn), (params,), (v,))[1])
+
+
+def cubic_regularized_newton_step(
+    loss_fn: Callable[[Array], Array],
+    params: Array,
+    sigma: float,
+    *,
+    krylov_dim: int = 20,
+) -> Array:
+    r"""One cubic-regularised Newton step (ARC), matrix-free via Lanczos.
+
+    Twin of :func:`omnibias.torch.optim.cubic_regularized_newton_step`.
+    Minimises ``g^T s + 0.5 s^T H s + (sigma/3) ||s||^3`` in a Krylov
+    subspace of the exact Hessian.
+    """
+    grad_fn = jax.grad(loss_fn)
+    g = grad_fn(params)
+    gnorm = float(jnp.linalg.norm(g))
+    if gnorm == 0.0:
+        return cast(Array, jnp.zeros_like(params))
+
+    def matvec(v: Array) -> Array:
+        return cast(Array, jax.jvp(grad_fn, (params,), (v,))[1])
+
+    q_basis, tri = lanczos_tridiag(matvec, g, krylov_dim)
+    c = jnp.zeros((tri.shape[0],), dtype=params.dtype).at[0].set(gnorm)
+    return cast(Array, q_basis @ _solve_cubic_subproblem(tri, c, sigma))
 
 
 def _solve_cubic_subproblem(tri: Array, c: Array, sigma: float, *, iters: int = 100) -> Array:
@@ -949,12 +997,15 @@ __all__ = [
     "MartensGrosseGNConfig",
     "MatVec",
     "ResidualFn",
+    "SharpnessReport",
+    "SharpnessSchedule",
     "approximate_inverse_jacobian",
     "cgls",
     "champ_barrier_residual",
     "composed_block_hessian",
     "composed_curvature_step",
     "cubic_regularized_gauss_newton_minimize",
+    "cubic_regularized_newton_step",
     "gauss_newton_direction",
     "gauss_newton_direction_cgls",
     "gauss_newton_fisher",
@@ -962,6 +1013,7 @@ __all__ = [
     "gauss_newton_step",
     "grad_norm_weights",
     "homotopy_gauss_newton_minimize",
+    "hvp",
     "init_gauss_newton_state",
     "jet_line_search",
     "jet_line_search_on_ray",
@@ -978,4 +1030,7 @@ __all__ = [
     "peak_weighted_residual",
     "polynomial_sqrt2_maps",
     "select_accepted_params",
+    "sharpness_lambda_max",
+    "sharpness_scheduled_minimize",
+    "sharpness_scheduled_step",
 ]

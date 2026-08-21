@@ -32,6 +32,8 @@ Public API:
   refinement algebra (theory 03-13).
 * :class:`ComposedCurvatureConfig`, :func:`select_composed_step` --
   composed-curvature joint Newton algebra (theory 08-02).
+* :class:`SharpnessSchedule`, :func:`scheduled_value` -- map a Ritz
+  ``lambda_max`` to cubic ``sigma`` or a learning rate (theory 08-06).
 
 There are no framework dependencies in this package.
 """
@@ -156,6 +158,12 @@ from omnibias.core.refine import (
     local_scale_from_derivatives,
     refine_bank,
 )
+from omnibias.core.sharpness import (
+    SharpnessReport,
+    SharpnessSchedule,
+    make_report,
+    scheduled_value,
+)
 from omnibias.core.spec import (
     ActivationSpec,
     NthDerivativeFn,
@@ -217,6 +225,8 @@ __all__ = [
     "RefinePolicy",
     "RefineReport",
     "RefinedPack",
+    "SharpnessReport",
+    "SharpnessSchedule",
     "TensorFn",
     "TensorT",
     "TransformIdentity",
@@ -272,6 +282,7 @@ __all__ = [
     "is_log_partition_activation",
     "is_poised",
     "local_scale_from_derivatives",
+    "make_report",
     "make_tempered_fastpath",
     "make_tempered_transforms",
     "mish_inner_coeffs",
@@ -292,6 +303,7 @@ __all__ = [
     "response_profile",
     "run_model_line_search",
     "scalar_nest_hessian",
+    "scheduled_value",
     "second_order_delta",
     "select_composed_step",
     "select_model_step",

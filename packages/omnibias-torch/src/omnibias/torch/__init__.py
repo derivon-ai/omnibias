@@ -141,6 +141,14 @@ from omnibias.torch.optim_kantorovich import (
     polynomial_sqrt2_maps,
     select_accepted_params,
 )
+from omnibias.torch.optim_sharpness import (
+    SharpnessReport,
+    SharpnessSchedule,
+    scheduled_value,
+    sharpness_lambda_max,
+    sharpness_scheduled_minimize,
+    sharpness_scheduled_step,
+)
 from omnibias.torch.probability import (
     binned_calibration_error,
     cdf,
@@ -200,6 +208,8 @@ __all__ = [
     "OMBU",
     "OperatorBlock",
     "OperatorMultiBiasUnit",
+    "SharpnessReport",
+    "SharpnessSchedule",
     "TemperedActivation",
     "TransformBlock",
     "__lineage__",
@@ -280,7 +290,11 @@ __all__ = [
     "renyi_divergence",
     "renyi_entropy",
     "scan_response",
+    "scheduled_value",
     "select_accepted_params",
+    "sharpness_lambda_max",
+    "sharpness_scheduled_minimize",
+    "sharpness_scheduled_step",
     "sinkhorn_distance",
     "sliced_wasserstein",
     "soft_argmax_offset",

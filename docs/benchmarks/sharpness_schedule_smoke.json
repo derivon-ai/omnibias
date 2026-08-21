@@ -1,0 +1,71 @@
+{
+  "schema": "omnibias.benchmarks.sharpness_schedule.v1",
+  "generated_utc": "2026-08-21T15:59:31Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "sharpness_schedule",
+    "full": false,
+    "steps": 20,
+    "schedule": {
+      "c": 0.001,
+      "n_lanczos": 4,
+      "ell_min": 1e-06,
+      "target": "cubic_sigma"
+    },
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "ccf_stretch_cleared": false,
+      "generalization_claim": false,
+      "temperature_collapse": false,
+      "hutchinson": false
+    }
+  },
+  "rss_mb_at_start": 1191.03,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_finite_finishes",
+        "passed": true,
+        "finite_rate": 1.0,
+        "n_seeds": 5,
+        "max_final_loss": 1.5628722422296557e-163,
+        "min_final_loss": 2.7759109934691674e-164,
+        "loss_floor_1e-8": true,
+        "scheduled_wall_seconds": 1.721154416038189,
+        "adam_wall_seconds": 0.02382179902633652,
+        "adam_max_final_loss": 4812.489198633955,
+        "fixed_sigma_also_finite": true,
+        "note": "fixed cubic sigma=1 is also finite on this quadratic; G1 still requires 100% finite scheduled finishes",
+        "ell_k_min": 1.0,
+        "ell_k_max": 10000.000000000004
+      },
+      {
+        "name": "g2_named_schedule",
+        "passed": true,
+        "c": 0.001,
+        "n_lanczos": 4,
+        "ell_min": 1e-06,
+        "ell_k_min": 1.0,
+        "ell_k_max": 10000.000000000004,
+        "target": "cubic_sigma"
+      },
+      {
+        "name": "g3_parity",
+        "passed": true,
+        "torch_lambda_max": 10000.0,
+        "jax_lambda_max": 10000.0,
+        "relative_gap": 0.0
+      }
+    ]
+  },
+  "wall_seconds": 2.6839463000069372
+}
