@@ -222,6 +222,7 @@ nav:
       - Exact score matching (09-21): api/exact_score_matching.md
       - Inverse design (09-22): api/inverse_design.md
       - Sharpness regularizer (09-23): api/sharpness_regularizer.md
+      - World-model-as-jet (09-25): api/world_model_jet.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -318,6 +319,7 @@ nav:
       - Exact score matching: cookbook/exact-score-matching.md
       - Inverse design: cookbook/inverse-design.md
       - Sharpness regularizer: cookbook/sharpness-regularizer.md
+      - World-model-as-jet: cookbook/world-model-jet.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

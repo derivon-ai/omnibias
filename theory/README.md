@@ -243,7 +243,7 @@ operator floor.
 | [09-22 inverse-design](09-inventions/22-inverse-design.md) | gated | Newton-on-`x` with exact `sigma'`; G1–G4 CI; not 08-03 layer invert |
 | [09-23 sharpness regularizer](09-inventions/23-sharpness-regularizer.md) | gated | Exact `lambda_max` / `Tr(H)` in the loss; G1–G4 CI; not 08-06 schedule |
 | [09-24 proof-carrying forward](09-inventions/24-proof-carrying-forward.md) | gated | Forward returns `(y, box)`; G1–G4 CI; not 08-09; Lean flags unforged; founding bias collapse, not temperature collapse |
-| [09-25 world-model-as-jet](09-inventions/25-world-model-jet.md) | concept | Next N-jet + Lohner remainder; not global regularity |
+| [09-25 world-model-as-jet](09-inventions/25-world-model-jet.md) | gated | Next N-jet + Lohner remainder; G1–G4 CI; not NS global regularity |
 | [09-26 net-to-annihilator](09-inventions/26-net-to-annihilator.md) | concept | Ore export + finite rational Lean only; flags future-earned |
 | [09-27 parameter-space jets](09-inventions/27-parameter-space-jets.md) | concept | Mixed `∂^{α,β} u / ∂x^α ∂μ^β`; closed form iff `μ` enters the tower; not a ParamPINN package |
 | [09-28 sliced-jet encoder](09-inventions/28-sliced-jet-encoder.md) | concept | Tokens are scan jets + named energy; not a ViT; not `R^D` |

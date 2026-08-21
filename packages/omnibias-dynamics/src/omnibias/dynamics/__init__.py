@@ -49,6 +49,7 @@ from omnibias.dynamics._core import (
     variational_step,
     vector_field_from_sigma_tower,
 )
+from omnibias.dynamics._core.jet_world import JetWorldConfig, predict_next_jet
 
 try:
     __version__ = _pkg_version("omnibias-dynamics")
@@ -60,6 +61,7 @@ __lineage__ = "bias collapse"
 
 __all__ = [
     "DiscretePeriodicOrbit",
+    "JetWorldConfig",
     "LyapunovBounds",
     "PeriodicOrbitCertificate",
     "PoincareCrossing",
@@ -76,6 +78,7 @@ __all__ = [
     "monodromy_matrix",
     "monodromy_trace",
     "poincare_map",
+    "predict_next_jet",
     "prove_periodic_orbit",
     "radial_logistic",
     "sigma_oscillator_field",

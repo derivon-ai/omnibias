@@ -162,7 +162,9 @@ G1–G4 CI; CNF exact `div` is prior art),
 inverse design (09-22; Newton-on-`x` with exact `sigma'`;
 G1–G4 CI; not 08-03; not a global inverse),
 sharpness regularizer (09-23; `L + mu * ritz`; G1–G4 CI;
-not 08-06 schedule). Cost /
+not 08-06 schedule),
+world-model-as-jet (09-25; next N-jet + Lohner remainder;
+G1–G4 CI; not NS global regularity). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — World-model-as-jet (theory 09-25)
+
+- `omnibias.core.jet_world` plus `omnibias.dynamics._core.jet_world`:
+  next N-jet of a named ODE plus a Lohner remainder plan.
+- G1–G4 CI-gated. Finite-time enclosure. Not NS global regularity.
+  Lohner path imports neither torch nor jax.
+- Docs: `docs/api/world_model_jet.md`,
+  `docs/cookbook/world-model-jet.md`.
+  Smoke: `docs/benchmarks/world_model_jet_smoke.json`.
+
+
 ### Added — Sharpness regularizer (theory 09-23)
 
 - `omnibias.core.sharp_loss` plus

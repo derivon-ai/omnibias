@@ -1,0 +1,54 @@
+{
+  "schema": "omnibias.benchmarks.world_model_jet.v1",
+  "generated_utc": "2026-08-21T21:17:15Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "world_model_jet",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "continuum_claim": false,
+      "global_regularity_claimed": false,
+      "rl_sota_claim": false,
+      "stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 809.16,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "pred": 0.995,
+        "named": 0.995,
+        "remainder": 4.165278025825003e-06
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "contains": true,
+        "width": 3.885780586188049e-15,
+        "pred_err": 4.165278025825003e-06,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "navier_stokes_proof_claim": false,
+        "continuum_claim": false
+      }
+    ]
+  },
+  "disclaimer": "finite-time jet + Lohner remainder; not NS global regularity, not CCF stretch, not an RL SOTA world model",
+  "wall_seconds": 1.7524241479695775
+}

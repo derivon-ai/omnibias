@@ -6,7 +6,7 @@ Predict the **next N-jet of a trajectory** and plan on the Taylor
 polynomial plus a Lohner remainder — a model-based loop whose planner
 is a remainder statement, not sampled imagination.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 07-06, 09-01
 - **Blocks**: none
 
@@ -108,11 +108,11 @@ def predict_next_jet(state_jet, f, *, config: JetWorldConfig):
 
 ## 12. Implementation checklist
 
-- [ ] Jet-world helpers in `omnibias.dynamics`
-- [ ] Oscillator Lohner test
-- [ ] `benchmarks/world_model_jet.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Jet-world helpers in `omnibias.dynamics`
+- [x] Oscillator Lohner test
+- [x] `benchmarks/world_model_jet.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 
