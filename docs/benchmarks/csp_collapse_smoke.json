@@ -1,0 +1,91 @@
+{
+  "schema": "omnibias.benchmarks.csp_collapse.v1",
+  "generated_utc": "2026-08-21T17:32:28Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "csp_collapse",
+    "full": false,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "honesty": {
+      "complete_solver": false,
+      "unsat_proof": false,
+      "p_equals_np_claim": false,
+      "simplex_is_temperature_collapse": true,
+      "clause_is_temperature_collapse": true,
+      "founding_bias_collapse_in_csp": false
+    }
+  },
+  "rss_mb_at_start": 1253.85,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_vertex_exact",
+        "passed": true,
+        "n_checked": 39,
+        "uniform_violation": 0.9999999999999998,
+        "detail": "E=0 iff SAT vertex; uniform triangle E=1"
+      },
+      {
+        "name": "g2_gap_sound",
+        "passed": true,
+        "unsat_triangle_violations": 0,
+        "random_violations": 0,
+        "detail": "never claim SAT where brute force shows none"
+      },
+      {
+        "name": "g3_solve_rate",
+        "passed": true,
+        "ours": 15,
+        "backtrack": 15,
+        "n": 15,
+        "ours_rate": 1.0,
+        "backtrack_rate": 1.0,
+        "detail": "within 10pp of backtracking on a tiny binary ensemble"
+      },
+      {
+        "name": "g4_e2e_skill",
+        "passed": true,
+        "mean_skill": 0.4,
+        "skills": [
+          0.375,
+          0.5,
+          0.375,
+          0.5,
+          0.25
+        ],
+        "detail": "clue-conditioned path colouring vs feature-blind majority"
+      },
+      {
+        "name": "g5_globals",
+        "passed": true,
+        "all_different_ok": true,
+        "cardinality_ok": true,
+        "detail": "globals zero iff feasible vertices"
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "torch_equal": true,
+        "jax_equal": true,
+        "clause_gap": 0.26876392038420827,
+        "detail": "torch / jax softmax_rows match numpy at float64"
+      }
+    ]
+  },
+  "wall_seconds": 1.992647017003037
+}

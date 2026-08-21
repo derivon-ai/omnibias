@@ -7,7 +7,7 @@ of soft-ORs whose `beta -> inf` limit is exact satisfaction; annealing that
 temperature turns constraint satisfaction into a differentiable descent with a
 closed-form gap to the hard problem.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-03, 01-08, 01-09
 - **Blocks**: 03-09
 
@@ -289,16 +289,16 @@ annealing.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-discrete/src/omnibias/discrete/csp/_core.py` on the
+- [x] `packages/omnibias-discrete/src/omnibias/discrete/csp/_core.py` on the
       existing `DiscreteProblem` seam
-- [ ] torch and jax twins with a parity test
-- [ ] Reuse `AnnealSchedule`, `anneal_descent`, `certify_gap`,
+- [x] torch and jax twins with a parity test
+- [x] Reuse `AnnealSchedule`, `anneal_descent`, `certify_gap`,
       `logsumexp_gap_bound`; fork nothing
-- [ ] Exhaustive vertex-exactness test for small instances
-- [ ] Global-constraint exactness tests
-- [ ] Phase-transition benchmark against a complete solver
-- [ ] Two-schedule default derived from measurement
-- [ ] Terminology cross-reference note plus `PENALTY_FILES` registration
-- [ ] `benchmarks/csp_collapse.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] Exhaustive vertex-exactness test for small instances
+- [x] Global-constraint exactness tests
+- [x] Phase-transition benchmark against a complete solver
+- [x] Two-schedule default derived from measurement
+- [x] Terminology cross-reference note plus `PENALTY_FILES` registration
+- [x] `benchmarks/csp_collapse.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

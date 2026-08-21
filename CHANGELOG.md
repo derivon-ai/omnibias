@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — constraint satisfaction collapse (theory 03-03)
+
+- `omnibias.discrete.csp`: finite-domain CSP on the
+  `DiscreteProblem` seam. Multilinear relations, compact
+  all-different / cardinality relaxations, two independent
+  temperature schedules, and soft arc consistency.
+- G1–G6 CI-gated. Both `beta` knobs are temperature collapse
+  (`beta -> inf`), not founding bias collapse (`delta -> 0`).
+  Not a complete solver. Not P vs NP.
+- Docs: `docs/api/csp.md`, `docs/cookbook/csp-collapse.md`.
+  Smoke: `docs/benchmarks/csp_collapse_smoke.json`.
+
+
 ### Added — arrangement LP / learned facets (theory 03-02)
 
 - `omnibias.convex.arrangement`: a learned-facet front end on

@@ -92,6 +92,10 @@ PENALTY_FILES = (
     "packages/omnibias-convex/src/omnibias/convex/arrangement/torch.py",
     "packages/omnibias-convex/src/omnibias/convex/arrangement/jax.py",
     "packages/omnibias-convex/src/omnibias/convex/arrangement/__init__.py",
+    "packages/omnibias-discrete/src/omnibias/discrete/csp/_core.py",
+    "packages/omnibias-discrete/src/omnibias/discrete/csp/torch.py",
+    "packages/omnibias-discrete/src/omnibias/discrete/csp/jax.py",
+    "packages/omnibias-discrete/src/omnibias/discrete/csp/__init__.py",
 )
 
 

@@ -187,6 +187,7 @@ nav:
       - rational stencil obligations (01-11): api/rational_stencil.md
       - soft-population evolution (03-01): api/soft_evolution.md
       - arrangement LP (03-02): api/arrangement_lp.md
+      - CSP collapse (03-03): api/csp.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -250,6 +251,7 @@ nav:
       - Rational stencil obligations: cookbook/rational-stencil.md
       - Soft-population evolution: cookbook/soft-evolution.md
       - Arrangement LP: cookbook/arrangement-lp.md
+      - Constraint satisfaction collapse: cookbook/csp-collapse.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

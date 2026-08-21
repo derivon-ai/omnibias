@@ -51,7 +51,7 @@ API-stability contract -- the public surface may shift between alpha releases.
 
 | Package | Version | Status | Scope |
 |---|---|---|---|
-| omnibias-discrete | 0.1.0a1 | Alpha | Shared discrete-optimization substrate: the DiscreteProblem seam, annealed sigmoid relaxation, rounding + k-flip decoder, and a Lasserre / moment-SOS optimality-gap certificate; ships a MaxSAT front-end. |
+| omnibias-discrete | 0.1.0a1 | Alpha | Shared discrete-optimization substrate: the DiscreteProblem seam, annealed sigmoid relaxation, rounding + k-flip decoder, and a Lasserre / moment-SOS optimality-gap certificate; ships MaxSAT, soft-population evolution, and finite-domain CSP front-ends. |
 | omnibias-qubo | 0.1.0a1 | Alpha | Differentiable + certified QUBO / Ising: annealed relaxation, 1-flip decoder, brute-force oracle, and a spectral / SOS-Lasserre gap certificate; max-cut / MIS front-ends. |
 | omnibias-submodular | 0.1.0a1 | Alpha | Differentiable + certified submodular optimization: multilinear extension + continuous greedy, pipage / swap rounding, a (1 - 1/e) / curvature guarantee + gap sandwich, and exact P-class minimization. |
 | omnibias-struct | 0.1.0a1 | Alpha | Certified differentiable dynamic programming: soft Viterbi / shortest-path / CTC via logsumexp_beta, differentiated exactly by the softplus / sigmoid tower, with a gap certificate vs hard DP; gated tropical homotopy (`omnibias.struct._core.tropical`). |

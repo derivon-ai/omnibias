@@ -157,4 +157,15 @@ respects founding-bias-collapse geometry. See
       show_root_heading: false
       heading_level: 3
 
+## Constraint satisfaction collapse (03-03)
+
+Finite-domain CSP on the discrete seam. Simplex and clause `beta` are
+temperature collapse, not founding bias collapse. See
+[`docs/api/csp.md`](csp.md).
+
+::: omnibias.discrete.csp
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 Status: Alpha (`0.1.0a1`).

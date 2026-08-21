@@ -68,7 +68,9 @@ Newton polish; certify-loop stop; G1–G6 CI; temperature collapse,
 not founding bias collapse; not P vs NP), arrangement LP (03-02;
 learned-facet front end on `solve_lp` + Neumaier-Shcherbina; G1–G5
 CI; not a new LP algorithm; temperature collapse, not founding bias
-collapse). Cost / wall-time / FermiNet-many-body gates are
+collapse), CSP collapse (03-03; finite-domain CSP + two `beta`
+schedules + soft AC; G1–G6 CI; temperature collapse, not founding
+bias collapse; not a complete solver; not P vs NP). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the
