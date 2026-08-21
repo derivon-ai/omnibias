@@ -529,3 +529,9 @@ singularity ansatz is the remaining ingredient and is documented as future work.
     options:
       show_root_heading: false
       heading_level: 3
+
+## Discovery engine
+
+The finite proposer loop, catalog, condition language, and shared
+observation class loop live in [`omnibias.core.proof`](discovery.md).
+Cookbook: [Finite discovery engine](../cookbook/discovery-loop.md).

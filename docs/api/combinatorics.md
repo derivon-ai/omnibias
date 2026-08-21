@@ -80,4 +80,61 @@ Bit-identical PyTorch twins of the relaxation layers (float64).
       show_root_heading: false
       heading_level: 3
 
+## Unsplittable-flow cost separation (DGG)
+
+Exact `Fraction` replay of the AFP / Rybin H* instance and a blind
+parameter-box search. A capped 3-terminal DAG family (≤6 vertices) uses
+the same predicate; a CI miss is `BLOCKED`. The congestion theorem stays
+true; a separator is not a claim that omnibias refuted Goemans.
+Cookbooks: [Unsplittable-flow cost separation](../cookbook/unsplittable-flow.md),
+[Finite discovery engine](../cookbook/discovery-loop.md).
+
+::: omnibias.combinatorics.unsplittable
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Finite Ramsey colouring
+
+Triangle-free colourings, a tiny `IsSaturated` smoke, and a blind
+`K_5` 2-colouring search (`ramsey_colouring_search`). Not Erdős 183.
+Cookbooks: [Finite Ramsey colouring](../cookbook/finite-ramsey-colouring.md),
+[Finite discovery engine](../cookbook/discovery-loop.md).
+
+::: omnibias.combinatorics.ramsey
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Extremal graph templates
+
+`C4` / `C6` / `jTemplate` / `kTemplate` / `pairGraph(4,2)` structural
+checks. Not Erdős 146 / 180.
+Cookbook: [Extremal graph templates](../cookbook/extremal-graph-replay.md).
+
+::: omnibias.combinatorics.extremal
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Named minors (`n≤5`)
+
+`condition_forbidden_minor` searches named `K2` / `K3` / `C4` minors of
+a host with at most five vertices. Finite branch-set test; not
+Robertson–Seymour and not Erdős 146 / 180.
+
+::: omnibias.combinatorics.minors
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+`condition_edge_colouring` and `condition_extremal_template` bind on a
+packed graph (K5 colourings; C4-like templates). Erdős parent keys stay
+False.
+
+::: omnibias.combinatorics.conditions
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 Status: Alpha (`0.1.0a1`).

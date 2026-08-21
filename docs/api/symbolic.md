@@ -25,6 +25,14 @@ experiments under `examples/symbolic_discovery/`.
 
 ## Discovery engine
 
+Condition-language families (`JetConditionFamily`, planted heat,
+continuity, integer-order, piecewise) and `propose_jet_condition` live
+beside the older spans. `omnibias.symbolic.ingest` packs tag-optional
+tables; `discover_observation` loads the stack and runs the bilevel
+loop. Soft residuals stay empirical until `snap_sparse_equation`
+accepts. Cookbook:
+[Finite discovery engine](../cookbook/discovery-loop.md).
+
 ### Fields, jets & sparse equation search
 
 ::: omnibias.symbolic.discovery

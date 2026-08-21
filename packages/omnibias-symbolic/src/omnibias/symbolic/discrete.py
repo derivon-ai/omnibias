@@ -63,6 +63,7 @@ __all__ = [
     "discover_recurrence_least_squares",
     "extract_difference_jets",
     "polynomial_from_samples",
+    "try_recurrence",
     "verify_binomial_recurrence",
 ]
 
@@ -243,6 +244,45 @@ def _poly_is_zero(coeffs: Sequence[Fraction]) -> bool:
     return all(c == 0 for c in coeffs)
 
 
+def try_recurrence(
+    samples: Sequence[Number],
+    order: int,
+    index_degree: int,
+    *,
+    min_equation_margin: int = 2,
+) -> RecurrenceRelation | None:
+    """Exact nullity-one P-recurrence at one ``(order, index_degree)`` cell."""
+
+    if order < 1:
+        raise ValueError(f"order must be >= 1, got {order}")
+    if index_degree < 0:
+        raise ValueError(f"index_degree must be >= 0, got {index_degree}")
+    vals = _as_fractions(samples)
+    width = index_degree + 1
+    unknowns = (order + 1) * width
+    row_indices = list(range(order, len(vals)))
+    if len(row_indices) < unknowns + min_equation_margin:
+        return None
+    design: list[list[Fraction]] = []
+    for n in row_indices:
+        row: list[Fraction] = []
+        for lag in range(order + 1):
+            a_shift = vals[n - lag]
+            for d in range(width):
+                row.append(Fraction(n) ** d * a_shift)
+        design.append(row)
+    null = integer_null_space(_clear_denominators(design))
+    if len(null) != 1:
+        return None
+    coeffs = _vector_to_coefficients(null[0], order, index_degree)
+    if _poly_is_zero(coeffs[0]) or _poly_is_zero(coeffs[order]):
+        return None
+    relation = RecurrenceRelation(order=order, index_degree=index_degree, coefficients=coeffs)
+    if relation.is_satisfied_by(vals):
+        return relation
+    return None
+
+
 def discover_recurrence(
     samples: Sequence[Number],
     *,
@@ -271,34 +311,15 @@ def discover_recurrence(
         raise ValueError(f"max_order must be >= 1, got {max_order}")
     if max_index_degree < 0:
         raise ValueError(f"max_index_degree must be >= 0, got {max_index_degree}")
-    vals = _as_fractions(samples)
-    n_samples = len(vals)
-
     for order in range(1, max_order + 1):
         for index_degree in range(max_index_degree + 1):
-            width = index_degree + 1
-            unknowns = (order + 1) * width
-            row_indices = list(range(order, n_samples))
-            if len(row_indices) < unknowns + min_equation_margin:
-                continue
-            design: list[list[Fraction]] = []
-            for n in row_indices:
-                row: list[Fraction] = []
-                for lag in range(order + 1):
-                    a_shift = vals[n - lag]
-                    for d in range(width):
-                        row.append(Fraction(n) ** d * a_shift)
-                design.append(row)
-            null = integer_null_space(_clear_denominators(design))
-            if len(null) != 1:
-                continue  # 0 = no relation; >1 = ambiguous, prefer a simpler model
-            coeffs = _vector_to_coefficients(null[0], order, index_degree)
-            if _poly_is_zero(coeffs[0]) or _poly_is_zero(coeffs[order]):
-                continue  # degenerate: not a genuine order-`order` recurrence
-            relation = RecurrenceRelation(
-                order=order, index_degree=index_degree, coefficients=coeffs
+            relation = try_recurrence(
+                samples,
+                order,
+                index_degree,
+                min_equation_margin=min_equation_margin,
             )
-            if relation.is_satisfied_by(vals):  # exact by construction; guard anyway
+            if relation is not None:
                 return relation
     return None
 

@@ -11,7 +11,8 @@ kernel re-checks, so a sealed certificate can earn `theorem_prover_verified`.
 - **Global SOS positivity** -- a sound proof that a polynomial is nonnegative
   everywhere.
 - **Positivstellensatz** -- constrained positivity `p >= 0` on `{g_i >= 0}` via
-  certified SOS multipliers (fixed-degree Putinar form).
+  certified SOS multipliers (fixed-degree Putinar form). The `sos_onset`
+  condition sort binds when an `Observation` carries `poly_constraints`.
 - **Auxiliary-functional (background) method** -- a certified `for all data`
   bound on the infinite-time average of an observable for a polynomial ODE /
   Galerkin-truncated system.

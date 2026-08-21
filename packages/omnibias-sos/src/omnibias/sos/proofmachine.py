@@ -44,11 +44,14 @@ from fractions import Fraction
 from typing import Any
 
 from omnibias.core.proof import (
+    CatalogEntry,
     Certificate,
     Conjecture,
     FunctionProver,
     ProofAttempt,
     ProofMachine,
+    register_catalog,
+    run_discovery,
     schema_errors_v1,
 )
 from omnibias.core.proof.certificate import decode_interval
@@ -64,6 +67,9 @@ from omnibias.sos.positivstellensatz import (
 SOS_GLOBAL_NONNEG = "sos_global_nonneg"
 SOS_NONNEG_ON_SET = "sos_nonneg_on_set"
 SOS_TIME_AVERAGE_BOUND = "sos_time_average_bound"
+SOS_DEGREE_SEARCH = "sos_degree_search"
+CONDITION_SOS_TEMPLATE = "condition_sos_template"
+CONDITION_SOS_ONSET = "condition_sos_onset"
 
 
 def _blocked(detail: str) -> ProofAttempt:
@@ -175,8 +181,29 @@ def replay_sos_certificate(certificate: Certificate) -> bool | None:
     return True
 
 
+def _prove_degree_search(conjecture: Conjecture) -> ProofAttempt:
+    from omnibias.sos.families import SosDegreeFamily
+
+    family = SosDegreeFamily(max_half_degree=int(conjecture.data.get("max_half_degree", 2)))
+    proposer = str(conjecture.data.get("proposer", "score_guided"))
+    result = run_discovery(family.statement, family, proposer, budget=int(conjecture.data.get("budget", 4)))
+    payload = result.as_dict()
+    if result.status != "PROVED":
+        return _blocked(result.detail)
+    return ProofAttempt(status="PROVED", certificate=payload, detail=result.detail)
+
+
+def _degree_schema(certificate: Certificate) -> list[str]:
+    honesty = certificate.get("honesty", {})
+    if not isinstance(honesty, Mapping):
+        return ["honesty must be a mapping"]
+    if honesty.get("unproven_claim"):
+        return ["unproven_claim must be False"]
+    return []
+
+
 def sos_provers() -> list[FunctionProver]:
-    """The three SOS provers registered by :func:`build_sos_machine`."""
+    """The SOS provers registered by :func:`build_sos_machine`."""
     return [
         FunctionProver(
             name="sos_global_nonneg",
@@ -199,6 +226,13 @@ def sos_provers() -> list[FunctionProver]:
             schema_fn=sos_certificate_schema_errors,
             replay_fn=replay_sos_certificate,
         ),
+        FunctionProver(
+            name=SOS_DEGREE_SEARCH,
+            kinds=frozenset({SOS_DEGREE_SEARCH}),
+            prove_fn=_prove_degree_search,
+            schema_fn=_degree_schema,
+            replay_fn=lambda c: bool(c.get("replay_ok")),
+        ),
     ]
 
 
@@ -210,7 +244,88 @@ def build_sos_machine() -> ProofMachine:
     return machine
 
 
+def _register() -> None:
+    from omnibias.sos.families import SosDegreeFamily
+
+    for kind, obligation in (
+        (SOS_GLOBAL_NONNEG, "a global SOS certificate for a named polynomial"),
+        (SOS_NONNEG_ON_SET, "a Positivstellensatz certificate on a named set"),
+        (SOS_TIME_AVERAGE_BOUND, "a time-average auxiliary-functional bound"),
+    ):
+        register_catalog(
+            CatalogEntry(
+                kind=kind,
+                obligation=obligation,
+                parent="sum-of-squares positivity",
+                parent_status="already_true",
+                package="omnibias.sos",
+                mode="enclosure",
+                complete=True,
+            ),
+            lambda kind=kind, **_k: {"kind": kind, "mode": "enclosure"},
+        )
+    register_catalog(
+        CatalogEntry(
+            kind=SOS_DEGREE_SEARCH,
+            obligation="the planted polynomial is SOS at some half-degree in the box",
+            parent="sum-of-squares positivity",
+            parent_status="already_true",
+            package="omnibias.sos",
+            mode="exact_search",
+            complete=True,
+        ),
+        lambda **kwargs: run_discovery(
+            SosDegreeFamily().statement,
+            SosDegreeFamily(),
+            "score_guided",
+            budget=int(kwargs.get("budget", 4)),
+        ),
+    )
+    from omnibias.sos.conditions import SosOnsetFamily, SosTemplateFamily
+
+    register_catalog(
+        CatalogEntry(
+            kind=CONDITION_SOS_TEMPLATE,
+            obligation="the planted polynomial is SOS at some half-degree in this grammar",
+            parent="sum-of-squares positivity",
+            parent_status="already_true",
+            package="omnibias.sos",
+            mode="exact_search",
+            complete=False,
+        ),
+        lambda **kwargs: run_discovery(
+            SosTemplateFamily().statement,
+            SosTemplateFamily(),
+            "score_guided",
+            budget=int(kwargs.get("budget", 4)),
+        ),
+    )
+    register_catalog(
+        CatalogEntry(
+            kind=CONDITION_SOS_ONSET,
+            obligation="the observed polynomial is nonnegative on the packed constraint set",
+            parent="on-set nonnegativity",
+            parent_status="already_true",
+            package="omnibias.sos",
+            mode="enclosure",
+            complete=False,
+        ),
+        lambda **kwargs: run_discovery(
+            SosOnsetFamily().statement,
+            SosOnsetFamily(),
+            "score_guided",
+            budget=int(kwargs.get("budget", 4)),
+        ),
+    )
+
+
+_register()
+
+
 __all__ = [
+    "CONDITION_SOS_ONSET",
+    "CONDITION_SOS_TEMPLATE",
+    "SOS_DEGREE_SEARCH",
     "SOS_GLOBAL_NONNEG",
     "SOS_NONNEG_ON_SET",
     "SOS_TIME_AVERAGE_BOUND",

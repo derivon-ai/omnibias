@@ -74,6 +74,7 @@ from omnibias.discrete._core.schedule import AnnealSchedule
 from omnibias.discrete._core.solution import DiscreteSolution, GapCertificate
 from omnibias.discrete._core.union_find import UnionFind, is_forest
 from omnibias.discrete.certify import certify_gap
+from omnibias.discrete.proposers import AnnealDescentProposer
 
 try:
     __version__ = _pkg_version("omnibias-discrete")
@@ -84,6 +85,7 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
 __lineage__ = "temperature collapse"
 
 __all__ = [
+    "AnnealDescentProposer",
     "AnnealSchedule",
     "DiscreteProblem",
     "DiscreteSolution",

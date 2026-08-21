@@ -150,6 +150,7 @@ nav:
   - Packages:
       - Package index (all 42): packages.md
       - omnibias-core: api/core.md
+      - discovery engine: api/discovery.md
       - multipack Birkhoff (01-01): api/multipack.md
       - bias scan (01-02): api/scan.md
       - mollifier calculus (01-05): api/mollifier.md
@@ -253,6 +254,11 @@ nav:
       - Navier-Stokes certified validation: cookbook/navier-stokes-certified.md
       - "Navier-Stokes tracks (numerical / certified / fractional)": cookbook/navier-stokes-tracks.md
       - Prove/disprove machine: cookbook/proof-machine.md
+      - Finite discovery engine: cookbook/discovery-loop.md
+      - Keller Jacobian replay: cookbook/keller-jacobian.md
+      - Unsplittable-flow cost separation: cookbook/unsplittable-flow.md
+      - Finite Ramsey colouring: cookbook/finite-ramsey-colouring.md
+      - Extremal graph templates: cookbook/extremal-graph-replay.md
       - Gauge-theory primitives: cookbook/gauge-theory-primitives.md
       - PINN strict-conservation cages: cookbook/pinn-strict-conservation.md
       - CCF self-similar singularities (CAP): cookbook/ccf-singularity.md

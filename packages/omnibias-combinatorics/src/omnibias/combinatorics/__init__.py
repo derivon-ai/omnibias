@@ -64,6 +64,28 @@ from omnibias.combinatorics._core.matroids import (
 )
 from omnibias.combinatorics._core.polytopes import PolytopeSystem
 from omnibias.combinatorics.certify import certify_gap
+from omnibias.combinatorics.extremal import (
+    ExtremalSearchFamily,
+    c4,
+    c6,
+    j_template,
+    k_template,
+    pair_graph,
+    verify_forbidden_family,
+    verify_pair_graph,
+)
+from omnibias.combinatorics.minors import (
+    ForbiddenMinorFamily,
+    bind_forbidden_minor,
+    complete_graph,
+    contains_minor,
+    k2,
+    k3,
+    k4,
+    observation_k4,
+    observation_path,
+    path_graph,
+)
 from omnibias.combinatorics.problem import (
     AnnealSchedule,
     AssignmentProblem,
@@ -71,6 +93,18 @@ from omnibias.combinatorics.problem import (
     MatroidProblem,
     MinCostFlowProblem,
     TransportProblem,
+)
+from omnibias.combinatorics.proofmachine import build_combinatorics_machine
+from omnibias.combinatorics.ramsey import (
+    is_saturated,
+    is_triangle_free_edge_colouring,
+    verify_pentagon_colouring,
+)
+from omnibias.combinatorics.ramsey_search import RamseyColouringFamily
+from omnibias.combinatorics.unsplittable import (
+    rybin_instance,
+    search_dgg,
+    verify_rybin_instance,
 )
 
 try:
@@ -85,20 +119,46 @@ __all__ = [
     "AnnealSchedule",
     "AssignmentProblem",
     "CombinatorialCertificate",
+    "ExtremalSearchFamily",
+    "ForbiddenMinorFamily",
     "GraphicMatroid",
     "Matroid",
     "MatroidProblem",
     "MinCostFlowProblem",
     "PartitionMatroid",
     "PolytopeSystem",
+    "RamseyColouringFamily",
     "TransportProblem",
     "UniformMatroid",
     "__lineage__",
     "__version__",
+    "bind_forbidden_minor",
     "brute_force_min",
+    "build_combinatorics_machine",
+    "c4",
+    "c6",
     "certify_gap",
     "classical_optimum",
+    "complete_graph",
+    "contains_minor",
     "decode",
     "independent_sets",
+    "is_saturated",
+    "is_triangle_free_edge_colouring",
+    "j_template",
+    "k2",
+    "k3",
+    "k4",
+    "k_template",
     "max_flow_value",
+    "observation_k4",
+    "observation_path",
+    "pair_graph",
+    "path_graph",
+    "rybin_instance",
+    "search_dgg",
+    "verify_forbidden_family",
+    "verify_pair_graph",
+    "verify_pentagon_colouring",
+    "verify_rybin_instance",
 ]

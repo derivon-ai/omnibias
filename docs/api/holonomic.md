@@ -54,6 +54,20 @@ and the `omnibias.core.proof` Lean loop.
     founded by `omnibias-difference` (the `delta -> 0` collapse). Smoke:
     `docs/examples/holonomic_validate.py`.
 
+Finite Keller-map identities (`omnibias.holonomic.keller`) are exact
+`Q` algebra: a replay of Alpöge / Gallagher and a blind deg-2 / deg-3
+tangent-sweep search via `run_discovery`. Prefix-verified guess families
+(`holonomic_recurrence_guess`, `holonomic_dfinite_guess`,
+`holonomic_algebraic_guess`) recover an annihilator on a finite prefix;
+all-`n` continuation stays the Zeilberger / `HolonomicProof` obligation.
+They do **not** prove the Jacobian conjecture, and they say nothing about
+`n = 2`. The Ore condition sort (`condition_ore`) wraps the recurrence
+guess as a `ConditionHypothesis`. `condition_dfinite` wraps the
+differential annihilator guess when the observation carries
+`extra.series=1`. Cookbooks:
+[Keller Jacobian replay](../cookbook/keller-jacobian.md),
+[Finite discovery engine](../cookbook/discovery-loop.md).
+
 ## Public API
 
 ::: omnibias.holonomic

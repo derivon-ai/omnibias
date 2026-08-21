@@ -69,6 +69,12 @@ from omnibias.holonomic._core.qholonomic import (
     q_shift_algebra,
     q_zeilberger,
 )
+from omnibias.holonomic._core.poly_n import (
+    PolyN,
+    jacobian_det,
+    q_from_p,
+    sylvester_resultant,
+)
 from omnibias.holonomic._core.rational_poly import (
     Poly,
     dispersion_set,
@@ -105,6 +111,7 @@ __all__ = [
     "OrePolynomial",
     "PRecursive",
     "Poly",
+    "PolyN",
     "ProperTerm",
     "QGosperResult",
     "QRecurrence",
@@ -133,6 +140,7 @@ __all__ = [
     "guess_dfinite",
     "guess_recurrence",
     "hyper",
+    "jacobian_det",
     "lclm",
     "ore_divmod",
     "peval",
@@ -141,6 +149,7 @@ __all__ = [
     "precursive_to_dfinite",
     "prove_hypergeometric_identity",
     "prove_identity_zeilberger",
+    "q_from_p",
     "q_gosper",
     "q_gosper_definite_sum",
     "q_gosper_normal_form",
@@ -152,6 +161,7 @@ __all__ = [
     "shift_algebra",
     "square_free",
     "summand_sum",
+    "sylvester_resultant",
     "symmetric_product",
     "term_ratio_annihilates",
     "to_poly",

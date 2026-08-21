@@ -58,3 +58,14 @@ def test_relaxation_docstrings_distinguish_the_two_collapse_senses() -> None:
     # the container docstring must carry the note even with no backend installed
     assert "founding bias collapse" in (combinatorics.__doc__ or "")
     assert seen >= 0
+
+
+def test_no_forged_parent_claims() -> None:
+    from pathlib import Path
+
+    banned = ("solved_dgg", "conjecture_disproved", "solved_erdos")
+    root = Path(combinatorics.__file__).resolve().parent
+    for path in root.rglob("*.py"):
+        text = path.read_text(encoding="utf-8")
+        for token in banned:
+            assert token not in text, f"{path.name} contains banned token {token}"

@@ -192,6 +192,84 @@ The certificate is a statement about **one fixed matrix at one fixed spacing in
 finite dimension**. `continuum_claim` is hard-wired `False`, and nothing in it is
 a claim about the Yang-Mills mass gap.
 
+### The holonomic machine (Keller replay / sweep)
+
+`omnibias-pinn` does not depend on `omnibias-holonomic`. Keller identities
+live on their own registry.
+
+| `kind` | Certificate | Can DISPROVE? |
+|---|---|---|
+| `keller_alpoge_replay` | Alpöge / Gallagher Jacobian identity + witness | No — a failed identity → `BLOCKED` |
+| `keller_tangent_sweep` | Blind deg-2 sweep hit (constant Jac, 3-to-1 fiber) | No — an empty coefficient box → `BLOCKED` |
+| `keller_tangent_sweep_deg3` | Deg-3 sweep via `run_discovery` (const Jac, multi-to-one fiber) | No — a budget miss → `BLOCKED` |
+| `holonomic_recurrence_guess` | Prefix-verified P-recurrence in a degree box | No — a box miss → `BLOCKED` |
+| `holonomic_dfinite_guess` | Prefix-verified differential annihilator | No — a box miss → `BLOCKED` |
+| `holonomic_algebraic_guess` | Prefix-verified `P(x,y)=0` | No — a box miss → `BLOCKED` |
+
+```python
+from omnibias.core.proof import Conjecture
+from omnibias.holonomic.proofmachine import build_holonomic_machine
+
+holonomic = build_holonomic_machine()
+assert set(holonomic.kinds()) >= {
+    "keller_alpoge_replay",
+    "keller_tangent_sweep",
+    "keller_tangent_sweep_deg3",
+    "holonomic_recurrence_guess",
+}
+alpoge = holonomic.evaluate(Conjecture("alpoge", "keller_alpoge_replay"))
+assert alpoge.status == "PROVED"
+assert alpoge.certificate["honesty"]["jacobian_conjecture_proof_claim"] is False
+```
+
+`PROVED` is the finite obligation (a constant-Jacobian 3-to-1 map). It is
+not a Jacobian-conjecture proof, and `n = 2` stays open.
+
+### The combinatorics machine (DGG / Ramsey / extremal)
+
+`omnibias-pinn` does not depend on `omnibias-combinatorics`. These finite
+gates have their own registry.
+
+| `kind` | Certificate | Can DISPROVE? |
+|---|---|---|
+| `dgg_cost_replay` | AFP / Rybin H* cost separation | No — a failed identity → `BLOCKED` |
+| `dgg_cost_search` | Blind H* parameter-box separator | No — an empty box → `BLOCKED` |
+| `dgg_dag_le6` | Capped 3-terminal DAG ≤6 vertices | No — a CI miss is `BLOCKED` (`search_incomplete`) |
+| `ramsey_triangle_free_colouring` | Pentagon 2-colouring of `K_5` | No — a monochrome triangle → `BLOCKED` |
+| `ramsey_saturated_matrix` | Tiny `IsSaturated` smoke | No — a failing matrix → `BLOCKED` |
+| `extremal_forbidden_family` | `C4`/`C6`/`jTemplate`/`kTemplate` predicates | No — a failed predicate → `BLOCKED` |
+| `extremal_pair_graph` | `pairGraph(4,2)` 2-degenerate smoke | No — a failed predicate → `BLOCKED` |
+| `ramsey_colouring_search` | Blind `K_5` 2-colouring search | No — a budget miss → `BLOCKED` |
+| `extremal_template_search` | Named template satisfying the cycle predicate | No — a miss → `BLOCKED` |
+
+```python
+from omnibias.combinatorics.proofmachine import build_combinatorics_machine
+
+combinatorics = build_combinatorics_machine()
+assert set(combinatorics.kinds()) >= {
+    "dgg_cost_replay",
+    "dgg_cost_search",
+    "dgg_dag_le6",
+    "extremal_forbidden_family",
+    "extremal_pair_graph",
+    "extremal_template_search",
+    "ramsey_colouring_search",
+    "ramsey_saturated_matrix",
+    "ramsey_triangle_free_colouring",
+}
+dgg = combinatorics.evaluate(Conjecture("rybin", "dgg_cost_replay"))
+assert dgg.status == "PROVED"
+assert dgg.certificate["honesty"]["dgg_congestion_theorem_refuted"] is False
+ramsey = combinatorics.evaluate(
+    Conjecture("pentagon", "ramsey_triangle_free_colouring")
+)
+assert ramsey.status == "PROVED"
+assert ramsey.certificate["honesty"]["erdos_183_claim"] is False
+```
+
+Docs may say the engine found a counterexample **in this family**. They
+must not say omnibias refuted Keller, Goemans, or Erdős 183 / 146 / 180.
+
 ## The Lean formal loop (kernel-checked verdicts)
 
 omnibias runs one derivative tower in three registers — **differentiable**,
@@ -278,5 +356,9 @@ prover, so a buggy or over-claiming prover is caught rather than trusted.
 
 - Engine (pure-Python, dependency-free): `omnibias.core.proof`.
 - Default registry (wires the concrete certificates): `omnibias.pinn.certified.build_default_machine`.
+- Holonomic registry: `omnibias.holonomic.proofmachine.build_holonomic_machine`.
+- Combinatorics registry: `omnibias.combinatorics.proofmachine.build_combinatorics_machine`.
 - The certificates themselves: [Navier–Stokes certified validation](navier-stokes-certified.md),
-  [CCF singularities](ccf-singularity.md).
+  [CCF singularities](ccf-singularity.md),
+  [Keller Jacobian](keller-jacobian.md),
+  [unsplittable flow](unsplittable-flow.md).
