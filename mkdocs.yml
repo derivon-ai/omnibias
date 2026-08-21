@@ -182,6 +182,7 @@ nav:
       - block exact search (08-07): api/block_exact_search.md
       - depth-causal local jet (08-03): api/local_jet.md
       - depth-causal residual (08-05): api/depth_residual.md
+      - implicit DEQ Newton (08-08): api/implicit.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -240,6 +241,7 @@ nav:
       - Block exact search: cookbook/block-exact-search.md
       - Depth-causal local jet: cookbook/depth-causal-local-jet.md
       - Depth-causal residual: cookbook/depth-causal-residual.md
+      - Implicit DEQ Newton: cookbook/implicit-deq.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

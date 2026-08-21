@@ -101,6 +101,9 @@ Block exact search (theory 08-07) lives in
 [block_exact_search.md](block_exact_search.md).
 Depth-causal local jet (theory 08-03) lives in
 `omnibias.jax.train_local`; see [local_jet.md](local_jet.md).
+Implicit / DEQ Newton (theory 08-08) lives in
+`omnibias.jax.implicit`; see [implicit.md](implicit.md). The
+default solver loop is `lax.while_loop`.
 
 ::: omnibias.jax.optim
     options:

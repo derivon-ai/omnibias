@@ -112,6 +112,12 @@ Named local Gauss–Newton plus a compressed `k`-direction `layer_jet`
 (theory 08-03). Greedy warm start, not a global min. Documented in
 full at [local_jet.md](local_jet.md).
 
+## Implicit / DEQ Newton
+
+Fixed point `u = sigma(W u + x)` plus an exact-`sigma'` IFT VJP
+(theory 08-08). One linear solve, not unrolled BPTT. Documented in
+full at [implicit.md](implicit.md).
+
 ## Hierarchical pack tree
 
 1-D near/far split (theory 02-07). `eta=0` is bit-identical to the

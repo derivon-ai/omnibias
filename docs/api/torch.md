@@ -184,6 +184,11 @@ Exact-HVP Lanczos `lambda_max` sets cubic `sigma`. See
 Forward `layer_jet` plus a named local Gauss–Newton step. See
 [local_jet.md](local_jet.md). Lives in `omnibias.torch.train_local`.
 
+## Implicit / DEQ Newton (08-08)
+
+`u = sigma(W u + x)` plus an exact-`sigma'` IFT VJP. See
+[implicit.md](implicit.md). Lives in `omnibias.torch.implicit`.
+
 ## Fastpath kernels
 
 ::: omnibias.torch.fastpath

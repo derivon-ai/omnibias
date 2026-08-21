@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — implicit DEQ Newton (theory 08-08)
+
+- `omnibias.core.implicit` plus `omnibias.{torch,jax}.implicit` twins:
+  solve `u = sigma(W u + x)` by Newton or Banach iteration and
+  differentiate the root with exact `sigma'` (IFT VJP). JAX uses
+  `lax.while_loop` for the default loop. Anderson is extra and raises.
+  `require_contraction=True` raises rather than silently unrolling.
+- G1–G3 CI-gated. IFT is the chain rule at a fixed point, not unrolled
+  BPTT, not a global min, and not CCF stretch. Bias collapse
+  (`delta -> 0`) supplies `sigma'`.
+- Docs: `docs/api/implicit.md`, `docs/cookbook/implicit-deq.md`.
+  Smoke: `docs/benchmarks/implicit_deq_smoke.json`.
+
 ### Added — depth-causal residual (theory 08-05)
 
 - `omnibias.pinn.train._core.depth_residual` plus

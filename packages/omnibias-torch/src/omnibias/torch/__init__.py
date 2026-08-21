@@ -59,6 +59,15 @@ from omnibias.torch.blocks import (
 from omnibias.torch.conjugate import hardy_atoms, hilbert_coeffs
 from omnibias.torch.growable import GrowableOperatorMultiBiasUnit, GrowStrategy
 from omnibias.torch.hierarchy import hierarchical_scan
+from omnibias.torch.implicit import (
+    DEQConfig,
+    DEQNotContractive,
+    DEQResult,
+    DEQSolverUnknown,
+    deq_du_dW,
+    deq_solve,
+    deq_vjp,
+)
 from omnibias.torch.information import (
     chi_squared_divergence,
     cross_entropy,
@@ -211,6 +220,10 @@ __all__ = [
     "CONTINUUM_PDE_CLAIM_KEY",
     "ComposedCurvatureConfig",
     "ComposedCurvatureReport",
+    "DEQConfig",
+    "DEQNotContractive",
+    "DEQResult",
+    "DEQSolverUnknown",
     "EquivariantScan",
     "FINITE_RESIDUAL_CLAIM",
     "FourierTransform",
@@ -259,6 +272,9 @@ __all__ = [
     "cross_entropy",
     "delta_method_gaussian",
     "delta_method_moments",
+    "deq_du_dW",
+    "deq_solve",
+    "deq_vjp",
     "derivative_jet",
     "empirical_band_mass",
     "entropy",

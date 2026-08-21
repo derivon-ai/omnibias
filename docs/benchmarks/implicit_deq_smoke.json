@@ -1,0 +1,80 @@
+{
+  "schema": "omnibias.benchmarks.implicit_deq.v1",
+  "generated_utc": "2026-08-21T16:47:50Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "implicit_deq",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "ccf_stretch_cleared": false,
+      "global_min_claim": false,
+      "unrolled_bptt_claim": false,
+      "greedy_only_claimed_optimal": false
+    }
+  },
+  "rss_mb_at_start": 1081.06,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_ift_fd",
+        "passed": true,
+        "vjp": 0.4457665473277394,
+        "fd": 0.4457665473411865,
+        "rel_gap": 3.0166186461539995e-11,
+        "residual": 3.552713678800501e-15,
+        "note": "Section-5 scalar DEQ. IFT uses exact sigma'. Solver residual must sit below the FD gate."
+      },
+      {
+        "name": "g2_implicit_residual",
+        "passed": true,
+        "n_seeds": 5,
+        "mses": [
+          0.12200280281388438,
+          0.11989389000450569,
+          0.12316191763826469,
+          0.1199524718701803,
+          0.12211766262148058
+        ],
+        "skills": [
+          0.7437941140908428,
+          0.7482228309905381,
+          0.7413599729596441,
+          0.7480998090726214,
+          0.7435529084948908
+        ],
+        "mean_mse": 0.12142574898966313,
+        "max_mse": 0.12316191763826469,
+        "zero_mse": 0.47619047619047616,
+        "mse_max": 0.25,
+        "contraction_raises": true,
+        "honesty": {
+          "navier_stokes_proof_claim": false,
+          "ccf_stretch_cleared": false,
+          "global_min_claim": false,
+          "unrolled_bptt_claim": false,
+          "greedy_only_claimed_optimal": false
+        },
+        "note": "Named implicit residual u*[:,0] - sin(pi x) on a width-2 tanh DEQ. IFT-GN with a never-worse accept, not unrolled BPTT. u=0 fails the MSE cap. require_contraction raises instead of unrolling."
+      },
+      {
+        "name": "g3_parity",
+        "passed": true,
+        "u_gap": 0.0,
+        "vjp_gap": 1.1102230246251565e-16,
+        "n_iter_torch": 3,
+        "n_iter_jax": 3
+      }
+    ]
+  },
+  "wall_seconds": 1.1834889460005797
+}

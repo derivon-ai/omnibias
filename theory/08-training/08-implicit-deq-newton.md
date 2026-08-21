@@ -6,7 +6,7 @@ An equilibrium layer `u = sigma(W u + x)` is differentiated by the
 implicit-function theorem with exact `sigma'`, so one linear solve
 replaces unrolled backprop through a fixed-point iteration.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 08-01
 - **Blocks**: none
 
@@ -158,12 +158,12 @@ Default dtype; jax marks `deq_solve` as the scan/while primitive.
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.{torch,jax}.implicit`
-- [ ] IFT VJP with exact `sigma'`
-- [ ] Tests: G1 FD, G3 parity, contraction raise
-- [ ] `benchmarks/implicit_deq.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.{torch,jax}.implicit`
+- [x] IFT VJP with exact `sigma'`
+- [x] Tests: G1 FD, G3 parity, contraction raise
+- [x] `benchmarks/implicit_deq.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

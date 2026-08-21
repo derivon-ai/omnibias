@@ -38,6 +38,8 @@ Public API:
   03-12 search on one coordinate block (theory 08-07).
 * :class:`LocalJetConfig`, :class:`LocalJetForbidden` -- depth-causal
   local jet flood forbid and invert-and-match (theory 08-03).
+* :class:`DEQConfig`, :class:`DEQNotContractive` -- implicit DEQ
+  contraction raise and Newton / Banach budget (theory 08-08).
 
 There are no framework dependencies in this package.
 """
@@ -95,6 +97,15 @@ from omnibias.core.frames import (
     vanishing_moments,
 )
 from omnibias.core.hierarchy import Cluster, build_pack_tree, hierarchical_value, truncation_bound
+from omnibias.core.implicit import (
+    DEQConfig,
+    DEQNotContractive,
+    DEQSolverUnknown,
+    honesty_payload,
+    reject_anderson,
+    reject_deq_contraction,
+    spectral_radius_inf_bound,
+)
 from omnibias.core.information import (
     binary_entropy,
     has_cumulant_tower,
@@ -233,6 +244,9 @@ __all__ = [
     "Cluster",
     "ComposedCurvatureConfig",
     "ComposedCurvatureReport",
+    "DEQConfig",
+    "DEQNotContractive",
+    "DEQSolverUnknown",
     "EqualitySystem",
     "FrameSpec",
     "HardyAtom",
@@ -305,6 +319,7 @@ __all__ = [
     "hermite_function",
     "hierarchical_value",
     "hilbert_hardy_dictionary",
+    "honesty_payload",
     "hp_decision",
     "incidence_matrix",
     "index_position",
@@ -334,6 +349,8 @@ __all__ = [
     "raw_to_central_moments",
     "refine_bank",
     "registered_activations",
+    "reject_anderson",
+    "reject_deq_contraction",
     "reject_full_parameter_jacobian",
     "reject_local_jet_flood",
     "relative_bandwidth",
@@ -348,6 +365,7 @@ __all__ = [
     "select_model_step",
     "sigmoid_polynomial_coeffs",
     "solve_dense",
+    "spectral_radius_inf_bound",
     "symmetrize",
     "tail_bound",
     "tanh_polynomial_coeffs",

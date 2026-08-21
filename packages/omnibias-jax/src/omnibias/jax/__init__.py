@@ -72,6 +72,15 @@ from omnibias.jax.bo_derivatives import (
 )
 from omnibias.jax.conjugate import hardy_atoms, hilbert_coeffs
 from omnibias.jax.hierarchy import hierarchical_scan
+from omnibias.jax.implicit import (
+    DEQConfig,
+    DEQNotContractive,
+    DEQResult,
+    DEQSolverUnknown,
+    deq_du_dW,
+    deq_solve,
+    deq_vjp,
+)
 from omnibias.jax.information import (
     chi_squared_divergence,
     cross_entropy,
@@ -240,6 +249,10 @@ __all__ = [
     "CONTINUUM_PDE_CLAIM_KEY",
     "ComposedCurvatureConfig",
     "ComposedCurvatureReport",
+    "DEQConfig",
+    "DEQNotContractive",
+    "DEQResult",
+    "DEQSolverUnknown",
     "FINITE_RESIDUAL_CLAIM",
     "FourierTransform",
     "JaxActivationSpec",
@@ -279,6 +292,9 @@ __all__ = [
     "cross_entropy",
     "delta_method_gaussian",
     "delta_method_moments",
+    "deq_du_dW",
+    "deq_solve",
+    "deq_vjp",
     "derivative_jet",
     "empirical_band_mass",
     "entropy",

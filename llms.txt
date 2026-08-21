@@ -55,7 +55,9 @@ step-size signal, not a generalization claim), block exact search
 global solver), depth-causal local jet (08-03; named local GN +
 `k`-direction `layer_jet`; G1–G4 CI; greedy warm start, not
 ImageNet), depth-causal residual (08-05; PDE residual marched in
-network depth; G1–G3 CI; not time marching, not CCF Hilbert). Cost / wall-time / FermiNet-many-body gates are
+network depth; G1–G3 CI; not time marching, not CCF Hilbert),
+implicit DEQ Newton (08-08; `u = sigma(W u + x)` with exact-`sigma'`
+IFT; G1–G3 CI; not unrolled BPTT, not CCF stretch). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

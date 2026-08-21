@@ -512,7 +512,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.pinn.train._core.depth_residual` plus
   `omnibias.pinn.train.{torch,jax}.depth_residual` (08-05; PDE residual
   marched in network depth; G1–G3 CI; not time marching, not CCF
-  Hilbert).
+  Hilbert) /
+  `omnibias.core.implicit` /
+  `omnibias.{torch,jax}.implicit` (08-08; `u = sigma(W u + x)` with
+  exact-`sigma'` IFT; G1–G3 CI; not unrolled BPTT, not CCF stretch).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -541,7 +544,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/sharpness_schedule.md`](docs/api/sharpness_schedule.md),
   [`docs/api/block_exact_search.md`](docs/api/block_exact_search.md),
   [`docs/api/local_jet.md`](docs/api/local_jet.md),
-  [`docs/api/depth_residual.md`](docs/api/depth_residual.md). Cost /
+  [`docs/api/depth_residual.md`](docs/api/depth_residual.md),
+  [`docs/api/implicit.md`](docs/api/implicit.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

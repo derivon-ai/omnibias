@@ -335,6 +335,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/depth_causal_residual.py
+      - name: Run implicit-DEQ smoke (08-08 G1/G2/G3)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/implicit_deq.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate
