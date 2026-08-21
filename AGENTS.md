@@ -625,7 +625,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   bias collapse, not temperature collapse) /
   `omnibias.qcalculus._core.hybrid` + `omnibias.timescale._core.hybrid`
   (09-15; Jackson / Hilger hybrid; G1–G4 CI; named `q -> 1` /
-  `mu -> 0`, not a continuum PDE).
+  `mu -> 0`, not a continuum PDE) /
+  `omnibias.core.homotopy` + `omnibias.{torch,jax}.optim_homotopy`
+  (09-20; 08-04 filter on a `tau`-path; G1–G4 CI; empty ball is a
+  halt, not a continuum PDE).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -690,7 +693,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/holonomic_layer.md`](docs/api/holonomic_layer.md),
   [`docs/api/jet_hopfield.md`](docs/api/jet_hopfield.md),
   [`docs/api/integral_kernel.md`](docs/api/integral_kernel.md),
-  [`docs/api/q_ombu_timescale.md`](docs/api/q_ombu_timescale.md). Cost /
+  [`docs/api/q_ombu_timescale.md`](docs/api/q_ombu_timescale.md),
+  [`docs/api/homotopy_continuation.md`](docs/api/homotopy_continuation.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

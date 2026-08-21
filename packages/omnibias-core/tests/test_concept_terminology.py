@@ -179,6 +179,9 @@ PENALTY_FILES = (
     "packages/omnibias-timescale/src/omnibias/timescale/_core/hybrid.py",
     "packages/omnibias-timescale/src/omnibias/timescale/torch/hybrid.py",
     "packages/omnibias-timescale/src/omnibias/timescale/jax/hybrid.py",
+    "packages/omnibias-core/src/omnibias/core/homotopy.py",
+    "packages/omnibias-torch/src/omnibias/torch/optim_homotopy.py",
+    "packages/omnibias-jax/src/omnibias/jax/optim_homotopy.py",
 )
 
 

@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Homotopy continuation (theory 09-20)
+
+- `omnibias.core.homotopy` plus `omnibias.{torch,jax}.optim_homotopy`:
+  a `tau`-path of residuals, each knot 08-04-accepted.
+- G1–G4 CI-gated. Empty ball is a halt, not a forged root. Not CCF
+  stretch. Not a continuum PDE.
+- Docs: `docs/api/homotopy_continuation.md`,
+  `docs/cookbook/homotopy-continuation.md`.
+  Smoke: `docs/benchmarks/homotopy_continuation_smoke.json`.
+
+
 ### Added — q-OMBU / timescale hybrid (theory 09-15)
 
 - `omnibias.qcalculus._core.hybrid` and

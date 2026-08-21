@@ -6,7 +6,7 @@ A **path of problems** (linear model to full nonlinear nest). Each
 step is taken only if the Kantorovich ball is nonempty (08-04).
 Training is a certified homotopy, not epoch soup.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 08-04, 09-01
 - **Blocks**: none
 
@@ -107,11 +107,11 @@ def homotopy_train(H_fn, theta0, *, config: HomotopyConfig) -> dict:
 
 ## 12. Implementation checklist
 
-- [ ] Homotopy wrapper calling 08-04
-- [ ] Halt-recording tests
-- [ ] `benchmarks/homotopy_continuation.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Homotopy wrapper calling 08-04
+- [x] Halt-recording tests
+- [x] `benchmarks/homotopy_continuation.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

@@ -1,0 +1,53 @@
+{
+  "schema": "omnibias.benchmarks.homotopy_continuation.v1",
+  "generated_utc": "2026-08-21T21:00:52Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "homotopy_continuation",
+    "full": false,
+    "honesty": {
+      "stretch_claim": false,
+      "continuum_claimed": false,
+      "theorem_prover_verified": false,
+      "empty_ball_is_reject": true
+    }
+  },
+  "rss_mb_at_start": 809.97,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "accepted": true,
+        "abs_h": 5.551115123125783e-17,
+        "theta": 1.1270166537925832
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "reached": 5,
+        "quad_halted": true,
+        "quad_tau": 0.25,
+        "honest": true,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "stretch_claim": false,
+        "empty_ball_is_reject": true
+      }
+    ]
+  },
+  "disclaimer": "Kantorovich homotopy: 08-04 filter on a tau-path; empty ball is a halt, not a continuum theorem and not CCF stretch",
+  "wall_seconds": 1.5249976799823344
+}

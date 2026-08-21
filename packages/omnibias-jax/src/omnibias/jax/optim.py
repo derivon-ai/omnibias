@@ -78,6 +78,7 @@ from omnibias.jax.optim_composed import (
     composed_block_hessian,
     composed_curvature_step,
 )
+from omnibias.jax.optim_homotopy import HomotopyConfig, homotopy_train
 from omnibias.jax.optim_kantorovich import (
     CONTINUUM_PDE_CLAIM_KEY,
     FINITE_RESIDUAL_CLAIM,
@@ -1005,6 +1006,7 @@ __all__ = [
     "FINITE_RESIDUAL_CLAIM",
     "GNSolver",
     "GaussNewtonState",
+    "HomotopyConfig",
     "HomotopyGNConfig",
     "HomotopyResidualFn",
     "JetLineSearchConfig",
@@ -1033,6 +1035,7 @@ __all__ = [
     "gauss_newton_step",
     "grad_norm_weights",
     "homotopy_gauss_newton_minimize",
+    "homotopy_train",
     "hvp",
     "init_gauss_newton_state",
     "jet_line_search",
