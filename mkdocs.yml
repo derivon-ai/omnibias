@@ -211,6 +211,7 @@ nav:
       - remainder training (09-18): api/remainder_training.md
       - Frame-UNet (09-04): api/frame_unet.md
       - Characteristic-Net (09-08): api/characteristic_net.md
+      - sheaf-atlas net (09-09): api/sheaf_atlas_net.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -296,6 +297,7 @@ nav:
       - Remainder training: cookbook/remainder-training.md
       - Frame-UNet: cookbook/frame-unet.md
       - Characteristic-Net: cookbook/characteristic-net.md
+      - Sheaf-atlas net: cookbook/sheaf-atlas-net.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

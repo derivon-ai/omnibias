@@ -291,6 +291,8 @@ jobs:
           pip install -e "packages/omnibias-sos[test]"
           pip install -e packages/omnibias-verify
           pip install -e "packages/omnibias-score[torch,jax]"
+          pip install -e packages/omnibias-partition
+          pip install -e "packages/omnibias-geometry[atlas]"
           pip install pytest
       - name: Run cross-backend parity tests
         run: |
@@ -477,6 +479,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/characteristic_net.py
+      - name: Run sheaf-atlas-net smoke (09-09 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/sheaf_atlas_net.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

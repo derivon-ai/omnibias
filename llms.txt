@@ -139,7 +139,10 @@ founding bias collapse, not temperature collapse; band skip is
 not a collapse head; `sigma'` not admissible),
 Characteristic-Net (09-08; transport along learned `v`; G1–G4 CI;
 founding bias collapse, not temperature collapse; shock flag;
-not 02-13). Cost / wall-time / FermiNet-many-body gates are
+not 02-13),
+sheaf-atlas net (09-09; jet cocycle on partition charts; G1–G4
+CI; founding bias collapse, not temperature collapse; not a
+sheaf theorem). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

@@ -1,0 +1,50 @@
+{
+  "schema": "omnibias.benchmarks.sheaf_atlas_net.v1",
+  "generated_utc": "2026-08-21T20:17:20Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "sheaf_atlas_net",
+    "full": false,
+    "honesty": {
+      "temperature_collapse_used": false,
+      "sheaf_cohomology_theorem": false,
+      "p_vs_np_claim": false,
+      "stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 809.68,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_algebra",
+        "passed": true,
+        "residual": 0.0,
+        "buggy_deriv_gap": 1.0
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "cocycle_mean": 0.0,
+        "overlap_min": 0.24751657271185995,
+        "skill_vs_zero": 1.0
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "temperature_collapse_used": false
+      }
+    ]
+  },
+  "disclaimer": "jet cocycle on an atlas; not a sheaf-cohomology theorem, not P vs NP, and not CCF stretch",
+  "wall_seconds": 1.6257816799916327
+}

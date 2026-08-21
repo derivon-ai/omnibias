@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — sheaf-atlas net (theory 09-09)
+
+- `omnibias.geometry.atlas.cocycle`: jet-valued transition maps
+  with a cocycle residual ``Phi_kj ∘ Phi_ji - Phi_ki``.
+- G1–G4 CI-gated. Chart jets are founding bias collapse
+  (`delta -> 0`); partition hardening is temperature collapse
+  (`beta -> inf`). Not a sheaf-cohomology theorem. Not P vs NP.
+- Docs: `docs/api/sheaf_atlas_net.md`,
+  `docs/cookbook/sheaf-atlas-net.md`.
+  Smoke: `docs/benchmarks/sheaf_atlas_net_smoke.json`.
+
+
 ### Added — Characteristic-Net (theory 09-08)
 
 - `omnibias.pinn.characteristic` plus

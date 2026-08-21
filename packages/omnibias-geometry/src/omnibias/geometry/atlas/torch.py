@@ -20,6 +20,14 @@ from __future__ import annotations
 import torch
 from omnibias.geometry._core.manifold import ManifoldSpec, MetricSpec
 from omnibias.geometry.atlas._core import AtlasSpec
+from omnibias.geometry.atlas.cocycle import (
+    SheafAtlasConfig,
+    honesty_payload,
+    worked_example,
+)
+from omnibias.geometry.atlas.cocycle import (
+    cocycle_residual as _cocycle_residual,
+)
 from omnibias.partition._core.params import region_code_matrix
 from torch import Tensor
 
@@ -57,4 +65,22 @@ def atlas_manifold(atlas: AtlasSpec) -> ManifoldSpec:
     return ManifoldSpec(name=atlas.name, dim=atlas.dim, metric=blended_metric(atlas))
 
 
-__all__ = ["atlas_manifold", "blended_metric"]
+def cocycle_residual(
+    transitions: object,
+    x: Tensor | float,
+    triples: object,
+    *,
+    config: SheafAtlasConfig | None = None,
+) -> dict[str, float]:
+    """Bit-identical to :func:`omnibias.geometry.atlas.cocycle.cocycle_residual`."""
+    xi = float(x.reshape(-1).tolist()[0]) if isinstance(x, Tensor) else float(x)
+    return _cocycle_residual(transitions, xi, triples, config=config)  # type: ignore[arg-type]
+
+
+__all__ = [
+    "atlas_manifold",
+    "blended_metric",
+    "cocycle_residual",
+    "honesty_payload",
+    "worked_example",
+]

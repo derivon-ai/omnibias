@@ -6,7 +6,7 @@ Partition cells plus **jet-valued transition maps**, with a training
 loss that includes the **cocycle residual** "chart `i -> j -> k` equals
 `i -> k` to order `N`."
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-03, 01-10, 09-01
 - **Blocks**: none
 
@@ -111,11 +111,11 @@ def cocycle_residual(transitions, jets, *, config: SheafAtlasConfig):
 
 ## 12. Implementation checklist
 
-- [ ] Cocycle helpers in `omnibias.geometry.atlas`
-- [ ] Partition-weight tests
-- [ ] `benchmarks/sheaf_atlas_net.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Cocycle helpers in `omnibias.geometry.atlas`
+- [x] Partition-weight tests
+- [x] `benchmarks/sheaf_atlas_net.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

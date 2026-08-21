@@ -36,5 +36,21 @@ if find_spec("omnibias.partition") is None:  # the optional ``atlas`` extra is n
     )
 
 from omnibias.geometry.atlas._core import AtlasSpec  # noqa: E402
+from omnibias.geometry.atlas.cocycle import (  # noqa: E402
+    AffineChart,
+    SheafAtlasConfig,
+    cocycle_residual,
+    compose_transition_jet,
+    honesty_payload,
+    worked_example,
+)
 
-__all__ = ["AtlasSpec"]
+__all__ = [
+    "AffineChart",
+    "AtlasSpec",
+    "SheafAtlasConfig",
+    "cocycle_residual",
+    "compose_transition_jet",
+    "honesty_payload",
+    "worked_example",
+]

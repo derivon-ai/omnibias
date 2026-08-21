@@ -153,6 +153,7 @@ PENALTY_FILES = (
     "packages/omnibias-pinn/src/omnibias/pinn/characteristic.py",
     "packages/omnibias-pinn/src/omnibias/pinn/torch/characteristic.py",
     "packages/omnibias-pinn/src/omnibias/pinn/jax/characteristic.py",
+    "packages/omnibias-geometry/src/omnibias/geometry/atlas/cocycle.py",
 )
 
 
