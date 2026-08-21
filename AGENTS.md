@@ -591,7 +591,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   temperature collapse; not ImageNet) /
   `omnibias.core.exact_maml` + `omnibias.{torch,jax}.optim_maml`
   (09-16; inner Newton + IFT meta-grad; G1–G3 CI; founding bias
-  collapse, not temperature collapse; not ImageNet).
+  collapse, not temperature collapse; not ImageNet) /
+  `omnibias.core.verified.tm_neuron` + `omnibias.verify._core.pci`
+  (09-05 / 09-24; TM hidden state + PCI box; G1–G4 CI; founding
+  bias collapse, not temperature collapse; not 08-09, not a
+  deep-net certificate).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -642,7 +646,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/domain_programs.md`](docs/api/domain_programs.md),
   [`docs/api/ftc_net.md`](docs/api/ftc_net.md),
   [`docs/api/jet_token.md`](docs/api/jet_token.md),
-  [`docs/api/exact_maml.md`](docs/api/exact_maml.md). Cost /
+  [`docs/api/exact_maml.md`](docs/api/exact_maml.md),
+  [`docs/api/tm_neuron.md`](docs/api/tm_neuron.md),
+  [`docs/api/pci.md`](docs/api/pci.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

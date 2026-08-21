@@ -204,6 +204,8 @@ nav:
       - FTC-Net / dual-FTC (09-03 / 09-17): api/ftc_net.md
       - jet-token / jet-distill (09-02 / 09-19): api/jet_token.md
       - exact MAML (09-16): api/exact_maml.md
+      - Taylor-model neuron (09-05): api/tm_neuron.md
+      - proof-carrying forward (09-24): api/pci.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -283,6 +285,7 @@ nav:
       - FTC-Net: cookbook/ftc-net.md
       - Jet-token mix: cookbook/jet-token.md
       - Exact MAML: cookbook/exact-maml.md
+      - Taylor-model neuron: cookbook/tm-neuron.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

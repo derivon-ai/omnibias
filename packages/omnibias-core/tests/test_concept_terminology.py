@@ -136,6 +136,8 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/exact_maml.py",
     "packages/omnibias-torch/src/omnibias/torch/optim_maml.py",
     "packages/omnibias-jax/src/omnibias/jax/optim_maml.py",
+    "packages/omnibias-core/src/omnibias/core/verified/tm_neuron.py",
+    "packages/omnibias-verify/src/omnibias/verify/_core/pci.py",
 )
 
 

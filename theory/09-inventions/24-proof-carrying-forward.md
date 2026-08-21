@@ -6,7 +6,7 @@ A forward pass that returns `(y, certificate)` under architecture
 constraints that keep Lipschitz / output boxes **non-vacuous** —
 distinct from 08-09, which filters a *parameter step*.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 08-09, 09-01, 09-05
 - **Blocks**: none
 
@@ -105,11 +105,11 @@ def proof_carrying_forward(net, input_box, spec) -> PCIResult:
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.verify` PCI helper
-- [ ] Flag-forge tests (must not set verified without lake)
-- [ ] `benchmarks/proof_carrying_forward.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.verify` PCI helper
+- [x] Flag-forge tests (must not set verified without lake)
+- [x] `benchmarks/proof_carrying_forward.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

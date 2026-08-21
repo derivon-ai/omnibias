@@ -223,7 +223,7 @@ operator floor.
 | [09-02 jet-token transformer](09-inventions/02-jet-token-transformer.md) | gated | `compose_jet` mix, not softmax-of-values; G1–G3 CI; model jet, not ImageNet; founding bias collapse, not temperature collapse |
 | [09-03 FTC-Net](09-inventions/03-ftc-net.md) | gated | Integral cell + collapse head; G1–G3 CI; not a VPINN; founding bias collapse, not temperature collapse |
 | [09-04 Frame-UNet](09-inventions/04-frame-unet.md) | concept | Order encoder + integral decoder; band skip is not a collapse head |
-| [09-05 Taylor-model neuron](09-inventions/05-taylor-model-neuron.md) | concept | Unit output is a `TaylorModel`; enclosure explosion is the floor |
+| [09-05 Taylor-model neuron](09-inventions/05-taylor-model-neuron.md) | gated | Unit output is a `TaylorModel`; G1–G4 CI; remainder sound, not a deep-net certificate; founding bias collapse, not temperature collapse |
 | [09-06 coupling Jet-Flow](09-inventions/06-coupling-jet-flow.md) | concept | Finite couplings; `log|det| = sum log sigma'`; Newton inverse |
 | [09-07 Pack-MoE](09-inventions/07-pack-moe.md) | concept | Experts are packs; router is slab mass, not softmax |
 | [09-08 Characteristic-Net](09-inventions/08-characteristic-net.md) | concept | Transport along learned `v` with a closed-form time integral |
@@ -242,7 +242,7 @@ operator floor.
 | [09-21 exact score matching](09-inventions/21-exact-score-matching.md) | concept | Hyvärinen on an OMBU score; CNF exact `div` is prior art |
 | [09-22 inverse-design](09-inventions/22-inverse-design.md) | concept | Newton-on-`x` with exact `sigma'`; not 08-03 layer invert |
 | [09-23 sharpness regularizer](09-inventions/23-sharpness-regularizer.md) | concept | Exact `lambda_max` / `Tr(H)` in the loss; not 08-06 schedule |
-| [09-24 proof-carrying forward](09-inventions/24-proof-carrying-forward.md) | concept | Forward returns `(y, certificate)`; not 08-09 step filter |
+| [09-24 proof-carrying forward](09-inventions/24-proof-carrying-forward.md) | gated | Forward returns `(y, box)`; G1–G4 CI; not 08-09; Lean flags unforged; founding bias collapse, not temperature collapse |
 | [09-25 world-model-as-jet](09-inventions/25-world-model-jet.md) | concept | Next N-jet + Lohner remainder; not global regularity |
 | [09-26 net-to-annihilator](09-inventions/26-net-to-annihilator.md) | concept | Ore export + finite rational Lean only; flags future-earned |
 | [09-27 parameter-space jets](09-inventions/27-parameter-space-jets.md) | concept | Mixed `∂^{α,β} u / ∂x^α ∂μ^β`; closed form iff `μ` enters the tower; not a ParamPINN package |

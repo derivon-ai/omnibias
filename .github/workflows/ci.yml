@@ -447,6 +447,14 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/exact_maml.py
+      - name: Run Taylor-model-neuron smoke (09-05 G1–G4)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/taylor_model_neuron.py
+      - name: Run proof-carrying-forward smoke (09-24 G1–G4)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/proof_carrying_forward.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

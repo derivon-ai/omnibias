@@ -6,7 +6,7 @@ A unit whose output is a **`TaylorModel` / interval**, not a float, so
 the forward pass is the same algebraic object as
 `omnibias.core.verified`.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-10, 09-01
 - **Blocks**: 09-24
 
@@ -111,11 +111,11 @@ def tm_dense(tm_in: TaylorModel, w: float, b: float, spec: TMNeuronSpec) -> Tayl
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.core.verified` TM-neuron helpers
-- [ ] Soundness tests (grid + sample)
-- [ ] `benchmarks/taylor_model_neuron.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.core.verified` TM-neuron helpers
+- [x] Soundness tests (grid + sample)
+- [x] `benchmarks/taylor_model_neuron.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

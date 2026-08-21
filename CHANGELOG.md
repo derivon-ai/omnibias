@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Taylor-model neuron and proof-carrying forward (theory 09-05 / 09-24)
+
+- `omnibias.core.verified.tm_neuron` plus `omnibias.verify._core.pci`:
+  a hidden state that is a `TaylorModel`, and a forward that
+  returns `(y_mid, box)`.
+- G1–G4 CI-gated. Jets are founding bias collapse (`delta -> 0`),
+  not temperature collapse. Lean flags stay unforged. Not 08-09.
+  Not a deep-net certificate. Not CCF stretch.
+- Docs: `docs/api/tm_neuron.md`, `docs/api/pci.md`,
+  `docs/cookbook/tm-neuron.md`.
+  Smoke: `docs/benchmarks/taylor_model_neuron_smoke.json`,
+  `docs/benchmarks/proof_carrying_forward_smoke.json`.
+
+
+
 ### Added — exact MAML (theory 09-16)
 
 - `omnibias.core.exact_maml` plus `omnibias.{torch,jax}.optim_maml`:

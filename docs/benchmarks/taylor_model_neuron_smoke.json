@@ -1,0 +1,53 @@
+{
+  "schema": "omnibias.benchmarks.taylor_model_neuron.v1",
+  "generated_utc": "2026-08-21T19:47:07Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "tm_neuron",
+    "full": false,
+    "honesty": {
+      "imagenet_claim": false,
+      "stretch_claim": false,
+      "deep_net_certificate": false,
+      "ns_regularity": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 808.96,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_soundness",
+        "passed": true
+      },
+      {
+        "name": "g2_non_vacuous",
+        "passed": true,
+        "remainder_width": 0.0004110063891656919,
+        "width": 0.050286214427745564
+      },
+      {
+        "name": "g3_depth_honesty",
+        "passed": true,
+        "enclosure_exploded": false,
+        "remainder_width": 3.3446509009866664e-05
+      },
+      {
+        "name": "g4_no_backend",
+        "passed": true,
+        "imagenet_claim": false
+      }
+    ]
+  },
+  "disclaimer": "TM hidden state; sound remainder, not a deep-net certificate, not ImageNet, not CCF stretch",
+  "wall_seconds": 1.4182163929799572
+}
