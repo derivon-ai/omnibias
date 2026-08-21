@@ -203,6 +203,8 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/sliced_jet.py",
     "packages/omnibias-torch/src/omnibias/torch/architectures/sliced_jet.py",
     "packages/omnibias-jax/src/omnibias/jax/architectures/sliced_jet.py",
+    "packages/omnibias-core/src/omnibias/core/uncertainty.py",
+    "packages/omnibias-verify/src/omnibias/verify/uncertainty.py",
 )
 
 

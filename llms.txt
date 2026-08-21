@@ -170,7 +170,9 @@ rational Lean only; flags future-earned),
 parameter-space jets (09-27; mixed `x`–`μ` jets; G1–G5 CI;
 `closed_form` iff `μ` is on the jet trunk),
 sliced-jet encoder (09-28; scan-jet tokens + named energy;
-G1–G5 CI; not a ViT). Cost /
+G1–G5 CI; not a ViT),
+conformal slabs (04-02; three guarantee kinds; G1–G6 CI;
+conformal is not sealable). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

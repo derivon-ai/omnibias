@@ -1,0 +1,66 @@
+{
+  "schema": "omnibias.benchmarks.conformal_slabs.v1",
+  "generated_utc": "2026-08-21T21:34:41Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "conformal_slabs",
+    "full": false,
+    "honesty": {
+      "registers_blended": false,
+      "conformal_sealed": false,
+      "conditional_coverage_guaranteed": false,
+      "exchangeability_assumed": true,
+      "stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 809.25,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "q": 0.88,
+        "resample": 0.87
+      },
+      {
+        "name": "g2_types",
+        "passed": true,
+        "add_raised": true
+      },
+      {
+        "name": "g3_adaptive",
+        "passed": true,
+        "adaptive_max_dev": 0.045695364238410585,
+        "fixed_max_dev": 0.102846975088968
+      },
+      {
+        "name": "g4_shift",
+        "passed": true,
+        "shift_detected": true,
+        "coverage": 0.46464646464646464
+      },
+      {
+        "name": "g5_combine",
+        "passed": true,
+        "combined_lo": 1.4300000000000002
+      },
+      {
+        "name": "g6_width",
+        "passed": true,
+        "average_width": 3.6086598638390814
+      }
+    ]
+  },
+  "disclaimer": "three guarantee kinds stay apart: sound enclosure, conformal, and model-based; conformal is not sealable",
+  "wall_seconds": 1.5056484069791622
+}

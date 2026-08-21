@@ -7,7 +7,7 @@ a prediction interval — so calibrated uncertainty, conformal coverage, and sou
 interval enclosures can share one object, with the crucial discipline that
 their guarantees are of three different kinds and must never be blended.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-03, 03-08, 04-01
 - **Blocks**: 05-01
 
@@ -322,14 +322,14 @@ model interval.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-verify/src/omnibias/verify/uncertainty.py`
-- [ ] `GuaranteeKind` enum with arithmetic between kinds raising
-- [ ] Finite-sample quantile index with an off-by-one regression test
-- [ ] Adaptive width via a positive OMBU output with exact derivatives
-- [ ] `CalibrationReport` requiring `average_width` at the type level
-- [ ] Distribution-shift diagnostic with reported operating characteristics
-- [ ] Certificate schema guard preventing conformal intervals from being sealed
-- [ ] Coverage sweeps across `alpha` and `n` in the benchmark
-- [ ] `benchmarks/conformal_slabs.py` plus smoke JSON
-- [ ] Docs page and nav entry, carrying the three-register table
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-verify/src/omnibias/verify/uncertainty.py`
+- [x] `GuaranteeKind` enum with arithmetic between kinds raising
+- [x] Finite-sample quantile index with an off-by-one regression test
+- [x] Adaptive width via a positive OMBU output with exact derivatives
+- [x] `CalibrationReport` requiring `average_width` at the type level
+- [x] Distribution-shift diagnostic with reported operating characteristics
+- [x] Certificate schema guard preventing conformal intervals from being sealed
+- [x] Coverage sweeps across `alpha` and `n` in the benchmark
+- [x] `benchmarks/conformal_slabs.py` plus smoke JSON
+- [x] Docs page and nav entry, carrying the three-register table
+- [x] Index row in `theory/README.md`

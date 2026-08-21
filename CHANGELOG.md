@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Conformal slabs (theory 04-02)
+
+- `omnibias.core.uncertainty` plus `omnibias.verify.uncertainty`:
+  sound / conformal / model-based slabs as distinct types.
+- G1–G6 CI-gated. Arithmetic across kinds raises. Conformal
+  intervals cannot be sealed.
+- Docs: `docs/api/conformal_slabs.md`,
+  `docs/cookbook/conformal-slabs.md`.
+  Smoke: `docs/benchmarks/conformal_slabs_smoke.json`.
+
+
 ### Added — Sliced-jet encoder (theory 09-28)
 
 - `omnibias.core.sliced_jet` plus architecture twins: tokens are

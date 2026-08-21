@@ -157,7 +157,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | Spec | Status | One line |
 |---|---|---|
 | [04-01 information geometry](04-bridges/01-information-geometry-exponential-family.md) | gated | OMBU outputs as sufficient statistics with closed-form Fisher structure; G2 earned (`G_{delta,delta} ~ delta^2/720`) |
-| [04-02 uncertainty and conformal slabs](04-bridges/02-uncertainty-calibration-and-conformal-slabs.md) | designed | Slab masses as calibrated, certifiable probabilities |
+| [04-02 uncertainty and conformal slabs](04-bridges/02-uncertainty-calibration-and-conformal-slabs.md) | gated | Three guarantee kinds stay apart; G1–G6 CI; conformal is not sealable |
 
 ### 05 Applications
 

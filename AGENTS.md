@@ -642,7 +642,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.parameter_jets` + `omnibias.pinn.operator`
   (09-27; mixed `x`–`μ` jets; G1–G5 CI; not a ParamPINN package) /
   `omnibias.core.sliced_jet` + `omnibias.{torch,jax}.architectures.sliced_jet`
-  (09-28; scan-jet tokens + named energy; G1–G5 CI; not a ViT).
+  (09-28; scan-jet tokens + named energy; G1–G5 CI; not a ViT) /
+  `omnibias.core.uncertainty` + `omnibias.verify.uncertainty`
+  (04-02; conformal slabs; G1–G6 CI; kinds do not mix; not sealable).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -715,7 +717,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/world_model_jet.md`](docs/api/world_model_jet.md),
   [`docs/api/net_to_annihilator.md`](docs/api/net_to_annihilator.md),
   [`docs/api/parameter_space_jets.md`](docs/api/parameter_space_jets.md),
-  [`docs/api/sliced_jet_encoder.md`](docs/api/sliced_jet_encoder.md). Cost /
+  [`docs/api/sliced_jet_encoder.md`](docs/api/sliced_jet_encoder.md),
+  [`docs/api/conformal_slabs.md`](docs/api/conformal_slabs.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.
