@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — jet-token transformer and jet distillation (theory 09-02 / 09-19)
+
+- `omnibias.core.jet_token` plus torch / jax `architectures.jet_token`
+  and `jet_distill`: tokens are N-jets mixed by `compose_jet`; a
+  student matches a teacher N-jet.
+- G1–G3 CI-gated. Jets are founding bias collapse (`delta -> 0`),
+  not temperature collapse. Not ImageNet, not Jet-KAN.
+- Docs: `docs/api/jet_token.md`, `docs/cookbook/jet-token.md`.
+  Smoke: `docs/benchmarks/jet_token_transformer_smoke.json`,
+  `docs/benchmarks/jet_distillation_smoke.json`.
+
+
 ### Added — FTC-Net and dual-FTC training (theory 09-03 / 09-17)
 
 - `omnibias.core.ftc` plus torch / jax `architectures.ftc_net`:

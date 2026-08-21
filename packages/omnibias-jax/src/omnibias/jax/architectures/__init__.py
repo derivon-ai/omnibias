@@ -47,6 +47,11 @@ from omnibias.jax.architectures.hardbc import (
     homogeneous_box,
     initial_value,
 )
+from omnibias.jax.architectures.jet_token import (
+    JetTokenConfig,
+    jet_token_forward,
+    worked_compose_jet,
+)
 from omnibias.jax.architectures.jetkan import (
     JetKANConfig,
     JetKANParams,
@@ -104,6 +109,7 @@ __all__ = [
     "JetKANConfig",
     "JetKANParams",
     "JetMLP",
+    "JetTokenConfig",
     "MscaleMLP",
     "PirateNetConfig",
     "ScanNetConfig",
@@ -122,6 +128,7 @@ __all__ = [
     "jet_kan_from_torch_state",
     "jet_kan_jet",
     "jet_kan_jet_mv",
+    "jet_token_forward",
     "jetkan_from_band_plan",
     "ladder_apply",
     "make_adaptive_activation",
@@ -137,4 +144,5 @@ __all__ = [
     "scan_net_apply",
     "scan_net_from_torch_state",
     "scannet_from_band_plan",
+    "worked_compose_jet",
 ]

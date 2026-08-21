@@ -128,6 +128,11 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/ftc.py",
     "packages/omnibias-torch/src/omnibias/torch/architectures/ftc_net.py",
     "packages/omnibias-jax/src/omnibias/jax/architectures/ftc_net.py",
+    "packages/omnibias-core/src/omnibias/core/jet_token.py",
+    "packages/omnibias-torch/src/omnibias/torch/architectures/jet_token.py",
+    "packages/omnibias-jax/src/omnibias/jax/architectures/jet_token.py",
+    "packages/omnibias-torch/src/omnibias/torch/jet_distill.py",
+    "packages/omnibias-jax/src/omnibias/jax/jet_distill.py",
 )
 
 

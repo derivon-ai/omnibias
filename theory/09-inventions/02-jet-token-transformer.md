@@ -6,7 +6,7 @@ A residual stream whose tokens are **N-jets** (value plus directional
 derivatives), mixed by `compose_jet` rather than a softmax of dots, so
 the network predicts the contact of a function, not a point.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-10, 09-01
 - **Blocks**: 09-19
 
@@ -137,11 +137,11 @@ JAX: pure function; `jax.jit` over a fixed `jet_order`.
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.{torch,jax}.architectures` jet-token module
-- [ ] Tests vs `compose_jet` on the worked example
-- [ ] `benchmarks/jet_token_transformer.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.{torch,jax}.architectures` jet-token module
+- [x] Tests vs `compose_jet` on the worked example
+- [x] `benchmarks/jet_token_transformer.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

@@ -1,0 +1,49 @@
+{
+  "schema": "omnibias.benchmarks.jet_token_transformer.v1",
+  "generated_utc": "2026-08-21T19:38:54Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "jet_token_transformer",
+    "full": false,
+    "honesty": {
+      "imagenet_claim": false,
+      "jetkan_claim": false,
+      "ccf_stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 813.49,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_algebra",
+        "passed": true,
+        "value_err": 0.0,
+        "deriv_err": 0.0
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "jet_median": 0.00018587560058291874,
+        "value_median": 0.00019018105035906174,
+        "skill": 0.9998141243994171
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "imagenet_claim": false
+      }
+    ]
+  },
+  "disclaimer": "model-jet mix / distillation; not ImageNet, not Jet-KAN, and not CCF stretch",
+  "wall_seconds": 1.3438361480366439
+}

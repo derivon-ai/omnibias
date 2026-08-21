@@ -48,6 +48,11 @@ from omnibias.torch.architectures.hardbc import (
     homogeneous_box,
     initial_value,
 )
+from omnibias.torch.architectures.jet_token import (
+    JetTokenConfig,
+    jet_token_forward,
+    worked_compose_jet,
+)
 from omnibias.torch.architectures.jetkan import (
     JetKAN,
     JetKANConfig,
@@ -103,6 +108,7 @@ __all__ = [
     "JetKAN",
     "JetKANConfig",
     "JetMLP",
+    "JetTokenConfig",
     "JointOperatorRegressor",
     "LadderNet",
     "MscaleMLP",
@@ -120,9 +126,11 @@ __all__ = [
     "homogeneous_box",
     "init_pirate_params",
     "initial_value",
+    "jet_token_forward",
     "jetkan_from_band_plan",
     "make_siren",
     "pirate_apply",
     "pirate_features",
     "scannet_from_band_plan",
+    "worked_compose_jet",
 ]

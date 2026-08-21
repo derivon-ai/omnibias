@@ -584,7 +584,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   temperature collapse; tooling, not a discovery) /
   `omnibias.core.ftc` + `omnibias.{torch,jax}.architectures.ftc_net`
   (09-03 / 09-17; integral cell + dual `r_D`/`r_I`; G1–G3 CI;
-  founding bias collapse, not temperature collapse; not a VPINN).
+  founding bias collapse, not temperature collapse; not a VPINN) /
+  `omnibias.core.jet_token` + `omnibias.{torch,jax}.architectures.jet_token`
+  + `omnibias.{torch,jax}.jet_distill` (09-02 / 09-19; `compose_jet`
+  mix + teacher-jet match; G1–G3 CI; founding bias collapse, not
+  temperature collapse; not ImageNet).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -633,7 +637,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/sos_adapted_basis.md`](docs/api/sos_adapted_basis.md),
   [`docs/api/validated_dynamics.md`](docs/api/validated_dynamics.md),
   [`docs/api/domain_programs.md`](docs/api/domain_programs.md),
-  [`docs/api/ftc_net.md`](docs/api/ftc_net.md). Cost /
+  [`docs/api/ftc_net.md`](docs/api/ftc_net.md),
+  [`docs/api/jet_token.md`](docs/api/jet_token.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

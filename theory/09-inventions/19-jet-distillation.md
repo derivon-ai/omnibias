@@ -6,7 +6,7 @@ A student matches a teacher's **N-jet**, not logits; a self-supervised
 variant matches **1-jets across views** (equivariance as a jet
 identity).
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 09-01, 09-02
 - **Blocks**: none
 
@@ -100,11 +100,11 @@ def jet_distill_loss(student, teacher, xs, *, config: JetDistillConfig):
 
 ## 12. Implementation checklist
 
-- [ ] Jet-distill helpers
-- [ ] SSL flip test
-- [ ] `benchmarks/jet_distillation.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Jet-distill helpers
+- [x] SSL flip test
+- [x] `benchmarks/jet_distillation.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

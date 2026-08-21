@@ -435,6 +435,14 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/dual_ftc_training.py
+      - name: Run jet-token-transformer smoke (09-02 G1/G2/G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/jet_token_transformer.py
+      - name: Run jet-distillation smoke (09-19 G1/G2/G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/jet_distillation.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

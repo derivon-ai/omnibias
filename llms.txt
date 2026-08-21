@@ -116,7 +116,10 @@ founding bias collapse, not temperature collapse; tooling,
 not a many-body / fusion / materials discovery),
 FTC-Net / dual-FTC (09-03 / 09-17; integral cell + paired
 residuals; G1–G3 CI; founding bias collapse, not temperature
-collapse; not a VPINN). Cost / wall-time / FermiNet-many-body gates are
+collapse; not a VPINN),
+jet-token / jet-distill (09-02 / 09-19; `compose_jet` mix +
+teacher N-jet match; G1–G3 CI; founding bias collapse, not
+temperature collapse; not ImageNet). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the
