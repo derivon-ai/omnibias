@@ -2,7 +2,7 @@
 name: omnibias-dev-deepmind-campaign
 description: >-
   Run the DeepMind-style autonomous unstable-singularity campaign in omnibias —
-  phase-0 neural CCF reproduction (Martens–Grosse, hardy_corrected_pv) to
+  phase-0 neural CCF reproduction (Martens–Grosse, wholeline_hp) to
   1e-13, then Hardy CCF Rung-1/2, IPM/Boussinesq, Phase 5. Use when iterating
   campaign ticks, closing residual gates, or wiring /loop autonomy.
 ---
@@ -99,7 +99,20 @@ description: >-
   LP pred earn `~8e-9`). Identity-init tanh on
   \(\zeta=\mathrm{asinh}(y)^2/(1+\mathrm{asinh}(y)^2)\)
   did not promote (tail-capped LP pred earn `~1.7e-6`;
-  line search raised L∞). Scored on 1601-pt L∞;
+  line search raised L∞). Even \(y\,\mathrm{dawsn}(y/s)\)
+  (Hilbert partner of a Gaussian) did not promote
+  (LP pred earn `~2.1e-7`; L∞ steps walked to `|y|≈38`).
+  Official-path tensors were audited float64 (champ
+  npzs, Hilbert GL nodes, envelope, residual fields).
+  Unfreezing PirateNet embedding bias `Δbe` did not
+  promote (LP pred earn `~2.6e-6`); the exact
+  Hilbert-quadratic ray along that LP direction had
+  no in-field improving scale (model `s=0`).
+  Even \(\tanh(\sinh(y/s))^2\) plus the same
+  Hilbert-quadratic ray did not promote (LP pred
+  earn `~1.6e-7`; model `s=0`; L∞ steps walked to
+  `|y|≈38`).
+  Scored on 1601-pt L∞;
   `HΩ(0)≈+1.007`; residual peak `|y|≈0.10`; gate `1e-13`).
   The tanh-even parent was `7.847e-3`; the Fourier-\(k=6..12\) parent was `7.876e-3`; the Padé-on-`q` parent was `7.884e-3`; the Legendre-on-`q` parent was `7.885e-3`; the Chebyshev-on-`q` parent was `7.889e-3`; the stage-3 MSNN parent was `7.938e-3`; the first-MSNN parent was `7.943e-3`; the even-Fourier parent was `7.991e-3`; the PirateNet parent was `8.063e-3`; the erf-sinh parent
   was `8.068e-3`; the circular-Planck
@@ -193,12 +206,14 @@ future \(10^{-8}\) stage-1; Adam stays the smoke heuristic.
 ## Optimizer doctrine
 
 - **Phase 0 (reproduce):** Martens–Grosse Gauss–Newton (exact JVP) on compactified
-  neural Ω. Default train Hilbert **`hardy_corrected_pv`** (exact `H` on Hardy
-  projection + PV on the remainder) still floors the official Wang net.
-  The open free-Ω operator is **`train_hilbert="wholeline_hp"`**. Gate scores
-  `max(residual, projection_defect)` on Hardy modes. Spectral FFT alone floors
-  ~`1e-1`. Adam warmup allowed only on the labeled reproduce arm (cold start);
-  escalate uses Adam=0.
+  neural Ω. Default train Hilbert **`wholeline_hp`** (split-core GL +
+  power-mapped tail). `proj_defect_weight` is 0 so the net is not crushed
+  into a small Hardy dictionary. `hardy_corrected_pv` remains a hybrid
+  (exact `H` on the projection + hp on the remainder when `omega_fn` is
+  set). Spectral FFT / finite-interval PV floor ~`1e-1` and are diagnostic
+  only. Gate scores `max(residual, projection_defect)` on Hardy modes.
+  Adam warmup allowed only on the labeled reproduce arm (cold start);
+  escalate uses Adam=0. Stretch is still unearned.
 - Multistage `optimizer="gauss_newton"` on a numpy residual is a
   **corr-matching proxy** (`gauss_newton_corr_proxy`). The eq. 19
   residual-vector path is JAX `optimizer="martens_grosse"` /

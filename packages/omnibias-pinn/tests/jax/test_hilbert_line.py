@@ -16,6 +16,7 @@ from omnibias.pinn.jax.equations.ccf_compactified import (  # noqa: E402
     alpha_from_lambda,
     hardy_even,
     hardy_odd,
+    hilbert_transform_truncated_line,
 )
 from omnibias.pinn.jax.discovery.ccf_vorticity import (  # noqa: E402
     free_omega_vorticity_residual,
@@ -68,6 +69,24 @@ def test_wholeline_hp_beats_gl96_u48_on_planted_q(
         assert err_new < 1e-12
     else:
         assert err_new < 5e-13
+
+
+def test_wholeline_hp_beats_truncated_fft_on_hardy_q_reproduce_grid() -> None:
+    """Periodic truncated-line FFT is not the whole-line operator."""
+    y = jnp.linspace(-40.0, 40.0, 257, dtype=jnp.float64)
+    a = 1.3
+    omega = hardy_odd(y, a, ALPHA)
+    href = -hardy_even(y, a, ALPHA)
+    core = jnp.abs(y) <= 36.0
+    err_fft = float(
+        jnp.max(jnp.abs((hilbert_transform_truncated_line(y, omega) - href)[core]))
+    )
+    h_hp = hilbert_wholeline_hp(
+        y, omega, lambda t: hardy_odd(t, a, ALPHA), decay_power=ALPHA, y_trunc=40.0
+    )
+    err_hp = float(jnp.max(jnp.abs((h_hp - href)[core])))
+    assert err_fft > 5e-2
+    assert err_hp <= 1e-8
 
 
 def test_wholeline_hp_is_even_for_odd_omega() -> None:
@@ -127,3 +146,29 @@ def test_free_omega_wang_residual_matches_hardy_samples() -> None:
         y, fields["omega"], fields["omega_y"], fields["U"], fields["U_y"], lam=LAM
     )
     assert float(jnp.max(jnp.abs(r_direct - r_h))) == 0.0
+
+
+def test_official_free_omega_path_is_float64() -> None:
+    """JAX defaults to float32; the stretch Hilbert must stay float64."""
+    from omnibias.pinn.jax.hilbert_line import _gl_pm1
+
+    y = jnp.linspace(-20.0, 20.0, 401, dtype=jnp.float64)
+    coeffs = jnp.asarray([1.0], dtype=jnp.float64)
+    scales = jnp.asarray([1.3], dtype=jnp.float64)
+    gammas = jnp.asarray([ALPHA], dtype=jnp.float64)
+    om, omy, _, _ = hardy_omega_profile(y, coeffs, scales, gammas)
+    omega_fn = lambda t: hardy_omega_profile(t, coeffs, scales, gammas)[0]
+    xi, w = _gl_pm1(16)
+    assert xi.dtype == jnp.float64
+    assert w.dtype == jnp.float64
+    h = hilbert_wholeline_hp(y, om, omega_fn, decay_power=ALPHA, y_trunc=20.0)
+    u = integrate_velocity_from_hilbert(y, h)
+    r, fields = free_omega_vorticity_residual(
+        y, om, omy, omega_fn, lam=LAM, y_trunc=20.0
+    )
+    assert h.dtype == jnp.float64
+    assert u.dtype == jnp.float64
+    assert r.dtype == jnp.float64
+    assert fields["U"].dtype == jnp.float64
+    assert fields["U_y"].dtype == jnp.float64
+    assert fields["omega"].dtype == jnp.float64

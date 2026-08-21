@@ -12,8 +12,10 @@ DeepMind / Lucas-style ingredients, omnibias weapons:
 * d0 + d1 + d2 residual stack + adaptive / hybrid collocation;
 * **Two arms:**
   - ``earn`` (default): Hardy train Hilbert + CubicGaussNewton (Adam forbidden);
-  - ``reproduce``: spectral/PV Hilbert + Martens–Grosse Gauss–Newton (exact JVP),
-    Adam warmup allowed, dense residual gated on the neural profile itself.
+  - ``reproduce``: ``wholeline_hp`` Hilbert + Martens–Grosse Gauss–Newton
+    (exact JVP), Adam warmup allowed, dense residual gated on the neural
+    profile itself. Periodic truncated-line FFT and finite-interval PV are
+    diagnostic only.
 
 CPU smoke configs stay small; ``--full`` / submit uses richer budgets.
 """
@@ -55,6 +57,7 @@ TrainHilbert = Literal[
     "wholeline_hp",
 ]
 _FREE_OMEGA_HILBERT = frozenset({"pv_mapped_tail", "wholeline_hp"})
+_HILBERT_NEEDS_OMEGA_FN = _FREE_OMEGA_HILBERT | frozenset({"hardy_corrected_pv"})
 OptimizerName = Literal["cubic_gauss_newton", "martens_grosse"]
 ArmName = Literal["earn", "reproduce"]
 
@@ -101,7 +104,7 @@ class CCFVorticityNeuralConfig:
     n_adaptive: int | None = None  # default = n_grid
     origin_fraction: float = 0.25  # fraction of points forced near origin / gauge
     # Hilbert: earn default matches Rung/CAP (Hardy). Reproduce defaults to
-    # hardy_corrected_pv via reproduce_deepmind_config (spectral/PV are diagnostic).
+    # wholeline_hp via reproduce_deepmind_config (spectral/PV are diagnostic).
     train_hilbert: TrainHilbert = "hardy_projection"
     hilbert_n_uniform: int | None = None
     hilbert_n_quad: int = 48  # mapped-tail / hp tail GL nodes
@@ -116,17 +119,22 @@ class CCFVorticityNeuralConfig:
 
 
 def reproduce_deepmind_config(**overrides: Any) -> CCFVorticityNeuralConfig:
-    """DeepMind-faithful reproduction defaults (neural + corrected Hilbert + MG)."""
-    device = str(overrides.pop("device", "cuda" if torch.cuda.is_available() else "cpu"))
+    """DeepMind-faithful reproduction defaults (neural + whole-line hp Hilbert + MG).
+
+    Default device is CPU: ``wholeline_hp`` through Martens–Grosse ``jacrev``
+    is the free-Ω train operator and is heavy on a 4GB laptop GPU. Pass
+    ``device="cuda"`` to override. Periodic truncated-line FFT is diagnostic
+    only. ``proj_defect_weight`` stays 0 so the net is not crushed into a
+    small Hardy dictionary.
+    """
+    device = str(overrides.pop("device", "cpu"))
     if device.startswith("cuda") and not torch.cuda.is_available():
         device = "cpu"
     base = CCFVorticityNeuralConfig(
         arm="reproduce",
         optimizer="martens_grosse",
-        # Exact H on Hardy projection + PV on remainder (PV diag autograd-safe).
-        train_hilbert="hardy_corrected_pv",
-        # Pull neural Ω into Hardy span so the corrected Hilbert → exact.
-        proj_defect_weight=float(overrides.pop("proj_defect_weight", 25.0)),
+        train_hilbert="wholeline_hp",
+        proj_defect_weight=float(overrides.pop("proj_defect_weight", 0.0)),
         adam_warmup_steps=int(overrides.pop("adam_warmup_steps", 50)),
         mg_steps=int(overrides.pop("mg_steps", 80)),
         mg_solver=overrides.pop("mg_solver", "qr"),
@@ -134,7 +142,6 @@ def reproduce_deepmind_config(**overrides: Any) -> CCFVorticityNeuralConfig:
         qr_gn_steps=int(overrides.pop("qr_gn_steps", 20)),
         use_grad_norm=True,
         exp_core=True,
-        # Modest dictionary keeps QR/MG Jacobians inside 4GB laptop GPUs.
         n_scales=int(overrides.pop("n_scales", 6)),
         n_gamma_multiples=int(overrides.pop("n_gamma_multiples", 4)),
         nontrivial_weight=float(overrides.pop("nontrivial_weight", 50.0)),
@@ -883,6 +890,24 @@ def _omega_pos_fn_from_net(
     return _fn
 
 
+def _hardy_omega_at(
+    y: Tensor,
+    coeffs: Tensor,
+    scales: Tensor,
+    gammas: Tensor,
+    orders: Tensor | None = None,
+    parities: Tensor | None = None,
+) -> Tensor:
+    """Evaluate the Hardy image ``Ω_H`` at ``y`` (off-grid safe)."""
+    use_n0 = _n0_odd_only(orders, parities)
+    if use_n0:
+        phi = _build_phi(y, scales, gammas)
+        return (phi @ coeffs.reshape(-1, 1)).reshape(-1)
+    assert orders is not None and parities is not None
+    phi, _, _, _ = _omega_atom_columns_torch(y, scales, gammas, orders, parities)
+    return (phi @ coeffs.reshape(-1, 1)).reshape(-1)
+
+
 def hardy_corrected_hu_from_omega(
     y: Tensor,
     omega: Tensor,
@@ -891,13 +916,24 @@ def hardy_corrected_hu_from_omega(
     gammas: Tensor,
     orders: Tensor | None = None,
     parities: Tensor | None = None,
+    omega_fn: Callable[[Tensor], Tensor] | None = None,
+    decay_power: float | None = None,
+    y_trunc: float | None = None,
+    n_near: int = 128,
+    n_far: int = 64,
+    n_tail: int = 96,
+    y_near: float = 2.0,
 ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
-    """Exact Hardy ``H`` on the L2 projection + PV Hilbert on the remainder.
+    """Exact Hardy ``H`` on the L2 projection + numerical ``H`` on the remainder.
 
     Periodized FFT / truncated PV alone err at ``O(10^{-1})``–``O(10^{-2})`` vs
-    ``H[Q]=-P``. Splitting ``Ω = Ω_H + r`` with exact ``H[Ω_H]`` and PV on the
-    faster-decaying remainder ``r`` recovers near-machine ``H`` whenever the
-    Hardy defect is small — the regime needed for a 1e-13 Wang residual.
+    ``H[Q]=-P``. Splitting ``Ω = Ω_H + r`` with exact ``H[Ω_H]`` and a
+    whole-line remainder Hilbert recovers near-machine ``H`` whenever the
+    Hardy defect is small.
+
+    When ``omega_fn`` is set, the remainder uses :func:`hilbert_wholeline_hp`
+    (off-grid evaluable). Without it, ``hilbert_pv_line`` is the labeled
+    finite-interval fallback — not a whole-line operator.
     """
     coeffs, defect, fields = project_omega_hardy_torch(
         y, omega, scales=scales, gammas=gammas, orders=orders, parities=parities
@@ -907,7 +943,27 @@ def hardy_corrected_hu_from_omega(
     u_exact = fields["U"]
     rem = omega - om_h
     rem = torch.nan_to_num(rem, nan=0.0, posinf=0.0, neginf=0.0)
-    h_rem = hilbert_pv_line(y, rem)
+    if omega_fn is not None:
+        p = float(decay_power) if decay_power is not None else float(torch.min(gammas))
+
+        def rem_fn(t: Tensor) -> Tensor:
+            om_t = omega_fn(t).reshape(-1)
+            proj_t = _hardy_omega_at(t, coeffs, scales, gammas, orders, parities)
+            return om_t - proj_t
+
+        h_rem = hilbert_wholeline_hp(
+            y,
+            rem,
+            rem_fn,
+            decay_power=p,
+            y_trunc=y_trunc,
+            y_near=float(y_near),
+            n_near=int(n_near),
+            n_far=int(n_far),
+            n_tail=int(n_tail),
+        )
+    else:
+        h_rem = hilbert_pv_line(y, rem)
     u_rem = _integrate_from_zero(y, h_rem)
     h = torch.nan_to_num(h_exact + h_rem, nan=0.0, posinf=0.0, neginf=0.0)
     u = torch.nan_to_num(u_exact + u_rem, nan=0.0, posinf=0.0, neginf=0.0)
@@ -1025,8 +1081,21 @@ def vorticity_fields(
         r = wang_residual(y, omega_r, omega_y_r, u, uy, lam=lam)
         return r, defect, coeffs, uy
     if train_hilbert == "hardy_corrected_pv":
+        n_near = int(hilbert_n_aux) if int(hilbert_n_aux) >= 4 else 128
+        n_tail = int(hilbert_n_quad) if int(hilbert_n_quad) >= 8 else 96
         h, u, coeffs, defect = hardy_corrected_hu_from_omega(
-            y, omega, scales=scales, gammas=gammas, orders=orders, parities=parities
+            y,
+            omega,
+            scales=scales,
+            gammas=gammas,
+            orders=orders,
+            parities=parities,
+            omega_fn=omega_pos_fn,
+            decay_power=float(alpha_from_lambda(lam)),
+            y_trunc=y_trunc,
+            n_near=n_near,
+            n_tail=n_tail,
+            y_near=float(hilbert_y_near),
         )
         uy = h
         r = wang_residual(y, omega, omega_y, u, uy, lam=lam)
@@ -1105,7 +1174,7 @@ def residual_vector(
         parities=parities,
         omega_pos_fn=(
             _omega_pos_fn_from_net(net, lam=cfg.lam, exp_core=cfg.exp_core)
-            if cfg.train_hilbert in _FREE_OMEGA_HILBERT
+            if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
             else None
         ),
         hilbert_n_quad=int(cfg.hilbert_n_quad),
@@ -1302,7 +1371,7 @@ def dense_neural_vorticity_residual(
         parities=parities,
         omega_pos_fn=(
             _omega_pos_fn_from_net(net, lam=lam, exp_core=exp_core, scale=scale)
-            if train_hilbert in _FREE_OMEGA_HILBERT
+            if train_hilbert in _HILBERT_NEEDS_OMEGA_FN
             else None
         ),
         hilbert_n_quad=int(hilbert_n_quad),
@@ -1374,7 +1443,7 @@ def _resample_collocation(
             parities=getattr(residual_mod, "parities_buf", residual_mod.parities),
             omega_pos_fn=(
                 _omega_pos_fn_from_net(net, lam=cfg.lam, exp_core=cfg.exp_core)
-                if cfg.train_hilbert in _FREE_OMEGA_HILBERT
+                if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
                 else None
             ),
             hilbert_n_quad=int(cfg.hilbert_n_quad),
@@ -1704,7 +1773,7 @@ def run_ccf_vorticity_neural_discovery(
                 _omega_pos_fn_from_net(
                     net, lam=cfg.lam, exp_core=cfg.exp_core, scale=scale
                 )
-                if cfg.train_hilbert in _FREE_OMEGA_HILBERT
+                if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
                 else None
             ),
             hilbert_n_quad=int(cfg.hilbert_n_quad),

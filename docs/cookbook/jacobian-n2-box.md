@@ -8,10 +8,11 @@ either has `det JF` not identically a nonzero constant, or has no two
 distinct points of a finite rational grid `G` sharing an image.
 
 A grid collision plus an **identical** (not probed) nonzero constant
-Jacobian would be a genuine `n=2` counterexample. A miss proves only
-`C_box`. It is not injectivity on all of `Q^2`, and it is not the
-parent. Probe samples of `det JF` can agree on an axis while the
-polynomial is non-constant (`1+y`); the gate uses
+Jacobian would be a genuine `n=2` counterexample. So would a Keller map
+that fails Gabber's inverse-degree test (`deg(F^{-1}) <= deg F` for
+`n=2`). A miss proves only `C_box`. It is not injectivity on all of
+`Q^2`, and it is not the parent. Probe samples of `det JF` can agree on
+an axis while the polynomial is non-constant (`1+y`); the gate uses
 `identical_jacobian_constant`.
 
 ```python
@@ -45,6 +46,19 @@ assert identity.payload["jacobian_constant"] == "1"
 assert identity.payload["honesty"]["jacobian_n2_claim"] is False
 ```
 
-`PROVED` on the machine is the finite obligation. Catalog kind
-`jacobian_n2_degree_box`. Degree `>= 2` walks a structured incomplete
-slice; a miss there is `search_incomplete`.
+A shear automorphism passes Gabber and is not a violator:
+
+```python
+from omnibias.holonomic import gabber_n2_test
+from omnibias.holonomic.jacobian_n2 import shear_map
+
+shear = shear_map(0, (0, 0, 1))
+result = gabber_n2_test(shear)
+assert result.keller is True
+assert result.inverse_ok is True
+assert result.fails is False
+```
+
+`PROVED` on the machine is the finite obligation. Catalog kinds
+`jacobian_n2_degree_box` and `jacobian_n2_homogeneous`. Degree `>= 2`
+walks a structured incomplete slice; a miss there is `search_incomplete`.

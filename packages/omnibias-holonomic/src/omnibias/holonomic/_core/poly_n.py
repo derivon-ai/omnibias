@@ -180,6 +180,21 @@ class PolyN:
             acc = acc + term
         return acc
 
+    def total_degree(self) -> int:
+        """Total degree, or ``-1`` for the zero polynomial."""
+        if not self.terms:
+            return -1
+        return max(sum(mon) for mon in self.terms)
+
+    def homogeneous_part(self, degree: int) -> PolyN:
+        """Sum of terms of exact total ``degree``."""
+        if degree < 0:
+            return PolyN.zero(self.nvars)
+        return PolyN(
+            self.nvars,
+            {mon: coeff for mon, coeff in self.terms.items() if sum(mon) == degree},
+        )
+
 
 def jacobian_matrix(components: Sequence[PolyN]) -> list[list[PolyN]]:
     """Jacobian matrix of a map ``Q^n -> Q^n``."""
@@ -331,7 +346,9 @@ def iter_exponents(nvars: int, max_degree: int) -> Iterable[Monomial]:
 __all__ = [
     "PolyN",
     "differentiate_univariate",
+    "eval_map",
     "eval_univariate",
+    "identical_jacobian_constant",
     "integrate_poly",
     "iter_exponents",
     "jacobian_det",

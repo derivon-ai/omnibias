@@ -63,9 +63,10 @@ all-`n` continuation stays the Zeilberger / `HolonomicProof` obligation.
 They do **not** prove the Jacobian conjecture. Dimension `n = 2` is a
 separate finite universal (`omnibias.holonomic.jacobian_n2`): integer
 maps of degree `<= d` and height `<= h` are exhausted for
-`C_box(d,h,G)`. A miss is not injectivity on `Q^2` and not the parent.
-`escalate_n2_result` sets `jacobian_n2_claim` only on an exact
-violator. The Ore condition sort (`condition_ore`) wraps the recurrence
+`C_box(d,h,G)`, or fail Gabber's inverse-degree test. A miss is not
+injectivity on `Q^2` and not the parent. `escalate_n2_result` sets
+`jacobian_n2_claim` only on an exact violator. The Ore condition sort
+(`condition_ore`) wraps the recurrence
 guess as a `ConditionHypothesis`. `condition_dfinite` wraps the
 differential annihilator guess when the observation carries
 `extra.series=1`. Cookbooks:

@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from fractions import Fraction
+from itertools import product
 
 import pytest
 from omnibias.core.proof import Conjecture, ExactCheck, catalog_entry, discover, run_discovery
@@ -12,14 +13,20 @@ from omnibias.core.proof.discovery import DiscoveryResult
 from omnibias.holonomic._core.poly_n import PolyN, identical_jacobian_constant
 from omnibias.holonomic.jacobian_n2 import (
     CI_COEFF_HEIGHT,
+    CI_HOMOG_DEGREE,
+    CI_HOMOG_HEIGHT,
     CI_MAX_DEGREE,
+    JACOBIAN_N2_HOMOG_KIND,
     JACOBIAN_N2_KIND,
     JACOBIAN_N2_PARENT,
     MOH_DEGREE_BOUND,
     JacobianN2DegreeFamily,
+    JacobianN2HomogeneousFamily,
     default_collision_grid,
     escalate_n2_result,
+    identity_plus_homogeneous,
     jacobian_n2_box_statement,
+    jacobian_n2_homog_statement,
     jacobian_n2_honesty,
     n2_counterexample_earned,
     n2_violation_payload,
@@ -346,6 +353,58 @@ def test_escalate_only_on_earned_disproof() -> None:
     assert hit["escalate_parent"] is True
     assert hit["honesty"]["jacobian_n2_claim"] is True
     assert hit["honesty"]["jacobian_conjecture_proof_claim"] is False
+
+
+def test_cubic_homogeneous_shear_is_not_a_counterexample() -> None:
+    family = JacobianN2HomogeneousFamily(degree=3, coeff_height=1)
+    assert family.complete is True
+    assert family.cardinality() == 6561
+    assert family.statement.parent_status == "open"
+    assert family.statement.existential is False
+    shear = (0, 0, 0, 0, 1, 0, 0, 0)
+    decoded = family.decode(shear)
+    assert decoded is not None
+    x, y = _xy()
+    assert decoded == (x, y + x**3)
+    checked = family.check(shear)
+    assert checked is not None
+    assert checked.ok is False
+    assert checked.payload["gabber_inverse_ok"] is True
+    assert checked.payload["honesty"]["jacobian_n2_claim"] is False
+
+
+def test_homog_statement_does_not_claim_the_parent() -> None:
+    statement = jacobian_n2_homog_statement(degree=3, coeff_height=1)
+    assert statement.name == f"{JACOBIAN_N2_HOMOG_KIND}_d3_h1"
+    assert "not jacobian_conjecture_n2" in statement.obligation
+    assert CI_HOMOG_DEGREE == 3
+    assert CI_HOMOG_HEIGHT == 1
+
+
+def test_identity_plus_homogeneous_roundtrip() -> None:
+    x, y = _xy()
+    mapped = identity_plus_homogeneous((0, 0, 0, 1, 0, 0, 0, 0), degree=3)
+    assert mapped == (x + y**3, y)
+
+
+def test_cubic_homogeneous_height_one_box_has_no_violator() -> None:
+    family = JacobianN2HomogeneousFamily(degree=3, coeff_height=1)
+    keller = 0
+    for coeffs in product((-1, 0, 1), repeat=8):
+        checked = family.check(coeffs)
+        assert checked is not None
+        assert checked.ok is False
+        if checked.payload["jacobian_nonzero_constant"]:
+            keller += 1
+            assert checked.payload["gabber_inverse_ok"] is True
+    assert keller == 5
+
+
+def test_homog_zero_budget_is_incomplete() -> None:
+    family = JacobianN2HomogeneousFamily(degree=3, coeff_height=1)
+    result = run_discovery(family.statement, family, "score_guided", budget=0)
+    assert result.status == "BLOCKED"
+    assert result.search_incomplete is True
 
 
 def test_rejects_invalid_box_parameters() -> None:

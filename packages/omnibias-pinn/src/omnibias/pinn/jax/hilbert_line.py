@@ -25,10 +25,22 @@ it. Tests report the measured ``H[Q]+P`` floor. Stretch stays ``1e-13``.
 from __future__ import annotations
 
 import math
+
+import jax
 import jax.numpy as jnp
 import numpy as np
 from jax import Array
 from numpy.polynomial.legendre import leggauss
+
+jax.config.update("jax_enable_x64", True)
+
+
+def _require_float64(name: str) -> None:
+    """Stretch Hilbert must not silently run in float32 (JAX default)."""
+    if not jax.config.jax_enable_x64:
+        raise RuntimeError(
+            f"{name} requires jax_enable_x64=True; float32 floors the 1e-13 Hilbert"
+        )
 
 _GL_PM1: dict[int, tuple[np.ndarray, np.ndarray]] = {}
 _GL_01: dict[int, tuple[np.ndarray, np.ndarray]] = {}
@@ -41,7 +53,10 @@ def _gl_pm1(n: int) -> tuple[Array, Array]:
         xi, w = leggauss(n)
         cached = (xi.astype(np.float64), w.astype(np.float64))
         _GL_PM1[n] = cached
-    return jnp.asarray(cached[0]), jnp.asarray(cached[1])
+    return (
+        jnp.asarray(cached[0], dtype=jnp.float64),
+        jnp.asarray(cached[1], dtype=jnp.float64),
+    )
 
 
 def _gl_01(n: int) -> tuple[Array, Array]:
@@ -52,7 +67,10 @@ def _gl_01(n: int) -> tuple[Array, Array]:
         u = np.clip(0.5 * (xi + 1.0), 1e-15, 1.0)
         cached = (u.astype(np.float64), (0.5 * w).astype(np.float64))
         _GL_01[n] = cached
-    return jnp.asarray(cached[0]), jnp.asarray(cached[1])
+    return (
+        jnp.asarray(cached[0], dtype=jnp.float64),
+        jnp.asarray(cached[1], dtype=jnp.float64),
+    )
 
 
 def hilbert_gl_panel(
@@ -202,6 +220,7 @@ def hilbert_wholeline_hp(
     Array
         Numerical ``HΩ`` at ``y``. Not a Hardy closed form.
     """
+    _require_float64("hilbert_wholeline_hp")
     y = jnp.asarray(y, dtype=jnp.float64).reshape(-1)
     values = jnp.asarray(values, dtype=jnp.float64).reshape(-1)
     Y = float(y_trunc) if y_trunc is not None else float(jnp.max(jnp.abs(y)))

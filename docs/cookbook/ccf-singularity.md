@@ -281,12 +281,17 @@ MSNN is ineffective above that basin.
   torch `optimizer="wang_linearized_gn"` (torch-graph residual required).
   Stretch \(10^{-13}\) never forges Rung-1. Measured dense Wang
   floors under nontrivial gauge remain \(O(10^{-2})\)–\(O(10^{-1})\).
-  `train_hilbert="pv_mapped_tail"` is the older single-panel GL + raw-`u`
-  tail (planted core `~1e-3` at 96 nodes). The open free-Ω fork is
+  Periodic truncated-line FFT and finite-interval PV are **numerical
+  diagnostics** and err at \(O(10^{-1})\) vs exact \(H[Q]=-P\); they are
+  not the reproduce train operator. `train_hilbert="pv_mapped_tail"` is
+  the older single-panel GL + raw-`u` tail (planted core `~1e-3` at 96
+  nodes). Reproduce / paper free-Ω Hilbert is
   `train_hilbert="wholeline_hp"`
   (`omnibias.pinn.{jax,torch}.hilbert_line`): split-core GL plus a
   power-mapped algebraic tail. Planted `H[Q]=-P` can sit near `1e-14`;
-  stretch `10^{-13}` is still unearned on a trained Wang net. Score a
+  that is a numerical whole-line quadrature, **not** a closed-form Hardy
+  transform and **not** a certificate. Stretch `10^{-13}` is still
+  unearned on a trained Wang net. Score a
   free `Ω` with `free_omega_vorticity_residual` and an analytic `Ω_y`
   (`integrate_velocity_from_hilbert` builds `U`, not `OperatorBlock`
   `integral`). `omnibias.pinn.jax.discovery.ccf_hat_homotopy` is a
@@ -330,7 +335,11 @@ MSNN is ineffective above that basin.
   even \(J_0\), a residual-shaped even lift, and
   PirateNet last-layer `ΔWout`, and even
   Hermite–Gauss, stage-3 MSNN `ΔB`, PirateNet
-  skip-gate `Δα`, and asinh-chart tanh did not
+  skip-gate `Δα`, asinh-chart tanh, even
+  Dawson \(y\,\mathrm{dawsn}(y/s)\), and PirateNet
+  embedding `Δbe` and even
+  \(\tanh(\sinh(y/s))^2\) (Hilbert-quadratic ray
+  `s=0` on both) did not
   promote; sinc realized `~7.0e-7`),
   scored on
   1601-pt L∞; `HΩ(0)≈+1.007`; tanh-even parent was

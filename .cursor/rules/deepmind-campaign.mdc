@@ -15,7 +15,7 @@ alwaysApply: false
 
 - Phase 0: reproduce neural line CCF to stretch `1e-13` (`reproduce_deepmind_ccf.py`) before Hardy CAP.
 - Absolute Rung-1 residual gate stays `1e-11` for 1st unstable CCF (`benchmarks/_gates.py`).
-- Reproduce arm: Martens–Grosse + **`hardy_corrected_pv`** Hilbert; Adam warmup allowed only on cold-start reproduce (not escalate).
+- Reproduce arm: Martens–Grosse + **`wholeline_hp`** Hilbert; Adam warmup allowed only on cold-start reproduce (not escalate). `proj_defect_weight` is 0. Periodic truncated-line FFT is diagnostic only.
 - Stretch still unearned (~`1e-1` Hilbert×dictionary floor); never weaken `1e-13`.
 - Earn-path (after stretch): exact-JVP Martens–Grosse / CubicGaussNewton — never Adam as primary; Hardy train Hilbert.
 - Never forge `whole_line_certified`, `theorem_prover_verified`, or `navier_stokes_proof_claim`.

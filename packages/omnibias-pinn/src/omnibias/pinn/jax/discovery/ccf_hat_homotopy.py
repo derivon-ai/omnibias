@@ -221,8 +221,11 @@ def omega_from_hat(
 def hard_gauge(
     y: Array, omega: Array, omega_y: Array, *, point: float, value: float
 ) -> tuple[Array, Array]:
-    g = jnp.interp(point, y, omega)
-    scale = value / (g + 1e-30)
+    y = jnp.asarray(y, dtype=jnp.float64)
+    omega = jnp.asarray(omega, dtype=jnp.float64)
+    omega_y = jnp.asarray(omega_y, dtype=jnp.float64)
+    g = jnp.interp(jnp.float64(point), y, omega)
+    scale = jnp.float64(value) / (g + jnp.float64(1e-30))
     return scale * omega, scale * omega_y
 
 

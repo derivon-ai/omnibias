@@ -117,10 +117,14 @@ def test_reproduce_config_allows_adam_and_martens_grosse() -> None:
         mg_solver="qr",
         d2_weight=0.0,
         resample_every=0,
+        hilbert_n_aux=16,
+        hilbert_n_quad=8,
+        hilbert_y_near=1.0,
     )
     assert cfg.arm == "reproduce"
     assert cfg.optimizer == "martens_grosse"
-    assert cfg.train_hilbert == "hardy_corrected_pv"
+    assert cfg.train_hilbert == "wholeline_hp"
+    assert cfg.proj_defect_weight == 0.0
     assert cfg.adam_warmup_steps == 2
     result = cvn.run_ccf_vorticity_neural_discovery(cfg)
     assert "MartensGrosse" in str(result.extra["optimizer"])

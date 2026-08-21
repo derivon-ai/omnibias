@@ -2,20 +2,17 @@
 # Copyright (C) 2026 Derivon
 """DeepMind-faithful neural CCF reproduction (Wang vorticity, stretch 1e-13).
 
-Primary path: compactified Ω-PINN + ``hardy_corrected_pv`` Hilbert +
+Primary path: compactified Ω-PINN + ``wholeline_hp`` Hilbert +
 Martens–Grosse Gauss–Newton (exact JVP) + optional multistage. Dense residual
 is scored on the **neural** profile with matched train Hilbert (not
-Hardy-projected for the CAP gate).
+Hardy-projected for the CAP gate). Periodic truncated-line FFT and
+finite-interval PV are diagnostic only.
 
 Never weakens ``CCF_STRETCH_RESIDUAL_GATE`` (1e-13) or Rung-1 (1e-11).
 ``navier_stokes_proof_claim`` stays False.
 
-Known stretch blocker (audit): spectral/PV Hilbert alone err at O(1e-1); with
-high ``proj_defect_weight`` the neural Ω is pulled into a Hardy span that itself
-floors near ~1e-1 under MG. Dictionary enrichment on the same ``{P,Q}`` family
-was tried. The open fork is ``train_hilbert="wholeline_hp"`` (planted
-``H[Q]=-P`` can sit near 1e-14). Stretch remains unearned on a trained Wang
-net — more MG alone does not clear 1e-13.
+Planted ``H[Q]=-P`` on ``wholeline_hp`` can sit near 1e-14. Stretch remains
+unearned on a trained Wang net — more MG alone does not clear 1e-13.
 """
 
 from __future__ import annotations
@@ -101,7 +98,7 @@ def run_once(
     adam_warmup_steps: int | None = None,
     depth: int = 1,
     seed: int = 0,
-    train_hilbert: str = "hardy_corrected_pv",
+    train_hilbert: str = "wholeline_hp",
     mg_solver: str = "qr",
     multistage_rounds: int = 0,
     y_max: float = 40.0,
@@ -507,7 +504,7 @@ def escalate_loop(
             "mg_steps": 300,
             "adam_warmup_steps": 0,
             "multistage_rounds": 0,
-            "train_hilbert": "hardy_corrected_pv",
+            "train_hilbert": "wholeline_hp",
             "depth": 2,
             "mg_solver": "qr",
             "dense_n_val": 1601,
@@ -521,7 +518,7 @@ def escalate_loop(
             "mg_steps": 300,
             "adam_warmup_steps": 0,
             "multistage_rounds": 0,
-            "train_hilbert": "hardy_corrected_pv",
+            "train_hilbert": "wholeline_hp",
             "depth": 2,
             "mg_solver": "qr",
             "dense_n_val": 1601,
@@ -535,7 +532,7 @@ def escalate_loop(
             "mg_steps": 300,
             "adam_warmup_steps": 0,
             "multistage_rounds": 0,
-            "train_hilbert": "hardy_corrected_pv",
+            "train_hilbert": "wholeline_hp",
             "depth": 2,
             "mg_solver": "qr",
             "dense_n_val": 1601,
@@ -549,7 +546,7 @@ def escalate_loop(
             "mg_steps": 600,
             "adam_warmup_steps": 0,
             "multistage_rounds": 0,
-            "train_hilbert": "hardy_corrected_pv",
+            "train_hilbert": "wholeline_hp",
             "depth": 2,
             "mg_solver": "qr",
             "dense_n_val": 2001,
@@ -706,7 +703,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--seed", type=int, default=0)
     p.add_argument(
         "--train-hilbert",
-        default="hardy_corrected_pv",
+        default="wholeline_hp",
         choices=[
             "hardy_corrected_pv",
             "hardy_projection",

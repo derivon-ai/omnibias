@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Changed — Phase-0 reproduce Hilbert is `wholeline_hp`
+
+- `reproduce_deepmind_config` / `benchmarks/reproduce_deepmind_ccf.py`
+  train Hilbert is `wholeline_hp` (split-core GL + power-mapped tail)
+  with `proj_defect_weight=0`. Periodic truncated-line FFT and
+  finite-interval `hilbert_pv_line` stay labeled numerical diagnostics
+  (they err at `O(1e-1)` vs `H[Q]=-P`). `hardy_corrected_pv` uses
+  `hilbert_wholeline_hp` on the remainder when `omega_fn` is set; PV is
+  the no-`omega_fn` fallback. Default reproduce device is CPU.
+- CI table: FFT/PV `O(1e-1)` vs hp `≤ 1e-8` on a leading Hardy atom;
+  unprojected neural Ω vs a higher-order hp reference `≪ 1e-4`;
+  torch/JAX hp parity. Stretch `1e-13` and
+  `navier_stokes_proof_claim` stay unearned. Earn-path default remains
+  `hardy_projection`.
+
 ### Added — Jacobian n=2 counterexample box
 
 - `omnibias.holonomic.jacobian_n2` names the finite universal
@@ -23,6 +38,11 @@ distributions is versioned independently under semantic versioning.
   violator. `jacobian_conjecture_proof_claim` stays False.
 - Catalog kind `jacobian_n2_degree_box`. Degree `>= 2` is an incomplete
   structured slice. Cookbook: `docs/cookbook/jacobian-n2-box.md`.
+- Gabber inverse-degree test: a Keller map whose unique origin-centered
+  inverse jet of degree `<= deg F` is not a polynomial inverse is an
+  exact `n=2` violator (`gabber_n2_test`). Catalog kind
+  `jacobian_n2_homogeneous` is the `I +` homogeneous integer box.
+  A miss is still not the parent.
 
 ### Added — autonomy engineering stack
 
@@ -203,9 +223,24 @@ distributions is versioned independently under semantic versioning.
   L∞).   Unfreezing the PirateNet skip-gate `α` did not
   promote (LP pred earn `~8e-9`). Identity-init tanh
   on an asinh chart did not promote (LP pred earn
-  `~1.7e-6`; line search raised L∞). Paper L2 /
-  grad-norm / exp-mult raised L∞
+  `~1.7e-6`; line search raised L∞). Even
+  \(y\,\mathrm{dawsn}(y/s)\) did not promote (LP pred
+  earn `~2.1e-7`; L∞ steps walked to `|y|≈38`). Unfreezing
+  PirateNet embedding bias `Δbe` did not promote (LP pred
+  earn `~2.6e-6`); an exact Hilbert-quadratic ray along
+  that direction had no in-field improving scale.
+  Even \(\tanh(\sinh(y/s))^2\) plus the same
+  Hilbert-quadratic ray did not promote (LP pred
+  earn `~1.6e-7`; model `s=0`; far-field peak walk).
+  Paper L2 / grad-norm / exp-mult raised L∞
   at this basin. Stretch stays unearned.
+
+### Fixed — official free-Ω path stays float64
+
+- `hilbert_wholeline_hp` / `free_omega_vorticity_residual` require
+  `jax_enable_x64` (JAX's default is float32). GL nodes, lambda
+  compactification, the decay envelope, and `hard_gauge` now pin
+  `float64` so the 1601-pt Wang score cannot silently demote.
 
 ### Added — signed PirateNet hat (jaxpi block, official envelope)
 
@@ -275,6 +310,13 @@ distributions is versioned independently under semantic versioning.
   promote (LP pred earn `~8e-9`).
   Identity-init tanh on an asinh chart did not
   promote (LP pred earn `~1.7e-6`).
+  Even \(y\,\mathrm{dawsn}(y/s)\) did not promote
+  (LP pred earn `~2.1e-7`; far-field peak walk).
+  Unfreezing PirateNet embedding bias `Δbe` did not
+  promote (LP pred earn `~2.6e-6`; Hilbert-quadratic
+  ray `s=0`).
+  Even \(\tanh(\sinh(y/s))^2\) did not promote
+  (LP pred earn `~1.6e-7`; quadratic ray `s=0`).
   Paper L2 / grad-norm /
   exp-adjacent multiplicative raised 1601-pt L∞ on that
   family. A same-Jacobian bake-off ranked epigraph L∞ first;

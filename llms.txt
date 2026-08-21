@@ -495,8 +495,8 @@ linear regime; *which* annihilator a guessed sum obeys is `guessed` then verifie
 `omnibias.core.proof` Lean loop. Smoke `docs/examples/holonomic_validate.py`.
 Jacobian `n=2` is the finite universal `C_box` in
 `omnibias.holonomic.jacobian_n2` (identical `det JF`, rational grid
-collision). A miss is not the parent. Cookbook:
-`docs/cookbook/jacobian-n2-box.md`.
+collision or Gabber inverse-degree failure). A miss is not the parent.
+Cookbook: `docs/cookbook/jacobian-n2-box.md`.
 `omnibias-struct` is the **dynamic-programming** register of the `beta -> inf` family:
 certified differentiable **soft Viterbi / shortest-path / CTC**, where the DP `max`
 combine becomes `lse_beta` (so `lse_beta -> max` as `beta -> inf`, annealing to exact hard

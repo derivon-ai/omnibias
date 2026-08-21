@@ -14,8 +14,9 @@ DeepMind-style line-domain toolkit:
     profile (preferred for the line);
   - ``truncated_line_resampled_periodic_fft`` -- numerical nonlocal on a
     truncated interval (kept for periodic-path compatibility). **Not** the
-    CCF Rung acceptance metric: Rung-1 / CAP use Hardy exact Hilbert on an
-    Omega-primary dictionary, never this FFT path.
+    CCF Rung acceptance metric and **not** the Phase-0 reproduce train
+    operator (that is ``wholeline_hp``). Rung-1 / CAP use Hardy exact
+    Hilbert on an Omega-primary dictionary, never this FFT path.
 
 A legacy rational map ``q = y/sqrt(1+y^2)`` remains as
 :func:`compactify_y_rational` for callers that need the odd coordinate.
@@ -43,7 +44,7 @@ def alpha_from_lambda(lam: Array | float) -> Array:
 
 def compactify_y_lambda(y: Array, lam: Array | float) -> Array:
     r"""Paper eq. 5 (1-D): ``q = (1+y^2)^{-1/(2(1+lambda))}`` into ``(0, 1]``."""
-    y = jnp.asarray(y)
+    y = jnp.asarray(y, dtype=jnp.float64)
     alpha = alpha_from_lambda(lam)
     return jnp.power(1.0 + y * y, -0.5 * alpha)
 
@@ -108,7 +109,7 @@ def np_sqrt_safe(x: float) -> float:
 
 def decay_envelope(y: Array, *, power: float = 1.0) -> tuple[Array, Array]:
     r"""Return ``(E, E')`` for :math:`E=(1+y^2)^{-p/2}`."""
-    y = jnp.asarray(y)
+    y = jnp.asarray(y, dtype=jnp.float64)
     p = float(power)
     one_y2 = 1.0 + y * y
     env = jnp.power(one_y2, -0.5 * p)

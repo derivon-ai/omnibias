@@ -98,6 +98,21 @@ def test_hardy_corrected_hilbert_matches_exact_atom() -> None:
     )
     assert float(defect) < 1e-10
     assert float(torch.max(torch.abs(h - h_exact))) < 1e-10
+    # Same atom through the omega_fn remainder path (hp, not finite-interval PV).
+    h_hp, _u2, _c2, defect_hp = cvn.hardy_corrected_hu_from_omega(
+        y,
+        omega,
+        scales=scales,
+        gammas=gammas,
+        omega_fn=lambda t: hardy_odd(t, a, g),
+        decay_power=g,
+        y_trunc=40.0,
+        n_near=32,
+        n_tail=16,
+        y_near=2.0,
+    )
+    assert float(defect_hp) < 1e-10
+    assert float(torch.max(torch.abs(h_hp - h_exact))) < 1e-10
 
 
 def test_deep_jetmlp_omega_path_smoke() -> None:
@@ -309,6 +324,16 @@ def test_iterate_multistage_labels_optimizer() -> None:
     assert "stage2_heuristic" in str(out["optimizer"]) or out["optimizer"] == "adam"
 
 
+def test_reproduce_default_is_wholeline_hp_not_fft() -> None:
+    """Periodic truncated-line FFT is diagnostic; reproduce trains on hp."""
+    cfg = cvn.reproduce_deepmind_config()
+    assert cfg.train_hilbert == "wholeline_hp"
+    assert cfg.train_hilbert != "truncated_line_spectral"
+    assert cfg.proj_defect_weight == 0.0
+    assert cfg.arm == "reproduce"
+    assert cfg.optimizer == "martens_grosse"
+
+
 def test_deepmind_paper_and_signed_configs_keep_honesty_flags() -> None:
     paper = cvn.deepmind_paper_architecture_config(n_grid=17, hidden=8)
     signed = cvn.deepmind_signed_hat_config(n_grid=17, hidden=8)
@@ -318,6 +343,7 @@ def test_deepmind_paper_and_signed_configs_keep_honesty_flags() -> None:
     assert signed.optimizer == "martens_grosse"
     assert paper.use_grad_norm is True
     assert paper.train_hilbert == "wholeline_hp"
+    assert paper.proj_defect_weight == 0.0
     assert paper.adam_warmup_steps == 0
 
 

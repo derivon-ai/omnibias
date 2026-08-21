@@ -14,13 +14,13 @@ Finite lie ``C_box(d, h, G)``
 
     1. has ``det JF`` **not** identically a nonzero constant, or
     2. has no two distinct points of the finite rational grid ``G``
-       sharing an image.
+       sharing an image, and passes the Gabber inverse-degree test.
 
 Polarity
-    ``existential=False``. A hit is ``DISPROVED``: a grid collision plus
-    an identical nonzero constant Jacobian is a genuine ``n=2``
-    counterexample (non-injective étale map). A miss on an exhausted
-    complete box is ``PROVED`` of ``C_box`` only. It does **not** prove
+    ``existential=False``. A hit is ``DISPROVED``: an identical nonzero
+    constant Jacobian plus a grid collision *or* a Gabber inverse
+    failure is a genuine ``n=2`` counterexample. A miss on an exhausted
+    complete box is ``PROVED`` of that box only. It does **not** prove
     injectivity on all of ``Q^2``, and it does not settle the parent.
     An incomplete miss is ``search_incomplete``.
 
@@ -51,15 +51,20 @@ from omnibias.holonomic._core.poly_n import (
     eval_map,
     identical_jacobian_constant,
 )
+from omnibias.holonomic.jacobian_n2_inverse import gabber_n2_test
 
 MAX_COMPLETE_CARDINALITY = 2000
+MAX_HOMOG_COMPLETE_CARDINALITY = 20000
 N2Candidate = tuple[Any, ...]
 
 JACOBIAN_N2_PARENT = "jacobian_conjecture_n2"
 JACOBIAN_N2_KIND = "jacobian_n2_degree_box"
+JACOBIAN_N2_HOMOG_KIND = "jacobian_n2_homogeneous"
 MOH_DEGREE_BOUND = 100
 CI_MAX_DEGREE = 1
 CI_COEFF_HEIGHT = 1
+CI_HOMOG_DEGREE = 3
+CI_HOMOG_HEIGHT = 1
 DEFAULT_GRID_HALFWIDTH = 2
 
 _FORBIDDEN_PARENT_CLAIMS = (
@@ -119,14 +124,16 @@ def n2_counterexample_earned(payload: Mapping[str, Any]) -> bool:
 
     * ``jacobian_identity == "identical"`` — not a probe sample
     * ``jacobian_nonzero_constant is True``
-    * ``rational_preimages`` — at least two distinct points
-    * those points share one image (``rational_image``)
+    * either a rational grid collision, or ``gabber_fails is True``
+      (Keller map whose Gabber-truncated inverse is not an inverse)
     """
 
     if payload.get("jacobian_identity") != "identical":
         return False
     if payload.get("jacobian_nonzero_constant") is not True:
         return False
+    if payload.get("gabber_fails") is True:
+        return True
     preimages = payload.get("rational_preimages")
     if not isinstance(preimages, (list, tuple)) or len(preimages) < 2:
         return False
@@ -189,6 +196,7 @@ def n2_violation_payload(
         rational_grid_collision(components, axis_vals) if nonzero else None
     )
     image, preimages = collision if collision is not None else (None, ())
+    gabber = gabber_n2_test(components) if nonzero else None
     payload: dict[str, Any] = {
         "jacobian_identity": "identical",
         "jacobian_constant": "" if constant is None else str(constant),
@@ -197,6 +205,9 @@ def n2_violation_payload(
         "rational_image": None if image is None else [str(c) for c in image],
         "grid_axis": [str(v) for v in axis_vals],
         "candidate": candidate,
+        "gabber_bound": 0 if gabber is None else gabber.bound,
+        "gabber_inverse_ok": False if gabber is None else gabber.inverse_ok,
+        "gabber_fails": False if gabber is None else gabber.fails,
     }
     earned = n2_counterexample_earned(payload)
     payload["honesty"] = jacobian_n2_honesty(
@@ -457,14 +468,201 @@ class JacobianN2DegreeFamily:
         return ExactCheck(ok=bool(n2_counterexample_earned(payload)), payload=payload)
 
 
+def homogeneous_plane_monomials(degree: int) -> tuple[tuple[int, int], ...]:
+    """Exact total-degree monomials of ``Q[x, y]``."""
+
+    if degree < 0:
+        raise ValueError(f"degree must be >= 0, got {degree}")
+    return tuple((degree - index, index) for index in range(degree + 1))
+
+
+def identity_plus_homogeneous(
+    coeffs: Sequence[int],
+    *,
+    degree: int,
+) -> tuple[PolyN, PolyN]:
+    """``(x, y) +`` two homogeneous forms of exact ``degree``."""
+
+    mons = homogeneous_plane_monomials(degree)
+    if len(coeffs) != 2 * len(mons):
+        raise ValueError(
+            f"I+homog degree {degree} needs {2 * len(mons)} coefficients, got {len(coeffs)}"
+        )
+    x, y = PolyN.var(2, 0), PolyN.var(2, 1)
+    first = x
+    second = y
+    half = len(mons)
+    for (i, j), coeff in zip(mons, coeffs[:half], strict=True):
+        if coeff:
+            first = first + PolyN.const(2, int(coeff)) * (x**i) * (y**j)
+    for (i, j), coeff in zip(mons, coeffs[half:], strict=True):
+        if coeff:
+            second = second + PolyN.const(2, int(coeff)) * (x**i) * (y**j)
+    return first, second
+
+
+def jacobian_n2_homog_statement(
+    *,
+    degree: int,
+    coeff_height: int,
+) -> Statement:
+    """Universal statement of the ``I +`` homogeneous integer box."""
+
+    if degree < 1:
+        raise ValueError(f"degree must be >= 1, got {degree}")
+    if coeff_height < 0:
+        raise ValueError(f"coeff_height must be >= 0, got {coeff_height}")
+    return Statement(
+        name=f"{JACOBIAN_N2_HOMOG_KIND}_d{degree}_h{coeff_height}",
+        obligation=(
+            f"every map (x,y)+H with H homogeneous of degree {degree} and "
+            f"integer height <= {coeff_height} either has det JF not "
+            "identically a nonzero constant, or has a polynomial inverse "
+            "of Gabber degree <= "
+            f"{degree}; a miss is not {JACOBIAN_N2_PARENT}"
+        ),
+        parent=JACOBIAN_N2_PARENT,
+        parent_status="open",
+        existential=False,
+    )
+
+
+class JacobianN2HomogeneousFamily:
+    """Integer ``I +`` homogeneous maps of one exact degree.
+
+    The Bass–Connell–Wright cubic reduction is *not* claimed: that
+    reduction raises dimension. A hit here would still be an ``n=2``
+    counterexample. A miss is only this box. Degree 3 / height 1 is
+    complete (6561 maps) and is the CI default.
+    """
+
+    def __init__(
+        self,
+        *,
+        degree: int = CI_HOMOG_DEGREE,
+        coeff_height: int = CI_HOMOG_HEIGHT,
+        grid: Sequence[Fraction] | None = None,
+    ) -> None:
+        if degree < 1:
+            raise ValueError(f"degree must be >= 1, got {degree}")
+        if coeff_height < 0:
+            raise ValueError(f"coeff_height must be >= 0, got {coeff_height}")
+        self.degree = degree
+        self.coeff_height = coeff_height
+        self.axis = tuple(grid) if grid is not None else default_collision_grid()
+        n_coeff = 2 * len(homogeneous_plane_monomials(degree))
+        width = 2 * coeff_height + 1
+        self._full_card = int(width**n_coeff)
+        self.complete = self._full_card <= MAX_HOMOG_COMPLETE_CARDINALITY
+        self._n_coeff = n_coeff
+        self._items = tuple(self._enumerate())
+        self._index = {item: i for i, item in enumerate(self._items)}
+        self.name = f"{JACOBIAN_N2_HOMOG_KIND}_d{degree}_h{coeff_height}"
+        if self.complete:
+            self.statement = jacobian_n2_homog_statement(
+                degree=degree,
+                coeff_height=coeff_height,
+            )
+        else:
+            self.statement = Statement(
+                name=f"{self.name}_slice",
+                obligation=(
+                    f"structured I+homog degree-{degree} height-{coeff_height} "
+                    f"slice; incomplete for the coefficient box; a miss is not "
+                    f"{JACOBIAN_N2_PARENT}"
+                ),
+                parent=JACOBIAN_N2_PARENT,
+                parent_status="open",
+                existential=False,
+            )
+
+    def _enumerate(self) -> list[N2Candidate]:
+        if self.complete:
+            width = range(-self.coeff_height, self.coeff_height + 1)
+            return [tuple(item) for item in product(width, repeat=self._n_coeff)]
+        # Incomplete: identity, one shear, and the two axis cubics / forms.
+        items: list[N2Candidate] = [tuple([0] * self._n_coeff)]
+        mons = homogeneous_plane_monomials(self.degree)
+        # (x, y + x^d) and (x + y^d, y)
+        shear_y = [0] * self._n_coeff
+        shear_y[len(mons) + 0] = 1
+        shear_x = [0] * self._n_coeff
+        shear_x[len(mons) - 1] = 1
+        items.append(tuple(shear_y))
+        items.append(tuple(shear_x))
+        return items
+
+    def cardinality(self) -> int:
+        return len(self._items)
+
+    def origin(self) -> N2Candidate:
+        zeros = tuple([0] * self._n_coeff)
+        if zeros in self._index:
+            return zeros
+        return self._items[0]
+
+    def neighbors(self, candidate: Candidate) -> Sequence[N2Candidate]:
+        if not isinstance(candidate, tuple):
+            return ()
+        typed = tuple(int(v) for v in candidate)
+        out: list[N2Candidate] = []
+        idx = self._index.get(typed)
+        if idx is not None:
+            if idx + 1 < len(self._items):
+                out.append(self._items[idx + 1])
+            if idx > 0:
+                out.append(self._items[idx - 1])
+        if self.complete:
+            for i, value in enumerate(typed):
+                for step in (-1, 1):
+                    nxt = list(typed)
+                    nxt[i] = int(value) + step
+                    if abs(nxt[i]) <= self.coeff_height:
+                        out.append(tuple(nxt))
+        return out
+
+    def score(self, candidate: Candidate) -> int:
+        components = self.decode(candidate)
+        if components is None:
+            return 0
+        constant = identical_jacobian_constant(components)
+        if constant is None:
+            return 0
+        if constant == 0:
+            return 1
+        return 2
+
+    def decode(self, candidate: Candidate) -> tuple[PolyN, PolyN] | None:
+        if not isinstance(candidate, tuple) or len(candidate) != self._n_coeff:
+            return None
+        if not all(isinstance(v, int) for v in candidate):
+            return None
+        return identity_plus_homogeneous(
+            tuple(int(v) for v in candidate),
+            degree=self.degree,
+        )
+
+    def check(self, candidate: Candidate) -> ExactCheck | None:
+        components = self.decode(candidate)
+        if components is None:
+            return None
+        payload = n2_violation_payload(
+            components,
+            axis=self.axis,
+            candidate=[str(item) for item in candidate] if isinstance(candidate, tuple) else None,
+        )
+        return ExactCheck(ok=bool(n2_counterexample_earned(payload)), payload=payload)
+
+
 def escalate_n2_result(result: DiscoveryResult) -> dict[str, Any]:
     """Seal a discovery verdict. Parent claim is earned only on a violator.
 
     ``jacobian_n2_claim`` becomes True only when ``status == DISPROVED``
     and the check payload records an identical nonzero constant Jacobian
-    plus a rational collision. ``jacobian_conjecture_proof_claim`` stays
-    False (a counterexample disproves; it does not prove the conjecture).
-    A ``PROVED`` finite universal does not escalate.
+    plus a rational collision or a Gabber inverse failure.
+    ``jacobian_conjecture_proof_claim`` stays False (a counterexample
+    disproves; it does not prove the conjecture). A ``PROVED`` finite
+    universal does not escalate.
     """
 
     payload = dict(result.check.payload) if result.check is not None else {}
@@ -496,18 +694,26 @@ def _full_box_cardinality(max_degree: int, coeff_height: int) -> int:
 
 __all__ = [
     "CI_COEFF_HEIGHT",
+    "CI_HOMOG_DEGREE",
+    "CI_HOMOG_HEIGHT",
     "CI_MAX_DEGREE",
     "DEFAULT_GRID_HALFWIDTH",
+    "JACOBIAN_N2_HOMOG_KIND",
     "JACOBIAN_N2_KIND",
     "JACOBIAN_N2_PARENT",
     "JacobianN2DegreeFamily",
+    "JacobianN2HomogeneousFamily",
     "MAX_COMPLETE_CARDINALITY",
+    "MAX_HOMOG_COMPLETE_CARDINALITY",
     "MOH_DEGREE_BOUND",
     "affine_map",
     "constant_map",
     "default_collision_grid",
     "escalate_n2_result",
+    "homogeneous_plane_monomials",
+    "identity_plus_homogeneous",
     "jacobian_n2_box_statement",
+    "jacobian_n2_homog_statement",
     "jacobian_n2_honesty",
     "n2_counterexample_earned",
     "n2_violation_payload",

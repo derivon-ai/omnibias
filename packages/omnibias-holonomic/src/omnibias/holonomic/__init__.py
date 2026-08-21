@@ -127,9 +127,12 @@ from omnibias.holonomic._core import (
 )
 from omnibias.holonomic.jacobian_n2 import (
     JacobianN2DegreeFamily,
+    JacobianN2HomogeneousFamily,
     escalate_n2_result,
     jacobian_n2_box_statement,
+    jacobian_n2_homog_statement,
 )
+from omnibias.holonomic.jacobian_n2_inverse import gabber_n2_test
 from omnibias.holonomic.keller import (
     alpoge_map,
     fiber_report,
@@ -154,6 +157,7 @@ __all__ = [
     "GosperResult",
     "HolonomicProof",
     "JacobianN2DegreeFamily",
+    "JacobianN2HomogeneousFamily",
     "OreAlgebra",
     "OreDivision",
     "OrePolynomial",
@@ -185,6 +189,7 @@ __all__ = [
     "empirical_rate",
     "escalate_n2_result",
     "fiber_report",
+    "gabber_n2_test",
     "gallagher_map",
     "gcrd",
     "geometric_k",
@@ -197,6 +202,7 @@ __all__ = [
     "hyper",
     "jacobian_det",
     "jacobian_n2_box_statement",
+    "jacobian_n2_homog_statement",
     "lclm",
     "ore_divmod",
     "peval",

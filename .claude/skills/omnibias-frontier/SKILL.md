@@ -22,8 +22,9 @@ open problems. It does not prove the famous parents by proximity.
   (`omnibias.holonomic.keller` via `run_discovery`) — a map in the sweep
   family, not a Jacobian-conjecture proof
 - Jacobian `n=2` finite box `C_box(d,h,G)` (`omnibias.holonomic.jacobian_n2`)
-  — identical constant Jacobian plus a rational grid collision. A miss
-  is not the parent. `jacobian_n2_claim` only via `escalate_n2_result`
+  — identical constant Jacobian plus a rational grid collision or a
+  Gabber inverse-degree failure. A miss is not the parent.
+  `jacobian_n2_claim` only via `escalate_n2_result`
 - DGG / Rybin H* cost separation (`omnibias.combinatorics.unsplittable`) —
   a separator in the H* family; the congestion theorem stays true. A
   capped DAG ≤6 miss is `BLOCKED`, not a parent proof

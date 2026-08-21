@@ -425,6 +425,11 @@ def free_omega_vorticity_residual(
     ``max|r|`` on ``|y| < y_trunc`` — the hp tail is not exact on the
     truncation nodes.
     """
+    if not jax.config.jax_enable_x64:
+        raise RuntimeError(
+            "free_omega_vorticity_residual requires jax_enable_x64=True; "
+            "float32 silently floors the official Wang score"
+        )
     y = jnp.asarray(y, dtype=jnp.float64).reshape(-1)
     omega = jnp.asarray(omega, dtype=jnp.float64).reshape(-1)
     omega_y = jnp.asarray(omega_y, dtype=jnp.float64).reshape(-1)

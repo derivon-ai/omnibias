@@ -320,6 +320,14 @@ The exactness of \(H[p_a]=q_a\) — on which the whole closure rests — is
 anti-faking-tested against an independent high-precision principal-value
 quadrature (`mpmath`) at the collocation nodes.
 
+Free neural \(\Omega\) (Phase-0 reproduce) does **not** use this closed-form
+Hardy \(H\). It uses the numerical whole-line operator
+`hilbert_wholeline_hp` (`train_hilbert="wholeline_hp"`). Periodic
+truncated-line FFT and finite-interval PV are labeled numerical and are
+not the reproduce default. That quadrature can match \(H[Q]=-P\) near
+`1e-14` on a planted atom; it is still not a certificate and does not
+earn `whole_line_certified` or stretch `1e-13`.
+
 ## Where this sits
 
 - Certificate + closure: `omnibias.pinn.certified.certified_ccf_selfsimilar_blowup_attempt`.
