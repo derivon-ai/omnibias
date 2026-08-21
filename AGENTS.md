@@ -515,7 +515,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   Hilbert) /
   `omnibias.core.implicit` /
   `omnibias.{torch,jax}.implicit` (08-08; `u = sigma(W u + x)` with
-  exact-`sigma'` IFT; G1–G3 CI; not unrolled BPTT, not CCF stretch).
+  exact-`sigma'` IFT; G1–G3 CI; not unrolled BPTT, not CCF stretch) /
+  `omnibias.verify.train_step` (08-09; accept `theta'` only if a
+  Lipschitz / output-box enclosure stays in cap; G1–G3 CI; empty is
+  a reject, not robustness; not imported by T1 torch/jax).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -545,7 +548,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/block_exact_search.md`](docs/api/block_exact_search.md),
   [`docs/api/local_jet.md`](docs/api/local_jet.md),
   [`docs/api/depth_residual.md`](docs/api/depth_residual.md),
-  [`docs/api/implicit.md`](docs/api/implicit.md). Cost /
+  [`docs/api/implicit.md`](docs/api/implicit.md),
+  [`docs/api/certified_step.md`](docs/api/certified_step.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

@@ -68,6 +68,12 @@ Four sound guarantees, all computed with outward-rounded arithmetic:
 - **reachable set** — an axis-aligned enclosure of the output set
   (`reachable_box`).
 
+A training step that consults those I/O bounds lives in
+[`certified_step.md`](certified_step.md) (theory 08-09). Empty or
+exploding enclosures reject the update; that is not a robustness
+claim. Distinct from Kantorovich (08-04), which seals a unique zero
+of a residual map.
+
 ## Certified global optimization
 
 Gradient descent (and L-BFGS, Adam, …) find a *local* minimum and can never

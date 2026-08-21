@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — certified step (theory 08-09)
+
+- `omnibias.verify.train_step`: accept a trial `theta'` only when a
+  sealed Lipschitz or output-box enclosure stays inside a declared
+  cap. Empty or overflowing enclosures return `reason="vacuous"`,
+  never `accepted=True`. Not imported by T1 `omnibias.{torch,jax}`.
+- G1–G3 CI-gated. Distinct from 08-04 (root of `F`). Not a global
+  min, not CCF stretch, and not a robustness claim without an
+  enclosure. Bias collapse (`delta -> 0`) supplies `sigma'`.
+- Docs: `docs/api/certified_step.md`,
+  `docs/cookbook/certified-step.md`.
+  Smoke: `docs/benchmarks/certified_step_smoke.json`.
+
 ### Added — implicit DEQ Newton (theory 08-08)
 
 - `omnibias.core.implicit` plus `omnibias.{torch,jax}.implicit` twins:

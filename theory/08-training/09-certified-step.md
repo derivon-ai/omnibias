@@ -7,7 +7,7 @@ of a named input-output property (Lipschitz or output box) remains
 inside a declared bound after the step, so training can refuse an
 update that would break a certificate.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 08-01
 - **Blocks**: none
 
@@ -139,11 +139,11 @@ Verify core stays pure Python. Torch/jax only supply `theta_trial`.
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.verify.train_step.certified_accept`
-- [ ] Tests: G1 toy, G2 vacuous, soundness (grid + random)
-- [ ] `benchmarks/certified_step.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.verify.train_step.certified_accept`
+- [x] Tests: G1 toy, G2 vacuous, soundness (grid + random)
+- [x] `benchmarks/certified_step.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

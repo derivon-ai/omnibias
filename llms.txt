@@ -57,7 +57,9 @@ global solver), depth-causal local jet (08-03; named local GN +
 ImageNet), depth-causal residual (08-05; PDE residual marched in
 network depth; G1–G3 CI; not time marching, not CCF Hilbert),
 implicit DEQ Newton (08-08; `u = sigma(W u + x)` with exact-`sigma'`
-IFT; G1–G3 CI; not unrolled BPTT, not CCF stretch). Cost / wall-time / FermiNet-many-body gates are
+IFT; G1–G3 CI; not unrolled BPTT, not CCF stretch), certified step
+(08-09; accept `theta'` only if a verify Lipschitz / output box stays
+in cap; G1–G3 CI; empty enclosure is a reject, not robustness). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

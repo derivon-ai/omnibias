@@ -183,6 +183,7 @@ nav:
       - depth-causal local jet (08-03): api/local_jet.md
       - depth-causal residual (08-05): api/depth_residual.md
       - implicit DEQ Newton (08-08): api/implicit.md
+      - certified step (08-09): api/certified_step.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -242,6 +243,7 @@ nav:
       - Depth-causal local jet: cookbook/depth-causal-local-jet.md
       - Depth-causal residual: cookbook/depth-causal-residual.md
       - Implicit DEQ Newton: cookbook/implicit-deq.md
+      - Certified step: cookbook/certified-step.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md
