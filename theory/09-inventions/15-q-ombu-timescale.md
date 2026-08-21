@@ -6,7 +6,7 @@ Alternate Jackson q-derivative or Hilger delta layers with ordinary
 `sigma` layers, with a **named limit** `q -> 1` / `mu -> 0` that
 recovers the ordinary tower.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 09-01
 - **Blocks**: none
 
@@ -107,11 +107,11 @@ def q_ombu_forward(x, params, *, config: QOMBUConfig) -> tuple:
 
 ## 12. Implementation checklist
 
-- [ ] Hybrid wrappers in qcalculus / timescale
-- [ ] Limit-residual tests
-- [ ] `benchmarks/q_ombu_timescale.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Hybrid wrappers in qcalculus / timescale
+- [x] Limit-residual tests
+- [x] `benchmarks/q_ombu_timescale.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

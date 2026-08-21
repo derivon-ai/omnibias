@@ -55,6 +55,7 @@ from omnibias.timescale._core import (
     solve_linear_dynamic,
     variation_of_constants,
 )
+from omnibias.timescale._core.hybrid import HilgerOMBUConfig, hilger_ombu_forward
 
 try:
     __version__ = _pkg_version("omnibias-timescale")
@@ -65,6 +66,7 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
 __lineage__ = "bias collapse"
 
 __all__ = [
+    "HilgerOMBUConfig",
     "TimeScale",
     "__lineage__",
     "__version__",
@@ -77,6 +79,7 @@ __all__ = [
     "finite",
     "h_integers",
     "hilger_exponential",
+    "hilger_ombu_forward",
     "is_regressive",
     "nabla_derivative",
     "quantum",

@@ -11,6 +11,7 @@ founding collapse). Bit-identical to the JAX twin up to the base activation's li
 
 from __future__ import annotations
 
+from omnibias.qcalculus.torch.hybrid import QOMBUConfig, q_ombu_forward
 from omnibias.torch.activations.registry import get_activation
 from torch import Tensor
 
@@ -42,7 +43,9 @@ def q_derivative_residual(name: str, z: Tensor, q: float) -> Tensor:
 
 
 __all__ = [
+    "QOMBUConfig",
     "q_derivative",
     "q_derivative_limit",
     "q_derivative_residual",
+    "q_ombu_forward",
 ]

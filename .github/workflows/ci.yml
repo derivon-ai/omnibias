@@ -505,6 +505,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/integral_kernel_operator.py
+      - name: Run q-OMBU / timescale smoke (09-15 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/q_ombu_timescale.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate
@@ -993,6 +997,10 @@ jobs:
         run: |
           source .venv-qcalculus/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/qcalculus_validate.py
+      - name: Run q-OMBU / timescale smoke (09-15 G1–G3)
+        run: |
+          source .venv-qcalculus/bin/activate
+          python benchmarks/q_ombu_timescale.py
 
   timescale:
     name: omnibias-timescale (alpha)
@@ -1024,6 +1032,10 @@ jobs:
         run: |
           source .venv-timescale/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/timescale_validate.py
+      - name: Run q-OMBU / timescale smoke (09-15 G1–G3)
+        run: |
+          source .venv-timescale/bin/activate
+          python benchmarks/q_ombu_timescale.py
 
   holonomic:
     name: omnibias-holonomic (alpha)

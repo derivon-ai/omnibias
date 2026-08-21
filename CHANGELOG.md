@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — q-OMBU / timescale hybrid (theory 09-15)
+
+- `omnibias.qcalculus._core.hybrid` and
+  `omnibias.timescale._core.hybrid` plus torch / jax twins:
+  Jackson / Hilger layers with a named `q -> 1` / `mu -> 0` limit.
+- G1–G4 CI-gated. Named limits are not founding bias collapse and
+  not temperature collapse. Not a continuum PDE. Not CCF stretch.
+- Docs: `docs/api/q_ombu_timescale.md`,
+  `docs/cookbook/q-ombu-timescale.md`.
+  Smoke: `docs/benchmarks/q_ombu_timescale_smoke.json`.
+
+
 ### Added — Integral-kernel operator (theory 09-14)
 
 - `omnibias.core.integral_kernel` plus architecture and

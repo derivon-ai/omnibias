@@ -13,6 +13,7 @@ twin up to the base activation's libm.
 from __future__ import annotations
 
 from omnibias.timescale._core.timescale import TimeScale
+from omnibias.timescale.torch.hybrid import HilgerOMBUConfig, hilger_ombu_forward
 from omnibias.torch.activations.registry import get_activation
 from torch import Tensor
 
@@ -46,7 +47,9 @@ def delta_derivative_residual(name: str, z: Tensor, ts: TimeScale) -> Tensor:
 
 
 __all__ = [
+    "HilgerOMBUConfig",
     "delta_derivative",
     "delta_derivative_limit",
     "delta_derivative_residual",
+    "hilger_ombu_forward",
 ]

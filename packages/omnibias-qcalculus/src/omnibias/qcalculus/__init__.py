@@ -70,6 +70,11 @@ from omnibias.qcalculus._core import (
     q_stirling_second_row,
     q_umbral_composition,
 )
+from omnibias.qcalculus._core.hybrid import (
+    QOMBUConfig,
+    q_ombu_forward,
+    q_ombu_limit,
+)
 
 try:
     __version__ = _pkg_version("omnibias-qcalculus")
@@ -80,6 +85,7 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
 __lineage__ = "exempt: q->1 third limit"
 
 __all__ = [
+    "QOMBUConfig",
     "QShefferClass",
     "__lineage__",
     "__version__",
@@ -109,6 +115,8 @@ __all__ = [
     "q_monomial_to_falling",
     "q_newton_forward_coeffs",
     "q_newton_forward_value",
+    "q_ombu_forward",
+    "q_ombu_limit",
     "q_pincherle_derivative",
     "q_pochhammer",
     "q_rising_factorial_coeffs",

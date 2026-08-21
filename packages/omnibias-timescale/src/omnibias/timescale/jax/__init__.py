@@ -14,6 +14,7 @@ from __future__ import annotations
 from jax import Array
 from omnibias.jax.activations import get_activation
 from omnibias.timescale._core.timescale import TimeScale
+from omnibias.timescale.jax.hybrid import HilgerOMBUConfig, hilger_ombu_forward
 
 
 def delta_derivative(name: str, z: Array, ts: TimeScale) -> Array:
@@ -45,7 +46,9 @@ def delta_derivative_residual(name: str, z: Array, ts: TimeScale) -> Array:
 
 
 __all__ = [
+    "HilgerOMBUConfig",
     "delta_derivative",
     "delta_derivative_limit",
     "delta_derivative_residual",
+    "hilger_ombu_forward",
 ]

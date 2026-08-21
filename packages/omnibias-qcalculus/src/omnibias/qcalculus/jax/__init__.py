@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from jax import Array
 from omnibias.jax.activations import get_activation
+from omnibias.qcalculus.jax.hybrid import QOMBUConfig, q_ombu_forward
 
 
 def q_derivative(name: str, z: Array, q: float) -> Array:
@@ -38,7 +39,9 @@ def q_derivative_residual(name: str, z: Array, q: float) -> Array:
 
 
 __all__ = [
+    "QOMBUConfig",
     "q_derivative",
     "q_derivative_limit",
     "q_derivative_residual",
+    "q_ombu_forward",
 ]

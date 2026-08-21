@@ -173,6 +173,12 @@ PENALTY_FILES = (
     "packages/omnibias-pinn/src/omnibias/pinn/operator/_core/integral_kernel.py",
     "packages/omnibias-pinn/src/omnibias/pinn/operator/torch/integral_kernel.py",
     "packages/omnibias-pinn/src/omnibias/pinn/operator/jax/integral_kernel.py",
+    "packages/omnibias-qcalculus/src/omnibias/qcalculus/_core/hybrid.py",
+    "packages/omnibias-qcalculus/src/omnibias/qcalculus/torch/hybrid.py",
+    "packages/omnibias-qcalculus/src/omnibias/qcalculus/jax/hybrid.py",
+    "packages/omnibias-timescale/src/omnibias/timescale/_core/hybrid.py",
+    "packages/omnibias-timescale/src/omnibias/timescale/torch/hybrid.py",
+    "packages/omnibias-timescale/src/omnibias/timescale/jax/hybrid.py",
 )
 
 

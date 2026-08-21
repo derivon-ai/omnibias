@@ -1,0 +1,52 @@
+{
+  "schema": "omnibias.benchmarks.q_ombu_timescale.v1",
+  "generated_utc": "2026-08-21T20:56:15Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "q_ombu_timescale",
+    "full": false,
+    "honesty": {
+      "continuum_claimed_from_q_limit": false,
+      "stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 810.58,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "y": 4.019999999999998,
+        "y_err": 1.7763568394002505e-15,
+        "limit": 4.0
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "errs": [
+          0.20000000000000018,
+          0.019999999999997797,
+          0.0019999999998354667
+        ],
+        "g2_earned": true
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "continuum_claimed_from_q_limit": false
+      }
+    ]
+  },
+  "disclaimer": "q-OMBU hybrid: named q -> 1 limit, not founding bias collapse, not temperature collapse, and not a continuum PDE",
+  "wall_seconds": 1.6308282549725845
+}

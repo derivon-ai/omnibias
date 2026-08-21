@@ -217,6 +217,7 @@ nav:
       - Holonomic layer (09-12): api/holonomic_layer.md
       - Jet-Hopfield (09-13): api/jet_hopfield.md
       - Integral-kernel operator (09-14): api/integral_kernel.md
+      - q-OMBU / timescale (09-15): api/q_ombu_timescale.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -308,6 +309,7 @@ nav:
       - Holonomic layer: cookbook/holonomic-layer.md
       - Jet-Hopfield: cookbook/jet-hopfield.md
       - Integral-kernel operator: cookbook/integral-kernel.md
+      - q-OMBU / timescale: cookbook/q-ombu-timescale.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md
