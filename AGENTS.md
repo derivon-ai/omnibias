@@ -619,7 +619,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   bias collapse, not temperature collapse; not a sheaf theorem) /
   `omnibias.core.riccati_flow` + `omnibias.{torch,jax}.architectures.riccati_flow`
   (09-10; Riccati time flow; G1–G4 CI; not DEQ / CNF; not bias
-  collapse unless a jet-in-`s0` head is used).
+  collapse unless a jet-in-`s0` head is used) /
+  `omnibias.core.integral_kernel` + `omnibias.pinn.operator`
+  (09-14; OMBU `integral` cell, not BEM-Net; G1–G4 CI; founding
+  bias collapse, not temperature collapse).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -682,7 +685,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/riccati_flow_net.md`](docs/api/riccati_flow_net.md),
   [`docs/api/collapse_net.md`](docs/api/collapse_net.md),
   [`docs/api/holonomic_layer.md`](docs/api/holonomic_layer.md),
-  [`docs/api/jet_hopfield.md`](docs/api/jet_hopfield.md). Cost /
+  [`docs/api/jet_hopfield.md`](docs/api/jet_hopfield.md),
+  [`docs/api/integral_kernel.md`](docs/api/integral_kernel.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

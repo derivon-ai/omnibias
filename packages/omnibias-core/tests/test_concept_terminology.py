@@ -167,6 +167,12 @@ PENALTY_FILES = (
     "packages/omnibias-jax/src/omnibias/jax/architectures/jet_hopfield.py",
     "packages/omnibias-hopfield/src/omnibias/hopfield/torch/ops/jet_hopfield.py",
     "packages/omnibias-hopfield/src/omnibias/hopfield/jax/ops/jet_hopfield.py",
+    "packages/omnibias-core/src/omnibias/core/integral_kernel.py",
+    "packages/omnibias-torch/src/omnibias/torch/architectures/integral_kernel.py",
+    "packages/omnibias-jax/src/omnibias/jax/architectures/integral_kernel.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/operator/_core/integral_kernel.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/operator/torch/integral_kernel.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/operator/jax/integral_kernel.py",
 )
 
 

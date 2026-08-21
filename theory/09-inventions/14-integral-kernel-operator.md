@@ -6,7 +6,7 @@ A volumetric / DeepONet-style neural operator whose **kernel is an
 OMBU `integral` cell** along learned directions — not a surface BEM
 and not a Fourier multiplier.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 09-01, 09-03
 - **Blocks**: none
 
@@ -117,11 +117,11 @@ def integral_kernel_apply(source, coords, params, *, config: IntegralKernelConfi
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.pinn.operator` integral-kernel twins
-- [ ] G1 vs `OperatorBlock`
-- [ ] `benchmarks/integral_kernel_operator.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.pinn.operator` integral-kernel twins
+- [x] G1 vs `OperatorBlock`
+- [x] `benchmarks/integral_kernel_operator.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

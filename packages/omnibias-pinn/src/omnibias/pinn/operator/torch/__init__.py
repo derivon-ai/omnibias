@@ -38,6 +38,11 @@ from omnibias.pinn.operator.torch.geometry_field import (
     condition_with_geometry,
     evaluate_geometry_batch,
 )
+from omnibias.pinn.operator.torch.integral_kernel import (
+    IntegralKernelConfig,
+    integral_cell,
+    integral_kernel_apply,
+)
 from omnibias.pinn.operator.torch.losses import (
     burgers_residual_loss,
     causal_operator_loss,
@@ -55,6 +60,7 @@ __all__ = [
     "DeepONetOperator",
     "FNO1d",
     "FNO2d",
+    "IntegralKernelConfig",
     "OperatorSlab",
     "ParametricOperatorSlab",
     "SpectralConv1d",
@@ -71,6 +77,8 @@ __all__ = [
     "evaluate_geometry_batch",
     "heat_residual_loss",
     "heat_residual_loss_fd",
+    "integral_cell",
+    "integral_kernel_apply",
     "ks_residual_loss",
     "ks_residual_loss_fd",
     "make_burgers_slab",

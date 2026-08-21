@@ -32,6 +32,8 @@ function-space maps) -- not `OperatorBlock` and not a field operator like
   sound interval bound on the PDE residual over a coefficient box -- **not** a
   solution-error bound.
 - **Operator accuracy** (held-out relative $L^2$) is **optimised, not proven**.
+- **Integral-kernel operator** (09-14) uses the OMBU `integral` cell as a
+  volumetric 1-D kernel. It is **not** BEM-Net (02-06) and **not** FNO SOTA.
 
 The submodule never asserts a continuum / global-regularity claim.
 
@@ -43,12 +45,18 @@ The submodule never asserts a continuum / global-regularity claim.
       heading_level: 3
       members:
         - ConditioningSpec
+        - IntegralKernelConfig
         - OperatorSpec
         - SensorGrid
         - sample_fourier_ics
         - branch_coefficient_box
         - enclose_heat_residual
         - certify_heat_residual
+        - honesty_payload
+        - integral_cell
+        - integral_kernel_apply
+        - volterra_apply
+        - worked_example
 
 ## Torch drivers
 
@@ -62,6 +70,9 @@ The submodule never asserts a continuum / global-regularity claim.
         - build_deeponet
         - FNO1d
         - FNO2d
+        - IntegralKernelConfig
+        - integral_cell
+        - integral_kernel_apply
         - SpectralConv1d
         - SpectralConv2d
         - build_fno1d

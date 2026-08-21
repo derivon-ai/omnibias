@@ -501,6 +501,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/jet_hopfield.py
+      - name: Run integral-kernel operator smoke (09-14 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/integral_kernel_operator.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate
@@ -571,6 +575,10 @@ jobs:
         run: |
           source .venv-pinn/bin/activate
           python benchmarks/bem_net.py
+      - name: Run integral-kernel operator smoke (09-14 G1–G3)
+        run: |
+          source .venv-pinn/bin/activate
+          python benchmarks/integral_kernel_operator.py
       - name: Run linearizing-transforms smoke (02-13 G1/G2/G4/G5/G6; G3 --full)
         run: |
           source .venv-pinn/bin/activate

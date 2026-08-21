@@ -19,6 +19,11 @@ from omnibias.pinn.operator.jax.deeponet import (
     make_deeponet,
 )
 from omnibias.pinn.operator.jax.fno import FNO1d, FNO2d, SpectralConv1d, make_fno1d, make_fno2d
+from omnibias.pinn.operator.jax.integral_kernel import (
+    IntegralKernelConfig,
+    integral_cell,
+    integral_kernel_apply,
+)
 from omnibias.pinn.operator.jax.losses import (
     burgers_residual_loss,
     causal_operator_loss,
@@ -36,6 +41,7 @@ __all__ = [
     "DeepONetOperator",
     "FNO1d",
     "FNO2d",
+    "IntegralKernelConfig",
     "OperatorSlab",
     "ParametricOperatorSlab",
     "SpectralConv1d",
@@ -44,6 +50,8 @@ __all__ = [
     "data_loss",
     "heat_residual_loss",
     "heat_residual_loss_fd",
+    "integral_cell",
+    "integral_kernel_apply",
     "ks_residual_loss",
     "ks_residual_loss_fd",
     "make_burgers_slab",

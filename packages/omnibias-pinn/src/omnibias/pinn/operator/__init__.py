@@ -32,20 +32,32 @@ from __future__ import annotations
 
 from omnibias.pinn.operator._core import (
     ConditioningSpec,
+    IntegralKernelConfig,
     OperatorSpec,
     SensorGrid,
     branch_coefficient_box,
     certify_heat_residual,
     enclose_heat_residual,
+    honesty_payload,
+    integral_cell,
+    integral_kernel_apply,
     sample_fourier_ics,
+    volterra_apply,
+    worked_example,
 )
 
 __all__ = [
     "ConditioningSpec",
+    "IntegralKernelConfig",
     "OperatorSpec",
     "SensorGrid",
     "branch_coefficient_box",
     "certify_heat_residual",
     "enclose_heat_residual",
+    "honesty_payload",
+    "integral_cell",
+    "integral_kernel_apply",
     "sample_fourier_ics",
+    "volterra_apply",
+    "worked_example",
 ]

@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Integral-kernel operator (theory 09-14)
+
+- `omnibias.core.integral_kernel` plus architecture and
+  `omnibias.pinn.operator` twins: the volumetric kernel is the
+  OMBU `integral` cell, not a surface BEM.
+- G1–G4 CI-gated. Founding bias collapse of the window is not
+  the default. Not BEM-Net. Not FNO SOTA. Not CCF stretch.
+- Docs: `docs/api/integral_kernel.md`,
+  `docs/cookbook/integral-kernel.md`.
+  Smoke: `docs/benchmarks/integral_kernel_operator_smoke.json`.
+
+
 ### Added — Jet-Hopfield (theory 09-13)
 
 - `omnibias.core.jet_hopfield` plus architecture and hopfield twins:

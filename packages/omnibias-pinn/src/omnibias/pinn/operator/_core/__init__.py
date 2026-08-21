@@ -5,6 +5,14 @@
 from __future__ import annotations
 
 from omnibias.pinn.operator._core.conditioning import ConditioningSpec
+from omnibias.pinn.operator._core.integral_kernel import (
+    IntegralKernelConfig,
+    honesty_payload,
+    integral_cell,
+    integral_kernel_apply,
+    volterra_apply,
+    worked_example,
+)
 from omnibias.pinn.operator._core.sensors import SensorGrid, sample_fourier_ics
 from omnibias.pinn.operator._core.spec import OperatorSpec
 from omnibias.pinn.operator._core.verified import (
@@ -15,10 +23,16 @@ from omnibias.pinn.operator._core.verified import (
 
 __all__ = [
     "ConditioningSpec",
+    "IntegralKernelConfig",
     "OperatorSpec",
     "SensorGrid",
     "branch_coefficient_box",
     "certify_heat_residual",
     "enclose_heat_residual",
+    "honesty_payload",
+    "integral_cell",
+    "integral_kernel_apply",
     "sample_fourier_ics",
+    "volterra_apply",
+    "worked_example",
 ]
