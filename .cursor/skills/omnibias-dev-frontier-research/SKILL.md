@@ -48,6 +48,10 @@ Smoke JSON is not a multi-seed claim.
 | Blow-up / singularity | CAP / radii-polynomial existence on a self-similar ansatz |
 | Gauge theory | `omnibias.geometry.gauge` transfer / curvature primitives with sealed scope |
 | Spectral geometry | Lehmann-Maehly-Goerisch lower bounds; SOS positivity certificates |
+| Jacobian conjecture (`n>=3` already false) | Exact `Q` Alpöge replay + blind deg-2 / deg-3 tangent sweep via `run_discovery` in `omnibias.holonomic.keller`. `n=2` stays external |
+| DGG / Goemans cost (already false) | AFP / Rybin H* replay + blind H* box + capped DAG ≤6 in `omnibias.combinatorics.unsplittable`. Congestion theorem stays true. A larger-family miss is `BLOCKED` |
+| Erdős 183 (`R_k(3)=k^{Θ(k)}`) | Triangle-free colouring + tiny `IsSaturated` smoke only. Not the `Θ` theorem |
+| Erdős 146 / 180 (compactness / degeneracy) | `C4`/`C6`/`jTemplate`/`kTemplate`/`pairGraph(4,2)` structural checks. Not the `atTop` inequalities |
 
 ## Forbidden-claims register
 
@@ -62,6 +66,33 @@ Restate these disclaimers from their canonical sources; never weaken them:
 | Lean discharged an infinite / continuum obligation | `formal/omnibias-verified-kernel`; certificates discharge **finite rational** obligations only |
 | `theorem_prover_verified` without a kernel pass | `omnibias.core.proof` -- flag is earned, never forged |
 | `mathlib_verified` conflated with `theorem_prover_verified` | AGENTS.md formal-loop section |
+| omnibias refuted Keller / the Jacobian conjecture | `omnibias.holonomic.keller`; engine found a map **in the sweep family** |
+| omnibias disproved Goemans / DGG congestion | congestion theorem stays true; cost separator is a family stress-test |
+| Erdős 183 / 146 / 180 solved | finite colouring / template predicates only |
+| `ten_proofs_formalization_claim` | we did not `lake build` openai/ten-proofs Lean |
+| Jacobian `n=2` settled | Moh through deg 100; still open |
+
+## ten-proofs absorb table
+
+openai/ten-proofs is Lean 4 certificates of already-obtained theorems, not a
+search engine. Do **not** vendor that Lean into `formal/`. Absorb only the
+finite smokes below.
+
+| # | Result | Finite in omnibias? | This pass |
+| --- | --- | --- | --- |
+| 1 | Cohn–Elkies packing exponent | No (`d→∞`) | Defer |
+| 2 | Binary / spherical code exponents | Partial (fixed `n,δ` LP) | Defer |
+| 3 | Non-sofic group | No | External |
+| 4 | Connes rigidity counterexample | No | External |
+| 5 | Permanent circuit lower bounds | No (all circuits) | Defer |
+| 6 | Quantum parallel repetition | No | External |
+| 7 | Gap-CVP hardness | No (complexity) | External |
+| 8 | Ehrhart volume | Partial (listed bodies) | Defer |
+| 9 | `R_k(3)=k^{Θ(k)}` (Erdős 183) | Colouring + tiny `IsSaturated` | Finite smoke only |
+| 10 | Compactness / 2-degenerate (146, 180) | Template / pair-graph predicates | Finite smoke only |
+
+Jacobian (Alpöge) and DGG cost (Rybin) are the same class as already-false
+parents: finite replay + blind search. They are not in ten-proofs.
 
 ## Worked example: absolute metrics protect discoveries
 
@@ -77,6 +108,37 @@ metric is what separates a discovery from a diverged diagnostic.**
 The same lesson as the ETDRK4 maximum-principle rescue: `isfinite` is not a
 validity floor. Ask, in order -- is the reference physically valid? Does every
 arm beat the zero predictor? Does absolute error clear a named threshold?
+
+## Discovery engine
+
+`omnibias.core.proof.discovery` is the proposer layer, not a second engine.
+`ProofMachine` still adjudicates. See also `omnibias-dev-discovery-engine`.
+
+1. Name a `Statement` (finite obligation + parent + `parent_status` +
+   `existential`).
+2. Implement a `FiniteFamily` (`complete`, optional `cardinality`, `origin`,
+   `neighbors`, `score`, exact `check`). Score is a heuristic; the accept gate
+   is `check`.
+3. `register_catalog` with a mode: `exact_search` / `exact_replay` /
+   `enclosure` / `empirical`. Soft residuals never become `ExactCheck`.
+4. Run `run_discovery(..., proposer="score_guided")` (CI default). Optional:
+   `coordinate_newton` (discrete finite-diff, not `CubicNewton`) or
+   `onehot_anneal` (1-flip box, not `omnibias-qubo`).
+   `AnnealDescentProposer` is an extension instance, not a core name.
+5. Existential hit → `PROVED`. Universal hit → `DISPROVED`. Exhausted
+   complete universal miss → `PROVED` of that finite universal.
+6. `budget == 0` or a cut-short walk is `search_incomplete`. Exhaustive miss
+   requires the iterator to end *and* `evaluated >= cardinality` when set.
+7. `collect=True` fills a solution set. First-hit `PROVED` is not
+   `unique_in_family`. Uniqueness is span/box-scoped.
+8. A larger family miss is **never** “the parent is true.”
+9. Condition language (`omnibias.core.proof.condition`): candidates
+   may be typed hypotheses. An incomplete grammar miss is
+   `search_incomplete`, never “no condition exists.”
+   `select_class(Observation)` binds the sorts that apply, may grow
+   one constructor on a miss, and ranks certified hits. Soft RMSE
+   never outranks an exact identity. Pack tables with
+   `omnibias.symbolic.ingest`; enter through `discover_observation`.
 
 ## Process
 

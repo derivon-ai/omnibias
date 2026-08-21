@@ -75,7 +75,8 @@ the field substrate). CCF line discovery uses a Cauchy–Hardy exact-Hilbert
 basis (`omnibias.core.verified.hardy_line`, `hilbert_mode="hardy_exact"`) with a
 whole-line CAP attempt (`ccf_hardy_wholeline_blowup`; `whole_line_certified` only
 on genuine covering + NK close), vorticity-form Rung-1 metric
-(`omnibias.pinn.jax.discovery.ccf_vorticity` and torch
+(`omnibias.pinn.jax.discovery.ccf_vorticity`, signed PirateNet hat
+`omnibias.pinn.jax.discovery.pirate_hat`, and torch
 `omnibias.pinn.torch.discovery.ccf_vorticity_neural` with CubicGaussNewton +
 Hardy-projection Hilbert — truncated FFT is not the Rung path), sealed Galerkin
 spectrum, and a fractional dissipation threshold certificate; reusable via
@@ -450,6 +451,23 @@ bit-identical torch + jax delta-derivative twins. It is the founding `delta -> 0
 **generalized** -- the graininess limit `mu -> 0` recovers the continuum tower -- a distinct
 limit from qcalculus's `q -> 1` and the `beta -> inf` penalty, carried honestly and registered
 in the `FOUNDING_FILES` terminology guard. Smoke `docs/examples/timescale_validate.py`.
+The **discovery engine** (`omnibias.core.proof.discovery` +
+`omnibias.core.proof.catalog` + `omnibias.core.proof.condition` +
+`omnibias.core.proof.observe`) is the proposer layer on `ProofMachine`:
+a named finite family or a typed `ConditionHypothesis` in a
+`GrammarSpec`, or a shared `Observation` bound to the sorts that apply.
+`select_class` collects certified hits, may grow one constructor step
+on an exact miss, and ranks them (exact ≻ enclosure ≻ empirical).
+`omnibias.symbolic.ingest` packs tag-optional tables;
+`discover_observation` loads owning packages. Optimizers and gates
+only propose. A hit is a witness **in that family / grammar**.
+Incomplete search — including an incomplete grammar miss — is
+`BLOCKED` (`search_incomplete`). It is never “no condition exists.”
+Catalog modes:
+`exact_search` / `exact_replay` / `enclosure` / `empirical`. Soft
+residuals are never an `ExactCheck` until
+`residual_identically_zero` accepts. Cookbook:
+`docs/cookbook/discovery-loop.md`.
 `omnibias-holonomic` is the **D-finite computer-algebra engine + Lean-certified identities**
 capstone: a genuine right-Euclidean Ore (skew-polynomial) algebra for the shift `S` and
 differential `D` operators (`ore_divmod` / `gcrd` / `lclm` / `symmetric_product`); `DFinite` /

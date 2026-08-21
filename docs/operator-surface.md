@@ -56,7 +56,10 @@ same six roles; it is not a seventh `OperatorBlock` role. Equivariance is an
 interior shift along `w` only. Gated Wave-3 `ScanNet`
 ([scannet.md](api/scannet.md)) stacks those templates; equivariance stays
 **per-layer, per-direction, on-lattice**, not the translation group of
-`R^D`.
+`R^D`. The convolution-class family is `scan(role)` over those six roles;
+the catalog (role × scan, non-scan operators, inventable pointers, and
+rejects) is theory spec 01-13. A named `BiasScan(op="integral")` layer is
+unused spend, not a seventh role.
 
 ## The antiderivative kernel `S` (why `integral` is closed form)
 
@@ -144,6 +147,8 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | Fractional derivative (general sampled `f`) | Grunwald-Letnikov / spectral | numerical | `omnibias.fractional...fractional` |
 | Neural operator `G(u)(y)` query derivatives (DeepONet) | trunk jet × branch coeffs | closed form | `omnibias.pinn.operator` |
 | Neural operator 4th-order residual (KS on DeepONet) | one order-4 trunk jet × live coeffs | closed form | `omnibias.pinn.operator` + shipped `KuramotoSivashinsky` |
+| PirateNet α-skip (`α=0` identity) | gated residual apply | numerical | `omnibias.{jax,torch}.architectures.piratenet` (not ImageNet / not CCF stretch) |
+| Boussinesq `(q, β)` envelopes | closed-form chart / product rule | autodiff-exact hats; closed-form envelope | `omnibias.pinn.{jax,torch}.equations.boussinesq_compactified` |
 | Neural operator spectral-conv (FNO 1-D / 2-D) | FFT multiply | numerical | `omnibias.pinn.operator` |
 | Operator multi-head conditioning (params / BC / geometry) | LayerNorm head encoders + fusion MLP; **width-1 parameter heads skip LayerNorm** (`nn.Identity`) so a scalar diffusivity is not collapsed to 0 | numerical | `omnibias.pinn.operator.ConditioningSpec` |
 | Causal time-marching PINN training | Wang–Perdikaris weights + gated window ladder | numerical | `omnibias.pinn.train` |
@@ -153,6 +158,20 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | Negative-inside R-function CSG | Rvachev ops via `r_intersect_sdf` / `r_union_sdf` | algebraic zero-set | `omnibias.pinn.domain` |
 | Multilevel FBPINN spectral-bias mitigation | hierarchy + partition combine / POU | numerical | `omnibias.pinn.{torch,jax}.fields.FBPINNField` |
 | NTK eigenspectrum / spectral-bias index | empirical Jacobian + Lanczos / mode LRs | measurement | `omnibias.pinn.{torch,jax}.losses.ntk` |
+| Keller n=3 Jacobian identity (Alpöge / Gallagher) | exact `Q` 3×3 Jacobian + witness eval | exact rational | `omnibias.holonomic.keller` (not a Jacobian-conjecture proof; `n=2` open) |
+| Blind deg-2 tangent-sweep Keller search | side conditions + constant-Jac 3-to-1 fiber | exact rational | `omnibias.holonomic.keller_search` |
+| Deg-3 tangent-sweep + finite discovery loop | `run_discovery` + score-guided walk; exact `Q` checker | exact rational | `omnibias.core.proof.discovery` / `keller_search` (family witness, not a parent proof) |
+| Discovery catalog / characterization | statement → family → proposer → exact check; box-scoped uniqueness | exact rational or honest `BLOCKED` | `omnibias.core.proof.catalog` / `discovery` (not a parent proof) |
+| Condition language / kind meta-family | `ConditionHypothesis` in a finite grammar; snap-to-`Q` accept gate; incomplete miss is `search_incomplete` | exact rational or honest `BLOCKED` | `omnibias.core.proof.condition` / `lift` (not “no condition exists”) |
+| Shared observation / class loop | one `Observation`; binders return `Family \| None`; `select_class` ranks certified hits; gate proposes only | exact rational or honest `BLOCKED` | `omnibias.core.proof.observe` / `select_class` (never “no condition exists”) |
+| Autonomy stack (ingest / grow / bilevel) | tag-optional packers; grow-on-miss; STLSQ / NeuralJet / optional field+PINN; `discover_observation` | exact rational or honest `BLOCKED` | `omnibias.symbolic.ingest` / `classloop` (PINN off by default; never “no condition exists”) |
+| Exact activation identity (tanh Riccati) | closed-form `T_n` at rational `t`; nullity-one span | exact rational | `omnibias.symbolic.families.ActivationIdentityFamily` |
+| P-recurrence span | exact `Q` null space in an `(order, degree)` box | exact rational | `omnibias.symbolic.families.RecurrenceSpanFamily` |
+| Blind `K_5` colouring search | 1-flip walk; triangle-free predicate | exact finite | `omnibias.combinatorics.ramsey_search` (not Erdős 183) |
+| DGG / Rybin unsplittable cost separation | exact `Fraction` H* enumerator | exact rational | `omnibias.combinatorics.unsplittable` (congestion theorem stays true) |
+| 3-terminal DAG ≤6 (capped) | same cost-separation predicate; miss is `BLOCKED` | exact rational | `omnibias.combinatorics.unsplittable_dags` |
+| Finite triangle-free colouring / `IsSaturated` | triple enumeration; matrix predicate | exact finite | `omnibias.combinatorics.ramsey` (not Erdős 183) |
+| Compactness / 2-degenerate templates | adjacency-list predicates | exact finite | `omnibias.combinatorics.extremal` (not Erdős 146 / 180) |
 
 ## Where NOT to look for a capability
 

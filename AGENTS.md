@@ -445,7 +445,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   omnibias. They are hand-authored **canonically in `.cursor/skills/`** and
   mirrored to `.claude/skills/` by `python scripts/sync_skills.py` (with `--check`
   in CI). Edit the `.cursor` copy, then re-run the sync. Includes
-  `omnibias-dev-pinn-research`, `omnibias-dev-empirical-validation`, and
+  `omnibias-dev-pinn-research`, `omnibias-dev-empirical-validation`,
+  `omnibias-dev-discovery-engine` (add a `FiniteFamily` or
+  `ConditionHypothesis` + catalog kind, or an `Observation` binder /
+  ingest packer / `discover_observation` sort), and
   `omnibias-dev-frontier-research` (decompose famous open problems into
   winnable sub-obligations; never forge continuum claims).
 - **Rules** (`.cursor/rules/`): one always-apply `omnibias.md` (universal

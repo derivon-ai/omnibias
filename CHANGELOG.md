@@ -6,6 +6,388 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — autonomy engineering stack
+
+- `omnibias.symbolic.ingest` packs jets / design / sequence / graph /
+  poly / residual into a tag-optional `Observation`. Binders read the
+  table (`sample_x`, column names, `poly_constraints`), not planted
+  tags. `observation_square` / `observation_abs` are packed tables.
+- `select_class(..., grow=True)` applies one legal constructor step
+  (or `LinearSpanFamily` column products) after an exact miss. The
+  grammar stays incomplete. `budget == 0` does not grow.
+- New registered sorts: `dfinite`, `sos_onset`, `edge_colouring`,
+  `extremal_template`, `residual_sign`. Factories stay human-authored.
+- `run_bilevel_class_loop` proposers: `stlsq`, `neural_jet`, optional
+  `fit_field`, optional `pinn_train` (pinn is not imported by default
+  and is off in CI). Snap remains the accept gate.
+- `ClassMemory.save` / `load` optional JSON. `Observation.features()`
+  is length-`FEATURE_DIM` and includes table flags. `LogitGate` follows
+  that width.
+- `load_discovery_stack` / `discover_observation` is the one entry
+  point. Core still does not import holonomic / sos / combinatorics /
+  pinn.
+
+### Added — shared-observation class loop
+
+- `Observation` is a tagged, JSON-able payload (sequence / jet / design /
+  graph / polynomial). `bind_sorts` applies registered
+  `Observation → FiniteFamily | None` factories. A dropped binder
+  forces an incomplete grammar. Planted defaults fire only when the
+  tag or payload matches, or when no observation is supplied.
+- `select_class` is the front door: bind → optional gate order →
+  `run_discovery(..., collect=True)` → `rank_class_hits`. Exact snap /
+  finite predicate outranks enclosure, which outranks empirical. Soft
+  RMSE never outranks an exact identity. The driver never sets
+  `GrammarSpec.complete=True`. `no_condition_exists_claim` stays False.
+- `ClassMemory` / `FrequencyGate` (core) and `LogitGate` (numpy, with
+  torch / jax logit twins) only propose a sort order. They never write
+  `ExactCheck`. `run_bilevel_class_loop` runs STLSQ then snap on a
+  design/target observation, then `select_class`.
+- `LinearSpanFamily` is a bitmask nullity-one checker over an exact-`Q`
+  table carried on the observation, so jet / PDE / conservation binders
+  are views of one table.
+
+### Added — condition-language discovery
+
+- `omnibias.core.proof.condition` is a hypothesis language whose points
+  are typed conditions (`ConditionHypothesis` / `GrammarSpec`), not
+  colourings or maps. Typed constructors (`compose_jets`,
+  `multiply_columns`, `raise_ore_degree`, `split_partition`,
+  `add_minor_edge`) grow the grammar. Depth overflow and untyped
+  emission return `None`.
+- `KindMetaFamily` tries registered condition sorts. Missing sorts
+  force an incomplete grammar. An incomplete miss is
+  `search_incomplete`. A complete exhausted miss is `BLOCKED` with
+  `no witness in enumerated grammar`. `no_condition_exists_claim` stays
+  False.
+- `omnibias.core.proof.lift.residual_identically_zero` is the exact-`Q`
+  accept gate. `snap_sparse_equation` calls it. NeuralJet / STLSQ /
+  PINN residuals stay `empirical` until they snap
+  (`omnibias.symbolic.propose`).
+- Cheap exact families: jet / PDE / conservation / integer-order /
+  piecewise (`omnibias-symbolic`), Ore (`omnibias-holonomic`), SOS
+  template (`omnibias-sos`), named minors on `n≤5`
+  (`omnibias-combinatorics`). Catalog kinds `condition_*`.
+
+### Added — discovery engine (catalog, lift, characterization)
+
+- `omnibias.core.proof.catalog` registers discoverable kinds without
+  core importing downstream packages. Modes are `exact_search`,
+  `exact_replay`, `enclosure`, and `empirical`. Soft residuals never
+  become an `ExactCheck`.
+- `run_discovery` now tracks exhaustion (`cardinality` + iterator
+  end). `budget == 0` is always `search_incomplete`. Universal
+  statements can `DISPROVE` (counterexample) or `PROVE` a finite
+  universal on an exhausted complete family. `collect=True` returns a
+  solution set. `DiscoveredEquation` / `Characterization` are
+  box-scoped; first-hit `PROVED` is not uniqueness.
+- Exact span families: recurrence / tanh identity / planted heat
+  (`omnibias-symbolic`), prefix-verified holonomic guesses, blind
+  `K_5` colouring search, extremal template search, SOS degree box.
+  Optional `AnnealDescentProposer` lives in `omnibias-discrete` and is
+  not a core `get_proposer` name.
+
+### Added — discovery-machine loop (statement → family → proposer → exact check)
+
+- `omnibias.core.proof.discovery` is the proposer layer on
+  `ProofMachine`: `Statement`, `FiniteFamily`, `run_discovery`. CI
+  default is `score_guided`. `coordinate_newton` is a discrete
+  finite-difference walk (not `CubicNewton`). `onehot_anneal` is a
+  1-flip box anneal (not `omnibias-qubo`). A hit is a family witness.
+  A miss on an incomplete family is `BLOCKED`.
+- Holonomic `keller_tangent_sweep_deg3` (height ≤4) and combinatorics
+  `dgg_dag_le6` (capped 3-terminal DAGs). The DAG CI default may miss.
+  Planted 6-vertex recovery is required. H* remains the box CI must
+  hit. Parent honesty flags stay `False`.
+
+### Added — finite prove/disprove gates (Keller, DGG, Ramsey, extremal)
+
+- `omnibias.holonomic.keller` replays Alpöge / Gallagher as exact `Q`
+  Jacobian identities and runs a blind deg-2 tangent-sweep search.
+  `build_holonomic_machine()` registers `keller_alpoge_replay` and
+  `keller_tangent_sweep`. `PROVED` is the finite obligation, not a
+  Jacobian-conjecture proof; `n=2` stays open.
+- `omnibias.combinatorics.unsplittable` replays the AFP / Rybin H*
+  instance (fractional 58 vs legal unsplittable 60) and searches the
+  H* parameter box. The 1999 congestion theorem stays true. Finding a
+  separator is a family stress-test, not "omnibias disproved Goemans."
+- `omnibias.combinatorics.ramsey` checks triangle-free colourings
+  (`R(3,3)>5` smoke) and a tiny `IsSaturated` matrix.
+  `erdos_183_claim` is never `True`.
+- `omnibias.combinatorics.extremal` encodes `C4`/`C6`/`jTemplate`/
+  `kTemplate`/`pairGraph(4,2)` and checks finite predicates.
+  `erdos_146_claim` / `erdos_180_claim` are never `True`.
+- `build_combinatorics_machine()` registers the replay and search
+  kinds. Cookbooks: `keller-jacobian`, `unsplittable-flow`,
+  `finite-ramsey-colouring`, `extremal-graph-replay`.
+
+### Added — DeepMind-gap absorbs (stage-2 Wang GN, Boussinesq q/β, PirateNet)
+
+- JAX stage-2 ``optimizer="martens_grosse"`` and torch
+  ``optimizer="wang_linearized_gn"`` run residual-vector Gauss–Newton on
+  paper eq. 19 ``R0 + ε D[Φ0] Φ1``. The numpy torch path stays the labeled
+  ``gauss_newton_corr_proxy``. Does **not** earn CCF stretch ``1e-13``.
+- ``omnibias.pinn.{jax,torch}.equations.boussinesq_compactified`` lifts
+  hats through the paper ``(q, β)`` chart with closed-form envelope jets.
+  Optional ``BoussinesqDiscoveryConfig(compactified=True)``. Scaffold
+  only; not a DeepMind residual or Navier–Stokes claim.
+- Reusable ``omnibias.{jax,torch}.architectures.piratenet`` α-skip
+  (``α=0`` is identity). CCF ``pirate_hat`` consumes it. Not ImageNet /
+  ViT, not stretch.
+- `deepmind_paper_architecture_config` / `deepmind_signed_hat_config`
+  select the Wang et al. stack (compactified tanh MLP, optional
+  exp-adjacent hat, gradient-normalized residual, Martens–Grosse,
+  `wholeline_hp`) without silently flipping
+  `reproduce_deepmind_config.exp_core`. `deepmind_multistage_config` +
+  `stage2_even_hat` are the paper MSNN stage-2 on even compactified
+  `q` (CCF hat stays even). A same-Jacobian bake-off on even
+  Fourier stage-2 ranked epigraph L∞ first for the 1601-pt L∞
+  stretch metric; L2 / peak-weighted / IRLS raised predicted
+  L∞. `train_stage2` now uses even compactified `q` when
+  `even_q=True` (DeepMind CCF path); `identity_readout` is
+  exact Φ1=0; `gradient_normalize_residual` is the follow-up
+  reweight. A later identity-init even-`q` MSNN bake-off
+  measured `max|r| = 7.943e-3`; a second identity-init even-`q`
+  MSNN (new seed) later measured `7.938e-3`. Even Chebyshev
+  \(T_k(2q-1)\) on compactified `q` later measured
+  `7.889e-3`. Even Legendre \(P_k(2q-1)\) later measured
+  `7.885e-3`. Even Padé `[4/4]` on \(x=2q-1\) later
+  measured `7.884e-3` (den Jacobian dead at `num=0`).
+  Higher even Fourier \(k=6..12\) later measured `7.876e-3`.
+  An identity-init tanh MLP readout on even `(q, ξ, bump)`
+  later measured `7.847e-3`. Even compact Gaussians at the
+  origin and residual peak later measured `7.840e-3`.
+  An identity-init SiLU MLP readout on even `(q, ξ, bump)`
+  did not promote (LP pred earn `~1.4e-7`; line search
+  raised L∞).   Unfreezing the tanh hidden as additive
+  `ΔW`/`Δb` did not promote (LP pred earn `~1.74e-6`;
+  line search raised L∞). A multiplicative even Fourier
+  on \(\xi=y^2/(1+y^2)\) did not promote (LP pred earn
+  `~8.2e-5`; line search raised L∞). Identity-init GELU
+  on \((\rho, E, \rho-q)\) did not promote (LP pred earn
+  `~3.4e-7`); paper L2 moved `HΩ(0)` toward `+1.30` but
+  raised L∞. Identity-init paper MSNN on
+  \(\eta=[(2/\pi)\arctan y]^2\) did not promote (LP pred
+  earn `~1.87e-5`; improving steps walked the peak to
+  `|y|≈38`). Identity-init Mish on a log1p chart did not
+  promote (tail-capped LP pred earn `~1.59e-6`; line
+  search raised L∞). Even \(\operatorname{sinc}(y/s)\)
+  realized a true L∞ earn of `~7.0e-7` (below the
+  `1e-6` promote gate). Even cylindrical \(J_0(y/s)\)
+  did not promote (LP pred earn `~7.5e-7`; far-field
+  peak walk). A residual-shaped even lift realized only
+  `~3e-11`. Unfreezing the PirateNet last layer did not
+  promote (LP pred earn `~7.4e-6`; line search raised
+  L∞). Even Hermite–Gauss functions did not promote
+  (LP pred earn `~3.6e-5`; line search raised L∞).
+  Unfreezing stage-3 MSNN Fourier frequencies did not
+  promote (LP pred earn `~3.4e-6`; line search raised
+  L∞). Paper L2 / grad-norm / exp-mult raised L∞
+  at this basin. Stretch stays unearned.
+
+### Added — signed PirateNet hat (jaxpi block, official envelope)
+
+- `omnibias.pinn.jax.discovery.pirate_hat` ports the jaxpi PirateNet
+  identity-init residual-adaptive block onto the official Wang lift
+  `Ω = y · E · hat` with a *signed* hat (no softplus). Official
+  `CompactifiedOmegaOMBU` defaults `exp_core=True` and cannot represent
+  the signed champ. Even coordinates are `(q, y²/(1+y²))` so the
+  near-field is not crushed by compactified `q` alone. `fit_pi_init`
+  least-squares the linear readout; `fit_hat_l2` is a Hilbert-free
+  Gauss–Newton hat match. Residual scoring stays
+  `free_omega_vorticity_residual`. Prototype. Stretch `1e-13` and
+  `navier_stokes_proof_claim` stay unearned. Rung-1 is not started
+  here. jaxpi / fluid-singularities / Unstable-Singularity-Detector
+  were audited and are not installed as the CCF solver (none ships a
+  working CCF `1e-13` path). A zero-readout correction on the
+  frozen erf-sinh stack later measured official-path
+  `max|r| = 8.063e-3` (`HΩ(0)≈+1.003`; erf-sinh parent was
+  `8.068e-3`). An even Fourier stage-2 on compactified `q`
+  (`kπ`, `k=1..5`) with epigraph L∞ then one refine later
+  measured `max|r| = 7.991e-3` (`HΩ(0)≈+1.004`). Identity-init
+  even-`q` MSNN (paper small tanh Fourier, additive) with
+  epigraph L∞ then one refine later measured
+  `max|r| = 7.943e-3` (`HΩ(0)≈+1.005`). A second identity-init
+  even-`q` MSNN (new seed) with epigraph L∞ then one refine
+  later measured `max|r| = 7.938e-3`. Even Chebyshev
+  \(T_k(2q-1)\) on compactified `q` with epigraph L∞
+  then one refine later measured `max|r| = 7.889e-3`
+  (`HΩ(0)≈+1.006`). Even Legendre \(P_k(2q-1)\)
+  with epigraph L∞ later measured `max|r| = 7.885e-3`.
+  Even Padé `[4/4]` on \(x=2q-1\) with epigraph L∞
+  then one refine later measured `max|r| = 7.884e-3`
+  (denominator columns vanished at `num=0`).
+  Higher even Fourier \(k=6..12\) with epigraph L∞ later
+  measured `max|r| = 7.876e-3`.
+  An identity-init tanh MLP readout on even `(q, ξ, bump)`
+  with epigraph L∞ then one refine later measured
+  `max|r| = 7.847e-3` (`HΩ(0)≈+1.007`).
+  Even compact Gaussians at the origin and `|y|≈1.50`
+  with epigraph L∞ then one refine later measured
+  `max|r| = 7.840e-3`.
+  An identity-init SiLU MLP readout on even `(q, ξ, bump)`
+  did not promote (LP pred earn `~1.4e-7`).
+  Unfreezing the tanh hidden as additive `ΔW`/`Δb`
+  did not promote (LP pred earn `~1.74e-6`).
+  A multiplicative even Fourier on \(\xi=y^2/(1+y^2)\)
+  did not promote (LP pred earn `~8.2e-5`).
+  Identity-init GELU on \((\rho, E, \rho-q)\) did not
+  promote (LP pred earn `~3.4e-7`).
+  Identity-init paper MSNN on
+  \(\eta=[(2/\pi)\arctan y]^2\) did not promote
+  (LP pred earn `~1.87e-5`; far-field peak walk).
+  Identity-init Mish on a log1p chart did not promote
+  (tail-capped LP pred earn `~1.59e-6`).
+  Even \(\operatorname{sinc}(y/s)\) realized
+  `~7.0e-7` (below the `1e-6` promote gate).
+  Even cylindrical \(J_0(y/s)\) did not promote
+  (LP pred earn `~7.5e-7`; far-field peak walk).
+  A residual-shaped even lift realized only `~3e-11`.
+  Unfreezing the PirateNet last layer did not promote
+  (LP pred earn `~7.4e-6`).
+  Even Hermite–Gauss functions did not promote
+  (LP pred earn `~3.6e-5`).
+  Unfreezing stage-3 MSNN Fourier frequencies did not
+  promote (LP pred earn `~3.4e-6`).
+  Paper L2 / grad-norm /
+  exp-adjacent multiplicative raised 1601-pt L∞ on that
+  family. A same-Jacobian bake-off ranked epigraph L∞ first;
+  L2 GN / peak-weighted L2 / Lawson IRLS raised predicted L∞
+  to `0.037` and earned 0. Random-embedding PI-init cannot
+  represent that signed stack (hat error `0.31`, residual
+  `0.10`, `HΩ(0)` negative) and is not a stand-alone champ path.
+
+### Added — gauge-hard Hilbert-coupling homotopy GN
+
+- `omnibias.jax.optim.homotopy_gauss_newton_minimize` runs Martens–Grosse
+  or cubic GN on `r(θ, t)` at increasing coupling `t` (for residuals that
+  split as `L + t Quad`). `peak_weighted_residual` is an L^∞ proxy that
+  does not change the zero set. `champ_barrier_residual` is an
+  active-set L^∞ residual plus a one-sided excess barrier so GN cannot
+  raise already-small entries above a known champ.
+  `linearized_linf_direction` is the Chebyshev (minimax) step on a
+  linearized residual `r + J c` (exact on one column; Lawson IRLS on
+  several). The campaign earn used the epigraph LP of that step.
+- `omnibias.pinn.jax.discovery.ccf_hat_homotopy` lifts a *signed*
+  Chebyshev hat through the official compactified envelope, hard-gauges
+  `Ω(0.5)=0.05` inside the Jacobian, starts from a nodal hat (so
+  `HΩ(0)` can be positive), runs frozen-velocity Picard, then optional
+  coupling homotopy, and scores with `free_omega_vorticity_residual`.
+  Prototype. An 11-node cubic Hermite plus frozen dual even
+  Chebyshev-arctan, Gaussian / sech / compact-C¹ / rat4 / Laplace
+  pads, then linearized L∞ Newton on `s=0.8`, `s=0.15`, `s=3.5`,
+  `s=0.08`, `s=0.30`, `s=1.8`, `s=2.8`, tanh-chart Chebyshev
+  `s=1.0`, Boyd-map Chebyshev `s=0.9`, tanh-sinh Chebyshev
+  `s=1.0`, erf-chart Chebyshev `s=1.1`, p=4 algebraic Chebyshev
+  `s=1.0`, asinh-arctan Chebyshev `s=0.85`, softsign Chebyshev
+  `s=1.2`, even Legendre on a p=3 algebraic chart, even
+  Chebyshev-U on a p=2 algebraic chart, even Gegenbauer
+  \(C^{(3/2)}\) on a log1p-arctan chart, even Jacobi
+  \(P^{(2,2)}\) on a p=6 algebraic chart, mapped Laguerre
+  on \(\xi=y^2/(s^2+y^2)\), p=5 algebraic Chebyshev,
+  half-stereo Chebyshev, even Gegenbauer \(C^{(5/2)}\) on
+  a p=1.5 algebraic chart, associated Laguerre
+  \(L_k^{(1)}\) on \(\xi=1-e^{-y^2/s^2}\) + compact C¹⁰ at
+  `|y|=0.10` + multiplicative gauss–Welch at `|y|=0.10`,
+  p=7 algebraic Chebyshev + compact C¹² at `|y|=1.60` +
+  multiplicative Tukey \(\alpha=0.25\) at `|y|=1.60`,
+  circular-chart Chebyshev \(x=2sy/(s^2+y^2)\) + Planck
+  taper at `|y|=0.85` + multiplicative Planck at `|y|=0.85`,
+  and erf-sinh Chebyshev \(x=\mathrm{erf}(\sinh(y/s))\) +
+  flat-top at `|y|=0.10` + multiplicative flat-top at
+  `|y|=0.10` family, then a signed PirateNet residual
+  correction, then even Fourier stage-2, then identity-init
+  even-`q` MSNN, then a second even-`q` MSNN (new seed),
+  then even Chebyshev \(T_k(2q-1)\) on compactified `q`,
+  then even Legendre \(P_k(2q-1)\) on compactified `q`,
+  then even Padé `[4/4]` on \(x=2q-1\),
+  then even Fourier \(k=6..12\) on compactified `q`,
+  then an identity-init tanh MLP readout on even `(q, ξ, bump)`,
+  then even compact Gaussians at the origin and `|y|≈1.50`,
+  scored on 1601-pt L∞,
+  later measured official-path `max|r| = 7.840e-3`
+  (`HΩ(0)≈+1.007`; tanh-even parent was `7.847e-3`;
+  Fourier-\(k=6..12\) parent was `7.876e-3`;
+  Padé-on-`q` parent was `7.884e-3`;
+  Legendre-on-`q` parent was `7.885e-3`;
+  Chebyshev-on-`q` parent was `7.889e-3`;
+  stage-3 MSNN parent was `7.938e-3`;
+  first-MSNN parent was `7.943e-3`;
+  even-Fourier parent was `7.991e-3`;
+  PirateNet parent was `8.063e-3`;
+  erf-sinh parent was `8.068e-3`;
+  circular-Planck parent was `8.227e-3`; alg7 parent was
+  `8.232e-3`; explag1 parent was
+  `8.234e-3`; alg15-Gegenbauer parent
+  was `8.278e-3`; half-stereo parent was
+  `8.279e-3`; alg5 parent was
+  `8.294e-3`; Laguerre parent was
+  `8.297e-3`; alg6-Jacobi parent
+  was `8.299e-3`; log1p-Gegenbauer parent
+  was `8.309e-3`; alg2-U parent was
+  `8.356e-3`; alg3-Legendre parent was `8.365e-3`; softsign parent was
+  `8.37e-3`; asinh was `8.38e-3`; alg4 was `8.39e-3`; erf was
+  `8.43e-3`; tanh-sinh was `8.44e-3`; Boyd was `8.46e-3`; tanh
+  was `8.48e-3`; `s=2.8` was `8.50e-3`; `s=1.8` was `8.53e-3`;
+  `s=0.30` was `8.56e-3`; L∞ parent was `1.008e-2`; Laplace was
+  `1.24e-2`; rat4 was `1.25e-2`; C¹ was `1.28e-2`; peak-weighted
+  `p=12` was `1.80e-2`; unweighted Hermite was `1.90e-2`; parent
+  dual-scale plus Gaussian pads was `4.44e-2`).
+  Stretch `1e-13` and `navier_stokes_proof_claim` stay unearned.
+  Rung-1 is not started here.
+
+### Added — JAX Wang residual + velocity integrate for free Ω
+
+- `omnibias.pinn.jax.discovery.ccf_vorticity.wang_residual` is the JAX
+  twin of the torch Wang residual. `free_omega_vorticity_residual` scores
+  a free odd `Ω` with analytic `Ω_y`, `hilbert_wholeline_hp`, and
+  `integrate_velocity_from_hilbert` (cumulative trap `U=∫_0 HΩ`). That
+  `U` is not the `OperatorBlock` `integral` role. Stretch `1e-13` and
+  `navier_stokes_proof_claim` stay unearned.
+
+### Added — whole-line hp Hilbert for free neural Ω
+
+- `omnibias.pinn.{jax,torch}.hilbert_line.hilbert_wholeline_hp` is a
+  numerical split-core GL + power-mapped-tail Hilbert for a free (non-Hardy)
+  odd `Ω`. Planted `H[Q]=-P` sits near `1e-14` (wide atom) / `1e-13`
+  (narrow `a=0.25`); campaign GL96+raw-`u` tail sat at `1e-3`–`1e-1`.
+  Torch `train_hilbert="wholeline_hp"` keeps the Wang net and swaps the
+  operator. Not a certificate. Stretch `1e-13` and
+  `navier_stokes_proof_claim` stay unearned until a trained residual
+  measures it.
+
+### Added — JAX cubic-regularised Gauss-Newton
+
+- `omnibias.jax.optim.cubic_regularized_gauss_newton_minimize` is the
+  matrix-free ARC twin of `omnibias.torch.optim.CubicRegularizedGaussNewton`.
+  Discovery `GNConfig(method="cubic")` dispatches to it. Default
+  `krylov_dim=None` uses the full parameter dimension (a fixed 20-D
+  Lanczos cap silently stalled wide Phase-0 hops). `train_gn` enables
+  JAX `float64`. Stretch `1e-13` and `navier_stokes_proof_claim` are
+  unchanged.
+
+### Added — CCF Hardy conjugate-tower CAP increment
+
+- `hardy_conjugate_dictionary` / `spatial_odd_omega_atoms` plus closed-form
+  Hardy-Ω velocity `U` (`U'=HΩ`, `U(0)=0`) in `omnibias.core.conjugate` and
+  interval twins in `omnibias.core.verified.hardy_line`.
+- Torch projection and JAX `hardy_omega_profile` accept `max_order` (default 0
+  is today's Q-only path). Whole-line CAP
+  `certified_ccf_hardy_wholeline_blowup_attempt` accepts `orders` / `parities`.
+- `benchmarks/reproduce_deepmind_ccf.py --dictionary conjugate --max-order N`
+  and `benchmarks/ccf_conjugate_sweep.py` measure residual vs span, Gram
+  condition, and a CAP attempt. Stretch `1e-13` and Rung-1 `1e-11` are
+  unchanged. `navier_stokes_proof_claim` stays false.
+  `whole_line_certified` flips only on a genuine residual + dual NK close.
+
+### Added — mapped-tail PV Hilbert (free neural Ω)
+
+- `hilbert_pv_mapped_tail` / `train_hilbert="pv_mapped_tail"` adds a
+  Gauss–Legendre `|t|>Y` tail and, when an `Ω` callback is available, a
+  GL subtracted-kernel interior (planted core `~1e-3` at 96 nodes).
+  Numerical, not a certificate. Stretch `1e-13` and Rung-1 stay unearned
+  until measured.
+
 ### Added — public CSV equation discovery
 
 - `examples/symbolic_discovery/public_csv_discovery`: Hudson Bay lynx–hare
