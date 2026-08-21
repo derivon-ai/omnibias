@@ -60,6 +60,8 @@ def test_relaxation_docstrings_distinguish_the_two_collapse_senses() -> None:
         "omnibias.discrete.torch.relaxation",
         "omnibias.discrete.maxsat.jax.relaxation",
         "omnibias.discrete.maxsat.torch.relaxation",
+        "omnibias.discrete.evolution._core",
+        "omnibias.discrete.evolution",
     )
     for mod_name in modules:
         try:

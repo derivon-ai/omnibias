@@ -1,0 +1,233 @@
+{
+  "schema": "omnibias.benchmarks.soft_evolution.v1",
+  "generated_utc": "2026-08-21T17:15:20Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "soft_evolution",
+    "full": false,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "honesty": {
+      "unproven_claim": false,
+      "p_equals_np_claim": false,
+      "selection_is_temperature_collapse": true,
+      "founding_bias_collapse_in_selection": false,
+      "cma_es_beaten": false
+    }
+  },
+  "rss_mb_at_start": 1254.03,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_selection_gap",
+        "passed": true,
+        "violations": 0,
+        "n_records": 50,
+        "bound": 0.716703787691222,
+        "detail": "measured soft-versus-best gap <= log(P)/beta on every generation"
+      },
+      {
+        "name": "g2_vs_cma_es",
+        "passed": true,
+        "mean_ea": 0.11142117181997371,
+        "mean_cma": 0.11073728231484112,
+        "mean_de": 0.11052634202689855,
+        "ratio": 1.0061757837183345,
+        "seeds": [
+          {
+            "seed": 0,
+            "ea": 0.1111274470030035,
+            "cma": 0.1109204569678934,
+            "de": 0.11052327613003256,
+            "n_eval": 148
+          },
+          {
+            "seed": 1,
+            "ea": 0.11273779214473423,
+            "cma": 0.11073898142515284,
+            "de": 0.11053176591038444,
+            "n_eval": 148
+          },
+          {
+            "seed": 2,
+            "ea": 0.1106463748698481,
+            "cma": 0.11053699273496126,
+            "de": 0.11052661751243734,
+            "n_eval": 148
+          },
+          {
+            "seed": 3,
+            "ea": 0.11142277383169993,
+            "cma": 0.11068564240184034,
+            "de": 0.11053017709406923,
+            "n_eval": 148
+          },
+          {
+            "seed": 4,
+            "ea": 0.11117147125058285,
+            "cma": 0.11080433804435777,
+            "de": 0.11051987348756916,
+            "n_eval": 148
+          }
+        ],
+        "detail": "soft-population mean objective <= 1.2 x CMA-ES at matched budget"
+      },
+      {
+        "name": "g3_geometry_vs_isotropic",
+        "passed": true,
+        "mean_geometry": 0.3446608388310791,
+        "mean_isotropic": 2.4504259147282372,
+        "ratio": 7.1096731588041235,
+        "seeds": [
+          {
+            "seed": 0,
+            "geometry": 0.24709761764857582,
+            "isotropic": 4.091071295410911
+          },
+          {
+            "seed": 1,
+            "geometry": 0.1427640734431776,
+            "isotropic": 0.785011387514083
+          },
+          {
+            "seed": 2,
+            "geometry": 0.7604742549110363,
+            "isotropic": 2.084453191592971
+          },
+          {
+            "seed": 3,
+            "geometry": 0.1162388403934003,
+            "isotropic": 4.13999615798503
+          },
+          {
+            "seed": 4,
+            "geometry": 0.4567294077592059,
+            "isotropic": 1.1515975411381896
+          }
+        ],
+        "detail": "geometry-aware mutation is at least 2x better on pack search"
+      },
+      {
+        "name": "g4_memetic_eval_accounting",
+        "passed": true,
+        "newton_evals": 4,
+        "gd_evals": 124,
+        "newton_best": 0.0,
+        "gd_best": 0.000146248618713482,
+        "detail": "exact Newton polish reaches the target in >= 3x fewer fitness evals"
+      },
+      {
+        "name": "g5_certified_stop",
+        "passed": true,
+        "n_closed": 10,
+        "n_incorrect": 0,
+        "n_instances": 10,
+        "rows": [
+          {
+            "i": 0,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 1
+          },
+          {
+            "i": 1,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 2
+          },
+          {
+            "i": 2,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 1
+          },
+          {
+            "i": 3,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 2
+          },
+          {
+            "i": 4,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 1
+          },
+          {
+            "i": 5,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 1
+          },
+          {
+            "i": 6,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 1
+          },
+          {
+            "i": 7,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 1
+          },
+          {
+            "i": 8,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 1
+          },
+          {
+            "i": 9,
+            "gap_closed": true,
+            "best": 0.0,
+            "lower": 0.0,
+            "opt": 0.0,
+            "generations": 3
+          }
+        ],
+        "detail": "gap_closed on >= 90% of tiny QUBOs and never incorrectly"
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "torch_equal": true,
+        "jax_equal": true,
+        "detail": "torch / jax soft_weights match numpy at float64"
+      }
+    ]
+  },
+  "wall_seconds": 1.7132538810255937
+}

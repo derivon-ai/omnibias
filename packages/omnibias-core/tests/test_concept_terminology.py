@@ -80,3 +80,22 @@ def test_symbolic_stlsq_labelled_numerical_non_differentiable(rel: str) -> None:
     text = _read(rel)
     assert "exact closed form" in text, rel
     assert "non-differentiable" in text, rel
+
+
+#: Modules that mention both collapse senses and must keep the disambiguation.
+PENALTY_FILES = (
+    "packages/omnibias-discrete/src/omnibias/discrete/evolution/_core.py",
+    "packages/omnibias-discrete/src/omnibias/discrete/evolution/torch.py",
+    "packages/omnibias-discrete/src/omnibias/discrete/evolution/jax.py",
+    "packages/omnibias-discrete/src/omnibias/discrete/evolution/__init__.py",
+)
+
+
+@pytest.mark.parametrize("rel", PENALTY_FILES)
+def test_penalty_files_label_both_collapse_senses(rel: str) -> None:
+    text = _read(rel)
+    assert "founding bias collapse" in text, rel
+    assert "delta -> 0" in text, rel
+    assert "beta -> inf" in text, rel
+    assert "feasibility" in text.lower(), rel
+    assert "do not conflate" in text.lower(), rel

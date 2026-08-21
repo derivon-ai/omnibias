@@ -146,4 +146,15 @@ See the runnable [certified sparse recovery example](../examples/certified_spars
       show_root_heading: false
       heading_level: 4
 
+## Soft-population evolution (03-01)
+
+Selection `softmax(-beta E)` is temperature collapse. Pack-gene mutation
+respects founding-bias-collapse geometry. See
+[`docs/api/soft_evolution.md`](soft_evolution.md).
+
+::: omnibias.discrete.evolution
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 Status: Alpha (`0.1.0a1`).

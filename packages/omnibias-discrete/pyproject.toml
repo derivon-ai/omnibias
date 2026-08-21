@@ -43,7 +43,7 @@ jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
 # omnibias-core), so this optional extra introduces no dependency cycle.
 convex = ["omnibias-convex>=0.1.0a1"]
 all = ["omnibias-discrete[sos,torch,jax,convex]"]
-test = ["pytest>=7.0", "numpy>=1.24"]
+test = ["pytest>=7.0", "numpy>=1.24", "omnibias-struct>=0.1.0a1"]
 dev = ["omnibias-discrete[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
 
 [project.urls]

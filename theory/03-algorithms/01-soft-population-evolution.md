@@ -8,7 +8,7 @@ selection pressure is a temperature, a **bias-geometry** EA that mutates pack
 spread and offsets, a **jet-memetic** hybrid that polishes with closed-form
 curvature, and a **certified discrete** EA on the `DiscreteProblem` seam.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-08, 03-12, 04-01
 - **Blocks**: 03-13
 
@@ -272,14 +272,14 @@ Baselines, all standard and named: CMA-ES, differential evolution, and plain
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-discrete/src/omnibias/discrete/evolution/_core.py`
-- [ ] torch and jax twins with a documented seed policy and a parity test
-- [ ] Reuse `logsumexp_gap_bound`, `AnnealSchedule`, `certify_gap`; fork nothing
-- [ ] Selection-gap soundness test on every generation
-- [ ] Geometry-versus-isotropic mutation ablation
-- [ ] Full-budget accounting test for the memetic variant
-- [ ] `certified_discrete_evolve` correctness test against the brute-force oracle
-- [ ] Terminology cross-reference note plus `PENALTY_FILES` registration
-- [ ] `benchmarks/soft_evolution.py` plus smoke JSON with per-seed records
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-discrete/src/omnibias/discrete/evolution/_core.py`
+- [x] torch and jax twins with a documented seed policy and a parity test
+- [x] Reuse `logsumexp_gap_bound`, `AnnealSchedule`, `certify_gap`; fork nothing
+- [x] Selection-gap soundness test on every generation
+- [x] Geometry-versus-isotropic mutation ablation
+- [x] Full-budget accounting test for the memetic variant
+- [x] `certified_discrete_evolve` correctness test against the brute-force oracle
+- [x] Terminology cross-reference note plus `PENALTY_FILES` registration
+- [x] `benchmarks/soft_evolution.py` plus smoke JSON with per-seed records
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

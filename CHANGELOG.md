@@ -6,6 +6,22 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — soft-population evolution (theory 03-01)
+
+- `omnibias.discrete.evolution`: softmax selection
+  `w = softmax(-beta E)` with a closed-form `log(P)/beta`
+  gap, geometry-aware pack mutation, exact-Newton memetic
+  polish (full evaluation accounting), and a certify-loop
+  stop on `DiscreteProblem`. Torch / jax twins specialise
+  `soft_weights`; evolve loops use `numpy.random.Generator(seed)`.
+- G1–G6 CI-gated. Selection is temperature collapse
+  (`beta -> inf`), not founding bias collapse
+  (`delta -> 0`). Not a P = NP claim, and G2 targets
+  parity with CMA-ES rather than beating it.
+- Docs: `docs/api/soft_evolution.md`,
+  `docs/cookbook/soft-evolution.md`.
+  Smoke: `docs/benchmarks/soft_evolution_smoke.json`.
+
 ### Added — rational stencil Lean obligations (theory 01-11)
 
 - `omnibias.core.proof.obligations.rational_stencil`: seal
