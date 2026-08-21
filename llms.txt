@@ -158,7 +158,9 @@ named `q -> 1` / `mu -> 0`, not a continuum PDE),
 homotopy continuation (09-20; 08-04 filter on a `tau`-path;
 G1–G4 CI; empty ball is a halt),
 exact score matching (09-21; Hyvärinen on an OMBU score;
-G1–G4 CI; CNF exact `div` is prior art). Cost /
+G1–G4 CI; CNF exact `div` is prior art),
+inverse design (09-22; Newton-on-`x` with exact `sigma'`;
+G1–G4 CI; not 08-03; not a global inverse). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

@@ -187,6 +187,9 @@ PENALTY_FILES = (
     "packages/omnibias-score/src/omnibias/score/jax/score_matching.py",
     "packages/omnibias-score/src/omnibias/score/flow/torch/score_matching.py",
     "packages/omnibias-score/src/omnibias/score/flow/jax/score_matching.py",
+    "packages/omnibias-core/src/omnibias/core/inverse_design.py",
+    "packages/omnibias-torch/src/omnibias/torch/optim_inverse.py",
+    "packages/omnibias-jax/src/omnibias/jax/optim_inverse.py",
 )
 
 

@@ -220,6 +220,7 @@ nav:
       - q-OMBU / timescale (09-15): api/q_ombu_timescale.md
       - Homotopy continuation (09-20): api/homotopy_continuation.md
       - Exact score matching (09-21): api/exact_score_matching.md
+      - Inverse design (09-22): api/inverse_design.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -314,6 +315,7 @@ nav:
       - q-OMBU / timescale: cookbook/q-ombu-timescale.md
       - Homotopy continuation: cookbook/homotopy-continuation.md
       - Exact score matching: cookbook/exact-score-matching.md
+      - Inverse design: cookbook/inverse-design.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

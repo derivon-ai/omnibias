@@ -79,6 +79,7 @@ from omnibias.jax.optim_composed import (
     composed_curvature_step,
 )
 from omnibias.jax.optim_homotopy import HomotopyConfig, homotopy_train
+from omnibias.jax.optim_inverse import InverseDesignConfig, invert_input
 from omnibias.jax.optim_kantorovich import (
     CONTINUUM_PDE_CLAIM_KEY,
     FINITE_RESIDUAL_CLAIM,
@@ -1009,6 +1010,7 @@ __all__ = [
     "HomotopyConfig",
     "HomotopyGNConfig",
     "HomotopyResidualFn",
+    "InverseDesignConfig",
     "JetLineSearchConfig",
     "KantorovichAccept",
     "LineSearchResult",
@@ -1038,6 +1040,7 @@ __all__ = [
     "homotopy_train",
     "hvp",
     "init_gauss_newton_state",
+    "invert_input",
     "jet_line_search",
     "jet_line_search_on_ray",
     "kantorovich_accept_step",

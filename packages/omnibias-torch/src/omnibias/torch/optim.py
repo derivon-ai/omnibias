@@ -110,6 +110,7 @@ from omnibias.torch.optim_composed import (
     composed_curvature_step,
 )
 from omnibias.torch.optim_homotopy import HomotopyConfig, homotopy_train
+from omnibias.torch.optim_inverse import InverseDesignConfig, invert_input
 from omnibias.torch.optim_kantorovich import (
     CONTINUUM_PDE_CLAIM_KEY,
     FINITE_RESIDUAL_CLAIM,
@@ -3866,6 +3867,7 @@ __all__ = [
     "GaussNewtonInfo",
     "GradNormBalancer",
     "HomotopyConfig",
+    "InverseDesignConfig",
     "JetLBFGS",
     "JetLBFGSOptimizer",
     "JetLineSearchConfig",
@@ -3901,6 +3903,7 @@ __all__ = [
     "gauss_newton_fisher_matvec",
     "homotopy_train",
     "hvp",
+    "invert_input",
     "jet_line_search",
     "jet_line_search_on_ray",
     "kantorovich_accept_step",

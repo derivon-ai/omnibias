@@ -240,7 +240,7 @@ operator floor.
 | [09-19 jet distillation](09-inventions/19-jet-distillation.md) | gated | Student matches a teacher N-jet; G1–G3 CI; not ImageNet KD; founding bias collapse, not temperature collapse |
 | [09-20 homotopy continuation](09-inventions/20-homotopy-continuation.md) | gated | Path of problems; each step 08-04-accepted; G1–G4 CI; empty ball is a halt |
 | [09-21 exact score matching](09-inventions/21-exact-score-matching.md) | gated | Hyvärinen on an OMBU score; G1–G4 CI; CNF exact `div` is prior art |
-| [09-22 inverse-design](09-inventions/22-inverse-design.md) | concept | Newton-on-`x` with exact `sigma'`; not 08-03 layer invert |
+| [09-22 inverse-design](09-inventions/22-inverse-design.md) | gated | Newton-on-`x` with exact `sigma'`; G1–G4 CI; not 08-03 layer invert |
 | [09-23 sharpness regularizer](09-inventions/23-sharpness-regularizer.md) | concept | Exact `lambda_max` / `Tr(H)` in the loss; not 08-06 schedule |
 | [09-24 proof-carrying forward](09-inventions/24-proof-carrying-forward.md) | gated | Forward returns `(y, box)`; G1–G4 CI; not 08-09; Lean flags unforged; founding bias collapse, not temperature collapse |
 | [09-25 world-model-as-jet](09-inventions/25-world-model-jet.md) | concept | Next N-jet + Lohner remainder; not global regularity |

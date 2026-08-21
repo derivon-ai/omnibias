@@ -1,0 +1,52 @@
+{
+  "schema": "omnibias.benchmarks.inverse_design.v1",
+  "generated_utc": "2026-08-21T21:10:37Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "inverse_design",
+    "full": false,
+    "honesty": {
+      "global_inverse_claimed": false,
+      "layer_invert_claimed": false,
+      "stretch_claim": false,
+      "continuum_claimed": false,
+      "theorem_prover_verified": false,
+      "n_roots_unknown": true
+    }
+  },
+  "rss_mb_at_start": 809.06,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "x": 0.2746530721669235,
+        "residual": 1.5593082380860324e-13,
+        "f_prime": 1.5000000000003118
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "median_err": 1.8735013540549517e-16,
+        "saturated_raised": true,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "global_inverse_claimed": false
+      }
+    ]
+  },
+  "disclaimer": "local Newton-on-x; not 08-03 layer invert, not a global inverse, not CCF stretch",
+  "wall_seconds": 1.345228466030676
+}

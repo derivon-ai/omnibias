@@ -6,7 +6,7 @@ Find `x` such that `f_theta(x) = y` by **Newton-on-`x`** with exact
 `sigma'`, optionally inside a Kantorovich ball; optionally fit `theta`
 so `sigma'` stays bounded away from 0.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 08-04, 09-01
 - **Blocks**: none
 
@@ -103,11 +103,11 @@ JAX: `lax.while_loop` with a max step cap.
 
 ## 12. Implementation checklist
 
-- [ ] Invert-on-x twins
-- [ ] Saturation raise test
-- [ ] `benchmarks/inverse_design.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Invert-on-x twins
+- [x] Saturation raise test
+- [x] `benchmarks/inverse_design.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

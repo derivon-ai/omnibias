@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Inverse design (theory 09-22)
+
+- `omnibias.core.inverse_design` plus
+  `omnibias.{torch,jax}.optim_inverse`: Newton-on-`x` with exact
+  `sigma'`. Saturated targets raise.
+- G1–G4 CI-gated. Not 08-03 layer invert. Not a global inverse.
+  Not CCF stretch.
+- Docs: `docs/api/inverse_design.md`,
+  `docs/cookbook/inverse-design.md`.
+  Smoke: `docs/benchmarks/inverse_design_smoke.json`.
+
+
 ### Added — Exact score matching (theory 09-21)
 
 - `omnibias.core.score_matching` plus `omnibias.score.{torch,jax}`
