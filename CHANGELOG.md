@@ -6,6 +6,22 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — jet-Padé singularity tracking (theory 03-10)
+
+- `omnibias.difference.singularity` plus
+  `omnibias.fields.singularity`: Domb-Sykes and Padé poles
+  locate the nearest singularity; a coefficient tail bound
+  encloses `|x_s|`. `SingularityTrack` always carries a
+  blow-up disclaimer.
+- G1–G6 CI-gated. Jets are founding bias collapse
+  (`delta -> 0`), not temperature collapse. Diagnostic and
+  estimate, not a proof of blow-up. Essential singularities
+  report failure. Froissart filter is machine-epsilon, not
+  suite-tuned.
+- Docs: `docs/api/singularity_tracking.md`,
+  `docs/cookbook/singularity-tracking.md`.
+  Smoke: `docs/benchmarks/singularity_tracking_smoke.json`.
+
 ### Added — differentiable topology (theory 03-09)
 
 - `omnibias.shape.topology`: soft Euler characteristic and

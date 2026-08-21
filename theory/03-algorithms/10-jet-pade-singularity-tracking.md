@@ -7,7 +7,7 @@ approximant locate the nearest complex singularity — so a field with an exact
 tower can **watch a singularity approach** in real time, with a certified
 remainder rather than a heuristic indicator.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01
 - **Blocks**: 03-13, 07-02, 07-03, 07-06
 
@@ -297,14 +297,14 @@ direct numerical singularity search.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-difference/src/omnibias/difference/singularity.py`
-- [ ] `packages/omnibias-fields/src/omnibias/fields/singularity.py`
-- [ ] Reuse `pade_certified_remainder` and `sequence_space` tail bounds
-- [ ] Recovery suite including deliberate failure cases
-- [ ] Enclosure soundness test
-- [ ] Froissart-doublet filter with a justified threshold
-- [ ] Coefficient-order ceiling measured and recorded
-- [ ] `disclaimer` field asserted present in serialized output
-- [ ] `benchmarks/singularity_tracking.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-difference/src/omnibias/difference/singularity.py`
+- [x] `packages/omnibias-fields/src/omnibias/fields/singularity.py`
+- [x] Reuse `pade_certified_remainder` and `sequence_space` tail bounds
+- [x] Recovery suite including deliberate failure cases
+- [x] Enclosure soundness test
+- [x] Froissart-doublet filter with a justified threshold
+- [x] Coefficient-order ceiling measured and recorded
+- [x] `disclaimer` field asserted present in serialized output
+- [x] `benchmarks/singularity_tracking.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

@@ -1,0 +1,69 @@
+{
+  "schema": "omnibias.benchmarks.singularity_tracking.v1",
+  "generated_utc": "2026-08-21T18:34:18Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "singularity_tracking",
+    "full": false,
+    "honesty": {
+      "blowup_proof": false,
+      "diagnostic": true,
+      "disclaimer": "diagnostic and estimate; not a proof of blow-up",
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "ns_regularity": false,
+      "order_ceiling_float64": 20
+    }
+  },
+  "rss_mb_at_start": 1558.95,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_recovery",
+        "passed": true,
+        "essential_failed": true
+      },
+      {
+        "name": "g2_annulus",
+        "passed": true,
+        "n": 21,
+        "violations": 0
+      },
+      {
+        "name": "g3_cost",
+        "passed": true,
+        "ratio": 34.91034476159927,
+        "jet_order": 7,
+        "ad_order": 5,
+        "agree_low_order": true,
+        "twenty_coeff_seconds": null,
+        "detail": "mlp_jet vs repeated jacfwd; experimental.jet used only for agreement"
+      },
+      {
+        "name": "g4_agreement",
+        "passed": true,
+        "easy": 0.0,
+        "hard": Infinity
+      },
+      {
+        "name": "g5_track",
+        "passed": true,
+        "t_c": 0.9999999999999998
+      },
+      {
+        "name": "g6_disclaimer",
+        "passed": true
+      }
+    ]
+  },
+  "wall_seconds": 7.636684867029544
+}

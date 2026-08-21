@@ -114,6 +114,9 @@ PENALTY_FILES = (
     "packages/omnibias-shape/src/omnibias/shape/topology/torch.py",
     "packages/omnibias-shape/src/omnibias/shape/topology/jax.py",
     "packages/omnibias-shape/src/omnibias/shape/topology/__init__.py",
+    "packages/omnibias-difference/src/omnibias/difference/_core/singularity.py",
+    "packages/omnibias-difference/src/omnibias/difference/singularity.py",
+    "packages/omnibias-fields/src/omnibias/fields/singularity.py",
 )
 
 

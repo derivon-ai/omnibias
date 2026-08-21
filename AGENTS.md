@@ -556,7 +556,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.shape.topology` (03-09; soft Euler / component
   counts + 1-D Morse persistence; G1–G6 CI; temperature
   collapse, not founding bias collapse; no differentiable
-  Betti number; `Inconclusive` when the gap does not separate).
+  Betti number; `Inconclusive` when the gap does not separate) /
+  `omnibias.difference.singularity` (03-10; Domb-Sykes + Padé
+  poles + certified `|x_s|` annulus; G1–G6 CI; founding bias
+  collapse, not temperature collapse; diagnostic, not a
+  blow-up proof).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -597,7 +601,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/neural_quadrature.md`](docs/api/neural_quadrature.md),
   [`docs/api/scale_flow.md`](docs/api/scale_flow.md),
   [`docs/api/certified_localization.md`](docs/api/certified_localization.md),
-  [`docs/api/differentiable_topology.md`](docs/api/differentiable_topology.md). Cost /
+  [`docs/api/differentiable_topology.md`](docs/api/differentiable_topology.md),
+  [`docs/api/singularity_tracking.md`](docs/api/singularity_tracking.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.
