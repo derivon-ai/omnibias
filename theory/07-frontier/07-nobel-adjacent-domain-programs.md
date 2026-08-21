@@ -7,7 +7,7 @@ quantum many-body wavefunctions, magnetized-plasma residuals, and layered
 materials design — framed honestly as tooling with named baselines, because a
 better tool is a real contribution and a discovery claim from a tool is not.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 02-10, 02-11, 07-01
 - **Blocks**: none
 
@@ -287,21 +287,21 @@ establishing that is itself gated.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-ferminet/src/omnibias/ferminet/hermite.py` with
+- [x] `packages/omnibias-ferminet/src/omnibias/ferminet/hermite.py` with
       required explicit normalization
-- [ ] `packages/omnibias-pinn/src/omnibias/pinn/plasma.py` composing the
+- [x] `packages/omnibias-pinn/src/omnibias/pinn/plasma.py` composing the
       existing `induction_residual` and `ideal_mhd_momentum_residual`
-- [ ] `packages/omnibias-pinn/src/omnibias/pinn/stack.py` with exact
+- [x] `packages/omnibias-pinn/src/omnibias/pinn/stack.py` with exact
       `dT/dtheta`
-- [ ] G0 baseline validation implemented and recorded **before** any comparison
-- [ ] Ladder-coefficient exactness test to `1e-14`
-- [ ] Physical-identity check at every optimization iterate, not only at
+- [x] G0 baseline validation implemented and recorded **before** any comparison
+- [x] Ladder-coefficient exactness test to `1e-14`
+- [x] Physical-identity check at every optimization iterate, not only at
       convergence
-- [ ] torch / jax parity tests for every tensor-evaluated path
-- [ ] Three benchmark scripts plus smoke JSON
-- [ ] Heavy runs under `$OMNIBIAS_SCRATCH`, only summaries committed
-- [ ] Docs pages and nav entries
-- [ ] Index rows in `theory/README.md`
+- [x] torch / jax parity tests for every tensor-evaluated path
+- [x] Three benchmark scripts plus smoke JSON
+- [x] Heavy runs under `$OMNIBIAS_SCRATCH`, only summaries committed
+- [x] Docs pages and nav entries
+- [x] Index rows in `theory/README.md`
 
 ## 13. Parent problem and the exact reason it stays an external obligation
 

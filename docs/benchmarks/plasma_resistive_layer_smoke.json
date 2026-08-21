@@ -1,0 +1,62 @@
+{
+  "schema": "omnibias.benchmarks.plasma_resistive_layer.v1",
+  "generated_utc": "2026-08-21T19:26:14Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "plasma_resistive_layer",
+    "full": false,
+    "honesty": {
+      "unproven_claim": false,
+      "fusion_claim": false,
+      "physical_discovery": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 813.66,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g0_harris_baseline",
+        "passed": true,
+        "ops": {
+          "torch.induction_residual": true,
+          "torch.ideal_mhd_momentum_residual": true,
+          "jax.induction_residual": true,
+          "jax.ideal_mhd_momentum_residual": true
+        }
+      },
+      {
+        "name": "g3_layer_scaling",
+        "passed": true,
+        "pack_dims": [
+          4,
+          4,
+          4,
+          4
+        ],
+        "uniform_dims": [
+          128,
+          2048,
+          4096,
+          4096
+        ]
+      },
+      {
+        "name": "g4_reference_equilibrium",
+        "passed": true,
+        "max_force": 0.0
+      }
+    ]
+  },
+  "disclaimer": "tooling: resistive-layer residual on a model geometry; not a fusion-energy result and not a physical discovery",
+  "wall_seconds": 1.401745479030069
+}

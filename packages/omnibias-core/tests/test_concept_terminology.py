@@ -122,6 +122,9 @@ PENALTY_FILES = (
     "packages/omnibias-pinn/src/omnibias/pinn/certified/weak_form.py",
     "packages/omnibias-core/src/omnibias/core/verified/trial_spaces.py",
     "packages/omnibias-core/src/omnibias/core/verified/jet_flow.py",
+    "packages/omnibias-ferminet/src/omnibias/ferminet/hermite.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/plasma.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/stack.py",
 )
 
 

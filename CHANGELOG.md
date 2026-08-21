@@ -6,6 +6,22 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Nobel-adjacent domain programs (theory 07-07)
+
+- `omnibias.ferminet.hermite`, `omnibias.pinn.plasma`,
+  `omnibias.pinn.stack`: an exact oscillator ladder, a
+  Harris-sheet resistive-layer residual, and exact
+  `dT/dtheta` through a transfer product.
+- G0–G6 CI-gated as tooling. Jets are founding bias
+  collapse (`delta -> 0`), not temperature collapse.
+  Not a many-body solution, not fusion, not a new material.
+- Docs: `docs/api/domain_programs.md`,
+  `docs/cookbook/domain-programs.md`.
+  Smoke: `docs/benchmarks/quantum_hermite_vmc_smoke.json`,
+  `docs/benchmarks/plasma_resistive_layer_smoke.json`,
+  `docs/benchmarks/materials_stack_design_smoke.json`.
+
+
 ### Added — validated dynamics and orbits (theory 07-06)
 
 - `omnibias.core.verified.jet_flow`: exact-Jacobian

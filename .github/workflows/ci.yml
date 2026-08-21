@@ -415,6 +415,18 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/validated_dynamics.py
+      - name: Run quantum-hermite-VMC smoke (07-07 G0/G1/G2)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/quantum_hermite_vmc.py
+      - name: Run plasma-resistive-layer smoke (07-07 G0/G3/G4)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/plasma_resistive_layer.py
+      - name: Run materials-stack-design smoke (07-07 G0/G5/G6)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/materials_stack_design.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

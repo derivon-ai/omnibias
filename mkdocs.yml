@@ -200,6 +200,7 @@ nav:
       - spectral trial spaces (07-05): api/trial_spaces.md
       - SOS adapted bases (07-05): api/sos_adapted_basis.md
       - validated dynamics (07-06): api/validated_dynamics.md
+      - domain programs (07-07): api/domain_programs.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -275,6 +276,7 @@ nav:
       - Weak-form NS enclosure: cookbook/ns-weak-form.md
       - Spectral floors and adapted SOS: cookbook/spectral-floors.md
       - Validated dynamics and orbits: cookbook/validated-dynamics.md
+      - Domain programs (quantum / plasma / stack): cookbook/domain-programs.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

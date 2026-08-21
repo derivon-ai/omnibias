@@ -577,7 +577,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.verified.jet_flow` (07-06; exact-Jacobian
   jet Lohner + `WidthBudget`; G1–G6 CI; founding bias
   collapse, not temperature collapse; finite horizon, not a
-  continuum existence theorem).
+  continuum existence theorem) /
+  `omnibias.ferminet.hermite` + `omnibias.pinn.plasma` +
+  `omnibias.pinn.stack` (07-07; exact ladder / Harris layer
+  / exact `dT/dθ`; G0–G6 CI; founding bias collapse, not
+  temperature collapse; tooling, not a discovery).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -624,7 +628,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/ns_weak_form.md`](docs/api/ns_weak_form.md),
   [`docs/api/trial_spaces.md`](docs/api/trial_spaces.md),
   [`docs/api/sos_adapted_basis.md`](docs/api/sos_adapted_basis.md),
-  [`docs/api/validated_dynamics.md`](docs/api/validated_dynamics.md). Cost /
+  [`docs/api/validated_dynamics.md`](docs/api/validated_dynamics.md),
+  [`docs/api/domain_programs.md`](docs/api/domain_programs.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.
