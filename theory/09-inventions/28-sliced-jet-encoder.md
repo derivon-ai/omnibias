@@ -6,7 +6,7 @@ A holistic encoder whose tokens are **jets of learned 1-D scans**
 (and/or `integral` mass along `w`), optionally selected by a **named**
 energy, and mixed by shipped Hopfield attention — not a patch ViT.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-02, 09-01, 09-13
 - **Blocks**: none
 
@@ -166,12 +166,12 @@ JAX: scans over directions with `vmap`; no Python loop over pixels.
 
 ## 12. Implementation checklist
 
-- [ ] `SlicedJetEncoder` torch / jax twins
-- [ ] 2×2 G1 test
-- [ ] Named-energy guard
-- [ ] `benchmarks/sliced_jet_encoder.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `SlicedJetEncoder` torch / jax twins
+- [x] 2×2 G1 test
+- [x] Named-energy guard
+- [x] `benchmarks/sliced_jet_encoder.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

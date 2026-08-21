@@ -537,6 +537,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/parameter_space_jets.py
+      - name: Run sliced-jet-encoder smoke (09-28 G1–G4)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/sliced_jet_encoder.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

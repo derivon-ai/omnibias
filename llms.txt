@@ -168,7 +168,9 @@ G1–G4 CI; not NS global regularity),
 net-to-annihilator (09-26; Ore export; G1–G4 CI; finite
 rational Lean only; flags future-earned),
 parameter-space jets (09-27; mixed `x`–`μ` jets; G1–G5 CI;
-`closed_form` iff `μ` is on the jet trunk). Cost /
+`closed_form` iff `μ` is on the jet trunk),
+sliced-jet encoder (09-28; scan-jet tokens + named energy;
+G1–G5 CI; not a ViT). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

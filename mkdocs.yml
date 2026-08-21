@@ -225,6 +225,7 @@ nav:
       - World-model-as-jet (09-25): api/world_model_jet.md
       - Net-to-annihilator (09-26): api/net_to_annihilator.md
       - Parameter-space jets (09-27): api/parameter_space_jets.md
+      - Sliced-jet encoder (09-28): api/sliced_jet_encoder.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -324,6 +325,7 @@ nav:
       - World-model-as-jet: cookbook/world-model-jet.md
       - Net-to-annihilator: cookbook/net-to-annihilator.md
       - Parameter-space jets: cookbook/parameter-space-jets.md
+      - Sliced-jet encoder: cookbook/sliced-jet-encoder.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

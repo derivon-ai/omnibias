@@ -95,6 +95,7 @@ from omnibias.torch.architectures.piratenet import (
 )
 from omnibias.torch.architectures.riccati_flow import RiccatiFlowConfig, riccati_flow
 from omnibias.torch.architectures.scannet import ScanNet, ScanNetConfig, scannet_from_band_plan
+from omnibias.torch.architectures.sliced_jet import SlicedJetConfig, SlicedJetEncoder
 
 __all__ = [
     "AdaptiveActivation",
@@ -133,6 +134,8 @@ __all__ = [
     "RiccatiFlowConfig",
     "ScanNet",
     "ScanNetConfig",
+    "SlicedJetConfig",
+    "SlicedJetEncoder",
     "collapse_net_forward",
     "dirichlet_interval",
     "dual_ftc_loss",

@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Sliced-jet encoder (theory 09-28)
+
+- `omnibias.core.sliced_jet` plus architecture twins: tokens are
+  1-D scans along `w`, not patches. Sparse readout names its energy.
+- G1–G5 CI-gated. Not a ViT. Not ImageNet. Not `R^D` equivariance.
+- Docs: `docs/api/sliced_jet_encoder.md`,
+  `docs/cookbook/sliced-jet-encoder.md`.
+  Smoke: `docs/benchmarks/sliced_jet_encoder_smoke.json`.
+
+
 ### Added — Parameter-space jets (theory 09-27)
 
 - `omnibias.core.parameter_jets` plus `omnibias.pinn.operator`

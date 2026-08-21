@@ -102,6 +102,7 @@ from omnibias.jax.architectures.scannet import (
     scan_net_from_torch_state,
     scannet_from_band_plan,
 )
+from omnibias.jax.architectures.sliced_jet import SlicedJetConfig, SlicedJetEncoder
 
 __all__ = [
     "AdaptiveActivation",
@@ -129,6 +130,8 @@ __all__ = [
     "RiccatiFlowConfig",
     "ScanNetConfig",
     "ScanNetParams",
+    "SlicedJetConfig",
+    "SlicedJetEncoder",
     "apply_operator",
     "collapse_net_forward",
     "dirichlet_interval",

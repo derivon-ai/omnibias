@@ -1,0 +1,56 @@
+{
+  "schema": "omnibias.benchmarks.sliced_jet_encoder.v1",
+  "generated_utc": "2026-08-21T21:29:40Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "sliced_jet_encoder",
+    "full": false,
+    "honesty": {
+      "imagenet_claim": false,
+      "euclidean_RD_claim": false,
+      "vit_claim": false,
+      "stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 808.94,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cell",
+        "passed": true,
+        "encoder_mae": 0.0,
+        "gap_mae": 0.375
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "encoder_mae": 0.0,
+        "gap_mae": 0.060546875,
+        "cnn_mae": 0.060546875
+      },
+      {
+        "name": "g3_energy",
+        "passed": true,
+        "unnamed_sparse_refused": true
+      },
+      {
+        "name": "g4_honesty",
+        "passed": true,
+        "imagenet_claim": false,
+        "vit_claim": false
+      }
+    ]
+  },
+  "disclaimer": "scan-jet tokens plus a named energy; not a ViT, not ImageNet, not R^D equivariance, not CCF stretch",
+  "wall_seconds": 1.3520263569662347
+}
