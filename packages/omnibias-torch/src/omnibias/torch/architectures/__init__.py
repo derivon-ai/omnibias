@@ -71,6 +71,7 @@ from omnibias.torch.architectures.multiscale import (
     AdaptiveJetMLP,
     MscaleMLP,
 )
+from omnibias.torch.architectures.pack_moe import PackMoEConfig, pack_moe_forward
 from omnibias.torch.architectures.pinn import (
     DeepPINNHeat,
     FourierFeatureMLP,
@@ -114,6 +115,7 @@ __all__ = [
     "MscaleMLP",
     "OperatorMetadata",
     "PINNHeat",
+    "PackMoEConfig",
     "PirateNet",
     "PirateNetConfig",
     "ScanNet",
@@ -129,6 +131,7 @@ __all__ = [
     "jet_token_forward",
     "jetkan_from_band_plan",
     "make_siren",
+    "pack_moe_forward",
     "pirate_apply",
     "pirate_features",
     "scannet_from_band_plan",

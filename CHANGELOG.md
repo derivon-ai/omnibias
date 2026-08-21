@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pack-MoE (theory 09-07)
+
+- `omnibias.core.pack_moe` plus
+  `omnibias.{torch,jax}.architectures.pack_moe`: experts are packs;
+  the router is slab mass, not softmax.
+- G1–G3 CI-gated. Jets are founding bias collapse (`delta -> 0`),
+  not temperature collapse unless `beta != 1`. Not ImageNet. Not a
+  05-02 LightGBM reversal. Not CCF stretch.
+- Docs: `docs/api/pack_moe.md`, `docs/cookbook/pack-moe.md`.
+  Smoke: `docs/benchmarks/pack_moe_smoke.json`.
+
+
+
 ### Added — coupling jet-flow (theory 09-06)
 
 - `omnibias.core.coupling_flow` plus

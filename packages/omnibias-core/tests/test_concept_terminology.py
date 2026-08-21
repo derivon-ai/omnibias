@@ -141,6 +141,9 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/coupling_flow.py",
     "packages/omnibias-score/src/omnibias/score/flow/torch/jet_flow.py",
     "packages/omnibias-score/src/omnibias/score/flow/jax/jet_flow.py",
+    "packages/omnibias-core/src/omnibias/core/pack_moe.py",
+    "packages/omnibias-torch/src/omnibias/torch/architectures/pack_moe.py",
+    "packages/omnibias-jax/src/omnibias/jax/architectures/pack_moe.py",
 )
 
 

@@ -6,7 +6,7 @@ A mixture whose **experts are OMBU packs** (order / window / position)
 and whose **router is slab mass** (`integral` or `band`), not a free
 softmax MLP.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-01, 04-02, 09-01, 09-03
 - **Blocks**: none
 
@@ -114,11 +114,11 @@ def pack_moe_forward(x, packs, *, config: PackMoEConfig):
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.{torch,jax}.architectures` Pack-MoE
-- [ ] Softmax-router raise test
-- [ ] `benchmarks/pack_moe.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.{torch,jax}.architectures` Pack-MoE
+- [x] Softmax-router raise test
+- [x] `benchmarks/pack_moe.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

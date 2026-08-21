@@ -599,7 +599,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.coupling_flow` + `omnibias.score.flow.{torch,jax}.jet_flow`
   (09-06; finite couplings + closed-form `sum log sigma'`; G1–G3
   CI; founding bias collapse, not temperature collapse; not
-  `integrate_cnf`).
+  `integrate_cnf`) /
+  `omnibias.core.pack_moe` + `omnibias.{torch,jax}.architectures.pack_moe`
+  (09-07; slab-mass router over pack experts; G1–G3 CI; founding
+  bias collapse, not temperature collapse; not softmax, not a
+  05-02 reversal).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -653,7 +657,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/exact_maml.md`](docs/api/exact_maml.md),
   [`docs/api/tm_neuron.md`](docs/api/tm_neuron.md),
   [`docs/api/pci.md`](docs/api/pci.md),
-  [`docs/api/coupling_jet_flow.md`](docs/api/coupling_jet_flow.md). Cost /
+  [`docs/api/coupling_jet_flow.md`](docs/api/coupling_jet_flow.md),
+  [`docs/api/pack_moe.md`](docs/api/pack_moe.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

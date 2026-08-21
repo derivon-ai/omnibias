@@ -72,6 +72,7 @@ from omnibias.jax.architectures.multiscale import (
     make_adaptive_jet_mlp,
     make_mscale_mlp,
 )
+from omnibias.jax.architectures.pack_moe import PackMoEConfig, pack_moe_forward
 from omnibias.jax.architectures.pinn import (
     FourierFeatureMLP,
     JetMLP,
@@ -111,6 +112,7 @@ __all__ = [
     "JetMLP",
     "JetTokenConfig",
     "MscaleMLP",
+    "PackMoEConfig",
     "PirateNetConfig",
     "ScanNetConfig",
     "ScanNetParams",
@@ -138,6 +140,7 @@ __all__ = [
     "make_jet_mlp",
     "make_mscale_mlp",
     "make_siren",
+    "pack_moe_forward",
     "pirate_apply",
     "pirate_features",
     "refine_pack",
