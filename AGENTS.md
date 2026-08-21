@@ -680,7 +680,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/characteristic_net.md`](docs/api/characteristic_net.md),
   [`docs/api/sheaf_atlas_net.md`](docs/api/sheaf_atlas_net.md),
   [`docs/api/riccati_flow_net.md`](docs/api/riccati_flow_net.md),
-  [`docs/api/collapse_net.md`](docs/api/collapse_net.md). Cost /
+  [`docs/api/collapse_net.md`](docs/api/collapse_net.md),
+  [`docs/api/holonomic_layer.md`](docs/api/holonomic_layer.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

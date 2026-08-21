@@ -125,6 +125,7 @@ from omnibias.holonomic._core import (
     wz_pair,
     zeilberger,
 )
+from omnibias.holonomic._core.layer import HolonomicLayerSpec, fit_holonomic_layer, holonomic_jet
 from omnibias.holonomic.jacobian_n2 import (
     JacobianN2DegreeFamily,
     JacobianN2HomogeneousFamily,
@@ -155,6 +156,7 @@ __all__ = [
     "AsymptoticEstimate",
     "DFinite",
     "GosperResult",
+    "HolonomicLayerSpec",
     "HolonomicProof",
     "JacobianN2DegreeFamily",
     "JacobianN2HomogeneousFamily",
@@ -189,6 +191,7 @@ __all__ = [
     "empirical_rate",
     "escalate_n2_result",
     "fiber_report",
+    "fit_holonomic_layer",
     "gabber_n2_test",
     "gallagher_map",
     "gcrd",
@@ -199,6 +202,7 @@ __all__ = [
     "guess_algebraic",
     "guess_dfinite",
     "guess_recurrence",
+    "holonomic_jet",
     "hyper",
     "jacobian_det",
     "jacobian_n2_box_statement",

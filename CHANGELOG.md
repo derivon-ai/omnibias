@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomic layer (theory 09-12)
+
+- `omnibias.holonomic._core.layer`: the block is an Ore annihilator;
+  forward prolongs the D-finite jet of `L u = 0`.
+- G1–G4 CI-gated. D-finite class only. Not a general PINN. Not CCF
+  stretch. Lean flags are 09-26, not asserted here.
+- Docs: `docs/api/holonomic_layer.md`,
+  `docs/cookbook/holonomic-layer.md`.
+  Smoke: `docs/benchmarks/holonomic_layer_smoke.json`.
+
+
 ### Added — Collapse-Net (theory 09-11)
 
 - `omnibias.core.collapse_net` plus
@@ -761,6 +772,11 @@ distributions is versioned independently under semantic versioning.
   Even \(\tanh(\sinh(y/s))^2\) plus the same
   Hilbert-quadratic ray did not promote (LP pred
   earn `~1.6e-7`; model `s=0`; far-field peak walk).
+  Later decaying special-function ticks (Airy,
+  modified Struve, Kummer
+  \({}_1F_1(3/2;5/2;-(y/s)^2)\), Whittaker
+  \(e^{-z/2}U(1,1,z)\)) stayed in-field but
+  realized only `~2e-11`–`~5e-11`.
   Paper L2 / grad-norm / exp-mult raised L∞
   at this basin. Stretch stays unearned.
 
@@ -846,6 +862,8 @@ distributions is versioned independently under semantic versioning.
   ray `s=0`).
   Even \(\tanh(\sinh(y/s))^2\) did not promote
   (LP pred earn `~1.6e-7`; quadratic ray `s=0`).
+  Even Whittaker \(e^{-z/2}U(1,1,z)\) did not
+  promote (realized earn `~2e-11`).
   Paper L2 / grad-norm /
   exp-adjacent multiplicative raised 1601-pt L∞ on that
   family. A same-Jacobian bake-off ranked epigraph L∞ first;

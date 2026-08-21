@@ -6,7 +6,7 @@ A block that **is an Ore annihilator**: representable maps are D-finite
 by construction, so discovery is "read the annihilator," not SINDy on
 a library soup.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-10, 09-01
 - **Blocks**: 09-26
 
@@ -110,11 +110,11 @@ def holonomic_jet(op: OrePolynomial, init_jet, x0: float, order: int):
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.holonomic` layer helpers
-- [ ] Exp / sin jet tests
-- [ ] `benchmarks/holonomic_layer.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.holonomic` layer helpers
+- [x] Exp / sin jet tests
+- [x] `benchmarks/holonomic_layer.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

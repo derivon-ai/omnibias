@@ -31,6 +31,10 @@ and the `omnibias.core.proof` Lean loop.
 - **Transforms & closures** (`dfinite_to_precursive`, `precursive_to_dfinite`,
   `dfinite_derivative`, `dfinite_integral`, `dfinite_compose_poly`) — the exact
   ODE ⇔ coefficient-recurrence bridge and D-finite closure operations.
+- **Holonomic layer** (`HolonomicLayerSpec`, `holonomic_jet`) — a block whose
+  weights are Ore coefficients; forward prolongs the D-finite jet of
+  `L u = 0`. Gated (09-12). D-finite class only; not a general PINN.
+  See [Holonomic layer](holonomic_layer.md).
 - **Guessing** (`guess_recurrence`, `guess_dfinite`, `guess_algebraic`) — minimal
   P-recursive / differential / algebraic annihilators, guessed by exact null space and
   verified on held-out terms.

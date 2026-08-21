@@ -161,6 +161,7 @@ PENALTY_FILES = (
     "packages/omnibias-torch/src/omnibias/torch/architectures/collapse_net.py",
     "packages/omnibias-jax/src/omnibias/jax/architectures/collapse_net.py",
     "packages/omnibias-difference/src/omnibias/difference/_core/collapse_net.py",
+    "packages/omnibias-holonomic/src/omnibias/holonomic/_core/layer.py",
 )
 
 

@@ -293,6 +293,8 @@ jobs:
           pip install -e "packages/omnibias-score[torch,jax]"
           pip install -e packages/omnibias-partition
           pip install -e "packages/omnibias-geometry[atlas]"
+          pip install -e packages/omnibias-qcalculus
+          pip install -e packages/omnibias-holonomic
           pip install pytest
       - name: Run cross-backend parity tests
         run: |
@@ -491,6 +493,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/collapse_net.py
+      - name: Run holonomic-layer smoke (09-12 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/holonomic_layer.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate
@@ -1034,6 +1040,10 @@ jobs:
         run: |
           source .venv-holonomic/bin/activate
           python docs/examples/holonomic_validate.py
+      - name: Run holonomic-layer smoke (09-12 G1–G3)
+        run: |
+          source .venv-holonomic/bin/activate
+          python benchmarks/holonomic_layer.py
 
   sos:
     name: omnibias-sos (alpha)

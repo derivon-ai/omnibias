@@ -214,6 +214,7 @@ nav:
       - sheaf-atlas net (09-09): api/sheaf_atlas_net.md
       - Riccati flow net (09-10): api/riccati_flow_net.md
       - Collapse-Net (09-11): api/collapse_net.md
+      - Holonomic layer (09-12): api/holonomic_layer.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -302,6 +303,7 @@ nav:
       - Sheaf-atlas net: cookbook/sheaf-atlas-net.md
       - Riccati flow net: cookbook/riccati-flow-net.md
       - Collapse-Net: cookbook/collapse-net.md
+      - Holonomic layer: cookbook/holonomic-layer.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md
