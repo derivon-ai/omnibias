@@ -603,7 +603,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.pack_moe` + `omnibias.{torch,jax}.architectures.pack_moe`
   (09-07; slab-mass router over pack experts; G1–G3 CI; founding
   bias collapse, not temperature collapse; not softmax, not a
-  05-02 reversal).
+  05-02 reversal) /
+  `omnibias.core.remainder_train` + `omnibias.{torch,jax}.optim_remainder`
+  (09-18; loss is `R_N`; optional 03-13 birth hook; G1–G4 CI;
+  founding bias collapse, not temperature collapse; not 03-10).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -658,7 +661,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/tm_neuron.md`](docs/api/tm_neuron.md),
   [`docs/api/pci.md`](docs/api/pci.md),
   [`docs/api/coupling_jet_flow.md`](docs/api/coupling_jet_flow.md),
-  [`docs/api/pack_moe.md`](docs/api/pack_moe.md). Cost /
+  [`docs/api/pack_moe.md`](docs/api/pack_moe.md),
+  [`docs/api/remainder_training.md`](docs/api/remainder_training.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

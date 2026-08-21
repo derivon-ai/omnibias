@@ -144,6 +144,9 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/pack_moe.py",
     "packages/omnibias-torch/src/omnibias/torch/architectures/pack_moe.py",
     "packages/omnibias-jax/src/omnibias/jax/architectures/pack_moe.py",
+    "packages/omnibias-core/src/omnibias/core/remainder_train.py",
+    "packages/omnibias-torch/src/omnibias/torch/optim_remainder.py",
+    "packages/omnibias-jax/src/omnibias/jax/optim_remainder.py",
 )
 
 

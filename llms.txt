@@ -130,7 +130,10 @@ coupling jet-flow (09-06; finite couplings + closed-form
 `sum log sigma'`; G1–G3 CI; founding bias collapse, not
 temperature collapse; not `integrate_cnf`),
 Pack-MoE (09-07; slab-mass router over pack experts; G1–G3 CI;
-founding bias collapse, not temperature collapse; not softmax). Cost / wall-time / FermiNet-many-body gates are
+founding bias collapse, not temperature collapse; not softmax),
+remainder training (09-18; loss is `R_N`; optional 03-13 birth
+hook; G1–G4 CI; founding bias collapse, not temperature collapse;
+not 03-10). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

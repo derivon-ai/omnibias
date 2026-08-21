@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — remainder training (theory 09-18)
+
+- `omnibias.core.remainder_train` plus
+  `omnibias.{torch,jax}.optim_remainder`: the loss is the Taylor
+  remainder `R_N`, with an optional 03-13 birth hook.
+- G1–G4 CI-gated. Jets are founding bias collapse (`delta -> 0`),
+  not temperature collapse. Not spec 03-10. Not CCF stretch.
+- Docs: `docs/api/remainder_training.md`,
+  `docs/cookbook/remainder-training.md`.
+  Smoke: `docs/benchmarks/remainder_training_smoke.json`.
+
+
 ### Added — Pack-MoE (theory 09-07)
 
 - `omnibias.core.pack_moe` plus

@@ -6,7 +6,7 @@ The **loss is the Taylor remainder after order `N`** (or a Padé
 remainder), not `L` itself, so the net is forced into "this function
 is well approximated by its N-jet."
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 03-10, 03-13, 09-01
 - **Blocks**: none
 
@@ -103,11 +103,11 @@ def remainder_loss(model, xs, x0, *, config: RemainderTrainConfig):
 
 ## 12. Implementation checklist
 
-- [ ] Remainder-loss helpers
-- [ ] Optional 03-13 hook
-- [ ] `benchmarks/remainder_training.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Remainder-loss helpers
+- [x] Optional 03-13 hook
+- [x] `benchmarks/remainder_training.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

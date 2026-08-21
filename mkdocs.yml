@@ -208,6 +208,7 @@ nav:
       - proof-carrying forward (09-24): api/pci.md
       - coupling jet-flow (09-06): api/coupling_jet_flow.md
       - Pack-MoE (09-07): api/pack_moe.md
+      - remainder training (09-18): api/remainder_training.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -290,6 +291,7 @@ nav:
       - Taylor-model neuron: cookbook/tm-neuron.md
       - Coupling jet-flow: cookbook/coupling-jet-flow.md
       - Pack-MoE: cookbook/pack-moe.md
+      - Remainder training: cookbook/remainder-training.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md
