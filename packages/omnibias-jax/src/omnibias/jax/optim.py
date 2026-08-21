@@ -33,6 +33,8 @@ This module provides
 * :func:`sharpness_lambda_max` -- theory 08-06: largest Ritz value from
   exact HVPs; :func:`sharpness_scheduled_step` sets cubic ``sigma`` or a
   learning rate from that value. Hutchinson is not the method.
+* :func:`block_exact_search` -- theory 08-07: 03-12 line search on one
+  named or masked block with ``verify=True``.
 * :func:`gauss_newton_step` / :func:`gauss_newton_minimize` -- an adaptive-damping LM
   loop driven by a ``residual_fn``.
 * :func:`grad_norm_weights` -- self-adaptive loss weights that equalise the per-term
@@ -56,6 +58,15 @@ from omnibias.jax.line_search import (
     LineSearchResult,
     jet_line_search,
     jet_line_search_on_ray,
+)
+from omnibias.jax.optim_block_search import (
+    BlockSpec,
+    arrangement_w_block,
+    block_direction,
+    block_exact_search,
+    block_exact_sweep,
+    last_linear_block,
+    ombu_bias_block,
 )
 from omnibias.jax.optim_composed import (
     ComposedCurvatureConfig,
@@ -982,6 +993,7 @@ def grad_norm_weights(
 
 
 __all__ = [
+    "BlockSpec",
     "CONTINUUM_PDE_CLAIM_KEY",
     "ComposedCurvatureConfig",
     "ComposedCurvatureReport",
@@ -1000,6 +1012,10 @@ __all__ = [
     "SharpnessReport",
     "SharpnessSchedule",
     "approximate_inverse_jacobian",
+    "arrangement_w_block",
+    "block_direction",
+    "block_exact_search",
+    "block_exact_sweep",
     "cgls",
     "champ_barrier_residual",
     "composed_block_hessian",
@@ -1020,6 +1036,7 @@ __all__ = [
     "kantorovich_accept_step",
     "kantorovich_gated_gauss_newton_step",
     "lanczos_tridiag",
+    "last_linear_block",
     "linearized_linf_direction",
     "lstsq_gauss_newton_direction",
     "make_residual_fn",
@@ -1027,6 +1044,7 @@ __all__ = [
     "martens_grosse_gauss_newton_minimize",
     "natural_gradient_direction",
     "natural_gradient_step",
+    "ombu_bias_block",
     "peak_weighted_residual",
     "polynomial_sqrt2_maps",
     "select_accepted_params",

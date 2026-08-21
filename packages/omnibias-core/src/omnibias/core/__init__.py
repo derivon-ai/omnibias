@@ -34,6 +34,8 @@ Public API:
   composed-curvature joint Newton algebra (theory 08-02).
 * :class:`SharpnessSchedule`, :func:`scheduled_value` -- map a Ritz
   ``lambda_max`` to cubic ``sigma`` or a learning rate (theory 08-06).
+* :class:`BlockSpec`, :func:`block_exact_search` algebra -- structured
+  03-12 search on one coordinate block (theory 08-07).
 
 There are no framework dependencies in this package.
 """
@@ -48,6 +50,17 @@ from omnibias.core.bell import (
     bell_number,
     bell_partial,
     faa_di_bruno_terms,
+)
+from omnibias.core.block_search import (
+    BlockKind,
+    BlockSpec,
+    apply_block_step,
+    arrangement_w_block,
+    default_block_config,
+    last_linear_block,
+    ombu_bias_block,
+    resolve_block_mask,
+    unit_direction_from_mask,
 )
 from omnibias.core.composed_curvature import (
     ComposedCurvatureConfig,
@@ -204,6 +217,8 @@ __all__ = [
     "AffineSet",
     "BandPlan",
     "BankSpec",
+    "BlockKind",
+    "BlockSpec",
     "Cluster",
     "ComposedCurvatureConfig",
     "ComposedCurvatureReport",
@@ -239,6 +254,8 @@ __all__ = [
     "admissibility_constant",
     "affine_locus",
     "alpha_for_peak",
+    "apply_block_step",
+    "arrangement_w_block",
     "assert_zero_perturbation",
     "bell_complete",
     "bell_number",
@@ -257,6 +274,7 @@ __all__ = [
     "compile_bank",
     "contact_residual",
     "cumulants_from_raw_moments",
+    "default_block_config",
     "delta_method_central_moments",
     "delta_method_from_cumulants",
     "design_band_plan",
@@ -281,6 +299,7 @@ __all__ = [
     "is_holonomic",
     "is_log_partition_activation",
     "is_poised",
+    "last_linear_block",
     "local_scale_from_derivatives",
     "make_report",
     "make_tempered_fastpath",
@@ -291,6 +310,7 @@ __all__ = [
     "multi_indices",
     "multiply_table",
     "num_multi_indices",
+    "ombu_bias_block",
     "peak_frequency",
     "polya_condition",
     "polynomial_wolfe",
@@ -300,6 +320,7 @@ __all__ = [
     "registered_activations",
     "reject_full_parameter_jacobian",
     "relative_bandwidth",
+    "resolve_block_mask",
     "response_profile",
     "run_model_line_search",
     "scalar_nest_hessian",
@@ -317,6 +338,7 @@ __all__ = [
     "tower_lower",
     "tower_raise",
     "truncation_bound",
+    "unit_direction_from_mask",
     "vanishing_moments",
     "verify_exact",
     "verify_transform",

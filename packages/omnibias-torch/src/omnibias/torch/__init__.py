@@ -125,6 +125,15 @@ from omnibias.torch.moments import (
     gaussian_moment_propagation,
 )
 from omnibias.torch.multipack import BirkhoffOMBU, MultiPackUnit, multipack_response
+from omnibias.torch.optim_block_search import (
+    BlockSpec,
+    arrangement_w_block,
+    block_direction,
+    block_exact_search,
+    block_exact_sweep,
+    last_linear_block,
+    ombu_bias_block,
+)
 from omnibias.torch.optim_composed import (
     ComposedCurvatureConfig,
     ComposedCurvatureReport,
@@ -189,6 +198,7 @@ __all__ = [
     "BankSpec",
     "BiasScan",
     "BirkhoffOMBU",
+    "BlockSpec",
     "CONTINUUM_PDE_CLAIM_KEY",
     "ComposedCurvatureConfig",
     "ComposedCurvatureReport",
@@ -219,7 +229,11 @@ __all__ = [
     "analytic_gaussian_taps",
     "antiderivative_jet",
     "approximate_inverse_jacobian",
+    "arrangement_w_block",
     "binned_calibration_error",
+    "block_direction",
+    "block_exact_search",
+    "block_exact_sweep",
     "cdf",
     "chi_squared_divergence",
     "cmbConv1d",
@@ -270,6 +284,7 @@ __all__ = [
     "kl_divergence",
     "ks_statistic",
     "laplace_transform",
+    "last_linear_block",
     "layer_jet",
     "layer_jet_mv",
     "lhopital_ratio",
@@ -282,6 +297,7 @@ __all__ = [
     "moment_match",
     "multipack_response",
     "mutual_information",
+    "ombu_bias_block",
     "polynomial_sqrt2_maps",
     "refine",
     "region_of_convergence",

@@ -205,7 +205,7 @@ chain rule, and not a global solver. CCF stretch stays an operator floor.
 | [08-04 Kantorovich-accepted Newton](08-training/04-kantorovich-accepted-newton.md) | gated | Take a GN/cubic step only if a unique-zero ball is nonempty; G1–G3 CI |
 | [08-05 depth-causal residual](08-training/05-depth-causal-residual.md) | designed | March the PDE residual in network depth; not CCF Hilbert |
 | [08-06 sharpness-scheduled step](08-training/06-sharpness-scheduled-step.md) | gated | Exact HVP `lambda_max` sets cubic `sigma` / lr; G1–G3 CI |
-| [08-07 block exact search](08-training/07-block-exact-search.md) | designed | Structured 03-12: OMBU / last linear / arrangement coordinate |
+| [08-07 block exact search](08-training/07-block-exact-search.md) | gated | Structured 03-12 on OMBU / last linear / arrangement; G1–G4 CI |
 | [08-08 implicit DEQ Newton](08-training/08-implicit-deq-newton.md) | designed | `u = sigma(W u + x)` with exact-`sigma'` IFT; no unrolled BPTT |
 | [08-09 certified step](08-training/09-certified-step.md) | designed | Accept `theta'` only if a verify Lipschitz / output box stays in cap |
 

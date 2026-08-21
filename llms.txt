@@ -50,7 +50,9 @@ escape on the order-2 chain rule; G1–G4 CI; not a global min),
 Kantorovich-accepted Newton (08-04; unique-zero ball of a finite
 map; G1–G3 CI; not a continuum PDE claim), sharpness-scheduled step
 (08-06; exact-HVP `lambda_max` sets cubic `sigma`; G1–G3 CI;
-step-size signal, not a generalization claim). Cost / wall-time / FermiNet-many-body gates are
+step-size signal, not a generalization claim), block exact search
+(08-07; 03-12 on a named block; G1–G4 CI; coordinate sweep, not a
+global solver). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

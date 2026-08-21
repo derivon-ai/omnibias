@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — block / coordinate exact search (theory 08-07)
+
+- `omnibias.core.block_search` plus
+  `omnibias.{torch,jax}.optim_block_search` twins: 03-12 jet line
+  search on a last-linear / OMBU-bias / arrangement-`W` block with
+  `verify=True`. Last-layer least squares is exactly quadratic.
+  Re-exported from `omnibias.{torch,jax}.optim`.
+- G1–G4 CI-gated. A coordinate sweep, not a global solver and not CCF
+  stretch. Bias collapse (`delta -> 0`) supplies the tower.
+- Docs: `docs/api/block_exact_search.md`,
+  `docs/cookbook/block-exact-search.md`.
+  Smoke: `docs/benchmarks/block_exact_search_smoke.json`.
+
 ### Added — sharpness-scheduled curvature step (theory 08-06)
 
 - `omnibias.core.sharpness` plus

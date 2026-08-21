@@ -7,7 +7,7 @@ arrangement normals), the directional loss `phi(s)` is a low-degree
 combination of the Riccati tower, so the step is a **polynomial root**
 — a structured special case of spec 03-12.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 03-12, 08-01
 - **Blocks**: none
 
@@ -76,21 +76,25 @@ The implementer asserts `s*` equals `1` to `1e-14` and
 
 ## 6. Proposed API
 
-Does not exist yet.
+Gated. Shared algebra in `omnibias.core.block_search`; tensor twins in
+`omnibias.{torch,jax}.optim_block_search`, re-exported from
+`omnibias.{torch,jax}.optim`. Reuses 03-12 `jet_line_search` with
+`verify=True`.
 
 ```python
-# omnibias/torch/optim.py  (and jax twin) — proposed
-def block_exact_search(
-    closure, params, block_mask, *,
-    order: int = 4,
-    verify: bool = True,
-) -> Any:
-    """03-12 line search along the unit direction of one block.
-    Does not exist yet."""
+from omnibias.torch.optim_block_search import (
+    block_exact_search,
+    last_linear_block,
+)
+
+new, result = block_exact_search(
+    loss_fn, params, spec=last_linear_block(width), exact_quadratic=True
+)
 ```
 
-Bit-identical twins; default dtype; `block_mask` is boolean over
-`params` (or a named block: `"last_linear" | "ombu_bias" | "arrangement_W"`).
+Bit-identical twins; default dtype; `mask` is boolean over flat
+`params`, or a named `BlockSpec` (`last_linear` / `ombu_bias` /
+`arrangement_W`).
 
 ## 7. Practical use cases
 
@@ -134,12 +138,12 @@ Bit-identical twins; default dtype; `block_mask` is boolean over
 
 ## 12. Implementation checklist
 
-- [ ] `block_exact_search` reusing 03-12 / `taylor_line_min` until 03-12 ships
-- [ ] Named blocks for OMBU / last linear / arrangement
-- [ ] Tests: G2 exact, G3 never-worse, G4 parity
-- [ ] `benchmarks/block_exact_search.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `block_exact_search` reusing 03-12 / `taylor_line_min` until 03-12 ships
+- [x] Named blocks for OMBU / last linear / arrangement
+- [x] Tests: G2 exact, G3 never-worse, G4 parity
+- [x] `benchmarks/block_exact_search.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

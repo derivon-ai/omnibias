@@ -100,6 +100,12 @@ learning rate (theory 08-06). Sharpness is a step-size signal, not a
 generalization claim. Documented in full at
 [sharpness_schedule.md](sharpness_schedule.md).
 
+## Block exact search
+
+03-12 line search on one last-linear / OMBU-bias / arrangement block
+(theory 08-07). A coordinate sweep, not a global solver. Documented in
+full at [block_exact_search.md](block_exact_search.md).
+
 ## Hierarchical pack tree
 
 1-D near/far split (theory 02-07). `eta=0` is bit-identical to the

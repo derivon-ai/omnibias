@@ -173,6 +173,12 @@ Exact-HVP Lanczos `lambda_max` sets cubic `sigma`. See
 [sharpness_schedule.md](sharpness_schedule.md). Re-exported from
 `omnibias.torch.optim`.
 
+## Block exact search (08-07)
+
+03-12 line search on one named or masked block. See
+[block_exact_search.md](block_exact_search.md). Re-exported from
+`omnibias.torch.optim`.
+
 ## Fastpath kernels
 
 ::: omnibias.torch.fastpath

@@ -96,6 +96,9 @@ Composed-curvature joint Newton (theory 08-02) lives in
 Sharpness-scheduled step (theory 08-06) lives in
 `omnibias.jax.optim_sharpness` and is re-exported here; see
 [sharpness_schedule.md](sharpness_schedule.md).
+Block exact search (theory 08-07) lives in
+`omnibias.jax.optim_block_search` and is re-exported here; see
+[block_exact_search.md](block_exact_search.md).
 
 ::: omnibias.jax.optim
     options:

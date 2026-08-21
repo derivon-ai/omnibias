@@ -51,6 +51,9 @@ This module provides
   exact-HVP Lanczos ``lambda_max`` sets cubic ``sigma`` each step. Hutchinson
   is not the method; sharpness is a step-size signal, not a generalization
   claim.
+* :func:`block_exact_search` -- theory 08-07: 03-12 line search on one
+  named or masked block (last linear / OMBU bias / arrangement ``W``)
+  with ``verify=True``. A coordinate sweep, not a global solver.
 * :func:`omnibias.torch.line_search.jet_line_search` -- theory 03-12: certified
   truncation radius, Wolfe-as-interval, ``verify=True`` never-worse backstop
   (re-exported below). :func:`taylor_line_min` remains the order-2/3 autodiff
@@ -86,6 +89,15 @@ from omnibias.torch.line_search import (
     LineSearchResult,
     jet_line_search,
     jet_line_search_on_ray,
+)
+from omnibias.torch.optim_block_search import (
+    BlockSpec,
+    arrangement_w_block,
+    block_direction,
+    block_exact_search,
+    block_exact_sweep,
+    last_linear_block,
+    ombu_bias_block,
 )
 from omnibias.torch.optim_composed import (
     ComposedCurvatureConfig,
@@ -3831,6 +3843,7 @@ class KFAC(torch.optim.Optimizer):
 
 
 __all__ = [
+    "BlockSpec",
     "CONTINUUM_PDE_CLAIM_KEY",
     "Closure",
     "ComposedCurvatureConfig",
@@ -3865,6 +3878,10 @@ __all__ = [
     "StochasticNewtonCG",
     "TrustRegionNewtonCG",
     "approximate_inverse_jacobian",
+    "arrangement_w_block",
+    "block_direction",
+    "block_exact_search",
+    "block_exact_sweep",
     "cgls",
     "composed_block_hessian",
     "composed_curvature_step",
@@ -3882,10 +3899,12 @@ __all__ = [
     "kantorovich_accept_step",
     "kantorovich_gated_gauss_newton_step",
     "lanczos_tridiag",
+    "last_linear_block",
     "lstsq_gauss_newton_direction",
     "martens_grosse_combine",
     "martens_grosse_gauss_newton_minimize",
     "natural_gradient_direction",
+    "ombu_bias_block",
     "polynomial_sqrt2_maps",
     "quadrature_loss",
     "select_accepted_params",
