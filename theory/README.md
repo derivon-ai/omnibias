@@ -131,7 +131,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [02-10 Hermite ladder nets](02-architectures/10-hermite-ladder-oscillator-net.md) | gated | Raw tower is not the QHO eigenbasis; Rodrigues reweight required; G4 FermiNet `--full`; G5 may lose |
 | [02-11 transfer-matrix layered media](02-architectures/11-transfer-matrix-layered-media.md) | gated | 1-D ABCD; `continuum_claim=False`; distinct from `geometry.gauge.transfer` |
 | [02-12 equality-intersection nets](02-architectures/12-equality-intersection-ansatz-nets.md) | gated | Layer on 01-09; always `branch` / `condition` / `converged`; not a general PDE solver |
-| [02-13 linearizing transforms](02-architectures/13-linearizing-transform-layers.md) | gated | Named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; 03-11 search stays designed |
+| [02-13 linearizing transforms](02-architectures/13-linearizing-transform-layers.md) | gated | Named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; 03-11 search is gated |
 | [02-14 Wilson-line holonomy band](02-architectures/14-wilson-line-holonomy-band.md) | gated | Closed form abelian + transverse-constant; open lines gauge-dependent; no YM / mass gap / continuum claim |
 
 ### 03 Algorithms and paradigms
@@ -148,7 +148,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [03-08 certified scan localization](03-algorithms/08-certified-scan-localization.md) | gated | Krawczyk unique-peak enclosure of a scan response; G1–G6 CI; founding bias collapse, not temperature collapse; `Inconclusive` is first-class; `local_box`; not `theorem_prover_verified` |
 | [03-09 differentiable topology](03-algorithms/09-differentiable-topology-of-arrangements.md) | gated | Soft Euler / component counts + 1-D Morse persistence; G1–G6 CI; temperature collapse, not founding bias collapse; no differentiable Betti number; `Inconclusive` when the gap does not separate |
 | [03-10 jet-Pade singularity tracking](03-algorithms/10-jet-pade-singularity-tracking.md) | gated | Domb-Sykes + Padé poles + certified `|x_s|` annulus; G1–G6 CI; founding bias collapse, not temperature collapse; diagnostic, not a blow-up proof |
-| [03-11 Lie symmetry discovery](03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md) | designed | Prolongations are jets, so symmetry search is a linear solve |
+| [03-11 Lie symmetry discovery](03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md) | gated | Point symmetries in a declared ansatz; G1–G6 CI; founding bias collapse, not temperature collapse; in-ansatz rank, not a classification |
 | [03-12 exact jet line search](03-algorithms/12-exact-jet-line-search.md) | gated | Certified radius + `verify=True` never-worse; G1/G2/G3/G6 CI; G4/G5 recorded, not CI `all_passed` |
 | [03-13 adaptive pack refinement](03-algorithms/13-adaptive-pack-refinement.md) | gated | Birth/growth bit-identical; death reports a bound; G1/G2/G3/G5/G6 CI; G4 recorded, not CI `all_passed` |
 

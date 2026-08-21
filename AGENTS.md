@@ -560,7 +560,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.difference.singularity` (03-10; Domb-Sykes + Padé
   poles + certified `|x_s|` annulus; G1–G6 CI; founding bias
   collapse, not temperature collapse; diagnostic, not a
-  blow-up proof).
+  blow-up proof) /
+  `omnibias.symbolic.symmetry` (03-11; Lie point symmetries
+  as a determining-matrix nullspace; G1–G6 CI; founding bias
+  collapse, not temperature collapse; in-ansatz only, not a
+  classification).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -602,7 +606,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/scale_flow.md`](docs/api/scale_flow.md),
   [`docs/api/certified_localization.md`](docs/api/certified_localization.md),
   [`docs/api/differentiable_topology.md`](docs/api/differentiable_topology.md),
-  [`docs/api/singularity_tracking.md`](docs/api/singularity_tracking.md). Cost /
+  [`docs/api/singularity_tracking.md`](docs/api/singularity_tracking.md),
+  [`docs/api/symmetry_discovery.md`](docs/api/symmetry_discovery.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

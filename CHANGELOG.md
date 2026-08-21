@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Lie symmetry discovery (theory 03-11)
+
+- `omnibias.symbolic.symmetry`: determining-matrix nullspace
+  for Lie point symmetries in a declared affine ansatz.
+  Prolongation is the characteristic / total-derivative jet
+  algebra. Rank threshold and singular-value separation are
+  required output.
+- G1–G6 CI-gated. Jets are founding bias collapse
+  (`delta -> 0`), not temperature collapse. Point symmetries
+  only; in-ansatz dimensions, not a classification.
+  Finite-difference prolongation gets the heat rank wrong.
+- Docs: `docs/api/symmetry_discovery.md`,
+  `docs/cookbook/symmetry-discovery.md`.
+  Smoke: `docs/benchmarks/symmetry_discovery_smoke.json`.
+
 ### Added — jet-Padé singularity tracking (theory 03-10)
 
 - `omnibias.difference.singularity` plus

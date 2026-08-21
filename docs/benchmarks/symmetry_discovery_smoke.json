@@ -1,0 +1,119 @@
+{
+  "schema": "omnibias.benchmarks.symmetry_discovery.v1",
+  "generated_utc": "2026-08-21T18:44:37Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "symmetry_discovery",
+    "full": false,
+    "honesty": {
+      "point_symmetries_only": true,
+      "ansatz_bounds_search": true,
+      "rank_threshold_reported": true,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "ns_regularity": false,
+      "disclaimer": "point symmetries in the declared ansatz only; not a blow-up or regularity proof"
+    }
+  },
+  "rss_mb_at_start": 814.62,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_recovery",
+        "passed": true,
+        "equations": [
+          {
+            "name": "heat",
+            "dim": 5,
+            "expected": 5
+          },
+          {
+            "name": "wave",
+            "dim": 6,
+            "expected": 6
+          },
+          {
+            "name": "burgers",
+            "dim": 4,
+            "expected": 4
+          },
+          {
+            "name": "kdv",
+            "dim": 4,
+            "expected": 4
+          },
+          {
+            "name": "laplace",
+            "dim": 6,
+            "expected": 6
+          },
+          {
+            "name": "fisher",
+            "dim": 2,
+            "expected": 2
+          },
+          {
+            "name": "kdv_linear",
+            "dim": 5,
+            "expected": 5
+          },
+          {
+            "name": "boussinesq",
+            "dim": 4,
+            "expected": 4
+          }
+        ]
+      },
+      {
+        "name": "g2_separation",
+        "passed": true,
+        "separations": {
+          "heat": 1.7313826931704072e+16,
+          "wave": 1.6675450577812794e+16,
+          "burgers": 5111882447394842.0,
+          "kdv": 2007651060470163.2,
+          "laplace": 1.9419403810575256e+16,
+          "fisher": 5971042130747663.0,
+          "kdv_linear": 1.0150856666562806e+16,
+          "boussinesq": 1222360454542290.2
+        }
+      },
+      {
+        "name": "g3_fd_rank",
+        "passed": true,
+        "exact_dim": 5,
+        "fd_dim": 1
+      },
+      {
+        "name": "g4_threshold",
+        "passed": true,
+        "dims": {
+          "1e-12": 5,
+          "1e-10": 5,
+          "1e-08": 5
+        }
+      },
+      {
+        "name": "g5_noether",
+        "passed": true,
+        "residual_dt": 0.0,
+        "residual_dx": 0.0
+      },
+      {
+        "name": "g6_negative",
+        "passed": true,
+        "dim": 0
+      }
+    ]
+  },
+  "wall_seconds": 1.5775777919916436
+}

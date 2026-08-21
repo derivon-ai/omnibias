@@ -117,6 +117,8 @@ PENALTY_FILES = (
     "packages/omnibias-difference/src/omnibias/difference/_core/singularity.py",
     "packages/omnibias-difference/src/omnibias/difference/singularity.py",
     "packages/omnibias-fields/src/omnibias/fields/singularity.py",
+    "packages/omnibias-symbolic/src/omnibias/symbolic/symmetry/_core.py",
+    "packages/omnibias-symbolic/src/omnibias/symbolic/symmetry/__init__.py",
 )
 
 

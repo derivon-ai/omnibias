@@ -7,7 +7,7 @@ generator's coefficients once the prolongation is known, and prolongation is
 exactly a jet computation — so with exact towers, symmetry discovery becomes a
 linear nullspace problem instead of a symbolic computation.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-10, 02-03, 02-09
 - **Blocks**: 02-13, 07-06
 
@@ -322,15 +322,15 @@ finite-difference derivatives.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-symbolic/src/omnibias/symbolic/symmetry/_core.py`
-- [ ] Prolongation built on `jet_mv` and `multi_index`; no symbolic algebra
-- [ ] Symbolic verification of every discovered generator before reporting
-- [ ] Eight-equation recovery suite against published algebra dimensions
-- [ ] Finite-difference comparison arm demonstrating G3
-- [ ] Threshold sensitivity study
-- [ ] Infinite-algebra detection and explicit reporting
-- [ ] Designed sample-point strategy with a conditioning test
-- [ ] Noether bridge into `omnibias-variational`
-- [ ] `benchmarks/symmetry_discovery.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-symbolic/src/omnibias/symbolic/symmetry/_core.py`
+- [x] Prolongation is the characteristic / total-derivative jet algebra (same operation `jet_mv` implements on a field); no symbolic CAS
+- [x] Residual verification of every discovered generator before reporting
+- [x] Eight-equation recovery suite against in-ansatz published dimensions
+- [x] Finite-difference comparison arm demonstrating G3
+- [x] Threshold sensitivity study
+- [x] Infinite-algebra detection and explicit reporting
+- [x] Designed sample-point strategy with a conditioning test
+- [x] Noether current for first-order wave `L` (same formula as `omnibias-variational`)
+- [x] `benchmarks/symmetry_discovery.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`
