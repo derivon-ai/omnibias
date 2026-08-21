@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Riccati flow net (theory 09-10)
+
+- `omnibias.core.riccati_flow` plus
+  `omnibias.{torch,jax}.architectures.riccati_flow`: depth is the
+  time-`t` flow of the founding Riccati ODE.
+- G1–G4 CI-gated. Not a DEQ. Not a CNF. The flow itself is not
+  bias collapse. Not CCF stretch.
+- Docs: `docs/api/riccati_flow_net.md`,
+  `docs/cookbook/riccati-flow-net.md`.
+  Smoke: `docs/benchmarks/riccati_flow_net_smoke.json`.
+
+
 ### Added — sheaf-atlas net (theory 09-09)
 
 - `omnibias.geometry.atlas.cocycle`: jet-valued transition maps

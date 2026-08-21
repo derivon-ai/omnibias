@@ -483,6 +483,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/sheaf_atlas_net.py
+      - name: Run Riccati-flow-net smoke (09-10 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/riccati_flow_net.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

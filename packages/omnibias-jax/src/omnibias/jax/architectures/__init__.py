@@ -87,6 +87,7 @@ from omnibias.jax.architectures.piratenet import (
     pirate_apply,
     pirate_features,
 )
+from omnibias.jax.architectures.riccati_flow import RiccatiFlowConfig, riccati_flow
 from omnibias.jax.architectures.scannet import (
     ScanNetConfig,
     ScanNetParams,
@@ -116,6 +117,7 @@ __all__ = [
     "MscaleMLP",
     "PackMoEConfig",
     "PirateNetConfig",
+    "RiccatiFlowConfig",
     "ScanNetConfig",
     "ScanNetParams",
     "apply_operator",
@@ -147,6 +149,7 @@ __all__ = [
     "pirate_apply",
     "pirate_features",
     "refine_pack",
+    "riccati_flow",
     "scan_net_apply",
     "scan_net_from_torch_state",
     "scannet_from_band_plan",

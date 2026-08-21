@@ -154,6 +154,9 @@ PENALTY_FILES = (
     "packages/omnibias-pinn/src/omnibias/pinn/torch/characteristic.py",
     "packages/omnibias-pinn/src/omnibias/pinn/jax/characteristic.py",
     "packages/omnibias-geometry/src/omnibias/geometry/atlas/cocycle.py",
+    "packages/omnibias-core/src/omnibias/core/riccati_flow.py",
+    "packages/omnibias-torch/src/omnibias/torch/architectures/riccati_flow.py",
+    "packages/omnibias-jax/src/omnibias/jax/architectures/riccati_flow.py",
 )
 
 

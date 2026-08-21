@@ -6,7 +6,7 @@ A layer that is the **time-`t` flow of the founding Riccati ODE**
 `sigma' = sigma(1-sigma)` (or `tanh' = 1-tanh^2`), not `sigma(Wx+b)`.
 Depth is integration time.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 09-01
 - **Blocks**: none
 
@@ -107,11 +107,11 @@ def riccati_flow(s0, *, config: RiccatiFlowConfig):
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.{torch,jax}.architectures` Riccati flow
-- [ ] Domain checks for logistic
-- [ ] `benchmarks/riccati_flow_net.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.{torch,jax}.architectures` Riccati flow
+- [x] Domain checks for logistic
+- [x] `benchmarks/riccati_flow_net.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

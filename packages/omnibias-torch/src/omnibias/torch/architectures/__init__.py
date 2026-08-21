@@ -87,6 +87,7 @@ from omnibias.torch.architectures.piratenet import (
     pirate_apply,
     pirate_features,
 )
+from omnibias.torch.architectures.riccati_flow import RiccatiFlowConfig, riccati_flow
 from omnibias.torch.architectures.scannet import ScanNet, ScanNetConfig, scannet_from_band_plan
 
 __all__ = [
@@ -120,6 +121,7 @@ __all__ = [
     "PackMoEConfig",
     "PirateNet",
     "PirateNetConfig",
+    "RiccatiFlowConfig",
     "ScanNet",
     "ScanNetConfig",
     "dirichlet_interval",
@@ -137,6 +139,7 @@ __all__ = [
     "pack_moe_forward",
     "pirate_apply",
     "pirate_features",
+    "riccati_flow",
     "scannet_from_band_plan",
     "worked_compose_jet",
 ]
