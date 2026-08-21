@@ -218,6 +218,16 @@ supervised fit of the same architecture, and cross-backend parity.
       show_root_heading: false
       heading_level: 3
 
+## Sliced optimal transport (03-04)
+
+Exact 1-D `W_1` of activation mixtures (founding bias collapse). The
+directional average is sampled. See [`docs/api/sliced_ot.md`](sliced_ot.md).
+
+::: omnibias.measure.transport
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ## JAX twin
 
 The JAX backend (`omnibias.measure.jax.ops` and the

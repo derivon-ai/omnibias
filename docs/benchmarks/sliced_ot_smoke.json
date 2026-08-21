@@ -1,0 +1,81 @@
+{
+  "schema": "omnibias.benchmarks.sliced_ot.v1",
+  "generated_utc": "2026-08-21T17:40:16Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "sliced_ot",
+    "full": false,
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "honesty": {
+      "sample_free": false,
+      "exact_per_slice": true,
+      "sliced_is_wasserstein": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false
+    }
+  },
+  "rss_mb_at_start": 1262.73,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_exactness",
+        "passed": true,
+        "worked_w1": 0.24022901391655482,
+        "max_rel": 4.765957452368983e-15,
+        "detail": "w1_exact vs tanh-independent GL of |F-G|; worked example closed form"
+      },
+      {
+        "name": "g2_quantile_grad",
+        "passed": true,
+        "rel": 3.2618942172142643e-10,
+        "detail": "implicit dQ/dmu vs central FD"
+      },
+      {
+        "name": "g3_variance",
+        "passed": true,
+        "var_cf": 0.0,
+        "var_mc": 0.002898275728660892,
+        "ratio": 2898275728660892.0,
+        "detail": "rotationally invariant pair: CF residual is direction-only"
+      },
+      {
+        "name": "g4_metric",
+        "passed": true,
+        "max_asym": 0.0,
+        "triangle_ok": true,
+        "detail": "symmetry and triangle on randomized 1-D triples"
+      },
+      {
+        "name": "g5_stderr",
+        "passed": true,
+        "stderr": 0.029397975604798274,
+        "bootstrap": 0.031893022386584646,
+        "rel": 0.07823174459739755,
+        "detail": "direction_stderr vs bootstrap SE of the slice mean"
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "torch_equal": true,
+        "jax_equal": true,
+        "detail": "torch / jax CDF match numpy at float64"
+      }
+    ]
+  },
+  "wall_seconds": 2.5994391820277087
+}

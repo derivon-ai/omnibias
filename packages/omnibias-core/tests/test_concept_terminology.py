@@ -96,6 +96,10 @@ PENALTY_FILES = (
     "packages/omnibias-discrete/src/omnibias/discrete/csp/torch.py",
     "packages/omnibias-discrete/src/omnibias/discrete/csp/jax.py",
     "packages/omnibias-discrete/src/omnibias/discrete/csp/__init__.py",
+    "packages/omnibias-measure/src/omnibias/measure/transport/_core.py",
+    "packages/omnibias-measure/src/omnibias/measure/transport/torch.py",
+    "packages/omnibias-measure/src/omnibias/measure/transport/jax.py",
+    "packages/omnibias-measure/src/omnibias/measure/transport/__init__.py",
 )
 
 

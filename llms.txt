@@ -70,7 +70,10 @@ learned-facet front end on `solve_lp` + Neumaier-Shcherbina; G1–G5
 CI; not a new LP algorithm; temperature collapse, not founding bias
 collapse), CSP collapse (03-03; finite-domain CSP + two `beta`
 schedules + soft AC; G1–G6 CI; temperature collapse, not founding
-bias collapse; not a complete solver; not P vs NP). Cost / wall-time / FermiNet-many-body gates are
+bias collapse; not a complete solver; not P vs NP), sliced OT
+(03-04; exact 1-D `W_1` of activation mixtures + sliced average;
+G1–G6 CI; founding bias collapse, not temperature collapse; exact
+per slice, not sample-free; not Wasserstein). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

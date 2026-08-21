@@ -188,6 +188,7 @@ nav:
       - soft-population evolution (03-01): api/soft_evolution.md
       - arrangement LP (03-02): api/arrangement_lp.md
       - CSP collapse (03-03): api/csp.md
+      - sliced OT (03-04): api/sliced_ot.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -252,6 +253,7 @@ nav:
       - Soft-population evolution: cookbook/soft-evolution.md
       - Arrangement LP: cookbook/arrangement-lp.md
       - Constraint satisfaction collapse: cookbook/csp-collapse.md
+      - Sliced optimal transport: cookbook/sliced-ot.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

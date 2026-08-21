@@ -7,7 +7,7 @@ tempered activations has a **closed-form CDF and closed-form quantile
 derivatives**, so sliced Wasserstein distances between such mixtures are exact
 rather than sample-estimated.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-02, 01-05
 - **Blocks**: 05-02
 
@@ -291,14 +291,14 @@ Sinkhorn-based entropic OT.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-measure/src/omnibias/measure/transport/_core.py`
-- [ ] torch and jax twins with a parity test
-- [ ] Reuse the `Measure` abstraction and the `integral` role antiderivatives
-- [ ] Exactness test against high-precision integration, multi-root cases
-- [ ] Gradient test through quantile inversion
-- [ ] Metric-property tests (symmetry, triangle inequality)
-- [ ] Robust sign-change root finder with a certified-count option
-- [ ] `direction_stderr` always populated, bootstrap-checked
-- [ ] `benchmarks/sliced_ot.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-measure/src/omnibias/measure/transport/_core.py`
+- [x] torch and jax twins with a parity test
+- [x] Reuse the `Measure` abstraction and the `integral` role antiderivatives
+- [x] Exactness test against high-precision integration, multi-root cases
+- [x] Gradient test through quantile inversion
+- [x] Metric-property tests (symmetry, triangle inequality)
+- [x] Robust sign-change root finder with a certified-count option
+- [x] `direction_stderr` always populated, bootstrap-checked
+- [x] `benchmarks/sliced_ot.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

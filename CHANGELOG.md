@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — sliced optimal transport (theory 03-04)
+
+- `omnibias.measure.transport`: exact 1-D `W_1` between
+  tempered-activation mixtures (sign-change roots + softplus
+  antiderivatives) and a sliced average that always reports
+  `direction_stderr`.
+- G1–G6 CI-gated. Founding bias collapse (`delta -> 0`), not
+  temperature collapse. Exact per slice, not sample-free. Sliced
+  Wasserstein is not Wasserstein.
+- Docs: `docs/api/sliced_ot.md`, `docs/cookbook/sliced-ot.md`.
+  Smoke: `docs/benchmarks/sliced_ot_smoke.json`.
+
+
 ### Added — constraint satisfaction collapse (theory 03-03)
 
 - `omnibias.discrete.csp`: finite-domain CSP on the
