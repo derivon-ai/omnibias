@@ -113,7 +113,10 @@ existence theorem),
 Nobel-adjacent domain programs (07-07; exact oscillator
 ladder + Harris resistive layer + exact `dT/dθ`; G0–G6 CI;
 founding bias collapse, not temperature collapse; tooling,
-not a many-body / fusion / materials discovery). Cost / wall-time / FermiNet-many-body gates are
+not a many-body / fusion / materials discovery),
+FTC-Net / dual-FTC (09-03 / 09-17; integral cell + paired
+residuals; G1–G3 CI; founding bias collapse, not temperature
+collapse; not a VPINN). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

@@ -32,6 +32,13 @@ Three families:
 from omnibias.torch.architectures.attention import AttentionJetMLP
 from omnibias.torch.architectures.cmbnet import CmbNet
 from omnibias.torch.architectures.cvxlayer import CvxLasso, CvxLogistic
+from omnibias.torch.architectures.ftc_net import (
+    DualFTCConfig,
+    FTCNet,
+    FTCNetConfig,
+    dual_ftc_loss,
+    ftc_block,
+)
 from omnibias.torch.architectures.hardbc import (
     AffineFactor,
     AffineLift,
@@ -86,6 +93,9 @@ __all__ = [
     "CvxLasso",
     "CvxLogistic",
     "DeepPINNHeat",
+    "DualFTCConfig",
+    "FTCNet",
+    "FTCNetConfig",
     "FittedJointOperatorRegressor",
     "FourierFeatureMLP",
     "HardConstraintField",
@@ -103,8 +113,10 @@ __all__ = [
     "ScanNet",
     "ScanNetConfig",
     "dirichlet_interval",
+    "dual_ftc_loss",
     "edge_functions",
     "fit_joint_operator_regressor",
+    "ftc_block",
     "homogeneous_box",
     "init_pirate_params",
     "initial_value",

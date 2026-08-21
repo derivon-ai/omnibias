@@ -31,6 +31,13 @@ from omnibias.jax.architectures.attention import (
     AttentionJetMLP,
     make_attention_jet_mlp,
 )
+from omnibias.jax.architectures.ftc_net import (
+    DualFTCConfig,
+    FTCNet,
+    FTCNetConfig,
+    dual_ftc_loss,
+    ftc_block,
+)
 from omnibias.jax.architectures.hardbc import (
     AffineFactor,
     AffineLift,
@@ -89,6 +96,9 @@ __all__ = [
     "AffineLift",
     "AttentionJetMLP",
     "BoundaryMask",
+    "DualFTCConfig",
+    "FTCNet",
+    "FTCNetConfig",
     "FourierFeatureMLP",
     "HardConstraintField",
     "JetKANConfig",
@@ -100,6 +110,8 @@ __all__ = [
     "ScanNetParams",
     "apply_operator",
     "dirichlet_interval",
+    "dual_ftc_loss",
+    "ftc_block",
     "hermite_basis",
     "homogeneous_box",
     "init_jet_kan",

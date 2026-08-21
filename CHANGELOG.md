@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — FTC-Net and dual-FTC training (theory 09-03 / 09-17)
+
+- `omnibias.core.ftc` plus torch / jax `architectures.ftc_net`:
+  the unused `integral` cell, its FTC derivative head, and a dual
+  residual `(r_D, r_I)`.
+- G1–G3 CI-gated. Jets are founding bias collapse (`delta -> 0`),
+  not temperature collapse. Not a VPINN / weak form.
+- Docs: `docs/api/ftc_net.md`, `docs/cookbook/ftc-net.md`.
+  Smoke: `docs/benchmarks/ftc_net_smoke.json`,
+  `docs/benchmarks/dual_ftc_training_smoke.json`.
+
+
 ### Added — Nobel-adjacent domain programs (theory 07-07)
 
 - `omnibias.ferminet.hermite`, `omnibias.pinn.plasma`,

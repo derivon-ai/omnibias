@@ -125,6 +125,9 @@ PENALTY_FILES = (
     "packages/omnibias-ferminet/src/omnibias/ferminet/hermite.py",
     "packages/omnibias-pinn/src/omnibias/pinn/plasma.py",
     "packages/omnibias-pinn/src/omnibias/pinn/stack.py",
+    "packages/omnibias-core/src/omnibias/core/ftc.py",
+    "packages/omnibias-torch/src/omnibias/torch/architectures/ftc_net.py",
+    "packages/omnibias-jax/src/omnibias/jax/architectures/ftc_net.py",
 )
 
 

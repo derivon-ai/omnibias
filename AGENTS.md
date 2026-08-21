@@ -581,7 +581,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.ferminet.hermite` + `omnibias.pinn.plasma` +
   `omnibias.pinn.stack` (07-07; exact ladder / Harris layer
   / exact `dT/dθ`; G0–G6 CI; founding bias collapse, not
-  temperature collapse; tooling, not a discovery).
+  temperature collapse; tooling, not a discovery) /
+  `omnibias.core.ftc` + `omnibias.{torch,jax}.architectures.ftc_net`
+  (09-03 / 09-17; integral cell + dual `r_D`/`r_I`; G1–G3 CI;
+  founding bias collapse, not temperature collapse; not a VPINN).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -629,7 +632,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/trial_spaces.md`](docs/api/trial_spaces.md),
   [`docs/api/sos_adapted_basis.md`](docs/api/sos_adapted_basis.md),
   [`docs/api/validated_dynamics.md`](docs/api/validated_dynamics.md),
-  [`docs/api/domain_programs.md`](docs/api/domain_programs.md). Cost /
+  [`docs/api/domain_programs.md`](docs/api/domain_programs.md),
+  [`docs/api/ftc_net.md`](docs/api/ftc_net.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

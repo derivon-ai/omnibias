@@ -201,6 +201,7 @@ nav:
       - SOS adapted bases (07-05): api/sos_adapted_basis.md
       - validated dynamics (07-06): api/validated_dynamics.md
       - domain programs (07-07): api/domain_programs.md
+      - FTC-Net / dual-FTC (09-03 / 09-17): api/ftc_net.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -277,6 +278,7 @@ nav:
       - Spectral floors and adapted SOS: cookbook/spectral-floors.md
       - Validated dynamics and orbits: cookbook/validated-dynamics.md
       - Domain programs (quantum / plasma / stack): cookbook/domain-programs.md
+      - FTC-Net: cookbook/ftc-net.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

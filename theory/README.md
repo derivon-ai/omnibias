@@ -221,7 +221,7 @@ operator floor.
 |---|---|---|
 | [09-01 invention ledger](09-inventions/01-invention-ledger.md) | designed | Already-specified map, rejects, first-bet ranking; inventions do not clear Hilbert stretch |
 | [09-02 jet-token transformer](09-inventions/02-jet-token-transformer.md) | concept | Residual stream is an N-jet; mix with `compose_jet`, not vector attention |
-| [09-03 FTC-Net](09-inventions/03-ftc-net.md) | concept | Cell is the `integral` role; collapse heads are the same pack |
+| [09-03 FTC-Net](09-inventions/03-ftc-net.md) | gated | Integral cell + collapse head; G1–G3 CI; not a VPINN; founding bias collapse, not temperature collapse |
 | [09-04 Frame-UNet](09-inventions/04-frame-unet.md) | concept | Order encoder + integral decoder; band skip is not a collapse head |
 | [09-05 Taylor-model neuron](09-inventions/05-taylor-model-neuron.md) | concept | Unit output is a `TaylorModel`; enclosure explosion is the floor |
 | [09-06 coupling Jet-Flow](09-inventions/06-coupling-jet-flow.md) | concept | Finite couplings; `log|det| = sum log sigma'`; Newton inverse |
@@ -235,7 +235,7 @@ operator floor.
 | [09-14 integral-kernel operator](09-inventions/14-integral-kernel-operator.md) | concept | Volumetric DeepONet kernel is an OMBU `integral`; not BEM-Net |
 | [09-15 q-OMBU / timescale](09-inventions/15-q-ombu-timescale.md) | concept | Hybrid q / Hilger layers; named `q -> 1` / `mu -> 0` limit |
 | [09-16 exact MAML](09-inventions/16-exact-maml.md) | concept | Inner exact GN / HVP; meta-grad is IFT through inner KKT |
-| [09-17 dual-FTC training](09-inventions/17-dual-ftc-training.md) | concept | Derivative residual and closed-form integral must agree |
+| [09-17 dual-FTC training](09-inventions/17-dual-ftc-training.md) | gated | Dual `r_D`/`r_I` on the 09-03 cell; G1–G3 CI; not a VPINN; founding bias collapse, not temperature collapse |
 | [09-18 remainder training](09-inventions/18-remainder-training.md) | concept | Loss is `R_N`; may trigger 03-13 birth; not 03-10 alone |
 | [09-19 jet distillation](09-inventions/19-jet-distillation.md) | concept | Student matches teacher N-jet; SSL matches 1-jets across views |
 | [09-20 homotopy continuation](09-inventions/20-homotopy-continuation.md) | concept | Path of problems; each step 08-04-accepted |

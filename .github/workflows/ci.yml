@@ -427,6 +427,14 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/materials_stack_design.py
+      - name: Run FTC-Net smoke (09-03 G1/G2/G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/ftc_net.py
+      - name: Run dual-FTC-training smoke (09-17 G1/G2/G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/dual_ftc_training.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

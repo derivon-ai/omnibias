@@ -6,7 +6,7 @@ Train with **two residuals at once**: a derivative residual and the
 closed-form **integral** of that residual. They must agree by the
 fundamental theorem.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 09-01, 09-03
 - **Blocks**: none
 
@@ -103,11 +103,11 @@ def dual_ftc_loss(I_fn, f_fn, xs, *, config: DualFTCConfig):
 
 ## 12. Implementation checklist
 
-- [ ] Dual-FTC loss twins
-- [ ] G1 identity test
-- [ ] `benchmarks/dual_ftc_training.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] Dual-FTC loss twins
+- [x] G1 identity test
+- [x] `benchmarks/dual_ftc_training.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

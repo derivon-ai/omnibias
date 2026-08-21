@@ -7,7 +7,7 @@ An architecture whose **cell is the `integral` role**
 fluxes, and derivative heads are the same pack read at bias collapse
 `delta -> 0`.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-01, 09-01
 - **Blocks**: 09-17
 
@@ -126,11 +126,11 @@ JAX: no Python-side mutation inside `jax.jit`.
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.{torch,jax}.architectures` FTC-Net
-- [ ] Tests of the worked FTC identities
-- [ ] `benchmarks/ftc_net.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.{torch,jax}.architectures` FTC-Net
+- [x] Tests of the worked FTC identities
+- [x] `benchmarks/ftc_net.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

@@ -1,0 +1,49 @@
+{
+  "schema": "omnibias.benchmarks.ftc_net.v1",
+  "generated_utc": "2026-08-21T19:32:50Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "ftc_net",
+    "full": false,
+    "honesty": {
+      "claimed_weak_form": false,
+      "claimed_vpinn": false,
+      "ccf_stretch_claim": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 813.4,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_ftc_identity",
+        "passed": true,
+        "collapse_err": 1.1102230246251565e-16,
+        "ftc_err": 0.0
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "ftc_median": 1.7046462588377054e-05,
+        "identity_median": 1.9316915771394605e-05,
+        "skill": 0.9999829535374116
+      },
+      {
+        "name": "g3_not_vpinn",
+        "passed": true,
+        "claimed_weak_form": false
+      }
+    ]
+  },
+  "disclaimer": "1-D FTC integral cell; not a VPINN, not a weak form, and not CCF stretch",
+  "wall_seconds": 1.3467126920004375
+}
