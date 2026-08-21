@@ -42,6 +42,8 @@ Public API:
   contraction raise and Newton / Banach budget (theory 08-08).
 * :class:`MomentSystem`, :func:`solve_rule` -- neural quadrature
   from pack moments with a Peano enclosure (theory 03-06).
+* :class:`ScaleBand`, :class:`ScaledPack`, :func:`rescale_pack` --
+  exact scale-flow algebra and linear coarse-graining (theory 03-07).
 
 There are no framework dependencies in this package.
 """
@@ -206,6 +208,20 @@ from omnibias.core.refine import (
     local_scale_from_derivatives,
     refine_bank,
 )
+from omnibias.core.scale import (
+    EffectiveOperator,
+    FlowSystem,
+    ScaleBand,
+    ScaledPack,
+    coarse_grain_linear,
+    eval_gaussian_derivative,
+    flow_coefficients,
+    gram_matrix,
+    overlap,
+    report_exponents,
+    rescale_pack,
+    stiffness_matrix,
+)
 from omnibias.core.sharpness import (
     SharpnessReport,
     SharpnessSchedule,
@@ -260,7 +276,9 @@ __all__ = [
     "DEQConfig",
     "DEQNotContractive",
     "DEQSolverUnknown",
+    "EffectiveOperator",
     "EqualitySystem",
+    "FlowSystem",
     "FrameSpec",
     "HardyAtom",
     "HardyDictionary",
@@ -283,6 +301,8 @@ __all__ = [
     "RefinePolicy",
     "RefineReport",
     "RefinedPack",
+    "ScaleBand",
+    "ScaledPack",
     "SharpnessReport",
     "SharpnessSchedule",
     "TensorFn",
@@ -315,6 +335,7 @@ __all__ = [
     "certified_truncation_radius",
     "certify_locus_point",
     "chain_rule_mse_blocks",
+    "coarse_grain_linear",
     "cole_hopf_u",
     "compile_bank",
     "contact_residual",
@@ -328,9 +349,12 @@ __all__ = [
     "dilated_sigma_n",
     "dkw_epsilon",
     "eigh_symmetric",
+    "eval_gaussian_derivative",
     "eval_tanh_derivative",
     "evaluate_hardy_dictionary",
+    "flow_coefficients",
     "gaussian_central_moments",
+    "gram_matrix",
     "hardy_conjugate_dictionary",
     "has_cumulant_tower",
     "hermite_coeffs",
@@ -360,6 +384,7 @@ __all__ = [
     "multiply_table",
     "num_multi_indices",
     "ombu_bias_block",
+    "overlap",
     "pack_moment",
     "peak_frequency",
     "peano_kernel",
@@ -374,7 +399,9 @@ __all__ = [
     "reject_full_parameter_jacobian",
     "reject_local_jet_flood",
     "relative_bandwidth",
+    "report_exponents",
     "require_invertible_sigma",
+    "rescale_pack",
     "resolve_block_mask",
     "response_profile",
     "run_model_line_search",
@@ -387,6 +414,7 @@ __all__ = [
     "solve_dense",
     "solve_rule",
     "spectral_radius_inf_bound",
+    "stiffness_matrix",
     "symmetrize",
     "tail_bound",
     "tanh_polynomial_coeffs",

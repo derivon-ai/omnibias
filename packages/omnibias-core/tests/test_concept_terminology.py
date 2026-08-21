@@ -106,6 +106,8 @@ PENALTY_FILES = (
     "packages/omnibias-shape/src/omnibias/shape/morphology/__init__.py",
     "packages/omnibias-core/src/omnibias/core/cubature.py",
     "packages/omnibias-fields/src/omnibias/fields/_core/quadrature.py",
+    "packages/omnibias-core/src/omnibias/core/scale.py",
+    "packages/omnibias-fields/src/omnibias/fields/scale.py",
 )
 
 

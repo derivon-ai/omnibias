@@ -7,7 +7,7 @@ a field means integrating out packs above a cutoff, and because the tower has an
 **exact scaling law** the flow of the effective parameters is computable rather
 than fitted.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-07, 02-07
 - **Blocks**: 03-13, 05-02
 
@@ -275,14 +275,14 @@ multigrid arm) single-level iteration.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-core/src/omnibias/core/scale.py`
-- [ ] `packages/omnibias-fields/src/omnibias/fields/scale.py`
-- [ ] Reuse the `tempered` combinator; do not reimplement the scaling law
-- [ ] Bit-exact rescaling round-trip test
-- [ ] Overlap validation against high-precision integration
-- [ ] Linear coarse-graining exactness test
-- [ ] `FlowSystem` refuses to report exponents without a truncation order
-- [ ] Curriculum arm added to the existing spectral-bias benchmark
-- [ ] `benchmarks/scale_flow.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] `packages/omnibias-core/src/omnibias/core/scale.py`
+- [x] `packages/omnibias-fields/src/omnibias/fields/scale.py`
+- [x] Reuse the `tempered` combinator; do not reimplement the scaling law
+- [x] Bit-exact rescaling round-trip test
+- [x] Overlap validation against high-precision integration
+- [x] Linear coarse-graining exactness test
+- [x] `FlowSystem` refuses to report exponents without a truncation order
+- [x] Curriculum arm added to the existing spectral-bias benchmark
+- [x] `benchmarks/scale_flow.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`

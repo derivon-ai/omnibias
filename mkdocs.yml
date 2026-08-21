@@ -191,6 +191,7 @@ nav:
       - sliced OT (03-04): api/sliced_ot.md
       - morphology (03-05): api/morphology.md
       - neural quadrature (03-06): api/neural_quadrature.md
+      - scale flow (03-07): api/scale_flow.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -258,6 +259,7 @@ nav:
       - Sliced optimal transport: cookbook/sliced-ot.md
       - Differentiable morphology: cookbook/morphology.md
       - Neural quadrature: cookbook/neural-quadrature.md
+      - Scale flow: cookbook/scale-flow.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — scale flow and coarse-graining (theory 03-07)
+
+- `omnibias.core.scale` plus `omnibias.fields.scale`: exact
+  `alpha^n` rescaling, closed-form gaussian overlaps, linear
+  Galerkin coarse-graining, a derived band schedule, and a
+  grid-free V-cycle. Nonlinear `FlowSystem` records the
+  truncation order and refuses exponents without it.
+- G1–G6 CI-gated. `alpha` is a tempering scale, not founding
+  bias collapse and not temperature collapse. Linear
+  coarse-graining is exact; nonlinear flow is truncated.
+- Docs: `docs/api/scale_flow.md`, `docs/cookbook/scale-flow.md`.
+  Smoke: `docs/benchmarks/scale_flow_smoke.json`.
+
 ### Added — neural quadrature (theory 03-06)
 
 - `omnibias.core.cubature`: moment-solved Gauss / pack quadrature

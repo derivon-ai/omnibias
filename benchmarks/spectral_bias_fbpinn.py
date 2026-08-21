@@ -11,7 +11,9 @@ eigenvalue decay does not apply.
 A parameter-matched ``lstsq_matched`` arm uses a feature count near the GD
 parameter budget so accuracy claims are not confounded with capacity. Per-arm
 wall-clock and peak RSS are recorded so speed / memory claims can be published
-honestly.
+honestly. Theory 03-07 adds :func:`scale_flow_window_scales`: a derived
+cutoff schedule from order-as-frequency, not a hand-tuned FBPINN window
+list. The default smoke arms are unchanged.
 
 Modes
 -----
@@ -28,6 +30,7 @@ Gates
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import resource
 import sys
@@ -58,6 +61,18 @@ from omnibias.pinn.torch.losses import (
 )
 
 DTYPE = torch.float64
+
+
+def scale_flow_window_scales(freq: int, n_levels: int = 3) -> tuple[float, ...]:
+    """Derived FBPINN-style scales from the 03-07 band schedule."""
+    from omnibias.fields.scale import scale_schedule
+
+    return scale_schedule(
+        target_band=lambda t: 2.0 * math.pi * (1.0 + (float(freq) - 1.0) * t),
+        steps=int(n_levels),
+        base="gaussian",
+        order=1,
+    )
 
 
 def _rss_mb() -> float:

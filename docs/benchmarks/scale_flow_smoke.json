@@ -1,0 +1,83 @@
+{
+  "schema": "omnibias.benchmarks.scale_flow.v1",
+  "generated_utc": "2026-08-21T18:09:15Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "scale_flow",
+    "full": false,
+    "honesty": {
+      "third_axis": true,
+      "founding_bias_collapse": false,
+      "temperature_collapse": false,
+      "linear_exact": true,
+      "nonlinear_truncated": true,
+      "exponent_requires_truncation_order": true
+    }
+  },
+  "rss_mb_at_start": 829.64,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_rescale",
+        "passed": true,
+        "worst_ulp": 0.0,
+        "detail": "orders 0..10, three decades"
+      },
+      {
+        "name": "g2_overlap",
+        "passed": true,
+        "rel": 5.548894677076532e-13,
+        "closed": -0.904248392247624,
+        "numeric": -0.9042483922481789
+      },
+      {
+        "name": "g3_linear",
+        "passed": true,
+        "worst": 5.699329896913241e-13,
+        "detail": "slow-subspace Galerkin"
+      },
+      {
+        "name": "g4_curriculum",
+        "passed": true,
+        "mse_hand": 0.009522917610496964,
+        "mse_derived": 0.00045683029319157483,
+        "verdict": "beats",
+        "derived_alphas": [
+          6.283185307179586,
+          28.274333882308138,
+          50.26548245743669
+        ],
+        "detail": "spectral-bias sinusoid f=8; hand-tuned (1,2,4) vs derived"
+      },
+      {
+        "name": "g5_vcycle",
+        "passed": true,
+        "reduction": 47.94508519681158,
+        "r_single": 0.059751428557466464,
+        "r_cycle": 0.03945252672439116,
+        "detail": "grid-free V-cycle vs four Jacobi sweeps"
+      },
+      {
+        "name": "g6_truncation",
+        "passed": true,
+        "study": [
+          1.0,
+          1.0,
+          1.0
+        ],
+        "truncation_order": 2,
+        "detail": "refuses without order; three-order study recorded"
+      }
+    ]
+  },
+  "wall_seconds": 0.4197015999816358
+}

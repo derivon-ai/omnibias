@@ -543,7 +543,12 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.cubature` (03-06; moment-solved quadrature +
   Peano enclosure; G1–G5 CI; founding bias collapse, not
   temperature collapse; refuses without a derivative bound;
-  no non-product cubature).
+  no non-product cubature) /
+  `omnibias.core.scale` plus `omnibias.fields.scale` (03-07;
+  exact `alpha^n` rescaling + linear coarse-graining + derived
+  band schedule; G1–G6 CI; `alpha` is a tempering scale, not
+  founding bias collapse and not temperature collapse;
+  nonlinear flow is a recorded truncation).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -581,7 +586,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/csp.md`](docs/api/csp.md),
   [`docs/api/sliced_ot.md`](docs/api/sliced_ot.md),
   [`docs/api/morphology.md`](docs/api/morphology.md),
-  [`docs/api/neural_quadrature.md`](docs/api/neural_quadrature.md). Cost /
+  [`docs/api/neural_quadrature.md`](docs/api/neural_quadrature.md),
+  [`docs/api/scale_flow.md`](docs/api/scale_flow.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

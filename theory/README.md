@@ -144,7 +144,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [03-04 sliced optimal transport](03-algorithms/04-sliced-optimal-transport-cdf.md) | gated | Exact 1-D `W_1` of activation mixtures + sliced average; G1–G6 CI; founding bias collapse, not temperature collapse; exact per slice, not sample-free; not Wasserstein |
 | [03-05 morphology and level sets](03-algorithms/05-differentiable-morphology-levelsets.md) | gated | Soft dilation / erosion via `logsumexp_beta`; G1–G6 CI; temperature collapse, not founding bias collapse; gap is worst-case; not a seventh OperatorBlock role |
 | [03-06 neural quadrature](03-algorithms/06-neural-quadrature-and-cubature.md) | gated | Moment-solved quadrature + Peano enclosure; G1–G5 CI; founding bias collapse, not temperature collapse; refuses without a derivative bound; no non-product cubature |
-| [03-07 scale flow and coarse-graining](03-algorithms/07-scale-flow-and-coarse-graining.md) | concept | Free energy, scale space, and schedules as geodesics |
+| [03-07 scale flow and coarse-graining](03-algorithms/07-scale-flow-and-coarse-graining.md) | gated | Exact `alpha^n` rescaling + linear coarse-graining + derived band schedule; G1–G6 CI; `alpha` is a tempering scale, not a collapse; nonlinear flow is a recorded truncation |
 | [03-08 certified scan localization](03-algorithms/08-certified-scan-localization.md) | designed | Sound "the feature is in this slab" statements |
 | [03-09 differentiable topology](03-algorithms/09-differentiable-topology-of-arrangements.md) | concept | Euler characteristic and persistence of a soft arrangement |
 | [03-10 jet-Pade singularity tracking](03-algorithms/10-jet-pade-singularity-tracking.md) | designed | High-order jets locate the nearest complex singularity |
