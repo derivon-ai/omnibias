@@ -196,6 +196,7 @@ nav:
       - differentiable topology (03-09): api/differentiable_topology.md
       - singularity tracking (03-10): api/singularity_tracking.md
       - Lie symmetry discovery (03-11): api/symmetry_discovery.md
+      - weak-form NS enclosure (07-02): api/ns_weak_form.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -268,6 +269,7 @@ nav:
       - Differentiable topology: cookbook/differentiable-topology.md
       - Jet-Padé singularity tracking: cookbook/singularity-tracking.md
       - Lie symmetry discovery: cookbook/symmetry-discovery.md
+      - Weak-form NS enclosure: cookbook/ns-weak-form.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

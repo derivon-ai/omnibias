@@ -564,7 +564,11 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.symbolic.symmetry` (03-11; Lie point symmetries
   as a determining-matrix nullspace; G1–G6 CI; founding bias
   collapse, not temperature collapse; in-ansatz only, not a
-  classification).
+  classification) /
+  `omnibias.pinn.certified.weak_form` (07-02; weak-form
+  width split + exact-jet Lohner; G1–G6 CI; founding bias
+  collapse, not temperature collapse; not a continuum
+  regularity claim).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -607,7 +611,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/certified_localization.md`](docs/api/certified_localization.md),
   [`docs/api/differentiable_topology.md`](docs/api/differentiable_topology.md),
   [`docs/api/singularity_tracking.md`](docs/api/singularity_tracking.md),
-  [`docs/api/symmetry_discovery.md`](docs/api/symmetry_discovery.md). Cost /
+  [`docs/api/symmetry_discovery.md`](docs/api/symmetry_discovery.md),
+  [`docs/api/ns_weak_form.md`](docs/api/ns_weak_form.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

@@ -97,7 +97,10 @@ certified `|x_s|` annulus; G1–G6 CI; founding bias collapse,
 not temperature collapse; diagnostic, not a blow-up proof),
 Lie symmetry discovery (03-11; determining-matrix nullspace;
 G1–G6 CI; founding bias collapse, not temperature collapse;
-in-ansatz point symmetries only, not a classification). Cost / wall-time / FermiNet-many-body gates are
+in-ansatz point symmetries only, not a classification),
+weak-form NS-adjacent enclosures (07-02; width split +
+exact-jet Lohner; G1–G6 CI; founding bias collapse, not
+temperature collapse; not a continuum regularity claim). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

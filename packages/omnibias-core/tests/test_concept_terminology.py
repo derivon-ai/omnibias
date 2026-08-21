@@ -119,6 +119,7 @@ PENALTY_FILES = (
     "packages/omnibias-fields/src/omnibias/fields/singularity.py",
     "packages/omnibias-symbolic/src/omnibias/symbolic/symmetry/_core.py",
     "packages/omnibias-symbolic/src/omnibias/symbolic/symmetry/__init__.py",
+    "packages/omnibias-pinn/src/omnibias/pinn/certified/weak_form.py",
 )
 
 

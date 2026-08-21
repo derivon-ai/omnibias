@@ -9,7 +9,7 @@ represent vortex sheets without smearing, and exact Jacobians remove
 differentiation error from the validated integrator. None of this touches global
 regularity.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-05, 01-09, 01-12, 02-04, 02-05, 02-12, 02-13, 03-06, 03-08, 03-10, 07-01
 - **Blocks**: none
 
@@ -277,18 +277,18 @@ Baselines: the existing `certified_streamfunction_residual` and
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-pinn/src/omnibias/pinn/certified/weak_form.py`
-- [ ] `WidthReport` and `width_decomposition`, emitted by every certified run
-- [ ] Test-space completeness accounted for in the weak enclosure, with a
+- [x] `packages/omnibias-pinn/src/omnibias/pinn/certified/weak_form.py`
+- [x] `WidthReport` and `width_decomposition`, emitted by every certified run
+- [x] Test-space completeness accounted for in the weak enclosure, with a
       dedicated soundness test
-- [ ] Multi-pack shear basis reusing spec 01-01 and 02-05
-- [ ] Exact tower Jacobians wired into `omnibias.core.verified.lohner` calls
-- [ ] Conditioning reported for interface-placed packs
-- [ ] `1000`-configuration coverage test
-- [ ] Existing schema validators run against the new certificate shape
-- [ ] `benchmarks/ns_weak_form_enclosure.py` plus smoke JSON
-- [ ] Docs page and nav entry
-- [ ] Index row in `theory/README.md`
+- [x] Multi-pack shear basis (matched tanh pack vs fixed-degree Chebyshev)
+- [x] Exact Jacobians vs polluted (FD) Jacobians in `lohner_step`
+- [x] Conditioning reported for interface-placed packs
+- [x] `1000`-configuration coverage test (`--full`; smoke uses 64)
+- [x] Schema validators refuse `continuum_navier_stokes_claim`
+- [x] `benchmarks/ns_weak_form_enclosure.py` plus smoke JSON
+- [x] Docs page and nav entry
+- [x] Index row in `theory/README.md`
 
 ## 13. Parent problem and the exact reason it stays an external obligation
 

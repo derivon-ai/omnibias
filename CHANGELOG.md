@@ -6,6 +6,20 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — weak-form NS-adjacent enclosures (theory 07-02)
+
+- `omnibias.pinn.certified.weak_form`: a width decomposition
+  (repr / quad / deriv / round) and a weak-form Taylor-Green
+  enclosure whose quadrature term is 2x narrower because the
+  Gauss piece is gone. Exact-jet Lohner vs a polluted Jacobian.
+- G1–G6 CI-gated. Jets are founding bias collapse
+  (`delta -> 0`), not temperature collapse. Finite box,
+  finite horizon, finite test space. Not a continuum
+  Navier-Stokes regularity claim.
+- Docs: `docs/api/ns_weak_form.md`,
+  `docs/cookbook/ns-weak-form.md`.
+  Smoke: `docs/benchmarks/ns_weak_form_enclosure_smoke.json`.
+
 ### Added — Lie symmetry discovery (theory 03-11)
 
 - `omnibias.symbolic.symmetry`: determining-matrix nullspace

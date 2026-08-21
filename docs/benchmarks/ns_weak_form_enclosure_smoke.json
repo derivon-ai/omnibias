@@ -1,0 +1,94 @@
+{
+  "schema": "omnibias.benchmarks.ns_weak_form_enclosure.v1",
+  "generated_utc": "2026-08-21T18:51:30Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "ns_weak_form_enclosure",
+    "full": false,
+    "honesty": {
+      "unproven_claim": false,
+      "continuum_navier_stokes_claim": false,
+      "three_d_claim": false,
+      "theorem_prover_verified": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "disclaimer": "finite box, finite horizon, finite test space; not a continuum Navier-Stokes regularity claim"
+    }
+  },
+  "rss_mb_at_start": 813.58,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_width_report",
+        "passed": true,
+        "report": {
+          "w_repr": 0.0,
+          "w_quad": 0.019276571095877652,
+          "w_deriv": 0.0,
+          "w_round": 2.220446049250313e-16,
+          "total": 0.019276571095877874,
+          "dominant": "quad"
+        }
+      },
+      {
+        "name": "g2_weak_narrower",
+        "passed": true,
+        "ratio": 2.0,
+        "strong_dominant": "quad",
+        "weak_dominant": "quad"
+      },
+      {
+        "name": "g3_coverage",
+        "passed": true,
+        "n": 64,
+        "misses": 0
+      },
+      {
+        "name": "g4_shear",
+        "passed": true,
+        "smooth": [
+          5.354284472153392,
+          29.90065207224639,
+          97.94250042356299,
+          332.2318297345671,
+          999.4711446414593
+        ],
+        "pack": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "conditioning": [
+          1.0000000000000004,
+          1.0000000000000004,
+          1.0000000000000004,
+          1.0000000000000004,
+          1.0000000000000004
+        ]
+      },
+      {
+        "name": "g5_horizon",
+        "passed": true,
+        "exact": 111,
+        "fd": 68,
+        "ratio": 1.6323529411764706
+      },
+      {
+        "name": "g6_honesty",
+        "passed": true
+      }
+    ]
+  },
+  "wall_seconds": 1.9328290220000781
+}
