@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — depth-causal local jet (theory 08-03)
+
+- `omnibias.core.local_jet` plus `omnibias.{torch,jax}.train_local`
+  twins: a reverse-depth local Gauss–Newton step on a named residual
+  (readout / invert-and-match / predictive coding) with a compressed
+  `k`-direction `layer_jet`. `n_directions >= n_params` raises
+  `LocalJetForbidden` unless `allow_full=True`. Not re-exported from
+  `omnibias.{torch,jax}.optim` (avoids an import cycle).
+- G1–G4 CI-gated. A greedy warm start, not a global min, not ImageNet,
+  and not CCF stretch. Bias collapse (`delta -> 0`) supplies the tower.
+  Not a rewrite of `omnibias.pinn.train`.
+- Docs: `docs/api/local_jet.md`,
+  `docs/cookbook/depth-causal-local-jet.md`.
+  Smoke: `docs/benchmarks/depth_causal_local_jet_smoke.json`.
+
 ### Added — block / coordinate exact search (theory 08-07)
 
 - `omnibias.core.block_search` plus

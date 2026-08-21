@@ -106,6 +106,12 @@ generalization claim. Documented in full at
 (theory 08-07). A coordinate sweep, not a global solver. Documented in
 full at [block_exact_search.md](block_exact_search.md).
 
+## Depth-causal local jet
+
+Named local Gauss–Newton plus a compressed `k`-direction `layer_jet`
+(theory 08-03). Greedy warm start, not a global min. Documented in
+full at [local_jet.md](local_jet.md).
+
 ## Hierarchical pack tree
 
 1-D near/far split (theory 02-07). `eta=0` is bit-identical to the

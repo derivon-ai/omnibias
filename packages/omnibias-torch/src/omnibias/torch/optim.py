@@ -54,6 +54,10 @@ This module provides
 * :func:`block_exact_search` -- theory 08-07: 03-12 line search on one
   named or masked block (last linear / OMBU bias / arrangement ``W``)
   with ``verify=True``. A coordinate sweep, not a global solver.
+* :func:`omnibias.torch.train_local.local_jet_step` -- theory 08-03:
+  depth-causal local Gauss-Newton on a named residual plus a
+  compressed ``k``-direction ``layer_jet``. Not a rewrite of
+  ``omnibias.pinn.train``.
 * :func:`omnibias.torch.line_search.jet_line_search` -- theory 03-12: certified
   truncation radius, Wolfe-as-interval, ``verify=True`` never-worse backstop
   (re-exported below). :func:`taylor_line_min` remains the order-2/3 autodiff

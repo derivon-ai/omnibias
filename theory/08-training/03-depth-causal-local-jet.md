@@ -7,7 +7,7 @@ before the final loss is known, so training can be causal in depth: each
 layer does a local Gauss–Newton step on a named local residual and pushes
 a compressed jet to the next layer.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-10, 08-01
 - **Blocks**: none
 
@@ -104,30 +104,35 @@ alternating sweep).
 
 ## 6. Proposed API
 
-Does not exist yet. Bit-identical torch / jax twins; default dtype.
+Shipped as `omnibias.{torch,jax}.train_local`. Bit-identical torch / jax
+twins; default dtype.
 
 ```python
-# omnibias/torch/train_local.py  (and jax twin) — proposed
+# omnibias/torch/train_local.py  (and jax twin)
 @dataclass(frozen=True)
 class LocalJetConfig:
     n_directions: int = 4
     jet_order: int = 1
     damping: float = 1e-4
     variant: str = "readout"   # readout | invert | predcode
+    allow_full: bool = False
+    refit_last: bool = True
 
 class LocalJetForbidden(ValueError):
     """Raised when the caller requests a full d h / d theta."""
 
 def local_jet_step(
-    layers, x, local_residual_fn, *, config: LocalJetConfig,
-) -> tuple[list, dict]:
-    """One depth-causal sweep. Must raise LocalJetForbidden if
-    n_directions >= n_params without an explicit override."""
+    layers, x, *, config: LocalJetConfig, target=None,
+    local_residual_fn=None, allow_full=None,
+) -> tuple[list, LocalJetReport]:
+    """One reverse-depth local GN sweep, then a forward layer_jet.
+    Raises LocalJetForbidden if n_directions >= n_params without
+    allow_full."""
 ```
 
 JAX: `local_residual_fn` must be a pure function of activations; no
-Python-side mutation inside `jax.jit`. A `lax.scan` over layers is
-the intended trace.
+Python-side mutation inside `jax.jit`. The driver itself is not
+`jax.jit`-wrapped.
 
 ## 7. Practical use cases
 
@@ -182,12 +187,12 @@ the intended trace.
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.{torch,jax}.train_local` (or `optim` helpers)
-- [ ] `LocalJetForbidden` on full Jacobians
-- [ ] Tests for invert / predcode variants
-- [ ] `benchmarks/depth_causal_local_jet.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.{torch,jax}.train_local` (or `optim` helpers)
+- [x] `LocalJetForbidden` on full Jacobians
+- [x] Tests for invert / predcode variants
+- [x] `benchmarks/depth_causal_local_jet.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

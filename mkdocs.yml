@@ -180,6 +180,7 @@ nav:
       - Kantorovich-accepted Newton (08-04): api/kantorovich_newton.md
       - sharpness-scheduled step (08-06): api/sharpness_schedule.md
       - block exact search (08-07): api/block_exact_search.md
+      - depth-causal local jet (08-03): api/local_jet.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -236,6 +237,7 @@ nav:
       - Kantorovich-accepted Newton: cookbook/kantorovich-newton.md
       - Sharpness-scheduled cubic step: cookbook/sharpness-schedule.md
       - Block exact search: cookbook/block-exact-search.md
+      - Depth-causal local jet: cookbook/depth-causal-local-jet.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

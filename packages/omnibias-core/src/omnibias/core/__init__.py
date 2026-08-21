@@ -36,6 +36,8 @@ Public API:
   ``lambda_max`` to cubic ``sigma`` or a learning rate (theory 08-06).
 * :class:`BlockSpec`, :func:`block_exact_search` algebra -- structured
   03-12 search on one coordinate block (theory 08-07).
+* :class:`LocalJetConfig`, :class:`LocalJetForbidden` -- depth-causal
+  local jet flood forbid and invert-and-match (theory 08-03).
 
 There are no framework dependencies in this package.
 """
@@ -108,6 +110,15 @@ from omnibias.core.line_search import (
     run_model_line_search,
     select_model_step,
     taylor_coeffs_from_derivatives,
+)
+from omnibias.core.local_jet import (
+    LocalJetConfig,
+    LocalJetForbidden,
+    LocalJetReport,
+    invert_sigma,
+    mlp_param_count,
+    reject_local_jet_flood,
+    require_invertible_sigma,
 )
 from omnibias.core.locus import (
     AffineSet,
@@ -231,6 +242,9 @@ __all__ = [
     "Layer",
     "LineSearchResult",
     "LinearizingTransform",
+    "LocalJetConfig",
+    "LocalJetForbidden",
+    "LocalJetReport",
     "MollifierSpec",
     "MultiPackSpec",
     "NewtonResult",
@@ -294,6 +308,7 @@ __all__ = [
     "hp_decision",
     "incidence_matrix",
     "index_position",
+    "invert_sigma",
     "is_admissible",
     "is_cdf_activation",
     "is_holonomic",
@@ -305,6 +320,7 @@ __all__ = [
     "make_tempered_fastpath",
     "make_tempered_transforms",
     "mish_inner_coeffs",
+    "mlp_param_count",
     "moments",
     "multi_index_factorial",
     "multi_indices",
@@ -319,7 +335,9 @@ __all__ = [
     "refine_bank",
     "registered_activations",
     "reject_full_parameter_jacobian",
+    "reject_local_jet_flood",
     "relative_bandwidth",
+    "require_invertible_sigma",
     "resolve_block_mask",
     "response_profile",
     "run_model_line_search",

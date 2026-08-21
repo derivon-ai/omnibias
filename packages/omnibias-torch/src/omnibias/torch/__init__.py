@@ -170,6 +170,15 @@ from omnibias.torch.refine import AdaptivePackBank, grow_ombu, refine
 from omnibias.torch.scan import BankSpec, BiasScan, scan_response, soft_argmax_offset
 from omnibias.torch.scan_equivariant import EquivariantScan, steerable_basis
 from omnibias.torch.tempered_blocks import LearnablePReLU, TemperedActivation
+from omnibias.torch.train_local import (
+    LocalJetConfig,
+    LocalJetForbidden,
+    LocalJetReport,
+    LocalLayerState,
+    invert_sigma,
+    local_jet_step,
+    make_input_jet,
+)
 from omnibias.torch.transforms import (
     FourierTransform,
     LaplaceTransform,
@@ -213,6 +222,10 @@ __all__ = [
     "LaplaceTransform",
     "LearnablePReLU",
     "LineSearchResult",
+    "LocalJetConfig",
+    "LocalJetForbidden",
+    "LocalJetReport",
+    "LocalLayerState",
     "MellinTransform",
     "MultiPackUnit",
     "OMBU",
@@ -266,6 +279,7 @@ __all__ = [
     "hierarchical_scan",
     "hilbert_coeffs",
     "identity_jet",
+    "invert_sigma",
     "is_registered",
     "jet_attention",
     "jet_exp",
@@ -290,6 +304,8 @@ __all__ = [
     "lhopital_ratio",
     "limit_of_ratio",
     "list_activations",
+    "local_jet_step",
+    "make_input_jet",
     "mellin_transform",
     "mlp_jet",
     "mlp_jet_mv",

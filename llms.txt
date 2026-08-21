@@ -52,7 +52,9 @@ map; G1–G3 CI; not a continuum PDE claim), sharpness-scheduled step
 (08-06; exact-HVP `lambda_max` sets cubic `sigma`; G1–G3 CI;
 step-size signal, not a generalization claim), block exact search
 (08-07; 03-12 on a named block; G1–G4 CI; coordinate sweep, not a
-global solver). Cost / wall-time / FermiNet-many-body gates are
+global solver), depth-causal local jet (08-03; named local GN +
+`k`-direction `layer_jet`; G1–G4 CI; greedy warm start, not
+ImageNet). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the

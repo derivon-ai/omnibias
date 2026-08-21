@@ -99,6 +99,8 @@ Sharpness-scheduled step (theory 08-06) lives in
 Block exact search (theory 08-07) lives in
 `omnibias.jax.optim_block_search` and is re-exported here; see
 [block_exact_search.md](block_exact_search.md).
+Depth-causal local jet (theory 08-03) lives in
+`omnibias.jax.train_local`; see [local_jet.md](local_jet.md).
 
 ::: omnibias.jax.optim
     options:

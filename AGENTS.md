@@ -505,7 +505,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   generalization claim) /
   `omnibias.core.block_search` /
   `omnibias.{torch,jax}.optim_block_search` (08-07; 03-12 on a named
-  block; G1–G4 CI; coordinate sweep, not a global solver).
+  block; G1–G4 CI; coordinate sweep, not a global solver) /
+  `omnibias.core.local_jet` /
+  `omnibias.{torch,jax}.train_local` (08-03; depth-causal local GN +
+  `k`-direction `layer_jet`; G1–G4 CI; greedy warm start, not ImageNet).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -532,7 +535,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/composed_curvature.md`](docs/api/composed_curvature.md),
   [`docs/api/kantorovich_newton.md`](docs/api/kantorovich_newton.md),
   [`docs/api/sharpness_schedule.md`](docs/api/sharpness_schedule.md),
-  [`docs/api/block_exact_search.md`](docs/api/block_exact_search.md). Cost /
+  [`docs/api/block_exact_search.md`](docs/api/block_exact_search.md),
+  [`docs/api/local_jet.md`](docs/api/local_jet.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

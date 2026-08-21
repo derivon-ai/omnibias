@@ -207,6 +207,15 @@ from omnibias.jax.scan import (
     soft_argmax_offset,
 )
 from omnibias.jax.scan_equivariant import equivariant_scan_apply, steerable_basis
+from omnibias.jax.train_local import (
+    LocalJetConfig,
+    LocalJetForbidden,
+    LocalJetReport,
+    LocalLayerState,
+    invert_sigma,
+    local_jet_step,
+    make_input_jet,
+)
 from omnibias.jax.transforms import (
     FourierTransform,
     LaplaceTransform,
@@ -238,6 +247,10 @@ __all__ = [
     "KantorovichAccept",
     "LaplaceTransform",
     "LineSearchResult",
+    "LocalJetConfig",
+    "LocalJetForbidden",
+    "LocalJetReport",
+    "LocalLayerState",
     "MellinTransform",
     "SharpnessReport",
     "SharpnessSchedule",
@@ -289,6 +302,7 @@ __all__ = [
     "init_bias_scan",
     "init_multipack",
     "init_pack_bank",
+    "invert_sigma",
     "is_registered",
     "jet_attention",
     "jet_exp",
@@ -313,8 +327,10 @@ __all__ = [
     "lhopital_ratio",
     "limit_of_ratio",
     "list_activations",
+    "local_jet_step",
     "make_bo_force",
     "make_bo_hessian",
+    "make_input_jet",
     "make_local_energy",
     "mellin_transform",
     "mlp_jet",

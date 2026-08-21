@@ -1,0 +1,119 @@
+{
+  "schema": "omnibias.benchmarks.depth_causal_local_jet.v1",
+  "generated_utc": "2026-08-21T16:22:49Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "depth_causal_local_jet",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "ccf_stretch_cleared": false,
+      "global_min_claim": false,
+      "greedy_only_claimed_optimal": false,
+      "temperature_collapse": false
+    }
+  },
+  "rss_mb_at_start": 1514.47,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_forbid_flood",
+        "passed": true,
+        "note": "n_directions >= n_params without allow_full raises LocalJetForbidden"
+      },
+      {
+        "name": "g2_warm_start",
+        "passed": true,
+        "n_seeds": 5,
+        "n_warm_better": 2,
+        "max_warm_mse": 6.50345508851825e-05,
+        "max_cold_mse": 2.500901595149698e-07,
+        "pde_mse_max": 0.001,
+        "gn_steps": 50,
+        "rows": [
+          {
+            "seed": 0,
+            "warm_mse": 1.4790966574541514e-08,
+            "cold_mse": 3.548483019607586e-08,
+            "greedy_mse": 0.13147777654628048,
+            "skill_warm": 0.9999999999991812,
+            "skill_cold": 0.9999999997049842,
+            "skill_greedy": 0.9999884815872896,
+            "warm_better": true,
+            "greedy_only_claimed_optimal": false
+          },
+          {
+            "seed": 1,
+            "warm_mse": 4.900733870305259e-08,
+            "cold_mse": 7.202579618848417e-08,
+            "greedy_mse": 1.4687630503930177e-05,
+            "skill_warm": 0.9999999998947605,
+            "skill_cold": 0.9999999999962276,
+            "skill_greedy": 0.9999999987820827,
+            "warm_better": true,
+            "greedy_only_claimed_optimal": false
+          },
+          {
+            "seed": 2,
+            "warm_mse": 6.50345508851825e-05,
+            "cold_mse": 2.500901595149698e-07,
+            "greedy_mse": 0.030917701823608052,
+            "skill_warm": 0.9999999855580685,
+            "skill_cold": 0.9999999999224446,
+            "skill_greedy": 0.9999977863103042,
+            "warm_better": false,
+            "greedy_only_claimed_optimal": false
+          },
+          {
+            "seed": 3,
+            "warm_mse": 2.0156832389015267e-07,
+            "cold_mse": 1.4516417829879513e-07,
+            "greedy_mse": 0.003130560068549712,
+            "skill_warm": 0.9999999998808117,
+            "skill_cold": 0.999999997064822,
+            "skill_greedy": 0.9999998245336514,
+            "warm_better": false,
+            "greedy_only_claimed_optimal": false
+          },
+          {
+            "seed": 4,
+            "warm_mse": 8.599144589137235e-08,
+            "cold_mse": 3.5944750114064714e-08,
+            "greedy_mse": 0.45236571035787826,
+            "skill_warm": 0.9999999998687105,
+            "skill_cold": 0.9999999999822051,
+            "skill_greedy": 0.9999059945818065,
+            "warm_better": false,
+            "greedy_only_claimed_optimal": false
+          }
+        ],
+        "note": "Named 1-D Poisson -u_xx = pi^2 sin(pi x) on [-1,1] with hard BC (1-x^2) * MLP. Local-jet readout matches u*/(1-x^2), then 50 QR GaussNewton. Skill vs u=0. Not a global min and not CCF stretch."
+      },
+      {
+        "name": "g3_greedy_honesty",
+        "passed": true,
+        "greedy_only_claimed_optimal": false,
+        "max_greedy_mse": 0.45236571035787826,
+        "max_warm_mse": 6.50345508851825e-05,
+        "note": "A local-only arm is reported and is not written as optimal."
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "w_gap": 0.0,
+        "v_gap": 0.0,
+        "yhat": 1.0
+      }
+    ]
+  },
+  "wall_seconds": 3.4252852619974874
+}

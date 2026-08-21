@@ -35,6 +35,10 @@ This module provides
   learning rate from that value. Hutchinson is not the method.
 * :func:`block_exact_search` -- theory 08-07: 03-12 line search on one
   named or masked block with ``verify=True``.
+* :func:`omnibias.jax.train_local.local_jet_step` -- theory 08-03:
+  depth-causal local Gauss-Newton on a named residual plus a
+  compressed ``k``-direction ``layer_jet``. Not a rewrite of
+  ``omnibias.pinn.train``.
 * :func:`gauss_newton_step` / :func:`gauss_newton_minimize` -- an adaptive-damping LM
   loop driven by a ``residual_fn``.
 * :func:`grad_norm_weights` -- self-adaptive loss weights that equalise the per-term

@@ -179,6 +179,11 @@ Exact-HVP Lanczos `lambda_max` sets cubic `sigma`. See
 [block_exact_search.md](block_exact_search.md). Re-exported from
 `omnibias.torch.optim`.
 
+## Depth-causal local jet (08-03)
+
+Forward `layer_jet` plus a named local Gauss–Newton step. See
+[local_jet.md](local_jet.md). Lives in `omnibias.torch.train_local`.
+
 ## Fastpath kernels
 
 ::: omnibias.torch.fastpath
