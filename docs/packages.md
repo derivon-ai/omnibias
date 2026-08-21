@@ -101,7 +101,7 @@ their parent distribution and are guarded by
 - `omnibias.score.flow` -- continuous normalizing flows (in `omnibias-score`).
 - `omnibias.pinn.solver` -- the PDE solver (in `omnibias-pinn`).
 - `omnibias.pinn.operator` -- neural operator learning: DeepONet closed-form trunk jet through order 4 (KS residual unchanged) + FNO baseline + multi-head conditioning (in `omnibias-pinn`).
-- `omnibias.pinn.train` -- causal marching drivers + causality / trivial-solution diagnostics + spectral band scheduler (in `omnibias-pinn`).
+- `omnibias.pinn.train` -- causal marching drivers + causality / trivial-solution diagnostics + spectral band scheduler + depth-causal residual (08-05) (in `omnibias-pinn`).
 - `omnibias.pinn.domain` -- SDF / R-function geometry + distance-constrained hard BCs (in `omnibias-pinn`).
 - `omnibias.geometry.gauge` -- the non-abelian gauge engine (in `omnibias-geometry`).
 

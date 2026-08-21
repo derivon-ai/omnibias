@@ -54,7 +54,8 @@ step-size signal, not a generalization claim), block exact search
 (08-07; 03-12 on a named block; G1–G4 CI; coordinate sweep, not a
 global solver), depth-causal local jet (08-03; named local GN +
 `k`-direction `layer_jet`; G1–G4 CI; greedy warm start, not
-ImageNet). Cost / wall-time / FermiNet-many-body gates are
+ImageNet), depth-causal residual (08-05; PDE residual marched in
+network depth; G1–G3 CI; not time marching, not CCF Hilbert). Cost / wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 
 The dictionary also carries **closed-form integral transforms** of the
@@ -112,7 +113,9 @@ seed-fragile on median (5/8) against the ≥6/8 rule; FNO baseline stays FFT-bas
 residual enclosure is not a solution-error bound; accuracy is optimised not proven;
 zero-shot parametric heat gate closed in `benchmarks/operator_zero_shot.py` with
 ETDRK4 / maximum-principle reference); also `omnibias.pinn.train` (gated causal
-marching; heat vs Krishnapriyan reaction families in `benchmarks/causal_marching.py`),
+marching; heat vs Krishnapriyan reaction families in `benchmarks/causal_marching.py`;
+depth-causal residual 08-05 marches the PDE residual in network depth,
+not time),
 `omnibias.pinn.domain` (SDF hard cages), and one-shot `solve_least_squares` /
 `benchmarks/spectral_bias_fbpinn.py`; absolute gates via `benchmarks/_gates.py`
 with smoke `*_smoke.json` vs `--full` acceptance JSON; matrix at

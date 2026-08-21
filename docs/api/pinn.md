@@ -40,7 +40,7 @@ Four alpha submodules of Beta `omnibias-pinn` host the gated research surface
 | Submodule | Role | Docs |
 | --- | --- | --- |
 | `omnibias.pinn.solver` | Mesh-free PDE solver, stiff ETDRK4 / Rosenbrock, least-squares collocation | [pinn-solver.md](pinn-solver.md) |
-| `omnibias.pinn.train` | Causal `march_solve`, causality / trivial-solution diagnostics | [pinn-train.md](pinn-train.md) |
+| `omnibias.pinn.train` | Causal `march_solve`, causality / trivial-solution diagnostics, depth-causal residual (08-05) | [pinn-train.md](pinn-train.md) |
 | `omnibias.pinn.domain` | SDF / R-function geometry + hard curved BCs | [pinn-domain.md](pinn-domain.md) |
 | `omnibias.pinn.operator` | DeepONet / FNO + multi-head conditioning | [pinn-operator.md](pinn-operator.md) |
 
@@ -659,7 +659,7 @@ for the hard-cage + `ic_fn` pattern. The acceptance artifact is
 
 | Submodule | Role |
 | --- | --- |
-| [`omnibias.pinn.train`](pinn-train.md) | Causal `march_solve`, causality / trivial-solution diagnostics |
+| [`omnibias.pinn.train`](pinn-train.md) | Causal `march_solve`, causality / trivial-solution diagnostics, depth-causal residual (08-05) |
 | [`omnibias.pinn.domain`](pinn-domain.md) | SDF / R-function geometry, `DistanceConstrainedField` |
 | [`omnibias.pinn.operator`](pinn-operator.md) | DeepONet / FNO + multi-head conditioning, ETDRK4 references |
 | [`omnibias.pinn.interface`](interface.md) | Gated transmission PINN (02-05); `alpha -> inf` is sharpening. **Not** the XPINN seam glue in `omnibias.pinn._core.interface` |

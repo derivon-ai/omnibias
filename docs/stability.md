@@ -112,7 +112,7 @@ public surface is
 | `diagnostics.{relative_l2_per_time, forecast_horizon, spectral_fidelity}` | stable | Backend-agnostic NumPy. |
 | `diagnostics.field_stability` | experimental | autograd-vs-closed-form benchmarks. |
 | `omnibias.pinn.solver` | experimental (alpha) | Mesh-free PDE solver; stiff ETDRK4 / Rosenbrock steppers; least-squares collocation. |
-| `omnibias.pinn.train` | experimental (alpha) | Causal `march_solve`, causality / trivial-solution diagnostics, `SpectralBandScheduler`. |
+| `omnibias.pinn.train` | experimental (alpha) | Causal `march_solve`, causality / trivial-solution diagnostics, `SpectralBandScheduler`, depth-causal residual (08-05). |
 | `omnibias.pinn.domain` | experimental (alpha) | SDF / R-function geometry + `DistanceConstrainedField` hard curved BCs. |
 | `omnibias.pinn.operator` | experimental (alpha) | DeepONet / FNO + multi-head conditioning; residual certificates. |
 

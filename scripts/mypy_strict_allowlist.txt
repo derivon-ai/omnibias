@@ -59,5 +59,6 @@ packages/omnibias-pinn/src/omnibias/pinn/train/__init__.py
 packages/omnibias-pinn/src/omnibias/pinn/train/_core/__init__.py
 packages/omnibias-pinn/src/omnibias/pinn/train/_core/bands.py
 packages/omnibias-pinn/src/omnibias/pinn/train/_core/causality.py
+packages/omnibias-pinn/src/omnibias/pinn/train/_core/depth_residual.py
 packages/omnibias-pinn/src/omnibias/pinn/train/_core/guards.py
 packages/omnibias-pinn/src/omnibias/pinn/_core/fbpinn.py

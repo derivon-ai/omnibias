@@ -6,6 +6,24 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — depth-causal residual (theory 08-05)
+
+- `omnibias.pinn.train._core.depth_residual` plus
+  `omnibias.pinn.train.{torch,jax}.depth_residual` twins: after each
+  hidden layer a linear decode is a field, the PDE residual is formed
+  from a closed-form `layer_jet` / `jet_to_tower`, and a damped
+  Gauss–Newton step updates only that layer. Not a rewrite of time
+  marching. Distinct from 08-03 (proxy residual).
+- G1–G3 CI-gated. A greedy depth march, not a global min, not CCF
+  stretch, and not Hilbert. Bias collapse (`delta -> 0`) supplies the
+  tower. Honesty keys are sealed
+  (`navier_stokes_proof_claim` / `stretch_1e-13_cleared` false,
+  `hilbert_not_in_scope` true).
+- Docs: `docs/api/depth_residual.md`,
+  `docs/cookbook/depth-causal-residual.md`.
+  Smoke: `docs/benchmarks/depth_causal_residual_smoke.json`.
+
+
 ### Added — depth-causal local jet (theory 08-03)
 
 - `omnibias.core.local_jet` plus `omnibias.{torch,jax}.train_local`

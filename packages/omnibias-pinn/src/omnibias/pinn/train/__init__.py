@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""omnibias.pinn.train: causal marching drivers and training diagnostics.
+"""omnibias.pinn.train: causal marching drivers, depth residual, diagnostics.
 
 Closes the loop that
 :class:`~omnibias.pinn._core.marching.TimeMarcher` deliberately left open:
@@ -27,9 +27,18 @@ from __future__ import annotations
 
 from omnibias.pinn.train._core import (
     CausalityReport,
+    DepthResidualConfig,
+    DepthResidualForbidden,
+    DepthResidualReport,
     SpectralBandScheduler,
     TrivialSolutionVerdict,
+    apply_hard_bc_tower,
     causality_index,
+    hard_bc_mask_tower,
+    honesty_payload,
+    layer_is_unlocked,
+    leibniz_product_tower,
+    reject_depth_residual_flood,
     report_causality,
     trivial_solution_guard,
     unlocked_fraction,
@@ -37,9 +46,18 @@ from omnibias.pinn.train._core import (
 
 __all__ = [
     "CausalityReport",
+    "DepthResidualConfig",
+    "DepthResidualForbidden",
+    "DepthResidualReport",
     "SpectralBandScheduler",
     "TrivialSolutionVerdict",
+    "apply_hard_bc_tower",
     "causality_index",
+    "hard_bc_mask_tower",
+    "honesty_payload",
+    "layer_is_unlocked",
+    "leibniz_product_tower",
+    "reject_depth_residual_flood",
     "report_causality",
     "trivial_solution_guard",
     "unlocked_fraction",

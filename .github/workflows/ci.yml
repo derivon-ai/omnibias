@@ -331,6 +331,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/depth_causal_local_jet.py
+      - name: Run depth-causal-residual smoke (08-05 G1/G2/G3)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/depth_causal_residual.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

@@ -1,0 +1,109 @@
+{
+  "schema": "omnibias.benchmarks.depth_causal_residual.v1",
+  "generated_utc": "2026-08-21T16:37:00Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "depth_causal_residual",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "stretch_1e-13_cleared": false,
+      "hilbert_not_in_scope": true,
+      "greedy_only_claimed_optimal": false
+    }
+  },
+  "rss_mb_at_start": 1419.44,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_last_layer",
+        "passed": true,
+        "n_seeds": 5,
+        "n_depth_leq_last": 3,
+        "mean_depth_mse": 14.466296827847312,
+        "mean_last_mse": 106.86017448514168,
+        "max_depth_mse": 45.799528325084516,
+        "pde_mse_max": 50.0,
+        "zero_field_mse": 51.02380958923938,
+        "gn_steps_per_arm": 20,
+        "rows": [
+          {
+            "seed": 0,
+            "depth_mse": 45.799528325084516,
+            "last_mse": 7.843202207917492,
+            "skill_depth": 0.9817849487339262,
+            "skill_last": 0.9757723864246035,
+            "depth_leq_last": false,
+            "n_gn_steps": 20
+          },
+          {
+            "seed": 1,
+            "depth_mse": 10.707251118220556,
+            "last_mse": 439.35825957421537,
+            "skill_depth": 0.981499404387079,
+            "skill_last": 0.8411640581434112,
+            "depth_leq_last": true,
+            "n_gn_steps": 20
+          },
+          {
+            "seed": 2,
+            "depth_mse": 0.13830024727930573,
+            "last_mse": 7.843202199255368,
+            "skill_depth": 0.9999920336919538,
+            "skill_last": 0.975772386428837,
+            "depth_leq_last": true,
+            "n_gn_steps": 20
+          },
+          {
+            "seed": 3,
+            "depth_mse": 7.843202249405966,
+            "last_mse": 71.41385575024394,
+            "skill_depth": 0.9757723862393392,
+            "skill_last": 0.9908851094207383,
+            "depth_leq_last": true,
+            "n_gn_steps": 20
+          },
+          {
+            "seed": 4,
+            "depth_mse": 7.843202199246217,
+            "last_mse": 7.842352694076233,
+            "skill_depth": 0.9757723864288563,
+            "skill_last": 0.975770848883072,
+            "depth_leq_last": false,
+            "n_gn_steps": 20
+          }
+        ],
+        "note": "Named 1-D Poisson -u_xx = pi^2 sin(pi x) on (0, 1) with hard BC x(1-x) * decode(h). Two tanh hidden layers, widths 8 then 2. 10 GN steps per layer; last-layer-only gets the matched budget on the last block. Skill vs u=0. Not a global min and not CCF stretch."
+      },
+      {
+        "name": "g2_honesty",
+        "passed": true,
+        "honesty": {
+          "navier_stokes_proof_claim": false,
+          "stretch_1e-13_cleared": false,
+          "hilbert_not_in_scope": true,
+          "greedy_only_claimed_optimal": false
+        },
+        "flood_raises": true,
+        "note": "Artifact honesty keys are sealed. Hilbert is out of scope. n_directions >= n_params raises DepthResidualForbidden."
+      },
+      {
+        "name": "g3_parity",
+        "passed": true,
+        "w_gap": 2.8990143619012088e-11,
+        "v_gap": 1.4221512856238405e-11,
+        "residual_gap": 8.313350008393172e-11
+      }
+    ]
+  },
+  "wall_seconds": 5.785323707037605
+}

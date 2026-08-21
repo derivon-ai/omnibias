@@ -6,7 +6,7 @@ Every hidden layer emits a spatial jet of the field `u` and a cheap PDE
 residual, so training can **march in network depth** the way
 `omnibias.pinn.train` already marches in physical time.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-10, 08-01, 08-03
 - **Blocks**: none
 
@@ -161,12 +161,12 @@ unless labelled `NUMERICAL`.
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.pinn.train._core.depth_residual` plus torch/jax drivers
-- [ ] Reuse `mlp_jet` / field Laplacian; no FD unless labelled
-- [ ] Tests: G1 Poisson, G2 honesty keys, G3 parity
-- [ ] `benchmarks/depth_causal_residual.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.pinn.train._core.depth_residual` plus torch/jax drivers
+- [x] Reuse `mlp_jet` / field Laplacian; no FD unless labelled
+- [x] Tests: G1 Poisson, G2 honesty keys, G3 parity
+- [x] `benchmarks/depth_causal_residual.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

@@ -152,6 +152,7 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | Neural operator spectral-conv (FNO 1-D / 2-D) | FFT multiply | numerical | `omnibias.pinn.operator` |
 | Operator multi-head conditioning (params / BC / geometry) | LayerNorm head encoders + fusion MLP; **width-1 parameter heads skip LayerNorm** (`nn.Identity`) so a scalar diffusivity is not collapsed to 0 | numerical | `omnibias.pinn.operator.ConditioningSpec` |
 | Causal time-marching PINN training | Wang–Perdikaris weights + gated window ladder | numerical | `omnibias.pinn.train` |
+| Depth-causal residual (08-05) | PDE residual of a per-layer decode + local GN | closed-form jet; numerical GN | `omnibias.pinn.train.{torch,jax}.depth_residual` (not time marching; not CCF Hilbert) |
 | Causality / trivial-solution diagnostics | inversion fraction / same-time variance | measurement | `omnibias.pinn.train` |
 | Curved-boundary hard Dirichlet (`u = g + φ·NN`) | SDF / ADF multiplicative cage | exact on `φ=0`; `φ` autodiff-exact | `omnibias.pinn.domain` |
 | Curved Neumann / Robin (smooth primitives) | normalized-distance factor modes | by construction where normals exist | `omnibias.pinn.domain.torch.DistanceConstrainedField` |

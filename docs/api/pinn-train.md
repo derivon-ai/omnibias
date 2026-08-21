@@ -1,9 +1,12 @@
-# omnibias.pinn.train (causal marching + diagnostics)
+# omnibias.pinn.train (causal marching + depth residual)
 
 Training drivers that close the loop
 [`TimeMarcher`](../api/pinn.md) deliberately left open: per-window
 optimisation, Wang–Perdikaris causal weights, warm-start handoff, and
 diagnostics for temporal discordance and trivial-solution collapse.
+Spec 08-05 adds a sibling that marches the **PDE residual in network
+depth** (`depth_residual_sweep`); it is not a rewrite of time marching
+and is not CCF Hilbert. See [depth_residual.md](depth_residual.md).
 
 Maturity: **alpha** submodule of Beta `omnibias-pinn`.
 
@@ -49,6 +52,9 @@ Capability matrix:
         - unlocked_fraction
         - report_causality
         - trivial_solution_guard
+        - DepthResidualConfig
+        - DepthResidualReport
+        - honesty_payload
 
 ## Torch driver
 
@@ -60,6 +66,9 @@ Capability matrix:
         - MarchResult
         - WindowResult
         - march_solve
+        - depth_residual_sweep
+        - field_tower
+        - poisson_1d_residual
 
 ## JAX twin
 
