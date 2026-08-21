@@ -23,14 +23,21 @@ Two complementary, fully rigorous routes are provided:
 :func:`newton_kantorovich_bounds` computes ``(Y0, Z0, Z1, Z2)`` from ``F``, its
 Jacobian, ``A`` and a caller-supplied Lipschitz bound on ``DF`` (explicit for
 polynomial maps), feeding the radii polynomial.
+
+:func:`kantorovich_accept_step` is the optimizer policy (theory 08-04): a
+Gauss–Newton or cubic trial is **legal** only when the radii polynomial
+returns a nonempty unique-zero ball.  An empty ball is a valid reject, not a
+training failure.  The sealed payload records ``continuum_pde_claim: false``;
+the ball is of a finite residual map, never a continuum PDE solution.
+``theorem_prover_verified`` is not asserted (sound-enclosure tier).
 """
 
 from __future__ import annotations
 
 import math
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Literal
 
 from omnibias.core.verified.interval import Interval, IntervalLike
 from omnibias.core.verified.linalg import (
@@ -88,6 +95,16 @@ class NKBounds:
     z2: float
 
 
+#: Default claim for the optimizer accept/reject policy (theory 08-04).
+FINITE_RESIDUAL_CLAIM = (
+    "unique zero of a finite-dimensional residual map F in B(theta_bar, r); "
+    "not a continuum PDE solution"
+)
+
+#: Honesty / payload key: the ball is never a continuum PDE existence claim.
+CONTINUUM_PDE_CLAIM_KEY = "continuum_pde_claim"
+
+
 def radii_polynomial_certificate(
     y0: float,
     z0: float,
@@ -96,6 +113,8 @@ def radii_polynomial_certificate(
     *,
     r_max: float = math.inf,
     claim: str = "unique zero in closed ball B(x_bar, r)",
+    honesty: Mapping[str, bool] | None = None,
+    payload_extra: Mapping[str, Any] | None = None,
 ) -> RadiiCertificate | None:
     r"""Verify the radii polynomial and return an existence certificate, or ``None``.
 
@@ -134,18 +153,22 @@ def radii_polynomial_certificate(
         p = yi + (z0i + z1i) * ri + z2i * ri * ri - ri
         kappa = z0i + z1i + two * z2i * ri
         if p.hi < 0.0 and kappa.hi < 1.0:
+            payload: dict[str, Any] = {
+                "type": "radii_polynomial",
+                "radius": r0,
+                "kappa": kappa.hi,
+                "p_value": p.hi,
+                "Y0": y0,
+                "Z0": z0,
+                "Z1": z1,
+                "Z2": z2,
+            }
+            if payload_extra:
+                payload.update(dict(payload_extra))
             cert = make_certificate(
                 claim=claim,
-                payload={
-                    "type": "radii_polynomial",
-                    "radius": r0,
-                    "kappa": kappa.hi,
-                    "p_value": p.hi,
-                    "Y0": y0,
-                    "Z0": z0,
-                    "Z1": z1,
-                    "Z2": z2,
-                },
+                payload=payload,
+                honesty=honesty,
             )
             return RadiiCertificate(r0, kappa.hi, p.hi, y0, z0, z1, z2, (r_lo, r_hi), cert)
     return None
@@ -255,13 +278,116 @@ def krawczyk_search(
     return None
 
 
+AcceptReason = Literal["ball", "empty", "bounds_failed"]
+
+
+@dataclass(frozen=True)
+class KantorovichAccept:
+    """Optimizer policy: apply a trial step only if a unique-zero ball exists.
+
+    ``reason`` is ``"ball"`` on accept, ``"empty"`` when the radii polynomial
+    has no admissible radius, and ``"bounds_failed"`` when the Newton-Kantorovich
+    bounds cannot be assembled (singular / mismatched ``A``, non-finite trial).
+    Empty is a **valid** outcome: refuse the step, do not train through it.
+    """
+
+    accepted: bool
+    certificate: RadiiCertificate | None
+    reason: AcceptReason
+
+
+def polynomial_sqrt2_maps() -> tuple[IntervalMap, IntervalJac, float]:
+    """Worked example ``F(x) = x^2 - 2`` with Lipschitz constant ``Lip(DF) = 2``.
+
+    ``F''(x) = 2`` constantly, so ``||DF(x) - DF(y)||_inf = 2 |x - y|``.
+    """
+
+    two = Interval.point(2.0)
+
+    def func(xs: list[Interval]) -> list[Interval]:
+        x = xs[0]
+        return [x * x - two]
+
+    def jacobian(xs: list[Interval]) -> list[list[Interval]]:
+        return [[two * xs[0]]]
+
+    return func, jacobian, 2.0
+
+
+def kantorovich_accept_step(
+    func: IntervalMap,
+    jacobian: IntervalJac,
+    a_inv: Sequence[Sequence[float]],
+    trial_params: Sequence[float],
+    *,
+    lipschitz_df: float,
+    r_max: float,
+    claim: str = FINITE_RESIDUAL_CLAIM,
+) -> KantorovichAccept:
+    """Accept a trial point iff it sits in a nonempty unique-zero ball of ``F``.
+
+    Assembles :func:`newton_kantorovich_bounds` and consults
+    :func:`radii_polynomial_certificate`.  The sealed payload always records
+    ``continuum_pde_claim: false``; ``theorem_prover_verified`` is never
+    asserted (sound-enclosure tier).  Does not apply the step -- callers keep
+    or discard ``trial_params`` from :attr:`KantorovichAccept.accepted`.
+    """
+    if r_max <= 0.0:
+        raise ValueError(f"r_max must be > 0, got {r_max}")
+    if float(lipschitz_df) < 0.0:
+        raise ValueError(f"lipschitz_df must be >= 0, got {lipschitz_df}")
+    trial = [float(v) for v in trial_params]
+    if not trial or not all(math.isfinite(v) for v in trial):
+        return KantorovichAccept(False, None, "bounds_failed")
+    try:
+        a_rows = [[float(c) for c in row] for row in a_inv]
+        if len(a_rows) != len(trial) or any(len(row) != len(trial) for row in a_rows):
+            return KantorovichAccept(False, None, "bounds_failed")
+        if not all(math.isfinite(c) for row in a_rows for c in row):
+            return KantorovichAccept(False, None, "bounds_failed")
+        bounds = newton_kantorovich_bounds(
+            func, jacobian, trial, a_rows, lipschitz_df=float(lipschitz_df)
+        )
+    except (ValueError, ZeroDivisionError, ArithmeticError):
+        return KantorovichAccept(False, None, "bounds_failed")
+    cert = radii_polynomial_certificate(
+        bounds.y0,
+        bounds.z0,
+        bounds.z1,
+        bounds.z2,
+        r_max=float(r_max),
+        claim=claim,
+        honesty={"unproven_claim": False, CONTINUUM_PDE_CLAIM_KEY: False},
+        payload_extra={CONTINUUM_PDE_CLAIM_KEY: False, "finite_map": True},
+    )
+    if cert is None:
+        return KantorovichAccept(False, None, "empty")
+    return KantorovichAccept(True, cert, "ball")
+
+
+def select_accepted_params(
+    current: Sequence[float],
+    trial: Sequence[float],
+    decision: KantorovichAccept,
+) -> list[float]:
+    """Return ``trial`` on a unique-zero ball, otherwise keep ``current``."""
+    chosen = trial if decision.accepted else current
+    return [float(v) for v in chosen]
+
+
 __all__ = [
+    "CONTINUUM_PDE_CLAIM_KEY",
+    "FINITE_RESIDUAL_CLAIM",
+    "KantorovichAccept",
     "KrawczykCertificate",
     "NKBounds",
     "RadiiCertificate",
     "certify_zero_radii",
+    "kantorovich_accept_step",
     "krawczyk_certificate",
     "krawczyk_search",
     "newton_kantorovich_bounds",
+    "polynomial_sqrt2_maps",
     "radii_polynomial_certificate",
+    "select_accepted_params",
 ]

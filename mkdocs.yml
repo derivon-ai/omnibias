@@ -177,6 +177,7 @@ nav:
       - jet line search (03-12): api/line_search.md
       - adaptive pack refinement (03-13): api/refine.md
       - composed curvature (08-02): api/composed_curvature.md
+      - Kantorovich-accepted Newton (08-04): api/kantorovich_newton.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -230,6 +231,7 @@ nav:
       - Exact jet line search: cookbook/jet-line-search.md
       - Adaptive pack refinement: cookbook/adaptive-pack-refinement.md
       - Composed-curvature joint Newton: cookbook/composed-curvature.md
+      - Kantorovich-accepted Newton: cookbook/kantorovich-newton.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

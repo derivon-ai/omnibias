@@ -87,6 +87,16 @@ from omnibias.torch.optim_composed import (
     composed_block_hessian,
     composed_curvature_step,
 )
+from omnibias.torch.optim_kantorovich import (
+    CONTINUUM_PDE_CLAIM_KEY,
+    FINITE_RESIDUAL_CLAIM,
+    KantorovichAccept,
+    approximate_inverse_jacobian,
+    kantorovich_accept_step,
+    kantorovich_gated_gauss_newton_step,
+    polynomial_sqrt2_maps,
+    select_accepted_params,
+)
 
 import torch
 import torch.nn as nn
@@ -3743,6 +3753,7 @@ class KFAC(torch.optim.Optimizer):
 
 
 __all__ = [
+    "CONTINUUM_PDE_CLAIM_KEY",
     "Closure",
     "ComposedCurvatureConfig",
     "ComposedCurvatureReport",
@@ -3753,6 +3764,7 @@ __all__ = [
     "CubicRegularizedGaussNewton",
     "CubicRegularizedNewton",
     "DiagonalCurvature",
+    "FINITE_RESIDUAL_CLAIM",
     "FrugalCurvature",
     "GaussNewton",
     "GaussNewtonInfo",
@@ -3762,6 +3774,7 @@ __all__ = [
     "JetLineSearchConfig",
     "JetSubspaceTensor",
     "KFAC",
+    "KantorovichAccept",
     "LBFGSInfo",
     "LineSearchResult",
     "MatVec",
@@ -3771,6 +3784,7 @@ __all__ = [
     "ScalarFn",
     "StochasticNewtonCG",
     "TrustRegionNewtonCG",
+    "approximate_inverse_jacobian",
     "cgls",
     "composed_block_hessian",
     "composed_curvature_step",
@@ -3785,12 +3799,16 @@ __all__ = [
     "hvp",
     "jet_line_search",
     "jet_line_search_on_ray",
+    "kantorovich_accept_step",
+    "kantorovich_gated_gauss_newton_step",
     "lanczos_tridiag",
     "lstsq_gauss_newton_direction",
     "martens_grosse_combine",
     "martens_grosse_gauss_newton_minimize",
     "natural_gradient_direction",
+    "polynomial_sqrt2_maps",
     "quadrature_loss",
+    "select_accepted_params",
     "solve_subspace_trust_region",
     "steihaug_cg",
     "taylor_line_min",

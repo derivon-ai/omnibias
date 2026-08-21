@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Kantorovich-accepted Newton (theory 08-04)
+
+- `kantorovich_accept_step` on
+  `omnibias.core.verified.kantorovich` plus
+  `omnibias.{torch,jax}.optim_kantorovich` twins: a Gauss–Newton trial
+  is kept only when the radii polynomial returns a nonempty unique-zero
+  ball of a finite residual map. Empty ball is a valid reject.
+  `continuum_pde_claim` is sealed false; `theorem_prover_verified` is
+  not asserted. Re-exported from `omnibias.{torch,jax}.optim`.
+- G1–G3 CI-gated. Not a continuum PDE theorem, not CCF stretch, and not
+  a Lean kernel pass. Bias collapse (`delta -> 0`) is not required.
+- Docs: `docs/api/kantorovich_newton.md`,
+  `docs/cookbook/kantorovich-newton.md`.
+  Smoke: `docs/benchmarks/kantorovich_newton_smoke.json`.
+
 ### Added — composed-curvature joint Newton (theory 08-02)
 
 - `omnibias.core.composed_curvature` plus

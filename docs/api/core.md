@@ -495,6 +495,10 @@ in an explicit ball. `radii_polynomial_certificate` verifies the scalar radii
 polynomial `p(r) = Z₂r² − (1 − Z₀ − Z₁)r + Y₀`; `krawczyk_certificate` is the
 finite-dimensional Krawczyk test; `newton_kantorovich_bounds` assembles
 `(Y₀, Z₀, Z₁, Z₂)` for a map with a Lipschitz Jacobian.
+`kantorovich_accept_step` (theory 08-04) is the optimizer policy: accept a
+trial only when that unique-zero ball is nonempty. Empty is a valid reject.
+The sealed payload records `continuum_pde_claim: false`. See
+[Kantorovich-accepted Newton](kantorovich_newton.md).
 
 ::: omnibias.core.verified.kantorovich
     options:

@@ -1,0 +1,52 @@
+{
+  "schema": "omnibias.benchmarks.kantorovich_newton.v1",
+  "generated_utc": "2026-08-21T15:47:55Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "kantorovich_newton",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "ccf_stretch_cleared": false,
+      "continuum_pde_claim": false,
+      "theorem_prover_verified": false,
+      "temperature_collapse": false
+    }
+  },
+  "rss_mb_at_start": 809.14,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_accept_reject",
+        "passed": true,
+        "accept_rate_good": 1.0,
+        "accept_rate_far": 0.0,
+        "good_reason": "ball",
+        "far_reason": "empty",
+        "good_radius": 0.15470595501046724
+      },
+      {
+        "name": "g2_never_continuum",
+        "passed": true,
+        "continuum_pde_claim": false,
+        "claim": "unique zero of a finite-dimensional residual map F in B(theta_bar, r); not a continuum PDE solution"
+      },
+      {
+        "name": "g3_no_forge",
+        "passed": true,
+        "theorem_prover_verified_in_honesty": false,
+        "note": "radii certificate is the sound-enclosure tier"
+      }
+    ]
+  },
+  "wall_seconds": 1.3552631509955972
+}

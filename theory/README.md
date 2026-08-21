@@ -202,7 +202,7 @@ chain rule, and not a global solver. CCF stretch stays an operator floor.
 | [08-01 training-idea ledger](08-training/01-training-idea-ledger.md) | designed | Taxonomy, rejects, recommended stack; trainers do not clear Hilbert stretch |
 | [08-02 composed-curvature joint Newton](08-training/02-composed-curvature-joint-newton.md) | gated | Order-2 chain rule on `(W_{ell-1}, W_ell)`; escape a slice min if the joint block is indefinite; G1–G4 CI |
 | [08-03 depth-causal local jet](08-training/03-depth-causal-local-jet.md) | designed | Forward `layer_jet` + local GN; `k` directions only; warm-start, not ImageNet |
-| [08-04 Kantorovich-accepted Newton](08-training/04-kantorovich-accepted-newton.md) | designed | Take a GN/cubic step only if a unique-zero ball is nonempty |
+| [08-04 Kantorovich-accepted Newton](08-training/04-kantorovich-accepted-newton.md) | gated | Take a GN/cubic step only if a unique-zero ball is nonempty; G1–G3 CI |
 | [08-05 depth-causal residual](08-training/05-depth-causal-residual.md) | designed | March the PDE residual in network depth; not CCF Hilbert |
 | [08-06 sharpness-scheduled step](08-training/06-sharpness-scheduled-step.md) | designed | Exact HVP `lambda_max` sets cubic `lambda` / lr |
 | [08-07 block exact search](08-training/07-block-exact-search.md) | designed | Structured 03-12: OMBU / last linear / arrangement coordinate |

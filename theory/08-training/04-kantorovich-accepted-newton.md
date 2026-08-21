@@ -7,7 +7,7 @@ A Gauss–Newton or cubic-Newton step is **legal** only when
 the trial point, so the optimizer can refuse a step that is not a
 certified isolated root of the residual map.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 08-01, 03-12
 - **Blocks**: none
 
@@ -94,32 +94,28 @@ Expected: accept rate `1.0` on the good ball, `0.0` on the far point.
 
 ## 6. Proposed API
 
-Does not exist yet.
+Shipped. Core policy in `omnibias.core.verified.kantorovich`; tensor
+trial conversion in `omnibias.{torch,jax}.optim_kantorovich`,
+re-exported from `omnibias.{torch,jax}.optim`.
 
 ```python
-# omnibias/torch/optim.py  (and jax twin) — proposed
-@dataclass(frozen=True)
-class KantorovichAccept:
-    accepted: bool
-    certificate: object | None    # RadiiCertificate
-    reason: str                   # "ball" | "empty" | "bounds_failed"
+from omnibias.core.verified.kantorovich import (
+    KantorovichAccept,
+    kantorovich_accept_step,
+    polynomial_sqrt2_maps,
+)
 
-def kantorovich_accept_step(
-    residual_iv,     # interval residual map (core, no torch)
-    jac_iv,
-    A,
-    trial_params,
-    *,
-    r_max: float,
-) -> KantorovichAccept:
-    """Assemble NK bounds and consult radii_polynomial_certificate.
-    Does not exist yet."""
+func, jac, lipschitz_df = polynomial_sqrt2_maps()
+decision: KantorovichAccept = kantorovich_accept_step(
+    func, jac, [[1.0 / 3.0]], [1.5],
+    lipschitz_df=lipschitz_df, r_max=0.2,
+)
 ```
 
-The interval maps are pure Python (`omnibias.core.verified`). Torch/jax
-only produce `trial_params` and a float `A` estimate; converting `A` to
-intervals is the wrapper's job. Default dtype for the trial step; the
-certificate is rational/interval, not float32.
+`reason` is `"ball"` | `"empty"` | `"bounds_failed"`. Interval maps are
+pure Python (`omnibias.core.verified`). Torch/jax produce `trial_params`
+and a float `A` estimate. The certificate is rational/interval, not
+float32. `lipschitz_df` is a required rigorous bound on `Lip(DF)`.
 
 ## 7. Practical use cases
 
@@ -170,13 +166,13 @@ certificate is rational/interval, not float32.
 
 ## 12. Implementation checklist
 
-- [ ] `kantorovich_accept_step` wrapping
+- [x] `kantorovich_accept_step` wrapping
       `radii_polynomial_certificate`
-- [ ] `continuum_pde_claim: false` in the artifact
-- [ ] Tests: G1 polynomial, soundness (grid + random sample of `F`)
-- [ ] `benchmarks/kantorovich_newton.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `continuum_pde_claim: false` in the artifact
+- [x] Tests: G1 polynomial, soundness (grid + random sample of `F`)
+- [x] `benchmarks/kantorovich_newton.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 
