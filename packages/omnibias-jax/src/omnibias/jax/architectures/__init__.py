@@ -31,6 +31,7 @@ from omnibias.jax.architectures.attention import (
     AttentionJetMLP,
     make_attention_jet_mlp,
 )
+from omnibias.jax.architectures.frame_unet import FrameUNetConfig, frame_unet_forward
 from omnibias.jax.architectures.ftc_net import (
     DualFTCConfig,
     FTCNet,
@@ -106,6 +107,7 @@ __all__ = [
     "FTCNet",
     "FTCNetConfig",
     "FourierFeatureMLP",
+    "FrameUNetConfig",
     "HardConstraintField",
     "JetKANConfig",
     "JetKANParams",
@@ -119,6 +121,7 @@ __all__ = [
     "apply_operator",
     "dirichlet_interval",
     "dual_ftc_loss",
+    "frame_unet_forward",
     "ftc_block",
     "hermite_basis",
     "homogeneous_box",

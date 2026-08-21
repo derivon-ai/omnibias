@@ -6,7 +6,7 @@ A U-Net whose **encoder raises pack order** (order as frequency, 01-07)
 and whose **decoder is integral synthesis**, with skip connections that
 are FTC identities between a collapse head and an integral cell.
 
-- **Status**: concept
+- **Status**: gated
 - **Depends on**: 01-06, 01-07, 09-01, 09-03
 - **Blocks**: none
 
@@ -123,11 +123,11 @@ def frame_unet_forward(x, *, config: FrameUNetConfig) -> tuple:
 
 ## 12. Implementation checklist
 
-- [ ] `omnibias.{torch,jax}.architectures` Frame-UNet
-- [ ] G1 skip-split test
-- [ ] `benchmarks/frame_unet.py` plus smoke JSON
-- [ ] `__all__` update
-- [ ] Index row in `theory/README.md`
+- [x] `omnibias.{torch,jax}.architectures` Frame-UNet
+- [x] G1 skip-split test
+- [x] `benchmarks/frame_unet.py` plus smoke JSON
+- [x] `__all__` update
+- [x] Index row in `theory/README.md`
 
 ---
 

@@ -147,6 +147,9 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/remainder_train.py",
     "packages/omnibias-torch/src/omnibias/torch/optim_remainder.py",
     "packages/omnibias-jax/src/omnibias/jax/optim_remainder.py",
+    "packages/omnibias-core/src/omnibias/core/frame_unet.py",
+    "packages/omnibias-torch/src/omnibias/torch/architectures/frame_unet.py",
+    "packages/omnibias-jax/src/omnibias/jax/architectures/frame_unet.py",
 )
 
 

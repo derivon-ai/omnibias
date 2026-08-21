@@ -469,6 +469,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/remainder_training.py
+      - name: Run Frame-UNet smoke (09-04 G1–G3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/frame_unet.py
       - name: Run Scan-Net smoke (02-01 G1/G2/G5; G3 cost not all_passed)
         run: |
           source .venv-cross/bin/activate

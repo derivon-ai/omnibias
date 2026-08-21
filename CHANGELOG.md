@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Frame-UNet (theory 09-04)
+
+- `omnibias.core.frame_unet` plus
+  `omnibias.{torch,jax}.architectures.frame_unet`: order encoder,
+  integral decoder, band skip labelled apart from the collapse head.
+- G1–G4 CI-gated. Jets are founding bias collapse (`delta -> 0`),
+  not temperature collapse. `sigma'` is not admissible. Not ImageNet.
+  Not CCF stretch.
+- Docs: `docs/api/frame_unet.md`, `docs/cookbook/frame-unet.md`.
+  Smoke: `docs/benchmarks/frame_unet_smoke.json`.
+
+
 ### Added — remainder training (theory 09-18)
 
 - `omnibias.core.remainder_train` plus
