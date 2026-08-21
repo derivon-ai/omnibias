@@ -94,7 +94,12 @@ description: >-
   was not an unfreeze of the frozen Hermite pad).
   Unfreezing stage-3 MSNN Fourier frequencies `ΔB`
   did not promote (LP pred earn `~3.4e-6`; line search
-  raised L∞). Scored on 1601-pt L∞;
+  raised L∞).   Unfreezing the PirateNet skip-gate `Δα`
+  (identity skip `α=0`) did not promote (live Jacobian;
+  LP pred earn `~8e-9`). Identity-init tanh on
+  \(\zeta=\mathrm{asinh}(y)^2/(1+\mathrm{asinh}(y)^2)\)
+  did not promote (tail-capped LP pred earn `~1.7e-6`;
+  line search raised L∞). Scored on 1601-pt L∞;
   `HΩ(0)≈+1.007`; residual peak `|y|≈0.10`; gate `1e-13`).
   The tanh-even parent was `7.847e-3`; the Fourier-\(k=6..12\) parent was `7.876e-3`; the Padé-on-`q` parent was `7.884e-3`; the Legendre-on-`q` parent was `7.885e-3`; the Chebyshev-on-`q` parent was `7.889e-3`; the stage-3 MSNN parent was `7.938e-3`; the first-MSNN parent was `7.943e-3`; the even-Fourier parent was `7.991e-3`; the PirateNet parent was `8.063e-3`; the erf-sinh parent
   was `8.068e-3`; the circular-Planck

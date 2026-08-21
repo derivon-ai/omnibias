@@ -329,7 +329,8 @@ MSNN is ineffective above that basin.
   arctan-chart MSNN, Mish-on-log1p, even sinc, and
   even \(J_0\), a residual-shaped even lift, and
   PirateNet last-layer `ΔWout`, and even
-  Hermite–Gauss, and stage-3 MSNN `ΔB` did not
+  Hermite–Gauss, stage-3 MSNN `ΔB`, PirateNet
+  skip-gate `Δα`, and asinh-chart tanh did not
   promote; sinc realized `~7.0e-7`),
   scored on
   1601-pt L∞; `HΩ(0)≈+1.007`; tanh-even parent was
