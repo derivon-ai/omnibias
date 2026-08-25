@@ -27,5 +27,16 @@ def test_cost_is_reported_and_g4_out_of_all_passed() -> None:
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g4_inverse_design" not in names
+    assert "g5_mlp_conservation" not in names
     assert "cost_stack_vs_periods" not in names
     assert payload["gates"]["all_passed"] is True
+    g5 = payload["g5"]
+    assert g5["name"] == "g5_mlp_conservation"
+    assert g5["earned"] is False
+    assert g5["passed"] is False
+    assert g5["reported"] is True
+    assert g5["in_ci_all_passed"] is False
+    assert g5["unitarity_refuses_lossy"] is True
+    assert float(g5["unstructured_energy_violation"]) > float(g5["structural_energy_violation"])
+    assert payload["honesty"]["g5_mlp_conservation_reported"] is True
+    assert payload["honesty"]["g5_in_ci_all_passed"] is False

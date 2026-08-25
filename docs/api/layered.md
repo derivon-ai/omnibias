@@ -9,8 +9,12 @@ G1–G3/G6 are CI-gated. G4 inverse-design (10× fewer evals vs
 gradient-free, five seeds) stays `--full` and is **unearned**: no
 optimizer loop is wired. `stack_matrix` / `certified_band_gap` wall vs
 `n_periods` is **reported**; the previous untimed `passed=True` stub is
-withdrawn. Cost is not in CI `all_passed`. G5 MLP conservation honesty
-is on smoke. Status is **gated**, not shipped. See theory spec 02-11.
+withdrawn. Cost is not in CI `all_passed`. G5 conservation honesty is
+**reported**: unstructured 2×2 `|r|^2+|t|^2-1` versus a lossless stack,
+and `unitarity_residual` refuses `lossless=False`. No MLP surrogate is
+wired. The previous untimed `passed=True` stub is withdrawn. G5 is not
+in CI `all_passed`. Status is **gated**, not shipped. See theory spec
+02-11.
 
 ## Core algebra
 

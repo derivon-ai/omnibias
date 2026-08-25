@@ -3,7 +3,7 @@
 """Gated architecture: layered transfer (theory 02-11). continuum_claim=False.
 
 G4 inverse-design stays ``--full``. Stack / gap wall vs period count is
-reported, not in CI ``all_passed``.
+reported. G5 conservation violation is reported, not in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -100,6 +100,50 @@ def _run_cost() -> dict[str, Any]:
     }
 
 
+def _run_g5() -> dict[str, Any]:
+    """Named leftover: unstructured 2x2 energy violation vs lossless stack."""
+    from omnibias.core.transfer import (
+        quarter_wave_stack,
+        reflection_transmission,
+        stack_matrix,
+        unitarity_residual,
+    )
+
+    layers = quarter_wave_stack(2.0, 1.0, n_periods=1, omega0=1.0)
+    m = stack_matrix(layers, 1.0)
+    r, t = reflection_transmission(m)
+    struct_energy = abs(abs(r) ** 2 + abs(t) ** 2 - 1.0)
+    struct_unit = unitarity_residual(m)
+    refused = False
+    try:
+        unitarity_residual(m, lossless=False)
+    except ValueError:
+        refused = True
+    rng = np.random.default_rng(0)
+    raw = rng.normal(size=4) + 1j * rng.normal(size=4)
+    unstructured = ((complex(raw[0]), complex(raw[1])), (complex(raw[2]), complex(raw[3])))
+    ru, tu = reflection_transmission(unstructured)
+    unstruct_energy = abs(abs(ru) ** 2 + abs(tu) ** 2 - 1.0)
+    return {
+        "name": "g5_mlp_conservation",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
+        "structural_unitarity": float(struct_unit),
+        "structural_energy_violation": float(struct_energy),
+        "unstructured_energy_violation": float(unstruct_energy),
+        "unitarity_refuses_lossy": bool(refused),
+        "note": (
+            "No MLP surrogate is wired. Unstructured 2x2 |r|^2+|t|^2-1 "
+            "versus a lossless quarter-wave stack. unitarity_residual "
+            "refuses lossless=False. G5 is honesty: report the "
+            "violation, do not assert a structural win. Previous "
+            "passed=True stub withdrawn. Not in CI all_passed."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
@@ -125,30 +169,30 @@ def main() -> int:
             "is_gap": cert.is_gap,
             "in_ci_all_passed": True,
         },
-        {
-            "name": "g5_mlp_conservation",
-            "passed": True,
-            "in_ci_all_passed": False,
-            "note": "unitarity_residual refused outside lossless reciprocal linear",
-        },
     ]
     cost = _run_cost()
+    g5 = _run_g5()
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.layered_transfer.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
+            "g5_in_all_passed": False,
             "gates_in_scope": ["g1", "g3"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["cost"] = cost
+    payload["g5"] = g5
     payload["honesty"] = {
         "distinct_from": "omnibias.geometry.gauge.transfer",
         "continuum_claim": False,
         "one_d_layered": True,
         "g4_inverse_design_earned": False,
         "g4_stays_full": True,
+        "g5_mlp_conservation_earned": False,
+        "g5_mlp_conservation_reported": True,
+        "g5_in_ci_all_passed": False,
         "cost_earned": False,
         "cost_reported": True,
         "cost_in_ci_all_passed": False,

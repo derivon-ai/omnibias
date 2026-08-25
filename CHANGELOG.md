@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Layered-transfer G5 conservation reported (theory 02-11)
+
+- `benchmarks/layered_transfer.py` now reports unstructured 2x2
+  `|r|^2+|t|^2-1` versus a lossless quarter-wave stack, and records
+  that `unitarity_residual` refuses `lossless=False`.
+- Reported: no MLP surrogate is wired. Previous untimed `passed=True`
+  stub withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/layered_transfer_smoke.json`.
+
+
 ### Added — Hermite-ladder G5 anharmonic reported (theory 02-10)
 
 - `benchmarks/hermite_ladder.py` now compares the oscillator ground
