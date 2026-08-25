@@ -8,7 +8,7 @@ differential operators the tower supplies exactly, so an omnibias network can
 carry an exact eigenbasis and exact ladder algebra for oscillator-like
 Schrodinger problems.
 
-- **Status**: gated (G1–G3/G6 CI; G4 FermiNet many-body **unearned** / `--full`; exact-ladder vs FD **reported**, not in CI `all_passed`; Rodrigues reweight required; G5 may lose)
+- **Status**: gated (G1–G3/G6 CI; G4 FermiNet many-body **unearned** / `--full`; exact-ladder vs FD **reported**; G5 anharmonic **reported** (basis loses to FD grid), not in CI `all_passed`; Rodrigues reweight required)
 - **Depends on**: 01-01, 01-06
 - **Blocks**: 07-07
 

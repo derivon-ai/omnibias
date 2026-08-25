@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Hermite-ladder G5 anharmonic reported (theory 02-10)
+
+- `benchmarks/hermite_ladder.py` now compares the oscillator ground
+  Rayleigh to a Dirichlet FD grid on `V = x^2/2 + x^4`.
+- Reported: the basis loses (honesty, not a skill win). Previous
+  untimed `passed=True` stub withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/hermite_ladder_smoke.json`.
+
+
 ### Added — Equivariant-scan cost reported (theory 02-08)
 
 - `benchmarks/equivariant_scan.py` now times `EquivariantScan` versus

@@ -2,15 +2,16 @@
 
 The gaussian base carries an exact raising and lowering algebra. The
 raw tower is **not** the QHO eigenbasis; Rodrigues reweight
-(`Normalization.OSCILLATOR`) is required. Anharmonic G5 may lose;
-report it.
+(`Normalization.OSCILLATOR`) is required.
 
 G1–G3/G6 are CI-gated. G4 many-body FermiNet variance (2x, five seeds)
 stays `--full` and is **unearned**: the 1-D QHO envelope already contains
 the ground state. Exact `apply_ladder` orbital derivatives versus
-central FD are **reported**; the previous untimed `passed=True` stub is
-withdrawn. Cost is not in CI `all_passed`. Status is **gated**, not
-shipped. See theory spec 02-10.
+central FD are **reported**. G5 anharmonic honesty is **reported**: the
+oscillator ground Rayleigh loses to a Dirichlet FD grid on
+`V = x^2/2 + x^4`; the previous untimed `passed=True` stub is withdrawn.
+Cost and G5 are not in CI `all_passed`. Status is **gated**, not shipped.
+See theory spec 02-10.
 
 ## Core algebra
 

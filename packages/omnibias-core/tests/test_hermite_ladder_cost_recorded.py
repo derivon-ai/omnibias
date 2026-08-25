@@ -28,5 +28,16 @@ def test_cost_is_reported_and_g4_out_of_all_passed() -> None:
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g4_ferminet" not in names
+    assert "g5_anharmonic" not in names
     assert "cost_exact_vs_fd_orbitals" not in names
     assert payload["gates"]["all_passed"] is True
+    g5 = payload["g5"]
+    assert g5["name"] == "g5_anharmonic"
+    assert g5["earned"] is False
+    assert g5["passed"] is False
+    assert g5["reported"] is True
+    assert g5["in_ci_all_passed"] is False
+    assert g5["lost_to_grid"] is True
+    assert float(g5["fd_grid_ground"]) < float(g5["oscillator_rayleigh"])
+    assert payload["honesty"]["g5_anharmonic_reported"] is True
+    assert payload["honesty"]["g5_in_ci_all_passed"] is False

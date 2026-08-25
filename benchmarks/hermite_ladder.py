@@ -3,8 +3,8 @@
 """Gated architecture: Hermite ladder (theory 02-10).
 
 G4 many-body FermiNet variance stays ``--full``. Exact-ladder orbital
-cost is reported, not in CI ``all_passed``. G5 may lose. The raw tower
-is not the QHO eigenbasis.
+cost is reported, not in CI ``all_passed``. G5 anharmonic lose/win is
+reported. The raw tower is not the QHO eigenbasis.
 """
 
 from __future__ import annotations
@@ -101,6 +101,46 @@ def _run_cost() -> dict[str, Any]:
     }
 
 
+def _run_g5() -> dict[str, Any]:
+    """Named leftover: anharmonic Rayleigh vs FD grid; lose is allowed."""
+    from omnibias.ferminet.hermite import oscillator_phi
+
+    lam = 1.0
+    xs = np.linspace(-4.0, 4.0, 81)
+    dx = float(xs[1] - xs[0])
+    phi = np.asarray([oscillator_phi(0, float(x)) for x in xs], dtype=np.float64)
+    # H_qho phi_0 = (1/2) phi_0; H_anh = H_qho + λ x^4.
+    hphi = 0.5 * phi + lam * (xs**4) * phi
+    osc_e = float(np.trapezoid(hphi * phi, xs) / np.trapezoid(phi * phi, xs))
+    pot = 0.5 * xs**2 + lam * xs**4
+    ham = np.diag(pot + 1.0 / (dx * dx))
+    off = -0.5 / (dx * dx)
+    idx = np.arange(xs.size - 1)
+    ham[idx, idx + 1] = off
+    ham[idx + 1, idx] = off
+    grid_e = float(np.linalg.eigvalsh(ham)[0])
+    lost = bool(grid_e < osc_e)
+    return {
+        "name": "g5_anharmonic",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
+        "lambda_x4": lam,
+        "n_grid": int(xs.size),
+        "oscillator_rayleigh": osc_e,
+        "fd_grid_ground": grid_e,
+        "lost_to_grid": lost,
+        "note": (
+            "Strongly anharmonic well V = x^2/2 + x^4. Oscillator ground "
+            "Rayleigh versus a Dirichlet FD grid on the same box. G5 is "
+            "honesty: the basis is allowed to lose. Previous "
+            "passed=True stub with no measured lose/win withdrawn. Not "
+            "in CI all_passed."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
@@ -119,24 +159,21 @@ def main() -> int:
     entries: list[dict[str, Any]] = [
         {"name": "g1_raise", "passed": g1, "in_ci_all_passed": True},
         {"name": "g2_number", "passed": g2, "in_ci_all_passed": True},
-        {
-            "name": "g5_anharmonic",
-            "passed": True,
-            "in_ci_all_passed": False,
-            "note": "raw tower is not the QHO eigenbasis; anharmonic G5 may lose",
-        },
     ]
     cost = _run_cost()
+    g5 = _run_g5()
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.hermite_ladder.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
+            "g5_in_all_passed": False,
             "gates_in_scope": ["g1", "g2"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["cost"] = cost
+    payload["g5"] = g5
     payload["honesty"] = {
         "raw_tower_is_qho": False,
         "rodrigues_required": True,
@@ -144,6 +181,9 @@ def main() -> int:
         "temperature_collapse": False,
         "g4_many_body_earned": False,
         "g4_stays_full": True,
+        "g5_anharmonic_earned": False,
+        "g5_anharmonic_reported": True,
+        "g5_in_ci_all_passed": False,
         "cost_earned": False,
         "cost_reported": True,
         "cost_in_ci_all_passed": False,
