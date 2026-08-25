@@ -485,7 +485,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   on by default) / `omnibias.fields.locus` (02-12) /
   `omnibias.pinn.interface` (02-05; interface sharpening, not collapse;
   distinct from XPINN `omnibias.pinn._core.interface`) /
-  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13; 02-09 G4 init-win unearned, algebraic cost reported) /
+  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13; 02-09 G4 init-win unearned; 02-11 G4 inverse-design unearned, stack cost reported) /
   `omnibias.geometry.gauge.band` (02-14; abelian + transverse-constant;
   no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02; sampled
   subgraph; cost vs n/D reported) / `omnibias.core.line_search` /

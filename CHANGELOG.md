@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Layered-transfer cost reported (theory 02-11)
+
+- `benchmarks/layered_transfer.py` now times `stack_matrix` and
+  `certified_band_gap` versus `n_periods` in `{1,2,4,8}` (warmup +
+  median).
+- Reported: G4 inverse-design (10x fewer evals vs gradient-free)
+  stays `--full` / unearned: no optimizer loop is wired. Previous
+  untimed `passed=True` stub withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/layered_transfer_smoke.json`.
+
+
 ### Added — Soliton tanh-method cost reported (theory 02-09)
 
 - `benchmarks/soliton_tanh_method.py` now times `verify_exact` /

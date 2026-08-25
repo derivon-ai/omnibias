@@ -5,9 +5,12 @@
 is refused outside lossless reciprocal linear media.
 `continuum_claim=False` on every certified gap.
 
-G1–G3/G6 are CI-gated. G4 inverse-design is `--full`. G5 MLP
-conservation honesty is on smoke. Status is **gated**, not shipped.
-See theory spec 02-11.
+G1–G3/G6 are CI-gated. G4 inverse-design (10× fewer evals vs
+gradient-free, five seeds) stays `--full` and is **unearned**: no
+optimizer loop is wired. `stack_matrix` / `certified_band_gap` wall vs
+`n_periods` is **reported**; the previous untimed `passed=True` stub is
+withdrawn. Cost is not in CI `all_passed`. G5 MLP conservation honesty
+is on smoke. Status is **gated**, not shipped. See theory spec 02-11.
 
 ## Core algebra
 
