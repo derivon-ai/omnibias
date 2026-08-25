@@ -176,8 +176,7 @@ gates are earned on smoke, not in CI `all_passed`.
 
 - **Mollifier** ([01-05](api/mollifier.md)): `MollifierSpec` / `tail_bound`.
   Analytic bases have certified exponential tails, not compact support;
-  higher-order kernels take **negative** values. G1–G3 CI-gated; G4 deferred
-  to VPINN.
+  higher-order kernels take **negative** values. G1–G4 CI-gated.
 - **Spectral design** ([01-07](api/spectral_design.md)): `BandPlan` /
   `peak_frequency`. Pack order is a **band selector**, not a Littlewood-Paley
   completeness claim. G1–G2 CI-gated; G3 not in CI `all_passed`.

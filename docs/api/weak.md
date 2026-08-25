@@ -3,7 +3,8 @@
 Petrov-Galerkin test functions built from OMBU bumps with closed-form
 antiderivatives. Exact integrals hold **only for polynomial coefficient
 data on box windows**; otherwise quadrature runs on the coefficient
-factor and the path is recorded. The certified boundary bound from
+factor and the path is recorded. Moments of `x^j v` for `j >= 1` scale
+the IBP primitive by `1/alpha`. The certified boundary bound from
 [mollifier.md](mollifier.md) is **on by default** — analytic bumps are
 not compactly supported, so boundary terms are never dropped. SDF
 domains stay quadrature-near-boundary and are not claimed.

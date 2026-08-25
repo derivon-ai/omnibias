@@ -1,6 +1,6 @@
 {
   "schema": "weak-form-vpinn-v1",
-  "generated_utc": "2026-08-15T10:19:12Z",
+  "generated_utc": "2026-08-25T17:07:59Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
     ],
     "g4_is_unit_test": true
   },
-  "rss_mb_at_start": 1269.55,
+  "rss_mb_at_start": 976.62,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -31,13 +31,13 @@
         "rel_vs_high_gauss": 7.619227876711719e-15,
         "gauss2_abs_err": 0.09102079211809425,
         "gauss48_abs_err": 1.887379141862766e-15,
-        "g4_deferred_from_01_05": true
+        "g4_deferred_from_01_05": false
       },
       {
         "name": "g2_boundary_honesty",
         "passed": true,
-        "loss_with_bound": 0.00023159994651794237,
-        "loss_without_bound": 5.000847170727047e-05
+        "loss_with_bound": 0.00019543527191331482,
+        "loss_without_bound": 1.3843797102642924e-05
       },
       {
         "name": "g3_discontinuous_coeff",
@@ -69,13 +69,13 @@
     "rel_vs_high_gauss": 7.619227876711719e-15,
     "gauss2_abs_err": 0.09102079211809425,
     "gauss48_abs_err": 1.887379141862766e-15,
-    "g4_deferred_from_01_05": true
+    "g4_deferred_from_01_05": false
   },
   "g2": {
     "name": "g2_boundary_honesty",
     "passed": true,
-    "loss_with_bound": 0.00023159994651794237,
-    "loss_without_bound": 5.000847170727047e-05
+    "loss_with_bound": 0.00019543527191331482,
+    "loss_without_bound": 1.3843797102642924e-05
   },
   "g3": {
     "name": "g3_discontinuous_coeff",

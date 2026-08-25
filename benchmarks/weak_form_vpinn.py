@@ -49,7 +49,7 @@ def _run_g1() -> dict[str, Any]:
         "rel_vs_high_gauss": rel,
         "gauss2_abs_err": abs(g_lo - exact),
         "gauss48_abs_err": abs(g_hi - exact),
-        "g4_deferred_from_01_05": True,
+        "g4_deferred_from_01_05": False,
     }
 
 

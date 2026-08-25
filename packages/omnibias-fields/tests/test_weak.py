@@ -48,6 +48,26 @@ def test_g1_exact_moment_vs_gauss() -> None:
     assert abs(g_lo - exact) > abs(g_hi - exact)
 
 
+def test_exact_moment_powers_match_gauss() -> None:
+    """IBP for power >= 1 must scale the recursive primitive by 1/alpha."""
+    space = TestFunctionSpace(
+        BankSpec.uniform(0.3, 0.7, 3, scales=(2.0,)),
+        orders=(2,),
+        base="tanh",
+        window=(0.0, 1.0),
+    )
+    hi = gauss_legendre(((0.0, 1.0),), 48)
+    xs = hi.nodes[:, 0]
+    ws = hi.weights
+    for index in range(space.size):
+        v = np.array([eval_test(space, index, float(x), deriv=0) for x in xs])
+        for power in (0, 1, 2):
+                exact = exact_moment(space, power, index)
+                gauss = float(np.dot(ws, (xs**power) * v))
+                scale = max(abs(gauss), abs(exact), 1.0)
+                assert abs(exact - gauss) / scale <= 1e-12
+
+
 def test_g2_boundary_bound_changes_loss() -> None:
     torch.set_default_dtype(torch.float64)
     space = _space()

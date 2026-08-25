@@ -1,11 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-3 primitive: mollifier calculus (theory 01-05 G1/G2/G3; G4 deferred).
+"""Wave-3 primitive: mollifier calculus (theory 01-05 G1–G4).
 
 Smoke (default) earns closed-form moments, order-m polynomial reproduction plus
-an ``O(eps^m)`` rate, and tail-bound soundness. G4 (weak-form residual vs Gauss)
-is deferred to ``benchmarks/weak_form_vpinn.py`` (theory 02-04 G1). ``--full``
-writes under ``$OMNIBIAS_SCRATCH/mollifier/``.
+an ``O(eps^m)`` rate, tail-bound soundness, and the downstream weak residual
+vs matched-cost Gauss (02-04 assembly). Analytic bases have certified
+exponential tails, not compact support. ``--full`` writes under
+``$OMNIBIAS_SCRATCH/mollifier/``.
 """
 
 from __future__ import annotations
@@ -109,6 +110,65 @@ def _run_g3(*, full: bool) -> dict[str, Any]:
     }
 
 
+def _run_g4() -> dict[str, Any]:
+    """02-04 weak residual on a known Poisson vs matched-cost Gauss."""
+    import numpy as np
+    import torch
+    from omnibias.core.scan import BankSpec
+    from omnibias.fields._core.quadrature import gauss_legendre
+    from omnibias.fields.weak import TestFunctionSpace, WeakForm, eval_test
+    from omnibias.fields.weak.torch import weak_residual
+
+    torch.set_default_dtype(torch.float64)
+    space = TestFunctionSpace(
+        BankSpec.uniform(0.3, 0.7, 3, scales=(2.0,)),
+        orders=(2,),
+        base="tanh",
+        window=(0.0, 1.0),
+    )
+    field = (0.0, 1.0, -1.0)  # u = x - x^2; -u'' = 2
+    op = WeakForm(diffusion=(1.0,), source=(2.0,))
+    exact, terms = weak_residual(field, space, operator=op)
+    exact_r = exact.detach().cpu().numpy()
+    exact_path = all(t.path == "exact" for t in terms)
+
+    def _assemble_gauss(n_quad: int) -> Any:
+        quad = gauss_legendre(((0.0, 1.0),), n_quad)
+        xs = quad.nodes[:, 0]
+        ws = quad.weights
+        du = 1.0 - 2.0 * xs
+        source = np.full_like(xs, 2.0)
+        rows = []
+        for i in range(space.size):
+            vp = np.array([eval_test(space, i, float(x), deriv=1) for x in xs])
+            v = np.array([eval_test(space, i, float(x), deriv=0) for x in xs])
+            rows.append(float(np.dot(ws, du * vp - source * v)))
+        return np.asarray(rows, dtype=np.float64)
+
+    ref = _assemble_gauss(48)
+    cheap = _assemble_gauss(2)
+    ref_n = float(np.linalg.norm(ref))
+    exact_rel = float(np.linalg.norm(exact_r - ref) / max(ref_n, 1e-30))
+    cheap_rel = float(np.linalg.norm(cheap - ref) / max(ref_n, 1e-30))
+    passed = bool(exact_path and exact_rel <= 1e-8 and exact_rel * 100.0 <= cheap_rel)
+    return {
+        "name": "g4_weak_residual_vs_gauss",
+        "passed": passed,
+        "earned": passed,
+        "exact_rel_l2": exact_rel,
+        "gauss2_rel_l2": cheap_rel,
+        "rel_limit": 1e-8,
+        "improvement": float(cheap_rel / max(exact_rel, 1e-30)),
+        "exact_path": exact_path,
+        "n_tests": int(space.size),
+        "note": (
+            "known 1-D Poisson u=x-x^2; exact 02-04 assembly vs Gauss-48 "
+            "reference; matched-cost baseline is Gauss-2 (two window edges). "
+            "Analytic bumps are not compactly supported."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true")
@@ -116,23 +176,25 @@ def main() -> int:
     g1 = _run_g1()
     g2 = _run_g2()
     g3 = _run_g3(full=args.full)
+    g4 = _run_g4()
     payload = provenance(
         schema="mollifier-calculus-v1",
         config={
             "family": "mollifier_calculus",
             "full": bool(args.full),
-            "g4_deferred": True,
-            "gates_in_scope": ["g1", "g2", "g3"],
+            "g4_deferred": False,
+            "gates_in_scope": ["g1", "g2", "g3", "g4"],
         },
     )
-    payload["gates"] = gates_block([g1, g2, g3])
+    payload["gates"] = gates_block([g1, g2, g3, g4])
     payload["g1"] = g1
     payload["g2"] = g2
     payload["g3"] = g3
+    payload["g4"] = g4
     payload["honesty"] = {
         "compact_support_claim": False,
         "higher_order_is_density": False,
-        "g4_deferred_to": "weak_form_vpinn G1",
+        "g4_deferred_to": None,
         "collapse": "delta -> 0 (eps -> 0); no temperature collapse",
     }
     if args.full:

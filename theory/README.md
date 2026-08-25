@@ -105,7 +105,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [01-02 bias scan](01-geometry/02-bias-scan-transverse-convolution.md) | gated | `BiasScan` / `BankSpec`; G1–G4 in CI `all_passed`; 01-13 G5 earned |
 | [01-03 arrangement geometry](01-geometry/03-hyperplane-arrangement-geometry.md) | gated | `omnibias.partition.arrangement`; temperature collapse, sampled subgraph, sound gap not P vs NP; G1–G4 CI; cost gates smoke-earned, not in CI `all_passed` |
 | [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | gated | Exact-`Q` weights in `omnibias.difference`; G1–G4 earned |
-| [01-05 mollifier calculus](01-geometry/05-mollifier-distribution-calculus.md) | gated | `MollifierSpec` / `tail_bound`; certified exponential tails, not compact support; G1–G3 earned; G4 deferred to VPINN |
+| [01-05 mollifier calculus](01-geometry/05-mollifier-distribution-calculus.md) | gated | `MollifierSpec` / `tail_bound`; certified exponential tails, not compact support; G1–G4 in CI `all_passed` |
 | [01-06 OMBU wavelet frames](01-geometry/06-ombu-wavelet-frames.md) | gated | `FrameSpec`; `sigma'` not admissible; not orthonormal / not compactly supported; G1–G3 CI; G4 denoising smoke-earned, not in CI `all_passed` |
 | [01-07 order as frequency](01-geometry/07-order-as-frequency-spectral-design.md) | gated | `BandPlan` / `peak_frequency`; pack order is a band selector, not Littlewood-Paley completeness; G1–G2 earned; G3 not in CI `all_passed` |
 | [01-08 tropical-log homotopy](01-geometry/08-tropical-log-homotopy.md) | gated | `omnibias.struct._core.tropical`; reuses `logsumexp_gap_bound`; G4 `--full` only; cost gates smoke-earned, not in CI `all_passed` |

@@ -7,7 +7,7 @@ A collapsing pack is a **mollifier**: the family `f_K(z; delta)` converges to th
 only a smooth function but a legitimate test-function generator, which is what a
 weak-form method needs.
 
-- **Status**: gated (G1–G3 earned; G4 deferred to 02-04 VPINN)
+- **Status**: gated (G1–G4 earned in CI `all_passed`)
 - **Depends on**: 01-01
 - **Blocks**: 01-06, 01-10, 02-04, 02-06, 02-14, 03-04, 03-06, 07-02
 
@@ -214,7 +214,12 @@ Pure Python. Tensor-side test functions are assembled in spec 02-04.
 - **G4 downstream.** With these test functions, the weak-form residual of spec
   02-04 on a problem with known solution reaches relative `L2 <= 1e-8`, at least
   two orders better than the same residual assembled with Gauss quadrature at
-  matched cost.
+  matched cost. **Earned** — see `docs/benchmarks/mollifier_calculus_smoke.json`:
+  1-D Poisson `u=x-x^2` via `omnibias.fields.weak` exact assembly vs a
+  Gauss-48 reference (`rel L2 9e-15`); Gauss-2 (matched two-edge cost) is
+  worse by `1.9e14`. In CI `all_passed`. The IBP for `int x^j v` scales the
+  recursive primitive by `1/alpha`. Analytic bumps are not compactly
+  supported.
 
 ## 9. Benchmark plan
 

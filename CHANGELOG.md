@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Mollifier weak-residual G4 (theory 01-05)
+
+- `exact_moment` IBP for `power >= 1` now scales the recursive primitive
+  by `1/alpha` (the antiderivative of `sigma^{(n)}(alpha (x-mu))`).
+- `benchmarks/mollifier_calculus.py` G4: 02-04 exact Poisson residual vs
+  Gauss-48 is `rel L2 9e-15`; matched-cost Gauss-2 is worse by `1.9e14`.
+  G1–G4 are in CI `all_passed`. Analytic bases are not compactly supported.
+- Smoke: `docs/benchmarks/mollifier_calculus_smoke.json`.
+
+
 ### Added — Bias-scan no-grid G4 (theory 01-02)
 
 - `benchmarks/bias_scan.py` G4 now times the full voxelize-then-`cmbConv1d`

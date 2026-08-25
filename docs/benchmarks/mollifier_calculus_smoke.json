@@ -1,6 +1,6 @@
 {
   "schema": "mollifier-calculus-v1",
-  "generated_utc": "2026-08-15T09:34:25Z",
+  "generated_utc": "2026-08-25T17:07:57Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,14 +13,15 @@
   "config": {
     "family": "mollifier_calculus",
     "full": false,
-    "g4_deferred": true,
+    "g4_deferred": false,
     "gates_in_scope": [
       "g1",
       "g2",
-      "g3"
+      "g3",
+      "g4"
     ]
   },
-  "rss_mb_at_start": 821.07,
+  "rss_mb_at_start": 816.95,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -79,6 +80,18 @@
         "n": 100,
         "violations": 0,
         "note": "analytic bases have certified exponential tails, not compact support"
+      },
+      {
+        "name": "g4_weak_residual_vs_gauss",
+        "passed": true,
+        "earned": true,
+        "exact_rel_l2": 9.175846846051754e-15,
+        "gauss2_rel_l2": 1.756246426152617,
+        "rel_limit": 1e-08,
+        "improvement": 191398838234566.5,
+        "exact_path": true,
+        "n_tests": 3,
+        "note": "known 1-D Poisson u=x-x^2; exact 02-04 assembly vs Gauss-48 reference; matched-cost baseline is Gauss-2 (two window edges). Analytic bumps are not compactly supported."
       }
     ]
   },
@@ -138,10 +151,22 @@
     "violations": 0,
     "note": "analytic bases have certified exponential tails, not compact support"
   },
+  "g4": {
+    "name": "g4_weak_residual_vs_gauss",
+    "passed": true,
+    "earned": true,
+    "exact_rel_l2": 9.175846846051754e-15,
+    "gauss2_rel_l2": 1.756246426152617,
+    "rel_limit": 1e-08,
+    "improvement": 191398838234566.5,
+    "exact_path": true,
+    "n_tests": 3,
+    "note": "known 1-D Poisson u=x-x^2; exact 02-04 assembly vs Gauss-48 reference; matched-cost baseline is Gauss-2 (two window edges). Analytic bumps are not compactly supported."
+  },
   "honesty": {
     "compact_support_claim": false,
     "higher_order_is_density": false,
-    "g4_deferred_to": "weak_form_vpinn G1",
+    "g4_deferred_to": null,
     "collapse": "delta -> 0 (eps -> 0); no temperature collapse"
   }
 }

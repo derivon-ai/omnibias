@@ -144,7 +144,9 @@ def exact_moment(space: TestFunctionSpace, power: int, index: int) -> float:
     """``integral_window x^{power} v_index(x) dx`` by antiderivative differences.
 
     Requires ``order >= power`` so integration by parts stays inside the
-    closed-form tower (no leftover ``int x^k sigma``).
+    closed-form tower (no leftover ``int x^k sigma``). For ``power >= 1``
+    the recursive term is scaled by ``1/alpha`` because the primitive of
+    ``sigma^{(n)}(alpha (x-mu))`` is ``sigma^{(n-1)} / alpha``.
     """
     if space.window is None:
         raise ValueError("exact_moment needs a box window")
@@ -165,16 +167,19 @@ def exact_moment(space: TestFunctionSpace, power: int, index: int) -> float:
 def _moment_ibp(
     base: str, lo: float, hi: float, power: int, order: int, alpha: float, mu: float
 ) -> float:
+    if alpha == 0.0:
+        raise ValueError("test-function scale alpha must be nonzero")
     z_lo = alpha * (lo - mu)
     z_hi = alpha * (hi - mu)
     if power == 0:
         return _scaled_primitive(base, z_hi, order, alpha) - _scaled_primitive(
             base, z_lo, order, alpha
         )
-    v_lo = _scaled_primitive(base, z_lo, order, alpha)
-    v_hi = _scaled_primitive(base, z_hi, order, alpha)
-    boundary = (hi**power) * v_hi - (lo**power) * v_lo
-    return boundary - float(power) * _moment_ibp(
+    prim_lo = _scaled_primitive(base, z_lo, order, alpha)
+    prim_hi = _scaled_primitive(base, z_hi, order, alpha)
+    boundary = (hi**power) * prim_hi - (lo**power) * prim_lo
+    # int x^j v = [x^j V] - j int x^{j-1} V, and V = sigma^{(n-1)} / alpha.
+    return boundary - (float(power) / alpha) * _moment_ibp(
         base, lo, hi, power - 1, order - 1, alpha, mu
     )
 

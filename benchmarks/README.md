@@ -46,7 +46,7 @@ uv run python docs/img/generate_figures.py
 | `multipack_birkhoff.py` | `docs/benchmarks/multipack_birkhoff_smoke.json` | Wave-1 primitive 01-01: MultiPackUnit G1–G5; float64 order ceiling recorded; two-interface span beats OperatorBlock / OMBU / JetMLP |
 | `irregular_stencils.py` | `docs/benchmarks/irregular_stencils_smoke.json` | Wave-1 primitive 01-04: exact-Q Birkhoff weights G1–G4 |
 | `bias_scan.py` | `docs/benchmarks/bias_scan_smoke.json` | Wave-1 primitive 01-02: BiasScan G1–G4 CI-gated; 01-13 G5; G4 is a warmed-up voxelize-then-`cmbConv1d` pipeline comparison |
-| `mollifier_calculus.py` | `docs/benchmarks/mollifier_calculus_smoke.json` | Wave-3 primitive 01-05: MollifierSpec G1–G3; G4 deferred to VPINN; certified exponential tails, not compact support |
+| `mollifier_calculus.py` | `docs/benchmarks/mollifier_calculus_smoke.json` | Wave-3 primitive 01-05: MollifierSpec G1–G4 CI-gated; certified exponential tails, not compact support; G4 is exact vs matched-cost Gauss on a known Poisson |
 | `spectral_design.py` | `docs/benchmarks/spectral_design_smoke.json` | Wave-3 primitive 01-07: BandPlan G1/G2/G4; G3 not in CI `all_passed`; pack order is a band selector |
 | `arrangement_geometry.py` | `docs/benchmarks/arrangement_geometry_smoke.json` | Gated 01-03: temperature collapse; sampled subgraph |
 | `ombu_frames.py` | `docs/benchmarks/ombu_frames_smoke.json` | Gated 01-06: `sigma'` not admissible; G4 not in CI `all_passed` |
