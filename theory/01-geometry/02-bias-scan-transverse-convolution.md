@@ -7,7 +7,7 @@ the convolutional idea is not "slide the plane" but **share one pack template
 and evaluate it at many bias offsets**, producing a translation-equivariant
 response along `w` at the cost of one activation call per offset.
 
-- **Status**: gated (G1/G2/G3 earned; G4 earned on smoke, not CI-gated)
+- **Status**: gated (G1–G4 earned in CI `all_passed`; 01-13 G5 earned)
 - **Depends on**: 01-01
 - **Blocks**: 01-06, 01-10, 01-13, 02-01, 02-07, 02-08, 02-11, 03-04, 03-05, 03-08, 05-01, 05-02
 
@@ -204,7 +204,11 @@ Baseline: (a) a single fixed-bias `OperatorBlock` of the same template, and
 - **G3 parity.** torch and jax bit-identical.
 - **G4 no-grid win.** On a point-cloud interface task with no natural grid, the
   scan beats a voxelized `cmbConv` pipeline in mean absolute position error at
-  equal or lower wall time.
+  equal or lower wall time. **Earned** — see
+  `docs/benchmarks/bias_scan_smoke.json`: `5/5` seeds; median scan MAE
+  `0.0064` vs voxelized `0.0625`; warmed-up median wall `0.072 ms` vs
+  `0.145 ms` (full voxelize-then-`cmbConv1d` pipeline, not a first
+  forward). In CI `all_passed`.
 
 ## 9. Benchmark plan
 

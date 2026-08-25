@@ -1,6 +1,6 @@
 {
   "schema": "bias-scan-v1",
-  "generated_utc": "2026-08-25T14:26:20Z",
+  "generated_utc": "2026-08-25T16:59:01Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -18,10 +18,11 @@
       "g1",
       "g2",
       "g3",
+      "g4",
       "g5"
     ]
   },
-  "rss_mb_at_start": 1026.52,
+  "rss_mb_at_start": 1286.4,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -68,8 +69,65 @@
       {
         "name": "g3_parity",
         "passed": true,
-        "worst_ulp": 1.0,
-        "max_abs_diff": 2.220446049250313e-16
+        "worst_ulp": 0.5,
+        "max_abs_diff": 1.1102230246251565e-16
+      },
+      {
+        "name": "g4_no_grid_win",
+        "passed": true,
+        "earned": true,
+        "wins": 5,
+        "n_seeds": 5,
+        "scan_mae": 0.0063985133964737095,
+        "conv_mae": 0.0625,
+        "scan_wall_ms": 0.0719260424375534,
+        "conv_wall_ms": 0.14513905625790358,
+        "n_points": 24,
+        "n_bins": 16,
+        "true_z": 0.25,
+        "per_seed": [
+          {
+            "seed": 0.0,
+            "scan_mae": 0.00840739142187491,
+            "conv_mae": 0.0625,
+            "scan_ms": 0.07205200381577015,
+            "conv_ms": 0.14767097309231758,
+            "won": 1.0
+          },
+          {
+            "seed": 1.0,
+            "scan_mae": 0.0016858047443679136,
+            "conv_mae": 0.0625,
+            "scan_ms": 0.07048901170492172,
+            "conv_ms": 0.14513905625790358,
+            "won": 1.0
+          },
+          {
+            "seed": 2.0,
+            "scan_mae": 0.004129055358999267,
+            "conv_mae": 0.0625,
+            "scan_ms": 0.07319904398173094,
+            "conv_ms": 0.1432949211448431,
+            "won": 1.0
+          },
+          {
+            "seed": 3.0,
+            "scan_mae": 0.0063985133964737095,
+            "conv_mae": 0.0625,
+            "scan_ms": 0.07155106868594885,
+            "conv_ms": 0.14378107152879238,
+            "won": 1.0
+          },
+          {
+            "seed": 4.0,
+            "scan_mae": 0.007141797910691555,
+            "conv_mae": 0.0625,
+            "scan_ms": 0.0719260424375534,
+            "conv_ms": 0.16110495198518038,
+            "won": 1.0
+          }
+        ],
+        "note": "scan localizes -z of the cluster; the named baseline is the full voxelize-then-cmbConv1d pipeline (histogram + identity 3-tap). Wall is a warmed-up median. Thresholds not moved."
       },
       {
         "name": "g5_integral_op_alias",
@@ -125,23 +183,65 @@
   "g3": {
     "name": "g3_parity",
     "passed": true,
-    "worst_ulp": 1.0,
-    "max_abs_diff": 2.220446049250313e-16
+    "worst_ulp": 0.5,
+    "max_abs_diff": 1.1102230246251565e-16
   },
   "g4": {
     "name": "g4_no_grid_win",
     "passed": true,
     "earned": true,
-    "scan_mae": 0.0016858047443679136,
+    "wins": 5,
+    "n_seeds": 5,
+    "scan_mae": 0.0063985133964737095,
     "conv_mae": 0.0625,
-    "scan_wall_seconds": 0.00020700693130493164,
-    "conv_wall_seconds": 0.012046789983287454,
+    "scan_wall_ms": 0.0719260424375534,
+    "conv_wall_ms": 0.14513905625790358,
     "n_points": 24,
     "n_bins": 16,
     "true_z": 0.25,
-    "scan_tau_star": -0.2483141952556321,
-    "conv_peak_z": 0.3125,
-    "note": "scan localizes -z of the cluster; voxelized cmbConv1d (identity 3-tap on the 1-D histogram of w.x) peaks on a bin center. Thresholds not moved if unearned."
+    "per_seed": [
+      {
+        "seed": 0.0,
+        "scan_mae": 0.00840739142187491,
+        "conv_mae": 0.0625,
+        "scan_ms": 0.07205200381577015,
+        "conv_ms": 0.14767097309231758,
+        "won": 1.0
+      },
+      {
+        "seed": 1.0,
+        "scan_mae": 0.0016858047443679136,
+        "conv_mae": 0.0625,
+        "scan_ms": 0.07048901170492172,
+        "conv_ms": 0.14513905625790358,
+        "won": 1.0
+      },
+      {
+        "seed": 2.0,
+        "scan_mae": 0.004129055358999267,
+        "conv_mae": 0.0625,
+        "scan_ms": 0.07319904398173094,
+        "conv_ms": 0.1432949211448431,
+        "won": 1.0
+      },
+      {
+        "seed": 3.0,
+        "scan_mae": 0.0063985133964737095,
+        "conv_mae": 0.0625,
+        "scan_ms": 0.07155106868594885,
+        "conv_ms": 0.14378107152879238,
+        "won": 1.0
+      },
+      {
+        "seed": 4.0,
+        "scan_mae": 0.007141797910691555,
+        "conv_mae": 0.0625,
+        "scan_ms": 0.0719260424375534,
+        "conv_ms": 0.16110495198518038,
+        "won": 1.0
+      }
+    ],
+    "note": "scan localizes -z of the cluster; the named baseline is the full voxelize-then-cmbConv1d pipeline (histogram + identity 3-tap). Wall is a warmed-up median. Thresholds not moved."
   },
   "g5": {
     "name": "g5_integral_op_alias",
@@ -174,7 +274,7 @@
     "g4_earned": true,
     "g5_earned": true,
     "two_interface_visible_failure": true,
-    "licensed_sentence": "BiasScan interior-shifts the response to <= 4 ulp on the bank lattice; soft-argmax localizes a noisy interface to <= 0.1 spacing with skill vs the domain midpoint; torch/jax responses agree within 4 ulp; two-interface soft-argmax bias is visible; G4 is earned only on a measured no-grid MAE win at equal-or-lower wall time; op='integral' is the 01-13 first spend, not a seventh role"
+    "licensed_sentence": "BiasScan interior-shifts the response to <= 4 ulp on the bank lattice; soft-argmax localizes a noisy interface to <= 0.1 spacing with skill vs the domain midpoint; torch/jax responses agree within 4 ulp; two-interface soft-argmax bias is visible; G4 is a no-grid MAE win against the voxelize-then-cmbConv1d pipeline at equal-or-lower warmed-up median wall; op='integral' is the 01-13 first spend, not a seventh role"
   },
-  "wall_seconds": 1.912
+  "wall_seconds": 2.11
 }

@@ -276,7 +276,7 @@ proceeds.
       submodule retired) in `theory/README.md`
 - [x] Open Wave 1 with 01-01 multipack (G1–G5 earned)
 - [x] Wave-1 01-04 irregular stencils (G1–G4 earned) and 01-02 bias scan
-      (G1–G3 CI-gated; G4 earned on smoke, not in CI all_passed)
+      (G1–G4 CI-gated; 01-13 G5 earned)
 - [x] Open Wave 3 with 01-05 mollifier / 01-07 spectral design plus 02-01
       Scan-Net, 02-03 Jet-KAN, 02-04 VPINN, 02-05 transmission PINN (gated;
       cost / wall-time gates smoke-earned, not in CI all_passed; no new

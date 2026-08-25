@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Bias-scan no-grid G4 (theory 01-02)
+
+- `benchmarks/bias_scan.py` G4 now times the full voxelize-then-`cmbConv1d`
+  pipeline after warmup (histogram + identity 3-tap; median wall).
+- Earned on `5/5` smoke seeds: median MAE `0.0064` vs `0.0625`, wall
+  `0.072 ms` vs `0.145 ms`. G1–G4 are in CI `all_passed`.
+- Smoke: `docs/benchmarks/bias_scan_smoke.json`.
+
+
 ### Added — Jet vs nested AD Poisson bench (theory 06-05 obligation 3)
 
 - `benchmarks/jet_vs_nested_ad.py`: 1-D Poisson `mlp_jet` residual vs

@@ -163,8 +163,8 @@ Three extensions of this geometry have code and CI smoke, still **gated**:
   template across a bank of offsets. Equivariance is an **interior lattice
   shift** along `w` (`R(z+Delta)[..., :-1]` vs `R(z)[..., 1:]`), not a
   circular wrap of `tanh'`. Soft-argmax `gamma` is a softmax readout;
-  `gamma -> inf` would be temperature collapse, not `delta -> 0`. G1–G3
-  CI-gated; G4 earned on smoke, not in CI `all_passed`.
+  `gamma -> inf` would be temperature collapse, not `delta -> 0`. G1–G4
+  CI-gated; G4 is a warmed-up voxelize-then-`cmbConv1d` pipeline win.
 - **Irregular stencils** ([difference API](api/difference.md)): exact-`Q`
   Birkhoff weights for arbitrary nodes and per-node orders. Order is
   asymptotic in the node scale `h`. G1–G4 earned.
