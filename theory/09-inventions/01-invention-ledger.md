@@ -9,7 +9,7 @@ already first-class specs in Groups 02–05. This file is the index: what is
 already specified, what is a new Group 09 spec, what is rejected, and which
 cluster to implement first.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-10, 06-01, 06-02, 08-01
 - **Blocks**: 09-02, 09-03, 09-04, 09-05, 09-06, 09-07, 09-08, 09-09,
   09-10, 09-11, 09-12, 09-13, 09-14, 09-15, 09-16, 09-17, 09-18, 09-19,
@@ -69,9 +69,10 @@ Group 09 must not re-derive shipped primitives or existing specs.
 - Group 08 — trainers that step `theta` given `L`. 08 still owns that
   surface; 09 owns architectures and non-`theta` learning rules.
 
-**Confirmed gap.** There is no index that says which brainstorm ideas are
-already 02/03/08 specs and which spend the integral role, jet-valued state,
-or three-register algebra as a *new* object.
+**No gap.** This ledger is the index. `test_theory_invention_ledger.py`
+checks G1–G5. The entries are already gated; this file records the
+taxonomy, already-specified map, rejects, and first-bet order they must
+keep.
 
 ## 4. Mathematics
 
@@ -133,9 +134,20 @@ router honesty or to 03-05 / 09-28 named `soft_top_k` / Hopfield `beta`.
 4. **Generic ImageNet transformer / MoE / Adam.** If it is implementable
    with a ReLU MLP and vanilla autodiff, it is not an omnibias invention.
 
+```python
+# documentation only — reject keys, not a module
+REJECTED = (
+    "skip_chain_rule_global_min",
+    "full_parameter_jacobian_flow",
+    "ccf_stretch_by_architecture",
+    "generic_imagenet_reimplementation",
+)
+```
+
 ### First-bet ranking (implement later, not this pass)
 
-Concept specs only in this pass. When code is written, this is the order:
+The first-bet cluster is already gated as code. This ranking stays the
+recorded order, not a claim that later entries are unearned:
 
 1. **09-03 FTC-Net + 09-17 dual-FTC** — unused `integral` cell + FTC
    consistency residual.
@@ -161,35 +173,35 @@ Yang–Mills mass gap, RH, or P vs NP.
 
 ### Comparison (concept, not measured)
 
-| Entry | What is new | Typical floor |
-|---|---|---|
-| 09-02 jet-token | Hidden state is an `N`-jet | jet truncation `R_N`; not ImageNet |
-| 09-03 FTC-Net | Cell is `integral` | FTC residual on 1-D; not CCF |
-| 09-04 Frame-UNet | Order encoder + integral decoder | 01-06 frame honesty (`sigma'` not admissible) |
-| 09-05 Taylor-model neuron | Unit is a `TaylorModel` | enclosure explosion past shallow depth |
-| 09-06 Jet-Flow | Finite coupling, exact det | small generative models |
-| 09-07 Pack-MoE | Slab-mass router | 04-02 calibration; LightGBM still a baseline |
-| 09-08 Characteristic-Net | Transport along learned `v` | 1-D conservation; characteristics cross |
-| 09-09 sheaf-atlas | Cocycle residual on jets | chart overlap quality |
-| 09-10 Riccati flow | Depth is Riccati time | distinct from DEQ / CNF |
-| 09-11 Collapse-Net | Train discrete, infer `delta -> 0` | stencil exactness (01-04) |
-| 09-12 holonomic layer | Ore annihilator as the block | D-finite class only |
-| 09-13 jet-Hopfield | Memories are germs | contact match, not vector Hopfield |
-| 09-14 integral-kernel op | OMBU `integral` as DeepONet kernel | not surface BEM |
-| 09-15 q-OMBU | Named `q -> 1` / `mu -> 0` | residual of the limit |
-| 09-16 exact MAML | Exact inner HVP / IFT | same operator floor as the task |
-| 09-17 dual-FTC | Derivative vs integral residual | FTC identity |
-| 09-18 remainder train | Loss is `R_N` | 03-10 diagnostic + 03-13 birth |
-| 09-19 jet distillation | Match teacher `N`-jet | jet order, not logits |
-| 09-20 homotopy | Path of problems + 08-04 | empty ball => halt |
-| 09-21 exact score match | Hyvärinen on tower score | CNF already has exact `div` |
-| 09-22 inverse-design | Newton-on-`x` | `sigma' -> 0` saturation |
-| 09-23 sharpness loss | `lambda_max` in `L` | not 08-06 schedule |
-| 09-24 PCI forward | `(y, certificate)` | vacuous box on deep nets |
-| 09-25 world-model jet | Next `N`-jet + Lohner | not global regularity |
-| 09-26 annihilator export | Ore + finite Lean obligation | finite rational only |
-| 09-27 parameter-space jets | Mixed `∂^{α,β} u / ∂x^α ∂μ^β` | `μ` must enter the tower; not a ParamPINN package |
-| 09-28 sliced-jet encoder | Tokens are scan jets + named energy | not a ViT; not `R^D` |
+| Entry | Taxonomy | What is new | Typical floor |
+|---|---|---|---|
+| 09-02 jet-token | architecture | Hidden state is an `N`-jet | jet truncation `R_N`; not ImageNet |
+| 09-03 FTC-Net | architecture | Cell is `integral` | FTC residual on 1-D; not CCF |
+| 09-04 Frame-UNet | architecture | Order encoder + integral decoder | 01-06 frame honesty (`sigma'` not admissible) |
+| 09-05 Taylor-model neuron | architecture | Unit is a `TaylorModel` | enclosure explosion past shallow depth |
+| 09-06 Jet-Flow | architecture | Finite coupling, exact det | small generative models |
+| 09-07 Pack-MoE | architecture | Slab-mass router | 04-02 calibration; LightGBM still a baseline |
+| 09-08 Characteristic-Net | architecture | Transport along learned `v` | 1-D conservation; characteristics cross |
+| 09-09 sheaf-atlas | architecture | Cocycle residual on jets | chart overlap quality |
+| 09-10 Riccati flow | architecture | Depth is Riccati time | distinct from DEQ / CNF |
+| 09-11 Collapse-Net | architecture | Train discrete, infer `delta -> 0` | stencil exactness (01-04) |
+| 09-12 holonomic layer | architecture | Ore annihilator as the block | D-finite class only |
+| 09-13 jet-Hopfield | architecture | Memories are germs | contact match, not vector Hopfield |
+| 09-14 integral-kernel op | architecture | OMBU `integral` as DeepONet kernel | not surface BEM |
+| 09-15 q-OMBU | architecture | Named `q -> 1` / `mu -> 0` | residual of the limit |
+| 09-16 exact MAML | learning rule | Exact inner HVP / IFT | same operator floor as the task |
+| 09-17 dual-FTC | learning rule | Derivative vs integral residual | FTC identity |
+| 09-18 remainder train | learning rule | Loss is `R_N` | 03-10 diagnostic + 03-13 birth |
+| 09-19 jet distillation | learning rule | Match teacher `N`-jet | jet order, not logits |
+| 09-20 homotopy | learning rule | Path of problems + 08-04 | empty ball => halt |
+| 09-21 exact score match | learning rule | Hyvärinen on tower score | CNF already has exact `div` |
+| 09-22 inverse-design | learning rule | Newton-on-`x` | `sigma' -> 0` saturation |
+| 09-23 sharpness loss | learning rule | `lambda_max` in `L` | not 08-06 schedule |
+| 09-24 PCI forward | export | `(y, certificate)` | vacuous box on deep nets |
+| 09-25 world-model jet | export | Next `N`-jet + Lohner | not global regularity |
+| 09-26 annihilator export | export | Ore + finite Lean obligation | finite rational only |
+| 09-27 parameter-space jets | architecture | Mixed `∂^{α,β} u / ∂x^α ∂μ^β` | `μ` must enter the tower; not a ParamPINN package |
+| 09-28 sliced-jet encoder | architecture | Tokens are scan jets + named energy | not a ViT; not `R^D` |
 
 ## 5. Worked example
 
@@ -322,9 +334,10 @@ No CI job for the ledger.
 ## 12. Implementation checklist
 
 - [x] `theory/09-inventions/01-invention-ledger.md` (this file)
-- [ ] Optional structural test asserting G1–G4 by reading the markdown
+- [x] `packages/omnibias-core/tests/test_theory_invention_ledger.py`
+      asserting G1–G5 by reading the markdown
 - [x] Index row in `theory/README.md` (Group 09; wired in the index pass)
-- [ ] No Python invention modules in the spec-only pass
+- [x] No Python invention modules in this ledger pass
 
 ---
 

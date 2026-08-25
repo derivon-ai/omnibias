@@ -213,13 +213,13 @@ chain rule, and not a global solver. CCF stretch stays an operator floor.
 
 Architectures, learning rules, and exports that spend the unused `integral`
 role, jet-valued state, or the three-register algebra, and that are not already
-first-class specs in Groups 02–05 or 08. Concept status except the ledger.
+first-class specs in Groups 02–05 or 08. Entries and the ledger are gated.
 Trainers that step `theta` given `L` stay in Group 08. CCF stretch stays an
 operator floor.
 
 | Spec | Status | One line |
 |---|---|---|
-| [09-01 invention ledger](09-inventions/01-invention-ledger.md) | designed | Already-specified map, rejects, first-bet ranking; inventions do not clear Hilbert stretch |
+| [09-01 invention ledger](09-inventions/01-invention-ledger.md) | gated | Already-specified map, rejects, first-bet ranking; inventions do not clear Hilbert stretch |
 | [09-02 jet-token transformer](09-inventions/02-jet-token-transformer.md) | gated | `compose_jet` mix, not softmax-of-values; G1–G3 CI; model jet, not ImageNet; founding bias collapse, not temperature collapse |
 | [09-03 FTC-Net](09-inventions/03-ftc-net.md) | gated | Integral cell + collapse head; G1–G3 CI; not a VPINN; founding bias collapse, not temperature collapse |
 | [09-04 Frame-UNet](09-inventions/04-frame-unet.md) | gated | Order encoder + integral decoder; G1–G4 CI; band skip is not a collapse head; founding bias collapse, not temperature collapse |

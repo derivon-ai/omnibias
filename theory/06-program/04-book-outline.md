@@ -211,9 +211,8 @@ numbers.
 ## 10. Honesty and scope
 
 - **The book must not be written yet.** Implementation specs are now mostly
-  `gated`, but this outline and the Group 09 ledger remain
-  `concept` or `designed`, Wave-0 A5 is still pending, and G1 still forbids a
-  chapter whose cited gates have not run. A monograph asserting the five-choice
+  `gated`, but this outline remains `concept`, Wave-0 A5 is still pending,
+  and G1 still forbids a chapter whose cited gates have not run. A monograph asserting the five-choice
   spine as a finished theory would still be describing a program as a book.
   This outline exists so the writing has a target, not so it can start.
 - `docs/theory.md` remains canonical for what the library *is*. The book covers
