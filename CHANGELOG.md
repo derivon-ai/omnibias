@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — OMBU frames G4 leftover-recorded (theory 01-06)
+
+- Leftover #10's denoising miss now leftover-records `reported` plus
+  honesty flags on `benchmarks/ombu_frames.py`.
+- Reported: order-2 MSE wins `5/5` vs n=1; skill vs noisy identity
+  `0/5` (median `-1.32`). Named G4 needs both. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/ombu_frames_smoke.json`.
+
+
 ### Added — Spectral-design G3 Mscale reported (theory 01-07)
 
 - `benchmarks/spectral_design.py` now leftover-records G3 from the

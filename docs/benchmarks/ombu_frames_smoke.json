@@ -38,6 +38,7 @@
     "name": "g4_denoising",
     "passed": false,
     "earned": false,
+    "reported": true,
     "mse_order2": 0.005810462959209069,
     "mse_order1": 0.005992599481412405,
     "beats_n1": true,
@@ -96,6 +97,9 @@
     "orthonormal": false,
     "compact_support": false,
     "fast_transform": false,
-    "littlewood_paley_completeness": false
+    "littlewood_paley_completeness": false,
+    "g4_earned": false,
+    "g4_reported": true,
+    "g4_in_ci_all_passed": false
   }
 }

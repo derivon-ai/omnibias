@@ -82,6 +82,7 @@ def _g4_denoising() -> dict[str, Any]:
         "name": "g4_denoising",
         "passed": False,
         "earned": False,
+        "reported": True,
         "mse_order2": float(np.median([r["mse_order2"] for r in rows])),
         "mse_order1": float(np.median([r["mse_order1"] for r in rows])),
         "beats_n1": beats == len(rows),
@@ -154,6 +155,9 @@ def main() -> int:
         "compact_support": False,
         "fast_transform": False,
         "littlewood_paley_completeness": False,
+        "g4_earned": False,
+        "g4_reported": True,
+        "g4_in_ci_all_passed": False,
     }
     if args.full:
         dest = SCRATCH / "frames"
