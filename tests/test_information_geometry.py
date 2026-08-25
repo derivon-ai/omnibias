@@ -86,6 +86,25 @@ def test_quadrature_is_node_independent() -> None:
     assert abs(g100 - g400) / abs(g400) < 1e-12
 
 
+def test_smoke_artifact_records_product_api_gates() -> None:
+    import json
+    from pathlib import Path
+
+    payload = json.loads(
+        (Path(__file__).resolve().parents[1] / "docs" / "benchmarks" / "information_geometry_smoke.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    honesty = payload["honesty"]
+    assert honesty["g1_earned"] is True
+    assert honesty["g2_earned"] is True
+    assert honesty["g3_earned"] is True
+    assert honesty["g4_earned"] is True
+    assert honesty["g5_earned"] is True
+    assert honesty["k_ge_3_fisher"] == "inapplicable_not_a_density"
+    assert payload["gates"]["all_passed"] is True
+
+
 def test_monte_carlo_agrees_with_closed_form() -> None:
     delta = 0.1
     g_closed = fisher_delta_delta(delta, nodes=200)

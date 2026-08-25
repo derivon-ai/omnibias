@@ -1,6 +1,6 @@
 {
   "schema": "information-geometry-v1",
-  "generated_utc": "2026-08-11T15:32:29Z",
+  "generated_utc": "2026-08-25T16:06:31Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -37,9 +37,10 @@
     "prefactor_delta": 0.0001,
     "prefactor_max_rel": 1e-06,
     "exponent_tol": 0.02,
-    "min_decades": 3.0
+    "min_decades": 3.0,
+    "product_api": true
   },
-  "rss_mb_at_start": 813.52,
+  "rss_mb_at_start": 813.79,
   "baseline": {
     "name": "Monte Carlo Fisher estimator",
     "sampler": "x = logit(U1) + delta*(U2 - 1/2)",
@@ -276,15 +277,120 @@
       "predicted": 0.001388888888888889
     },
     "six_decade_fitted_exponent": 1.9989376285238207,
-    "median_time_ms": 3.7086060037836432
+    "median_time_ms": 3.2745510106906295
   },
   "cost": {
-    "closed_form_median_ms": 3.7086060037836432,
+    "closed_form_median_ms": 3.2745510106906295,
     "monte_carlo_median_ms_at_n": {
       "n": 50000,
-      "ms": 2.2215090575627983
+      "ms": 1.8950880039483309
     },
-    "note": "cost reported, never gated; 04-01 G1 remains unearned"
+    "product_api": {
+      "max_sigmas": [
+        1.9220164826511663,
+        1.7098618366664857,
+        1.2440878748092712,
+        1.4211128468887504
+      ],
+      "closed_ms": 0.06699096411466599,
+      "mc_ms": 80.74760402087122,
+      "speedup": 1205.3506780803825
+    }
+  },
+  "product_api": {
+    "n_suite": 4,
+    "n_accuracy": 80000,
+    "n_speed": 300000,
+    "n_trials_g4": 80,
+    "thetas": [
+      [
+        -1.4834497254196406,
+        -0.07792019364018313,
+        2.13064917485631,
+        0.32432472356862196,
+        -0.18816854798951455
+      ],
+      [
+        -1.6073429714383942,
+        0.054599568184580644,
+        1.9587836313486187,
+        0.12479684383652975,
+        -0.47244088675693163
+      ],
+      [
+        -1.1450816478552708,
+        0.014865858249546088,
+        1.5534006385069896,
+        0.24421435171420217,
+        -0.19680517070835502
+      ],
+      [
+        -1.565102954727088,
+        0.05155649322356462,
+        0.9876583761460307,
+        -0.048272379661925185,
+        -0.2376866595581505
+      ]
+    ],
+    "g1": {
+      "max_sigmas": [
+        1.9220164826511663,
+        1.7098618366664857,
+        1.2440878748092712,
+        1.4211128468887504
+      ],
+      "closed_ms": 0.06699096411466599,
+      "mc_ms": 80.74760402087122,
+      "speedup": 1205.3506780803825
+    },
+    "g4": {
+      "predicted": 66,
+      "empirical": 37
+    },
+    "g5": {
+      "per_seed": [
+        {
+          "seed": 0,
+          "undamped_delta": 1e-08,
+          "damped_delta": 0.5967202124848945,
+          "damped_mu_err": 0.12699916897831123,
+          "damped_stable": 1.0,
+          "undamped_stable": 0.0
+        },
+        {
+          "seed": 1,
+          "undamped_delta": 1.8134629743720672,
+          "damped_delta": 1.859794182880979,
+          "damped_mu_err": 0.034672379016705376,
+          "damped_stable": 1.0,
+          "undamped_stable": 1.0
+        },
+        {
+          "seed": 2,
+          "undamped_delta": 1e-08,
+          "damped_delta": 0.9078240680304641,
+          "damped_mu_err": 0.04097535764674425,
+          "damped_stable": 1.0,
+          "undamped_stable": 0.0
+        },
+        {
+          "seed": 3,
+          "undamped_delta": 1e-08,
+          "damped_delta": 0.5525108328078598,
+          "damped_mu_err": 0.06978228671956695,
+          "damped_stable": 1.0,
+          "undamped_stable": 0.0
+        },
+        {
+          "seed": 4,
+          "undamped_delta": 1e-08,
+          "damped_delta": 0.03595343123381356,
+          "damped_mu_err": 0.10929760012349643,
+          "damped_stable": 1.0,
+          "undamped_stable": 0.0
+        }
+      ]
+    }
   },
   "gates": {
     "all_passed": true,
@@ -467,24 +573,159 @@
         "sigmas": 1.2182352130443415,
         "max_sigmas": 3.0,
         "passed": true
+      },
+      {
+        "name": "g1_mixture_0_max_sigma",
+        "measured": 1.9220164826511663,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_1_max_sigma",
+        "measured": 1.7098618366664857,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_2_max_sigma",
+        "measured": 1.2440878748092712,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_3_max_sigma",
+        "measured": 1.4211128468887504,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_closed_form_1000x",
+        "fast_ms": 0.06699096411466599,
+        "slow_ms": 80.74760402087122,
+        "factor": 1205.3506780803825,
+        "min_factor": 1000.0,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_0",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_0",
+        "measured": 0.012708117321456757,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_1",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_1",
+        "measured": 0.01123756901246918,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_2",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_2",
+        "measured": 0.0038687416587090185,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_3",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_3",
+        "measured": 0.0015549104708013916,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_two_bias_near_collapse_small_eig",
+        "measured": 1.388888888227481e-11,
+        "max_eig": 1e-09,
+        "passed": true
+      },
+      {
+        "name": "g4_distinguishability_factor_2",
+        "predicted": 66.0,
+        "measured": 37.0,
+        "ratio": 1.7837837837837838,
+        "max_factor": 2.0,
+        "passed": true
+      },
+      {
+        "name": "g5_damped_chart_stable",
+        "key": "damped_stable",
+        "expected": 1.0,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 1.0,
+        "worst_deviation": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g5_damped_beats_undamped_stability",
+        "damped_stable_seeds": 5,
+        "undamped_stable_seeds": 1,
+        "passed": true
       }
     ]
   },
   "honesty": {
     "claim_rung": 1,
-    "family": "two_bias_logistic_pack",
+    "family": "two_bias_logistic_pack_and_logistic_mixture",
     "bias_collapse": true,
     "temperature_collapse": false,
     "k_ge_3_fisher": "inapplicable_not_a_density",
-    "g1_earned": false,
+    "g1_earned": true,
     "g2_earned": true,
-    "g3_earned": false,
-    "g4_earned": false,
-    "g5_earned": false,
+    "g3_earned": true,
+    "g4_earned": true,
+    "g5_earned": true,
     "theorem_prover_verified": false,
     "mathlib_verified": false,
     "pre_registered": "analytic prediction delta^2/720 derived in theory/04-bridges/01-information-geometry-exponential-family.md section 5 and confirmed before the gate was written",
-    "licensed_sentence": "for the two-bias logistic pack family, the Fisher information in the spread direction vanishes as delta^2 with leading coefficient 1/720, measured over three decades against a Monte Carlo estimator"
+    "licensed_sentence": "for the two-bias logistic pack family, the Fisher information in the spread direction vanishes as delta^2 with leading coefficient 1/720; the pack-parameter metric on two-component logistic mixtures matches Monte Carlo, is SPSD, and a degeneracy-damped natural step stays on the spread chart"
   },
-  "wall_seconds": 0.286
+  "wall_seconds": 0.828
 }

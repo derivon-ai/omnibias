@@ -735,7 +735,7 @@ jobs:
         run: |
           source .venv-curv/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/certified_rank_collapse.py
-      - name: Run information-geometry Fisher degeneracy smoke (04-01 G2)
+      - name: Run information-geometry pack Fisher smoke (04-01 G1–G5)
         run: |
           source .venv-curv/bin/activate
           python benchmarks/information_geometry.py

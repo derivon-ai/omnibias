@@ -17,6 +17,17 @@ distributions is versioned independently under semantic versioning.
 
 
 
+### Added — Pack Fisher product API (theory 04-01)
+
+- `omnibias.curvature.information`: pack-parameter Fisher metric
+  (`fisher_metric`, geodesic length, distinguishability, collapse
+  degeneracy). Distinct from the scalar GLM `A''(theta)` Fisher.
+- G1 / G3–G5 earned on a randomized two-component mixture suite;
+  G2 unchanged. `K>=3` finite-difference packs stay inapplicable.
+- Docs: `docs/api/pack_fisher.md`, `docs/cookbook/pack-fisher.md`.
+  Smoke: `docs/benchmarks/information_geometry_smoke.json`.
+
+
 ### Added — Conformal slabs (theory 04-02)
 
 - `omnibias.core.uncertainty` plus `omnibias.verify.uncertainty`:

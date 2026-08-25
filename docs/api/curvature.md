@@ -4,6 +4,11 @@
 
 `omnibias-curvature` is an alpha extension package. It is useful for research into second-order optimization, Fisher/KFAC factors, and loss-landscape analysis, but it is not part of the curated-core stability contract.
 
+The **pack-parameter** Fisher metric (theory 04-01) lives in
+[`omnibias.curvature.information`](pack_fisher.md). It is a different
+object from the scalar exponential-family
+[`fisher_information_metric`][omnibias.curvature.glm_fisher.fisher_information_metric].
+
 ## Public alpha surface
 
 ::: omnibias.curvature.one_layer

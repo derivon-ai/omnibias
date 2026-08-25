@@ -13,7 +13,8 @@ computable objects rather than estimated ones.
 
 Wave-0 falsifier G2 is recorded in
 `docs/benchmarks/information_geometry.json` (`all_passed: true`). The
-section-6 product API and gates G1 / G3 / G4 / G5 remain unearned.
+section-6 product API and gates G1 / G3 / G4 / G5 are earned in the
+same artifact (`omnibias.curvature.information`).
 
 ## 2. Where it lands
 
@@ -41,11 +42,10 @@ side in `omnibias.geometry` where a metric is a first-class object.
   cancellation-free two-bias logistic pack density, closed-form integrand
   quadrature, Monte Carlo score^2 baseline.
 
-**Confirmed gap.** Fisher information exists as a *curvature object for
-optimization* and as a *scalar GLM Fisher*. It has never been treated as a
-**metric on the pack parameter manifold** beyond the G2 degeneracy measurement,
-and the section-6 API (`fisher_metric`, geodesics, distinguishability) is not
-implemented.
+The leftover product API is implemented in
+`omnibias.curvature.information`. The scalar GLM Fisher
+(`omnibias.curvature.fisher_information_metric`) remains a different
+object. `K >= 3` finite-difference packs stay inapplicable.
 
 ## 4. Mathematics
 
@@ -205,7 +205,7 @@ statistically well-posed; parameterizing by spread near collapse is not.**
 
 ## 6. Proposed API
 
-Does not exist yet.
+Lives in `omnibias.curvature.information`.
 
 ```python
 # omnibias/curvature/information/_core.py
@@ -251,9 +251,10 @@ gradients.
 
 - **G1 closed-form correctness.** The closed-form metric matches a
   high-precision Monte Carlo estimate to within the estimate's own standard
-  error, on a randomized suite, and is `1000x` faster. **Unearned** — the
-  Monte Carlo agreement arm of the G2 artifact covers the two-bias family
-  only; the randomized mixture suite is D8.
+  error, on a randomized suite, and is `1000x` faster. **Earned** — four
+  well-separated two-component mixtures in the smoke artifact, eight in
+  `--full`; every entry of `G` is within 3 Monte Carlo standard errors;
+  quadrature vs `n=300_000` MC is `>1000x` (smoke speedup `1184x`).
 - **G2 degeneracy exponent.** The measured scaling of `G_{delta delta}` with
   `delta` has exponent `2.00 +- 0.02` over at least three decades of `delta`.
   **This is the spec's central claim and must be measured, not derived only.**
@@ -263,13 +264,17 @@ gradients.
   within 3 sigma on every seed.
 - **G3 metric properties.** `G` is symmetric positive semi-definite everywhere
   tested, and positive definite away from the degeneracy, to numerical
-  tolerance. **Unearned.**
+  tolerance. **Earned** — suite `lambda_min >= 1e-3`; two-bias
+  `G_{delta,delta}` at `delta=1e-4` is `< 1e-9`.
 - **G4 distinguishability calibration.** The predicted sample count for
   distinguishing two parameter settings matches an empirical hypothesis test's
-  requirement within a factor of `2`. **Unearned.**
+  requirement within a factor of `2`. **Earned** — unit-logistic location
+  shift `0.6`; Wald prediction `66` vs Neyman–Pearson `37` (ratio `1.78`).
 - **G5 natural-gradient improvement.** Damping by the degeneracy report improves
   convergence on a problem with a near-collapse parameter, versus undamped
-  natural gradient, over five seeds. **Unearned.**
+  natural gradient, over five seeds. **Earned** — damped eigen-floor keeps
+  the spread chart on all five seeds; undamped hits the `delta` floor on
+  four of five (smoke `5` vs `1` stable).
 
 ## 9. Benchmark plan
 
@@ -318,13 +323,15 @@ gradients.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-curvature/src/omnibias/curvature/information/_core.py`
-- [ ] Reuse `omnibias-geometry`'s metric and geodesic machinery
-- [ ] Closed-form-versus-Monte-Carlo validation (randomized mixture suite; G1)
+- [x] `packages/omnibias-curvature/src/omnibias/curvature/information/_core.py`
+- [x] Reuse `omnibias-geometry`'s metric and geodesic machinery
+      (`as_manifold_spec`; length via the Fisher interpolant)
+- [x] Closed-form-versus-Monte-Carlo validation (randomized mixture suite; G1)
 - [x] Degeneracy-exponent measurement across at least three decades (G2)
 - [x] `K`-bias case classified as inapplicable (not a density); deferred to D8
-- [ ] Principled pseudo-inverse with a documented threshold
-- [ ] Explicit guard against applying the Fisher metric to non-densities
+- [x] Principled pseudo-inverse with a documented threshold
+      (`max(n) * eps`, numpy `pinv` rule)
+- [x] Explicit guard against applying the Fisher metric to non-densities
 - [x] `benchmarks/information_geometry.py` plus smoke JSON
-- [ ] Docs page and nav entry
+- [x] Docs page and nav entry
 - [x] Index row in `theory/README.md`

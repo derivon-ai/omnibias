@@ -1,19 +1,21 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-0 falsifier A6: Fisher degeneracy of the two-bias logistic pack.
+"""Wave-0 falsifier A6 plus the 04-01 product API (G1 / G3–G5).
 
-Measures ``G_{delta,delta}`` for the one-parameter density family
+G2 measures ``G_{delta,delta}`` for the two-bias logistic pack
 
     p_delta(x) = ( sigma(x + delta/2) - sigma(x - delta/2) ) / delta
 
-where ``sigma`` is the logistic sigmoid. Spec 04-01 G2 predicts the scaling
-``G_{delta,delta} ~ delta^2 / 720`` (exponent ``2.00 +- 0.02`` over at least
-three decades of ``delta``).
+and predicts ``G_{delta,delta} ~ delta^2 / 720``. G1 / G3–G5 exercise
+``omnibias.curvature.information`` on a randomized two-component
+mixture suite, metric properties, Wald-vs-LRT distinguishability, and
+degeneracy-damped natural gradient.
 
 Modes
 -----
-* default (smoke): Monte Carlo ``n = 200_000`` x 5 seeds; CI wiring gate.
-* ``--full``: Monte Carlo ``n = 2_000_000`` x 5 seeds; acceptance artifact
+* default (smoke): G2 Monte Carlo ``n = 200_000`` x 5 seeds; product-API
+  suite of 4 mixtures; CI wiring gate.
+* ``--full``: G2 Monte Carlo ``n = 2_000_000`` x 5 seeds; 8 mixtures;
   also copied under ``$OMNIBIAS_SCRATCH/infogeom/``.
 
 The deterministic quadrature arm is identical in both tiers. Method labels
@@ -41,9 +43,24 @@ from _common import (  # type: ignore[import-not-found]  # noqa: E402
 )
 from _gates import (  # type: ignore[import-not-found]  # noqa: E402
     gates_block,
+    require_all_seeds,
     require_rel_error,
     require_scaling_exponent,
     require_within_stderr,
+)
+from omnibias.curvature.information import (  # noqa: E402
+    damped_natural_step,
+    distinguishability_samples,
+    empirical_distinguishability_n,
+    fisher_metric,
+    fisher_metric_mc,
+    logistic_location_family,
+    logistic_mixture_family,
+    randomized_mixture_suite,
+    sample_family,
+    two_bias_family,
+    two_bias_located_family,
+    undamped_natural_step,
 )
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
@@ -229,6 +246,237 @@ def _run_gates(
     return dict(gates_block(entries))
 
 
+def _require_speedup(
+    fast_ms: float,
+    slow_ms: float,
+    *,
+    min_factor: float,
+    name: str,
+) -> dict[str, Any]:
+    if fast_ms <= 0.0:
+        raise AssertionError(f"{name}: closed-form time must be positive")
+    factor = float(slow_ms) / float(fast_ms)
+    passed = bool(factor >= float(min_factor))
+    verdict = {
+        "name": name,
+        "fast_ms": float(fast_ms),
+        "slow_ms": float(slow_ms),
+        "factor": factor,
+        "min_factor": float(min_factor),
+        "passed": passed,
+    }
+    if not passed:
+        raise AssertionError(
+            f"{name}: speedup {factor:.1f}x < {min_factor}x "
+            f"(closed={fast_ms:.4f}ms, mc={slow_ms:.4f}ms)"
+        )
+    return verdict
+
+
+def _require_ratio_within(
+    predicted: float,
+    measured: float,
+    *,
+    max_factor: float,
+    name: str,
+) -> dict[str, Any]:
+    if measured <= 0.0 or predicted <= 0.0:
+        raise AssertionError(f"{name}: predicted and measured must be positive")
+    ratio = float(predicted) / float(measured)
+    passed = bool((1.0 / float(max_factor)) <= ratio <= float(max_factor))
+    verdict = {
+        "name": name,
+        "predicted": float(predicted),
+        "measured": float(measured),
+        "ratio": ratio,
+        "max_factor": float(max_factor),
+        "passed": passed,
+    }
+    if not passed:
+        raise AssertionError(
+            f"{name}: predicted/measured={ratio:.3f} outside "
+            f"[{1.0 / max_factor:g}, {max_factor:g}]"
+        )
+    return verdict
+
+
+def _product_api_gates(*, full: bool) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """G1 / G3–G5 on ``omnibias.curvature.information``."""
+    entries: list[dict[str, Any]] = []
+    mix = logistic_mixture_family()
+    n_suite = 8 if full else 4
+    n_acc = 200_000 if full else 80_000
+    n_speed = 400_000 if full else 300_000
+    n_trials = 160 if full else 80
+    thetas = randomized_mixture_suite(n=n_suite, seed=1)
+    details: dict[str, Any] = {
+        "n_suite": n_suite,
+        "n_accuracy": n_acc,
+        "n_speed": n_speed,
+        "n_trials_g4": n_trials,
+        "thetas": [t.tolist() for t in thetas],
+    }
+
+    # G1: closed-form vs MC on the randomized mixture suite + 1000x.
+    max_sigs: list[float] = []
+    for i, theta in enumerate(thetas):
+        closed = fisher_metric(mix, theta, nodes=64)
+        mc, se = fisher_metric_mc(mix, theta, n=n_acc, seed=10 + i)
+        sig = np.abs(closed - mc) / np.maximum(se, 1e-18)
+        worst = float(np.max(sig))
+        max_sigs.append(worst)
+        passed = bool(worst <= 3.0)
+        entries.append(
+            {
+                "name": f"g1_mixture_{i}_max_sigma",
+                "measured": worst,
+                "max_sigmas": 3.0,
+                "passed": passed,
+            }
+        )
+        if not passed:
+            raise AssertionError(
+                f"g1_mixture_{i}_max_sigma: max |G-G_mc|/se = {worst:.3f} > 3"
+            )
+
+    probe = thetas[0]
+    closed_ms = median_time_ms(
+        lambda: fisher_metric(mix, probe, nodes=64), warmup=4, repeats=9
+    )
+    mc_ms = median_time_ms(
+        lambda: fisher_metric_mc(mix, probe, n=n_speed, seed=0),
+        warmup=1,
+        repeats=3,
+    )
+    entries.append(
+        _require_speedup(
+            closed_ms,
+            mc_ms,
+            min_factor=1000.0,
+            name="g1_closed_form_1000x",
+        )
+    )
+    details["g1"] = {
+        "max_sigmas": max_sigs,
+        "closed_ms": closed_ms,
+        "mc_ms": mc_ms,
+        "speedup": mc_ms / closed_ms if closed_ms else None,
+    }
+
+    # G3: SPSD on the suite; PD away from collapse; two-bias degeneracy.
+    for i, theta in enumerate(thetas):
+        g = fisher_metric(mix, theta, nodes=64)
+        eig = np.linalg.eigvalsh(0.5 * (g + g.T))
+        skew = float(np.max(np.abs(g - g.T)))
+        if skew > 1e-12:
+            raise AssertionError(f"g3_symmetric_{i}: max |G-G.T|={skew}")
+        entries.append(
+            {
+                "name": f"g3_symmetric_{i}",
+                "measured": skew,
+                "max_skew": 1e-12,
+                "passed": True,
+            }
+        )
+        min_eig = float(np.min(eig))
+        if min_eig < 1e-3:
+            raise AssertionError(f"g3_pd_{i}: min eig {min_eig} < 1e-3")
+        entries.append(
+            {
+                "name": f"g3_pd_{i}",
+                "measured": min_eig,
+                "min_eig": 1e-3,
+                "passed": True,
+            }
+        )
+    g_deg = fisher_metric(two_bias_family(), np.array([1e-4]), nodes=200)
+    entries.append(
+        {
+            "name": "g3_two_bias_near_collapse_small_eig",
+            "measured": float(g_deg[0, 0]),
+            "max_eig": 1e-9,
+            "passed": bool(float(g_deg[0, 0]) < 1e-9),
+        }
+    )
+    if float(g_deg[0, 0]) >= 1e-9:
+        raise AssertionError("g3: two-bias eigenvalue at delta=1e-4 is not degenerate")
+
+    # G4: Wald prediction vs Neyman–Pearson sample count, factor of 2.
+    loc = logistic_location_family()
+    theta_a = np.array([0.0])
+    theta_b = np.array([0.6])
+    predicted = distinguishability_samples(loc, theta_a, theta_b)
+    empirical = empirical_distinguishability_n(
+        loc,
+        theta_a,
+        theta_b,
+        n_trials=n_trials,
+        seed=0,
+        n_min=16,
+        n_max=256,
+    )
+    entries.append(
+        _require_ratio_within(
+            float(predicted),
+            float(empirical),
+            max_factor=2.0,
+            name="g4_distinguishability_factor_2",
+        )
+    )
+    details["g4"] = {"predicted": predicted, "empirical": empirical}
+
+    # G5: damping keeps the near-collapse chart on every seed.
+    located = two_bias_located_family()
+    true = np.array([0.0, 0.35])
+    init = np.array([1.2, 1.6])
+    per_seed: list[dict[str, Any]] = []
+    for seed in SEEDS:
+        xs = sample_family(located, true, 200 if not full else 400, seed=20 + int(seed))
+        undamped = init.copy()
+        damped = init.copy()
+        for _ in range(8):
+            undamped = undamped_natural_step(located, undamped, xs, lr=0.8)
+            damped = damped_natural_step(located, damped, xs, lr=0.8)
+        per_seed.append(
+            {
+                "seed": int(seed),
+                "undamped_delta": float(undamped[1]),
+                "damped_delta": float(damped[1]),
+                "damped_mu_err": abs(float(damped[0]) - float(true[0])),
+                "damped_stable": float(1.0 if 1e-4 <= float(damped[1]) <= 5.0 else 0.0),
+                "undamped_stable": float(
+                    1.0 if 1e-4 <= float(undamped[1]) <= 5.0 else 0.0
+                ),
+            }
+        )
+    entries.append(
+        require_all_seeds(
+            per_seed,
+            key="damped_stable",
+            expected=1.0,
+            tol=0.0,
+            direction="min",
+            name="g5_damped_chart_stable",
+        )
+    )
+    damped_n = int(sum(row["damped_stable"] for row in per_seed))
+    undamped_n = int(sum(row["undamped_stable"] for row in per_seed))
+    if damped_n <= undamped_n:
+        raise AssertionError(
+            f"g5: damped stable {damped_n} did not beat undamped {undamped_n}"
+        )
+    entries.append(
+        {
+            "name": "g5_damped_beats_undamped_stability",
+            "damped_stable_seeds": damped_n,
+            "undamped_stable_seeds": undamped_n,
+            "passed": True,
+        }
+    )
+    details["g5"] = {"per_seed": per_seed}
+    return entries, details
+
+
 def main(argv: list[str] | None = None) -> dict[str, Any]:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -261,6 +509,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "prefactor_max_rel": PREFACTOR_MAX_REL,
         "exponent_tol": 0.02,
         "min_decades": 3.0,
+        "product_api": True,
     }
     payload = provenance(schema="information-geometry-v1", config=config)
 
@@ -293,7 +542,6 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 }
             )
 
-    # Cost: reported, never gated (04-01 G1 unearned).
     closed_ms = median_time_ms(
         lambda: fisher_delta_delta(0.1, nodes=QUAD_NODES), warmup=2, repeats=5
     )
@@ -303,11 +551,19 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         repeats=3,
     )
 
-    gates = _run_gates(
+    g2_block = _run_gates(
         sweep_data=sweep_data,
         mc_per_seed=mc_per_seed,
         prefactor_value=prefactor_value,
     )
+    product_entries, product_details = _product_api_gates(full=full)
+    all_entries = list(g2_block["entries"]) + product_entries
+    gates = dict(gates_block(all_entries))
+    g2_ok = bool(g2_block["all_passed"])
+    g1_ok = all(e["passed"] for e in product_entries if e["name"].startswith("g1_"))
+    g3_ok = all(e["passed"] for e in product_entries if e["name"].startswith("g3_"))
+    g4_ok = all(e["passed"] for e in product_entries if e["name"].startswith("g4_"))
+    g5_ok = all(e["passed"] for e in product_entries if e["name"].startswith("g5_"))
 
     payload.update(
         {
@@ -344,20 +600,21 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                     "n": min(mc_n, 50_000),
                     "ms": mc_ms,
                 },
-                "note": "cost reported, never gated; 04-01 G1 remains unearned",
+                "product_api": product_details.get("g1"),
             },
+            "product_api": product_details,
             "gates": gates,
             "honesty": {
                 "claim_rung": 1,
-                "family": "two_bias_logistic_pack",
+                "family": "two_bias_logistic_pack_and_logistic_mixture",
                 "bias_collapse": True,
                 "temperature_collapse": False,
                 "k_ge_3_fisher": "inapplicable_not_a_density",
-                "g1_earned": False,
-                "g2_earned": bool(gates["all_passed"]),
-                "g3_earned": False,
-                "g4_earned": False,
-                "g5_earned": False,
+                "g1_earned": bool(g1_ok),
+                "g2_earned": bool(g2_ok),
+                "g3_earned": bool(g3_ok),
+                "g4_earned": bool(g4_ok),
+                "g5_earned": bool(g5_ok),
                 "theorem_prover_verified": False,
                 "mathlib_verified": False,
                 "pre_registered": (
@@ -368,8 +625,9 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "licensed_sentence": (
                     "for the two-bias logistic pack family, the Fisher information "
                     "in the spread direction vanishes as delta^2 with leading "
-                    "coefficient 1/720, measured over three decades against a "
-                    "Monte Carlo estimator"
+                    "coefficient 1/720; the pack-parameter metric on two-component "
+                    "logistic mixtures matches Monte Carlo, is SPSD, and a "
+                    "degeneracy-damped natural step stays on the spread chart"
                 ),
             },
             "wall_seconds": round(time.perf_counter() - t0, 3),

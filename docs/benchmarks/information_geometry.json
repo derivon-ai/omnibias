@@ -1,6 +1,6 @@
 {
   "schema": "information-geometry-v1",
-  "generated_utc": "2026-08-11T15:32:31Z",
+  "generated_utc": "2026-08-25T16:06:49Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -37,9 +37,10 @@
     "prefactor_delta": 0.0001,
     "prefactor_max_rel": 1e-06,
     "exponent_tol": 0.02,
-    "min_decades": 3.0
+    "min_decades": 3.0,
+    "product_api": true
   },
-  "rss_mb_at_start": 813.36,
+  "rss_mb_at_start": 814.14,
   "baseline": {
     "name": "Monte Carlo Fisher estimator",
     "sampler": "x = logit(U1) + delta*(U2 - 1/2)",
@@ -276,15 +277,156 @@
       "predicted": 0.001388888888888889
     },
     "six_decade_fitted_exponent": 1.9989376285238207,
-    "median_time_ms": 3.3470559865236282
+    "median_time_ms": 3.226457047276199
   },
   "cost": {
-    "closed_form_median_ms": 3.3470559865236282,
+    "closed_form_median_ms": 3.226457047276199,
     "monte_carlo_median_ms_at_n": {
       "n": 50000,
-      "ms": 1.1150389909744263
+      "ms": 1.1443530675023794
     },
-    "note": "cost reported, never gated; 04-01 G1 remains unearned"
+    "product_api": {
+      "max_sigmas": [
+        2.5233187630703857,
+        1.5278015085579029,
+        1.5249974277069935,
+        2.5373780641802623,
+        2.500357348797712,
+        2.479692289233825,
+        1.6421364056537815,
+        2.600359754324093
+      ],
+      "closed_ms": 0.0607870751991868,
+      "mc_ms": 112.75848699733615,
+      "speedup": 1854.9747068410459
+    }
+  },
+  "product_api": {
+    "n_suite": 8,
+    "n_accuracy": 200000,
+    "n_speed": 400000,
+    "n_trials_g4": 160,
+    "thetas": [
+      [
+        -1.4834497254196406,
+        -0.07792019364018313,
+        2.13064917485631,
+        0.32432472356862196,
+        -0.18816854798951455
+      ],
+      [
+        -1.6073429714383942,
+        0.054599568184580644,
+        1.9587836313486187,
+        0.12479684383652975,
+        -0.47244088675693163
+      ],
+      [
+        -1.1450816478552708,
+        0.014865858249546088,
+        1.5534006385069896,
+        0.24421435171420217,
+        -0.19680517070835502
+      ],
+      [
+        -1.565102954727088,
+        0.05155649322356462,
+        0.9876583761460307,
+        -0.048272379661925185,
+        -0.2376866595581505
+      ],
+      [
+        -1.1494894583179265,
+        0.09259548721581753,
+        1.192572261180456,
+        0.3403685999006193,
+        0.46165719366378677
+      ],
+      [
+        -1.185294082917053,
+        -0.011554397977314584,
+        1.5577175977664082,
+        -0.06967399561243656,
+        0.46992541321613257
+      ],
+      [
+        -1.47750398023297,
+        0.1617448777687502,
+        0.9622118574590786,
+        0.238341557171149,
+        0.11300330105304046
+      ],
+      [
+        -1.3021405632048753,
+        0.146470509052142,
+        1.9936859738729196,
+        -0.01995127613138839,
+        0.3398815210314088
+      ]
+    ],
+    "g1": {
+      "max_sigmas": [
+        2.5233187630703857,
+        1.5278015085579029,
+        1.5249974277069935,
+        2.5373780641802623,
+        2.500357348797712,
+        2.479692289233825,
+        1.6421364056537815,
+        2.600359754324093
+      ],
+      "closed_ms": 0.0607870751991868,
+      "mc_ms": 112.75848699733615,
+      "speedup": 1854.9747068410459
+    },
+    "g4": {
+      "predicted": 66,
+      "empirical": 37
+    },
+    "g5": {
+      "per_seed": [
+        {
+          "seed": 0,
+          "undamped_delta": 1e-08,
+          "damped_delta": 0.8889799431893038,
+          "damped_mu_err": 0.09548238797381262,
+          "damped_stable": 1.0,
+          "undamped_stable": 0.0
+        },
+        {
+          "seed": 1,
+          "undamped_delta": 1.0057493247317075,
+          "damped_delta": 1.2643133328715805,
+          "damped_mu_err": 0.03732072595219577,
+          "damped_stable": 1.0,
+          "undamped_stable": 1.0
+        },
+        {
+          "seed": 2,
+          "undamped_delta": 1e-08,
+          "damped_delta": 0.8248672764147553,
+          "damped_mu_err": 0.10644552554780982,
+          "damped_stable": 1.0,
+          "undamped_stable": 0.0
+        },
+        {
+          "seed": 3,
+          "undamped_delta": 1e-08,
+          "damped_delta": 0.4638276088325911,
+          "damped_mu_err": 0.14229457089797354,
+          "damped_stable": 1.0,
+          "undamped_stable": 0.0
+        },
+        {
+          "seed": 4,
+          "undamped_delta": 1e-08,
+          "damped_delta": 0.564744905495115,
+          "damped_mu_err": 0.04280588971754444,
+          "damped_stable": 1.0,
+          "undamped_stable": 0.0
+        }
+      ]
+    }
   },
   "gates": {
     "all_passed": true,
@@ -467,24 +609,231 @@
         "sigmas": 0.08832251093040963,
         "max_sigmas": 3.0,
         "passed": true
+      },
+      {
+        "name": "g1_mixture_0_max_sigma",
+        "measured": 2.5233187630703857,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_1_max_sigma",
+        "measured": 1.5278015085579029,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_2_max_sigma",
+        "measured": 1.5249974277069935,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_3_max_sigma",
+        "measured": 2.5373780641802623,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_4_max_sigma",
+        "measured": 2.500357348797712,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_5_max_sigma",
+        "measured": 2.479692289233825,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_6_max_sigma",
+        "measured": 1.6421364056537815,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_mixture_7_max_sigma",
+        "measured": 2.600359754324093,
+        "max_sigmas": 3.0,
+        "passed": true
+      },
+      {
+        "name": "g1_closed_form_1000x",
+        "fast_ms": 0.0607870751991868,
+        "slow_ms": 112.75848699733615,
+        "factor": 1854.9747068410459,
+        "min_factor": 1000.0,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_0",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_0",
+        "measured": 0.012708117321456757,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_1",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_1",
+        "measured": 0.01123756901246918,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_2",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_2",
+        "measured": 0.0038687416587090185,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_3",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_3",
+        "measured": 0.0015549104708013916,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_4",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_4",
+        "measured": 0.002996052908018134,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_5",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_5",
+        "measured": 0.0015705866145307472,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_6",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_6",
+        "measured": 0.004106965979055958,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_symmetric_7",
+        "measured": 0.0,
+        "max_skew": 1e-12,
+        "passed": true
+      },
+      {
+        "name": "g3_pd_7",
+        "measured": 0.0067556595284398195,
+        "min_eig": 0.001,
+        "passed": true
+      },
+      {
+        "name": "g3_two_bias_near_collapse_small_eig",
+        "measured": 1.388888888227481e-11,
+        "max_eig": 1e-09,
+        "passed": true
+      },
+      {
+        "name": "g4_distinguishability_factor_2",
+        "predicted": 66.0,
+        "measured": 37.0,
+        "ratio": 1.7837837837837838,
+        "max_factor": 2.0,
+        "passed": true
+      },
+      {
+        "name": "g5_damped_chart_stable",
+        "key": "damped_stable",
+        "expected": 1.0,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 1.0,
+        "worst_deviation": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g5_damped_beats_undamped_stability",
+        "damped_stable_seeds": 5,
+        "undamped_stable_seeds": 1,
+        "passed": true
       }
     ]
   },
   "honesty": {
     "claim_rung": 1,
-    "family": "two_bias_logistic_pack",
+    "family": "two_bias_logistic_pack_and_logistic_mixture",
     "bias_collapse": true,
     "temperature_collapse": false,
     "k_ge_3_fisher": "inapplicable_not_a_density",
-    "g1_earned": false,
+    "g1_earned": true,
     "g2_earned": true,
-    "g3_earned": false,
-    "g4_earned": false,
-    "g5_earned": false,
+    "g3_earned": true,
+    "g4_earned": true,
+    "g5_earned": true,
     "theorem_prover_verified": false,
     "mathlib_verified": false,
     "pre_registered": "analytic prediction delta^2/720 derived in theory/04-bridges/01-information-geometry-exponential-family.md section 5 and confirmed before the gate was written",
-    "licensed_sentence": "for the two-bias logistic pack family, the Fisher information in the spread direction vanishes as delta^2 with leading coefficient 1/720, measured over three decades against a Monte Carlo estimator"
+    "licensed_sentence": "for the two-bias logistic pack family, the Fisher information in the spread direction vanishes as delta^2 with leading coefficient 1/720; the pack-parameter metric on two-component logistic mixtures matches Monte Carlo, is SPSD, and a degeneracy-damped natural step stays on the spread chart"
   },
-  "wall_seconds": 1.632
+  "wall_seconds": 2.699
 }
