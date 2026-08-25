@@ -119,7 +119,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 
 | Spec | Status | One line |
 |---|---|---|
-| [02-01 scan-net](02-architectures/01-scan-net-gridless-cnn.md) | gated | Stacked scan banks; equivariance per-layer, on-lattice, not `R^D`; G1/G2/G5 earned; G3 cost and G4 k-NN recorded, not CI `all_passed` |
+| [02-01 scan-net](02-architectures/01-scan-net-gridless-cnn.md) | gated | Stacked scan banks; equivariance per-layer, on-lattice, not `R^D`; G1/G2/G3/G5 earned (G3 wall/point vs named k-NN over two decades); G4 k-NN recorded, not CI `all_passed` |
 | [02-02 arrangement graph network](02-architectures/02-arrangement-graph-network.md) | gated | Sampled tope subgraph; temperature collapse; sound gap, not P vs NP; G3 vs k-NN smoke/`--full`; cost gates smoke-earned, not in CI `all_passed` |
 | [02-03 jet-KAN](02-architectures/03-jet-kan-univariate-basis.md) | gated | Edge-wise univariate bases; exactness of the model jet, not the target; KA theorem does not justify; G2 cost not CI-gated |
 | [02-04 weak-form VPINN](02-architectures/04-weak-form-vpinn-closed-test-functions.md) | gated | Exact integrals only for polynomial coeffs on boxes; boundary bound on by default |

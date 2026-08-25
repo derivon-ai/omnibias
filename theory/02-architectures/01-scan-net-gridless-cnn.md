@@ -7,7 +7,7 @@ benefits of a convolutional network — weight sharing, translation equivariance
 a multiscale hierarchy — on inputs that have **no grid at all**: point clouds,
 collocation sets, scattered sensors, implicit fields.
 
-- **Status**: gated (G1/G2/G5 earned; G3 cost and G4 k-NN recorded, not CI `all_passed`)
+- **Status**: gated (G1/G2/G3/G5 earned; G4 k-NN recorded, not CI `all_passed`)
 - **Depends on**: 01-02, 01-06, 01-07
 - **Blocks**: 02-07, 05-01, 05-02
 
@@ -177,6 +177,9 @@ Baselines, all at matched parameter count: `CmbNet` on a binned grid, a
   against the domain-midpoint predictor, over five seeds.
 - **G3 no-neighbour-search cost.** Wall time per point is independent of `N`
   (measured across `N` spanning two decades), unlike the `k`-NN baseline.
+  **Earned** — `docs/benchmarks/scannet_smoke.json`. `N` in `{32, 320, 3200}`;
+  Scan-Net seconds/point ratio `3200/32 = 0.264` (need `<= 4`); named k-NN
+  ratio `42.1` (need `>= 8`). Warmup + median of repeats. In CI `all_passed`.
 - **G4 honest boundary.** On a task where spatial neighbourhoods genuinely
   matter (local density estimation), the `k`-NN baseline is *allowed* to win,
   and the result is reported rather than omitted.

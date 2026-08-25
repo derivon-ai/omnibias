@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-3 architecture: Scan-Net (theory 02-01 G1/G2/G5; G3 cost not CI-gated).
+"""Wave-3 architecture: Scan-Net (theory 02-01 G1/G2/G3/G5; G4 k-NN reported).
 
 Smoke earns per-layer interior-shift equivariance, a scattered-interface win
-versus voxelized ``cmbConv1d`` with skill vs midpoint, and torch/jax parity.
-G3 (wall/point independent of N) is recorded, not in CI ``all_passed``.
+versus voxelized ``cmbConv1d`` with skill vs midpoint, torch/jax parity,
+and no-neighbour-search cost versus named k-NN across two decades of ``N``.
 G4 (k-NN may win on density) is reported, not a win condition.
 """
 
@@ -25,6 +25,14 @@ from _common import provenance, write_json  # type: ignore[import-not-found]  # 
 from _gates import gates_block, skill_score  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
+
+# G3: wall/point independent of N, unlike k-NN. 32 -> 3200 is two decades.
+G3_NS = (32, 320, 3200)
+G3_SCAN_RATIO_MAX = 4.0
+G3_KNN_RATIO_MIN = 8.0
+G3_K = 8
+G3_WARMUP = 3
+G3_REPEATS = 5
 
 
 def _ulp_error(a: float, b: float) -> float:
@@ -179,6 +187,24 @@ def _run_g2(*, full: bool) -> dict[str, Any]:
     }
 
 
+def _knn_neighbour_search(xs: np.ndarray, *, k: int) -> np.ndarray:
+    """Named k-NN baseline: pairwise search, ``O(N)`` work per point."""
+    d = np.abs(xs.reshape(-1, 1) - xs.reshape(1, -1))
+    np.fill_diagonal(d, np.inf)
+    return np.partition(d, kth=k - 1, axis=1)[:, :k]
+
+
+def _median_seconds_per_point(fn: Any, *, warmup: int, repeats: int, n: int) -> float:
+    for _ in range(int(warmup)):
+        fn()
+    samples: list[float] = []
+    for _ in range(int(repeats)):
+        t0 = time.perf_counter()
+        fn()
+        samples.append((time.perf_counter() - t0) / float(n))
+    return float(np.median(np.asarray(samples, dtype=np.float64)))
+
+
 def _run_g3() -> dict[str, Any]:
     import torch
     from omnibias.torch.architectures.scannet import ScanNet, ScanNetConfig
@@ -189,23 +215,44 @@ def _run_g3() -> dict[str, Any]:
     )
     net = ScanNet(cfg, dtype=torch.float64)
     net.eval()
-    times: dict[int, float] = {}
-    for n in (32, 128, 512):
-        x = torch.randn(n, 1, dtype=torch.float64)
-        for _ in range(3):
-            net(x)
-        t0 = time.perf_counter()
-        for _ in range(8):
-            net(x)
-        times[n] = (time.perf_counter() - t0) / 8.0 / n
-    ratio = times[512] / max(times[32], 1e-12)
+    scan_tpp: dict[str, float] = {}
+    knn_tpp: dict[str, float] = {}
+    rng = np.random.default_rng(0)
+    for n in G3_NS:
+        x = torch.randn(int(n), 1, dtype=torch.float64)
+        xs = rng.standard_normal(int(n)).astype(np.float64)
+
+        def _scan(batch: torch.Tensor = x) -> None:
+            net(batch)
+
+        def _knn(points: np.ndarray = xs) -> None:
+            _knn_neighbour_search(points, k=G3_K)
+
+        scan_tpp[str(n)] = _median_seconds_per_point(
+            _scan, warmup=G3_WARMUP, repeats=G3_REPEATS, n=int(n)
+        )
+        knn_tpp[str(n)] = _median_seconds_per_point(
+            _knn, warmup=G3_WARMUP, repeats=G3_REPEATS, n=int(n)
+        )
+    n_lo, n_hi = str(G3_NS[0]), str(G3_NS[-1])
+    scan_ratio = scan_tpp[n_hi] / max(scan_tpp[n_lo], 1e-12)
+    knn_ratio = knn_tpp[n_hi] / max(knn_tpp[n_lo], 1e-12)
+    passed = bool(scan_ratio <= G3_SCAN_RATIO_MAX and knn_ratio >= G3_KNN_RATIO_MIN)
     return {
         "name": "g3_cost_vs_n",
-        "passed": False,
-        "in_ci_all_passed": False,
-        "seconds_per_point": times,
-        "ratio_512_over_32": ratio,
-        "note": "wall/point vs N recorded; not in CI all_passed (wall time)",
+        "passed": passed,
+        "in_ci_all_passed": True,
+        "n": list(G3_NS),
+        "scan_seconds_per_point": scan_tpp,
+        "knn_seconds_per_point": knn_tpp,
+        "scan_ratio_hi_over_lo": scan_ratio,
+        "knn_ratio_hi_over_lo": knn_ratio,
+        "scan_ratio_max": G3_SCAN_RATIO_MAX,
+        "knn_ratio_min": G3_KNN_RATIO_MIN,
+        "note": (
+            "wall/point vs N over two decades; Scan-Net stays bounded, "
+            "named k-NN grows. Warmup + median of repeats."
+        ),
     }
 
 
@@ -301,14 +348,14 @@ def main() -> int:
     g3 = _run_g3()
     g4 = _run_g4()
     g5 = _run_g5()
-    in_scope = [g1, g2, g5]
+    in_scope = [g1, g2, g3, g5]
     payload = provenance(
         schema="scannet-v1",
         config={
             "family": "scannet",
             "full": bool(args.full),
-            "g3_in_all_passed": False,
-            "gates_in_scope": ["g1", "g2", "g5"],
+            "g3_in_all_passed": True,
+            "gates_in_scope": ["g1", "g2", "g3", "g5"],
         },
     )
     payload["gates"] = gates_block(in_scope)
@@ -321,7 +368,7 @@ def main() -> int:
         "rd_translation_equivariance": False,
         "gamma_is_delta_collapse": False,
         "seventh_operatorblock_role": False,
-        "g3_in_ci_all_passed": False,
+        "g3_in_ci_all_passed": True,
     }
     if args.full:
         out_dir = SCRATCH / "scannet"

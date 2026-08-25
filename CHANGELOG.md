@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Scan-Net no-neighbour-search G3 (theory 02-01)
+
+- `benchmarks/scannet.py` G3 now times Scan-Net against named k-NN over
+  two decades (`N` in `{32, 320, 3200}`), warmup + median wall/point.
+- Earned: Scan-Net seconds/point ratio `0.264` (need `<= 4`); k-NN
+  `42.1` (need `>= 8`). G3 is in CI `all_passed`. G4 stays recorded.
+- Equivariance stays on-lattice, not `R^D`. Smoke:
+  `docs/benchmarks/scannet_smoke.json`.
+
+
 ### Added — Conjugate-Hilbert G5 recorded unearned (theory 01-12)
 
 - Named G5 is the CCF profile-fitting subproblem, not an in-span
