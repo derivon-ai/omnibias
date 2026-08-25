@@ -5,7 +5,8 @@
 Every spec's section 2 names an existing package, submodule, or
 docs-only home. ``NEW_PACKAGES_ALLOWED`` stays empty. Wave-0
 A4–A7 are recorded in the index. Failed falsifiers are marked
-``retired``. No new distribution. Not a performance benchmark.
+``retired``. Arrangement promotion is measured, not asserted.
+No new distribution. Not a performance benchmark.
 """
 
 from __future__ import annotations
@@ -36,6 +37,21 @@ _INDEX_RETIRED = re.compile(
     r"^\| \[([^\]]+)\]\([^)]+\) \| \*?\*?retired\*?\*? \| (.+?) \|",
     re.MULTILINE,
 )
+ARRANGEMENT_SRC = (
+    REPO
+    / "packages"
+    / "omnibias-partition"
+    / "src"
+    / "omnibias"
+    / "partition"
+    / "arrangement"
+)
+ARRANGEMENT_SPEC = REPO / "theory" / "06-program" / "03-packaging-and-rollout.md"
+LINE_NEED = 2000
+CONSUMER_NEED = 2
+_CRITERION_LINES = re.compile(r"2[\s,]?000")
+_CRITERION_CONSUMERS = re.compile(r"two (?:independent|external) consumers", re.I)
+_ARRANGEMENT_IMPORT = re.compile(r"omnibias\.partition\.arrangement")
 
 
 def _run_g1() -> dict[str, Any]:
@@ -222,6 +238,82 @@ def _run_g4() -> dict[str, Any]:
     }
 
 
+def _src_line_count(root: Path) -> int:
+    return sum(
+        len(path.read_text(encoding="utf-8").splitlines())
+        for path in sorted(root.rglob("*.py"))
+        if path.is_file()
+    )
+
+
+def _external_arrangement_consumers() -> list[str]:
+    packages = REPO / "packages"
+    found: set[str] = set()
+    for dist in sorted(packages.glob("omnibias-*")):
+        if dist.name == "omnibias-partition":
+            continue
+        src = dist / "src"
+        if not src.is_dir():
+            continue
+        for path in src.rglob("*.py"):
+            text = path.read_text(encoding="utf-8")
+            if _ARRANGEMENT_IMPORT.search(text):
+                found.add(dist.name)
+                break
+    return sorted(found)
+
+
+def _run_g5() -> dict[str, Any]:
+    """Named leftover: promotion criteria are demonstrated, not asserted."""
+    existing = homes._package_dirs()
+    minted = "omnibias-arrangement" in existing or (
+        homes.PACKAGES / "omnibias-arrangement"
+    ).exists()
+    n_lines = _src_line_count(ARRANGEMENT_SRC) if ARRANGEMENT_SRC.is_dir() else 0
+    consumers = _external_arrangement_consumers()
+    spec = ARRANGEMENT_SPEC.read_text(encoding="utf-8")
+    criterion_written = bool(
+        _CRITERION_LINES.search(spec) and _CRITERION_CONSUMERS.search(spec)
+    )
+    size_met = n_lines >= LINE_NEED
+    consumers_met = len(consumers) >= CONSUMER_NEED
+    promotion_licensed = bool(size_met and consumers_met)
+    if minted:
+        earned = bool(criterion_written and promotion_licensed)
+        vacuous = False
+    else:
+        earned = bool(criterion_written)
+        vacuous = True
+    return {
+        "name": "g5_promotion_criterion",
+        "passed": bool(earned),
+        "earned": bool(earned),
+        "reported": True,
+        "in_ci_all_passed": bool(earned),
+        "arrangement_minted": bool(minted),
+        "criterion_written": bool(criterion_written),
+        "n_lines": int(n_lines),
+        "line_need": LINE_NEED,
+        "size_met": bool(size_met),
+        "n_external_consumers": len(consumers),
+        "consumer_need": CONSUMER_NEED,
+        "consumers_met": bool(consumers_met),
+        "external_consumers": consumers,
+        "promotion_licensed": bool(promotion_licensed),
+        "vacuous_not_promoted": bool(vacuous),
+        "need": (
+            "written two-consumer / ~2000-line criterion; if minted, "
+            "both demonstrated"
+        ),
+        "note": (
+            "Named G5 is the promotion criterion. Face-Net "
+            "(`omnibias-graph`) is a consumer; `omnibias-convex` is "
+            "another. Size is below ~2000 lines, so promotion is not "
+            "licensed. No `omnibias-arrangement` package."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true")
@@ -230,7 +322,8 @@ def main() -> int:
     g2 = _run_g2()
     g3 = _run_g3()
     g4 = _run_g4()
-    in_scope = [row for row in (g1, g2, g3, g4) if row["in_ci_all_passed"]]
+    g5 = _run_g5()
+    in_scope = [row for row in (g1, g2, g3, g4, g5) if row["in_ci_all_passed"]]
     payload = provenance(
         schema="omnibias.benchmark.theory_homes.v1",
         config={
@@ -239,7 +332,7 @@ def main() -> int:
             "gates_in_scope": [row["name"] for row in in_scope],
             "g3_in_all_passed": bool(g3["in_ci_all_passed"]),
             "g4_in_all_passed": bool(g4["in_ci_all_passed"]),
-            "g5_in_all_passed": False,
+            "g5_in_all_passed": bool(g5["in_ci_all_passed"]),
         },
     )
     payload["gates"] = {
@@ -250,9 +343,10 @@ def main() -> int:
     payload["g2"] = g2
     payload["g3"] = g3
     payload["g4"] = g4
+    payload["g5"] = g5
     payload["honesty"] = {
         "new_packages_allowed": False,
-        "omnibias_arrangement_package": False,
+        "omnibias_arrangement_package": bool(g5["arrangement_minted"]),
         "docs_only_program_specs": True,
         "g1_earned": bool(g1["earned"]),
         "g1_in_ci_all_passed": bool(g1["in_ci_all_passed"]),
@@ -265,7 +359,10 @@ def main() -> int:
         "g4_in_ci_all_passed": bool(g4["in_ci_all_passed"]),
         "g4_vacuous_no_failed_falsifier": bool(g4["vacuous_no_failed_falsifier"]),
         "g4_is_same_commit_proof": False,
-        "g5_earned": False,
+        "g5_earned": bool(g5["earned"]),
+        "g5_in_ci_all_passed": bool(g5["in_ci_all_passed"]),
+        "g5_vacuous_not_promoted": bool(g5["vacuous_not_promoted"]),
+        "g5_promotion_licensed": bool(g5["promotion_licensed"]),
         "book_tree": False,
     }
     if args.full:

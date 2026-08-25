@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.theory_homes.v1",
-  "generated_utc": "2026-08-25T20:15:56Z",
+  "generated_utc": "2026-08-25T20:24:27Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -17,13 +17,14 @@
       "g1_zero_new_packages",
       "g2_homes_declared",
       "g3_falsifiers_first",
-      "g4_deletion_discipline"
+      "g4_deletion_discipline",
+      "g5_promotion_criterion"
     ],
     "g3_in_all_passed": true,
     "g4_in_all_passed": true,
-    "g5_in_all_passed": false
+    "g5_in_all_passed": true
   },
-  "rss_mb_at_start": 804.25,
+  "rss_mb_at_start": 804.12,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -129,6 +130,29 @@
         "vacuous_no_failed_falsifier": true,
         "need": "every failed Wave-0 falsifier has a retired index row with a reason",
         "note": "Named G4 is deletion discipline. Unearned leftover gates are not spec-killing failures. A5's first protocol miss was re-earned; 05-02 stays gated. No Wave-0 unit is **failed**, so the universal is vacuously true."
+      },
+      {
+        "name": "g5_promotion_criterion",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "arrangement_minted": false,
+        "criterion_written": true,
+        "n_lines": 389,
+        "line_need": 2000,
+        "size_met": false,
+        "n_external_consumers": 2,
+        "consumer_need": 2,
+        "consumers_met": true,
+        "external_consumers": [
+          "omnibias-convex",
+          "omnibias-graph"
+        ],
+        "promotion_licensed": false,
+        "vacuous_not_promoted": true,
+        "need": "written two-consumer / ~2000-line criterion; if minted, both demonstrated",
+        "note": "Named G5 is the promotion criterion. Face-Net (`omnibias-graph`) is a consumer; `omnibias-convex` is another. Size is below ~2000 lines, so promotion is not licensed. No `omnibias-arrangement` package."
       }
     ]
   },
@@ -235,6 +259,29 @@
     "need": "every failed Wave-0 falsifier has a retired index row with a reason",
     "note": "Named G4 is deletion discipline. Unearned leftover gates are not spec-killing failures. A5's first protocol miss was re-earned; 05-02 stays gated. No Wave-0 unit is **failed**, so the universal is vacuously true."
   },
+  "g5": {
+    "name": "g5_promotion_criterion",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "arrangement_minted": false,
+    "criterion_written": true,
+    "n_lines": 389,
+    "line_need": 2000,
+    "size_met": false,
+    "n_external_consumers": 2,
+    "consumer_need": 2,
+    "consumers_met": true,
+    "external_consumers": [
+      "omnibias-convex",
+      "omnibias-graph"
+    ],
+    "promotion_licensed": false,
+    "vacuous_not_promoted": true,
+    "need": "written two-consumer / ~2000-line criterion; if minted, both demonstrated",
+    "note": "Named G5 is the promotion criterion. Face-Net (`omnibias-graph`) is a consumer; `omnibias-convex` is another. Size is below ~2000 lines, so promotion is not licensed. No `omnibias-arrangement` package."
+  },
   "honesty": {
     "new_packages_allowed": false,
     "omnibias_arrangement_package": false,
@@ -250,7 +297,10 @@
     "g4_in_ci_all_passed": true,
     "g4_vacuous_no_failed_falsifier": true,
     "g4_is_same_commit_proof": false,
-    "g5_earned": false,
+    "g5_earned": true,
+    "g5_in_ci_all_passed": true,
+    "g5_vacuous_not_promoted": true,
+    "g5_promotion_licensed": false,
     "book_tree": false
   }
 }

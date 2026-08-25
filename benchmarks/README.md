@@ -54,7 +54,7 @@ uv run python docs/img/generate_figures.py
 | `tropical_homotopy.py` | `docs/benchmarks/tropical_homotopy_smoke.json` | Gated 01-08: reuses `logsumexp_gap_bound`; G4 path-following reported (no anneal driver); cost vs n/D reported |
 | `equality_locus.py` | `docs/benchmarks/equality_locus_smoke.json` | Gated 01-09: constraint manifold, not a PDE solver |
 | `jet_bundle.py` | `docs/benchmarks/jet_bundle_smoke.json` | Gated 01-10: vocabulary, not a discovery; G1–G3 earned |
-| `theory_homes.py` | `docs/benchmarks/theory_homes_smoke.json` | Gated 06-03: G1–G4 earned (93/93 homes; Wave-0 A4–A7 recorded; G4 vacuous); G5 not in `all_passed` |
+| `theory_homes.py` | `docs/benchmarks/theory_homes_smoke.json` | Gated 06-03: G1–G5 earned (93/93 homes; Wave-0 A4–A7 recorded; G4/G5 vacuous; 389 lines, not promoted) |
 | `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Gated 01-12: line Hilbert; G1–G4 CI; G5 unearned on CCF smoke (matched-width ratio `0.978`), not in `all_passed` |
 | `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Gated 02-02 Face-Net: sampled subgraph; G3 vs k-NN reported (0-hop; GNN / RegionModels `--full`); cost vs n/D reported |
 | `bem_net.py` | `docs/benchmarks/bem_net_smoke.json` | Gated 02-06: off-surface exact; G2 disc `--full`; G3 exterior win reported (no volume PINN); single-layer cost reported |

@@ -37,7 +37,6 @@ def test_g4_deletion_discipline_is_recorded() -> None:
         assert payload["honesty"]["g4_in_ci_all_passed"] is False
     assert payload["gates"]["all_passed"] is True
     assert payload["honesty"]["g4_is_same_commit_proof"] is False
-    assert payload["honesty"]["g5_earned"] is False
     assert payload["g1"]["earned"] is True
     assert payload["g2"]["earned"] is True
     assert payload["g3"]["earned"] is True

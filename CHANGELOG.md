@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Packaging promotion-criterion G5 earned (theory 06-03)
+
+- `benchmarks/theory_homes.py` now counts `omnibias.partition.arrangement`
+  source lines and external consumers.
+- Earned: criterion written; `omnibias-graph` (Face-Net) and
+  `omnibias-convex` consume it; 389 lines (need ~2000); package not
+  minted. Vacuous implication, measured not asserted. Promotion is
+  not licensed. In CI `all_passed`.
+- Smoke: `docs/benchmarks/theory_homes_smoke.json`.
+
+
 ### Added — Packaging deletion-discipline G4 earned (theory 06-03)
 
 - `benchmarks/theory_homes.py` now checks that every failed Wave-0
