@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Spectral-design G3 Mscale reported (theory 01-07)
+
+- `benchmarks/spectral_design.py` now leftover-records G3 from the
+  named five-seed Mscale path.
+- Reported: geometric and band-planned Mscale `0/5` hits of the
+  four-gap lstsq gate in 60 steps; `2x` ratio undefined. Not in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/spectral_design_smoke.json`.
+
+
 ### Added — Tabular G3b capacity reported (theory 05-02)
 
 - `benchmarks/tabular_arrangement_capacity.py` now records G3b from the

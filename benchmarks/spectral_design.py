@@ -198,6 +198,7 @@ def _run_g3() -> dict[str, Any]:
         "name": "g3_spectral_bias_steps",
         "passed": False,
         "earned": False,
+        "reported": True,
         "in_ci_all_passed": False,
         "gate": gate,
         "steps": steps,
@@ -242,6 +243,8 @@ def main() -> int:
     payload["honesty"] = {
         "wavelet_frame_claim": False,
         "littlewood_paley_claim": False,
+        "g3_earned": False,
+        "g3_reported": True,
         "g3_in_ci_all_passed": False,
         "collapse": "delta -> 0; pack order is a band selector",
     }

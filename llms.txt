@@ -33,7 +33,7 @@ Wave-3 algebra + architectures (gated, no new packages): `MollifierSpec` /
 `tail_bound` (01-05; G1–G4 CI-gated; certified exponential tails, not
 compact support; higher-order kernels take negative values),
 `BandPlan` / `peak_frequency`
-(01-07; G3 unearned, not `all_passed`; pack order is a band selector),
+(01-07; G3 reported `0/5` Mscale hits, not `all_passed`; pack order is a band selector),
 `FrameSpec` (01-06; `sigma'` not
 admissible; G4 unearned), `EqualitySystem` / `EqualityLocusLayer` (01-09 / 02-12;
 constraint manifold, not a PDE solver; 02-12 G4 Burgers RH reported,

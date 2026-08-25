@@ -67,6 +67,7 @@
     "name": "g3_spectral_bias_steps",
     "passed": false,
     "earned": false,
+    "reported": true,
     "in_ci_all_passed": false,
     "gate": 1e-05,
     "steps": 60,
@@ -88,6 +89,8 @@
   "honesty": {
     "wavelet_frame_claim": false,
     "littlewood_paley_claim": false,
+    "g3_earned": false,
+    "g3_reported": true,
     "g3_in_ci_all_passed": false,
     "collapse": "delta -> 0; pack order is a band selector"
   }
