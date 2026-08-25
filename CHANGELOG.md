@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomy-band G2 closed-form earned (theory 02-14)
+
+- `benchmarks/holonomy_band.py` now compares `band_holonomy` closed form
+  to PRODUCT at `substeps=4096` in the abelian and transverse-constant
+  regimes.
+- Earned: abs err `<= 1e-12` and cost ratio `~3e-4` (need a fraction of
+  the PRODUCT cost). Previous smoke skipped G2. In CI `all_passed`.
+- Smoke: `docs/benchmarks/holonomy_band_smoke.json`.
+
+
 ### Added — Tropical G4 path-following reported (theory 01-08)
 
 - `benchmarks/tropical_homotopy.py` now records that `relaxed_hess` is

@@ -6,8 +6,12 @@ gauge-dependent. **No** Yang-Mills / mass-gap / continuum claim. The
 gap is held finite (band), the opposite of founding `delta -> 0`.
 Wraps existing `parallel_transport` / `wilson_loop`.
 
-G1–G5 are CI-gated. Status is **gated**, not shipped. See theory spec
-02-14.
+G1–G5 are CI-gated. G2 closed-form exactness is **earned** on the smoke
+artifact: `band_holonomy` matches PRODUCT at `substeps=4096` to
+`<= 1e-12` in the abelian and transverse-constant regimes, at a
+fraction of the PRODUCT cost. Previous smoke skipped G2. No YM / mass
+gap / continuum claim. Status is **gated**, not shipped. See theory
+spec 02-14.
 
 ## Algebra and twins
 

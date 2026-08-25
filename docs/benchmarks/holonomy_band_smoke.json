@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.holonomy_band.v1",
-  "generated_utc": "2026-08-15T18:16:47Z",
+  "generated_utc": "2026-08-25T19:21:37Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,9 +11,16 @@
     "folx": "0.2.22"
   },
   "config": {
-    "mode": "smoke"
+    "mode": "smoke",
+    "g2_in_all_passed": true,
+    "gates_in_scope": [
+      "g1",
+      "g2",
+      "g3",
+      "g4"
+    ]
   },
-  "rss_mb_at_start": 821.96,
+  "rss_mb_at_start": 826.41,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -21,6 +28,15 @@
         "name": "g1_regime",
         "passed": true,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "g2_closed_form",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "abelian_abs_err": 3.4241877141052725e-15,
+        "su2_abs_err": 5.564437799421285e-13,
+        "abelian_cost_ratio": 0.0003570198724678671,
+        "su2_cost_ratio": 0.0003967153746211072
       },
       {
         "name": "g3_magnus_bound",
@@ -34,11 +50,36 @@
       }
     ]
   },
+  "g2": {
+    "name": "g2_closed_form",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "substeps": 4096,
+    "abs_tol": 1e-12,
+    "cost_ratio_max": 0.25,
+    "abelian_abs_err": 3.4241877141052725e-15,
+    "su2_abs_err": 5.564437799421285e-13,
+    "abelian_cost_ratio": 0.0003570198724678671,
+    "su2_cost_ratio": 0.0003967153746211072,
+    "abelian_closed_form_seconds": 4.710047505795956e-06,
+    "abelian_product_seconds": 0.01319267600774765,
+    "su2_closed_form_seconds": 6.292015314102173e-06,
+    "su2_product_seconds": 0.015860275947488844,
+    "note": "band_holonomy closed form versus PRODUCT at substeps=4096 in the abelian and transverse-constant (A^1) regimes. Named G2 needs match <= 1e-12 and a fraction of the PRODUCT cost. Previous smoke skipped G2. No YM / mass gap."
+  },
   "honesty": {
     "closed_form": "abelian and transverse-constant only",
     "open_lines": "gauge-dependent",
     "yang_mills": false,
     "mass_gap": false,
-    "continuum_claim": false
+    "continuum_claim": false,
+    "g2_earned": true,
+    "g2_reported": true,
+    "g2_in_ci_all_passed": true,
+    "temperature_collapse": false,
+    "founding_bias_collapse": false,
+    "finite_band_gap": true
   }
 }

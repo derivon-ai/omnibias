@@ -63,7 +63,7 @@ uv run python docs/img/generate_figures.py
 | `layered_transfer.py` | `docs/benchmarks/layered_transfer_smoke.json` | Gated 02-11: `continuum_claim=False`; G4 inverse-design `--full`; stack cost reported; G5 conservation reported |
 | `equality_intersection.py` | `docs/benchmarks/equality_intersection_smoke.json` | Gated 02-12: not a general PDE solver; G4 Burgers RH reported (noisy contour `--full`) |
 | `linearizing_transforms.py` | `docs/benchmarks/linearizing_transforms_smoke.json` | Gated 02-13: named transforms; 03-11 stays designed |
-| `holonomy_band.py` | `docs/benchmarks/holonomy_band_smoke.json` | Gated 02-14: no YM / mass-gap claim |
+| `holonomy_band.py` | `docs/benchmarks/holonomy_band_smoke.json` | Gated 02-14: no YM / mass-gap claim; G2 closed-form earned vs PRODUCT 4096 |
 | `gauge_holonomy_gap.py` | `docs/benchmarks/gauge_holonomy_gap_smoke.json` | Gated 07-04: holonomy trials on one fixed matrix; G1 factor measured; no YM / continuum |
 | `gauge_two_plaquette_gap.py` | `docs/benchmarks/gauge_two_plaquette_gap_smoke.json` | Two-plaquette KS Hamiltonian `λ1-λ0`; G1 factor measured; no YM / continuum |
 | `gauge_spatial_strip.py` | `docs/benchmarks/gauge_spatial_strip_smoke.json` | Finite 2+1-D strip gap + RP + cluster tail; no YM / OS / continuum |
