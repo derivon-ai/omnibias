@@ -49,7 +49,8 @@ interface sharpening, neither collapse; parallel interfaces only; not the
 XPINN `omnibias.pinn._core.interface`), BEM-Net / pack tree / equivariant
 scan / tanh-method / Hermite ladder / layered transfer / named linearizing
 transforms / holonomy band (02-06–02-11, 02-13, 02-14; see honesty on
-each API page), exact jet line search (03-12; certified Lagrange
+each API page; 02-10 G4 many-body unearned, exact-ladder vs FD reported),
+exact jet line search (03-12; certified Lagrange
 radius + `verify=True` never-worse; G4 unearned vs strong Wolfe,
 G5 crossover reported, not in CI `all_passed`), adaptive pack
 refinement (03-13; birth/growth

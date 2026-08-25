@@ -5,8 +5,12 @@ raw tower is **not** the QHO eigenbasis; Rodrigues reweight
 (`Normalization.OSCILLATOR`) is required. Anharmonic G5 may lose;
 report it.
 
-G1–G3/G6 are CI-gated. G4 FermiNet is `--full`. Status is **gated**,
-not shipped. See theory spec 02-10.
+G1–G3/G6 are CI-gated. G4 many-body FermiNet variance (2x, five seeds)
+stays `--full` and is **unearned**: the 1-D QHO envelope already contains
+the ground state. Exact `apply_ladder` orbital derivatives versus
+central FD are **reported**; the previous untimed `passed=True` stub is
+withdrawn. Cost is not in CI `all_passed`. Status is **gated**, not
+shipped. See theory spec 02-10.
 
 ## Core algebra
 

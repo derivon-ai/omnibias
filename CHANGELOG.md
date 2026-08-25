@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Hermite-ladder cost reported (theory 02-10)
+
+- `benchmarks/hermite_ladder.py` now times exact `apply_ladder`
+  orbital derivatives versus central FD at `n` in `{2,4,8}` (64
+  points; warmup + median).
+- Reported: FD/exact median `~0.63` (no wall-time win). G4 many-body
+  2x variance stays `--full` / unearned: the 1-D QHO envelope already
+  contains the ground state. Previous untimed `passed=True` stub
+  withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/hermite_ladder_smoke.json`.
+
+
 ### Added — Face-Net cost reported (theory 02-02)
 
 - `benchmarks/arrangement_graph.py` now times sampled
