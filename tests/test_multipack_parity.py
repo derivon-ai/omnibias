@@ -175,6 +175,29 @@ def test_g3_torch_jax_bit_identical() -> None:
     np.testing.assert_array_equal(torch_out, jax_out)
 
 
+def test_smoke_artifact_records_g4() -> None:
+    import json
+    from pathlib import Path
+
+    payload = json.loads(
+        (
+            Path(__file__).resolve().parents[1]
+            / "docs"
+            / "benchmarks"
+            / "multipack_birkhoff_smoke.json"
+        ).read_text(encoding="utf-8")
+    )
+    honesty = payload["honesty"]
+    assert honesty["g1_earned"] is True
+    assert honesty["g2_earned"] is True
+    assert honesty["g3_earned"] is True
+    assert honesty["g4_earned"] is True
+    assert honesty["g5_earned"] is True
+    assert payload["gates"]["all_passed"] is True
+    assert payload["g4"]["passed"] is True
+    assert float(payload["g4"]["max_rel_l2"]) <= 1e-6
+
+
 def test_negative_order_raises() -> None:
     with pytest.raises(ValueError):
         PackSpec(-1, 0.0)

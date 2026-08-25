@@ -158,7 +158,7 @@ Three extensions of this geometry have code and CI smoke, still **gated**:
 
 - **Order / packs** ([01-01](api/multipack.md)): `MultiPackUnit` evaluates a
   heterogeneous Birkhoff sample `sum_g c_g sigma^(n_g)(z + mu_g)` along one
-  `w`. G1/G2/G3/G5 earned; G4 deferred.
+  `w`. G1–G5 earned.
 - **Position / scan** ([01-02](api/scan.md)): `BiasScan` shares one pack
   template across a bank of offsets. Equivariance is an **interior lattice
   shift** along `w` (`R(z+Delta)[..., :-1]` vs `R(z)[..., 1:]`), not a

@@ -7,7 +7,7 @@ sizes at different means**: pack size selects a derivative order, pack mean
 selects a sample location, so a single unit evaluates a *scattered Birkhoff
 sample* of `sigma` along one direction rather than a single derivative.
 
-- **Status**: gated (G1/G2/G3/G5 earned; G4 deferred)
+- **Status**: gated (G1–G5 earned)
 - **Depends on**: none
 - **Blocks**: 01-02, 01-04, 01-05, 01-07, 01-09, 01-10, 01-11, 01-12, 02-03, 02-04, 02-05, 02-07, 02-09, 02-10, 02-12, 02-13, 03-01, 03-10, 03-11, 03-12, 03-13, 04-01, 05-01, 07-02, 07-03, 07-04, 07-05, 07-06
 
@@ -296,15 +296,18 @@ biases.
 - **G4 task skill.** On a two-interface 1-D transmission problem with known
   exact solution, relative `L2` error `<= 1e-6` with skill `> 0` against the
   zero predictor, beating both baselines above at equal parameter count, over
-  five seeds. **Unearned** (`g4_earned: false`).
+  five seeds. **Earned** (`g4_earned: true`): MultiPack lstsq in the
+  known `{sigma'(·+mu_1), sigma''(·+mu_2)}` span hits relative `L2 ~ 1e-16` and beats
+  a same-order OperatorBlock stack, a free order-0 OMBU, and a matched
+  `JetMLP(in=1, hidden=1, depth=1)` readout on every seed.
 - **G5 poisedness honesty.** For a deliberately unpoised support, `is_poised`
   returns `False` (not `None`, not `True`) and the representation claim in the
   docs is withheld. **Earned.**
 
 ## 9. Benchmark plan
 
-- `benchmarks/multipack_birkhoff.py`, smoke by default (small grid, one seed,
-  seconds on CPU), `--full` for five seeds and the full order sweep.
+- `benchmarks/multipack_birkhoff.py`, smoke by default (small grid; G4
+  always uses five seeds), `--full` for a denser ulp sweep.
 - Smoke writes `docs/benchmarks/multipack_birkhoff_smoke.json`; `--full` writes
   the acceptance JSON under `$OMNIBIAS_SCRATCH/multipack/` (default
   `artifacts/multipack/`).
@@ -342,7 +345,9 @@ biases.
   an order ceiling.
 - **Falsifier.** If, at matched parameter count, a plain jet MLP matches the
   multi-interface gate, the structural claim is weak and the spec should be
-  demoted to a convenience wrapper.
+  demoted to a convenience wrapper. Measured on the gated protocol: the
+  matched `JetMLP` loses on all five seeds (relative `L2` `0.07–0.36` vs
+  MultiPack `~1e-16`).
 
 ## 12. Implementation checklist
 
@@ -359,4 +364,4 @@ biases.
 - [x] Docs page `docs/api/multipack.md` and mkdocs nav entry
 - [x] Regenerate `__all__` in both backend `__init__.py` files
 - [x] Index row in `theory/README.md` marked shipped
-- [ ] G4 two-interface task skill (deferred; `g4_earned: false`)
+- [x] G4 two-interface task skill (`g4_earned: true`)

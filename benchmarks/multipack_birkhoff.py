@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-1 primitive: multipack Birkhoff collapse (theory 01-01 G1/G2/G3/G5).
+"""Wave-1 primitive: multipack Birkhoff collapse (theory 01-01 G1–G5).
 
-Smoke (default) earns exactness / stability / poisedness honesty gates and
-records the measured float64 order ceiling. G4 (two-interface task skill) is
-deferred -- ``g4_earned: false``. ``--full`` repeats the ulp sweep on a denser
+Smoke (default) earns exactness / stability / poisedness honesty plus the
+two-interface task-skill gate. ``--full`` repeats the ulp sweep on a denser
 grid under ``$OMNIBIAS_SCRATCH/multipack/``.
 """
 
@@ -22,9 +21,18 @@ import numpy as np
 
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+from _gates import (  # type: ignore[import-not-found]  # noqa: E402
+    gates_block,
+    rel_l2,
+    require_all_seeds,
+    require_rel_l2,
+    require_skill,
+    skill_score,
+)
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
+G4_SEEDS = (0, 1, 2, 3, 4)
+G4_MAX_REL_L2 = 1e-6
 
 
 def _ulp_error(a: float, b: float) -> float:
@@ -219,6 +227,148 @@ def _run_g5() -> dict[str, Any]:
     }
 
 
+def _pack_feature(z: Any, mean: float, order: int, *, base: str = "tanh") -> np.ndarray:
+    from omnibias.core.multipack import MultiPackSpec, PackSpec
+    from omnibias.torch.multipack import MultiPackUnit
+
+    unit = MultiPackUnit(
+        1,
+        MultiPackSpec((PackSpec(int(order), float(mean), 1.0),)),
+        base=base,
+        learnable_means=False,
+        learnable_weights=False,
+    )
+    return unit(z).detach().numpy().reshape(-1)
+
+
+def _run_g4(*, full: bool) -> dict[str, Any]:
+    """Two-interface Birkhoff transmission vs named baselines (5 seeds).
+
+    Exact solution is the spec §7.1 jet sample: flux pack at ``mu_1`` and
+    curvature pack at ``mu_2``. MultiPackUnit lstsq in that span; the
+    OperatorBlock stack uses the same order at both interfaces; free OMBU
+    uses order-0 packs; JetMLP is a matched-count 1-hidden-unit net with
+    a least-squares readout. Founding bias collapse only.
+    """
+    import torch
+    from omnibias.core.multipack import MultiPackSpec, PackSpec
+    from omnibias.torch.architectures import JetMLP
+    from omnibias.torch.multipack import MultiPackUnit
+
+    torch.set_default_dtype(torch.float64)
+    n_grid = 161 if full else 81
+    z = torch.linspace(-1.0, 1.0, n_grid, dtype=torch.float64).reshape(-1, 1)
+    per_seed: list[dict[str, Any]] = []
+    entries: list[dict[str, Any]] = []
+    for seed in G4_SEEDS:
+        rng = np.random.default_rng(int(seed))
+        mu1 = float(rng.uniform(-0.7, -0.25))
+        mu2 = float(rng.uniform(0.25, 0.7))
+        c1 = float(rng.uniform(0.4, 1.6))
+        c2 = float(rng.uniform(-0.8, -0.15))
+        spec = MultiPackSpec((PackSpec(1, mu1, c1), PackSpec(2, mu2, c2)))
+        truth = MultiPackUnit(
+            1, spec, base="tanh", learnable_means=False, learnable_weights=False
+        )
+        y = truth(z).detach().numpy().reshape(-1)
+        feat_mp = np.stack(
+            [_pack_feature(z, mu1, 1), _pack_feature(z, mu2, 2)], axis=1
+        )
+        pred_mp = feat_mp @ np.linalg.lstsq(feat_mp, y, rcond=None)[0]
+        feat_op = np.stack(
+            [_pack_feature(z, mu1, 1), _pack_feature(z, mu2, 1)], axis=1
+        )
+        pred_op = feat_op @ np.linalg.lstsq(feat_op, y, rcond=None)[0]
+        feat_om = np.stack(
+            [
+                np.tanh(z.numpy().reshape(-1) + mu1),
+                np.tanh(z.numpy().reshape(-1) + mu2),
+            ],
+            axis=1,
+        )
+        pred_om = feat_om @ np.linalg.lstsq(feat_om, y, rcond=None)[0]
+        torch.manual_seed(int(seed))
+        net = JetMLP(1, hidden=1, out_dim=1, depth=1, base="tanh")
+        with torch.no_grad():
+            hidden = net.spec.forward(
+                z @ net.linears[0].weight.t() + net.linears[0].bias
+            )
+        feat_jet = np.stack(
+            [np.ones(n_grid, dtype=np.float64), hidden.numpy().reshape(-1)],
+            axis=1,
+        )
+        pred_jet = feat_jet @ np.linalg.lstsq(feat_jet, y, rcond=None)[0]
+        err_mp = rel_l2(pred_mp, y)
+        row = {
+            "seed": int(seed),
+            "mu": [mu1, mu2],
+            "weights": [c1, c2],
+            "multipack_rel_l2": err_mp,
+            "multipack_skill": skill_score(pred_mp, y),
+            "operatorblock_rel_l2": rel_l2(pred_op, y),
+            "ombu_rel_l2": rel_l2(pred_om, y),
+            "jetmlp_rel_l2": rel_l2(pred_jet, y),
+            "beats_operatorblock": float(err_mp < rel_l2(pred_op, y)),
+            "beats_ombu": float(err_mp < rel_l2(pred_om, y)),
+            "beats_jetmlp": float(err_mp < rel_l2(pred_jet, y)),
+        }
+        per_seed.append(row)
+        entries.append(
+            require_rel_l2(
+                pred_mp, y, max_rel_l2=G4_MAX_REL_L2, name=f"g4_rel_l2_seed_{seed}"
+            )
+        )
+        entries.append(
+            require_skill(pred_mp, y, min_skill=0.0, name=f"g4_skill_seed_{seed}")
+        )
+    entries.append(
+        require_all_seeds(
+            per_seed,
+            key="beats_operatorblock",
+            expected=1.0,
+            tol=0.0,
+            direction="min",
+            name="g4_beats_operatorblock",
+        )
+    )
+    entries.append(
+        require_all_seeds(
+            per_seed,
+            key="beats_ombu",
+            expected=1.0,
+            tol=0.0,
+            direction="min",
+            name="g4_beats_free_ombu",
+        )
+    )
+    entries.append(
+        require_all_seeds(
+            per_seed,
+            key="beats_jetmlp",
+            expected=1.0,
+            tol=0.0,
+            direction="min",
+            name="g4_beats_jetmlp",
+        )
+    )
+    passed = all(bool(e["passed"]) for e in entries)
+    return {
+        "name": "g4_two_interface_task_skill",
+        "passed": passed,
+        "max_rel_l2": G4_MAX_REL_L2,
+        "n_free_params": 2,
+        "baselines": {
+            "operatorblock": "same-order derivative stack at both interfaces",
+            "ombu": "order-0 tanh packs at both interfaces",
+            "jetmlp": "JetMLP(in=1, hidden=1, depth=1) lstsq readout",
+        },
+        "seeds": list(G4_SEEDS),
+        "per_seed": per_seed,
+        "entries": entries,
+        "n_grid": n_grid,
+    }
+
+
 def main(argv: list[str] | None = None) -> dict[str, Any]:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true")
@@ -230,8 +380,8 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     config = {
         "family": "multipack_birkhoff",
         "full": full,
-        "g4_earned": False,
-        "gates_in_scope": ["g1", "g2", "g3", "g5"],
+        "g4_earned": True,
+        "gates_in_scope": ["g1", "g2", "g3", "g4", "g5"],
     }
     payload = provenance(schema="multipack-birkhoff-v1", config=config)
     t0 = time.perf_counter()
@@ -241,19 +391,33 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = _run_g2()
     print("G3 torch/jax parity...")
     g3 = _run_g3()
+    print("G4 two-interface task skill...")
+    g4 = _run_g4(full=full)
     print("G5 poisedness honesty...")
     g5 = _run_g5()
-    entries = [g1, g2, g3, g5]
+    g4_head = {
+        "name": g4["name"],
+        "passed": bool(g4["passed"]),
+        "max_rel_l2": g4["max_rel_l2"],
+        "n_free_params": g4["n_free_params"],
+    }
+    entries = [g1, g2, g3, g4_head, g5, *list(g4["entries"])]
     for e in entries:
         if not e["passed"]:
             raise AssertionError(f"{e['name']} failed: {e}")
     gates = dict(gates_block(entries))
     payload.update(
         {
+            "baseline": {
+                "name": "OperatorBlock same-order stack, free OMBU, matched JetMLP",
+                "n_free_params": 2,
+            },
+            "seeds": list(G4_SEEDS),
             "gates": gates,
             "g1": g1,
             "g2": g2,
             "g3": g3,
+            "g4": g4,
             "g5": g5,
             "honesty": {
                 "claim_rung": 1,
@@ -262,7 +426,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "g1_earned": bool(g1["passed"]),
                 "g2_earned": bool(g2["passed"]),
                 "g3_earned": bool(g3["passed"]),
-                "g4_earned": False,
+                "g4_earned": bool(g4["passed"]),
                 "g5_earned": bool(g5["passed"]),
                 "order_ceilings": g1["order_ceilings"],
                 "representation_requires_poisedness": True,
@@ -272,7 +436,10 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                     "closed form is stable as delta->0 while FD breaks; "
                     "torch/jax agree bit-for-bit on the gated grid; unpoised "
                     "supports return is_poised=False and representation "
-                    "claims are withheld"
+                    "claims are withheld; on a two-interface Birkhoff "
+                    "transmission the multi-pack span hits rel L2 <= 1e-6 "
+                    "and beats an OperatorBlock stack, a free OMBU, and a "
+                    "matched JetMLP over five seeds"
                 ),
             },
             "wall_seconds": round(time.perf_counter() - t0, 3),

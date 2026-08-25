@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Multipack Birkhoff G4 (theory 01-01)
+
+- `benchmarks/multipack_birkhoff.py` earns the two-interface task-skill
+  gate: MultiPack lstsq in the known Birkhoff span hits rel `L2 ~ 1e-16`
+  and beats a same-order OperatorBlock stack, a free OMBU, and a matched
+  JetMLP over five seeds.
+- G1–G5 now in CI `all_passed`. Smoke:
+  `docs/benchmarks/multipack_birkhoff_smoke.json`.
+
+
 ### Added — Wave-0 A5 sequence falsifier (theory 05-02 G5)
 
 - `benchmarks/sequence_transverse.py` compares a designed causal

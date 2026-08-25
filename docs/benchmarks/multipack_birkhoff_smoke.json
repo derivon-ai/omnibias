@@ -1,6 +1,6 @@
 {
   "schema": "multipack-birkhoff-v1",
-  "generated_utc": "2026-08-11T17:36:38Z",
+  "generated_utc": "2026-08-25T16:13:38Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,15 +13,16 @@
   "config": {
     "family": "multipack_birkhoff",
     "full": false,
-    "g4_earned": false,
+    "g4_earned": true,
     "gates_in_scope": [
       "g1",
       "g2",
       "g3",
+      "g4",
       "g5"
     ]
   },
-  "rss_mb_at_start": 813.42,
+  "rss_mb_at_start": 804.2,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -86,11 +87,182 @@
         "max_abs_diff": 0.0
       },
       {
+        "name": "g4_two_interface_task_skill",
+        "passed": true,
+        "max_rel_l2": 1e-06,
+        "n_free_params": 2
+      },
+      {
         "name": "g5_poisedness_honesty",
         "passed": true,
         "unpoised_is_poised": false,
         "poised_is_poised": true,
         "representation_claim_withheld_for_unpoised": true
+      },
+      {
+        "name": "g4_rel_l2_seed_0",
+        "rel_l2": 6.675506585967563e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_0",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_rel_l2_seed_1",
+        "rel_l2": 3.6290552778827426e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_1",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_rel_l2_seed_2",
+        "rel_l2": 1.557113677545631e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_2",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_rel_l2_seed_3",
+        "rel_l2": 3.8868673768843526e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_3",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_rel_l2_seed_4",
+        "rel_l2": 4.81336459141479e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_4",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_beats_operatorblock",
+        "key": "beats_operatorblock",
+        "expected": 1.0,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 1.0,
+        "worst_deviation": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_beats_free_ombu",
+        "key": "beats_ombu",
+        "expected": 1.0,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 1.0,
+        "worst_deviation": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_beats_jetmlp",
+        "key": "beats_jetmlp",
+        "expected": 1.0,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 1.0,
+        "worst_deviation": 0.0,
+        "passed": true
       }
     ]
   },
@@ -154,6 +326,289 @@
     "passed": true,
     "max_abs_diff": 0.0
   },
+  "g4": {
+    "name": "g4_two_interface_task_skill",
+    "passed": true,
+    "max_rel_l2": 1e-06,
+    "n_free_params": 2,
+    "baselines": {
+      "operatorblock": "same-order derivative stack at both interfaces",
+      "ombu": "order-0 tanh packs at both interfaces",
+      "jetmlp": "JetMLP(in=1, hidden=1, depth=1) lstsq readout"
+    },
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "per_seed": [
+      {
+        "seed": 0,
+        "mu": [
+          -0.41336724070534553,
+          0.3714040211937416
+        ],
+        "weights": [
+          0.44916822872343365,
+          -0.7892570369064561
+        ],
+        "multipack_rel_l2": 6.675506585967563e-16,
+        "multipack_skill": 1.0,
+        "operatorblock_rel_l2": 0.2672398870202424,
+        "ombu_rel_l2": 0.23200198450586632,
+        "jetmlp_rel_l2": 0.29196322893298093,
+        "beats_operatorblock": 1.0,
+        "beats_ombu": 1.0,
+        "beats_jetmlp": 1.0
+      },
+      {
+        "seed": 1,
+        "mu": [
+          -0.46968026888488446,
+          0.6777086633466709
+        ],
+        "weights": [
+          0.5729915352635605,
+          -0.18337785936079154
+        ],
+        "multipack_rel_l2": 3.6290552778827426e-16,
+        "multipack_skill": 1.0,
+        "operatorblock_rel_l2": 0.0949824696144285,
+        "ombu_rel_l2": 0.07155666079595886,
+        "jetmlp_rel_l2": 0.1656801593424971,
+        "beats_operatorblock": 1.0,
+        "beats_ombu": 1.0,
+        "beats_jetmlp": 1.0
+      },
+      {
+        "seed": 2,
+        "mu": [
+          -0.5822745395878076,
+          0.3843210145363555
+        ],
+        "weights": [
+          1.3770708887131367,
+          -0.740254637612187
+        ],
+        "multipack_rel_l2": 1.557113677545631e-16,
+        "multipack_skill": 1.0,
+        "operatorblock_rel_l2": 0.16221580704042954,
+        "ombu_rel_l2": 0.08699148391509424,
+        "jetmlp_rel_l2": 0.3623110129546881,
+        "beats_operatorblock": 1.0,
+        "beats_ombu": 1.0,
+        "beats_jetmlp": 1.0
+      },
+      {
+        "seed": 3,
+        "mu": [
+          -0.661457874785369,
+          0.35656472796824484
+        ],
+        "weights": [
+          1.3615293582476764,
+          -0.42159467655816096
+        ],
+        "multipack_rel_l2": 3.8868673768843526e-16,
+        "multipack_skill": 1.0,
+        "operatorblock_rel_l2": 0.11360054122844992,
+        "ombu_rel_l2": 0.06788558376029664,
+        "jetmlp_rel_l2": 0.10608130584564351,
+        "beats_operatorblock": 1.0,
+        "beats_ombu": 1.0,
+        "beats_jetmlp": 1.0
+      },
+      {
+        "seed": 4,
+        "mu": [
+          -0.27562475249243457,
+          0.48009739876646274
+        ],
+        "weights": [
+          1.5714924468492453,
+          -0.7474565844678587
+        ],
+        "multipack_rel_l2": 4.81336459141479e-16,
+        "multipack_skill": 1.0,
+        "operatorblock_rel_l2": 0.10823230867413253,
+        "ombu_rel_l2": 0.12574126259824833,
+        "jetmlp_rel_l2": 0.31800786960632405,
+        "beats_operatorblock": 1.0,
+        "beats_ombu": 1.0,
+        "beats_jetmlp": 1.0
+      }
+    ],
+    "entries": [
+      {
+        "name": "g4_rel_l2_seed_0",
+        "rel_l2": 6.675506585967563e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_0",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_rel_l2_seed_1",
+        "rel_l2": 3.6290552778827426e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_1",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_rel_l2_seed_2",
+        "rel_l2": 1.557113677545631e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_2",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_rel_l2_seed_3",
+        "rel_l2": 3.8868673768843526e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_3",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_rel_l2_seed_4",
+        "rel_l2": 4.81336459141479e-16,
+        "max_rel_l2": 1e-06,
+        "passed": true
+      },
+      {
+        "name": "g4_skill_seed_4",
+        "skill_score": 1.0,
+        "min_skill": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_beats_operatorblock",
+        "key": "beats_operatorblock",
+        "expected": 1.0,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 1.0,
+        "worst_deviation": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_beats_free_ombu",
+        "key": "beats_ombu",
+        "expected": 1.0,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 1.0,
+        "worst_deviation": 0.0,
+        "passed": true
+      },
+      {
+        "name": "g4_beats_jetmlp",
+        "key": "beats_jetmlp",
+        "expected": 1.0,
+        "tol": 0.0,
+        "direction": "min",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 1.0,
+        "worst_deviation": 0.0,
+        "passed": true
+      }
+    ],
+    "n_grid": 81
+  },
   "g5": {
     "name": "g5_poisedness_honesty",
     "passed": true,
@@ -168,14 +623,14 @@
     "g1_earned": true,
     "g2_earned": true,
     "g3_earned": true,
-    "g4_earned": false,
+    "g4_earned": true,
     "g5_earned": true,
     "order_ceilings": {
       "sigmoid": 1,
       "tanh": 2
     },
     "representation_requires_poisedness": true,
-    "licensed_sentence": "MultiPackUnit matches a high-dps mpmath reference within 4 ulp up to the recorded float64 order ceiling; the closed form is stable as delta->0 while FD breaks; torch/jax agree bit-for-bit on the gated grid; unpoised supports return is_poised=False and representation claims are withheld"
+    "licensed_sentence": "MultiPackUnit matches a high-dps mpmath reference within 4 ulp up to the recorded float64 order ceiling; the closed form is stable as delta->0 while FD breaks; torch/jax agree bit-for-bit on the gated grid; unpoised supports return is_poised=False and representation claims are withheld; on a two-interface Birkhoff transmission the multi-pack span hits rel L2 <= 1e-6 and beats an OperatorBlock stack, a free OMBU, and a matched JetMLP over five seeds"
   },
-  "wall_seconds": 0.885
+  "wall_seconds": 0.819
 }

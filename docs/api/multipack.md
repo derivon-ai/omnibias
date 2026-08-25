@@ -12,7 +12,10 @@ collapse ``delta -> 0`` of a K-bias stencil onto ``sigma^(order)(z + mu)``.
 For a Riccati base this costs **one activation evaluation per distinct
 mean**. Representation claims ("can match any prescribed Birkhoff data")
 require a poised support; the unit always computes a well-defined
-functional. See theory spec 01-01.
+functional. See theory spec 01-01. G1–G5 are earned: on a two-interface
+Birkhoff transmission the multi-pack span hits relative ``L2 <= 1e-6``
+and beats an OperatorBlock stack, a free OMBU, and a matched JetMLP
+over five seeds.
 
 ## Core algebra
 
