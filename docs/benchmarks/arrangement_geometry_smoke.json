@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.arrangement_geometry.v1",
-  "generated_utc": "2026-08-15T17:28:23Z",
+  "generated_utc": "2026-08-25T18:15:13Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,9 +11,14 @@
     "folx": "0.2.22"
   },
   "config": {
-    "mode": "smoke"
+    "mode": "smoke",
+    "cost_in_all_passed": false,
+    "gates_in_scope": [
+      "g1",
+      "g2"
+    ]
   },
-  "rss_mb_at_start": 822.15,
+  "rss_mb_at_start": 813.15,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -33,9 +38,65 @@
       }
     ]
   },
+  "cost": {
+    "name": "cost_vs_n_d",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
+    "rows": [
+      {
+        "n": 4,
+        "dim": 2,
+        "max_cells": 11,
+        "wall_seconds": 0.0007257258985191584
+      },
+      {
+        "n": 6,
+        "dim": 2,
+        "max_cells": 22,
+        "wall_seconds": 0.0036216939333826303
+      },
+      {
+        "n": 8,
+        "dim": 2,
+        "max_cells": 37,
+        "wall_seconds": 0.005320506053976715
+      },
+      {
+        "n": 4,
+        "dim": 3,
+        "max_cells": 15,
+        "wall_seconds": 0.0009343349374830723
+      },
+      {
+        "n": 6,
+        "dim": 3,
+        "max_cells": 42,
+        "wall_seconds": 0.004926067078486085
+      },
+      {
+        "n": 8,
+        "dim": 3,
+        "max_cells": 93,
+        "wall_seconds": 0.014290011953562498
+      }
+    ],
+    "time_exponent_vs_n_d2": 2.9456465931238798,
+    "cutoff_n": 12,
+    "cutoff_d": 4,
+    "note": "Vertex-enumeration wall vs n at D=2 and D=3. G1 tooling refuses n>12 or D>4. Combinatorial growth is the honesty bound, not a tractable-large-n claim. Previous smoke-earned stub with no timing withdrawn. Not in CI all_passed."
+  },
   "honesty": {
     "complete_face_lattice": false,
     "collapse": "beta -> inf (temperature); not delta -> 0",
-    "p_vs_np": false
+    "p_vs_np": false,
+    "cost_earned": false,
+    "cost_reported": true,
+    "cost_in_ci_all_passed": false,
+    "enumeration_cutoff_n": 12,
+    "enumeration_cutoff_d": 4,
+    "temperature_collapse": true,
+    "founding_bias_collapse": false
   }
 }

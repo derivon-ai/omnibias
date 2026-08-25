@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Arrangement-geometry cost reported (theory 01-03)
+
+- `benchmarks/arrangement_geometry.py` now times vertex enumeration
+  versus `n` in `{4,6,8}` at `D=2,3` (warmup + median).
+- Reported: G1 tooling cutoff `n<=12`, `D<=4`. Combinatorial growth is
+  the honesty bound, not a large-`n` claim. Previous smoke-earned stub
+  with no timing withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/arrangement_geometry_smoke.json`.
+
+
 ### Added — Scan-Net G4 density boundary reported (theory 02-01)
 
 - `benchmarks/scannet.py` G4 now compares affine-calibrated k-NN to a
