@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pack-tree G3 recorded unearned (theory 02-07)
+
+- `benchmarks/pack_tree.py` G3 now times hierarchical vs dense over two
+  decades (`M` in `{32, 320, 3200}`). `far_eval` is a per-source Taylor,
+  not an `O(p)` multipole.
+- Unearned: hier/dense `~8.9` at `M=3200`; no crossover. Not in CI
+  `all_passed`. 1-D offsets only.
+- Smoke: `docs/benchmarks/pack_tree_smoke.json`.
+
+
 ### Added — Scan-Net no-neighbour-search G3 (theory 02-01)
 
 - `benchmarks/scannet.py` G3 now times Scan-Net against named k-NN over

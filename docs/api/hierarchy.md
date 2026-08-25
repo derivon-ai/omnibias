@@ -6,8 +6,10 @@ dense sum (same summands, same order). 1-D offset axis only; no 2-D/3-D
 FMM.
 
 G1 (`eta=0`), G2 (bound never undercovers), G4 target accuracy, and G5
-parity are CI-gated. G3 complexity is smoke-recorded, not in CI
-`all_passed`. Status is **gated**, not shipped. See theory spec 02-07.
+parity are CI-gated. G3 complexity is **unearned**: `far_eval` is a
+per-source Taylor, not an `O(p)` multipole, and hierarchical wall does
+not beat dense over two decades of `M`. Not in CI `all_passed`. Status
+is **gated**, not shipped. See theory spec 02-07.
 
 ## Core algebra
 

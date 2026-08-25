@@ -215,7 +215,7 @@ gates are earned on smoke, not in CI `all_passed`.
   linear constant-coeff homogeneous only.
 - **Pack tree** ([02-07](api/hierarchy.md)): 1-D offsets; `eta=0` bit-identical
   to dense; far-field is a truncation with a bound. G3 complexity
-  smoke-recorded.
+  **unearned** (per-source Taylor, no dense crossover).
 - **Equivariant scan** ([02-08](api/equivariant_scan.md)): gaussian-family
   steering only; discrete `C_L`, not SO(2)/SO(3).
 - **Soliton tanh-method** ([02-09](api/travelling.md)): tanh algebra, not a

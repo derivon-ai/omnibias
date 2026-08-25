@@ -125,7 +125,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [02-04 weak-form VPINN](02-architectures/04-weak-form-vpinn-closed-test-functions.md) | gated | Exact integrals only for polynomial coeffs on boxes; boundary bound on by default |
 | [02-05 multi-interface PINN](02-architectures/05-multi-interface-transmission-pinn.md) | gated | Parallel interfaces; `alpha -> inf` is sharpening, neither collapse |
 | [02-06 potential theory and BEM-net](02-architectures/06-potential-theory-and-bem-net.md) | gated | PDE exact off-surface; BC approximated; linear constant-coeff homogeneous; G3 small-N if pack-tree crossover is high |
-| [02-07 hierarchical pack tree](02-architectures/07-hierarchical-pack-tree-fmm.md) | gated | 1-D offsets; `eta=0` bit-identical to dense; G3 complexity smoke-recorded, not in CI `all_passed` |
+| [02-07 hierarchical pack tree](02-architectures/07-hierarchical-pack-tree-fmm.md) | gated | 1-D offsets; `eta=0` bit-identical to dense; G3 complexity **unearned** (per-source Taylor, no dense crossover), not in CI `all_passed` |
 | [02-08 equivariant and manifold scan](02-architectures/08-equivariant-and-manifold-scan.md) | gated | Gaussian-family steering only; discrete `C_L`, not SO(2)/SO(3) |
 | [02-09 soliton tanh-method nets](02-architectures/09-soliton-tanh-method-networks.md) | gated | Tanh algebra, not a collapse; multi-kink is not the n-soliton formula; G4 `--full` |
 | [02-10 Hermite ladder nets](02-architectures/10-hermite-ladder-oscillator-net.md) | gated | Raw tower is not the QHO eigenbasis; Rodrigues reweight required; G4 FermiNet `--full`; G5 may lose |

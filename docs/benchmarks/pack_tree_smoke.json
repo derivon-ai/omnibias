@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.pack_tree.v1",
-  "generated_utc": "2026-08-15T18:16:21Z",
+  "generated_utc": "2026-08-25T17:43:30Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,9 +11,13 @@
     "folx": "0.2.22"
   },
   "config": {
-    "mode": "smoke"
+    "mode": "smoke",
+    "g3_in_all_passed": false,
+    "gates_in_scope": [
+      "g1"
+    ]
   },
-  "rss_mb_at_start": 821.34,
+  "rss_mb_at_start": 812.61,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -21,18 +25,53 @@
         "name": "g1_eta0_bit_identical",
         "passed": true,
         "in_ci_all_passed": true
-      },
-      {
-        "name": "g3_complexity",
-        "passed": true,
-        "in_ci_all_passed": false,
-        "note": "1-D offset axis; far-field is a truncation with a bound",
-        "n": 16
       }
     ]
   },
+  "g3": {
+    "name": "g3_complexity",
+    "passed": false,
+    "earned": false,
+    "in_ci_all_passed": false,
+    "m": [
+      32,
+      320,
+      3200
+    ],
+    "n_eval": 16,
+    "p": 6,
+    "eta": 2.0,
+    "rows": [
+      {
+        "m": 32,
+        "dense_seconds": 0.00015533703844994307,
+        "hier_seconds": 0.001394924009218812,
+        "hier_over_dense": 8.979983287555225
+      },
+      {
+        "m": 320,
+        "dense_seconds": 0.0015550840180367231,
+        "hier_seconds": 0.014062280068174005,
+        "hier_over_dense": 9.042778335493077
+      },
+      {
+        "m": 3200,
+        "dense_seconds": 0.01581331598572433,
+        "hier_seconds": 0.1411560729611665,
+        "hier_over_dense": 8.926405637413236
+      }
+    ],
+    "hier_time_exponent_vs_m": 1.0025745090998057,
+    "exponent_max": 1.3,
+    "hier_over_dense_at_m_hi": 8.926405637413236,
+    "crossover_m": null,
+    "note": "far_eval is a per-source Taylor (O(M) per z), not an O(p) multipole. Measured hierarchical wall does not beat dense over two decades of M; no crossover. 1-D offsets only."
+  },
   "honesty": {
     "axis": "1-D offsets",
-    "far_field": "truncation with a bound"
+    "far_field": "truncation with a bound",
+    "g3_earned": false,
+    "g3_in_ci_all_passed": false,
+    "far_eval_is_per_source_taylor": true
   }
 }
