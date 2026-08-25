@@ -1,0 +1,226 @@
+{
+  "schema": "sequence-transverse-v1",
+  "generated_utc": "2026-08-25T15:49:15Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "causal_transverse_filter_vs_s4d",
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "g5_max_r2_gap": 0.02,
+    "matched_n_params": 4,
+    "baseline": "S4D (Gu et al. 2022 diagonal SSM, N=1)",
+    "full": false,
+    "length": 64,
+    "rho": 0.95,
+    "width": 24,
+    "n_train": 24,
+    "n_val": 8,
+    "n_test": 16,
+    "steps": 60,
+    "lr": 0.05
+  },
+  "rss_mb_at_start": 963.64,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "per_seed": [
+    {
+      "seed": 0,
+      "filter_r2": 0.44319758074475857,
+      "ssm_r2": 0.9997762315581271,
+      "r2_gap": 0.5565786508133685,
+      "filter_skill": 0.44705818674656217,
+      "ssm_skill": 0.999777783063221,
+      "filter_train_r2": 0.4488011048371433,
+      "ssm_train_r2": 0.9997852247930932,
+      "filter_wall_ms": 1570.627891109325,
+      "ssm_wall_ms": 223.6576940631494,
+      "filter_params": {
+        "coeff": 0.2800359932011252,
+        "alpha": 0.9289826795812823,
+        "tau": 3.7191765068742355,
+        "bias": -0.010353717554238223,
+        "n_params": 4.0
+      },
+      "ssm_params": {
+        "a": -2.994523304677173,
+        "b": 0.09383063350258299,
+        "c": 0.508680454335918,
+        "d": 0.048988312853016636,
+        "discrete_decay": 0.9511718911301665,
+        "n_params": 4.0
+      },
+      "n_params_filter": 4,
+      "n_params_ssm": 4
+    },
+    {
+      "seed": 1,
+      "filter_r2": 0.4372221569727358,
+      "ssm_r2": 0.9989164219689025,
+      "r2_gap": 0.5616942649961667,
+      "filter_skill": 0.4378745729135335,
+      "ssm_skill": 0.9989176781370146,
+      "filter_train_r2": 0.440202647344456,
+      "ssm_train_r2": 0.9987876471641752,
+      "filter_wall_ms": 39.55279104411602,
+      "ssm_wall_ms": 239.27474999800324,
+      "filter_params": {
+        "coeff": 0.27945624652609796,
+        "alpha": 0.9120753751976426,
+        "tau": 3.9265587678283995,
+        "bias": -0.020383412600049167,
+        "n_params": 4.0
+      },
+      "ssm_params": {
+        "a": -3.012791873638766,
+        "b": 0.09461501542831346,
+        "c": 0.5203910928814544,
+        "d": 0.05152472264057256,
+        "discrete_decay": 0.9520342627577014,
+        "n_params": 4.0
+      },
+      "n_params_filter": 4,
+      "n_params_ssm": 4
+    },
+    {
+      "seed": 2,
+      "filter_r2": 0.3460541172244569,
+      "ssm_r2": 0.9978110629843323,
+      "r2_gap": 0.6517569457598754,
+      "filter_skill": 0.3493210511522292,
+      "ssm_skill": 0.9978219983121486,
+      "filter_train_r2": 0.36673254412201794,
+      "ssm_train_r2": 0.9974016850232448,
+      "filter_wall_ms": 37.98344708047807,
+      "ssm_wall_ms": 230.3704370278865,
+      "filter_params": {
+        "coeff": 0.22635344739004443,
+        "alpha": 0.9891327451022717,
+        "tau": 3.9321967709480297,
+        "bias": -0.03254478955358716,
+        "n_params": 4.0
+      },
+      "ssm_params": {
+        "a": -2.9081455684178814,
+        "b": 0.10567827011668045,
+        "c": 0.4925332209742195,
+        "d": 0.05162179343605847,
+        "discrete_decay": 0.9468857425231506,
+        "n_params": 4.0
+      },
+      "n_params_filter": 4,
+      "n_params_ssm": 4
+    },
+    {
+      "seed": 3,
+      "filter_r2": 0.3499145203208207,
+      "ssm_r2": 0.9995001782676638,
+      "r2_gap": 0.6495856579468431,
+      "filter_skill": 0.36491346560230564,
+      "ssm_skill": 0.9995117102877568,
+      "filter_train_r2": 0.4116898899386504,
+      "ssm_train_r2": 0.9995313501943134,
+      "filter_wall_ms": 36.46143991500139,
+      "ssm_wall_ms": 223.33422803785652,
+      "filter_params": {
+        "coeff": 0.25769906150092114,
+        "alpha": 0.9865875374561458,
+        "tau": 4.139621589903106,
+        "bias": 0.01455542310890914,
+        "n_params": 4.0
+      },
+      "ssm_params": {
+        "a": -2.920580793536054,
+        "b": 0.09947620097949628,
+        "c": 0.49755239187968753,
+        "d": 0.048627625658389614,
+        "discrete_decay": 0.9475246068636619,
+        "n_params": 4.0
+      },
+      "n_params_filter": 4,
+      "n_params_ssm": 4
+    },
+    {
+      "seed": 4,
+      "filter_r2": 0.4389515173046743,
+      "ssm_r2": 0.9974059170781076,
+      "r2_gap": 0.5584543997734333,
+      "filter_skill": 0.44506523420981514,
+      "ssm_skill": 0.9974341846683463,
+      "filter_train_r2": 0.42435498476480304,
+      "ssm_train_r2": 0.9975822050420241,
+      "filter_wall_ms": 37.44543099310249,
+      "ssm_wall_ms": 223.98133401293308,
+      "filter_params": {
+        "coeff": 0.2521330270110826,
+        "alpha": 0.9428186453519065,
+        "tau": 3.66633893891702,
+        "bias": 0.006369752456633801,
+        "n_params": 4.0
+      },
+      "ssm_params": {
+        "a": -2.893106194822771,
+        "b": 0.10475357663812936,
+        "c": 0.4982665447406228,
+        "d": 0.049909232547436316,
+        "discrete_decay": 0.946102987191976,
+        "n_params": 4.0
+      },
+      "n_params_filter": 4,
+      "n_params_ssm": 4
+    }
+  ],
+  "baseline": {
+    "name": "S4D (Gu et al. 2022 diagonal SSM, N=1)",
+    "n_params": 4,
+    "citation": "Gu, Goel, Re; Efficiently Modeling Long Sequences with Structured State Spaces (S4 / S4D)"
+  },
+  "gates": {
+    "all_passed": false,
+    "entries": [
+      {
+        "name": "g5_ssm_beats_zero",
+        "passed": true,
+        "worst_ssm_skill": 0.9974341846683463,
+        "min_skill": 0.0
+      },
+      {
+        "name": "g5_filter_within_2pct_of_s4d",
+        "passed": false,
+        "worst_r2_gap": 0.6517569457598754,
+        "max_gap": 0.02
+      },
+      {
+        "name": "g5_matched_param_count",
+        "passed": true,
+        "n_params_filter": 4,
+        "n_params_ssm": 4
+      }
+    ]
+  },
+  "g5_earned": false,
+  "sequence_submodule_shipped": false,
+  "honesty": {
+    "temperature_collapse_claim": false,
+    "founding_bias_collapse": true,
+    "not_omnibias_struct": true,
+    "ssm_is_named_s4d": true
+  }
+}

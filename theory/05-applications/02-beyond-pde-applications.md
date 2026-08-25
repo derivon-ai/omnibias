@@ -17,8 +17,9 @@ Wave-0 falsifier A4 (G1/G2) is recorded in
 `docs/benchmarks/tabular_arrangement_public.json` and stays frozen. Gate G3b
 (capacity suite, primary `boost_h2`) is recorded in
 `docs/benchmarks/tabular_arrangement_capacity.json` (`g3b_earned: false`;
-not-worse on `4/8`). Gates G4–G7 remain unearned; the sequence submodule is
-not shipped.
+not-worse on `4/8`). Gate G5 **failed** (Wave-0 A5; worst-seed `R^2` gap
+`0.652` vs S4D, need `<= 0.02`); the sequence submodule is retired, not
+shipped. Gates G4 / G6 / G7 remain unearned.
 
 ## 2. Where it lands
 
@@ -27,8 +28,9 @@ Three separate homes, because these are three separate audiences:
 - tabular → `omnibias.tab` (already exists, already benchmarked against
   LightGBM),
 - shapes → `omnibias.shape` (already exists),
-- sequences → a new `omnibias.torch.sequence` submodule, or nothing at all if
-  gate G5 fails.
+- sequences → **retired**. G5 failed against a named S4D baseline; there is
+  no `omnibias.torch.sequence` submodule. `omnibias.struct` remains the
+  sequence home.
 
 None of them earns a new package. Stating that up front is the point of the
 section.
@@ -55,9 +57,9 @@ all — those packages exist and are benchmarked. The *arrangement* view of a
 tabular model (Wave-0 G1/G2) now lands in `omnibias.tab.arrangement` /
 `omnibias.tab.torch.arrangement` with
 `benchmarks/tabular_arrangement.py`. What remains missing is (b) topology of a
-learned shape as a trainable quantity, and (c) a transverse convolution for
-sequences, which `omnibias.struct` does not provide because it solves a
-different problem.
+learned shape as a trainable quantity. (c) A transverse convolution for
+sequences was the Wave-0 A5 falsifier; G5 failed against S4D and that
+sub-application is retired. `omnibias.struct` remains the sequence home.
 
 ## 4. Mathematics
 
@@ -265,7 +267,10 @@ implicit-surface pipeline (shapes), and a structured state-space model
   state-space baseline within `2%` on a long-range benchmark at matched
   parameter count. **If this fails, the sequence submodule is not shipped** —
   it is removed from the plan, not softened into "promising future work".
-  **Unearned.**
+  **Failed** — see `docs/benchmarks/sequence_transverse_smoke.json`.
+  Worst-seed `R^2` gap `0.652` (filter `0.346` vs S4D `0.998`); S4D skill
+  `~0.998` so the baseline is a solved experiment. Sequence submodule
+  retired.
 - **G6 topology bound.** The soft Euler characteristic's reported gap bound
   contains the true integer in `100%` of test cases, and the API cannot return
   the value without the bound. **Unearned.**
@@ -357,8 +362,8 @@ implicit-surface pipeline (shapes), and a structured state-space model
       on >=6/8)
 - [ ] `packages/omnibias-shape/src/omnibias/shape/topology.py` returning
       value and bound together, never value alone
-- [ ] `benchmarks/sequence_transverse.py` run **first**, with the submodule
-      built only if G5 passes
+- [x] `benchmarks/sequence_transverse.py` run **first**; G5 failed; no
+      `omnibias.torch.sequence` submodule (retired, not future work)
 - [x] Gate runner `benchmarks/tabular_arrangement.py` (extends the LightGBM
       tuning pattern from `omnibias/tab/bench.py`)
 - [x] Docs page and nav entry, carrying the "trees usually win" statement

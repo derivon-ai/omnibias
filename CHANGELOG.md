@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Wave-0 A5 sequence falsifier (theory 05-02 G5)
+
+- `benchmarks/sequence_transverse.py` compares a designed causal
+  `sigma^(n)` FIR to a named S4D baseline (Gu et al. 2022, N=1) on a
+  leaky-integrator task at matched parameter count.
+- G5 failed: worst-seed `R^2` gap `0.652` (need `<= 0.02`). The
+  `omnibias.torch.sequence` submodule is not shipped.
+- Smoke: `docs/benchmarks/sequence_transverse_smoke.json`.
+
+
+
 ### Added — Conformal slabs (theory 04-02)
 
 - `omnibias.core.uncertainty` plus `omnibias.verify.uncertainty`:

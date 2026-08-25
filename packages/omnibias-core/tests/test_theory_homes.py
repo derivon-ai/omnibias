@@ -198,11 +198,21 @@ def test_arrangement_and_folded_names_are_not_minted() -> None:
         assert not (PACKAGES / name).exists(), f"{name} directory must stay gone"
 
 
-def test_wave0_a5_is_still_pending() -> None:
-    """G4: do not invent a retirement; Wave-0 A5 has not run."""
+def test_wave0_a5_is_recorded_failed() -> None:
+    """G4: A5 ran and failed; the sequence submodule is retired, not invented."""
     text = (THEORY / "README.md").read_text(encoding="utf-8")
     assert re.search(r"\| A5 \|", text), "Wave-0 table lost the A5 row"
-    assert re.search(r"A5.*not run", text), "A5 must stay recorded as not run"
+    assert re.search(r"A5.*\*\*failed\*\*", text), "A5 must be recorded as failed"
+    assert not re.search(r"A5.*not run", text), "A5 already ran; drop 'not run'"
+    seq = (
+        PACKAGES
+        / "omnibias-torch"
+        / "src"
+        / "omnibias"
+        / "torch"
+        / "sequence.py"
+    )
+    assert not seq.exists(), "G5 failed: do not ship omnibias.torch.sequence"
 
 
 def test_home_parser_self_checks() -> None:
