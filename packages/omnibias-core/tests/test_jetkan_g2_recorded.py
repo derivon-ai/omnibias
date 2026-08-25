@@ -17,11 +17,13 @@ def test_g2_jet_cost_is_unearned_and_out_of_all_passed() -> None:
     assert g2["name"] == "g2_jet_cost"
     assert g2["earned"] is False
     assert g2["passed"] is False
+    assert g2["reported"] is True
     assert g2["in_ci_all_passed"] is False
     assert int(g2["order"]) == 6
     assert int(g2["depth"]) == 3
     assert float(g2["autodiff_over_jet"]) < float(g2["expected"])
     assert payload["honesty"]["g2_earned"] is False
+    assert payload["honesty"]["g2_reported"] is True
     assert payload["honesty"]["g2_in_ci_all_passed"] is False
     assert payload["honesty"]["g2_compares_order6_to_order6"] is True
     assert payload["config"]["g2_in_all_passed"] is False

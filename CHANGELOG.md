@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-KAN G2 leftover-recorded (theory 02-03)
+
+- Leftover #16's cost miss now leftover-records `reported` plus honesty
+  flags on `benchmarks/jetkan.py`.
+- Reported: order-6 jet vs autodiff ~`2.2x` (need `5x`). Not in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/jetkan_smoke.json`.
+
+
 ### Added — Conjugate Hilbert G5 leftover-recorded (theory 01-12)
 
 - Leftover #11's CCF capacity miss now leftover-records `reported` plus
