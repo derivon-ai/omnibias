@@ -581,8 +581,37 @@
     "finding": null,
     "theorem_prover_verified": false,
     "mathlib_verified": false,
-    "licensed_sentence": "smoke wiring only: breast_cancer exercise of the capacity suite; G3b not earned"
+    "licensed_sentence": "smoke wiring only: breast_cancer exercise of the capacity suite; G3b not earned",
+    "g3b_reported": true,
+    "g3b_in_ci_all_passed": false
   },
   "g3b_earned": false,
-  "wall_seconds": 6.051
+  "wall_seconds": 6.051,
+  "g3b": {
+    "name": "g3b_capacity_boost_h2",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
+    "primary_arm": "boost_h2",
+    "not_worse": 4,
+    "n_scored": 8,
+    "need": 6,
+    "win_loss_tie": [
+      4,
+      4,
+      0
+    ],
+    "tab_boost_not_worse": 4,
+    "tab_boost_would_earn_g3b": false,
+    "g3_frozen": true,
+    "source": "docs/benchmarks/tabular_arrangement_capacity.json",
+    "smoke_n_scored": 1,
+    "smoke_not_worse_not_g3b": 1,
+    "need_note": "Named G3b is predeclared boost_h2 not-worse on >=6/8. Smoke one-dataset not-worse is not G3b. No relicense from tab_boost. Temperature collapse, not founding bias collapse."
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": []
+  }
 }

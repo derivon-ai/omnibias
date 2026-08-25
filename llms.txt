@@ -533,6 +533,8 @@ outward-rounded interval / Taylor-model forward), and a certified train-soft / d
 **rounding gap** as `beta -> inf`. The honest "yes-if": you get a differentiable +
 certified tree model, not an optimal hard tree (which is NP-hard); beating LightGBM is a
 benchmarked claim earned per dataset (`docs/benchmarks.md`), never asserted.
+G3b capacity leftover is reported from the eight-dataset artifact
+(`boost_h2` not-worse `4/8`, need `>=6/8`; not in CI `all_passed`).
 G4 frozen obliqueness diagnostic is reported from the eight-dataset artifact
 (predictiveness `0.25`, need `0.75`; not in CI `all_passed`). Builds on
 `omnibias-discrete` / `-curvature` / `-verify`; torch + jax twins.

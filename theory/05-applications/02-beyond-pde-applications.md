@@ -17,7 +17,8 @@ Wave-0 falsifier A4 (G1/G2) is recorded in
 `docs/benchmarks/tabular_arrangement_public.json` and stays frozen. Gate G3b
 (capacity suite, primary `boost_h2`) is recorded in
 `docs/benchmarks/tabular_arrangement_capacity.json` (`g3b_earned: false`;
-not-worse on `4/8`). Gate G5 **earned** (Wave-0 A5; order-0 logistic
+not-worse on `4/8`, need `>=6/8`; leftover-reported on the capacity
+smoke, not in CI `all_passed`). Gate G5 **earned** (Wave-0 A5; order-0 logistic
 tail at `width=T`; see `docs/benchmarks/sequence_transverse_smoke.json`).
 The first protocol (order-1 `sigma'` bump, `W=24`) was a miss: that FIR
 cannot clear a `0.02` gap versus S4D. Gate G4 remains unearned (eight-dataset frozen

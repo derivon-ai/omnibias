@@ -8,14 +8,16 @@ protocol: train on ``Xtr``, early-stop + restore best on ``Xva``, score ``Xte``.
 
 Primary licensed arm is predeclared: ``boost_h2`` (Newton-boosted H=2
 arrangements). G3b is earned only if that arm is not-worse (win or 0.5-pt tie)
-on >=6 of 8 completed public binary datasets. Other arms are ablations; do not
-relicense after seeing test. If ``tab_boost`` would have earned G3b and
-``boost_h2`` did not, record that as a finding.
+on >=6 of 8 completed public binary datasets. Smoke one-dataset not-worse is
+not G3b; the leftover records the named eight-dataset artifact. Other arms
+are ablations; do not relicense after seeing test. If ``tab_boost`` would
+have earned G3b and ``boost_h2`` did not, record that as a finding.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import time
@@ -42,6 +44,8 @@ from tabular_arrangement_public import (  # type: ignore[import-not-found]  # no
 )
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
+REPO = Path(__file__).resolve().parents[1]
+FULL_G3B_ARTIFACT = REPO / "docs" / "benchmarks" / "tabular_arrangement_capacity.json"
 
 PRIMARY_ARM = "boost_h2"
 G3B_MIN_DATASETS = 6
@@ -733,6 +737,17 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             f"(need >={G3B_MIN_DATASETS}); G3 H=2 table stays frozen"
         )
 
+    g3b = _leftover_g3b(
+        full=full,
+        run_not_worse=int(primary["not_worse"]),
+        run_n=len(completed),
+        run_arr=int(primary["arrangement"]),
+        run_lgbm=int(primary["lightgbm"]),
+        run_tie=int(primary["tie"]),
+        run_tab_boost_not_worse=tab_boost_nw,
+        run_tab_boost_would_earn=tab_boost_would_earn,
+    )
+    g3b_earned = bool(g3b["earned"])
     payload.update(
         {
             "baseline": {
@@ -743,6 +758,8 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "datasets": blocks,
             "win_loss_by_arm": win_loss_by_arm,
             "primary_arm": PRIMARY_ARM,
+            "gates": {"all_passed": True, "entries": []},
+            "g3b": g3b,
             "honesty": {
                 "claim_rung": 1,
                 "g3_frozen": True,
@@ -753,7 +770,9 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "smoke_is_wiring_gate": not full,
                 "g3_earned": True,
                 "g3b_earned": g3b_earned,
-                "tab_boost_would_earn_g3b": tab_boost_would_earn,
+                "g3b_reported": True,
+                "g3b_in_ci_all_passed": False,
+                "tab_boost_would_earn_g3b": bool(g3b["tab_boost_would_earn_g3b"]),
                 "finding": finding,
                 "theorem_prover_verified": False,
                 "mathlib_verified": False,
@@ -776,6 +795,80 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         scratch_path.write_text(out.read_text(encoding="utf-8"), encoding="utf-8")
         print(f"copied to {scratch_path}")
     return dict(payload)
+
+
+def _read_named_g3b() -> dict[str, Any]:
+    """Named leftover path: the committed eight-dataset capacity artifact."""
+    raw = json.loads(FULL_G3B_ARTIFACT.read_text(encoding="utf-8"))
+    primary = raw["win_loss_by_arm"][PRIMARY_ARM]["counts"]
+    tab = raw["win_loss_by_arm"]["tab_boost"]["counts"]
+    return {
+        "not_worse": int(primary["not_worse"]),
+        "n_scored": int(primary["completed"]),
+        "arrangement": int(primary["arrangement"]),
+        "lightgbm": int(primary["lightgbm"]),
+        "tie": int(primary["tie"]),
+        "tab_boost_not_worse": int(tab["not_worse"]),
+        "tab_boost_would_earn": bool(raw["honesty"]["tab_boost_would_earn_g3b"]),
+        "source": "docs/benchmarks/tabular_arrangement_capacity.json",
+    }
+
+
+def _leftover_g3b(
+    *,
+    full: bool,
+    run_not_worse: int,
+    run_n: int,
+    run_arr: int,
+    run_lgbm: int,
+    run_tie: int,
+    run_tab_boost_not_worse: int,
+    run_tab_boost_would_earn: bool,
+) -> dict[str, Any]:
+    """Report G3b from the eight-dataset artifact; smoke 1/1 is not the gate."""
+    if full:
+        not_worse = int(run_not_worse)
+        n_scored = int(run_n)
+        arrangement = int(run_arr)
+        lightgbm = int(run_lgbm)
+        tie = int(run_tie)
+        tab_nw = int(run_tab_boost_not_worse)
+        tab_would = bool(run_tab_boost_would_earn)
+        source = "this run"
+    else:
+        named = _read_named_g3b()
+        not_worse = int(named["not_worse"])
+        n_scored = int(named["n_scored"])
+        arrangement = int(named["arrangement"])
+        lightgbm = int(named["lightgbm"])
+        tie = int(named["tie"])
+        tab_nw = int(named["tab_boost_not_worse"])
+        tab_would = bool(named["tab_boost_would_earn"])
+        source = str(named["source"])
+    earned = bool(n_scored >= 8 and not_worse >= G3B_MIN_DATASETS)
+    return {
+        "name": "g3b_capacity_boost_h2",
+        "passed": bool(earned),
+        "earned": bool(earned),
+        "reported": True,
+        "in_ci_all_passed": False,
+        "primary_arm": PRIMARY_ARM,
+        "not_worse": not_worse,
+        "n_scored": n_scored,
+        "need": G3B_MIN_DATASETS,
+        "win_loss_tie": [arrangement, lightgbm, tie],
+        "tab_boost_not_worse": tab_nw,
+        "tab_boost_would_earn_g3b": tab_would,
+        "g3_frozen": True,
+        "source": source,
+        "smoke_n_scored": int(run_n) if not full else n_scored,
+        "smoke_not_worse_not_g3b": int(run_not_worse) if not full else None,
+        "need_note": (
+            "Named G3b is predeclared boost_h2 not-worse on >=6/8. "
+            "Smoke one-dataset not-worse is not G3b. No relicense from "
+            "tab_boost. Temperature collapse, not founding bias collapse."
+        ),
+    }
 
 
 if __name__ == "__main__":

@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tabular G3b capacity reported (theory 05-02)
+
+- `benchmarks/tabular_arrangement_capacity.py` now records G3b from the
+  named eight-dataset artifact, not the smoke one-dataset score.
+- Reported: predeclared `boost_h2` not-worse `4/8` (need `>=6/8`);
+  `tab_boost` also `4/8`, no relicense. Smoke `1/1` withdrawn as G3b.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/tabular_arrangement_capacity_smoke.json`.
+
+
 ### Added — Tabular G4 diagnostic reported (theory 05-02)
 
 - `benchmarks/tabular_arrangement_public.py` now records G4 from the
