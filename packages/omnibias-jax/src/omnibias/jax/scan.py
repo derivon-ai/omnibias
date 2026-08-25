@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import Literal
 
 from omnibias.core.multipack import MultiPackSpec, PackSpec
-from omnibias.core.scan import BankSpec
+from omnibias.core.scan import BankSpec, resolve_scan_role
 from omnibias.jax.activations import JaxActivationSpec, get_activation
 from omnibias.jax.multipack import multipack_response
 
@@ -112,20 +112,30 @@ def init_bias_scan(
     num_channels: int,
     bank: BankSpec,
     *,
-    template: MultiPackSpec | OpName | str = "grad",
+    template: MultiPackSpec | OpName | str | None = None,
+    op: OpName | str | None = None,
     base: str | JaxActivationSpec = "tanh",
     derivative_order: int = 1,
     gap: float = 1.0,
 ) -> tuple[JaxActivationSpec, Array, Array, MultiPackSpec | str, Array]:
-    """Return ``(act, offsets, scales, template, pool_taps)``."""
+    """Return ``(act, offsets, scales, template, pool_taps)``.
+
+    ``op`` is the 01-13 catalog alias for ``template``. Pass only one.
+    """
     if num_channels < 1:
         raise ValueError(f"num_channels must be >= 1, got {num_channels}")
     act = get_activation(base) if isinstance(base, str) else base
     tmpl: MultiPackSpec | str
     if isinstance(template, MultiPackSpec):
+        if op is not None:
+            raise ValueError("pass only one of template= or op=; they name the same role")
         tmpl = template
     else:
-        tmpl = template_from_op(template, derivative_order=derivative_order, gap=gap)
+        tmpl = template_from_op(
+            resolve_scan_role(template, op),
+            derivative_order=derivative_order,
+            gap=gap,
+        )
     offsets = jnp.asarray(list(bank.offsets), dtype=jnp.float64)
     scales = jnp.asarray(list(bank.scales), dtype=jnp.float64)
     n = int(offsets.size)

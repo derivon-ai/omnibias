@@ -83,4 +83,26 @@ class BankSpec:
         return min(ordered[i + 1] - ordered[i] for i in range(len(ordered) - 1))
 
 
-__all__ = ["BankSpec"]
+def resolve_scan_role(
+    template: str | None = None,
+    op: str | None = None,
+    *,
+    default: str = "grad",
+) -> str:
+    """Select the BiasScan role name.
+
+    ``op`` is the 01-13 catalog alias for ``template``. They name the same
+    six-role family, not a seventh ``OperatorBlock`` role. Passing both
+    raises; passing neither returns ``default``. A ``MultiPackSpec`` stays
+    on the ``template=`` path in the twins and never enters this helper.
+    """
+    if template is not None and op is not None:
+        raise ValueError("pass only one of template= or op=; they name the same role")
+    if template is not None:
+        return template
+    if op is not None:
+        return op
+    return default
+
+
+__all__ = ["BankSpec", "resolve_scan_role"]

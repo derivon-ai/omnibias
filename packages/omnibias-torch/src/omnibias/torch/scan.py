@@ -16,7 +16,7 @@ from __future__ import annotations
 from typing import Literal
 
 from omnibias.core.multipack import MultiPackSpec, PackSpec
-from omnibias.core.scan import BankSpec
+from omnibias.core.scan import BankSpec, resolve_scan_role
 from omnibias.torch.activations.registry import ActivationSpec, get_activation
 from omnibias.torch.multipack import multipack_response
 
@@ -137,6 +137,9 @@ class BiasScan(nn.Module):
         Offset / scale bank.
     template:
         :class:`~omnibias.core.multipack.MultiPackSpec` or an operator role name.
+    op:
+        01-13 catalog alias for ``template``. Pass only one of ``template``
+        or ``op``; they name the same six-role family, not a seventh role.
     readout:
         ``response`` -> ``(..., C, M)``; ``pooled`` / ``argmax`` -> ``(..., C)``.
     gamma:
@@ -152,7 +155,8 @@ class BiasScan(nn.Module):
         num_channels: int,
         bank: BankSpec,
         *,
-        template: MultiPackSpec | OpName | str = "grad",
+        template: MultiPackSpec | OpName | str | None = None,
+        op: OpName | str | None = None,
         base: str | ActivationSpec[Tensor] = "tanh",
         learnable_offsets: bool = True,
         learnable_scales: bool = False,
@@ -173,10 +177,13 @@ class BiasScan(nn.Module):
         self.gap = float(gap)
         self.act_spec = base if isinstance(base, ActivationSpec) else get_activation(base)
         if isinstance(template, MultiPackSpec):
+            if op is not None:
+                raise ValueError("pass only one of template= or op=; they name the same role")
             self.template: MultiPackSpec | str = template
         else:
+            role = resolve_scan_role(template, op)
             self.template = template_from_op(
-                template, derivative_order=derivative_order, gap=gap
+                role, derivative_order=derivative_order, gap=gap
             )
         dt = torch.get_default_dtype() if dtype is None else dtype
         off0 = torch.tensor(list(bank.offsets), dtype=dt)

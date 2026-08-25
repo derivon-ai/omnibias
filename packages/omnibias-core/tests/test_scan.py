@@ -7,7 +7,7 @@ from __future__ import annotations
 import math
 
 import pytest
-from omnibias.core.scan import BankSpec
+from omnibias.core.scan import BankSpec, resolve_scan_role
 
 
 def test_uniform_spacing() -> None:
@@ -46,3 +46,11 @@ def test_rejects_empty_and_non_finite() -> None:
         BankSpec(offsets=(0.0, float("nan")))
     with pytest.raises(ValueError, match="positive"):
         BankSpec(offsets=(0.0, 1.0), scales=(0.0,))
+
+
+def test_resolve_scan_role_op_is_template_alias() -> None:
+    assert resolve_scan_role() == "grad"
+    assert resolve_scan_role(op="integral", default="grad") == "integral"
+    assert resolve_scan_role(template="band", default="grad") == "band"
+    with pytest.raises(ValueError, match="only one of template= or op="):
+        resolve_scan_role(template="grad", op="integral", default="grad")

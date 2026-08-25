@@ -305,7 +305,7 @@ jobs:
           source .venv-cross/bin/activate
           pip install mpmath
           JAX_PLATFORMS=cpu python benchmarks/multipack_birkhoff.py
-      - name: Run bias-scan smoke (01-02 G1/G2/G3; G4 smoke-earned, not all_passed)
+      - name: Run bias-scan smoke (01-02 G1/G2/G3; 01-13 G5; G4 smoke-earned, not all_passed)
         run: |
           source .venv-cross/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/bias_scan.py

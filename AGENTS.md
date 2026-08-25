@@ -463,7 +463,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
 - Activation math: `omnibias.core.polynomials`, `omnibias.core.spec`.
 - Wave-1 gated primitives (not shipped): `omnibias.core.multipack` /
   `omnibias.{torch,jax}.multipack` (01-01); `omnibias.core.scan` /
-  `omnibias.{torch,jax}.scan` (01-02); `omnibias.difference` irregular
+  `omnibias.{torch,jax}.scan` (01-02; `op=` is the 01-13 catalog alias);
+  `omnibias.difference` irregular
   stencils (01-04). Docs: [`docs/api/multipack.md`](docs/api/multipack.md),
   [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md).
 - Wave-3 gated algebra + architectures (not shipped): `omnibias.core.mollifier`

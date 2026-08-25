@@ -20,8 +20,9 @@ quadrature (`omnibias-fields`), and the measure integral `integral f dmu`
 capability matrix: `docs/operator-surface.md`.
 
 Wave-1 primitives (gated, no new packages): `MultiPackUnit` (01-01; G4
-deferred), `BiasScan` / `BankSpec` (01-02; interior lattice shift along `w`,
-not a circular wrap of `tanh'`; soft-argmax `gamma` is not `delta -> 0`),
+deferred), `BiasScan` / `BankSpec` (01-02 / 01-13; interior lattice shift
+along `w`, not a circular wrap of `tanh'`; `op=` aliases `template=` and
+is not a seventh role; soft-argmax `gamma` is not `delta -> 0`),
 and exact-`Q` irregular Birkhoff stencils in `omnibias.difference` (01-04).
 
 Wave-3 algebra + architectures (gated, no new packages): `MollifierSpec` /

@@ -7,7 +7,7 @@ A new omnibias operator is **`scan(role)`** for one of the six
 not a new invention group. This file is the generator rule and the
 catalog; named architectures stay in Groups 02 / 03 / 09.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-02, 06-02, 09-01
 - **Blocks**: none
 
@@ -16,14 +16,14 @@ catalog; named architectures stay in Groups 02 / 03 / 09.
 - **Benefit.** One page answers "is this a new primitive or a scan of
   a role we already have."
 - **How it works.** Role × scan table, inventable list as **pointers**,
-  reject list, design test. First later spend: `BiasScan(op="integral")`,
-  then spec 09-14.
+  reject list, design test. First spend: `BiasScan(op="integral")`,
+  then spec 09-14 (gated).
 - **Strength.** Stops a seventh `OperatorBlock` role and stops Group 10
   from re-specifying 09-14 / 03-05.
 - **When to use.** Before proposing a convolution-like operator or a
   new `op=` string.
-- **When not.** This file does not implement a scan and does not train
-  a network.
+- **When not.** This file is the catalog, not a seventh `op` and not a
+  new package. It does not train a network.
 - **Accuracy floor.** None of its own. Scan-Net equivariance stays
   per-layer, on-lattice. CCF Hilbert is not an operator-family gate.
 
@@ -80,8 +80,8 @@ labelled if used (01-02).
 | `identity` | smoothed step slid along `w` | gated (01-02 / Scan-Net) |
 | `grad` / `laplacian` | matched derivative filter | gated; collapse heads |
 | `derivative(n)` | order-`n` matched filter | gated; 01-07 band selector |
-| `band` | sliding slab (band-pass along `w`) | **spend**; role exists, named scan layer thin |
-| `integral` | sliding mass `S(z+b_hi)-S(z+b_lo)` | **spend**; first later layer |
+| `band` | sliding slab (band-pass along `w`) | gated (`BiasScan(op="band")`) |
+| `integral` | sliding mass `S(z+b_hi)-S(z+b_lo)` | gated (`BiasScan(op="integral")`); consumer 09-14 |
 
 ### Other first-class operators (not scans)
 
@@ -122,8 +122,8 @@ If a row already has a spec, implement there. Do not open a second
 | Mixed space–parameter jets | [09-27](../09-inventions/27-parameter-space-jets.md) |
 | Sliced-jet / energy encoder | [09-28](../09-inventions/28-sliced-jet-encoder.md) |
 
-**First spend (later, not this pass):** a named `BiasScan(op="integral")`
-layer, then 09-14.
+**First spend (shipped):** a named `BiasScan(op="integral")` alias of
+`template="integral"`, then 09-14 (gated).
 
 ### Rejected (no spec)
 
@@ -160,25 +160,22 @@ open 01-14.
 
 ## 6. Proposed API
 
-Does not exist as a new module. The catalog names shipped symbols.
+No new module. The catalog names shipped symbols. `op=` is the alias
+in `omnibias.{torch,jax}.scan` (`resolve_scan_role` in
+`omnibias.core.scan`).
 
 ```python
-# documentation only
+from omnibias.core.scan import BankSpec
+from omnibias.torch.scan import BiasScan
+
 ROLES = ("identity", "grad", "laplacian", "derivative", "band", "integral")
 GENERATOR = "BiasScan(op=role)"   # not a seventh role
 FIRST_SPEND = "BiasScan(op='integral')"
-REJECTED = (
-    "seventh_role_conv2d",
-    "euclidean_RD_equivariance",
-    "hilbert_as_ccf_stretch",
-    "softmax_as_ombu_role",
-    "seventh_role_maxpool_or_vit",
-    "patch_free_imagenet_vit",
-)
+scan = BiasScan(1, BankSpec.uniform(-1.0, 1.0, 3), op="integral")
 ```
 
-A later `BiasScan` integral convenience wrapper lands in
-`omnibias.{torch,jax}.scan`, default dtype, bit-identical twins.
+Passing both `template=` and `op=` raises. An unknown seventh role
+(`op="conv2d"`) raises. Default dtype; bit-identical twins.
 
 ## 7. Practical use cases
 
@@ -198,8 +195,10 @@ Document gates only.
   file does not re-specify 09-14, 03-05, or 02-06.
 - **G3 rejects named.** The rejected proposals have no
   implementation files.
-- **G4 first spend named.** `BiasScan(op="integral")` then 09-14.
-- **G5 no new package.**
+- **G4 first spend named.** `BiasScan(op="integral")` then 09-14 (both
+  shipped).
+- **G5 no new package.** Alias lives on the existing scan twins;
+  `benchmarks/bias_scan.py` G5 is in CI `all_passed`.
 
 ## 9. Benchmark plan
 
@@ -220,9 +219,10 @@ extend existing scan benches, not invent a new CI product:
 
 ## 11. Open questions and risks
 
-- **Thin `band` / `integral` scan.** The roles exist; a missing
-  convenience API is not a missing primitive. G4 records the spend
-  order so a wrapper is not sold as a seventh role.
+- **Thin `band` / `integral` scan.** The roles existed before the
+  named `op=` alias. The alias is not a seventh role and not a new
+  primitive. G4 recorded the spend order so the wrapper is not sold
+  as a new `op`.
 - **Overlap with 09-01.** Named nets stay in Group 09. This file is
   the *family*. Mixed `μ` jets are 09-27; sliced-jet encoder is 09-28;
   an "integral scan net" is 09-03 / 09-14, not a new role.
@@ -231,8 +231,8 @@ extend existing scan benches, not invent a new CI product:
 ## 12. Implementation checklist
 
 - [x] `theory/01-geometry/13-operator-family.md` (this file)
-- [ ] Later: `BiasScan(op="integral")` convenience + tests
-- [ ] Later: 09-14 implementation (not this pass)
+- [x] `BiasScan(op="integral")` convenience + tests
+- [x] 09-14 implementation (gated separately)
 - [x] Index row in `theory/README.md` (wired in the index pass)
 - [x] Pointer in `docs/operator-surface.md` (index pass)
 

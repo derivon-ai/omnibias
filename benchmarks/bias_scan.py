@@ -1,13 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-1 primitive: bias scan (theory 01-02 G1/G2/G3; G4 attempted).
+"""Wave-1 primitive: bias scan (theory 01-02 G1/G2/G3; 01-13 G5; G4 attempted).
 
-Smoke (default) earns interior-shift equivariance, 5-seed localization, and
-torch/jax parity. The two-interface soft-argmax bias is recorded, not gated
-as a win. G4 (point-cloud vs voxelized ``cmbConv1d``) is attempted; if the
-scan does not win on MAE at equal-or-lower wall time, ``g4_earned`` stays
-false -- the threshold is not moved. ``--full`` writes under
-``$OMNIBIAS_SCRATCH/scan/``.
+Smoke (default) earns interior-shift equivariance, 5-seed localization,
+torch/jax parity, and the 01-13 ``op='integral'`` alias. The two-interface
+soft-argmax bias is recorded, not gated as a win. G4 (point-cloud vs
+voxelized ``cmbConv1d``) is attempted; if the scan does not win on MAE at
+equal-or-lower wall time, ``g4_earned`` stays false -- the threshold is not
+moved. ``--full`` writes under ``$OMNIBIAS_SCRATCH/scan/``.
 """
 
 from __future__ import annotations
@@ -280,6 +280,79 @@ def _run_g4(*, full: bool) -> dict[str, Any]:
     }
 
 
+def _run_g5() -> dict[str, Any]:
+    """01-13 first spend: ``op='integral'`` equals ``template='integral'``."""
+    import jax
+    import jax.numpy as jnp
+    import torch
+    from omnibias.core.scan import BankSpec
+    from omnibias.jax.scan import bias_scan, init_bias_scan
+    from omnibias.torch.scan import BiasScan
+
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    bank = BankSpec.uniform(-1.0, 1.0, 5)
+    z_np = np.array([[0.0], [0.3], [-0.25]], dtype=np.float64)
+    via_template = BiasScan(
+        1,
+        bank,
+        template="integral",
+        base="tanh",
+        learnable_offsets=False,
+        learnable_scales=False,
+        dtype=torch.float64,
+    )
+    via_op = BiasScan(
+        1,
+        bank,
+        op="integral",
+        base="tanh",
+        learnable_offsets=False,
+        learnable_scales=False,
+        dtype=torch.float64,
+    )
+    t_tmpl = via_template(torch.as_tensor(z_np)).detach().numpy()
+    t_op = via_op(torch.as_tensor(z_np)).detach().numpy()
+    alias_worst = 0.0
+    for a, b in zip(t_tmpl.reshape(-1), t_op.reshape(-1), strict=True):
+        alias_worst = max(alias_worst, _ulp_error(float(a), float(b)))
+    act, offsets, scales, tmpl, _taps = init_bias_scan(1, bank, op="integral", base="tanh")
+    jax_out = np.asarray(
+        bias_scan(jnp.asarray(z_np), offsets, scales, tmpl, act, readout="response")
+    )
+    parity_worst = 0.0
+    for a, b in zip(t_op.reshape(-1), jax_out.reshape(-1), strict=True):
+        parity_worst = max(parity_worst, _ulp_error(float(a), float(b)))
+    both_raised = False
+    try:
+        BiasScan(1, bank, template="integral", op="integral", dtype=torch.float64)
+    except ValueError as exc:
+        both_raised = "only one of template= or op=" in str(exc)
+    seventh_raised = False
+    try:
+        BiasScan(1, bank, op="conv2d", dtype=torch.float64)
+    except ValueError as exc:
+        seventh_raised = "unknown" in str(exc)
+    passed = (
+        alias_worst <= 4.0
+        and parity_worst <= 4.0
+        and both_raised
+        and seventh_raised
+    )
+    return {
+        "name": "g5_integral_op_alias",
+        "passed": bool(passed),
+        "alias_worst_ulp": float(alias_worst),
+        "parity_worst_ulp": float(parity_worst),
+        "both_kwargs_raise": both_raised,
+        "seventh_role_raise": seventh_raised,
+        "note": (
+            "BiasScan(op='integral') is the 01-13 first spend, not a "
+            "seventh OperatorBlock role; 09-14 is the named consumer"
+        ),
+    }
+
+
 def main(argv: list[str] | None = None) -> dict[str, Any]:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true")
@@ -297,7 +370,9 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     two = _two_interface_diagnostic()
     print("G4 no-grid attempt...")
     g4 = _run_g4(full=full)
-    entries = [g1, g2, g3]
+    print("G5 integral op alias...")
+    g5 = _run_g5()
+    entries = [g1, g2, g3, g5]
     for e in entries:
         if not e["passed"]:
             raise AssertionError(f"{e['name']} failed: {e}")
@@ -307,7 +382,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "family": "bias_scan",
         "full": full,
         "g4_earned": g4_earned,
-        "gates_in_scope": ["g1", "g2", "g3"],
+        "gates_in_scope": ["g1", "g2", "g3", "g5"],
     }
     payload = provenance(schema="bias-scan-v1", config=config)
     payload.update(
@@ -317,6 +392,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "g2": g2,
             "g3": g3,
             "g4": g4,
+            "g5": g5,
             "two_interface": two,
             "honesty": {
                 "claim_rung": 1,
@@ -328,6 +404,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "g2_earned": bool(g2["passed"]),
                 "g3_earned": bool(g3["passed"]),
                 "g4_earned": g4_earned,
+                "g5_earned": bool(g5["passed"]),
                 "two_interface_visible_failure": bool(two["biased_to_zero"]),
                 "licensed_sentence": (
                     "BiasScan interior-shifts the response to <= 4 ulp on the "
@@ -335,7 +412,8 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                     "<= 0.1 spacing with skill vs the domain midpoint; "
                     "torch/jax responses agree within 4 ulp; two-interface "
                     "soft-argmax bias is visible; G4 is earned only on a "
-                    "measured no-grid MAE win at equal-or-lower wall time"
+                    "measured no-grid MAE win at equal-or-lower wall time; "
+                    "op='integral' is the 01-13 first spend, not a seventh role"
                 ),
             },
             "wall_seconds": round(time.perf_counter() - t0, 3),

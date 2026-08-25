@@ -179,3 +179,31 @@ def test_band_and_integral_templates_run() -> None:
     assert integ(z).shape == (2, 1, 3)
     with pytest.raises(ValueError, match="unknown"):
         template_from_op("not-an-op")
+
+
+def test_op_alias_matches_template_integral() -> None:
+    """01-13 first spend: BiasScan(op='integral') is template='integral'."""
+    torch.set_default_dtype(torch.float64)
+    bank = BankSpec.uniform(-1.0, 1.0, 3)
+    z = torch.tensor([[0.25], [-0.1]], dtype=torch.float64)
+    via_template = BiasScan(
+        1,
+        bank,
+        template="integral",
+        base="tanh",
+        learnable_offsets=False,
+        dtype=torch.float64,
+    )
+    via_op = BiasScan(
+        1,
+        bank,
+        op="integral",
+        base="tanh",
+        learnable_offsets=False,
+        dtype=torch.float64,
+    )
+    assert torch.equal(via_op(z), via_template(z))
+    with pytest.raises(ValueError, match="only one of template= or op="):
+        BiasScan(1, bank, template="integral", op="integral", dtype=torch.float64)
+    with pytest.raises(ValueError, match="unknown"):
+        BiasScan(1, bank, op="conv2d", dtype=torch.float64)
