@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — BEM-Net cost reported (theory 02-06)
+
+- `benchmarks/bem_net.py` now times `single_layer` versus `n_quad` in
+  `{12,24,48}` (one far point and N exterior points; warmup + median).
+- Reported: G2 disc-accuracy (annulus L2 `<= 1e-8`) stays `--full` /
+  unearned: no Dirichlet density solve is wired. Previous untimed
+  `passed=True` stub withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/bem_net_smoke.json`.
+
+
 ### Added — Layered-transfer cost reported (theory 02-11)
 
 - `benchmarks/layered_transfer.py` now times `stack_matrix` and
