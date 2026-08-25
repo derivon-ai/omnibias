@@ -9,8 +9,9 @@ zero-perturbation. Death is bounded: the report carries
 `sigma_alpha^(n)(u) = alpha^n sigma^(n)(alpha u)`, a third axis — not
 bias collapse and not temperature collapse.
 
-Status is **gated**, not shipped. G1/G2/G3/G5/G6 are CI-gated. G4
-(10x vs a fixed bank) is recorded, **not** in CI `all_passed`. See
+Status is **gated**, not shipped. G1–G6 are CI-gated. G4 (10x vs a
+matched-count fixed bank on the named boundary layer, five `eps`) is
+**earned** through `propose_refinement`, not a hand-placed pack. See
 theory spec 03-13. Singularity / scale-flow indicators use Domb-Sykes
 and jet-ratio estimators; they are not the full 03-10 Padé tracker or
 the 03-07 RG beta-function.

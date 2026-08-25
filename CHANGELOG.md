@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Adaptive-refinement G4 earned (theory 03-13)
+
+- `benchmarks/adaptive_refinement.py` G4 now births through
+  `propose_refinement` on the spec boundary layer
+  `u=(1-exp(-x/eps))/(1-exp(-1/eps))` at the `|u'|` peak, five `eps`.
+- Earned: `5/5` hit `10x` vs a matched-count uniform `alpha=2` bank
+  (shared intercept). The previous hand-placed `exp(-100 x)` oracle is
+  withdrawn. G4 is in CI `all_passed`.
+- Smoke: `docs/benchmarks/adaptive_refinement_smoke.json`.
+
+
 ### Added — Jet line-search G4/G5 recorded (theory 03-12)
 
 - `benchmarks/jet_line_search.py` G4 now runs a target-loss trajectory

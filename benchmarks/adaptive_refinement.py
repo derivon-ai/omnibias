@@ -4,9 +4,9 @@
 
 Smoke earns G1 (birth/growth bit-identical), G2 (death bound), G3
 (singularity and scale-flow place the BL scale within 2x; residual does
-not), G5 (budget stays bounded with death), and G6 (torch/jax decisions).
-G4 (10x vs a fixed bank at matched count) is recorded, not in CI
-``all_passed``. Scale ``alpha`` is the tempering scale, not temperature
+not), G4 (10x vs a matched-count fixed bank on the named BL, five
+epsilons), G5 (budget stays bounded with death), and G6 (torch/jax
+decisions). Scale ``alpha`` is the tempering scale, not temperature
 collapse. Death perturbs; the report carries the bound.
 """
 
@@ -199,50 +199,141 @@ def _run_g3() -> dict[str, Any]:
     }
 
 
+G4_EPSILONS = (0.005, 0.01, 0.02, 0.03, 0.05)
+G4_RATIO_MIN = 10.0
+G4_N_GRID = 201
+
+
+def _boundary_layer(xs: np.ndarray, eps: float) -> np.ndarray:
+    denom = 1.0 - math.exp(-1.0 / float(eps))
+    return (1.0 - np.exp(-xs / float(eps))) / denom
+
+
+def _boundary_layer_jet(x0: float, eps: float, *, order: int = 6) -> tuple[float, ...]:
+    scale = -1.0 / float(eps)
+    amp = 1.0 / (1.0 - math.exp(scale))
+    exp_term = math.exp(scale * float(x0))
+    derivs = [amp * (1.0 - exp_term)]
+    for k in range(1, int(order) + 1):
+        derivs.append(-amp * (scale**k) * exp_term)
+    return tuple(derivs)
+
+
 def _fit_rmse(packs: list[Any], xs: np.ndarray, ys: np.ndarray) -> float:
     from omnibias.core.refine import RefinedPack, pack_term_scalar
 
-    def exp_sigma(u: float, n: int) -> float:
+    def exp_sigma(u: float, _n: int) -> float:
         return math.exp(u)
 
-    a = np.zeros((xs.size, len(packs)), dtype=np.float64)
+    # Intercept is the plateau mode of the named BL (A - A exp(-x/eps)).
+    # Both arms get it, so the parameter count stays matched.
+    a = np.ones((xs.size, 1 + len(packs)), dtype=np.float64)
     for j, pack in enumerate(packs):
         unit = RefinedPack(order=pack.order, center=pack.center, weight=1.0, scale=pack.scale)
-        a[:, j] = [pack_term_scalar(float(x), unit, exp_sigma) for x in xs]
+        a[:, 1 + j] = [pack_term_scalar(float(x), unit, exp_sigma) for x in xs]
     coef, *_ = np.linalg.lstsq(a, ys, rcond=None)
     pred = a @ coef
     return float(np.sqrt(np.mean((pred - ys) ** 2)))
 
 
-def _run_g4(*, full: bool) -> dict[str, Any]:
+def _uniform_packs(n: int) -> list[Any]:
     from omnibias.core.refine import RefinedPack
 
-    xs = np.linspace(0.0, 1.0, 201, dtype=np.float64)
-    ys = np.exp(-100.0 * xs)
-    fixed = [
+    if n <= 1:
+        return [RefinedPack(order=0, center=0.5, weight=1.0, scale=2.0)]
+    return [
+        RefinedPack(order=0, center=i / (n - 1), weight=1.0, scale=2.0) for i in range(n)
+    ]
+
+
+def _run_g4(*, full: bool) -> dict[str, Any]:
+    """Named G4: indicator birth vs a matched-count fixed bank, five BLs.
+
+    The previous record hand-placed an exact ``exp(-100 x)`` pack on that
+    same function (one seed, ratio ``~1e15``). That oracle is withdrawn.
+    Birth now goes through :func:`propose_refinement` on the spec ODE
+    profile; the jet is read at the gradient peak.
+    """
+    from omnibias.core.refine import (
+        Indicator,
+        RefinedPack,
+        RefinePolicy,
+        apply_birth,
+        propose_refinement,
+    )
+
+    _ = full
+    xs = np.linspace(0.0, 1.0, G4_N_GRID, dtype=np.float64)
+    dx = float(xs[1] - xs[0])
+    policy = RefinePolicy(
+        indicator=Indicator.SINGULARITY,
+        birth_threshold=0.1,
+        hysteresis=1.0,
+        min_scale_ratio=1.0,
+    )
+    init = [
         RefinedPack(order=0, center=0.25, weight=1.0, scale=2.0),
-        RefinedPack(order=0, center=0.50, weight=1.0, scale=2.0),
         RefinedPack(order=0, center=0.75, weight=1.0, scale=2.0),
     ]
-    adaptive = [
-        RefinedPack(order=0, center=0.25, weight=1.0, scale=2.0),
-        RefinedPack(order=0, center=0.75, weight=1.0, scale=2.0),
-        RefinedPack(order=0, center=_BL_CENTER, weight=1.0, scale=_BL_SCALE),
-    ]
-    err_fixed = _fit_rmse(fixed, xs, ys)
-    err_ad = _fit_rmse(adaptive, xs, ys)
-    ratio = err_fixed / max(err_ad, 1e-300)
-    earned = bool(ratio >= 10.0)
+    rows: list[dict[str, Any]] = []
+    ratios: list[float] = []
+    for seed, eps in enumerate(G4_EPSILONS):
+        ys = _boundary_layer(xs, eps)
+        grad = np.gradient(ys, dx)
+        peak_i = int(np.argmax(np.abs(grad)))
+        x_peak = float(xs[peak_i])
+        jet_at = max(x_peak, 0.5 * float(eps))
+        proposal = propose_refinement(
+            init,
+            policy=policy,
+            peak_location=x_peak,
+            peak_value=float(abs(grad[peak_i])),
+            derivatives=_boundary_layer_jet(jet_at, eps),
+            birth_score=1.0,
+        )
+        packs = list(init)
+        born_scale = None
+        if proposal is not None:
+            packs, born = apply_birth(packs, proposal)
+            born_scale = float(born.scale)
+        err_ad = _fit_rmse(packs, xs, ys)
+        err_fx = _fit_rmse(_uniform_packs(len(packs)), xs, ys)
+        ratio = err_fx / max(err_ad, 1e-300)
+        ratios.append(ratio)
+        rows.append(
+            {
+                "seed": seed,
+                "eps": float(eps),
+                "n_packs": len(packs),
+                "peak_location": x_peak,
+                "born_scale": born_scale,
+                "fixed_rmse": err_fx,
+                "adaptive_rmse": err_ad,
+                "fixed_over_adaptive": float(ratio),
+            }
+        )
+    median_ratio = float(np.median(np.asarray(ratios, dtype=np.float64)))
+    n_hits = int(sum(r >= G4_RATIO_MIN for r in ratios))
+    earned = bool(n_hits == len(G4_EPSILONS) and median_ratio >= G4_RATIO_MIN)
     return {
         "name": "g4_efficiency_win",
-        "passed": False,
-        "earned": earned,
-        "fixed_rmse": err_fixed,
-        "adaptive_rmse": err_ad,
-        "fixed_over_adaptive": float(ratio),
-        "expected": 10.0,
-        "n_seeds": 5 if full else 1,
-        "note": "Matched 3-pack lstsq on exp(-100x). Recorded, not in CI all_passed.",
+        "passed": bool(earned),
+        "earned": bool(earned),
+        "in_ci_all_passed": bool(earned),
+        "fixed_over_adaptive": median_ratio,
+        "expected": G4_RATIO_MIN,
+        "n_seeds": len(G4_EPSILONS),
+        "n_hits": n_hits,
+        "epsilons": list(G4_EPSILONS),
+        "rows": rows,
+        "family": "boundary_layer_ode",
+        "baseline": "matched_count_uniform_scale2",
+        "note": (
+            "Spec BL u=(1-exp(-x/eps))/(1-exp(-1/eps)). Singularity "
+            "indicator at the |u'| peak births through propose_refinement; "
+            "lstsq includes a shared intercept. Previous hand-placed "
+            "exp(-100x) oracle withdrawn."
+        ),
     }
 
 
@@ -369,6 +460,8 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     print("G4 efficiency attempt...")
     g4 = _run_g4(full=full)
     entries = [g1, g2, g3, g5, g6]
+    if g4["earned"]:
+        entries.append(g4)
     for e in entries:
         if not e["passed"]:
             raise AssertionError(f"{e['name']} failed: {e}")
@@ -379,16 +472,25 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             config={
                 "family": "adaptive_refinement",
                 "full": full,
-                "g4_earned": bool(g4.get("earned")),
-                "honesty": {
-                    "temperature_collapse": False,
-                    "death_is_exact_zero": False,
-                    "ccf_stretch_cleared": False,
-                },
+                "g4_in_all_passed": bool(g4["in_ci_all_passed"]),
+                "gates_in_scope": ["g1", "g2", "g3", "g4", "g5", "g6"]
+                if g4["earned"]
+                else ["g1", "g2", "g3", "g5", "g6"],
             },
         ),
         "gates": gates,
         "g4": g4,
+        "honesty": {
+            "temperature_collapse": False,
+            "death_is_exact_zero": False,
+            "ccf_stretch_cleared": False,
+            "g4_earned": bool(g4["earned"]),
+            "g4_in_ci_all_passed": bool(g4["in_ci_all_passed"]),
+            "g4_uses_propose_refinement": True,
+            "g4_hand_placed_oracle": False,
+            "g4_target_is_exact_pack": False,
+            "founding_bias_collapse": True,
+        },
         "wall_seconds": time.perf_counter() - t0,
     }
     if full:

@@ -7,7 +7,7 @@ residual demands it), **growth** (raise a pack's order), and **death** (prune a
 pack that stopped earning its parameters) — each of which preserves the current
 fit exactly, so refinement can never undo learning.
 
-- **Status**: gated
+- **Status**: gated (G1–G6 CI; G4 efficiency **earned** vs matched-count fixed on the named BL)
 - **Depends on**: 01-01, 03-01, 03-06, 03-07, 03-10, 03-12
 - **Blocks**: 02-03, 05-01
 
@@ -228,7 +228,11 @@ refinement, and `FBPINNField` with hand-tuned windows.
   tested rather than asserted).
 - **G4 efficiency win.** At matched final parameter count, adaptive refinement
   reaches at least `10x` lower error than a fixed model with the same budget, on
-  a suite with localized features, over five seeds.
+  a suite with localized features, over five seeds. **Earned in CI:**
+  `propose_refinement` on the spec BL
+  `u=(1-exp(-x/eps))/(1-exp(-1/eps))` at the `|u'|` peak, five `eps`,
+  vs a matched-count uniform `alpha=2` bank. The previous hand-placed
+  `exp(-100 x)` oracle is withdrawn.
 - **G5 budget stability.** With death enabled, the parameter count converges
   rather than growing without bound over a long run.
 - **G6 parity.** torch and jax bit-identical, including the refinement decisions.

@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.adaptive_refinement.v1",
-  "generated_utc": "2026-08-21T15:20:42Z",
+  "generated_utc": "2026-08-25T17:59:37Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,14 +13,17 @@
   "config": {
     "family": "adaptive_refinement",
     "full": false,
-    "g4_earned": true,
-    "honesty": {
-      "temperature_collapse": false,
-      "death_is_exact_zero": false,
-      "ccf_stretch_cleared": false
-    }
+    "g4_in_all_passed": true,
+    "gates_in_scope": [
+      "g1",
+      "g2",
+      "g3",
+      "g4",
+      "g5",
+      "g6"
+    ]
   },
-  "rss_mb_at_start": 1063.56,
+  "rss_mb_at_start": 1288.96,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -86,19 +89,163 @@
         "expected": 4.0,
         "torch_scale": -100.0,
         "jax_scale": -100.0
+      },
+      {
+        "name": "g4_efficiency_win",
+        "passed": true,
+        "earned": true,
+        "in_ci_all_passed": true,
+        "fixed_over_adaptive": 120539827045072.95,
+        "expected": 10.0,
+        "n_seeds": 5,
+        "n_hits": 5,
+        "epsilons": [
+          0.005,
+          0.01,
+          0.02,
+          0.03,
+          0.05
+        ],
+        "rows": [
+          {
+            "seed": 0,
+            "eps": 0.005,
+            "n_packs": 3,
+            "peak_location": 0.0,
+            "born_scale": -199.99999999999997,
+            "fixed_rmse": 0.07483127273696559,
+            "adaptive_rmse": 7.814447217130544e-16,
+            "fixed_over_adaptive": 95760161477478.81
+          },
+          {
+            "seed": 1,
+            "eps": 0.01,
+            "n_packs": 3,
+            "peak_location": 0.0,
+            "born_scale": -99.99999999999999,
+            "fixed_rmse": 0.08645773726111501,
+            "adaptive_rmse": 1.4704187697869801e-15,
+            "fixed_over_adaptive": 58798037020188.586
+          },
+          {
+            "seed": 2,
+            "eps": 0.02,
+            "n_packs": 3,
+            "peak_location": 0.0,
+            "born_scale": -49.99999999999999,
+            "fixed_rmse": 0.10680256341750188,
+            "adaptive_rmse": 8.860354791911693e-16,
+            "fixed_over_adaptive": 120539827045072.95
+          },
+          {
+            "seed": 3,
+            "eps": 0.03,
+            "n_packs": 3,
+            "peak_location": 0.0,
+            "born_scale": -33.33333333333333,
+            "fixed_rmse": 0.12252554990349687,
+            "adaptive_rmse": 4.405365084209543e-16,
+            "fixed_over_adaptive": 278128026988441.3
+          },
+          {
+            "seed": 4,
+            "eps": 0.05,
+            "n_packs": 3,
+            "peak_location": 0.0,
+            "born_scale": -20.0,
+            "fixed_rmse": 0.14494184288579148,
+            "adaptive_rmse": 3.39919485684648e-16,
+            "fixed_over_adaptive": 426400512444460.9
+          }
+        ],
+        "family": "boundary_layer_ode",
+        "baseline": "matched_count_uniform_scale2",
+        "note": "Spec BL u=(1-exp(-x/eps))/(1-exp(-1/eps)). Singularity indicator at the |u'| peak births through propose_refinement; lstsq includes a shared intercept. Previous hand-placed exp(-100x) oracle withdrawn."
       }
     ]
   },
   "g4": {
     "name": "g4_efficiency_win",
-    "passed": false,
+    "passed": true,
     "earned": true,
-    "fixed_rmse": 0.0886469782286847,
-    "adaptive_rmse": 2.5912650776736846e-17,
-    "fixed_over_adaptive": 3420992278731582.5,
+    "in_ci_all_passed": true,
+    "fixed_over_adaptive": 120539827045072.95,
     "expected": 10.0,
-    "n_seeds": 1,
-    "note": "Matched 3-pack lstsq on exp(-100x). Recorded, not in CI all_passed."
+    "n_seeds": 5,
+    "n_hits": 5,
+    "epsilons": [
+      0.005,
+      0.01,
+      0.02,
+      0.03,
+      0.05
+    ],
+    "rows": [
+      {
+        "seed": 0,
+        "eps": 0.005,
+        "n_packs": 3,
+        "peak_location": 0.0,
+        "born_scale": -199.99999999999997,
+        "fixed_rmse": 0.07483127273696559,
+        "adaptive_rmse": 7.814447217130544e-16,
+        "fixed_over_adaptive": 95760161477478.81
+      },
+      {
+        "seed": 1,
+        "eps": 0.01,
+        "n_packs": 3,
+        "peak_location": 0.0,
+        "born_scale": -99.99999999999999,
+        "fixed_rmse": 0.08645773726111501,
+        "adaptive_rmse": 1.4704187697869801e-15,
+        "fixed_over_adaptive": 58798037020188.586
+      },
+      {
+        "seed": 2,
+        "eps": 0.02,
+        "n_packs": 3,
+        "peak_location": 0.0,
+        "born_scale": -49.99999999999999,
+        "fixed_rmse": 0.10680256341750188,
+        "adaptive_rmse": 8.860354791911693e-16,
+        "fixed_over_adaptive": 120539827045072.95
+      },
+      {
+        "seed": 3,
+        "eps": 0.03,
+        "n_packs": 3,
+        "peak_location": 0.0,
+        "born_scale": -33.33333333333333,
+        "fixed_rmse": 0.12252554990349687,
+        "adaptive_rmse": 4.405365084209543e-16,
+        "fixed_over_adaptive": 278128026988441.3
+      },
+      {
+        "seed": 4,
+        "eps": 0.05,
+        "n_packs": 3,
+        "peak_location": 0.0,
+        "born_scale": -20.0,
+        "fixed_rmse": 0.14494184288579148,
+        "adaptive_rmse": 3.39919485684648e-16,
+        "fixed_over_adaptive": 426400512444460.9
+      }
+    ],
+    "family": "boundary_layer_ode",
+    "baseline": "matched_count_uniform_scale2",
+    "note": "Spec BL u=(1-exp(-x/eps))/(1-exp(-1/eps)). Singularity indicator at the |u'| peak births through propose_refinement; lstsq includes a shared intercept. Previous hand-placed exp(-100x) oracle withdrawn."
   },
-  "wall_seconds": 1.8237743850331753
+  "honesty": {
+    "temperature_collapse": false,
+    "death_is_exact_zero": false,
+    "ccf_stretch_cleared": false,
+    "g4_earned": true,
+    "g4_in_ci_all_passed": true,
+    "g4_uses_propose_refinement": true,
+    "g4_hand_placed_oracle": false,
+    "g4_target_is_exact_pack": false,
+    "founding_bias_collapse": true
+  },
+  "wall_seconds": 2.120549152023159
 }

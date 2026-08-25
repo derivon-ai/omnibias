@@ -124,7 +124,7 @@ weak-form VPINN and 02-05 transmission PINN (both plug into an existing,
 benchmarked PINN surface), 02-03 Jet-KAN (a well-defined comparison against
 spline KANs), 03-12 line search (**gated**: certified radius +
 `verify=True`; G4/G5 recorded) and 03-13 refinement (**gated**: birth/growth
-bit-identical, death reports a bound; G4 recorded). Group 08 (tower-native trainers)
+bit-identical, death reports a bound; G4 earned). Group 08 (tower-native trainers)
 is specified in this wave and implemented after 03-12 exists as code: 08-02
 (2-layer PINN escape ablation; **gated**: G1–G4 CI) is the cheap falsifier; 08-04 / 08-06 / 08-07
 hook shipped `optim.py`; 08-05 lands in `pinn.train`; 08-08 is
