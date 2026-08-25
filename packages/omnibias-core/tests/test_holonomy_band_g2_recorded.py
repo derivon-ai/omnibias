@@ -28,6 +28,7 @@ def test_g2_closed_form_is_earned_and_in_all_passed() -> None:
     assert payload["honesty"]["g2_in_ci_all_passed"] is True
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g2_closed_form" in names
+    assert "g3_magnus_bound" not in names
     gate = next(row for row in payload["gates"]["entries"] if row["name"] == "g2_closed_form")
     assert gate["passed"] is True
     assert gate["in_ci_all_passed"] is True

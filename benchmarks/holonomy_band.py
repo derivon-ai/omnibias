@@ -2,9 +2,11 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: holonomy band (theory 02-14). No YM / mass-gap claim.
 
-G2 closed-form exactness is measured: ``band_holonomy`` versus PRODUCT
-at ``substeps=4096``. Closed form is abelian + transverse-constant only.
-The gap is held finite (band), the opposite of founding ``delta -> 0``.
+G2 closed-form exactness is earned versus PRODUCT at ``substeps=4096``.
+G3 Magnus soundness is reported: the bound is checked on a grid and a
+sample, but no Magnus-truncated holonomy is wired. Closed form is
+abelian + transverse-constant only. The gap is held finite (band), the
+opposite of founding ``delta -> 0``.
 """
 
 from __future__ import annotations
@@ -120,6 +122,95 @@ def _run_g2() -> dict[str, Any]:
     }
 
 
+G3_ORDER = 2
+G3_GRID_A = (0.2, 0.4, 0.8)
+G3_GRID_L = (0.5, 1.0)
+G3_N_RANDOM = 8
+G3_ML_HALVINGS = (0.8, 0.4, 0.2)
+
+
+def _run_g3() -> dict[str, Any]:
+    """Named leftover: bound on a grid + sample; Magnus holonomy stays --full."""
+    from omnibias.geometry.gauge.band._core import magnus_truncation_bound
+
+    rows: list[dict[str, Any]] = []
+    violations = 0
+    for a_norm in G3_GRID_A:
+        for length in G3_GRID_L:
+            bound = magnus_truncation_bound(a_norm=a_norm, length=length, order=G3_ORDER)
+            ok = bool(bound.lo < 0.0 < bound.hi)
+            violations += int(not ok)
+            rows.append(
+                {
+                    "kind": "grid",
+                    "a_norm": float(a_norm),
+                    "length": float(length),
+                    "bound_hi": float(bound.hi),
+                    "contains_zero": ok,
+                }
+            )
+    rng = np.random.default_rng(0)
+    for _ in range(G3_N_RANDOM):
+        a_norm = float(rng.uniform(0.1, 1.2))
+        length = float(rng.uniform(0.2, 1.5))
+        if a_norm * length >= 3.0:
+            length = 2.0 / a_norm
+        bound = magnus_truncation_bound(a_norm=a_norm, length=length, order=G3_ORDER)
+        ok = bool(bound.lo < 0.0 < bound.hi)
+        violations += int(not ok)
+        rows.append(
+            {
+                "kind": "sample",
+                "a_norm": a_norm,
+                "length": length,
+                "bound_hi": float(bound.hi),
+                "contains_zero": ok,
+            }
+        )
+    refused = False
+    try:
+        magnus_truncation_bound(a_norm=4.0, length=1.0, order=G3_ORDER)
+    except ValueError:
+        refused = True
+    widths = []
+    for ml in G3_ML_HALVINGS:
+        bound = magnus_truncation_bound(a_norm=float(ml), length=1.0, order=G3_ORDER)
+        widths.append(float(bound.hi))
+    ratio_hi_mid = widths[0] / max(widths[1], 1e-18)
+    # Bound is (ml^{order+1})/(order+1)! exp(ml); ratio at 2x is 2^{k} exp(ml/2).
+    predicted = (2.0 ** (G3_ORDER + 1)) * float(np.exp(0.5 * G3_ML_HALVINGS[1]))
+    return {
+        "name": "g3_magnus_bound",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
+        "need": (
+            "bound upper-bounds Magnus-truncation vs PRODUCT 4096 on a "
+            "grid and a sample, zero violations, predicted-order decay"
+        ),
+        "violations": int(violations),
+        "n_grid": int(len(G3_GRID_A) * len(G3_GRID_L)),
+        "n_sample": G3_N_RANDOM,
+        "refuses_outside_radius": bool(refused),
+        "zero_in_every_bound": violations == 0,
+        "width_halving_ratio": float(ratio_hi_mid),
+        "width_halving_predicted": float(predicted),
+        "magnus_holonomy_api": False,
+        "stays_full": True,
+        "rows": rows,
+        "note": (
+            "magnus_truncation_bound contains 0 on a (a_norm, L) grid "
+            "and a random sample, and refuses ||A|| L >= pi. Named G3 "
+            "needs a Magnus-truncated holonomy whose error versus "
+            "PRODUCT substeps=4096 is enclosed and decays at the "
+            "predicted order. That evaluator is not wired. Previous "
+            "sign-check stub withdrawn from named G3. Not in CI "
+            "all_passed."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
@@ -127,15 +218,14 @@ def main() -> int:
     from omnibias.geometry.gauge.band._core import (
         BandRegime,
         classify_regime,
-        magnus_truncation_bound,
         open_line_is_gauge_dependent,
     )
     from omnibias.geometry.gauge._core.lie_algebra import su, u1
 
     g1 = classify_regime(u1(), transverse_constant=False) is BandRegime.ABELIAN
     g1 = g1 and classify_regime(su(2), transverse_constant=False) is BandRegime.PRODUCT
-    bound = magnus_truncation_bound(a_norm=0.4, length=1.0, order=2)
     g2 = _run_g2()
+    g3 = _run_g3()
     entries: list[dict[str, Any]] = [
         {"name": "g1_regime", "passed": g1, "in_ci_all_passed": True},
         {
@@ -148,11 +238,6 @@ def main() -> int:
             "su2_cost_ratio": g2["su2_cost_ratio"],
         },
         {
-            "name": "g3_magnus_bound",
-            "passed": bound.lo < 0.0 < bound.hi,
-            "in_ci_all_passed": True,
-        },
-        {
             "name": "g4_open_line_flagged",
             "passed": open_line_is_gauge_dependent() is True,
             "in_ci_all_passed": True,
@@ -163,11 +248,13 @@ def main() -> int:
         config={
             "mode": "full" if args.full else "smoke",
             "g2_in_all_passed": bool(g2["in_ci_all_passed"]),
-            "gates_in_scope": ["g1", "g2", "g3", "g4"],
+            "g3_in_all_passed": False,
+            "gates_in_scope": ["g1", "g2", "g4"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["g2"] = g2
+    payload["g3"] = g3
     payload["honesty"] = {
         "closed_form": "abelian and transverse-constant only",
         "open_lines": "gauge-dependent",
@@ -177,6 +264,10 @@ def main() -> int:
         "g2_earned": bool(g2["earned"]),
         "g2_reported": True,
         "g2_in_ci_all_passed": bool(g2["in_ci_all_passed"]),
+        "g3_earned": False,
+        "g3_reported": True,
+        "g3_in_ci_all_passed": False,
+        "g3_magnus_holonomy_api": False,
         "temperature_collapse": False,
         "founding_bias_collapse": False,
         "finite_band_gap": True,

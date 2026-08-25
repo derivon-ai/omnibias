@@ -132,7 +132,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [02-11 transfer-matrix layered media](02-architectures/11-transfer-matrix-layered-media.md) | gated | 1-D ABCD; `continuum_claim=False`; distinct from `geometry.gauge.transfer`; G4 inverse-design **unearned** / `--full`; stack cost **reported**; G5 conservation **reported**, not in CI `all_passed` |
 | [02-12 equality-intersection nets](02-architectures/12-equality-intersection-ansatz-nets.md) | gated | Layer on 01-09; always `branch` / `condition` / `converged`; not a general PDE solver; G4 Burgers RH **reported** (clean speed from `affine_locus`; noisy contour stays `--full`), not in CI `all_passed` |
 | [02-13 linearizing transforms](02-architectures/13-linearizing-transform-layers.md) | gated | Named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; 03-11 search is gated |
-| [02-14 Wilson-line holonomy band](02-architectures/14-wilson-line-holonomy-band.md) | gated | Closed form abelian + transverse-constant; open lines gauge-dependent; no YM / mass gap / continuum claim; G2 closed-form **earned** vs PRODUCT `substeps=4096` |
+| [02-14 Wilson-line holonomy band](02-architectures/14-wilson-line-holonomy-band.md) | gated | Closed form abelian + transverse-constant; open lines gauge-dependent; no YM / mass gap / continuum claim; G2 closed-form **earned** vs PRODUCT `substeps=4096`; G3 Magnus **reported** (no truncated holonomy API), not in CI `all_passed` |
 
 ### 03 Algorithms and paradigms
 

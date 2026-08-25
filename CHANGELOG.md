@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomy-band G3 Magnus reported (theory 02-14)
+
+- `benchmarks/holonomy_band.py` now checks `magnus_truncation_bound` on
+  a `(a_norm, L)` grid and a random sample, and records that it refuses
+  `||A|| L >= pi`.
+- Reported: named G3 needs a Magnus-truncated holonomy versus PRODUCT
+  `substeps=4096`. That evaluator is not wired. Previous sign-check
+  stub withdrawn from named G3. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/holonomy_band_smoke.json`.
+
+
 ### Added — Holonomy-band G2 closed-form earned (theory 02-14)
 
 - `benchmarks/holonomy_band.py` now compares `band_holonomy` closed form
