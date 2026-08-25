@@ -7,7 +7,7 @@ way, and the repository has already learned that lesson the expensive way — so
 this file assigns every spec a home under the "earn independent existence" rule
 and sequences them so that the cheap falsifiers run before the expensive builds.
 
-- **Status**: gated (G1/G2 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 93/93 specs name a home; G3–G5 not in CI `all_passed`; no new distribution)
+- **Status**: gated (G1–G3 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 93/93 specs name a home, Wave-0 A4–A7 recorded; G4/G5 not in CI `all_passed`; no new distribution)
 - **Depends on**: 06-01, 06-02
 - **Blocks**: none
 

@@ -3,14 +3,16 @@
 """Gated program: packaging homes (theory 06-03).
 
 Every spec's section 2 names an existing package, submodule, or
-docs-only home. ``NEW_PACKAGES_ALLOWED`` stays empty. No new
-distribution. Not a performance benchmark.
+docs-only home. ``NEW_PACKAGES_ALLOWED`` stays empty. Wave-0
+A4–A7 are recorded in the index. No new distribution. Not a
+performance benchmark.
 """
 
 from __future__ import annotations
 
 import argparse
 import os
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -24,6 +26,11 @@ TESTS = REPO / "packages" / "omnibias-core" / "tests"
 sys.path.insert(0, str(TESTS))
 
 import test_theory_homes as homes  # noqa: E402
+
+WAVE0_UNITS = ("A4", "A5", "A6", "A7")
+_ARTIFACT = re.compile(r"`(?:\.\./)?(docs/benchmarks/[^`]+\.json)`")
+_RECORDED = re.compile(r"(?i)\b(passed|earned|unearned|failed|retired)\b")
+_NOT_RUN = re.compile(r"(?i)not run")
 
 
 def _run_g1() -> dict[str, Any]:
@@ -97,20 +104,86 @@ def _run_g2() -> dict[str, Any]:
     }
 
 
+def _wave0_rows(text: str) -> dict[str, dict[str, Any]]:
+    start = text.find("## Wave-0 falsifier outcomes")
+    if start < 0:
+        return {}
+    rest = text[start:]
+    nxt = rest.find("\n## ", 3)
+    block = rest if nxt < 0 else rest[:nxt]
+    rows: dict[str, dict[str, Any]] = {}
+    for line in block.splitlines():
+        if not line.startswith("| A"):
+            continue
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        if len(cells) < 4:
+            continue
+        unit = cells[0]
+        if unit not in WAVE0_UNITS:
+            continue
+        artifacts = _ARTIFACT.findall(cells[2])
+        missing_art = [rel for rel in artifacts if not (REPO / rel).is_file()]
+        outcome = cells[3]
+        rows[unit] = {
+            "unit": unit,
+            "gate": cells[1],
+            "artifacts": artifacts,
+            "missing_artifacts": missing_art,
+            "outcome": outcome,
+            "recorded": bool(_RECORDED.search(outcome)) and not _NOT_RUN.search(outcome),
+        }
+    return rows
+
+
+def _run_g3() -> dict[str, Any]:
+    """Named leftover: Wave-0 A4–A7 recorded in the index before Wave 1+."""
+    text = (REPO / "theory" / "README.md").read_text(encoding="utf-8")
+    rows = _wave0_rows(text)
+    missing_units = [unit for unit in WAVE0_UNITS if unit not in rows]
+    unrecorded = [
+        unit
+        for unit, row in rows.items()
+        if not row["recorded"] or row["missing_artifacts"]
+    ]
+    wave1 = "## Wave-1 primitives" in text
+    earned = not missing_units and not unrecorded and wave1 and len(rows) == 4
+    return {
+        "name": "g3_falsifiers_first",
+        "passed": bool(earned),
+        "earned": bool(earned),
+        "reported": True,
+        "in_ci_all_passed": bool(earned),
+        "n_units": len(WAVE0_UNITS),
+        "n_recorded": len(rows) - len(unrecorded),
+        "missing_units": missing_units,
+        "unrecorded": unrecorded,
+        "wave1_section": wave1,
+        "rows": [rows[unit] for unit in WAVE0_UNITS if unit in rows],
+        "need": "A4–A7 recorded pass/fail/earned in the index; artifacts exist",
+        "note": (
+            "Named G3 is falsifiers-first: Wave-0 A4–A7 must be recorded "
+            "in theory/README.md before Wave 1+ work is treated as "
+            "licensed. This smoke checks the index and artifacts, not "
+            "git-order landing dates. Ambiguous 'not run' is a fail."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true")
     args = parser.parse_args()
     g1 = _run_g1()
     g2 = _run_g2()
-    in_scope = [row for row in (g1, g2) if row["in_ci_all_passed"]]
+    g3 = _run_g3()
+    in_scope = [row for row in (g1, g2, g3) if row["in_ci_all_passed"]]
     payload = provenance(
         schema="omnibias.benchmark.theory_homes.v1",
         config={
             "family": "theory_homes",
             "full": bool(args.full),
             "gates_in_scope": [row["name"] for row in in_scope],
-            "g3_in_all_passed": False,
+            "g3_in_all_passed": bool(g3["in_ci_all_passed"]),
             "g4_in_all_passed": False,
             "g5_in_all_passed": False,
         },
@@ -121,6 +194,7 @@ def main() -> int:
     }
     payload["g1"] = g1
     payload["g2"] = g2
+    payload["g3"] = g3
     payload["honesty"] = {
         "new_packages_allowed": False,
         "omnibias_arrangement_package": False,
@@ -129,7 +203,9 @@ def main() -> int:
         "g1_in_ci_all_passed": bool(g1["in_ci_all_passed"]),
         "g2_earned": bool(g2["earned"]),
         "g2_in_ci_all_passed": bool(g2["in_ci_all_passed"]),
-        "g3_earned": False,
+        "g3_earned": bool(g3["earned"]),
+        "g3_in_ci_all_passed": bool(g3["in_ci_all_passed"]),
+        "g3_is_git_order_proof": False,
         "g4_earned": False,
         "g5_earned": False,
         "book_tree": False,

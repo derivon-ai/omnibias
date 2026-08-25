@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.theory_homes.v1",
-  "generated_utc": "2026-08-25T20:05:15Z",
+  "generated_utc": "2026-08-25T20:10:17Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,13 +15,14 @@
     "full": false,
     "gates_in_scope": [
       "g1_zero_new_packages",
-      "g2_homes_declared"
+      "g2_homes_declared",
+      "g3_falsifiers_first"
     ],
-    "g3_in_all_passed": false,
+    "g3_in_all_passed": true,
     "g4_in_all_passed": false,
     "g5_in_all_passed": false
   },
-  "rss_mb_at_start": 803.84,
+  "rss_mb_at_start": 803.79,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -53,6 +54,64 @@
         "unexpected_packages": {},
         "need": "every spec section 2 names an existing home; no new distribution",
         "note": "Named G2 is the test_theory_homes consistency pass. Docs-only rows in the 06-03 table stay documents."
+      },
+      {
+        "name": "g3_falsifiers_first",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "n_units": 4,
+        "n_recorded": 4,
+        "missing_units": [],
+        "unrecorded": [],
+        "wave1_section": true,
+        "rows": [
+          {
+            "unit": "A4",
+            "gate": "05-02 G1 / G2 / G3 / G3b",
+            "artifacts": [
+              "docs/benchmarks/tabular_arrangement.json",
+              "docs/benchmarks/tabular_arrangement_public.json",
+              "docs/benchmarks/tabular_arrangement_capacity.json"
+            ],
+            "missing_artifacts": [],
+            "outcome": "**passed** G1\u2013G3 (G3 frozen W/L/T `2/5/1`); **G3b unearned** (`boost_h2` not-worse `4/8`, need `>=6/8`); G4 unearned; G5 **earned** (see A5); G6/G7 **earned** on [`shape_topology_smoke.json`](../docs/benchmarks/shape_topology_smoke.json)",
+            "recorded": true
+          },
+          {
+            "unit": "A5",
+            "gate": "05-02 G5 (filter `R^2` within `0.02` of S4D, 5 seeds, worst-seed)",
+            "artifacts": [
+              "docs/benchmarks/sequence_transverse_smoke.json"
+            ],
+            "missing_artifacts": [],
+            "outcome": "**earned** \u2014 worst-seed `R^2` gap `0.0013` (filter `0.9984` vs S4D `0.9998`); order-0 logistic tail, `width=T`; first protocol (order-1 bump, `W=24`) was a miss; sequence submodule shipped",
+            "recorded": true
+          },
+          {
+            "unit": "A6",
+            "gate": "04-01 G2 (`G_{delta,delta}` exponent `2.00 +- 0.02`, prefactor `1/720`)",
+            "artifacts": [
+              "docs/benchmarks/information_geometry.json"
+            ],
+            "missing_artifacts": [],
+            "outcome": "**passed** \u2014 licenses D8; G1/G3\u2013G5 earned on the product API; `K>=3` Fisher recorded inapplicable (not a density)",
+            "recorded": true
+          },
+          {
+            "unit": "A7",
+            "gate": "05-01 G7 (`sd(tau_hat) ~ alpha^(n-5/2)`, tol `0.1`, `n in {3,4}`)",
+            "artifacts": [
+              "docs/benchmarks/inverse_imaging.json"
+            ],
+            "missing_artifacts": [],
+            "outcome": "**passed** (locally seeded; 5 seeds, worst-seed) \u2014 licenses smallest-alpha design rule; worst deviations `0.016` / `0.031`; global search earned for n=3 only (n=4 boundary artifact); G1\u2013G6 earned on `omnibias.pinn.inverse`",
+            "recorded": true
+          }
+        ],
+        "need": "A4\u2013A7 recorded pass/fail/earned in the index; artifacts exist",
+        "note": "Named G3 is falsifiers-first: Wave-0 A4\u2013A7 must be recorded in theory/README.md before Wave 1+ work is treated as licensed. This smoke checks the index and artifacts, not git-order landing dates. Ambiguous 'not run' is a fail."
       }
     ]
   },
@@ -85,6 +144,64 @@
     "need": "every spec section 2 names an existing home; no new distribution",
     "note": "Named G2 is the test_theory_homes consistency pass. Docs-only rows in the 06-03 table stay documents."
   },
+  "g3": {
+    "name": "g3_falsifiers_first",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "n_units": 4,
+    "n_recorded": 4,
+    "missing_units": [],
+    "unrecorded": [],
+    "wave1_section": true,
+    "rows": [
+      {
+        "unit": "A4",
+        "gate": "05-02 G1 / G2 / G3 / G3b",
+        "artifacts": [
+          "docs/benchmarks/tabular_arrangement.json",
+          "docs/benchmarks/tabular_arrangement_public.json",
+          "docs/benchmarks/tabular_arrangement_capacity.json"
+        ],
+        "missing_artifacts": [],
+        "outcome": "**passed** G1\u2013G3 (G3 frozen W/L/T `2/5/1`); **G3b unearned** (`boost_h2` not-worse `4/8`, need `>=6/8`); G4 unearned; G5 **earned** (see A5); G6/G7 **earned** on [`shape_topology_smoke.json`](../docs/benchmarks/shape_topology_smoke.json)",
+        "recorded": true
+      },
+      {
+        "unit": "A5",
+        "gate": "05-02 G5 (filter `R^2` within `0.02` of S4D, 5 seeds, worst-seed)",
+        "artifacts": [
+          "docs/benchmarks/sequence_transverse_smoke.json"
+        ],
+        "missing_artifacts": [],
+        "outcome": "**earned** \u2014 worst-seed `R^2` gap `0.0013` (filter `0.9984` vs S4D `0.9998`); order-0 logistic tail, `width=T`; first protocol (order-1 bump, `W=24`) was a miss; sequence submodule shipped",
+        "recorded": true
+      },
+      {
+        "unit": "A6",
+        "gate": "04-01 G2 (`G_{delta,delta}` exponent `2.00 +- 0.02`, prefactor `1/720`)",
+        "artifacts": [
+          "docs/benchmarks/information_geometry.json"
+        ],
+        "missing_artifacts": [],
+        "outcome": "**passed** \u2014 licenses D8; G1/G3\u2013G5 earned on the product API; `K>=3` Fisher recorded inapplicable (not a density)",
+        "recorded": true
+      },
+      {
+        "unit": "A7",
+        "gate": "05-01 G7 (`sd(tau_hat) ~ alpha^(n-5/2)`, tol `0.1`, `n in {3,4}`)",
+        "artifacts": [
+          "docs/benchmarks/inverse_imaging.json"
+        ],
+        "missing_artifacts": [],
+        "outcome": "**passed** (locally seeded; 5 seeds, worst-seed) \u2014 licenses smallest-alpha design rule; worst deviations `0.016` / `0.031`; global search earned for n=3 only (n=4 boundary artifact); G1\u2013G6 earned on `omnibias.pinn.inverse`",
+        "recorded": true
+      }
+    ],
+    "need": "A4\u2013A7 recorded pass/fail/earned in the index; artifacts exist",
+    "note": "Named G3 is falsifiers-first: Wave-0 A4\u2013A7 must be recorded in theory/README.md before Wave 1+ work is treated as licensed. This smoke checks the index and artifacts, not git-order landing dates. Ambiguous 'not run' is a fail."
+  },
   "honesty": {
     "new_packages_allowed": false,
     "omnibias_arrangement_package": false,
@@ -93,7 +210,9 @@
     "g1_in_ci_all_passed": true,
     "g2_earned": true,
     "g2_in_ci_all_passed": true,
-    "g3_earned": false,
+    "g3_earned": true,
+    "g3_in_ci_all_passed": true,
+    "g3_is_git_order_proof": false,
     "g4_earned": false,
     "g5_earned": false,
     "book_tree": false

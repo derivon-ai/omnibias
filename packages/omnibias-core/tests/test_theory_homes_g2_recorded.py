@@ -57,5 +57,4 @@ def test_g1_zero_new_packages_is_recorded() -> None:
         assert g1["in_ci_all_passed"] is False
         assert "g1_zero_new_packages" not in names
         assert payload["honesty"]["g1_in_ci_all_passed"] is False
-    assert payload["honesty"]["g3_earned"] is False
     assert payload["honesty"]["g5_earned"] is False

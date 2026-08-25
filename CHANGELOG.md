@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Packaging falsifiers-first G3 earned (theory 06-03)
+
+- `benchmarks/theory_homes.py` now checks that Wave-0 A4–A7 are
+  recorded in `theory/README.md` with existing artifacts.
+- Earned: A4/A5/A6/A7 all recorded (passed/earned); no `not run`.
+  Index check, not a git-order proof. G4/G5 stay later. In CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/theory_homes_smoke.json`.
+
+
 ### Added — Packaging homes G1/G2 earned (theory 06-03)
 
 - `benchmarks/theory_homes.py` now runs the `test_theory_homes`
