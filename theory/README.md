@@ -172,7 +172,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | gated | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | gated | Claim ladder + forbidden-claims register; guards in core tests |
-| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | gated | G1–G3 **earned** (42 packages, 93/93 homes, Wave-0 A4–A7 recorded); G4/G5 not in CI `all_passed`; no new distribution |
+| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | gated | G1–G4 **earned** (42 packages, 93/93 homes, Wave-0 A4–A7 recorded; G4 vacuous — no failed falsifier); G5 not in CI `all_passed`; no new distribution |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | Monograph spine only; no `book/` tree; drafting still forbidden |
 | [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | gated | Publish-and-use order for the shipped object; obligation-3 `jet_vs_nested_ad` earned; extract / paper / external stay later; CCF and Group 09 are not the public face |
 
@@ -271,6 +271,10 @@ section 12. Ambiguous outcomes count as failure.
 | A7 | 05-01 G7 (`sd(tau_hat) ~ alpha^(n-5/2)`, tol `0.1`, `n in {3,4}`) | [`docs/benchmarks/inverse_imaging.json`](../docs/benchmarks/inverse_imaging.json) | **passed** (locally seeded; 5 seeds, worst-seed) — licenses smallest-alpha design rule; worst deviations `0.016` / `0.031`; global search earned for n=3 only (n=4 boundary artifact); G1–G6 earned on `omnibias.pinn.inverse` |
 | A4 | 05-02 G1 / G2 / G3 / G3b | [`docs/benchmarks/tabular_arrangement.json`](../docs/benchmarks/tabular_arrangement.json), [`docs/benchmarks/tabular_arrangement_public.json`](../docs/benchmarks/tabular_arrangement_public.json), [`docs/benchmarks/tabular_arrangement_capacity.json`](../docs/benchmarks/tabular_arrangement_capacity.json) | **passed** G1–G3 (G3 frozen W/L/T `2/5/1`); **G3b unearned** (`boost_h2` not-worse `4/8`, need `>=6/8`); G4 unearned; G5 **earned** (see A5); G6/G7 **earned** on [`shape_topology_smoke.json`](../docs/benchmarks/shape_topology_smoke.json) |
 | A5 | 05-02 G5 (filter `R^2` within `0.02` of S4D, 5 seeds, worst-seed) | [`docs/benchmarks/sequence_transverse_smoke.json`](../docs/benchmarks/sequence_transverse_smoke.json) | **earned** — worst-seed `R^2` gap `0.0013` (filter `0.9984` vs S4D `0.9998`); order-0 logistic tail, `width=T`; first protocol (order-1 bump, `W=24`) was a miss; sequence submodule shipped |
+
+No Wave-0 unit is marked **failed** and no index row is `retired`
+(06-03 G4: vacuous deletion discipline; unearned leftover gates
+are not spec-killing failures). Index check, not a same-commit proof.
 
 ## Wave-1 primitives
 

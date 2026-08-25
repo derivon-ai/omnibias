@@ -7,7 +7,7 @@ way, and the repository has already learned that lesson the expensive way — so
 this file assigns every spec a home under the "earn independent existence" rule
 and sequences them so that the cheap falsifiers run before the expensive builds.
 
-- **Status**: gated (G1–G3 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 93/93 specs name a home, Wave-0 A4–A7 recorded; G4/G5 not in CI `all_passed`; no new distribution)
+- **Status**: gated (G1–G4 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 93/93 specs name a home, Wave-0 A4–A7 recorded, no failed falsifier / no `retired` row; G4 is vacuous and not a same-commit proof; G5 not in CI `all_passed`; no new distribution)
 - **Depends on**: 06-01, 06-02
 - **Blocks**: none
 
@@ -226,7 +226,9 @@ a justification, which is the right amount of friction.
   falsifier has run and its result is recorded in the index, pass or fail.
 - **G4 deletion discipline.** Any spec whose falsifier failed is marked
   `retired` in the index within the same change that records the failure, with
-  a one-line reason.
+  a one-line reason. Smoke-earned as a vacuous universal: no Wave-0 unit is
+  **failed** and no index row is `retired`. Unearned leftover gates are not
+  spec-killing failures. Index check, not a same-commit proof.
 - **G5 promotion criterion.** If `omnibias.partition.arrangement` is promoted to
   a package, the two-external-consumer and size criteria are demonstrated in the
   promoting change, not asserted.

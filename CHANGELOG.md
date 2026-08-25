@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Packaging deletion-discipline G4 earned (theory 06-03)
+
+- `benchmarks/theory_homes.py` now checks that every failed Wave-0
+  falsifier has a `retired` index row with a reason.
+- Earned: `n_failed=0`, `n_retired=0`; vacuous universal. Unearned
+  leftover gates are not spec-killing failures. A5's first protocol
+  miss was re-earned; 05-02 stays gated. Index check, not a
+  same-commit proof. G5 stays later. In CI `all_passed`.
+- Smoke: `docs/benchmarks/theory_homes_smoke.json`.
+
+
 ### Added — Packaging falsifiers-first G3 earned (theory 06-03)
 
 - `benchmarks/theory_homes.py` now checks that Wave-0 A4–A7 are

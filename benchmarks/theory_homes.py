@@ -4,8 +4,8 @@
 
 Every spec's section 2 names an existing package, submodule, or
 docs-only home. ``NEW_PACKAGES_ALLOWED`` stays empty. Wave-0
-A4–A7 are recorded in the index. No new distribution. Not a
-performance benchmark.
+A4–A7 are recorded in the index. Failed falsifiers are marked
+``retired``. No new distribution. Not a performance benchmark.
 """
 
 from __future__ import annotations
@@ -31,6 +31,11 @@ WAVE0_UNITS = ("A4", "A5", "A6", "A7")
 _ARTIFACT = re.compile(r"`(?:\.\./)?(docs/benchmarks/[^`]+\.json)`")
 _RECORDED = re.compile(r"(?i)\b(passed|earned|unearned|failed|retired)\b")
 _NOT_RUN = re.compile(r"(?i)not run")
+_FAILED_UNIT = re.compile(r"(?i)\*\*failed\*\*|^\*\*retired\*\*")
+_INDEX_RETIRED = re.compile(
+    r"^\| \[([^\]]+)\]\([^)]+\) \| \*?\*?retired\*?\*? \| (.+?) \|",
+    re.MULTILINE,
+)
 
 
 def _run_g1() -> dict[str, Any]:
@@ -169,6 +174,54 @@ def _run_g3() -> dict[str, Any]:
     }
 
 
+def _index_retired(text: str) -> list[dict[str, str]]:
+    return [
+        {"spec": match.group(1), "reason": match.group(2).strip()}
+        for match in _INDEX_RETIRED.finditer(text)
+    ]
+
+
+def _run_g4() -> dict[str, Any]:
+    """Named leftover: failed falsifiers are marked retired in the index."""
+    text = (REPO / "theory" / "README.md").read_text(encoding="utf-8")
+    rows = _wave0_rows(text)
+    failed = [
+        unit
+        for unit, row in rows.items()
+        if _FAILED_UNIT.search(row["outcome"].strip())
+    ]
+    retired = _index_retired(text)
+    unmatched = [
+        unit
+        for unit in failed
+        if not any(unit.lower() in row["spec"].lower() or unit in row["reason"] for row in retired)
+    ]
+    empty_reason = [row["spec"] for row in retired if not row["reason"]]
+    vacuous = not failed
+    earned = not unmatched and not empty_reason
+    return {
+        "name": "g4_deletion_discipline",
+        "passed": bool(earned),
+        "earned": bool(earned),
+        "reported": True,
+        "in_ci_all_passed": bool(earned),
+        "n_failed": len(failed),
+        "n_retired": len(retired),
+        "failed_units": failed,
+        "retired": retired,
+        "unmatched": unmatched,
+        "empty_reason": empty_reason,
+        "vacuous_no_failed_falsifier": vacuous,
+        "need": "every failed Wave-0 falsifier has a retired index row with a reason",
+        "note": (
+            "Named G4 is deletion discipline. Unearned leftover gates "
+            "are not spec-killing failures. A5's first protocol miss "
+            "was re-earned; 05-02 stays gated. No Wave-0 unit is "
+            "**failed**, so the universal is vacuously true."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true")
@@ -176,7 +229,8 @@ def main() -> int:
     g1 = _run_g1()
     g2 = _run_g2()
     g3 = _run_g3()
-    in_scope = [row for row in (g1, g2, g3) if row["in_ci_all_passed"]]
+    g4 = _run_g4()
+    in_scope = [row for row in (g1, g2, g3, g4) if row["in_ci_all_passed"]]
     payload = provenance(
         schema="omnibias.benchmark.theory_homes.v1",
         config={
@@ -184,7 +238,7 @@ def main() -> int:
             "full": bool(args.full),
             "gates_in_scope": [row["name"] for row in in_scope],
             "g3_in_all_passed": bool(g3["in_ci_all_passed"]),
-            "g4_in_all_passed": False,
+            "g4_in_all_passed": bool(g4["in_ci_all_passed"]),
             "g5_in_all_passed": False,
         },
     )
@@ -195,6 +249,7 @@ def main() -> int:
     payload["g1"] = g1
     payload["g2"] = g2
     payload["g3"] = g3
+    payload["g4"] = g4
     payload["honesty"] = {
         "new_packages_allowed": False,
         "omnibias_arrangement_package": False,
@@ -206,7 +261,10 @@ def main() -> int:
         "g3_earned": bool(g3["earned"]),
         "g3_in_ci_all_passed": bool(g3["in_ci_all_passed"]),
         "g3_is_git_order_proof": False,
-        "g4_earned": False,
+        "g4_earned": bool(g4["earned"]),
+        "g4_in_ci_all_passed": bool(g4["in_ci_all_passed"]),
+        "g4_vacuous_no_failed_falsifier": bool(g4["vacuous_no_failed_falsifier"]),
+        "g4_is_same_commit_proof": False,
         "g5_earned": False,
         "book_tree": False,
     }

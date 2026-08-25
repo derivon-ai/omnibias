@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.theory_homes.v1",
-  "generated_utc": "2026-08-25T20:10:17Z",
+  "generated_utc": "2026-08-25T20:15:56Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -16,13 +16,14 @@
     "gates_in_scope": [
       "g1_zero_new_packages",
       "g2_homes_declared",
-      "g3_falsifiers_first"
+      "g3_falsifiers_first",
+      "g4_deletion_discipline"
     ],
     "g3_in_all_passed": true,
-    "g4_in_all_passed": false,
+    "g4_in_all_passed": true,
     "g5_in_all_passed": false
   },
-  "rss_mb_at_start": 803.79,
+  "rss_mb_at_start": 804.25,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -112,6 +113,22 @@
         ],
         "need": "A4\u2013A7 recorded pass/fail/earned in the index; artifacts exist",
         "note": "Named G3 is falsifiers-first: Wave-0 A4\u2013A7 must be recorded in theory/README.md before Wave 1+ work is treated as licensed. This smoke checks the index and artifacts, not git-order landing dates. Ambiguous 'not run' is a fail."
+      },
+      {
+        "name": "g4_deletion_discipline",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "n_failed": 0,
+        "n_retired": 0,
+        "failed_units": [],
+        "retired": [],
+        "unmatched": [],
+        "empty_reason": [],
+        "vacuous_no_failed_falsifier": true,
+        "need": "every failed Wave-0 falsifier has a retired index row with a reason",
+        "note": "Named G4 is deletion discipline. Unearned leftover gates are not spec-killing failures. A5's first protocol miss was re-earned; 05-02 stays gated. No Wave-0 unit is **failed**, so the universal is vacuously true."
       }
     ]
   },
@@ -202,6 +219,22 @@
     "need": "A4\u2013A7 recorded pass/fail/earned in the index; artifacts exist",
     "note": "Named G3 is falsifiers-first: Wave-0 A4\u2013A7 must be recorded in theory/README.md before Wave 1+ work is treated as licensed. This smoke checks the index and artifacts, not git-order landing dates. Ambiguous 'not run' is a fail."
   },
+  "g4": {
+    "name": "g4_deletion_discipline",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "n_failed": 0,
+    "n_retired": 0,
+    "failed_units": [],
+    "retired": [],
+    "unmatched": [],
+    "empty_reason": [],
+    "vacuous_no_failed_falsifier": true,
+    "need": "every failed Wave-0 falsifier has a retired index row with a reason",
+    "note": "Named G4 is deletion discipline. Unearned leftover gates are not spec-killing failures. A5's first protocol miss was re-earned; 05-02 stays gated. No Wave-0 unit is **failed**, so the universal is vacuously true."
+  },
   "honesty": {
     "new_packages_allowed": false,
     "omnibias_arrangement_package": false,
@@ -213,7 +246,10 @@
     "g3_earned": true,
     "g3_in_ci_all_passed": true,
     "g3_is_git_order_proof": false,
-    "g4_earned": false,
+    "g4_earned": true,
+    "g4_in_ci_all_passed": true,
+    "g4_vacuous_no_failed_falsifier": true,
+    "g4_is_same_commit_proof": false,
     "g5_earned": false,
     "book_tree": false
   }

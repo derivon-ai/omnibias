@@ -179,7 +179,7 @@ jobs:
         run: |
           source .venv-core/bin/activate
           python benchmarks/jet_bundle.py
-      - name: Run theory-homes smoke (06-03 G1–G3; G4/G5 not all_passed)
+      - name: Run theory-homes smoke (06-03 G1–G4; G5 not all_passed)
         run: |
           source .venv-core/bin/activate
           python benchmarks/theory_homes.py
