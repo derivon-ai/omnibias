@@ -4,9 +4,10 @@
 
 Smoke earns G1 (jet vs closed-form orders 0..6), G2 (Lagrange remainder
 sound on exp), G3 (never-worse), and G6 (torch/jax parity). G4 (2x fewer
-weighted evals vs Wolfe) and G5 (cost-crossover table) are recorded, not
-in CI ``all_passed``. The polynomial is a model; CCF stretch is not a
-trainer gate.
+weighted evals vs strong Wolfe on a target-loss trajectory) and G5
+(order x depth crossover vs a named Wolfe trial budget) are measured
+and recorded, not in CI ``all_passed``. The polynomial is a model; CCF
+stretch is not a trainer gate.
 """
 
 from __future__ import annotations
@@ -141,112 +142,411 @@ def _run_g3() -> dict[str, Any]:
     }
 
 
-def _armijo_backtrack(
+G4_SEEDS = 5
+G4_CONDS = (50.0, 100.0, 200.0, 400.0, 800.0)
+G4_TARGET = 1e-8
+G4_MAX_OUTER = 12
+G4_JET_ORDER = 2
+G4_RATIO_MIN = 2.0
+G4_WOLFE_C1 = 1e-4
+G4_WOLFE_C2 = 0.9
+G4_START = (-1.2, 0.8)
+
+G5_ORDERS = (2, 4, 6)
+G5_DEPTHS = (1, 2, 4)
+G5_WIDTH = 4
+G5_WARMUP = 1
+G5_REPEATS = 3
+G5_WOLFE_TRIALS = 4.0
+
+
+def _median_seconds(fn: Any, *, warmup: int, repeats: int) -> float:
+    for _ in range(int(warmup)):
+        fn()
+    samples: list[float] = []
+    for _ in range(int(repeats)):
+        t0 = time.perf_counter()
+        fn()
+        samples.append(time.perf_counter() - t0)
+    return float(np.median(np.asarray(samples, dtype=np.float64)))
+
+
+def _cubic_step(
+    a: float,
+    fa: float,
+    dfa: float,
+    b: float,
+    fb: float,
+) -> float:
+    """Safeguarded quadratic interpolant of a minimizer on the open interval."""
+    lo, hi = (a, b) if a < b else (b, a)
+    if hi - lo < 1e-16:
+        return 0.5 * (a + b)
+    denom = (fb - fa) - dfa * (b - a)
+    if abs(denom) < 1e-18 or not math.isfinite(denom):
+        trial = 0.5 * (a + b)
+    else:
+        trial = a - dfa * (b - a) * (b - a) / (2.0 * denom)
+        if not math.isfinite(trial):
+            trial = 0.5 * (a + b)
+    pad = 0.1 * (hi - lo)
+    return min(max(trial, lo + pad), hi - pad)
+
+
+def _zoom(
     phi: Any,
-    dphi0: float,
+    dphi: Any,
     *,
-    c1: float = 1e-4,
+    f0: float,
+    dphi0: float,
+    lo_s: float,
+    lo_f: float,
+    lo_df: float,
+    hi_s: float,
+    hi_f: float,
+    evals: int,
+    c1: float,
+    c2: float,
+    max_evals: int,
+) -> tuple[float, int]:
+    for _ in range(max_evals):
+        if evals >= max_evals or abs(hi_s - lo_s) < 1e-16:
+            return lo_s, evals
+        s = _cubic_step(lo_s, lo_f, lo_df, hi_s, hi_f)
+        fs = float(phi(s))
+        evals += 1
+        if (fs > f0 + c1 * s * dphi0) or (fs >= lo_f):
+            hi_s, hi_f = s, fs
+            continue
+        dfs = float(dphi(s))
+        evals += 1
+        if abs(dfs) <= -c2 * dphi0:
+            return s, evals
+        if dfs * (hi_s - lo_s) >= 0.0:
+            hi_s, hi_f = lo_s, lo_f
+        lo_s, lo_f, lo_df = s, fs, dfs
+    return lo_s, evals
+
+
+def _strong_wolfe(
+    phi: Any,
+    dphi: Any,
+    *,
+    f0: float,
+    dphi0: float,
+    c1: float = G4_WOLFE_C1,
+    c2: float = G4_WOLFE_C2,
+    max_step: float = 1.0,
     max_evals: int = 20,
 ) -> tuple[float, int]:
-    step = 1.0
-    f0 = float(phi(0.0))
-    evals = 1
-    for _ in range(max_evals):
-        fs = float(phi(step))
+    """Named G4 baseline: strong Wolfe with safeguarded interpolation.
+
+    Counts every ``phi`` and ``dphi`` call, including the known values at
+    ``s = 0`` (one value + one directional derivative).
+    """
+    evals = 2
+    if dphi0 >= 0.0 or not math.isfinite(dphi0):
+        return 0.0, evals
+    prev_s, prev_f = 0.0, f0
+    s = max_step
+    for it in range(max_evals):
+        if evals >= max_evals:
+            return prev_s, evals
+        fs = float(phi(s))
         evals += 1
-        if fs <= f0 + c1 * step * dphi0:
-            return step, evals
-        step *= 0.5
-    return 0.0, evals
+        if (fs > f0 + c1 * s * dphi0) or (it > 0 and fs >= prev_f):
+            return _zoom(
+                phi,
+                dphi,
+                f0=f0,
+                dphi0=dphi0,
+                lo_s=prev_s,
+                lo_f=prev_f,
+                lo_df=dphi0 if prev_s == 0.0 else float(dphi(prev_s)),
+                hi_s=s,
+                hi_f=fs,
+                evals=evals + (0 if prev_s == 0.0 else 1),
+                c1=c1,
+                c2=c2,
+                max_evals=max_evals,
+            )
+        dfs = float(dphi(s))
+        evals += 1
+        if abs(dfs) <= -c2 * dphi0:
+            return s, evals
+        if dfs >= 0.0:
+            return _zoom(
+                phi,
+                dphi,
+                f0=f0,
+                dphi0=dphi0,
+                lo_s=s,
+                lo_f=fs,
+                lo_df=dfs,
+                hi_s=prev_s,
+                hi_f=prev_f,
+                evals=evals,
+                c1=c1,
+                c2=c2,
+                max_evals=max_evals,
+            )
+        prev_s, prev_f = s, fs
+        s = min(2.0 * s, 8.0 * max_step)
+    return prev_s, evals
+
+
+def _illcond_quad(p: Any, cond: float) -> Any:
+    return p[0] ** 2 + float(cond) * p[1] ** 2
+
+
+def _flat_grad(loss: Any, params: Any) -> Any:
+    from torch.func import grad
+
+    return grad(loss)(params).detach()
 
 
 def _run_g4(*, full: bool) -> dict[str, Any]:
+    """Named G4: target-loss trajectory vs strong Wolfe, jet at true units.
+
+    Rosenbrock + 16 steepest-descent steps does not hit ``1e-3`` on either
+    arm (measured). The named gate uses a reachable ill-conditioned
+    quadratic so both line searches can finish. The previous Armijo
+    single-step stub is withdrawn.
+    """
     import torch
     from omnibias.core.line_search import JetLineSearchConfig
     from omnibias.torch.line_search import jet_line_search
 
     torch.set_default_dtype(torch.float64)
-    seeds = list(range(5 if full else 2))
+    _ = full
+    n_seeds = G4_SEEDS
     jet_units: list[float] = []
     wolfe_units: list[float] = []
-    for seed in seeds:
-        rng = torch.Generator().manual_seed(seed)
-        params = torch.tensor([1.2, -0.8], dtype=torch.float64)
-        a = 10.0 + float(torch.rand((), generator=rng))
+    jet_hits = 0
+    wolfe_hits = 0
+    cfg = JetLineSearchConfig(
+        order=G4_JET_ORDER,
+        trust_radius=1.0,
+        verify=True,
+        wolfe_c1=G4_WOLFE_C1,
+        wolfe_c2=G4_WOLFE_C2,
+    )
+    jet_step_cost = float(G4_JET_ORDER + 1 + 1)
+    rows: list[dict[str, Any]] = []
+    start = torch.tensor(G4_START, dtype=torch.float64)
+    for seed, cond in enumerate(G4_CONDS):
 
-        def loss(p: torch.Tensor, a: float = a) -> torch.Tensor:
-            return (p[0] - 1.0) ** 2 + a * (p[1] + 0.2) ** 2
+        def loss(p: Any, cond: float = cond) -> Any:
+            return _illcond_quad(p, cond)
 
-        g = torch.tensor(
-            [2.0 * (params[0] - 1.0), 2.0 * a * (params[1] + 0.2)],
-            dtype=torch.float64,
+        def _descend_jet(
+            loss_fn: Any = loss,
+            theta0: Any = start,
+        ) -> tuple[float, int, bool]:
+            theta = theta0.clone()
+            units = 0.0
+            outer = 0
+            for outer in range(G4_MAX_OUTER):
+                val = float(loss_fn(theta))
+                if val <= G4_TARGET:
+                    return units, outer, True
+                g = _flat_grad(loss_fn, theta)
+                direction = -g
+                units += 1.0
+                result = jet_line_search(loss_fn, theta, direction, config=cfg)
+                units += jet_step_cost
+                theta = theta + float(result.step) * direction
+            return units, G4_MAX_OUTER, float(loss_fn(theta)) <= G4_TARGET
+
+        def _descend_wolfe(
+            loss_fn: Any = loss,
+            theta0: Any = start,
+        ) -> tuple[float, int, bool]:
+            theta = theta0.clone()
+            units = 0.0
+            outer = 0
+            for outer in range(G4_MAX_OUTER):
+                val = float(loss_fn(theta))
+                if val <= G4_TARGET:
+                    return units, outer, True
+                g = _flat_grad(loss_fn, theta)
+                direction = -g
+                units += 1.0
+                dphi0 = float((g * direction).sum())
+
+                def phi(
+                    s: float,
+                    theta: Any = theta,
+                    direction: Any = direction,
+                    loss_fn: Any = loss_fn,
+                ) -> float:
+                    return float(loss_fn(theta + s * direction))
+
+                def dphi(
+                    s: float,
+                    theta: Any = theta,
+                    direction: Any = direction,
+                    loss_fn: Any = loss_fn,
+                ) -> float:
+                    moved = (theta + s * direction).detach().clone().requires_grad_(True)
+                    loss_fn(moved).backward()
+                    assert moved.grad is not None
+                    return float((moved.grad * direction).sum())
+
+                step, evals = _strong_wolfe(phi, dphi, f0=val, dphi0=dphi0)
+                units += float(evals)
+                theta = theta + float(step) * direction
+            return units, G4_MAX_OUTER, float(loss_fn(theta)) <= G4_TARGET
+
+        j_u, j_steps, j_hit = _descend_jet()
+        w_u, w_steps, w_hit = _descend_wolfe()
+        jet_units.append(j_u)
+        wolfe_units.append(w_u)
+        jet_hits += int(j_hit)
+        wolfe_hits += int(w_hit)
+        rows.append(
+            {
+                "seed": seed,
+                "cond": float(cond),
+                "jet_units": float(j_u),
+                "wolfe_units": float(w_u),
+                "jet_hit": bool(j_hit),
+                "wolfe_hit": bool(w_hit),
+                "jet_outer": int(j_steps),
+                "wolfe_outer": int(w_steps),
+            }
         )
-        direction = -g
-        cfg = JetLineSearchConfig(order=2, trust_radius=1.0, verify=True)
-        jet_line_search(loss, params, direction, config=cfg, next_derivative_bound=0.0)
-        # Jet of order 2 costs two nested grads + value + one verify.
-        jet_units.append(2.0 + 1.0 + 1.0)
-
-        def phi(s: float, params: torch.Tensor = params, direction: torch.Tensor = direction) -> float:
-            return float(loss(params + s * direction))
-
-        dphi0 = float((g * direction).sum())
-        _step, evals = _armijo_backtrack(phi, dphi0)
-        wolfe_units.append(float(evals))
     jet_mean = float(np.mean(jet_units))
     wolfe_mean = float(np.mean(wolfe_units))
     ratio = wolfe_mean / jet_mean if jet_mean > 0.0 else 0.0
-    earned = bool(ratio >= 2.0)
+    earned = bool(
+        jet_hits == n_seeds and wolfe_hits == n_seeds and ratio >= G4_RATIO_MIN
+    )
     return {
         "name": "g4_step_count_win",
         "passed": bool(earned),
         "earned": bool(earned),
+        "in_ci_all_passed": False,
         "jet_mean_units": jet_mean,
         "wolfe_mean_units": wolfe_mean,
         "wolfe_over_jet": float(ratio),
-        "expected": 2.0,
-        "n_seeds": len(seeds),
+        "expected": G4_RATIO_MIN,
+        "n_seeds": n_seeds,
+        "jet_hits": jet_hits,
+        "wolfe_hits": wolfe_hits,
+        "target_loss": G4_TARGET,
+        "max_outer": G4_MAX_OUTER,
+        "jet_order": G4_JET_ORDER,
+        "jet_step_cost_units": jet_step_cost,
+        "baseline": "strong_wolfe_cubic_or_quadratic",
+        "family": "illcond_quadratic",
+        "conds": list(G4_CONDS),
+        "rows": rows,
         "note": (
-            "jet counted as order nested grads + value + verify; "
-            "Armijo backtracking counted as true evals. Not in CI all_passed."
+            "Steepest descent on f=x^2+cond y^2 to a named target. Jet "
+            "counted as order nested grads + value + verify plus one outer "
+            "grad per step. Strong Wolfe counted as phi + dphi (including "
+            "s=0) plus the same outer grad. Rosenbrock does not hit 1e-3 "
+            "in a 16-step CI budget on either arm; that miss is not used "
+            "as the gate. Previous Armijo single-step stub withdrawn. "
+            "Not in CI all_passed."
         ),
     }
 
 
 def _run_g5() -> dict[str, Any]:
+    """Named G5: crossover in order N and network depth vs a Wolfe trial."""
     import torch
-    from omnibias.torch.line_search import directional_derivatives
+    from omnibias.torch.jet import mlp_jet
 
     torch.set_default_dtype(torch.float64)
+    rng = torch.Generator().manual_seed(0)
     rows: list[dict[str, Any]] = []
-    for width in (8, 32):
-        for order in (2, 4, 6):
-            params = torch.zeros(width, dtype=torch.float64)
-            direction = torch.ones(width, dtype=torch.float64) / math.sqrt(width)
+    for depth in G5_DEPTHS:
+        layers: list[Any] = []
+        for _ in range(depth):
+            weight = (
+                0.35
+                * torch.randn(G5_WIDTH, G5_WIDTH, generator=rng, dtype=torch.float64)
+            )
+            bias = torch.zeros(G5_WIDTH, dtype=torch.float64)
+            layers.append((weight, bias, "tanh"))
+        readout = 0.35 * torch.randn(1, G5_WIDTH, generator=rng, dtype=torch.float64)
+        layers.append((readout, None, None))
+        x0 = torch.zeros(G5_WIDTH, dtype=torch.float64)
+        direction = torch.ones(G5_WIDTH, dtype=torch.float64) / math.sqrt(G5_WIDTH)
 
-            def loss(p: torch.Tensor) -> torch.Tensor:
-                return torch.log1p((p**2).sum())
+        def _forward(
+            x0: Any = x0,
+            direction: Any = direction,
+            layers: list[Any] = layers,
+        ) -> None:
+            mlp_jet(x0, direction, layers, 0)
 
-            t0 = time.perf_counter()
-            directional_derivatives(loss, params, direction, order)
-            dt = time.perf_counter() - t0
+        fwd = _median_seconds(_forward, warmup=G5_WARMUP, repeats=G5_REPEATS)
+        for order in G5_ORDERS:
+
+            def _jet(
+                x0: Any = x0,
+                direction: Any = direction,
+                layers: list[Any] = layers,
+                order: int = order,
+            ) -> None:
+                mlp_jet(x0, direction, layers, order)
+
+            jet_s = _median_seconds(_jet, warmup=G5_WARMUP, repeats=G5_REPEATS)
             rows.append(
                 {
-                    "width": width,
-                    "order": order,
-                    "wall_seconds": float(dt),
-                    "model_cost_units": float(order + 1),
+                    "depth": int(depth),
+                    "order": int(order),
+                    "width": G5_WIDTH,
+                    "jet_seconds": float(jet_s),
+                    "trial_seconds": float(fwd),
+                    "jet_over_trial": float(jet_s / max(fwd, 1e-12)),
+                    "wolfe_equivalent_trials": G5_WOLFE_TRIALS,
+                    "jet_over_wolfe_budget": float(
+                        jet_s / max(G5_WOLFE_TRIALS * fwd, 1e-12)
+                    ),
                 }
             )
+    crossover_order = next(
+        (
+            int(row["order"])
+            for row in rows
+            if int(row["depth"]) == G5_DEPTHS[0]
+            and float(row["jet_over_wolfe_budget"]) > 1.0
+        ),
+        None,
+    )
+    crossover_depth = next(
+        (
+            int(row["depth"])
+            for row in rows
+            if int(row["order"]) == 4 and float(row["jet_over_wolfe_budget"]) > 1.0
+        ),
+        None,
+    )
+    favourable = any(float(row["jet_over_wolfe_budget"]) <= 1.0 for row in rows)
+    unfavourable = any(float(row["jet_over_wolfe_budget"]) > 1.0 for row in rows)
     return {
         "name": "g5_cost_crossover_table",
-        "passed": True,
-        "earned": True,
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
         "rows": rows,
+        "crossover_order": crossover_order,
+        "crossover_depth": crossover_depth,
+        "favourable_regime": bool(favourable),
+        "unfavourable_regime": bool(unfavourable),
+        "wolfe_equivalent_trials": G5_WOLFE_TRIALS,
+        "depths": list(G5_DEPTHS),
+        "orders": list(G5_ORDERS),
         "note": (
-            "Published favourable (small width, modest order) and costlier "
-            "regimes. Not a claim that the jet always beats backtracking. "
-            "Not in CI all_passed."
+            "mlp_jet wall vs one forward trial, scaled by a named four-trial "
+            "Wolfe budget. Crossover is the first (N, depth) where the jet "
+            "exceeds that budget. Previous jet-only table with earned:true "
+            "is withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -329,18 +629,28 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             config={
                 "family": "jet_line_search",
                 "full": full,
-                "g4_earned": bool(g4["earned"]),
-                "g5_reported": True,
-                "honesty": {
-                    "navier_stokes_proof_claim": False,
-                    "ccf_stretch_cleared": False,
-                    "global_min_claim": False,
-                },
+                "g4_in_all_passed": False,
+                "g5_in_all_passed": False,
+                "gates_in_scope": ["g1", "g2", "g3", "g6"],
             },
         ),
         "gates": gates,
         "g4": g4,
         "g5": g5,
+        "honesty": {
+            "navier_stokes_proof_claim": False,
+            "ccf_stretch_cleared": False,
+            "global_min_claim": False,
+            "g4_earned": bool(g4["earned"]),
+            "g5_earned": bool(g5["earned"]),
+            "g5_reported": True,
+            "g4_in_ci_all_passed": False,
+            "g5_in_ci_all_passed": False,
+            "g4_baseline_is_strong_wolfe": True,
+            "g5_compares_jet_to_trial": True,
+            "founding_bias_collapse": True,
+            "temperature_collapse": False,
+        },
         "wall_seconds": float(time.perf_counter() - t0),
     }
     if full:

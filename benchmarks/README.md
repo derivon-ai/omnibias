@@ -73,7 +73,7 @@ uv run python docs/img/generate_figures.py
 | `jetkan.py` | `docs/benchmarks/jetkan_smoke.json` | Wave-3 architecture 02-03: JetKAN G1/G3/G5; G2 timing not in CI `all_passed`; model-jet exactness, KA theorem does not justify |
 | `weak_form_vpinn.py` | `docs/benchmarks/weak_form_vpinn_smoke.json` | Wave-3 architecture 02-04: exact on polynomial boxes; boundary bound on by default |
 | `multi_interface_pinn.py` | `docs/benchmarks/multi_interface_pinn_smoke.json` | Wave-3 architecture 02-05: parallel interfaces; `alpha -> inf` is sharpening, neither collapse |
-| `jet_line_search.py` | `docs/benchmarks/jet_line_search_smoke.json` | Wave-3 algorithm 03-12: G1/G2/G3/G6 CI-gated; G4/G5 recorded, not in CI `all_passed` |
+| `jet_line_search.py` | `docs/benchmarks/jet_line_search_smoke.json` | Wave-3 algorithm 03-12: G1/G2/G3/G6 CI-gated; G4 unearned vs strong Wolfe; G5 order×depth crossover reported; not in CI `all_passed` |
 | `adaptive_refinement.py` | `docs/benchmarks/adaptive_refinement_smoke.json` | Wave-3 algorithm 03-13: G1/G2/G3/G5/G6 CI-gated; G4 recorded, not in CI `all_passed` |
 
 All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries

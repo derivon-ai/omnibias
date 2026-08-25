@@ -6,11 +6,14 @@ into root-finding on a known polynomial. The model is exact to order
 bound on `|phi^(N+1)|` is supplied; `verify=True` is the never-worse
 backstop.
 
-Status is **gated**, not shipped. G1/G2/G3/G6 are CI-gated. G4 (step-count
-vs Wolfe) and G5 (cost-crossover table) are recorded, **not** in CI
-`all_passed`. The win is a constant factor in a specific regime, not an
-asymptotic one. Jets come from the founding bias collapse (`delta -> 0`).
-No temperature collapse appears. See theory spec 03-12.
+Status is **gated**, not shipped. G1/G2/G3/G6 are CI-gated. G4 (target-loss
+step count vs strong Wolfe) is recorded **unearned** (ratio `1.83`, need
+`2x`; Wolfe misses the stiffest seed). G5 reports the order×depth
+crossover versus a four-trial Wolfe budget (favourable at `N=2`, over
+budget from `N=4`), **not** in CI `all_passed`. The win is a constant
+factor in a specific regime, not an asymptotic one. Jets come from the
+founding bias collapse (`delta -> 0`). No temperature collapse appears.
+See theory spec 03-12.
 
 `taylor_line_min` (order 2/3, no certified radius) is unchanged.
 

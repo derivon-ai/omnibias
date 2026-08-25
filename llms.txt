@@ -49,8 +49,9 @@ XPINN `omnibias.pinn._core.interface`), BEM-Net / pack tree / equivariant
 scan / tanh-method / Hermite ladder / layered transfer / named linearizing
 transforms / holonomy band (02-06–02-11, 02-13, 02-14; see honesty on
 each API page), exact jet line search (03-12; certified Lagrange
-radius + `verify=True` never-worse; G4/G5 recorded, not in CI
-`all_passed`), adaptive pack refinement (03-13; birth/growth
+radius + `verify=True` never-worse; G4 unearned vs strong Wolfe,
+G5 crossover reported, not in CI `all_passed`), adaptive pack
+refinement (03-13; birth/growth
 bit-identical; death reports a bound; G4 recorded, not in CI
 `all_passed`), composed-curvature joint Newton (08-02; slice
 escape on the order-2 chain rule; G1–G4 CI; not a global min),

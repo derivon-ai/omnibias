@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet line-search G4/G5 recorded (theory 03-12)
+
+- `benchmarks/jet_line_search.py` G4 now runs a target-loss trajectory
+  against strong Wolfe on `x^2 + cond y^2` (five conds). Jet counted at
+  true units (order + value + verify + outer grad).
+- Unearned: Wolfe/jet `1.83` (need `2x`); Wolfe misses cond `800`.
+  Previous Armijo single-step stub withdrawn. Not in CI `all_passed`.
+- G5 reports `mlp_jet` vs a four-trial Wolfe budget over orders
+  `{2,4,6}` and depths `{1,2,4}`: favourable at `N=2`, crossover at
+  `N=4` / depth `1`. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/jet_line_search_smoke.json`.
+
+
 ### Added — Pack-tree G3 recorded unearned (theory 02-07)
 
 - `benchmarks/pack_tree.py` G3 now times hierarchical vs dense over two

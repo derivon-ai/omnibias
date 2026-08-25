@@ -6,7 +6,7 @@ A directional jet of the loss gives the exact Taylor polynomial along a search
 direction in **one** forward pass, so the line-search subproblem becomes root
 finding on a known polynomial instead of a sequence of trial evaluations.
 
-- **Status**: gated
+- **Status**: gated (G1/G2/G3/G6 CI; G4 step-count **unearned** vs strong Wolfe, not in CI `all_passed`; G5 order×depth crossover **reported**, not in CI `all_passed`)
 - **Depends on**: 01-01
 - **Blocks**: 03-01, 03-13
 
@@ -244,10 +244,14 @@ fixed step size.
 - **G4 step-count win.** On a suite of ill-conditioned problems, the jet line
   search reaches a target loss in at least `2x` fewer *total function
   evaluations* (counting the jet at its true cost) than strong Wolfe, over five
-  seeds.
+  seeds. **Recorded unearned:** reachable `x^2 + cond y^2` trajectories give
+  Wolfe/jet `1.83` (need `2`); the stiffest seed is a Wolfe miss. The previous
+  Armijo single-step stub is withdrawn. Not in CI `all_passed`.
 - **G5 honest regime.** The benchmark reports the crossover in `N` and in
   network depth beyond which the jet's cost exceeds its benefit, rather than
-  only showing the favourable regime.
+  only showing the favourable regime. **Reported:** `mlp_jet` vs a named
+  four-trial Wolfe budget is favourable at `N=2` and over budget from `N=4`
+  (crossover depth `1` at order `4`). Not in CI `all_passed`.
 - **G6 parity.** torch and jax bit-identical.
 
 ## 9. Benchmark plan

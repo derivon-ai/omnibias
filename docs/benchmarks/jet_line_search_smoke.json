@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.jet_line_search.v1",
-  "generated_utc": "2026-08-21T15:08:16Z",
+  "generated_utc": "2026-08-25T17:53:10Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,15 +13,16 @@
   "config": {
     "family": "jet_line_search",
     "full": false,
-    "g4_earned": false,
-    "g5_reported": true,
-    "honesty": {
-      "navier_stokes_proof_claim": false,
-      "ccf_stretch_cleared": false,
-      "global_min_claim": false
-    }
+    "g4_in_all_passed": false,
+    "g5_in_all_passed": false,
+    "gates_in_scope": [
+      "g1",
+      "g2",
+      "g3",
+      "g6"
+    ]
   },
-  "rss_mb_at_start": 1191.99,
+  "rss_mb_at_start": 1457.62,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -64,56 +65,209 @@
     "name": "g4_step_count_win",
     "passed": false,
     "earned": false,
-    "jet_mean_units": 4.0,
-    "wolfe_mean_units": 6.0,
-    "wolfe_over_jet": 1.5,
+    "in_ci_all_passed": false,
+    "jet_mean_units": 29.0,
+    "wolfe_mean_units": 53.0,
+    "wolfe_over_jet": 1.8275862068965518,
     "expected": 2.0,
-    "n_seeds": 2,
-    "note": "jet counted as order nested grads + value + verify; Armijo backtracking counted as true evals. Not in CI all_passed."
+    "n_seeds": 5,
+    "jet_hits": 5,
+    "wolfe_hits": 4,
+    "target_loss": 1e-08,
+    "max_outer": 12,
+    "jet_order": 2,
+    "jet_step_cost_units": 4.0,
+    "baseline": "strong_wolfe_cubic_or_quadratic",
+    "family": "illcond_quadratic",
+    "conds": [
+      50.0,
+      100.0,
+      200.0,
+      400.0,
+      800.0
+    ],
+    "rows": [
+      {
+        "seed": 0,
+        "cond": 50.0,
+        "jet_units": 35.0,
+        "wolfe_units": 46.0,
+        "jet_hit": true,
+        "wolfe_hit": true,
+        "jet_outer": 7,
+        "wolfe_outer": 7
+      },
+      {
+        "seed": 1,
+        "cond": 100.0,
+        "jet_units": 30.0,
+        "wolfe_units": 45.0,
+        "jet_hit": true,
+        "wolfe_hit": true,
+        "jet_outer": 6,
+        "wolfe_outer": 6
+      },
+      {
+        "seed": 2,
+        "cond": 200.0,
+        "jet_units": 30.0,
+        "wolfe_units": 42.0,
+        "jet_hit": true,
+        "wolfe_hit": true,
+        "jet_outer": 6,
+        "wolfe_outer": 6
+      },
+      {
+        "seed": 3,
+        "cond": 400.0,
+        "jet_units": 25.0,
+        "wolfe_units": 36.0,
+        "jet_hit": true,
+        "wolfe_hit": true,
+        "jet_outer": 5,
+        "wolfe_outer": 5
+      },
+      {
+        "seed": 4,
+        "cond": 800.0,
+        "jet_units": 25.0,
+        "wolfe_units": 96.0,
+        "jet_hit": true,
+        "wolfe_hit": false,
+        "jet_outer": 5,
+        "wolfe_outer": 12
+      }
+    ],
+    "note": "Steepest descent on f=x^2+cond y^2 to a named target. Jet counted as order nested grads + value + verify plus one outer grad per step. Strong Wolfe counted as phi + dphi (including s=0) plus the same outer grad. Rosenbrock does not hit 1e-3 in a 16-step CI budget on either arm; that miss is not used as the gate. Previous Armijo single-step stub withdrawn. Not in CI all_passed."
   },
   "g5": {
     "name": "g5_cost_crossover_table",
-    "passed": true,
-    "earned": true,
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
     "rows": [
       {
-        "width": 8,
+        "depth": 1,
         "order": 2,
-        "wall_seconds": 0.0006936650024726987,
-        "model_cost_units": 3.0
+        "width": 4,
+        "jet_seconds": 0.00016064895316958427,
+        "trial_seconds": 5.972001235932112e-05,
+        "jet_over_trial": 2.69003549769879,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 0.6725088744246975
       },
       {
-        "width": 8,
+        "depth": 1,
         "order": 4,
-        "wall_seconds": 0.002786643977742642,
-        "model_cost_units": 5.0
+        "width": 4,
+        "jet_seconds": 0.000387219013646245,
+        "trial_seconds": 5.972001235932112e-05,
+        "jet_over_trial": 6.483907125076269,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 1.6209767812690672
       },
       {
-        "width": 8,
+        "depth": 1,
         "order": 6,
-        "wall_seconds": 0.01637475099414587,
-        "model_cost_units": 7.0
+        "width": 4,
+        "jet_seconds": 0.0008747350657358766,
+        "trial_seconds": 5.972001235932112e-05,
+        "jet_over_trial": 14.647268665532144,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 3.661817166383036
       },
       {
-        "width": 32,
+        "depth": 2,
         "order": 2,
-        "wall_seconds": 0.000640365993604064,
-        "model_cost_units": 3.0
+        "width": 4,
+        "jet_seconds": 0.0002914560027420521,
+        "trial_seconds": 9.41689359024167e-05,
+        "jet_over_trial": 3.095033409362039,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 0.7737583523405097
       },
       {
-        "width": 32,
+        "depth": 2,
         "order": 4,
-        "wall_seconds": 0.00293693202547729,
-        "model_cost_units": 5.0
+        "width": 4,
+        "jet_seconds": 0.0007773510878905654,
+        "trial_seconds": 9.41689359024167e-05,
+        "jet_over_trial": 8.25485687441665,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 2.0637142186041624
       },
       {
-        "width": 32,
+        "depth": 2,
         "order": 6,
-        "wall_seconds": 0.015760815993417054,
-        "model_cost_units": 7.0
+        "width": 4,
+        "jet_seconds": 0.0016731839859858155,
+        "trial_seconds": 9.41689359024167e-05,
+        "jet_over_trial": 17.767897342704025,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 4.441974335676006
+      },
+      {
+        "depth": 4,
+        "order": 2,
+        "width": 4,
+        "jet_seconds": 0.0005697099259123206,
+        "trial_seconds": 0.00017083098646253347,
+        "jet_over_trial": 3.334933185773466,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 0.8337332964433665
+      },
+      {
+        "depth": 4,
+        "order": 4,
+        "width": 4,
+        "jet_seconds": 0.0015565570211037993,
+        "trial_seconds": 0.00017083098646253347,
+        "jet_over_trial": 9.111678468503033,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 2.2779196171257583
+      },
+      {
+        "depth": 4,
+        "order": 6,
+        "width": 4,
+        "jet_seconds": 0.0033214259892702103,
+        "trial_seconds": 0.00017083098646253347,
+        "jet_over_trial": 19.44276069610277,
+        "wolfe_equivalent_trials": 4.0,
+        "jet_over_wolfe_budget": 4.8606901740256925
       }
     ],
-    "note": "Published favourable (small width, modest order) and costlier regimes. Not a claim that the jet always beats backtracking. Not in CI all_passed."
+    "crossover_order": 4,
+    "crossover_depth": 1,
+    "favourable_regime": true,
+    "unfavourable_regime": true,
+    "wolfe_equivalent_trials": 4.0,
+    "depths": [
+      1,
+      2,
+      4
+    ],
+    "orders": [
+      2,
+      4,
+      6
+    ],
+    "note": "mlp_jet wall vs one forward trial, scaled by a named four-trial Wolfe budget. Crossover is the first (N, depth) where the jet exceeds that budget. Previous jet-only table with earned:true is withdrawn. Not in CI all_passed."
   },
-  "wall_seconds": 3.53976077697007
+  "honesty": {
+    "navier_stokes_proof_claim": false,
+    "ccf_stretch_cleared": false,
+    "global_min_claim": false,
+    "g4_earned": false,
+    "g5_earned": false,
+    "g5_reported": true,
+    "g4_in_ci_all_passed": false,
+    "g5_in_ci_all_passed": false,
+    "g4_baseline_is_strong_wolfe": true,
+    "g5_compares_jet_to_trial": true,
+    "founding_bias_collapse": true,
+    "temperature_collapse": false
+  },
+  "wall_seconds": 3.523625469999388
 }
