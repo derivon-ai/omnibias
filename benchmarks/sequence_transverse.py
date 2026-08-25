@@ -3,24 +3,29 @@
 """Wave-0 falsifier A5: causal transverse filter vs S4D (05-02 G5).
 
 The filter is a designed causal FIR whose taps are a closed-form
-``sigma^(n)`` pack (theory 05-02). The named baseline is a diagonal
-structured state-space model (S4D; Gu et al. 2022 parameterization):
-stable ``A = -exp(a)``, ZOH discretisation, ``y_t = C h_t + D x_t``.
+``sigma^(n)`` pack (theory 05-02). Default ``n=0`` is the logistic
+survival / integral-role tail ``c * sigma(tau - alpha k)`` — the
+leaky-integrator class. Pack order is a band selector (01-07);
+``n=1`` (``sigma'``) is a mid-lag bump and cannot match an AR(1).
+
+The named baseline is a diagonal structured state-space model (S4D;
+Gu et al. 2022 parameterization): stable ``A = -exp(a)``, ZOH
+discretisation, ``y_t = C h_t + D x_t``.
 
 Task (long-range): recover an AR(1) / leaky integrator
-``y_t = rho y_{t-1} + (1-rho) x_t`` with ``rho`` close to 1. That is
-the inductive bias S4D is built for. The OMBU kernel is a localized
-bump (spec 01-07), not a long exponential tail.
+``y_t = rho y_{t-1} + (1-rho) x_t`` with ``rho`` close to 1. FIR
+width equals the horizon so truncation is not an extra handicap
+(still ``O(T K)`` convolution, not a recurrence). Both arms use
+four parameters and an AR(1)-near init.
 
-The prototype lives **in this benchmark**. ``omnibias.torch.sequence``
-is built only if G5 passes. If it fails, the sequence submodule is
-retired from the plan — not softened into future work.
+The product API is ``omnibias.torch.sequence.CausalTransverseFilter``.
+This bench trains that module.
 
 Modes
 -----
-* default (smoke): ``T=64``, ``rho=0.95``, 5 seeds; CI wiring gate.
-* ``--full``: ``T=256``, ``rho=0.98``; also copied under
-  ``$OMNIBIAS_SCRATCH/beyond_pde/``.
+* default (smoke): ``T=64``, ``rho=0.95``, ``width=64``, 5 seeds.
+* ``--full``: ``T=256``, ``rho=0.98``, ``width=256``; also copied
+  under ``$OMNIBIAS_SCRATCH/beyond_pde/``.
 
 G5: on every seed, filter ``R^2`` is within ``0.02`` of S4D (absolute)
 and S4D beats the zero predictor. Worst-seed via ``require_all_seeds``.
@@ -86,22 +91,23 @@ def causal_sigma_kernel(
     coeff: float,
     alpha: float,
     tau: float,
-    order: int = 1,
+    order: int = 0,
     base: str = "sigmoid",
 ) -> np.ndarray:
-    """Designed causal taps ``c * sigma^(n)(alpha (k - tau))`` for ``k >= 0``."""
-    from omnibias.core.locus import sigma_n
+    """Designed causal taps; default ``order=0`` is the logistic tail."""
+    from omnibias.core.sequence import causal_transverse_taps
 
-    if width < 1:
-        raise ValueError(f"width must be >= 1, got {width}")
-    if order < 0:
-        raise ValueError(f"order must be >= 0, got {order}")
-    lags = np.arange(width, dtype=np.float64)
-    kern = np.array(
-        [coeff * sigma_n(base, float(alpha) * (k - float(tau)), order) for k in lags],
+    return np.asarray(
+        causal_transverse_taps(
+            width=width,
+            coeff=coeff,
+            alpha=alpha,
+            tau=tau,
+            order=order,
+            base=base,
+        ),
         dtype=np.float64,
     )
-    return kern
 
 
 def apply_causal_fir(x: np.ndarray, kernel: np.ndarray) -> np.ndarray:
@@ -122,56 +128,36 @@ def fit_transverse_filter(
     steps: int,
     lr: float,
     seed: int,
+    rho: float,
 ) -> tuple[np.ndarray, dict[str, float]]:
-    """Adam-fit ``(c, log_alpha, tau, bias)`` of one designed pack."""
-    import omnibias.torch.activations  # noqa: F401 — register fastpaths
+    """Adam-fit the shipped ``CausalTransverseFilter`` (order-0 tail)."""
     import torch
-    from omnibias.torch.activations.registry import get_activation
+    from omnibias.torch.sequence import CausalTransverseFilter
 
     torch.manual_seed(int(seed))
-    spec = get_activation("sigmoid")
-    if spec.fastpath is None:
-        raise RuntimeError("sigmoid fastpath is required")
     xt = torch.tensor(x, dtype=torch.float64)
     yt = torch.tensor(y, dtype=torch.float64)
-    # Start at a mid-lag bump with moderate width — not the AR(1) tail.
-    coeff = torch.nn.Parameter(torch.tensor(1.0, dtype=torch.float64))
-    log_alpha = torch.nn.Parameter(torch.tensor(0.0, dtype=torch.float64))
-    tau = torch.nn.Parameter(torch.tensor(float(width) / 4.0, dtype=torch.float64))
-    bias = torch.nn.Parameter(torch.tensor(0.0, dtype=torch.float64))
-    opt = torch.optim.Adam([coeff, log_alpha, tau, bias], lr=float(lr))
-    lags = torch.arange(width, dtype=torch.float64)
-    ones = torch.ones_like(xt)
+    # Same privilege as S4D: start on the AR(1) tail, not a mid-lag bump.
+    filt = CausalTransverseFilter.from_leaky_integrator(
+        float(rho), width=int(width), dtype=torch.float64
+    )
+    opt = torch.optim.Adam(filt.parameters(), lr=float(lr))
     for _ in range(int(steps)):
         opt.zero_grad(set_to_none=True)
-        alpha = torch.nn.functional.softplus(log_alpha) + 1e-3
-        kern = coeff * spec.fastpath(alpha * (lags - tau), 1)
-        pred = torch.nn.functional.conv1d(
-            xt.unsqueeze(1),
-            kern.flip(0).view(1, 1, -1),
-            padding=width - 1,
-        ).squeeze(1)[:, : xt.shape[1]]
-        pred = pred + bias * ones
+        pred = filt(xt)
         loss = torch.mean((pred - yt) ** 2)
         loss.backward()
         opt.step()
     with torch.no_grad():
-        alpha = float(torch.nn.functional.softplus(log_alpha) + 1e-3)
         params = {
-            "coeff": float(coeff.detach()),
-            "alpha": alpha,
-            "tau": float(tau.detach()),
-            "bias": float(bias.detach()),
+            "coeff": float(filt.coeff.detach()),
+            "alpha": float(filt.timescale().detach()),
+            "tau": float(filt.tau.detach()),
+            "bias": float(filt.bias.detach()),
             "n_params": float(N_FILTER_PARAMS),
+            "order": 0.0,
         }
-        kern = causal_sigma_kernel(
-            width=width,
-            coeff=params["coeff"],
-            alpha=params["alpha"],
-            tau=params["tau"],
-            order=1,
-        )
-        pred_np = apply_causal_fir(x, kern) + params["bias"]
+        pred_np = filt(xt).detach().cpu().numpy()
     return pred_np, params
 
 
@@ -259,6 +245,7 @@ def run_seed(seed: int, *, cfg: dict[str, Any]) -> dict[str, Any]:
         steps=int(cfg["steps"]),
         lr=float(cfg["lr"]),
         seed=int(seed),
+        rho=float(cfg["rho"]),
     )
     filt_ms = (time.perf_counter() - t0) * 1e3
     t1 = time.perf_counter()
@@ -278,7 +265,7 @@ def run_seed(seed: int, *, cfg: dict[str, Any]) -> dict[str, Any]:
             coeff=filt_params["coeff"],
             alpha=filt_params["alpha"],
             tau=filt_params["tau"],
-            order=1,
+            order=0,
         ),
     ) + filt_params["bias"]
     decay = ssm_params["discrete_decay"]
@@ -318,7 +305,7 @@ def _config(*, full: bool) -> dict[str, Any]:
         return {
             "length": 256,
             "rho": 0.98,
-            "width": 48,
+            "width": 256,
             "n_train": 48,
             "n_val": 16,
             "n_test": 32,
@@ -326,9 +313,9 @@ def _config(*, full: bool) -> dict[str, Any]:
             "lr": 0.05,
         }
     return {
-        "length": 64,
-        "rho": 0.95,
-        "width": 24,
+            "length": 64,
+            "rho": 0.95,
+            "width": 64,
         "n_train": 24,
         "n_val": 8,
         "n_test": 16,
@@ -365,6 +352,12 @@ def main(argv: list[str] | None = None) -> int:
             "n_params_filter": N_FILTER_PARAMS,
             "n_params_ssm": N_SSM_PARAMS,
         },
+        {
+            "name": "g5_width_equals_horizon",
+            "passed": int(cfg["width"]) == int(cfg["length"]),
+            "width": int(cfg["width"]),
+            "length": int(cfg["length"]),
+        },
     ]
     hard = gates_block(entries)
 
@@ -397,6 +390,9 @@ def main(argv: list[str] | None = None) -> int:
             "founding_bias_collapse": True,
             "not_omnibias_struct": True,
             "ssm_is_named_s4d": True,
+            "kernel_order": 0,
+            "kernel_class": "logistic_survival_tail",
+            "width_equals_horizon": True,
         },
     }
     name = (

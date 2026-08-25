@@ -652,6 +652,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
+  [`docs/api/sequence.md`](docs/api/sequence.md),
   [`docs/api/arrangement.md`](docs/api/arrangement.md),
   [`docs/api/tropical.md`](docs/api/tropical.md),
   [`docs/api/locus.md`](docs/api/locus.md),

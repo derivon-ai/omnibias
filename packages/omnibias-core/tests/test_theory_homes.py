@@ -198,11 +198,11 @@ def test_arrangement_and_folded_names_are_not_minted() -> None:
         assert not (PACKAGES / name).exists(), f"{name} directory must stay gone"
 
 
-def test_wave0_a5_is_recorded_failed() -> None:
-    """G4: A5 ran and failed; the sequence submodule is retired, not invented."""
+def test_wave0_a5_is_recorded_earned() -> None:
+    """A5 ran; G5 is earned on the order-0 tail and the sequence module ships."""
     text = (THEORY / "README.md").read_text(encoding="utf-8")
     assert re.search(r"\| A5 \|", text), "Wave-0 table lost the A5 row"
-    assert re.search(r"A5.*\*\*failed\*\*", text), "A5 must be recorded as failed"
+    assert re.search(r"A5.*\*\*earned\*\*", text), "A5 must be recorded as earned"
     assert not re.search(r"A5.*not run", text), "A5 already ran; drop 'not run'"
     seq = (
         PACKAGES
@@ -212,7 +212,7 @@ def test_wave0_a5_is_recorded_failed() -> None:
         / "torch"
         / "sequence.py"
     )
-    assert not seq.exists(), "G5 failed: do not ship omnibias.torch.sequence"
+    assert seq.is_file(), "G5 earned: ship omnibias.torch.sequence"
 
 
 def test_home_parser_self_checks() -> None:

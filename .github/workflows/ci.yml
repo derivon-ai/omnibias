@@ -1715,7 +1715,7 @@ jobs:
         run: |
           source .venv-tab/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/tabular_arrangement_capacity.py
-      - name: Wave-0 A5 sequence-transverse smoke (05-02 G5; failed, submodule retired)
+      - name: Wave-0 A5 sequence-transverse smoke (05-02 G5)
         run: |
           source .venv-tab/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/sequence_transverse.py

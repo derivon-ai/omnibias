@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Kernel-level checks for the 05-02 G5 prototype (benchmark-local, not shipped)."""
+"""Kernel-level checks for the 05-02 G5 designed taps (benchmark + core)."""
 
 from __future__ import annotations
 

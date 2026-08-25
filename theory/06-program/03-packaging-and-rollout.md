@@ -98,8 +98,9 @@ line of work before it is built.
 1. 05-02's G1 (arrangement versus LightGBM on the constructed oblique dataset) —
    kills or licenses the tabular application in a day.
 2. 05-02's G5 (transverse filter versus a structured state-space model) —
-   **ran and failed** (worst-seed `R^2` gap `0.652` vs S4D); sequence
-   submodule deleted from the plan, not shipped.
+   **earned** after a protocol miss: order-1 `sigma'` / `W=24` cannot
+   clear the gate (FIR ceiling); order-0 logistic tail at `width=T`
+   does. Sequence submodule shipped.
 3. 04-01's G2 (the `delta^2` Fisher degeneracy exponent — pack spread
    `delta`, **not** the scan tempering scale `alpha`; `alpha` belongs to
    05-01 G7) — validates or refutes the architectural argument that the
@@ -272,8 +273,8 @@ proceeds.
 - [x] Keep the assignment table current as specs move
 - [x] Run Wave-0 falsifiers A6 (04-01 G2), A7 (05-01 G7), A4 (05-02 G1/G2),
       and A5 (05-02 G5)
-- [x] Record A6, A7, and A4 outcomes (passed) and A5 (**failed**; sequence
-      submodule retired) in `theory/README.md`
+- [x] Record A6, A7, and A4 outcomes (passed) and A5 (**earned**; sequence
+      submodule shipped) in `theory/README.md`
 - [x] Open Wave 1 with 01-01 multipack (G1–G5 earned)
 - [x] Wave-1 01-04 irregular stencils (G1–G4 earned) and 01-02 bias scan
       (G1–G4 CI-gated; 01-13 G5 earned)
@@ -287,7 +288,8 @@ proceeds.
       cost / wall-time / FermiNet-many-body gates smoke-earned, not in CI
       `all_passed`
 - [x] Mark failed-falsifier sub-applications `retired` with a reason
-      (05-02 sequence / G5 vs S4D; the tabular 05-02 spec stays gated)
+      (none currently; 05-02 G5 earned after the order-1/`W=24` miss;
+      the tabular 05-02 spec stays gated)
 - [x] Written promotion criterion for `omnibias.partition.arrangement` in
       this file (two external consumers + ~2 000 lines); still no
       `omnibias-arrangement` package

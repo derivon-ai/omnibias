@@ -155,6 +155,7 @@ nav:
       - discovery engine: api/discovery.md
       - multipack Birkhoff (01-01): api/multipack.md
       - bias scan (01-02): api/scan.md
+      - causal transverse filter (05-02 G5): api/sequence.md
       - mollifier calculus (01-05): api/mollifier.md
       - spectral design (01-07): api/spectral_design.md
       - Scan-Net (02-01): api/scannet.md

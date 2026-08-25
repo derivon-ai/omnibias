@@ -110,7 +110,7 @@ router honesty or to 03-05 / 09-28 named `soft_top_k` / Hopfield `beta`.
 | Sharpness as *step size* | 08-06 | `lambda_max` sets cubic `sigma` / lr |
 | Certified *step* filter | 08-09 | Accept/reject `theta'` |
 | Arrangement LP / face walk | 03-02 | Learned facets into a certified argmin |
-| Mechanism cells / causal slabs | 05-02 G5 | Failed vs S4D; sequence submodule retired; do not re-open as 09 |
+| Mechanism cells / causal slabs | 05-02 G5 | Earned vs S4D (order-0 tail, `width=T`); shipped as `omnibias.{torch,jax}.sequence`; do not re-open as 09 |
 | Slab-mass probabilities | 04-02 | Calibrated conformal slabs |
 | Learnable morphology / SoftMaxPool / index-SE | 03-05 | Flat dilation + `soft_top_k`; not a seventh role |
 | Semiring neighborhood combiner | shipped `cmbConv*` + 01-08 + 03-05 | Sum-product vs max-plus homotopy |

@@ -6,6 +6,19 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Fixed — Wave-0 A5 sequence G5 earned (theory 05-02)
+
+- The first protocol used order-1 `sigma'` (a mid-lag bump) and
+  `width=24`. The truncated-true-IR ceiling is `R^2 ~ 0.947` vs S4D
+  `~0.998` (gap `~0.05 > 0.02`). That miss is withdrawn.
+- Default kernel is the order-0 logistic tail
+  `c * sigma(tau - alpha k)` at `width=T`, with an AR(1)-near init.
+- Worst-seed `R^2` gap `0.0013` (filter `0.9984` vs S4D `0.9998`).
+- `omnibias.{core,torch,jax}.sequence` shipped. Founding tower taps,
+  not temperature collapse; not `omnibias.struct`.
+- Smoke: `docs/benchmarks/sequence_transverse_smoke.json`.
+
+
 ### Added — OMBU-frame G4 recorded unearned (theory 01-06)
 
 - `benchmarks/ombu_frames.py` G4 now runs five seeds. Order-2 beats

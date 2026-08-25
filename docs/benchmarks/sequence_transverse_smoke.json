@@ -1,6 +1,6 @@
 {
   "schema": "sequence-transverse-v1",
-  "generated_utc": "2026-08-25T15:49:15Z",
+  "generated_utc": "2026-08-25T17:30:07Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -25,14 +25,14 @@
     "full": false,
     "length": 64,
     "rho": 0.95,
-    "width": 24,
+    "width": 64,
     "n_train": 24,
     "n_val": 8,
     "n_test": 16,
     "steps": 60,
     "lr": 0.05
   },
-  "rss_mb_at_start": 963.64,
+  "rss_mb_at_start": 964.59,
   "seeds": [
     0,
     1,
@@ -43,21 +43,22 @@
   "per_seed": [
     {
       "seed": 0,
-      "filter_r2": 0.44319758074475857,
+      "filter_r2": 0.9984471070737283,
       "ssm_r2": 0.9997762315581271,
-      "r2_gap": 0.5565786508133685,
-      "filter_skill": 0.44705818674656217,
+      "r2_gap": 0.0013291244843988137,
+      "filter_skill": 0.9984578741026492,
       "ssm_skill": 0.999777783063221,
-      "filter_train_r2": 0.4488011048371433,
+      "filter_train_r2": 0.9985537357719219,
       "ssm_train_r2": 0.9997852247930932,
-      "filter_wall_ms": 1570.627891109325,
-      "ssm_wall_ms": 223.6576940631494,
+      "filter_wall_ms": 1653.780302964151,
+      "ssm_wall_ms": 241.0020800307393,
       "filter_params": {
-        "coeff": 0.2800359932011252,
-        "alpha": 0.9289826795812823,
-        "tau": 3.7191765068742355,
-        "bias": -0.010353717554238223,
-        "n_params": 4.0
+        "coeff": 0.10746166431329902,
+        "alpha": 0.06687707284561373,
+        "tau": -0.21136281015026326,
+        "bias": -0.0007558090455965586,
+        "n_params": 4.0,
+        "order": 0.0
       },
       "ssm_params": {
         "a": -2.994523304677173,
@@ -72,21 +73,22 @@
     },
     {
       "seed": 1,
-      "filter_r2": 0.4372221569727358,
+      "filter_r2": 0.9985766684515873,
       "ssm_r2": 0.9989164219689025,
-      "r2_gap": 0.5616942649961667,
-      "filter_skill": 0.4378745729135335,
+      "r2_gap": 0.0003397535173151889,
+      "filter_skill": 0.9985783184884583,
       "ssm_skill": 0.9989176781370146,
-      "filter_train_r2": 0.440202647344456,
+      "filter_train_r2": 0.9984305910624672,
       "ssm_train_r2": 0.9987876471641752,
-      "filter_wall_ms": 39.55279104411602,
-      "ssm_wall_ms": 239.27474999800324,
+      "filter_wall_ms": 45.023413957096636,
+      "ssm_wall_ms": 240.5570240225643,
       "filter_params": {
-        "coeff": 0.27945624652609796,
-        "alpha": 0.9120753751976426,
-        "tau": 3.9265587678283995,
-        "bias": -0.020383412600049167,
-        "n_params": 4.0
+        "coeff": 0.1067260492396371,
+        "alpha": 0.06671880342132964,
+        "tau": -0.2164268655966878,
+        "bias": -0.0020476054899483337,
+        "n_params": 4.0,
+        "order": 0.0
       },
       "ssm_params": {
         "a": -3.012791873638766,
@@ -101,21 +103,22 @@
     },
     {
       "seed": 2,
-      "filter_r2": 0.3460541172244569,
+      "filter_r2": 0.9987125234698379,
       "ssm_r2": 0.9978110629843323,
-      "r2_gap": 0.6517569457598754,
-      "filter_skill": 0.3493210511522292,
+      "r2_gap": -0.0009014604855055453,
+      "filter_skill": 0.9987189553487875,
       "ssm_skill": 0.9978219983121486,
-      "filter_train_r2": 0.36673254412201794,
+      "filter_train_r2": 0.998448495742308,
       "ssm_train_r2": 0.9974016850232448,
-      "filter_wall_ms": 37.98344708047807,
-      "ssm_wall_ms": 230.3704370278865,
+      "filter_wall_ms": 44.11653697025031,
+      "ssm_wall_ms": 240.3397309826687,
       "filter_params": {
-        "coeff": 0.22635344739004443,
-        "alpha": 0.9891327451022717,
-        "tau": 3.9321967709480297,
-        "bias": -0.03254478955358716,
-        "n_params": 4.0
+        "coeff": 0.10777244789458776,
+        "alpha": 0.06765025335794679,
+        "tau": -0.21805723130882612,
+        "bias": 4.238407372283634e-07,
+        "n_params": 4.0,
+        "order": 0.0
       },
       "ssm_params": {
         "a": -2.9081455684178814,
@@ -130,21 +133,22 @@
     },
     {
       "seed": 3,
-      "filter_r2": 0.3499145203208207,
+      "filter_r2": 0.9982684073106899,
       "ssm_r2": 0.9995001782676638,
-      "r2_gap": 0.6495856579468431,
-      "filter_skill": 0.36491346560230564,
+      "r2_gap": 0.00123177095697391,
+      "filter_skill": 0.9983083590782783,
       "ssm_skill": 0.9995117102877568,
-      "filter_train_r2": 0.4116898899386504,
+      "filter_train_r2": 0.9983148205462506,
       "ssm_train_r2": 0.9995313501943134,
-      "filter_wall_ms": 36.46143991500139,
-      "ssm_wall_ms": 223.33422803785652,
+      "filter_wall_ms": 44.76089694071561,
+      "ssm_wall_ms": 251.9711359636858,
       "filter_params": {
-        "coeff": 0.25769906150092114,
-        "alpha": 0.9865875374561458,
-        "tau": 4.139621589903106,
-        "bias": 0.01455542310890914,
-        "n_params": 4.0
+        "coeff": 0.10731865332386893,
+        "alpha": 0.0673601794893521,
+        "tau": -0.21813483841652684,
+        "bias": 0.0024860232170969576,
+        "n_params": 4.0,
+        "order": 0.0
       },
       "ssm_params": {
         "a": -2.920580793536054,
@@ -159,21 +163,22 @@
     },
     {
       "seed": 4,
-      "filter_r2": 0.4389515173046743,
+      "filter_r2": 0.9982545615025117,
       "ssm_r2": 0.9974059170781076,
-      "r2_gap": 0.5584543997734333,
-      "filter_skill": 0.44506523420981514,
+      "r2_gap": -0.0008486444244041325,
+      "filter_skill": 0.9982735814574321,
       "ssm_skill": 0.9974341846683463,
-      "filter_train_r2": 0.42435498476480304,
+      "filter_train_r2": 0.9982403863375151,
       "ssm_train_r2": 0.9975822050420241,
-      "filter_wall_ms": 37.44543099310249,
-      "ssm_wall_ms": 223.98133401293308,
+      "filter_wall_ms": 44.248127029277384,
+      "ssm_wall_ms": 254.6086439397186,
       "filter_params": {
-        "coeff": 0.2521330270110826,
-        "alpha": 0.9428186453519065,
-        "tau": 3.66633893891702,
-        "bias": 0.006369752456633801,
-        "n_params": 4.0
+        "coeff": 0.10873282396528385,
+        "alpha": 0.06748838530607662,
+        "tau": -0.22118283680311965,
+        "bias": -0.0006749469380415706,
+        "n_params": 4.0,
+        "order": 0.0
       },
       "ssm_params": {
         "a": -2.893106194822771,
@@ -193,7 +198,7 @@
     "citation": "Gu, Goel, Re; Efficiently Modeling Long Sequences with Structured State Spaces (S4 / S4D)"
   },
   "gates": {
-    "all_passed": false,
+    "all_passed": true,
     "entries": [
       {
         "name": "g5_ssm_beats_zero",
@@ -203,8 +208,8 @@
       },
       {
         "name": "g5_filter_within_2pct_of_s4d",
-        "passed": false,
-        "worst_r2_gap": 0.6517569457598754,
+        "passed": true,
+        "worst_r2_gap": 0.0013291244843988137,
         "max_gap": 0.02
       },
       {
@@ -212,15 +217,24 @@
         "passed": true,
         "n_params_filter": 4,
         "n_params_ssm": 4
+      },
+      {
+        "name": "g5_width_equals_horizon",
+        "passed": true,
+        "width": 64,
+        "length": 64
       }
     ]
   },
-  "g5_earned": false,
-  "sequence_submodule_shipped": false,
+  "g5_earned": true,
+  "sequence_submodule_shipped": true,
   "honesty": {
     "temperature_collapse_claim": false,
     "founding_bias_collapse": true,
     "not_omnibias_struct": true,
-    "ssm_is_named_s4d": true
+    "ssm_is_named_s4d": true,
+    "kernel_order": 0,
+    "kernel_class": "logistic_survival_tail",
+    "width_equals_horizon": true
   }
 }

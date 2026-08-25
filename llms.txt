@@ -25,6 +25,9 @@ interior lattice shift along `w`, not a circular wrap of `tanh'`;
 `op=` aliases `template=` and is not a seventh role; soft-argmax
 `gamma` is not `delta -> 0`),
 and exact-`Q` irregular Birkhoff stencils in `omnibias.difference` (01-04).
+`CausalTransverseFilter` (05-02 G5; `omnibias.{torch,jax}.sequence`) is
+an order-0 logistic-tail causal FIR (`width=T`); founding tower taps,
+not temperature collapse, not `omnibias.struct`.
 
 Wave-3 algebra + architectures (gated, no new packages): `MollifierSpec` /
 `tail_bound` (01-05; G1–G4 CI-gated; certified exponential tails, not

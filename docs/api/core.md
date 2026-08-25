@@ -37,6 +37,11 @@ Pure-Python support algebra for heterogeneous multi-pack collapse (theory
 Offset / scale bank algebra for the transverse bias scan (theory 01-02).
 Documented in full at [scan.md](scan.md).
 
+## Causal transverse taps
+
+Designed causal `sigma^(n)` FIR taps (theory 05-02 G5). Order 0 is the
+logistic tail. Documented in full at [sequence.md](sequence.md).
+
 ## Mollifier calculus
 
 Pack-as-mollifier algebra with certified exponential tails (theory 01-05).

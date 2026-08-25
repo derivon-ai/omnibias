@@ -17,10 +17,11 @@ Wave-0 falsifier A4 (G1/G2) is recorded in
 `docs/benchmarks/tabular_arrangement_public.json` and stays frozen. Gate G3b
 (capacity suite, primary `boost_h2`) is recorded in
 `docs/benchmarks/tabular_arrangement_capacity.json` (`g3b_earned: false`;
-not-worse on `4/8`). Gate G5 **failed** (Wave-0 A5; worst-seed `R^2` gap
-`0.652` vs S4D, need `<= 0.02`); the sequence submodule is retired, not
-shipped. Gate G4 remains unearned. Gates G6 / G7 are earned — see
-`docs/benchmarks/shape_topology_smoke.json`.
+not-worse on `4/8`). Gate G5 **earned** (Wave-0 A5; order-0 logistic
+tail at `width=T`; see `docs/benchmarks/sequence_transverse_smoke.json`).
+The first protocol (order-1 `sigma'` bump, `W=24`) was a miss: that FIR
+cannot clear a `0.02` gap versus S4D. Gate G4 remains unearned. Gates G6
+/ G7 are earned — see `docs/benchmarks/shape_topology_smoke.json`.
 
 ## 2. Where it lands
 
@@ -29,9 +30,8 @@ Three separate homes, because these are three separate audiences:
 - tabular → `omnibias.tab` (already exists, already benchmarked against
   LightGBM),
 - shapes → `omnibias.shape` (already exists),
-- sequences → **retired**. G5 failed against a named S4D baseline; there is
-  no `omnibias.torch.sequence` submodule. `omnibias.struct` remains the
-  sequence home.
+- sequences → `omnibias.torch.sequence` / `omnibias.jax.sequence` (causal
+  transverse FIR). `omnibias.struct` remains the certified-DP sequence home.
 
 None of them earns a new package. Stating that up front is the point of the
 section.
@@ -60,8 +60,9 @@ tabular model (Wave-0 G1/G2) now lands in `omnibias.tab.arrangement` /
 `benchmarks/tabular_arrangement.py`. (b) Topology of a learned shape is a
 trainable quantity (`field_euler_characteristic` / `regularize_occupancy`;
 G6/G7). (c) A transverse convolution for
-sequences was the Wave-0 A5 falsifier; G5 failed against S4D and that
-sub-application is retired. `omnibias.struct` remains the sequence home.
+sequences was the Wave-0 A5 falsifier; G5 earned on the order-0
+logistic tail at matched width = horizon. `omnibias.struct` remains the
+certified-DP sequence home.
 
 ## 4. Mathematics
 
@@ -270,12 +271,13 @@ implicit-surface pipeline (shapes), and a structured state-space model
   oblique only; not retuned on these datasets.
 - **G5 sequence viability.** The causal transverse filter matches a structured
   state-space baseline within `2%` on a long-range benchmark at matched
-  parameter count. **If this fails, the sequence submodule is not shipped** —
+  parameter count.   **If this fails, the sequence submodule is not shipped** —
   it is removed from the plan, not softened into "promising future work".
-  **Failed** — see `docs/benchmarks/sequence_transverse_smoke.json`.
-  Worst-seed `R^2` gap `0.652` (filter `0.346` vs S4D `0.998`); S4D skill
-  `~0.998` so the baseline is a solved experiment. Sequence submodule
-  retired.
+  **Earned** — see `docs/benchmarks/sequence_transverse_smoke.json`.
+  Worst-seed `R^2` gap `0.0013` (filter `0.9984` vs S4D `0.9998`;
+  need `<= 0.02`). Order-0 logistic tail, `width=T`, AR(1)-near init
+  (same privilege as S4D). The first protocol (order-1 bump, `W=24`)
+  had an FIR ceiling below the gate and is withdrawn.
 - **G6 topology bound.** The soft Euler characteristic's reported gap bound
   contains the true integer in `100%` of test cases, and the API cannot return
   the value without the bound. **Earned** — see
@@ -296,8 +298,8 @@ implicit-surface pipeline (shapes), and a structured state-space model
   diagnostic study. Reusing the existing harness means the LightGBM comparison
   is apples to apples.
 - `benchmarks/shape_topology.py` for G6 and G7.
-- `benchmarks/sequence_transverse.py` for G5, written to be **deleted** along
-  with the submodule if the gate fails.
+- `benchmarks/sequence_transverse.py` for G5, training the shipped
+  `CausalTransverseFilter`.
 - Smoke JSON committed; full under `$OMNIBIAS_SCRATCH/beyond_pde/`.
 
 ## 10. Honesty and scope
@@ -324,9 +326,9 @@ implicit-surface pipeline (shapes), and a structured state-space model
 - `omnibias.struct` already handles sequences seriously through certified
   differentiable dynamic programming. The transverse filter is a different and
   much smaller idea, and must not be presented as omnibias's sequence story.
-- Structured state-space models are strong, actively developed, and the honest
-  prior is that the transverse filter does not beat them. G5 exists to find that
-  out cheaply.
+- Structured state-space models are strong. G5 asks for a `0.02` `R^2` match
+  at equal parameter count, not a claim that the FIR replaces S4 / Mamba.
+  The designed kernel is founding-tower taps, not temperature collapse.
 - The soft topology invariants are **not** the integer invariants; the gap bound
   is the whole content of the claim.
 - No certificate tier beyond what `omnibias.partition` and `omnibias.tab`
@@ -377,8 +379,8 @@ implicit-surface pipeline (shapes), and a structured state-space model
 - [x] `benchmarks/shape_topology.py` for G6 and G7 (smoke
       `docs/benchmarks/shape_topology_smoke.json`; full under
       `$OMNIBIAS_SCRATCH/beyond_pde/`)
-- [x] `benchmarks/sequence_transverse.py` run **first**; G5 failed; no
-      `omnibias.torch.sequence` submodule (retired, not future work)
+- [x] `benchmarks/sequence_transverse.py`; G5 earned (order-0 tail,
+      `width=T`); `omnibias.{torch,jax}.sequence` shipped
 - [x] Gate runner `benchmarks/tabular_arrangement.py` (extends the LightGBM
       tuning pattern from `omnibias/tab/bench.py`)
 - [x] Docs page and nav entry, carrying the "trees usually win" statement
