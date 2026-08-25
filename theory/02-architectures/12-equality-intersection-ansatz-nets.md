@@ -7,7 +7,7 @@ Newton and whose backward pass uses the implicit function theorem — the same
 technique `omnibias.convex.torch.qp_layer` applies to a KKT system, on a much smaller
 and better-conditioned system, because the tower supplies the Jacobian exactly.
 
-- **Status**: gated (layer on 01-09; always `branch` / `condition` / `converged`; not a general PDE solver)
+- **Status**: gated (layer on 01-09; always `branch` / `condition` / `converged`; not a general PDE solver; G4 Burgers RH **reported** / unearned — clean speed from `affine_locus`, noisy contour stays `--full`, not in CI `all_passed`)
 - **Depends on**: 01-01, 01-03, 01-09
 - **Blocks**: 05-01, 07-02
 

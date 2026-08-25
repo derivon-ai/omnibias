@@ -61,7 +61,7 @@ uv run python docs/img/generate_figures.py
 | `soliton_tanh_method.py` | `docs/benchmarks/soliton_tanh_method_smoke.json` | Gated 02-09: tanh algebra; G4 init-win `--full`; algebraic cost reported |
 | `hermite_ladder.py` | `docs/benchmarks/hermite_ladder_smoke.json` | Gated 02-10: Rodrigues reweight; G4 many-body `--full`; exact-vs-FD reported; G5 anharmonic reported |
 | `layered_transfer.py` | `docs/benchmarks/layered_transfer_smoke.json` | Gated 02-11: `continuum_claim=False`; G4 inverse-design `--full`; stack cost reported; G5 conservation reported |
-| `equality_intersection.py` | `docs/benchmarks/equality_intersection_smoke.json` | Gated 02-12: not a general PDE solver |
+| `equality_intersection.py` | `docs/benchmarks/equality_intersection_smoke.json` | Gated 02-12: not a general PDE solver; G4 Burgers RH reported (noisy contour `--full`) |
 | `linearizing_transforms.py` | `docs/benchmarks/linearizing_transforms_smoke.json` | Gated 02-13: named transforms; 03-11 stays designed |
 | `holonomy_band.py` | `docs/benchmarks/holonomy_band_smoke.json` | Gated 02-14: no YM / mass-gap claim |
 | `gauge_holonomy_gap.py` | `docs/benchmarks/gauge_holonomy_gap_smoke.json` | Gated 07-04: holonomy trials on one fixed matrix; G1 factor measured; no YM / continuum |

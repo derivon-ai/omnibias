@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equality-locus G4 Burgers RH reported (theory 02-12)
+
+- `benchmarks/equality_intersection.py` now recovers the Rankine–Hugoniot
+  speed `0.5` from `affine_locus` on the published Burgers units, and
+  compares that locus to noisy contour extraction (five seeds).
+- Reported: the locus uses published units, not a fit from samples.
+  Named G4 needs a data-fit that beats contour with skill `> 0`.
+  Previous smoke-geometry `passed=True` stub withdrawn. Not in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/equality_intersection_smoke.json`.
+
+
 ### Added — Face-Net G3 vs k-NN reported (theory 02-02)
 
 - `benchmarks/arrangement_graph.py` now reports a 0-hop cell-centroid

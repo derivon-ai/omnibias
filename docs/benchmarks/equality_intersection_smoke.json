@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.equality_intersection.v1",
-  "generated_utc": "2026-08-15T18:16:19Z",
+  "generated_utc": "2026-08-25T19:06:36Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,9 +11,13 @@
     "folx": "0.2.22"
   },
   "config": {
-    "mode": "smoke"
+    "mode": "smoke",
+    "g4_in_all_passed": false,
+    "gates_in_scope": [
+      "g1"
+    ]
   },
-  "rss_mb_at_start": 821.51,
+  "rss_mb_at_start": 807.99,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -21,17 +25,72 @@
         "name": "g1_locus_residual",
         "passed": true,
         "in_ci_all_passed": true
-      },
-      {
-        "name": "g4_burgers_rh",
-        "passed": true,
-        "in_ci_all_passed": false,
-        "note": "smoke records RH geometry; --full noisy-data skill"
       }
     ]
   },
+  "g4": {
+    "name": "g4_burgers_rh",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
+    "rh_match": true,
+    "rh_abs_err": 0.0,
+    "rh_tol": 1e-10,
+    "recovered_speed": 0.5,
+    "residual_at_shock": true,
+    "wins": 5,
+    "n_seeds": 5,
+    "median_skill_vs_zero": 1.0,
+    "rows": [
+      {
+        "seed": 0,
+        "mse_locus": 0.0,
+        "mse_contour": 0.00019687263103377868,
+        "skill_vs_zero": 1.0,
+        "locus_wins": true
+      },
+      {
+        "seed": 1,
+        "mse_locus": 0.0,
+        "mse_contour": 0.00014818488680360732,
+        "skill_vs_zero": 1.0,
+        "locus_wins": true
+      },
+      {
+        "seed": 2,
+        "mse_locus": 0.0,
+        "mse_contour": 0.00016060016433533424,
+        "skill_vs_zero": 1.0,
+        "locus_wins": true
+      },
+      {
+        "seed": 3,
+        "mse_locus": 0.0,
+        "mse_contour": 0.00018127726544054265,
+        "skill_vs_zero": 1.0,
+        "locus_wins": true
+      },
+      {
+        "seed": 4,
+        "mse_locus": 0.0,
+        "mse_contour": 0.00022214139622679947,
+        "skill_vs_zero": 1.0,
+        "locus_wins": true
+      }
+    ],
+    "units_fit_from_data": false,
+    "stays_full": true,
+    "note": "Clean Rankine-Hugoniot speed from affine_locus on the published Burgers units (need |s-0.5|<=1e-10). Noisy contour extraction is measured on five seeds; the locus uses those published units, not a fit from samples. Named G4 needs a data-fit that beats contour with skill > 0. Previous g4_burgers_rh passed=True smoke-geometry stub withdrawn. Not in CI all_passed."
+  },
   "honesty": {
     "level3_general_solver": false,
-    "returns": "branch / condition / converged"
+    "returns": "branch / condition / converged",
+    "g4_earned": false,
+    "g4_reported": true,
+    "g4_in_ci_all_passed": false,
+    "g4_units_fit_from_data": false,
+    "temperature_collapse": false,
+    "founding_bias_collapse": true
   }
 }
