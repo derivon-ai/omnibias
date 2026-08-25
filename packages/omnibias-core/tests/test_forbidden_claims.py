@@ -85,6 +85,8 @@ ALLOWED = frozenset(
         "theory/07-frontier/01-sub-obligation-ledger.md",
         # Public docs page repeats the register so a reader sees the sentences.
         "docs/honesty.md",
+        # Public ledger quotes the never-write column as the thing to refuse.
+        "docs/frontier-ledger.md",
     }
 )
 

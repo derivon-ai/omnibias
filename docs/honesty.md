@@ -47,5 +47,6 @@ These sentences are never licensed by any result this program can produce.
 Padé / Borel (spec 03-10) locates singularities of a truncated series. That
 is not analytic continuation of a Dirichlet series past `Re(s) = 1`.
 
-See also [scope and guarantees](scope-and-guarantees.md) and
+See also [scope and guarantees](scope-and-guarantees.md),
+the [frontier sub-obligation ledger](frontier-ledger.md), and
 [theory/06-program/02-honesty-and-claim-boundaries.md](https://github.com/derivon-ai/omnibias/blob/main/theory/06-program/02-honesty-and-claim-boundaries.md).

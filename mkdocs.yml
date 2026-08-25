@@ -139,6 +139,7 @@ nav:
   - Theory:
       - Closed-form derivatives: theory.md
       - Claim ladder and forbidden claims: honesty.md
+      - Frontier sub-obligation ledger: frontier-ledger.md
       - Jet-bundle vocabulary (01-10): theory-jets.md
       - Operator surface (capability matrix): operator-surface.md
       - Differentiable binarization: theory-binary.md
