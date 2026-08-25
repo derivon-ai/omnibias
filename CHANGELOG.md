@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Face-Net G3 vs k-NN reported (theory 02-02)
+
+- `benchmarks/arrangement_graph.py` now reports a 0-hop cell-centroid
+  readout versus `k=5` k-NN on a piecewise-constant sign-bit target
+  (five seeds). The 0-hop readout loses `0/5`.
+- Reported: named G3 needs a Face-Net GNN and `RegionModels` at matched
+  parameter count. Previous untimed `passed=True` stub withdrawn. Not
+  in CI `all_passed`.
+- Smoke: `docs/benchmarks/arrangement_graph_smoke.json`.
+
+
 ### Added — Layered-transfer G5 conservation reported (theory 02-11)
 
 - `benchmarks/layered_transfer.py` now reports unstructured 2x2

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""02-02 cost vs n/D is reported, not in CI all_passed."""
+"""02-02 cost vs n/D is reported; G3 vs k-NN stays out of all_passed."""
 
 from __future__ import annotations
 
@@ -29,4 +29,16 @@ def test_cost_vs_n_d_is_reported_and_out_of_all_passed() -> None:
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "cost_vs_n_d" not in names
     assert "g4_scaling_cutoff" not in names
+    assert "g3_vs_knn" not in names
     assert payload["gates"]["all_passed"] is True
+    g3 = payload["g3"]
+    assert g3["name"] == "g3_vs_knn"
+    assert g3["earned"] is False
+    assert g3["passed"] is False
+    assert g3["reported"] is True
+    assert g3["in_ci_all_passed"] is False
+    assert int(g3["n_seeds"]) == 5
+    assert g3["message_passing"] is False
+    assert g3["region_models"] is False
+    assert payload["honesty"]["g3_earned"] is False
+    assert payload["honesty"]["g3_in_ci_all_passed"] is False

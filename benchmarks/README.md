@@ -54,7 +54,7 @@ uv run python docs/img/generate_figures.py
 | `tropical_homotopy.py` | `docs/benchmarks/tropical_homotopy_smoke.json` | Gated 01-08: reuses `logsumexp_gap_bound`; G4 `--full`; cost vs n/D reported |
 | `equality_locus.py` | `docs/benchmarks/equality_locus_smoke.json` | Gated 01-09: constraint manifold, not a PDE solver |
 | `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Gated 01-12: line Hilbert; G1–G4 CI; G5 unearned on CCF smoke (matched-width ratio `0.978`), not in `all_passed` |
-| `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Gated 02-02 Face-Net: sampled subgraph; cost vs n/D reported |
+| `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Gated 02-02 Face-Net: sampled subgraph; G3 vs k-NN reported (0-hop; GNN / RegionModels `--full`); cost vs n/D reported |
 | `bem_net.py` | `docs/benchmarks/bem_net_smoke.json` | Gated 02-06: off-surface exact; G2 disc `--full`; single-layer cost reported |
 | `pack_tree.py` | `docs/benchmarks/pack_tree_smoke.json` | Gated 02-07: 1-D offsets; G3 unearned (per-source Taylor, no dense crossover), not in CI `all_passed` |
 | `equivariant_scan.py` | `docs/benchmarks/equivariant_scan_smoke.json` | Gated 02-08: gaussian steering; discrete `C_L`; G5 `--full`; orbit cost reported |

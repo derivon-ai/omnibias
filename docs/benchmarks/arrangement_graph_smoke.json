@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.arrangement_graph.v1",
-  "generated_utc": "2026-08-25T18:25:43Z",
+  "generated_utc": "2026-08-25T19:01:12Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,12 +13,13 @@
   "config": {
     "mode": "smoke",
     "cost_in_all_passed": false,
+    "g3_in_all_passed": false,
     "gates_in_scope": [
       "g1",
       "g2"
     ]
   },
-  "rss_mb_at_start": 814.1,
+  "rss_mb_at_start": 814.5,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -32,12 +33,6 @@
         "name": "g2_gap_sound",
         "passed": true,
         "in_ci_all_passed": true
-      },
-      {
-        "name": "g3_vs_knn",
-        "passed": true,
-        "in_ci_all_passed": false,
-        "note": "smoke/--full vs k-NN GNN + RegionModels"
       }
     ]
   },
@@ -52,56 +47,106 @@
         "n": 4,
         "dim": 2,
         "n_samples": 400,
-        "wall_seconds": 0.001483182073570788
+        "wall_seconds": 0.0015390020562335849
       },
       {
         "n": 6,
         "dim": 2,
         "n_samples": 400,
-        "wall_seconds": 0.0017029530135914683
+        "wall_seconds": 0.0016806289786472917
       },
       {
         "n": 8,
         "dim": 2,
         "n_samples": 400,
-        "wall_seconds": 0.0022758839186280966
+        "wall_seconds": 0.002241555950604379
       },
       {
         "n": 12,
         "dim": 2,
         "n_samples": 400,
-        "wall_seconds": 0.0027675540186464787
+        "wall_seconds": 0.0027360349195078015
       },
       {
         "n": 4,
         "dim": 3,
         "n_samples": 400,
-        "wall_seconds": 0.0016553810564801097
+        "wall_seconds": 0.0016334810061380267
       },
       {
         "n": 6,
         "dim": 3,
         "n_samples": 400,
-        "wall_seconds": 0.0022206130670383573
+        "wall_seconds": 0.002240439993329346
       },
       {
         "n": 8,
         "dim": 3,
         "n_samples": 400,
-        "wall_seconds": 0.0030360299861058593
+        "wall_seconds": 0.0030691249994561076
       },
       {
         "n": 12,
         "dim": 3,
         "n_samples": 400,
-        "wall_seconds": 0.005898926989175379
+        "wall_seconds": 0.005902586039155722
       }
     ],
-    "time_exponent_vs_n_d2": 0.5960371370426143,
+    "time_exponent_vs_n_d2": 0.5543631971867543,
     "cutoff_n": 12,
     "cutoff_d": 4,
     "refuses_over_cutoff": true,
-    "note": "Sampled build_arrangement_graph wall vs n at D=2 and D=3 (400 points). G1 tooling refuses n>12 or D>4. Previous G4 smoke-earned stub with no timing withdrawn. G3 vs k-NN stays smoke/--full. Not in CI all_passed."
+    "note": "Sampled build_arrangement_graph wall vs n at D=2 and D=3 (400 points). G1 tooling refuses n>12 or D>4. Previous G4 smoke-earned stub with no timing withdrawn. G3 vs k-NN is reported, not a GNN / RegionModels win. Not in CI all_passed."
+  },
+  "g3": {
+    "name": "g3_vs_knn",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
+    "wins": 0,
+    "n_seeds": 5,
+    "median_skill_vs_zero": 0.8,
+    "rows": [
+      {
+        "seed": 0,
+        "mse_facenet_0hop": 0.05,
+        "mse_knn": 0.048,
+        "skill_vs_zero": 0.95,
+        "facenet_wins": false
+      },
+      {
+        "seed": 1,
+        "mse_facenet_0hop": 0.4,
+        "mse_knn": 0.12800000000000003,
+        "skill_vs_zero": 0.6,
+        "facenet_wins": false
+      },
+      {
+        "seed": 2,
+        "mse_facenet_0hop": 0.4,
+        "mse_knn": 0.11800000000000002,
+        "skill_vs_zero": 0.6,
+        "facenet_wins": false
+      },
+      {
+        "seed": 3,
+        "mse_facenet_0hop": 0.2,
+        "mse_knn": 0.03200000000000001,
+        "skill_vs_zero": 0.8,
+        "facenet_wins": false
+      },
+      {
+        "seed": 4,
+        "mse_facenet_0hop": 0.2,
+        "mse_knn": 0.11400000000000002,
+        "skill_vs_zero": 0.8,
+        "facenet_wins": false
+      }
+    ],
+    "region_models": false,
+    "message_passing": false,
+    "note": "0-hop cell-centroid readout versus k=5 k-NN on a piecewise-constant sign-bit target (five seeds). Named G3 needs a Face-Net GNN and RegionModels at matched parameter count. Previous g3_vs_knn passed=True stub withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "sampling": "subgraph / lower bound",
@@ -110,6 +155,9 @@
     "cost_earned": false,
     "cost_reported": true,
     "cost_in_ci_all_passed": false,
+    "g3_earned": false,
+    "g3_reported": true,
+    "g3_in_ci_all_passed": false,
     "enumeration_cutoff_n": 12,
     "enumeration_cutoff_d": 4,
     "temperature_collapse": true,

@@ -2,8 +2,10 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: Face-Net (theory 02-02). Subgraph sampling; temperature collapse.
 
-Cost vs ``n`` / ``D`` is reported with the G1 tooling cutoff; not in CI
-``all_passed``. ``beta -> inf`` is temperature collapse.
+Cost vs ``n`` / ``D`` is reported with the G1 tooling cutoff. G3 is a
+0-hop centroid versus k-NN; a Face-Net GNN / ``RegionModels`` win stays
+``--full``. Neither is in CI ``all_passed``. ``beta -> inf`` is
+temperature collapse.
 """
 
 from __future__ import annotations
@@ -91,7 +93,79 @@ def _run_cost() -> dict[str, Any]:
             "Sampled build_arrangement_graph wall vs n at D=2 and D=3 "
             f"({COST_N_SAMPLES} points). G1 tooling refuses n>12 or D>4. "
             "Previous G4 smoke-earned stub with no timing withdrawn. G3 "
-            "vs k-NN stays smoke/--full. Not in CI all_passed."
+            "vs k-NN is reported, not a GNN / RegionModels win. Not in "
+            "CI all_passed."
+        ),
+    }
+
+
+def _knn_predict(train_x: np.ndarray, train_y: np.ndarray, test_x: np.ndarray, *, k: int) -> np.ndarray:
+    d2 = ((test_x[:, None, :] - train_x[None, :, :]) ** 2).sum(axis=-1)
+    idx = np.argpartition(d2, kth=min(k, train_x.shape[0] - 1), axis=1)[:, :k]
+    return train_y[idx].mean(axis=1)
+
+
+def _run_g3() -> dict[str, Any]:
+    """Named leftover: 0-hop cell-centroid vs k-NN; GNN/RegionModels stays --full."""
+    from omnibias.graph.arrangement._core import build_arrangement_graph
+    from omnibias.partition.arrangement import Arrangement, sign_vector
+
+    normals = np.array([[1.0, 0.0], [-1.0, 0.0], [0.0, 1.0], [0.0, -1.0]])
+    arr = Arrangement(normals, np.array([-1.0, -1.0, -1.0, -1.0]))
+    wins = 0
+    skills: list[float] = []
+    rows: list[dict[str, Any]] = []
+    for seed in range(5):
+        rng = np.random.default_rng(seed)
+        train = rng.uniform(-2.0, 2.0, size=(120, 2))
+        test = rng.uniform(-2.0, 2.0, size=(80, 2))
+        y_train = sign_vector(arr, train)[:, 0]
+        y_test = sign_vector(arr, test)[:, 0]
+        graph = build_arrangement_graph(arr, train)
+        reps = np.asarray(graph.representatives, dtype=np.float64)
+        train_signs = sign_vector(arr, train)
+        cell_means = []
+        for cell in graph.cells:
+            mask = np.all(train_signs == np.asarray(cell, dtype=np.float64), axis=1)
+            cell_means.append(float(y_train[mask].mean()) if mask.any() else 0.0)
+        means = np.asarray(cell_means, dtype=np.float64)
+        assign = ((test[:, None, :] - reps[None, :, :]) ** 2).sum(axis=-1).argmin(axis=1)
+        pred_fn = means[assign]
+        pred_knn = _knn_predict(train, y_train, test, k=5)
+        mse_fn = float(np.mean((pred_fn - y_test) ** 2))
+        mse_knn = float(np.mean((pred_knn - y_test) ** 2))
+        mse_zero = float(np.mean(y_test**2))
+        skill = 1.0 - mse_fn / max(mse_zero, 1e-18)
+        skills.append(skill)
+        win = bool(mse_fn < mse_knn)
+        wins += int(win)
+        rows.append(
+            {
+                "seed": int(seed),
+                "mse_facenet_0hop": mse_fn,
+                "mse_knn": mse_knn,
+                "skill_vs_zero": skill,
+                "facenet_wins": win,
+            }
+        )
+    return {
+        "name": "g3_vs_knn",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
+        "wins": int(wins),
+        "n_seeds": 5,
+        "median_skill_vs_zero": float(np.median(np.asarray(skills))),
+        "rows": rows,
+        "region_models": False,
+        "message_passing": False,
+        "note": (
+            "0-hop cell-centroid readout versus k=5 k-NN on a piecewise-"
+            "constant sign-bit target (five seeds). Named G3 needs a "
+            "Face-Net GNN and RegionModels at matched parameter count. "
+            "Previous g3_vs_knn passed=True stub withdrawn. Not in CI "
+            "all_passed."
         ),
     }
 
@@ -120,24 +194,21 @@ def main() -> int:
             "in_ci_all_passed": True,
         },
         {"name": "g2_gap_sound", "passed": bool(cert["sound"]), "in_ci_all_passed": True},
-        {
-            "name": "g3_vs_knn",
-            "passed": True,
-            "in_ci_all_passed": False,
-            "note": "smoke/--full vs k-NN GNN + RegionModels",
-        },
     ]
     cost = _run_cost()
+    g3 = _run_g3()
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.arrangement_graph.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
+            "g3_in_all_passed": False,
             "gates_in_scope": ["g1", "g2"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["cost"] = cost
+    payload["g3"] = g3
     payload["honesty"] = {
         "sampling": "subgraph / lower bound",
         "collapse": "temperature (beta -> inf), not founding delta -> 0",
@@ -145,6 +216,9 @@ def main() -> int:
         "cost_earned": False,
         "cost_reported": True,
         "cost_in_ci_all_passed": False,
+        "g3_earned": False,
+        "g3_reported": True,
+        "g3_in_ci_all_passed": False,
         "enumeration_cutoff_n": COST_CUTOFF_N,
         "enumeration_cutoff_d": COST_CUTOFF_D,
         "temperature_collapse": True,
