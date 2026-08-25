@@ -172,7 +172,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | gated | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | gated | Claim ladder + forbidden-claims register; guards in core tests |
-| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | designed | Where each spec lands and in what order |
+| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | gated | Homes guard: every spec names an existing package; allowlist empty |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | The monograph spine |
 | [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | designed | Publish-and-use order for the shipped object; CCF and Group 09 are not the public face |
 

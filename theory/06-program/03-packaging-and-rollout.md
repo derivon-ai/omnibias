@@ -7,7 +7,7 @@ way, and the repository has already learned that lesson the expensive way — so
 this file assigns every spec a home under the "earn independent existence" rule
 and sequences them so that the cheap falsifiers run before the expensive builds.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 06-01, 06-02
 - **Blocks**: none
 
@@ -267,9 +267,9 @@ proceeds.
 
 ## 12. Implementation checklist
 
-- [ ] `packages/omnibias-core/tests/test_theory_homes.py` with an empty
+- [x] `packages/omnibias-core/tests/test_theory_homes.py` with an empty
       `NEW_PACKAGES_ALLOWED`
-- [ ] Keep the assignment table current as specs move
+- [x] Keep the assignment table current as specs move
 - [x] Run Wave-0 falsifiers A6 (04-01 G2), A7 (05-01 G7), and A4 (05-02 G1/G2)
       before Wave 1+; A5 still pending
 - [x] Record A6, A7, and A4 falsifier outcomes in `theory/README.md` (all passed)
