@@ -5,8 +5,12 @@ is tanh **algebra**, not a collapse. A multi-kink sum is not the
 n-soliton formula (that is [transforms_pde.md](transforms_pde.md)).
 
 G1/G2/G3/G5 are CI-gated (published tanh-class list, exact rational
-zeros, 1e-14 residual, negative control). G4 init-win is `--full`.
-Status is **gated**, not shipped. See theory spec 02-09.
+zeros, 1e-14 residual, negative control). G4 PINN init-win (5× fewer
+steps vs cold start, five seeds) stays `--full` and is **unearned**:
+no training loop is wired. Algebraic `verify_exact` / `solve_ansatz`
+wall plus published-vs-cold residual L1 are **reported**; the previous
+untimed `passed=True` stub is withdrawn. Cost is not in CI
+`all_passed`. Status is **gated**, not shipped. See theory spec 02-09.
 
 ## Core algebra
 

@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Soliton tanh-method cost reported (theory 02-09)
+
+- `benchmarks/soliton_tanh_method.py` now times `verify_exact` /
+  `solve_ansatz` over the G1 list and records published-vs-cold
+  residual L1 on Burgers / KdV / mKdV.
+- Reported: algebraic wall is milliseconds. G4 PINN init-win (5x
+  fewer steps vs cold start) stays `--full` / unearned: no training
+  loop is wired. Previous untimed `passed=True` stub withdrawn. Not
+  in CI `all_passed`.
+- Smoke: `docs/benchmarks/soliton_tanh_method_smoke.json`.
+
+
 ### Added — Hermite-ladder cost reported (theory 02-10)
 
 - `benchmarks/hermite_ladder.py` now times exact `apply_ladder`

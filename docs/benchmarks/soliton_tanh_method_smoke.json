@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.soliton_tanh_method.v1",
-  "generated_utc": "2026-08-15T18:15:55Z",
+  "generated_utc": "2026-08-25T18:34:55Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,9 +11,14 @@
     "folx": "0.2.22"
   },
   "config": {
-    "mode": "smoke"
+    "mode": "smoke",
+    "cost_in_all_passed": false,
+    "gates_in_scope": [
+      "g1",
+      "g5"
+    ]
   },
-  "rss_mb_at_start": 821.41,
+  "rss_mb_at_start": 807.84,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -27,17 +32,52 @@
         "name": "g5_heat_negative",
         "passed": true,
         "in_ci_all_passed": true
-      },
-      {
-        "name": "g4_init_win",
-        "passed": true,
-        "in_ci_all_passed": false,
-        "note": "--full only; tanh algebra, not a collapse; multi-kink is not n-soliton"
       }
     ]
   },
+  "cost": {
+    "name": "cost_algebraic_vs_init_win",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
+    "verify_exact_wall_seconds": 0.00186199601739645,
+    "solve_ansatz_wall_seconds": 0.0019290309865027666,
+    "n_g1": 10,
+    "rows": [
+      {
+        "name": "burgers",
+        "published_residual_l1": 0.0,
+        "cold_residual_l1": 2.0
+      },
+      {
+        "name": "kdv",
+        "published_residual_l1": 0.0,
+        "cold_residual_l1": 132.0
+      },
+      {
+        "name": "mkdv",
+        "published_residual_l1": 0.0,
+        "cold_residual_l1": 36.0
+      }
+    ],
+    "g4_init_win": {
+      "earned": false,
+      "stays_full": true,
+      "need": "5x fewer PINN steps vs cold start on a perturbed problem, 5 seeds",
+      "reason": "No PINN training loop is wired. Algebraic verify_exact / solve_ansatz and residual L1 vs a same-degree cold ansatz are recorded; they are not the named 5x step-count win."
+    },
+    "note": "G1 algebraic wall plus published-vs-cold residual L1. G4 init-win is a 5-seed PINN study under $OMNIBIAS_SCRATCH, not CI. Previous g4_init_win passed=True / --full-only stub with no timing withdrawn. Tanh algebra, not a collapse. Not in CI all_passed."
+  },
   "honesty": {
     "algebra": "tanh polynomial, not a collapse",
-    "n_soliton": false
+    "n_soliton": false,
+    "temperature_collapse": false,
+    "founding_bias_collapse": false,
+    "g4_init_win_earned": false,
+    "g4_stays_full": true,
+    "cost_earned": false,
+    "cost_reported": true,
+    "cost_in_ci_all_passed": false
   }
 }

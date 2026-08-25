@@ -58,7 +58,7 @@ uv run python docs/img/generate_figures.py
 | `bem_net.py` | `docs/benchmarks/bem_net_smoke.json` | Gated 02-06: off-surface exact; BC approximated |
 | `pack_tree.py` | `docs/benchmarks/pack_tree_smoke.json` | Gated 02-07: 1-D offsets; G3 unearned (per-source Taylor, no dense crossover), not in CI `all_passed` |
 | `equivariant_scan.py` | `docs/benchmarks/equivariant_scan_smoke.json` | Gated 02-08: gaussian steering; discrete `C_L` |
-| `soliton_tanh_method.py` | `docs/benchmarks/soliton_tanh_method_smoke.json` | Gated 02-09: tanh algebra, not a collapse |
+| `soliton_tanh_method.py` | `docs/benchmarks/soliton_tanh_method_smoke.json` | Gated 02-09: tanh algebra; G4 init-win `--full`; algebraic cost reported |
 | `hermite_ladder.py` | `docs/benchmarks/hermite_ladder_smoke.json` | Gated 02-10: Rodrigues reweight; G4 many-body `--full`; exact-vs-FD reported |
 | `layered_transfer.py` | `docs/benchmarks/layered_transfer_smoke.json` | Gated 02-11: `continuum_claim=False` |
 | `equality_intersection.py` | `docs/benchmarks/equality_intersection_smoke.json` | Gated 02-12: not a general PDE solver |
