@@ -1,6 +1,6 @@
 {
   "schema": "weak-form-vpinn-v1",
-  "generated_utc": "2026-08-25T17:07:59Z",
+  "generated_utc": "2026-08-25T19:36:21Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -17,11 +17,13 @@
       "g1",
       "g2",
       "g3",
+      "g4",
       "g5"
     ],
-    "g4_is_unit_test": true
+    "g4_is_unit_test": false,
+    "g4_in_all_passed": true
   },
-  "rss_mb_at_start": 976.62,
+  "rss_mb_at_start": 1238.41,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -47,6 +49,18 @@
         "skill": 1.0,
         "n_seeds": 1,
         "note": "smoke uses 1 seed / closed-form ramp; --full repeats the same check"
+      },
+      {
+        "name": "g4_conditioning",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "cond_weak": 4.172567079811507,
+        "cond_strong": 1.412659850697933e+18,
+        "ratio_strong_over_weak": 3.385589311512636e+17,
+        "need": 10.0,
+        "note": "Weak stiffness (grad-grad quadrature) versus strong-form collocation (-v'') on the same TestFunctionSpace. Named G4 needs cond(strong)/cond(weak) >= 10. Previous g4_is_unit_test deferral withdrawn."
       },
       {
         "name": "g5_parity",
@@ -86,6 +100,18 @@
     "n_seeds": 1,
     "note": "smoke uses 1 seed / closed-form ramp; --full repeats the same check"
   },
+  "g4": {
+    "name": "g4_conditioning",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "cond_weak": 4.172567079811507,
+    "cond_strong": 1.412659850697933e+18,
+    "ratio_strong_over_weak": 3.385589311512636e+17,
+    "need": 10.0,
+    "note": "Weak stiffness (grad-grad quadrature) versus strong-form collocation (-v'') on the same TestFunctionSpace. Named G4 needs cond(strong)/cond(weak) >= 10. Previous g4_is_unit_test deferral withdrawn."
+  },
   "g5": {
     "name": "g5_parity",
     "passed": true,
@@ -103,6 +129,12 @@
     "exact_only_for_polynomial_on_boxes": true,
     "boundary_terms_dropped": false,
     "boundary_bound_default_on": true,
-    "sdf_domains_claimed": false
+    "sdf_domains_claimed": false,
+    "g4_earned": true,
+    "g4_reported": true,
+    "g4_in_ci_all_passed": true,
+    "g4_is_unit_test": false,
+    "founding_bias_collapse": true,
+    "temperature_collapse": false
   }
 }

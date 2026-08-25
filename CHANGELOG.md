@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Weak-form VPINN G4 conditioning earned (theory 02-04)
+
+- `benchmarks/weak_form_vpinn.py` now measures `cond` of the weak
+  stiffness matrix versus strong-form collocation on the named
+  `TestFunctionSpace`.
+- Earned: strong/weak ratio `~3.4e17` (need `10x`). Previous
+  `g4_is_unit_test` deferral withdrawn. In CI `all_passed`.
+- Smoke: `docs/benchmarks/weak_form_vpinn_smoke.json`.
+
+
 ### Added — Holonomy-band G4 gauge covariance reported (theory 02-14)
 
 - `benchmarks/holonomy_band.py` now records the open-line flag, that

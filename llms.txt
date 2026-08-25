@@ -47,7 +47,7 @@ driver; 02-02 G3 vs k-NN reported, GNN / RegionModels
 per-layer on-lattice equivariance, not `R^D`; G1–G3/G5 CI), `JetKAN` (02-03; exactness
 of the model jet; KA theorem does not justify; G2 unearned), `omnibias.fields.weak`
 (02-04; exact integrals only for polynomial coeffs on boxes; boundary
-bound on by default), `omnibias.pinn.interface` (02-05; `alpha -> inf` is
+bound on by default; G4 conditioning earned), `omnibias.pinn.interface` (02-05; `alpha -> inf` is
 interface sharpening, neither collapse; parallel interfaces only; not the
 XPINN `omnibias.pinn._core.interface`), BEM-Net / pack tree / equivariant
 scan / tanh-method / Hermite ladder / layered transfer / named linearizing

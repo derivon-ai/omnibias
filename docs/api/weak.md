@@ -9,9 +9,11 @@ the IBP primitive by `1/alpha`. The certified boundary bound from
 not compactly supported, so boundary terms are never dropped. SDF
 domains stay quadrature-near-boundary and are not claimed.
 
-G1/G2/G3/G5 are CI-gated. G4 (condition number) is a unit test on the
-discrete matrix. Status is **gated**, not shipped. See theory spec
-02-04.
+G1–G5 are CI-gated. G4 conditioning is **earned** on the smoke
+artifact: `cond(strong collocation) / cond(weak stiffness)` is far
+above `10x` on the named `TestFunctionSpace`. Previous
+`g4_is_unit_test` deferral is withdrawn. Status is **gated**, not
+shipped. See theory spec 02-04.
 
 ## Algebra
 
