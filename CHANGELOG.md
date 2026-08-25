@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-KAN G2 recorded unearned (theory 02-03)
+
+- `benchmarks/jetkan.py` G2 now times an order-6 directional jet against
+  nested 1-D autodiff of the same restriction at depth `L=3`, warmup +
+  median of 5.
+- Unearned: autodiff/jet `~2.26` (need `5x`). Previous depth-2 / order-4
+  / no-warmup stub withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/jetkan_smoke.json`.
+
+
 ### Added — Adaptive-refinement G4 earned (theory 03-13)
 
 - `benchmarks/adaptive_refinement.py` G4 now births through

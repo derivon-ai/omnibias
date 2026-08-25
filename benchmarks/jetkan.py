@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-3 architecture: Jet-KAN (theory 02-03 G1/G3/G5; G2 cost not CI-gated).
+"""Wave-3 architecture: Jet-KAN (theory 02-03 G1/G3/G5; G2 cost unearned).
 
 Exactness is of the **model jet**, not the target. A cubic spline's 4th
 derivative is identically zero; Jet-KAN's is finite. The Kolmogorov-Arnold
@@ -24,6 +24,13 @@ from _common import provenance, write_json  # type: ignore[import-not-found]  # 
 from _gates import gates_block, rel_l2  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
+
+# G2: one-pass N=6 jet vs repeated autodiff at depth L=3, need 5x.
+G2_WIDTHS = (2, 2, 2, 1)
+G2_ORDER = 6
+G2_RATIO_MIN = 5.0
+G2_WARMUP = 2
+G2_REPEATS = 5
 
 
 def _ulp_error(a: float, b: float) -> float:
@@ -132,41 +139,75 @@ def _additive_design(x1: np.ndarray, x2: np.ndarray) -> tuple[np.ndarray, np.nda
     return phi, spline
 
 
+def _median_seconds(fn: Any, *, warmup: int, repeats: int) -> float:
+    for _ in range(int(warmup)):
+        fn()
+    samples: list[float] = []
+    for _ in range(int(repeats)):
+        t0 = time.perf_counter()
+        fn()
+        samples.append(time.perf_counter() - t0)
+    return float(np.median(np.asarray(samples, dtype=np.float64)))
+
+
 def _run_g2() -> dict[str, Any]:
+    """Named G2: order-6 jet vs order-6 autodiff at depth L=3.
+
+    The previous record timed a depth-2 net and only four nested grads,
+    with no warmup. That is not the named gate.
+    """
     import torch
     from omnibias.torch.architectures.jetkan import JetKAN, JetKANConfig
 
     torch.set_default_dtype(torch.float64)
-    cfg = JetKANConfig(widths=(2, 2, 1), packs_per_edge=2, extra_packs=0, orders=(0, 1))
+    cfg = JetKANConfig(
+        widths=G2_WIDTHS,
+        packs_per_edge=2,
+        extra_packs=0,
+        orders=(0, 1),
+        growable=False,
+    )
     net = JetKAN(cfg, dtype=torch.float64)
+    net.eval()
     x0 = torch.tensor([0.2, -0.1], dtype=torch.float64)
-    v = torch.tensor([0.6, 0.8], dtype=torch.float64)
-    t0 = time.perf_counter()
-    _ = net.jet(x0, order=6, direction=v)
-    jet_s = time.perf_counter() - t0
-    x = x0.detach().clone().requires_grad_(True)
+    direction = torch.tensor([0.6, 0.8], dtype=torch.float64)
 
-    def _value(z: torch.Tensor) -> torch.Tensor:
-        return net(z.unsqueeze(0)).reshape(())
+    def _jet() -> None:
+        net.jet(x0, order=G2_ORDER, direction=direction)
 
-    t1 = time.perf_counter()
-    y = _value(x)
-    g = torch.autograd.grad(y, x, create_graph=True)[0]
-    # Nested autodiff along v up to a few orders (smoke timing, not all_passed).
-    directional = (g * v).sum()
-    for _ in range(3):
-        directional = torch.autograd.grad(directional, x, create_graph=True)[0]
-        directional = (directional * v).sum()
-    ad_s = time.perf_counter() - t1
+    def _autodiff() -> None:
+        def phi(step: torch.Tensor) -> torch.Tensor:
+            return net((x0 + step * direction).unsqueeze(0)).reshape(())
+
+        step = torch.zeros((), dtype=torch.float64, requires_grad=True)
+        current = phi(step)
+        for _ in range(G2_ORDER):
+            current = torch.autograd.grad(current, step, create_graph=True)[0]
+
+    jet_s = _median_seconds(_jet, warmup=G2_WARMUP, repeats=G2_REPEATS)
+    ad_s = _median_seconds(_autodiff, warmup=G2_WARMUP, repeats=G2_REPEATS)
     ratio = ad_s / max(jet_s, 1e-12)
+    earned = bool(ratio >= G2_RATIO_MIN)
     return {
         "name": "g2_jet_cost",
-        "passed": False,
+        "passed": bool(earned),
+        "earned": bool(earned),
         "in_ci_all_passed": False,
         "jet_seconds": jet_s,
         "autodiff_seconds": ad_s,
-        "autodiff_over_jet": ratio,
-        "note": "jet vs autodiff timing smoke-earned, not in CI all_passed",
+        "autodiff_over_jet": float(ratio),
+        "expected": G2_RATIO_MIN,
+        "order": G2_ORDER,
+        "widths": list(G2_WIDTHS),
+        "depth": len(G2_WIDTHS) - 1,
+        "warmup": G2_WARMUP,
+        "repeats": G2_REPEATS,
+        "note": (
+            "Median wall of an order-6 directional jet vs nested 1-D "
+            "autodiff of the same restriction at L=3. Previous "
+            "depth-2 / order-4 / no-warmup stub withdrawn. Not in CI "
+            "all_passed."
+        ),
     }
 
 
@@ -262,8 +303,12 @@ def main() -> int:
     payload["honesty"] = {
         "ka_theorem_justifies_architecture": False,
         "exactness_is_model_jet": True,
+        "g2_earned": bool(g2["earned"]),
         "g2_in_ci_all_passed": False,
+        "g2_compares_order6_to_order6": True,
         "full_pack_birth_death_03_13": False,
+        "founding_bias_collapse": True,
+        "temperature_collapse": False,
     }
     if args.full:
         out_dir = SCRATCH / "jetkan"

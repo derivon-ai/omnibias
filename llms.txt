@@ -41,7 +41,7 @@ package), conjugate Hilbert (01-12; line only; G5 not `all_passed`),
 arrangement / tropical / Face-Net (01-03 / 01-08 / 02-02; temperature
 collapse, sampled subgraph, sound gap not P vs NP), `ScanNet` (02-01;
 per-layer on-lattice equivariance, not `R^D`; G1–G3/G5 CI), `JetKAN` (02-03; exactness
-of the model jet; KA theorem does not justify), `omnibias.fields.weak`
+of the model jet; KA theorem does not justify; G2 unearned), `omnibias.fields.weak`
 (02-04; exact integrals only for polynomial coeffs on boxes; boundary
 bound on by default), `omnibias.pinn.interface` (02-05; `alpha -> inf` is
 interface sharpening, neither collapse; parallel interfaces only; not the

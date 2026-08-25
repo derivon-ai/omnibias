@@ -1,6 +1,6 @@
 {
   "schema": "jetkan-v1",
-  "generated_utc": "2026-08-15T10:08:56Z",
+  "generated_utc": "2026-08-25T18:05:03Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "g5"
     ]
   },
-  "rss_mb_at_start": 1302.6,
+  "rss_mb_at_start": 1272.44,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -62,11 +62,23 @@
   "g2": {
     "name": "g2_jet_cost",
     "passed": false,
+    "earned": false,
     "in_ci_all_passed": false,
-    "jet_seconds": 0.009641258977353573,
-    "autodiff_seconds": 0.03902299504261464,
-    "autodiff_over_jet": 4.047499930691215,
-    "note": "jet vs autodiff timing smoke-earned, not in CI all_passed"
+    "jet_seconds": 0.01723090000450611,
+    "autodiff_seconds": 0.038935779011808336,
+    "autodiff_over_jet": 2.259648596511274,
+    "expected": 5.0,
+    "order": 6,
+    "widths": [
+      2,
+      2,
+      2,
+      1
+    ],
+    "depth": 3,
+    "warmup": 2,
+    "repeats": 5,
+    "note": "Median wall of an order-6 directional jet vs nested 1-D autodiff of the same restriction at L=3. Previous depth-2 / order-4 / no-warmup stub withdrawn. Not in CI all_passed."
   },
   "g3": {
     "name": "g3_fit_parity",
@@ -84,7 +96,11 @@
   "honesty": {
     "ka_theorem_justifies_architecture": false,
     "exactness_is_model_jet": true,
+    "g2_earned": false,
     "g2_in_ci_all_passed": false,
-    "full_pack_birth_death_03_13": false
+    "g2_compares_order6_to_order6": true,
+    "full_pack_birth_death_03_13": false,
+    "founding_bias_collapse": true,
+    "temperature_collapse": false
   }
 }
