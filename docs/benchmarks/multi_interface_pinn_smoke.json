@@ -1,6 +1,6 @@
 {
   "schema": "multi-interface-pinn-v1",
-  "generated_utc": "2026-08-25T19:42:01Z",
+  "generated_utc": "2026-08-25T19:47:24Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -16,12 +16,12 @@
     "gates_in_scope": [
       "g1",
       "g2",
-      "g4",
       "g5"
     ],
-    "g3_in_all_passed": false
+    "g3_in_all_passed": false,
+    "g4_in_all_passed": false
   },
-  "rss_mb_at_start": 1278.17,
+  "rss_mb_at_start": 1278.87,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -65,12 +65,6 @@
           0.20794415416798273,
           0.20794415416798273
         ]
-      },
-      {
-        "name": "g4_hard_vs_penalized",
-        "passed": true,
-        "hard_residual": 1.3504219453785993e-07,
-        "zero_coeff_residual": 0.6
       },
       {
         "name": "g5_parity",
@@ -139,9 +133,19 @@
   },
   "g4": {
     "name": "g4_hard_vs_penalized",
-    "passed": true,
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
     "hard_residual": 1.3504219453785993e-07,
-    "zero_coeff_residual": 0.6
+    "zero_coeff_residual": 0.6,
+    "hard_below_1e_6": true,
+    "zero_coeff_worse": true,
+    "training_loop": false,
+    "equal_budget": false,
+    "stays_full": true,
+    "need": "hard residual at smoothing floor; soft worse at equal training budget",
+    "note": "Hard MultiInterfaceField residual versus a zero-coeff soft field. Named G4 needs hard residuals at the smoothing-error floor with no interface loss term, and hard=False strictly worse at equal training budget. That training loop is not wired. Previous g4_hard_vs_penalized passed=True zero-coeff stub withdrawn. Not in CI all_passed."
   },
   "g5": {
     "name": "g5_parity",
@@ -157,6 +161,11 @@
     "g3_reported": true,
     "g3_in_ci_all_passed": false,
     "g3_training_loop": false,
+    "g4_earned": false,
+    "g4_reported": true,
+    "g4_in_ci_all_passed": false,
+    "g4_training_loop": false,
+    "g4_equal_budget": false,
     "temperature_collapse": false,
     "founding_bias_collapse": false
   }

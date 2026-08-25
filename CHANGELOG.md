@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Multi-interface G4 equal-budget reported (theory 02-05)
+
+- `benchmarks/multi_interface_pinn.py` now records the hard residual
+  versus a zero-coeff soft field (`hard ~1.35e-7`, soft `0.6`).
+- Reported: named G4 needs hard residuals at the smoothing-error floor
+  with no interface loss term, and `hard=False` strictly worse at
+  equal training budget. That training loop is not wired. Previous
+  `passed=True` zero-coeff stub withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/multi_interface_pinn_smoke.json`.
+
+
 ### Added — Multi-interface G3 bake-off reported (theory 02-05)
 
 - `benchmarks/multi_interface_pinn.py` now records mixed-condition

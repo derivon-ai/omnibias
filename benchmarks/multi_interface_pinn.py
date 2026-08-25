@@ -5,7 +5,9 @@
 ``alpha -> inf`` is interface sharpening, neither collapse. Parallel
 interfaces only. Conditions hold to a stated smoothing tolerance.
 G3 versus PartitionedField / FBPINN / MLP is reported unearned: smoke
-is a linear stand-in, not a training bake-off.
+is a linear stand-in, not a training bake-off. G4 hard versus
+penalized is reported unearned: smoke is zero-coeff soft, not an
+equal-budget train.
 """
 
 from __future__ import annotations
@@ -144,6 +146,7 @@ def _run_g3() -> dict[str, Any]:
 
 
 def _run_g4() -> dict[str, Any]:
+    """Named leftover: hard residual vs zero-coeff soft; equal budget stays --full."""
     import torch
     from omnibias.pinn.interface import Interface
     from omnibias.pinn.interface.torch import MultiInterfaceField
@@ -159,9 +162,26 @@ def _run_g4() -> dict[str, Any]:
     soft_r = abs(float(soft.interface_residuals(x)[0].detach()))
     return {
         "name": "g4_hard_vs_penalized",
-        "passed": bool(hard_r < 1e-6 and soft_r > hard_r),
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
         "hard_residual": hard_r,
         "zero_coeff_residual": soft_r,
+        "hard_below_1e_6": bool(hard_r < 1e-6),
+        "zero_coeff_worse": bool(soft_r > hard_r),
+        "training_loop": False,
+        "equal_budget": False,
+        "stays_full": True,
+        "need": "hard residual at smoothing floor; soft worse at equal training budget",
+        "note": (
+            "Hard MultiInterfaceField residual versus a zero-coeff soft "
+            "field. Named G4 needs hard residuals at the smoothing-error "
+            "floor with no interface loss term, and hard=False strictly "
+            "worse at equal training budget. That training loop is not "
+            "wired. Previous g4_hard_vs_penalized passed=True zero-coeff "
+            "stub withdrawn. Not in CI all_passed."
+        ),
     }
 
 
@@ -204,14 +224,15 @@ def main() -> int:
     g3 = _run_g3()
     g4 = _run_g4()
     g5 = _run_g5()
-    in_scope = [g1, g2, g4, g5]
+    in_scope = [g1, g2, g5]
     payload = provenance(
         schema="multi-interface-pinn-v1",
         config={
             "family": "multi_interface_pinn",
             "full": bool(args.full),
-            "gates_in_scope": ["g1", "g2", "g4", "g5"],
+            "gates_in_scope": ["g1", "g2", "g5"],
             "g3_in_all_passed": False,
+            "g4_in_all_passed": False,
         },
     )
     payload["gates"] = gates_block(in_scope)
@@ -229,6 +250,11 @@ def main() -> int:
         "g3_reported": True,
         "g3_in_ci_all_passed": False,
         "g3_training_loop": False,
+        "g4_earned": False,
+        "g4_reported": True,
+        "g4_in_ci_all_passed": False,
+        "g4_training_loop": False,
+        "g4_equal_budget": False,
         "temperature_collapse": False,
         "founding_bias_collapse": False,
     }

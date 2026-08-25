@@ -11,13 +11,16 @@ Import `Interface` from `omnibias.pinn.interface` (alias
 `omnibias.pinn._core.interface.Interface` — that is the XPINN penalty
 glue between subnetworks.
 
-G1/G2/G4/G5 are CI-gated. G3 accuracy is **reported** unearned: the
-smoke measures `MultiInterfaceField` on a mixed-condition three-layer
-versus a linear stand-in, but named G3 needs a matched-parameter
-bake-off against `PartitionedField`, `FBPINNField`, and a plain MLP
-over five seeds. That training loop is not wired. Previous
-`passed=True` stand-in stub withdrawn. G3 is not in CI `all_passed`.
-Status is **gated**, not shipped. See theory spec 02-05.
+G1/G2/G5 are CI-gated. G3 accuracy is **reported** unearned: the smoke
+measures `MultiInterfaceField` on a mixed-condition three-layer versus
+a linear stand-in, but named G3 needs a matched-parameter bake-off
+against `PartitionedField`, `FBPINNField`, and a plain MLP over five
+seeds. G4 hard versus penalized is **reported** unearned: the smoke
+measures a hard residual versus a zero-coeff soft field, but named G4
+needs an equal-budget train. Those training loops are not wired.
+Previous `passed=True` stand-in stubs withdrawn. G3 and G4 are not in
+CI `all_passed`. Status is **gated**, not shipped. See theory spec
+02-05.
 
 ## Algebra
 
