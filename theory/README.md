@@ -174,7 +174,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | gated | Claim ladder + forbidden-claims register; guards in core tests |
 | [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | gated | Homes guard: every spec names an existing package; allowlist empty |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | Monograph spine only; no `book/` tree; drafting still forbidden |
-| [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | designed | Publish-and-use order for the shipped object; CCF and Group 09 are not the public face |
+| [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | gated | Publish-and-use order for the shipped object; extract stays later; CCF and Group 09 are not the public face |
 
 ### 07 Frontier sub-obligations
 

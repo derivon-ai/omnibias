@@ -8,7 +8,7 @@ in which to **publish and use** that object so it can be addressed
 later without being mistaken for Group 09 inventions, a CCF residual,
 or a prize claim.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 06-01, 06-02, 09-01
 - **Blocks**: none
 
@@ -48,7 +48,7 @@ installable artifact is a later implementation PR, not this spec.
 - `omnibias.{torch,jax}.jet` — `compose_jet`, `layer_jet`, `mlp_jet`.
 - `omnibias.{torch,jax}.optim.GaussNewton` — exact-J residual steps
   on a local operator.
-- Spec 01-11 — rational collapse weights, Lean-checkable (designed).
+- Spec 01-11 — rational collapse weights, Lean-checkable (gated).
 - `formal/omnibias-verified-kernel` — finite rational `ZInterval`.
 - Spec 09-01 — inventions are **not** this path.
 - Spec 07-03 / 08-01 — CCF stretch is an operator gate; Hilbert floor
@@ -238,7 +238,8 @@ No CI job for this document.
 ## 12. Implementation checklist
 
 - [x] `theory/06-program/05-public-primitive-and-citation-path.md`
-      (this file)
+      (this file); document gates G1–G5 earned by
+      `test_theory_citation_path.py`
 - [ ] Later: freeze / extract `PUBLIC_SURFACE` as an installable
       artifact (not this pass)
 - [ ] Later: algebra + complexity + bit-identity paper
