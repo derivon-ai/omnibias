@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Conjugate Hilbert G5 leftover-recorded (theory 01-12)
+
+- Leftover #11's CCF capacity miss now leftover-records `reported` plus
+  honesty flags on `benchmarks/conjugate_hilbert.py`.
+- Reported: matched-width residual ratio `0.978` (need `10x`); N=0 is
+  best. Not a stretch-gate clearing. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/conjugate_hilbert_smoke.json`.
+
+
 ### Added — OMBU frames G4 leftover-recorded (theory 01-06)
 
 - Leftover #10's denoising miss now leftover-records `reported` plus

@@ -166,6 +166,7 @@ def _run_g5_capacity_record() -> dict[str, Any]:
         "name": "g5_dictionary_capacity",
         "passed": False,
         "earned": False,
+        "reported": True,
         "source": "docs/benchmarks/ccf_conjugate_sweep_smoke.json",
         "n0_dense_max_abs": n0,
         "matched_width_dense_max_abs": matched,
@@ -204,6 +205,8 @@ def main() -> int:
         "clears_ccf_stretch_gate": False,
         "g5_in_all_passed": False,
         "g5_earned": False,
+        "g5_reported": True,
+        "g5_in_ci_all_passed": False,
         "g5_is_ccf_profile_not_synthetic": True,
     }
     name = "conjugate_hilbert_smoke.json"

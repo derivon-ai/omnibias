@@ -39,7 +39,7 @@ admissible; G4 reported), `EqualitySystem` / `EqualityLocusLayer` (01-09 / 02-12
 constraint manifold, not a PDE solver; 02-12 G4 Burgers RH reported,
 noisy contour `--full`), jet vocabulary (01-10; not a
 package; G1–G3 earned), packaging homes (06-03; G1–G5 earned, allowlist
-empty, 93/93 specs, Wave-0 A4–A7 recorded; G4/G5 vacuous, not promoted), conjugate Hilbert (01-12; line only; G5 not `all_passed`),
+empty, 93/93 specs, Wave-0 A4–A7 recorded; G4/G5 vacuous, not promoted), conjugate Hilbert (01-12; line only; G5 reported, not `all_passed`),
 arrangement / tropical / Face-Net (01-03 / 01-08 / 02-02; temperature
 collapse, sampled subgraph, sound gap not P vs NP; 01-03 / 01-08 / 02-02
 cost vs n/D reported; 01-08 G4 path-following reported, no anneal

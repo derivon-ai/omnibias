@@ -47,6 +47,7 @@
     "name": "g5_dictionary_capacity",
     "passed": false,
     "earned": false,
+    "reported": true,
     "source": "docs/benchmarks/ccf_conjugate_sweep_smoke.json",
     "n0_dense_max_abs": 0.0856715478179377,
     "matched_width_dense_max_abs": 0.08757518307761564,
@@ -73,6 +74,8 @@
     "clears_ccf_stretch_gate": false,
     "g5_in_all_passed": false,
     "g5_earned": false,
+    "g5_reported": true,
+    "g5_in_ci_all_passed": false,
     "g5_is_ccf_profile_not_synthetic": true
   }
 }
