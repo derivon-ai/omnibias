@@ -488,7 +488,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13) /
   `omnibias.geometry.gauge.band` (02-14; abelian + transverse-constant;
   no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02; sampled
-  subgraph) / `omnibias.core.line_search` /
+  subgraph; cost vs n/D reported) / `omnibias.core.line_search` /
   `omnibias.{torch,jax}.line_search` (03-12; certified Lagrange radius +
   `verify=True` never-worse; G4 unearned vs strong Wolfe, G5 crossover
   reported, not in CI `all_passed`) /

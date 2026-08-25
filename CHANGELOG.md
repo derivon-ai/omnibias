@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Face-Net cost reported (theory 02-02)
+
+- `benchmarks/arrangement_graph.py` now times sampled
+  `build_arrangement_graph` versus `n` in `{4,6,8,12}` at `D=2,3`
+  (400 points; warmup + median).
+- Reported: G1 tooling cutoff `n<=12`, `D<=4`. Previous untimed G4
+  smoke-earned stub withdrawn. G3 vs k-NN stays smoke/`--full`. Not
+  in CI `all_passed`.
+- Smoke: `docs/benchmarks/arrangement_graph_smoke.json`.
+
+
 ### Added — Tropical homotopy cost reported (theory 01-08)
 
 - `benchmarks/tropical_homotopy.py` now times sampled `dual_subdivision`
