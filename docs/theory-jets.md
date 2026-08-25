@@ -3,7 +3,9 @@
 This page is a **dictionary**, not a discovery. It names what omnibias
 already computes. There is no `omnibias-jetbundle` package.
 
-Status is **gated** (the two contact tests). Founding `delta -> 0`
+Status is **gated**. G1/G2 contact tests are **earned** on
+[`jet_bundle_smoke.json`](benchmarks/jet_bundle_smoke.json). G3
+vocabulary coverage is not in CI `all_passed`. Founding `delta -> 0`
 produces fiber coordinates. Temperature collapse (`beta -> inf`) acts
 on the base stratification, not on the fiber.
 

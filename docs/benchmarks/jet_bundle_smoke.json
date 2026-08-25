@@ -1,0 +1,104 @@
+{
+  "schema": "omnibias.benchmark.jet_bundle.v1",
+  "generated_utc": "2026-08-25T19:53:42Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "jet_bundle",
+    "full": false,
+    "gates_in_scope": [
+      "g1_contact",
+      "g2_rate"
+    ],
+    "g3_in_all_passed": false
+  },
+  "rss_mb_at_start": 807.61,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_contact",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "n_cases": 220,
+        "n_holonomic_true": 220,
+        "n_corrupted_false": 220,
+        "n_misclass": 0,
+        "need": 200,
+        "note": "is_holonomic on genuine tanh / Gauss / polynomial / exp prolongations versus first-derivative overwrite. Named G1 needs >= 200 of each class and zero misclassifications."
+      },
+      {
+        "name": "g2_rate",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "holonomic_ratios": [
+          0.2500276492225453,
+          0.25001380044924915,
+          0.25000689437041423
+        ],
+        "corrupted_ratios": [
+          0.5,
+          0.5,
+          0.5
+        ],
+        "need": "holonomic ~1/4 and corrupted ~1/2 over three halvings",
+        "note": "Contact residual of tanh versus first-derivative overwrite over three halvings of h. Same named path as G1."
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_contact",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "n_cases": 220,
+    "n_holonomic_true": 220,
+    "n_corrupted_false": 220,
+    "n_misclass": 0,
+    "need": 200,
+    "note": "is_holonomic on genuine tanh / Gauss / polynomial / exp prolongations versus first-derivative overwrite. Named G1 needs >= 200 of each class and zero misclassifications."
+  },
+  "g2": {
+    "name": "g2_rate",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "holonomic_ratios": [
+      0.2500276492225453,
+      0.25001380044924915,
+      0.25000689437041423
+    ],
+    "corrupted_ratios": [
+      0.5,
+      0.5,
+      0.5
+    ],
+    "need": "holonomic ~1/4 and corrupted ~1/2 over three halvings",
+    "note": "Contact residual of tanh versus first-derivative overwrite over three halvings of h. Same named path as G1."
+  },
+  "honesty": {
+    "reformulation_not_discovery": true,
+    "omnibias_jetbundle_package": false,
+    "founding_bias_collapse": true,
+    "temperature_collapse": false,
+    "g1_earned": true,
+    "g1_in_ci_all_passed": true,
+    "g2_earned": true,
+    "g2_in_ci_all_passed": true,
+    "g3_earned": false,
+    "certificate_tier": false
+  }
+}

@@ -472,7 +472,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.spectral_design` (01-07; pack order is a band selector) /
   `omnibias.core.frames` (01-06; `sigma'` not admissible) /
   `omnibias.core.locus` (01-09; constraint manifold, not a PDE solver) /
-  `omnibias.core.jets` (01-10; vocabulary / contact test, not a package) /
+  `omnibias.core.jets` (01-10; vocabulary / contact test, not a package; G1/G2 earned) /
   `omnibias.core.conjugate` (01-12; line Hilbert; G5 unearned, not `all_passed`) /
   `omnibias.partition.arrangement` (01-03; temperature collapse; cost vs n/D reported) /
   `omnibias.struct._core.tropical` (01-08; reuses `logsumexp_gap_bound`; G4 path-following reported, no anneal driver; cost vs n/D reported) /

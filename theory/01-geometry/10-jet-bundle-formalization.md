@@ -8,7 +8,7 @@ scan is **translation along the base**, an arrangement is a **stratification**,
 and an equality locus is a **fiber-product subvariety**. Fixing this vocabulary
 is what keeps fifty specs from inventing fifty ontologies.
 
-- **Status**: gated (contact tests; vocabulary, not a discovery; no `omnibias-jetbundle` package)
+- **Status**: gated (contact tests; vocabulary, not a discovery; no `omnibias-jetbundle` package; G1/G2 **earned** on `jet_bundle` smoke — 220/220 classifications, residual rates `~1/4` vs `~1/2`; G3 vocabulary not in CI `all_passed`)
 - **Depends on**: 01-01, 01-02, 01-03, 01-05, 01-09
 - **Blocks**: 02-14, 03-11, 04-01, 06-04
 
@@ -210,7 +210,8 @@ two small tests:
 ## 9. Benchmark plan
 
 No performance benchmark. The two tests above live in
-`packages/omnibias-core/tests/test_jets_contact.py`.
+`packages/omnibias-core/tests/test_jets_contact.py`. Smoke:
+`benchmarks/jet_bundle.py` / `docs/benchmarks/jet_bundle_smoke.json`.
 
 ## 10. Honesty and scope
 
@@ -239,10 +240,11 @@ No performance benchmark. The two tests above live in
 
 ## 12. Implementation checklist
 
-- [ ] `docs/theory-jets.md` with the dictionary table and the contact discussion
-- [ ] `packages/omnibias-core/src/omnibias/core/jets.py` with the two test helpers
-- [ ] `packages/omnibias-core/tests/test_jets_contact.py`
+- [x] `docs/theory-jets.md` with the dictionary table and the contact discussion
+- [x] `packages/omnibias-core/src/omnibias/core/jets.py` with the two test helpers
+- [x] `packages/omnibias-core/tests/test_jets_contact.py`
 - [ ] Chapter slot in spec 06-04
-- [ ] Terminology reconciliation during the consistency pass
-- [ ] mkdocs nav entry
-- [ ] Index row in `theory/README.md`
+- [ ] Terminology reconciliation during the consistency pass (G3)
+- [x] mkdocs nav entry
+- [x] Index row in `theory/README.md`
+- [x] `benchmarks/jet_bundle.py` plus smoke JSON (G1/G2 earned)

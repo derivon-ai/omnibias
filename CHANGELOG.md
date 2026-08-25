@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-bundle G1/G2 contact earned (theory 01-10)
+
+- `benchmarks/jet_bundle.py` now runs `is_holonomic` on 220 genuine
+  versus corrupted towers, and the three-halving residual rate test.
+- Earned: 220/220 classifications, zero misclassifications;
+  holonomic ratios `~0.25`, corrupted `0.5`. Previous unit-test-only
+  contact gate now has a smoke artifact. In CI `all_passed`. G3
+  vocabulary stays later.
+- Smoke: `docs/benchmarks/jet_bundle_smoke.json`.
+
+
 ### Added — Multi-interface G4 equal-budget reported (theory 02-05)
 
 - `benchmarks/multi_interface_pinn.py` now records the hard residual
