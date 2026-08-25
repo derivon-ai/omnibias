@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""OMBU wavelet frames G1–G3 (theory 01-06). G4 is smoke-earned."""
+"""OMBU wavelet frames G1–G3 (theory 01-06). G4 denoising is unearned."""
 
 from __future__ import annotations
 

@@ -1,6 +1,13 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Gated primitive: OMBU frames (theory 01-06). G4 denoising is smoke-earned."""
+"""Gated primitive: OMBU frames (theory 01-06). G4 denoising is unearned.
+
+G1/G2 are CI-gated. G3 lives in ``test_frames.py``. G4 is recorded and
+**not** in CI ``all_passed``: the order-2 bank beats a matched-cost
+order-1 Gaussian-derivative bank in MSE, but skill versus the noisy
+identity is negative on all five seeds. ``sigma'`` is not admissible;
+frames are not orthonormal and not compactly supported.
+"""
 
 from __future__ import annotations
 
@@ -19,22 +26,20 @@ SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
 
 def _g4_denoising() -> dict[str, Any]:
+    """Order-2 bank vs matched-cost n=1; skill vs identity. Not CI-gated."""
     import numpy as np
     from omnibias.core.frames import dilated_sigma_n
 
-    rng = np.random.default_rng(0)
     xs = np.linspace(-4.0, 4.0, 256)
     trend = 0.3 * xs**2
     bump = np.exp(-((xs - 0.7) ** 2) / (2 * 0.05**2))
     signal = trend + bump
-    noise = 0.05 * rng.normal(size=xs.shape)
-    y = signal + noise
     # Order-2 gaussian bank vs matched-cost gaussian-derivative (n=1, not admissible).
     scales = (0.4, 0.8, 1.6)
-
     offsets = np.linspace(-3.0, 3.0, 17)
+    seeds = (0, 1, 2, 3, 4)
 
-    def recon(order: int) -> np.ndarray:
+    def recon(order: int, y: np.ndarray) -> np.ndarray:
         cols = []
         for a in scales:
             for b in offsets:
@@ -46,24 +51,54 @@ def _g4_denoising() -> dict[str, Any]:
         # Polynomials of degree < 2 (annihilated by admissible n=2 atoms).
         cols.append(np.ones_like(xs))
         cols.append(xs)
-        a = np.stack(cols, axis=1)
-        coef, *_ = np.linalg.lstsq(a, y, rcond=None)
-        return a @ coef
+        design = np.stack(cols, axis=1)
+        coef, *_ = np.linalg.lstsq(design, y, rcond=None)
+        return design @ coef
 
-    pred_n2 = recon(2)
-    pred_n1 = recon(1)
-    mse_n2 = float(np.mean((pred_n2 - signal) ** 2))
-    mse_n1 = float(np.mean((pred_n1 - signal) ** 2))
-    mse_id = float(np.mean((y - signal) ** 2))
-    skill = 1.0 - mse_n2 / max(mse_id, 1e-30)
+    rows: list[dict[str, float]] = []
+    for seed in seeds:
+        rng = np.random.default_rng(seed)
+        y = signal + 0.05 * rng.normal(size=xs.shape)
+        pred_n2 = recon(2, y)
+        pred_n1 = recon(1, y)
+        mse_n2 = float(np.mean((pred_n2 - signal) ** 2))
+        mse_n1 = float(np.mean((pred_n1 - signal) ** 2))
+        mse_id = float(np.mean((y - signal) ** 2))
+        skill = 1.0 - mse_n2 / max(mse_id, 1e-30)
+        rows.append(
+            {
+                "seed": float(seed),
+                "mse_order2": mse_n2,
+                "mse_order1": mse_n1,
+                "skill_vs_identity": skill,
+                "beats_n1": float(mse_n2 < mse_n1),
+                "skill_positive": float(skill > 0.0),
+            }
+        )
+    beats = sum(1 for r in rows if r["beats_n1"] >= 1.0)
+    skill_wins = sum(1 for r in rows if r["skill_positive"] >= 1.0)
+    earned = beats == len(rows) and skill_wins == len(rows)
     return {
         "name": "g4_denoising",
-        "passed": True,
-        "mse_order2": mse_n2,
-        "mse_order1": mse_n1,
-        "beats_n1": mse_n2 < mse_n1,
-        "skill_vs_identity": skill,
+        "passed": False,
+        "earned": False,
+        "mse_order2": float(np.median([r["mse_order2"] for r in rows])),
+        "mse_order1": float(np.median([r["mse_order1"] for r in rows])),
+        "beats_n1": beats == len(rows),
+        "beats_n1_wins": int(beats),
+        "skill_vs_identity": float(np.median([r["skill_vs_identity"] for r in rows])),
+        "skill_positive_wins": int(skill_wins),
+        "n_seeds": len(rows),
+        "per_seed": rows,
         "in_ci_all_passed": False,
+        "note": (
+            "order-2 beats matched-cost n=1 in MSE on all five seeds, but "
+            "skill versus the noisy identity is negative on all five "
+            f"(median {float(np.median([r['skill_vs_identity'] for r in rows])):.3f}). "
+            "Named G4 needs both. sigma' is not admissible. Not orthonormal, "
+            "not compactly supported. Not in CI all_passed."
+        ),
+        "both_gates": bool(earned),
     }
 
 

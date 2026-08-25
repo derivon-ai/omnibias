@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — OMBU-frame G4 recorded unearned (theory 01-06)
+
+- `benchmarks/ombu_frames.py` G4 now runs five seeds. Order-2 beats
+  matched-cost n=1 in MSE on `5/5`, but skill versus the noisy identity
+  is negative on `5/5` (median `-1.32`). Named G4 needs both.
+- Unearned; not in CI `all_passed`. The previous hardcoded `passed: true`
+  is withdrawn. `sigma'` is not admissible; frames are not orthonormal
+  and not compactly supported.
+- Smoke: `docs/benchmarks/ombu_frames_smoke.json`.
+
+
 ### Added — Spectral-design G3 recorded unearned (theory 01-07)
 
 - `benchmarks/spectral_design.py` G3 now measures geometric vs band-planned

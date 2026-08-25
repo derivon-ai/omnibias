@@ -184,7 +184,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **OMBU frames** ([01-06](api/frames.md)): `FrameSpec` /
   `admissibility_constant`. `sigma'` is **not** admissible; frames are not
   orthonormal and not compactly supported. G1–G3 CI-gated; G4 denoising
-  smoke-earned, not in CI `all_passed`.
+  unearned, not in CI `all_passed`.
 - **Scan-Net** ([02-01](api/scannet.md)): stacked `BiasScan` banks. Equivariance
   is per-layer, per-direction, on-lattice; `gamma` is not `delta -> 0`.
   G1/G2/G5 CI-gated; G3 cost and G4 k-NN recorded.
