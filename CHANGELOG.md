@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tabular G4 diagnostic reported (theory 05-02)
+
+- `benchmarks/tabular_arrangement_public.py` now records G4 from the
+  named eight-dataset artifact, not the smoke one-dataset score.
+- Reported: frozen `diag > 1.0` predictiveness `0.25` (need `0.75`);
+  `corr(diag, margin) ≈ -0.13`; not retuned. Smoke `1.0` withdrawn as
+  G4. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/tabular_arrangement_public_smoke.json`.
+
+
 ### Added — Packaging promotion-criterion G5 earned (theory 06-03)
 
 - `benchmarks/theory_homes.py` now counts `omnibias.partition.arrangement`

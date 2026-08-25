@@ -20,7 +20,9 @@ Wave-0 falsifier A4 (G1/G2) is recorded in
 not-worse on `4/8`). Gate G5 **earned** (Wave-0 A5; order-0 logistic
 tail at `width=T`; see `docs/benchmarks/sequence_transverse_smoke.json`).
 The first protocol (order-1 `sigma'` bump, `W=24`) was a miss: that FIR
-cannot clear a `0.02` gap versus S4D. Gate G4 remains unearned. Gates G6
+cannot clear a `0.02` gap versus S4D. Gate G4 remains unearned (eight-dataset frozen
+predictiveness `0.25`, need `0.75`; leftover-reported on the public
+smoke, not in CI `all_passed`). Gates G6
 / G7 are earned — see `docs/benchmarks/shape_topology_smoke.json`.
 
 ## 2. Where it lands
@@ -319,7 +321,7 @@ implicit-surface pipeline (shapes), and a structured state-space model
   `obliqueness_diagnostic_discriminates: false`. Do not retune the diagnostic
   against G1/G2 (see section 11). On the eight public binary sets the frozen
   `diag > 1.0` rule scores `0.25` predictiveness with
-  `corr(diag, margin) ≈ -0.09` — G4 remains unearned.
+  `corr(diag, margin) ≈ -0.13` — G4 remains unearned.
 - The arrangement's expressiveness advantage per gate is real (Zaslavsky) and
   irrelevant to most tabular data. Quoting the cell count as evidence of
   practical superiority would be misleading.

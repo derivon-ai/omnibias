@@ -532,7 +532,9 @@ global-min (additive via `omnibias-verify` ingestion; multiplicative via a bespo
 outward-rounded interval / Taylor-model forward), and a certified train-soft / deploy-hard
 **rounding gap** as `beta -> inf`. The honest "yes-if": you get a differentiable +
 certified tree model, not an optimal hard tree (which is NP-hard); beating LightGBM is a
-benchmarked claim earned per dataset (`docs/benchmarks.md`), never asserted. Builds on
+benchmarked claim earned per dataset (`docs/benchmarks.md`), never asserted.
+G4 frozen obliqueness diagnostic is reported from the eight-dataset artifact
+(predictiveness `0.25`, need `0.75`; not in CI `all_passed`). Builds on
 `omnibias-discrete` / `-curvature` / `-verify`; torch + jax twins.
 `omnibias-partition` is the light, **certified soft partition-of-unity** keystone: `depth`
 oblique split gates `sigmoid(beta (w.x - t))` route an input into `2**depth` regions with

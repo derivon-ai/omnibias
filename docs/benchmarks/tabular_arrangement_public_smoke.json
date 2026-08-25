@@ -513,12 +513,22 @@
     "skipped": 0
   },
   "g4": {
+    "name": "g4_diagnostic_predictiveness",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
     "diag_threshold": 1.0,
     "rule": "predict arrangement if mean_obliqueness_diagnostic > threshold else lightgbm",
-    "predictiveness": 1.0,
-    "corr_diag_margin": NaN,
-    "n_scored": 1,
-    "retuned": false
+    "predictiveness": 0.25,
+    "corr_diag_margin": -0.1337165849860534,
+    "n_scored": 8,
+    "need": 0.75,
+    "retuned": false,
+    "source": "docs/benchmarks/tabular_arrangement_public.json",
+    "smoke_n_scored": 1,
+    "smoke_predictiveness_not_g4": 1.0,
+    "need_note": "Named G4 is frozen eight-dataset predictiveness >= 0.75. Smoke one-dataset predictiveness is not G4. Not retuned. Temperature collapse, not founding bias collapse."
   },
   "honesty": {
     "claim_rung": 1,
@@ -532,9 +542,15 @@
     "g4_earned": false,
     "theorem_prover_verified": false,
     "mathlib_verified": false,
-    "licensed_sentence": "smoke wiring only: breast_cancer exercise of the public arrangement vs LightGBM path; G3 not earned"
+    "licensed_sentence": "smoke wiring only: breast_cancer exercise of the public arrangement vs LightGBM path; G3 not earned",
+    "g4_reported": true,
+    "g4_in_ci_all_passed": false
   },
   "g3_earned": false,
   "g4_earned": false,
-  "wall_seconds": 17.738
+  "wall_seconds": 17.738,
+  "gates": {
+    "all_passed": true,
+    "entries": []
+  }
 }
