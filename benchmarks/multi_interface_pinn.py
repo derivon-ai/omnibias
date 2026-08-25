@@ -4,6 +4,8 @@
 
 ``alpha -> inf`` is interface sharpening, neither collapse. Parallel
 interfaces only. Conditions hold to a stated smoothing tolerance.
+G3 versus PartitionedField / FBPINN / MLP is reported unearned: smoke
+is a linear stand-in, not a training bake-off.
 """
 
 from __future__ import annotations
@@ -87,10 +89,13 @@ def _run_g2() -> dict[str, Any]:
     }
 
 
-def _run_g3(*, full: bool) -> dict[str, Any]:
+def _run_g3() -> dict[str, Any]:
+    """Named leftover: mixed-condition field vs linear stand-in; bake-off stays --full."""
     import torch
     from omnibias.pinn.interface import Interface
     from omnibias.pinn.interface.torch import MultiInterfaceField
+    from omnibias.pinn.partition.torch.field import PartitionedField
+    from omnibias.pinn.torch.fields.fbpinn import FBPINNField
 
     torch.set_default_dtype(torch.float64)
     alpha = 1.0e6
@@ -109,20 +114,32 @@ def _run_g3(*, full: bool) -> dict[str, Any]:
     exact = _exact_two_layer(xs.numpy().reshape(-1))
     err = rel_l2(pred, exact)
     skill = skill_score(pred, exact)
-    # Polynomial baseline (no kink): best line through the BCs.
     x = xs.numpy().reshape(-1)
     poly = 0.5 * (x + 1.0)
     err_poly = rel_l2(poly, exact)
-    n_seeds = 5 if full else 1
-    passed = err <= 1e-6 and skill > 0.0 and err < err_poly
     return {
         "name": "g3_mixed_vs_baselines",
-        "passed": bool(passed),
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
         "rel_l2": err,
-        "rel_l2_linear_mlp_standin": err_poly,
+        "rel_l2_linear_standin": err_poly,
         "skill": skill,
-        "n_seeds": n_seeds,
-        "note": "PartitionedField/FBPINN matched-param training is --full; smoke uses linear stand-in",
+        "n_seeds": 1,
+        "partitioned_field_exported": callable(PartitionedField),
+        "fbpinn_field_exported": callable(FBPINNField),
+        "training_loop": False,
+        "stays_full": True,
+        "need": "rel L2 <= 1e-6, skill > 0, beat PartitionedField + FBPINN + MLP, five seeds",
+        "note": (
+            "MultiInterfaceField on a mixed-condition three-layer versus a "
+            "linear stand-in. Named G3 needs a matched-parameter bake-off "
+            "against PartitionedField, FBPINNField, and a plain MLP over "
+            "five seeds. That training loop is not wired. Previous "
+            "g3_mixed_vs_baselines passed=True stand-in stub withdrawn. "
+            "Not in CI all_passed."
+        ),
     }
 
 
@@ -184,16 +201,17 @@ def main() -> int:
     args = parser.parse_args()
     g1 = _run_g1()
     g2 = _run_g2()
-    g3 = _run_g3(full=args.full)
+    g3 = _run_g3()
     g4 = _run_g4()
     g5 = _run_g5()
-    in_scope = [g1, g2, g3, g4, g5]
+    in_scope = [g1, g2, g4, g5]
     payload = provenance(
         schema="multi-interface-pinn-v1",
         config={
             "family": "multi_interface_pinn",
             "full": bool(args.full),
-            "gates_in_scope": ["g1", "g2", "g3", "g4", "g5"],
+            "gates_in_scope": ["g1", "g2", "g4", "g5"],
+            "g3_in_all_passed": False,
         },
     )
     payload["gates"] = gates_block(in_scope)
@@ -207,6 +225,12 @@ def main() -> int:
         "alpha_inf_is_interface_sharpening": True,
         "exact_transmission_at_finite_alpha": False,
         "parallel_interfaces_only": True,
+        "g3_earned": False,
+        "g3_reported": True,
+        "g3_in_ci_all_passed": False,
+        "g3_training_loop": False,
+        "temperature_collapse": False,
+        "founding_bias_collapse": False,
     }
     if args.full:
         out_dir = SCRATCH / "interface"

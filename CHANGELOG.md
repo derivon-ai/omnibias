@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Multi-interface G3 bake-off reported (theory 02-05)
+
+- `benchmarks/multi_interface_pinn.py` now records mixed-condition
+  `MultiInterfaceField` versus a linear stand-in, and that
+  `PartitionedField` / `FBPINNField` are exported.
+- Reported: named G3 needs a matched-parameter bake-off against
+  PartitionedField, FBPINN, and a plain MLP over five seeds. That
+  training loop is not wired. Previous `passed=True` stand-in stub
+  withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/multi_interface_pinn_smoke.json`.
+
+
 ### Added — Weak-form VPINN G4 conditioning earned (theory 02-04)
 
 - `benchmarks/weak_form_vpinn.py` now measures `cond` of the weak

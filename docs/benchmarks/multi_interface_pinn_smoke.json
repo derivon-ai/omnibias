@@ -1,6 +1,6 @@
 {
   "schema": "multi-interface-pinn-v1",
-  "generated_utc": "2026-08-15T10:09:01Z",
+  "generated_utc": "2026-08-25T19:42:01Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -16,12 +16,12 @@
     "gates_in_scope": [
       "g1",
       "g2",
-      "g3",
       "g4",
       "g5"
-    ]
+    ],
+    "g3_in_all_passed": false
   },
-  "rss_mb_at_start": 1296.2,
+  "rss_mb_at_start": 1278.17,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -65,15 +65,6 @@
           0.20794415416798273,
           0.20794415416798273
         ]
-      },
-      {
-        "name": "g3_mixed_vs_baselines",
-        "passed": true,
-        "rel_l2": 2.8882358259772394e-08,
-        "rel_l2_linear_mlp_standin": 0.240596877953189,
-        "skill": 0.9999999999999991,
-        "n_seeds": 1,
-        "note": "PartitionedField/FBPINN matched-param training is --full; smoke uses linear stand-in"
       },
       {
         "name": "g4_hard_vs_penalized",
@@ -131,12 +122,20 @@
   },
   "g3": {
     "name": "g3_mixed_vs_baselines",
-    "passed": true,
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
     "rel_l2": 2.8882358259772394e-08,
-    "rel_l2_linear_mlp_standin": 0.240596877953189,
+    "rel_l2_linear_standin": 0.240596877953189,
     "skill": 0.9999999999999991,
     "n_seeds": 1,
-    "note": "PartitionedField/FBPINN matched-param training is --full; smoke uses linear stand-in"
+    "partitioned_field_exported": true,
+    "fbpinn_field_exported": true,
+    "training_loop": false,
+    "stays_full": true,
+    "need": "rel L2 <= 1e-6, skill > 0, beat PartitionedField + FBPINN + MLP, five seeds",
+    "note": "MultiInterfaceField on a mixed-condition three-layer versus a linear stand-in. Named G3 needs a matched-parameter bake-off against PartitionedField, FBPINNField, and a plain MLP over five seeds. That training loop is not wired. Previous g3_mixed_vs_baselines passed=True stand-in stub withdrawn. Not in CI all_passed."
   },
   "g4": {
     "name": "g4_hard_vs_penalized",
@@ -153,6 +152,12 @@
     "alpha_inf_is_collapse": false,
     "alpha_inf_is_interface_sharpening": true,
     "exact_transmission_at_finite_alpha": false,
-    "parallel_interfaces_only": true
+    "parallel_interfaces_only": true,
+    "g3_earned": false,
+    "g3_reported": true,
+    "g3_in_ci_all_passed": false,
+    "g3_training_loop": false,
+    "temperature_collapse": false,
+    "founding_bias_collapse": false
   }
 }
