@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equivariant-scan cost reported (theory 02-08)
+
+- `benchmarks/equivariant_scan.py` now times `EquivariantScan` versus
+  `C_L` orbit size `L` in `{4,8,16}` (batch 32; warmup + median).
+- Reported: G5 anisotropic-interface (5-seed angular skill) stays
+  `--full` / unearned: no task loop is wired. Previous untimed
+  `passed=True` stub withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/equivariant_scan_smoke.json`.
+
+
 ### Added — BEM-Net cost reported (theory 02-06)
 
 - `benchmarks/bem_net.py` now times `single_layer` versus `n_quad` in

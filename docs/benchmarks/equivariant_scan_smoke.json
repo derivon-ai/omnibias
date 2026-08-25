@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.equivariant_scan.v1",
-  "generated_utc": "2026-08-15T18:16:17Z",
+  "generated_utc": "2026-08-25T18:47:58Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,9 +11,14 @@
     "folx": "0.2.22"
   },
   "config": {
-    "mode": "smoke"
+    "mode": "smoke",
+    "cost_in_all_passed": false,
+    "gates_in_scope": [
+      "g1",
+      "g2"
+    ]
   },
-  "rss_mb_at_start": 822.32,
+  "rss_mb_at_start": 820.87,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -26,17 +31,52 @@
         "name": "g2_nongaussian_none",
         "passed": true,
         "in_ci_all_passed": true
-      },
-      {
-        "name": "g5_anisotropic_interface",
-        "passed": true,
-        "in_ci_all_passed": false,
-        "note": "--full only; C_L discrete orbit, not SO(2)/SO(3)"
       }
     ]
   },
+  "cost": {
+    "name": "cost_orbit_vs_L",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
+    "rows": [
+      {
+        "L": 4,
+        "batch": 32,
+        "n_offsets": 3,
+        "wall_seconds": 0.00035177101381123066
+      },
+      {
+        "L": 8,
+        "batch": 32,
+        "n_offsets": 3,
+        "wall_seconds": 0.0006739269010722637
+      },
+      {
+        "L": 16,
+        "batch": 32,
+        "n_offsets": 3,
+        "wall_seconds": 0.0013645950239151716
+      }
+    ],
+    "g5_anisotropic_interface": {
+      "earned": false,
+      "stays_full": true,
+      "need": "orientation bank beats single-direction scan in angular error, skill > 0 vs random-angle, 5 seeds",
+      "reason": "No interface-orientation task is wired. EquivariantScan forward wall vs C_L orbit size is recorded; that is not the named 5-seed skill gate. Discrete C_L, not SO(2)."
+    },
+    "note": "EquivariantScan wall vs L (L orientations multiply cost). G5 anisotropic-interface is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous g5_anisotropic_interface passed=True / --full-only stub with no timing withdrawn. Not in CI all_passed."
+  },
   "honesty": {
     "steering": "gaussian-family only",
-    "orbit": "C_L, not SO(2)"
+    "orbit": "C_L, not SO(2)",
+    "founding_bias_collapse": true,
+    "temperature_collapse": false,
+    "g5_anisotropic_interface_earned": false,
+    "g5_stays_full": true,
+    "cost_earned": false,
+    "cost_reported": true,
+    "cost_in_ci_all_passed": false
   }
 }
