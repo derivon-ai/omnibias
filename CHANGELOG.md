@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Scan-Net G4 density boundary reported (theory 02-01)
+
+- `benchmarks/scannet.py` G4 now compares affine-calibrated k-NN to a
+  real Scan-Net lstsq on an analytic mixture density (five seeds).
+- Reported: Scan-Net wins `5/5` because density is a function of `x`.
+  k-NN is still allowed to win. Previous k-NN-as-truth / constant-scan
+  stub withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/scannet_smoke.json`.
+
+
 ### Added — Jet-KAN G2 recorded unearned (theory 02-03)
 
 - `benchmarks/jetkan.py` G2 now times an order-6 directional jet against

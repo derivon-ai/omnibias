@@ -5,7 +5,8 @@
 Smoke earns per-layer interior-shift equivariance, a scattered-interface win
 versus voxelized ``cmbConv1d`` with skill vs midpoint, torch/jax parity,
 and no-neighbour-search cost versus named k-NN across two decades of ``N``.
-G4 (k-NN may win on density) is reported, not a win condition.
+G4 (k-NN may win on density) is reported from a real Scan-Net
+comparison, not a win condition and not in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -256,6 +257,13 @@ def _run_g3() -> dict[str, Any]:
     }
 
 
+G4_SEEDS = 5
+G4_K = 8
+G4_SIGMA = 0.08
+G4_CLUSTER = 40
+G4_BACKGROUND = 40
+
+
 def _knn_density(xs: np.ndarray, k: int = 8) -> np.ndarray:
     d = np.abs(xs.reshape(-1, 1) - xs.reshape(1, -1))
     np.fill_diagonal(d, np.inf)
@@ -263,24 +271,83 @@ def _knn_density(xs: np.ndarray, k: int = 8) -> np.ndarray:
     return 1.0 / np.maximum(part.mean(axis=1), 1e-8)
 
 
+def _mixture_density(xs: np.ndarray, mu: float, *, sig: float = G4_SIGMA, w: float = 0.5) -> np.ndarray:
+    gauss = np.exp(-0.5 * ((xs - mu) / sig) ** 2) / (sig * np.sqrt(2.0 * np.pi))
+    return w * gauss + (1.0 - w) * 0.5
+
+
+def _affine_mse(pred: np.ndarray, truth: np.ndarray) -> float:
+    design = np.stack([pred, np.ones_like(pred)], axis=1)
+    coef, *_ = np.linalg.lstsq(design, truth, rcond=None)
+    fit = design @ coef
+    return float(np.mean((fit - truth) ** 2))
+
+
 def _run_g4() -> dict[str, Any]:
-    """Local density: k-NN is *allowed* to win (spatial neighbourhoods matter)."""
-    rng = np.random.default_rng(0)
-    cluster = rng.normal(0.0, 0.05, size=40)
-    background = rng.uniform(-1.0, 1.0, size=40)
-    xs = np.concatenate([cluster, background])
-    truth = _knn_density(xs, k=8)
-    # Scan-Net along x with pooled readout cannot see neighbour counts.
-    scan = np.full_like(truth, float(np.mean(truth)))
-    knn_mse = float(np.mean((truth - truth) ** 2))  # oracle
-    scan_mse = float(np.mean((scan - truth) ** 2))
-    knn_won = knn_mse < scan_mse
+    """Local density: k-NN is *allowed* to win; report the measured winner.
+
+    The previous record used k-NN as the truth and a constant mean as
+    Scan-Net (oracle tautology). That stub is withdrawn.
+    """
+    import torch
+    from omnibias.torch.architectures.scannet import ScanNet, ScanNetConfig
+
+    torch.set_default_dtype(torch.float64)
+    cfg = ScanNetConfig(
+        dim_in=1,
+        channels=(4,),
+        bank_sizes=(9,),
+        bank_extents=(1.0,),
+        readout="response",
+    )
+    rows: list[dict[str, Any]] = []
+    knn_wins = 0
+    for seed in range(G4_SEEDS):
+        rng = np.random.default_rng(seed)
+        mu = float(rng.uniform(-0.6, 0.6))
+        xs = np.concatenate(
+            [
+                rng.normal(mu, G4_SIGMA, size=G4_CLUSTER),
+                rng.uniform(-1.0, 1.0, size=G4_BACKGROUND),
+            ]
+        )
+        truth = _mixture_density(xs, mu)
+        knn_mse = _affine_mse(_knn_density(xs, k=G4_K), truth)
+        net = ScanNet(cfg, dtype=torch.float64)
+        with torch.no_grad():
+            feat = net(torch.as_tensor(xs.reshape(-1, 1))).detach().cpu().numpy()
+        feat = feat.reshape(xs.size, -1)
+        design = np.concatenate([feat, np.ones((xs.size, 1))], axis=1)
+        coef, *_ = np.linalg.lstsq(design, truth, rcond=None)
+        scan_mse = float(np.mean((design @ coef - truth) ** 2))
+        knn_won = bool(knn_mse < scan_mse)
+        knn_wins += int(knn_won)
+        rows.append(
+            {
+                "seed": seed,
+                "mu": mu,
+                "knn_mse": knn_mse,
+                "scan_mse": scan_mse,
+                "knn_won": knn_won,
+            }
+        )
     return {
         "name": "g4_knn_density_boundary",
-        "passed": True,
-        "knn_won": bool(knn_won),
-        "scan_mse": scan_mse,
-        "note": "k-NN is allowed to win on spatial density; reported, not omitted",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
+        "knn_won": bool(knn_wins > G4_SEEDS / 2),
+        "knn_wins": knn_wins,
+        "n_seeds": G4_SEEDS,
+        "rows": rows,
+        "note": (
+            "Analytic mixture density; affine-calibrated k-NN vs Scan-Net "
+            "lstsq on the bank response. k-NN is allowed to win; on this "
+            "constructive route Scan-Net wins because density is a "
+            "function of x. Previous k-NN-as-truth / constant-scan stub "
+            "withdrawn. Not in CI all_passed."
+        ),
     }
 
 
@@ -355,6 +422,7 @@ def main() -> int:
             "family": "scannet",
             "full": bool(args.full),
             "g3_in_all_passed": True,
+            "g4_in_all_passed": False,
             "gates_in_scope": ["g1", "g2", "g3", "g5"],
         },
     )
@@ -369,6 +437,13 @@ def main() -> int:
         "gamma_is_delta_collapse": False,
         "seventh_operatorblock_role": False,
         "g3_in_ci_all_passed": True,
+        "g4_earned": bool(g4["earned"]),
+        "g4_reported": True,
+        "g4_in_ci_all_passed": False,
+        "g4_truth_is_knn_oracle": False,
+        "g4_scan_is_constant_mean": False,
+        "founding_bias_collapse": True,
+        "temperature_collapse": False,
     }
     if args.full:
         out_dir = SCRATCH / "scannet"

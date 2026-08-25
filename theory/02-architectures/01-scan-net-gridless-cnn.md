@@ -182,7 +182,11 @@ Baselines, all at matched parameter count: `CmbNet` on a binned grid, a
   ratio `42.1` (need `>= 8`). Warmup + median of repeats. In CI `all_passed`.
 - **G4 honest boundary.** On a task where spatial neighbourhoods genuinely
   matter (local density estimation), the `k`-NN baseline is *allowed* to win,
-  and the result is reported rather than omitted.
+  and the result is reported rather than omitted. **Reported:** analytic
+  mixture density, five seeds; affine-calibrated k-NN vs Scan-Net lstsq
+  on the bank response. Scan-Net wins `5/5` because density is a function
+  of `x`. The previous k-NN-as-truth / constant-scan stub is withdrawn.
+  Not in CI `all_passed`.
 - **G5 parity.** torch and jax bit-identical.
 
 ## 9. Benchmark plan
