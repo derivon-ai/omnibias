@@ -7,7 +7,7 @@ way, and the repository has already learned that lesson the expensive way — so
 this file assigns every spec a home under the "earn independent existence" rule
 and sequences them so that the cheap falsifiers run before the expensive builds.
 
-- **Status**: gated
+- **Status**: gated (G1/G2 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 93/93 specs name a home; G3–G5 not in CI `all_passed`; no new distribution)
 - **Depends on**: 06-01, 06-02
 - **Blocks**: none
 
@@ -233,9 +233,10 @@ a justification, which is the right amount of friction.
 
 ## 9. Benchmark plan
 
-Not a benchmark. Deliverables: the assignment table above kept current, the
-`test_theory_homes.py` guard, and index status transitions recorded as work
-proceeds.
+Not a performance benchmark. Deliverables: the assignment table above
+kept current, the `test_theory_homes.py` guard, and index status
+transitions recorded as work proceeds. Smoke:
+`benchmarks/theory_homes.py` / `docs/benchmarks/theory_homes_smoke.json`.
 
 ## 10. Honesty and scope
 

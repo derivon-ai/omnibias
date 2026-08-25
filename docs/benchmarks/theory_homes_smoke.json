@@ -1,0 +1,101 @@
+{
+  "schema": "omnibias.benchmark.theory_homes.v1",
+  "generated_utc": "2026-08-25T20:05:15Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "theory_homes",
+    "full": false,
+    "gates_in_scope": [
+      "g1_zero_new_packages",
+      "g2_homes_declared"
+    ],
+    "g3_in_all_passed": false,
+    "g4_in_all_passed": false,
+    "g5_in_all_passed": false
+  },
+  "rss_mb_at_start": 803.84,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_zero_new_packages",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "n_packages": 42,
+        "allowlist": [],
+        "arrangement_minted": false,
+        "folded_resurrected": [],
+        "need": "NEW_PACKAGES_ALLOWED empty; no omnibias-arrangement; folded names gone",
+        "note": "Named G1 is zero new packages after Waves 0-3. The homes guard allowlist is empty and folded distributions stay gone."
+      },
+      {
+        "name": "g2_homes_declared",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "n_specs": 93,
+        "n_docs_only": 21,
+        "n_missing_section": 0,
+        "n_missing_home": 0,
+        "missing_section": [],
+        "missing_home": [],
+        "unexpected_packages": {},
+        "need": "every spec section 2 names an existing home; no new distribution",
+        "note": "Named G2 is the test_theory_homes consistency pass. Docs-only rows in the 06-03 table stay documents."
+      }
+    ]
+  },
+  "g1": {
+    "name": "g1_zero_new_packages",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "n_packages": 42,
+    "allowlist": [],
+    "arrangement_minted": false,
+    "folded_resurrected": [],
+    "need": "NEW_PACKAGES_ALLOWED empty; no omnibias-arrangement; folded names gone",
+    "note": "Named G1 is zero new packages after Waves 0-3. The homes guard allowlist is empty and folded distributions stay gone."
+  },
+  "g2": {
+    "name": "g2_homes_declared",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "n_specs": 93,
+    "n_docs_only": 21,
+    "n_missing_section": 0,
+    "n_missing_home": 0,
+    "missing_section": [],
+    "missing_home": [],
+    "unexpected_packages": {},
+    "need": "every spec section 2 names an existing home; no new distribution",
+    "note": "Named G2 is the test_theory_homes consistency pass. Docs-only rows in the 06-03 table stay documents."
+  },
+  "honesty": {
+    "new_packages_allowed": false,
+    "omnibias_arrangement_package": false,
+    "docs_only_program_specs": true,
+    "g1_earned": true,
+    "g1_in_ci_all_passed": true,
+    "g2_earned": true,
+    "g2_in_ci_all_passed": true,
+    "g3_earned": false,
+    "g4_earned": false,
+    "g5_earned": false,
+    "book_tree": false
+  }
+}

@@ -326,7 +326,9 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   *audience*. If it fails that test, ship it as a submodule of an existing package
   and promote it to its own distribution only once it earns independence. Folding
   a submodule back out later is cheap; un-shipping a premature distribution is not.
-  See the `omnibias-dev-new-package` skill.
+  See the `omnibias-dev-new-package` skill. Theory 06-03 G1/G2 are
+  earned on `benchmarks/theory_homes.py` (42 packages, 93/93 homes,
+  allowlist empty).
 
 ## Don't
 

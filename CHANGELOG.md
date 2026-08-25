@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Packaging homes G1/G2 earned (theory 06-03)
+
+- `benchmarks/theory_homes.py` now runs the `test_theory_homes`
+  consistency pass as a smoke: allowlist empty, folded names gone,
+  every spec section 2 names a home.
+- Earned: 42 packages, 93/93 specs, 0 missing homes. No
+  `omnibias-arrangement`. G3–G5 stay later. In CI `all_passed`.
+- Smoke: `docs/benchmarks/theory_homes_smoke.json`.
+
+
 ### Added — Jet-bundle G3 vocabulary earned (theory 01-10)
 
 - `benchmarks/jet_bundle.py` now scans other theory specs for the
