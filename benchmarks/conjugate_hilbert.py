@@ -2,14 +2,15 @@
 # Copyright (C) 2026 Derivon
 """Gated primitive: conjugate Hilbert tower (theory 01-12 G1–G4; G5 not CI).
 
-Line Hilbert only. Commutation needs ``alpha > 0``. G5 (dictionary capacity)
-is a campaign artifact and is **not** in ``all_passed``; it does not clear
-``CCF_STRETCH_RESIDUAL_GATE``.
+Line Hilbert only. Commutation needs ``alpha > 0``. G5 (dictionary capacity
+on the CCF profile-fitting subproblem) is a campaign artifact and is
+**not** in ``all_passed``; it does not clear ``CCF_STRETCH_RESIDUAL_GATE``.
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from pathlib import Path
@@ -97,13 +98,12 @@ def _run_g4() -> dict[str, Any]:
     }
 
 
-def _run_g5_capacity_record() -> dict[str, Any]:
-    """Projection-defect comparison on a synthetic profile; not CCF stretch."""
+def _run_g5_synthetic_in_span() -> dict[str, Any]:
+    """Sanity: an in-span target is recovered. This is not named G5."""
     import math as _math
 
     from omnibias.core.conjugate import HardyAtom, HardyDictionary, evaluate
 
-    # Fit a target P_{1, 0.5} + 0.3 P_{1, 2.5} with a 2-atom vs 4-atom (n=0,2) dict.
     ys = [i * 0.2 for i in range(-15, 16)]
 
     def target(y: float) -> float:
@@ -126,14 +126,12 @@ def _run_g5_capacity_record() -> dict[str, Any]:
     )
 
     def defect(dictionary: HardyDictionary) -> float:
-        # Least-squares on even atoms only (target is even).
         cols = []
         t = [target(y) for y in ys]
         for i, atom in enumerate(dictionary.atoms):
             if atom.parity != "even":
                 continue
             cols.append([evaluate(dictionary, y)[i] for y in ys])
-        # 1- or 2-column normal equations
         import numpy as np
 
         a = np.asarray(cols, dtype=float).T
@@ -144,14 +142,45 @@ def _run_g5_capacity_record() -> dict[str, Any]:
 
     d_small = defect(small)
     d_big = defect(big)
-    ratio = d_small / max(d_big, 1e-30)
     return {
-        "name": "g5_dictionary_capacity",
-        "passed": True,
+        "name": "g5_synthetic_in_span",
+        "passed": d_big <= 1e-12,
         "small_defect": d_small,
         "enlarged_defect": d_big,
-        "reduction_ratio": ratio,
-        "note": "synthetic even profile; not CCF_STRETCH_RESIDUAL_GATE",
+        "note": "in-span sanity, not the CCF G5 gate",
+        "in_ci_all_passed": False,
+    }
+
+
+def _run_g5_capacity_record() -> dict[str, Any]:
+    """Named G5: CCF profile-fitting subproblem from the campaign smoke."""
+    repo = Path(__file__).resolve().parents[1]
+    path = repo / "docs" / "benchmarks" / "ccf_conjugate_sweep_smoke.json"
+    sweep = json.loads(path.read_text(encoding="utf-8"))
+    meas = sweep["g2_measurement"]
+    ratio = float(meas["matched_width_ratio_vs_n0"])
+    ten_x = bool(meas["ten_x"])
+    n0 = float(sweep["rows"][0]["dense_max_abs"])
+    matched = float(sweep["matched_width"]["dense_max_abs"])
+    return {
+        "name": "g5_dictionary_capacity",
+        "passed": False,
+        "earned": False,
+        "source": "docs/benchmarks/ccf_conjugate_sweep_smoke.json",
+        "n0_dense_max_abs": n0,
+        "matched_width_dense_max_abs": matched,
+        "matched_width_ratio_vs_n0": ratio,
+        "ten_x_required": 10.0,
+        "ten_x": ten_x,
+        "matched_width_gram_cond": float(sweep["matched_width"]["gram_cond"]),
+        "n1_unmatched_gram_cond": float(sweep["rows"][1]["gram_cond"]),
+        "best_max_order": int(sweep["best"]["max_order"]),
+        "note": (
+            "CCF profile-fitting subproblem. Enlargement does not cut "
+            "dense residual 10x at matched atom count; N=0 is best. "
+            "Catch-22 is not dictionary order on this grid. "
+            "Not CCF_STRETCH_RESIDUAL_GATE."
+        ),
         "in_ci_all_passed": False,
     }
 
@@ -168,11 +197,14 @@ def main() -> int:
     )
     payload["gates"] = gates_block(ci)
     payload["g5_capacity"] = g5
+    payload["g5_synthetic_in_span"] = _run_g5_synthetic_in_span()
     payload["honesty"] = {
         "line_hilbert_only": True,
         "commutation_needs_alpha_gt_0": True,
         "clears_ccf_stretch_gate": False,
         "g5_in_all_passed": False,
+        "g5_earned": False,
+        "g5_is_ccf_profile_not_synthetic": True,
     }
     name = "conjugate_hilbert_smoke.json"
     if args.full:

@@ -6,8 +6,10 @@ The n-th Hardy derivatives on the line are interval-equal to the
 existing n=1 case; Hilbert is a permutation of the activation
 dictionary.
 
-G1–G4 are CI-gated. G5 is a campaign artifact, **not** in CI
-`all_passed`. Status is **gated**, not shipped. See theory spec 01-12.
+G1–G4 are CI-gated. G5 is a campaign artifact, **unearned** on the CCF
+profile-fitting smoke (matched-width residual ratio `0.978`, need
+`10x`), **not** in CI `all_passed`. Status is **gated**, not shipped.
+See theory spec 01-12.
 
 ## Core algebra
 

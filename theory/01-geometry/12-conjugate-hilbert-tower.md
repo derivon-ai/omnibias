@@ -9,7 +9,7 @@ simultaneously closed under differentiation *and* under `H`, which attacks the
 recorded Hilbert-and-dictionary floor at the basis level rather than by
 quadrature refinement.
 
-- **Status**: gated (G1–G4 CI; G5 campaign-artifact, not in CI `all_passed`; line Hilbert only)
+- **Status**: gated (G1–G4 CI; G5 campaign-artifact **unearned**, not in CI `all_passed`; line Hilbert only)
 - **Depends on**: 01-01
 - **Blocks**: 02-06, 07-02, 07-03
 
@@ -292,6 +292,11 @@ bit-identical twins for use inside the CCF training loop.
   least `10x` smaller than the current Hardy span at matched atom count, and the
   reduction is reported in the campaign artifact. This gate is about the
   *dictionary*, not about the stretch residual.
+  **Unearned** — `docs/benchmarks/ccf_conjugate_sweep_smoke.json` /
+  `docs/benchmarks/conjugate_hilbert_smoke.json`. Matched-width residual
+  ratio vs N=0 is `0.978` (need `>= 10`); N=0 is best; unmatched N=1
+  Gram condition is `~2.3e5`. The in-span synthetic recovery is sanity,
+  not this gate. Catch-22 is not dictionary order on this grid.
 
 Note what G5 is not: clearing `CCF_STRETCH_RESIDUAL_GATE = 1e-13` is spec
 07-03's gate, is not weakened, and is not claimed here.
@@ -357,7 +362,8 @@ Note what G5 is not: clearing `CCF_STRETCH_RESIDUAL_GATE = 1e-13` is spec
 - [ ] High-precision tower test for `n = 0 .. 8`
 - [ ] Enclosure soundness test: dense grid **and** random sample
 - [ ] Numerical-Hilbert cross-check test
-- [ ] Dictionary-capacity arm in the CCF pipeline, artifact field recorded
+- [x] Dictionary-capacity arm in the CCF pipeline, artifact field recorded
+      (G5 unearned on the CCF smoke; 10x matched-width cut misses)
 - [ ] `benchmarks/conjugate_tower.py` plus smoke JSON
 - [ ] Regenerate `__all__` in `omnibias/core/verified/__init__.py`
 - [ ] Docs page and nav entry

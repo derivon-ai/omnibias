@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.conjugate_hilbert.v1",
-  "generated_utc": "2026-08-15T16:37:46Z",
+  "generated_utc": "2026-08-25T17:33:41Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,7 +13,7 @@
   "config": {
     "mode": "smoke"
   },
-  "rss_mb_at_start": 822.65,
+  "rss_mb_at_start": 807.69,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -45,17 +45,34 @@
   },
   "g5_capacity": {
     "name": "g5_dictionary_capacity",
+    "passed": false,
+    "earned": false,
+    "source": "docs/benchmarks/ccf_conjugate_sweep_smoke.json",
+    "n0_dense_max_abs": 0.0856715478179377,
+    "matched_width_dense_max_abs": 0.08757518307761564,
+    "matched_width_ratio_vs_n0": 0.9782628457882778,
+    "ten_x_required": 10.0,
+    "ten_x": false,
+    "matched_width_gram_cond": 5.006824011199118,
+    "n1_unmatched_gram_cond": 231780.18064880688,
+    "best_max_order": 0,
+    "note": "CCF profile-fitting subproblem. Enlargement does not cut dense residual 10x at matched atom count; N=0 is best. Catch-22 is not dictionary order on this grid. Not CCF_STRETCH_RESIDUAL_GATE.",
+    "in_ci_all_passed": false
+  },
+  "g5_synthetic_in_span": {
+    "name": "g5_synthetic_in_span",
     "passed": true,
     "small_defect": 0.12683072574014304,
     "enlarged_defect": 1.567580422032911e-16,
-    "reduction_ratio": 809085926039208.0,
-    "note": "synthetic even profile; not CCF_STRETCH_RESIDUAL_GATE",
+    "note": "in-span sanity, not the CCF G5 gate",
     "in_ci_all_passed": false
   },
   "honesty": {
     "line_hilbert_only": true,
     "commutation_needs_alpha_gt_0": true,
     "clears_ccf_stretch_gate": false,
-    "g5_in_all_passed": false
+    "g5_in_all_passed": false,
+    "g5_earned": false,
+    "g5_is_ccf_profile_not_synthetic": true
   }
 }

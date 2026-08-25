@@ -8,8 +8,10 @@ decay (``alpha > 0``). This is the line Hilbert
 ``H[f](x) = (1/pi) p.v. int f(t)/(x-t) dt``, not a periodic or
 finite-interval operator.
 
-G5 (dictionary capacity vs the CCF stretch residual) is a campaign
-artifact, **not** a claim that ``CCF_STRETCH_RESIDUAL_GATE`` is cleared.
+G5 (dictionary capacity on the CCF profile-fitting subproblem) is a
+campaign artifact, recorded unearned: enlargement does not cut residual
+10x at matched atom count. It is **not** a claim that
+``CCF_STRETCH_RESIDUAL_GATE`` is cleared.
 
 Pure Python: no tensor imports. Training-loop twins live in
 ``omnibias.{torch,jax}.conjugate``.

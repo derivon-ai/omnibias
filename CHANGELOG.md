@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Conjugate-Hilbert G5 recorded unearned (theory 01-12)
+
+- Named G5 is the CCF profile-fitting subproblem, not an in-span
+  synthetic. Campaign smoke matched-width residual ratio vs N=0 is
+  `0.978` (need `10x`); N=0 is best. Unmatched N=1 Gram condition is
+  `~2.3e5`.
+- Unearned; not in CI `all_passed`. Stretch `1e-13` is unchanged.
+  Line Hilbert only.
+- Smoke: `docs/benchmarks/conjugate_hilbert_smoke.json`.
+
+
 ### Fixed — Wave-0 A5 sequence G5 earned (theory 05-02)
 
 - The first protocol used order-1 `sigma'` (a mid-lag bump) and

@@ -473,7 +473,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.frames` (01-06; `sigma'` not admissible) /
   `omnibias.core.locus` (01-09; constraint manifold, not a PDE solver) /
   `omnibias.core.jets` (01-10; vocabulary / contact test, not a package) /
-  `omnibias.core.conjugate` (01-12; line Hilbert; G5 not `all_passed`) /
+  `omnibias.core.conjugate` (01-12; line Hilbert; G5 unearned, not `all_passed`) /
   `omnibias.partition.arrangement` (01-03; temperature collapse) /
   `omnibias.struct._core.tropical` (01-08; reuses `logsumexp_gap_bound`) /
   `omnibias.{torch,jax}.architectures` Scan-Net (02-01; on-lattice
