@@ -3,7 +3,9 @@
 """Gated architecture: BEM-Net (theory 02-06). Off-surface exact; BC approximated.
 
 G2 disc-accuracy stays smoke/``--full``. Single-layer wall vs ``n_quad``
-is reported, not in CI ``all_passed``.
+is reported. G3 exterior win is reported unearned: pack-tree 02-07 G3
+has no dense crossover, and no volume-PINN loop is wired. Neither is
+in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -92,7 +94,39 @@ def _run_cost() -> dict[str, Any]:
             "points). G2 disc-accuracy is a Dirichlet L2 study under "
             "$OMNIBIAS_SCRATCH, not CI. Previous g2_disc_accuracy "
             "passed=True / smoke/--full stub with no timing withdrawn. "
-            "Off-surface PDE exact; BC approximated. Not in CI all_passed."
+            "G3 exterior win is reported from the pack-tree leftover, "
+            "not a volume-PINN bake-off. Not in CI all_passed."
+        ),
+    }
+
+
+def _run_g3() -> dict[str, Any]:
+    """Named leftover: pack-tree crossover is unearned; volume PINN stays --full."""
+    pack_path = Path(__file__).resolve().parent.parent / "docs" / "benchmarks" / "pack_tree_smoke.json"
+    pack = __import__("json").loads(pack_path.read_text(encoding="utf-8"))
+    pack_g3 = pack["g3"]
+    crossover = pack_g3.get("crossover_m")
+    hier_over = float(pack_g3["hier_over_dense_at_m_hi"])
+    return {
+        "name": "g3_exterior_win",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
+        "need": "100x far-field vs truncated volumetric PINN, five seeds",
+        "volume_pinn": False,
+        "pack_tree_crossover_m": crossover,
+        "pack_tree_hier_over_dense_at_m_hi": hier_over,
+        "pack_tree_far_eval_is_per_source_taylor": True,
+        "stays_full": True,
+        "note": (
+            "Named G3 is a 100x far-field win versus a truncated "
+            "volumetric PINN at matched cost. No density solve or "
+            "volume-PINN loop is wired. The small-N escape needed a "
+            "pack-tree (02-07) dense crossover; that leftover recorded "
+            f"hier/dense {hier_over:.2f} at M=3200 and crossover_m="
+            f"{crossover!r}. Previous spec-status smoke/--full line "
+            "withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -134,16 +168,19 @@ def main() -> int:
         },
     ]
     cost = _run_cost()
+    g3 = _run_g3()
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.bem_net.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
+            "g3_in_all_passed": False,
             "gates_in_scope": ["g1", "g5"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["cost"] = cost
+    payload["g3"] = g3
     payload["honesty"] = {
         "pde_exact": "off-surface by construction",
         "bc": "approximated",
@@ -152,6 +189,10 @@ def main() -> int:
         "temperature_collapse": False,
         "g2_disc_accuracy_earned": False,
         "g2_stays_full": True,
+        "g3_exterior_win_earned": False,
+        "g3_reported": True,
+        "g3_in_ci_all_passed": False,
+        "g3_volume_pinn": False,
         "cost_earned": False,
         "cost_reported": True,
         "cost_in_ci_all_passed": False,

@@ -56,7 +56,7 @@ each API page; 02-09 G4 init-win unearned, algebraic cost reported;
 reported; 02-11 G4
 inverse-design unearned, stack cost reported, G5 conservation reported;
 02-06 G2 disc-accuracy
-unearned, single-layer cost reported; 02-08 G5 anisotropic-interface
+unearned, G3 exterior win reported, single-layer cost reported; 02-08 G5 anisotropic-interface
 unearned, orbit cost reported),
 exact jet line search (03-12; certified Lagrange
 radius + `verify=True` never-worse; G4 unearned vs strong Wolfe,

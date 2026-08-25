@@ -11,8 +11,11 @@ mollifier order is CI-gated. G2 disc-accuracy (annulus L2 `<= 1e-8`)
 stays `--full` and is **unearned**: no Dirichlet density solve is
 wired. `single_layer` wall vs `n_quad` is **reported**; the previous
 untimed `passed=True` stub is withdrawn. Cost is not in CI
-`all_passed`. G3 is smoke/`--full` (small-N if the pack-tree crossover
-is high). Status is **gated**, not shipped. See theory spec 02-06.
+`all_passed`. G3 exterior win is **reported** unearned: pack-tree
+02-07 has no dense crossover, and no truncated volumetric PINN loop
+is wired. The previous spec-status smoke/`--full` line is withdrawn.
+G3 is not in CI `all_passed`. Status is **gated**, not shipped. See
+theory spec 02-06.
 
 ## Algebra and twins
 

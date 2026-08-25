@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — BEM-Net G3 exterior win reported (theory 02-06)
+
+- `benchmarks/bem_net.py` now records that pack-tree 02-07 has no dense
+  crossover (`hier/dense` `8.93` at `M=3200`) and that no truncated
+  volumetric PINN loop is wired.
+- Reported: named G3 needs a `100x` far-field win at matched cost.
+  Previous spec-status smoke/`--full` line withdrawn. Not in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/bem_net_smoke.json`.
+
+
 ### Added — Equality-locus G4 Burgers RH reported (theory 02-12)
 
 - `benchmarks/equality_intersection.py` now recovers the Rankine–Hugoniot

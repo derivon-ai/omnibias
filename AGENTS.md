@@ -486,7 +486,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   reported, noisy contour stays `--full`) /
   `omnibias.pinn.interface` (02-05; interface sharpening, not collapse;
   distinct from XPINN `omnibias.pinn._core.interface`) /
-  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13; 02-09 G4 init-win unearned; 02-11 G4 inverse-design unearned, G5 conservation reported; 02-06 G2 disc-accuracy unearned, single-layer cost reported) /
+  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13; 02-09 G4 init-win unearned; 02-11 G4 inverse-design unearned, G5 conservation reported; 02-06 G2 disc-accuracy unearned, G3 exterior win reported, single-layer cost reported) /
   `omnibias.geometry.gauge.band` (02-14; abelian + transverse-constant;
   no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02; sampled
   subgraph; G3 vs k-NN reported, GNN / RegionModels stay `--full`; cost
