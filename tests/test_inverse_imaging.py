@@ -183,6 +183,30 @@ def test_localize_batch_captures_clean_signal() -> None:
     assert loc["seeded"] is True
 
 
+def test_smoke_artifact_records_product_gates() -> None:
+    import json
+    from pathlib import Path
+
+    payload = json.loads(
+        (
+            Path(__file__).resolve().parents[1]
+            / "docs"
+            / "benchmarks"
+            / "inverse_imaging_smoke.json"
+        ).read_text(encoding="utf-8")
+    )
+    honesty = payload["honesty"]
+    assert honesty["g1_earned"] is True
+    assert honesty["g2_earned"] is True
+    assert honesty["g3_earned"] is True
+    assert honesty["g4_earned"] is True
+    assert honesty["g5_earned"] is True
+    assert honesty["g6_earned"] is True
+    assert honesty["g7_earned"] is True
+    assert honesty["no_pinn_inverse_module"] is False
+    assert payload["gates"]["all_passed"] is True
+
+
 def test_global_argmax_fails_for_n4_at_large_alpha() -> None:
     """Locks the boundary-artifact failure so the claim cannot be upgraded."""
     x = sample_grid()

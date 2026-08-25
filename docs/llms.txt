@@ -25,6 +25,7 @@
 - [omnibias-qpinn](api/qpinn.md)
 - [omnibias-curvature](api/curvature.md)
 - [Pack Fisher metric (04-01)](api/pack_fisher.md)
+- [Inverse imaging (05-01)](api/pinn_inverse.md)
 - [omnibias-geometry](api/geometry.md)
 - [omnibias-fractional](api/fractional.md)
 - [omnibias-measure](api/measure.md)

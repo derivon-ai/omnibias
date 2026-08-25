@@ -1,10 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-0 falsifier A7: scan localization scaling ``alpha^(n - 5/2)`` (05-01 G7).
+"""Inverse imaging (theory 05-01): product API G1–G6 plus Wave-0 G7.
 
-Only the ``alpha``-sweep family of ``benchmarks/inverse_imaging.py`` is
-implemented here. Spec 05-01 gates G1–G6 remain unearned; no
-``omnibias.pinn.inverse`` code ships in this unit.
+G7 is the locally-seeded ``alpha^(n - 5/2)`` scaling falsifier. G1–G6
+exercise ``omnibias.pinn.inverse``. Do not merge the Krawczyk enclosure
+with a conformal slab. ``alpha`` is a tempering scale.
 
 Estimator
 ---------
@@ -639,6 +639,216 @@ def _run_gates(
     return dict(gates_block(entries))
 
 
+def _run_product_gates(*, full: bool) -> dict[str, Any]:
+    """G1–G6 on ``omnibias.pinn.inverse``. Founding G7 is unchanged."""
+    from omnibias.core.transfer import Layer, reflection_transmission, stack_matrix
+    from omnibias.core.verified.interval import Interval
+    from omnibias.pinn.inverse import (
+        SUBMODULAR_GUARANTEE,
+        GuaranteeKindError,
+        LayerStack,
+        identify_jump_order,
+        invert_layered,
+        level_set_front,
+        locate_interface,
+        merge_guarantees,
+        piecewise_jump_field,
+        place_sensors,
+        stefan_front,
+        stefan_temperature,
+        track_free_boundary,
+        tv_deconvolution_localize,
+    )
+
+    entries: list[dict[str, Any]] = []
+    x = np.linspace(0.0, 1.0, 201)
+    tau_star = 0.37
+    # G1: ensemble mean |err| over 10 seeds x 3 noise levels.
+    scan_err: list[float] = []
+    tv_err: list[float] = []
+    for seed in range(10):
+        for s in (0.01, 0.03, 0.06):
+            rng = np.random.default_rng(10 * seed + int(100 * s))
+            y = piecewise_jump_field(x, jump_order=1, jump=2.0, tau=tau_star)
+            y = y + rng.normal(0.0, s, size=x.size)
+            est = locate_interface(x, y, order=3, alpha=25.0)
+            scan_err.append(abs(est.tau_hat - tau_star))
+            tv_err.append(abs(tv_deconvolution_localize(x, y) - tau_star))
+    g1_ok = float(np.mean(scan_err)) <= 0.5 * float(np.mean(tv_err))
+    entries.append(
+        {
+            "name": "g1_localization_vs_tv",
+            "passed": g1_ok,
+            "mean_scan": float(np.mean(scan_err)),
+            "mean_tv": float(np.mean(tv_err)),
+            "baseline": "1-D ROF TV deconvolution + |D^2| peak",
+        }
+    )
+    # G2: 1000 noiseless interior instances; one miss is a bug.
+    n_g2 = 1000 if full else 1000
+    misses = 0
+    unique_ok = 0
+    for i in range(n_g2):
+        rng = np.random.default_rng(4000 + i)
+        tstar = float(rng.uniform(0.38, 0.62))
+        jump = float(rng.uniform(1.5, 3.0))
+        alpha = float(rng.uniform(22.0, 32.0))
+        xx = np.linspace(0.0, 1.0, 161)
+        yy = piecewise_jump_field(xx, jump_order=1, jump=jump, tau=tstar)
+        est = locate_interface(xx, yy, order=3, alpha=alpha)
+        unique_ok += int(est.unique_in_enclosure)
+        misses += int(not est.location.contains(tstar))
+    g2_ok = misses == 0 and unique_ok == n_g2
+    entries.append(
+        {
+            "name": "g2_enclosure_soundness",
+            "passed": g2_ok,
+            "n": n_g2,
+            "misses": misses,
+            "unique": unique_ok,
+        }
+    )
+    try:
+        merge_guarantees(Interval(0.36, 0.38), {"kind": "conformal"})
+        merge_raised = False
+    except GuaranteeKindError:
+        merge_raised = True
+    entries.append(
+        {
+            "name": "g2_kinds_unmerged",
+            "passed": merge_raised,
+        }
+    )
+    # G3: jump-order confusion at SNR >= 10.
+    n_g3 = 120 if full else 80
+    confusion = np.zeros((3, 3), dtype=int)
+    for i in range(n_g3):
+        rng = np.random.default_rng(5000 + i)
+        m = int(rng.integers(0, 3))
+        yy = piecewise_jump_field(x, jump_order=m, jump=6.0, tau=0.45)
+        yy = yy + rng.normal(0.0, 0.002, size=x.size)
+        ch, _scores = identify_jump_order(x, yy, alpha=22.0)
+        pred = min(max(int(ch) - 2, 0), 2)
+        confusion[m, pred] += 1
+    acc = float(np.trace(confusion)) / float(n_g3)
+    entries.append(
+        {
+            "name": "g3_jump_order",
+            "passed": acc >= 0.95,
+            "accuracy": acc,
+            "confusion": confusion.tolist(),
+            "n": n_g3,
+        }
+    )
+    # G4: five-layer split (known n invert d; known d invert n).
+    true_layers = (
+        Layer(1.4, 0.12),
+        Layer(2.1, 0.08),
+        Layer(1.5, 0.10),
+        Layer(2.0, 0.09),
+        Layer(1.6, 0.11),
+    )
+    omegas = np.linspace(0.8, 2.8, 32)
+    r_obs = np.array(
+        [reflection_transmission(stack_matrix(true_layers, float(w)))[0] for w in omegas],
+        dtype=np.complex128,
+    )
+    meas = {"omega": omegas, "r": r_obs}
+    init_d = LayerStack(
+        layers=tuple(Layer(layer.index, layer.thickness * 1.12) for layer in true_layers),
+        n_iterations=0,
+        residual=0.0,
+    )
+    an_d = invert_layered(meas, n_layers=5, init=init_d, analytic=True, free="thickness")
+    fd_d = invert_layered(
+        meas, n_layers=5, init=init_d, analytic=False, free="thickness", fd_eps=1e-2
+    )
+    d_err = max(
+        abs(a.thickness - b.thickness) / b.thickness
+        for a, b in zip(an_d.layers, true_layers, strict=True)
+    )
+    init_n = LayerStack(
+        layers=tuple(
+            Layer(complex(abs(layer.index) * 1.10, 0.0), layer.thickness)
+            for layer in true_layers
+        ),
+        n_iterations=0,
+        residual=0.0,
+    )
+    an_n = invert_layered(meas, n_layers=5, init=init_n, analytic=True, free="index")
+    fd_n = invert_layered(
+        meas, n_layers=5, init=init_n, analytic=False, free="index", fd_eps=1e-2
+    )
+    n_err = max(
+        abs(abs(a.index) - abs(b.index)) / abs(b.index)
+        for a, b in zip(an_n.layers, true_layers, strict=True)
+    )
+    g4_ok = (
+        d_err <= 0.01
+        and n_err <= 0.05
+        and an_d.n_iterations < fd_d.n_iterations
+        and an_n.n_iterations < fd_n.n_iterations
+    )
+    entries.append(
+        {
+            "name": "g4_layered_inversion",
+            "passed": g4_ok,
+            "thickness_rel": float(d_err),
+            "index_rel": float(n_err),
+            "analytic_iters": [an_d.n_iterations, an_n.n_iterations],
+            "fd_lm_iters": [fd_d.n_iterations, fd_n.n_iterations],
+            "regularizer": "known_index_or_known_thickness",
+        }
+    )
+    # G5: Stefan IFT tracker vs level-set.
+    t_span = (0.2, 1.0)
+    tr = track_free_boundary(
+        (stefan_temperature, lambda _x, _t: 0.0), t_span=t_span, n_times=16
+    )
+    ls = level_set_front(t_span=t_span, n_times=16, n_space=81)
+    truth = np.array([stefan_front(float(t)) for t in tr.times])
+    e_tr = float(np.max(np.abs(tr.positions - truth)))
+    e_ls = float(np.max(np.abs(ls.positions - truth)))
+    entries.append(
+        {
+            "name": "g5_stefan_vs_level_set",
+            "passed": e_tr <= 0.3 * e_ls,
+            "tracker_max_abs": e_tr,
+            "level_set_max_abs": e_ls,
+            "baseline": "1-D upwind level-set",
+        }
+    )
+    # G6: D-optimal vs uniform posterior volume.
+    plan = place_sensors(
+        "location",
+        {"tau": 0.37, "alpha": 25.0},
+        np.linspace(0.0, 1.0, 21),
+        budget=4,
+    )
+    entries.append(
+        {
+            "name": "g6_sensor_design",
+            "passed": plan.volume_ratio >= 2.0
+            and abs(plan.guarantee - SUBMODULAR_GUARANTEE) < 1e-12,
+            "volume_ratio": plan.volume_ratio,
+            "guarantee": plan.guarantee,
+            "baseline": "uniform 4-sensor placement",
+        }
+    )
+    return {
+        "entries": entries,
+        "g1_mean_scan": float(np.mean(scan_err)),
+        "g1_mean_tv": float(np.mean(tv_err)),
+        "g2_misses": misses,
+        "g3_accuracy": acc,
+        "g3_confusion": confusion.tolist(),
+        "g4_thickness_rel": float(d_err),
+        "g4_index_rel": float(n_err),
+        "g5_ratio": e_tr / max(e_ls, 1e-30),
+        "g6_volume_ratio": plan.volume_ratio,
+    }
+
+
 def main(argv: list[str] | None = None) -> dict[str, Any]:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -678,7 +888,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "anchor_alpha": ANCHOR_ALPHA,
         "seed_halfwidth_kernels": SEED_HALFWIDTH_KERNELS,
         "estimator": "locally_seeded_coarse_argmax_plus_newton",
-        "g1_to_g6_earned": False,
+        "g1_to_g6_earned": True,
         "pre_registration": (
             "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; "
             "boundary_contamination_ratio <= 1e-2 at alpha_min and alpha_max; "
@@ -695,7 +905,15 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         order_seed_results[n] = [
             _run_seed(n=n, seed=seed, R=R, x=x) for seed in SEEDS
         ]
-    gates = _run_gates(order_seed_results)
+    print("G1–G6 product API...")
+    product = _run_product_gates(full=full)
+    print("G7 alpha scaling...")
+    gates_g7 = _run_gates(order_seed_results)
+    entries = list(product["entries"]) + list(gates_g7["entries"])
+    for e in entries:
+        if not e["passed"]:
+            raise AssertionError(f"{e['name']} failed: {e}")
+    gates = dict(gates_block(entries))
 
     fitted = {
         str(n): {
@@ -767,6 +985,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 for n in (3, 4)
             ],
             "gates": gates,
+            "product": product,
             "honesty": {
                 "claim_rung": 1,
                 "family": "logistic_scan_localization",
@@ -776,17 +995,23 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "locally_seeded_estimator": True,
                 "global_search_earned": global_search_earned,
                 "boundary_artifact": boundary_artifact,
-                "g1_earned": False,
-                "g2_earned": False,
-                "g3_earned": False,
-                "g4_earned": False,
-                "g5_earned": False,
-                "g6_earned": False,
-                "g7_earned": bool(gates["all_passed"]),
+                "g1_earned": bool(product["entries"][0]["passed"]),
+                "g2_earned": bool(product["entries"][1]["passed"]),
+                "g3_earned": bool(product["entries"][3]["passed"]),
+                "g4_earned": bool(product["entries"][4]["passed"]),
+                "g5_earned": bool(product["entries"][5]["passed"]),
+                "g6_earned": bool(product["entries"][6]["passed"]),
+                "g7_earned": bool(
+                    all(
+                        e["passed"]
+                        for e in gates["entries"]
+                        if str(e["name"]).startswith("localization_exponent")
+                    )
+                ),
                 "theorem_prover_verified": False,
                 "mathlib_verified": False,
                 "not_statistically_efficient": True,
-                "no_pinn_inverse_module": True,
+                "no_pinn_inverse_module": False,
                 "pre_registered": config["pre_registration"],
                 "licensed_sentence": (
                     "for the locally-seeded logistic bias-scan localizer on "
@@ -795,7 +1020,16 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                     "alpha^(n - 5/2) for n in {3, 4}, measured over 1.2 "
                     "decades of tempering scale alpha across five seeds; "
                     "a tau*-free global argmax earns the same claim only "
-                    "for n=3 (n=4 is dominated by a boundary artifact)"
+                    "for n=3 (n=4 is dominated by a boundary artifact); "
+                    "G1–G6 are earned on omnibias.pinn.inverse: scan "
+                    "localization beats TV, the noiseless Krawczyk box "
+                    "covers 1000/1000 instances and must not merge with a "
+                    "conformal slab, jump order is identified at SNR>=10, "
+                    "five-layer transfer inversion with a known-index or "
+                    "known-thickness regularizer beats FD LM, the Stefan "
+                    "IFT tracker beats a 1-D level-set, and D-optimal "
+                    "sensors beat uniform placement by >=2x volume with "
+                    "the (1-1/e) guarantee reported"
                 ),
             },
             "wall_seconds": round(time.perf_counter() - t0, 3),

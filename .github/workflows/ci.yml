@@ -727,6 +727,8 @@ jobs:
           pip install -e packages/omnibias-jax
           pip install -e packages/omnibias-torch
           pip install -e "packages/omnibias-curvature[test]"
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-pinn
       - name: Run curvature tests
         run: |
           source .venv-curv/bin/activate
@@ -739,7 +741,7 @@ jobs:
         run: |
           source .venv-curv/bin/activate
           python benchmarks/information_geometry.py
-      - name: Run inverse-imaging localization scaling smoke (05-01 G7)
+      - name: Run inverse-imaging smoke (05-01 G1–G7)
         run: |
           source .venv-curv/bin/activate
           python benchmarks/inverse_imaging.py

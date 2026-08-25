@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Inverse imaging product API (theory 05-01)
+
+- `omnibias.pinn.inverse`: locate an interface, invert a layered stack,
+  track a Stefan front, report Fisher identifiability, and place sensors.
+- G1–G6 earned; G7 unchanged. The enclosure and a conformal slab stay
+  unmerged. Five-layer inversion uses a known-index or known-thickness
+  regularizer.
+- Docs: `docs/api/pinn_inverse.md`, `docs/cookbook/pinn-inverse.md`.
+  Smoke: `docs/benchmarks/inverse_imaging_smoke.json`.
+
+
 ### Added — Multipack Birkhoff G4 (theory 01-01)
 
 - `benchmarks/multipack_birkhoff.py` earns the two-interface task-skill

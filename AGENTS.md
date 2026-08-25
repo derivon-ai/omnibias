@@ -723,7 +723,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/parameter_space_jets.md`](docs/api/parameter_space_jets.md),
   [`docs/api/sliced_jet_encoder.md`](docs/api/sliced_jet_encoder.md),
   [`docs/api/conformal_slabs.md`](docs/api/conformal_slabs.md),
-  [`docs/api/pack_fisher.md`](docs/api/pack_fisher.md). Cost /
+  [`docs/api/pack_fisher.md`](docs/api/pack_fisher.md),
+  [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
 - Field substrate + field ops: `omnibias.fields`.

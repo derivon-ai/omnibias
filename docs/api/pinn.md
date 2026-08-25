@@ -46,7 +46,8 @@ Four alpha submodules of Beta `omnibias-pinn` host the gated research surface
 
 Gated Group 02 architectures (not shipped; cost gates smoke-earned, not
 in CI `all_passed`): [travelling.md](travelling.md) (02-09),
-[layered.md](layered.md) (02-11), [bem.md](bem.md) (02-06),
+[layered.md](layered.md) (02-11), [pinn_inverse.md](pinn_inverse.md) (05-01),
+[bem.md](bem.md) (02-06),
 [transforms_pde.md](transforms_pde.md) (02-13). Transmission PINN:
 [interface.md](interface.md).
 

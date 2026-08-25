@@ -1,6 +1,6 @@
 {
   "schema": "inverse-imaging-v1",
-  "generated_utc": "2026-08-11T16:12:29Z",
+  "generated_utc": "2026-08-25T16:29:19Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -50,10 +50,10 @@
     "anchor_alpha": 80.0,
     "seed_halfwidth_kernels": 5.0,
     "estimator": "locally_seeded_coarse_argmax_plus_newton",
-    "g1_to_g6_earned": false,
+    "g1_to_g6_earned": true,
     "pre_registration": "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; boundary_contamination_ratio <= 1e-2 at alpha_min and alpha_max; s = round_down_1sig(0.5 * s_max) from the closed-form regime bound; never retuned after seeing the fit; five seeds gated by worst seed"
   },
-  "rss_mb_at_start": 817.18,
+  "rss_mb_at_start": 814.86,
   "baseline": {
     "name": "continuum delta-method sd(tau_hat) ~ alpha^(n-5/2)",
     "note": "scan is not statistically efficient; Cramer-Rao is ~10x tighter on this family (spec 05-01 section 5); gated estimator is locally seeded on true tau*"
@@ -2697,6 +2697,76 @@
     "all_passed": true,
     "entries": [
       {
+        "name": "g1_localization_vs_tv",
+        "passed": true,
+        "mean_scan": 0.0056140473016379035,
+        "mean_tv": 0.221,
+        "baseline": "1-D ROF TV deconvolution + |D^2| peak"
+      },
+      {
+        "name": "g2_enclosure_soundness",
+        "passed": true,
+        "n": 1000,
+        "misses": 0,
+        "unique": 1000
+      },
+      {
+        "name": "g2_kinds_unmerged",
+        "passed": true
+      },
+      {
+        "name": "g3_jump_order",
+        "passed": true,
+        "accuracy": 1.0,
+        "confusion": [
+          [
+            31,
+            0,
+            0
+          ],
+          [
+            0,
+            27,
+            0
+          ],
+          [
+            0,
+            0,
+            22
+          ]
+        ],
+        "n": 80
+      },
+      {
+        "name": "g4_layered_inversion",
+        "passed": true,
+        "thickness_rel": 3.3202546163846325e-07,
+        "index_rel": 3.269833633486504e-08,
+        "analytic_iters": [
+          8,
+          7
+        ],
+        "fd_lm_iters": [
+          14,
+          13
+        ],
+        "regularizer": "known_index_or_known_thickness"
+      },
+      {
+        "name": "g5_stefan_vs_level_set",
+        "passed": true,
+        "tracker_max_abs": 1.6893265053496975e-07,
+        "level_set_max_abs": 0.03487477944519202,
+        "baseline": "1-D upwind level-set"
+      },
+      {
+        "name": "g6_sensor_design",
+        "passed": true,
+        "volume_ratio": 2.3473272166523036,
+        "guarantee": 0.6321205588285577,
+        "baseline": "uniform 4-sensor placement"
+      },
+      {
         "name": "l2sq_sigma3_one_over_42",
         "measured": 0.02380952380952399,
         "expected": 0.023809523809523808,
@@ -2802,6 +2872,105 @@
       }
     ]
   },
+  "product": {
+    "entries": [
+      {
+        "name": "g1_localization_vs_tv",
+        "passed": true,
+        "mean_scan": 0.0056140473016379035,
+        "mean_tv": 0.221,
+        "baseline": "1-D ROF TV deconvolution + |D^2| peak"
+      },
+      {
+        "name": "g2_enclosure_soundness",
+        "passed": true,
+        "n": 1000,
+        "misses": 0,
+        "unique": 1000
+      },
+      {
+        "name": "g2_kinds_unmerged",
+        "passed": true
+      },
+      {
+        "name": "g3_jump_order",
+        "passed": true,
+        "accuracy": 1.0,
+        "confusion": [
+          [
+            31,
+            0,
+            0
+          ],
+          [
+            0,
+            27,
+            0
+          ],
+          [
+            0,
+            0,
+            22
+          ]
+        ],
+        "n": 80
+      },
+      {
+        "name": "g4_layered_inversion",
+        "passed": true,
+        "thickness_rel": 3.3202546163846325e-07,
+        "index_rel": 3.269833633486504e-08,
+        "analytic_iters": [
+          8,
+          7
+        ],
+        "fd_lm_iters": [
+          14,
+          13
+        ],
+        "regularizer": "known_index_or_known_thickness"
+      },
+      {
+        "name": "g5_stefan_vs_level_set",
+        "passed": true,
+        "tracker_max_abs": 1.6893265053496975e-07,
+        "level_set_max_abs": 0.03487477944519202,
+        "baseline": "1-D upwind level-set"
+      },
+      {
+        "name": "g6_sensor_design",
+        "passed": true,
+        "volume_ratio": 2.3473272166523036,
+        "guarantee": 0.6321205588285577,
+        "baseline": "uniform 4-sensor placement"
+      }
+    ],
+    "g1_mean_scan": 0.0056140473016379035,
+    "g1_mean_tv": 0.221,
+    "g2_misses": 0,
+    "g3_accuracy": 1.0,
+    "g3_confusion": [
+      [
+        31,
+        0,
+        0
+      ],
+      [
+        0,
+        27,
+        0
+      ],
+      [
+        0,
+        0,
+        22
+      ]
+    ],
+    "g4_thickness_rel": 3.3202546163846325e-07,
+    "g4_index_rel": 3.269833633486504e-08,
+    "g5_ratio": 4.843977602796267e-06,
+    "g6_volume_ratio": 2.3473272166523036
+  },
   "honesty": {
     "claim_rung": 1,
     "family": "logistic_scan_localization",
@@ -2829,19 +2998,19 @@
         "global_min_capture_rate": 0.0
       }
     },
-    "g1_earned": false,
-    "g2_earned": false,
-    "g3_earned": false,
-    "g4_earned": false,
-    "g5_earned": false,
-    "g6_earned": false,
+    "g1_earned": true,
+    "g2_earned": true,
+    "g3_earned": true,
+    "g4_earned": true,
+    "g5_earned": true,
+    "g6_earned": true,
     "g7_earned": true,
     "theorem_prover_verified": false,
     "mathlib_verified": false,
     "not_statistically_efficient": true,
-    "no_pinn_inverse_module": true,
+    "no_pinn_inverse_module": false,
     "pre_registered": "N = 20 * alpha_max; rho(alpha_max) = sd_pred * alpha_max <= 0.25; boundary_contamination_ratio <= 1e-2 at alpha_min and alpha_max; s = round_down_1sig(0.5 * s_max) from the closed-form regime bound; never retuned after seeing the fit; five seeds gated by worst seed",
-    "licensed_sentence": "for the locally-seeded logistic bias-scan localizer on this synthetic piecewise-polynomial family, the localization standard deviation scales as alpha^(n - 5/2) for n in {3, 4}, measured over 1.2 decades of tempering scale alpha across five seeds; a tau*-free global argmax earns the same claim only for n=3 (n=4 is dominated by a boundary artifact)"
+    "licensed_sentence": "for the locally-seeded logistic bias-scan localizer on this synthetic piecewise-polynomial family, the localization standard deviation scales as alpha^(n - 5/2) for n in {3, 4}, measured over 1.2 decades of tempering scale alpha across five seeds; a tau*-free global argmax earns the same claim only for n=3 (n=4 is dominated by a boundary artifact); G1\u2013G6 are earned on omnibias.pinn.inverse: scan localization beats TV, the noiseless Krawczyk box covers 1000/1000 instances and must not merge with a conformal slab, jump order is identified at SNR>=10, five-layer transfer inversion with a known-index or known-thickness regularizer beats FD LM, the Stefan IFT tracker beats a 1-D level-set, and D-optimal sensors beat uniform placement by >=2x volume with the (1-1/e) guarantee reported"
   },
-  "wall_seconds": 90.333
+  "wall_seconds": 112.302
 }

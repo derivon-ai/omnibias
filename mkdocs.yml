@@ -229,6 +229,7 @@ nav:
       - Parameter-space jets (09-27): api/parameter_space_jets.md
       - Sliced-jet encoder (09-28): api/sliced_jet_encoder.md
       - Pack Fisher (04-01): api/pack_fisher.md
+      - Inverse imaging (05-01): api/pinn_inverse.md
       - Conformal slabs (04-02): api/conformal_slabs.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
@@ -331,6 +332,7 @@ nav:
       - Parameter-space jets: cookbook/parameter-space-jets.md
       - Sliced-jet encoder: cookbook/sliced-jet-encoder.md
       - Pack Fisher metric: cookbook/pack-fisher.md
+      - Inverse imaging: cookbook/pinn-inverse.md
       - Conformal slabs: cookbook/conformal-slabs.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
