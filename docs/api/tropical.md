@@ -7,7 +7,10 @@ Large `(n, D)` inputs are refused. Sound gap, not P vs NP.
 
 G1 gap soundness is CI-gated. G2 subdivision vs the 01-03 sampler and
 G3 jet derivatives are CI-gated. G4 path-following is `--full` only.
-Status is **gated**, not shipped. See theory spec 01-08.
+Sampled `dual_subdivision` wall vs `n`/`D` is **reported** (API refuses
+`n>10` or `D>3`); the previous untimed smoke-earned stub is withdrawn.
+Cost is not in CI `all_passed`. Status is **gated**, not shipped. See
+theory spec 01-08.
 
 ## Algebra
 

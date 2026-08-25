@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tropical homotopy cost reported (theory 01-08)
+
+- `benchmarks/tropical_homotopy.py` now times sampled `dual_subdivision`
+  versus `n` in `{4,6,8,10}` at `D=2,3` (warmup + median).
+- Reported: API cutoff `n<=10`, `D<=3`. Growth is mild because the
+  implementation is sampling, not full face-lattice enumeration.
+  Previous smoke-earned stub with no timing withdrawn. Not in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/tropical_homotopy_smoke.json`.
+
+
 ### Added — Arrangement-geometry cost reported (theory 01-03)
 
 - `benchmarks/arrangement_geometry.py` now times vertex enumeration
