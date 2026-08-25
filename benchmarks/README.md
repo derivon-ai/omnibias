@@ -42,6 +42,7 @@ uv run python docs/img/generate_figures.py
 | `tabular_arrangement_public.py` | `docs/benchmarks/tabular_arrangement_public_smoke.json` / `tabular_arrangement_public.json` | 05-02 G3: same fair protocol on eight public binary datasets (full win/loss table; G4 reported, not retuned) |
 | `tabular_arrangement_capacity.py` | `docs/benchmarks/tabular_arrangement_capacity_smoke.json` / `tabular_arrangement_capacity.json` | 05-02 G3b: capacity/optimizer ablations; G3 frozen; primary `boost_h2` not-worse on 4/8 (need >=6/8; unearned) |
 | `shape_topology.py` | `docs/benchmarks/shape_topology_smoke.json` / `$OMNIBIAS_SCRATCH/beyond_pde/shape_topology.json` | 05-02 G6/G7: soft Euler gap containment + topology-regularized genus vs a named soft-disk implicit; G4 unearned; G5 failed |
+| `jet_vs_nested_ad.py` | `docs/benchmarks/jet_vs_nested_ad_smoke.json` / `$OMNIBIAS_SCRATCH/citation/jet_vs_ad/` | 06-05 obligation 3: 1-D Poisson `mlp_jet` vs nested AD + GN vs Adam; not CCF; extract / paper stay later |
 | `multipack_birkhoff.py` | `docs/benchmarks/multipack_birkhoff_smoke.json` | Wave-1 primitive 01-01: MultiPackUnit G1–G5; float64 order ceiling recorded; two-interface span beats OperatorBlock / OMBU / JetMLP |
 | `irregular_stencils.py` | `docs/benchmarks/irregular_stencils_smoke.json` | Wave-1 primitive 01-04: exact-Q Birkhoff weights G1–G4 |
 | `bias_scan.py` | `docs/benchmarks/bias_scan_smoke.json` | Wave-1 primitive 01-02: BiasScan G1/G2/G3 CI-gated; G4 earned on smoke (not in CI `all_passed`; wall time) |
@@ -95,6 +96,7 @@ uv run python benchmarks/tabular_arrangement.py
 uv run python benchmarks/tabular_arrangement_public.py
 uv run python benchmarks/tabular_arrangement_capacity.py
 uv run python benchmarks/shape_topology.py
+uv run python benchmarks/jet_vs_nested_ad.py
 uv run python benchmarks/multipack_birkhoff.py
 uv run python benchmarks/irregular_stencils.py
 uv run python benchmarks/bias_scan.py
@@ -105,6 +107,7 @@ uv run python benchmarks/tabular_arrangement.py --full
 uv run python benchmarks/tabular_arrangement_public.py --full
 uv run python benchmarks/tabular_arrangement_capacity.py --full
 uv run python benchmarks/shape_topology.py --full
+uv run python benchmarks/jet_vs_nested_ad.py --full
 uv run python benchmarks/multipack_birkhoff.py --full
 uv run python benchmarks/irregular_stencils.py --full
 uv run python benchmarks/bias_scan.py --full

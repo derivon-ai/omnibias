@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet vs nested AD Poisson bench (theory 06-05 obligation 3)
+
+- `benchmarks/jet_vs_nested_ad.py`: 1-D Poisson `mlp_jet` residual vs
+  nested AD, plus exact-J Gauss-Newton vs named Adam on the same jet
+  residual. Not CCF, not a package extract, not a paper.
+- Smoke agreement `~2e-15`; order-6 wall speedup `~3.3x` (order 2
+  often loses). GN beats Adam on `3/3` smoke seeds.
+- Smoke: `docs/benchmarks/jet_vs_nested_ad_smoke.json`.
+
+
 ### Added — Shape topology bound and quality (theory 05-02 G6/G7)
 
 - `omnibias.shape.topology`: field-level Euler (`field_euler_characteristic`,

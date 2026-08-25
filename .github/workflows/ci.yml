@@ -401,6 +401,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/shape_topology.py
+      - name: Run jet-vs-nested-AD smoke (06-05 obligation 3)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/jet_vs_nested_ad.py
       - name: Run singularity-tracking smoke (03-10 G1–G6)
         run: |
           source .venv-cross/bin/activate

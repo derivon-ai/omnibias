@@ -25,9 +25,11 @@ or a prize claim.
   first methods paper, or adding a jet-vs-AD benchmark.
 - **When not.** This file does not extract a package, write a paper,
   or train a network.
-- **Accuracy floor.** None of its own. Later numerical gates live in
-  implementation PRs. CCF stretch remains an operator floor, not a
-  citation-path gate.
+- **Accuracy floor.** Document gates G1–G5 stay on this file.
+  Obligation 3 numerical gates live in
+  `benchmarks/jet_vs_nested_ad.py` (1-D Poisson; not CCF).
+  CCF stretch remains an operator floor, not a citation-path gate.
+  Extract, paper, and external reproduction stay later.
 
 ## 2. Where it lands
 
@@ -198,15 +200,21 @@ Document gates (this file). Numerical gates belong to later PRs.
 - **G5 no new package in this pass.** This spec creates no
   distribution.
 
+Obligation 3 numerical gates (later PR, now present) live in
+`benchmarks/jet_vs_nested_ad.py`. They do not relicense G1–G5.
+
 ## 9. Benchmark plan
 
-None of this file's own. Later implementation PRs should write:
+Document gates stay on this file. Obligation 3 numerical gates:
 
-- `benchmarks/jet_vs_nested_ad.py` (obligation 3)
+- `benchmarks/jet_vs_nested_ad.py` — 1-D Poisson; `mlp_jet` vs nested
+  AD (agreement + order-6 wall); exact-J `GaussNewton` vs named Adam
+  on the same jet residual.
 - Smoke: `docs/benchmarks/jet_vs_nested_ad_smoke.json`
 - `--full`: `$OMNIBIAS_SCRATCH/citation/jet_vs_ad/`
 
-No CI job for this document.
+Extract, paper, and external reproduction are still later. No CI job
+for this document itself; the bench smoke is wired separately.
 
 ## 10. Honesty and scope
 
@@ -243,7 +251,8 @@ No CI job for this document.
 - [ ] Later: freeze / extract `PUBLIC_SURFACE` as an installable
       artifact (not this pass)
 - [ ] Later: algebra + complexity + bit-identity paper
-- [ ] Later: `benchmarks/jet_vs_nested_ad.py` plus smoke JSON
+- [x] `benchmarks/jet_vs_nested_ad.py` plus smoke JSON
+      (obligation 3 numerical; extract / paper / external stay later)
 - [ ] Later: one external reproduction
 - [x] Index row in `theory/README.md` (wired in the index pass)
 

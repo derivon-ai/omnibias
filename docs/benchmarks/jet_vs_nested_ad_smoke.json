@@ -1,0 +1,107 @@
+{
+  "schema": "omnibias.benchmarks.jet_vs_nested_ad.v1",
+  "generated_utc": "2026-08-25T16:53:11Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "jet_vs_nested_ad",
+    "full": false,
+    "pde": "1d_poisson",
+    "honesty": {
+      "ccf_showcase": false,
+      "group_09_vehicle": false,
+      "package_extract": false,
+      "paper": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "public_primitive": "omnibias.torch.jet.mlp_jet"
+    }
+  },
+  "rss_mb_at_start": 1024.73,
+  "baseline": {
+    "name": "nested torch.autograd + Adam"
+  },
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "jet_ad_agreement",
+        "passed": true,
+        "max_abs": 1.7763568394002505e-15,
+        "max_abs_cap": 1e-12,
+        "rss_mb": 705.89453125
+      },
+      {
+        "name": "jet_wall_order6",
+        "passed": true,
+        "order": 6,
+        "n_points": 2048,
+        "jet_ms": 23.663713946007192,
+        "nested_ad_ms": 83.84644892066717,
+        "speedup": 3.5432497667938843,
+        "order2_jet_ms": 3.6726590478792787,
+        "order2_nested_ad_ms": 2.410567016340792,
+        "order2_speedup": 0.6563546969416444,
+        "order2_note": "order-2 mlp_jet often loses to AD on a small net; gated order is 6",
+        "max_abs_order6": 6.661338147750939e-15,
+        "rss_mb": 1023.07421875
+      },
+      {
+        "name": "gn_beats_adam",
+        "passed": true,
+        "n_seeds": 3,
+        "wins": 3,
+        "median_adam_rel_l2": 0.2922512625192331,
+        "median_gn_rel_l2": 0.0023439501415606825,
+        "adam_steps": 80,
+        "gn_steps": 12,
+        "per_seed": [
+          {
+            "seed": 0,
+            "adam_rel_l2": 0.2922512625192331,
+            "gn_rel_l2": 0.00045029442919996974,
+            "adam_loss": 3.4008409238573574,
+            "gn_loss": 0.00038728906631138593,
+            "adam_wall_s": 0.10073057492263615,
+            "gn_wall_s": 0.05293237301521003,
+            "gn_better": true
+          },
+          {
+            "seed": 1,
+            "adam_rel_l2": 0.7188225123526254,
+            "gn_rel_l2": 0.02363319012367278,
+            "adam_loss": 14.128413295561987,
+            "gn_loss": 0.13405530568750934,
+            "adam_wall_s": 0.10578850691672415,
+            "gn_wall_s": 0.052412413991987705,
+            "gn_better": true
+          },
+          {
+            "seed": 2,
+            "adam_rel_l2": 0.25402598297711987,
+            "gn_rel_l2": 0.0023439501415606825,
+            "adam_loss": 2.2169465182379255,
+            "gn_loss": 0.0012518090821056428,
+            "adam_wall_s": 0.10169966891407967,
+            "gn_wall_s": 0.05388289596885443,
+            "gn_better": true
+          }
+        ],
+        "baseline": "nested torch.autograd + Adam"
+      }
+    ]
+  },
+  "wall_seconds": 2.0275796769419685
+}
