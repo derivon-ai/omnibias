@@ -210,9 +210,12 @@ numbers.
 
 ## 10. Honesty and scope
 
-- **The book must not be written yet.** Most specs in this tree are `concept` or
-  `designed`; a monograph asserting them would be describing intentions as
-  results. This outline exists so the writing has a target, not so it can start.
+- **The book must not be written yet.** Implementation specs are now mostly
+  `gated`, but this outline, 06-05, and the Group 07 / 08 / 09 ledgers remain
+  `concept` or `designed`, Wave-0 A5 is still pending, and G1 still forbids a
+  chapter whose cited gates have not run. A monograph asserting the five-choice
+  spine as a finished theory would still be describing a program as a book.
+  This outline exists so the writing has a target, not so it can start.
 - `docs/theory.md` remains canonical for what the library *is*. The book covers
   what the program *could become*, and the distinction must be visible on the
   page, not just in the front matter.
@@ -243,11 +246,14 @@ numbers.
 
 ## 12. Implementation checklist
 
-- [ ] Keep this outline current as specs change status
-- [ ] Do not begin drafting a chapter until its specs' gates have run
+- [x] Keep this outline current as specs change status
+- [x] Do not begin drafting a chapter until its specs' gates have run
+      (`test_theory_book_outline.py`: no `book/` tree, status stays
+      `concept`)
 - [ ] `book/` tree excluded from the mkdocs site, or a sibling repository
+      (not created; the guard is that `book/` does not exist)
 - [ ] Executable-listing harness reused from `tests/test_docs_snippets.py`
 - [ ] Artifact index appendix generated from `docs/benchmarks/`
 - [ ] Part I diffed against `docs/theory.md` before any release
 - [ ] Terminology and forbidden-claims guards run over the manuscript
-- [ ] Index row in `theory/README.md`
+- [x] Index row in `theory/README.md`
