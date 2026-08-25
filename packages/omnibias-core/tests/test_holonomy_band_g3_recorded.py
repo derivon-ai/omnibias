@@ -30,4 +30,5 @@ def test_g3_magnus_bound_is_reported_and_out_of_all_passed() -> None:
     assert payload["honesty"]["g3_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g3_magnus_bound" not in names
+    assert "g4_open_line_flagged" not in names
     assert payload["gates"]["all_passed"] is True

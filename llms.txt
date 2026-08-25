@@ -59,7 +59,7 @@ inverse-design unearned, stack cost reported, G5 conservation reported;
 02-06 G2 disc-accuracy
 unearned, G3 exterior win reported, single-layer cost reported; 02-08 G5 anisotropic-interface
 unearned, orbit cost reported; 02-14 G2 closed-form earned vs PRODUCT
-4096, G3 Magnus reported),
+4096, G3 Magnus reported, G4 gauge covariance reported),
 exact jet line search (03-12; certified Lagrange
 radius + `verify=True` never-worse; G4 unearned vs strong Wolfe,
 G5 crossover reported, not in CI `all_passed`), adaptive pack

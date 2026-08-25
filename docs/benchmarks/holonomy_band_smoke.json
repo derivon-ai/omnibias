@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.holonomy_band.v1",
-  "generated_utc": "2026-08-25T19:26:34Z",
+  "generated_utc": "2026-08-25T19:31:54Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -14,13 +14,13 @@
     "mode": "smoke",
     "g2_in_all_passed": true,
     "g3_in_all_passed": false,
+    "g4_in_all_passed": false,
     "gates_in_scope": [
       "g1",
-      "g2",
-      "g4"
+      "g2"
     ]
   },
-  "rss_mb_at_start": 823.04,
+  "rss_mb_at_start": 823.41,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -35,13 +35,8 @@
         "in_ci_all_passed": true,
         "abelian_abs_err": 3.4241877141052725e-15,
         "su2_abs_err": 5.564437799421285e-13,
-        "abelian_cost_ratio": 0.0002898462773214213,
-        "su2_cost_ratio": 0.0002980373517555291
-      },
-      {
-        "name": "g4_open_line_flagged",
-        "passed": true,
-        "in_ci_all_passed": true
+        "abelian_cost_ratio": 0.00029937426212142687,
+        "su2_cost_ratio": 0.0005272757430195294
       }
     ]
   },
@@ -56,12 +51,12 @@
     "cost_ratio_max": 0.25,
     "abelian_abs_err": 3.4241877141052725e-15,
     "su2_abs_err": 5.564437799421285e-13,
-    "abelian_cost_ratio": 0.0002898462773214213,
-    "su2_cost_ratio": 0.0002980373517555291,
-    "abelian_closed_form_seconds": 3.852066583931446e-06,
-    "abelian_product_seconds": 0.013290032977238297,
-    "su2_closed_form_seconds": 4.8120273277163506e-06,
-    "su2_product_seconds": 0.016145718982443213,
+    "abelian_cost_ratio": 0.00029937426212142687,
+    "su2_cost_ratio": 0.0005272757430195294,
+    "abelian_closed_form_seconds": 4.075001925230026e-06,
+    "abelian_product_seconds": 0.013611731003038585,
+    "su2_closed_form_seconds": 8.382950909435749e-06,
+    "su2_product_seconds": 0.015898609068244696,
     "note": "band_holonomy closed form versus PRODUCT at substeps=4096 in the abelian and transverse-constant (A^1) regimes. Named G2 needs match <= 1e-12 and a fraction of the PRODUCT cost. Previous smoke skipped G2. No YM / mass gap."
   },
   "g3": {
@@ -182,6 +177,23 @@
     ],
     "note": "magnus_truncation_bound contains 0 on a (a_norm, L) grid and a random sample, and refuses ||A|| L >= pi. Named G3 needs a Magnus-truncated holonomy whose error versus PRODUCT substeps=4096 is enclosed and decays at the predicted order. That evaluator is not wired. Previous sign-check stub withdrawn from named G3. Not in CI all_passed."
   },
+  "g4": {
+    "name": "g4_gauge_covariance",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
+    "need": "open holonomy transforms as g(hi) U g(lo)^{-1} to <= 4 ulp; loop invariant to <= 4 ulp",
+    "open_line_flagged": true,
+    "open_holonomy_not_invariant": true,
+    "loop_identity": 1.0,
+    "loop_ulps": 0.0,
+    "loop_ulp_max": 4.0,
+    "loop_within_4_ulp": true,
+    "random_gauge_api": false,
+    "stays_full": true,
+    "note": "open_line_is_gauge_dependent is True and band_holonomy returns gauge_invariant=False. band_wilson_loop of a forward-back pair is measured in ulps versus 1. Named G4 also needs a random gauge on the open band, g(hi) U g(lo)^{-1} to <= 4 ulp. That path is not wired. Previous open-line-flag stub withdrawn from named G4. Not in CI all_passed."
+  },
   "honesty": {
     "closed_form": "abelian and transverse-constant only",
     "open_lines": "gauge-dependent",
@@ -195,6 +207,10 @@
     "g3_reported": true,
     "g3_in_ci_all_passed": false,
     "g3_magnus_holonomy_api": false,
+    "g4_earned": false,
+    "g4_reported": true,
+    "g4_in_ci_all_passed": false,
+    "g4_random_gauge_api": false,
     "temperature_collapse": false,
     "founding_bias_collapse": false,
     "finite_band_gap": true

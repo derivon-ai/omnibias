@@ -4,9 +4,11 @@
 
 G2 closed-form exactness is earned versus PRODUCT at ``substeps=4096``.
 G3 Magnus soundness is reported: the bound is checked on a grid and a
-sample, but no Magnus-truncated holonomy is wired. Closed form is
-abelian + transverse-constant only. The gap is held finite (band), the
-opposite of founding ``delta -> 0``.
+sample, but no Magnus-truncated holonomy is wired. G4 gauge covariance
+is reported: the open-line flag and a closed-loop identity are
+measured, but a random ``g(x_hi) U g(x_lo)^{-1}`` path is not wired.
+Closed form is abelian + transverse-constant only. The gap is held
+finite (band), the opposite of founding ``delta -> 0``.
 """
 
 from __future__ import annotations
@@ -211,21 +213,66 @@ def _run_g3() -> dict[str, Any]:
     }
 
 
+G4_ULP_MAX = 4.0
+
+
+def _run_g4() -> dict[str, Any]:
+    """Named leftover: open-line flag + loop identity; random gauge stays --full."""
+    import torch
+    from omnibias.geometry.gauge._core.lie_algebra import u1
+    from omnibias.geometry.gauge.band._core import HolonomyBand, open_line_is_gauge_dependent
+    from omnibias.geometry.gauge.band.torch import band_holonomy, band_wilson_loop
+
+    torch.set_default_dtype(torch.float64)
+    flagged = open_line_is_gauge_dependent() is True
+    band = HolonomyBand((1.0,), lo=-0.5, hi=0.5, algebra=u1(), coupling=1.0)
+    _u, invariant = band_holonomy(band, a0=1.0)
+    open_not_invariant = invariant is False
+    bands = (
+        HolonomyBand((1.0,), lo=-0.5, hi=0.5, algebra=u1(), coupling=1.0),
+        HolonomyBand((1.0,), lo=0.5, hi=-0.5, algebra=u1(), coupling=1.0),
+    )
+    tr = float(band_wilson_loop(bands, a0=1.0).detach())
+    ulp = float(abs(tr - 1.0) / float(np.finfo(np.float64).eps))
+    return {
+        "name": "g4_gauge_covariance",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
+        "need": "open holonomy transforms as g(hi) U g(lo)^{-1} to <= 4 ulp; loop invariant to <= 4 ulp",
+        "open_line_flagged": bool(flagged),
+        "open_holonomy_not_invariant": bool(open_not_invariant),
+        "loop_identity": float(tr),
+        "loop_ulps": ulp,
+        "loop_ulp_max": G4_ULP_MAX,
+        "loop_within_4_ulp": bool(ulp <= G4_ULP_MAX),
+        "random_gauge_api": False,
+        "stays_full": True,
+        "note": (
+            "open_line_is_gauge_dependent is True and band_holonomy "
+            "returns gauge_invariant=False. band_wilson_loop of a "
+            "forward-back pair is measured in ulps versus 1. Named G4 "
+            "also needs a random gauge on the open band, g(hi) U "
+            "g(lo)^{-1} to <= 4 ulp. That path is not wired. Previous "
+            "open-line-flag stub withdrawn from named G4. Not in CI "
+            "all_passed."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
     args = parser.parse_args()
-    from omnibias.geometry.gauge.band._core import (
-        BandRegime,
-        classify_regime,
-        open_line_is_gauge_dependent,
-    )
+    from omnibias.geometry.gauge.band._core import BandRegime, classify_regime
     from omnibias.geometry.gauge._core.lie_algebra import su, u1
 
     g1 = classify_regime(u1(), transverse_constant=False) is BandRegime.ABELIAN
     g1 = g1 and classify_regime(su(2), transverse_constant=False) is BandRegime.PRODUCT
     g2 = _run_g2()
     g3 = _run_g3()
+    g4 = _run_g4()
     entries: list[dict[str, Any]] = [
         {"name": "g1_regime", "passed": g1, "in_ci_all_passed": True},
         {
@@ -237,11 +284,6 @@ def main() -> int:
             "abelian_cost_ratio": g2["abelian_cost_ratio"],
             "su2_cost_ratio": g2["su2_cost_ratio"],
         },
-        {
-            "name": "g4_open_line_flagged",
-            "passed": open_line_is_gauge_dependent() is True,
-            "in_ci_all_passed": True,
-        },
     ]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.holonomy_band.v1",
@@ -249,12 +291,14 @@ def main() -> int:
             "mode": "full" if args.full else "smoke",
             "g2_in_all_passed": bool(g2["in_ci_all_passed"]),
             "g3_in_all_passed": False,
-            "gates_in_scope": ["g1", "g2", "g4"],
+            "g4_in_all_passed": False,
+            "gates_in_scope": ["g1", "g2"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["g2"] = g2
     payload["g3"] = g3
+    payload["g4"] = g4
     payload["honesty"] = {
         "closed_form": "abelian and transverse-constant only",
         "open_lines": "gauge-dependent",
@@ -268,6 +312,10 @@ def main() -> int:
         "g3_reported": True,
         "g3_in_ci_all_passed": False,
         "g3_magnus_holonomy_api": False,
+        "g4_earned": False,
+        "g4_reported": True,
+        "g4_in_ci_all_passed": False,
+        "g4_random_gauge_api": False,
         "temperature_collapse": False,
         "founding_bias_collapse": False,
         "finite_band_gap": True,

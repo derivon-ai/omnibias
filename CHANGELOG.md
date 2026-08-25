@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomy-band G4 gauge covariance reported (theory 02-14)
+
+- `benchmarks/holonomy_band.py` now records the open-line flag, that
+  `band_holonomy` returns `gauge_invariant=False`, and the forward-back
+  `band_wilson_loop` identity in ulps (`0` ulp versus 1).
+- Reported: named G4 needs a random `g(x_hi) U g(x_lo)^{-1}` path to
+  `<= 4` ulp. That path is not wired. Previous open-line-flag stub
+  withdrawn from named G4. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/holonomy_band_smoke.json`.
+
+
 ### Added — Holonomy-band G3 Magnus reported (theory 02-14)
 
 - `benchmarks/holonomy_band.py` now checks `magnus_truncation_bound` on
