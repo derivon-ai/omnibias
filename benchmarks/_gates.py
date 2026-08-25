@@ -333,6 +333,131 @@ def require_capture_rate(
     return verdict
 
 
+def require_enclosure_coverage(
+    enclosures: Sequence[tuple[float, float]],
+    truths: Sequence[float],
+    *,
+    n_min: int = 1000,
+    name: str = "enclosure",
+) -> dict[str, Any]:
+    """Require every truth to lie in its enclosure.
+
+    Coverage must be exactly ``1.0``. A single miss raises with its index.
+    Median and max width are reported in the verdict and are never gated
+    jointly with coverage, so a tight-but-unsound box cannot pass.
+    """
+    boxes = list(enclosures)
+    values = [float(t) for t in truths]
+    if len(boxes) != len(values):
+        raise ValueError(
+            f"{name}: enclosure/truth length mismatch {len(boxes)} vs {len(values)}"
+        )
+    n = len(values)
+    if n < int(n_min):
+        raise ValueError(f"{name}: n={n} < n_min={n_min}")
+    widths: list[float] = []
+    for i, (box, truth) in enumerate(zip(boxes, values, strict=True)):
+        if len(box) != 2:
+            raise ValueError(f"{name}: enclosure {i} must be (lo, hi)")
+        lo = float(box[0])
+        hi = float(box[1])
+        if not (np.isfinite(lo) and np.isfinite(hi) and np.isfinite(truth)):
+            raise AssertionError(f"{name}: non-finite enclosure or truth at index {i}")
+        if lo > hi:
+            raise AssertionError(f"{name}: empty enclosure at index {i}: [{lo}, {hi}]")
+        if truth < lo or truth > hi:
+            raise AssertionError(
+                f"{name}: truth {truth} outside [{lo}, {hi}] at index {i} "
+                f"(coverage miss; not a width failure)"
+            )
+        widths.append(hi - lo)
+    ordered = sorted(widths)
+    mid = n // 2
+    median_width = float(ordered[mid]) if n % 2 else 0.5 * (ordered[mid - 1] + ordered[mid])
+    return {
+        "name": name,
+        "n": n,
+        "n_min": int(n_min),
+        "coverage": 1.0,
+        "median_width": median_width,
+        "max_width": float(ordered[-1]),
+        "passed": True,
+    }
+
+
+def require_backend_parity(
+    a: Any,
+    b: Any,
+    *,
+    name: str = "parity",
+) -> dict[str, Any]:
+    """Require exact equality of two backend outputs. Not ``allclose``."""
+    left = np.asarray(a)
+    right = np.asarray(b)
+    if left.shape != right.shape:
+        raise AssertionError(
+            f"{name}: shape mismatch {left.shape} vs {right.shape}"
+        )
+    if left.dtype != right.dtype:
+        raise AssertionError(
+            f"{name}: dtype mismatch {left.dtype} vs {right.dtype}"
+        )
+    equal = bool(np.array_equal(left, right, equal_nan=True))
+    verdict = {
+        "name": name,
+        "shape": list(left.shape),
+        "dtype": str(left.dtype),
+        "passed": equal,
+    }
+    if not equal:
+        flat_l = left.reshape(-1)
+        flat_r = right.reshape(-1)
+        miss = int(np.nonzero(np.not_equal(flat_l, flat_r))[0][0])
+        raise AssertionError(
+            f"{name}: backend outputs differ at flat index {miss} "
+            f"({flat_l[miss]!r} vs {flat_r[miss]!r}); exact equality required, "
+            "not allclose"
+        )
+    return verdict
+
+
+def require_cost_parity(
+    method_ms: float,
+    baseline_ms: float,
+    *,
+    max_ratio: float,
+    name: str = "cost",
+) -> dict[str, Any]:
+    """Require ``method_ms / baseline_ms <= max_ratio`` on one hardware class."""
+    method = float(method_ms)
+    baseline = float(baseline_ms)
+    ratio_cap = float(max_ratio)
+    if not (np.isfinite(method) and np.isfinite(baseline) and np.isfinite(ratio_cap)):
+        raise AssertionError(f"{name}: non-finite method, baseline, or max_ratio")
+    if baseline <= 0.0:
+        raise ValueError(f"{name}: baseline_ms must be positive")
+    if method < 0.0:
+        raise ValueError(f"{name}: method_ms must be non-negative")
+    if ratio_cap <= 0.0:
+        raise ValueError(f"{name}: max_ratio must be positive")
+    ratio = method / baseline
+    passed = bool(ratio <= ratio_cap)
+    verdict = {
+        "name": name,
+        "method_ms": method,
+        "baseline_ms": baseline,
+        "ratio": float(ratio),
+        "max_ratio": ratio_cap,
+        "passed": passed,
+    }
+    if not passed:
+        raise AssertionError(
+            f"{name}: cost ratio {ratio:.4g} = {method:.4g}/{baseline:.4g} ms "
+            f"exceeds max_ratio={ratio_cap}"
+        )
+    return verdict
+
+
 def require_all_seeds(
     per_seed: Sequence[dict[str, Any]],
     *,
@@ -595,8 +720,11 @@ __all__ = [
     "mse",
     "rel_l2",
     "require_all_seeds",
-    "require_reference_valid",
+    "require_backend_parity",
     "require_capture_rate",
+    "require_cost_parity",
+    "require_enclosure_coverage",
+    "require_reference_valid",
     "require_rel_error",
     "require_rel_l2",
     "require_scaling_exponent",

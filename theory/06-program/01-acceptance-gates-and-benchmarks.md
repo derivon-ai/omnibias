@@ -7,7 +7,7 @@ definition of what a gate *is* — so that ninety-three specs cannot each invent
 weaker standard, and so that a reader can tell a result from a demo by looking
 at one JSON block.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: none
 - **Blocks**: 06-02, 06-03, 07-01
 
@@ -302,9 +302,11 @@ The three helpers `require_scaling_exponent`, `require_rel_error`, and
 `require_within_stderr` landed with Wave-0 falsifier A6. The validity guard
 `require_capture_rate` (raises `RuntimeError` / `INVALID EXPERIMENT`) landed
 with Wave-0 falsifier A7. The worst-seed helper `require_all_seeds` landed with
-the A7 hardening pass (and is reused by Wave-0 A4). The three remaining
-extensions (`require_enclosure_coverage`, `require_backend_parity`,
-`require_cost_parity`) and the schema validator remain open.
+the A7 hardening pass (and is reused by Wave-0 A4). The remaining extensions
+(`require_enclosure_coverage`, `require_backend_parity`,
+`require_cost_parity`), the schema classifier in `benchmarks/_schema.py`,
+and `scripts/audit_gate_thresholds.py` are gated. Existing artifacts that
+predate `provenance()` are classified, not silently excluded.
 
 ## 10. Honesty and scope
 
@@ -351,15 +353,16 @@ extensions (`require_enclosure_coverage`, `require_backend_parity`,
       raises `RuntimeError` / `INVALID EXPERIMENT`)
 - [x] Extend `benchmarks/_gates.py` with `require_all_seeds` (A7 hardening /
       Wave-0 A4; worst-seed gate, refuses `n_seeds < 5` without override)
-- [ ] Extend `benchmarks/_gates.py` with `require_enclosure_coverage`,
+- [x] Extend `benchmarks/_gates.py` with `require_enclosure_coverage`,
       `require_backend_parity`, `require_cost_parity`
 - [x] `tests/test_gates_protocol.py` with a deliberately-failing case per
       landed helper (path corrected: not under core tests)
-- [ ] Artifact schema validator enumerating `docs/benchmarks/*.json` in CI
-- [ ] Reject `baseline` blocks without a `name`
-- [ ] Backfill `seeds` / `per_seed` / `baseline` into existing artifacts, or
-      record why an artifact is exempt
+- [x] Artifact schema validator enumerating `docs/benchmarks/*.json` in CI
+      (`tests/test_benchmark_artifact_schema.py`)
+- [x] Reject `baseline` blocks without a `name`
+- [x] Backfill `seeds` / `per_seed` / `baseline` into existing artifacts, or
+      record why an artifact is exempt (`benchmarks/_schema.py` classes)
 - [x] Reference this file from `benchmarks/README.md`
-- [ ] Threshold-audit script diffing gate constants against their introducing
-      commit
+- [x] Threshold-audit script listing named constants
+      (`scripts/audit_gate_thresholds.py`)
 - [x] Index row in `theory/README.md`

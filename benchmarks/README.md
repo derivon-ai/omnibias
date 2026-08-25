@@ -81,8 +81,10 @@ All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries
 Wave-0 kill experiments from [`theory/06-program/03-packaging-and-rollout.md`](../theory/06-program/03-packaging-and-rollout.md).
 Shared gate protocol: [`theory/06-program/01-acceptance-gates-and-benchmarks.md`](../theory/06-program/01-acceptance-gates-and-benchmarks.md).
 Helpers: `require_scaling_exponent`, `require_rel_error`, `require_within_stderr`,
-`require_capture_rate`, `require_all_seeds` in [`_gates.py`](_gates.py), self-tested in
-`tests/test_gates_protocol.py`.
+`require_capture_rate`, `require_all_seeds`, `require_enclosure_coverage`,
+`require_backend_parity`, `require_cost_parity` in [`_gates.py`](_gates.py),
+self-tested in `tests/test_gates_protocol.py`. Artifact classes and G5
+(`baseline.name`) live in [`_schema.py`](_schema.py).
 
 ```bash
 # CI smoke

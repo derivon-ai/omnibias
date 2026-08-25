@@ -12,11 +12,18 @@ resolves without a hand-rolled ``sys.path`` insert.
 
 from __future__ import annotations
 
+import subprocess
+import sys
+from pathlib import Path
+
 import numpy as np
 import pytest
 from _gates import (
     require_all_seeds,
+    require_backend_parity,
     require_capture_rate,
+    require_cost_parity,
+    require_enclosure_coverage,
     require_rel_error,
     require_scaling_exponent,
     require_within_stderr,
@@ -147,6 +154,54 @@ def test_require_all_seeds_direction_min_passes() -> None:
         name="g1",
     )
     assert verdict["passed"] is True
+
+
+def test_threshold_audit_lists_stretch_gate() -> None:
+    script = Path(__file__).resolve().parents[1] / "scripts" / "audit_gate_thresholds.py"
+    out = subprocess.check_output([sys.executable, str(script)], text=True)
+    assert "CCF_STRETCH_RESIDUAL_GATE=" in out
+
+
+def test_require_enclosure_coverage_passes() -> None:
+    boxes = [(float(i), float(i) + 1.0) for i in range(8)]
+    truths = [i + 0.5 for i in range(8)]
+    verdict = require_enclosure_coverage(boxes, truths, n_min=8, name="ok")
+    assert verdict["passed"] is True
+    assert verdict["coverage"] == 1.0
+    assert verdict["median_width"] == 1.0
+
+
+def test_require_enclosure_coverage_single_miss_raises() -> None:
+    n = 10_000
+    boxes = [(0.0, 1.0)] * n
+    truths = [0.5] * n
+    truths[4242] = 1.5
+    with pytest.raises(AssertionError, match="index 4242"):
+        require_enclosure_coverage(boxes, truths, n_min=n, name="miss")
+
+
+def test_require_backend_parity_passes() -> None:
+    a = np.array([1.0, -0.25, 0.0], dtype=np.float64)
+    verdict = require_backend_parity(a, a.copy(), name="ok")
+    assert verdict["passed"] is True
+
+
+def test_require_backend_parity_one_ulp_raises() -> None:
+    a = np.array([1.0], dtype=np.float64)
+    b = np.array([np.nextafter(1.0, 2.0)], dtype=np.float64)
+    with pytest.raises(AssertionError, match="exact equality"):
+        require_backend_parity(a, b, name="ulp")
+
+
+def test_require_cost_parity_passes() -> None:
+    verdict = require_cost_parity(12.0, 10.0, max_ratio=2.0, name="ok")
+    assert verdict["passed"] is True
+    assert verdict["ratio"] == pytest.approx(1.2)
+
+
+def test_require_cost_parity_raises() -> None:
+    with pytest.raises(AssertionError, match="max_ratio"):
+        require_cost_parity(250.0, 10.0, max_ratio=10.0, name="slow")
 
 
 def test_require_all_seeds_direction_min_raises() -> None:

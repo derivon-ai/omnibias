@@ -170,7 +170,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 
 | Spec | Status | One line |
 |---|---|---|
-| [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | designed | The shared protocol every spec in this tree must satisfy |
+| [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | gated | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | designed | The claim ladder and the forbidden-claims register |
 | [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | designed | Where each spec lands and in what order |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | The monograph spine |
