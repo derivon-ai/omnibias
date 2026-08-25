@@ -27,4 +27,5 @@ sub-results. Treat every claim as a **sub-obligation** with an absolute gate.
   requires dense grid **and** random sample containment.
 
 See the `omnibias-dev-frontier-research` maintainer skill for the route list
-and the seam-artifact / ETDRK4 worked examples.
+and the seam-artifact / ETDRK4 worked examples. The claim ladder and
+forbidden-claims register are theory spec 06-02 and `docs/honesty.md`.

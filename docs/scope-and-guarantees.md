@@ -1,5 +1,8 @@
 # Scope & guarantees
 
+The four-rung claim ladder and the never-write register live on
+[`honesty.md`](honesty.md) (theory 06-02).
+
 > One canonical page for what omnibias **does** guarantee, what it **doesn't**,
 > and how every page on the site uses those words consistently. Cookbook pages
 > link here rather than repeating the same disclaimer panel.

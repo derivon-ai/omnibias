@@ -138,6 +138,7 @@ nav:
       - "7. Information geometry & natural gradient": handbook/07-information-geometry.md
   - Theory:
       - Closed-form derivatives: theory.md
+      - Claim ladder and forbidden claims: honesty.md
       - Jet-bundle vocabulary (01-10): theory-jets.md
       - Operator surface (capability matrix): operator-surface.md
       - Differentiable binarization: theory-binary.md

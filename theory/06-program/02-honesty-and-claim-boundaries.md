@@ -7,7 +7,7 @@ benchmark in the same repository needs one written rule for which sentence each
 result licenses — and, more importantly, a written list of sentences that are
 never licensed by anything this program can produce.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 06-01
 - **Blocks**: 06-03, 07-01
 
@@ -285,15 +285,15 @@ fail on synthetic violations:
 
 - [x] Add `theory` to `SCANNED_ROOTS` in `tests/test_terminology.py` and fix any
       hits
-- [ ] `packages/omnibias-core/tests/test_forbidden_claims.py` with a self-test
+- [x] `packages/omnibias-core/tests/test_forbidden_claims.py` with a self-test
       that injects a synthetic violation
-- [ ] Dedicated test that no Padé / Borel path claims analytic continuation of a
+- [x] Dedicated test that no Padé / Borel path claims analytic continuation of a
       Dirichlet series
-- [ ] `packages/omnibias-core/tests/test_theory_structure.py` for Group 07
+- [x] `packages/omnibias-core/tests/test_theory_structure.py` for Group 07
       section 13, external parent, and non-claim sentence
-- [ ] Method-label lint over the theory tree
-- [ ] `ALLOWED` entries require a reason comment
-- [ ] Reconfirm reserved-key behaviour with an explicit test
-- [ ] Docs page carrying the claim ladder and forbidden-claims register
-- [ ] Cross-reference from `.cursor/rules/frontier-claims.mdc`
-- [ ] Index row in `theory/README.md`
+- [x] Method-label lint over the theory tree
+- [x] `ALLOWED` entries require a reason comment
+- [x] Reconfirm reserved-key behaviour with an explicit test
+- [x] Docs page carrying the claim ladder and forbidden-claims register
+- [x] Cross-reference from `.cursor/rules/frontier-claims.mdc`
+- [x] Index row in `theory/README.md`
