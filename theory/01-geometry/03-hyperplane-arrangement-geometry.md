@@ -6,6 +6,8 @@ Many units with different normals define a **hyperplane arrangement**: its
 cells, flats and face lattice are the combinatorial object that every downstream
 region-based construction (constraint sets, polytopes, graph networks) actually
 uses, and the soft version is a differentiable weighting of those cells.
+In jet-bundle language (01-10) the arrangement is a stratification of
+the base by the sign data of those affine functions.
 
 - **Status**: gated (G1–G4 CI; temperature collapse, sampled subgraph; cost vs `n`/`D` **reported**, not in CI `all_passed`)
 - **Depends on**: none

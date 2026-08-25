@@ -34,7 +34,6 @@ def test_g1_contact_is_recorded() -> None:
     assert payload["gates"]["all_passed"] is True
     assert payload["honesty"]["reformulation_not_discovery"] is True
     assert payload["honesty"]["omnibias_jetbundle_package"] is False
-    assert payload["honesty"]["g3_earned"] is False
 
 
 def test_g2_rate_is_recorded() -> None:

@@ -6,6 +6,8 @@ Sliding a hyperplane along its own normal *is* what the bias already does, so
 the convolutional idea is not "slide the plane" but **share one pack template
 and evaluate it at many bias offsets**, producing a translation-equivariant
 response along `w` at the cost of one activation call per offset.
+In jet-bundle language (01-10) the scan is the section pulled back
+along a translation of the base in the `w` direction.
 
 - **Status**: gated (G1–G4 earned in CI `all_passed`; 01-13 G5 earned)
 - **Depends on**: 01-01

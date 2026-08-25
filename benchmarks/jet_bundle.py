@@ -5,7 +5,8 @@
 Vocabulary, not a discovery. No ``omnibias-jetbundle`` package.
 Founding ``delta -> 0`` produces fiber coordinates. Temperature
 collapse acts on the base stratification, not on the fiber.
-G1/G2 are the named contact tests. G3 vocabulary stays a later leftover.
+G1/G2 are the named contact tests. G3 is dictionary coverage in
+other theory specs, not a discovery.
 """
 
 from __future__ import annotations
@@ -24,8 +25,28 @@ from _common import provenance, write_json  # type: ignore[import-not-found]  # 
 from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
+REPO = Path(__file__).resolve().parents[1]
 N_CASES = 220
 NEED = 200
+SELF_SPEC = "10-jet-bundle-formalization.md"
+DICTIONARY_TERMS: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("fiber coordinate", ("fiber coordinate", "fiber coordinates")),
+    ("scattered jet", ("scattered jet",)),
+    ("fiber interval", ("fiber interval",)),
+    (
+        "translation of the base",
+        ("translation of the base", "translation along the base"),
+    ),
+    ("stratification", ("stratification",)),
+    ("fiber product", ("fiber product", "fiber-product")),
+    ("subvariety", ("subvariety",)),
+    ("prolongation", ("prolongation", "prolongations")),
+)
+COMPETING_NEEDLES = (
+    "band role is a local jet",
+    "integral role is a local jet",
+    "fiber interval is a derivative",
+)
 
 
 def _horner(coeffs: tuple[float, ...], x: float) -> float:
@@ -179,25 +200,79 @@ def _run_g2() -> dict[str, Any]:
     }
 
 
+def _theory_specs() -> list[Path]:
+    theory = REPO / "theory"
+    return sorted(
+        path
+        for path in theory.rglob("*.md")
+        if path.name != "README.md" and path.name != SELF_SPEC
+    )
+
+
+def _run_g3() -> dict[str, Any]:
+    """Named leftover: dictionary terms in other specs; no competing names."""
+    specs = _theory_specs()
+    blobs = [(path, path.read_text(encoding="utf-8").lower()) for path in specs]
+    coverage: list[dict[str, Any]] = []
+    missing: list[str] = []
+    for name, needles in DICTIONARY_TERMS:
+        hits: list[str] = []
+        for path, text in blobs:
+            if any(needle in text for needle in needles):
+                hits.append(str(path.relative_to(REPO)))
+        row = {"term": name, "n_specs": len(hits), "specs": hits[:8]}
+        coverage.append(row)
+        if not hits:
+            missing.append(name)
+    competing: list[str] = []
+    for path, text in blobs:
+        for needle in COMPETING_NEEDLES:
+            if needle in text:
+                competing.append(f"{path.relative_to(REPO)}:{needle}")
+    earned = not missing and not competing
+    return {
+        "name": "g3_vocabulary",
+        "passed": bool(earned),
+        "earned": bool(earned),
+        "reported": True,
+        "in_ci_all_passed": bool(earned),
+        "n_terms": len(DICTIONARY_TERMS),
+        "n_covered": len(DICTIONARY_TERMS) - len(missing),
+        "missing": missing,
+        "competing": competing,
+        "coverage": coverage,
+        "need": "every dictionary term in another spec; no competing name",
+        "note": (
+            "Consistency pass over theory/ specs excluding 01-10. "
+            "Named G3 needs every dictionary term in at least one other "
+            "spec and no competing term for the same object. Scale-flow "
+            "V-cycle 'prolongation' is a different object, not a "
+            "competing name for the jet-bundle prolongation."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true")
     args = parser.parse_args()
     g1 = _run_g1()
     g2 = _run_g2()
-    in_scope = [row for row in (g1, g2) if row["in_ci_all_passed"]]
+    g3 = _run_g3()
+    in_scope = [row for row in (g1, g2, g3) if row["in_ci_all_passed"]]
     payload = provenance(
         schema="omnibias.benchmark.jet_bundle.v1",
         config={
             "family": "jet_bundle",
             "full": bool(args.full),
             "gates_in_scope": [row["name"] for row in in_scope],
-            "g3_in_all_passed": False,
+            "g3_in_all_passed": bool(g3["in_ci_all_passed"]),
         },
     )
     payload["gates"] = gates_block(in_scope)
     payload["g1"] = g1
     payload["g2"] = g2
+    payload["g3"] = g3
     payload["honesty"] = {
         "reformulation_not_discovery": True,
         "omnibias_jetbundle_package": False,
@@ -207,7 +282,9 @@ def main() -> int:
         "g1_in_ci_all_passed": bool(g1["in_ci_all_passed"]),
         "g2_earned": bool(g2["earned"]),
         "g2_in_ci_all_passed": bool(g2["in_ci_all_passed"]),
-        "g3_earned": False,
+        "g3_earned": bool(g3["earned"]),
+        "g3_in_ci_all_passed": bool(g3["in_ci_all_passed"]),
+        "scale_flow_prolongation_is_v_cycle": True,
         "certificate_tier": False,
     }
     if args.full:

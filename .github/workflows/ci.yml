@@ -175,7 +175,7 @@ jobs:
         run: |
           source .venv-core/bin/activate
           python benchmarks/conjugate_hilbert.py
-      - name: Run jet-bundle smoke (01-10 G1/G2; G3 not all_passed)
+      - name: Run jet-bundle smoke (01-10 G1–G3)
         run: |
           source .venv-core/bin/activate
           python benchmarks/jet_bundle.py

@@ -6,6 +6,9 @@ A new omnibias operator is **`scan(role)`** for one of the six
 `OperatorBlock` roles — not a seventh role, not `Conv2d` on `R^D`, and
 not a new invention group. This file is the generator rule and the
 catalog; named architectures stay in Groups 02 / 03 / 09.
+The `band` and `integral` roles are a fiber interval — the difference
+of the order `-1` coordinate at two base points — not a local jet
+coordinate (01-10).
 
 - **Status**: gated
 - **Depends on**: 01-01, 01-02, 06-02, 09-01

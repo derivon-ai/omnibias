@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.jet_bundle.v1",
-  "generated_utc": "2026-08-25T19:53:42Z",
+  "generated_utc": "2026-08-25T20:00:22Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,11 +15,12 @@
     "full": false,
     "gates_in_scope": [
       "g1_contact",
-      "g2_rate"
+      "g2_rate",
+      "g3_vocabulary"
     ],
-    "g3_in_all_passed": false
+    "g3_in_all_passed": true
   },
-  "rss_mb_at_start": 807.61,
+  "rss_mb_at_start": 807.88,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -54,6 +55,84 @@
         ],
         "need": "holonomic ~1/4 and corrupted ~1/2 over three halvings",
         "note": "Contact residual of tanh versus first-derivative overwrite over three halvings of h. Same named path as G1."
+      },
+      {
+        "name": "g3_vocabulary",
+        "passed": true,
+        "earned": true,
+        "reported": true,
+        "in_ci_all_passed": true,
+        "n_terms": 8,
+        "n_covered": 8,
+        "missing": [],
+        "competing": [],
+        "coverage": [
+          {
+            "term": "fiber coordinate",
+            "n_specs": 1,
+            "specs": [
+              "theory/01-geometry/01-multipack-birkhoff-collapse.md"
+            ]
+          },
+          {
+            "term": "scattered jet",
+            "n_specs": 1,
+            "specs": [
+              "theory/01-geometry/01-multipack-birkhoff-collapse.md"
+            ]
+          },
+          {
+            "term": "fiber interval",
+            "n_specs": 1,
+            "specs": [
+              "theory/01-geometry/13-operator-family.md"
+            ]
+          },
+          {
+            "term": "translation of the base",
+            "n_specs": 2,
+            "specs": [
+              "theory/01-geometry/02-bias-scan-transverse-convolution.md",
+              "theory/06-program/04-book-outline.md"
+            ]
+          },
+          {
+            "term": "stratification",
+            "n_specs": 3,
+            "specs": [
+              "theory/01-geometry/03-hyperplane-arrangement-geometry.md",
+              "theory/02-architectures/08-equivariant-and-manifold-scan.md",
+              "theory/06-program/04-book-outline.md"
+            ]
+          },
+          {
+            "term": "fiber product",
+            "n_specs": 1,
+            "specs": [
+              "theory/01-geometry/09-equality-locus-and-intersection-calculus.md"
+            ]
+          },
+          {
+            "term": "subvariety",
+            "n_specs": 2,
+            "specs": [
+              "theory/01-geometry/09-equality-locus-and-intersection-calculus.md",
+              "theory/03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md"
+            ]
+          },
+          {
+            "term": "prolongation",
+            "n_specs": 4,
+            "specs": [
+              "theory/02-architectures/03-jet-kan-univariate-basis.md",
+              "theory/03-algorithms/07-scale-flow-and-coarse-graining.md",
+              "theory/03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md",
+              "theory/06-program/04-book-outline.md"
+            ]
+          }
+        ],
+        "need": "every dictionary term in another spec; no competing name",
+        "note": "Consistency pass over theory/ specs excluding 01-10. Named G3 needs every dictionary term in at least one other spec and no competing term for the same object. Scale-flow V-cycle 'prolongation' is a different object, not a competing name for the jet-bundle prolongation."
       }
     ]
   },
@@ -89,6 +168,84 @@
     "need": "holonomic ~1/4 and corrupted ~1/2 over three halvings",
     "note": "Contact residual of tanh versus first-derivative overwrite over three halvings of h. Same named path as G1."
   },
+  "g3": {
+    "name": "g3_vocabulary",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "n_terms": 8,
+    "n_covered": 8,
+    "missing": [],
+    "competing": [],
+    "coverage": [
+      {
+        "term": "fiber coordinate",
+        "n_specs": 1,
+        "specs": [
+          "theory/01-geometry/01-multipack-birkhoff-collapse.md"
+        ]
+      },
+      {
+        "term": "scattered jet",
+        "n_specs": 1,
+        "specs": [
+          "theory/01-geometry/01-multipack-birkhoff-collapse.md"
+        ]
+      },
+      {
+        "term": "fiber interval",
+        "n_specs": 1,
+        "specs": [
+          "theory/01-geometry/13-operator-family.md"
+        ]
+      },
+      {
+        "term": "translation of the base",
+        "n_specs": 2,
+        "specs": [
+          "theory/01-geometry/02-bias-scan-transverse-convolution.md",
+          "theory/06-program/04-book-outline.md"
+        ]
+      },
+      {
+        "term": "stratification",
+        "n_specs": 3,
+        "specs": [
+          "theory/01-geometry/03-hyperplane-arrangement-geometry.md",
+          "theory/02-architectures/08-equivariant-and-manifold-scan.md",
+          "theory/06-program/04-book-outline.md"
+        ]
+      },
+      {
+        "term": "fiber product",
+        "n_specs": 1,
+        "specs": [
+          "theory/01-geometry/09-equality-locus-and-intersection-calculus.md"
+        ]
+      },
+      {
+        "term": "subvariety",
+        "n_specs": 2,
+        "specs": [
+          "theory/01-geometry/09-equality-locus-and-intersection-calculus.md",
+          "theory/03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md"
+        ]
+      },
+      {
+        "term": "prolongation",
+        "n_specs": 4,
+        "specs": [
+          "theory/02-architectures/03-jet-kan-univariate-basis.md",
+          "theory/03-algorithms/07-scale-flow-and-coarse-graining.md",
+          "theory/03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md",
+          "theory/06-program/04-book-outline.md"
+        ]
+      }
+    ],
+    "need": "every dictionary term in another spec; no competing name",
+    "note": "Consistency pass over theory/ specs excluding 01-10. Named G3 needs every dictionary term in at least one other spec and no competing term for the same object. Scale-flow V-cycle 'prolongation' is a different object, not a competing name for the jet-bundle prolongation."
+  },
   "honesty": {
     "reformulation_not_discovery": true,
     "omnibias_jetbundle_package": false,
@@ -98,7 +255,9 @@
     "g1_in_ci_all_passed": true,
     "g2_earned": true,
     "g2_in_ci_all_passed": true,
-    "g3_earned": false,
+    "g3_earned": true,
+    "g3_in_ci_all_passed": true,
+    "scale_flow_prolongation_is_v_cycle": true,
     "certificate_tier": false
   }
 }

@@ -6,6 +6,8 @@ A Lie point symmetry's determining equations are **linear** in the infinitesimal
 generator's coefficients once the prolongation is known, and prolongation is
 exactly a jet computation — so with exact towers, symmetry discovery becomes a
 linear nullspace problem instead of a symbolic computation.
+In jet-bundle language (01-10) a PDE is a subvariety of `J^N(E)`, and
+a symmetry's prolongation is tangent to that subvariety.
 
 - **Status**: gated
 - **Depends on**: 01-01, 01-10, 02-03, 02-09

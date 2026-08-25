@@ -6,6 +6,8 @@ Force two or more collapsed units to **agree**, and their shared level set
 `f_i(x) = f_j(x)` becomes a codimension-`m` manifold whose exact Jacobian and
 Hessian the derivative tower supplies in closed form, so the locus can be
 followed by Newton without autodiff and its existence can be certified on a box.
+In jet-bundle language (01-10) the locus is a fiber product of two
+sections, a subvariety of the base cut out by a jet condition.
 
 - **Status**: gated (G1–G5 CI; G6 parity; constraint manifold, not a PDE solver)
 - **Depends on**: 01-01

@@ -6,6 +6,9 @@ One channel, one normal, but **several independent bias packs of different
 sizes at different means**: pack size selects a derivative order, pack mean
 selects a sample location, so a single unit evaluates a *scattered Birkhoff
 sample* of `sigma` along one direction rather than a single derivative.
+In jet-bundle language (01-10) that is a linear functional on a
+scattered jet: values of several fiber coordinates at several base
+points.
 
 - **Status**: gated (G1–G5 earned)
 - **Depends on**: none

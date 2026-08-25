@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-bundle G3 vocabulary earned (theory 01-10)
+
+- `benchmarks/jet_bundle.py` now scans other theory specs for the
+  eight dictionary terms and for competing names of the same object.
+- Earned: 8/8 terms appear outside 01-10; no competing name. Mapped
+  specs 01-01 / 01-02 / 01-03 / 01-09 / 01-13 / 03-11 carry one
+  dictionary sentence each. Scale-flow V-cycle prolongation is a
+  different object. In CI `all_passed`.
+- Smoke: `docs/benchmarks/jet_bundle_smoke.json`.
+
+
 ### Added — Jet-bundle G1/G2 contact earned (theory 01-10)
 
 - `benchmarks/jet_bundle.py` now runs `is_holonomic` on 220 genuine
