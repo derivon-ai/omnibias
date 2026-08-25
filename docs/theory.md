@@ -179,7 +179,8 @@ gates are earned on smoke, not in CI `all_passed`.
   higher-order kernels take **negative** values. G1–G4 CI-gated.
 - **Spectral design** ([01-07](api/spectral_design.md)): `BandPlan` /
   `peak_frequency`. Pack order is a **band selector**, not a Littlewood-Paley
-  completeness claim. G1–G2 CI-gated; G3 not in CI `all_passed`.
+  completeness claim. G1–G2/G4 CI-gated; G3 unearned, not in CI
+  `all_passed`.
 - **OMBU frames** ([01-06](api/frames.md)): `FrameSpec` /
   `admissibility_constant`. `sigma'` is **not** admissible; frames are not
   orthonormal and not compactly supported. G1–G3 CI-gated; G4 denoising

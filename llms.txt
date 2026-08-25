@@ -30,7 +30,8 @@ Wave-3 algebra + architectures (gated, no new packages): `MollifierSpec` /
 `tail_bound` (01-05; G1–G4 CI-gated; certified exponential tails, not
 compact support; higher-order kernels take negative values),
 `BandPlan` / `peak_frequency`
-(01-07; pack order is a band selector), `FrameSpec` (01-06; `sigma'` not
+(01-07; G3 unearned, not `all_passed`; pack order is a band selector),
+`FrameSpec` (01-06; `sigma'` not
 admissible), `EqualitySystem` / `EqualityLocusLayer` (01-09 / 02-12;
 constraint manifold, not a PDE solver), jet vocabulary (01-10; not a
 package), conjugate Hilbert (01-12; line only; G5 not `all_passed`),

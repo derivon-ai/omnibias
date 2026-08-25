@@ -1,11 +1,14 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-3 primitive: spectral design (theory 01-07 G1/G2/G4; G3 not CI-gated).
+"""Wave-3 primitive: spectral design (theory 01-07 G1/G2/G4; G3 unearned).
 
 Smoke earns formula peak correctness, a transfer-magnitude check of ``R``
 against a DFT of the sampled kernel, and hole detection. G3 (2x fewer steps
-vs MscaleMLP on the spectral-bias arm) is ``--full`` / smoke-attempted and is
-**not** in CI ``all_passed``. Does not mutate ``spectral_bias_fbpinn`` gates.
+vs MscaleMLP on the spectral-bias arm) is recorded unearned and is **not**
+in CI ``all_passed``: the named lstsq-level gate is not reached by either
+the geometric or a band-planned Mscale in the CI step budget. Does not
+mutate ``spectral_bias_fbpinn`` gates. Pack order is a band selector, not
+Littlewood-Paley completeness.
 """
 
 from __future__ import annotations
@@ -127,15 +130,88 @@ def _run_g4() -> dict[str, Any]:
     }
 
 
-def _run_g3_placeholder() -> dict[str, Any]:
+def _run_g3() -> dict[str, Any]:
+    """Record the named 2x-steps comparison; do not put it in ``all_passed``.
+
+    The four-gap arm's absolute gate is lstsq-level (``rel L2 <= 1e-5`` on
+    smoke). Geometric Mscale and a band-planned Mscale (peaks mapped to
+    input stretches) are trained for the smoke step budget. The 2x ratio
+    is defined only if both arms hit that gate.
+    """
+    import math
+
+    import torch
+    from omnibias.core.spectral_design import design_band_plan, peak_frequency
+    from omnibias.pinn import ComponentSpec, CoordinateSpec
+    from omnibias.pinn.torch.fields import MscaleVectorField
+
+    torch.set_default_dtype(torch.float64)
+    freq = 8
+    n_grid = 64
+    hidden = 16
+    steps = 60
+    lr = 1e-2
+    gate = 1e-5
+    seeds = (0, 1, 2, 3, 4)
+    geometric = (1.0, 2.0, 4.0, 8.0)
+    plan = design_band_plan(
+        "sech", xi_lo=2.0 * math.pi, xi_hi=2.0 * math.pi * 16.0, channels=4, order=2
+    )
+    planned = tuple(
+        peak_frequency("sech", n, a) / (2.0 * math.pi)
+        for n, a in zip(plan.orders, plan.scales, strict=True)
+    )
+    cs = CoordinateSpec(("x",), domain=((0.0, 1.0),))
+    comps = ComponentSpec(("u",))
+
+    def _rel_after(scales: tuple[float, ...], seed: int) -> float:
+        torch.manual_seed(seed)
+        field = MscaleVectorField(
+            coordinate_spec=cs,
+            components=comps,
+            hidden=hidden,
+            depth=1,
+            scales=scales,
+            dtype=torch.float64,
+        )
+        x = torch.linspace(0.0, 1.0, n_grid, dtype=torch.float64).unsqueeze(-1)
+        target = torch.sin(2.0 * math.pi * freq * x[:, 0])
+        opt = torch.optim.Adam(field.parameters(), lr=lr)
+        for _ in range(steps):
+            opt.zero_grad()
+            pred = field.forward_values(x)[:, 0]
+            torch.mean((pred - target) ** 2).backward()
+            opt.step()
+        with torch.no_grad():
+            pred = field.forward_values(x)[:, 0]
+            return float(
+                torch.linalg.vector_norm(pred - target)
+                / torch.linalg.vector_norm(target)
+            )
+
+    geo_rels = [_rel_after(geometric, seed) for seed in seeds]
+    plan_rels = [_rel_after(planned, seed) for seed in seeds]
+    geo_hits = sum(1 for r in geo_rels if r <= gate)
+    plan_hits = sum(1 for r in plan_rels if r <= gate)
+    earned = geo_hits == len(seeds) and plan_hits == len(seeds)
     return {
         "name": "g3_spectral_bias_steps",
         "passed": False,
+        "earned": False,
         "in_ci_all_passed": False,
+        "gate": gate,
+        "steps": steps,
+        "n_seeds": len(seeds),
+        "geometric_hits": int(geo_hits),
+        "planned_hits": int(plan_hits),
+        "geometric_median_rel_l2": float(np.median(geo_rels)),
+        "planned_median_rel_l2": float(np.median(plan_rels)),
+        "both_reached_gate": bool(earned),
         "note": (
-            "2x fewer steps vs MscaleMLP on spectral_bias_fbpinn is --full / "
-            "smoke-attempted and is not in CI all_passed (wall time). The "
-            "four-gap benchmark gates are not mutated."
+            "named 2x-fewer-steps comparison is undefined while neither "
+            "geometric nor band-planned Mscale reaches the four-gap lstsq "
+            "gate in the CI step budget. Calculator stays diagnostic. "
+            "Four-gap gates are not mutated. Not Littlewood-Paley."
         ),
     }
 
@@ -147,7 +223,7 @@ def main() -> int:
     g1 = _run_g1()
     g2 = _run_g2()
     g4 = _run_g4()
-    g3 = _run_g3_placeholder()
+    g3 = _run_g3()
     in_scope = [g1, g2, g4]
     payload = provenance(
         schema="spectral-design-v1",

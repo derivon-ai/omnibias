@@ -1,6 +1,6 @@
 {
   "schema": "spectral-design-v1",
-  "generated_utc": "2026-08-15T09:41:15Z",
+  "generated_utc": "2026-08-25T17:13:55Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "g4"
     ]
   },
-  "rss_mb_at_start": 822.04,
+  "rss_mb_at_start": 977.73,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -66,8 +66,17 @@
   "g3": {
     "name": "g3_spectral_bias_steps",
     "passed": false,
+    "earned": false,
     "in_ci_all_passed": false,
-    "note": "2x fewer steps vs MscaleMLP on spectral_bias_fbpinn is --full / smoke-attempted and is not in CI all_passed (wall time). The four-gap benchmark gates are not mutated."
+    "gate": 1e-05,
+    "steps": 60,
+    "n_seeds": 5,
+    "geometric_hits": 0,
+    "planned_hits": 0,
+    "geometric_median_rel_l2": 0.997683855740048,
+    "planned_median_rel_l2": 0.9972381348332725,
+    "both_reached_gate": false,
+    "note": "named 2x-fewer-steps comparison is undefined while neither geometric nor band-planned Mscale reaches the four-gap lstsq gate in the CI step budget. Calculator stays diagnostic. Four-gap gates are not mutated. Not Littlewood-Paley."
   },
   "g4": {
     "name": "g4_hole_detection",

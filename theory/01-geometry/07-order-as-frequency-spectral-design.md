@@ -7,7 +7,7 @@ is a frequency-band selector**: choosing `n` and the tempering scale `alpha`
 places a channel's sensitivity in a known band, which converts spectral-bias
 mitigation from a heuristic into a design calculation.
 
-- **Status**: gated (G1–G2 earned; G3 not in CI `all_passed`; pack order is a band selector, not Littlewood-Paley completeness)
+- **Status**: gated (G1–G2/G4 earned; G3 unearned, not in CI `all_passed`; pack order is a band selector, not Littlewood-Paley completeness)
 - **Depends on**: 01-01, 01-06
 - **Blocks**: 02-01, 02-05, 02-07, 03-07, 07-03
 
@@ -210,7 +210,13 @@ with a tuned bandwidth, both at matched parameter count.
   (`benchmarks/spectral_bias_fbpinn.py`), a band-planned initialization reaches
   the arm's absolute error gate in at least `2x` fewer steps than the tuned
   `MscaleMLP` baseline, over five seeds, with `lstsq_matched` recorded as the
-  benchmark already requires.
+  benchmark already requires. **Unearned** — see
+  `docs/benchmarks/spectral_design_smoke.json`: geometric and band-planned
+  Mscale both miss the four-gap lstsq gate (`rel L2 <= 1e-5`) in the CI
+  step budget (`0/5` hits either arm; median rel L2 `0.998` / `0.997`). The
+  `2x` ratio is undefined until both arms finish. Not in CI `all_passed`.
+  The four-gap `lstsq` gates are not mutated. The calculator stays
+  diagnostic (spec falsifier).
 - **G4 hole detection.** For a deliberately holed plan, the diagnostic flags the
   hole before training, and training does in fact stall in that band.
 

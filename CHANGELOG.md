@@ -6,6 +6,17 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Spectral-design G3 recorded unearned (theory 01-07)
+
+- `benchmarks/spectral_design.py` G3 now measures geometric vs band-planned
+  Mscale on the four-gap sine task (5 seeds, 60 steps, gate `rel L2 1e-5`).
+- Unearned: `0/5` hits either arm (median rel L2 `0.998` / `0.997`). The
+  named `2x` fewer-steps ratio is undefined until both arms finish. G3
+  stays out of CI `all_passed`. Four-gap `lstsq` gates are not mutated.
+  Pack order stays a band selector, not Littlewood-Paley completeness.
+- Smoke: `docs/benchmarks/spectral_design_smoke.json`.
+
+
 ### Added — Mollifier weak-residual G4 (theory 01-05)
 
 - `exact_moment` IBP for `power >= 1` now scales the recursive primitive
