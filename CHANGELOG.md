@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tropical G4 path-following reported (theory 01-08)
+
+- `benchmarks/tropical_homotopy.py` now records that `relaxed_hess` is
+  exported and that no second-order path-follow driver is wired to
+  `anneal_descent`.
+- Reported: named G4 needs a `2x` eval win at matched decode. Previous
+  `--full` only line withdrawn. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/tropical_homotopy_smoke.json`.
+
+
 ### Added — BEM-Net G3 exterior win reported (theory 02-06)
 
 - `benchmarks/bem_net.py` now records that pack-tree 02-07 has no dense

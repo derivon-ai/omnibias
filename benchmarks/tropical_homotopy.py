@@ -1,9 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Gated primitive: tropical homotopy (theory 01-08). G4 path-following is --full.
+"""Gated primitive: tropical homotopy (theory 01-08).
 
-Cost vs ``n`` / ``D`` is reported with the refuse cutoff; not in CI
-``all_passed``. ``beta -> inf`` is temperature collapse.
+G4 path-following is reported unearned: ``relaxed_hess`` exists, but no
+second-order driver is wired to ``anneal_descent``. Cost vs ``n`` / ``D``
+is reported with the refuse cutoff. Neither is in CI ``all_passed``.
+``beta -> inf`` is temperature collapse.
 """
 
 from __future__ import annotations
@@ -87,7 +89,40 @@ def _run_cost() -> dict[str, Any]:
             "Sampled dual-subdivision wall vs n at D=2 and D=3. API "
             "refuses n>10 or D>3 (subdivision is exponential in D). "
             "Previous smoke-earned stub with no timing withdrawn. G4 "
-            "path-following stays --full. Not in CI all_passed."
+            "path-following is reported, not an anneal_descent win. "
+            "Not in CI all_passed."
+        ),
+    }
+
+
+def _run_g4() -> dict[str, Any]:
+    """Named leftover: no tropical path-follow driver; G4 stays --full."""
+    from omnibias.struct._core import tropical
+
+    exported = set(tropical.__all__)
+    path_names = sorted(
+        name
+        for name in exported
+        if "path" in name.lower() or "follow" in name.lower() or "anneal" in name.lower()
+    )
+    return {
+        "name": "g4_path_following",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "in_ci_all_passed": False,
+        "need": "2x fewer evals than anneal_descent, five seeds, same decode + certified gap",
+        "path_follow_api": False,
+        "path_follow_exports": path_names,
+        "relaxed_hess_exported": "relaxed_hess" in exported,
+        "anneal_descent_wired": False,
+        "stays_full": True,
+        "note": (
+            "Named G4 is a second-order path-follow that matches "
+            "anneal_descent's decode in 2x fewer evaluations. "
+            "tropical.__all__ has relaxed_hess (G3) but no path-follow "
+            "or anneal driver. Previous g4_path_following 'full only' "
+            "line withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -124,20 +159,27 @@ def main() -> int:
         "in_ci_all_passed": True,
     }
     cost = _run_cost()
+    g4 = _run_g4()
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.tropical_homotopy.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
+            "g4_in_all_passed": False,
             "gates_in_scope": ["g1", "g2"],
         },
     )
     payload["gates"] = gates_block([g1, g2])
     payload["cost"] = cost
+    payload["g4"] = g4
     payload["honesty"] = {
         "collapse": "beta -> inf (temperature); not delta -> 0",
         "p_vs_np": False,
-        "g4_path_following": "full only",
+        "g4_path_following": "reported",
+        "g4_earned": False,
+        "g4_reported": True,
+        "g4_in_ci_all_passed": False,
+        "g4_path_follow_api": False,
         "cost_earned": False,
         "cost_reported": True,
         "cost_in_ci_all_passed": False,

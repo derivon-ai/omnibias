@@ -51,7 +51,7 @@ uv run python docs/img/generate_figures.py
 | `spectral_design.py` | `docs/benchmarks/spectral_design_smoke.json` | Wave-3 primitive 01-07: BandPlan G1/G2/G4; G3 unearned (named 2x-steps vs Mscale never reaches the four-gap lstsq gate), not in CI `all_passed`; pack order is a band selector |
 | `arrangement_geometry.py` | `docs/benchmarks/arrangement_geometry_smoke.json` | Gated 01-03: temperature collapse; sampled subgraph; cost vs n/D reported, not in CI `all_passed` |
 | `ombu_frames.py` | `docs/benchmarks/ombu_frames_smoke.json` | Gated 01-06: `sigma'` not admissible; G4 denoising unearned (skill vs identity negative), not in CI `all_passed` |
-| `tropical_homotopy.py` | `docs/benchmarks/tropical_homotopy_smoke.json` | Gated 01-08: reuses `logsumexp_gap_bound`; G4 `--full`; cost vs n/D reported |
+| `tropical_homotopy.py` | `docs/benchmarks/tropical_homotopy_smoke.json` | Gated 01-08: reuses `logsumexp_gap_bound`; G4 path-following reported (no anneal driver); cost vs n/D reported |
 | `equality_locus.py` | `docs/benchmarks/equality_locus_smoke.json` | Gated 01-09: constraint manifold, not a PDE solver |
 | `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Gated 01-12: line Hilbert; G1–G4 CI; G5 unearned on CCF smoke (matched-width ratio `0.978`), not in `all_passed` |
 | `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Gated 02-02 Face-Net: sampled subgraph; G3 vs k-NN reported (0-hop; GNN / RegionModels `--full`); cost vs n/D reported |

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""01-08 cost vs n/D is reported, not in CI all_passed."""
+"""01-08 cost vs n/D is reported; G4 path-following stays out of all_passed."""
 
 from __future__ import annotations
 
@@ -28,4 +28,17 @@ def test_cost_vs_n_d_is_reported_and_out_of_all_passed() -> None:
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "cost_vs_n_d" not in names
+    assert "g4_path_following" not in names
     assert payload["gates"]["all_passed"] is True
+    g4 = payload["g4"]
+    assert g4["name"] == "g4_path_following"
+    assert g4["earned"] is False
+    assert g4["passed"] is False
+    assert g4["reported"] is True
+    assert g4["in_ci_all_passed"] is False
+    assert g4["path_follow_api"] is False
+    assert g4["anneal_descent_wired"] is False
+    assert g4["relaxed_hess_exported"] is True
+    assert g4["stays_full"] is True
+    assert payload["honesty"]["g4_earned"] is False
+    assert payload["honesty"]["g4_in_ci_all_passed"] is False

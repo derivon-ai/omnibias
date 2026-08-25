@@ -6,11 +6,12 @@ them. `beta -> inf` is temperature collapse, not founding `delta -> 0`.
 Large `(n, D)` inputs are refused. Sound gap, not P vs NP.
 
 G1 gap soundness is CI-gated. G2 subdivision vs the 01-03 sampler and
-G3 jet derivatives are CI-gated. G4 path-following is `--full` only.
-Sampled `dual_subdivision` wall vs `n`/`D` is **reported** (API refuses
-`n>10` or `D>3`); the previous untimed smoke-earned stub is withdrawn.
-Cost is not in CI `all_passed`. Status is **gated**, not shipped. See
-theory spec 01-08.
+G3 jet derivatives are CI-gated. G4 path-following is **reported**
+unearned: `relaxed_hess` is exported, but no second-order driver is
+wired to `anneal_descent`. The previous `--full` only line is
+withdrawn. Sampled `dual_subdivision` wall vs `n`/`D` is **reported**
+(API refuses `n>10` or `D>3`). Cost and G4 are not in CI `all_passed`.
+Status is **gated**, not shipped. See theory spec 01-08.
 
 ## Algebra
 

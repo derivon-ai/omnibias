@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.tropical_homotopy.v1",
-  "generated_utc": "2026-08-25T18:20:34Z",
+  "generated_utc": "2026-08-25T19:16:45Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,12 +13,13 @@
   "config": {
     "mode": "smoke",
     "cost_in_all_passed": false,
+    "g4_in_all_passed": false,
     "gates_in_scope": [
       "g1",
       "g2"
     ]
   },
-  "rss_mb_at_start": 802.4,
+  "rss_mb_at_start": 802.82,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -48,54 +49,72 @@
       {
         "n": 4,
         "dim": 2,
-        "wall_seconds": 0.000671488931402564
+        "wall_seconds": 0.0014293389394879341
       },
       {
         "n": 6,
         "dim": 2,
-        "wall_seconds": 0.0008345079841092229
+        "wall_seconds": 0.0007730060024186969
       },
       {
         "n": 8,
         "dim": 2,
-        "wall_seconds": 0.000951808993704617
+        "wall_seconds": 0.0007655679946765304
       },
       {
         "n": 10,
         "dim": 2,
-        "wall_seconds": 0.0010100299259647727
+        "wall_seconds": 0.0008524790173396468
       },
       {
         "n": 4,
         "dim": 3,
-        "wall_seconds": 0.0007364070042967796
+        "wall_seconds": 0.0006117040757089853
       },
       {
         "n": 6,
         "dim": 3,
-        "wall_seconds": 0.0009163758950307965
+        "wall_seconds": 0.0007742559537291527
       },
       {
         "n": 8,
         "dim": 3,
-        "wall_seconds": 0.0009636299218982458
+        "wall_seconds": 0.0007957839407026768
       },
       {
         "n": 10,
         "dim": 3,
-        "wall_seconds": 0.0011823639506474137
+        "wall_seconds": 0.0009687989950180054
       }
     ],
-    "time_exponent_vs_n_d2": 0.4540101145236723,
+    "time_exponent_vs_n_d2": -0.5774145430298261,
     "cutoff_n": 10,
     "cutoff_d": 3,
     "refuses_over_cutoff": true,
-    "note": "Sampled dual-subdivision wall vs n at D=2 and D=3. API refuses n>10 or D>3 (subdivision is exponential in D). Previous smoke-earned stub with no timing withdrawn. G4 path-following stays --full. Not in CI all_passed."
+    "note": "Sampled dual-subdivision wall vs n at D=2 and D=3. API refuses n>10 or D>3 (subdivision is exponential in D). Previous smoke-earned stub with no timing withdrawn. G4 path-following is reported, not an anneal_descent win. Not in CI all_passed."
+  },
+  "g4": {
+    "name": "g4_path_following",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "in_ci_all_passed": false,
+    "need": "2x fewer evals than anneal_descent, five seeds, same decode + certified gap",
+    "path_follow_api": false,
+    "path_follow_exports": [],
+    "relaxed_hess_exported": true,
+    "anneal_descent_wired": false,
+    "stays_full": true,
+    "note": "Named G4 is a second-order path-follow that matches anneal_descent's decode in 2x fewer evaluations. tropical.__all__ has relaxed_hess (G3) but no path-follow or anneal driver. Previous g4_path_following 'full only' line withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "collapse": "beta -> inf (temperature); not delta -> 0",
     "p_vs_np": false,
-    "g4_path_following": "full only",
+    "g4_path_following": "reported",
+    "g4_earned": false,
+    "g4_reported": true,
+    "g4_in_ci_all_passed": false,
+    "g4_path_follow_api": false,
     "cost_earned": false,
     "cost_reported": true,
     "cost_in_ci_all_passed": false,
