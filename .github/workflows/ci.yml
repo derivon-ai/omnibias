@@ -397,6 +397,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/differentiable_topology.py
+      - name: Run shape-topology smoke (05-02 G6/G7)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/shape_topology.py
       - name: Run singularity-tracking smoke (03-10 G1–G6)
         run: |
           source .venv-cross/bin/activate

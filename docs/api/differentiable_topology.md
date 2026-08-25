@@ -21,6 +21,25 @@ Home: `omnibias.shape.topology`. Reuses
 `count_eigenvalues_below`. Face masses may come from
 `partition_weights`. No new package.
 
+Spec 05-02 G6/G7 compose this module: `field_euler_characteristic`
+and `field_euler_pair` return the soft Euler **and** its gap bound
+together (`SoftCount` / a 2-tuple; never a bare float).
+`regularize_occupancy` is a temperature-smoothed Euler prior, not
+an integer Betti number. Smoke:
+`docs/benchmarks/shape_topology_smoke.json`.
+
+```python
+import numpy as np
+from omnibias.shape.topology import field_euler_pair
+
+xs = np.linspace(-1.0, 1.0, 15)
+value, bound = field_euler_pair(
+    lambda x, y: 0.36 - x * x - y * y, beta=12.0, grid=xs
+)
+assert bound >= 0.0
+assert isinstance(value, float)
+```
+
 ## API
 
 ::: omnibias.shape.topology

@@ -19,7 +19,8 @@ Wave-0 falsifier A4 (G1/G2) is recorded in
 `docs/benchmarks/tabular_arrangement_capacity.json` (`g3b_earned: false`;
 not-worse on `4/8`). Gate G5 **failed** (Wave-0 A5; worst-seed `R^2` gap
 `0.652` vs S4D, need `<= 0.02`); the sequence submodule is retired, not
-shipped. Gates G4 / G6 / G7 remain unearned.
+shipped. Gate G4 remains unearned. Gates G6 / G7 are earned — see
+`docs/benchmarks/shape_topology_smoke.json`.
 
 ## 2. Where it lands
 
@@ -56,8 +57,9 @@ section.
 all — those packages exist and are benchmarked. The *arrangement* view of a
 tabular model (Wave-0 G1/G2) now lands in `omnibias.tab.arrangement` /
 `omnibias.tab.torch.arrangement` with
-`benchmarks/tabular_arrangement.py`. What remains missing is (b) topology of a
-learned shape as a trainable quantity. (c) A transverse convolution for
+`benchmarks/tabular_arrangement.py`. (b) Topology of a learned shape is a
+trainable quantity (`field_euler_characteristic` / `regularize_occupancy`;
+G6/G7). (c) A transverse convolution for
 sequences was the Wave-0 A5 falsifier; G5 failed against S4D and that
 sub-application is retired. `omnibias.struct` remains the sequence home.
 
@@ -195,9 +197,12 @@ def obliqueness_diagnostic(X, y) -> float:
     """Ratio of dense-linear-probe accuracy to best-axis-probe accuracy.
     Predicts whether an arrangement or a tree should be preferred."""
 
-# omnibias/shape/topology.py
-def soft_euler_characteristic(field, *, beta: float, grid) -> tuple[float, float]:
-    """Returns (value, bound_on_gap_to_integer). Never returns the value alone."""
+# omnibias.shape.topology  (package; not a topology.py file)
+def field_euler_characteristic(field, *, beta: float, grid) -> SoftCount:
+    """Value and gap bound travel together. Never a bare float."""
+
+def field_euler_pair(field, *, beta: float, grid) -> tuple[float, float]:
+    """Returns (value, bound_on_gap_to_integer). Never the value alone."""
 
 # omnibias/torch/sequence.py   -- only if G5 passes
 class CausalTransverseFilter(Module):
@@ -273,10 +278,16 @@ implicit-surface pipeline (shapes), and a structured state-space model
   retired.
 - **G6 topology bound.** The soft Euler characteristic's reported gap bound
   contains the true integer in `100%` of test cases, and the API cannot return
-  the value without the bound. **Unearned.**
+  the value without the bound. **Earned** — see
+  `docs/benchmarks/shape_topology_smoke.json` (`98/98` smoke, `0`
+  violations). `SoftCount` / `field_euler_pair` are the only unpacks;
+  `float(SoftCount)` raises.
 - **G7 shape quality.** Topologically regularized reconstruction achieves the
   correct genus in at least `90%` of cases where an unregularized baseline gets
-  it wrong, without degrading surface accuracy by more than `5%`. **Unearned.**
+  it wrong, without degrading surface accuracy by more than `5%`. **Earned**
+  — smoke recovery `12/12` vs a named thresholded soft-disk implicit
+  (2-D marching-cubes stand-in); mean IoU ratio `1.11` (need `>= 0.95`).
+  Planar holes `C - chi`, not a 3-D surface genus.
 
 ## 9. Benchmark plan
 
@@ -360,8 +371,12 @@ implicit-surface pipeline (shapes), and a structured state-space model
 - [x] Capacity suite runner `benchmarks/tabular_arrangement_capacity.py`
       (G3 frozen; G3b earned only if predeclared `boost_h2` is not-worse
       on >=6/8)
-- [ ] `packages/omnibias-shape/src/omnibias/shape/topology.py` returning
-      value and bound together, never value alone
+- [x] `omnibias.shape.topology` (`field_euler_characteristic` /
+      `field_euler_pair` / `SoftCount.as_pair`) returning value and bound
+      together, never value alone
+- [x] `benchmarks/shape_topology.py` for G6 and G7 (smoke
+      `docs/benchmarks/shape_topology_smoke.json`; full under
+      `$OMNIBIAS_SCRATCH/beyond_pde/`)
 - [x] `benchmarks/sequence_transverse.py` run **first**; G5 failed; no
       `omnibias.torch.sequence` submodule (retired, not future work)
 - [x] Gate runner `benchmarks/tabular_arrangement.py` (extends the LightGBM

@@ -14,7 +14,7 @@ spectral enclosure; otherwise the answer is :class:`Inconclusive`.
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Literal
 
@@ -23,6 +23,7 @@ from numpy.typing import NDArray
 from omnibias.core.verified.eig_operator import count_eigenvalues_below
 
 FloatArray = NDArray[np.float64]
+FieldFn = Callable[[FloatArray, FloatArray], FloatArray]
 
 
 def honesty_payload() -> dict[str, object]:
@@ -56,6 +57,14 @@ class SoftCount:
     def __post_init__(self) -> None:
         if self.gap_bound < 0.0:
             raise ValueError("gap_bound must be >= 0")
+
+    def as_pair(self) -> tuple[float, float]:
+        """The only unpack: ``(value, gap_bound)``. Never a bare float."""
+        return (float(self.value), float(self.gap_bound))
+
+    def __iter__(self):  # noqa: ANN204 -- pair iterator, not a collection
+        yield float(self.value)
+        yield float(self.gap_bound)
 
 
 @dataclass(frozen=True)
@@ -321,6 +330,243 @@ def cluster_laplacian(n_clusters: int, n_per: int = 2, *, gap: float = 0.4) -> F
     return lap
 
 
+def euler_value_bound(count: SoftCount) -> tuple[float, float]:
+    """Public unpack of a soft Euler report. Never a bare float."""
+    return count.as_pair()
+
+
+def cubical_faces_2d(occupancy: np.ndarray) -> tuple[list[float], list[int]]:
+    """Gray cubical faces of a 2-D occupancy grid (product edge / vertex masses)."""
+    u = np.asarray(occupancy, dtype=np.float64)
+    if u.ndim != 2:
+        raise ValueError("occupancy must be a 2-D grid")
+    if u.size == 0:
+        raise ValueError("occupancy must be non-empty")
+    masses: list[float] = [float(v) for v in u.ravel()]
+    dims: list[int] = [2] * int(u.size)
+    if u.shape[1] > 1:
+        eh = u[:, :-1] * u[:, 1:]
+        masses.extend(float(v) for v in eh.ravel())
+        dims.extend([1] * int(eh.size))
+    if u.shape[0] > 1:
+        ev = u[:-1, :] * u[1:, :]
+        masses.extend(float(v) for v in ev.ravel())
+        dims.extend([1] * int(ev.size))
+    if u.shape[0] > 1 and u.shape[1] > 1:
+        vv = u[:-1, :-1] * u[:-1, 1:] * u[1:, :-1] * u[1:, 1:]
+        masses.extend(float(v) for v in vv.ravel())
+        dims.extend([0] * int(vv.size))
+    return masses, dims
+
+
+def cubical_euler_value(occupancy: np.ndarray) -> float:
+    """Product-Gray Euler of a 2-D occupancy grid (smooth in the masses)."""
+    u = np.asarray(occupancy, dtype=np.float64)
+    if u.ndim != 2:
+        raise ValueError("occupancy must be a 2-D grid")
+    chi = float(u.sum())
+    if u.shape[1] > 1:
+        chi -= float((u[:, :-1] * u[:, 1:]).sum())
+    if u.shape[0] > 1:
+        chi -= float((u[:-1, :] * u[1:, :]).sum())
+    if u.shape[0] > 1 and u.shape[1] > 1:
+        chi += float((u[:-1, :-1] * u[:-1, 1:] * u[1:, :-1] * u[1:, 1:]).sum())
+    return chi
+
+
+def cubical_euler_grad(occupancy: np.ndarray) -> FloatArray:
+    """``d chi / d u`` for :func:`cubical_euler_value`."""
+    u = np.asarray(occupancy, dtype=np.float64)
+    if u.ndim != 2:
+        raise ValueError("occupancy must be a 2-D grid")
+    grad = np.ones_like(u, dtype=np.float64)
+    if u.shape[1] > 1:
+        grad[:, :-1] -= u[:, 1:]
+        grad[:, 1:] -= u[:, :-1]
+    if u.shape[0] > 1:
+        grad[:-1, :] -= u[1:, :]
+        grad[1:, :] -= u[:-1, :]
+    if u.shape[0] > 1 and u.shape[1] > 1:
+        a = u[:-1, :-1]
+        b = u[:-1, 1:]
+        c = u[1:, :-1]
+        d = u[1:, 1:]
+        grad[:-1, :-1] += b * c * d
+        grad[:-1, 1:] += a * c * d
+        grad[1:, :-1] += a * b * d
+        grad[1:, 1:] += a * b * c
+    return grad
+
+
+def occupancy_euler(occupancy: np.ndarray) -> SoftCount:
+    """Soft Euler of a ``[0, 1]`` occupancy grid. Value and bound travel together."""
+    masses, dims = cubical_faces_2d(occupancy)
+    return soft_euler_characteristic(masses, dims)
+
+
+def _grid_axes(
+    grid: np.ndarray | Sequence[float] | tuple[np.ndarray, np.ndarray],
+) -> tuple[FloatArray, FloatArray]:
+    if isinstance(grid, tuple) and len(grid) == 2:
+        xs = np.asarray(grid[0], dtype=np.float64).reshape(-1)
+        ys = np.asarray(grid[1], dtype=np.float64).reshape(-1)
+        return xs, ys
+    arr = np.asarray(grid, dtype=np.float64)
+    if arr.ndim == 1:
+        return arr, arr
+    raise ValueError("grid must be a 1-D axis or a (xs, ys) pair")
+
+
+def _sigmoid_array(z: np.ndarray) -> FloatArray:
+    out = np.empty_like(z, dtype=np.float64)
+    pos = z >= 0.0
+    out[pos] = 1.0 / (1.0 + np.exp(-z[pos]))
+    ez = np.exp(z[~pos])
+    out[~pos] = ez / (1.0 + ez)
+    return out
+
+
+def field_to_occupancy(
+    field: FieldFn | np.ndarray,
+    *,
+    beta: float,
+    grid: np.ndarray | Sequence[float] | tuple[np.ndarray, np.ndarray],
+) -> FloatArray:
+    """``sigmoid(beta * field)`` on ``grid``. ``beta -> inf`` is temperature collapse."""
+    if float(beta) <= 0.0:
+        raise ValueError("beta must be > 0")
+    xs, ys = _grid_axes(grid)
+    xx, yy = np.meshgrid(xs, ys, indexing="xy")
+    if callable(field):
+        raw = np.asarray(field(xx, yy), dtype=np.float64)
+    else:
+        raw = np.asarray(field, dtype=np.float64)
+    if raw.shape != xx.shape:
+        raise ValueError(f"field shape {raw.shape} does not match grid {xx.shape}")
+    return _sigmoid_array(float(beta) * raw)
+
+
+def field_euler_characteristic(
+    field: FieldFn | np.ndarray,
+    *,
+    beta: float,
+    grid: np.ndarray | Sequence[float] | tuple[np.ndarray, np.ndarray],
+) -> SoftCount:
+    """Soft Euler of a sampled implicit field. Returns value and bound together.
+
+    Occupancy is ``sigmoid(beta * field(x, y))``. The gap bound is the
+    03-09 face-sum and contains the integer Euler of the independently
+    thresholded cubical complex. This is not a Betti number.
+    """
+    occ = field_to_occupancy(field, beta=beta, grid=grid)
+    return occupancy_euler(occ)
+
+
+def field_euler_pair(
+    field: FieldFn | np.ndarray,
+    *,
+    beta: float,
+    grid: np.ndarray | Sequence[float] | tuple[np.ndarray, np.ndarray],
+) -> tuple[float, float]:
+    """Spec 05-02 unpack: ``(value, bound_on_gap_to_integer)``."""
+    return euler_value_bound(field_euler_characteristic(field, beta=beta, grid=grid))
+
+
+def euler_regularizer(occupancy: np.ndarray, *, target: float) -> float:
+    """``(soft_chi - target)^2``. Temperature-smoothed; not an integer Betti number."""
+    chi = cubical_euler_value(occupancy)
+    return float((chi - float(target)) ** 2)
+
+
+def digital_components_2d(bits: np.ndarray) -> int:
+    """4-connected component count of a boolean image."""
+    mask = np.asarray(bits, dtype=bool)
+    if mask.ndim != 2:
+        raise ValueError("bits must be a 2-D image")
+    seen = np.zeros(mask.shape, dtype=bool)
+    h, w = mask.shape
+    count = 0
+    for i in range(h):
+        for j in range(w):
+            if not mask[i, j] or seen[i, j]:
+                continue
+            count += 1
+            stack = [(i, j)]
+            seen[i, j] = True
+            while stack:
+                x, y = stack.pop()
+                for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    nx, ny = x + dx, y + dy
+                    if 0 <= nx < h and 0 <= ny < w and mask[nx, ny] and not seen[nx, ny]:
+                        seen[nx, ny] = True
+                        stack.append((nx, ny))
+    return int(count)
+
+
+def digital_genus(occupancy: np.ndarray, *, threshold: float = 0.5) -> int:
+    """Planar holes ``C - chi`` of a padded thresholded occupancy.
+
+    A disk has genus 0; an annulus has genus 1. Not a 3-D surface genus.
+    """
+    bits = np.asarray(occupancy, dtype=np.float64) >= float(threshold)
+    pad = np.pad(bits, 1, constant_values=False)
+    chi = int(round(cubical_euler_value(pad.astype(np.float64))))
+    comps = digital_components_2d(pad)
+    return int(comps - chi)
+
+
+def _discrete_laplacian(u: np.ndarray) -> FloatArray:
+    pad = np.pad(u, 1, mode="edge")
+    return (
+        4.0 * u
+        - pad[1:-1, 2:]
+        - pad[1:-1, :-2]
+        - pad[2:, 1:-1]
+        - pad[:-2, 1:-1]
+    )
+
+
+def regularize_occupancy(
+    occupancy: np.ndarray,
+    *,
+    pos_mask: np.ndarray,
+    exterior_mask: np.ndarray,
+    target_chi: float,
+    steps: int = 36,
+    lr: float = 0.25,
+    lam_euler: float = 0.35,
+    lam_data: float = 2.5,
+    lam_bg: float = 2.5,
+    lam_smooth: float = 0.08,
+) -> FloatArray:
+    """Open an unconstrained hole by stepping occupancy toward ``target_chi``.
+
+    Positives and the far exterior are pinned by the data term. The Euler
+    gradient is applied only on the leftover interior so the regularizer
+    cannot swiss-cheese the material. An unregularized fill stays filled.
+    """
+    u = np.clip(np.asarray(occupancy, dtype=np.float64), 0.0, 1.0)
+    pos = np.asarray(pos_mask, dtype=bool)
+    ext = np.asarray(exterior_mask, dtype=bool)
+    if u.shape != pos.shape or u.shape != ext.shape:
+        raise ValueError("occupancy and masks must share a shape")
+    free = ~(pos | ext)
+    for _ in range(int(steps)):
+        grad = np.zeros_like(u)
+        if np.any(pos):
+            grad[pos] += 2.0 * float(lam_data) * (u[pos] - 1.0)
+        if np.any(ext):
+            grad[ext] += 2.0 * float(lam_bg) * u[ext]
+        chi = cubical_euler_value(u)
+        euler_g = 2.0 * (chi - float(target_chi)) * cubical_euler_grad(u)
+        masked = np.zeros_like(u)
+        masked[free] = euler_g[free]
+        grad += float(lam_euler) * masked
+        grad += float(lam_smooth) * _discrete_laplacian(u)
+        u = np.clip(u - float(lr) * grad, 0.0, 1.0)
+    return u
+
+
 __all__ = [
     "Inconclusive",
     "PersistencePair",
@@ -330,10 +576,22 @@ __all__ = [
     "certified_component_count",
     "cluster_laplacian",
     "connected_components_1d",
+    "cubical_euler_grad",
+    "cubical_euler_value",
+    "cubical_faces_2d",
+    "digital_components_2d",
+    "digital_genus",
+    "euler_regularizer",
+    "euler_value_bound",
     "exact_h0_persistence",
+    "field_euler_characteristic",
+    "field_euler_pair",
+    "field_to_occupancy",
     "honesty_payload",
+    "occupancy_euler",
     "persistence_loss",
     "persistence_loss_grad",
+    "regularize_occupancy",
     "soft_component_count",
     "soft_euler_characteristic",
     "soft_persistence",

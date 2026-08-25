@@ -164,7 +164,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | Spec | Status | One line |
 |---|---|---|
 | [05-01 inverse problems and imaging](05-applications/01-inverse-problems-and-imaging.md) | gated | `omnibias.pinn.inverse`; G1–G7 earned (locally-seeded `sd ~ alpha^(n-5/2)`; global search earned for n=3 only) |
-| [05-02 beyond-PDE applications](05-applications/02-beyond-pde-applications.md) | gated | Tabular arrangements (G1/G2/G3 earned; G4 reported unearned), implicit shapes; sequence filter **retired** (G5 failed vs S4D) |
+| [05-02 beyond-PDE applications](05-applications/02-beyond-pde-applications.md) | gated | Tabular arrangements (G1/G2/G3 earned; G4 reported unearned); shape topology G6/G7 earned; sequence filter **retired** (G5 failed vs S4D) |
 
 ### 06 Program
 
@@ -269,7 +269,7 @@ section 12. Ambiguous outcomes count as failure.
 |---|---|---|---|
 | A6 | 04-01 G2 (`G_{delta,delta}` exponent `2.00 +- 0.02`, prefactor `1/720`) | [`docs/benchmarks/information_geometry.json`](../docs/benchmarks/information_geometry.json) | **passed** — licenses D8; G1/G3–G5 earned on the product API; `K>=3` Fisher recorded inapplicable (not a density) |
 | A7 | 05-01 G7 (`sd(tau_hat) ~ alpha^(n-5/2)`, tol `0.1`, `n in {3,4}`) | [`docs/benchmarks/inverse_imaging.json`](../docs/benchmarks/inverse_imaging.json) | **passed** (locally seeded; 5 seeds, worst-seed) — licenses smallest-alpha design rule; worst deviations `0.016` / `0.031`; global search earned for n=3 only (n=4 boundary artifact); G1–G6 earned on `omnibias.pinn.inverse` |
-| A4 | 05-02 G1 / G2 / G3 / G3b | [`docs/benchmarks/tabular_arrangement.json`](../docs/benchmarks/tabular_arrangement.json), [`docs/benchmarks/tabular_arrangement_public.json`](../docs/benchmarks/tabular_arrangement_public.json), [`docs/benchmarks/tabular_arrangement_capacity.json`](../docs/benchmarks/tabular_arrangement_capacity.json) | **passed** G1–G3 (G3 frozen W/L/T `2/5/1`); **G3b unearned** (`boost_h2` not-worse `4/8`, need `>=6/8`); G4 unearned; G5–G7 unearned |
+| A4 | 05-02 G1 / G2 / G3 / G3b | [`docs/benchmarks/tabular_arrangement.json`](../docs/benchmarks/tabular_arrangement.json), [`docs/benchmarks/tabular_arrangement_public.json`](../docs/benchmarks/tabular_arrangement_public.json), [`docs/benchmarks/tabular_arrangement_capacity.json`](../docs/benchmarks/tabular_arrangement_capacity.json) | **passed** G1–G3 (G3 frozen W/L/T `2/5/1`); **G3b unearned** (`boost_h2` not-worse `4/8`, need `>=6/8`); G4 unearned; G5 **failed**; G6/G7 **earned** on [`shape_topology_smoke.json`](../docs/benchmarks/shape_topology_smoke.json) |
 | A5 | 05-02 G5 (filter `R^2` within `0.02` of S4D, 5 seeds, worst-seed) | [`docs/benchmarks/sequence_transverse_smoke.json`](../docs/benchmarks/sequence_transverse_smoke.json) | **failed** — worst-seed `R^2` gap `0.652` (need `<= 0.02`); S4D skill `~0.998`; sequence submodule retired, not shipped |
 
 ## Wave-1 primitives

@@ -53,4 +53,6 @@ Gated 03-09 topology lives in `omnibias.shape.topology`
 (`docs/api/differentiable_topology.md`): soft Euler /
 component counts and 1-D Morse persistence, no differentiable
 Betti number, `Inconclusive` when the spectral gap does not
-separate.
+separate. Spec 05-02 G6/G7 add a field-level Euler pair and
+an occupancy regularizer on that bound; G4 stays unearned and
+G5 stays failed.

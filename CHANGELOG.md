@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Shape topology bound and quality (theory 05-02 G6/G7)
+
+- `omnibias.shape.topology`: field-level Euler (`field_euler_characteristic`,
+  `field_euler_pair`) returns the soft value and gap bound together.
+- G6 earned (`98/98` smoke, no value-only API). G7 earned: Euler-regularized
+  occupancy recovers planar genus in `12/12` cases a named soft-disk implicit
+  gets wrong; mean IoU ratio `1.11`. G4 stays unearned; G5 stays failed.
+- Smoke: `docs/benchmarks/shape_topology_smoke.json`.
+
+
 ### Added — Inverse imaging product API (theory 05-01)
 
 - `omnibias.pinn.inverse`: locate an interface, invert a layered stack,
