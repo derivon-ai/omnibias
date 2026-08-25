@@ -145,6 +145,8 @@ unless labelled `NUMERICAL`.
 - Bias collapse for jets. Not temperature collapse.
 - **Does not clear CCF stretch.** Hilbert remains `~1e-1` until 07-03
   moves the operator.
+- **Not** a global minimum of a deep nest. Depth-causal residuals still
+  use the chain rule (`layer_jet` / Faà di Bruno).
 - **Not** global regularity. Finite collocation residual only.
 - Distinct from 08-03 (proxy residual).
 

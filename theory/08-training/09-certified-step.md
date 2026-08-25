@@ -125,9 +125,11 @@ Verify core stays pure Python. Torch/jax only supply `theta_trial`.
 ## 10. Honesty and scope
 
 - Sound enclosure of an I/O property, not a root (08-04) and not a
-  global min.
+  global min of a deep nest.
 - Empty enclosure ⇒ reject. That is not a robustness claim.
-- Not CCF stretch; not Clay.
+- Not CCF stretch; not Clay. Hilbert × dictionary remains `~1e-1`.
+- The bound uses the chain rule (jet / Lipschitz composition); it does
+  not skip it.
 - Name which collapse the bound uses (`beta` mollifier vs jet Taylor).
 
 ## 11. Open questions and risks

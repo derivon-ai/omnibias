@@ -8,7 +8,7 @@ accept/reject — and this file is the index that says which of those ideas are
 already specified, which are new Group 08 specs, which are rejected, and which
 stack is the default.
 
-- **Status**: designed
+- **Status**: gated
 - **Depends on**: 01-01, 01-10, 03-12, 06-01, 06-02
 - **Blocks**: 08-02, 08-03, 08-04, 08-05, 08-06, 08-07, 08-08, 08-09
 
@@ -68,9 +68,9 @@ Shipped trainers and jets — Group 08 must not re-derive them.
 - Spec 05-02 — arrangement / temperature collapse. A different hypothesis
   class, not a generic-MLP trainer.
 
-**Confirmed gap.** There is no index that separates "how to step `theta` given
-`L`" from "what signal a layer may use before `L` is known," and no written
-reject list for "skip the chain rule" or full `d h / d theta` transport.
+**No gap.** This ledger is the index. `test_theory_training_ledger.py`
+checks G1–G5. The entries are already gated; this file records the
+taxonomy, rejects, and stack they must keep.
 
 ## 4. Mathematics
 
@@ -108,6 +108,19 @@ as a warm start or as a PINN-depth march, then handed to the stack above.
 08-07 is a structured special case of 03-12. 08-08 replaces unrolled depth
 with a fixed point. 08-09 is optional and is not the CCF path.
 
+### Ledger table
+
+| Spec | Taxonomy | Home | Floor |
+|---|---|---|---|
+| 08-02 | learning rule | `omnibias.{torch,jax}.optim_composed` | slice critical point; not global |
+| 08-03 | learning rule | `omnibias.{torch,jax}.train_local` | greedy local residual; `k` directions |
+| 08-04 | optimizer | `omnibias.core.verified.kantorovich` + `optim` | empty ball ⇒ reject |
+| 08-05 | learning rule | `omnibias.pinn.train` depth residual | greedy depth march; not Hilbert |
+| 08-06 | optimizer | `omnibias.{torch,jax}.optim` CubicNewton hook | HVP budget |
+| 08-07 | optimizer | `omnibias.{torch,jax}.optim` block search | one named block |
+| 08-08 | optimizer | `omnibias.{torch,jax}.implicit` | fixed-point quality |
+| 08-09 | filter | `omnibias.verify.train_step` | enclosure explosion ⇒ reject |
+
 ### Rejected (no spec)
 
 1. **"Skip the chain rule and solve for a global min."** A deep net is a
@@ -116,6 +129,14 @@ with a fixed point. 08-09 is optional and is not the CCF path.
 2. **Full `d h / d theta` as a "flow."** That Jacobian is `width x n_params`.
    Every 08 learning rule carries `k << P` directions or `d / d x` (the PINN
    jet). An API that materializes the full parameter Jacobian must raise.
+
+```python
+# documentation only — reject keys, not a module
+REJECTED = (
+    "skip_chain_rule_global_min",
+    "full_parameter_jacobian_flow",
+)
+```
 
 ### CCF / stretch floor
 
@@ -263,11 +284,10 @@ No CI job for the ledger.
 ## 12. Implementation checklist
 
 - [x] `theory/08-training/01-training-idea-ledger.md` (this file)
-- [ ] Optional `packages/omnibias-core/tests/test_theory_training_ledger.py`
-      asserting G1–G4 by reading the markdown (same spirit as 07-01's proposed
-      guard)
+- [x] `packages/omnibias-core/tests/test_theory_training_ledger.py`
+      asserting G1–G5 by reading the markdown (same spirit as 07-01)
 - [x] Index row in `theory/README.md` (Group 08)
-- [ ] No Python trainer modules in the spec-only pass
+- [x] No Python trainer modules in this ledger pass
 
 ---
 

@@ -148,6 +148,9 @@ float32. `lipschitz_df` is a required rigorous bound on `Lip(DF)`.
 ## 10. Honesty and scope
 
 - Sound enclosure tier. Not Mathlib, not Clay, not NS regularity.
+- Not a global minimum of a deep nest. Faà di Bruno is the chain rule.
+- Hilbert × dictionary remains `~1e-1`; this wrapper does not set or
+  weaken `CCF_STRETCH_RESIDUAL_GATE`.
 - Empty ball is a **valid outcome** (reject), not a bug.
 - Bias collapse may tighten `DF`; it does not certify a continuum
   solution.

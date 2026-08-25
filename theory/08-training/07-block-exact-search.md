@@ -123,9 +123,10 @@ Bit-identical twins; default dtype; `mask` is boolean over flat
 
 ## 10. Honesty and scope
 
-- Special case of 03-12, not a global solver.
+- Special case of 03-12, not a global minimum of a deep nest.
+- Faà di Bruno is the chain rule; a block line search does not skip it.
 - Bias collapse for the tower; arrangement `beta` is caller-owned.
-- Does not clear CCF stretch.
+- Does not clear CCF stretch. Hilbert × dictionary remains `~1e-1`.
 
 ## 11. Open questions and risks
 

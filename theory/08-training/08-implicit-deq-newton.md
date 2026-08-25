@@ -145,7 +145,8 @@ Default dtype; jax marks `deq_solve` as the scan/while primitive.
 - IFT is the chain rule at a fixed point, not an absence of the chain
   rule.
 - Not a global min; not CCF stretch; not continuum existence of a PDE
-  (08-04 may later seal the finite map).
+  (08-04 may later seal the finite map). Hilbert × dictionary remains
+  `~1e-1`.
 - Bias collapse for `sigma'` only.
 
 ## 11. Open questions and risks

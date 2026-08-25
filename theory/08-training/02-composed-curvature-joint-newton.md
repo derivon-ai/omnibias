@@ -221,8 +221,8 @@ for G2 (the field must beat `u = 0`).
   critical point to a lower residual, locally.
 - **Not** "we do not use the chain rule." This spec *is* the order-2
   chain rule.
-- **Not** CCF stretch and not Navier–Stokes regularity. A local Poisson
-  residual is the gate.
+- **Not** CCF stretch and not Navier–Stokes regularity. Hilbert ×
+  dictionary remains `~1e-1`. A local Poisson residual is the gate.
 - Certificate tier: empirical (G2). No Lean flag.
 
 ## 11. Open questions and risks

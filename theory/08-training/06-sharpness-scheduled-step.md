@@ -122,7 +122,9 @@ scheduled value refuses the step.
 
 - Empirical tier. Sharpness is a **step-size** signal, not a
   generalization or Clay claim.
-- Does not clear CCF stretch.
+- Does not clear CCF stretch. Hilbert × dictionary remains `~1e-1`.
+- Not a global minimum of a deep nest. HVPs are the chain rule, not a
+  skip of it.
 - Bias collapse makes HVPs exact; Hutchinson is not the method.
 
 ## 11. Open questions and risks
