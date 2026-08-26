@@ -7,7 +7,7 @@ definition of what a gate *is* — so that ninety-three specs cannot each invent
 weaker standard, and so that a reader can tell a result from a demo by looking
 at one JSON block.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 earned; shared protocol in `benchmarks/_gates.py` + `tests/test_gates_protocol.py`; design record)
 - **Depends on**: none
 - **Blocks**: 06-02, 06-03, 07-01
 

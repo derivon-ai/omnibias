@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Acceptance-gates protocol shipped (theory 06-01)
+
+- Spec 06-01 status is **shipped**: G1–G5 earned; design record.
+- Shared helpers in `benchmarks/_gates.py`; self-test
+  `tests/test_gates_protocol.py`.
+- No new package.
+
 ### Added — Beyond-PDE applications shipped (theory 05-02)
 
 - Spec 05-02 status is **shipped**: G1/G2/G3/G5/G6/G7 earned; G3b

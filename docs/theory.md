@@ -313,6 +313,8 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Beyond-PDE applications** ([05-02](api/tab.md)): G3b leftover
   #49 and G4 leftover #50 leftover-recorded. Temperature collapse
   on tabular; founding bias collapse on the scan. Status is **shipped**.
+- **Acceptance gates** (06-01): shared protocol in
+  `benchmarks/_gates.py`. Design record. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
