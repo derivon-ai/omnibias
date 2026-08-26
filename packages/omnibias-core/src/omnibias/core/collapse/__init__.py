@@ -24,6 +24,7 @@ from omnibias.core.collapse.schema import (
     CollapseStatus,
     DistinctnessReport,
     RejectedCollapse,
+    add_registry_hook,
     are_distinct,
     default_honesty,
     get_collapse,
@@ -33,6 +34,14 @@ from omnibias.core.collapse.schema import (
     reject_collapse,
     require_sound_enclosure,
     reset_collapse_registry,
+)
+from omnibias.core.collapse.verdict import (
+    VERDICT_SPEC,
+    ObligationVerdict,
+    VerdictStatus,
+    adjudicate_residual,
+    is_singleton_zero,
+    search_residuals,
 )
 
 __all__ = [
@@ -44,14 +53,21 @@ __all__ = [
     "DistinctnessReport",
     "FOUNDING_COLLAPSES",
     "FOUNDING_NAMES",
+    "ObligationVerdict",
     "RejectedCollapse",
+    "VERDICT_SPEC",
+    "VerdictStatus",
+    "add_registry_hook",
+    "adjudicate_residual",
     "are_distinct",
     "default_honesty",
     "get_collapse",
+    "is_singleton_zero",
     "list_collapses",
     "list_rejected_collapses",
     "register_collapse",
     "reject_collapse",
     "require_sound_enclosure",
     "reset_collapse_registry",
+    "search_residuals",
 ]

@@ -461,7 +461,11 @@ Additional *named* collapses are catalogued in
 [`omnibias.core.collapse`](api/collapse.md) and must be distinct from
 these three on moving parameter or surviving object. They do not
 replace or redefine the founding three senses. A float residual is
-never a proof.
+never a proof. Verdict collapse
+([cookbook](cookbook/verdict-collapse.md)) is one such sense: a
+sound residual enclosure of a finite obligation is `PROVED` only at
+`{0}` and `BLOCKED` (not false) when `0` sits in a positive-width
+box.
 
 ## 5. Operator dictionary
 

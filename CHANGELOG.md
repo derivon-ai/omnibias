@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Verdict collapse
+
+- `omnibias.core.collapse.verdict`: a sound residual enclosure of a
+  finite obligation is `PROVED` only at `{0}`, `DISPROVED` when `0`
+  is excluded, and `BLOCKED` (`Inconclusive`) otherwise.
+- Cookbook: [`docs/cookbook/verdict-collapse.md`](docs/cookbook/verdict-collapse.md).
+- A float residual is not a proof. A complete existential miss is not
+  a parent-false claim.
+
 ### Added — Named-collapse schema
 
 - `omnibias.core.collapse`: catalogue of the founding three collapse

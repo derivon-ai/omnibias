@@ -12,7 +12,7 @@ from omnibias.core.collapse import are_distinct, list_collapses, reset_collapse_
 
 reset_collapse_registry()
 names = {spec.name for spec in list_collapses()}
-assert names == {"bias", "temperature", "enclosure"}
+assert {"bias", "temperature", "enclosure"} <= names
 founding = {spec.name: spec for spec in list_collapses()}
 assert are_distinct(founding["bias"], founding["enclosure"]).distinct
 assert founding["bias"].surviving_object == "derivative"

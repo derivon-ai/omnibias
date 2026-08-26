@@ -22,7 +22,7 @@ A float residual is never a proof. ``theorem_prover_verified`` and
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from typing import Literal
 
@@ -324,6 +324,14 @@ class CollapseRegistry:
 
 
 _REGISTRY = CollapseRegistry()
+_RESEED_HOOKS: list[Callable[[], None]] = []
+
+
+def add_registry_hook(hook: Callable[[], None]) -> None:
+    """Run ``hook`` after every :func:`reset_collapse_registry` (and now)."""
+
+    _RESEED_HOOKS.append(hook)
+    hook()
 
 
 def get_collapse(name: str) -> CollapseSpec:
@@ -347,13 +355,15 @@ def reject_collapse(name: str, reason: str) -> RejectedCollapse:
 
 
 def reset_collapse_registry() -> None:
-    """Restore the process-global registry to the founding three.
+    """Restore the founding three, then re-run shipped named-collapse hooks.
 
     Tests that register or reject names must call this in teardown.
     """
 
     global _REGISTRY
     _REGISTRY = CollapseRegistry()
+    for hook in _RESEED_HOOKS:
+        hook()
 
 
 __all__ = [
@@ -366,6 +376,7 @@ __all__ = [
     "FOUNDING_COLLAPSES",
     "FOUNDING_NAMES",
     "RejectedCollapse",
+    "add_registry_hook",
     "are_distinct",
     "default_honesty",
     "get_collapse",

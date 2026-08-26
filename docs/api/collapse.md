@@ -15,6 +15,11 @@ earned it. Do not conflate the three founding senses.
 
 Home: `omnibias.core.collapse` (schema + registry). No new distribution.
 
+Verdict collapse (`omnibias.core.collapse.verdict`) is the first named
+sense that earned a slot: a sound residual enclosure of a finite
+obligation becomes `PROVED` only at `{0}`, `DISPROVED` when `0` is
+excluded, and `BLOCKED` otherwise. A float residual is not a proof.
+
 ::: omnibias.core.collapse
     options:
       show_root_heading: false

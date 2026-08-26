@@ -373,6 +373,7 @@ nav:
       - PINN advection-diffusion: cookbook/pinn-advection-diffusion.md
       - Enclosure Collapse: cookbook/enclosure-collapse.md
       - Named-collapse schema: cookbook/collapse-schema.md
+      - Verdict collapse: cookbook/verdict-collapse.md
       - Dirichlet enclosures on Re(s)>1: cookbook/dirichlet-enclosure.md
       - Instance-gap tightening: cookbook/instance-gap.md
       - CCF jet-Padé profile diagnostic: cookbook/ccf-pade-profile.md
