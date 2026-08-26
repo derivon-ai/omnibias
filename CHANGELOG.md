@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Sliced OT shipped (theory 03-04)
+
+- Spec 03-04 status is **shipped**: G1–G6 CI, no leftover gate.
+- Exact per slice, not sample-free. Not Wasserstein.
+- Smoke: `docs/benchmarks/sliced_ot_smoke.json`.
+
 ### Added — CSP collapse shipped (theory 03-03)
 
 - Spec 03-03 status is **shipped**: G1–G6 CI, no leftover gate.

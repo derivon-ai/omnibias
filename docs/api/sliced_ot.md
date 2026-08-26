@@ -2,7 +2,7 @@
 
 A tempered-activation mixture has a closed-form CDF, so one-dimensional
 `W_1` is an exact integral of `|F-G|` (sign-change roots plus
-softplus antiderivatives). Status is **gated**, not shipped. G1–G6
+softplus antiderivatives). Status is **shipped**. G1–G6
 are CI-gated.
 
 Mixture components come from the **founding bias collapse**

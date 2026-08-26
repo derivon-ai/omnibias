@@ -548,7 +548,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.discrete.csp` (03-03, **shipped**; finite-domain CSP + two `beta`
   schedules + soft AC; G1–G6 CI; temperature collapse, not
   founding bias collapse; not a complete solver; not P vs NP) /
-  `omnibias.measure.transport` (03-04; exact 1-D `W_1` of
+  `omnibias.measure.transport` (03-04, **shipped**; exact 1-D `W_1` of
   activation mixtures + sliced average; G1–G6 CI; founding bias
   collapse, not temperature collapse; exact per slice, not
   sample-free; not Wasserstein) /

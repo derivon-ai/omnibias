@@ -7,7 +7,7 @@ tempered activations has a **closed-form CDF and closed-form quantile
 derivatives**, so sliced Wasserstein distances between such mixtures are exact
 rather than sample-estimated.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; founding bias collapse, not temperature collapse; exact per slice, not sample-free; not Wasserstein)
 - **Depends on**: 01-02, 01-05
 - **Blocks**: 05-02
 

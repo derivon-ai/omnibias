@@ -271,6 +271,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **CSP collapse** ([03-03](api/csp.md)): finite-domain CSP; not a
   complete solver; not P vs NP. Temperature collapse, not founding
   bias collapse. Status is **shipped**.
+- **Sliced OT** ([03-04](api/sliced_ot.md)): exact 1-D `W_1` per slice;
+  founding bias collapse, not temperature collapse. Not Wasserstein.
+  Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
