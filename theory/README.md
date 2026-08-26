@@ -217,7 +217,7 @@ chain rule, and not a global solver. CCF stretch stays an operator floor.
 
 Architectures, learning rules, and exports that spend the unused `integral`
 role, jet-valued state, or the three-register algebra, and that are not already
-first-class specs in Groups 02–05 or 08. Entries and the ledger are gated.
+first-class specs in Groups 02–05 or 08. Entries and the ledger are shipped.
 Trainers that step `theta` given `L` stay in Group 08. CCF stretch stays an
 operator floor.
 

@@ -6,6 +6,11 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Fixed — Group 09 index prose matches shipped ledger
+
+- `theory/README.md` no longer says Group 09 entries and the ledger
+  are gated.
+
 ### Added — Operator-family document gates in CI (theory 01-13)
 
 - Spec 01-13 G1–G5 catalog / reject / first-spend / no-package
