@@ -7,7 +7,7 @@ learned arrangement is a learned polytope: the constraints become trainable, the
 vertex structure is the tope graph, and the existing interior-point and duality
 machinery supplies both the solve and the certificate.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 CI; temperature collapse, not founding bias collapse; not a new LP algorithm)
 - **Depends on**: 01-03, 01-08, 02-02
 - **Blocks**: 05-02
 

@@ -542,7 +542,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `log(P)/beta` gap; geometry mutation; exact-curvature polish;
   certify-loop stop; G1–G6 CI; temperature collapse, not founding
   bias collapse; not P vs NP) /
-  `omnibias.convex.arrangement` (03-02; learned-facet LP front end
+  `omnibias.convex.arrangement` (03-02, **shipped**; learned-facet LP front end
   on `solve_lp` + Neumaier-Shcherbina; G1–G5 CI; not a new LP
   algorithm; temperature collapse, not founding bias collapse) /
   `omnibias.discrete.csp` (03-03; finite-domain CSP + two `beta`

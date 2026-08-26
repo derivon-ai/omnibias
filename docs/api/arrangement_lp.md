@@ -3,7 +3,7 @@
 An inequality LP is one cell of a hyperplane arrangement. This is a
 learned-constraint front end on the existing interior-point solver and
 the Neumaier-Shcherbina bound -- **not** a new LP algorithm. Status is
-**gated**, not shipped. G1–G5 are CI-gated.
+**shipped**. G1–G5 are CI-gated.
 
 Soft membership `prod_i σ(β (b_i - a_i · x))` is **temperature
 collapse** (`beta -> inf`, feasibility). It is **not** the founding

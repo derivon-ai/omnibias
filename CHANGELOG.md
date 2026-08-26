@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Arrangement LP shipped (theory 03-02)
+
+- Spec 03-02 status is **shipped**: G1–G5 CI, no leftover gate.
+- Not a new LP algorithm. Temperature collapse, not founding bias collapse.
+- Smoke: `docs/benchmarks/arrangement_lp_smoke.json`.
+
 ### Added — Soft-population evolution shipped (theory 03-01)
 
 - Spec 03-01 status is **shipped**: G1–G6 CI, no leftover gate.

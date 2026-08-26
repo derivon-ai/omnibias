@@ -265,6 +265,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Soft-population evolution** ([03-01](api/soft_evolution.md)):
   `log(P)/beta` gap; temperature collapse, not founding bias collapse.
   Not P vs NP. Status is **shipped**.
+- **Arrangement LP** ([03-02](api/arrangement_lp.md)): learned-facet
+  front end; not a new LP algorithm. Temperature collapse, not
+  founding bias collapse. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
