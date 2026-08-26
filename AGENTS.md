@@ -472,7 +472,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
 - Activation math: `omnibias.core.polynomials`, `omnibias.core.spec`.
 - Wave-1 primitives: `omnibias.core.multipack` /
   `omnibias.{torch,jax}.multipack` (01-01, **shipped**); `omnibias.core.scan` /
-  `omnibias.{torch,jax}.scan` (01-02, **shipped**; `op=` is the 01-13 catalog alias);
+  `omnibias.{torch,jax}.scan` (01-02, **shipped**; `op=` is the 01-13 catalog alias, **shipped**);
   `omnibias.difference` irregular
   stencils (01-04, **shipped**);
   `omnibias.core.verified.enclosure_collapse` plus

@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Operator family shipped (theory 01-13)
+
+- Spec 01-13 status is **shipped**: G4 first spend
+  `BiasScan(op="integral")` plus 09-14 are both shipped; G5 is in
+  CI `all_passed`.
+- Catalog of `scan(role)`, not a seventh `op`.
+
 ### Added — Integral-kernel operator shipped (theory 09-14)
 
 - Spec 09-14 status is **shipped**: G1–G4 CI; G4 torch/jax parity

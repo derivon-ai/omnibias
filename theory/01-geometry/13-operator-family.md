@@ -10,7 +10,7 @@ The `band` and `integral` roles are a fiber interval — the difference
 of the order `-1` coordinate at two base points — not a local jet
 coordinate (01-10).
 
-- **Status**: gated
+- **Status**: shipped (G1–G5; G4 first spend `BiasScan(op="integral")` + 09-14 both shipped)
 - **Depends on**: 01-01, 01-02, 06-02, 09-01
 - **Blocks**: none
 
@@ -20,7 +20,7 @@ coordinate (01-10).
   a role we already have."
 - **How it works.** Role × scan table, inventable list as **pointers**,
   reject list, design test. First spend: `BiasScan(op="integral")`,
-  then spec 09-14 (gated).
+  then spec 09-14 (shipped).
 - **Strength.** Stops a seventh `OperatorBlock` role and stops Group 10
   from re-specifying 09-14 / 03-05.
 - **When to use.** Before proposing a convolution-like operator or a
@@ -84,7 +84,7 @@ labelled if used (01-02).
 | `grad` / `laplacian` | matched derivative filter | gated; collapse heads |
 | `derivative(n)` | order-`n` matched filter | gated; 01-07 band selector |
 | `band` | sliding slab (band-pass along `w`) | gated (`BiasScan(op="band")`) |
-| `integral` | sliding mass `S(z+b_hi)-S(z+b_lo)` | gated (`BiasScan(op="integral")`); consumer 09-14 |
+| `integral` | sliding mass `S(z+b_hi)-S(z+b_lo)` | shipped (`BiasScan(op="integral")`); consumer 09-14 shipped |
 
 ### Other first-class operators (not scans)
 
@@ -126,7 +126,7 @@ If a row already has a spec, implement there. Do not open a second
 | Sliced-jet / energy encoder | [09-28](../09-inventions/28-sliced-jet-encoder.md) |
 
 **First spend (shipped):** a named `BiasScan(op="integral")` alias of
-`template="integral"`, then 09-14 (gated).
+`template="integral"`, then 09-14 (shipped).
 
 ### Rejected (no spec)
 

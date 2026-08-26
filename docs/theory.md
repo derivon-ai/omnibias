@@ -166,6 +166,9 @@ Three extensions of this geometry have code and CI smoke.
   `gamma -> inf` would be temperature collapse, not `delta -> 0`. G1–G4
   CI-gated; G4 is a warmed-up voxelize-then-`cmbConv1d` pipeline win.
   Status is **shipped**.
+- **Operator family** ([01-13](api/scan.md)): `scan(role)` over the
+  six `OperatorBlock` roles; not a seventh `op`. First spend is
+  `BiasScan(op="integral")` plus 09-14. Status is **shipped**.
 - **Irregular stencils** ([difference API](api/difference.md)): exact-`Q`
   Birkhoff weights for arbitrary nodes and per-node orders. Order is
   asymptotic in the node scale `h`. G1–G4 earned. Status is **shipped**.

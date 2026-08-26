@@ -60,8 +60,9 @@ interior shift along `w` only. Gated Wave-3 `ScanNet`
 **per-layer, per-direction, on-lattice**, not the translation group of
 `R^D`. The convolution-class family is `scan(role)` over those six roles;
 the catalog (role × scan, non-scan operators, inventable pointers, and
-rejects) is theory spec 01-13. A named `BiasScan(op="integral")` layer is
-the first spend of that family (then 09-14), not a seventh role.
+rejects) is theory spec 01-13 (**shipped**). A named
+`BiasScan(op="integral")` layer is the first spend of that family
+(then 09-14, **shipped**), not a seventh role.
 
 ## The antiderivative kernel `S` (why `integral` is closed form)
 
