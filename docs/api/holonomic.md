@@ -74,9 +74,10 @@ injectivity on `Q^2` and not the parent. `escalate_n2_result` sets
 accepts only with rank collapse. A float SVD is not a proof. It does
 not certify a special-function identity and does not settle the
 Jacobian conjecture. Case A leftover
-(`omnibias.holonomic.jacobian_n2_case_a`) seals the
-`(b11, b21, b31)` subsystem over `Q` at the origin only; the parent
-stays open.
+(`omnibias.holonomic.jacobian_n2_case_a` and
+`omnibias.holonomic.jacobian_n2_case_a_b02`) seals the
+`(b11, b21, b31)` and `(b02, b03, b04)` subsystems over `Q` at the
+origin only; the Case A chart then empties. The parent stays open.
 
 The Ore condition sort
 (`condition_ore`) wraps the recurrence

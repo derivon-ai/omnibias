@@ -12,8 +12,18 @@ distributions is versioned independently under semantic versioning.
   the I+Q+C+Qu leftover, the `(b11, b21, b31)` subsystem vanishes over
   `Q` only at the origin. Accepted only via `prove("identity")` /
   `prove("residual")`. Catalog kind `jacobian_n2_case_a_b31`. Parent
-  stays open. `jacobian_conjecture_proof_claim` stays false. Remaining
-  Case A leftover in `(b02, b03, b04)` is a later slice.
+  stays open. `jacobian_conjecture_proof_claim` stays false.
+- Cookbook: [`docs/cookbook/jacobian-n2-box.md`](docs/cookbook/jacobian-n2-box.md).
+
+### Added — Jacobian n=2 Case A axis leftover (finite engine)
+
+- `omnibias.holonomic.jacobian_n2_case_a_b02`: after the Case A
+  fixes, the `(b11, b21, b31)` origin, and forcing `b22=b12=b13=0`,
+  the `(b02, b03, b04)` leftover vanishes over `Q` only at the origin
+  and the Case A chart empties. Accepted only via
+  `prove("identity")` / `prove("residual")`. Catalog kind
+  `jacobian_n2_case_a_b02`. Parent stays open. Case B is a later
+  slice. Not JC.
 - Cookbook: [`docs/cookbook/jacobian-n2-box.md`](docs/cookbook/jacobian-n2-box.md).
 
 ### Added — Proof engine

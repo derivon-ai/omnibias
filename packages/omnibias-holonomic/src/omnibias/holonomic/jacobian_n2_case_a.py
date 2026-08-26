@@ -6,7 +6,8 @@ On the I+Q+C+Qu Keller leftover, Case A is the slice ``b20=b30=b40=0``.
 The three leftover generators that live in ``Q[b11, b21, b31]`` vanish
 over ``Q`` only at the origin. That is a local chart seal, not the
 Jacobian conjecture. The remaining Case A leftover in
-``(b02, b03, b04)`` is a later slice.
+``(b02, b03, b04)`` is sealed by
+:mod:`omnibias.holonomic.jacobian_n2_case_a_b02`.
 
 Accept only via :func:`~omnibias.core.proof.engine.prove` on ``identity``
 (exact ``Q`` laws) or ``residual`` (a sound point enclosure). A float

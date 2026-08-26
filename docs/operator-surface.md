@@ -165,6 +165,7 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | Keller n=3 Jacobian identity (Alpöge / Gallagher) | exact `Q` 3×3 Jacobian + witness eval | exact rational | `omnibias.holonomic.keller` (not a Jacobian-conjecture proof; `n=2` open) |
 | Jacobian n=2 finite box `C_box(d,h,G)` | identical `det JF` + rational grid collision or Gabber inverse failure | exact rational | `omnibias.holonomic.jacobian_n2` (miss is not the parent; `jacobian_n2_claim` only on a violator) |
 | Jacobian n=2 Case A `(b11,b21,b31)` leftover | exact `Q` identities; origin-only variety | exact rational | `omnibias.holonomic.jacobian_n2_case_a` (local seal; parent stays open; not JC) |
+| Jacobian n=2 Case A `(b02,b03,b04)` leftover | exact `Q` identities; origin-only; Case A chart then empty | exact rational | `omnibias.holonomic.jacobian_n2_case_a_b02` (local seal; parent stays open; not JC) |
 | Blind deg-2 tangent-sweep Keller search | side conditions + constant-Jac 3-to-1 fiber | exact rational | `omnibias.holonomic.keller_search` |
 | Deg-3 tangent-sweep + finite discovery loop | `run_discovery` + score-guided walk; exact `Q` checker | exact rational | `omnibias.core.proof.discovery` / `keller_search` (family witness, not a parent proof) |
 | Discovery catalog / characterization | statement → family → proposer → exact check; box-scoped uniqueness | exact rational or honest `BLOCKED` | `omnibias.core.proof.catalog` / `discovery` (not a parent proof) |

@@ -682,6 +682,8 @@ Jacobian `n=2` is the finite universal `C_box` in
 collision or Gabber inverse-degree failure). A miss is not the parent.
 Case A leftover `omnibias.holonomic.jacobian_n2_case_a` seals
 `(b11,b21,b31)` over `Q` at the origin only.
+`omnibias.holonomic.jacobian_n2_case_a_b02` seals `(b02,b03,b04)`
+over `Q` at the origin only; the Case A chart then empties.
 Cookbook: `docs/cookbook/jacobian-n2-box.md`.
 `omnibias-struct` is the **dynamic-programming** register of the `beta -> inf` family:
 certified differentiable **soft Viterbi / shortest-path / CTC**, where the DP `max`
