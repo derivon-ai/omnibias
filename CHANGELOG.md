@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Arrangement-geometry cost leftover-recorded (theory 01-03)
+
+- Leftover #18's vertex-enum wall vs `n`/`D` now leftover-records
+  `reported` plus honesty flags on `benchmarks/arrangement_geometry.py`.
+- Reported: `n` in `{4,6,8}` at `D=2,3`; cutoff `n<=12`, `D<=4`. Not in
+  CI `all_passed`.
+- Smoke: `docs/benchmarks/arrangement_geometry_smoke.json`.
+
 ### Added — Scan-Net G4 leftover-recorded (theory 02-01)
 
 - Leftover #17's density-boundary measurement now leftover-records

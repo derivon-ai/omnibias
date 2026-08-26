@@ -202,7 +202,8 @@ gates are earned on smoke, not in CI `all_passed`.
   `omnibias.pinn._core.interface`.
 - **Arrangement geometry** ([01-03](api/arrangement.md)): cells / tope graph /
   `soft_membership`. `beta -> inf` is temperature collapse, not founding
-  `delta -> 0`. Sampling is a subgraph. Sound gap, not P vs NP.
+  `delta -> 0`. Sampling is a subgraph. Sound gap, not P vs NP. Cost vs
+  `n`/`D` leftover-recorded.
 - **Tropical homotopy** ([01-08](api/tropical.md)): log / max-plus path;
   reuses `logsumexp_gap_bound`. G4 path-following is `--full` only.
 - **Equality locus** ([01-09](api/locus.md) / [02-12](api/locus.md)):

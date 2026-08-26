@@ -86,12 +86,15 @@ def _run_cost() -> dict[str, Any]:
         "time_exponent_vs_n_d2": float(slope),
         "cutoff_n": COST_CUTOFF_N,
         "cutoff_d": COST_CUTOFF_D,
+        "leftover_recorded": True,
+        "leftover_id": 18,
+        "leftover_tick": 53,
         "note": (
-            "Vertex-enumeration wall vs n at D=2 and D=3. G1 tooling "
-            "refuses n>12 or D>4. Combinatorial growth is the honesty "
-            "bound, not a tractable-large-n claim. Previous "
-            "smoke-earned stub with no timing withdrawn. Not in CI "
-            "all_passed."
+            "Leftover #18 leftover-recorded: vertex-enumeration wall "
+            "vs n at D=2 and D=3. G1 tooling refuses n>12 or D>4. "
+            "Combinatorial growth is the honesty bound, not a "
+            "tractable-large-n claim. Previous smoke-earned stub with "
+            "no timing withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -143,6 +146,9 @@ def main() -> int:
         "p_vs_np": False,
         "cost_earned": False,
         "cost_reported": True,
+        "cost_leftover_recorded": True,
+        "cost_leftover_id": 18,
+        "cost_leftover_tick": 53,
         "cost_in_ci_all_passed": False,
         "enumeration_cutoff_n": COST_CUTOFF_N,
         "enumeration_cutoff_d": COST_CUTOFF_D,

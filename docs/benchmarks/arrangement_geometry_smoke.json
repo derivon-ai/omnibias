@@ -85,7 +85,10 @@
     "time_exponent_vs_n_d2": 2.9456465931238798,
     "cutoff_n": 12,
     "cutoff_d": 4,
-    "note": "Vertex-enumeration wall vs n at D=2 and D=3. G1 tooling refuses n>12 or D>4. Combinatorial growth is the honesty bound, not a tractable-large-n claim. Previous smoke-earned stub with no timing withdrawn. Not in CI all_passed."
+    "leftover_recorded": true,
+    "leftover_id": 18,
+    "leftover_tick": 53,
+    "note": "Leftover #18 leftover-recorded: vertex-enumeration wall vs n at D=2 and D=3. G1 tooling refuses n>12 or D>4. Combinatorial growth is the honesty bound, not a tractable-large-n claim. Previous smoke-earned stub with no timing withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "complete_face_lattice": false,
@@ -93,6 +96,9 @@
     "p_vs_np": false,
     "cost_earned": false,
     "cost_reported": true,
+    "cost_leftover_recorded": true,
+    "cost_leftover_id": 18,
+    "cost_leftover_tick": 53,
     "cost_in_ci_all_passed": false,
     "enumeration_cutoff_n": 12,
     "enumeration_cutoff_d": 4,
