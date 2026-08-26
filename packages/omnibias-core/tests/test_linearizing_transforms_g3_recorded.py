@@ -34,6 +34,7 @@ def test_g3_burgers_is_leftover_recorded_out_of_all_passed() -> None:
     assert "g3_burgers_init" not in names
     assert "g1_cole_hopf" in names
     assert "g5_negative_control" in names
+    assert "g6_parity" in names
     assert payload["gates"]["all_passed"] is True
     assert payload["g1"]["passed"] is True
     assert payload["g5"]["passed"] is True

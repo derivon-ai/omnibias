@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Linearizing-transform G6 parity earned (theory 02-13)
+
+- Spec 02-13 G6 torch/jax Cole-Hopf field parity is now in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/linearizing_transforms_smoke.json`.
+
 ### Added — Holonomy-band G5 parity earned (theory 02-14)
 
 - Spec 02-14 G5 torch/jax abelian holonomy parity is now in CI

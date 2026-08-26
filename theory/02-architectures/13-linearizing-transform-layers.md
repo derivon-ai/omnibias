@@ -8,7 +8,7 @@ logarithm, differentiate, integrate — is available exactly on jets, so a layer
 can carry a nonlinear problem into a linear one, solve it there, and map back
 with no approximation anywhere in the transform.
 
-- **Status**: shipped (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; G1 jet identity CI; G3 Burgers leftover-recorded / unearned, leftover #39 — no train vs direct PINN, previous `g3_burgers_init` stub withdrawn; 03-11 search stays designed)
+- **Status**: shipped (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; G1 jet identity CI; G6 torch/jax parity CI; G3 Burgers leftover-recorded / unearned, leftover #39 — no train vs direct PINN, previous `g3_burgers_init` stub withdrawn; 03-11 search stays designed)
 - **Depends on**: 01-01, 01-09, 02-09, 03-11
 - **Blocks**: 07-02
 

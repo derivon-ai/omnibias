@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.linearizing_transforms.v1",
-  "generated_utc": "2026-08-26T16:23:46Z",
+  "generated_utc": "2026-08-26T17:28:47Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,12 +13,14 @@
   "config": {
     "mode": "smoke",
     "g3_in_all_passed": false,
+    "g6_in_all_passed": true,
     "gates_in_scope": [
       "g1",
-      "g5"
+      "g5",
+      "g6"
     ]
   },
-  "rss_mb_at_start": 808.7,
+  "rss_mb_at_start": 1241.41,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -29,6 +31,11 @@
       },
       {
         "name": "g5_negative_control",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g6_parity",
         "passed": true,
         "in_ci_all_passed": true
       }
@@ -62,6 +69,21 @@
     "in_ci_all_passed": true,
     "note": "wrong nu shifts u0; the jet checker is not vacuous"
   },
+  "g6": {
+    "name": "g6_parity",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "torch": [
+      -2.0,
+      -2.0
+    ],
+    "jax": [
+      -2.0,
+      -2.0
+    ]
+  },
   "honesty": {
     "named_only": true,
     "search_claimed": false,
@@ -76,6 +98,9 @@
     "g3_leftover_tick": 81,
     "g3_stays_full": true,
     "g3_in_ci_all_passed": false,
-    "g3_training_loop": false
+    "g3_training_loop": false,
+    "g6_earned": true,
+    "g6_reported": true,
+    "g6_in_ci_all_passed": true
   }
 }

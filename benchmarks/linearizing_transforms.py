@@ -5,7 +5,8 @@
 G1 is the Cole-Hopf factorial-jet identity. G3 Burgers win is
 leftover-recorded (leftover #39): no Cole-Hopf-trained field versus a
 direct PINN. Previous ``g3_burgers_init`` ``passed=True`` stub withdrawn.
-Not a Navier-Stokes claim. Spec 03-11 search is not claimed.
+G6 is torch/jax bit-identity on the Cole-Hopf field. Not a
+Navier-Stokes claim. Spec 03-11 search is not claimed.
 """
 
 from __future__ import annotations
@@ -89,6 +90,33 @@ def _run_g5() -> dict[str, Any]:
     }
 
 
+def _run_g6() -> dict[str, Any]:
+    import jax
+    import jax.numpy as jnp
+    import torch
+    from omnibias.pinn.transform.jax import cole_hopf_apply
+    from omnibias.pinn.transform.torch import ColeHopfField
+
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    x = torch.tensor([0.2, -0.1], dtype=torch.float64)
+    t = torch.tensor([0.0, 0.3], dtype=torch.float64)
+    u_t = ColeHopfField(nu=1.0, dtype=torch.float64)(x, t)
+    u_j = cole_hopf_apply(jnp.asarray(x.numpy()), jnp.asarray(t.numpy()), nu=1.0, k=1.0)
+    t_list = u_t.detach().cpu().tolist()
+    j_list = [float(v) for v in u_j.tolist()]
+    passed = t_list == j_list
+    return {
+        "name": "g6_parity",
+        "passed": passed,
+        "earned": passed,
+        "reported": True,
+        "in_ci_all_passed": passed,
+        "torch": t_list,
+        "jax": j_list,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
@@ -96,6 +124,7 @@ def main() -> int:
     g1 = _run_g1()
     g3 = _run_g3()
     g5 = _run_g5()
+    g6 = _run_g6()
     entries: list[dict[str, Any]] = [
         {
             "name": "g1_cole_hopf",
@@ -107,19 +136,26 @@ def main() -> int:
             "passed": bool(g5["passed"]),
             "in_ci_all_passed": bool(g5["in_ci_all_passed"]),
         },
+        {
+            "name": "g6_parity",
+            "passed": bool(g6["passed"]),
+            "in_ci_all_passed": bool(g6["in_ci_all_passed"]),
+        },
     ]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.linearizing_transforms.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "g3_in_all_passed": False,
-            "gates_in_scope": ["g1", "g5"],
+            "g6_in_all_passed": bool(g6["in_ci_all_passed"]),
+            "gates_in_scope": ["g1", "g5", "g6"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["g1"] = g1
     payload["g3"] = g3
     payload["g5"] = g5
+    payload["g6"] = g6
     payload["honesty"] = {
         "named_only": True,
         "search_claimed": False,
@@ -135,6 +171,9 @@ def main() -> int:
         "g3_stays_full": True,
         "g3_in_ci_all_passed": False,
         "g3_training_loop": False,
+        "g6_earned": bool(g6["earned"]),
+        "g6_reported": True,
+        "g6_in_ci_all_passed": bool(g6["in_ci_all_passed"]),
     }
     if args.full:
         dest = SCRATCH / "transforms" / "linearizing_transforms.json"

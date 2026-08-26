@@ -5,7 +5,8 @@ Exactness is **to jet truncation order N**. Spec 03-11 Lie-symmetry
 *search* stays designed and is not claimed. Full 03-13 pack
 birth/death stays designed.
 
-G1 Cole-Hopf jet identity is CI-gated. G3 Burgers win is
+G1 Cole-Hopf jet identity is CI-gated. G6 torch/jax Cole-Hopf
+parity is CI-gated. G3 Burgers win is
 **leftover-recorded** unearned (leftover #39): no Cole-Hopf-trained
 field versus a direct PINN at matched cost. The previous
 `g3_burgers_init` `passed=True` stub is withdrawn. Status is
