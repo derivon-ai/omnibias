@@ -577,7 +577,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   poles + certified `|x_s|` annulus; G1–G6 CI; founding bias
   collapse, not temperature collapse; diagnostic, not a
   blow-up proof) /
-  `omnibias.symbolic.symmetry` (03-11; Lie point symmetries
+  `omnibias.symbolic.symmetry` (03-11, **shipped**; Lie point symmetries
   as a determining-matrix nullspace; G1–G6 CI; founding bias
   collapse, not temperature collapse; in-ansatz only, not a
   classification) /

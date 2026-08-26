@@ -292,6 +292,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Singularity tracking** ([03-10](api/singularity_tracking.md)):
   diagnostic, not a blow-up proof. Founding bias collapse, not
   temperature collapse. Status is **shipped**.
+- **Lie symmetry discovery** ([03-11](api/symmetry_discovery.md)):
+  in-ansatz only, not a classification. Founding bias collapse, not
+  temperature collapse. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

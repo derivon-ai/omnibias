@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Lie symmetry discovery shipped (theory 03-11)
+
+- Spec 03-11 status is **shipped**: G1–G6 CI, no leftover gate.
+- In-ansatz only, not a classification. Founding bias collapse.
+- Smoke: `docs/benchmarks/symmetry_discovery_smoke.json`.
+
 ### Added — Singularity tracking shipped (theory 03-10)
 
 - Spec 03-10 status is **shipped**: G1–G6 CI, no leftover gate.

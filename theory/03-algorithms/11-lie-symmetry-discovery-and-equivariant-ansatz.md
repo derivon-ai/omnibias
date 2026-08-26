@@ -9,7 +9,7 @@ linear nullspace problem instead of a symbolic computation.
 In jet-bundle language (01-10) a PDE is a subvariety of `J^N(E)`, and
 a symmetry's prolongation is tangent to that subvariety.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; founding bias collapse, not temperature collapse; in-ansatz only, not a classification)
 - **Depends on**: 01-01, 01-10, 02-03, 02-09
 - **Blocks**: 02-13, 07-06
 
