@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Spectral design shipped (theory 01-07)
+
+- Spec 01-07 status is **shipped**: G1–G2/G4 CI; leftover #40 G3 stays
+  reported and out of `all_passed`.
+- Pack order is a band selector, not Littlewood-Paley completeness.
+- Smoke: `docs/benchmarks/spectral_design_smoke.json`.
+
 ### Added — Spectral-design G3 leftover-recorded (theory 01-07)
 
 - Leftover #40 leftover-records `reported` plus honesty flags on
