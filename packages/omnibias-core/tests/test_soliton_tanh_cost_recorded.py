@@ -41,3 +41,17 @@ def test_cost_is_reported_and_g4_out_of_all_passed() -> None:
     assert "g4_init_win" not in gate_names
     assert "cost_algebraic_vs_init_win" not in gate_names
     assert payload["gates"]["all_passed"] is True
+    g2 = payload["g2"]
+    assert g2["name"] == "g2_balance_degree"
+    assert g2["passed"] is True
+    assert g2["in_ci_all_passed"] is True
+    assert int(g2["mismatches"]) == 0
+    g3 = payload["g3"]
+    assert g3["name"] == "g3_numerical_residual"
+    assert g3["passed"] is True
+    assert g3["in_ci_all_passed"] is True
+    assert int(g3["violations"]) == 0
+    assert float(g3["worst_rel"]) <= 1e-14
+    assert payload["honesty"]["g2_earned"] is True
+    assert payload["honesty"]["g3_earned"] is True
+    assert payload["config"]["gates_in_scope"] == ["g1", "g2", "g3", "g5"]

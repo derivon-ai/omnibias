@@ -8,7 +8,7 @@ that the omnibias tanh tower already implements exactly — so a network built
 from that ansatz can represent known soliton solutions with zero residual and
 can search for new ones by solving small algebraic systems.
 
-- **Status**: shipped (G1/G2/G3/G5 CI; G4 PINN init-win leftover-recorded / unearned, leftover #22 — `--full`, no train; algebraic cost **leftover-recorded**, leftover #44, not in CI `all_passed`; tanh algebra, not a collapse)
+- **Status**: shipped (G1/G2/G3/G5 **earned**; G4 PINN init-win leftover-recorded / unearned, leftover #22 — `--full`, no train; algebraic cost **leftover-recorded**, leftover #44, not in CI `all_passed`; tanh algebra, not a collapse)
 - **Depends on**: 01-01
 - **Blocks**: 02-13, 03-11
 
@@ -240,8 +240,12 @@ class SolitonField(nn.Module):
   every coefficient identically zero.
 - **G2 balance correctness.** `balance_degree` matches the published `M` for
   every equation in the list.
+  **Earned** — tanh-poly members of `G1_NAMES`; non-poly kinds skipped.
+  In CI `all_passed`.
 - **G3 numerical residual.** `exact_residual` evaluated in float64 on a dense
   grid is at rounding level (`<= 1e-14` relative to the term magnitudes).
+  **Earned** — `SolitonField.exact_residual` on a 21×3 grid; worst rel 0.
+  In CI `all_passed`.
 - **G4 initialization win.** A PINN initialized from the ansatz reaches a given
   accuracy target on a perturbed problem in at least `5x` fewer steps than a
   cold start, over five seeds.

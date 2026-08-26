@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Soliton tanh-method G2/G3 earned (theory 02-09)
+
+- Spec 02-09 G2 `balance_degree` and G3 `exact_residual` are now in
+  CI `all_passed`.
+- Smoke: `docs/benchmarks/soliton_tanh_method_smoke.json`.
+
 ### Added — Equivariant-scan G3/G4 earned (theory 02-08)
 
 - Spec 02-08 G3 discrete `C_L` cyclic shift and G4 chart metric

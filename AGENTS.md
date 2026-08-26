@@ -508,7 +508,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   G3 vs PartitionedField / FBPINN leftover-recorded, G4 hard vs penalized
   leftover-recorded, training stays `--full`;
   distinct from XPINN `omnibias.pinn._core.interface`) /
-  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13, **all four shipped**; 02-09 G4 init-win leftover-recorded, algebraic cost leftover-recorded; 02-11 G4 inverse-design leftover-recorded, stack cost leftover-recorded, G5 conservation leftover-recorded; 02-06 G2 disc-accuracy earned, G4 regularization order earned, G3 exterior win leftover-recorded, single-layer cost leftover-recorded; 02-13 G2 n-soliton leftover-recorded, G3 Burgers leftover-recorded, G4 permutability leftover-recorded, G6 torch/jax parity) /
+  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13, **all four shipped**; 02-09 G1/G2/G3/G5 earned, G4 init-win leftover-recorded, algebraic cost leftover-recorded; 02-11 G4 inverse-design leftover-recorded, stack cost leftover-recorded, G5 conservation leftover-recorded; 02-06 G2 disc-accuracy earned, G4 regularization order earned, G3 exterior win leftover-recorded, single-layer cost leftover-recorded; 02-13 G2 n-soliton leftover-recorded, G3 Burgers leftover-recorded, G4 permutability leftover-recorded, G6 torch/jax parity) /
   `omnibias.geometry.gauge.band` (02-14, **shipped**; abelian + transverse-constant;
   G2 closed-form earned vs PRODUCT 4096; G3 Magnus leftover-recorded; G4 gauge
   covariance earned, `random_u1_gauge`; G5 torch/jax parity;

@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.soliton_tanh_method.v1",
-  "generated_utc": "2026-08-26T16:40:31Z",
+  "generated_utc": "2026-08-26T17:57:50Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,10 +15,12 @@
     "cost_in_all_passed": false,
     "gates_in_scope": [
       "g1",
+      "g2",
+      "g3",
       "g5"
     ]
   },
-  "rss_mb_at_start": 808.96,
+  "rss_mb_at_start": 820.79,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -29,9 +31,165 @@
         "in_ci_all_passed": true
       },
       {
+        "name": "g2_balance_degree",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_numerical_residual",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
         "name": "g5_heat_negative",
         "passed": true,
         "in_ci_all_passed": true
+      }
+    ]
+  },
+  "g2": {
+    "name": "g2_balance_degree",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "mismatches": 0,
+    "rows": [
+      {
+        "name": "kdv",
+        "balance": 2,
+        "published_M": 2,
+        "passed": true
+      },
+      {
+        "name": "mkdv",
+        "balance": 1,
+        "published_M": 1,
+        "passed": true
+      },
+      {
+        "name": "burgers",
+        "balance": 1,
+        "published_M": 1,
+        "passed": true
+      },
+      {
+        "name": "sine_gordon",
+        "kind": "sg_kink",
+        "skipped": true
+      },
+      {
+        "name": "fkpp",
+        "balance": 2,
+        "published_M": 2,
+        "passed": true
+      },
+      {
+        "name": "fisher",
+        "balance": 1,
+        "published_M": 1,
+        "passed": true
+      },
+      {
+        "name": "boussinesq",
+        "balance": 2,
+        "published_M": 2,
+        "passed": true
+      },
+      {
+        "name": "kuramoto_sivashinsky",
+        "balance": 3,
+        "published_M": 3,
+        "passed": true
+      },
+      {
+        "name": "klein_gordon",
+        "balance": 1,
+        "published_M": 1,
+        "passed": true
+      },
+      {
+        "name": "camassa_holm_adjacent",
+        "kind": "peakon_sech2",
+        "skipped": true
+      }
+    ]
+  },
+  "g3": {
+    "name": "g3_numerical_residual",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "violations": 0,
+    "worst_rel": 0.0,
+    "n_grid": 63,
+    "rows": [
+      {
+        "name": "kdv",
+        "max_abs": 0.0,
+        "mag": 2.0,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "mkdv",
+        "max_abs": 0.0,
+        "mag": 0.9866142981514303,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "burgers",
+        "max_abs": 0.0,
+        "mag": 1.7615941559557649,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "sine_gordon",
+        "max_abs": 0.0,
+        "mag": 5.405049344090811,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "fkpp",
+        "max_abs": 0.0,
+        "mag": 0.9374526194671824,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "fisher",
+        "max_abs": 0.0,
+        "mag": 0.9051482536448664,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "boussinesq",
+        "max_abs": 0.0,
+        "mag": 2.0,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "kuramoto_sivashinsky",
+        "max_abs": 0.0,
+        "mag": 5.732287939243482,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "klein_gordon",
+        "max_abs": 0.0,
+        "mag": 0.9051482536448664,
+        "rel": 0.0,
+        "passed": true
+      },
+      {
+        "name": "camassa_holm_adjacent",
+        "max_abs": 0.0,
+        "mag": 2.0,
+        "rel": 0.0,
+        "passed": true
       }
     ]
   },
@@ -44,8 +202,8 @@
     "leftover_id": 44,
     "leftover_tick": 88,
     "in_ci_all_passed": false,
-    "verify_exact_wall_seconds": 0.0019430239917710423,
-    "solve_ansatz_wall_seconds": 0.002001811983063817,
+    "verify_exact_wall_seconds": 0.0057687710504978895,
+    "solve_ansatz_wall_seconds": 0.005805960041470826,
     "n_g1": 10,
     "rows": [
       {
@@ -81,6 +239,8 @@
     "n_soliton": false,
     "temperature_collapse": false,
     "founding_bias_collapse": false,
+    "g2_earned": true,
+    "g3_earned": true,
     "g4_init_win_earned": false,
     "g4_reported": true,
     "g4_leftover_recorded": true,

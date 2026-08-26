@@ -2,9 +2,10 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: tanh-method solitons (theory 02-09).
 
-G4 PINN init-win is leftover-recorded (leftover #22) and stays
-``--full``. Algebraic solve / residual cost is reported, not in CI
-``all_passed``. Tanh algebra, not a collapse.
+G2 is ``balance_degree`` vs published ``M``. G3 is ``exact_residual``
+on a dense float64 grid. G4 PINN init-win is leftover-recorded
+(leftover #22) and stays ``--full``. Algebraic solve / residual cost
+is reported, not in CI ``all_passed``. Tanh algebra, not a collapse.
 """
 
 from __future__ import annotations
@@ -43,6 +44,71 @@ def _median_seconds(fn: Any, *, warmup: int, repeats: int) -> float:
 
 def _coeff_l1(coeffs: tuple[Any, ...]) -> float:
     return float(sum(abs(float(c)) for c in coeffs))
+
+
+def _run_g2() -> dict[str, Any]:
+    from omnibias.core.tanh_method import G1_NAMES, balance_degree, classical_pdes, published_ansatz
+
+    pdes = classical_pdes()
+    rows: list[dict[str, Any]] = []
+    mismatches = 0
+    for name in G1_NAMES:
+        ans = published_ansatz(name)
+        if ans.kind != "tanh_poly":
+            rows.append({"name": name, "kind": ans.kind, "skipped": True})
+            continue
+        got = int(balance_degree(pdes[name]))
+        expect = int(ans.degree)
+        ok = got == expect
+        if not ok:
+            mismatches += 1
+        rows.append({"name": name, "balance": got, "published_M": expect, "passed": ok})
+    passed = mismatches == 0
+    return {
+        "name": "g2_balance_degree",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "mismatches": int(mismatches),
+        "rows": rows,
+    }
+
+
+def _run_g3() -> dict[str, Any]:
+    import torch
+    from omnibias.core.tanh_method import G1_NAMES, classical_pdes, published_ansatz
+    from omnibias.pinn.travelling.torch import SolitonField
+
+    torch.set_default_dtype(torch.float64)
+    pdes = classical_pdes()
+    xs = torch.linspace(-1.5, 1.5, 21, dtype=torch.float64)
+    ts = torch.tensor([0.0, 0.25, 0.5], dtype=torch.float64)
+    x = xs.repeat(ts.numel())
+    t = ts.repeat_interleave(xs.numel())
+    worst_rel = 0.0
+    violations = 0
+    rows: list[dict[str, Any]] = []
+    for name in G1_NAMES:
+        ans = published_ansatz(name)
+        field = SolitonField((ans,), dtype=torch.float64)
+        res = field.exact_residual(x, t, pdes[name])
+        mag = float(field(x, t).abs().max().clamp_min(1e-16).detach())
+        peak = float(res.abs().max().detach())
+        rel = peak / max(mag, 1.0)
+        ok = peak <= 1e-14 * max(mag, 1.0)
+        if not ok:
+            violations += 1
+        worst_rel = max(worst_rel, rel)
+        rows.append({"name": name, "max_abs": peak, "mag": mag, "rel": rel, "passed": ok})
+    passed = violations == 0
+    return {
+        "name": "g3_numerical_residual",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "violations": int(violations),
+        "worst_rel": float(worst_rel),
+        "n_grid": int(x.numel()),
+        "rows": rows,
+    }
 
 
 def _run_cost() -> dict[str, Any]:
@@ -139,9 +205,21 @@ def main() -> int:
 
     pdes = classical_pdes()
     g1 = all(verify_exact(pdes[n], published_ansatz(n)) for n in G1_NAMES)
+    g2 = _run_g2()
+    g3 = _run_g3()
     heat = PDESpec("heat", (PDETerm(TermKind.U_T, 1), PDETerm(TermKind.U_XX, -1)))
     entries: list[dict[str, Any]] = [
         {"name": "g1_symbolic_exact", "passed": g1, "n": len(G1_NAMES), "in_ci_all_passed": True},
+        {
+            "name": "g2_balance_degree",
+            "passed": bool(g2["passed"]),
+            "in_ci_all_passed": bool(g2["in_ci_all_passed"]),
+        },
+        {
+            "name": "g3_numerical_residual",
+            "passed": bool(g3["passed"]),
+            "in_ci_all_passed": bool(g3["in_ci_all_passed"]),
+        },
         {"name": "g5_heat_negative", "passed": solve_ansatz(heat) == (), "in_ci_all_passed": True},
     ]
     cost = _run_cost()
@@ -150,16 +228,20 @@ def main() -> int:
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
-            "gates_in_scope": ["g1", "g5"],
+            "gates_in_scope": ["g1", "g2", "g3", "g5"],
         },
     )
     payload["gates"] = gates_block(entries)
+    payload["g2"] = g2
+    payload["g3"] = g3
     payload["cost"] = cost
     payload["honesty"] = {
         "algebra": "tanh polynomial, not a collapse",
         "n_soliton": False,
         "temperature_collapse": False,
         "founding_bias_collapse": False,
+        "g2_earned": bool(g2["passed"]),
+        "g3_earned": bool(g3["passed"]),
         "g4_init_win_earned": False,
         "g4_reported": True,
         "g4_leftover_recorded": True,
