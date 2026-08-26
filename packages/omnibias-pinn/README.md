@@ -70,7 +70,7 @@ Alpha submodules (still under Beta `omnibias-pinn`, not separate wheels):
   parallel interfaces only. Import `Interface` / `TransmissionInterface`
   from here, **not** from `omnibias.pinn._core.interface` (XPINN penalty
   glue).
-* **`omnibias.pinn.travelling`** — gated tanh-method solitons (02-09).
+* **`omnibias.pinn.travelling`** — shipped tanh-method solitons (02-09).
   Tanh algebra, not a collapse; a multi-kink sum is not the n-soliton
   formula.
 * **`omnibias.pinn.layered`** — gated 1-D transfer stacks (02-11).

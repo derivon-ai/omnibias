@@ -57,7 +57,7 @@ print(hermite_coeffs(5))             # probabilist's Hermite (Gaussian)
 | `omnibias.core.jets` | `contact_residual` / `is_holonomic` — vocabulary, not a discovery (theory 01-10, **shipped**; G1–G3 earned) |
 | `omnibias.core.conjugate` | line Hilbert permutation of the dictionary (theory 01-12, **shipped**; G5 leftover-recorded, leftover #11) |
 | `omnibias.core.hierarchy` | 1-D pack tree; `eta=0` bit-identical to dense (theory 02-07, **shipped**) |
-| `omnibias.core.tanh_method` | travelling-wave tanh algebra, not a collapse (theory 02-09, **gated**) |
+| `omnibias.core.tanh_method` | travelling-wave tanh algebra, not a collapse (theory 02-09, **shipped**) |
 | `omnibias.core.ladder` | Hermite raise/lower; Rodrigues reweight required (theory 02-10, **gated**) |
 | `omnibias.core.transfer` | 1-D ABCD stacks; `continuum_claim=False` (theory 02-11, **gated**) |
 | `omnibias.core.transforms_pde` | named Cole-Hopf / Miura / Bäcklund / Darboux (theory 02-13, **shipped**) |

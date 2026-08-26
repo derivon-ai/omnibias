@@ -245,6 +245,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Soliton tanh-method** ([02-09](api/travelling.md)): tanh algebra, not a
   collapse; multi-kink is not the n-soliton formula. G4 PINN init-win
   leftover-recorded. Algebraic cost leftover-recorded (leftover #44).
+  Status is **shipped**.
 - **Hermite ladder** ([02-10](api/ladder.md)): raw tower is not the QHO
   eigenbasis; Rodrigues reweight required. G4 FermiNet many-body
   leftover-recorded. Anharmonic G5 leftover-recorded (may lose).

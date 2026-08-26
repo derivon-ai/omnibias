@@ -12,7 +12,7 @@ step-count win stays `--full`. Algebraic `verify_exact` /
 `solve_ansatz` wall plus published-vs-cold residual L1 are
 **leftover-recorded** (leftover #44); the previous untimed
 `passed=True` stub is withdrawn. Cost is not in CI `all_passed`.
-Status is **gated**, not shipped. See theory spec 02-09.
+Status is **shipped**. See theory spec 02-09.
 
 ## Core algebra
 

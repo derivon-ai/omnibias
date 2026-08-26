@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Soliton tanh-method shipped (theory 02-09)
+
+- Spec 02-09 status is **shipped**: leftover #22 G4 and leftover #44
+  algebraic cost stay reported and out of `all_passed`.
+- Tanh algebra, not a collapse. Multi-kink is not the n-soliton formula.
+- Smoke: `docs/benchmarks/soliton_tanh_method_smoke.json`.
+
 ### Added — Soliton algebraic cost leftover-recorded (theory 02-09)
 
 - Leftover #44 leftover-records `cost_algebraic_vs_init_win` so it
