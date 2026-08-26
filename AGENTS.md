@@ -615,7 +615,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   mix + teacher-jet match; G1–G3 CI; founding bias collapse, not
   temperature collapse; not ImageNet) /
   `omnibias.core.exact_maml` + `omnibias.{torch,jax}.optim_maml`
-  (09-16; inner Newton + IFT meta-grad; G1–G3 CI; founding bias
+  (09-16, **shipped**; inner Newton + IFT meta-grad; G1–G4 CI; founding bias
   collapse, not temperature collapse; not ImageNet) /
   `omnibias.core.verified.tm_neuron` + `omnibias.verify._core.pci`
   (09-05, **shipped** / 09-24; TM hidden state + PCI box; G1–G4 CI; founding

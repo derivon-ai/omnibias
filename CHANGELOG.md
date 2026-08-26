@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Exact MAML shipped (theory 09-16)
+
+- Spec 09-16 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 quadratic step.
+- Inner Newton + IFT meta-grad, not ImageNet.
+- Smoke: `docs/benchmarks/exact_maml_smoke.json`.
+
 ### Added — q-OMBU / timescale shipped (theory 09-15)
 
 - Spec 09-15 status is **shipped**: G1–G4 CI; G4 torch/jax parity

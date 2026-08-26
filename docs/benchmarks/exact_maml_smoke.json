@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.exact_maml.v1",
-  "generated_utc": "2026-08-21T19:42:17Z",
+  "generated_utc": "2026-08-26T17:12:35Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 809.2,
+  "rss_mb_at_start": 1232.45,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -42,9 +42,15 @@
         "passed": true,
         "imagenet_claim": false,
         "stretch_claim": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_step": -0.2999999999999998,
+        "jax_step": -0.2999999999999998
       }
     ]
   },
   "disclaimer": "exact inner Newton + IFT meta-grad; not ImageNet few-shot and not CCF stretch",
-  "wall_seconds": 1.521914837998338
+  "wall_seconds": 0.4377863919362426
 }

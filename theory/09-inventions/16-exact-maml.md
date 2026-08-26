@@ -6,7 +6,7 @@ Model-agnostic meta-learning whose **inner step uses exact HVPs /
 Gauss–Newton** and whose **meta-gradient is IFT through the inner KKT
 system**, not a finite-difference unrolling of Adam.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not ImageNet)
 - **Depends on**: 08-01, 09-01
 - **Blocks**: none
 

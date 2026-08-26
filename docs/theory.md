@@ -392,6 +392,8 @@ gates are earned on smoke, not in CI `all_passed`.
   OMBU `integral` cell, not BEM-Net. Status is **shipped**.
 - **q-OMBU / timescale** ([09-15](api/q_ombu_timescale.md)): named
   `q -> 1` / `mu -> 0`, not a continuum PDE. Status is **shipped**.
+- **Exact MAML** ([09-16](api/exact_maml.md)): inner Newton + IFT
+  meta-grad, not ImageNet. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

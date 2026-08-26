@@ -6,7 +6,7 @@ rule. The founding bias collapse (`delta -> 0`) supplies exact HVPs.
 Temperature collapse (`beta -> inf`, feasibility) does not appear.
 Do not conflate the two.
 
-Status is **gated**, not shipped. Not ImageNet few-shot. Not CCF
+Status is **shipped**. Not ImageNet few-shot. Not CCF
 stretch. `imagenet_claim` and `stretch_claim` stay false.
 `theorem_prover_verified` is not asserted.
 
