@@ -286,6 +286,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Certified localization** ([03-08](api/certified_localization.md)):
   Krawczyk unique-peak enclosure. `Inconclusive` is first-class.
   Status is **shipped**.
+- **Differentiable topology** ([03-09](api/differentiable_topology.md)):
+  no differentiable Betti number. Temperature collapse, not founding
+  bias collapse. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

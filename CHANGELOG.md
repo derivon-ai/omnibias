@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Differentiable topology shipped (theory 03-09)
+
+- Spec 03-09 status is **shipped**: G1–G6 CI, no leftover gate.
+- No differentiable Betti number. Temperature collapse, not founding bias collapse.
+- Smoke: `docs/benchmarks/differentiable_topology_smoke.json`.
+
 ### Added — Certified localization shipped (theory 03-08)
 
 - Spec 03-08 status is **shipped**: G1–G6 CI, no leftover gate.

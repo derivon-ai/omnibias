@@ -569,7 +569,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   enclosure of a scan response; G1–G6 CI; founding bias
   collapse, not temperature collapse; `Inconclusive` is
   first-class; `local_box`; not `theorem_prover_verified`) /
-  `omnibias.shape.topology` (03-09; soft Euler / component
+  `omnibias.shape.topology` (03-09, **shipped**; soft Euler / component
   counts + 1-D Morse persistence; G1–G6 CI; temperature
   collapse, not founding bias collapse; no differentiable
   Betti number; `Inconclusive` when the gap does not separate) /

@@ -3,7 +3,7 @@
 Cell counts and Euler characteristics are integers, so **no
 differentiable function equals a Betti number**. Soft cell masses
 and 1-D Morse persistence values are surrogates with a stated
-gap to the integer truth. Status is **gated**, not shipped.
+gap to the integer truth. Status is **shipped**.
 G1–G6 are CI-gated.
 
 `beta -> inf` is **temperature collapse** (feasibility). The

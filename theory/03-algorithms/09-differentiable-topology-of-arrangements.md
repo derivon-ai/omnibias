@@ -8,7 +8,7 @@ soft cell masses and `beta`-smoothed sublevel filtrations give them
 differentiable surrogates whose gap to the integer truth is bounded, so topology
 can enter a loss function honestly.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; temperature collapse, not founding bias collapse; no differentiable Betti number; `Inconclusive` when the gap does not separate)
 - **Depends on**: 01-03, 02-02, 03-03, 03-05
 - **Blocks**: 05-01, 05-02
 
