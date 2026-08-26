@@ -7,7 +7,7 @@ nodes and weights can be *solved* for exactness on a prescribed function space
 — and, unlike a classical rule, the resulting rule is differentiable in its own
 design parameters.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 CI; founding bias collapse, not temperature collapse; refuses without a derivative bound; no non-product cubature)
 - **Depends on**: 01-04, 01-05, 02-04
 - **Blocks**: 03-13, 07-02
 

@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Neural quadrature shipped (theory 03-06)
+
+- Spec 03-06 status is **shipped**: G1–G5 CI, no leftover gate.
+- Founding bias collapse, not temperature collapse. No non-product cubature.
+- Smoke: `docs/benchmarks/neural_quadrature_smoke.json`.
+
 ### Added — Morphology shipped (theory 03-05)
 
 - Spec 03-05 status is **shipped**: G1–G6 CI, no leftover gate.

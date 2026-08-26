@@ -2,7 +2,7 @@
 
 A pack's moments are closed form, so a bank of packs is a quadrature
 rule whose nodes and weights are *solved* for exactness on a prescribed
-space. Status is **gated**, not shipped. G1–G5 are CI-gated.
+space. Status is **shipped**. G1–G5 are CI-gated.
 
 Pack functionals come from the **founding bias collapse** (`delta -> 0`).
 Temperature collapse (`beta -> inf`, feasibility) does not appear. Do

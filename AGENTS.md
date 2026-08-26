@@ -556,7 +556,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   via `logsumexp_beta`; G1–G6 CI; temperature collapse, not
   founding bias collapse; gap is worst-case; not a seventh
   OperatorBlock role) /
-  `omnibias.core.cubature` (03-06; moment-solved quadrature +
+  `omnibias.core.cubature` (03-06, **shipped**; moment-solved quadrature +
   Peano enclosure; G1–G5 CI; founding bias collapse, not
   temperature collapse; refuses without a derivative bound;
   no non-product cubature) /

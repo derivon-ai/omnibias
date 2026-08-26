@@ -277,6 +277,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Morphology** ([03-05](api/morphology.md)): soft dilation / erosion
   via `logsumexp_beta`. Temperature collapse, not founding bias
   collapse. Status is **shipped**.
+- **Neural quadrature** ([03-06](api/neural_quadrature.md)):
+  moment-solved nodes plus Peano enclosure. Founding bias collapse,
+  not temperature collapse. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
