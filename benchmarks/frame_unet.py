@@ -4,6 +4,7 @@
 
 G1 splits the band skip from the collapse head. G2 denoises a named
 1-D sine against a same-width Scan-Net. G3 keeps sigma' non-admissible.
+G4 is torch/jax bit-identity on the G1 worked example and forward.
 Not ImageNet. Not CCF stretch. Jets are founding bias collapse, not
 temperature collapse.
 """
@@ -17,15 +18,31 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.frame_unet import (
     DISCLAIMER,
     denoise_skill,
     honesty_payload,
     worked_example,
 )
+from omnibias.jax.architectures.frame_unet import (
+    frame_unet_forward as jax_fwd,
+)
+from omnibias.jax.architectures.frame_unet import (
+    worked_example as jax_ex,
+)
+from omnibias.torch.architectures.frame_unet import (
+    frame_unet_forward as torch_fwd,
+)
+from omnibias.torch.architectures.frame_unet import (
+    worked_example as torch_ex,
+)
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -42,6 +59,19 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["below_zero"] and skill["not_worse_than_scan"])
     hon = honesty_payload()
     g3 = hon["sigma_prime_admissible"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t_ex = torch_ex()
+    j_ex = jax_ex()
+    ty, ts = torch_fwd(torch.tensor(0.0))
+    jy, js = jax_fwd(jnp.asarray(0.0))
+    g4 = bool(
+        t_ex["band"] == j_ex["band"]
+        and t_ex["collapse"] == j_ex["collapse"]
+        and float(ty) == float(jy)
+        and ts["band"] == js["band"]
+        and ts["collapse"] == js["collapse"]
+    )
     entries = [
         {
             "name": "g1_skip_split",
@@ -61,6 +91,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "name": "g3_honesty",
             "passed": g3,
             "sigma_prime_admissible": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_y": float(ty),
+            "jax_y": float(jy),
         },
     ]
     for entry in entries:

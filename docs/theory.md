@@ -363,6 +363,8 @@ gates are earned on smoke, not in CI `all_passed`.
   not ImageNet. Status is **shipped**.
 - **FTC-Net** ([09-03](api/ftc_net.md)): integral cell, not a
   VPINN. Status is **shipped**.
+- **Frame-UNet** ([09-04](api/frame_unet.md)): band skip is not a
+  collapse head. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

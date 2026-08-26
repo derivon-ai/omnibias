@@ -6,7 +6,7 @@ A U-Net whose **encoder raises pack order** (order as frequency, 01-07)
 and whose **decoder is integral synthesis**, with skip connections that
 are FTC identities between a collapse head and an integral cell.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; band skip is not a collapse head; founding bias collapse)
 - **Depends on**: 01-06, 01-07, 09-01, 09-03
 - **Blocks**: none
 

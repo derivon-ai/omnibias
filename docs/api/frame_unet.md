@@ -8,7 +8,7 @@ The decoder gap is the window knob. Temperature collapse
 (`beta -> inf`, feasibility) does not appear. Do not conflate the
 two.
 
-Status is **gated**, not shipped. `sigma'` is not an admissible
+Status is **shipped**. `sigma'` is not an admissible
 wavelet. Frames are not orthonormal and not compactly supported.
 Not Littlewood–Paley completeness. Not ImageNet. Not CCF stretch.
 

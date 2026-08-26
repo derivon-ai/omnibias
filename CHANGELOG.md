@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Frame-UNet shipped (theory 09-04)
+
+- Spec 09-04 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Band skip is not a collapse head.
+- Smoke: `docs/benchmarks/frame_unet_smoke.json`.
+
 ### Added — FTC-Net shipped (theory 09-03)
 
 - Spec 09-03 status is **shipped**: G1–G3 CI; not a VPINN.
