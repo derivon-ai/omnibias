@@ -365,6 +365,8 @@ gates are earned on smoke, not in CI `all_passed`.
   VPINN. Status is **shipped**.
 - **Frame-UNet** ([09-04](api/frame_unet.md)): band skip is not a
   collapse head. Status is **shipped**.
+- **Taylor-model neuron** ([09-05](api/tm_neuron.md)): remainder
+  sound, not a deep-net certificate. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

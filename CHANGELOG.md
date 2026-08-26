@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Taylor-model neuron shipped (theory 09-05)
+
+- Spec 09-05 status is **shipped**: G1–G4 CI; remainder sound, not
+  a deep-net certificate.
+- Smoke: `docs/benchmarks/taylor_model_neuron_smoke.json`.
+
 ### Added — Frame-UNet shipped (theory 09-04)
 
 - Spec 09-04 status is **shipped**: G1–G4 CI; G4 torch/jax parity

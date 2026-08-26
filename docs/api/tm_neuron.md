@@ -6,7 +6,7 @@ supplies the polynomial coefficients. Temperature collapse
 (`beta -> inf`, feasibility) does not appear. Do not conflate the
 two.
 
-Status is **gated**, not shipped. Sound enclosure of a shallow cell.
+Status is **shipped**. Sound enclosure of a shallow cell.
 Not a deep-net certificate. Not ImageNet. Not CCF stretch.
 `theorem_prover_verified` is not asserted. Navier–Stokes stays
 external.

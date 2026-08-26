@@ -6,7 +6,7 @@ A unit whose output is a **`TaylorModel` / interval**, not a float, so
 the forward pass is the same algebraic object as
 `omnibias.core.verified`.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; remainder sound, not a deep-net certificate)
 - **Depends on**: 01-10, 09-01
 - **Blocks**: 09-24
 
