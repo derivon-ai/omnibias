@@ -334,7 +334,8 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   extract / paper / external stay later). Theory 07-01 is **shipped**
   ([`docs/frontier-ledger.md`](docs/frontier-ledger.md); RH is a
   non-entry). Theory 08-01 is **shipped** (training-idea ledger;
-  trainers do not clear Hilbert stretch).
+  trainers do not clear Hilbert stretch). Theory 09-01 is **shipped**
+  (invention ledger; inventions do not clear Hilbert stretch).
 
 ## Don't
 

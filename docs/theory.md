@@ -357,6 +357,8 @@ gates are earned on smoke, not in CI `all_passed`.
   unrolled BPTT. Status is **shipped**.
 - **Certified step** ([08-09](api/certified_step.md)): empty is a
   reject, not robustness. Status is **shipped**.
+- **Invention ledger** (09-01): first-bet ranking; inventions do
+  not clear Hilbert stretch. Design record. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

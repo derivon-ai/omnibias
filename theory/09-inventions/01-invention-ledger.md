@@ -9,7 +9,7 @@ already first-class specs in Groups 02–05. This file is the index: what is
 already specified, what is a new Group 09 spec, what is rejected, and which
 cluster to implement first.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 earned; inventions do not clear Hilbert stretch; design record)
 - **Depends on**: 01-01, 01-10, 06-01, 06-02, 08-01
 - **Blocks**: 09-02, 09-03, 09-04, 09-05, 09-06, 09-07, 09-08, 09-09,
   09-10, 09-11, 09-12, 09-13, 09-14, 09-15, 09-16, 09-17, 09-18, 09-19,

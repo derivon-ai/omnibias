@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Invention ledger shipped (theory 09-01)
+
+- Spec 09-01 status is **shipped**: G1–G5 earned; design record.
+- Inventions do not clear Hilbert stretch.
+- Guard: `packages/omnibias-core/tests/test_theory_invention_ledger.py`.
+
 ### Added — Certified step shipped (theory 08-09)
 
 - Spec 08-09 status is **shipped**: G1–G3 CI; empty is a reject,
