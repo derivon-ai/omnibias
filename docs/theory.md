@@ -226,7 +226,8 @@ gates are earned on smoke, not in CI `all_passed`.
   to dense; far-field is a truncation with a bound. G3 complexity
   leftover-recorded (per-source Taylor, no dense crossover).
 - **Equivariant scan** ([02-08](api/equivariant_scan.md)): gaussian-family
-  steering only; discrete `C_L`, not SO(2)/SO(3).
+  steering only; discrete `C_L`, not SO(2)/SO(3). G5 anisotropic-interface
+  leftover-recorded.
 - **Soliton tanh-method** ([02-09](api/travelling.md)): tanh algebra, not a
   collapse; multi-kink is not the n-soliton formula.
 - **Hermite ladder** ([02-10](api/ladder.md)): raw tower is not the QHO

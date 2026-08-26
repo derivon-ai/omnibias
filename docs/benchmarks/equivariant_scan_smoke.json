@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.equivariant_scan.v1",
-  "generated_utc": "2026-08-25T18:47:58Z",
+  "generated_utc": "2026-08-26T15:57:50Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -18,7 +18,7 @@
       "g2"
     ]
   },
-  "rss_mb_at_start": 820.87,
+  "rss_mb_at_start": 821.97,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -45,28 +45,32 @@
         "L": 4,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.00035177101381123066
+        "wall_seconds": 0.00035191699862480164
       },
       {
         "L": 8,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.0006739269010722637
+        "wall_seconds": 0.0006792040076106787
       },
       {
         "L": 16,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.0013645950239151716
+        "wall_seconds": 0.001315327943302691
       }
     ],
     "g5_anisotropic_interface": {
       "earned": false,
+      "reported": true,
+      "leftover_recorded": true,
+      "leftover_id": 25,
+      "leftover_tick": 63,
       "stays_full": true,
       "need": "orientation bank beats single-direction scan in angular error, skill > 0 vs random-angle, 5 seeds",
-      "reason": "No interface-orientation task is wired. EquivariantScan forward wall vs C_L orbit size is recorded; that is not the named 5-seed skill gate. Discrete C_L, not SO(2)."
+      "reason": "Leftover #25 leftover-recorded: no interface-orientation task is wired. EquivariantScan forward wall vs C_L orbit size is recorded; that is not the named 5-seed skill gate. Discrete C_L, not SO(2)."
     },
-    "note": "EquivariantScan wall vs L (L orientations multiply cost). G5 anisotropic-interface is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous g5_anisotropic_interface passed=True / --full-only stub with no timing withdrawn. Not in CI all_passed."
+    "note": "Leftover #25 leftover-recorded: EquivariantScan wall vs L (L orientations multiply cost). G5 anisotropic-interface is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous g5_anisotropic_interface passed=True / --full-only stub with no timing withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "steering": "gaussian-family only",
@@ -74,6 +78,10 @@
     "founding_bias_collapse": true,
     "temperature_collapse": false,
     "g5_anisotropic_interface_earned": false,
+    "g5_reported": true,
+    "g5_leftover_recorded": true,
+    "g5_leftover_id": 25,
+    "g5_leftover_tick": 63,
     "g5_stays_full": true,
     "cost_earned": false,
     "cost_reported": true,

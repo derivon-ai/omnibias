@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equivariant-scan G5 leftover-recorded (theory 02-08)
+
+- Leftover #25's anisotropic-interface miss now leftover-records
+  `reported` plus honesty flags on `benchmarks/equivariant_scan.py`.
+- Reported: no task loop; named 5-seed skill stays `--full`. Not in
+  CI `all_passed`.
+- Smoke: `docs/benchmarks/equivariant_scan_smoke.json`.
+
 ### Added — BEM-Net G3 leftover-recorded (theory 02-06)
 
 - Leftover #30's exterior-win miss now leftover-records `reported`

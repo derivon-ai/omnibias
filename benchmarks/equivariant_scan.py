@@ -2,8 +2,8 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: equivariant scan (theory 02-08). Discrete C_L, not SO(2).
 
-G5 anisotropic-interface stays ``--full``. Orbit wall vs ``L`` is
-reported, not in CI ``all_passed``.
+G5 anisotropic-interface is leftover-recorded (leftover #25) and stays
+``--full``. Orbit wall vs ``L`` is reported, not in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -76,23 +76,28 @@ def _run_cost() -> dict[str, Any]:
         "rows": rows,
         "g5_anisotropic_interface": {
             "earned": False,
+            "reported": True,
+            "leftover_recorded": True,
+            "leftover_id": 25,
+            "leftover_tick": 63,
             "stays_full": True,
             "need": (
                 "orientation bank beats single-direction scan in angular "
                 "error, skill > 0 vs random-angle, 5 seeds"
             ),
             "reason": (
-                "No interface-orientation task is wired. EquivariantScan "
-                "forward wall vs C_L orbit size is recorded; that is not "
-                "the named 5-seed skill gate. Discrete C_L, not SO(2)."
+                "Leftover #25 leftover-recorded: no interface-orientation "
+                "task is wired. EquivariantScan forward wall vs C_L orbit "
+                "size is recorded; that is not the named 5-seed skill "
+                "gate. Discrete C_L, not SO(2)."
             ),
         },
         "note": (
-            "EquivariantScan wall vs L (L orientations multiply cost). G5 "
-            "anisotropic-interface is a 5-seed study under "
-            "$OMNIBIAS_SCRATCH, not CI. Previous g5_anisotropic_interface "
-            "passed=True / --full-only stub with no timing withdrawn. "
-            "Not in CI all_passed."
+            "Leftover #25 leftover-recorded: EquivariantScan wall vs L "
+            "(L orientations multiply cost). G5 anisotropic-interface "
+            "is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous "
+            "g5_anisotropic_interface passed=True / --full-only stub "
+            "with no timing withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -126,6 +131,10 @@ def main() -> int:
         "founding_bias_collapse": True,
         "temperature_collapse": False,
         "g5_anisotropic_interface_earned": False,
+        "g5_reported": True,
+        "g5_leftover_recorded": True,
+        "g5_leftover_id": 25,
+        "g5_leftover_tick": 63,
         "g5_stays_full": True,
         "cost_earned": False,
         "cost_reported": True,

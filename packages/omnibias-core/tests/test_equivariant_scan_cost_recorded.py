@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""02-08 orbit cost is reported; G5 anisotropic-interface stays out of all_passed."""
+"""02-08 G5 anisotropic-interface is leftover-recorded, not in CI all_passed."""
 
 from __future__ import annotations
 
@@ -20,10 +20,16 @@ def test_cost_is_reported_and_g5_out_of_all_passed() -> None:
     assert cost["reported"] is True
     assert cost["in_ci_all_passed"] is False
     assert cost["g5_anisotropic_interface"]["earned"] is False
+    assert cost["g5_anisotropic_interface"]["reported"] is True
+    assert cost["g5_anisotropic_interface"]["leftover_recorded"] is True
+    assert int(cost["g5_anisotropic_interface"]["leftover_id"]) == 25
+    assert int(cost["g5_anisotropic_interface"]["leftover_tick"]) == 63
     assert cost["g5_anisotropic_interface"]["stays_full"] is True
     ls = {int(row["L"]) for row in cost["rows"]}
     assert {4, 8, 16} <= ls
     assert payload["honesty"]["g5_anisotropic_interface_earned"] is False
+    assert payload["honesty"]["g5_leftover_recorded"] is True
+    assert int(payload["honesty"]["g5_leftover_id"]) == 25
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g5_anisotropic_interface" not in names
