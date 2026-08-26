@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Hermite-ladder cost leftover-recorded (theory 02-10)
+
+- Leftover #45 leftover-records `cost_exact_vs_fd_orbitals` so it
+  stays reported and out of `all_passed`.
+- Leftover #21 G4 stays `--full`; leftover #26 G5 stays unearned.
+- Smoke: `docs/benchmarks/hermite_ladder_smoke.json`.
+
 ### Added — Soliton tanh-method shipped (theory 02-09)
 
 - Spec 02-09 status is **shipped**: leftover #22 G4 and leftover #44

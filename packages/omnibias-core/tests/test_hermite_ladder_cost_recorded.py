@@ -18,6 +18,9 @@ def test_cost_is_reported_and_g4_out_of_all_passed() -> None:
     assert cost["earned"] is False
     assert cost["passed"] is False
     assert cost["reported"] is True
+    assert cost["leftover_recorded"] is True
+    assert int(cost["leftover_id"]) == 45
+    assert int(cost["leftover_tick"]) == 89
     assert cost["in_ci_all_passed"] is False
     assert cost["g4_many_body"]["earned"] is False
     assert cost["g4_many_body"]["reported"] is True
@@ -31,6 +34,8 @@ def test_cost_is_reported_and_g4_out_of_all_passed() -> None:
     assert payload["honesty"]["g4_many_body_earned"] is False
     assert payload["honesty"]["g4_leftover_recorded"] is True
     assert int(payload["honesty"]["g4_leftover_id"]) == 21
+    assert payload["honesty"]["cost_leftover_recorded"] is True
+    assert int(payload["honesty"]["cost_leftover_id"]) == 45
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g4_ferminet" not in names

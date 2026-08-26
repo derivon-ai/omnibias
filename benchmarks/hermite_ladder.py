@@ -81,6 +81,9 @@ def _run_cost() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 45,
+        "leftover_tick": 89,
         "in_ci_all_passed": False,
         "rows": rows,
         "median_fd_over_exact": float(np.median(np.asarray(ratios))),
@@ -99,13 +102,12 @@ def _run_cost() -> dict[str, Any]:
             ),
         },
         "note": (
-            "Leftover #21 leftover-recorded: exact apply_ladder orbital "
+            "Leftover #45 leftover-recorded: exact apply_ladder orbital "
             "derivatives vs central FD on the named 1-D oscillator. G4 "
-            "many-body 2x variance is a FermiNet run under "
-            "$OMNIBIAS_SCRATCH, not CI. 1-D QHO envelope already contains "
-            "the ground state (no improvement). Previous G4 passed=True "
-            "/ --full-only stub with no timing withdrawn. Not in CI "
-            "all_passed."
+            "many-body is leftover #21 and stays --full. 1-D QHO "
+            "envelope already contains the ground state (no improvement). "
+            "Previous G4 passed=True / --full-only stub with no timing "
+            "withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -205,6 +207,9 @@ def main() -> int:
         "g5_in_ci_all_passed": False,
         "cost_earned": False,
         "cost_reported": True,
+        "cost_leftover_recorded": True,
+        "cost_leftover_id": 45,
+        "cost_leftover_tick": 89,
         "cost_in_ci_all_passed": False,
         "many_body_solution_claim": False,
     }
