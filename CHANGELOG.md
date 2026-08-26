@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Weak-form VPINN shipped (theory 02-04)
+
+- Spec 02-04 status is **shipped**: G1–G5 CI; G4 conditioning earned.
+- Exact on polynomial boxes; boundary bound on by default.
+- Smoke: `docs/benchmarks/weak_form_vpinn_smoke.json`.
+
 ### Added — Face-Net shipped (theory 02-02)
 
 - Spec 02-02 status is **shipped**: G1/G2 CI; leftover #28 G3 and

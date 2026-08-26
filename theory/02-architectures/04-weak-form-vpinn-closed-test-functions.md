@@ -7,7 +7,7 @@ antiderivatives**: integration by parts becomes exact instead of
 quadrature-approximated, the residual needs one fewer derivative of the
 solution, and problems with weak or discontinuous data become well posed.
 
-- **Status**: gated (exact on polynomial boxes; boundary bound on by default; G4 conditioning **earned** vs strong collocation, `>> 10x`)
+- **Status**: shipped (exact on polynomial boxes; boundary bound on by default; G4 conditioning **earned** vs strong collocation, `>> 10x`)
 - **Depends on**: 01-01, 01-05
 - **Blocks**: 02-05, 03-06, 07-02
 

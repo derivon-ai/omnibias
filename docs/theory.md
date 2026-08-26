@@ -199,6 +199,7 @@ gates are earned on smoke, not in CI `all_passed`.
   justify the architecture. G2 cost not in CI `all_passed`.
 - **Weak-form VPINN** ([02-04](api/weak.md)): exact integrals only for
   polynomial coeffs on boxes; path recorded; boundary bound **on by default**.
+  Status is **shipped**.
 - **Transmission PINN** ([02-05](api/interface.md)): parallel interfaces;
   `alpha -> inf` is **interface sharpening**, neither collapse. G3 vs
   PartitionedField / FBPINN leftover-recorded. G4 hard vs penalized

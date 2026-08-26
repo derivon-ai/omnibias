@@ -12,8 +12,8 @@ domains stay quadrature-near-boundary and are not claimed.
 G1–G5 are CI-gated. G4 conditioning is **earned** on the smoke
 artifact: `cond(strong collocation) / cond(weak stiffness)` is far
 above `10x` on the named `TestFunctionSpace`. Previous
-`g4_is_unit_test` deferral is withdrawn. Status is **gated**, not
-shipped. See theory spec 02-04.
+`g4_is_unit_test` deferral is withdrawn. Status is **shipped**.
+See theory spec 02-04.
 
 ## Algebra
 
