@@ -10,8 +10,8 @@ Littlewood-Paley completeness claim. Atoms come from founding
 G1–G3 are CI-gated. G4 (denoising skill) is **leftover-recorded**
 unearned (leftover #10) and not in CI `all_passed`: order-2 beats
 matched-cost n=1 in MSE, but skill versus the noisy identity is
-negative. `sigma'` is not admissible. Status is **gated**, not
-shipped. See theory spec 01-06.
+negative. `sigma'` is not admissible. Status is **shipped**.
+See theory spec 01-06.
 
 ## Core algebra
 

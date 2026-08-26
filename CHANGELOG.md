@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — OMBU frames shipped (theory 01-06)
+
+- Spec 01-06 status is **shipped**: G1–G3 CI; leftover #10 G4 stays
+  reported and out of `all_passed`.
+- `sigma'` is not admissible; not orthonormal / not compactly supported.
+- Smoke: `docs/benchmarks/ombu_frames_smoke.json`.
+
 ### Added — OMBU-frames G4 leftover flags (theory 01-06)
 
 - Leftover #10 now leftover-records `leftover_recorded` plus honesty

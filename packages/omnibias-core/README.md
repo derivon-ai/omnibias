@@ -52,7 +52,7 @@ print(hermite_coeffs(5))             # probabilist's Hermite (Gaussian)
 | `omnibias.core.scan` | `BankSpec` — offset / scale bank for the bias scan (theory 01-02, **shipped**) |
 | `omnibias.core.mollifier` | `MollifierSpec` / `tail_bound` — pack-as-mollifier algebra; certified exponential tails, not compact support (theory 01-05, **shipped**) |
 | `omnibias.core.spectral_design` | `BandPlan` / `peak_frequency` — order as a band selector, not Littlewood-Paley completeness (theory 01-07, **gated**) |
-| `omnibias.core.frames` | `FrameSpec` / `admissibility_constant` — `sigma'` is not admissible (theory 01-06, **gated**) |
+| `omnibias.core.frames` | `FrameSpec` / `admissibility_constant` — `sigma'` is not admissible (theory 01-06, **shipped**) |
 | `omnibias.core.locus` | `EqualitySystem` — constraint manifold, not a PDE solver (theory 01-09, **gated**) |
 | `omnibias.core.jets` | `contact_residual` / `is_holonomic` — vocabulary, not a discovery (theory 01-10, **gated**; G1–G3 earned) |
 | `omnibias.core.conjugate` | line Hilbert permutation of the dictionary (theory 01-12, **gated**; G5 not in CI `all_passed`) |
