@@ -236,6 +236,7 @@ gates are earned on smoke, not in CI `all_passed`.
   leftover-recorded. Anharmonic G5 leftover-recorded (may lose).
 - **Layered transfer** ([02-11](api/layered.md)): 1-D only;
   `continuum_claim=False`; distinct from `geometry.gauge.transfer`.
+  G4 inverse-design leftover-recorded.
 - **Linearizing transforms** ([02-13](api/transforms_pde.md)): named Cole-Hopf
   / Miura / Bäcklund / Darboux; exactness to jet order N; 03-11 search
   stays designed.

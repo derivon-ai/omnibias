@@ -2,8 +2,9 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: layered transfer (theory 02-11). continuum_claim=False.
 
-G4 inverse-design stays ``--full``. Stack / gap wall vs period count is
-reported. G5 conservation violation is reported, not in CI ``all_passed``.
+G4 inverse-design is leftover-recorded (leftover #23) and stays
+``--full``. Stack / gap wall vs period count is reported. G5
+conservation violation is reported, not in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -79,23 +80,29 @@ def _run_cost() -> dict[str, Any]:
         "rows": rows,
         "g4_inverse_design": {
             "earned": False,
+            "reported": True,
+            "leftover_recorded": True,
+            "leftover_id": 23,
+            "leftover_tick": 67,
             "stays_full": True,
             "need": (
                 "bandwidth-max differentiable trace beats gradient-free "
                 "at 10x fewer objective evals, 5 seeds"
             ),
             "reason": (
-                "No inverse-design loop is wired. stack_matrix / "
-                "certified_band_gap wall vs n_periods is recorded; that "
-                "is not the named 10x eval-count win."
+                "Leftover #23 leftover-recorded: no inverse-design loop "
+                "is wired. stack_matrix / certified_band_gap wall vs "
+                "n_periods is recorded; that is not the named 10x "
+                "eval-count win."
             ),
         },
         "note": (
-            "Quarter-wave stack_matrix and certified_band_gap wall vs "
-            "n_periods. G4 inverse-design is a 5-seed study under "
-            "$OMNIBIAS_SCRATCH, not CI. Previous g4_inverse_design "
-            "passed=True / --full-only stub with no timing withdrawn. "
-            "continuum_claim=False. Not in CI all_passed."
+            "Leftover #23 leftover-recorded: quarter-wave stack_matrix "
+            "and certified_band_gap wall vs n_periods. G4 inverse-design "
+            "is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous "
+            "g4_inverse_design passed=True / --full-only stub with no "
+            "timing withdrawn. continuum_claim=False. Not in CI "
+            "all_passed."
         ),
     }
 
@@ -189,6 +196,10 @@ def main() -> int:
         "continuum_claim": False,
         "one_d_layered": True,
         "g4_inverse_design_earned": False,
+        "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 23,
+        "g4_leftover_tick": 67,
         "g4_stays_full": True,
         "g5_mlp_conservation_earned": False,
         "g5_mlp_conservation_reported": True,

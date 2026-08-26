@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.layered_transfer.v1",
-  "generated_utc": "2026-08-25T18:56:15Z",
+  "generated_utc": "2026-08-26T16:00:43Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "g3"
     ]
   },
-  "rss_mb_at_start": 807.8,
+  "rss_mb_at_start": 809.28,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -46,35 +46,39 @@
       {
         "n_periods": 1,
         "n_layers": 2,
-        "stack_wall_seconds": 1.971959136426449e-06,
-        "gap_wall_seconds": 5.86899695917964e-05
+        "stack_wall_seconds": 2.2830208763480186e-06,
+        "gap_wall_seconds": 6.35739415884018e-05
       },
       {
         "n_periods": 2,
         "n_layers": 4,
-        "stack_wall_seconds": 3.202003426849842e-06,
-        "gap_wall_seconds": 0.00010088598355650902
+        "stack_wall_seconds": 3.60200647264719e-06,
+        "gap_wall_seconds": 0.00011089409235864878
       },
       {
         "n_periods": 4,
         "n_layers": 8,
-        "stack_wall_seconds": 5.899928510189056e-06,
-        "gap_wall_seconds": 0.0001843619393184781
+        "stack_wall_seconds": 8.109025657176971e-06,
+        "gap_wall_seconds": 0.00019801000598818064
       },
       {
         "n_periods": 8,
         "n_layers": 16,
-        "stack_wall_seconds": 1.129903830587864e-05,
-        "gap_wall_seconds": 0.00038292992394417524
+        "stack_wall_seconds": 1.2160977348685265e-05,
+        "gap_wall_seconds": 0.00040790997445583344
       }
     ],
     "g4_inverse_design": {
       "earned": false,
+      "reported": true,
+      "leftover_recorded": true,
+      "leftover_id": 23,
+      "leftover_tick": 67,
       "stays_full": true,
       "need": "bandwidth-max differentiable trace beats gradient-free at 10x fewer objective evals, 5 seeds",
-      "reason": "No inverse-design loop is wired. stack_matrix / certified_band_gap wall vs n_periods is recorded; that is not the named 10x eval-count win."
+      "reason": "Leftover #23 leftover-recorded: no inverse-design loop is wired. stack_matrix / certified_band_gap wall vs n_periods is recorded; that is not the named 10x eval-count win."
     },
-    "note": "Quarter-wave stack_matrix and certified_band_gap wall vs n_periods. G4 inverse-design is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous g4_inverse_design passed=True / --full-only stub with no timing withdrawn. continuum_claim=False. Not in CI all_passed."
+    "note": "Leftover #23 leftover-recorded: quarter-wave stack_matrix and certified_band_gap wall vs n_periods. G4 inverse-design is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous g4_inverse_design passed=True / --full-only stub with no timing withdrawn. continuum_claim=False. Not in CI all_passed."
   },
   "g5": {
     "name": "g5_mlp_conservation",
@@ -93,6 +97,10 @@
     "continuum_claim": false,
     "one_d_layered": true,
     "g4_inverse_design_earned": false,
+    "g4_reported": true,
+    "g4_leftover_recorded": true,
+    "g4_leftover_id": 23,
+    "g4_leftover_tick": 67,
     "g4_stays_full": true,
     "g5_mlp_conservation_earned": false,
     "g5_mlp_conservation_reported": true,

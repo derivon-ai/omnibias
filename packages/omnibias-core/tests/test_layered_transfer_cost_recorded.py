@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""02-11 stack cost is reported; G4 inverse-design stays out of all_passed."""
+"""02-11 G4 inverse-design is leftover-recorded; G5 stays out of all_passed."""
 
 from __future__ import annotations
 
@@ -20,10 +20,16 @@ def test_cost_is_reported_and_g4_out_of_all_passed() -> None:
     assert cost["reported"] is True
     assert cost["in_ci_all_passed"] is False
     assert cost["g4_inverse_design"]["earned"] is False
+    assert cost["g4_inverse_design"]["reported"] is True
+    assert cost["g4_inverse_design"]["leftover_recorded"] is True
+    assert int(cost["g4_inverse_design"]["leftover_id"]) == 23
+    assert int(cost["g4_inverse_design"]["leftover_tick"]) == 67
     assert cost["g4_inverse_design"]["stays_full"] is True
     periods = {int(row["n_periods"]) for row in cost["rows"]}
     assert {1, 2, 4, 8} <= periods
     assert payload["honesty"]["g4_inverse_design_earned"] is False
+    assert payload["honesty"]["g4_leftover_recorded"] is True
+    assert int(payload["honesty"]["g4_leftover_id"]) == 23
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g4_inverse_design" not in names

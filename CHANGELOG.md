@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Layered-transfer G4 leftover-recorded (theory 02-11)
+
+- Leftover #23's inverse-design miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/layered_transfer.py`.
+- Reported: no optimizer loop; named 10x eval-count win stays `--full`.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/layered_transfer_smoke.json`.
+
 ### Added — Hermite-ladder G5 leftover-recorded (theory 02-10)
 
 - Leftover #26's anharmonic honesty miss now leftover-records `reported`

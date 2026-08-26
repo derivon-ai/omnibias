@@ -6,8 +6,9 @@ is refused outside lossless reciprocal linear media.
 `continuum_claim=False` on every certified gap.
 
 G1–G3/G6 are CI-gated. G4 inverse-design (10× fewer evals vs
-gradient-free, five seeds) stays `--full` and is **unearned**: no
-optimizer loop is wired. `stack_matrix` / `certified_band_gap` wall vs
+gradient-free, five seeds) is **leftover-recorded** unearned (leftover
+#23): no optimizer loop is wired, so the named 5-seed eval-count win
+stays `--full`. `stack_matrix` / `certified_band_gap` wall vs
 `n_periods` is **reported**; the previous untimed `passed=True` stub is
 withdrawn. Cost is not in CI `all_passed`. G5 conservation honesty is
 **reported**: unstructured 2×2 `|r|^2+|t|^2-1` versus a lossless stack,
