@@ -7,7 +7,7 @@ arrangement normals), the directional loss `phi(s)` is a low-degree
 combination of the Riccati tower, so the step is a **polynomial root**
 — a structured special case of spec 03-12.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; coordinate sweep, not a global solver)
 - **Depends on**: 01-01, 03-12, 08-01
 - **Blocks**: none
 

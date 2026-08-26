@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Block exact search shipped (theory 08-07)
+
+- Spec 08-07 status is **shipped**: G1–G4 CI; coordinate sweep,
+  not a global solver.
+- Smoke: `docs/benchmarks/block_exact_search_smoke.json`.
+
 ### Added — Sharpness-scheduled step shipped (theory 08-06)
 
 - Spec 08-06 status is **shipped**: G1–G3 CI; step-size signal,

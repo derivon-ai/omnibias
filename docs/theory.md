@@ -351,6 +351,8 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Sharpness schedule** ([08-06](api/sharpness_schedule.md)):
   step-size signal, not a generalization claim. Status is
   **shipped**.
+- **Block exact search** ([08-07](api/block_exact_search.md)):
+  coordinate sweep, not a global solver. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

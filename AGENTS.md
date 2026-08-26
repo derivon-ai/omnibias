@@ -525,7 +525,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `lambda_max` sets cubic `sigma`; G1–G3 CI; step-size signal, not a
   generalization claim) /
   `omnibias.core.block_search` /
-  `omnibias.{torch,jax}.optim_block_search` (08-07; 03-12 on a named
+  `omnibias.{torch,jax}.optim_block_search` (08-07, **shipped**; 03-12 on a named
   block; G1–G4 CI; coordinate sweep, not a global solver) /
   `omnibias.core.local_jet` /
   `omnibias.{torch,jax}.train_local` (08-03, **shipped**; depth-causal local GN +
