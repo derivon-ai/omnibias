@@ -237,6 +237,14 @@ from omnibias.jax.transforms import (
     mellin_transform,
     region_of_convergence,
 )
+from omnibias.jax.weight_loss_jet import (
+    WeightLossJetSpec,
+    one_layer_loss,
+    one_layer_loss_grad,
+    one_layer_loss_hessian,
+    one_layer_loss_jet,
+    one_layer_newton_direction,
+)
 
 # Founding-idea lineage (see docs/theory.md "Two senses of collapse").
 __lineage__ = "bias collapse"
@@ -268,6 +276,7 @@ __all__ = [
     "SharpnessReport",
     "SharpnessSchedule",
     "TransformBlock",
+    "WeightLossJetSpec",
     "X64_HINT",
     "__lineage__",
     "__version__",
@@ -363,6 +372,11 @@ __all__ = [
     "neural_field_value_grad_hessian",
     "neural_field_value_grad_laplacian",
     "ombu_bias_block",
+    "one_layer_loss",
+    "one_layer_loss_grad",
+    "one_layer_loss_hessian",
+    "one_layer_loss_jet",
+    "one_layer_newton_direction",
     "polynomial_sqrt2_maps",
     "refine",
     "region_of_convergence",

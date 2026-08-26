@@ -730,6 +730,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/layered.md`](docs/api/layered.md),
   [`docs/api/transforms_pde.md`](docs/api/transforms_pde.md),
   [`docs/api/holonomy_band.md`](docs/api/holonomy_band.md),
+  [`docs/api/weight_loss_jet.md`](docs/api/weight_loss_jet.md),
   [`docs/api/line_search.md`](docs/api/line_search.md),
   [`docs/api/refine.md`](docs/api/refine.md),
   [`docs/api/composed_curvature.md`](docs/api/composed_curvature.md),

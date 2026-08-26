@@ -78,6 +78,13 @@ Line Hilbert permutation of the dictionary (theory 01-12). G5 is a
 projection defect, not a stretch-gate clearing. Documented in full at
 [conjugate.md](conjugate.md).
 
+## Weight-space loss jet
+
+Closed-form directional derivatives of a one-layer Riccati MSE loss
+along a weight direction. Leibniz assembly from `σ^(n)`; not a deep-net
+polynomial in every weight. Documented in full at
+[weight_loss_jet.md](weight_loss_jet.md).
+
 ## Exact jet line search
 
 Taylor-polynomial line search (theory 03-12). Certified Lagrange

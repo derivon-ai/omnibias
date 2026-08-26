@@ -201,6 +201,14 @@ from omnibias.torch.transforms import (
     region_of_convergence,
 )
 from omnibias.torch.unit import OperatorMultiBiasUnit
+from omnibias.torch.weight_loss_jet import (
+    WeightLossJetSpec,
+    one_layer_loss,
+    one_layer_loss_grad,
+    one_layer_loss_hessian,
+    one_layer_loss_jet,
+    one_layer_newton_direction,
+)
 
 OMBU = OperatorMultiBiasUnit  # short alias
 GrowableOMBU = GrowableOperatorMultiBiasUnit  # short alias
@@ -248,6 +256,7 @@ __all__ = [
     "SharpnessSchedule",
     "TemperedActivation",
     "TransformBlock",
+    "WeightLossJetSpec",
     "__lineage__",
     "__version__",
     "affine_jet",
@@ -330,6 +339,11 @@ __all__ = [
     "multipack_response",
     "mutual_information",
     "ombu_bias_block",
+    "one_layer_loss",
+    "one_layer_loss_grad",
+    "one_layer_loss_hessian",
+    "one_layer_loss_jet",
+    "one_layer_newton_direction",
     "polynomial_sqrt2_maps",
     "refine",
     "region_of_convergence",

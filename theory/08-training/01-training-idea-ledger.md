@@ -45,6 +45,9 @@ Shipped trainers and jets — Group 08 must not re-derive them.
 - `omnibias.{torch,jax}.jet` — `compose_jet`, `layer_jet`, `mlp_jet`,
   `affine_jet`. Exact directional jets through depth; Faà di Bruno is the
   compositional rule.
+- `omnibias.core.weight_loss_jet` — closed-form one-layer
+  `φ^(k)(0) = d^k L(θ + s d)/ds^k` from the shared `σ^(n)` tower.
+  Not a skip of the chain rule and not a full `d h / d θ`.
 - `omnibias.core.polynomials` — shared `sigma^(n)` coefficients. Every 08
   trainer that evaluates an activation derivative imports these, never a
   per-backend fork.

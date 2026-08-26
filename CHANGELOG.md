@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — One-layer weight-space loss jet
+
+- `omnibias.core.weight_loss_jet` plus `omnibias.{torch,jax}.weight_loss_jet`:
+  closed-form `φ^(k)(0)` of a one-layer Riccati MSE loss along a
+  weight direction, assembled from the shared `σ^(n)` tower.
+- Cookbook: [`docs/cookbook/weight-loss-jet.md`](docs/cookbook/weight-loss-jet.md).
+- One-layer only. Not a skip of the chain rule, not a full
+  `d h / d θ`, not a global min.
+
 ### Added — Plant PID layer (theory 09-29)
 
 - `omnibias.core.pid_layer` plus `omnibias.{torch,jax}.plant_pid`:

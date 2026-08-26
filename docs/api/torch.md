@@ -150,6 +150,12 @@ scale here (no LLM-scale claim).
       show_root_heading: false
       heading_level: 3
 
+## Weight-space loss jet
+
+Closed-form one-layer `φ^(k)(0)` along a weight direction. See
+[weight_loss_jet.md](weight_loss_jet.md). Re-exported from
+`omnibias.torch.weight_loss_jet`.
+
 ## Exact jet line search (03-12)
 
 Certified-radius directional line search, re-exported from
