@@ -492,7 +492,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (`omnibias.core.collapse.winding`) isolates a unique integer in a
   sound `Δarg / 2π` enclosure. Pairing collapse
   (`omnibias.core.collapse.pairing`) is a weak residual on a finite
-  test pack, not a strong solution.
+  test pack, not a strong solution. Rank collapse
+  (`omnibias.core.collapse.rank`) is an exact `Q` syzygy; a float
+  SVD is not a proof.
   Finite-row smokes: [`docs/benchmarks/dirichlet_enclosure_smoke.json`](docs/benchmarks/dirichlet_enclosure_smoke.json)
   (`Re(s)>1` only), [`docs/benchmarks/instance_gap_tightening_smoke.json`](docs/benchmarks/instance_gap_tightening_smoke.json)
   (never tight), [`docs/benchmarks/ccf_pade_profile_smoke.json`](docs/benchmarks/ccf_pade_profile_smoke.json)

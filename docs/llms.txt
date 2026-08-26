@@ -21,6 +21,7 @@
 - [Identity collapse cookbook](cookbook/identity-collapse.md)
 - [Winding collapse cookbook](cookbook/winding-collapse.md)
 - [Pairing collapse cookbook](cookbook/pairing-collapse.md)
+- [Rank collapse cookbook](cookbook/rank-collapse.md)
 - [omnibias-torch](api/torch.md)
 - [omnibias-jax](api/jax.md)
 - [omnibias-ferminet](api/ferminet.md)
