@@ -1,7 +1,11 @@
 # Scope & guarantees
 
 The four-rung claim ladder and the never-write register live on
-[`honesty.md`](honesty.md) (theory 06-02).
+[`honesty.md`](honesty.md) (theory 06-02). Enclosure Collapse
+(`width -> 0` of a *sound enclosure*) is a third collapse sense: the
+output is a point plus a proof, not bias collapse and not a conformal
+slab (04-02); see
+[`theory.md`](theory.md#three-senses-of-collapse-do-not-conflate).
 
 > One canonical page for what omnibias **does** guarantee, what it **doesn't**,
 > and how every page on the site uses those words consistently. Cookbook pages

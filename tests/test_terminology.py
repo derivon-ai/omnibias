@@ -208,3 +208,67 @@ def test_the_hyperplane_guard_is_not_vacuous() -> None:
     assert not _SINGLE_HYPERPLANE_AS_BIAS_COLLAPSE.search(
         "temperature collapse sharpens a single hyperplane"
     )
+
+
+def test_enclosure_collapse_is_named_in_canonical_sources() -> None:
+    """The third limit is Enclosure Collapse: width -> 0 of a sound enclosure."""
+    for rel in (
+        "docs/theory.md",
+        ".cursor/skills/omnibias-dev-core-concepts/SKILL.md",
+        ".claude/skills/omnibias-dev-core-concepts/SKILL.md",
+        "AGENTS.md",
+    ):
+        text = (REPO / rel).read_text(encoding="utf-8")
+        assert "Enclosure Collapse" in text, rel
+        lowered = text.lower()
+        assert "width -> 0" in lowered, rel
+        assert "sound enclosure" in lowered, rel
+        assert "proof" in lowered, rel
+
+
+def test_public_docs_do_not_call_enclosure_collapse_bias_collapse() -> None:
+    """Mentioning Enclosure Collapse must keep width -> 0 and a point plus a proof."""
+    offenders: list[tuple[str, int, str]] = []
+    for path in _tracked_files():
+        rel = path.relative_to(REPO).as_posix()
+        if rel in ALLOWED:
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        if "Enclosure Collapse" not in text:
+            continue
+        lowered = text.lower()
+        if "width -> 0" not in lowered or "sound enclosure" not in lowered:
+            offenders.append((rel, 0, "missing width -> 0 / sound enclosure"))
+            continue
+        if "plus a proof" not in lowered and "and a proof" not in lowered:
+            offenders.append((rel, 0, "missing point-plus-proof wording"))
+        for lineno, line in enumerate(text.splitlines(), start=1):
+            if "Enclosure Collapse" not in line or "bias collapse" not in line.lower():
+                continue
+            if "not" in line.lower() or "distinct" in line.lower() or "third" in line.lower():
+                continue
+            offenders.append((rel, lineno, line.strip()))
+    assert not offenders, (
+        "Enclosure Collapse is width -> 0 of a sound enclosure (a point plus a "
+        "proof), not bias collapse.\n"
+        + "\n".join(f"  {rel}:{no}: {line}" for rel, no, line in offenders)
+    )
+
+
+def test_forbidden_interval_collapse_public_names_are_absent() -> None:
+    forbidden = re.compile(r"\binterval_collapse\b|\bIntervalCollapse\b")
+    hits: list[str] = []
+    for path in _tracked_files():
+        rel = path.relative_to(REPO).as_posix()
+        if rel in ALLOWED or rel.endswith("14-enclosure-collapse-and-width-law.md"):
+            continue
+        try:
+            text = path.read_text(encoding="utf-8")
+        except UnicodeDecodeError:
+            continue
+        if forbidden.search(text):
+            hits.append(rel)
+    assert not hits, f"interval_collapse is not a public name: {hits}"

@@ -250,7 +250,9 @@ No CI job for the ledger.
 ## 10. Honesty and scope
 
 - The tower is the founding **bias collapse** (`delta -> 0`). Group 08 does
-  not introduce a third sense of "collapse."
+  not introduce a third sense of "collapse." The third *named* collapse is
+  Enclosure Collapse (`width -> 0` of a sound enclosure; a point plus a proof)
+  in spec 01-14, not in 08-*.
 - A Mathlib- or kernel-verified finite obligation is still a finite
   obligation (spec 06-02). 08-04's uniqueness ball is not a continuum PDE
   theorem.

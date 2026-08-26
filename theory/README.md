@@ -1,6 +1,6 @@
 # omnibias theory program
 
-This tree is the **forward-looking research program**: 93 implementation-ready
+This tree is the **forward-looking research program**: 94 implementation-ready
 specs that extend the omnibias primitive beyond what ships today.
 
 It is not the shipped documentation. [`docs/theory.md`](../docs/theory.md) is the
@@ -43,7 +43,7 @@ about those planes.
 | **Region** | many normals, not one | arrangement cells, faces, polytopes | 01-03, 02-02, 03-02 |
 | **Locus** | outputs forced equal | the shared level set as the solution manifold | 01-09, 02-12 |
 
-Two limits are both called "collapse" in the literature around this repo and
+Three limits are called "collapse" in the literature around this repo and
 must never be conflated:
 
 - **Bias collapse** (the founding one): `K` biases coalesce as the spread
@@ -51,6 +51,9 @@ must never be conflated:
   `sigma^(K-1)(z + b_mean)`.
 - **Temperature collapse** (downstream): one gate is sharpened as
   `beta -> inf`; a soft indicator hardens into a 0/1 feasibility step.
+- **Enclosure Collapse** (verified register): a sound enclosure shrinks as
+  `width -> 0`; the output is a point **plus a proof**, or `Inconclusive`.
+  Not a derivative and not a 0/1 step (spec 01-14).
 
 Different limit, different output. Every spec that uses `beta -> inf` says so
 explicitly.
@@ -114,6 +117,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [01-11 rational exactness](01-geometry/11-rational-exactness-and-new-lean-obligations.md) | gated | Collapse weights are rationals; `C_j` / poisedness are Lean-checkable; G1–G5 earned (kernel pass in the Lean job); algebra only, not the collapse |
 | [01-12 conjugate Hilbert tower](01-geometry/12-conjugate-hilbert-tower.md) | gated | Line Hilbert only; G1–G4 CI; G5 campaign-artifact **reported** (matched-width ratio `0.978`, need `10x`), not in CI `all_passed` |
 | [01-13 operator family](01-geometry/13-operator-family.md) | gated | Scan of the six roles; catalog + rejects; not a seventh `op`; first spend `BiasScan(op="integral")` shipped; 09-14 gated |
+| [01-14 Enclosure Collapse](01-geometry/14-enclosure-collapse-and-width-law.md) | gated | Width Law + six `squeeze_*` wrappers; `width -> 0` of a sound enclosure (a point plus a proof); not a package; not bias collapse |
 
 ### 02 Architectures
 
@@ -172,7 +176,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | gated | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | gated | Claim ladder + forbidden-claims register; guards in core tests |
-| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | gated | G1–G5 **earned** (42 packages, 93/93 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
+| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | gated | G1–G5 **earned** (42 packages, 94/94 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | Monograph spine only; no `book/` tree; drafting still forbidden |
 | [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | gated | Publish-and-use order for the shipped object; obligation-3 `jet_vs_nested_ad` earned; extract / paper / external stay later; CCF and Group 09 are not the public face |
 

@@ -48,7 +48,9 @@ them:
 
 That is why `integral` is closed form for the same reason the derivatives are:
 it is the same parallel-hyperplane family, read in the antiderivative direction
-instead of the derivative direction. See
+instead of the derivative direction. The window `S(z+b_hi)-S(z+b_lo)` is
+bias-geometry held finite, **not** Enclosure Collapse (`width -> 0` of a
+sound enclosure; output is a point plus a proof; theory 01-14). See
 [`theory.md` sec 4a](theory.md#4a-the-geometric-statement-what-collapses-geometrically).
 
 The gated Wave-1 `BiasScan` ([scan.md](api/scan.md)) templates reuse these

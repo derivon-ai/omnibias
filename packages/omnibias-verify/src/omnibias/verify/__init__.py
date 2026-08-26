@@ -73,6 +73,7 @@ from omnibias.verify._core import (
     SigmoidLayer,
     SobolevNormCertificate,
     StencilTruncationCertificate,
+    SqueezeReport,
     StochasticResidualCertificate,
     SubspaceModel,
     SubspaceStepCertificate,
@@ -144,8 +145,16 @@ from omnibias.verify._core import (
     relu_enclosure,
     relu_taylor,
     replay_stochastic_residual_certificate,
+    report_digest_ok,
     scalar_readout_range,
     select_certified_theta,
+    squeeze,
+    squeeze_existence,
+    squeeze_flow,
+    squeeze_identifiability,
+    squeeze_peak,
+    squeeze_remainder,
+    squeeze_residual,
     stochastic_residual_schema_errors,
     surrogate_kernel_iv,
     tail_gradient_iv,
@@ -160,7 +169,7 @@ try:
 except _PkgNotFound:  # pragma: no cover - bare source checkout
     __version__ = "0.0.0+unknown"
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Founding-idea lineage (see docs/theory.md "Three senses of collapse").
 __lineage__ = "bias collapse"
 
 __all__ = [
@@ -201,6 +210,7 @@ __all__ = [
     "SUPPORTED_ACTIVATIONS",
     "SigmoidLayer",
     "SobolevNormCertificate",
+    "SqueezeReport",
     "StencilTruncationCertificate",
     "StochasticResidualCertificate",
     "SubspaceModel",
@@ -275,8 +285,16 @@ __all__ = [
     "relu_enclosure",
     "relu_taylor",
     "replay_stochastic_residual_certificate",
+    "report_digest_ok",
     "scalar_readout_range",
     "select_certified_theta",
+    "squeeze",
+    "squeeze_existence",
+    "squeeze_flow",
+    "squeeze_identifiability",
+    "squeeze_peak",
+    "squeeze_remainder",
+    "squeeze_residual",
     "stochastic_residual_schema_errors",
     "surrogate_kernel_iv",
     "tail_gradient_iv",

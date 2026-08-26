@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Enclosure Collapse and the Width Law (theory 01-14)
+
+- Named the third collapse: `width -> 0` of a sound enclosure (a point plus a proof).
+  Algebra in `omnibias.core.verified.enclosure_collapse`;
+  six `squeeze_*` wrappers in `omnibias.verify.enclosure_collapse`.
+- No new package. `WidthBudget` reused. G1–G6 package-test gated.
+- Smoke: `docs/benchmarks/enclosure_collapse_smoke.json`.
+
+
 ### Added — Jet line-search G4 leftover-recorded (theory 03-12)
 
 - Leftover #14's Wolfe miss now leftover-records `reported` plus honesty

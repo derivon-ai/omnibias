@@ -327,7 +327,7 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   and promote it to its own distribution only once it earns independence. Folding
   a submodule back out later is cheap; un-shipping a premature distribution is not.
   See the `omnibias-dev-new-package` skill. Theory 06-03 G1–G5 are
-  earned on `benchmarks/theory_homes.py` (42 packages, 93/93 homes,
+  earned on `benchmarks/theory_homes.py` (42 packages, 94/94 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
   lines, not promoted).
 
@@ -468,8 +468,13 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.{torch,jax}.multipack` (01-01); `omnibias.core.scan` /
   `omnibias.{torch,jax}.scan` (01-02; `op=` is the 01-13 catalog alias);
   `omnibias.difference` irregular
-  stencils (01-04). Docs: [`docs/api/multipack.md`](docs/api/multipack.md),
-  [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md).
+  stencils (01-04);
+  `omnibias.core.verified.enclosure_collapse` plus
+  `omnibias.verify.enclosure_collapse` (01-14; Enclosure Collapse is
+  `width -> 0` of a *sound enclosure*, a point plus a proof, not bias
+  collapse and not a package). Docs: [`docs/api/multipack.md`](docs/api/multipack.md),
+  [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md),
+  [`docs/api/enclosure_collapse.md`](docs/api/enclosure_collapse.md).
 - Wave-3 gated algebra + architectures (not shipped): `omnibias.core.mollifier`
   (01-05; certified exponential tails, not compact support) /
   `omnibias.core.spectral_design` (01-07; pack order is a band selector; G3 reported, not in CI `all_passed`) /

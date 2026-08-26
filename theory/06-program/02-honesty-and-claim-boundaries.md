@@ -220,7 +220,7 @@ refactor that breaks the regex will silently disable it.
 ## 8. Acceptance gates
 
 - **G1 theory tree guarded.** `theory` is in `SCANNED_ROOTS` and
-  `tests/test_terminology.py` passes over all 93 specs.
+  `tests/test_terminology.py` passes over all 94 specs.
 - **G2 forbidden-claims guard live.** `test_forbidden_claims.py` scans the same
   roots, passes on the current tree, and **fails on a synthetic violation**
   injected by its own self-test.

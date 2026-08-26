@@ -1,0 +1,63 @@
+{
+  "schema": "omnibias.benchmarks.enclosure_collapse.v1",
+  "generated_utc": "2026-08-26T15:23:48Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "enclosure_collapse",
+    "full": false,
+    "honesty": {
+      "enclosure_collapse": true,
+      "width_to_zero": true,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 810.8,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_width_law",
+        "passed": true,
+        "error": 2.3500999083631013e-05
+      },
+      {
+        "name": "g2_floor",
+        "passed": true,
+        "width": 2.2204460492503136e-16
+      },
+      {
+        "name": "g3_residual",
+        "passed": true,
+        "widths": [
+          3.193705107196814,
+          1.871346359950454,
+          0.5146729081622932,
+          0.13069400225199942
+        ]
+      },
+      {
+        "name": "g4_callables",
+        "passed": true,
+        "status": "certified"
+      },
+      {
+        "name": "g5_inconclusive",
+        "passed": true
+      },
+      {
+        "name": "g6_honesty",
+        "passed": true,
+        "ident": "certified"
+      }
+    ]
+  },
+  "wall_seconds": 2.023581573041156
+}

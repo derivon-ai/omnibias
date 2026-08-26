@@ -7,7 +7,7 @@ way, and the repository has already learned that lesson the expensive way — so
 this file assigns every spec a home under the "earn independent existence" rule
 and sequences them so that the cheap falsifiers run before the expensive builds.
 
-- **Status**: gated (G1–G5 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 93/93 specs name a home, Wave-0 A4–A7 recorded, no failed falsifier / no `retired` row; G4 vacuous; G5 vacuous — not promoted: 2 external consumers, 389 lines < 2000; no new distribution)
+- **Status**: gated (G1–G5 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 94/94 specs name a home, Wave-0 A4–A7 recorded, no failed falsifier / no `retired` row; G4 vacuous; G5 vacuous — not promoted: 2 external consumers, 389 lines < 2000; no new distribution)
 - **Depends on**: 06-01, 06-02
 - **Blocks**: none
 
@@ -183,7 +183,7 @@ documented mistake, so it ships as `omnibias.geometry.gauge.holonomy`.
 with a written promotion criterion, which is the only case in the tree where a
 new distribution is even plausible. It did **not** land in `geometry`.
 
-**Net effect: 93 specs, 0 new packages at the start, at most 1 later.** If that
+**Net effect: 94 specs, 0 new packages at the start, at most 1 later.** If that
 number grows during implementation, the rule is being bypassed, and the tree
 inventory in `AGENTS.md` is the place it will show.
 

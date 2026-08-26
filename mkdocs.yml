@@ -195,6 +195,8 @@ nav:
       - morphology (03-05): api/morphology.md
       - neural quadrature (03-06): api/neural_quadrature.md
       - scale flow (03-07): api/scale_flow.md
+      # Enclosure Collapse is width -> 0 of a sound enclosure (a point plus a proof).
+      - Enclosure Collapse (01-14): api/enclosure_collapse.md
       - certified localization (03-08): api/certified_localization.md
       - differentiable topology (03-09): api/differentiable_topology.md
       - singularity tracking (03-10): api/singularity_tracking.md
@@ -355,6 +357,7 @@ nav:
       - Operator zero-shot: cookbook/operator-zero-shot.md
       - One-shot least-squares (spectral): cookbook/spectral-one-shot-lstsq.md
       - PINN advection-diffusion: cookbook/pinn-advection-diffusion.md
+      - Enclosure Collapse: cookbook/enclosure-collapse.md
       - Proof-carrying PDE certificates: cookbook/proof-carrying-pde.md
       - Proof-carrying fluid dynamics: cookbook/proof-carrying-fluid-dynamics.md
       - Train-then-certify (sealed network cert): cookbook/train-then-certify.md

@@ -168,6 +168,9 @@ Three extensions of this geometry have code and CI smoke, still **gated**:
 - **Irregular stencils** ([difference API](api/difference.md)): exact-`Q`
   Birkhoff weights for arbitrary nodes and per-node orders. Order is
   asymptotic in the node scale `h`. G1–G4 earned.
+- **Enclosure Collapse** ([01-14](api/enclosure_collapse.md)): `width -> 0`
+  of a sound enclosure (a point plus a proof); Width Law plus six
+  `squeeze_*` wrappers. Not a derivative and not a 0/1 step. G1–G6 gated.
 
 ### Wave-3 gated architectures (not shipped)
 
@@ -231,24 +234,29 @@ gates are earned on smoke, not in CI `all_passed`.
   + transverse-constant; open lines gauge-dependent; no Yang-Mills / mass
   gap / continuum claim.
 
-## Two senses of "collapse" (do not conflate)
+## Three senses of "collapse" (do not conflate)
 
-"Collapse" names two *different* limits in this codebase. Only the first --
+"Collapse" names three *different* limits in this codebase. Only the first --
 the one defined in sec 3 above -- is **the** bias collapse.
 
 | Sense | What moves | Limit | Output | Where |
 |-------|------------|-------|--------|-------|
 | **Bias collapse** (founding, this document) | the `K` biases coalesce, spread `delta -> 0` | finite difference -> derivative | a smooth `sigma^(K-1)(z + b_mean)` | `omnibias.torch.unit`, `omnibias.torch.stencil`; sec 3-4 above |
 | **Temperature collapse** (downstream) | one gate sharpened, `beta -> inf` | soft threshold -> hard step | a 0/1 feasibility indicator (a step, *not* a derivative) | `omnibias-convex` / `-control` / `-routing` |
+| **Enclosure Collapse** (verified register) | enclosure width, `w = hi-lo -> 0` of a *sound enclosure* | certificates contract | a point **plus a proof**, or `Inconclusive` | `omnibias.core.verified.enclosure_collapse`, `omnibias.verify.enclosure_collapse`; [01-14](api/enclosure_collapse.md) |
 
-Both put a threshold inside `sigma` and take a limit, which is why they were once
-both called "collapse" -- but they are not the same operation, and each now has
-its own name. **Bias collapse** takes **many** biases to **one** and yields a
-derivative; **temperature collapse** takes **one** soft gate and hardens it into
-a constraint indicator. As `beta -> inf` a sigmoid saturates to 0 or 1 (a step),
-so if you find yourself describing "bias collapse" as a hard step or a
-constraint, you mean temperature collapse. The `K=2` "collapse output"
+The first two put a threshold inside `sigma` and take a limit, which is why they
+were once both called "collapse" -- but they are not the same operation, and
+each now has its own name. **Bias collapse** takes **many** biases to **one**
+and yields a derivative; **temperature collapse** takes **one** soft gate and
+hardens it into a constraint indicator. As `beta -> inf` a sigmoid saturates to
+0 or 1 (a step), so if you find yourself describing "bias collapse" as a hard
+step or a constraint, you mean temperature collapse. The `K=2` "collapse output"
 column in sec 5 below is the *founding* sense (`sigma'`).
+
+**Enclosure Collapse** is not a derivative and not a 0/1 step. `lo` and `hi`
+are not two biases. The integral window `S(z+b_hi)-S(z+b_lo)` is bias-geometry
+held finite, not this limit. Forcing `lo = hi` by clamping is unsound.
 
 ## 5. Operator dictionary
 

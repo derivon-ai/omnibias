@@ -101,15 +101,18 @@ boundary, and sharpening it is *temperature* collapse. The distinction is
 **`K` parallel hyperplanes coalescing** (`delta -> 0`, yields a derivative)
 versus **one hyperplane sharpened** (`beta -> inf`, yields a 0/1 step).
 
-## Two senses of "collapse" -- DO NOT CONFLATE
+## Three senses of "collapse" -- DO NOT CONFLATE
 
 "Collapse" is overloaded in this repo. Only the first is *the* bias collapse;
-always qualify the others.
+always qualify the others. Enclosure Collapse is a third *limit*
+(`width -> 0` of a sound enclosure). Operator/proximal collapse is a
+reduction, not a limit.
 
 | Sense | What moves | Limit | Output | Where |
 |---|---|---|---|---|
 | **Bias collapse** (founding) | the `K` biases coalesce (spread `delta -> 0`) | finite difference -> derivative | a smooth `sigma^(K-1)` | `unit.py`, `stencil.py`, the tower |
 | **Temperature collapse** (downstream) | one gate sharpened (`beta -> inf`) | soft -> hard threshold | a 0/1 feasibility step (indicator) | `omnibias.convex` / `omnibias.control` / `omnibias.routing` |
+| **Enclosure Collapse** (verified register) | enclosure width (`width -> 0` of a *sound enclosure*) | certificates contract | a point **plus a proof**, or `Inconclusive` | `omnibias.core.verified.enclosure_collapse`, `omnibias.verify.enclosure_collapse` |
 | **Operator/proximal collapse** | a `K` / config setting | reduces to a named classical operator | e.g. an L1 proximal map | activation dictionary, `docs/theory.md` sec 5 |
 
 Trap: `beta -> inf` on a sigmoid saturates to 0 or 1 (a step) -- that is

@@ -205,6 +205,15 @@ PENALTY_FILES = (
     "packages/omnibias-jax/src/omnibias/jax/architectures/sliced_jet.py",
     "packages/omnibias-core/src/omnibias/core/uncertainty.py",
     "packages/omnibias-verify/src/omnibias/verify/uncertainty.py",
+    "packages/omnibias-core/src/omnibias/core/verified/enclosure_collapse.py",
+    "packages/omnibias-verify/src/omnibias/verify/enclosure_collapse.py",
+    "packages/omnibias-verify/src/omnibias/verify/_core/enclosure_collapse.py",
+)
+
+ENCLOSURE_COLLAPSE_FILES = (
+    "packages/omnibias-core/src/omnibias/core/verified/enclosure_collapse.py",
+    "packages/omnibias-verify/src/omnibias/verify/enclosure_collapse.py",
+    "packages/omnibias-verify/src/omnibias/verify/_core/enclosure_collapse.py",
 )
 
 
@@ -216,3 +225,12 @@ def test_penalty_files_label_both_collapse_senses(rel: str) -> None:
     assert "beta -> inf" in text, rel
     assert "feasibility" in text.lower(), rel
     assert "do not conflate" in text.lower(), rel
+
+
+@pytest.mark.parametrize("rel", ENCLOSURE_COLLAPSE_FILES)
+def test_enclosure_collapse_files_label_the_third_limit(rel: str) -> None:
+    text = _read(rel)
+    assert "width -> 0" in text, rel
+    assert "sound enclosure" in text.lower(), rel
+    assert "not a derivative" in text.lower(), rel
+    assert "0/1" in text, rel
