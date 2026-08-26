@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Rational stencil shipped (theory 01-11)
+
+- Spec 01-11 status is **shipped**: G1–G5 CI, kernel pass in Lean.
+- Algebra only, not the collapse; `mathlib_verified` stays false.
+- Smoke: `docs/benchmarks/rational_stencil_smoke.json`.
+
 ### Added — Jet-bundle vocabulary shipped (theory 01-10)
 
 - Spec 01-10 status is **shipped**: G1–G3 earned, no leftover gate.

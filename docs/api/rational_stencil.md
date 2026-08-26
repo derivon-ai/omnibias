@@ -2,7 +2,7 @@
 
 Collapse weights are **rationals**, so the consistency conditions of a
 stencil are a finite conjunction of identities the Mathlib-free Lean
-kernel can decide. Status is **gated**, not shipped. G1–G5 are
+kernel can decide. Status is **shipped**. G1–G5 are
 CI-gated (G1 kernel pass and G2 lake-fail run in the Lean job).
 
 Lean certifies the **algebra**. It does not state `delta -> 0`, Taylor's

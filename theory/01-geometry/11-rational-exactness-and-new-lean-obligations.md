@@ -7,7 +7,7 @@ rationals**, which is exactly the payload class the existing Lean bridge already
 discharges, so `theorem_prover_verified` becomes reachable for the new
 mathematics itself rather than only for downstream numerical enclosures.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 CI; algebra only, not the collapse; `mathlib_verified` stays false)
 - **Depends on**: 01-01, 01-04
 - **Blocks**: 07-01, 07-05
 

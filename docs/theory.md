@@ -218,6 +218,9 @@ gates are earned on smoke, not in CI `all_passed`.
   02-12 G4 Burgers RH leftover-recorded.
 - **Jet vocabulary** ([01-10](api/jets.md)): dictionary and contact test,
   not a discovery and not a package. Status is **shipped**.
+- **Rational stencil obligations** ([01-11](api/rational_stencil.md)):
+  `C_j` / poisedness as finite rational Lean obligations. Algebra
+  only, not the collapse. Status is **shipped**.
 - **Conjugate Hilbert** ([01-12](api/conjugate.md)): line Hilbert only;
   G5 is a projection defect, not a stretch-gate clearing.
 - **Face-Net** ([02-02](api/facenet.md)): sampled tope subgraph; temperature
