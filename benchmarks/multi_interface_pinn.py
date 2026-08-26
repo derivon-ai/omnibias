@@ -4,10 +4,10 @@
 
 ``alpha -> inf`` is interface sharpening, neither collapse. Parallel
 interfaces only. Conditions hold to a stated smoothing tolerance.
-G3 versus PartitionedField / FBPINN / MLP is reported unearned: smoke
-is a linear stand-in, not a training bake-off. G4 hard versus
-penalized is reported unearned: smoke is zero-coeff soft, not an
-equal-budget train.
+G3 versus PartitionedField / FBPINN / MLP is leftover-recorded
+(leftover #37): smoke is a linear stand-in, not a training bake-off.
+G4 hard versus penalized is reported unearned: smoke is zero-coeff
+soft, not an equal-budget train.
 """
 
 from __future__ import annotations
@@ -133,12 +133,16 @@ def _run_g3() -> dict[str, Any]:
         "fbpinn_field_exported": callable(FBPINNField),
         "training_loop": False,
         "stays_full": True,
+        "leftover_recorded": True,
+        "leftover_id": 37,
+        "leftover_tick": 59,
         "need": "rel L2 <= 1e-6, skill > 0, beat PartitionedField + FBPINN + MLP, five seeds",
         "note": (
-            "MultiInterfaceField on a mixed-condition three-layer versus a "
-            "linear stand-in. Named G3 needs a matched-parameter bake-off "
-            "against PartitionedField, FBPINNField, and a plain MLP over "
-            "five seeds. That training loop is not wired. Previous "
+            "Leftover #37 leftover-recorded: MultiInterfaceField on a "
+            "mixed-condition three-layer versus a linear stand-in. Named "
+            "G3 needs a matched-parameter bake-off against "
+            "PartitionedField, FBPINNField, and a plain MLP over five "
+            "seeds. That training loop is not wired. Previous "
             "g3_mixed_vs_baselines passed=True stand-in stub withdrawn. "
             "Not in CI all_passed."
         ),
@@ -248,6 +252,9 @@ def main() -> int:
         "parallel_interfaces_only": True,
         "g3_earned": False,
         "g3_reported": True,
+        "g3_leftover_recorded": True,
+        "g3_leftover_id": 37,
+        "g3_leftover_tick": 59,
         "g3_in_ci_all_passed": False,
         "g3_training_loop": False,
         "g4_earned": False,

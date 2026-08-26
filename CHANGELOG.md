@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Multi-interface G3 leftover-recorded (theory 02-05)
+
+- Leftover #37's PartitionedField / FBPINN stand-in miss now leftover-records
+  `reported` plus honesty flags on `benchmarks/multi_interface_pinn.py`.
+- Reported: linear stand-in; named G3 needs a five-seed bake-off. Training
+  stays `--full`. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/multi_interface_pinn_smoke.json`.
+
 ### Added — Pack-tree G3 leftover-recorded (theory 02-07)
 
 - Leftover #13's per-source Taylor / no-crossover miss now leftover-records

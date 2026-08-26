@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""02-05 G3 mixed-condition skill is reported, not in CI all_passed."""
+"""02-05 G3 mixed-condition skill is leftover-recorded, not in CI all_passed."""
 
 from __future__ import annotations
 
@@ -18,12 +18,17 @@ def test_g3_mixed_vs_baselines_is_reported_and_out_of_all_passed() -> None:
     assert g3["earned"] is False
     assert g3["passed"] is False
     assert g3["reported"] is True
+    assert g3["leftover_recorded"] is True
+    assert int(g3["leftover_id"]) == 37
+    assert int(g3["leftover_tick"]) == 59
     assert g3["in_ci_all_passed"] is False
     assert g3["training_loop"] is False
     assert g3["stays_full"] is True
     assert g3["partitioned_field_exported"] is True
     assert g3["fbpinn_field_exported"] is True
     assert payload["honesty"]["g3_earned"] is False
+    assert payload["honesty"]["g3_leftover_recorded"] is True
+    assert int(payload["honesty"]["g3_leftover_id"]) == 37
     assert payload["honesty"]["g3_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g3_mixed_vs_baselines" not in names

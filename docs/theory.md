@@ -197,8 +197,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Weak-form VPINN** ([02-04](api/weak.md)): exact integrals only for
   polynomial coeffs on boxes; path recorded; boundary bound **on by default**.
 - **Transmission PINN** ([02-05](api/interface.md)): parallel interfaces;
-  `alpha -> inf` is **interface sharpening**, neither collapse. Import
-  `Interface` from `omnibias.pinn.interface`, not the XPINN glue in
+  `alpha -> inf` is **interface sharpening**, neither collapse. G3 vs
+  PartitionedField / FBPINN leftover-recorded. Import `Interface` from
+  `omnibias.pinn.interface`, not the XPINN glue in
   `omnibias.pinn._core.interface`.
 - **Arrangement geometry** ([01-03](api/arrangement.md)): cells / tope graph /
   `soft_membership`. `beta -> inf` is temperature collapse, not founding
