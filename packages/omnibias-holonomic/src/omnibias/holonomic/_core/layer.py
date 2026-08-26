@@ -18,10 +18,12 @@ Not NS.
 
 from __future__ import annotations
 
+import ast
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from fractions import Fraction
+from pathlib import Path
 
 from omnibias.holonomic._core.guess import guess_dfinite
 from omnibias.holonomic._core.ore import OrePolynomial, diff_algebra
@@ -219,6 +221,21 @@ def _sin_taylor(count: int) -> list[Fraction]:
     return out
 
 
+def source_imports_no_backend() -> bool:
+    """G4: the authored module must not import torch / jax / tensorflow / keras."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    banned = {"torch", "jax", "tensorflow", "keras"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".")[0] in banned:
+                    return False
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            if node.module.split(".")[0] in banned:
+                return False
+    return True
+
+
 def sin_skill(*, n_samples: int = 16) -> dict[str, object]:
     """G2: recover ``D^2+1`` from a 16-term sine prefix; residual on ``[0,1]``."""
     if n_samples < 2:
@@ -253,5 +270,6 @@ __all__ = [
     "honesty_payload",
     "is_rational_multiple_of_d2_plus_1",
     "sin_skill",
+    "source_imports_no_backend",
     "worked_example",
 ]

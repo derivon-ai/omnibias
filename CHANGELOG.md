@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomic layer shipped (theory 09-12)
+
+- Spec 09-12 status is **shipped**: G1–G4 CI; G4 core-layer purity
+  (no torch/jax).
+- Ore annihilator, D-finite class only.
+- Smoke: `docs/benchmarks/holonomic_layer_smoke.json`.
+
 ### Added — Collapse-Net shipped (theory 09-11)
 
 - Spec 09-11 status is **shipped**: G1–G4 CI; G4 torch/jax parity

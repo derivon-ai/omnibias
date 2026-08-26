@@ -9,7 +9,7 @@ supply the data jet via founding bias collapse (`delta -> 0`).
 Temperature collapse (`beta -> inf`, feasibility) does not appear.
 Do not conflate the two.
 
-Status is **gated**, not shipped. D-finite class only. Not a general
+Status is **shipped**. D-finite class only. Not a general
 PINN. Not CCF stretch. Lean flags are 09-26, not asserted here.
 
 Home: `omnibias.holonomic._core.layer`.

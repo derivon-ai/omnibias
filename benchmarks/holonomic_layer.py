@@ -4,7 +4,8 @@
 
 G1 matches the ``D-1`` / ``D^2+1`` jets. G2 recovers a rational
 multiple of ``D^2+1`` from a sine prefix. G3 refuses a nonlinear PDE
-D-finite claim. D-finite class only. Not CCF stretch.
+D-finite claim. G4 is core-layer purity (no torch/jax). D-finite
+class only. Not CCF stretch.
 """
 
 from __future__ import annotations
@@ -16,13 +17,16 @@ import time
 from pathlib import Path
 from typing import Any
 
+_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_ROOT / "packages" / "omnibias-holonomic" / "src"))
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
 from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
-from omnibias.holonomic._core.layer import (
+from omnibias.holonomic._core.layer import (  # noqa: E402
     DISCLAIMER,
     honesty_payload,
     sin_skill,
+    source_imports_no_backend,
     worked_example,
 )
 
@@ -41,6 +45,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["g2_earned"])
     hon = honesty_payload()
     g3 = hon["nonlinear_pde_claimed_dfinite"] is False
+    g4 = source_imports_no_backend()
     entries = [
         {
             "name": "g1_exp_sin_jet",
@@ -59,6 +64,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "name": "g3_honesty",
             "passed": g3,
             "nonlinear_pde_claimed_dfinite": False,
+        },
+        {
+            "name": "g4_purity",
+            "passed": g4,
+            "imports_backend": False,
         },
     ]
     for entry in entries:

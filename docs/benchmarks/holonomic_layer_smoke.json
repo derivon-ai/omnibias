@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.holonomic_layer.v1",
-  "generated_utc": "2026-08-21T20:34:46Z",
+  "generated_utc": "2026-08-26T17:09:06Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 811.27,
+  "rss_mb_at_start": 809.93,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -40,9 +40,14 @@
         "name": "g3_honesty",
         "passed": true,
         "nonlinear_pde_claimed_dfinite": false
+      },
+      {
+        "name": "g4_purity",
+        "passed": true,
+        "imports_backend": false
       }
     ]
   },
   "disclaimer": "Holonomic layer: D-finite Ore annihilator only; not a general PINN, not a nonlinear PDE, and not CCF stretch",
-  "wall_seconds": 1.2546957960003056
+  "wall_seconds": 1.0634932500543073
 }

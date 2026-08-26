@@ -6,7 +6,7 @@ A block that **is an Ore annihilator**: representable maps are D-finite
 by construction, so discovery is "read the annihilator," not SINDy on
 a library soup.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 core-layer purity; D-finite class only)
 - **Depends on**: 01-10, 09-01
 - **Blocks**: 09-26
 

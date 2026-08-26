@@ -381,6 +381,8 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Collapse-Net** ([09-11](api/collapse_net.md)): stencil train,
   founding collapse at eval, not a continuum PDE. Status is
   **shipped**.
+- **Holonomic layer** ([09-12](api/holonomic_layer.md)): Ore
+  annihilator, D-finite class only. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

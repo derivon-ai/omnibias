@@ -648,6 +648,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.collapse_net` + `omnibias.{torch,jax}.architectures.collapse_net`
   (09-11, **shipped**; stencil train, collapse at eval; G1–G4 CI;
   founding bias collapse, not a continuum PDE) /
+  `omnibias.holonomic._core.layer`
+  (09-12, **shipped**; Ore annihilator layer; G1–G4 CI; D-finite
+  class only) /
   `omnibias.core.integral_kernel` + `omnibias.pinn.operator`
   (09-14; OMBU `integral` cell, not BEM-Net; G1–G4 CI; founding
   bias collapse, not temperature collapse) /
