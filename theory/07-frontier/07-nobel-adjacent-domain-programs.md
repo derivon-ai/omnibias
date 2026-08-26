@@ -7,7 +7,7 @@ quantum many-body wavefunctions, magnetized-plasma residuals, and layered
 materials design — framed honestly as tooling with named baselines, because a
 better tool is a real contribution and a discovery claim from a tool is not.
 
-- **Status**: gated
+- **Status**: shipped (G0–G6 CI; tooling, not a discovery; founding bias collapse, not temperature collapse)
 - **Depends on**: 02-10, 02-11, 07-01
 - **Blocks**: none
 

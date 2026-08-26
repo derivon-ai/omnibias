@@ -599,7 +599,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   collapse, not temperature collapse; finite horizon, not a
   continuum existence theorem) /
   `omnibias.ferminet.hermite` + `omnibias.pinn.plasma` +
-  `omnibias.pinn.stack` (07-07; exact ladder / Harris layer
+  `omnibias.pinn.stack` (07-07, **shipped**; exact ladder / Harris layer
   / exact `dT/dθ`; G0–G6 CI; founding bias collapse, not
   temperature collapse; tooling, not a discovery) /
   `omnibias.core.ftc` + `omnibias.{torch,jax}.architectures.ftc_net`

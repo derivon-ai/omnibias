@@ -7,7 +7,7 @@ bias collapse (`delta -> 0`) supplies the operators.
 Temperature collapse (`beta -> inf`, feasibility) does not
 appear. Do not conflate the two.
 
-Status is **gated**, not shipped. G0–G6 are CI-gated as
+Status is **shipped**. G0–G6 are CI-gated as
 empirical tooling results. "Nobel-adjacent" names the
 domains, not the results.
 

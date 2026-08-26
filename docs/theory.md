@@ -333,6 +333,8 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Validated dynamics** ([07-06](api/validated_dynamics.md)):
   finite horizon; not a continuum existence theorem. Status is
   **shipped**.
+- **Domain programs** ([07-07](api/domain_programs.md)): tooling,
+  not a discovery. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

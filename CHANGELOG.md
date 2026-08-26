@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Domain programs shipped (theory 07-07)
+
+- Spec 07-07 status is **shipped**: G0–G6 CI; tooling, not a
+  discovery.
+- Exact ladder / Harris layer / exact `dT/dθ`.
+- Smoke: `docs/benchmarks/quantum_hermite_vmc_smoke.json`.
+
 ### Added — Validated dynamics shipped (theory 07-06)
 
 - Spec 07-06 status is **shipped**: G1–G6 CI, no leftover gate.
