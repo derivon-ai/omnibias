@@ -21,6 +21,11 @@ from omnibias.core.collapse.identity import (
     identity_collapse,
     remainder_collapse,
 )
+from omnibias.core.collapse.pairing import (
+    PAIRING_SPEC,
+    pairing_collapse,
+    pairing_value,
+)
 from omnibias.core.collapse.schema import (
     FOUNDING_COLLAPSES,
     FOUNDING_NAMES,
@@ -67,6 +72,7 @@ __all__ = [
     "FOUNDING_NAMES",
     "IDENTITY_SPEC",
     "ObligationVerdict",
+    "PAIRING_SPEC",
     "RejectedCollapse",
     "VERDICT_SPEC",
     "VerdictStatus",
@@ -82,6 +88,8 @@ __all__ = [
     "is_singleton_zero",
     "list_collapses",
     "list_rejected_collapses",
+    "pairing_collapse",
+    "pairing_value",
     "register_collapse",
     "reject_collapse",
     "remainder_collapse",

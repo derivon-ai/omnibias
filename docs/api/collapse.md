@@ -28,6 +28,9 @@ Winding collapse (`omnibias.core.collapse.winding`) encloses
 `Δarg / 2π` on a circle and accepts only a unique integer. Not a
 blow-up proof.
 
+Pairing collapse (`omnibias.core.collapse.pairing`) is a certified
+weak residual on a finite test pack, not a strong solution.
+
 ::: omnibias.core.collapse
     options:
       show_root_heading: false

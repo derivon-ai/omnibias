@@ -490,7 +490,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   collapse (`omnibias.core.collapse.identity`) is the same geometry
   for `f - T_N` over `Q`. Winding collapse
   (`omnibias.core.collapse.winding`) isolates a unique integer in a
-  sound `Δarg / 2π` enclosure.
+  sound `Δarg / 2π` enclosure. Pairing collapse
+  (`omnibias.core.collapse.pairing`) is a weak residual on a finite
+  test pack, not a strong solution.
   Finite-row smokes: [`docs/benchmarks/dirichlet_enclosure_smoke.json`](docs/benchmarks/dirichlet_enclosure_smoke.json)
   (`Re(s)>1` only), [`docs/benchmarks/instance_gap_tightening_smoke.json`](docs/benchmarks/instance_gap_tightening_smoke.json)
   (never tight), [`docs/benchmarks/ccf_pade_profile_smoke.json`](docs/benchmarks/ccf_pade_profile_smoke.json)

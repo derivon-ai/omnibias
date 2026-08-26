@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pairing collapse
+
+- `omnibias.core.collapse.pairing`: exact `Q` pairings of a polynomial
+  residual against a finite test pack. Collapse is a weak residual on
+  that pack, not a strong solution.
+- Cookbook: [`docs/cookbook/pairing-collapse.md`](docs/cookbook/pairing-collapse.md).
+
 ### Added — Winding collapse
 
 - `omnibias.core.collapse.winding`: certified `Δarg / 2π` on a circle;
