@@ -5,7 +5,7 @@ filters a parameter step. The founding bias collapse (`delta -> 0`)
 supplies the polynomial part. Temperature collapse (`beta -> inf`,
 feasibility) does not appear. Do not conflate the two.
 
-Status is **gated**, not shipped. Lean flags stay false unless a
+Status is **shipped**. Lean flags stay false unless a
 later PR attaches a genuine `lake build`. Not ImageNet. Not CCF
 stretch.
 

@@ -6,7 +6,7 @@ A forward pass that returns `(y, certificate)` under architecture
 constraints that keep Lipschitz / output boxes **non-vacuous** —
 distinct from 08-09, which filters a *parameter step*.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; not 08-09; Lean flags unforged)
 - **Depends on**: 08-09, 09-01, 09-05
 - **Blocks**: none
 

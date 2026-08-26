@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Proof-carrying forward shipped (theory 09-24)
+
+- Spec 09-24 status is **shipped**: G1–G4 CI; not 08-09; Lean
+  flags unforged.
+- Smoke: `docs/benchmarks/proof_carrying_forward_smoke.json`.
+
 ### Added — Sharpness regularizer shipped (theory 09-23)
 
 - Spec 09-23 status is **shipped**: G1–G4 CI; G4 torch/jax parity

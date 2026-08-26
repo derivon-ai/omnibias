@@ -408,6 +408,8 @@ gates are earned on smoke, not in CI `all_passed`.
   not a global inverse. Status is **shipped**.
 - **Sharpness regularizer** ([09-23](api/sharpness_regularizer.md)):
   `L + mu * ritz`, not 08-06. Status is **shipped**.
+- **Proof-carrying forward** ([09-24](api/pci.md)): `(y, box)`, not
+  08-09. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
