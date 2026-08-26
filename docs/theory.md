@@ -205,7 +205,8 @@ gates are earned on smoke, not in CI `all_passed`.
   `delta -> 0`. Sampling is a subgraph. Sound gap, not P vs NP. Cost vs
   `n`/`D` leftover-recorded.
 - **Tropical homotopy** ([01-08](api/tropical.md)): log / max-plus path;
-  reuses `logsumexp_gap_bound`. G4 path-following is `--full` only.
+  reuses `logsumexp_gap_bound`. G4 path-following leftover-recorded
+  (no `anneal_descent` driver).
 - **Equality locus** ([01-09](api/locus.md) / [02-12](api/locus.md)):
   constraint manifold, not a general PDE solver. Always returns
   `branch` / `condition` / `converged`.

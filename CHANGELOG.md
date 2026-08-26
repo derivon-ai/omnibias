@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tropical G4 leftover-recorded (theory 01-08)
+
+- Leftover #32's path-following miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/tropical_homotopy.py`.
+- Reported: `relaxed_hess` exported; no `anneal_descent` driver. Not in
+  CI `all_passed`.
+- Smoke: `docs/benchmarks/tropical_homotopy_smoke.json`.
+
 ### Added — Arrangement-geometry cost leftover-recorded (theory 01-03)
 
 - Leftover #18's vertex-enum wall vs `n`/`D` now leftover-records

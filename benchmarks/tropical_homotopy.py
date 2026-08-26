@@ -117,12 +117,16 @@ def _run_g4() -> dict[str, Any]:
         "relaxed_hess_exported": "relaxed_hess" in exported,
         "anneal_descent_wired": False,
         "stays_full": True,
+        "leftover_recorded": True,
+        "leftover_id": 32,
+        "leftover_tick": 54,
         "note": (
-            "Named G4 is a second-order path-follow that matches "
-            "anneal_descent's decode in 2x fewer evaluations. "
-            "tropical.__all__ has relaxed_hess (G3) but no path-follow "
-            "or anneal driver. Previous g4_path_following 'full only' "
-            "line withdrawn. Not in CI all_passed."
+            "Leftover #32 leftover-recorded: named G4 is a "
+            "second-order path-follow that matches anneal_descent's "
+            "decode in 2x fewer evaluations. tropical.__all__ has "
+            "relaxed_hess (G3) but no path-follow or anneal driver. "
+            "Previous g4_path_following 'full only' line withdrawn. "
+            "Not in CI all_passed."
         ),
     }
 
@@ -175,9 +179,12 @@ def main() -> int:
     payload["honesty"] = {
         "collapse": "beta -> inf (temperature); not delta -> 0",
         "p_vs_np": False,
-        "g4_path_following": "reported",
+        "g4_path_following": "leftover-recorded",
         "g4_earned": False,
         "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 32,
+        "g4_leftover_tick": 54,
         "g4_in_ci_all_passed": False,
         "g4_path_follow_api": False,
         "cost_earned": False,
