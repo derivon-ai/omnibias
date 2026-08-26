@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Soliton tanh-method G4 leftover-recorded (theory 02-09)
+
+- Leftover #22's PINN init-win miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/soliton_tanh_method.py`.
+- Reported: no training loop; named 5x step-count win stays `--full`.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/soliton_tanh_method_smoke.json`.
+
 ### Added — Equivariant-scan G5 leftover-recorded (theory 02-08)
 
 - Leftover #25's anisotropic-interface miss now leftover-records

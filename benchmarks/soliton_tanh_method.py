@@ -2,8 +2,9 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: tanh-method solitons (theory 02-09).
 
-G4 PINN init-win stays ``--full``. Algebraic solve / residual cost is
-reported, not in CI ``all_passed``. Tanh algebra, not a collapse.
+G4 PINN init-win is leftover-recorded (leftover #22) and stays
+``--full``. Algebraic solve / residual cost is reported, not in CI
+``all_passed``. Tanh algebra, not a collapse.
 """
 
 from __future__ import annotations
@@ -94,19 +95,25 @@ def _run_cost() -> dict[str, Any]:
         "rows": rows,
         "g4_init_win": {
             "earned": False,
+            "reported": True,
+            "leftover_recorded": True,
+            "leftover_id": 22,
+            "leftover_tick": 64,
             "stays_full": True,
             "need": "5x fewer PINN steps vs cold start on a perturbed problem, 5 seeds",
             "reason": (
-                "No PINN training loop is wired. Algebraic verify_exact / "
-                "solve_ansatz and residual L1 vs a same-degree cold ansatz "
-                "are recorded; they are not the named 5x step-count win."
+                "Leftover #22 leftover-recorded: no PINN training loop "
+                "is wired. Algebraic verify_exact / solve_ansatz and "
+                "residual L1 vs a same-degree cold ansatz are recorded; "
+                "they are not the named 5x step-count win."
             ),
         },
         "note": (
-            "G1 algebraic wall plus published-vs-cold residual L1. G4 "
-            "init-win is a 5-seed PINN study under $OMNIBIAS_SCRATCH, not "
-            "CI. Previous g4_init_win passed=True / --full-only stub with "
-            "no timing withdrawn. Tanh algebra, not a collapse. Not in CI "
+            "Leftover #22 leftover-recorded: G1 algebraic wall plus "
+            "published-vs-cold residual L1. G4 init-win is a 5-seed "
+            "PINN study under $OMNIBIAS_SCRATCH, not CI. Previous "
+            "g4_init_win passed=True / --full-only stub with no timing "
+            "withdrawn. Tanh algebra, not a collapse. Not in CI "
             "all_passed."
         ),
     }
@@ -151,6 +158,10 @@ def main() -> int:
         "temperature_collapse": False,
         "founding_bias_collapse": False,
         "g4_init_win_earned": False,
+        "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 22,
+        "g4_leftover_tick": 64,
         "g4_stays_full": True,
         "cost_earned": False,
         "cost_reported": True,

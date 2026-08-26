@@ -229,7 +229,8 @@ gates are earned on smoke, not in CI `all_passed`.
   steering only; discrete `C_L`, not SO(2)/SO(3). G5 anisotropic-interface
   leftover-recorded.
 - **Soliton tanh-method** ([02-09](api/travelling.md)): tanh algebra, not a
-  collapse; multi-kink is not the n-soliton formula.
+  collapse; multi-kink is not the n-soliton formula. G4 PINN init-win
+  leftover-recorded.
 - **Hermite ladder** ([02-10](api/ladder.md)): raw tower is not the QHO
   eigenbasis; Rodrigues reweight required. Anharmonic G5 may lose.
 - **Layered transfer** ([02-11](api/layered.md)): 1-D only;
