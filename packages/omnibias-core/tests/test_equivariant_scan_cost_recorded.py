@@ -40,3 +40,18 @@ def test_cost_is_reported_and_g5_out_of_all_passed() -> None:
     assert "g5_anisotropic_interface" not in names
     assert "cost_orbit_vs_L" not in names
     assert payload["gates"]["all_passed"] is True
+    g3 = payload["g3"]
+    assert g3["name"] == "g3_discrete_equivariance"
+    assert g3["passed"] is True
+    assert g3["in_ci_all_passed"] is True
+    assert float(g3["cyclic_ulp"]) <= 4.0
+    assert all(float(r) >= 1.6 for r in g3["off_orbit_rates"])
+    g4 = payload["g4"]
+    assert g4["name"] == "g4_metric_correction"
+    assert g4["passed"] is True
+    assert g4["in_ci_all_passed"] is True
+    assert float(g4["corrected_rel_err"]) <= 0.01
+    assert float(g4["uncorrected_rel_err"]) >= 0.4
+    assert payload["honesty"]["g3_earned"] is True
+    assert payload["honesty"]["g4_earned"] is True
+    assert payload["config"]["gates_in_scope"] == ["g1", "g2", "g3", "g4"]

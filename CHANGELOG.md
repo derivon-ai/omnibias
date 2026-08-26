@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equivariant-scan G3/G4 earned (theory 02-08)
+
+- Spec 02-08 G3 discrete `C_L` cyclic shift and G4 chart metric
+  correction are now in CI `all_passed`.
+- Smoke: `docs/benchmarks/equivariant_scan_smoke.json`.
+
 ### Added — BEM-Net G4 regularization order earned (theory 02-06)
 
 - Spec 02-06 G4 mollified-Green order is now in CI `all_passed`.

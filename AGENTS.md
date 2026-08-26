@@ -500,7 +500,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   equivariance; G1–G3/G5 CI; G4 leftover-recorded) and Jet-KAN (02-03, **shipped**; model-jet exactness, KA theorem does
   not justify; G1/G3/G4/G5 earned; G2 leftover-recorded) plus LadderNet (02-10, **shipped**; Rodrigues reweight; G4 many-body leftover-recorded, exact-vs-FD leftover-recorded; G5 anharmonic leftover-recorded) /
   `omnibias.{torch,jax}.scan_equivariant` (02-08, **shipped**; gaussian steering,
-  discrete `C_L`; G5 leftover-recorded, orbit cost leftover-recorded) / `omnibias.{torch,jax}.hierarchy` (02-07, **shipped**; 1-D offsets; G1–G5 earned) /
+  discrete `C_L`; G1–G4 earned; G5 leftover-recorded, orbit cost leftover-recorded) / `omnibias.{torch,jax}.hierarchy` (02-07, **shipped**; 1-D offsets; G1–G5 earned) /
   `omnibias.fields.weak` (02-04, **shipped**; exact on polynomial boxes, boundary bound
   on by default; G4 conditioning earned vs strong collocation) / `omnibias.fields.locus` (02-12, **shipped**; G4 Burgers RH
   leftover-recorded, noisy contour stays `--full`) /

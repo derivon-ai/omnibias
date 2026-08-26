@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.equivariant_scan.v1",
-  "generated_utc": "2026-08-26T16:39:13Z",
+  "generated_utc": "2026-08-26T17:54:11Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,10 +15,12 @@
     "cost_in_all_passed": false,
     "gates_in_scope": [
       "g1",
-      "g2"
+      "g2",
+      "g3",
+      "g4"
     ]
   },
-  "rss_mb_at_start": 822.39,
+  "rss_mb_at_start": 967.01,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -31,8 +33,41 @@
         "name": "g2_nongaussian_none",
         "passed": true,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_discrete_equivariance",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g4_metric_correction",
+        "passed": true,
+        "in_ci_all_passed": true
       }
     ]
+  },
+  "g3": {
+    "name": "g3_discrete_equivariance",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "cyclic_ulp": 0.5,
+    "off_orbit_err": {
+      "L4": 0.1034844861108592,
+      "L8": 0.031018185660039707,
+      "L16": 0.007912359470132118
+    },
+    "off_orbit_rates": [
+      3.3362520698358193,
+      3.9202194714646574
+    ]
+  },
+  "g4": {
+    "name": "g4_metric_correction",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "anisotropy": 2.0,
+    "uncorrected_rel_err": 1.0,
+    "corrected_rel_err": 2.7755575615628914e-16
   },
   "cost": {
     "name": "cost_orbit_vs_L",
@@ -48,19 +83,19 @@
         "L": 4,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.00038168695755302906
+        "wall_seconds": 0.000470608938485384
       },
       {
         "L": 8,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.0006964349886402488
+        "wall_seconds": 0.000960805919021368
       },
       {
         "L": 16,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.001357623958028853
+        "wall_seconds": 0.0017743840580806136
       }
     ],
     "g5_anisotropic_interface": {
@@ -80,6 +115,8 @@
     "orbit": "C_L, not SO(2)",
     "founding_bias_collapse": true,
     "temperature_collapse": false,
+    "g3_earned": true,
+    "g4_earned": true,
     "g5_anisotropic_interface_earned": false,
     "g5_reported": true,
     "g5_leftover_recorded": true,

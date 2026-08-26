@@ -7,7 +7,7 @@ derivative features that transform predictably under rotation, and scan in
 **chart coordinates** using the pullback metric so the same construction works
 on a learned manifold rather than only in flat space.
 
-- **Status**: shipped (G1–G4 CI; G5 anisotropic-interface leftover-recorded / unearned, leftover #25 — `--full`, no task loop; orbit cost **leftover-recorded**, leftover #43, not in CI `all_passed`; gaussian-family steering; discrete `C_L`, not SO(2)/SO(3))
+- **Status**: shipped (G1–G4 **earned**; G5 anisotropic-interface leftover-recorded / unearned, leftover #25 — `--full`, no task loop; orbit cost **leftover-recorded**, leftover #43, not in CI `all_passed`; gaussian-family steering; discrete `C_L`, not SO(2)/SO(3))
 - **Depends on**: 01-02, 01-06
 - **Blocks**: 05-02
 
@@ -221,9 +221,13 @@ orientation orbit at high `L`.
 - **G3 discrete equivariance.** Rotating the input by `2 pi / L` cyclically
   shifts the response vector to `<= 4 ulp`; off-orbit equivariance error decays
   as `L` doubles at the predicted rate.
+  **Earned** — cyclic shift `<= 4` ulp; half-step residual vs linear
+  interpolate drops at rate `>= 1.6` when `L` doubles. In CI `all_passed`.
 - **G4 metric correction.** On a chart with known anisotropy, arc-length spacing
   after correction is uniform to `<= 1` percent, versus the uncorrected error
   which equals the metric anisotropy.
+  **Earned** — stretch-2 chart; corrected offset is arc-length (`rel <= 1%`);
+  uncorrected physical step equals the anisotropy. In CI `all_passed`.
 - **G5 task skill.** On an anisotropic interface-orientation task, the
   orientation bank beats the single-direction scan in angular error, with skill
   `> 0` against a random-angle predictor, over five seeds.

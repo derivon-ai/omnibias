@@ -5,7 +5,7 @@ Orientation orbits of a `BiasScan` bank. Exact steering is
 The discrete orbit is `C_L`, not SO(2) or SO(3). Chart-coordinate
 scan uses the existing pullback metric `g = J^T h J`.
 
-G1–G4 are CI-gated. G5 anisotropic-interface (orientation bank vs
+G1–G4 are CI-gated and **earned**. G5 anisotropic-interface (orientation bank vs
 single-direction scan, five seeds) is **leftover-recorded** unearned
 (leftover #25): no task loop is wired, so the named 5-seed skill
 stays `--full`. `EquivariantScan` wall vs `C_L` orbit size is
