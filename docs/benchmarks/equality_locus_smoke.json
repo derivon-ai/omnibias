@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.equality_locus.v1",
-  "generated_utc": "2026-08-15T16:37:44Z",
+  "generated_utc": "2026-08-26T17:27:03Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,7 +13,7 @@
   "config": {
     "mode": "smoke"
   },
-  "rss_mb_at_start": 836.29,
+  "rss_mb_at_start": 1220.45,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -47,6 +47,19 @@
         "name": "g5_ift",
         "passed": true,
         "rel": 4.320342345536893e-16,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "torch": [
+          0.0,
+          0.27642642029946163
+        ],
+        "jax": [
+          0.0,
+          0.27642642029946163
+        ],
         "in_ci_all_passed": true
       }
     ]

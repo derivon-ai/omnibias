@@ -9,7 +9,7 @@ followed by Newton without autodiff and its existence can be certified on a box.
 In jet-bundle language (01-10) the locus is a fiber product of two
 sections, a subvariety of the base cut out by a jet condition.
 
-- **Status**: shipped (G1–G5 CI; G6 parity; constraint manifold, not a PDE solver)
+- **Status**: shipped (G1–G6 CI; G6 torch/jax Newton parity; constraint manifold, not a PDE solver)
 - **Depends on**: 01-01
 - **Blocks**: 01-10, 02-12, 02-13, 03-03, 03-08, 07-02
 

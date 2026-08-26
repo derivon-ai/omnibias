@@ -6,6 +6,11 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equality-locus G6 parity earned (theory 01-09)
+
+- Spec 01-09 G6 torch/jax Newton parity is now in CI `all_passed`.
+- Smoke: `docs/benchmarks/equality_locus_smoke.json`.
+
 ### Added — Implicit DEQ G4 tracing earned (theory 08-08)
 
 - Spec 08-08 G4 is now in CI `all_passed`: docs / docstring name

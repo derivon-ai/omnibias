@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Gated primitive: equality locus (theory 01-09 G1–G5; G6 in fields tests).
+"""Gated primitive: equality locus (theory 01-09 G1–G6).
 
 The locus is a constraint manifold, not a PDE solution. Founding collapse
-only (``delta -> 0``). Cost gates are not in CI ``all_passed``.
+only (``delta -> 0``). G6 is torch/jax Newton parity. Cost gates are
+not in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -135,11 +136,39 @@ def _run_g5() -> dict[str, Any]:
     }
 
 
+def _run_g6() -> dict[str, Any]:
+    import jax
+    import jax.numpy as jnp
+    import torch
+    from omnibias.core.locus import EqualitySystem, UnitTerm
+    from omnibias.core.locus import newton_project as newton_core
+    from omnibias.fields.locus.jax import newton_project as newton_jax
+    from omnibias.fields.locus.torch import newton_project as newton_torch
+
+    jax.config.update("jax_enable_x64", True)
+    sys = EqualitySystem(
+        (UnitTerm(1, 1.0, (1.0, 0.0)), UnitTerm(2, -2.0, (0.0, 1.0))),
+    )
+    x_t = newton_torch(sys, torch.tensor([0.0, 0.20], dtype=torch.float64))
+    x_j = newton_jax(sys, jnp.asarray([0.0, 0.20], dtype=jnp.float64))
+    core = newton_core(sys, (0.0, 0.20))
+    t_list = x_t.detach().cpu().tolist()
+    j_list = [float(v) for v in x_j.tolist()]
+    passed = t_list == j_list and t_list[1] == core.point[1]
+    return {
+        "name": "g6_parity",
+        "passed": passed,
+        "torch": t_list,
+        "jax": j_list,
+        "in_ci_all_passed": True,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
     args = parser.parse_args()
-    entries = [_run_g1(), _run_g2(), _run_g3(), _run_g4(), _run_g5()]
+    entries = [_run_g1(), _run_g2(), _run_g3(), _run_g4(), _run_g5(), _run_g6()]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.equality_locus.v1",
         config={"mode": "full" if args.full else "smoke"},
