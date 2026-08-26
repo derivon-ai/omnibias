@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet line-search G4/G5 leftover-recorded (theory 03-12)
+
+- Leftover #47 leftover-records `g4_step_count_win` (`1.83x`, need
+  `2x`) so it stays reported and out of `all_passed`.
+- Leftover #48 leftover-records `g5_cost_crossover_table`.
+- Smoke: `docs/benchmarks/jet_line_search_smoke.json`.
+
 ### Added — Adaptive pack refinement shipped (theory 03-13)
 
 - Spec 03-13 status is **shipped**: G1–G6 CI; G4 earned vs matched-count

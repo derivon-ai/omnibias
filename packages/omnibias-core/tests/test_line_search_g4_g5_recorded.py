@@ -19,6 +19,9 @@ def test_g4_g5_are_recorded_and_out_of_all_passed() -> None:
     assert g4["earned"] is False
     assert g4["passed"] is False
     assert g4["reported"] is True
+    assert g4["leftover_recorded"] is True
+    assert int(g4["leftover_id"]) == 47
+    assert int(g4["leftover_tick"]) == 91
     assert g4["in_ci_all_passed"] is False
     assert g4["baseline"] == "strong_wolfe_cubic_or_quadratic"
     assert float(g4["wolfe_over_jet"]) < float(g4["expected"])
@@ -27,6 +30,9 @@ def test_g4_g5_are_recorded_and_out_of_all_passed() -> None:
     assert g5["earned"] is False
     assert g5["passed"] is False
     assert g5["reported"] is True
+    assert g5["leftover_recorded"] is True
+    assert int(g5["leftover_id"]) == 48
+    assert int(g5["leftover_tick"]) == 91
     assert g5["in_ci_all_passed"] is False
     assert g5["crossover_order"] is not None
     assert g5["crossover_depth"] is not None
@@ -34,7 +40,11 @@ def test_g4_g5_are_recorded_and_out_of_all_passed() -> None:
     assert g5["unfavourable_regime"] is True
     assert payload["honesty"]["g4_earned"] is False
     assert payload["honesty"]["g4_reported"] is True
+    assert payload["honesty"]["g4_leftover_recorded"] is True
+    assert int(payload["honesty"]["g4_leftover_id"]) == 47
     assert payload["honesty"]["g5_earned"] is False
+    assert payload["honesty"]["g5_leftover_recorded"] is True
+    assert int(payload["honesty"]["g5_leftover_id"]) == 48
     assert payload["honesty"]["g4_baseline_is_strong_wolfe"] is True
     assert payload["honesty"]["g5_compares_jet_to_trial"] is True
     assert payload["config"]["g4_in_all_passed"] is False

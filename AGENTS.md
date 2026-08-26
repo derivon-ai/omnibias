@@ -504,8 +504,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   subgraph; G3 vs k-NN leftover-recorded, GNN / RegionModels stay `--full`; cost
   vs n/D leftover-recorded) / `omnibias.core.line_search` /
   `omnibias.{torch,jax}.line_search` (03-12; certified Lagrange radius +
-  `verify=True` never-worse; G4 unearned vs strong Wolfe, G5 crossover
-  reported, not in CI `all_passed`) /
+  `verify=True` never-worse; G4 leftover-recorded vs strong Wolfe, G5
+  leftover-recorded, not in CI `all_passed`) /
   `omnibias.core.refine` / `omnibias.{torch,jax}.refine` (03-13, **shipped**; birth and
   growth bit-identical; death reports a bound; G4 earned vs matched-count
   fixed on the named BL) /

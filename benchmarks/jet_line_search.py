@@ -419,14 +419,14 @@ def _run_g4(*, full: bool) -> dict[str, Any]:
     jet_mean = float(np.mean(jet_units))
     wolfe_mean = float(np.mean(wolfe_units))
     ratio = wolfe_mean / jet_mean if jet_mean > 0.0 else 0.0
-    earned = bool(
-        jet_hits == n_seeds and wolfe_hits == n_seeds and ratio >= G4_RATIO_MIN
-    )
     return {
         "name": "g4_step_count_win",
-        "passed": bool(earned),
-        "earned": bool(earned),
+        "passed": False,
+        "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 47,
+        "leftover_tick": 91,
         "in_ci_all_passed": False,
         "jet_mean_units": jet_mean,
         "wolfe_mean_units": wolfe_mean,
@@ -444,13 +444,14 @@ def _run_g4(*, full: bool) -> dict[str, Any]:
         "conds": list(G4_CONDS),
         "rows": rows,
         "note": (
-            "Steepest descent on f=x^2+cond y^2 to a named target. Jet "
-            "counted as order nested grads + value + verify plus one outer "
-            "grad per step. Strong Wolfe counted as phi + dphi (including "
-            "s=0) plus the same outer grad. Rosenbrock does not hit 1e-3 "
-            "in a 16-step CI budget on either arm; that miss is not used "
-            "as the gate. Previous Armijo single-step stub withdrawn. "
-            "Not in CI all_passed."
+            "Leftover #47 leftover-recorded: steepest descent on "
+            "f=x^2+cond y^2 to a named target. Jet counted as order "
+            "nested grads + value + verify plus one outer grad per "
+            "step. Strong Wolfe counted as phi + dphi (including "
+            "s=0) plus the same outer grad. Recorded ratio is a "
+            "Wolfe-miss artifact on the stiffest seed; true "
+            "matched-outer ratio is below 2x. Previous Armijo "
+            "single-step stub withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -534,6 +535,9 @@ def _run_g5() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 48,
+        "leftover_tick": 91,
         "in_ci_all_passed": False,
         "rows": rows,
         "crossover_order": crossover_order,
@@ -544,10 +548,11 @@ def _run_g5() -> dict[str, Any]:
         "depths": list(G5_DEPTHS),
         "orders": list(G5_ORDERS),
         "note": (
-            "mlp_jet wall vs one forward trial, scaled by a named four-trial "
-            "Wolfe budget. Crossover is the first (N, depth) where the jet "
-            "exceeds that budget. Previous jet-only table with earned:true "
-            "is withdrawn. Not in CI all_passed."
+            "Leftover #48 leftover-recorded: mlp_jet wall vs one "
+            "forward trial, scaled by a named four-trial Wolfe "
+            "budget. Crossover is the first (N, depth) where the jet "
+            "exceeds that budget. Previous jet-only table with "
+            "earned:true is withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -642,10 +647,16 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "navier_stokes_proof_claim": False,
             "ccf_stretch_cleared": False,
             "global_min_claim": False,
-            "g4_earned": bool(g4["earned"]),
+            "g4_earned": False,
             "g4_reported": True,
-            "g5_earned": bool(g5["earned"]),
+            "g4_leftover_recorded": True,
+            "g4_leftover_id": 47,
+            "g4_leftover_tick": 91,
+            "g5_earned": False,
             "g5_reported": True,
+            "g5_leftover_recorded": True,
+            "g5_leftover_id": 48,
+            "g5_leftover_tick": 91,
             "g4_in_ci_all_passed": False,
             "g5_in_ci_all_passed": False,
             "g4_baseline_is_strong_wolfe": True,
