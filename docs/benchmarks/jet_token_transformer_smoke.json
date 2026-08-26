@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.jet_token_transformer.v1",
-  "generated_utc": "2026-08-21T19:38:54Z",
+  "generated_utc": "2026-08-26T17:23:08Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 813.49,
+  "rss_mb_at_start": 1264.79,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -41,9 +41,15 @@
         "name": "g3_honesty",
         "passed": true,
         "imagenet_claim": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_value": 0.4621171572600098,
+        "jax_value": 0.4621171572600098
       }
     ]
   },
   "disclaimer": "model-jet mix / distillation; not ImageNet, not Jet-KAN, and not CCF stretch",
-  "wall_seconds": 1.3438361480366439
+  "wall_seconds": 0.6833883789367974
 }

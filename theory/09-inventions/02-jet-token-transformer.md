@@ -6,7 +6,7 @@ A residual stream whose tokens are **N-jets** (value plus directional
 derivatives), mixed by `compose_jet` rather than a softmax of dots, so
 the network predicts the contact of a function, not a point.
 
-- **Status**: shipped (G1–G3 CI; model jet, not ImageNet; founding bias collapse)
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on the worked mix; model jet, not ImageNet; founding bias collapse)
 - **Depends on**: 01-10, 09-01
 - **Blocks**: 09-19
 

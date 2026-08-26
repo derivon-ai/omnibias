@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-token G4 parity earned (theory 09-02)
+
+- Spec 09-02 G4 torch/jax parity is now in CI `all_passed` on
+  the worked `compose_jet` mix.
+- Smoke: `docs/benchmarks/jet_token_transformer_smoke.json`.
+
 ### Added — Sliced-jet encoder shipped (theory 09-28)
 
 - Spec 09-28 status is **shipped**: G1–G5 CI; G5 torch/jax parity

@@ -4,7 +4,8 @@
 
 G1 matches compose_jet on the worked mix. G2 is five-seed skill vs a
 value-only mix on ``u = sin x``. G3 keeps ``imagenet_claim`` false.
-Jets are founding bias collapse, not temperature collapse.
+G4 is torch/jax bit-identity on the worked mix. Jets are founding
+bias collapse, not temperature collapse.
 """
 
 from __future__ import annotations
@@ -16,10 +17,15 @@ import time
 from pathlib import Path
 from typing import Any
 
+import jax
+import torch
+from omnibias.core.jet_token import DISCLAIMER, honesty_payload, jet_token_skill, worked_example
+from omnibias.jax.architectures.jet_token import worked_compose_jet as jax_worked
+from omnibias.torch.architectures.jet_token import worked_compose_jet as torch_worked
+
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
 from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
-from omnibias.core.jet_token import DISCLAIMER, honesty_payload, jet_token_skill, worked_example
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -35,6 +41,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     skill = jet_token_skill()
     g2 = bool(skill["below_1e3"] and skill["beats_value"] and float(skill["skill"]) > 0.0)
     g3 = honesty_payload()["imagenet_claim"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t = torch_worked()
+    j = jax_worked()
+    g4 = bool(float(t[0]) == float(j[0]) and float(t[1]) == float(j[1]))
     entries = [
         {"name": "g1_algebra", "passed": g1, "value_err": ex["value_err"], "deriv_err": ex["deriv_err"]},
         {
@@ -45,6 +56,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "skill": skill["skill"],
         },
         {"name": "g3_honesty", "passed": g3, "imagenet_claim": False},
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_value": float(t[0]),
+            "jax_value": float(j[0]),
+        },
     ]
     for entry in entries:
         print(entry["name"], "ok" if entry["passed"] else "FAIL")
