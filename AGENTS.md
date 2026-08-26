@@ -589,6 +589,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   width split + exact-jet Lohner; G1–G6 CI; founding bias
   collapse, not temperature collapse; not a continuum
   regularity claim) /
+  `omnibias.geometry.gauge.transfer` (07-04, **shipped**; holonomy
+  trials on one fixed matrix; G1 factor measured; no YM / mass gap /
+  continuum) /
   `omnibias.core.verified.trial_spaces` (07-05, **shipped**; multi-pack
   spectral floors + `omnibias.sos` arrangement-adapted
   bases; G1–G6 CI; founding bias collapse, not temperature

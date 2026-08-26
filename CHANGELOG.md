@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Yang-Mills adjacent finite gap shipped (theory 07-04)
+
+- Spec 07-04 status is **shipped**: finite-matrix G1–G6; G1 factor
+  measured (`1.0`, not invented `5x`).
+- Mass gap / continuum stay external.
+- Smoke: `docs/benchmarks/gauge_holonomy_gap_smoke.json`.
+
 ### Added — Domain programs shipped (theory 07-07)
 
 - Spec 07-07 status is **shipped**: G0–G6 CI; tooling, not a

@@ -430,7 +430,7 @@ the dense `angle` / class-angle grid) into Lehmann–Maehly and the symmetric
 engine. Character-basis heat-kernel matrices are already diagonal in this
 basis, so the lever is the dense constructors. A badly conditioned Gram is
 flagged rather than silently trusted. This is still one fixed matrix; the
-continuum limit is not taken.
+continuum limit is not taken. Theory 07-04 status is **shipped**.
 
 ```python
 from omnibias.geometry.gauge.transfer import (

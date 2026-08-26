@@ -327,6 +327,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **NS-adjacent weak form** ([07-02](api/ns_weak_form.md)): finite
   box / horizon / test space. Not a continuum regularity claim.
   Status is **shipped**.
+- **Yang-Mills adjacent** ([07-04](api/geometry-gauge.md)): finite
+  transfer gap; G1 factor measured. Mass gap / continuum stay
+  external. Status is **shipped**.
 - **Spectral floors** ([07-05](api/trial_spaces.md)): multi-pack
   trial spaces + arrangement SOS. Not a continuum gap or YM mass
   gap. Status is **shipped**.
