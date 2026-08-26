@@ -10,7 +10,7 @@ The `band` and `integral` roles are a fiber interval — the difference
 of the order `-1` coordinate at two base points — not a local jet
 coordinate (01-10).
 
-- **Status**: shipped (G1–G5; G4 first spend `BiasScan(op="integral")` + 09-14 both shipped)
+- **Status**: shipped (G1–G5 document gates in CI; G4 first spend `BiasScan(op="integral")` + 09-14 both shipped)
 - **Depends on**: 01-01, 01-02, 06-02, 09-01
 - **Blocks**: none
 

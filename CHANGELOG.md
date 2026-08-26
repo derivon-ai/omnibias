@@ -6,6 +6,11 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Operator-family document gates in CI (theory 01-13)
+
+- Spec 01-13 G1–G5 catalog / reject / first-spend / no-package
+  guards now live in `test_theory_operator_family.py`.
+
 ### Fixed — Design-record index tests expect shipped
 
 - 06-05 / 08-01 / 09-01 ledger guards now assert the index row is
