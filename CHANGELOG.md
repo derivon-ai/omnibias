@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-token transformer shipped (theory 09-02)
+
+- Spec 09-02 status is **shipped**: G1–G3 CI; model jet, not
+  ImageNet.
+- Smoke: `docs/benchmarks/jet_token_transformer_smoke.json`.
+
 ### Added — Invention ledger shipped (theory 09-01)
 
 - Spec 09-01 status is **shipped**: G1–G5 earned; design record.

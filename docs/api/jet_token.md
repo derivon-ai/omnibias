@@ -6,7 +6,8 @@ collapse (`delta -> 0`) supplies `sigma^(n)`. Temperature collapse
 (`beta -> inf`, feasibility) does not appear in the default mix.
 Do not conflate the two.
 
-Status is **gated**, not shipped. Exactness is of the **model** jet,
+Status is **shipped** for 09-02 (G1–G3 CI). 09-19 stays gated
+until its own gates are flipped. Exactness is of the **model** jet,
 not the target. Not ImageNet, not Jet-KAN, not CCF stretch.
 `imagenet_claim` stays false. `theorem_prover_verified` is not
 asserted.

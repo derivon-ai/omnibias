@@ -359,6 +359,8 @@ gates are earned on smoke, not in CI `all_passed`.
   reject, not robustness. Status is **shipped**.
 - **Invention ledger** (09-01): first-bet ranking; inventions do
   not clear Hilbert stretch. Design record. Status is **shipped**.
+- **Jet-token transformer** ([09-02](api/jet_token.md)): model jet,
+  not ImageNet. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
