@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Layered-transfer G2/G6 earned (theory 02-11)
+
+- Spec 02-11 G2 quarter-wave band edges and G6 torch/jax parity are
+  now in CI `all_passed`.
+- Smoke: `docs/benchmarks/layered_transfer_smoke.json`.
+
 ### Added — Hermite-ladder G3/G6 earned (theory 02-10)
 
 - Spec 02-10 G3 `commutator_residual(20)` and G6 torch/jax parity are

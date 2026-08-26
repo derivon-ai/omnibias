@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.layered_transfer.v1",
-  "generated_utc": "2026-08-26T16:42:11Z",
+  "generated_utc": "2026-08-26T18:01:24Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -16,10 +16,12 @@
     "g5_in_all_passed": false,
     "gates_in_scope": [
       "g1",
-      "g3"
+      "g2",
+      "g3",
+      "g6"
     ]
   },
-  "rss_mb_at_start": 809.28,
+  "rss_mb_at_start": 1211.43,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -29,12 +31,39 @@
         "in_ci_all_passed": true
       },
       {
+        "name": "g2_band_edges",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
         "name": "g3_certified_gap",
         "passed": true,
         "is_gap": true,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "in_ci_all_passed": true
       }
     ]
+  },
+  "g2": {
+    "name": "g2_band_edges",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "closed_lo": 0.7836531040612148,
+    "closed_hi": 1.216346895938785,
+    "computed_lo": 0.7836531040612145,
+    "computed_hi": 1.2163468959387855,
+    "rel_lo": 4.2501829656700954e-16,
+    "rel_hi": 3.651007877216733e-16
+  },
+  "g6": {
+    "name": "g6_parity",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "max_abs": 0.0
   },
   "cost": {
     "name": "cost_stack_vs_periods",
@@ -49,26 +78,26 @@
       {
         "n_periods": 1,
         "n_layers": 2,
-        "stack_wall_seconds": 2.4239998310804367e-06,
-        "gap_wall_seconds": 6.068800576031208e-05
+        "stack_wall_seconds": 2.033892087638378e-06,
+        "gap_wall_seconds": 6.0098012909293175e-05
       },
       {
         "n_periods": 2,
         "n_layers": 4,
-        "stack_wall_seconds": 3.384076990187168e-06,
-        "gap_wall_seconds": 0.00011289597023278475
+        "stack_wall_seconds": 3.2049138098955154e-06,
+        "gap_wall_seconds": 9.961298201233149e-05
       },
       {
         "n_periods": 4,
         "n_layers": 8,
-        "stack_wall_seconds": 6.441026926040649e-06,
-        "gap_wall_seconds": 0.0002020800020545721
+        "stack_wall_seconds": 5.383975803852081e-06,
+        "gap_wall_seconds": 0.0001814250135794282
       },
       {
         "n_periods": 8,
         "n_layers": 16,
-        "stack_wall_seconds": 1.2460979633033276e-05,
-        "gap_wall_seconds": 0.000365407089702785
+        "stack_wall_seconds": 1.0492978617548943e-05,
+        "gap_wall_seconds": 0.0003517690347507596
       }
     ],
     "g4_inverse_design": {
@@ -102,6 +131,8 @@
     "distinct_from": "omnibias.geometry.gauge.transfer",
     "continuum_claim": false,
     "one_d_layered": true,
+    "g2_earned": true,
+    "g6_earned": true,
     "g4_inverse_design_earned": false,
     "g4_reported": true,
     "g4_leftover_recorded": true,

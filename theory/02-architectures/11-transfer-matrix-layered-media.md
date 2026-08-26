@@ -8,7 +8,7 @@ scattering matrices inherits exact physics (energy conservation, reciprocity,
 Bloch band structure) as algebraic identities rather than as learned
 approximations.
 
-- **Status**: shipped (1-D ABCD; `continuum_claim=False`; G1–G3/G6 CI; G4 inverse-design leftover-recorded / unearned, leftover #23 — `--full`, no optimizer; stack cost **leftover-recorded**, leftover #46; G5 conservation leftover-recorded / unearned, leftover #27 — no MLP surrogate, not in CI `all_passed`)
+- **Status**: shipped (1-D ABCD; `continuum_claim=False`; G1–G3/G6 **earned**; G4 inverse-design leftover-recorded / unearned, leftover #23 — `--full`, no optimizer; stack cost **leftover-recorded**, leftover #46; G5 conservation leftover-recorded / unearned, leftover #27 — no MLP surrogate, not in CI `all_passed`)
 - **Depends on**: 01-02, 02-05
 - **Blocks**: 05-01, 07-07
 
@@ -206,6 +206,8 @@ finite-element or finite-difference Helmholtz solve at matched cost.
   structural.
 - **G2 band-structure accuracy.** Computed band edges for the quarter-wave stack
   match the classical closed-form result to `<= 1e-10` relative.
+  **Earned** — `sin δ = 2√(n_h n_l)/(n_h+n_l)` vs bisection of
+  `|bloch_dispersion|=1`. In CI `all_passed`.
 - **G3 certified gaps.** `certified_band_gap` never claims a gap where a dense
   frequency scan plus a random sample finds a propagating mode, and every
   claimed gap is confirmed by the scan.
@@ -216,6 +218,8 @@ finite-element or finite-difference Helmholtz solve at matched cost.
   violation is reported alongside its accuracy, so the structural advantage is
   quantified rather than asserted.
 - **G6 parity.** torch and jax bit-identical.
+  **Earned** — `TransferStack` vs `transfer_apply` on a quarter-wave
+  cell, `max_abs == 0`. In CI `all_passed`.
 
 ## 9. Benchmark plan
 

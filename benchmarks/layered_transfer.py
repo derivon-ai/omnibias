@@ -2,15 +2,17 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: layered transfer (theory 02-11). continuum_claim=False.
 
-G4 inverse-design is leftover-recorded (leftover #23) and stays
-``--full``. Stack / gap wall vs period count is reported. G5
-conservation is leftover-recorded (leftover #27), not in CI
-``all_passed``.
+G2 is quarter-wave band edges vs the closed-form arcsin law. G6 is
+torch/jax ``r, t`` parity. G4 inverse-design is leftover-recorded
+(leftover #23) and stays ``--full``. Stack / gap wall vs period count
+is reported. G5 conservation is leftover-recorded (leftover #27), not
+in CI ``all_passed``.
 """
 
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import sys
 import time
@@ -40,6 +42,103 @@ def _median_seconds(fn: Any, *, warmup: int, repeats: int) -> float:
         fn()
         samples.append(time.perf_counter() - t0)
     return float(np.median(np.asarray(samples, dtype=np.float64)))
+
+
+def _qw_closed_edges(n_hi: float, n_lo: float, omega0: float) -> tuple[float, float]:
+    """First gap edges: ``sin δ = 2√(n_h n_l)/(n_h+n_l)``, ``δ = (π/2)(ω/ω0)``."""
+    s = 2.0 * math.sqrt(n_hi * n_lo) / (n_hi + n_lo)
+    delta = math.asin(min(1.0, max(0.0, s)))
+    w_lo = (2.0 / math.pi) * delta * omega0
+    w_hi = 2.0 * omega0 - w_lo
+    return w_lo, w_hi
+
+
+def _run_g2() -> dict[str, Any]:
+    from omnibias.core.transfer import bloch_dispersion, quarter_wave_stack
+
+    n_hi, n_lo, omega0 = 2.0, 1.0, 1.0
+    cell = quarter_wave_stack(n_hi, n_lo, n_periods=1, omega0=omega0)
+    expect_lo, expect_hi = _qw_closed_edges(n_hi, n_lo, omega0)
+
+    def _edge(lo: float, hi: float, *, rising: bool) -> float:
+        a, b = lo, hi
+        for _ in range(80):
+            mid = 0.5 * (a + b)
+            val = abs(bloch_dispersion(cell, mid))
+            if rising:
+                if val >= 1.0:
+                    b = mid
+                else:
+                    a = mid
+            elif val <= 1.0:
+                b = mid
+            else:
+                a = mid
+        return 0.5 * (a + b)
+
+    # Pass band left of the gap, then gap, then pass band.
+    got_lo = _edge(0.4, 1.0, rising=True)
+    got_hi = _edge(1.0, 1.6, rising=False)
+    rel_lo = abs(got_lo - expect_lo) / max(abs(expect_lo), 1e-18)
+    rel_hi = abs(got_hi - expect_hi) / max(abs(expect_hi), 1e-18)
+    passed = bool(rel_lo <= 1e-10 and rel_hi <= 1e-10)
+    return {
+        "name": "g2_band_edges",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "closed_lo": expect_lo,
+        "closed_hi": expect_hi,
+        "computed_lo": got_lo,
+        "computed_hi": got_hi,
+        "rel_lo": rel_lo,
+        "rel_hi": rel_hi,
+    }
+
+
+def _run_g6() -> dict[str, Any]:
+    import jax
+    import jax.numpy as jnp
+    import torch
+    from omnibias.core.transfer import quarter_wave_stack
+    from omnibias.pinn.layered.jax import transfer_apply
+    from omnibias.pinn.layered.torch import TransferStack
+
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    n_hi, n_lo, omega0 = 2.0, 1.0, 1.0
+    layers = quarter_wave_stack(n_hi, n_lo, n_periods=1, omega0=omega0)
+    net = TransferStack(2, dtype=torch.float64)
+    with torch.no_grad():
+        net.log_n.copy_(
+            torch.log(torch.tensor([n_hi, n_lo], dtype=torch.float64))
+        )
+        net.log_d.copy_(
+            torch.log(
+                torch.tensor(
+                    [
+                        math.pi / (2.0 * omega0 * n_hi),
+                        math.pi / (2.0 * omega0 * n_lo),
+                    ],
+                    dtype=torch.float64,
+                )
+            )
+        )
+    omega = torch.tensor([0.8, 1.0, 1.2], dtype=torch.float64)
+    r_t, t_t = net(omega)
+    r_j, t_j = transfer_apply(layers, jnp.asarray(omega.numpy()))
+    gap = float(
+        max(
+            np.max(np.abs(r_t.detach().cpu().numpy() - np.asarray(r_j))),
+            np.max(np.abs(t_t.detach().cpu().numpy() - np.asarray(t_j))),
+        )
+    )
+    passed = bool(gap == 0.0)
+    return {
+        "name": "g6_parity",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "max_abs": gap,
+    }
 
 
 def _run_cost() -> dict[str, Any]:
@@ -175,14 +274,26 @@ def main() -> int:
     m = stack_matrix(layers, 1.0)
     r, t = reflection_transmission(m)
     g1 = unitarity_residual(m) <= 1e-12 and abs(abs(r) ** 2 + abs(t) ** 2 - 1.0) <= 1e-12
+    g2 = _run_g2()
+    g6 = _run_g6()
     cert = certified_band_gap(layers, omega_range=(0.85, 1.15), n_grid=32)
     entries: list[dict[str, Any]] = [
         {"name": "g1_unitarity", "passed": g1, "in_ci_all_passed": True},
+        {
+            "name": "g2_band_edges",
+            "passed": bool(g2["passed"]),
+            "in_ci_all_passed": bool(g2["in_ci_all_passed"]),
+        },
         {
             "name": "g3_certified_gap",
             "passed": cert.continuum_claim is False,
             "is_gap": cert.is_gap,
             "in_ci_all_passed": True,
+        },
+        {
+            "name": "g6_parity",
+            "passed": bool(g6["passed"]),
+            "in_ci_all_passed": bool(g6["in_ci_all_passed"]),
         },
     ]
     cost = _run_cost()
@@ -193,16 +304,20 @@ def main() -> int:
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
             "g5_in_all_passed": False,
-            "gates_in_scope": ["g1", "g3"],
+            "gates_in_scope": ["g1", "g2", "g3", "g6"],
         },
     )
     payload["gates"] = gates_block(entries)
+    payload["g2"] = g2
+    payload["g6"] = g6
     payload["cost"] = cost
     payload["g5"] = g5
     payload["honesty"] = {
         "distinct_from": "omnibias.geometry.gauge.transfer",
         "continuum_claim": False,
         "one_d_layered": True,
+        "g2_earned": bool(g2["passed"]),
+        "g6_earned": bool(g6["passed"]),
         "g4_inverse_design_earned": False,
         "g4_reported": True,
         "g4_leftover_recorded": True,

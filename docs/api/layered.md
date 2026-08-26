@@ -5,7 +5,7 @@
 is refused outside lossless reciprocal linear media.
 `continuum_claim=False` on every certified gap.
 
-G1–G3/G6 are CI-gated. G4 inverse-design (10× fewer evals vs
+G1–G3/G6 are CI-gated and **earned**. G4 inverse-design (10× fewer evals vs
 gradient-free, five seeds) is **leftover-recorded** unearned (leftover
 #23): no optimizer loop is wired, so the named 5-seed eval-count win
 stays `--full`. `stack_matrix` / `certified_band_gap` wall vs

@@ -257,8 +257,9 @@ gates are earned on smoke, not in CI `all_passed`.
   **shipped**.
 - **Layered transfer** ([02-11](api/layered.md)): 1-D only;
   `continuum_claim=False`; distinct from `geometry.gauge.transfer`.
-  G4 inverse-design leftover-recorded. Stack cost leftover-recorded
-  (leftover #46). G5 conservation leftover-recorded. Status is
+  G1–G3/G6 earned. G4 inverse-design leftover-recorded. Stack cost
+  leftover-recorded (leftover #46). G5 conservation leftover-recorded.
+  Status is
   **shipped**.
 - **Linearizing transforms** ([02-13](api/transforms_pde.md)): named Cole-Hopf
   / Miura / Bäcklund / Darboux; exactness to jet order N; G3 Burgers
