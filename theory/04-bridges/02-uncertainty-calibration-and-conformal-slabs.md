@@ -7,7 +7,7 @@ a prediction interval — so calibrated uncertainty, conformal coverage, and sou
 interval enclosures can share one object, with the crucial discipline that
 their guarantees are of three different kinds and must never be blended.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; three guarantee kinds stay apart; conformal is not sealable)
 - **Depends on**: 01-03, 03-08, 04-01
 - **Blocks**: 05-01
 

@@ -660,7 +660,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.sliced_jet` + `omnibias.{torch,jax}.architectures.sliced_jet`
   (09-28; scan-jet tokens + named energy; G1–G5 CI; not a ViT) /
   `omnibias.core.uncertainty` + `omnibias.verify.uncertainty`
-  (04-02; conformal slabs; G1–G6 CI; kinds do not mix; not sealable) /
+  (04-02, **shipped**; conformal slabs; G1–G6 CI; kinds do not mix; not sealable) /
   `omnibias.curvature.information`
   (04-01, **shipped**; pack Fisher metric, not scalar `A''(theta)`; G1–G5 CI;
   `K>=3` FD packs inapplicable; founding bias collapse).

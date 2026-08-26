@@ -304,6 +304,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Pack Fisher** ([04-01](api/pack_fisher.md)): pack-parameter metric,
   not scalar `A''(theta)`. G1–G5 earned. Founding bias collapse.
   Status is **shipped**.
+- **Conformal slabs** ([04-02](api/conformal_slabs.md)): three
+  guarantee kinds stay apart; conformal is not sealable. G1–G6 CI.
+  Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Conformal slabs shipped (theory 04-02)
+
+- Spec 04-02 status is **shipped**: G1–G6 CI, no leftover gate.
+- Three guarantee kinds stay apart; conformal is not sealable.
+- Smoke: `docs/benchmarks/conformal_slabs_smoke.json`.
+
 ### Added — Pack Fisher shipped (theory 04-01)
 
 - Spec 04-01 status is **shipped**: G1–G5 earned

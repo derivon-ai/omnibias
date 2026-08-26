@@ -15,7 +15,7 @@ feasibility) does not appear.
 
 Conformal intervals cannot be sealed into certificate v1. Combined
 statements keep the enclosure and the residual quantile separate.
-Status is **gated**, not shipped.
+Status is **shipped**.
 
 Homes: `omnibias.core.uncertainty`, `omnibias.verify.uncertainty`.
 
