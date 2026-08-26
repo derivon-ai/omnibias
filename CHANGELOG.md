@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pack tree shipped (theory 02-07)
+
+- Spec 02-07 status is **shipped**: G1–G5 CI; leftover #13 G3 closed.
+- 1-D offsets; `eta=0` bit-identical to dense.
+- Smoke: `docs/benchmarks/pack_tree_smoke.json`.
+
 ### Added — Multi-interface PINN shipped (theory 02-05)
 
 - Spec 02-05 status is **shipped**: leftover #37 G3 and leftover #38
