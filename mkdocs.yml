@@ -191,6 +191,7 @@ nav:
       - jet-LQR optimizer (08-11): api/jet_lqr.md
       - jet-MPC optimizer (08-12): api/jet_mpc.md
       - weight-space loss jet: api/weight_loss_jet.md
+      - recommended trainer stack: api/train_stack.md
       - rational stencil obligations (01-11): api/rational_stencil.md
       - soft-population evolution (03-01): api/soft_evolution.md
       - arrangement LP (03-02): api/arrangement_lp.md
@@ -303,6 +304,7 @@ nav:
       - Jet-LQR optimizer: cookbook/jet-lqr.md
       - Jet-MPC optimizer: cookbook/jet-mpc.md
       - Weight-space loss jet: cookbook/weight-loss-jet.md
+      - Recommended trainer stack: cookbook/train-stack.md
       - Rational stencil obligations: cookbook/rational-stencil.md
       - Soft-population evolution: cookbook/soft-evolution.md
       - Arrangement LP: cookbook/arrangement-lp.md

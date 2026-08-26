@@ -237,6 +237,12 @@ from omnibias.jax.transforms import (
     mellin_transform,
     region_of_convergence,
 )
+from omnibias.jax.train_stack import (
+    TrainStackConfig,
+    TrainStackReport,
+    recommended_stack_step,
+    stack_minimize,
+)
 from omnibias.jax.weight_loss_jet import (
     WeightLossJetSpec,
     one_layer_loss,
@@ -275,6 +281,8 @@ __all__ = [
     "MellinTransform",
     "SharpnessReport",
     "SharpnessSchedule",
+    "TrainStackConfig",
+    "TrainStackReport",
     "TransformBlock",
     "WeightLossJetSpec",
     "X64_HINT",
@@ -378,6 +386,7 @@ __all__ = [
     "one_layer_loss_jet",
     "one_layer_newton_direction",
     "polynomial_sqrt2_maps",
+    "recommended_stack_step",
     "refine",
     "region_of_convergence",
     "register_activation",
@@ -395,6 +404,7 @@ __all__ = [
     "sliced_wasserstein",
     "soft_argmax_offset",
     "soft_histogram",
+    "stack_minimize",
     "steerable_basis",
     "total_variation_distance",
     "tower_to_jet",

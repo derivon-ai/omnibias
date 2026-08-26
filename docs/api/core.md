@@ -78,6 +78,12 @@ Line Hilbert permutation of the dictionary (theory 01-12). G5 is a
 projection defect, not a stretch-gate clearing. Documented in full at
 [conjugate.md](conjugate.md).
 
+## Recommended trainer stack
+
+08-01 stack on a one-layer closed-form loss jet: Newton, jet line
+search, optional Kantorovich, sharpness damping. Documented in full at
+[train_stack.md](train_stack.md).
+
 ## Weight-space loss jet
 
 Closed-form directional derivatives of a one-layer Riccati MSE loss

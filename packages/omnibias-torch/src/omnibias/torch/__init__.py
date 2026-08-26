@@ -200,6 +200,12 @@ from omnibias.torch.transforms import (
     mellin_transform,
     region_of_convergence,
 )
+from omnibias.torch.train_stack import (
+    TrainStackConfig,
+    TrainStackReport,
+    recommended_stack_step,
+    stack_minimize,
+)
 from omnibias.torch.unit import OperatorMultiBiasUnit
 from omnibias.torch.weight_loss_jet import (
     WeightLossJetSpec,
@@ -255,6 +261,8 @@ __all__ = [
     "SharpnessReport",
     "SharpnessSchedule",
     "TemperedActivation",
+    "TrainStackConfig",
+    "TrainStackReport",
     "TransformBlock",
     "WeightLossJetSpec",
     "__lineage__",
@@ -345,6 +353,7 @@ __all__ = [
     "one_layer_loss_jet",
     "one_layer_newton_direction",
     "polynomial_sqrt2_maps",
+    "recommended_stack_step",
     "refine",
     "region_of_convergence",
     "register_activation",
@@ -361,6 +370,7 @@ __all__ = [
     "sliced_wasserstein",
     "soft_argmax_offset",
     "soft_histogram",
+    "stack_minimize",
     "steerable_basis",
     "total_variation_distance",
     "tower_to_jet",

@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Recommended 08-01 trainer stack
+
+- `omnibias.core.train_stack` plus `omnibias.{torch,jax}.train_stack`:
+  Newton direction from the closed-form one-layer loss jet, 03-12 line
+  search, optional Kantorovich accept, sharpness damping.
+- Cookbook: [`docs/cookbook/train-stack.md`](docs/cookbook/train-stack.md).
+- One-layer only. 08-02 is skipped. Not a global min.
+
 ### Added — One-layer weight-space loss jet
 
 - `omnibias.core.weight_loss_jet` plus `omnibias.{torch,jax}.weight_loss_jet`:

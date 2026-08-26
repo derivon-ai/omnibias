@@ -86,6 +86,8 @@ bit-identical functional twin of the torch `NaturalGradient`. Two closed-form me
 the Gauss-Newton **Fisher** `(1/N) J^T J` (`gauss_newton_fisher`; Newton on a residual linear
 in `theta`) and the **geometry pullback** `g = J^T h J`
 (`omnibias.geometry.jax.ops.pullback_metric`).
+The 08-01 recommended stack lives in `omnibias.jax.train_stack`; see
+[train_stack.md](train_stack.md).
 Closed-form one-layer weight-space loss jets live in
 `omnibias.jax.weight_loss_jet`; see [weight_loss_jet.md](weight_loss_jet.md).
 Exact jet line search (theory 03-12) lives in `omnibias.jax.line_search`

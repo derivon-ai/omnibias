@@ -249,7 +249,9 @@ REJECTED = (
 - **G4 no global-min claim.** Each implementable spec's honesty section
   forbids "global minimum of a deep nest" and "we do not use the chain rule."
 - **G5 recommended stack is implementable.** Every name in the stack exists
-  as a shipped symbol or as a Group 08 / 03-12 spec.
+  as a shipped symbol or as a Group 08 / 03-12 spec. The one-layer
+  callable is `omnibias.core.train_stack.recommended_stack_step`
+  (08-02 skipped; not a new trainer algorithm).
 
 These are document gates (checked by review / a later structural test), not
 numerical gates. Numerical gates live in 08-02…08-09.

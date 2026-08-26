@@ -247,6 +247,12 @@ from omnibias.core.spectral_design import (
     response_profile,
 )
 from omnibias.core.tanh_method import TravellingWaveAnsatz, verify_exact
+from omnibias.core.train_stack import (
+    TrainStackConfig,
+    TrainStackReport,
+    recommended_stack_step,
+    stack_minimize,
+)
 from omnibias.core.transfer import Layer, certified_band_gap
 from omnibias.core.transforms import (
     TransformIdentity,
@@ -328,6 +334,8 @@ __all__ = [
     "SharpnessSchedule",
     "TensorFn",
     "TensorT",
+    "TrainStackConfig",
+    "TrainStackReport",
     "TransformIdentity",
     "TransformKernels",
     "TransformName",
@@ -426,6 +434,7 @@ __all__ = [
     "polynomial_wolfe",
     "raw_moments_from_cumulants",
     "raw_to_central_moments",
+    "recommended_stack_step",
     "refine_bank",
     "registered_activations",
     "reject_anderson",
@@ -448,6 +457,7 @@ __all__ = [
     "solve_dense",
     "solve_rule",
     "spectral_radius_inf_bound",
+    "stack_minimize",
     "stiffness_matrix",
     "symmetrize",
     "tail_bound",

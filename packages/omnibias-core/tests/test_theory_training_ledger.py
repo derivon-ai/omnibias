@@ -46,6 +46,11 @@ STACK_SYMBOLS = (
         "packages/omnibias-jax/src/omnibias/jax/optim.py",
         r"^def cubic_regularized_gauss_newton_minimize\b",
     ),
+    (
+        "recommended_stack_step",
+        "packages/omnibias-core/src/omnibias/core/train_stack.py",
+        r"^def recommended_stack_step\b",
+    ),
 )
 _SECTION = re.compile(
     r"^## (?P<n>\d+)\. [^\n]+\n(?P<body>.*?)(?=^## \d|\Z)",

@@ -150,6 +150,10 @@ scale here (no LLM-scale claim).
       show_root_heading: false
       heading_level: 3
 
+## Recommended trainer stack
+
+One-layer 08-01 stack. See [train_stack.md](train_stack.md).
+
 ## Weight-space loss jet
 
 Closed-form one-layer `φ^(k)(0)` along a weight direction. See
