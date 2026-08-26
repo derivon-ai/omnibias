@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Coupling jet-flow shipped (theory 09-06)
+
+- Spec 09-06 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Finite couplings, not `integrate_cnf`.
+- Smoke: `docs/benchmarks/coupling_jet_flow_smoke.json`.
+
 ### Added — Taylor-model neuron shipped (theory 09-05)
 
 - Spec 09-05 status is **shipped**: G1–G4 CI; remainder sound, not

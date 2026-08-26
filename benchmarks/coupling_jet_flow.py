@@ -4,18 +4,24 @@
 
 G1 is the tanh(2x) log-det identity. G2 is a 64-point Newton
 round-trip. G3 is five-seed NLL skill vs an isotropic Gaussian on
-a 2-D two-Gaussian mixture. Jets are founding bias collapse, not
-temperature collapse. Not ImageNet. Not CCF stretch.
+a 2-D two-Gaussian mixture. G4 is torch/jax bit-identity on G1.
+Jets are founding bias collapse, not temperature collapse. Not
+ImageNet. Not CCF stretch.
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import os
 import sys
 import time
 from pathlib import Path
 from typing import Any
+
+import jax
+import jax.numpy as jnp
+import torch
 
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
@@ -30,6 +36,26 @@ from omnibias.core.coupling_flow import (
 )
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
+_SCORE_FLOW = (
+    Path(__file__).resolve().parents[1]
+    / "packages"
+    / "omnibias-score"
+    / "src"
+    / "omnibias"
+    / "score"
+    / "flow"
+)
+
+
+def _load_twin_forward(backend: str):
+    """Load ``jet_flow_forward`` without importing ``omnibias.score``."""
+    path = _SCORE_FLOW / backend / "jet_flow.py"
+    spec = importlib.util.spec_from_file_location(f"_jet_flow_{backend}", path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.jet_flow_forward
 
 
 def _cnf_nll_closed(xs: list[tuple[float, float]]) -> float:
@@ -65,6 +91,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     cnf = _cnf_nll_closed(mixture_samples(256, 0))
     g3 = bool(skill["beats_iso"] and float(skill["flow_mean"]) <= cnf and float(skill["skill"]) > 0.0)
     hon = honesty_payload()
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    torch_fwd = _load_twin_forward("torch")
+    jax_fwd = _load_twin_forward("jax")
+    yt, lt = torch_fwd(torch.tensor(0.3), torch.tensor(2.0))
+    yj, lj = jax_fwd(jnp.asarray(0.3), jnp.asarray(2.0))
+    g4 = bool(float(yt) == float(yj) and float(lt) == float(lj))
     entries = [
         {"name": "g1_det", "passed": g1, "log_det_err": ex["log_det_err"], "inv_err": ex["inv_err"]},
         {"name": "g2_invert", "passed": g2, "roundtrip": rt},
@@ -77,9 +110,10 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "skill": skill["skill"],
         },
         {
-            "name": "g4_honesty",
-            "passed": hon["imagenet_claim"] is False and hon["rewrites_integrate_cnf"] is False,
-            "imagenet_claim": False,
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_log_det": float(lt),
+            "jax_log_det": float(lj),
         },
     ]
     for entry in entries:

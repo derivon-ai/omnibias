@@ -622,7 +622,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   bias collapse, not temperature collapse; not 08-09, not a
   deep-net certificate) /
   `omnibias.core.coupling_flow` + `omnibias.score.flow.{torch,jax}.jet_flow`
-  (09-06; finite couplings + closed-form `sum log sigma'`; G1–G3
+  (09-06, **shipped**; finite couplings + closed-form `sum log sigma'`; G1–G4
   CI; founding bias collapse, not temperature collapse; not
   `integrate_cnf`) /
   `omnibias.core.pack_moe` + `omnibias.{torch,jax}.architectures.pack_moe`

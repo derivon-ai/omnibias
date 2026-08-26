@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.coupling_jet_flow.v1",
-  "generated_utc": "2026-08-21T19:51:47Z",
+  "generated_utc": "2026-08-26T17:05:12Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 808.87,
+  "rss_mb_at_start": 1248.42,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -44,12 +44,13 @@
         "skill": 0.6401809323293023
       },
       {
-        "name": "g4_honesty",
+        "name": "g4_parity",
         "passed": true,
-        "imagenet_claim": false
+        "torch_log_det": 0.3528766070037736,
+        "jax_log_det": 0.3528766070037736
       }
     ]
   },
   "disclaimer": "finite coupling + closed-form log-det; not integrate_cnf, not ImageNet, not CCF stretch",
-  "wall_seconds": 1.2909327740198933
+  "wall_seconds": 0.5771438410738483
 }

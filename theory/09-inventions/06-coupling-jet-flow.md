@@ -6,7 +6,7 @@ A finite-depth coupling flow whose Jacobian determinant is
 `sum log sigma'(z_i)` in closed form and whose inverse is Newton with
 exact `sigma'`.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not `integrate_cnf`)
 - **Depends on**: 09-01
 - **Blocks**: none
 

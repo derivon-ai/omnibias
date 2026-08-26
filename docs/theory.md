@@ -367,6 +367,8 @@ gates are earned on smoke, not in CI `all_passed`.
   collapse head. Status is **shipped**.
 - **Taylor-model neuron** ([09-05](api/tm_neuron.md)): remainder
   sound, not a deep-net certificate. Status is **shipped**.
+- **Coupling jet-flow** ([09-06](api/coupling_jet_flow.md)): finite
+  couplings, not `integrate_cnf`. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

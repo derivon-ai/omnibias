@@ -6,7 +6,7 @@ from the founding bias collapse (`delta -> 0`). Temperature collapse
 two.
 
 The inverse is Newton with exact `sigma'`. This is not
-`integrate_cnf`. Status is **gated**, not shipped. Not ImageNet
+`integrate_cnf`. Status is **shipped**. Not ImageNet
 generative SOTA. Not CCF stretch.
 
 Homes: `omnibias.core.coupling_flow`,
