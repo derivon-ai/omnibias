@@ -402,6 +402,8 @@ gates are earned on smoke, not in CI `all_passed`.
   match, not ImageNet KD. Status is **shipped**.
 - **Homotopy continuation** ([09-20](api/homotopy_continuation.md)):
   08-04 filter on a `tau`-path. Status is **shipped**.
+- **Exact score matching** ([09-21](api/exact_score_matching.md)):
+  Hyvärinen; CNF exact `div` is prior art. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

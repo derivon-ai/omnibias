@@ -7,8 +7,8 @@ founding bias collapse (`delta -> 0`). Temperature collapse
 (`beta -> inf`, feasibility) does not appear.
 
 This is a training objective. Exact CNF `div` (`integrate_cnf`) is
-prior art and is not claimed as new. Status is **gated**, not
-shipped. Not ImageNet. Not CCF stretch.
+prior art and is not claimed as new. Status is **shipped**.
+Not ImageNet. Not CCF stretch.
 
 Homes: `omnibias.core.score_matching`,
 `omnibias.score.{torch,jax}.score_matching`,

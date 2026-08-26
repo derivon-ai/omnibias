@@ -6,7 +6,7 @@ Hyvärinen / denoising score matching on an **OMBU score** whose
 **Hessian trace is closed form**. This is a *training objective*, not
 a claim that omnibias lacks divergence.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; CNF exact div is prior art)
 - **Depends on**: 09-01
 - **Blocks**: none
 

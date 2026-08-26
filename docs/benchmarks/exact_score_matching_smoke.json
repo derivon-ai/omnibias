@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.exact_score_matching.v1",
-  "generated_utc": "2026-08-21T21:06:29Z",
+  "generated_utc": "2026-08-26T17:16:57Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 809.0,
+  "rss_mb_at_start": 1208.79,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -48,9 +48,15 @@
         "name": "g3_honesty",
         "passed": true,
         "cnf_div_claimed_new": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_div": -1.0,
+        "jax_div": -1.0
       }
     ]
   },
   "disclaimer": "Hyv\u00e4rinen / DSM on an OMBU score; CNF exact div is prior art, not ImageNet, not CCF stretch",
-  "wall_seconds": 1.3680372320231982
+  "wall_seconds": 0.42502228694502264
 }

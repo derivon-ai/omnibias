@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Exact score matching shipped (theory 09-21)
+
+- Spec 09-21 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 exact `div`.
+- CNF exact `div` is prior art.
+- Smoke: `docs/benchmarks/exact_score_matching_smoke.json`.
+
 ### Added — Homotopy continuation shipped (theory 09-20)
 
 - Spec 09-20 status is **shipped**: G1–G4 CI; G4 torch/jax parity

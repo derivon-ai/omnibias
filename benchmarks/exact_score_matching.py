@@ -4,17 +4,22 @@
 
 G1 is ``div(-x) = -1``. G2 trains an affine OMBU score on 1-D
 N(0,1). G3 records that CNF exact ``div`` is not claimed as new.
+G4 is torch/jax bit-identity on G1.
 """
 
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import os
 import sys
 import time
 from pathlib import Path
 from typing import Any
 
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.score_matching import (
     DISCLAIMER,
     honesty_payload,
@@ -27,6 +32,24 @@ from _common import provenance, write_json  # type: ignore[import-not-found]  # 
 from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
+_SCORE = (
+    Path(__file__).resolve().parents[1]
+    / "packages"
+    / "omnibias-score"
+    / "src"
+    / "omnibias"
+    / "score"
+)
+
+
+def _load_twin(backend: str, attr: str):
+    path = _SCORE / backend / "score_matching.py"
+    spec = importlib.util.spec_from_file_location(f"_score_matching_{backend}", path)
+    if spec is None or spec.loader is None:
+        raise ImportError(f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return getattr(mod, attr)
 
 
 def main(argv: list[str] | None = None) -> dict[str, Any]:
@@ -41,6 +64,17 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["g2_earned"])
     hon = honesty_payload()
     g3 = hon["cnf_div_claimed_new"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    torch_div = _load_twin("torch", "exact_div_neg_id")
+    jax_div = _load_twin("jax", "exact_div_neg_id")
+    torch_ex = _load_twin("torch", "worked_example")
+    jax_ex = _load_twin("jax", "worked_example")
+    g4 = bool(
+        torch_ex() == jax_ex()
+        and torch_div(1) == jax_div(1)
+        and torch_div(torch.tensor(1.0)) == jax_div(jnp.asarray(1.0))
+    )
     entries = [
         {
             "name": "g1_cell",
@@ -60,6 +94,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "name": "g3_honesty",
             "passed": g3,
             "cnf_div_claimed_new": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_div": torch_div(1),
+            "jax_div": jax_div(1),
         },
     ]
     for entry in entries:
