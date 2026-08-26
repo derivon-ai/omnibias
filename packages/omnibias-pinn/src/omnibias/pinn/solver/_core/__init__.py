@@ -18,6 +18,13 @@ from omnibias.pinn.solver._core.conditions import (
     ValueLike,
 )
 from omnibias.pinn.solver._core.domain import Domain
+from omnibias.pinn.solver._core.guided_cinf import (
+    GuidedHuntReport,
+    GuidedStep,
+    cinf_fourier_basis,
+    guided_cinf_burgers_hunt,
+    guided_cinf_smoke,
+)
 from omnibias.pinn.solver._core.hard import (
     HARD_CONDITION_MODES,
     DeclinedCondition,
@@ -49,6 +56,14 @@ from omnibias.pinn.solver._core.problems import (
 from omnibias.pinn.solver._core.readout import (
     ReadoutDependentError,
     requires_readout_independent,
+)
+from omnibias.pinn.solver._core.recursive import (
+    PicardReport,
+    burgers_residual_periodic,
+    cole_hopf_exact_burgers_demo,
+    honesty_payload,
+    picard_frozen_advection,
+    recursive_toolkit_smoke,
 )
 from omnibias.pinn.solver._core.sampling import (
     CollocationSpec,
@@ -90,6 +105,8 @@ __all__ = [
     "DeclinedCondition",
     "Domain",
     "Field",
+    "GuidedHuntReport",
+    "GuidedStep",
     "HARD_CONDITION_MODES",
     "HIGH_ORDER",
     "HardConditionPlan",
@@ -99,6 +116,7 @@ __all__ = [
     "Observations",
     "PDEType",
     "PERIODIC_ORDERS",
+    "PicardReport",
     "ProblemKind",
     "READOUT_INDEPENDENT_ATTR",
     "ReadoutDependentError",
@@ -116,19 +134,27 @@ __all__ = [
     "bound_names",
     "boundary_points",
     "burgers",
+    "burgers_residual_periodic",
     "candidate_points",
     "check_observations",
+    "cinf_fourier_basis",
     "coefficient",
+    "cole_hopf_exact_burgers_demo",
     "collect_unknowns",
+    "guided_cinf_burgers_hunt",
+    "guided_cinf_smoke",
     "heat",
     "honesty_labels",
+    "honesty_payload",
     "initial_slice_points",
     "interior_points",
     "make_system",
     "periodic_axes",
+    "picard_frozen_advection",
     "plan_hard_conditions",
     "poisson",
     "reaction_diffusion",
+    "recursive_toolkit_smoke",
     "requires_readout_independent",
     "sample_observations",
     "select_refinement_points",

@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Finite 1-D Cole-Hopf / Picard / guided-C∞ Burgers
+
+- `omnibias.pinn.solver` exports Cole-Hopf factorial jets, frozen-advection
+  Picard, and a C∞ Fourier hunt with a `Q` reconstruction seal.
+- Cookbook: [`docs/cookbook/recursive-burgers.md`](docs/cookbook/recursive-burgers.md).
+- Not Clay NS; OWNS / Adomian / 3-D stay unimplemented.
+
 ### Fixed — Group 09 index prose matches shipped ledger
 
 - `theory/README.md` no longer says Group 09 entries and the ledger

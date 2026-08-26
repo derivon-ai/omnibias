@@ -70,6 +70,34 @@ basis="spectral")` makes spatial periodicity free in a `SpectralVectorField`.
         - ReadoutDependentError
         - requires_readout_independent
 
+## Finite 1-D recursive / guided-C∞ Burgers
+
+Periodic viscous Burgers / heat on `T^1`, not Clay Navier–Stokes. Cole–Hopf
+factorial jets linearize a plane-wave identity. Frozen-advection Picard is a
+line-searched defect correction. The guided hunt fits a C∞ Fourier span and may
+seal `Phi @ c == target` over `Fraction` (`q_reconstruction_seal`). That lift is
+not a Burgers PDE identity. The default target is the constant Cole–Hopf field
+`u = 2ν`, whose residual is identically zero. OWNS, Adomian, and 3-D
+Cauchy–Kovalevskaya stay unimplemented. Cookbook:
+[`recursive-burgers.md`](../cookbook/recursive-burgers.md).
+
+::: omnibias.pinn.solver
+    options:
+      show_root_heading: false
+      heading_level: 3
+      members:
+        - burgers_residual_periodic
+        - honesty_payload
+        - picard_frozen_advection
+        - PicardReport
+        - cole_hopf_exact_burgers_demo
+        - recursive_toolkit_smoke
+        - cinf_fourier_basis
+        - guided_cinf_burgers_hunt
+        - guided_cinf_smoke
+        - GuidedHuntReport
+        - GuidedStep
+
 ## Solver drivers (torch)
 
 ::: omnibias.pinn.solver.torch

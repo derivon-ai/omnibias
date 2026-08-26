@@ -352,6 +352,7 @@ nav:
       - Spectral shape analysis: cookbook/spectral-shape-analysis.md
       - Equivariant operator features: cookbook/equivariant-operator-features.md
       - PINN heat equation: cookbook/pinn-heat.md
+      - Finite 1-D recursive Burgers: cookbook/recursive-burgers.md
       - PINN causal marching: cookbook/pinn-causal-marching.md
       - PINN SDF geometry: cookbook/pinn-sdf-geometry.md
       - Operator zero-shot: cookbook/operator-zero-shot.md
