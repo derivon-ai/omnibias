@@ -126,6 +126,15 @@ constraint. Different limit (`delta` vs `beta`), different output.
 "bias-collapse penalty" -- are retired precisely because they invite the trap
 above; `tests/test_terminology.py` fails the build if they come back.
 
+Additional *named* collapses live in `omnibias.core.collapse` and must mint
+a different surviving object (verdict, germ identity, winding number, weak
+residual on a pack, exact syzygy). They do not replace the founding three.
+A float residual is never a proof. Duality/gap, cocycle, path, `q -> 1`
+specialization, scale/RG, Morse, and policy entropy were evaluated and
+**rejected** (rebrand, already shipped, or no new object). Founding
+surviving objects (`derivative`, `indicator`, `point_plus_proof`) cannot
+be reused.
+
 ## The operator surface -- six roles, incl. a closed-form INTEGRAL
 
 `OperatorBlock` has **six** roles, not four. Under-stating this is a known,

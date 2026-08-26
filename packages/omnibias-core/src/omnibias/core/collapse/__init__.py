@@ -26,9 +26,15 @@ from omnibias.core.collapse.pairing import (
     pairing_collapse,
     pairing_value,
 )
+from omnibias.core.collapse.rank import (
+    RANK_SPEC,
+    RankReport,
+    rank_collapse,
+)
 from omnibias.core.collapse.schema import (
     FOUNDING_COLLAPSES,
     FOUNDING_NAMES,
+    FOUNDING_SURVIVING,
     CollapseOutcome,
     CollapseRegister,
     CollapseRegistry,
@@ -70,9 +76,12 @@ __all__ = [
     "DistinctnessReport",
     "FOUNDING_COLLAPSES",
     "FOUNDING_NAMES",
+    "FOUNDING_SURVIVING",
     "IDENTITY_SPEC",
     "ObligationVerdict",
     "PAIRING_SPEC",
+    "RANK_SPEC",
+    "RankReport",
     "RejectedCollapse",
     "VERDICT_SPEC",
     "VerdictStatus",
@@ -90,6 +99,7 @@ __all__ = [
     "list_rejected_collapses",
     "pairing_collapse",
     "pairing_value",
+    "rank_collapse",
     "register_collapse",
     "reject_collapse",
     "remainder_collapse",

@@ -216,6 +216,10 @@ FOUNDING_COLLAPSES: tuple[CollapseSpec, ...] = (
     ),
 )
 
+FOUNDING_SURVIVING: frozenset[str] = frozenset(
+    spec.surviving_object for spec in FOUNDING_COLLAPSES
+)
+
 
 def are_distinct(left: CollapseSpec, right: CollapseSpec) -> DistinctnessReport:
     """Two specs are a rebrand iff parameter *and* surviving object match."""
@@ -302,6 +306,11 @@ class CollapseRegistry:
                     f"same parameter {spec.parameter!r} and surviving "
                     f"object {spec.surviving_object!r}"
                 )
+        if spec.surviving_object in FOUNDING_SURVIVING:
+            raise ValueError(
+                f"{spec.name!r} reuses founding surviving object "
+                f"{spec.surviving_object!r}; that object is already minted"
+            )
         self._active[spec.name] = spec
         return spec
 
@@ -375,6 +384,7 @@ __all__ = [
     "DistinctnessReport",
     "FOUNDING_COLLAPSES",
     "FOUNDING_NAMES",
+    "FOUNDING_SURVIVING",
     "RejectedCollapse",
     "add_registry_hook",
     "are_distinct",

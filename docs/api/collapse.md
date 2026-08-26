@@ -37,6 +37,14 @@ A float SVD is not a proof.
 Duality / gap collapse was evaluated and **rejected**: a primal-dual
 sandwich that collapses at `L = U` is Enclosure Collapse of `OPT`.
 
+Honorable mentions that were evaluated and **not shipped**: cocycle
+(identity of a jet defect), path (already homotopy 09-20),
+`q -> 1` / `μ -> 0` specialization (recovers the ordinary derivative),
+scale / RG (03-07 tempering, not a collapse), Morse (already 03-09),
+and policy entropy (temperature collapse of a search heuristic).
+Founding surviving objects (`derivative`, `indicator`,
+`point_plus_proof`) cannot be reused.
+
 ::: omnibias.core.collapse
     options:
       show_root_heading: false

@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Rejected — Honorable-mention collapses
+
+- Cocycle, path, `q -> 1` specialization, scale / RG, Morse, and
+  policy entropy were evaluated and not shipped. Founding surviving
+  objects cannot be reused.
+
 ### Rejected — Duality / gap collapse
 
 - A primal-dual sandwich that collapses at `L = U` is Enclosure
