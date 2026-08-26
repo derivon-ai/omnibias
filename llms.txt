@@ -680,6 +680,8 @@ linear regime; *which* annihilator a guessed sum obeys is `guessed` then verifie
 Jacobian `n=2` is the finite universal `C_box` in
 `omnibias.holonomic.jacobian_n2` (identical `det JF`, rational grid
 collision or Gabber inverse-degree failure). A miss is not the parent.
+Case A leftover `omnibias.holonomic.jacobian_n2_case_a` seals
+`(b11,b21,b31)` over `Q` at the origin only.
 Cookbook: `docs/cookbook/jacobian-n2-box.md`.
 `omnibias-struct` is the **dynamic-programming** register of the `beta -> inf` family:
 certified differentiable **soft Viterbi / shortest-path / CTC**, where the DP `max`

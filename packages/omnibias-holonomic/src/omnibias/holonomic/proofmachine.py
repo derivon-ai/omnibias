@@ -10,6 +10,7 @@ kind                             prover
 ``keller_tangent_sweep_deg3``    deg-3 sweep via :func:`omnibias.core.proof.run_discovery`
 ``jacobian_n2_degree_box``       finite universal ``C_box`` via :class:`JacobianN2DegreeFamily`
 ``jacobian_n2_homogeneous``      ``I+`` homogeneous box + Gabber inverse test
+``jacobian_n2_case_a_b31``       Case A ``(b11,b21,b31)`` leftover over ``Q``
 ===============================  ==========================================
 
 ``PROVED`` certifies the **finite obligation** (Jacobian identity, or a
@@ -52,6 +53,11 @@ from omnibias.holonomic.jacobian_n2 import (
     JacobianN2HomogeneousFamily,
     n2_counterexample_earned,
 )
+from omnibias.holonomic.jacobian_n2_case_a import (
+    CASE_A_B31_KIND,
+    replay_case_a_b31,
+    seal_case_a_b31,
+)
 from omnibias.holonomic.keller import (
     search_hit_certificate,
     verify_alpoge_map,
@@ -75,6 +81,7 @@ CONDITION_ORE = "condition_ore"
 CONDITION_DFINITE = "condition_dfinite"
 JACOBIAN_N2_DEGREE_BOX = JACOBIAN_N2_KIND
 JACOBIAN_N2_HOMOGENEOUS = JACOBIAN_N2_HOMOG_KIND
+JACOBIAN_N2_CASE_A_B31 = CASE_A_B31_KIND
 
 FAMILY_CATALOG: dict[str, dict[str, str]] = {
     KELLER_ALPOGE_REPLAY: {
@@ -125,6 +132,15 @@ FAMILY_CATALOG: dict[str, dict[str, str]] = {
         "obligation": (
             "every I+homogeneous integer map in the CI degree/height box "
             "either is not Keller or has a Gabber-degree polynomial inverse; "
+            "a miss is not the Jacobian conjecture"
+        ),
+        "complete": "True",
+    },
+    JACOBIAN_N2_CASE_A_B31: {
+        "parent_status": "open",
+        "obligation": (
+            "after b20=b30=b40=0 on the I+Q+C+Qu leftover, the "
+            "(b11,b21,b31) subsystem vanishes over Q only at the origin; "
             "a miss is not the Jacobian conjecture"
         ),
         "complete": "True",
@@ -374,6 +390,37 @@ def _prove_jacobian_n2_homog(conjecture: Conjecture) -> ProofAttempt:
     return _from_discovery(_discover_jacobian_n2_homog(**dict(conjecture.data)))
 
 
+def _prove_case_a_b31(conjecture: Conjecture) -> ProofAttempt:
+    verdict = seal_case_a_b31(dict(conjecture.data))
+    if verdict.proved:
+        return ProofAttempt(
+            status="PROVED",
+            certificate=verdict.certificate,
+            detail=verdict.detail,
+        )
+    if verdict.disproved:
+        return ProofAttempt(
+            status="DISPROVED",
+            certificate=verdict.certificate,
+            detail=verdict.detail,
+        )
+    return _blocked(verdict.detail, verdict.certificate)
+
+
+def _replay_case_a_b31(certificate: Certificate) -> bool | None:
+    return replay_case_a_b31(certificate)
+
+
+def _case_a_b31_factory(**kwargs: Any) -> dict[str, Any]:
+    verdict = seal_case_a_b31(kwargs)
+    honesty = verdict.certificate.get("honesty", {})
+    return {
+        "status": verdict.status,
+        "detail": verdict.detail,
+        "honesty": dict(honesty) if isinstance(honesty, Mapping) else {},
+    }
+
+
 def _prove_algebraic_guess(conjecture: Conjecture) -> ProofAttempt:
     family = HolonomicAlgebraicGuessFamily(
         series=linear_series(),
@@ -441,6 +488,13 @@ def holonomic_provers() -> list[FunctionProver]:
             ),
         ),
         FunctionProver(
+            name=JACOBIAN_N2_CASE_A_B31,
+            kinds=frozenset({JACOBIAN_N2_CASE_A_B31}),
+            prove_fn=_prove_case_a_b31,
+            schema_fn=_schema_errors,
+            replay_fn=_replay_case_a_b31,
+        ),
+        FunctionProver(
             name=HOLONOMIC_ALGEBRAIC_GUESS,
             kinds=frozenset({HOLONOMIC_ALGEBRAIC_GUESS}),
             prove_fn=_prove_algebraic_guess,
@@ -475,6 +529,7 @@ def _register() -> None:
         HOLONOMIC_SYZYGY_KIND: "exact_replay",
         JACOBIAN_N2_DEGREE_BOX: "exact_search",
         JACOBIAN_N2_HOMOGENEOUS: "exact_search",
+        JACOBIAN_N2_CASE_A_B31: "exact_replay",
     }
     parents = {
         KELLER_ALPOGE_REPLAY: "Jacobian conjecture n>=3",
@@ -486,6 +541,7 @@ def _register() -> None:
         HOLONOMIC_SYZYGY_KIND: "Ore / D-finite relations",
         JACOBIAN_N2_DEGREE_BOX: "jacobian_conjecture_n2",
         JACOBIAN_N2_HOMOGENEOUS: "jacobian_conjecture_n2",
+        JACOBIAN_N2_CASE_A_B31: "jacobian_conjecture_n2",
     }
     factories = {
         KELLER_ALPOGE_REPLAY: lambda **_k: verify_alpoge_map().as_dict(),
@@ -515,6 +571,7 @@ def _register() -> None:
         HOLONOMIC_SYZYGY_KIND: _holonomic_syzygy_factory,
         JACOBIAN_N2_DEGREE_BOX: _discover_jacobian_n2,
         JACOBIAN_N2_HOMOGENEOUS: _discover_jacobian_n2_homog,
+        JACOBIAN_N2_CASE_A_B31: _case_a_b31_factory,
     }
     for kind, meta in FAMILY_CATALOG.items():
         register_catalog(
@@ -576,6 +633,7 @@ __all__ = [
     "HOLONOMIC_DFINITE_GUESS",
     "HOLONOMIC_RECURRENCE_GUESS",
     "HOLONOMIC_SYZYGY_KIND",
+    "JACOBIAN_N2_CASE_A_B31",
     "JACOBIAN_N2_DEGREE_BOX",
     "JACOBIAN_N2_HOMOGENEOUS",
     "KELLER_ALPOGE_REPLAY",

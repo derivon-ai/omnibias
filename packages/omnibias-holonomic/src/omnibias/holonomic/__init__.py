@@ -138,6 +138,12 @@ from omnibias.holonomic.jacobian_n2 import (
     reject_jacobian_proof_claim,
     seal_jacobian_honesty,
 )
+from omnibias.holonomic.jacobian_n2_case_a import (
+    CASE_A_B31_KIND,
+    case_a_b31_statement,
+    replay_case_a_b31,
+    seal_case_a_b31,
+)
 from omnibias.holonomic.jacobian_n2_inverse import gabber_n2_test
 from omnibias.holonomic.jacobian_n2_normalize import (
     classify_leftover_chart,
@@ -171,6 +177,7 @@ __lineage__ = "exempt: D-finite Ore algebra"
 __all__ = [
     "AnnihilatorExport",
     "AsymptoticEstimate",
+    "CASE_A_B31_KIND",
     "DFinite",
     "GosperResult",
     "HOLONOMIC_SYZYGY",
@@ -196,6 +203,7 @@ __all__ = [
     "alpoge_map",
     "binomial_nk",
     "build_holonomic_machine",
+    "case_a_b31_statement",
     "certified_asymptotic",
     "certify_holonomic_syzygy",
     "classify_leftover_chart",
@@ -249,8 +257,10 @@ __all__ = [
     "rational_roots",
     "recurrence_to_operator",
     "reject_jacobian_proof_claim",
+    "replay_case_a_b31",
     "replay_leftover_certificate",
     "roots_with_multiplicity",
+    "seal_case_a_b31",
     "seal_jacobian_honesty",
     "seal_leftover_certificate",
     "search_tangent_sweep",

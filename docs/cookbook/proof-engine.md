@@ -49,3 +49,7 @@ tight = prove("gap", {"L": 3.0, "U": 3.0})
 assert tight.proved
 assert tight.reason[0].honesty["enclosure_collapse"] is True
 ```
+
+Jacobian `n=2` Case A leftover identities are the same `identity` kind.
+The parent stays open; see
+[Jacobian n=2 finite box](jacobian-n2-box.md).

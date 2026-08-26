@@ -508,6 +508,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (profile diagnostic, stretch untouched). `seal_run` emits `diagnose_width`.
   Jacobian O1 leftover replay lives in `omnibias.holonomic.jacobian_n2_normalize`
   (`jacobian_conjecture_proof_claim` stays false).
+  Case A `(b11,b21,b31)` leftover over `Q` is
+  `omnibias.holonomic.jacobian_n2_case_a` (origin only; parent stays
+  open; remaining `(b02,b03,b04)` is a later slice).
 - Wave-3 gated algebra + architectures (not shipped): `omnibias.core.mollifier`
   (01-05, **shipped**; certified exponential tails, not compact support) /
   `omnibias.core.spectral_design` (01-07, **shipped**; pack order is a band selector; G3 leftover-recorded, not in CI `all_passed`) /

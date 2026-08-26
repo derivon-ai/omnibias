@@ -6,6 +6,16 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jacobian n=2 Case A leftover (finite engine)
+
+- `omnibias.holonomic.jacobian_n2_case_a`: after `b20=b30=b40=0` on
+  the I+Q+C+Qu leftover, the `(b11, b21, b31)` subsystem vanishes over
+  `Q` only at the origin. Accepted only via `prove("identity")` /
+  `prove("residual")`. Catalog kind `jacobian_n2_case_a_b31`. Parent
+  stays open. `jacobian_conjecture_proof_claim` stays false. Remaining
+  Case A leftover in `(b02, b03, b04)` is a later slice.
+- Cookbook: [`docs/cookbook/jacobian-n2-box.md`](docs/cookbook/jacobian-n2-box.md).
+
 ### Added — Proof engine
 
 - `omnibias.core.proof.engine`: named-kind router

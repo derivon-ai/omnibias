@@ -96,3 +96,36 @@ assert case_d.case == "D" and case_d.leftover != 0
 assert case_c.honesty()["jacobian_conjecture_proof_claim"] is False
 assert case_d.honesty()["jacobian_conjecture_proof_claim"] is False
 ```
+
+## Case A `(b11, b21, b31)` leftover (not the parent)
+
+After `b20=b30=b40=0` on the I+Q+C+Qu leftover, the three generators in
+`Q[b11, b21, b31]` vanish over `Q` only at the origin. That is a local
+chart seal. The remaining Case A leftover in `(b02, b03, b04)` is a
+later slice. A complete miss is `BLOCKED`, not parent-false.
+
+```python
+from omnibias.core.collapse import reset_collapse_registry
+from omnibias.core.proof import prove
+from omnibias.holonomic import (
+    JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED,
+    case_a_b31_statement,
+    seal_case_a_b31,
+)
+from omnibias.holonomic.jacobian_n2_case_a import case_a_b31_identity_payloads
+
+reset_collapse_registry()
+assert JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED is False
+statement = case_a_b31_statement()
+assert statement.parent_status == "open"
+assert statement.existential is False
+for payload in case_a_b31_identity_payloads():
+    assert prove("identity", payload).proved
+sealed = seal_case_a_b31()
+assert sealed.proved
+assert sealed.certificate["honesty"]["jacobian_conjecture_proof_claim"] is False
+assert sealed.certificate["honesty"]["continuum_parent_inferred"] is False
+assert sealed.certificate["payload"]["parent_status"] == "open"
+refused = prove("residual", {"value": 0.0})
+assert refused.blocked
+```

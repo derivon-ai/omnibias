@@ -73,7 +73,10 @@ injectivity on `Q^2` and not the parent. `escalate_n2_result` sets
 `certify_holonomic_syzygy` integerizes a `Q` determining matrix and
 accepts only with rank collapse. A float SVD is not a proof. It does
 not certify a special-function identity and does not settle the
-Jacobian conjecture.
+Jacobian conjecture. Case A leftover
+(`omnibias.holonomic.jacobian_n2_case_a`) seals the
+`(b11, b21, b31)` subsystem over `Q` at the origin only; the parent
+stays open.
 
 The Ore condition sort
 (`condition_ore`) wraps the recurrence
