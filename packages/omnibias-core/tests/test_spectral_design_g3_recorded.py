@@ -18,6 +18,9 @@ def test_g3_spectral_bias_is_reported_and_out_of_all_passed() -> None:
     assert g3["earned"] is False
     assert g3["passed"] is False
     assert g3["reported"] is True
+    assert g3["leftover_recorded"] is True
+    assert int(g3["leftover_id"]) == 40
+    assert int(g3["leftover_tick"]) == 83
     assert g3["in_ci_all_passed"] is False
     assert int(g3["n_seeds"]) == 5
     assert int(g3["geometric_hits"]) == 0
@@ -25,6 +28,8 @@ def test_g3_spectral_bias_is_reported_and_out_of_all_passed() -> None:
     assert g3["both_reached_gate"] is False
     assert payload["honesty"]["g3_earned"] is False
     assert payload["honesty"]["g3_reported"] is True
+    assert payload["honesty"]["g3_leftover_recorded"] is True
+    assert int(payload["honesty"]["g3_leftover_id"]) == 40
     assert payload["honesty"]["g3_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g3_spectral_bias_steps" not in names

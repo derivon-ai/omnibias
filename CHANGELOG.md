@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Spectral-design G3 leftover-recorded (theory 01-07)
+
+- Leftover #40 leftover-records `reported` plus honesty flags on
+  `benchmarks/spectral_design.py`.
+- Reported: geometric and band-planned Mscale `0/5` lstsq hits. Not in
+  CI `all_passed`.
+- Smoke: `docs/benchmarks/spectral_design_smoke.json`.
+
 ### Added — OMBU frames shipped (theory 01-06)
 
 - Spec 01-06 status is **shipped**: G1–G3 CI; leftover #10 G4 stays

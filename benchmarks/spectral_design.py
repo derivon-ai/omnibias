@@ -199,6 +199,9 @@ def _run_g3() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 40,
+        "leftover_tick": 83,
         "in_ci_all_passed": False,
         "gate": gate,
         "steps": steps,
@@ -209,10 +212,11 @@ def _run_g3() -> dict[str, Any]:
         "planned_median_rel_l2": float(np.median(plan_rels)),
         "both_reached_gate": bool(earned),
         "note": (
-            "named 2x-fewer-steps comparison is undefined while neither "
-            "geometric nor band-planned Mscale reaches the four-gap lstsq "
-            "gate in the CI step budget. Calculator stays diagnostic. "
-            "Four-gap gates are not mutated. Not Littlewood-Paley."
+            "Leftover #40 leftover-recorded: named 2x-fewer-steps "
+            "comparison is undefined while neither geometric nor "
+            "band-planned Mscale reaches the four-gap lstsq gate in the "
+            "CI step budget. Calculator stays diagnostic. Four-gap "
+            "gates are not mutated. Not Littlewood-Paley."
         ),
     }
 
@@ -245,6 +249,9 @@ def main() -> int:
         "littlewood_paley_claim": False,
         "g3_earned": False,
         "g3_reported": True,
+        "g3_leftover_recorded": True,
+        "g3_leftover_id": 40,
+        "g3_leftover_tick": 83,
         "g3_in_ci_all_passed": False,
         "collapse": "delta -> 0; pack order is a band selector",
     }
