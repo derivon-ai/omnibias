@@ -538,7 +538,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.proof.obligations.rational_stencil` (01-11, **shipped**;
   `C_j` / poisedness as finite rational Lean obligations; G1–G5 CI;
   algebra only, not the collapse; `mathlib_verified` stays false) /
-  `omnibias.discrete.evolution` (03-01; softmax selection +
+  `omnibias.discrete.evolution` (03-01, **shipped**; softmax selection +
   `log(P)/beta` gap; geometry mutation; exact-curvature polish;
   certify-loop stop; G1–G6 CI; temperature collapse, not founding
   bias collapse; not P vs NP) /

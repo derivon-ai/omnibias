@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Soft-population evolution shipped (theory 03-01)
+
+- Spec 03-01 status is **shipped**: G1–G6 CI, no leftover gate.
+- Temperature collapse, not founding bias collapse. Not P vs NP.
+- Smoke: `docs/benchmarks/soft_evolution_smoke.json`.
+
 ### Added — Layered transfer shipped (theory 02-11)
 
 - Spec 02-11 status is **shipped**: leftover #23 G4, leftover #46

@@ -8,7 +8,7 @@ selection pressure is a temperature, a **bias-geometry** EA that mutates pack
 spread and offsets, a **jet-memetic** hybrid that polishes with closed-form
 curvature, and a **certified discrete** EA on the `DiscreteProblem` seam.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; temperature collapse, not founding bias collapse; not P vs NP)
 - **Depends on**: 01-01, 01-08, 03-12, 04-01
 - **Blocks**: 03-13
 

@@ -262,6 +262,9 @@ gates are earned on smoke, not in CI `all_passed`.
   + transverse-constant; open lines gauge-dependent; no Yang-Mills / mass
   gap / continuum claim. G3 Magnus leftover-recorded. G4 gauge
   covariance earned (`random_u1_gauge`). Status is **shipped**.
+- **Soft-population evolution** ([03-01](api/soft_evolution.md)):
+  `log(P)/beta` gap; temperature collapse, not founding bias collapse.
+  Not P vs NP. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

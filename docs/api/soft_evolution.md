@@ -1,7 +1,7 @@
 # Soft-population evolution (03-01)
 
 Four evolutionary variants that reuse omnibias structure instead of
-treating the model as a black box. Status is **gated**, not shipped.
+treating the model as a black box. Status is **shipped**.
 G1–G6 are CI-gated.
 
 Selection `w = softmax(-beta E)` is **temperature collapse**
