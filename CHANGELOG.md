@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Kantorovich-accepted Newton shipped (theory 08-04)
+
+- Spec 08-04 status is **shipped**: G1–G3 CI; empty ball is a
+  reject, not a continuum PDE theorem.
+- Smoke: `docs/benchmarks/kantorovich_newton_smoke.json`.
+
 ### Added — Depth-causal local jet shipped (theory 08-03)
 
 - Spec 08-03 status is **shipped**: G1–G4 CI; greedy warm start,

@@ -4,7 +4,7 @@ A Gauss–Newton or cubic-Newton trial is **legal** only when the radii
 polynomial returns a nonempty unique-zero ball around the trial point.
 Empty is a valid reject: do not train through it.
 
-Status is **gated**, not shipped. G1–G3 are CI-gated. The ball is of a
+Status is **shipped**. G1–G3 are CI-gated. The ball is of a
 **finite residual map**, never a continuum PDE solution. Sound-enclosure
 tier: `theorem_prover_verified` is not asserted. Not CCF stretch and not
 Navier–Stokes regularity. Bias collapse (`delta -> 0`) may tighten `DF`

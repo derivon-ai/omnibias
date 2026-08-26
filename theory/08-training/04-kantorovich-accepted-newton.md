@@ -7,7 +7,7 @@ A Gauss–Newton or cubic-Newton step is **legal** only when
 the trial point, so the optimizer can refuse a step that is not a
 certified isolated root of the residual map.
 
-- **Status**: gated
+- **Status**: shipped (G1–G3 CI; unique-zero ball accept/reject; not a continuum PDE claim)
 - **Depends on**: 08-01, 03-12
 - **Blocks**: none
 

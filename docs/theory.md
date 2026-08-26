@@ -344,6 +344,8 @@ gates are earned on smoke, not in CI `all_passed`.
   escape, not a global min. Status is **shipped**.
 - **Depth-causal local jet** ([08-03](api/local_jet.md)): greedy
   warm start, not ImageNet. Status is **shipped**.
+- **Kantorovich Newton** ([08-04](api/kantorovich_newton.md)): empty
+  ball is a reject, not a continuum PDE. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
