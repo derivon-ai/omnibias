@@ -374,6 +374,7 @@ nav:
       - Enclosure Collapse: cookbook/enclosure-collapse.md
       - Named-collapse schema: cookbook/collapse-schema.md
       - Verdict collapse: cookbook/verdict-collapse.md
+      - Identity collapse: cookbook/identity-collapse.md
       - Dirichlet enclosures on Re(s)>1: cookbook/dirichlet-enclosure.md
       - Instance-gap tightening: cookbook/instance-gap.md
       - CCF jet-Padé profile diagnostic: cookbook/ccf-pade-profile.md

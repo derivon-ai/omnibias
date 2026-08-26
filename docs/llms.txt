@@ -18,6 +18,7 @@
 - [omnibias-core](api/core.md)
 - [Named-collapse schema](api/collapse.md)
 - [Verdict collapse cookbook](cookbook/verdict-collapse.md)
+- [Identity collapse cookbook](cookbook/identity-collapse.md)
 - [omnibias-torch](api/torch.md)
 - [omnibias-jax](api/jax.md)
 - [omnibias-ferminet](api/ferminet.md)

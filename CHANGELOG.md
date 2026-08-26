@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Identity collapse
+
+- `omnibias.core.collapse.identity`: exact `Q` polynomial agreement, or
+  a sound remainder enclosure of `f - T_N`, is `PROVED` only at `{0}`.
+- Cookbook: [`docs/cookbook/identity-collapse.md`](docs/cookbook/identity-collapse.md).
+- A float remainder loss is not a proof. Not a continuum PDE identity.
+
 ### Added — Verdict collapse
 
 - `omnibias.core.collapse.verdict`: a sound residual enclosure of a

@@ -14,6 +14,13 @@ proof. ``theorem_prover_verified`` stays false unless a genuine
 
 from __future__ import annotations
 
+from omnibias.core.collapse.identity import (
+    IDENTITY_SPEC,
+    difference_coeffs,
+    evaluate_difference,
+    identity_collapse,
+    remainder_collapse,
+)
 from omnibias.core.collapse.schema import (
     FOUNDING_COLLAPSES,
     FOUNDING_NAMES,
@@ -53,6 +60,7 @@ __all__ = [
     "DistinctnessReport",
     "FOUNDING_COLLAPSES",
     "FOUNDING_NAMES",
+    "IDENTITY_SPEC",
     "ObligationVerdict",
     "RejectedCollapse",
     "VERDICT_SPEC",
@@ -61,12 +69,16 @@ __all__ = [
     "adjudicate_residual",
     "are_distinct",
     "default_honesty",
+    "difference_coeffs",
+    "evaluate_difference",
     "get_collapse",
+    "identity_collapse",
     "is_singleton_zero",
     "list_collapses",
     "list_rejected_collapses",
     "register_collapse",
     "reject_collapse",
+    "remainder_collapse",
     "require_sound_enclosure",
     "reset_collapse_registry",
     "search_residuals",

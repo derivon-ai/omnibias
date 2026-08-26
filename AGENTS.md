@@ -486,7 +486,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   ([`docs/api/collapse.md`](docs/api/collapse.md)). Verdict collapse
   (`omnibias.core.collapse.verdict`) adjudicates a sound residual
   enclosure of a finite obligation: `{0}` is `PROVED`, exclusion of
-  `0` is `DISPROVED`, a fat zero is `BLOCKED` (not false).
+  `0` is `DISPROVED`, a fat zero is `BLOCKED` (not false). Identity
+  collapse (`omnibias.core.collapse.identity`) is the same geometry
+  for `f - T_N` over `Q`.
   Finite-row smokes: [`docs/benchmarks/dirichlet_enclosure_smoke.json`](docs/benchmarks/dirichlet_enclosure_smoke.json)
   (`Re(s)>1` only), [`docs/benchmarks/instance_gap_tightening_smoke.json`](docs/benchmarks/instance_gap_tightening_smoke.json)
   (never tight), [`docs/benchmarks/ccf_pade_profile_smoke.json`](docs/benchmarks/ccf_pade_profile_smoke.json)

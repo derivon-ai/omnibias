@@ -20,6 +20,10 @@ sense that earned a slot: a sound residual enclosure of a finite
 obligation becomes `PROVED` only at `{0}`, `DISPROVED` when `0` is
 excluded, and `BLOCKED` otherwise. A float residual is not a proof.
 
+Identity collapse (`omnibias.core.collapse.identity`) decides a germ
+identity: exact `Q` coefficient agreement is `{0}`; a float `||R_N||`
+is not a proof.
+
 ::: omnibias.core.collapse
     options:
       show_root_heading: false

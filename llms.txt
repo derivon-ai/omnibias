@@ -116,6 +116,9 @@ different surviving object; a float residual is not a proof),
 verdict collapse (`omnibias.core.collapse.verdict`; `{0}` proves,
 exclusion disproves, fat zero is `BLOCKED` not false; not a parent
 claim),
+identity collapse (`omnibias.core.collapse.identity`; exact `Q`
+agreement or remainder enclosure of `f - T_N`; float `||R_N||` is
+not a proof),
 certified localization (03-08; Krawczyk unique-peak enclosure;
 G1–G6 CI; founding bias collapse, not temperature collapse;
 `Inconclusive` is first-class; `local_box`; not
