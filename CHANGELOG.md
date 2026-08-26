@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Face-Net cost leftover-recorded (theory 02-02)
+
+- Leftover #20's sampled `build_arrangement_graph` wall now leftover-records
+  `reported` plus honesty flags on `benchmarks/arrangement_graph.py`.
+- Reported: `n` in `{4,6,8,12}` at `D=2,3`; cutoff `n<=12`, `D<=4`.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/arrangement_graph_smoke.json`.
+
 ### Added — Face-Net G3 leftover-recorded (theory 02-02)
 
 - Leftover #28's 0-hop vs k-NN miss now leftover-records `reported`

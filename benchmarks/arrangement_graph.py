@@ -2,10 +2,11 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: Face-Net (theory 02-02). Subgraph sampling; temperature collapse.
 
-Cost vs ``n`` / ``D`` is reported with the G1 tooling cutoff. G3 is a
-0-hop centroid versus k-NN; a Face-Net GNN / ``RegionModels`` win stays
-``--full``. Neither is in CI ``all_passed``. ``beta -> inf`` is
-temperature collapse.
+Cost vs ``n`` / ``D`` is leftover-recorded (leftover #20) with the G1
+tooling cutoff. G3 is leftover-recorded (leftover #28): 0-hop centroid
+versus k-NN; a Face-Net GNN / ``RegionModels`` win stays ``--full``.
+Neither is in CI ``all_passed``. ``beta -> inf`` is temperature
+collapse.
 """
 
 from __future__ import annotations
@@ -89,12 +90,17 @@ def _run_cost() -> dict[str, Any]:
         "cutoff_n": COST_CUTOFF_N,
         "cutoff_d": COST_CUTOFF_D,
         "refuses_over_cutoff": bool(refused),
+        "leftover_recorded": True,
+        "leftover_id": 20,
+        "leftover_tick": 57,
         "note": (
-            "Sampled build_arrangement_graph wall vs n at D=2 and D=3 "
-            f"({COST_N_SAMPLES} points). G1 tooling refuses n>12 or D>4. "
-            "Previous G4 smoke-earned stub with no timing withdrawn. G3 "
-            "vs k-NN is reported, not a GNN / RegionModels win. Not in "
-            "CI all_passed."
+            "Leftover #20 leftover-recorded: sampled "
+            "build_arrangement_graph wall vs n at D=2 and D=3 "
+            f"({COST_N_SAMPLES} points). G1 tooling refuses n>12 or "
+            "D>4. Combinatorial growth is the honesty bound, not a "
+            "tractable-large-n claim. Previous G4 smoke-earned stub "
+            "with no timing withdrawn. G3 vs k-NN is leftover-recorded, "
+            "not a GNN / RegionModels win. Not in CI all_passed."
         ),
     }
 
@@ -219,6 +225,9 @@ def main() -> int:
         "p_vs_np": False,
         "cost_earned": False,
         "cost_reported": True,
+        "cost_leftover_recorded": True,
+        "cost_leftover_id": 20,
+        "cost_leftover_tick": 57,
         "cost_in_ci_all_passed": False,
         "g3_earned": False,
         "g3_reported": True,

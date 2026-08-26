@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.arrangement_graph.v1",
-  "generated_utc": "2026-08-25T19:01:12Z",
+  "generated_utc": "2026-08-26T15:52:30Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "g2"
     ]
   },
-  "rss_mb_at_start": 814.5,
+  "rss_mb_at_start": 815.87,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -47,56 +47,59 @@
         "n": 4,
         "dim": 2,
         "n_samples": 400,
-        "wall_seconds": 0.0015390020562335849
+        "wall_seconds": 0.0015029091155156493
       },
       {
         "n": 6,
         "dim": 2,
         "n_samples": 400,
-        "wall_seconds": 0.0016806289786472917
+        "wall_seconds": 0.001708243042230606
       },
       {
         "n": 8,
         "dim": 2,
         "n_samples": 400,
-        "wall_seconds": 0.002241555950604379
+        "wall_seconds": 0.002280905027873814
       },
       {
         "n": 12,
         "dim": 2,
         "n_samples": 400,
-        "wall_seconds": 0.0027360349195078015
+        "wall_seconds": 0.002771924016997218
       },
       {
         "n": 4,
         "dim": 3,
         "n_samples": 400,
-        "wall_seconds": 0.0016334810061380267
+        "wall_seconds": 0.0016593080945312977
       },
       {
         "n": 6,
         "dim": 3,
         "n_samples": 400,
-        "wall_seconds": 0.002240439993329346
+        "wall_seconds": 0.002240531030111015
       },
       {
         "n": 8,
         "dim": 3,
         "n_samples": 400,
-        "wall_seconds": 0.0030691249994561076
+        "wall_seconds": 0.0030766859417781234
       },
       {
         "n": 12,
         "dim": 3,
         "n_samples": 400,
-        "wall_seconds": 0.005902586039155722
+        "wall_seconds": 0.0059845179785043
       }
     ],
-    "time_exponent_vs_n_d2": 0.5543631971867543,
+    "time_exponent_vs_n_d2": 0.5859258108441953,
     "cutoff_n": 12,
     "cutoff_d": 4,
     "refuses_over_cutoff": true,
-    "note": "Sampled build_arrangement_graph wall vs n at D=2 and D=3 (400 points). G1 tooling refuses n>12 or D>4. Previous G4 smoke-earned stub with no timing withdrawn. G3 vs k-NN is reported, not a GNN / RegionModels win. Not in CI all_passed."
+    "leftover_recorded": true,
+    "leftover_id": 20,
+    "leftover_tick": 57,
+    "note": "Leftover #20 leftover-recorded: sampled build_arrangement_graph wall vs n at D=2 and D=3 (400 points). G1 tooling refuses n>12 or D>4. Combinatorial growth is the honesty bound, not a tractable-large-n claim. Previous G4 smoke-earned stub with no timing withdrawn. G3 vs k-NN is leftover-recorded, not a GNN / RegionModels win. Not in CI all_passed."
   },
   "g3": {
     "name": "g3_vs_knn",
@@ -157,6 +160,9 @@
     "p_vs_np": false,
     "cost_earned": false,
     "cost_reported": true,
+    "cost_leftover_recorded": true,
+    "cost_leftover_id": 20,
+    "cost_leftover_tick": 57,
     "cost_in_ci_all_passed": false,
     "g3_earned": false,
     "g3_reported": true,

@@ -7,7 +7,7 @@ facets as edges — run message passing on it, then decode a discrete answer and
 **certify the gap**, giving a graph neural network whose graph is learned
 geometry rather than given data.
 
-- **Status**: gated (G1/G2 CI on `n<=12`; G3 vs k-NN leftover-recorded / unearned, leftover #28 — 0-hop centroid, GNN / `RegionModels` stay `--full`; sampled subgraph; temperature collapse; cost vs `n`/`D` **reported**, not in CI `all_passed`)
+- **Status**: gated (G1/G2 CI on `n<=12`; G3 vs k-NN leftover-recorded / unearned, leftover #28 — 0-hop centroid, GNN / `RegionModels` stay `--full`; sampled subgraph; temperature collapse; cost vs `n`/`D` leftover-recorded, leftover #20, not in CI `all_passed`)
 - **Depends on**: 01-03, 01-08
 - **Blocks**: 03-02, 03-09, 05-02
 
@@ -194,9 +194,11 @@ Baselines: a fixed `k`-NN graph neural network on the same points, and
 - **G3 task skill.** On a piecewise-function regression suite, Face-Net beats
   both baselines in relative `L2` at matched parameter count, with skill `> 0`,
   over five seeds.
-- **G4 scaling honesty.** The benchmark records the `n`, `D` at which graph
-  discovery becomes the bottleneck, and the artifact states the cutoff rather
-  than quietly avoiding large cases.
+- **G4 scaling honesty.** Leftover-recorded (leftover #20): the
+  benchmark records the sampled `build_arrangement_graph` wall vs `n`
+  at `D=2,3` and the G1 tooling cutoff (`n<=12`, `D<=4`). Combinatorial
+  growth is the honesty bound, not a tractable-large-n claim. Not in
+  CI `all_passed`.
 
 ## 9. Benchmark plan
 
