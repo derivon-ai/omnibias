@@ -16,8 +16,9 @@ cross-backend (PyTorch + JAX) parity:
   (analytic or neural), turning curvature / Laplace-Beltrami into tools for
   *learned* manifolds
 - gated chart scan (`omnibias.geometry.scan`; discrete `C_L`, not SO(2)/SO(3))
-  and Wilson-line holonomy band (`omnibias.geometry.gauge.band`; closed form
-  only abelian + transverse-constant; no Yang-Mills / mass-gap claim)
+  and shipped Wilson-line holonomy band (`omnibias.geometry.gauge.band`;
+  closed form only abelian + transverse-constant; no Yang-Mills /
+  mass-gap claim)
 
 ## Install
 

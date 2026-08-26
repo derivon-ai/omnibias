@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomy band shipped (theory 02-14)
+
+- Spec 02-14 status is **shipped**: G1/G2/G4/G5 CI; leftover #34 G3
+  stays reported and out of `all_passed`.
+- Abelian + transverse-constant; no YM / mass-gap claim.
+- Smoke: `docs/benchmarks/holonomy_band_smoke.json`.
+
 ### Added — Linearizing transforms shipped (theory 02-13)
 
 - Spec 02-13 status is **shipped**: G1 jet identity CI; leftover #39

@@ -254,7 +254,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Holonomy band** ([02-14](api/holonomy_band.md)): closed form only abelian
   + transverse-constant; open lines gauge-dependent; no Yang-Mills / mass
   gap / continuum claim. G3 Magnus leftover-recorded. G4 gauge
-  covariance earned (`random_u1_gauge`).
+  covariance earned (`random_u1_gauge`). Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

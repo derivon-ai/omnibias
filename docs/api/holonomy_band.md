@@ -17,7 +17,7 @@ G4 gauge covariance is **earned** (leftover #35 closed):
 holonomy to `<= 4` ulp, the open-line flag stays, and a forward-back
 `band_wilson_loop` identity is within `4` ulp. G3 is not in CI
 `all_passed`.
-No YM / mass gap / continuum claim. Status is **gated**, not shipped.
+No YM / mass gap / continuum claim. Status is **shipped**.
 See theory spec 02-14.
 
 ## Algebra and twins
