@@ -7,7 +7,7 @@ closed-form function of one variable, so interval arithmetic on the response can
 produce a **sound enclosure of the peak location** — a certified answer to
 "where is the interface", not an estimate.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; founding bias collapse, not temperature collapse; `Inconclusive` is first-class; not `theorem_prover_verified`)
 - **Depends on**: 01-02, 01-09
 - **Blocks**: 04-02, 05-01, 07-02
 

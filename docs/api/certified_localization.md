@@ -2,8 +2,8 @@
 
 A bias scan's response is a closed-form function of one offset, so
 Krawczyk on `r'` produces a **sound enclosure of the peak** and
-proves uniqueness in a declared box. Status is **gated**, not
-shipped. G1–G6 are CI-gated.
+proves uniqueness in a declared box. Status is **shipped**.
+G1–G6 are CI-gated.
 
 The scan template comes from the **founding bias collapse**
 (`delta -> 0`). Temperature collapse (`beta -> inf`, feasibility)

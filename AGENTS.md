@@ -565,7 +565,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   band schedule; G1–G6 CI; `alpha` is a tempering scale, not
   founding bias collapse and not temperature collapse;
   nonlinear flow is a recorded truncation) /
-  `omnibias.verify.localization` (03-08; Krawczyk unique-peak
+  `omnibias.verify.localization` (03-08, **shipped**; Krawczyk unique-peak
   enclosure of a scan response; G1–G6 CI; founding bias
   collapse, not temperature collapse; `Inconclusive` is
   first-class; `local_box`; not `theorem_prover_verified`) /

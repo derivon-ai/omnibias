@@ -283,6 +283,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Scale flow** ([03-07](api/scale_flow.md)): `alpha` is a tempering
   scale, not a collapse. Nonlinear flow is a recorded truncation.
   Status is **shipped**.
+- **Certified localization** ([03-08](api/certified_localization.md)):
+  Krawczyk unique-peak enclosure. `Inconclusive` is first-class.
+  Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

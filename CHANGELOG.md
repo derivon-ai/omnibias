@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Certified localization shipped (theory 03-08)
+
+- Spec 03-08 status is **shipped**: G1–G6 CI, no leftover gate.
+- `Inconclusive` is first-class. Not `theorem_prover_verified`.
+- Smoke: `docs/benchmarks/certified_localization_smoke.json`.
+
 ### Added — Scale flow shipped (theory 03-07)
 
 - Spec 03-07 status is **shipped**: G1–G6 CI, no leftover gate.
