@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.parameter_space_jets.v1",
-  "generated_utc": "2026-08-21T21:24:36Z",
+  "generated_utc": "2026-08-26T17:21:51Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 808.77,
+  "rss_mb_at_start": 1251.04,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -48,9 +48,15 @@
         "passed": true,
         "parampinn_package": false,
         "ns_claim": false
+      },
+      {
+        "name": "g5_parity",
+        "passed": true,
+        "torch_du": -0.36787944117144233,
+        "jax_du": -0.36787944117144233
       }
     ]
   },
   "disclaimer": "mixed x-mu jets; closed_form iff mu is on the jet trunk; not a ParamPINN package, not NS, not CCF stretch",
-  "wall_seconds": 1.4957134629948996
+  "wall_seconds": 0.41050001804251224
 }

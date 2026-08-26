@@ -6,7 +6,7 @@ Treat a PDE parameter `μ` as a **jet coordinate** so one forward
 pass yields mixed partials `∂^{α,β} u / ∂x^α ∂μ^β`, not only
 query-coordinate derivatives at a frozen `μ`.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 CI; G5 torch/jax parity on G1; not a ParamPINN package)
 - **Depends on**: 01-10, 09-01
 - **Blocks**: none
 

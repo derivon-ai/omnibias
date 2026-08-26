@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Parameter-space jets shipped (theory 09-27)
+
+- Spec 09-27 status is **shipped**: G1–G5 CI; G5 torch/jax parity
+  on the G1 mixed jet.
+- Not a ParamPINN package.
+- Smoke: `docs/benchmarks/parameter_space_jets_smoke.json`.
+
 ### Added — Net-to-annihilator shipped (theory 09-26)
 
 - Spec 09-26 status is **shipped**: G1–G4 CI; G4 export purity

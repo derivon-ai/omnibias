@@ -3,7 +3,8 @@
 """Frontier 09-27: parameter-space mixed jets.
 
 G1 is the Fourier heat identity. G2 beats h=1e-3 FD. G3/G4
-refuse a ParamPINN / autodiff closed_form label.
+refuse a ParamPINN / autodiff closed_form label. G5 is
+torch/jax bit-identity on G1.
 """
 
 from __future__ import annotations
@@ -15,6 +16,9 @@ import time
 from pathlib import Path
 from typing import Any
 
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.parameter_jets import (
     DISCLAIMER,
     ParameterJetSpec,
@@ -23,6 +27,10 @@ from omnibias.core.parameter_jets import (
     parameter_jet_skill,
     worked_example,
 )
+from omnibias.pinn.operator.jax.parameter_jets import mixed_jet as jax_jet
+from omnibias.pinn.operator.jax.parameter_jets import worked_example as jax_ex
+from omnibias.pinn.operator.torch.parameter_jets import mixed_jet as torch_jet
+from omnibias.pinn.operator.torch.parameter_jets import worked_example as torch_ex
 
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
@@ -54,6 +62,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     hon = honesty_payload()
     g3 = closed_refused
     g4 = hon["parampinn_package"] is False and hon["ns_claim"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t_du = torch_jet(None, torch.tensor([ex["x"], ex["t"]]), torch.tensor([ex["mu"]]))
+    j_du = jax_jet(None, jnp.asarray([ex["x"], ex["t"]]), jnp.asarray([ex["mu"]]))
+    g5 = bool(torch_ex() == jax_ex() and t_du == j_du)
     entries = [
         {"name": "g1_cell", "passed": g1, "abs_sum": ex["abs_sum"], "u": ex["u"]},
         {
@@ -69,6 +82,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "passed": g4,
             "parampinn_package": False,
             "ns_claim": False,
+        },
+        {
+            "name": "g5_parity",
+            "passed": g5,
+            "torch_du": t_du,
+            "jax_du": j_du,
         },
     ]
     for entry in entries:

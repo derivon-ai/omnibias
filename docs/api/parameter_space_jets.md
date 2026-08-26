@@ -7,7 +7,7 @@ supplies `sigma^(n)` along `z = (x, μ)`. Temperature collapse
 
 `closed_form` is refused unless `μ` enters the jet trunk. A dense
 `pde_params` encoder is autodiff. Not a ParamPINN package. Not NS.
-Not CCF stretch. Status is **gated**, not shipped.
+Not CCF stretch. Status is **shipped**.
 
 Homes: `omnibias.core.parameter_jets`,
 `omnibias.pinn.operator._core.parameter_jets`,

@@ -674,7 +674,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.holonomic._core.export`
   (09-26, **shipped**; Ore export; G1–G4 CI; finite rational Lean only) /
   `omnibias.core.parameter_jets` + `omnibias.pinn.operator`
-  (09-27; mixed `x`–`μ` jets; G1–G5 CI; not a ParamPINN package) /
+  (09-27, **shipped**; mixed `x`–`μ` jets; G1–G5 CI; not a ParamPINN package) /
   `omnibias.core.sliced_jet` + `omnibias.{torch,jax}.architectures.sliced_jet`
   (09-28; scan-jet tokens + named energy; G1–G5 CI; not a ViT) /
   `omnibias.core.uncertainty` + `omnibias.verify.uncertainty`
