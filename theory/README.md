@@ -123,7 +123,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 
 | Spec | Status | One line |
 |---|---|---|
-| [02-01 scan-net](02-architectures/01-scan-net-gridless-cnn.md) | gated | Stacked scan banks; equivariance per-layer, on-lattice, not `R^D`; G1/G2/G3/G5 earned (G3 wall/point vs named k-NN over two decades); G4 k-NN boundary **leftover-recorded** (leftover #17: Scan-Net lstsq wins `5/5`; k-NN is allowed to win), not CI `all_passed` |
+| [02-01 scan-net](02-architectures/01-scan-net-gridless-cnn.md) | shipped | Stacked scan banks; equivariance per-layer, on-lattice, not `R^D`; G1/G2/G3/G5 earned (G3 wall/point vs named k-NN over two decades); G4 k-NN boundary **leftover-recorded** (leftover #17: Scan-Net lstsq wins `5/5`; k-NN is allowed to win), not CI `all_passed` |
 | [02-02 arrangement graph network](02-architectures/02-arrangement-graph-network.md) | gated | Sampled tope subgraph; temperature collapse; sound gap, not P vs NP; G3 vs k-NN **leftover-recorded** (leftover #28; 0-hop centroid; GNN / `RegionModels` stay `--full`); cost vs `n`/`D` **leftover-recorded** (leftover #20; cutoff `n<=12`, `D<=4`), not in CI `all_passed` |
 | [02-03 jet-KAN](02-architectures/03-jet-kan-univariate-basis.md) | gated | Edge-wise univariate bases; exactness of the model jet, not the target; KA theorem does not justify; G1/G3/G5 CI; G2 cost **reported** (~2.2x vs autodiff, need 5x), not CI `all_passed` |
 | [02-04 weak-form VPINN](02-architectures/04-weak-form-vpinn-closed-test-functions.md) | gated | Exact integrals only for polynomial coeffs on boxes; boundary bound on by default; G4 conditioning **earned** (`cond` strong/weak `>> 10x`) |

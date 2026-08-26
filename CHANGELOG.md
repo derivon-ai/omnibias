@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Scan-Net shipped (theory 02-01)
+
+- Spec 02-01 status is **shipped**: G1/G2/G3/G5 CI; leftover #17 G4
+  stays reported and out of `all_passed`.
+- On-lattice equivariance, not `R^D`.
+- Smoke: `docs/benchmarks/scannet_smoke.json`.
+
 ### Added — Enclosure Collapse shipped (theory 01-14)
 
 - Spec 01-14 status is **shipped**: G1–G6 CI, no leftover gate.

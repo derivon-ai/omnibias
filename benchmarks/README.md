@@ -72,7 +72,7 @@ uv run python docs/img/generate_figures.py
 | `gauge_spatial_strip.py` | `docs/benchmarks/gauge_spatial_strip_smoke.json` | Finite 2+1-D strip gap + RP + cluster tail; no YM / OS / continuum |
 | `gauge_gap_scaling.py` | `docs/benchmarks/gauge_gap_scaling_smoke.json` | Independent certified gaps vs spacing; continuum_claim false |
 | `gauge_finite_report.py` | `docs/benchmarks/gauge_finite_report_smoke.json` | Sealed finite-gauge pack; SU(3) gap at locked `n_cells=32`; three-plaquette G1 measured; Wilson-character domain; no YM / continuum / Clay staircase |
-| `scannet.py` | `docs/benchmarks/scannet_smoke.json` | Wave-3 architecture 02-01: ScanNet G1/G2/G3/G5; G3 wall/point vs named k-NN over two decades is in CI `all_passed`; G4 density boundary reported (Scan-Net wins the constructive fit); on-lattice equivariance |
+| `scannet.py` | `docs/benchmarks/scannet_smoke.json` | Shipped 02-01: ScanNet G1/G2/G3/G5; G3 wall/point vs named k-NN over two decades is in CI `all_passed`; G4 leftover-recorded (leftover #17); on-lattice equivariance |
 | `jetkan.py` | `docs/benchmarks/jetkan_smoke.json` | Wave-3 architecture 02-03: JetKAN G1/G3/G5; G2 cost reported (~2.2x vs autodiff, need 5x); model-jet exactness, KA theorem does not justify |
 | `weak_form_vpinn.py` | `docs/benchmarks/weak_form_vpinn_smoke.json` | Wave-3 architecture 02-04: exact on polynomial boxes; G4 conditioning earned vs strong collocation |
 | `multi_interface_pinn.py` | `docs/benchmarks/multi_interface_pinn_smoke.json` | Wave-3 architecture 02-05: sharpening, neither collapse; G3 leftover-recorded (linear stand-in); G4 leftover-recorded (zero-coeff; training `--full`) |

@@ -193,7 +193,7 @@ gates are earned on smoke, not in CI `all_passed`.
   leftover-recorded, not in CI `all_passed`. Status is **shipped**.
 - **Scan-Net** ([02-01](api/scannet.md)): stacked `BiasScan` banks. Equivariance
   is per-layer, per-direction, on-lattice; `gamma` is not `delta -> 0`.
-  G1/G2/G3/G5 CI-gated; G4 k-NN leftover-recorded.
+  G1/G2/G3/G5 CI-gated; G4 k-NN leftover-recorded. Status is **shipped**.
 - **Jet-KAN** ([02-03](api/jetkan.md)): univariate multi-pack edges. Exactness
   is of the **model jet**, not the target; the KA theorem does **not**
   justify the architecture. G2 cost not in CI `all_passed`.

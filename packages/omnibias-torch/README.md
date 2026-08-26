@@ -61,9 +61,10 @@ interior lattice shift, not a circular wrap. Soft-argmax `gamma` is not
 `delta -> 0`. See [docs/api/multipack.md](../../docs/api/multipack.md) and
 [docs/api/scan.md](../../docs/api/scan.md).
 
-Gated Wave-3 architectures (not shipped): `ScanNet` (on-lattice equivariance,
-not `R^D`), `JetKAN` (exactness of the model jet; the KA theorem does not
-justify), `LadderNet` (Rodrigues reweight required), `EquivariantScan`
+Shipped Wave-3 architecture: `ScanNet` (on-lattice equivariance, not
+`R^D`; G4 leftover-recorded). Gated Wave-3 (not shipped): `JetKAN`
+(exactness of the model jet; the KA theorem does not justify),
+`LadderNet` (Rodrigues reweight required), `EquivariantScan`
 (gaussian-family steering; discrete `C_L`), and `hierarchical_scan` (1-D
 offsets; `eta=0` bit-identical to dense). See
 [docs/api/scannet.md](../../docs/api/scannet.md),
