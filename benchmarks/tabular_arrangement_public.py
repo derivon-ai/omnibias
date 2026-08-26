@@ -485,12 +485,14 @@ def _leftover_g4(
         corr = float(named["corr_diag_margin"])
         n_scored = int(named["n_scored"])
         source = str(named["source"])
-    earned = bool(n_scored >= 8 and pred >= G4_MIN_ACCURACY)
     return {
         "name": "g4_diagnostic_predictiveness",
-        "passed": bool(earned),
-        "earned": bool(earned),
+        "passed": False,
+        "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 50,
+        "leftover_tick": 92,
         "in_ci_all_passed": False,
         "diag_threshold": G4_DIAG_THRESHOLD,
         "rule": (
@@ -508,9 +510,10 @@ def _leftover_g4(
             float(run_predictiveness) if not full else None
         ),
         "need_note": (
-            "Named G4 is frozen eight-dataset predictiveness >= 0.75. "
-            "Smoke one-dataset predictiveness is not G4. Not retuned. "
-            "Temperature collapse, not founding bias collapse."
+            "Leftover #50 leftover-recorded: Named G4 is frozen "
+            "eight-dataset predictiveness >= 0.75. Smoke one-dataset "
+            "predictiveness is not G4. Not retuned. Temperature collapse, "
+            "not founding bias collapse."
         ),
     }
 
@@ -675,8 +678,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "smoke_is_wiring_gate": not full,
                 "obliqueness_diagnostic_retuned": False,
                 "g3_earned": g3_earned,
-                "g4_earned": g4_earned,
+                "g4_earned": False,
                 "g4_reported": True,
+                "g4_leftover_recorded": True,
+                "g4_leftover_id": 50,
+                "g4_leftover_tick": 92,
                 "g4_in_ci_all_passed": False,
                 "theorem_prover_verified": False,
                 "mathlib_verified": False,

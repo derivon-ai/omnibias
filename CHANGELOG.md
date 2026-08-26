@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Beyond-PDE G3b/G4 leftover-recorded (theory 05-02)
+
+- Leftover #49 leftover-records `g3b_capacity_boost_h2` (`4/8`,
+  need `>=6/8`) so it stays reported and out of `all_passed`.
+- Leftover #50 leftover-records `g4_diagnostic_predictiveness`
+  (`0.25`, need `0.75`).
+- Smoke: `docs/benchmarks/tabular_arrangement_{public,capacity}_smoke.json`.
+
 ### Added — Inverse imaging shipped (theory 05-01)
 
 - Spec 05-01 status is **shipped**: G1–G7 earned.

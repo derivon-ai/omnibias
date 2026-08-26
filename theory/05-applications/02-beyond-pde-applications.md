@@ -7,7 +7,7 @@ general-purpose geometry, and three domains with no differential equation in
 sight (tabular data, point clouds and implicit shapes, sequences) each get a
 concrete construction from them, with honest baselines that are hard to beat.
 
-- **Status**: gated
+- **Status**: gated (G1/G2/G3/G5/G6/G7 earned; G3b leftover-recorded leftover #49; G4 leftover-recorded leftover #50; not in CI `all_passed`)
 - **Depends on**: 01-02, 01-03, 02-01, 02-02, 02-08, 03-02, 03-04, 03-07, 03-09
 - **Blocks**: none
 
@@ -261,14 +261,16 @@ implicit-surface pipeline (shapes), and a structured state-space model
   at least `6/8` public binary sets. Ablations (`h2_newton`, `h3`/`h4`,
   `tab_boost`, `tab_joint`) are reported; they cannot relicense the gate after
   seeing test. G3 stays frozen. See
-  `docs/benchmarks/tabular_arrangement_capacity.json`. **Unearned** —
+  `docs/benchmarks/tabular_arrangement_capacity.json`. **Leftover-recorded**
+  (leftover #49) / **unearned** —
   `boost_h2` not-worse on `4/8` (W/L/T `4/4/0`: wins on `breast_cancer`,
   `banknote`, `blood_transfusion`, `sonar`). `tab_boost` is also `4/8` (no
   relicense finding). Other arms: `h2_adam` `3/8` (matches frozen G3 `2/5/1`),
   `h2_newton` `3/8`, `h3_adam`/`h4_adam` `4/8`, `tab_joint` `3/8`.
 - **G4 diagnostic predictiveness.** The obliqueness diagnostic predicts the
   winner on the eight benchmarks with at least `75%` accuracy, and its
-  correlation with the accuracy gap is reported. **Unearned** — frozen
+  correlation with the accuracy gap is reported. **Leftover-recorded**
+  (leftover #50) / **unearned** — frozen
   threshold `diag > 1.0` predicts arrangement on all eight (predictiveness
   `0.25`); `corr(diag, margin) ≈ -0.13`. Expected miss: diagnostic is linear
   oblique only; not retuned on these datasets.

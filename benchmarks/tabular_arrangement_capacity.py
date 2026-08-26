@@ -769,8 +769,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "trees_expected_to_win_most": True,
                 "smoke_is_wiring_gate": not full,
                 "g3_earned": True,
-                "g3b_earned": g3b_earned,
+                "g3b_earned": False,
                 "g3b_reported": True,
+                "g3b_leftover_recorded": True,
+                "g3b_leftover_id": 49,
+                "g3b_leftover_tick": 92,
                 "g3b_in_ci_all_passed": False,
                 "tab_boost_would_earn_g3b": bool(g3b["tab_boost_would_earn_g3b"]),
                 "finding": finding,
@@ -845,12 +848,14 @@ def _leftover_g3b(
         tab_nw = int(named["tab_boost_not_worse"])
         tab_would = bool(named["tab_boost_would_earn"])
         source = str(named["source"])
-    earned = bool(n_scored >= 8 and not_worse >= G3B_MIN_DATASETS)
     return {
         "name": "g3b_capacity_boost_h2",
-        "passed": bool(earned),
-        "earned": bool(earned),
+        "passed": False,
+        "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 49,
+        "leftover_tick": 92,
         "in_ci_all_passed": False,
         "primary_arm": PRIMARY_ARM,
         "not_worse": not_worse,
@@ -864,9 +869,10 @@ def _leftover_g3b(
         "smoke_n_scored": int(run_n) if not full else n_scored,
         "smoke_not_worse_not_g3b": int(run_not_worse) if not full else None,
         "need_note": (
-            "Named G3b is predeclared boost_h2 not-worse on >=6/8. "
-            "Smoke one-dataset not-worse is not G3b. No relicense from "
-            "tab_boost. Temperature collapse, not founding bias collapse."
+            "Leftover #49 leftover-recorded: Named G3b is predeclared "
+            "boost_h2 not-worse on >=6/8. Smoke one-dataset not-worse is "
+            "not G3b. No relicense from tab_boost. Temperature collapse, "
+            "not founding bias collapse."
         ),
     }
 

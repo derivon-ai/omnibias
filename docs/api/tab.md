@@ -76,11 +76,12 @@ full win/loss table on eight public binary sets via
 to win most). Capacity / optimizer ablations (Newton, H=3/4, Newton-boosted
 H=2, SoftTree) live in ``benchmarks/tabular_arrangement_capacity.py``; G3b
 stays unearned (predeclared ``boost_h2`` not-worse on 4/8; need >=6/8;
-leftover-reported from the named eight-dataset artifact, not in CI
-``all_passed``).
+**leftover-recorded**, leftover #49, from the named eight-dataset
+artifact, not in CI ``all_passed``).
 The obliqueness diagnostic detects linear oblique structure only
-(not XOR parity) and is frozen for G4 reporting (eight-dataset
-predictiveness `0.25`, need `0.75`; not in CI `all_passed`).
+(not XOR parity) and is frozen for G4 **leftover-recorded** (leftover
+#50; eight-dataset predictiveness `0.25`, need `0.75`; not in CI
+`all_passed`).
 
 **Plugin contract.** ``as_head(z, kind)`` returns a :class:`~omnibias.tab.torch.plugin.TabHead`
 wrapping SoftTree / Arrangement / Boosted on ``z.device`` / ``z.dtype``.

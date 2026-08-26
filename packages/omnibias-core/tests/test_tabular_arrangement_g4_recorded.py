@@ -18,6 +18,9 @@ def test_g4_diagnostic_is_reported_and_out_of_all_passed() -> None:
     assert g4["earned"] is False
     assert g4["passed"] is False
     assert g4["reported"] is True
+    assert g4["leftover_recorded"] is True
+    assert int(g4["leftover_id"]) == 50
+    assert int(g4["leftover_tick"]) == 92
     assert g4["in_ci_all_passed"] is False
     assert g4["retuned"] is False
     assert int(g4["n_scored"]) == 8
@@ -27,6 +30,8 @@ def test_g4_diagnostic_is_reported_and_out_of_all_passed() -> None:
     assert payload["honesty"]["g4_earned"] is False
     assert payload["honesty"]["g4_in_ci_all_passed"] is False
     assert payload["honesty"]["g4_reported"] is True
+    assert payload["honesty"]["g4_leftover_recorded"] is True
+    assert int(payload["honesty"]["g4_leftover_id"]) == 50
     assert payload["honesty"]["obliqueness_diagnostic_retuned"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g4_diagnostic_predictiveness" not in names

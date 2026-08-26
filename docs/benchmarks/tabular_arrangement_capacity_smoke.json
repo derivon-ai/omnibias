@@ -1,6 +1,6 @@
 {
   "schema": "tabular-arrangement-capacity-v1",
-  "generated_utc": "2026-08-13T21:23:59Z",
+  "generated_utc": "2026-08-26T16:51:00Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -125,7 +125,7 @@
     "smoke_is_wiring_gate": true,
     "full": false
   },
-  "rss_mb_at_start": 820.87,
+  "rss_mb_at_start": 810.87,
   "baseline": {
     "name": "tuned LightGBM (same fair protocol as G3)",
     "note": "one LightGBM fit per dataset\u00d7seed; all arms scored against it"
@@ -421,7 +421,7 @@
           "not_worse": false
         }
       },
-      "wall_seconds": 6.05
+      "wall_seconds": 6.916
     }
   },
   "win_loss_by_arm": {
@@ -567,31 +567,18 @@
     }
   },
   "primary_arm": "boost_h2",
-  "honesty": {
-    "claim_rung": 1,
-    "g3_frozen": true,
-    "primary_arm_predeclared": "boost_h2",
-    "arm_selection_on_val_never_test": true,
-    "no_relicense_after_test": true,
-    "trees_expected_to_win_most": true,
-    "smoke_is_wiring_gate": true,
-    "g3_earned": true,
-    "g3b_earned": false,
-    "tab_boost_would_earn_g3b": false,
-    "finding": null,
-    "theorem_prover_verified": false,
-    "mathlib_verified": false,
-    "licensed_sentence": "smoke wiring only: breast_cancer exercise of the capacity suite; G3b not earned",
-    "g3b_reported": true,
-    "g3b_in_ci_all_passed": false
+  "gates": {
+    "all_passed": true,
+    "entries": []
   },
-  "g3b_earned": false,
-  "wall_seconds": 6.051,
   "g3b": {
     "name": "g3b_capacity_boost_h2",
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 49,
+    "leftover_tick": 92,
     "in_ci_all_passed": false,
     "primary_arm": "boost_h2",
     "not_worse": 4,
@@ -608,10 +595,29 @@
     "source": "docs/benchmarks/tabular_arrangement_capacity.json",
     "smoke_n_scored": 1,
     "smoke_not_worse_not_g3b": 1,
-    "need_note": "Named G3b is predeclared boost_h2 not-worse on >=6/8. Smoke one-dataset not-worse is not G3b. No relicense from tab_boost. Temperature collapse, not founding bias collapse."
+    "need_note": "Leftover #49 leftover-recorded: Named G3b is predeclared boost_h2 not-worse on >=6/8. Smoke one-dataset not-worse is not G3b. No relicense from tab_boost. Temperature collapse, not founding bias collapse."
   },
-  "gates": {
-    "all_passed": true,
-    "entries": []
-  }
+  "honesty": {
+    "claim_rung": 1,
+    "g3_frozen": true,
+    "primary_arm_predeclared": "boost_h2",
+    "arm_selection_on_val_never_test": true,
+    "no_relicense_after_test": true,
+    "trees_expected_to_win_most": true,
+    "smoke_is_wiring_gate": true,
+    "g3_earned": true,
+    "g3b_earned": false,
+    "g3b_reported": true,
+    "g3b_leftover_recorded": true,
+    "g3b_leftover_id": 49,
+    "g3b_leftover_tick": 92,
+    "g3b_in_ci_all_passed": false,
+    "tab_boost_would_earn_g3b": false,
+    "finding": null,
+    "theorem_prover_verified": false,
+    "mathlib_verified": false,
+    "licensed_sentence": "smoke wiring only: breast_cancer exercise of the capacity suite; G3b not earned"
+  },
+  "g3b_earned": false,
+  "wall_seconds": 6.917
 }

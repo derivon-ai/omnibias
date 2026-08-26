@@ -18,6 +18,9 @@ def test_g3b_capacity_is_reported_and_out_of_all_passed() -> None:
     assert g3b["earned"] is False
     assert g3b["passed"] is False
     assert g3b["reported"] is True
+    assert g3b["leftover_recorded"] is True
+    assert int(g3b["leftover_id"]) == 49
+    assert int(g3b["leftover_tick"]) == 92
     assert g3b["in_ci_all_passed"] is False
     assert g3b["primary_arm"] == "boost_h2"
     assert g3b["g3_frozen"] is True
@@ -32,6 +35,8 @@ def test_g3b_capacity_is_reported_and_out_of_all_passed() -> None:
     assert payload["honesty"]["g3b_earned"] is False
     assert payload["honesty"]["g3b_in_ci_all_passed"] is False
     assert payload["honesty"]["g3b_reported"] is True
+    assert payload["honesty"]["g3b_leftover_recorded"] is True
+    assert int(payload["honesty"]["g3b_leftover_id"]) == 49
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g3b_capacity_boost_h2" not in names
     assert payload["gates"]["all_passed"] is True
