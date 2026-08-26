@@ -4,6 +4,7 @@
 
 G1 matches the OMBU integral cell. G2 is the named Volterra
 antiderivative of cos. G3 records not BEM-Net / not FNO SOTA.
+G4 is torch/jax bit-identity on G1.
 """
 
 from __future__ import annotations
@@ -15,15 +16,23 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.integral_kernel import (
     DISCLAIMER,
     antiderivative_skill,
     honesty_payload,
     worked_example,
 )
+from omnibias.jax.architectures.integral_kernel import integral_cell as jax_cell
+from omnibias.jax.architectures.integral_kernel import worked_example as jax_ex
+from omnibias.torch.architectures.integral_kernel import integral_cell as torch_cell
+from omnibias.torch.architectures.integral_kernel import worked_example as torch_ex
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -40,6 +49,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["below_1e3"] and skill["skill_positive"])
     hon = honesty_payload()
     g3 = hon["claimed_bem_net"] is False and hon["claimed_fno_sota"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t = float(torch_cell(torch.tensor([0.5]), -0.5, 0.5)[0])
+    j = float(jax_cell(jnp.asarray([0.5]), -0.5, 0.5)[0])
+    g4 = bool(torch_ex()["g1_cell"] == jax_ex()["g1_cell"] and t == j)
     entries = [
         {
             "name": "g1_cell",
@@ -61,6 +75,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "passed": g3,
             "claimed_bem_net": False,
             "claimed_fno_sota": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_cell": t,
+            "jax_cell": j,
         },
     ]
     for entry in entries:

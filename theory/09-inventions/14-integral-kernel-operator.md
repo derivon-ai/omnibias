@@ -6,7 +6,7 @@ A volumetric / DeepONet-style neural operator whose **kernel is an
 OMBU `integral` cell** along learned directions — not a surface BEM
 and not a Fourier multiplier.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not BEM-Net)
 - **Depends on**: 09-01, 09-03
 - **Blocks**: none
 

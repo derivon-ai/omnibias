@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.integral_kernel_operator.v1",
-  "generated_utc": "2026-08-21T20:50:55Z",
+  "generated_utc": "2026-08-26T17:09:58Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 813.15,
+  "rss_mb_at_start": 1219.83,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -44,9 +44,15 @@
         "passed": true,
         "claimed_bem_net": false,
         "claimed_fno_sota": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_cell": 0.6201145069582775,
+        "jax_cell": 0.6201145069582775
       }
     ]
   },
   "disclaimer": "Integral-kernel operator: OMBU integral cell, not BEM-Net, not FNO SOTA, and not CCF stretch",
-  "wall_seconds": 1.3787772840005346
+  "wall_seconds": 0.46076166396960616
 }

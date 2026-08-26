@@ -9,7 +9,7 @@ that window recovers a `sigma` kernel and is not the default.
 Temperature collapse (`beta -> inf`, feasibility) does not appear.
 Do not conflate the two.
 
-Status is **gated**, not shipped. Not FNO SOTA. Not CCF stretch.
+Status is **shipped**. Not FNO SOTA. Not CCF stretch.
 Not NS.
 
 Homes: `omnibias.core.integral_kernel`,

@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Integral-kernel operator shipped (theory 09-14)
+
+- Spec 09-14 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- OMBU `integral` cell, not BEM-Net.
+- Smoke: `docs/benchmarks/integral_kernel_operator_smoke.json`.
+
 ### Added — Jet-Hopfield shipped (theory 09-13)
 
 - Spec 09-13 status is **shipped**: G1–G4 CI; G4 torch/jax parity

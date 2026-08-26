@@ -385,6 +385,8 @@ gates are earned on smoke, not in CI `all_passed`.
   annihilator, D-finite class only. Status is **shipped**.
 - **Jet-Hopfield** ([09-13](api/jet_hopfield.md)): germ memories,
   not vector Hopfield. Status is **shipped**.
+- **Integral-kernel operator** ([09-14](api/integral_kernel.md)):
+  OMBU `integral` cell, not BEM-Net. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
