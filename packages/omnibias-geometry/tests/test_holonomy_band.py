@@ -13,9 +13,13 @@ from omnibias.geometry.gauge.band._core import (
     BandRegime,
     HolonomyBand,
     abelian_holonomy,
+    abelian_holonomy_gauged,
     classify_regime,
+    conjugate_open_holonomy,
     magnus_truncation_bound,
     open_line_is_gauge_dependent,
+    random_gauge_covariance_ulps,
+    random_u1_gauge,
     su2_transverse_constant,
 )
 from omnibias.geometry.gauge.band.torch import band_holonomy, band_wilson_loop
@@ -67,6 +71,22 @@ def test_g3_magnus_bound_sound_and_refusal() -> None:
     assert bound.lo < 0.0 < bound.hi
     with pytest.raises(ValueError, match="convergence radius"):
         magnus_truncation_bound(a_norm=4.0, length=1.0, order=2)
+
+
+def test_g4_random_gauge_covariance() -> None:
+    coupling = 1.0
+    for seed in range(8):
+        ulps = random_gauge_covariance_ulps(
+            a0=1.0, lo=-0.5, hi=0.5, coupling=coupling, seed=seed
+        )
+        assert ulps <= 4.0
+        gauge = random_u1_gauge(seed=seed)
+        u = abelian_holonomy(a0=1.0, lo=-0.5, hi=0.5, coupling=coupling)
+        transformed = abelian_holonomy_gauged(
+            a0=1.0, lo=-0.5, hi=0.5, coupling=coupling, gauge=gauge
+        )
+        conjugated = conjugate_open_holonomy(u, gauge, coupling=coupling)
+        assert abs(transformed - conjugated) <= 4.0 * math.ulp(1.0)
 
 
 def test_g4_loop_invariant() -> None:

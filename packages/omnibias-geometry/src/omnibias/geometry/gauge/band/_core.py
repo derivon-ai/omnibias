@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import cmath
 import math
+import random
 from dataclasses import dataclass
 from enum import StrEnum
 
@@ -123,14 +124,88 @@ def open_line_is_gauge_dependent() -> bool:
     return True
 
 
+@dataclass(frozen=True)
+class RandomU1Gauge:
+    """Endpoint values of a U(1) gauge, ``g(x) = exp(-i coupling λ(x) T)``.
+
+    ``T`` is the package's ``1/sqrt(2)`` generator, matching
+    :func:`abelian_holonomy`.
+    """
+
+    lambda_lo: float
+    lambda_hi: float
+
+
+def random_u1_gauge(*, seed: int) -> RandomU1Gauge:
+    """Random endpoint gauge on the open band (leftover #35 API)."""
+    rng = random.Random(int(seed))
+    return RandomU1Gauge(
+        lambda_lo=rng.uniform(-math.pi, math.pi),
+        lambda_hi=rng.uniform(-math.pi, math.pi),
+    )
+
+
+def u1_gauge_element(*, lam: float, coupling: float) -> complex:
+    """``g = exp(-i coupling λ T)`` with ``T = 1/sqrt(2)``."""
+    return cmath.exp(-1j * float(coupling) * float(lam) * _U1_GENERATOR)
+
+
+def conjugate_open_holonomy(
+    u: complex, gauge: RandomU1Gauge, *, coupling: float
+) -> complex:
+    """``g(x_hi) U g(x_lo)^{-1}`` for an open U(1) holonomy."""
+    g_hi = u1_gauge_element(lam=gauge.lambda_hi, coupling=coupling)
+    g_lo = u1_gauge_element(lam=gauge.lambda_lo, coupling=coupling)
+    return g_hi * complex(u) * g_lo.conjugate()
+
+
+def abelian_holonomy_gauged(
+    *,
+    a0: float,
+    lo: float,
+    hi: float,
+    coupling: float,
+    gauge: RandomU1Gauge,
+) -> complex:
+    """Holonomy of ``A' = A + dλ``. Extra flux is ``λ(hi) - λ(lo)``."""
+    u = abelian_holonomy(a0=a0, lo=lo, hi=hi, coupling=coupling)
+    extra = u1_gauge_element(lam=gauge.lambda_hi - gauge.lambda_lo, coupling=coupling)
+    return u * extra
+
+
+def random_gauge_covariance_ulps(
+    *,
+    a0: float,
+    lo: float,
+    hi: float,
+    coupling: float,
+    seed: int,
+) -> float:
+    """Ulp error of ``U'`` versus ``g(hi) U g(lo)^{-1}`` on a random gauge."""
+    gauge = random_u1_gauge(seed=seed)
+    u = abelian_holonomy(a0=a0, lo=lo, hi=hi, coupling=coupling)
+    transformed = abelian_holonomy_gauged(
+        a0=a0, lo=lo, hi=hi, coupling=coupling, gauge=gauge
+    )
+    conjugated = conjugate_open_holonomy(u, gauge, coupling=coupling)
+    err = abs(transformed - conjugated)
+    return float(err / math.ulp(1.0))
+
+
 __all__ = [
     "BandRegime",
     "HolonomyBand",
+    "RandomU1Gauge",
     "abelian_holonomy",
+    "abelian_holonomy_gauged",
     "classify_regime",
+    "conjugate_open_holonomy",
     "magnus_truncation_bound",
     "open_line_is_gauge_dependent",
+    "random_gauge_covariance_ulps",
+    "random_u1_gauge",
     "su",
     "su2_transverse_constant",
     "u1",
+    "u1_gauge_element",
 ]

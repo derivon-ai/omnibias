@@ -499,7 +499,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13; 02-09 G4 init-win leftover-recorded; 02-11 G4 inverse-design leftover-recorded, G5 conservation leftover-recorded; 02-06 G2 disc-accuracy leftover-recorded, G3 exterior win leftover-recorded, single-layer cost reported) /
   `omnibias.geometry.gauge.band` (02-14; abelian + transverse-constant;
   G2 closed-form earned vs PRODUCT 4096; G3 Magnus leftover-recorded; G4 gauge
-  covariance leftover-recorded, no random-gauge API;
+  covariance earned, `random_u1_gauge`;
   no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02; sampled
   subgraph; G3 vs k-NN leftover-recorded, GNN / RegionModels stay `--full`; cost
   vs n/D leftover-recorded) / `omnibias.core.line_search` /

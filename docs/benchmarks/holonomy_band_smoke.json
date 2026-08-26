@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.holonomy_band.v1",
-  "generated_utc": "2026-08-26T16:03:30Z",
+  "generated_utc": "2026-08-26T16:10:50Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -14,13 +14,14 @@
     "mode": "smoke",
     "g2_in_all_passed": true,
     "g3_in_all_passed": false,
-    "g4_in_all_passed": false,
+    "g4_in_all_passed": true,
     "gates_in_scope": [
       "g1",
-      "g2"
+      "g2",
+      "g4"
     ]
   },
-  "rss_mb_at_start": 827.86,
+  "rss_mb_at_start": 828.26,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -35,8 +36,14 @@
         "in_ci_all_passed": true,
         "abelian_abs_err": 3.4241877141052725e-15,
         "su2_abs_err": 5.564437799421285e-13,
-        "abelian_cost_ratio": 0.0002927447266234803,
-        "su2_cost_ratio": 0.00032035235152032986
+        "abelian_cost_ratio": 0.00029562894264989237,
+        "su2_cost_ratio": 0.00031308602908713566
+      },
+      {
+        "name": "g4_gauge_covariance",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "random_gauge_max_ulps": 1.4142135623730951
       }
     ]
   },
@@ -51,12 +58,12 @@
     "cost_ratio_max": 0.25,
     "abelian_abs_err": 3.4241877141052725e-15,
     "su2_abs_err": 5.564437799421285e-13,
-    "abelian_cost_ratio": 0.0002927447266234803,
-    "su2_cost_ratio": 0.00032035235152032986,
-    "abelian_closed_form_seconds": 4.073954187333584e-06,
-    "abelian_product_seconds": 0.013916405034251511,
-    "su2_closed_form_seconds": 5.376990884542465e-06,
-    "su2_product_seconds": 0.01678461499977857,
+    "abelian_cost_ratio": 0.00029562894264989237,
+    "su2_cost_ratio": 0.00031308602908713566,
+    "abelian_closed_form_seconds": 4.060100764036179e-06,
+    "abelian_product_seconds": 0.01373377291020006,
+    "su2_closed_form_seconds": 5.314941518008709e-06,
+    "su2_product_seconds": 0.016975977923721075,
     "note": "band_holonomy closed form versus PRODUCT at substeps=4096 in the abelian and transverse-constant (A^1) regimes. Named G2 needs match <= 1e-12 and a fraction of the PRODUCT cost. Previous smoke skipped G2. No YM / mass gap."
   },
   "g3": {
@@ -182,13 +189,13 @@
   },
   "g4": {
     "name": "g4_gauge_covariance",
-    "passed": false,
-    "earned": false,
+    "passed": true,
+    "earned": true,
     "reported": true,
-    "leftover_recorded": true,
+    "leftover_recorded": false,
     "leftover_id": 35,
-    "leftover_tick": 71,
-    "in_ci_all_passed": false,
+    "leftover_tick": 73,
+    "in_ci_all_passed": true,
     "need": "open holonomy transforms as g(hi) U g(lo)^{-1} to <= 4 ulp; loop invariant to <= 4 ulp",
     "open_line_flagged": true,
     "open_holonomy_not_invariant": true,
@@ -196,9 +203,21 @@
     "loop_ulps": 0.0,
     "loop_ulp_max": 4.0,
     "loop_within_4_ulp": true,
-    "random_gauge_api": false,
-    "stays_full": true,
-    "note": "Leftover #35 leftover-recorded: open_line_is_gauge_dependent is True and band_holonomy returns gauge_invariant=False. band_wilson_loop of a forward-back pair is measured in ulps versus 1. Named G4 also needs a random gauge on the open band, g(hi) U g(lo)^{-1} to <= 4 ulp. That path is not wired. Previous open-line-flag stub withdrawn from named G4. Not in CI all_passed."
+    "random_gauge_api": true,
+    "random_gauge_ulps": [
+      0.0,
+      1.0,
+      1.4142135623730951,
+      0.5,
+      0.25,
+      1.0307764064044151,
+      0.5,
+      0.75
+    ],
+    "random_gauge_max_ulps": 1.4142135623730951,
+    "random_gauge_within_4_ulp": true,
+    "stays_full": false,
+    "note": "Leftover #35 earned on tick #73: random_u1_gauge plus g(hi) U g(lo)^{-1} matches abelian_holonomy_gauged to <= 4 ulp on eight seeds. Open-line flag and forward-back loop identity stay. In CI all_passed."
   },
   "honesty": {
     "closed_form": "abelian and transverse-constant only",
@@ -216,13 +235,13 @@
     "g3_leftover_tick": 70,
     "g3_in_ci_all_passed": false,
     "g3_magnus_holonomy_api": false,
-    "g4_earned": false,
+    "g4_earned": true,
     "g4_reported": true,
-    "g4_leftover_recorded": true,
+    "g4_leftover_recorded": false,
     "g4_leftover_id": 35,
-    "g4_leftover_tick": 71,
-    "g4_in_ci_all_passed": false,
-    "g4_random_gauge_api": false,
+    "g4_leftover_tick": 73,
+    "g4_in_ci_all_passed": true,
+    "g4_random_gauge_api": true,
     "temperature_collapse": false,
     "founding_bias_collapse": false,
     "finite_band_gap": true

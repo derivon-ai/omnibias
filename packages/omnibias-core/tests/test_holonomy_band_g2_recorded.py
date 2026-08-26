@@ -30,7 +30,7 @@ def test_g2_closed_form_is_earned_and_in_all_passed() -> None:
     assert "g2_closed_form" in names
     assert "g3_magnus_bound" not in names
     assert "g4_open_line_flagged" not in names
-    assert "g4_gauge_covariance" not in names
+    assert "g4_gauge_covariance" in names
     gate = next(row for row in payload["gates"]["entries"] if row["name"] == "g2_closed_form")
     assert gate["passed"] is True
     assert gate["in_ci_all_passed"] is True

@@ -11,23 +11,35 @@ from __future__ import annotations
 from omnibias.geometry.gauge.band._core import (
     BandRegime,
     HolonomyBand,
+    RandomU1Gauge,
     abelian_holonomy,
+    abelian_holonomy_gauged,
     classify_regime,
+    conjugate_open_holonomy,
     magnus_truncation_bound,
     open_line_is_gauge_dependent,
+    random_gauge_covariance_ulps,
+    random_u1_gauge,
     su2_transverse_constant,
+    u1_gauge_element,
 )
 
 __all__ = [
     "BandRegime",
     "HolonomyBand",
+    "RandomU1Gauge",
     "abelian_holonomy",
+    "abelian_holonomy_gauged",
     "band_holonomy",
     "band_wilson_loop",
     "classify_regime",
+    "conjugate_open_holonomy",
     "magnus_truncation_bound",
     "open_line_is_gauge_dependent",
+    "random_gauge_covariance_ulps",
+    "random_u1_gauge",
     "su2_transverse_constant",
+    "u1_gauge_element",
 ]
 
 

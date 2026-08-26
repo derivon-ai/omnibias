@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomy-band random-gauge API earned (theory 02-14)
+
+- `random_u1_gauge` / `abelian_holonomy_gauged` / `conjugate_open_holonomy`
+  ship on `omnibias.geometry.gauge.band`.
+- Leftover #35's G4 4-ulp covariance win is earned (eight seeds + loop
+  identity). In CI `all_passed`. Not a Yang-Mills / mass-gap claim.
+- Smoke: `docs/benchmarks/holonomy_band_smoke.json`.
+
 ### Added — Tropical path-follow earned (theory 01-08)
 
 - `path_follow` and `tropical_anneal_descent` ship on

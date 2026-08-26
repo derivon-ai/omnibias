@@ -12,11 +12,11 @@ smoke artifact: `band_holonomy` matches PRODUCT at `substeps=4096` to
 fraction of the PRODUCT cost. G3 Magnus soundness is **leftover-recorded**
 unearned (leftover #34): the bound contains 0 on a grid and a sample
 and refuses `||A|| L >= pi`, but no Magnus-truncated holonomy is wired.
-G4 gauge covariance is **leftover-recorded** unearned (leftover #35):
-the open-line flag and a forward-back `band_wilson_loop` identity are
-measured, but a random `g(x_hi) U g(x_lo)^{-1}` path is not wired.
-Previous open-line-flag stub withdrawn from named G4. G3 and G4 are not
-in CI `all_passed`.
+G4 gauge covariance is **earned** (leftover #35 closed):
+`random_u1_gauge` plus `g(x_hi) U g(x_lo)^{-1}` matches the gauged
+holonomy to `<= 4` ulp, the open-line flag stays, and a forward-back
+`band_wilson_loop` identity is within `4` ulp. G3 is not in CI
+`all_passed`.
 No YM / mass gap / continuum claim. Status is **gated**, not shipped.
 See theory spec 02-14.
 
