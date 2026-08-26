@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.collapse_net.v1",
-  "generated_utc": "2026-08-21T20:28:20Z",
+  "generated_utc": "2026-08-26T17:07:59Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 808.91,
+  "rss_mb_at_start": 1221.52,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -42,9 +42,15 @@
         "name": "g3_honesty",
         "passed": true,
         "continuum_pde_claimed": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_y": 0.24979187478940013,
+        "jax_y": 0.24979187478940013
       }
     ]
   },
   "disclaimer": "Collapse-Net trains a stencil and infers by founding bias collapse; not a continuum PDE and not CCF stretch",
-  "wall_seconds": 1.4663603700464591
+  "wall_seconds": 0.3928032940020785
 }

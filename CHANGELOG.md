@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Collapse-Net shipped (theory 09-11)
+
+- Spec 09-11 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Stencil train, founding collapse at eval, not a continuum PDE.
+- Smoke: `docs/benchmarks/collapse_net_smoke.json`.
+
 ### Added — Riccati flow net shipped (theory 09-10)
 
 - Spec 09-10 status is **shipped**: G1–G4 CI; G4 torch/jax parity

@@ -645,6 +645,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.riccati_flow` + `omnibias.{torch,jax}.architectures.riccati_flow`
   (09-10, **shipped**; Riccati time flow; G1–G4 CI; not DEQ / CNF; not bias
   collapse unless a jet-in-`s0` head is used) /
+  `omnibias.core.collapse_net` + `omnibias.{torch,jax}.architectures.collapse_net`
+  (09-11, **shipped**; stencil train, collapse at eval; G1–G4 CI;
+  founding bias collapse, not a continuum PDE) /
   `omnibias.core.integral_kernel` + `omnibias.pinn.operator`
   (09-14; OMBU `integral` cell, not BEM-Net; G1–G4 CI; founding
   bias collapse, not temperature collapse) /

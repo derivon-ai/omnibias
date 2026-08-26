@@ -378,6 +378,9 @@ gates are earned on smoke, not in CI `all_passed`.
   **shipped**.
 - **Riccati flow net** ([09-10](api/riccati_flow_net.md)): depth
   is integration time, not DEQ / CNF. Status is **shipped**.
+- **Collapse-Net** ([09-11](api/collapse_net.md)): stencil train,
+  founding collapse at eval, not a continuum PDE. Status is
+  **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

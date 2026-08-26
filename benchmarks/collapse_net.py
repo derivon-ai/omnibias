@@ -4,7 +4,8 @@
 
 G1 matches the spec remainder. G2 collapsed eval of ``d/dx sin x``
 beats stencil eval on a denser probe. G3 refuses a continuum PDE
-claim. Founding bias collapse only. Not CCF stretch.
+claim. G4 is torch/jax bit-identity on G1. Founding bias collapse
+only. Not CCF stretch.
 """
 
 from __future__ import annotations
@@ -16,15 +17,26 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.collapse_net import (
     DISCLAIMER,
+    CollapseNetConfig,
     honesty_payload,
     sin_skill,
     worked_example,
 )
+from omnibias.jax.architectures.collapse_net import collapse_net_forward as jax_fwd
+from omnibias.jax.architectures.collapse_net import collapse_remainder as jax_rem
+from omnibias.jax.architectures.collapse_net import worked_example as jax_ex
+from omnibias.torch.architectures.collapse_net import collapse_net_forward as torch_fwd
+from omnibias.torch.architectures.collapse_net import collapse_remainder as torch_rem
+from omnibias.torch.architectures.collapse_net import worked_example as torch_ex
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -41,6 +53,18 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["below_1e3"] and skill["skill_positive"] and skill["collapsed_no_worse"])
     hon = honesty_payload()
     g3 = hon["continuum_pde_claimed"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    cfg = CollapseNetConfig(order=1, delta=0.1, mode="stencil")
+    t = torch_fwd(torch.tensor(0.0), config=cfg)
+    j = jax_fwd(jnp.asarray(0.0), config=cfg)
+    tr = torch_rem(torch.tensor(0.0), config=cfg)
+    jr = jax_rem(jnp.asarray(0.0), config=cfg)
+    g4 = bool(
+        torch_ex()["remainder"] == jax_ex()["remainder"]
+        and float(t) == float(j)
+        and float(tr) == float(jr)
+    )
     entries = [
         {
             "name": "g1_remainder",
@@ -60,6 +84,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "name": "g3_honesty",
             "passed": g3,
             "continuum_pde_claimed": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_y": float(t),
+            "jax_y": float(j),
         },
     ]
     for entry in entries:

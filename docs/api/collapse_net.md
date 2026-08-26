@@ -7,7 +7,7 @@ map, not a hope and not a continuum PDE. Temperature collapse
 (`beta -> inf`, feasibility) does not appear. Do not conflate the
 two.
 
-Status is **gated**, not shipped. Not CCF stretch.
+Status is **shipped**. Not CCF stretch.
 
 Homes: `omnibias.core.collapse_net`,
 `omnibias.{torch,jax}.architectures.collapse_net`,

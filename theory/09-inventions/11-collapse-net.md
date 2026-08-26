@@ -6,7 +6,7 @@ Train on a lattice with umbral / irregular Birkhoff stencils (01-04)
 and **infer by founding bias collapse** `delta -> 0` to `sigma^(K-1)`,
 so the continuum limit is a named map, not a hope.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not a continuum PDE)
 - **Depends on**: 01-04, 09-01
 - **Blocks**: none
 
