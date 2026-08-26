@@ -2,7 +2,7 @@
 
 A finite-domain CSP is a product of multilinear relations plus compact
 global relaxations. `E = 0` exactly on satisfying one-hot vertices.
-Status is **gated**, not shipped. G1–G6 are CI-gated.
+Status is **shipped**. G1–G6 are CI-gated.
 
 Simplex sharpness `p = softmax(beta_1 z)` and clause sharpness
 `log(m)/beta_2` are two independent **temperature collapse** knobs

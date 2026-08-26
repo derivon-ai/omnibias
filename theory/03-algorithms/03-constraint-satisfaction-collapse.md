@@ -7,7 +7,7 @@ of soft-ORs whose `beta -> inf` limit is exact satisfaction; annealing that
 temperature turns constraint satisfaction into a differentiable descent with a
 closed-form gap to the hard problem.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; temperature collapse, not founding bias collapse; not a complete solver; not P vs NP)
 - **Depends on**: 01-03, 01-08, 01-09
 - **Blocks**: 03-09
 

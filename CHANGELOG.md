@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — CSP collapse shipped (theory 03-03)
+
+- Spec 03-03 status is **shipped**: G1–G6 CI, no leftover gate.
+- Temperature collapse, not founding bias collapse. Not P vs NP.
+- Smoke: `docs/benchmarks/csp_collapse_smoke.json`.
+
 ### Added — Arrangement LP shipped (theory 03-02)
 
 - Spec 03-02 status is **shipped**: G1–G5 CI, no leftover gate.

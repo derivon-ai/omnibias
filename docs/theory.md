@@ -268,6 +268,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Arrangement LP** ([03-02](api/arrangement_lp.md)): learned-facet
   front end; not a new LP algorithm. Temperature collapse, not
   founding bias collapse. Status is **shipped**.
+- **CSP collapse** ([03-03](api/csp.md)): finite-domain CSP; not a
+  complete solver; not P vs NP. Temperature collapse, not founding
+  bias collapse. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
