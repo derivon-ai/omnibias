@@ -117,7 +117,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [01-11 rational exactness](01-geometry/11-rational-exactness-and-new-lean-obligations.md) | shipped | Collapse weights are rationals; `C_j` / poisedness are Lean-checkable; G1–G5 earned (kernel pass in the Lean job); algebra only, not the collapse |
 | [01-12 conjugate Hilbert tower](01-geometry/12-conjugate-hilbert-tower.md) | shipped | Line Hilbert only; G1–G4 CI; G5 campaign-artifact **leftover-recorded** (leftover #11; matched-width ratio `0.978`, need `10x`), not in CI `all_passed` |
 | [01-13 operator family](01-geometry/13-operator-family.md) | gated | Scan of the six roles; catalog + rejects; not a seventh `op`; first spend `BiasScan(op="integral")` shipped; 09-14 gated |
-| [01-14 Enclosure Collapse](01-geometry/14-enclosure-collapse-and-width-law.md) | gated | Width Law + six `squeeze_*` wrappers; `width -> 0` of a sound enclosure (a point plus a proof); not a package; not bias collapse |
+| [01-14 Enclosure Collapse](01-geometry/14-enclosure-collapse-and-width-law.md) | shipped | Width Law + six `squeeze_*` wrappers; `width -> 0` of a sound enclosure (a point plus a proof); not a package; not bias collapse |
 
 ### 02 Architectures
 

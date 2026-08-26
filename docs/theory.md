@@ -171,7 +171,8 @@ Three extensions of this geometry have code and CI smoke.
   asymptotic in the node scale `h`. G1–G4 earned. Status is **shipped**.
 - **Enclosure Collapse** ([01-14](api/enclosure_collapse.md)): `width -> 0`
   of a sound enclosure (a point plus a proof); Width Law plus six
-  `squeeze_*` wrappers. Not a derivative and not a 0/1 step. G1–G6 gated.
+  `squeeze_*` wrappers. Not a derivative and not a 0/1 step. G1–G6
+  earned. Status is **shipped**.
 
 ### Wave-3 gated architectures (not shipped)
 

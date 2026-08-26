@@ -13,7 +13,7 @@ tower derivative. The operation is squeeze: contract a named enclosure
 until a certificate fires, or return `Inconclusive`. Forcing `lo = hi`
 by clamping is unsound and forbidden.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; Width Law + six `squeeze_*`; not a package; not bias collapse)
 - **Depends on**: 03-08, 07-02, 07-06, 08-04, 09-18
 - **Blocks**: none
 

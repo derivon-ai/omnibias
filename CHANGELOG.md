@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Enclosure Collapse shipped (theory 01-14)
+
+- Spec 01-14 status is **shipped**: G1–G6 CI, no leftover gate.
+- Width Law plus six `squeeze_*`; not a package; not bias collapse.
+- Smoke: `docs/benchmarks/enclosure_collapse_smoke.json`.
+
 ### Added — Conjugate Hilbert shipped (theory 01-12)
 
 - Spec 01-12 status is **shipped**: G1–G4 CI; leftover #11 G5 stays

@@ -470,7 +470,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.difference` irregular
   stencils (01-04, **shipped**);
   `omnibias.core.verified.enclosure_collapse` plus
-  `omnibias.verify.enclosure_collapse` (01-14; Enclosure Collapse is
+  `omnibias.verify.enclosure_collapse` (01-14, **shipped**; Enclosure Collapse is
   `width -> 0` of a *sound enclosure*, a point plus a proof, not bias
   collapse and not a package). Docs: [`docs/api/multipack.md`](docs/api/multipack.md),
   [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md),

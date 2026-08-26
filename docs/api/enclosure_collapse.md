@@ -2,7 +2,7 @@
 
 Enclosure Collapse is the `width -> 0` limit of a **sound enclosure**.
 The output is a point **plus a proof**, or `Inconclusive`. It is **not**
-a derivative and **not** a 0/1 step. Status is **gated**, not shipped.
+a derivative and **not** a 0/1 step. Status is **shipped**.
 G1–G6 are package-test gated.
 
 The founding **bias collapse** (`delta -> 0`) yields `sigma^(K-1)`.
