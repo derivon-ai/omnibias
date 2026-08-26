@@ -4,6 +4,7 @@
 
 G1 inverts tanh(2x)=0.5. G2 inverts random unsaturated
 targets and refuses |y|=0.999. G3 records no global inverse.
+G4 is torch/jax bit-identity on G1.
 """
 
 from __future__ import annotations
@@ -15,12 +16,19 @@ import time
 from pathlib import Path
 from typing import Any
 
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.inverse_design import (
     DISCLAIMER,
     honesty_payload,
     invert_skill,
     worked_example,
 )
+from omnibias.jax.optim_inverse import invert_input as jax_inv
+from omnibias.jax.optim_inverse import worked_example as jax_ex
+from omnibias.torch.optim_inverse import invert_input as torch_inv
+from omnibias.torch.optim_inverse import worked_example as torch_ex
 
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
@@ -41,6 +49,15 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["g2_earned"])
     hon = honesty_payload()
     g3 = hon["global_inverse_claimed"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t_rep = torch_inv(None, torch.tensor(0.5), torch.tensor(0.0))
+    j_rep = jax_inv(None, jnp.asarray(0.5), jnp.asarray(0.0))
+    g4 = bool(
+        torch_ex()["x"] == jax_ex()["x"]
+        and t_rep.x == j_rep.x
+        and t_rep.residual == j_rep.residual
+    )
     entries = [
         {
             "name": "g1_cell",
@@ -60,6 +77,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "name": "g3_honesty",
             "passed": g3,
             "global_inverse_claimed": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_x": t_rep.x,
+            "jax_x": j_rep.x,
         },
     ]
     for entry in entries:

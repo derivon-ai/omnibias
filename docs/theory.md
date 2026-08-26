@@ -404,6 +404,8 @@ gates are earned on smoke, not in CI `all_passed`.
   08-04 filter on a `tau`-path. Status is **shipped**.
 - **Exact score matching** ([09-21](api/exact_score_matching.md)):
   Hyvärinen; CNF exact `div` is prior art. Status is **shipped**.
+- **Inverse design** ([09-22](api/inverse_design.md)): Newton-on-`x`,
+  not a global inverse. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

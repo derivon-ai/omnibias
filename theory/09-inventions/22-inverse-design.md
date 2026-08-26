@@ -6,7 +6,7 @@ Find `x` such that `f_theta(x) = y` by **Newton-on-`x`** with exact
 `sigma'`, optionally inside a Kantorovich ball; optionally fit `theta`
 so `sigma'` stays bounded away from 0.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not a global inverse)
 - **Depends on**: 08-04, 09-01
 - **Blocks**: none
 

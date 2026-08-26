@@ -666,7 +666,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.score_matching` + `omnibias.score.{torch,jax}.score_matching`
   (09-21, **shipped**; Hyvärinen / DSM; G1–G4 CI; CNF exact `div` is prior art) /
   `omnibias.core.inverse_design` + `omnibias.{torch,jax}.optim_inverse`
-  (09-22; Newton-on-`x`; G1–G4 CI; not 08-03; not a global inverse) /
+  (09-22, **shipped**; Newton-on-`x`; G1–G4 CI; not 08-03; not a global inverse) /
   `omnibias.core.sharp_loss` + `omnibias.{torch,jax}.optim_sharp_loss`
   (09-23; `L + mu * ritz`; G1–G4 CI; not 08-06 schedule) /
   `omnibias.core.jet_world` + `omnibias.dynamics._core.jet_world`

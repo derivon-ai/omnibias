@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Inverse design shipped (theory 09-22)
+
+- Spec 09-22 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 invert.
+- Newton-on-`x`, not a global inverse.
+- Smoke: `docs/benchmarks/inverse_design_smoke.json`.
+
 ### Added — Exact score matching shipped (theory 09-21)
 
 - Spec 09-21 status is **shipped**: G1–G4 CI; G4 torch/jax parity
