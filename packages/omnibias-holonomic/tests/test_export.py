@@ -4,8 +4,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 from omnibias.holonomic._core.export import (
     DISCLAIMER,
@@ -15,6 +13,7 @@ from omnibias.holonomic._core.export import (
     honesty_payload,
     ore_from_dict,
     ore_to_dict,
+    source_imports_no_backend,
     worked_example,
 )
 from omnibias.holonomic._core.layer import d_minus_1
@@ -46,9 +45,4 @@ def test_g3_forbidden_lean() -> None:
 
 
 def test_g4_no_torch_jax() -> None:
-    text = Path(__file__).resolve().parents[1].joinpath(
-        "src/omnibias/holonomic/_core/export.py"
-    ).read_text(encoding="utf-8")
-    assert "import torch" not in text
-    assert "import jax" not in text
-    assert "tensorflow" not in text
+    assert source_imports_no_backend() is True

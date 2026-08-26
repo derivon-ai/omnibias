@@ -3,7 +3,8 @@
 """Frontier 09-26: net-to-annihilator export.
 
 G1 is a D-1 serialize/parse identity. G2 keeps verified flags
-false. G3 refuses a continuum Lean sentence.
+false. G3 refuses a continuum Lean sentence. G4 is export-module
+purity (no torch/jax).
 """
 
 from __future__ import annotations
@@ -15,10 +16,13 @@ import time
 from pathlib import Path
 from typing import Any
 
-from omnibias.holonomic._core.export import (
+_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_ROOT / "packages" / "omnibias-holonomic" / "src"))
+from omnibias.holonomic._core.export import (  # noqa: E402
     DISCLAIMER,
     export_skill,
     honesty_payload,
+    source_imports_no_backend,
     worked_example,
 )
 
@@ -41,6 +45,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["g2_earned"])
     hon = honesty_payload()
     g3 = hon["theorem_prover_verified"] is False and bool(skill["continuum_raised"])
+    g4 = source_imports_no_backend()
     entries = [
         {
             "name": "g1_cell",
@@ -60,6 +65,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "passed": g3,
             "theorem_prover_verified": False,
             "mathlib_verified": False,
+        },
+        {
+            "name": "g4_purity",
+            "passed": g4,
+            "imports_backend": False,
         },
     ]
     for entry in entries:

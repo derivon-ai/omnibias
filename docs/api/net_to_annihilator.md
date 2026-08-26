@@ -8,7 +8,7 @@ does not appear.
 
 `theorem_prover_verified` and `mathlib_verified` stay false until a
 genuine `lake build`. Not a continuum PDE. Not CCF stretch. Status
-is **gated**, not shipped. The export module imports neither torch
+is **shipped**. The export module imports neither torch
 nor jax.
 
 Homes: `omnibias.holonomic._core.export`.

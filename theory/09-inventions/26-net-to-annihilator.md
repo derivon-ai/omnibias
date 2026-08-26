@@ -6,7 +6,7 @@ After training, **emit an Ore / jet description** plus a *finite
 rational* Lean obligation — an export format, not a better loss.
 Infinite analytic obligations stay out of Lean.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 export purity; Lean flags future-earned)
 - **Depends on**: 01-11, 09-01, 09-12
 - **Blocks**: none
 

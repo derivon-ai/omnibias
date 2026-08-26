@@ -18,8 +18,10 @@ nor jax.
 
 from __future__ import annotations
 
+import ast
 from dataclasses import dataclass
 from fractions import Fraction
+from pathlib import Path
 from typing import Any
 
 from omnibias.holonomic._core.layer import d2_plus_1, d_minus_1
@@ -30,6 +32,21 @@ DISCLAIMER = (
     "Ore annihilator export; finite rational Lean only; verified flags "
     "future-earned; not a continuum PDE, not CCF stretch"
 )
+
+def source_imports_no_backend() -> bool:
+    """G4: the export module has no backend imports."""
+    tree = ast.parse(Path(__file__).read_text(encoding="utf-8"))
+    banned = {"torch", "jax"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                if alias.name.split(".")[0] in banned:
+                    return False
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            if node.module.split(".")[0] in banned:
+                return False
+    return True
+
 
 FORBIDDEN_LEAN = (
     "sorry",
@@ -196,5 +213,6 @@ __all__ = [
     "ore_from_dict",
     "ore_to_dict",
     "render_finite_lean",
+    "source_imports_no_backend",
     "worked_example",
 ]

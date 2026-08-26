@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.net_to_annihilator.v1",
-  "generated_utc": "2026-08-21T21:21:01Z",
+  "generated_utc": "2026-08-26T17:21:10Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
       "stretch_claim": false
     }
   },
-  "rss_mb_at_start": 810.97,
+  "rss_mb_at_start": 813.81,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -43,9 +43,14 @@
         "passed": true,
         "theorem_prover_verified": false,
         "mathlib_verified": false
+      },
+      {
+        "name": "g4_purity",
+        "passed": true,
+        "imports_backend": false
       }
     ]
   },
   "disclaimer": "Ore annihilator export; finite rational Lean only; verified flags future-earned; not a continuum PDE, not CCF stretch",
-  "wall_seconds": 1.721789579023607
+  "wall_seconds": 1.1156490449793637
 }

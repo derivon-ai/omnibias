@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Net-to-annihilator shipped (theory 09-26)
+
+- Spec 09-26 status is **shipped**: G1–G4 CI; G4 export purity
+  (no torch/jax). Lean flags stay future-earned.
+- Finite rational Lean only.
+- Smoke: `docs/benchmarks/net_to_annihilator_smoke.json`.
+
 ### Added — World-model-as-jet shipped (theory 09-25)
 
 - Spec 09-25 status is **shipped**: G1–G4 CI; G4 Lohner-path

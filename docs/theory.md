@@ -412,6 +412,8 @@ gates are earned on smoke, not in CI `all_passed`.
   08-09. Status is **shipped**.
 - **World-model-as-jet** ([09-25](api/world_model_jet.md)): next
   N-jet + Lohner, not NS. Status is **shipped**.
+- **Net-to-annihilator** ([09-26](api/net_to_annihilator.md)): Ore
+  export, finite rational Lean only. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
