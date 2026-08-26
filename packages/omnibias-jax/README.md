@@ -68,12 +68,12 @@ and `init_bias_scan` / `bias_scan` / `BankSpec` (01-02, **shipped**). Same hones
 torch modules: interior shift along `w`, `gamma` is not `delta -> 0`.
 
 Shipped Wave-3 twins: Scan-Net (`init_scan_net` / `scan_net_apply`;
-on-lattice equivariance; G4 leftover-recorded) and `hierarchical_scan`
-(1-D offsets). Gated Wave-3 (not shipped): Jet-KAN (`init_jet_kan` /
-`jet_kan_apply`; model-jet exactness, KA theorem does not justify),
-Hermite ladder (`hermite_basis` / `ladder_apply`; Rodrigues reweight
-required), and equivariant scan (gaussian-family steering; discrete
-`C_L`).
+on-lattice equivariance; G4 leftover-recorded), Jet-KAN (`init_jet_kan`
+/ `jet_kan_apply`; model-jet exactness, KA theorem does not justify; G2
+leftover-recorded), and `hierarchical_scan` (1-D offsets). Gated
+Wave-3 (not shipped): Hermite ladder (`hermite_basis` / `ladder_apply`;
+Rodrigues reweight required) and equivariant scan (gaussian-family
+steering; discrete `C_L`).
 
 ## License
 

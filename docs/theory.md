@@ -197,7 +197,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Jet-KAN** ([02-03](api/jetkan.md)): univariate multi-pack edges. Exactness
   is of the **model jet**, not the target; the KA theorem does **not**
   justify the architecture. G2 leftover-recorded (leftover #41), not
-  in CI `all_passed`.
+  in CI `all_passed`. Status is **shipped**.
 - **Weak-form VPINN** ([02-04](api/weak.md)): exact integrals only for
   polynomial coeffs on boxes; path recorded; boundary bound **on by default**.
   Status is **shipped**.

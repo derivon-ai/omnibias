@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-KAN shipped (theory 02-03)
+
+- Spec 02-03 status is **shipped**: G1/G3/G5 CI; leftover #41 G2 stays
+  reported and out of `all_passed`.
+- Model-jet exactness; KA theorem does not justify.
+- Smoke: `docs/benchmarks/jetkan_smoke.json`.
+
 ### Added — Jet-KAN G2 leftover-recorded (theory 02-03)
 
 - Leftover #41 leftover-records `g2_jet_cost` (~2.2x vs autodiff,

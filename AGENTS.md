@@ -485,7 +485,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.partition.arrangement` (01-03, **shipped**; temperature collapse; cost vs n/D leftover-recorded) /
   `omnibias.struct._core.tropical` (01-08, **shipped**; reuses `logsumexp_gap_bound`; G4 path-following earned, `path_follow` wired to `AnnealSchedule`; cost vs n/D leftover-recorded) /
   `omnibias.{torch,jax}.architectures` Scan-Net (02-01, **shipped**; on-lattice
-  equivariance; G1–G3/G5 CI; G4 leftover-recorded) and Jet-KAN (02-03; model-jet exactness, KA theorem does
+  equivariance; G1–G3/G5 CI; G4 leftover-recorded) and Jet-KAN (02-03, **shipped**; model-jet exactness, KA theorem does
   not justify; G2 leftover-recorded) plus LadderNet (02-10; Rodrigues reweight; G4 many-body leftover-recorded, exact-vs-FD reported; G5 anharmonic leftover-recorded) /
   `omnibias.{torch,jax}.scan_equivariant` (02-08; gaussian steering,
   discrete `C_L`; G5 leftover-recorded, orbit cost reported) / `omnibias.{torch,jax}.hierarchy` (02-07, **shipped**; 1-D offsets; G3 earned) /
