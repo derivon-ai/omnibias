@@ -280,6 +280,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Neural quadrature** ([03-06](api/neural_quadrature.md)):
   moment-solved nodes plus Peano enclosure. Founding bias collapse,
   not temperature collapse. Status is **shipped**.
+- **Scale flow** ([03-07](api/scale_flow.md)): `alpha` is a tempering
+  scale, not a collapse. Nonlinear flow is a recorded truncation.
+  Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

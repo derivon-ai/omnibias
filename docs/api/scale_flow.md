@@ -14,7 +14,7 @@ approximations; G6 records a three-order study rather than a
 three-digit claim.
 
 Home: `omnibias.core.scale` plus `omnibias.fields.scale`. No new
-package. Status is **gated**, not shipped. G1–G6 are CI-gated.
+package. Status is **shipped**. G1–G6 are CI-gated.
 
 ## API
 

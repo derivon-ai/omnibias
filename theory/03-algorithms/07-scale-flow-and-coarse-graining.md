@@ -7,7 +7,7 @@ a field means integrating out packs above a cutoff, and because the tower has an
 **exact scaling law** the flow of the effective parameters is computable rather
 than fitted.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; `alpha` is a tempering scale, not a collapse; nonlinear flow is a recorded truncation)
 - **Depends on**: 01-07, 02-07
 - **Blocks**: 03-13, 05-02
 

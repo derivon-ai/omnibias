@@ -560,7 +560,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   Peano enclosure; G1–G5 CI; founding bias collapse, not
   temperature collapse; refuses without a derivative bound;
   no non-product cubature) /
-  `omnibias.core.scale` plus `omnibias.fields.scale` (03-07;
+  `omnibias.core.scale` plus `omnibias.fields.scale` (03-07, **shipped**;
   exact `alpha^n` rescaling + linear coarse-graining + derived
   band schedule; G1–G6 CI; `alpha` is a tempering scale, not
   founding bias collapse and not temperature collapse;

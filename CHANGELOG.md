@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Scale flow shipped (theory 03-07)
+
+- Spec 03-07 status is **shipped**: G1–G6 CI, no leftover gate.
+- `alpha` is a tempering scale, not a collapse.
+- Smoke: `docs/benchmarks/scale_flow_smoke.json`.
+
 ### Added — Neural quadrature shipped (theory 03-06)
 
 - Spec 03-06 status is **shipped**: G1–G5 CI, no leftover gate.
