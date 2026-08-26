@@ -7,7 +7,8 @@ No 2-D/3-D FMM. The half-plane Dirichlet-to-Neumann map uses the
 [conjugate Hilbert](conjugate.md) dictionary.
 
 G1 off-surface residual and G5 DtN (<= 4 ulp) are CI-gated. G4
-mollifier order is CI-gated. G2 disc-accuracy (annulus L2 `<= 1e-8`)
+regularization order is **earned** (`sqrt(r^2+eps^2)` Green is
+`O(eps^2)` over three halvings). G2 disc-accuracy (annulus L2 `<= 1e-8`)
 is **earned** (leftover #24 closed): `circle_dirichlet_density` is
 the single-layer Fourier solve, not a train, and is in CI
 `all_passed`. `single_layer` wall vs `n_quad` is **leftover-recorded**

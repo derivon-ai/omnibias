@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — BEM-Net G4 regularization order earned (theory 02-06)
+
+- Spec 02-06 G4 mollified-Green order is now in CI `all_passed`.
+- `sqrt(r^2+eps^2)` error is `O(eps^2)` over three halvings.
+- Smoke: `docs/benchmarks/bem_net_smoke.json`.
+
 ### Added — Jet-KAN G4 refinement earned (theory 02-03)
 
 - Spec 02-03 G4 pack birth / order growth is now in CI `all_passed`.

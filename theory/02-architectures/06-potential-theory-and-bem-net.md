@@ -7,7 +7,7 @@ single-layer potential: a boundary-integral network that solves exterior
 Laplace and Helmholtz problems by learning **densities on surfaces** rather than
 fields in volumes, with the layer potentials evaluated in closed form.
 
-- **Status**: shipped (off-surface exact; BC approximated; linear constant-coeff homogeneous; G2 disc-accuracy **earned**, leftover #24 closed — `circle_dirichlet_density` annulus L2, in CI `all_passed`; single-layer cost **leftover-recorded**, leftover #42; G3 exterior win leftover-recorded / unearned, leftover #30 — pack-tree has a crossover, no volume PINN, not in CI `all_passed`)
+- **Status**: shipped (off-surface exact; BC approximated; linear constant-coeff homogeneous; G2 disc-accuracy **earned**, leftover #24 closed — `circle_dirichlet_density` annulus L2, in CI `all_passed`; G4 regularization order **earned** (`eps^2` Green, three halvings); single-layer cost **leftover-recorded**, leftover #42; G3 exterior win leftover-recorded / unearned, leftover #30 — pack-tree has a crossover, no volume PINN, not in CI `all_passed`)
 - **Depends on**: 01-05, 01-12, 02-07
 - **Blocks**: 05-01
 
@@ -220,6 +220,9 @@ classical dense BEM with the same number of surface unknowns.
   matched cost, over five seeds.
 - **G4 regularization order.** The measured regularization error decays at the
   order predicted by the mollifier's moment conditions, over three halvings.
+  **Earned** — `sqrt(r^2+eps^2)` Green is `O(eps^2)`; observed orders
+  over three halvings match 2. Not a moment-annihilating pack. In CI
+  `all_passed`.
 - **G5 half-plane exactness.** `half_plane_dtn` matches the analytic
   Dirichlet-to-Neumann map to `<= 4 ulp` on the test set, using the conjugate
   tower rather than quadrature.

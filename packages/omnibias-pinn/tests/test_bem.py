@@ -70,19 +70,18 @@ def test_g5_half_plane_dtn_ulp() -> None:
 
 
 def test_g4_mollifier_order_smoke() -> None:
-    surface = Surface("circle", radius=1.0, n_quad=24)
+    surface = Surface("circle", radius=1.0, n_quad=32)
     exact = KernelSpec("laplace", dimension=2)
-    x = (2.0, 0.0)
-    dens = [1.0] * 24
+    x = (3.0, 0.0)
+    dens = [1.0] * 32
     u0 = single_layer(x, surface, dens, exact)
     errs = []
-    for eps in (0.2, 0.1, 0.05):
+    for eps in (0.2, 0.1, 0.05, 0.025):
         moll = KernelSpec("laplace", dimension=2, regularization=eps)
         u = single_layer(x, surface, dens, moll)
         errs.append(abs(u - u0))
-    # Error shrinks as eps halves (order at least 1).
-    assert errs[1] < errs[0]
-    assert errs[2] < errs[1]
+    orders = [math.log2(errs[i] / errs[i + 1]) for i in range(3)]
+    assert all(abs(o - 2.0) <= 0.25 for o in orders)
 
 
 def test_g6_torch_jax_parity() -> None:

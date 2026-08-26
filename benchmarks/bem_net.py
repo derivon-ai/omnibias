@@ -5,7 +5,8 @@
 G2 disc-accuracy is earned: ``circle_dirichlet_density`` hits the
 annulus ``L2`` gate. Single-layer wall vs ``n_quad`` is reported. G3
 exterior win is leftover-recorded (leftover #30): no volume-PINN loop.
-G3 is not in CI ``all_passed``.
+G3 is not in CI ``all_passed``. G4 is the ``eps^2`` mollified-Green
+order over three halvings.
 """
 
 from __future__ import annotations
@@ -169,6 +170,41 @@ def _run_g3() -> dict[str, Any]:
     }
 
 
+def _run_g4() -> dict[str, Any]:
+    """Mollified Green error is O(eps^2) over three halvings."""
+    from omnibias.pinn.bem._core import KernelSpec, Surface, single_layer
+
+    surface = Surface("circle", radius=1.0, n_quad=32)
+    exact = KernelSpec("laplace", dimension=2)
+    x = (3.0, 0.0)
+    dens = [1.0] * 32
+    u0 = single_layer(x, surface, dens, exact)
+    epss = (0.2, 0.1, 0.05, 0.025)
+    errs = []
+    for eps in epss:
+        moll = KernelSpec("laplace", dimension=2, regularization=eps)
+        errs.append(abs(single_layer(x, surface, dens, moll) - u0))
+    observed = [
+        float(np.log2(max(errs[i], 1e-30) / max(errs[i + 1], 1e-30)))
+        for i in range(3)
+    ]
+    predicted = 2.0
+    passed = bool(all(abs(o - predicted) <= 0.25 for o in observed))
+    return {
+        "name": "g4_regularization_order",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "predicted_order": predicted,
+        "eps": list(epss),
+        "abs_err": [float(e) for e in errs],
+        "observed_orders": observed,
+        "note": (
+            "sqrt(r^2+eps^2) Green: G_eps - G_0 = O(eps^2). "
+            "Three halvings of eps. Not a moment-annihilating pack."
+        ),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
@@ -208,12 +244,21 @@ def main() -> int:
     cost = _run_cost()
     g2 = _run_g2()
     g3 = _run_g3()
+    g4 = _run_g4()
     entries.append(
         {
             "name": "g2_disc_accuracy",
             "passed": bool(g2["passed"]),
             "in_ci_all_passed": bool(g2["in_ci_all_passed"]),
             "rel_l2": g2["rel_l2"],
+        }
+    )
+    entries.append(
+        {
+            "name": "g4_regularization_order",
+            "passed": bool(g4["passed"]),
+            "in_ci_all_passed": bool(g4["in_ci_all_passed"]),
+            "predicted_order": g4["predicted_order"],
         }
     )
     payload: dict[str, Any] = provenance(
@@ -223,13 +268,15 @@ def main() -> int:
             "cost_in_all_passed": False,
             "g2_in_all_passed": bool(g2["in_ci_all_passed"]),
             "g3_in_all_passed": False,
-            "gates_in_scope": ["g1", "g2", "g5"],
+            "g4_in_all_passed": bool(g4["in_ci_all_passed"]),
+            "gates_in_scope": ["g1", "g2", "g4", "g5"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["cost"] = cost
     payload["g2"] = g2
     payload["g3"] = g3
+    payload["g4"] = g4
     payload["honesty"] = {
         "pde_exact": "off-surface by construction",
         "bc": "approximated",
@@ -249,6 +296,7 @@ def main() -> int:
         "g3_leftover_tick": 62,
         "g3_in_ci_all_passed": False,
         "g3_volume_pinn": False,
+        "g4_regularization_order_earned": bool(g4["passed"]),
         "cost_earned": False,
         "cost_reported": True,
         "cost_leftover_recorded": True,

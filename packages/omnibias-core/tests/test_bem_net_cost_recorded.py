@@ -67,3 +67,12 @@ def test_g2_earned_and_g3_cost_out_of_all_passed() -> None:
     assert payload["honesty"]["g3_leftover_recorded"] is True
     assert int(payload["honesty"]["g3_leftover_id"]) == 30
     assert payload["honesty"]["g3_in_ci_all_passed"] is False
+    g4 = payload["g4"]
+    assert g4["name"] == "g4_regularization_order"
+    assert g4["passed"] is True
+    assert g4["in_ci_all_passed"] is True
+    assert float(g4["predicted_order"]) == 2.0
+    assert all(abs(float(o) - 2.0) <= 0.25 for o in g4["observed_orders"])
+    assert payload["honesty"]["g4_regularization_order_earned"] is True
+    assert "g4_regularization_order" in names
+    assert payload["config"]["gates_in_scope"] == ["g1", "g2", "g4", "g5"]

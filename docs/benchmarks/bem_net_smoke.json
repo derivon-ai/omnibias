@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.bem_net.v1",
-  "generated_utc": "2026-08-26T16:37:58Z",
+  "generated_utc": "2026-08-26T17:49:56Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,13 +15,15 @@
     "cost_in_all_passed": false,
     "g2_in_all_passed": true,
     "g3_in_all_passed": false,
+    "g4_in_all_passed": true,
     "gates_in_scope": [
       "g1",
       "g2",
+      "g4",
       "g5"
     ]
   },
-  "rss_mb_at_start": 810.21,
+  "rss_mb_at_start": 809.78,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -41,6 +43,12 @@
         "passed": true,
         "in_ci_all_passed": true,
         "rel_l2": 1.183357285554708e-10
+      },
+      {
+        "name": "g4_regularization_order",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "predicted_order": 2.0
       }
     ]
   },
@@ -56,18 +64,18 @@
     "rows": [
       {
         "n_quad": 12,
-        "one_point_wall_seconds": 9.636976756155491e-06,
-        "n_point_wall_seconds": 0.00016467098612338305
+        "one_point_wall_seconds": 2.504501026123762e-05,
+        "n_point_wall_seconds": 0.00028253509663045406
       },
       {
         "n_quad": 24,
-        "one_point_wall_seconds": 2.228503581136465e-05,
-        "n_point_wall_seconds": 0.0003150600241497159
+        "one_point_wall_seconds": 4.296097904443741e-05,
+        "n_point_wall_seconds": 0.0010362130124121904
       },
       {
         "n_quad": 48,
-        "one_point_wall_seconds": 2.4545006453990936e-05,
-        "n_point_wall_seconds": 0.0012333070626482368
+        "one_point_wall_seconds": 8.24240269139409e-05,
+        "n_point_wall_seconds": 0.013977044960483909
       }
     ],
     "note": "Leftover #42 leftover-recorded: single-layer wall vs n_quad (one far point and N exterior points). G2 disc-accuracy is earned separately via circle_dirichlet_density. G3 exterior win stays leftover (no volume PINN). Dense N-point eval is the O(N^2) honesty bound (no 2-D FMM). Not a cost win."
@@ -98,13 +106,37 @@
     "need": "100x far-field vs truncated volumetric PINN, five seeds",
     "volume_pinn": false,
     "pack_tree_crossover_m": 32,
-    "pack_tree_hier_over_dense_at_m_hi": 0.1708930146400412,
+    "pack_tree_hier_over_dense_at_m_hi": 0.17247905461593455,
     "pack_tree_far_eval_is_per_source_taylor": false,
     "stays_full": true,
     "leftover_recorded": true,
     "leftover_id": 30,
     "leftover_tick": 62,
     "note": "Leftover #30 leftover-recorded: named G3 is a 100x far-field win versus a truncated volumetric PINN at matched cost. No density solve or volume-PINN loop is wired. Pack-tree 02-07 G3 now has a dense crossover (hier/dense 0.17 at M=3200, crossover_m=32); that is not a volume-PINN bake-off. Previous spec-status smoke/--full line withdrawn. Not in CI all_passed."
+  },
+  "g4": {
+    "name": "g4_regularization_order",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "predicted_order": 2.0,
+    "eps": [
+      0.2,
+      0.1,
+      0.05,
+      0.025
+    ],
+    "abs_err": [
+      0.002492225678085269,
+      0.0006245123180124157,
+      0.00015621949179611683,
+      3.906059279801255e-05
+    ],
+    "observed_orders": [
+      1.996632781147127,
+      1.9991555556841845,
+      1.999788723072986
+    ],
+    "note": "sqrt(r^2+eps^2) Green: G_eps - G_0 = O(eps^2). Three halvings of eps. Not a moment-annihilating pack."
   },
   "honesty": {
     "pde_exact": "off-surface by construction",
@@ -125,6 +157,7 @@
     "g3_leftover_tick": 62,
     "g3_in_ci_all_passed": false,
     "g3_volume_pinn": false,
+    "g4_regularization_order_earned": true,
     "cost_earned": false,
     "cost_reported": true,
     "cost_leftover_recorded": true,
