@@ -295,6 +295,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Lie symmetry discovery** ([03-11](api/symmetry_discovery.md)):
   in-ansatz only, not a classification. Founding bias collapse, not
   temperature collapse. Status is **shipped**.
+- **Adaptive pack refinement** ([03-13](api/refine.md)): birth/growth
+  bit-identical; death reports a bound. G4 earned. Status is
+  **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Adaptive pack refinement shipped (theory 03-13)
+
+- Spec 03-13 status is **shipped**: G1–G6 CI; G4 earned vs matched-count
+  fixed on the named BL.
+- Birth/growth bit-identical; death reports a bound.
+- Smoke: `docs/benchmarks/adaptive_refinement_smoke.json`.
+
 ### Added — Lie symmetry discovery shipped (theory 03-11)
 
 - Spec 03-11 status is **shipped**: G1–G6 CI, no leftover gate.

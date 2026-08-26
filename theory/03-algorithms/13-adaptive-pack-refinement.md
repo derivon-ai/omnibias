@@ -7,7 +7,7 @@ residual demands it), **growth** (raise a pack's order), and **death** (prune a
 pack that stopped earning its parameters) — each of which preserves the current
 fit exactly, so refinement can never undo learning.
 
-- **Status**: gated (G1–G6 CI; G4 efficiency **earned** vs matched-count fixed on the named BL)
+- **Status**: shipped (G1–G6 CI; G4 efficiency **earned** vs matched-count fixed on the named BL)
 - **Depends on**: 01-01, 03-01, 03-06, 03-07, 03-10, 03-12
 - **Blocks**: 02-03, 05-01
 
