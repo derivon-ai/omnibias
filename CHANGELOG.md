@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equality-intersection G2/G3/G5/G6 earned (theory 02-12)
+
+- Spec 02-12 G2 IFT vs unrolled, G3 degeneracy refusal, G5 ansatz
+  reject, and G6 torch/jax parity are now in CI `all_passed`.
+- Smoke: `docs/benchmarks/equality_intersection_smoke.json`.
+
 ### Added — Layered-transfer G2/G6 earned (theory 02-11)
 
 - Spec 02-11 G2 quarter-wave band edges and G6 torch/jax parity are

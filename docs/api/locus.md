@@ -5,7 +5,8 @@ PDE solver" is **not** claimed. Every solver return carries
 `branch` / `condition` / `converged`. Founding `delta -> 0` only.
 
 G1–G6 of 01-09 are CI-gated (G6 torch/jax Newton parity). 02-12 G1–G3/G5/G6
-are CI-gated. G4 Burgers Rankine–Hugoniot is **leftover-recorded**
+are **earned** in CI `all_passed` (IFT vs unrolled, degeneracy refusal,
+ansatz reject, torch/jax layer parity). G4 Burgers Rankine–Hugoniot is **leftover-recorded**
 unearned (leftover #29): `affine_locus` recovers the published-unit
 speed, but the noisy-data skill versus contour extraction stays
 `--full` (units are not fit from samples). The previous smoke-geometry

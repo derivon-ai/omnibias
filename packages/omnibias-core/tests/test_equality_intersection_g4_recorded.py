@@ -35,3 +35,32 @@ def test_g4_burgers_rh_is_reported_and_out_of_all_passed() -> None:
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g4_burgers_rh" not in names
     assert payload["gates"]["all_passed"] is True
+    g2 = payload["g2"]
+    assert g2["name"] == "g2_ift_vs_unrolled"
+    assert g2["passed"] is True
+    assert g2["in_ci_all_passed"] is True
+    assert float(g2["rel"]) <= 1e-8
+    assert float(g2["iter_rel"]) <= 1e-12
+    assert g2["memory_independent_of_max_iter"] is True
+    g3 = payload["g3"]
+    assert g3["name"] == "g3_degeneracy_refusal"
+    assert g3["passed"] is True
+    assert g3["in_ci_all_passed"] is True
+    assert g3["converged"] is False
+    assert float(g3["condition"]) > 1e6
+    g5 = payload["g5"]
+    assert g5["name"] == "g5_ansatz_reject"
+    assert g5["passed"] is True
+    assert g5["in_ci_all_passed"] is True
+    assert g5["wrong_raised"] is True
+    assert g5["level3_general_solver"] is False
+    g6 = payload["g6"]
+    assert g6["name"] == "g6_parity"
+    assert g6["passed"] is True
+    assert g6["in_ci_all_passed"] is True
+    assert float(g6["max_abs"]) == 0.0
+    assert payload["honesty"]["g2_earned"] is True
+    assert payload["honesty"]["g3_earned"] is True
+    assert payload["honesty"]["g5_earned"] is True
+    assert payload["honesty"]["g6_earned"] is True
+    assert payload["config"]["gates_in_scope"] == ["g1", "g2", "g3", "g5", "g6"]

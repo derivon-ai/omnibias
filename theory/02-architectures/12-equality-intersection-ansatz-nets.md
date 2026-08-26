@@ -7,7 +7,7 @@ Newton and whose backward pass uses the implicit function theorem — the same
 technique `omnibias.convex.torch.qp_layer` applies to a KKT system, on a much smaller
 and better-conditioned system, because the tower supplies the Jacobian exactly.
 
-- **Status**: shipped (layer on 01-09; always `branch` / `condition` / `converged`; not a general PDE solver; G4 Burgers RH leftover-recorded / unearned, leftover #29 — clean speed from `affine_locus`, noisy contour stays `--full`, not in CI `all_passed`)
+- **Status**: shipped (layer on 01-09; always `branch` / `condition` / `converged`; not a general PDE solver; G1–G3/G5/G6 **earned**; G4 Burgers RH leftover-recorded / unearned, leftover #29 — clean speed from `affine_locus`, noisy contour stays `--full`, not in CI `all_passed`)
 - **Depends on**: 01-01, 01-03, 01-09
 - **Blocks**: 05-01, 07-02
 
@@ -234,9 +234,14 @@ Baselines: an unrolled-Newton layer with autodiff, a penalty formulation
 - **G2 backward correctness and memory.** The implicit gradient matches the
   unrolled autodiff gradient to `<= 1e-8` relative, while peak memory is
   independent of `max_iter` (asserted, not just measured).
+  **Earned** — IFT vs `newton_project_unrolled` `rel ~ 4e-16`;
+  `save_for_backward(x_star, weights)` only; `max_iter` 8 vs 20
+  `iter_rel == 0`. In CI `all_passed`.
 - **G3 degeneracy refusal.** On deliberately tangent systems the layer reports
   `converged = False` and a large `condition`, and never returns a confident
   wrong point.
+  **Earned** — identical normals, `converged=False`, `condition > 1e6`.
+  In CI `all_passed`.
 - **G4 shock task.** On the Burgers Riemann problem, the recovered shock speed
   matches Rankine-Hugoniot to `<= 1e-10`, and on a noisy-data version the
   position error beats the contour-extraction baseline, with skill `> 0`, over
@@ -244,7 +249,11 @@ Baselines: an unrolled-Newton layer with autodiff, a penalty formulation
 - **G5 level-2 verification.** `AnsatzSolutionField` raises at construction when
   symbolic verification fails, and a test asserts that a deliberately wrong
   ansatz is rejected.
+  **Earned** — KdV ansatz on Burgers raises; published Burgers
+  verifies; `level3_general_solver` stays false. In CI `all_passed`.
 - **G6 parity.** torch and jax bit-identical.
+  **Earned** — `EqualityLocusLayer` vs `equality_locus_apply`,
+  `max_abs == 0`. In CI `all_passed`.
 
 ## 9. Benchmark plan
 

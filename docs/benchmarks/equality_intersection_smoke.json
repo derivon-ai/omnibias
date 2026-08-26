@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.equality_intersection.v1",
-  "generated_utc": "2026-08-26T16:02:13Z",
+  "generated_utc": "2026-08-26T18:03:56Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -14,10 +14,14 @@
     "mode": "smoke",
     "g4_in_all_passed": false,
     "gates_in_scope": [
-      "g1"
+      "g1",
+      "g2",
+      "g3",
+      "g5",
+      "g6"
     ]
   },
-  "rss_mb_at_start": 809.24,
+  "rss_mb_at_start": 969.2,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -25,8 +29,44 @@
         "name": "g1_locus_residual",
         "passed": true,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "g2_ift_vs_unrolled",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_degeneracy_refusal",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g5_ansatz_reject",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "in_ci_all_passed": true
       }
     ]
+  },
+  "g2": {
+    "name": "g2_ift_vs_unrolled",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "rel": 4.320342345536893e-16,
+    "iter_rel": 0.0,
+    "memory_independent_of_max_iter": true,
+    "saved_tensors": "x_star, weights"
+  },
+  "g3": {
+    "name": "g3_degeneracy_refusal",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "converged": false,
+    "condition": 9.999999999999999e+29
   },
   "g4": {
     "name": "g4_burgers_rh",
@@ -86,9 +126,27 @@
     "stays_full": true,
     "note": "Leftover #29 leftover-recorded: clean Rankine-Hugoniot speed from affine_locus on the published Burgers units (need |s-0.5|<=1e-10). Noisy contour extraction is measured on five seeds; the locus uses those published units, not a fit from samples. Named G4 needs a data-fit that beats contour with skill > 0. Previous g4_burgers_rh passed=True smoke-geometry stub withdrawn. Not in CI all_passed."
   },
+  "g5": {
+    "name": "g5_ansatz_reject",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "wrong_raised": true,
+    "verified": true,
+    "level3_general_solver": false
+  },
+  "g6": {
+    "name": "g6_parity",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "max_abs": 0.0
+  },
   "honesty": {
     "level3_general_solver": false,
     "returns": "branch / condition / converged",
+    "g2_earned": true,
+    "g3_earned": true,
+    "g5_earned": true,
+    "g6_earned": true,
     "g4_earned": false,
     "g4_reported": true,
     "g4_leftover_recorded": true,
