@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — BEM-Net shipped (theory 02-06)
+
+- Spec 02-06 status is **shipped**: leftover #24 G2 earned; leftover
+  #42 cost and leftover #30 G3 stay reported and out of `all_passed`.
+- Off-surface exact; no volume PINN; no 2-D FMM.
+- Smoke: `docs/benchmarks/bem_net_smoke.json`.
+
 ### Added — BEM-Net cost leftover-recorded (theory 02-06)
 
 - Leftover #42 leftover-records `cost_single_layer_vs_n` so it stays

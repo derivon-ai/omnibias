@@ -233,7 +233,8 @@ gates are earned on smoke, not in CI `all_passed`.
 - **BEM-Net** ([02-06](api/bem.md)): PDE exact off-surface; BC approximated;
   linear constant-coeff homogeneous only. G2 disc-accuracy earned
   (`circle_dirichlet_density`). Single-layer cost leftover-recorded
-  (leftover #42). G3 exterior win leftover-recorded.
+  (leftover #42). G3 exterior win leftover-recorded. Status is
+  **shipped**.
 - **Pack tree** ([02-07](api/hierarchy.md)): 1-D offsets; `eta=0` bit-identical
   to dense; far-field is a truncation with a bound. G3 complexity
   earned (cached `O(p)` multipole, dense crossover). Status is **shipped**.

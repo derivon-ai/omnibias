@@ -15,7 +15,7 @@ the single-layer Fourier solve, not a train, and is in CI
 **leftover-recorded** unearned (leftover #30): pack-tree 02-07 has a
 dense crossover, and
 no truncated volumetric PINN loop is wired. G3 is not in CI
-`all_passed`. Status is **gated**, not shipped. See theory spec 02-06.
+`all_passed`. Status is **shipped**. See theory spec 02-06.
 
 ## Algebra and twins
 
