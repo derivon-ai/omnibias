@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Hermite ladder shipped (theory 02-10)
+
+- Spec 02-10 status is **shipped**: leftover #21 G4, leftover #45
+  exact-vs-FD, and leftover #26 G5 stay reported and out of `all_passed`.
+- Rodrigues reweight required. Not a many-body solution claim.
+- Smoke: `docs/benchmarks/hermite_ladder_smoke.json`.
+
 ### Added — Hermite-ladder cost leftover-recorded (theory 02-10)
 
 - Leftover #45 leftover-records `cost_exact_vs_fd_orbitals` so it

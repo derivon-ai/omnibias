@@ -249,7 +249,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Hermite ladder** ([02-10](api/ladder.md)): raw tower is not the QHO
   eigenbasis; Rodrigues reweight required. G4 FermiNet many-body
   leftover-recorded. Exact-vs-FD leftover-recorded (leftover #45).
-  Anharmonic G5 leftover-recorded (may lose).
+  Anharmonic G5 leftover-recorded (may lose). Status is **shipped**.
 - **Layered transfer** ([02-11](api/layered.md)): 1-D only;
   `continuum_claim=False`; distinct from `geometry.gauge.transfer`.
   G4 inverse-design leftover-recorded. G5 conservation leftover-recorded.

@@ -71,9 +71,9 @@ Shipped Wave-3 twins: Scan-Net (`init_scan_net` / `scan_net_apply`;
 on-lattice equivariance; G4 leftover-recorded), Jet-KAN (`init_jet_kan`
 / `jet_kan_apply`; model-jet exactness, KA theorem does not justify; G2
 leftover-recorded), equivariant scan (gaussian-family steering;
-discrete `C_L`; G5 leftover-recorded), and `hierarchical_scan` (1-D
-offsets). Gated Wave-3 (not shipped): Hermite ladder (`hermite_basis` /
-`ladder_apply`; Rodrigues reweight required).
+discrete `C_L`; G5 leftover-recorded), `hierarchical_scan` (1-D
+offsets), and Hermite ladder (`hermite_basis` / `ladder_apply`;
+Rodrigues reweight required; G4 leftover-recorded).
 
 ## License
 

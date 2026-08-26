@@ -65,8 +65,8 @@ Shipped Wave-3 architectures: `ScanNet` (on-lattice equivariance, not
 `R^D`; G4 leftover-recorded), `JetKAN` (exactness of the model jet; the
 KA theorem does not justify; G2 leftover-recorded), `EquivariantScan`
 (gaussian-family steering; discrete `C_L`; G5 leftover-recorded), and
-`hierarchical_scan` (1-D offsets; `eta=0` bit-identical to dense).
-Gated Wave-3 (not shipped): `LadderNet` (Rodrigues reweight required).
+`hierarchical_scan` (1-D offsets; `eta=0` bit-identical to dense), and
+`LadderNet` (Rodrigues reweight required; G4 leftover-recorded).
 See
 [docs/api/scannet.md](../../docs/api/scannet.md),
 [docs/api/jetkan.md](../../docs/api/jetkan.md),
