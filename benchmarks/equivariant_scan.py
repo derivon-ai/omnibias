@@ -72,6 +72,9 @@ def _run_cost() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 43,
+        "leftover_tick": 87,
         "in_ci_all_passed": False,
         "rows": rows,
         "g5_anisotropic_interface": {
@@ -93,9 +96,9 @@ def _run_cost() -> dict[str, Any]:
             ),
         },
         "note": (
-            "Leftover #25 leftover-recorded: EquivariantScan wall vs L "
+            "Leftover #43 leftover-recorded: EquivariantScan wall vs L "
             "(L orientations multiply cost). G5 anisotropic-interface "
-            "is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous "
+            "is leftover #25 and stays --full. Previous "
             "g5_anisotropic_interface passed=True / --full-only stub "
             "with no timing withdrawn. Not in CI all_passed."
         ),
@@ -138,6 +141,9 @@ def main() -> int:
         "g5_stays_full": True,
         "cost_earned": False,
         "cost_reported": True,
+        "cost_leftover_recorded": True,
+        "cost_leftover_id": 43,
+        "cost_leftover_tick": 87,
         "cost_in_ci_all_passed": False,
     }
     if args.full:

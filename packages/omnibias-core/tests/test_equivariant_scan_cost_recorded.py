@@ -18,6 +18,9 @@ def test_cost_is_reported_and_g5_out_of_all_passed() -> None:
     assert cost["earned"] is False
     assert cost["passed"] is False
     assert cost["reported"] is True
+    assert cost["leftover_recorded"] is True
+    assert int(cost["leftover_id"]) == 43
+    assert int(cost["leftover_tick"]) == 87
     assert cost["in_ci_all_passed"] is False
     assert cost["g5_anisotropic_interface"]["earned"] is False
     assert cost["g5_anisotropic_interface"]["reported"] is True
@@ -30,6 +33,8 @@ def test_cost_is_reported_and_g5_out_of_all_passed() -> None:
     assert payload["honesty"]["g5_anisotropic_interface_earned"] is False
     assert payload["honesty"]["g5_leftover_recorded"] is True
     assert int(payload["honesty"]["g5_leftover_id"]) == 25
+    assert payload["honesty"]["cost_leftover_recorded"] is True
+    assert int(payload["honesty"]["cost_leftover_id"]) == 43
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g5_anisotropic_interface" not in names

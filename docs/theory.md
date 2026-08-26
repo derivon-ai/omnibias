@@ -240,7 +240,7 @@ gates are earned on smoke, not in CI `all_passed`.
   earned (cached `O(p)` multipole, dense crossover). Status is **shipped**.
 - **Equivariant scan** ([02-08](api/equivariant_scan.md)): gaussian-family
   steering only; discrete `C_L`, not SO(2)/SO(3). G5 anisotropic-interface
-  leftover-recorded.
+  leftover-recorded. Orbit cost leftover-recorded (leftover #43).
 - **Soliton tanh-method** ([02-09](api/travelling.md)): tanh algebra, not a
   collapse; multi-kink is not the n-soliton formula. G4 PINN init-win
   leftover-recorded.

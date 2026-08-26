@@ -60,7 +60,7 @@ uv run python docs/img/generate_figures.py
 | `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Shipped 02-02 Face-Net: sampled subgraph; G3 vs k-NN leftover-recorded (0-hop; GNN / RegionModels `--full`); cost vs n/D leftover-recorded |
 | `bem_net.py` | `docs/benchmarks/bem_net_smoke.json` | Shipped 02-06: off-surface exact; G2 disc earned (`circle_dirichlet_density`); G3 exterior win leftover-recorded (no volume PINN); single-layer cost leftover-recorded (leftover #42) |
 | `pack_tree.py` | `docs/benchmarks/pack_tree_smoke.json` | Shipped 02-07: 1-D offsets; G3 earned (cached O(p) multipole, dense crossover) |
-| `equivariant_scan.py` | `docs/benchmarks/equivariant_scan_smoke.json` | Gated 02-08: gaussian steering; discrete `C_L`; G5 leftover-recorded (`--full`); orbit cost reported |
+| `equivariant_scan.py` | `docs/benchmarks/equivariant_scan_smoke.json` | Gated 02-08: gaussian steering; discrete `C_L`; G5 leftover-recorded (`--full`); orbit cost leftover-recorded (leftover #43) |
 | `soliton_tanh_method.py` | `docs/benchmarks/soliton_tanh_method_smoke.json` | Gated 02-09: tanh algebra; G4 init-win leftover-recorded (`--full`); algebraic cost reported |
 | `hermite_ladder.py` | `docs/benchmarks/hermite_ladder_smoke.json` | Gated 02-10: Rodrigues reweight; G4 many-body leftover-recorded (`--full`); exact-vs-FD reported; G5 anharmonic leftover-recorded |
 | `layered_transfer.py` | `docs/benchmarks/layered_transfer_smoke.json` | Gated 02-11: `continuum_claim=False`; G4 inverse-design leftover-recorded (`--full`); stack cost reported; G5 conservation leftover-recorded |

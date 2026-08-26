@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equivariant-scan cost leftover-recorded (theory 02-08)
+
+- Leftover #43 leftover-records `cost_orbit_vs_L` so it stays
+  reported and out of `all_passed`.
+- Leftover #25 G5 stays `--full`. Discrete `C_L`, not SO(2).
+- Smoke: `docs/benchmarks/equivariant_scan_smoke.json`.
+
 ### Added — BEM-Net shipped (theory 02-06)
 
 - Spec 02-06 status is **shipped**: leftover #24 G2 earned; leftover

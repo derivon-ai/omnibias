@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.equivariant_scan.v1",
-  "generated_utc": "2026-08-26T15:57:50Z",
+  "generated_utc": "2026-08-26T16:39:13Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -18,7 +18,7 @@
       "g2"
     ]
   },
-  "rss_mb_at_start": 821.97,
+  "rss_mb_at_start": 822.39,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -39,25 +39,28 @@
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 43,
+    "leftover_tick": 87,
     "in_ci_all_passed": false,
     "rows": [
       {
         "L": 4,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.00035191699862480164
+        "wall_seconds": 0.00038168695755302906
       },
       {
         "L": 8,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.0006792040076106787
+        "wall_seconds": 0.0006964349886402488
       },
       {
         "L": 16,
         "batch": 32,
         "n_offsets": 3,
-        "wall_seconds": 0.001315327943302691
+        "wall_seconds": 0.001357623958028853
       }
     ],
     "g5_anisotropic_interface": {
@@ -70,7 +73,7 @@
       "need": "orientation bank beats single-direction scan in angular error, skill > 0 vs random-angle, 5 seeds",
       "reason": "Leftover #25 leftover-recorded: no interface-orientation task is wired. EquivariantScan forward wall vs C_L orbit size is recorded; that is not the named 5-seed skill gate. Discrete C_L, not SO(2)."
     },
-    "note": "Leftover #25 leftover-recorded: EquivariantScan wall vs L (L orientations multiply cost). G5 anisotropic-interface is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous g5_anisotropic_interface passed=True / --full-only stub with no timing withdrawn. Not in CI all_passed."
+    "note": "Leftover #43 leftover-recorded: EquivariantScan wall vs L (L orientations multiply cost). G5 anisotropic-interface is leftover #25 and stays --full. Previous g5_anisotropic_interface passed=True / --full-only stub with no timing withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "steering": "gaussian-family only",
@@ -85,6 +88,9 @@
     "g5_stays_full": true,
     "cost_earned": false,
     "cost_reported": true,
+    "cost_leftover_recorded": true,
+    "cost_leftover_id": 43,
+    "cost_leftover_tick": 87,
     "cost_in_ci_all_passed": false
   }
 }

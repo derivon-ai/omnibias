@@ -9,9 +9,9 @@ G1–G4 are CI-gated. G5 anisotropic-interface (orientation bank vs
 single-direction scan, five seeds) is **leftover-recorded** unearned
 (leftover #25): no task loop is wired, so the named 5-seed skill
 stays `--full`. `EquivariantScan` wall vs `C_L` orbit size is
-**reported**; the previous untimed `passed=True` stub is withdrawn.
-Cost is not in CI `all_passed`. Status is **gated**, not shipped. See
-theory spec 02-08.
+**leftover-recorded** (leftover #43); the previous untimed
+`passed=True` stub is withdrawn. Cost is not in CI `all_passed`.
+Status is **gated**, not shipped. See theory spec 02-08.
 
 ## PyTorch module
 
