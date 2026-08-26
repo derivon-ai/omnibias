@@ -11,11 +11,11 @@ gradient-free, five seeds) is **leftover-recorded** unearned (leftover
 stays `--full`. `stack_matrix` / `certified_band_gap` wall vs
 `n_periods` is **reported**; the previous untimed `passed=True` stub is
 withdrawn. Cost is not in CI `all_passed`. G5 conservation honesty is
-**reported**: unstructured 2×2 `|r|^2+|t|^2-1` versus a lossless stack,
-and `unitarity_residual` refuses `lossless=False`. No MLP surrogate is
-wired. The previous untimed `passed=True` stub is withdrawn. G5 is not
-in CI `all_passed`. Status is **gated**, not shipped. See theory spec
-02-11.
+**leftover-recorded** unearned (leftover #27): unstructured 2×2
+`|r|^2+|t|^2-1` versus a lossless stack, and `unitarity_residual`
+refuses `lossless=False`. No MLP surrogate is wired. The previous
+untimed `passed=True` stub is withdrawn. G5 is not in CI `all_passed`.
+Status is **gated**, not shipped. See theory spec 02-11.
 
 ## Core algebra
 

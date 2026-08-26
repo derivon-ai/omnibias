@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Layered-transfer G5 leftover-recorded (theory 02-11)
+
+- Leftover #27's conservation honesty miss now leftover-records
+  `reported` plus honesty flags on `benchmarks/layered_transfer.py`.
+- Reported: no MLP surrogate; unstructured energy violation is honesty,
+  not a structural win. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/layered_transfer_smoke.json`.
+
 ### Added — Layered-transfer G4 leftover-recorded (theory 02-11)
 
 - Leftover #23's inverse-design miss now leftover-records `reported`

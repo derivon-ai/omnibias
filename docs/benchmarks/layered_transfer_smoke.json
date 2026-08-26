@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.layered_transfer.v1",
-  "generated_utc": "2026-08-26T16:00:43Z",
+  "generated_utc": "2026-08-26T16:01:34Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "g3"
     ]
   },
-  "rss_mb_at_start": 809.28,
+  "rss_mb_at_start": 809.29,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -46,26 +46,26 @@
       {
         "n_periods": 1,
         "n_layers": 2,
-        "stack_wall_seconds": 2.2830208763480186e-06,
-        "gap_wall_seconds": 6.35739415884018e-05
+        "stack_wall_seconds": 1.8579885363578796e-06,
+        "gap_wall_seconds": 5.7357014156877995e-05
       },
       {
         "n_periods": 2,
         "n_layers": 4,
-        "stack_wall_seconds": 3.60200647264719e-06,
-        "gap_wall_seconds": 0.00011089409235864878
+        "stack_wall_seconds": 3.1329691410064697e-06,
+        "gap_wall_seconds": 9.736302308738232e-05
       },
       {
         "n_periods": 4,
         "n_layers": 8,
-        "stack_wall_seconds": 8.109025657176971e-06,
-        "gap_wall_seconds": 0.00019801000598818064
+        "stack_wall_seconds": 5.563022568821907e-06,
+        "gap_wall_seconds": 0.0001835619332268834
       },
       {
         "n_periods": 8,
         "n_layers": 16,
-        "stack_wall_seconds": 1.2160977348685265e-05,
-        "gap_wall_seconds": 0.00040790997445583344
+        "stack_wall_seconds": 1.158192753791809e-05,
+        "gap_wall_seconds": 0.0003821180434897542
       }
     ],
     "g4_inverse_design": {
@@ -85,12 +85,15 @@
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 27,
+    "leftover_tick": 68,
     "in_ci_all_passed": false,
     "structural_unitarity": 0.0,
     "structural_energy_violation": 0.0,
     "unstructured_energy_violation": 1.1494701524901525,
     "unitarity_refuses_lossy": true,
-    "note": "No MLP surrogate is wired. Unstructured 2x2 |r|^2+|t|^2-1 versus a lossless quarter-wave stack. unitarity_residual refuses lossless=False. G5 is honesty: report the violation, do not assert a structural win. Previous passed=True stub withdrawn. Not in CI all_passed."
+    "note": "Leftover #27 leftover-recorded: no MLP surrogate is wired. Unstructured 2x2 |r|^2+|t|^2-1 versus a lossless quarter-wave stack. unitarity_residual refuses lossless=False. G5 is honesty: report the violation, do not assert a structural win. Previous passed=True stub withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "distinct_from": "omnibias.geometry.gauge.transfer",
@@ -104,6 +107,9 @@
     "g4_stays_full": true,
     "g5_mlp_conservation_earned": false,
     "g5_mlp_conservation_reported": true,
+    "g5_leftover_recorded": true,
+    "g5_leftover_id": 27,
+    "g5_leftover_tick": 68,
     "g5_in_ci_all_passed": false,
     "cost_earned": false,
     "cost_reported": true,

@@ -4,7 +4,8 @@
 
 G4 inverse-design is leftover-recorded (leftover #23) and stays
 ``--full``. Stack / gap wall vs period count is reported. G5
-conservation violation is reported, not in CI ``all_passed``.
+conservation is leftover-recorded (leftover #27), not in CI
+``all_passed``.
 """
 
 from __future__ import annotations
@@ -136,17 +137,21 @@ def _run_g5() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 27,
+        "leftover_tick": 68,
         "in_ci_all_passed": False,
         "structural_unitarity": float(struct_unit),
         "structural_energy_violation": float(struct_energy),
         "unstructured_energy_violation": float(unstruct_energy),
         "unitarity_refuses_lossy": bool(refused),
         "note": (
-            "No MLP surrogate is wired. Unstructured 2x2 |r|^2+|t|^2-1 "
-            "versus a lossless quarter-wave stack. unitarity_residual "
-            "refuses lossless=False. G5 is honesty: report the "
-            "violation, do not assert a structural win. Previous "
-            "passed=True stub withdrawn. Not in CI all_passed."
+            "Leftover #27 leftover-recorded: no MLP surrogate is wired. "
+            "Unstructured 2x2 |r|^2+|t|^2-1 versus a lossless "
+            "quarter-wave stack. unitarity_residual refuses "
+            "lossless=False. G5 is honesty: report the violation, do "
+            "not assert a structural win. Previous passed=True stub "
+            "withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -203,6 +208,9 @@ def main() -> int:
         "g4_stays_full": True,
         "g5_mlp_conservation_earned": False,
         "g5_mlp_conservation_reported": True,
+        "g5_leftover_recorded": True,
+        "g5_leftover_id": 27,
+        "g5_leftover_tick": 68,
         "g5_in_ci_all_passed": False,
         "cost_earned": False,
         "cost_reported": True,
