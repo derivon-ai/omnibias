@@ -55,7 +55,7 @@ print(list_activations())
 ```
 
 Wave-1 primitives: `MultiPackUnit` (heterogeneous Birkhoff
-packs, 01-01, **shipped**) and `BiasScan` / `BankSpec` (transverse scan along `w`, 01-02, gated).
+packs, 01-01, **shipped**) and `BiasScan` / `BankSpec` (transverse scan along `w`, 01-02, **shipped**).
 `BiasScan` templates reuse the six `OperatorBlock` roles; equivariance is an
 interior lattice shift, not a circular wrap. Soft-argmax `gamma` is not
 `delta -> 0`. See [docs/api/multipack.md](../../docs/api/multipack.md) and

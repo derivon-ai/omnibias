@@ -64,7 +64,7 @@ package; importing `omnibias.jax` does **not** trigger a FermiNet import,
 so the JAX core remains useful when FermiNet is absent.
 
 Wave-1 twins: `init_multipack` / `multipack_apply` (01-01, **shipped**)
-and `init_bias_scan` / `bias_scan` / `BankSpec` (01-02, gated). Same honesty as the
+and `init_bias_scan` / `bias_scan` / `BankSpec` (01-02, **shipped**). Same honesty as the
 torch modules: interior shift along `w`, `gamma` is not `delta -> 0`.
 
 Gated Wave-3 twins (not shipped): Scan-Net (`init_scan_net` / `scan_net_apply`;

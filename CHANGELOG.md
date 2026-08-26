@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Bias scan shipped (theory 01-02)
+
+- Spec 01-02 status is **shipped**: G1–G4 in CI `all_passed`, 01-13 G5 earned.
+- `BiasScan` is an interior lattice shift along `w`, not a circular wrap.
+- Smoke: `docs/benchmarks/bias_scan_smoke.json`.
+
 ### Added — Multipack Birkhoff shipped (theory 01-01)
 
 - Spec 01-01 status is **shipped**: G1–G5 earned, no leftover gate.

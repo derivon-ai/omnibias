@@ -165,6 +165,7 @@ Three extensions of this geometry have code and CI smoke.
   circular wrap of `tanh'`. Soft-argmax `gamma` is a softmax readout;
   `gamma -> inf` would be temperature collapse, not `delta -> 0`. G1–G4
   CI-gated; G4 is a warmed-up voxelize-then-`cmbConv1d` pipeline win.
+  Status is **shipped**.
 - **Irregular stencils** ([difference API](api/difference.md)): exact-`Q`
   Birkhoff weights for arbitrary nodes and per-node orders. Order is
   asymptotic in the node scale `h`. G1–G4 earned.

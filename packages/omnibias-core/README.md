@@ -49,7 +49,7 @@ print(hermite_coeffs(5))             # probabilist's Hermite (Gaussian)
 | `omnibias.core.polynomials` | `sigmoid_polynomial_coeffs`, `tanh_polynomial_coeffs`, `hermite_coeffs` |
 | `omnibias.core.spec` | `ActivationSpec` — shared activation metadata |
 | `omnibias.core.multipack` | `PackSpec` / `MultiPackSpec` — heterogeneous Birkhoff support (theory 01-01, **shipped**) |
-| `omnibias.core.scan` | `BankSpec` — offset / scale bank for the bias scan (theory 01-02, **gated**) |
+| `omnibias.core.scan` | `BankSpec` — offset / scale bank for the bias scan (theory 01-02, **shipped**) |
 | `omnibias.core.mollifier` | `MollifierSpec` / `tail_bound` — pack-as-mollifier algebra; certified exponential tails, not compact support (theory 01-05, **gated**) |
 | `omnibias.core.spectral_design` | `BandPlan` / `peak_frequency` — order as a band selector, not Littlewood-Paley completeness (theory 01-07, **gated**) |
 | `omnibias.core.frames` | `FrameSpec` / `admissibility_constant` — `sigma'` is not admissible (theory 01-06, **gated**) |

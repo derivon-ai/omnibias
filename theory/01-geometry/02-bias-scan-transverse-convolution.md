@@ -9,7 +9,7 @@ response along `w` at the cost of one activation call per offset.
 In jet-bundle language (01-10) the scan is the section pulled back
 along a translation of the base in the `w` direction.
 
-- **Status**: gated (G1–G4 earned in CI `all_passed`; 01-13 G5 earned)
+- **Status**: shipped (G1–G4 earned in CI `all_passed`; 01-13 G5 earned)
 - **Depends on**: 01-01
 - **Blocks**: 01-06, 01-10, 01-13, 02-01, 02-07, 02-08, 02-11, 03-04, 03-05, 03-08, 05-01, 05-02
 
