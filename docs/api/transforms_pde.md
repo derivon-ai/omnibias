@@ -6,7 +6,9 @@ Exactness is **to jet truncation order N**. Spec 03-11 Lie-symmetry
 birth/death stays designed.
 
 G1 Cole-Hopf jet identity is CI-gated. G6 torch/jax Cole-Hopf
-parity is CI-gated. G3 Burgers win is
+parity is CI-gated. G2 n-soliton generation is
+**leftover-recorded** unearned (leftover #51): no n=1,2,3 grid plus
+phase-shift API. G3 Burgers win is
 **leftover-recorded** unearned (leftover #39): no Cole-Hopf-trained
 field versus a direct PINN at matched cost. The previous
 `g3_burgers_init` `passed=True` stub is withdrawn. Status is

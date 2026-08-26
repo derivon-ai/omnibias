@@ -5,8 +5,10 @@
 G1 is the Cole-Hopf factorial-jet identity. G3 Burgers win is
 leftover-recorded (leftover #39): no Cole-Hopf-trained field versus a
 direct PINN. Previous ``g3_burgers_init`` ``passed=True`` stub withdrawn.
-G6 is torch/jax bit-identity on the Cole-Hopf field. Not a
-Navier-Stokes claim. Spec 03-11 search is not claimed.
+G6 is torch/jax bit-identity on the Cole-Hopf field. G2 n-soliton
+generation is leftover-recorded (leftover #51): no n=1,2,3 grid
+plus phase-shift check is wired. Not a Navier-Stokes claim. Spec
+03-11 search is not claimed.
 """
 
 from __future__ import annotations
@@ -46,6 +48,32 @@ def _run_g1() -> dict[str, Any]:
         "jet_passed": bool(jet["passed"]),
         "jet_err0": float(jet["err0"]),
         "navier_stokes_proof_claim": False,
+    }
+
+
+def _run_g2() -> dict[str, Any]:
+    return {
+        "name": "g2_exact_soliton",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 51,
+        "leftover_tick": 93,
+        "stays_full": True,
+        "in_ci_all_passed": False,
+        "n_soliton_api": False,
+        "need": (
+            "Generated n-soliton solutions for n=1,2,3 satisfy the PDE "
+            "to <= 1e-13 relative on a dense space-time grid, and their "
+            "asymptotic phase shifts match the published formulas"
+        ),
+        "note": (
+            "Leftover #51 leftover-recorded: named G2 is n-soliton "
+            "generation plus published phase shifts. permutability is "
+            "a scalar Bäcklund formula, not that grid check. Not in "
+            "CI all_passed."
+        ),
     }
 
 
@@ -122,6 +150,7 @@ def main() -> int:
     parser.add_argument("--full", action="store_true")
     args = parser.parse_args()
     g1 = _run_g1()
+    g2 = _run_g2()
     g3 = _run_g3()
     g5 = _run_g5()
     g6 = _run_g6()
@@ -146,6 +175,7 @@ def main() -> int:
         schema="omnibias.benchmark.linearizing_transforms.v1",
         config={
             "mode": "full" if args.full else "smoke",
+            "g2_in_all_passed": False,
             "g3_in_all_passed": False,
             "g6_in_all_passed": bool(g6["in_ci_all_passed"]),
             "gates_in_scope": ["g1", "g5", "g6"],
@@ -153,6 +183,7 @@ def main() -> int:
     )
     payload["gates"] = gates_block(entries)
     payload["g1"] = g1
+    payload["g2"] = g2
     payload["g3"] = g3
     payload["g5"] = g5
     payload["g6"] = g6
@@ -163,6 +194,14 @@ def main() -> int:
         "founding_bias_collapse": True,
         "temperature_collapse": False,
         "navier_stokes_proof_claim": False,
+        "g2_exact_soliton_earned": False,
+        "g2_reported": True,
+        "g2_leftover_recorded": True,
+        "g2_leftover_id": 51,
+        "g2_leftover_tick": 93,
+        "g2_stays_full": True,
+        "g2_in_ci_all_passed": False,
+        "g2_n_soliton_api": False,
         "g3_burgers_win_earned": False,
         "g3_reported": True,
         "g3_leftover_recorded": True,

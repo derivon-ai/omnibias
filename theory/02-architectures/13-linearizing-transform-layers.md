@@ -8,7 +8,7 @@ logarithm, differentiate, integrate — is available exactly on jets, so a layer
 can carry a nonlinear problem into a linear one, solve it there, and map back
 with no approximation anywhere in the transform.
 
-- **Status**: shipped (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; G1 jet identity CI; G6 torch/jax parity CI; G3 Burgers leftover-recorded / unearned, leftover #39 — no train vs direct PINN, previous `g3_burgers_init` stub withdrawn; 03-11 search stays designed)
+- **Status**: shipped (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; G1 jet identity CI; G6 torch/jax parity CI; G2 n-soliton leftover-recorded / unearned, leftover #51 — no n=1,2,3 grid + phase-shift API; G3 Burgers leftover-recorded / unearned, leftover #39 — no train vs direct PINN, previous `g3_burgers_init` stub withdrawn; 03-11 search stays designed)
 - **Depends on**: 01-01, 01-09, 02-09, 03-11
 - **Blocks**: 07-02
 
@@ -267,6 +267,8 @@ numerical solve.
 - **G2 exact solution generation.** Generated `n`-soliton solutions for
   `n = 1, 2, 3` satisfy the PDE to `<= 1e-13` relative on a dense space-time
   grid, and their asymptotic phase shifts match the published formulas.
+  **Leftover-recorded** (leftover #51): `permutability` is a scalar
+  Bäcklund formula, not that grid check. Not in CI `all_passed`.
 - **G3 Burgers win.** A Cole-Hopf-trained field reaches relative `L2 <= 1e-8` on
   a shock-forming Burgers problem, at least `100x` better than the direct PINN
   baseline at matched cost, over five seeds. **Leftover-recorded** (leftover

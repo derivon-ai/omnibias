@@ -1,0 +1,33 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
+"""02-13 G2 n-soliton leftover-record stays out of all_passed."""
+
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+REPO = Path(__file__).resolve().parents[3]
+
+
+def test_g2_soliton_is_leftover_recorded_out_of_all_passed() -> None:
+    path = REPO / "docs" / "benchmarks" / "linearizing_transforms_smoke.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    g2 = payload["g2"]
+    assert g2["name"] == "g2_exact_soliton"
+    assert g2["earned"] is False
+    assert g2["passed"] is False
+    assert g2["reported"] is True
+    assert g2["leftover_recorded"] is True
+    assert int(g2["leftover_id"]) == 51
+    assert int(g2["leftover_tick"]) == 93
+    assert g2["in_ci_all_passed"] is False
+    assert g2["n_soliton_api"] is False
+    assert g2["stays_full"] is True
+    assert payload["honesty"]["g2_exact_soliton_earned"] is False
+    assert payload["honesty"]["g2_leftover_recorded"] is True
+    assert int(payload["honesty"]["g2_leftover_id"]) == 51
+    assert payload["honesty"]["g2_in_ci_all_passed"] is False
+    names = [row["name"] for row in payload["gates"]["entries"]]
+    assert "g2_exact_soliton" not in names
+    assert payload["gates"]["all_passed"] is True

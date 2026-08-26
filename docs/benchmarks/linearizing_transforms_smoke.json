@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.linearizing_transforms.v1",
-  "generated_utc": "2026-08-26T17:28:47Z",
+  "generated_utc": "2026-08-26T17:29:45Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -12,6 +12,7 @@
   },
   "config": {
     "mode": "smoke",
+    "g2_in_all_passed": false,
     "g3_in_all_passed": false,
     "g6_in_all_passed": true,
     "gates_in_scope": [
@@ -20,7 +21,7 @@
       "g6"
     ]
   },
-  "rss_mb_at_start": 1241.41,
+  "rss_mb_at_start": 1241.4,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -48,6 +49,20 @@
     "jet_passed": true,
     "jet_err0": 0.0,
     "navier_stokes_proof_claim": false
+  },
+  "g2": {
+    "name": "g2_exact_soliton",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 51,
+    "leftover_tick": 93,
+    "stays_full": true,
+    "in_ci_all_passed": false,
+    "n_soliton_api": false,
+    "need": "Generated n-soliton solutions for n=1,2,3 satisfy the PDE to <= 1e-13 relative on a dense space-time grid, and their asymptotic phase shifts match the published formulas",
+    "note": "Leftover #51 leftover-recorded: named G2 is n-soliton generation plus published phase shifts. permutability is a scalar B\u00e4cklund formula, not that grid check. Not in CI all_passed."
   },
   "g3": {
     "name": "g3_burgers_win",
@@ -91,6 +106,14 @@
     "founding_bias_collapse": true,
     "temperature_collapse": false,
     "navier_stokes_proof_claim": false,
+    "g2_exact_soliton_earned": false,
+    "g2_reported": true,
+    "g2_leftover_recorded": true,
+    "g2_leftover_id": 51,
+    "g2_leftover_tick": 93,
+    "g2_stays_full": true,
+    "g2_in_ci_all_passed": false,
+    "g2_n_soliton_api": false,
     "g3_burgers_win_earned": false,
     "g3_reported": true,
     "g3_leftover_recorded": true,

@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — leftover-record 02-13 G2 n-soliton (leftover #51)
+
+- Leftover #51 leftover-records G2 exact n-soliton generation
+  (`n=1,2,3` grid plus published phase shifts).
+- `permutability` is a scalar Bäcklund formula, not that check.
+- Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/linearizing_transforms_smoke.json`.
+
 ### Added — Linearizing-transform G6 parity earned (theory 02-13)
 
 - Spec 02-13 G6 torch/jax Cole-Hopf field parity is now in CI
