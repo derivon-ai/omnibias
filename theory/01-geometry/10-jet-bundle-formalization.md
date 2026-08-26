@@ -8,7 +8,7 @@ scan is **translation along the base**, an arrangement is a **stratification**,
 and an equality locus is a **fiber-product subvariety**. Fixing this vocabulary
 is what keeps fifty specs from inventing fifty ontologies.
 
-- **Status**: gated (contact tests; vocabulary, not a discovery; no `omnibias-jetbundle` package; G1–G3 **earned** on `jet_bundle` smoke — 220/220 classifications, residual rates `~1/4` vs `~1/2`, dictionary terms in other specs)
+- **Status**: shipped (contact tests; vocabulary, not a discovery; no `omnibias-jetbundle` package; G1–G3 **earned** on `jet_bundle` smoke — 220/220 classifications, residual rates `~1/4` vs `~1/2`, dictionary terms in other specs)
 - **Depends on**: 01-01, 01-02, 01-03, 01-05, 01-09
 - **Blocks**: 02-14, 03-11, 04-01, 06-04
 

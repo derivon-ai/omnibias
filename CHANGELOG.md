@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-bundle vocabulary shipped (theory 01-10)
+
+- Spec 01-10 status is **shipped**: G1–G3 earned, no leftover gate.
+- Vocabulary / contact test, not a discovery and not a package.
+- Smoke: `docs/benchmarks/jet_bundle_smoke.json`.
+
 ### Added — Equality locus shipped (theory 01-09)
 
 - Spec 01-09 status is **shipped**: G1–G5 CI, G6 parity.

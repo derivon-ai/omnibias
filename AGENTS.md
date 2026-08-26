@@ -480,7 +480,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.spectral_design` (01-07, **shipped**; pack order is a band selector; G3 leftover-recorded, not in CI `all_passed`) /
   `omnibias.core.frames` (01-06, **shipped**; `sigma'` not admissible; G4 leftover-recorded) /
   `omnibias.core.locus` (01-09, **shipped**; constraint manifold, not a PDE solver) /
-  `omnibias.core.jets` (01-10; vocabulary / contact test, not a package; G1–G3 earned) /
+  `omnibias.core.jets` (01-10, **shipped**; vocabulary / contact test, not a package; G1–G3 earned) /
   `omnibias.core.conjugate` (01-12; line Hilbert; G5 unearned, not `all_passed`) /
   `omnibias.partition.arrangement` (01-03, **shipped**; temperature collapse; cost vs n/D leftover-recorded) /
   `omnibias.struct._core.tropical` (01-08, **shipped**; reuses `logsumexp_gap_bound`; G4 path-following earned, `path_follow` wired to `AnnealSchedule`; cost vs n/D leftover-recorded) /

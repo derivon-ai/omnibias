@@ -10,7 +10,7 @@ G1–G3 are CI-gated. G1/G2 are the contact smoke: `is_holonomic` on
 misclassifications, and second-order versus first-order residual
 rates over three halvings. G3 is dictionary coverage in other
 theory specs, with no competing name for the same object. No
-performance claim. Status is **gated**. The canonical write-up is
+performance claim. Status is **shipped**. The canonical write-up is
 [theory-jets.md](../theory-jets.md).
 
 ## Contact tests

@@ -53,7 +53,7 @@ uv run python docs/img/generate_figures.py
 | `ombu_frames.py` | `docs/benchmarks/ombu_frames_smoke.json` | Shipped 01-06: `sigma'` not admissible; G4 denoising leftover-recorded (`5/5` MSE vs n=1, `0/5` skill vs identity), not in `all_passed` |
 | `tropical_homotopy.py` | `docs/benchmarks/tropical_homotopy_smoke.json` | Shipped 01-08: reuses `logsumexp_gap_bound`; G4 path-following earned; cost vs n/D leftover-recorded |
 | `equality_locus.py` | `docs/benchmarks/equality_locus_smoke.json` | Shipped 01-09: constraint manifold, not a PDE solver |
-| `jet_bundle.py` | `docs/benchmarks/jet_bundle_smoke.json` | Gated 01-10: vocabulary, not a discovery; G1–G3 earned |
+| `jet_bundle.py` | `docs/benchmarks/jet_bundle_smoke.json` | Shipped 01-10: vocabulary, not a discovery; G1–G3 earned |
 | `enclosure_collapse.py` | `docs/benchmarks/enclosure_collapse_smoke.json` | Gated 01-14: Width Law + six squeezes; `width -> 0` of a sound enclosure (a point plus a proof); not a package |
 | `theory_homes.py` | `docs/benchmarks/theory_homes_smoke.json` | Gated 06-03: G1–G5 earned (94/94 homes; Wave-0 A4–A7 recorded; G4/G5 vacuous; 389 lines, not promoted) |
 | `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Gated 01-12: line Hilbert; G1–G4 CI; G5 reported on CCF smoke (matched-width ratio `0.978`, need `10x`), not in `all_passed` |
