@@ -6,6 +6,11 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — FTC-Net shipped (theory 09-03)
+
+- Spec 09-03 status is **shipped**: G1–G3 CI; not a VPINN.
+- Smoke: `docs/benchmarks/ftc_net_smoke.json`.
+
 ### Added — Jet-token transformer shipped (theory 09-02)
 
 - Spec 09-02 status is **shipped**: G1–G3 CI; model jet, not

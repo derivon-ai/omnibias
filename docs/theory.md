@@ -361,6 +361,8 @@ gates are earned on smoke, not in CI `all_passed`.
   not clear Hilbert stretch. Design record. Status is **shipped**.
 - **Jet-token transformer** ([09-02](api/jet_token.md)): model jet,
   not ImageNet. Status is **shipped**.
+- **FTC-Net** ([09-03](api/ftc_net.md)): integral cell, not a
+  VPINN. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
