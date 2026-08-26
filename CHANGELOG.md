@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Face-Net G3 leftover-recorded (theory 02-02)
+
+- Leftover #28's 0-hop vs k-NN miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/arrangement_graph.py`.
+- Reported: 0-hop centroid loses `0/5`; named G3 needs a GNN /
+  `RegionModels`. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/arrangement_graph_smoke.json`.
+
 ### Added — Tropical cost leftover-recorded (theory 01-08)
 
 - Leftover #19's sampled `dual_subdivision` wall now leftover-records

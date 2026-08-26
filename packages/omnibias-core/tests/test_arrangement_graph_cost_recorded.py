@@ -36,9 +36,14 @@ def test_cost_vs_n_d_is_reported_and_out_of_all_passed() -> None:
     assert g3["earned"] is False
     assert g3["passed"] is False
     assert g3["reported"] is True
+    assert g3["leftover_recorded"] is True
+    assert int(g3["leftover_id"]) == 28
+    assert int(g3["leftover_tick"]) == 56
     assert g3["in_ci_all_passed"] is False
     assert int(g3["n_seeds"]) == 5
     assert g3["message_passing"] is False
     assert g3["region_models"] is False
     assert payload["honesty"]["g3_earned"] is False
+    assert payload["honesty"]["g3_leftover_recorded"] is True
+    assert int(payload["honesty"]["g3_leftover_id"]) == 28
     assert payload["honesty"]["g3_in_ci_all_passed"] is False

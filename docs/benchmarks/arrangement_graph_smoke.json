@@ -146,7 +146,10 @@
     ],
     "region_models": false,
     "message_passing": false,
-    "note": "0-hop cell-centroid readout versus k=5 k-NN on a piecewise-constant sign-bit target (five seeds). Named G3 needs a Face-Net GNN and RegionModels at matched parameter count. Previous g3_vs_knn passed=True stub withdrawn. Not in CI all_passed."
+    "leftover_recorded": true,
+    "leftover_id": 28,
+    "leftover_tick": 56,
+    "note": "Leftover #28 leftover-recorded: 0-hop cell-centroid readout versus k=5 k-NN on a piecewise-constant sign-bit target (five seeds). Named G3 needs a Face-Net GNN and RegionModels at matched parameter count. Previous g3_vs_knn passed=True stub withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "sampling": "subgraph / lower bound",
@@ -157,6 +160,9 @@
     "cost_in_ci_all_passed": false,
     "g3_earned": false,
     "g3_reported": true,
+    "g3_leftover_recorded": true,
+    "g3_leftover_id": 28,
+    "g3_leftover_tick": 56,
     "g3_in_ci_all_passed": false,
     "enumeration_cutoff_n": 12,
     "enumeration_cutoff_d": 4,

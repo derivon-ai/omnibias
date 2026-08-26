@@ -215,7 +215,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Conjugate Hilbert** ([01-12](api/conjugate.md)): line Hilbert only;
   G5 is a projection defect, not a stretch-gate clearing.
 - **Face-Net** ([02-02](api/facenet.md)): sampled tope subgraph; temperature
-  collapse; sound gap, not P vs NP.
+  collapse; sound gap, not P vs NP. G3 vs k-NN leftover-recorded.
 - **BEM-Net** ([02-06](api/bem.md)): PDE exact off-surface; BC approximated;
   linear constant-coeff homogeneous only.
 - **Pack tree** ([02-07](api/hierarchy.md)): 1-D offsets; `eta=0` bit-identical

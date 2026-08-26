@@ -160,11 +160,15 @@ def _run_g3() -> dict[str, Any]:
         "rows": rows,
         "region_models": False,
         "message_passing": False,
+        "leftover_recorded": True,
+        "leftover_id": 28,
+        "leftover_tick": 56,
         "note": (
-            "0-hop cell-centroid readout versus k=5 k-NN on a piecewise-"
-            "constant sign-bit target (five seeds). Named G3 needs a "
-            "Face-Net GNN and RegionModels at matched parameter count. "
-            "Previous g3_vs_knn passed=True stub withdrawn. Not in CI "
+            "Leftover #28 leftover-recorded: 0-hop cell-centroid "
+            "readout versus k=5 k-NN on a piecewise-constant sign-bit "
+            "target (five seeds). Named G3 needs a Face-Net GNN and "
+            "RegionModels at matched parameter count. Previous "
+            "g3_vs_knn passed=True stub withdrawn. Not in CI "
             "all_passed."
         ),
     }
@@ -218,6 +222,9 @@ def main() -> int:
         "cost_in_ci_all_passed": False,
         "g3_earned": False,
         "g3_reported": True,
+        "g3_leftover_recorded": True,
+        "g3_leftover_id": 28,
+        "g3_leftover_tick": 56,
         "g3_in_ci_all_passed": False,
         "enumeration_cutoff_n": COST_CUTOFF_N,
         "enumeration_cutoff_d": COST_CUTOFF_D,

@@ -501,7 +501,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   G2 closed-form earned vs PRODUCT 4096; G3 Magnus reported; G4 gauge
   covariance reported, no random-gauge API;
   no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02; sampled
-  subgraph; G3 vs k-NN reported, GNN / RegionModels stay `--full`; cost
+  subgraph; G3 vs k-NN leftover-recorded, GNN / RegionModels stay `--full`; cost
   vs n/D reported) / `omnibias.core.line_search` /
   `omnibias.{torch,jax}.line_search` (03-12; certified Lagrange radius +
   `verify=True` never-worse; G4 unearned vs strong Wolfe, G5 crossover
