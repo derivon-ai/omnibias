@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Packaging homes shipped (theory 06-03)
+
+- Spec 06-03 status is **shipped**: G1–G5 earned (42 packages,
+  94/94 homes).
+- G4/G5 vacuous; not promoted; no new distribution.
+- Smoke: `docs/benchmarks/theory_homes_smoke.json`.
+
 ### Added — Honesty register shipped (theory 06-02)
 
 - Spec 06-02 status is **shipped**: G1–G6 earned; design record.

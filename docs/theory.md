@@ -318,6 +318,8 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Honesty and claim boundaries** ([06-02](honesty.md)): claim
   ladder + forbidden-claims register. Design record. Status is
   **shipped**.
+- **Packaging and rollout** (06-03): G1–G5 earned (94/94 homes).
+  G4/G5 vacuous, not promoted. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
