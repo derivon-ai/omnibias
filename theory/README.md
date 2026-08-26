@@ -149,7 +149,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [03-09 differentiable topology](03-algorithms/09-differentiable-topology-of-arrangements.md) | gated | Soft Euler / component counts + 1-D Morse persistence; G1–G6 CI; temperature collapse, not founding bias collapse; no differentiable Betti number; `Inconclusive` when the gap does not separate |
 | [03-10 jet-Pade singularity tracking](03-algorithms/10-jet-pade-singularity-tracking.md) | gated | Domb-Sykes + Padé poles + certified `|x_s|` annulus; G1–G6 CI; founding bias collapse, not temperature collapse; diagnostic, not a blow-up proof |
 | [03-11 Lie symmetry discovery](03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md) | gated | Point symmetries in a declared ansatz; G1–G6 CI; founding bias collapse, not temperature collapse; in-ansatz rank, not a classification |
-| [03-12 exact jet line search](03-algorithms/12-exact-jet-line-search.md) | gated | Certified radius + `verify=True` never-worse; G1/G2/G3/G6 CI; G4 step-count **unearned** (strong Wolfe, 1.83x, need 2x), G5 order×depth crossover reported, not CI `all_passed` |
+| [03-12 exact jet line search](03-algorithms/12-exact-jet-line-search.md) | gated | Certified radius + `verify=True` never-worse; G1/G2/G3/G6 CI; G4 step-count **reported** (strong Wolfe, 1.83x, need 2x), G5 order×depth crossover reported, not CI `all_passed` |
 | [03-13 adaptive pack refinement](03-algorithms/13-adaptive-pack-refinement.md) | gated | Birth/growth bit-identical; death reports a bound; G1–G6 CI; G4 **earned** (indicator birth vs matched-count fixed on the named BL) |
 
 ### 04 Cross-domain bridges

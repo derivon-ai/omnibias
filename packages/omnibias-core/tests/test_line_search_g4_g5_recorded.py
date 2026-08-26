@@ -18,6 +18,7 @@ def test_g4_g5_are_recorded_and_out_of_all_passed() -> None:
     assert g4["name"] == "g4_step_count_win"
     assert g4["earned"] is False
     assert g4["passed"] is False
+    assert g4["reported"] is True
     assert g4["in_ci_all_passed"] is False
     assert g4["baseline"] == "strong_wolfe_cubic_or_quadratic"
     assert float(g4["wolfe_over_jet"]) < float(g4["expected"])
@@ -32,6 +33,7 @@ def test_g4_g5_are_recorded_and_out_of_all_passed() -> None:
     assert g5["favourable_regime"] is True
     assert g5["unfavourable_regime"] is True
     assert payload["honesty"]["g4_earned"] is False
+    assert payload["honesty"]["g4_reported"] is True
     assert payload["honesty"]["g5_earned"] is False
     assert payload["honesty"]["g4_baseline_is_strong_wolfe"] is True
     assert payload["honesty"]["g5_compares_jet_to_trial"] is True

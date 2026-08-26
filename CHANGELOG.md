@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet line-search G4 leftover-recorded (theory 03-12)
+
+- Leftover #14's Wolfe miss now leftover-records `reported` plus honesty
+  flags on `benchmarks/jet_line_search.py`.
+- Reported: target-loss vs strong Wolfe `1.83x` (need `2x`); Wolfe
+  misses cond `800`. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/jet_line_search_smoke.json`.
+
+
 ### Added — Jet-KAN G2 leftover-recorded (theory 02-03)
 
 - Leftover #16's cost miss now leftover-records `reported` plus honesty
