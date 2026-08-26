@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Hermite-ladder G4 leftover-recorded (theory 02-10)
+
+- Leftover #21's FermiNet many-body miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/hermite_ladder.py`.
+- Reported: 1-D QHO envelope already contains the ground state; named
+  2x variance stays `--full`. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/hermite_ladder_smoke.json`.
+
 ### Added — Soliton tanh-method G4 leftover-recorded (theory 02-09)
 
 - Leftover #22's PINN init-win miss now leftover-records `reported`

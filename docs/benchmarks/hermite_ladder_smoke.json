@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.hermite_ladder.v1",
-  "generated_utc": "2026-08-25T18:52:11Z",
+  "generated_utc": "2026-08-26T15:59:21Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "g2"
     ]
   },
-  "rss_mb_at_start": 812.67,
+  "rss_mb_at_start": 813.77,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -45,34 +45,38 @@
       {
         "n": 2,
         "n_points": 64,
-        "exact_wall_seconds": 0.00014457001816481352,
-        "fd_wall_seconds": 8.873199112713337e-05,
-        "fd_over_exact": 0.6137648196597487
+        "exact_wall_seconds": 0.00015248404815793037,
+        "fd_wall_seconds": 9.90680418908596e-05,
+        "fd_over_exact": 0.6496944637005775
       },
       {
         "n": 4,
         "n_points": 64,
-        "exact_wall_seconds": 0.00016971107106655836,
-        "fd_wall_seconds": 0.00010446598753333092,
-        "fd_over_exact": 0.6155519900782477
+        "exact_wall_seconds": 0.00016608205623924732,
+        "fd_wall_seconds": 0.00010060996282845736,
+        "fd_over_exact": 0.6057846651628939
       },
       {
         "n": 8,
         "n_points": 64,
-        "exact_wall_seconds": 0.0001826499355956912,
-        "fd_wall_seconds": 0.00010644993744790554,
-        "fd_over_exact": 0.5828085134589926
+        "exact_wall_seconds": 0.00018213700968772173,
+        "fd_wall_seconds": 0.00011126499157398939,
+        "fd_over_exact": 0.6108862320994283
       }
     ],
-    "median_fd_over_exact": 0.6137648196597487,
+    "median_fd_over_exact": 0.6108862320994283,
     "g4_many_body": {
       "earned": false,
+      "reported": true,
+      "leftover_recorded": true,
+      "leftover_id": 21,
+      "leftover_tick": 65,
       "stays_full": true,
       "need": "2x variational-energy variance on a small FermiNet system, 5 seeds",
       "one_d_no_improvement": true,
-      "reason": "1-D QHO Gaussian envelope already contains the exact ground state; FermiNet many-body G2 is a heavy run, not CI"
+      "reason": "Leftover #21 leftover-recorded: 1-D QHO Gaussian envelope already contains the exact ground state; FermiNet many-body G2 is a heavy run, not CI"
     },
-    "note": "Exact apply_ladder orbital derivatives vs central FD on the named 1-D oscillator. G4 many-body 2x variance is a FermiNet run under $OMNIBIAS_SCRATCH, not CI. 1-D QHO envelope already contains the ground state (no improvement). Previous G4 passed=True / --full-only stub with no timing withdrawn. Not in CI all_passed."
+    "note": "Leftover #21 leftover-recorded: exact apply_ladder orbital derivatives vs central FD on the named 1-D oscillator. G4 many-body 2x variance is a FermiNet run under $OMNIBIAS_SCRATCH, not CI. 1-D QHO envelope already contains the ground state (no improvement). Previous G4 passed=True / --full-only stub with no timing withdrawn. Not in CI all_passed."
   },
   "g5": {
     "name": "g5_anharmonic",
@@ -93,6 +97,10 @@
     "founding_bias_collapse": true,
     "temperature_collapse": false,
     "g4_many_body_earned": false,
+    "g4_reported": true,
+    "g4_leftover_recorded": true,
+    "g4_leftover_id": 21,
+    "g4_leftover_tick": 65,
     "g4_stays_full": true,
     "g5_anharmonic_earned": false,
     "g5_anharmonic_reported": true,

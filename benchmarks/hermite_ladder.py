@@ -2,9 +2,10 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: Hermite ladder (theory 02-10).
 
-G4 many-body FermiNet variance stays ``--full``. Exact-ladder orbital
-cost is reported, not in CI ``all_passed``. G5 anharmonic lose/win is
-reported. The raw tower is not the QHO eigenbasis.
+G4 many-body FermiNet variance is leftover-recorded (leftover #21) and
+stays ``--full``. Exact-ladder orbital cost is reported, not in CI
+``all_passed``. G5 anharmonic lose/win is reported. The raw tower is
+not the QHO eigenbasis.
 """
 
 from __future__ import annotations
@@ -85,18 +86,26 @@ def _run_cost() -> dict[str, Any]:
         "median_fd_over_exact": float(np.median(np.asarray(ratios))),
         "g4_many_body": {
             "earned": False,
+            "reported": True,
+            "leftover_recorded": True,
+            "leftover_id": 21,
+            "leftover_tick": 65,
             "stays_full": True,
             "need": "2x variational-energy variance on a small FermiNet system, 5 seeds",
             "one_d_no_improvement": bool(vmc["no_improvement"]),
-            "reason": str(vmc["reason"]),
+            "reason": (
+                "Leftover #21 leftover-recorded: "
+                + str(vmc["reason"])
+            ),
         },
         "note": (
-            "Exact apply_ladder orbital derivatives vs central FD on the "
-            "named 1-D oscillator. G4 many-body 2x variance is a FermiNet "
-            "run under $OMNIBIAS_SCRATCH, not CI. 1-D QHO envelope already "
-            "contains the ground state (no improvement). Previous G4 "
-            "passed=True / --full-only stub with no timing withdrawn. "
-            "Not in CI all_passed."
+            "Leftover #21 leftover-recorded: exact apply_ladder orbital "
+            "derivatives vs central FD on the named 1-D oscillator. G4 "
+            "many-body 2x variance is a FermiNet run under "
+            "$OMNIBIAS_SCRATCH, not CI. 1-D QHO envelope already contains "
+            "the ground state (no improvement). Previous G4 passed=True "
+            "/ --full-only stub with no timing withdrawn. Not in CI "
+            "all_passed."
         ),
     }
 
@@ -180,6 +189,10 @@ def main() -> int:
         "founding_bias_collapse": True,
         "temperature_collapse": False,
         "g4_many_body_earned": False,
+        "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 21,
+        "g4_leftover_tick": 65,
         "g4_stays_full": True,
         "g5_anharmonic_earned": False,
         "g5_anharmonic_reported": True,
