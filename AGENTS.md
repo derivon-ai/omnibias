@@ -521,7 +521,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.{torch,jax}.optim_kantorovich` (08-04, **shipped**; unique-zero ball
   accept/reject; G1–G3 CI; not a continuum PDE claim) /
   `omnibias.core.sharpness` /
-  `omnibias.{torch,jax}.optim_sharpness` (08-06; exact-HVP
+  `omnibias.{torch,jax}.optim_sharpness` (08-06, **shipped**; exact-HVP
   `lambda_max` sets cubic `sigma`; G1–G3 CI; step-size signal, not a
   generalization claim) /
   `omnibias.core.block_search` /

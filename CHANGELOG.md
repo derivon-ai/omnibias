@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Sharpness-scheduled step shipped (theory 08-06)
+
+- Spec 08-06 status is **shipped**: G1–G3 CI; step-size signal,
+  not a generalization claim.
+- Smoke: `docs/benchmarks/sharpness_schedule_smoke.json`.
+
 ### Added — Depth-causal residual shipped (theory 08-05)
 
 - Spec 08-05 status is **shipped**: G1–G3 CI; not time marching,

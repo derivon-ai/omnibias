@@ -5,7 +5,7 @@ loss Hessian. That value sets cubic `sigma` or a gradient learning
 rate. Sharpness is a **step-size** signal, not a generalization
 certificate and not CCF stretch.
 
-Status is **gated**, not shipped. G1–G3 are CI-gated. Hutchinson is
+Status is **shipped**. G1–G3 are CI-gated. Hutchinson is
 not the method. Bias collapse (`delta -> 0`) makes HVPs exact through
 `sigma''`. No temperature collapse. See theory spec 08-06.
 

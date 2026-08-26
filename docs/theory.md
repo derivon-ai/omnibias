@@ -348,6 +348,9 @@ gates are earned on smoke, not in CI `all_passed`.
   ball is a reject, not a continuum PDE. Status is **shipped**.
 - **Depth-causal residual** ([08-05](api/depth_residual.md)): marches
   in network depth, not time. Status is **shipped**.
+- **Sharpness schedule** ([08-06](api/sharpness_schedule.md)):
+  step-size signal, not a generalization claim. Status is
+  **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

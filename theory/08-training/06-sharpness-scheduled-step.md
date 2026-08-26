@@ -7,7 +7,7 @@ Hessian (or GN matrix) in closed form, so the cubic penalty or learning
 rate can be set from **measured sharpness** instead of a fixed
 hyperparameter or a Hutchinson estimate.
 
-- **Status**: gated
+- **Status**: shipped (G1–G3 CI; step-size signal, not a generalization claim)
 - **Depends on**: 08-01
 - **Blocks**: none
 
