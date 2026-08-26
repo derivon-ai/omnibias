@@ -7,7 +7,7 @@ splitting the bank into a **near-field / far-field hierarchy**, where far packs
 are represented by a low-order expansion of their aggregate, reduces this to
 near-linear cost with a controllable, computable error.
 
-- **Status**: shipped (1-D offsets; `eta=0` bit-identical; G3 complexity **earned**, leftover #13 closed on tick #74 — cached `O(p)` multipole `far_eval`, dense crossover)
+- **Status**: shipped (1-D offsets; `eta=0` bit-identical; G1–G5 CI; G2 bound soundness **earned**; G3 complexity **earned**, leftover #13 closed on tick #74 — cached `O(p)` multipole `far_eval`, dense crossover; G4 `separation_for_accuracy` **earned** with `_deriv_bound` weight; G5 torch/jax parity **earned**)
 - **Depends on**: 01-01, 01-02, 01-06, 01-07, 02-01
 - **Blocks**: 02-06, 03-07
 
@@ -225,6 +225,8 @@ Baseline: dense evaluation.
 - **G2 bound soundness.** `truncation_bound` upper-bounds the observed error on
   a dense grid **and** a random sample, over `p = 1 .. 10` and a range of
   separations, with zero violations.
+  **Earned** — `docs/benchmarks/pack_tree_smoke.json` (`g2_bound_soundness`;
+  leaf remainder vs exact leaf sum). In CI `all_passed`.
 - **G3 complexity.** Measured cost scales as predicted (near-linear in `N + M`)
   over `M` spanning two decades, with the crossover point against dense
   evaluation recorded.
@@ -235,7 +237,11 @@ Baseline: dense evaluation.
   `all_passed`.
 - **G4 accuracy at target.** Given a target accuracy, `separation_for_accuracy`
   produces a tree whose measured error meets the target on every test instance.
+  **Earned** — helper now uses the same `_deriv_bound` / member weight as
+  `truncation_bound` (unit-bound formula under-covered). In CI `all_passed`.
 - **G5 parity.** torch and jax bit-identical.
+  **Earned** — `eta=0` `hierarchical_scan` torch/jax, `max_abs == 0`. In CI
+  `all_passed`.
 
 ## 9. Benchmark plan
 

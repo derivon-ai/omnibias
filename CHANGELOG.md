@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pack-tree G2/G4/G5 earned (theory 02-07)
+
+- Spec 02-07 G2 bound soundness, G4 `separation_for_accuracy`, and
+  G5 torch/jax parity are now in CI `all_passed`.
+- `separation_for_accuracy` uses the same `_deriv_bound` weight as
+  `truncation_bound` (unit-bound formula under-covered).
+- Smoke: `docs/benchmarks/pack_tree_smoke.json`.
+
 ### Added — OMBU-frames G3 dilation earned (theory 01-06)
 
 - Spec 01-06 G3 `alpha^n` dilation exactness is now in CI

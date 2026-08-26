@@ -239,8 +239,9 @@ gates are earned on smoke, not in CI `all_passed`.
   (leftover #42). G3 exterior win leftover-recorded. Status is
   **shipped**.
 - **Pack tree** ([02-07](api/hierarchy.md)): 1-D offsets; `eta=0` bit-identical
-  to dense; far-field is a truncation with a bound. G3 complexity
-  earned (cached `O(p)` multipole, dense crossover). Status is **shipped**.
+  to dense; far-field is a truncation with a bound. G1–G5 earned
+  (G3 leftover #13 closed; G4 `separation_for_accuracy` uses
+  `_deriv_bound`). Status is **shipped**.
 - **Equivariant scan** ([02-08](api/equivariant_scan.md)): gaussian-family
   steering only; discrete `C_L`, not SO(2)/SO(3). G5 anisotropic-interface
   leftover-recorded. Orbit cost leftover-recorded (leftover #43).

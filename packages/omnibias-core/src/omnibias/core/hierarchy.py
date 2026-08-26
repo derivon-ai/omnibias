@@ -147,18 +147,37 @@ def truncation_bound(
     return Interval(-cap, cap)
 
 
-def separation_for_accuracy(*, radius: float, p: int, target: float) -> float:
-    """``eta`` such that ``(eta^{p+1})/(p+1)!`` meets ``target`` for unit bound."""
+def separation_for_accuracy(
+    *,
+    radius: float,
+    p: int,
+    target: float,
+    deriv_bound: Interval | None = None,
+    n_members_weight: float = 1.0,
+) -> float:
+    """Distance ``R`` such that ``(radius/R)^{p+1} B W / (p+1)! <= target``.
+
+    ``B`` defaults to the same crude ``_deriv_bound(p+1)`` used by
+    ``truncation_bound``. The unit-bound formula under-covers measured
+    tanh remainders (theory 02-07 G4).
+    """
     if target <= 0.0:
         raise ValueError("target must be positive")
+    if radius < 0.0:
+        raise ValueError("radius must be non-negative")
     fact = 1.0
     for i in range(1, p + 2):
         fact *= float(i)
-    # (radius/R)^{p+1} / (p+1)! <= target  => R >= radius / (target * fact)^{1/(p+1)}
-    root = (target * fact) ** (1.0 / (p + 1))
-    if root <= 0.0:
+    b = deriv_bound if deriv_bound is not None else _deriv_bound(p + 1)
+    bw = max(abs(b.lo), abs(b.hi)) * abs(float(n_members_weight))
+    # (radius/R)^{p+1} * B * W / (p+1)! <= target
+    rhs = target * fact / max(bw, 1e-30)
+    if rhs <= 0.0:
         return float("inf")
-    return float(radius / root)
+    ratio = rhs ** (1.0 / (p + 1))
+    if ratio <= 0.0:
+        return float("inf")
+    return float(radius / ratio)
 
 
 def far_eval(

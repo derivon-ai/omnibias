@@ -6,10 +6,11 @@ dense sum (same summands, same order). 1-D offset axis only; no 2-D/3-D
 FMM.
 
 G1 (`eta=0`), G2 (bound never undercovers), G3 complexity, G4 target
-accuracy, and G5 parity are CI-gated. G3 is **earned** (leftover #13
-closed): `far_eval` is an `O(p)` multipole when member orders match,
-and hierarchical wall crosses dense over two decades of `M`. Status is
-**shipped**. See theory spec 02-07.
+accuracy, and G5 parity are CI-gated and **earned**. G3 leftover #13
+closed: `far_eval` is an `O(p)` multipole when member orders match,
+and hierarchical wall crosses dense over two decades of `M`. G4
+`separation_for_accuracy` uses the same `_deriv_bound` weight as
+`truncation_bound`. Status is **shipped**. See theory spec 02-07.
 
 ## Core algebra
 

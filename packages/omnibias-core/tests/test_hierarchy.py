@@ -10,6 +10,7 @@ from omnibias.core.hierarchy import (
     far_eval,
     hierarchical_value,
     multipole_moments,
+    separation_for_accuracy,
     truncation_bound,
 )
 
@@ -68,3 +69,23 @@ def test_g2_bound_never_undercovers() -> None:
     )
     assert bound.lo <= -local <= bound.hi or abs(err) >= 0.0
     assert -bound.hi <= local <= bound.hi
+
+
+def test_g4_separation_meets_target() -> None:
+    offsets = tuple(float(i) * 0.25 for i in range(12))
+    weights = tuple(1.0 for _ in offsets)
+    orders = tuple(0 for _ in offsets)
+    tree = build_pack_tree(offsets, leaf_size=2)
+    target = 1e-4
+    p = 6
+    sep = separation_for_accuracy(
+        radius=float(tree.radius),
+        p=p,
+        target=target,
+        n_members_weight=float(len(tree.members)),
+    )
+    assert sep > tree.radius
+    z = tree.centre + sep
+    far = far_eval(z, tree, offsets, weights, orders, p=p)
+    err = abs(dense_scan(z, offsets, weights, orders) - far)
+    assert err <= target
