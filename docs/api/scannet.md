@@ -8,9 +8,10 @@ role.
 
 G1/G2/G3/G5 are CI-gated. G3 is wall/point vs `N` over two decades
 against named k-NN (Scan-Net stays bounded; k-NN grows). G4 (k-NN may
-win on density) is **reported** from a real Scan-Net lstsq vs
-calibrated k-NN; Scan-Net wins the constructive mixture fit. Not in CI
-`all_passed`. Status is **gated**, not shipped. See theory spec 02-01.
+win on density) is **leftover-recorded** (leftover #17) from a real
+Scan-Net lstsq vs calibrated k-NN; Scan-Net wins the constructive
+mixture fit. Not in CI `all_passed`. Status is **gated**, not shipped.
+See theory spec 02-01.
 
 ## PyTorch module
 

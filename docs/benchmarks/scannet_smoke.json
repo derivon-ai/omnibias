@@ -205,7 +205,10 @@
         "knn_won": false
       }
     ],
-    "note": "Analytic mixture density; affine-calibrated k-NN vs Scan-Net lstsq on the bank response. k-NN is allowed to win; on this constructive route Scan-Net wins because density is a function of x. Previous k-NN-as-truth / constant-scan stub withdrawn. Not in CI all_passed."
+    "leftover_recorded": true,
+    "leftover_id": 17,
+    "leftover_tick": 52,
+    "note": "Leftover #17 leftover-recorded: analytic mixture density; affine-calibrated k-NN vs Scan-Net lstsq on the bank response. k-NN is allowed to win; on this constructive route Scan-Net wins because density is a function of x. Previous k-NN-as-truth / constant-scan stub withdrawn. Not in CI all_passed."
   },
   "g5": {
     "name": "g5_parity",
@@ -219,6 +222,9 @@
     "g3_in_ci_all_passed": true,
     "g4_earned": false,
     "g4_reported": true,
+    "g4_leftover_recorded": true,
+    "g4_leftover_id": 17,
+    "g4_leftover_tick": 52,
     "g4_in_ci_all_passed": false,
     "g4_truth_is_knn_oracle": false,
     "g4_scan_is_constant_mean": false,

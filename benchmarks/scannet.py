@@ -341,12 +341,16 @@ def _run_g4() -> dict[str, Any]:
         "knn_wins": knn_wins,
         "n_seeds": G4_SEEDS,
         "rows": rows,
+        "leftover_recorded": True,
+        "leftover_id": 17,
+        "leftover_tick": 52,
         "note": (
-            "Analytic mixture density; affine-calibrated k-NN vs Scan-Net "
-            "lstsq on the bank response. k-NN is allowed to win; on this "
-            "constructive route Scan-Net wins because density is a "
-            "function of x. Previous k-NN-as-truth / constant-scan stub "
-            "withdrawn. Not in CI all_passed."
+            "Leftover #17 leftover-recorded: analytic mixture density; "
+            "affine-calibrated k-NN vs Scan-Net lstsq on the bank "
+            "response. k-NN is allowed to win; on this constructive "
+            "route Scan-Net wins because density is a function of x. "
+            "Previous k-NN-as-truth / constant-scan stub withdrawn. "
+            "Not in CI all_passed."
         ),
     }
 
@@ -439,6 +443,9 @@ def main() -> int:
         "g3_in_ci_all_passed": True,
         "g4_earned": bool(g4["earned"]),
         "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 17,
+        "g4_leftover_tick": 52,
         "g4_in_ci_all_passed": False,
         "g4_truth_is_knn_oracle": False,
         "g4_scan_is_constant_mean": False,

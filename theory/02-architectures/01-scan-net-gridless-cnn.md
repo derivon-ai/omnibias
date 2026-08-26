@@ -7,7 +7,7 @@ benefits of a convolutional network — weight sharing, translation equivariance
 a multiscale hierarchy — on inputs that have **no grid at all**: point clouds,
 collocation sets, scattered sensors, implicit fields.
 
-- **Status**: gated (G1/G2/G3/G5 earned; G4 k-NN recorded, not CI `all_passed`)
+- **Status**: gated (G1/G2/G3/G5 earned; G4 k-NN leftover-recorded, leftover #17, not CI `all_passed`)
 - **Depends on**: 01-02, 01-06, 01-07
 - **Blocks**: 02-07, 05-01, 05-02
 
@@ -182,11 +182,11 @@ Baselines, all at matched parameter count: `CmbNet` on a binned grid, a
   ratio `42.1` (need `>= 8`). Warmup + median of repeats. In CI `all_passed`.
 - **G4 honest boundary.** On a task where spatial neighbourhoods genuinely
   matter (local density estimation), the `k`-NN baseline is *allowed* to win,
-  and the result is reported rather than omitted. **Reported:** analytic
-  mixture density, five seeds; affine-calibrated k-NN vs Scan-Net lstsq
-  on the bank response. Scan-Net wins `5/5` because density is a function
-  of `x`. The previous k-NN-as-truth / constant-scan stub is withdrawn.
-  Not in CI `all_passed`.
+  and the result is reported rather than omitted. **Leftover-recorded**
+  (leftover #17): analytic mixture density, five seeds; affine-calibrated
+  k-NN vs Scan-Net lstsq on the bank response. Scan-Net wins `5/5`
+  because density is a function of `x`. The previous k-NN-as-truth /
+  constant-scan stub is withdrawn. Not in CI `all_passed`.
 - **G5 parity.** torch and jax bit-identical.
 
 ## 9. Benchmark plan

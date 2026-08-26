@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Scan-Net G4 leftover-recorded (theory 02-01)
+
+- Leftover #17's density-boundary measurement now leftover-records
+  `reported` plus honesty flags on `benchmarks/scannet.py`.
+- Reported: Scan-Net lstsq wins `5/5` on the analytic mixture; k-NN is
+  allowed to win. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/scannet_smoke.json`.
+
 ### Added — Enclosure Collapse and the Width Law (theory 01-14)
 
 - Named the third collapse: `width -> 0` of a sound enclosure (a point plus a proof).
