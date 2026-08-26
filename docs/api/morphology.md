@@ -1,7 +1,7 @@
 # Differentiable morphology (03-05)
 
 Dilation is max-plus convolution. `logsumexp_beta` is the homotopy.
-Status is **gated**, not shipped. G1–G6 are CI-gated.
+Status is **shipped**. G1–G6 are CI-gated.
 
 `beta -> inf` is **temperature collapse** (feasibility), a soft max
 hardening to a hard max. Pack structuring elements come from the

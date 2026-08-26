@@ -7,7 +7,7 @@ homotopy of spec 01-08 makes the whole morphological algebra — opening, closin
 top-hat, skeletons, distance transforms — differentiable with exact derivatives
 and a `log(N)/beta` gap to the hard operator.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; temperature collapse, not founding bias collapse; gap is worst-case; not a seventh OperatorBlock role)
 - **Depends on**: 01-02, 01-06, 01-08
 - **Blocks**: 03-09, 05-01
 

@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Morphology shipped (theory 03-05)
+
+- Spec 03-05 status is **shipped**: G1–G6 CI, no leftover gate.
+- Temperature collapse, not founding bias collapse. Not a seventh role.
+- Smoke: `docs/benchmarks/morphology_smoke.json`.
+
 ### Added — Sliced OT shipped (theory 03-04)
 
 - Spec 03-04 status is **shipped**: G1–G6 CI, no leftover gate.

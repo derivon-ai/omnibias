@@ -274,6 +274,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Sliced OT** ([03-04](api/sliced_ot.md)): exact 1-D `W_1` per slice;
   founding bias collapse, not temperature collapse. Not Wasserstein.
   Status is **shipped**.
+- **Morphology** ([03-05](api/morphology.md)): soft dilation / erosion
+  via `logsumexp_beta`. Temperature collapse, not founding bias
+  collapse. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

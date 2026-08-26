@@ -552,7 +552,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   activation mixtures + sliced average; G1–G6 CI; founding bias
   collapse, not temperature collapse; exact per slice, not
   sample-free; not Wasserstein) /
-  `omnibias.shape.morphology` (03-05; soft dilation / erosion
+  `omnibias.shape.morphology` (03-05, **shipped**; soft dilation / erosion
   via `logsumexp_beta`; G1–G6 CI; temperature collapse, not
   founding bias collapse; gap is worst-case; not a seventh
   OperatorBlock role) /
