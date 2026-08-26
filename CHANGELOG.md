@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Dual-FTC training shipped (theory 09-17)
+
+- Spec 09-17 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 identity.
+- Dual `r_D`/`r_I`, not a VPINN.
+- Smoke: `docs/benchmarks/dual_ftc_training_smoke.json`.
+
 ### Added — Exact MAML shipped (theory 09-16)
 
 - Spec 09-16 status is **shipped**: G1–G4 CI; G4 torch/jax parity

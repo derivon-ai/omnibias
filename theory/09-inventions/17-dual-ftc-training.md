@@ -6,7 +6,7 @@ Train with **two residuals at once**: a derivative residual and the
 closed-form **integral** of that residual. They must agree by the
 fundamental theorem.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not a VPINN)
 - **Depends on**: 09-01, 09-03
 - **Blocks**: none
 

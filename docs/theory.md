@@ -394,6 +394,8 @@ gates are earned on smoke, not in CI `all_passed`.
   `q -> 1` / `mu -> 0`, not a continuum PDE. Status is **shipped**.
 - **Exact MAML** ([09-16](api/exact_maml.md)): inner Newton + IFT
   meta-grad, not ImageNet. Status is **shipped**.
+- **Dual-FTC training** ([09-17](api/ftc_net.md)): dual `r_D`/`r_I`,
+  not a VPINN. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

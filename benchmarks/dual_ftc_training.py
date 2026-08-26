@@ -4,7 +4,8 @@
 
 G1: residuals vanish when ``f = dI/dx``. G2: dual loss beats a
 derivative-only ablation on ``r_I``. G3 keeps ``claimed_vpinn`` false.
-Jets are founding bias collapse, not temperature collapse.
+G4 is torch/jax bit-identity on G1. Jets are founding bias collapse,
+not temperature collapse.
 """
 
 from __future__ import annotations
@@ -16,9 +17,9 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.ftc import (
     DISCLAIMER,
     dual_ftc_loss,
@@ -26,6 +27,14 @@ from omnibias.core.ftc import (
     ftc_block,
     honesty_payload,
 )
+from omnibias.jax.architectures.ftc_net import dual_ftc_loss as jax_dual
+from omnibias.jax.architectures.ftc_net import ftc_block as jax_ftc
+from omnibias.torch.architectures.ftc_net import dual_ftc_loss as torch_dual
+from omnibias.torch.architectures.ftc_net import ftc_block as torch_ftc
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -42,6 +51,23 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     skill = dual_skill_report()
     g2 = bool(skill["below_1e4"] and skill["ri_below_deriv_only"] and float(skill["skill"]) > 0.0)
     g3 = honesty_payload()["claimed_vpinn"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    ti, td, tc = torch_ftc(
+        torch.tensor(0.0), torch.tensor(1.0), torch.tensor(-0.1), torch.tensor(0.1)
+    )
+    ji, jd, jc = jax_ftc(
+        jnp.asarray(0.0), jnp.asarray(1.0), jnp.asarray(-0.1), jnp.asarray(0.1)
+    )
+    t_loss = torch_dual([float(ti)], [float(td)], [float(td)], [0.0], I_a=float(ti))
+    j_loss = jax_dual([float(ji)], [float(jd)], [float(jd)], [0.0], I_a=float(ji))
+    g4 = bool(
+        float(ti) == float(ji)
+        and float(td) == float(jd)
+        and float(tc) == float(jc)
+        and t_loss.max_r_D == j_loss.max_r_D
+        and t_loss.max_r_I == j_loss.max_r_I
+    )
     entries = [
         {"name": "g1_identity", "passed": g1, "max_r_D": ident.max_r_D, "max_r_I": ident.max_r_I},
         {
@@ -52,6 +78,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "skill": skill["skill"],
         },
         {"name": "g3_not_vpinn", "passed": g3, "claimed_vpinn": False},
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_r_I": t_loss.max_r_I,
+            "jax_r_I": j_loss.max_r_I,
+        },
     ]
     for entry in entries:
         print(entry["name"], "ok" if entry["passed"] else "FAIL")
