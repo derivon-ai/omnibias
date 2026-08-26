@@ -47,8 +47,9 @@ def test_cost_is_reported_and_g2_out_of_all_passed() -> None:
     assert g3["in_ci_all_passed"] is False
     assert g3["volume_pinn"] is False
     assert g3["stays_full"] is True
-    assert g3["pack_tree_crossover_m"] is None
-    assert float(g3["pack_tree_hier_over_dense_at_m_hi"]) > 1.0
+    assert g3["pack_tree_crossover_m"] is not None
+    assert float(g3["pack_tree_hier_over_dense_at_m_hi"]) <= 1.0
+    assert g3["pack_tree_far_eval_is_per_source_taylor"] is False
     assert payload["honesty"]["g3_exterior_win_earned"] is False
     assert payload["honesty"]["g3_leftover_recorded"] is True
     assert int(payload["honesty"]["g3_leftover_id"]) == 30

@@ -124,7 +124,7 @@ def _run_g3() -> dict[str, Any]:
         "volume_pinn": False,
         "pack_tree_crossover_m": crossover,
         "pack_tree_hier_over_dense_at_m_hi": hier_over,
-        "pack_tree_far_eval_is_per_source_taylor": True,
+        "pack_tree_far_eval_is_per_source_taylor": False,
         "stays_full": True,
         "leftover_recorded": True,
         "leftover_id": 30,
@@ -133,9 +133,10 @@ def _run_g3() -> dict[str, Any]:
             "Leftover #30 leftover-recorded: named G3 is a 100x "
             "far-field win versus a truncated volumetric PINN at "
             "matched cost. No density solve or volume-PINN loop is "
-            "wired. The small-N escape needed a pack-tree (02-07) "
-            "dense crossover; that leftover recorded hier/dense "
-            f"{hier_over:.2f} at M=3200 and crossover_m={crossover!r}. "
+            "wired. Pack-tree 02-07 G3 now has a dense crossover "
+            f"(hier/dense {hier_over:.2f} at M=3200, "
+            f"crossover_m={crossover!r}); that is not a volume-PINN "
+            "bake-off. "
             "Previous spec-status smoke/--full line withdrawn. Not in "
             "CI all_passed."
         ),

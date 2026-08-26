@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.bem_net.v1",
-  "generated_utc": "2026-08-26T15:56:56Z",
+  "generated_utc": "2026-08-26T16:13:24Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "g5"
     ]
   },
-  "rss_mb_at_start": 809.98,
+  "rss_mb_at_start": 810.01,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -45,18 +45,18 @@
     "rows": [
       {
         "n_quad": 12,
-        "one_point_wall_seconds": 8.59296415001154e-06,
-        "n_point_wall_seconds": 8.59750434756279e-05
+        "one_point_wall_seconds": 8.026021532714367e-06,
+        "n_point_wall_seconds": 8.65779584273696e-05
       },
       {
         "n_quad": 24,
-        "one_point_wall_seconds": 1.3277051039040089e-05,
-        "n_point_wall_seconds": 0.0003087579971179366
+        "one_point_wall_seconds": 1.3230019249022007e-05,
+        "n_point_wall_seconds": 0.0003073490224778652
       },
       {
         "n_quad": 48,
-        "one_point_wall_seconds": 2.6106019504368305e-05,
-        "n_point_wall_seconds": 0.0011285509681329131
+        "one_point_wall_seconds": 2.5011948309838772e-05,
+        "n_point_wall_seconds": 0.0011592539958655834
       }
     ],
     "g2_disc_accuracy": {
@@ -79,14 +79,14 @@
     "in_ci_all_passed": false,
     "need": "100x far-field vs truncated volumetric PINN, five seeds",
     "volume_pinn": false,
-    "pack_tree_crossover_m": null,
-    "pack_tree_hier_over_dense_at_m_hi": 8.903254761816688,
-    "pack_tree_far_eval_is_per_source_taylor": true,
+    "pack_tree_crossover_m": 32,
+    "pack_tree_hier_over_dense_at_m_hi": 0.1708930146400412,
+    "pack_tree_far_eval_is_per_source_taylor": false,
     "stays_full": true,
     "leftover_recorded": true,
     "leftover_id": 30,
     "leftover_tick": 62,
-    "note": "Leftover #30 leftover-recorded: named G3 is a 100x far-field win versus a truncated volumetric PINN at matched cost. No density solve or volume-PINN loop is wired. The small-N escape needed a pack-tree (02-07) dense crossover; that leftover recorded hier/dense 8.90 at M=3200 and crossover_m=None. Previous spec-status smoke/--full line withdrawn. Not in CI all_passed."
+    "note": "Leftover #30 leftover-recorded: named G3 is a 100x far-field win versus a truncated volumetric PINN at matched cost. No density solve or volume-PINN loop is wired. Pack-tree 02-07 G3 now has a dense crossover (hier/dense 0.17 at M=3200, crossover_m=32); that is not a volume-PINN bake-off. Previous spec-status smoke/--full line withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "pde_exact": "off-surface by construction",

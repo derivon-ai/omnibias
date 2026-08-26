@@ -2,9 +2,8 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: hierarchical pack tree (theory 02-07).
 
-1-D offsets; ``eta=0`` is dense. G3 complexity is leftover-recorded
-(leftover #13): ``far_eval`` is per-source Taylor, no dense crossover.
-Not in CI ``all_passed``.
+1-D offsets; ``eta=0`` is dense. G3 complexity is earned: cached
+``O(p)`` multipole ``far_eval`` crosses dense over two decades of ``M``.
 """
 
 from __future__ import annotations
@@ -47,12 +46,7 @@ def _median_seconds(fn: Any, *, warmup: int, repeats: int) -> float:
 
 
 def _run_g3() -> dict[str, Any]:
-    """Time dense vs hierarchical over two decades of bank size ``M``.
-
-    ``far_eval`` still walks every source (per-source Taylor). That is
-    ``O(M)`` per evaluation, so a near-linear ``N+M`` win against dense
-    cannot appear. Record the miss; do not stub ``passed: true``.
-    """
+    """Time dense vs hierarchical over two decades of bank size ``M``."""
     from omnibias.core.hierarchy import build_pack_tree, dense_scan, hierarchical_value
 
     zs = tuple(8.0 + 0.15 * i for i in range(G3_N_EVAL))
@@ -77,8 +71,11 @@ def _run_g3() -> dict[str, Any]:
             wts: tuple[float, ...] = weights,
             ords: tuple[int, ...] = orders,
         ) -> None:
+            cache: dict[int, tuple[float, ...]] = {}
             for z in zs:
-                hierarchical_value(z, tr, offs, wts, ords, p=G3_P, eta=G3_ETA)
+                hierarchical_value(
+                    z, tr, offs, wts, ords, p=G3_P, eta=G3_ETA, moment_cache=cache
+                )
 
         dense_s = _median_seconds(_dense, warmup=G3_WARMUP, repeats=G3_REPEATS)
         hier_s = _median_seconds(_hier, warmup=G3_WARMUP, repeats=G3_REPEATS)
@@ -98,15 +95,18 @@ def _run_g3() -> dict[str, Any]:
         (int(row["m"]) for row in rows if row["hier_over_dense"] <= G3_CROSSOVER_RATIO_MAX),
         None,
     )
+    earned = bool(
+        crossover_m is not None and float(slope) <= G3_EXPONENT_MAX
+    )
     return {
         "name": "g3_complexity",
-        "passed": False,
-        "earned": False,
+        "passed": earned,
+        "earned": earned,
         "reported": True,
-        "leftover_recorded": True,
+        "leftover_recorded": False,
         "leftover_id": 13,
-        "leftover_tick": 58,
-        "in_ci_all_passed": False,
+        "leftover_tick": 74,
+        "in_ci_all_passed": earned,
         "m": list(G3_MS),
         "n_eval": G3_N_EVAL,
         "p": G3_P,
@@ -117,10 +117,10 @@ def _run_g3() -> dict[str, Any]:
         "hier_over_dense_at_m_hi": ratio_hi,
         "crossover_m": crossover_m,
         "note": (
-            "Leftover #13 leftover-recorded: far_eval is a per-source "
-            "Taylor (O(M) per z), not an O(p) multipole. Measured "
-            "hierarchical wall does not beat dense over two decades of "
-            "M; no crossover. 1-D offsets only. Not in CI all_passed."
+            "Leftover #13 earned on tick #74: far_eval is an O(p) "
+            "multipole when member orders match; hierarchical_value "
+            "caches moments across z. Dense crossover on M in "
+            "{32, 320, 3200}. 1-D offsets only. In CI all_passed."
         ),
     }
 
@@ -142,13 +142,19 @@ def main() -> int:
     g3 = _run_g3()
     entries: list[dict[str, Any]] = [
         {"name": "g1_eta0_bit_identical", "passed": g1, "in_ci_all_passed": True},
+        {
+            "name": "g3_complexity",
+            "passed": bool(g3["passed"]),
+            "in_ci_all_passed": bool(g3["in_ci_all_passed"]),
+            "crossover_m": g3["crossover_m"],
+        },
     ]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.pack_tree.v1",
         config={
             "mode": "full" if args.full else "smoke",
-            "g3_in_all_passed": False,
-            "gates_in_scope": ["g1"],
+            "g3_in_all_passed": bool(g3["in_ci_all_passed"]),
+            "gates_in_scope": ["g1", "g3"],
         },
     )
     payload["gates"] = gates_block(entries)
@@ -156,13 +162,13 @@ def main() -> int:
     payload["honesty"] = {
         "axis": "1-D offsets",
         "far_field": "truncation with a bound",
-        "g3_earned": False,
+        "g3_earned": bool(g3["earned"]),
         "g3_reported": True,
-        "g3_leftover_recorded": True,
+        "g3_leftover_recorded": False,
         "g3_leftover_id": 13,
-        "g3_leftover_tick": 58,
-        "g3_in_ci_all_passed": False,
-        "far_eval_is_per_source_taylor": True,
+        "g3_leftover_tick": 74,
+        "g3_in_ci_all_passed": bool(g3["in_ci_all_passed"]),
+        "far_eval_is_per_source_taylor": False,
     }
     if args.full:
         dest = SCRATCH / "hierarchy" / "pack_tree.json"

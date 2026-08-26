@@ -7,7 +7,9 @@ from __future__ import annotations
 from omnibias.core.hierarchy import (
     build_pack_tree,
     dense_scan,
+    far_eval,
     hierarchical_value,
+    multipole_moments,
     truncation_bound,
 )
 
@@ -21,6 +23,23 @@ def test_g1_eta_zero_bit_identical() -> None:
         dense = dense_scan(z, offsets, weights, orders)
         hier = hierarchical_value(z, tree, offsets, weights, orders, p=4, eta=0.0)
         assert dense == hier
+
+
+def test_far_eval_uniform_order_is_multipole() -> None:
+    offsets = tuple(float(i) * 0.2 - 0.7 for i in range(12))
+    weights = tuple(0.25 * ((-1.0) ** i) for i in range(12))
+    orders = tuple(1 for _ in range(12))
+    tree = build_pack_tree(offsets, leaf_size=3)
+    z = tree.centre + 6.0
+    moms = multipole_moments(tree, offsets, weights, orders, p=4)
+    factored = far_eval(z, tree, offsets, weights, orders, p=4, moments=moms)
+    rebuilt = far_eval(z, tree, offsets, weights, orders, p=4)
+    assert factored == rebuilt
+    cache: dict[int, tuple[float, ...]] = {}
+    a = hierarchical_value(z, tree, offsets, weights, orders, p=4, eta=2.0, moment_cache=cache)
+    b = hierarchical_value(z + 0.1, tree, offsets, weights, orders, p=4, eta=2.0, moment_cache=cache)
+    assert cache
+    assert a != b
 
 
 def test_g2_bound_never_undercovers() -> None:

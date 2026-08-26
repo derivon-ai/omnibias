@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pack-tree G3 multipole earned (theory 02-07)
+
+- `far_eval` is an `O(p)` multipole when member orders match;
+  `hierarchical_value` caches moments across `z`.
+- Leftover #13's dense crossover is earned on `M in {32, 320, 3200}`.
+  In CI `all_passed`. 1-D offsets only.
+- Smoke: `docs/benchmarks/pack_tree_smoke.json`.
+
 ### Added — Holonomy-band random-gauge API earned (theory 02-14)
 
 - `random_u1_gauge` / `abelian_holonomy_gauged` / `conjugate_open_holonomy`

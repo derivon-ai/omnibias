@@ -226,7 +226,7 @@ gates are earned on smoke, not in CI `all_passed`.
   G3 exterior win leftover-recorded.
 - **Pack tree** ([02-07](api/hierarchy.md)): 1-D offsets; `eta=0` bit-identical
   to dense; far-field is a truncation with a bound. G3 complexity
-  leftover-recorded (per-source Taylor, no dense crossover).
+  earned (cached `O(p)` multipole, dense crossover).
 - **Equivariant scan** ([02-08](api/equivariant_scan.md)): gaussian-family
   steering only; discrete `C_L`, not SO(2)/SO(3). G5 anisotropic-interface
   leftover-recorded.

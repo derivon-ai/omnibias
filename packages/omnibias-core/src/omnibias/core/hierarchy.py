@@ -170,17 +170,31 @@ def far_eval(
     *,
     p: int,
     base: str = "tanh",
+    moments: tuple[float, ...] | None = None,
 ) -> float:
-    """Taylor of each source about ``cluster.centre``, truncated at ``p``."""
+    """O(p) multipole when member orders match; mixed orders stay per-source.
+
+    Uniform-order path: ``sum_k sigma^{(n+k)}(z-c) M_k`` with ``M`` from
+    :func:`multipole_moments`. Passing ``moments`` skips the O(M) rebuild.
+    """
     if base != "tanh":
         raise ValueError("hierarchy far path is tanh-only")
     c = cluster.centre
+    order_set = {int(orders[j]) for j in cluster.members}
+    if len(order_set) == 1:
+        n0 = next(iter(order_set))
+        moms = moments if moments is not None else multipole_moments(
+            cluster, offsets, weights, orders, p=p
+        )
+        acc = 0.0
+        for k, mk in enumerate(moms):
+            acc += sigma_n_tanh(n0 + k, z - c) * float(mk)
+        return acc
     acc = 0.0
     for j in cluster.members:
         n0 = int(orders[j])
         w = float(weights[j])
         db = c - float(offsets[j])
-        # sigma^{(n)}(z-b) = sum_{k=0}^p sigma^{(n+k)}(z-c) (c-b)^k / k!
         term = 0.0
         pow_db = 1.0
         fact = 1.0
@@ -203,15 +217,35 @@ def hierarchical_value(
     p: int = 6,
     eta: float = 0.5,
     base: str = "tanh",
+    moment_cache: dict[int, tuple[float, ...]] | None = None,
 ) -> float:
     """Near/far split. ``eta = 0`` is the dense path (original order)."""
     if eta <= 0.0:
         return dense_scan(z, offsets, weights, orders, base=base)
 
+    cache = {} if moment_cache is None else moment_cache
+
+    def cached_moments(node: Cluster) -> tuple[float, ...]:
+        key = id(node)
+        cached = cache.get(key)
+        if cached is None:
+            cached = multipole_moments(node, offsets, weights, orders, p=p)
+            cache[key] = cached
+        return cached
+
     def walk(node: Cluster) -> float:
         dist = abs(z - node.centre)
         if (not node.is_leaf) and node.radius <= eta * max(dist, 1e-18):
-            return far_eval(z, node, offsets, weights, orders, p=p, base=base)
+            return far_eval(
+                z,
+                node,
+                offsets,
+                weights,
+                orders,
+                p=p,
+                base=base,
+                moments=cached_moments(node),
+            )
         if node.is_leaf:
             acc = 0.0
             for j in node.members:
