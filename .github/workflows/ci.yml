@@ -369,6 +369,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/certified_step.py
+      - name: Run jet-PID smoke (08-10 G1/G2/G3/G4)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/jet_pid.py
       - name: Run rational-stencil smoke (01-11 G1 algebra / G2–G5)
         run: |
           source .venv-cross/bin/activate

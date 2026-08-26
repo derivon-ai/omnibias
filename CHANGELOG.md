@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-PID optimizer (theory 08-10)
+
+- `omnibias.core.control_pid` plus `omnibias.{torch,jax}.optim_pid`:
+  PID on a directional restriction whose I term is the exact FTC of
+  the Taylor model and whose D term is `phi''`.
+- Cookbook: [`docs/cookbook/jet-pid.md`](docs/cookbook/jet-pid.md).
+- Smoke: [`docs/benchmarks/jet_pid_smoke.json`](docs/benchmarks/jet_pid_smoke.json).
+- Not a plant PID, not LQR, not MPC, not a global min.
+
 ### Added — Finite 1-D Cole-Hopf / Picard / guided-C∞ Burgers
 
 - `omnibias.pinn.solver` exports Cole-Hopf factorial jets, frozen-advection

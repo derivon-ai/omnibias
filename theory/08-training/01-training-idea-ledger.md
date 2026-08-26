@@ -10,7 +10,7 @@ stack is the default.
 
 - **Status**: shipped (G1–G5 earned; trainers do not clear Hilbert stretch; design record)
 - **Depends on**: 01-01, 01-10, 03-12, 06-01, 06-02
-- **Blocks**: 08-02, 08-03, 08-04, 08-05, 08-06, 08-07, 08-08, 08-09
+- **Blocks**: 08-02, 08-03, 08-04, 08-05, 08-06, 08-07, 08-08, 08-09, 08-10
 
 ### Operator card
 
@@ -79,7 +79,7 @@ taxonomy, rejects, and stack they must keep.
 An **optimizer** is a map `(theta, L) -> theta'`. It may use exact jets of
 `L` along a direction, exact Hessians, or a radii polynomial. It still
 evaluates a *global* (or end-to-end residual) objective. Specs 03-12, 08-04,
-08-06, 08-07, 08-08 (as a step on the implicit residual) sit here.
+08-06, 08-07, 08-08 (as a step on the implicit residual), and 08-10 sit here.
 
 A **learning rule** is a map from *layer-local* information to a weight
 update that does not wait for the final `L`. Depth is causal: layer `ell`
@@ -106,7 +106,8 @@ objective (end-to-end L, or PDE residual)
 08-03 / 08-05 are an **alternative** information path (local residual), used
 as a warm start or as a PINN-depth march, then handed to the stack above.
 08-07 is a structured special case of 03-12. 08-08 replaces unrolled depth
-with a fixed point. 08-09 is optional and is not the CCF path.
+with a fixed point. 08-09 is optional and is not the CCF path. 08-10 is
+an optional jet-PID step on the same 03-12 restriction.
 
 ### Ledger table
 
@@ -120,6 +121,7 @@ with a fixed point. 08-09 is optional and is not the CCF path.
 | 08-07 | optimizer | `omnibias.{torch,jax}.optim` block search | one named block |
 | 08-08 | optimizer | `omnibias.{torch,jax}.implicit` | fixed-point quality |
 | 08-09 | filter | `omnibias.verify.train_step` | enclosure explosion ⇒ reject |
+| 08-10 | optimizer | `omnibias.core.control_pid` + `optim_pid` | jet truncation `R_N`; not a plant PID |
 
 ### Rejected (no spec)
 
@@ -163,6 +165,7 @@ Costs are versus one forward+backward. `L` = depth, `N` = jet order,
 | 08-07 block search | cheap per block | exact on that line | block structure required |
 | 08-08 DEQ + IFT | one linear solve | implicit-depth Newton | fixed-point quality |
 | 08-09 certified step | interval bound | may refuse steps | enclosure explosion |
+| 08-10 jet-PID | one restriction jet | P + FTC-I + exact D | jet truncation `R_N` |
 
 Nothing in this table is a global solver for a deep nest. The only guarantees
 stronger than Adam are **local quadratic** (Newton family) and **local
@@ -200,7 +203,7 @@ and that the two rejected sentences do not appear as claims in Group 08.
 ```python
 # documentation only — not a module
 LEDGER_OPTIMIZERS = (
-    "03-12", "08-04", "08-06", "08-07", "08-08",
+    "03-12", "08-04", "08-06", "08-07", "08-08", "08-10",
 )
 LEDGER_LEARNING_RULES = (
     "08-02", "08-03", "08-05",
