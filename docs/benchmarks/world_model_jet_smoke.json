@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.world_model_jet.v1",
-  "generated_utc": "2026-08-21T21:17:15Z",
+  "generated_utc": "2026-08-26T17:19:51Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -22,7 +22,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 809.16,
+  "rss_mb_at_start": 808.93,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -46,9 +46,14 @@
         "passed": true,
         "navier_stokes_proof_claim": false,
         "continuum_claim": false
+      },
+      {
+        "name": "g4_purity",
+        "passed": true,
+        "imports_backend": false
       }
     ]
   },
   "disclaimer": "finite-time jet + Lohner remainder; not NS global regularity, not CCF stretch, not an RL SOTA world model",
-  "wall_seconds": 1.7524241479695775
+  "wall_seconds": 1.2538766820216551
 }

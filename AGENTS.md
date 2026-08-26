@@ -670,7 +670,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.sharp_loss` + `omnibias.{torch,jax}.optim_sharp_loss`
   (09-23, **shipped**; `L + mu * ritz`; G1–G4 CI; not 08-06 schedule) /
   `omnibias.core.jet_world` + `omnibias.dynamics._core.jet_world`
-  (09-25; next N-jet + Lohner; G1–G4 CI; not NS global regularity) /
+  (09-25, **shipped**; next N-jet + Lohner; G1–G4 CI; not NS global regularity) /
   `omnibias.holonomic._core.export`
   (09-26; Ore export; G1–G4 CI; finite rational Lean only) /
   `omnibias.core.parameter_jets` + `omnibias.pinn.operator`

@@ -3,7 +3,8 @@
 """Frontier 09-25: world-model-as-jet.
 
 G1 is the order-2 oscillator Taylor. G2 is a sound Lohner box.
-G3 records no NS / continuum claim. Lohner path is pure Python.
+G3 records no NS / continuum claim. G4 is Lohner-path purity
+(no torch/jax).
 """
 
 from __future__ import annotations
@@ -19,6 +20,7 @@ from omnibias.core.jet_world import (
     DISCLAIMER,
     honesty_payload,
     jet_world_skill,
+    source_imports_no_backend,
     worked_example,
 )
 
@@ -41,6 +43,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["g2_earned"])
     hon = honesty_payload()
     g3 = hon["navier_stokes_proof_claim"] is False and hon["continuum_claim"] is False
+    g4 = source_imports_no_backend()
     entries = [
         {
             "name": "g1_cell",
@@ -62,6 +65,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "passed": g3,
             "navier_stokes_proof_claim": False,
             "continuum_claim": False,
+        },
+        {
+            "name": "g4_purity",
+            "passed": g4,
+            "imports_backend": False,
         },
     ]
     for entry in entries:

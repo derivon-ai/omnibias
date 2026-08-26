@@ -16,8 +16,10 @@ neither torch nor jax.
 
 from __future__ import annotations
 
+import ast
 import math
 from dataclasses import dataclass
+from pathlib import Path
 
 from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.lohner import (
@@ -33,6 +35,24 @@ DISCLAIMER = (
 )
 
 OSCILLATOR_A = ((0.0, 1.0), (-1.0, 0.0))
+
+
+def source_imports_no_backend() -> bool:
+    """G4: the Lohner path (this module + verified.lohner) imports no backend."""
+    banned = {"torch", "jax", "tensorflow", "keras"}
+    here = Path(__file__).resolve().parent
+    paths = (Path(__file__), here / "verified" / "lohner.py")
+    for path in paths:
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    if alias.name.split(".")[0] in banned:
+                        return False
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                if node.module.split(".")[0] in banned:
+                    return False
+    return True
 
 
 def honesty_payload() -> dict[str, bool]:
@@ -163,5 +183,6 @@ __all__ = [
     "lohner_plan",
     "oscillator_taylor_x",
     "predict_next_jet",
+    "source_imports_no_backend",
     "worked_example",
 ]

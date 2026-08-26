@@ -7,7 +7,7 @@ collapse (`beta -> inf`, feasibility) does not appear.
 
 Finite-time enclosure on a named ODE. Not Navier–Stokes global
 regularity. Not CCF stretch. Not an RL SOTA world model. Status is
-**gated**, not shipped. The Lohner path imports neither torch nor jax.
+**shipped**. The Lohner path imports neither torch nor jax.
 
 Homes: `omnibias.core.jet_world`,
 `omnibias.dynamics._core.jet_world`.

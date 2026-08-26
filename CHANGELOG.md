@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — World-model-as-jet shipped (theory 09-25)
+
+- Spec 09-25 status is **shipped**: G1–G4 CI; G4 Lohner-path
+  purity (no torch/jax).
+- Not NS global regularity.
+- Smoke: `docs/benchmarks/world_model_jet_smoke.json`.
+
 ### Added — Proof-carrying forward shipped (theory 09-24)
 
 - Spec 09-24 status is **shipped**: G1–G4 CI; not 08-09; Lean

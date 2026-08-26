@@ -410,6 +410,8 @@ gates are earned on smoke, not in CI `all_passed`.
   `L + mu * ritz`, not 08-06. Status is **shipped**.
 - **Proof-carrying forward** ([09-24](api/pci.md)): `(y, box)`, not
   08-09. Status is **shipped**.
+- **World-model-as-jet** ([09-25](api/world_model_jet.md)): next
+  N-jet + Lohner, not NS. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

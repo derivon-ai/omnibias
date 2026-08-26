@@ -6,7 +6,7 @@ Predict the **next N-jet of a trajectory** and plan on the Taylor
 polynomial plus a Lohner remainder — a model-based loop whose planner
 is a remainder statement, not sampled imagination.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 Lohner-path purity; not NS global regularity)
 - **Depends on**: 07-06, 09-01
 - **Blocks**: none
 
