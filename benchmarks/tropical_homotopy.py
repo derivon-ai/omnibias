@@ -2,7 +2,8 @@
 # Copyright (C) 2026 Derivon
 """Gated primitive: tropical homotopy (theory 01-08).
 
-G4 path-following is earned: ``path_follow`` matches
+G3 is closed-form ``relaxed_grad`` / ``relaxed_hess`` versus central
+FD. G4 path-following is earned: ``path_follow`` matches
 ``tropical_anneal_descent`` (``AnnealSchedule`` duck-typed) at 2x fewer
 evals on the surrounding-exponent family. Cost vs ``n`` / ``D`` stays
 leftover-recorded. ``beta -> inf`` is temperature collapse.
@@ -96,6 +97,48 @@ def _run_cost() -> dict[str, Any]:
             "leftover-recorded, not an anneal_descent win. Not in CI "
             "all_passed."
         ),
+    }
+
+
+def _run_g3() -> dict[str, Any]:
+    from omnibias.struct._core.tropical import (
+        TropicalLinear,
+        relaxed_grad,
+        relaxed_hess,
+        relaxed_value,
+    )
+
+    rng = np.random.default_rng(3)
+    poly = TropicalLinear(rng.normal(size=5), rng.normal(size=(5, 2)))
+    x = np.array([0.15, -0.22])
+    beta = 3.0
+
+    def rv(pt: np.ndarray) -> float:
+        return float(np.asarray(relaxed_value(poly, pt, beta=beta)).reshape(-1)[0])
+
+    g = np.asarray(relaxed_grad(poly, x, beta=beta)).reshape(-1)
+    h = 1e-5
+    fd = np.array(
+        [
+            (rv(x + np.array([h, 0.0])) - rv(x - np.array([h, 0.0]))) / (2 * h),
+            (rv(x + np.array([0.0, h])) - rv(x - np.array([0.0, h]))) / (2 * h),
+        ]
+    )
+    rel = float(np.linalg.norm(g - fd) / max(float(np.linalg.norm(fd)), 1e-12))
+    hess = np.asarray(relaxed_hess(poly, x, beta=beta))
+    hh = 1e-4
+    h00 = (rv(x + np.array([hh, 0.0])) - 2 * rv(x) + rv(x - np.array([hh, 0.0]))) / (
+        hh * hh
+    )
+    scale = max(abs(float(hess[0, 0])), abs(h00), 1e-8)
+    hess_rel = abs(float(hess[0, 0]) - h00) / scale
+    passed = bool(rel <= 1e-6 and hess_rel <= 1e-4)
+    return {
+        "name": "g3_derivatives",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "grad_rel": rel,
+        "hess00_rel": float(hess_rel),
     }
 
 
@@ -199,6 +242,7 @@ def main() -> int:
         "n_vertices": len(verts),
         "in_ci_all_passed": True,
     }
+    g3 = _run_g3()
     cost = _run_cost()
     g4 = _run_g4()
     g4_entry = {
@@ -213,11 +257,12 @@ def main() -> int:
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
             "g4_in_all_passed": bool(g4["in_ci_all_passed"]),
-            "gates_in_scope": ["g1", "g2", "g4"],
+            "gates_in_scope": ["g1", "g2", "g3", "g4"],
         },
     )
-    payload["gates"] = gates_block([g1, g2, g4_entry])
+    payload["gates"] = gates_block([g1, g2, g3, g4_entry])
     payload["cost"] = cost
+    payload["g3"] = g3
     payload["g4"] = g4
     payload["honesty"] = {
         "collapse": "beta -> inf (temperature); not delta -> 0",
@@ -230,6 +275,8 @@ def main() -> int:
         "g4_leftover_tick": 72,
         "g4_in_ci_all_passed": bool(g4["in_ci_all_passed"]),
         "g4_path_follow_api": True,
+        "g3_earned": bool(g3["passed"]),
+        "g3_in_ci_all_passed": bool(g3["in_ci_all_passed"]),
         "cost_earned": False,
         "cost_reported": True,
         "cost_leftover_recorded": True,

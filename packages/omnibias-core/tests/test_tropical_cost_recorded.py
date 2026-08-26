@@ -33,6 +33,7 @@ def test_cost_vs_n_d_is_reported_and_out_of_all_passed() -> None:
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "cost_vs_n_d" not in names
+    assert "g3_derivatives" in names
     assert "g4_path_following" in names
     assert payload["gates"]["all_passed"] is True
     g4 = payload["g4"]

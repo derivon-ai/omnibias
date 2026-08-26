@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tropical homotopy G3 derivatives earned (theory 01-08)
+
+- Spec 01-08 G3 closed-form `relaxed_grad` / `relaxed_hess` versus
+  central FD is now in CI `all_passed`.
+- Smoke: `docs/benchmarks/tropical_homotopy_smoke.json`.
+
 ### Added — Arrangement-geometry G3/G4 earned (theory 01-03)
 
 - Spec 01-03 G3 tree agreement and G4 torch/jax soft-path parity
