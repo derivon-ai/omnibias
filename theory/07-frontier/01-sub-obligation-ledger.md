@@ -7,7 +7,7 @@ primitives can actually attack, and — for each — the absolute gate that deci
 it and the sentence that must never be written. This file is the ledger the
 other six frontier specs are entries in.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 earned; RH is a non-entry; design record)
 - **Depends on**: 01-11, 06-01, 06-02
 - **Blocks**: 07-02, 07-03, 07-04, 07-05, 07-06, 07-07
 

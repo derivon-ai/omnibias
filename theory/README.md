@@ -187,7 +187,7 @@ external parent and states why the parent stays external.
 
 | Spec | Status | One line |
 |---|---|---|
-| [07-01 sub-obligation ledger](07-frontier/01-sub-obligation-ledger.md) | gated | Parent, sub-obligation, gate, sealed scope, never-write, distance; RH is a non-entry |
+| [07-01 sub-obligation ledger](07-frontier/01-sub-obligation-ledger.md) | shipped | Parent, sub-obligation, gate, sealed scope, never-write, distance; RH is a non-entry |
 | [07-02 Navier-Stokes adjacent](07-frontier/02-navier-stokes-adjacent.md) | gated | Weak-form width split + exact-jet Lohner; G1–G6 CI; founding bias collapse, not temperature collapse; not a continuum regularity claim |
 | [07-03 CCF campaign acceleration](07-frontier/03-ccf-campaign-acceleration.md) | gated | A basis-level attack on the recorded dictionary floor |
 | [07-04 Yang-Mills adjacent](07-frontier/04-yang-mills-adjacent-holonomy-and-gap.md) | gated | Holonomy trials, 6j / 3-plaquette Hamiltonians, two-scale polymer, Lipschitz SU(3) Haar, and a 2+1-D strip; the mass gap stays external |

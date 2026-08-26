@@ -330,7 +330,10 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   **shipped**; they are
   earned on `benchmarks/theory_homes.py` (42 packages, 94/94 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
-  lines, not promoted).
+  lines, not promoted). Theory 06-05 is **shipped** (document G1–G5;
+  extract / paper / external stay later). Theory 07-01 is **shipped**
+  ([`docs/frontier-ledger.md`](docs/frontier-ledger.md); RH is a
+  non-entry).
 
 ## Don't
 

@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Frontier ledger shipped (theory 07-01)
+
+- Spec 07-01 status is **shipped**: G1–G5 earned; design record.
+- RH is a non-entry. Public copy: `docs/frontier-ledger.md`.
+- Parents stay external.
+
 ### Added — Citation path shipped (theory 06-05)
 
 - Spec 06-05 status is **shipped**: G1–G5 document gates earned.

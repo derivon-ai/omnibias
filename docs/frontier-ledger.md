@@ -3,7 +3,7 @@
 This page is the public copy of theory spec 07-01. Every row is a
 **finite or compact** obligation with an absolute gate. Passing every
 row would solve none of the parents. That is what "external
-obligation" means.
+obligation" means. Status is **shipped**.
 
 The four claim rungs are on [the honesty page](honesty.md). Climbing a
 rung does not shrink the distance to a parent.
