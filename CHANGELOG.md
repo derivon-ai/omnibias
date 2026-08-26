@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Citation path shipped (theory 06-05)
+
+- Spec 06-05 status is **shipped**: G1–G5 document gates earned.
+- Obligation-3 `jet_vs_nested_ad` earned; extract / paper / external
+  stay later.
+- Smoke: `docs/benchmarks/jet_vs_nested_ad_smoke.json`.
+
 ### Added — Packaging homes shipped (theory 06-03)
 
 - Spec 06-03 status is **shipped**: G1–G5 earned (42 packages,

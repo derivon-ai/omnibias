@@ -8,7 +8,7 @@ in which to **publish and use** that object so it can be addressed
 later without being mistaken for Group 09 inventions, a CCF residual,
 or a prize claim.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 document gates earned; obligation-3 `jet_vs_nested_ad` earned; extract / paper / external stay later; design record)
 - **Depends on**: 06-01, 06-02, 09-01
 - **Blocks**: none
 
