@@ -211,7 +211,7 @@ chain rule, and not a global solver. CCF stretch stays an operator floor.
 | [08-06 sharpness-scheduled step](08-training/06-sharpness-scheduled-step.md) | shipped | Exact HVP `lambda_max` sets cubic `sigma` / lr; G1–G3 CI |
 | [08-07 block exact search](08-training/07-block-exact-search.md) | shipped | Structured 03-12 on OMBU / last linear / arrangement; G1–G4 CI |
 | [08-08 implicit DEQ Newton](08-training/08-implicit-deq-newton.md) | shipped | `u = sigma(W u + x)` with exact-`sigma'` IFT; no unrolled BPTT; G1–G3 CI |
-| [08-09 certified step](08-training/09-certified-step.md) | gated | Accept `theta'` only if a verify Lipschitz / output box stays in cap; G1–G3 CI |
+| [08-09 certified step](08-training/09-certified-step.md) | shipped | Accept `theta'` only if a verify Lipschitz / output box stays in cap; G1–G3 CI |
 
 ### 09 Tower inventions
 

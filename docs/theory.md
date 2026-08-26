@@ -355,6 +355,8 @@ gates are earned on smoke, not in CI `all_passed`.
   coordinate sweep, not a global solver. Status is **shipped**.
 - **Implicit DEQ Newton** ([08-08](api/implicit.md)): IFT, not
   unrolled BPTT. Status is **shipped**.
+- **Certified step** ([08-09](api/certified_step.md)): empty is a
+  reject, not robustness. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

@@ -7,7 +7,7 @@ of a named input-output property (Lipschitz or output box) remains
 inside a declared bound after the step, so training can refuse an
 update that would break a certificate.
 
-- **Status**: gated
+- **Status**: shipped (G1–G3 CI; empty is a reject, not robustness)
 - **Depends on**: 08-01
 - **Blocks**: none
 

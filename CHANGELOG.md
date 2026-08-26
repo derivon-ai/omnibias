@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Certified step shipped (theory 08-09)
+
+- Spec 08-09 status is **shipped**: G1–G3 CI; empty is a reject,
+  not robustness.
+- Smoke: `docs/benchmarks/certified_step_smoke.json`.
+
 ### Added — Implicit DEQ Newton shipped (theory 08-08)
 
 - Spec 08-08 status is **shipped**: G1–G3 CI; exact-`sigma'` IFT,
