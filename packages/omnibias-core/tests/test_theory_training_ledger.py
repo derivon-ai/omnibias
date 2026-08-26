@@ -18,7 +18,7 @@ THEORY_README = REPO / "theory" / "README.md"
 PACKAGES = REPO / "packages"
 
 LEDGER_TABLE_HEADER = "| Spec | Taxonomy | Home | Floor |"
-LEDGER_OPTIMIZERS = ("03-12", "08-04", "08-06", "08-07", "08-08", "08-10", "08-11")
+LEDGER_OPTIMIZERS = ("03-12", "08-04", "08-06", "08-07", "08-08", "08-10", "08-11", "08-12")
 LEDGER_LEARNING_RULES = ("08-02", "08-03", "08-05")
 LEDGER_FILTERS = ("08-09",)
 REJECTED = (

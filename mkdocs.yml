@@ -189,6 +189,7 @@ nav:
       - certified step (08-09): api/certified_step.md
       - jet-PID optimizer (08-10): api/jet_pid.md
       - jet-LQR optimizer (08-11): api/jet_lqr.md
+      - jet-MPC optimizer (08-12): api/jet_mpc.md
       - rational stencil obligations (01-11): api/rational_stencil.md
       - soft-population evolution (03-01): api/soft_evolution.md
       - arrangement LP (03-02): api/arrangement_lp.md
@@ -298,6 +299,7 @@ nav:
       - Certified step: cookbook/certified-step.md
       - Jet-PID optimizer: cookbook/jet-pid.md
       - Jet-LQR optimizer: cookbook/jet-lqr.md
+      - Jet-MPC optimizer: cookbook/jet-mpc.md
       - Rational stencil obligations: cookbook/rational-stencil.md
       - Soft-population evolution: cookbook/soft-evolution.md
       - Arrangement LP: cookbook/arrangement-lp.md

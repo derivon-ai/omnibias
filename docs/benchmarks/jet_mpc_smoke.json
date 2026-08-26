@@ -1,0 +1,62 @@
+{
+  "schema": "omnibias.benchmarks.jet_mpc.v1",
+  "generated_utc": "2026-08-26T18:38:39Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "jet_mpc",
+    "full": false,
+    "honesty": {
+      "global_min_claimed": false,
+      "plant_mpc_claimed": false,
+      "general_qp_claimed": false,
+      "algebraic_riccati_claimed": false,
+      "activation_riccati_as_model": false,
+      "stretch_claim": false,
+      "continuum_claimed": false,
+      "theorem_prover_verified": false,
+      "skips_chain_rule": false
+    }
+  },
+  "rss_mb_at_start": 1140.1,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_recede",
+        "passed": true,
+        "step": 1.0,
+        "boxed_step": 0.25
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "median_err": 0.0,
+        "boxed": true,
+        "refused": true,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "plant_mpc_claimed": false,
+        "general_qp_claimed": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_step": 1.0,
+        "jax_step": 1.0
+      }
+    ]
+  },
+  "disclaimer": "receding jet-MPC: first control of scalar LQR plus box / remainder; not plant MPC, not a general QP, not a global min, not CCF stretch",
+  "wall_seconds": 1.1280242969514802
+}

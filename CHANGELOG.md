@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-MPC optimizer (theory 08-12)
+
+- `omnibias.core.control_mpc` plus `omnibias.{torch,jax}.optim_mpc`:
+  receding first control of 08-11 LQR, boxed by `u_max` and an
+  optional Lagrange trust radius.
+- Cookbook: [`docs/cookbook/jet-mpc.md`](docs/cookbook/jet-mpc.md).
+- Smoke: [`docs/benchmarks/jet_mpc_smoke.json`](docs/benchmarks/jet_mpc_smoke.json).
+- Not plant MPC and not a general horizon-QP.
+
 ### Added — Jet-LQR optimizer (theory 08-11)
 
 - `omnibias.core.control_lqr` plus `omnibias.{torch,jax}.optim_lqr`:
