@@ -6,7 +6,7 @@ The **loss is the Taylor remainder after order `N`** (or a Padé
 remainder), not `L` itself, so the net is forced into "this function
 is well approximated by its N-jet."
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not 03-10)
 - **Depends on**: 03-10, 03-13, 09-01
 - **Blocks**: none
 

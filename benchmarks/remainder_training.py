@@ -4,28 +4,36 @@
 
 G1 matches analytic exp R_2(0.2). G2 remainder-trains an OMBU
 against value-only MSE on the model's own R_2. G3 refuses to call
-this spec 03-10 or 03-13. Not CCF stretch. Jets are founding bias
-collapse, not temperature collapse.
+this spec 03-10 or 03-13. G4 is torch/jax bit-identity on G1.
+Not CCF stretch. Jets are founding bias collapse, not temperature
+collapse.
 """
 
 from __future__ import annotations
 
 import argparse
+import math
 import os
 import sys
 import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.remainder_train import (
     DISCLAIMER,
     exp_remainder_skill,
     honesty_payload,
     worked_example,
 )
+from omnibias.jax.optim_remainder import remainder_loss as jax_loss
+from omnibias.torch.optim_remainder import remainder_loss as torch_loss
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -46,6 +54,14 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         and hon["is_03_13"] is False
         and hon["stretch_claim"] is False
     )
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    xs = [0.2]
+    jet = [1.0, 1.0, 1.0]
+    vals = [math.exp(0.2)]
+    t = torch_loss(torch.tensor(vals), torch.tensor(jet), torch.tensor(xs))
+    j = jax_loss(jnp.asarray(vals), jnp.asarray(jet), jnp.asarray(xs))
+    g4 = bool(float(t["max_abs"]) == float(j["max_abs"]) and float(t["loss"]) == float(j["loss"]))
     entries = [
         {"name": "g1_analytic", "passed": g1, "R2": ex["R2"], "loss": ex["loss"]},
         {
@@ -60,6 +76,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "is_03_10": False,
             "is_03_13": False,
             "stretch_claim": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_loss": float(t["loss"]),
+            "jax_loss": float(j["loss"]),
         },
     ]
     for entry in entries:

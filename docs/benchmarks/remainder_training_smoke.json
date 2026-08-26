@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.remainder_training.v1",
-  "generated_utc": "2026-08-21T20:03:01Z",
+  "generated_utc": "2026-08-26T17:14:09Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 813.27,
+  "rss_mb_at_start": 1216.07,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -42,9 +42,15 @@
         "is_03_10": false,
         "is_03_13": false,
         "stretch_claim": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_loss": 1.9677304559231904e-06,
+        "jax_loss": 1.9677304559231904e-06
       }
     ]
   },
   "disclaimer": "remainder loss R_N; not spec 03-10, not spec 03-13, and not CCF stretch",
-  "wall_seconds": 1.464360503014177
+  "wall_seconds": 0.4393326250137761
 }

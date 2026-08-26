@@ -630,7 +630,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   bias collapse, not temperature collapse; not softmax, not a
   05-02 reversal) /
   `omnibias.core.remainder_train` + `omnibias.{torch,jax}.optim_remainder`
-  (09-18; loss is `R_N`; optional 03-13 birth hook; G1–G4 CI;
+  (09-18, **shipped**; loss is `R_N`; optional 03-13 birth hook; G1–G4 CI;
   founding bias collapse, not temperature collapse; not 03-10) /
   `omnibias.core.frame_unet` + `omnibias.{torch,jax}.architectures.frame_unet`
   (09-04, **shipped**; order encoder + integral decoder; G1–G4 CI; founding

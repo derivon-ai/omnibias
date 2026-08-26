@@ -396,6 +396,8 @@ gates are earned on smoke, not in CI `all_passed`.
   meta-grad, not ImageNet. Status is **shipped**.
 - **Dual-FTC training** ([09-17](api/ftc_net.md)): dual `r_D`/`r_I`,
   not a VPINN. Status is **shipped**.
+- **Remainder training** ([09-18](api/remainder_training.md)): loss
+  is `R_N`, not 03-10. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

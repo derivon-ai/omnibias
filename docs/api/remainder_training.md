@@ -8,7 +8,7 @@ founding bias collapse (`delta -> 0`) supplies the jet of `T_N`.
 Temperature collapse (`beta -> inf`, feasibility) does not appear.
 Do not conflate the two.
 
-Status is **gated**, not shipped. `R_N` is of the model (or a named
+Status is **shipped**. `R_N` is of the model (or a named
 analytic target), not of an unknown PDE solution. Not CCF stretch.
 
 Homes: `omnibias.core.remainder_train`,

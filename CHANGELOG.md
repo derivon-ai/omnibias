@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Remainder training shipped (theory 09-18)
+
+- Spec 09-18 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 analytic remainder.
+- Loss is `R_N`, not 03-10.
+- Smoke: `docs/benchmarks/remainder_training_smoke.json`.
+
 ### Added — Dual-FTC training shipped (theory 09-17)
 
 - Spec 09-17 status is **shipped**: G1–G4 CI; G4 torch/jax parity
