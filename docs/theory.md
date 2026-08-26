@@ -376,6 +376,8 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Sheaf-atlas net** ([09-09](api/sheaf_atlas_net.md)): jet
   cocycle on partition charts, not a sheaf theorem. Status is
   **shipped**.
+- **Riccati flow net** ([09-10](api/riccati_flow_net.md)): depth
+  is integration time, not DEQ / CNF. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

@@ -6,7 +6,7 @@ A layer that is the **time-`t` flow of the founding Riccati ODE**
 `sigma' = sigma(1-sigma)` (or `tanh' = 1-tanh^2`), not `sigma(Wx+b)`.
 Depth is integration time.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not DEQ / CNF)
 - **Depends on**: 09-01
 - **Blocks**: none
 

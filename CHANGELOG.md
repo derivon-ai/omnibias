@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Riccati flow net shipped (theory 09-10)
+
+- Spec 09-10 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Depth is Riccati time, not DEQ / CNF.
+- Smoke: `docs/benchmarks/riccati_flow_net_smoke.json`.
+
 ### Added — Sheaf-atlas net shipped (theory 09-09)
 
 - Spec 09-09 status is **shipped**: G1–G4 CI; G4 torch/jax parity

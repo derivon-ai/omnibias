@@ -8,7 +8,7 @@ jets of `s(t)` in `s0` may still use the tower. Temperature collapse
 (`beta -> inf`, feasibility) does not appear. Do not conflate the
 two.
 
-Status is **gated**, not shipped. Not ImageNet. Not CCF stretch.
+Status is **shipped**. Not ImageNet. Not CCF stretch.
 
 Homes: `omnibias.core.riccati_flow`,
 `omnibias.{torch,jax}.architectures.riccati_flow`.
