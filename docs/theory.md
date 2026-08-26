@@ -250,7 +250,7 @@ gates are earned on smoke, not in CI `all_passed`.
   G4 inverse-design leftover-recorded. G5 conservation leftover-recorded.
 - **Linearizing transforms** ([02-13](api/transforms_pde.md)): named Cole-Hopf
   / Miura / Bäcklund / Darboux; exactness to jet order N; G3 Burgers
-  leftover-recorded. 03-11 search stays designed.
+  leftover-recorded. 03-11 search stays designed. Status is **shipped**.
 - **Holonomy band** ([02-14](api/holonomy_band.md)): closed form only abelian
   + transverse-constant; open lines gauge-dependent; no Yang-Mills / mass
   gap / continuum claim. G3 Magnus leftover-recorded. G4 gauge

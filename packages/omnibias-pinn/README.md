@@ -80,7 +80,7 @@ Alpha submodules (still under Beta `omnibias-pinn`, not separate wheels):
   D-optimal sensors. Distinct from `omnibias.pinn.solver.torch.inverse`.
 * **`omnibias.pinn.bem`** — gated BEM-Net (02-06). PDE exact off-surface;
   BC approximated; linear constant-coeff homogeneous only.
-* **`omnibias.pinn.transform`** — gated named linearizing maps (02-13).
+* **`omnibias.pinn.transform`** — shipped named linearizing maps (02-13).
   Cole-Hopf / Miura / Bäcklund / Darboux; 03-11 search stays designed.
 
 Four-gap acceptance matrix (smoke vs `--full`):

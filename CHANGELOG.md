@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Linearizing transforms shipped (theory 02-13)
+
+- Spec 02-13 status is **shipped**: G1 jet identity CI; leftover #39
+  G3 stays reported and out of `all_passed`.
+- Named maps only; 03-11 search stays designed.
+- Smoke: `docs/benchmarks/linearizing_transforms_smoke.json`.
+
 ### Added — Equality-intersection nets shipped (theory 02-12)
 
 - Spec 02-12 status is **shipped**: leftover #29 G4 stays reported

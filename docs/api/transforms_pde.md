@@ -9,7 +9,7 @@ G1 Cole-Hopf jet identity is CI-gated. G3 Burgers win is
 **leftover-recorded** unearned (leftover #39): no Cole-Hopf-trained
 field versus a direct PINN at matched cost. The previous
 `g3_burgers_init` `passed=True` stub is withdrawn. Status is
-**gated**, not shipped. See theory spec 02-13.
+**shipped**. See theory spec 02-13.
 
 ## Core algebra
 

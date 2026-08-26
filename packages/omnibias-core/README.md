@@ -60,7 +60,7 @@ print(hermite_coeffs(5))             # probabilist's Hermite (Gaussian)
 | `omnibias.core.tanh_method` | travelling-wave tanh algebra, not a collapse (theory 02-09, **gated**) |
 | `omnibias.core.ladder` | Hermite raise/lower; Rodrigues reweight required (theory 02-10, **gated**) |
 | `omnibias.core.transfer` | 1-D ABCD stacks; `continuum_claim=False` (theory 02-11, **gated**) |
-| `omnibias.core.transforms_pde` | named Cole-Hopf / Miura / Bäcklund / Darboux (theory 02-13, **gated**) |
+| `omnibias.core.transforms_pde` | named Cole-Hopf / Miura / Bäcklund / Darboux (theory 02-13, **shipped**) |
 | `omnibias.core.bell` | Bell polynomials / Faà di Bruno combinatorics |
 | `omnibias.core.multi_index` | Multi-index ordering + Cauchy product for multivariate jets |
 | `omnibias.core.verified` | Rigorous numerics: `Interval`, Taylor models, Kantorovich, Lohner, … |
