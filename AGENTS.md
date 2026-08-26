@@ -503,7 +503,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02, **shipped**; sampled
   subgraph; G3 vs k-NN leftover-recorded, GNN / RegionModels stay `--full`; cost
   vs n/D leftover-recorded) / `omnibias.core.line_search` /
-  `omnibias.{torch,jax}.line_search` (03-12; certified Lagrange radius +
+  `omnibias.{torch,jax}.line_search` (03-12, **shipped**; certified Lagrange radius +
   `verify=True` never-worse; G4 leftover-recorded vs strong Wolfe, G5
   leftover-recorded, not in CI `all_passed`) /
   `omnibias.core.refine` / `omnibias.{torch,jax}.refine` (03-13, **shipped**; birth and

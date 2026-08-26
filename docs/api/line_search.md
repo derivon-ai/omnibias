@@ -6,7 +6,7 @@ into root-finding on a known polynomial. The model is exact to order
 bound on `|phi^(N+1)|` is supplied; `verify=True` is the never-worse
 backstop.
 
-Status is **gated**, not shipped. G1/G2/G3/G6 are CI-gated. G4
+Status is **shipped**. G1/G2/G3/G6 are CI-gated. G4
 (target-loss step count vs strong Wolfe) is **leftover-recorded**
 unearned (leftover #47; ratio `1.83`, need `2x`; Wolfe misses the
 stiffest seed). G5 reports the order×depth crossover versus a

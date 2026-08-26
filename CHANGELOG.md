@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Exact jet line search shipped (theory 03-12)
+
+- Spec 03-12 status is **shipped**: G1/G2/G3/G6 CI; G4 leftover #47
+  and G5 leftover #48 recorded, not in `all_passed`.
+- Certified radius + `verify=True` never-worse; not a global solver.
+- Smoke: `docs/benchmarks/jet_line_search_smoke.json`.
+
 ### Added — Jet line-search G4/G5 leftover-recorded (theory 03-12)
 
 - Leftover #47 leftover-records `g4_step_count_win` (`1.83x`, need

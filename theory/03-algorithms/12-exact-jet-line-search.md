@@ -6,7 +6,7 @@ A directional jet of the loss gives the exact Taylor polynomial along a search
 direction in **one** forward pass, so the line-search subproblem becomes root
 finding on a known polynomial instead of a sequence of trial evaluations.
 
-- **Status**: gated (G1/G2/G3/G6 CI; G4 step-count **leftover-recorded** / unearned vs strong Wolfe, leftover #47 (`1.83x`, need `2x`), not in CI `all_passed`; G5 order×depth crossover **leftover-recorded**, leftover #48, not in CI `all_passed`)
+- **Status**: shipped (G1/G2/G3/G6 CI; G4 step-count **leftover-recorded** / unearned vs strong Wolfe, leftover #47 (`1.83x`, need `2x`), not in CI `all_passed`; G5 order×depth crossover **leftover-recorded**, leftover #48, not in CI `all_passed`)
 - **Depends on**: 01-01
 - **Blocks**: 03-01, 03-13
 
