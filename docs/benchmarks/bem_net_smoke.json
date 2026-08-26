@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.bem_net.v1",
-  "generated_utc": "2026-08-26T16:18:30Z",
+  "generated_utc": "2026-08-26T16:37:58Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
       "g5"
     ]
   },
-  "rss_mb_at_start": 810.03,
+  "rss_mb_at_start": 810.21,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -49,25 +49,28 @@
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 42,
+    "leftover_tick": 86,
     "in_ci_all_passed": false,
     "rows": [
       {
         "n_quad": 12,
-        "one_point_wall_seconds": 9.309966117143631e-06,
-        "n_point_wall_seconds": 8.899997919797897e-05
+        "one_point_wall_seconds": 9.636976756155491e-06,
+        "n_point_wall_seconds": 0.00016467098612338305
       },
       {
         "n_quad": 24,
-        "one_point_wall_seconds": 1.3521057553589344e-05,
-        "n_point_wall_seconds": 0.0003196629695594311
+        "one_point_wall_seconds": 2.228503581136465e-05,
+        "n_point_wall_seconds": 0.0003150600241497159
       },
       {
         "n_quad": 48,
-        "one_point_wall_seconds": 2.6327092200517654e-05,
-        "n_point_wall_seconds": 0.0012610360281541944
+        "one_point_wall_seconds": 2.4545006453990936e-05,
+        "n_point_wall_seconds": 0.0012333070626482368
       }
     ],
-    "note": "Single-layer wall vs n_quad (one far point and N exterior points). G2 disc-accuracy is earned separately via circle_dirichlet_density. G3 exterior win stays leftover (no volume PINN). Dense N-point eval is the O(N^2) honesty bound (no 2-D FMM). Not a cost win."
+    "note": "Leftover #42 leftover-recorded: single-layer wall vs n_quad (one far point and N exterior points). G2 disc-accuracy is earned separately via circle_dirichlet_density. G3 exterior win stays leftover (no volume PINN). Dense N-point eval is the O(N^2) honesty bound (no 2-D FMM). Not a cost win."
   },
   "g2": {
     "name": "g2_disc_accuracy",
@@ -124,6 +127,9 @@
     "g3_volume_pinn": false,
     "cost_earned": false,
     "cost_reported": true,
+    "cost_leftover_recorded": true,
+    "cost_leftover_id": 42,
+    "cost_leftover_tick": 86,
     "cost_in_ci_all_passed": false,
     "fmm": false
   }

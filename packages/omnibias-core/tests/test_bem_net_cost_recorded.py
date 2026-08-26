@@ -18,6 +18,9 @@ def test_g2_earned_and_g3_cost_out_of_all_passed() -> None:
     assert cost["earned"] is False
     assert cost["passed"] is False
     assert cost["reported"] is True
+    assert cost["leftover_recorded"] is True
+    assert int(cost["leftover_id"]) == 42
+    assert int(cost["leftover_tick"]) == 86
     assert cost["in_ci_all_passed"] is False
     ns = {int(row["n_quad"]) for row in cost["rows"]}
     assert {12, 24, 48} <= ns
@@ -37,6 +40,8 @@ def test_g2_earned_and_g3_cost_out_of_all_passed() -> None:
     assert payload["honesty"]["g2_leftover_recorded"] is False
     assert int(payload["honesty"]["g2_leftover_id"]) == 24
     assert int(payload["honesty"]["g2_leftover_tick"]) == 75
+    assert payload["honesty"]["cost_leftover_recorded"] is True
+    assert int(payload["honesty"]["cost_leftover_id"]) == 42
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     assert payload["config"]["g2_in_all_passed"] is True
     names = [row["name"] for row in payload["gates"]["entries"]]

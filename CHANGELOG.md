@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — BEM-Net cost leftover-recorded (theory 02-06)
+
+- Leftover #42 leftover-records `cost_single_layer_vs_n` so it stays
+  reported and out of `all_passed`.
+- G2 leftover #24 stays earned; leftover #30 G3 stays unearned.
+- Smoke: `docs/benchmarks/bem_net_smoke.json`.
+
 ### Added — Holonomy band shipped (theory 02-14)
 
 - Spec 02-14 status is **shipped**: G1/G2/G4/G5 CI; leftover #34 G3

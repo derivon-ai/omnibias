@@ -76,11 +76,15 @@ def _run_cost() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 42,
+        "leftover_tick": 86,
         "in_ci_all_passed": False,
         "rows": rows,
         "note": (
-            "Single-layer wall vs n_quad (one far point and N exterior "
-            "points). G2 disc-accuracy is earned separately via "
+            "Leftover #42 leftover-recorded: single-layer wall vs "
+            "n_quad (one far point and N exterior points). G2 "
+            "disc-accuracy is earned separately via "
             "circle_dirichlet_density. G3 exterior win stays leftover "
             "(no volume PINN). Dense N-point eval is the O(N^2) honesty "
             "bound (no 2-D FMM). Not a cost win."
@@ -247,6 +251,9 @@ def main() -> int:
         "g3_volume_pinn": False,
         "cost_earned": False,
         "cost_reported": True,
+        "cost_leftover_recorded": True,
+        "cost_leftover_id": 42,
+        "cost_leftover_tick": 86,
         "cost_in_ci_all_passed": False,
         "fmm": False,
     }
