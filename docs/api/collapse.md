@@ -31,6 +31,12 @@ blow-up proof.
 Pairing collapse (`omnibias.core.collapse.pairing`) is a certified
 weak residual on a finite test pack, not a strong solution.
 
+Rank collapse (`omnibias.core.collapse.rank`) is an exact `Q` syzygy.
+A float SVD is not a proof.
+
+Duality / gap collapse was evaluated and **rejected**: a primal-dual
+sandwich that collapses at `L = U` is Enclosure Collapse of `OPT`.
+
 ::: omnibias.core.collapse
     options:
       show_root_heading: false

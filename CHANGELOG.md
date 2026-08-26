@@ -6,6 +6,18 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Rejected — Duality / gap collapse
+
+- A primal-dual sandwich that collapses at `L = U` is Enclosure
+  Collapse of `OPT`. The probe module was removed; the rebrand is
+  refused by `omnibias.core.collapse`.
+
+### Added — Rank collapse
+
+- `omnibias.core.collapse.rank`: exact integer nullspace plus a `Q`
+  residual check. A float singular value is not a certificate.
+- Cookbook: [`docs/cookbook/rank-collapse.md`](docs/cookbook/rank-collapse.md).
+
 ### Added — Pairing collapse
 
 - `omnibias.core.collapse.pairing`: exact `Q` pairings of a polynomial
