@@ -50,6 +50,11 @@ from omnibias.core.collapse.verdict import (
     is_singleton_zero,
     search_residuals,
 )
+from omnibias.core.collapse.winding import (
+    WINDING_SPEC,
+    winding_collapse,
+    winding_enclosure,
+)
 
 __all__ = [
     "CollapseOutcome",
@@ -65,6 +70,7 @@ __all__ = [
     "RejectedCollapse",
     "VERDICT_SPEC",
     "VerdictStatus",
+    "WINDING_SPEC",
     "add_registry_hook",
     "adjudicate_residual",
     "are_distinct",
@@ -82,4 +88,6 @@ __all__ = [
     "require_sound_enclosure",
     "reset_collapse_registry",
     "search_residuals",
+    "winding_collapse",
+    "winding_enclosure",
 ]

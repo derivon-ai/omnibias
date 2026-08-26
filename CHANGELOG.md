@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Winding collapse
+
+- `omnibias.core.collapse.winding`: certified `Δarg / 2π` on a circle;
+  collapse fires when the enclosure contains exactly one integer.
+- Cookbook: [`docs/cookbook/winding-collapse.md`](docs/cookbook/winding-collapse.md).
+- Not a blow-up proof and not a continuum PDE claim.
+
 ### Added — Identity collapse
 
 - `omnibias.core.collapse.identity`: exact `Q` polynomial agreement, or

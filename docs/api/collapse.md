@@ -24,6 +24,10 @@ Identity collapse (`omnibias.core.collapse.identity`) decides a germ
 identity: exact `Q` coefficient agreement is `{0}`; a float `||R_N||`
 is not a proof.
 
+Winding collapse (`omnibias.core.collapse.winding`) encloses
+`Δarg / 2π` on a circle and accepts only a unique integer. Not a
+blow-up proof.
+
 ::: omnibias.core.collapse
     options:
       show_root_heading: false
