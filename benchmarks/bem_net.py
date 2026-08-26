@@ -2,11 +2,10 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: BEM-Net (theory 02-06). Off-surface exact; BC approximated.
 
-G2 disc-accuracy is leftover-recorded (leftover #24) and stays
-``--full``. Single-layer wall vs ``n_quad`` is reported. G3 exterior
-win is leftover-recorded (leftover #30): pack-tree 02-07 G3 has no
-dense crossover, and no volume-PINN loop is wired. Neither is in CI
-``all_passed``.
+G2 disc-accuracy is earned: ``circle_dirichlet_density`` hits the
+annulus ``L2`` gate. Single-layer wall vs ``n_quad`` is reported. G3
+exterior win is leftover-recorded (leftover #30): no volume-PINN loop.
+G3 is not in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -44,7 +43,7 @@ def _median_seconds(fn: Any, *, warmup: int, repeats: int) -> float:
 
 
 def _run_cost() -> dict[str, Any]:
-    """Named leftover: single-layer wall vs n_quad; G2 disc L2 stays --full."""
+    """Named leftover: single-layer wall vs n_quad; not a cost win."""
     from omnibias.pinn.bem._core import KernelSpec, Surface, single_layer
 
     kernel = KernelSpec("laplace", dimension=2)
@@ -79,30 +78,53 @@ def _run_cost() -> dict[str, Any]:
         "reported": True,
         "in_ci_all_passed": False,
         "rows": rows,
-        "g2_disc_accuracy": {
-            "earned": False,
-            "reported": True,
-            "leftover_recorded": True,
-            "leftover_id": 24,
-            "leftover_tick": 61,
-            "stays_full": True,
-            "need": "exterior Dirichlet disc relative L2 <= 1e-8 on a test annulus, skill > 0",
-            "reason": (
-                "Leftover #24 leftover-recorded: no Dirichlet density "
-                "solve is wired. Constant-density single_layer wall vs "
-                "n_quad is recorded; that is not the named annulus L2 "
-                "gate. Dense N-point eval is the O(N^2) honesty bound "
-                "(no 2-D FMM)."
-            ),
-        },
         "note": (
-            "Leftover #24 leftover-recorded: single_layer wall vs "
-            "n_quad (one far point and N exterior points). G2 "
-            "disc-accuracy is a Dirichlet L2 study under "
-            "$OMNIBIAS_SCRATCH, not CI. Previous g2_disc_accuracy "
-            "passed=True / smoke/--full stub with no timing withdrawn. "
-            "G3 exterior win is reported from the pack-tree leftover, "
-            "not a volume-PINN bake-off. Not in CI all_passed."
+            "Single-layer wall vs n_quad (one far point and N exterior "
+            "points). G2 disc-accuracy is earned separately via "
+            "circle_dirichlet_density. G3 exterior win stays leftover "
+            "(no volume PINN). Dense N-point eval is the O(N^2) honesty "
+            "bound (no 2-D FMM). Not a cost win."
+        ),
+    }
+
+
+def _run_g2() -> dict[str, Any]:
+    """Named G2: exterior Dirichlet disc annulus L2 via the Fourier density."""
+    from omnibias.pinn.bem._core import (
+        KernelSpec,
+        Surface,
+        annulus_rel_l2,
+        circle_dirichlet_density,
+        exterior_disc_field,
+    )
+
+    n = 48
+    surface = Surface("circle", radius=1.0, n_quad=n)
+    kernel = KernelSpec("laplace", dimension=2)
+    g = [math.cos(2.0 * math.pi * i / n) for i in range(n)]
+    phi = circle_dirichlet_density(surface, g)
+    rel, skill = annulus_rel_l2(surface, phi, kernel, exterior_disc_field)
+    earned = bool(rel <= 1e-8 and skill > 0.0)
+    return {
+        "name": "g2_disc_accuracy",
+        "passed": earned,
+        "earned": earned,
+        "reported": True,
+        "leftover_recorded": False,
+        "leftover_id": 24,
+        "leftover_tick": 75,
+        "stays_full": False,
+        "in_ci_all_passed": earned,
+        "need": "exterior Dirichlet disc relative L2 <= 1e-8 on a test annulus, skill > 0",
+        "rel_l2": float(rel),
+        "skill_vs_zero": float(skill),
+        "n_quad": n,
+        "dirichlet_solver": "circle_dirichlet_density",
+        "note": (
+            "Leftover #24 earned on tick #75: circle_dirichlet_density "
+            "is the single-layer Fourier solve (mode k scaled by 2k), "
+            "not a train. Annulus L2 vs exterior_disc_field. In CI "
+            "all_passed."
         ),
     }
 
@@ -180,18 +202,29 @@ def main() -> int:
         },
     ]
     cost = _run_cost()
+    g2 = _run_g2()
     g3 = _run_g3()
+    entries.append(
+        {
+            "name": "g2_disc_accuracy",
+            "passed": bool(g2["passed"]),
+            "in_ci_all_passed": bool(g2["in_ci_all_passed"]),
+            "rel_l2": g2["rel_l2"],
+        }
+    )
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.bem_net.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
+            "g2_in_all_passed": bool(g2["in_ci_all_passed"]),
             "g3_in_all_passed": False,
-            "gates_in_scope": ["g1", "g5"],
+            "gates_in_scope": ["g1", "g2", "g5"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["cost"] = cost
+    payload["g2"] = g2
     payload["g3"] = g3
     payload["honesty"] = {
         "pde_exact": "off-surface by construction",
@@ -199,12 +232,12 @@ def main() -> int:
         "scope": "linear constant-coeff homogeneous",
         "founding_bias_collapse": True,
         "temperature_collapse": False,
-        "g2_disc_accuracy_earned": False,
+        "g2_disc_accuracy_earned": bool(g2["earned"]),
         "g2_reported": True,
-        "g2_leftover_recorded": True,
+        "g2_leftover_recorded": False,
         "g2_leftover_id": 24,
-        "g2_leftover_tick": 61,
-        "g2_stays_full": True,
+        "g2_leftover_tick": 75,
+        "g2_stays_full": False,
         "g3_exterior_win_earned": False,
         "g3_reported": True,
         "g3_leftover_recorded": True,

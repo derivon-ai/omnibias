@@ -10,7 +10,7 @@ No 2-D/3-D FMM. Dense evaluation is small-N unless the 02-07 tree is used.
 from __future__ import annotations
 
 import math
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Literal
 
@@ -150,6 +150,93 @@ def half_plane_dtn(
     return acc
 
 
+def circle_dirichlet_density(
+    surface: Surface,
+    boundary_values: Sequence[float],
+    *,
+    mean_tol: float = 1e-12,
+) -> tuple[float, ...]:
+    """Exterior Dirichlet density on a circle via the single-layer spectrum.
+
+    Mode ``k >= 1`` of the boundary data is scaled by ``2 k``; a nonzero
+    mean (net charge / log term) is refused. Not a train.
+    """
+    if surface.kind != "circle":
+        raise ValueError("circle_dirichlet_density is the disc solver")
+    if abs(float(surface.radius) - 1.0) > 1e-15:
+        raise ValueError("circle_dirichlet_density ships the unit disc (radius=1)")
+    n = surface.n_quad
+    if len(boundary_values) != n:
+        raise ValueError("boundary_values length must match n_quad")
+    g = [float(v) for v in boundary_values]
+    mean = sum(g) / float(n)
+    if abs(mean) > mean_tol:
+        raise ValueError(
+            "exterior single-layer disc solver refuses a net charge "
+            f"(mean Dirichlet {mean}); the log term does not decay"
+        )
+    # Unnormalized real DFT. Mode k of cos(k θ) has hat = n/2.
+    # Density scale for the decaying exterior mode is 2k.
+    two_pi_n = 2.0 * math.pi / float(n)
+    phi = [0.0] * n
+    k_max = (n - 1) // 2
+    for k in range(1, k_max + 1):
+        ak = 2.0 * sum(g[j] * math.cos(two_pi_n * k * j) for j in range(n)) / float(n)
+        bk = 2.0 * sum(g[j] * math.sin(two_pi_n * k * j) for j in range(n)) / float(n)
+        scale = 2.0 * float(k)
+        for j in range(n):
+            ang = two_pi_n * k * j
+            phi[j] += scale * (ak * math.cos(ang) + bk * math.sin(ang))
+    if n % 2 == 0:
+        k = n // 2
+        ak = sum(g[j] * math.cos(two_pi_n * k * j) for j in range(n)) / float(n)
+        scale = 2.0 * float(k) * ak
+        for j in range(n):
+            phi[j] += scale * math.cos(two_pi_n * k * j)
+    return tuple(phi)
+
+
+def exterior_disc_field(x: tuple[float, float], *, radius: float = 1.0) -> float:
+    """Analytic exterior unit-mode field ``(R/r) cos θ = R x / r^2``."""
+    r2 = float(x[0]) * float(x[0]) + float(x[1]) * float(x[1])
+    if r2 <= float(radius) * float(radius):
+        raise ValueError("exterior_disc_field is defined outside the disc")
+    return float(radius) * float(x[0]) / r2
+
+
+def annulus_rel_l2(
+    surface: Surface,
+    density: Sequence[float],
+    kernel: KernelSpec,
+    truth: Callable[[tuple[float, float]], float],
+    *,
+    r_lo: float = 1.5,
+    r_hi: float = 3.0,
+    n_radial: int = 8,
+    n_theta: int = 32,
+) -> tuple[float, float]:
+    """Relative ``L2`` and skill vs the zero predictor on an annulus."""
+    if r_lo <= surface.radius:
+        raise ValueError("annulus must sit outside the surface")
+    num = 0.0
+    den = 0.0
+    for ir in range(n_radial):
+        if n_radial == 1:
+            r = 0.5 * (r_lo + r_hi)
+        else:
+            r = r_lo + (r_hi - r_lo) * ir / float(n_radial - 1)
+        for it in range(n_theta):
+            t = 2.0 * math.pi * it / float(n_theta)
+            pt = (r * math.cos(t), r * math.sin(t))
+            pred = single_layer(pt, surface, density, kernel)
+            tru = float(truth(pt))
+            num += (pred - tru) * (pred - tru)
+            den += tru * tru
+    rel = math.sqrt(num / max(den, 1e-18))
+    skill = 1.0 - (num / max(den, 1e-18))
+    return rel, skill
+
+
 def poisson_pair_dictionary(*, scale: float = 1.0) -> tuple[HardyDictionary, tuple[float, float]]:
     """``P_{a,1}`` / ``Q_{a,1}`` pair; coeffs ``(1, 0)`` recover the Poisson kernel."""
     a = float(scale)
@@ -163,6 +250,9 @@ def poisson_pair_dictionary(*, scale: float = 1.0) -> tuple[HardyDictionary, tup
 __all__ = [
     "KernelSpec",
     "Surface",
+    "annulus_rel_l2",
+    "circle_dirichlet_density",
+    "exterior_disc_field",
     "green_laplace_2d",
     "half_plane_dtn",
     "pde_residual_off_surface",

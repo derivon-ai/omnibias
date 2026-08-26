@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — BEM-Net G2 Dirichlet density earned (theory 02-06)
+
+- `circle_dirichlet_density` / `exterior_disc_field` / `annulus_rel_l2`
+  ship on `omnibias.pinn.bem`.
+- Leftover #24's annulus L2 `<= 1e-8` is earned (Fourier `2k` scale,
+  not a train). In CI `all_passed`.
+- Smoke: `docs/benchmarks/bem_net_smoke.json`.
+
 ### Added — Pack-tree G3 multipole earned (theory 02-07)
 
 - `far_eval` is an `O(p)` multipole when member orders match;

@@ -12,6 +12,9 @@ import torch
 from omnibias.pinn.bem._core import (
     KernelSpec,
     Surface,
+    annulus_rel_l2,
+    circle_dirichlet_density,
+    exterior_disc_field,
     half_plane_dtn,
     pde_residual_off_surface,
     poisson_pair_dictionary,
@@ -41,6 +44,20 @@ def test_g1_off_surface_residual() -> None:
         val = single_layer((pt[0], pt[1]), surface, dens, kernel)
         assert math.isfinite(val)
         assert pde_residual_off_surface((pt[0], pt[1]), surface, dens, kernel) == 0.0
+
+
+def test_g2_exterior_disc_dirichlet() -> None:
+    n = 48
+    surface = Surface("circle", radius=1.0, n_quad=n)
+    kernel = KernelSpec("laplace", dimension=2)
+    g = [math.cos(2.0 * math.pi * i / n) for i in range(n)]
+    phi = circle_dirichlet_density(surface, g)
+    assert max(abs(p - 2.0 * math.cos(2.0 * math.pi * i / n)) for i, p in enumerate(phi)) <= 1e-12
+    rel, skill = annulus_rel_l2(surface, phi, kernel, exterior_disc_field)
+    assert rel <= 1e-8
+    assert skill > 0.0
+    with pytest.raises(ValueError, match="net charge"):
+        circle_dirichlet_density(surface, [1.0] * n)
 
 
 def test_g5_half_plane_dtn_ulp() -> None:
