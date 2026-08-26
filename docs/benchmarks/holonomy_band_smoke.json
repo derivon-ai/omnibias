@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.holonomy_band.v1",
-  "generated_utc": "2026-08-25T19:31:54Z",
+  "generated_utc": "2026-08-26T16:02:54Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "g2"
     ]
   },
-  "rss_mb_at_start": 823.41,
+  "rss_mb_at_start": 828.12,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -35,8 +35,8 @@
         "in_ci_all_passed": true,
         "abelian_abs_err": 3.4241877141052725e-15,
         "su2_abs_err": 5.564437799421285e-13,
-        "abelian_cost_ratio": 0.00029937426212142687,
-        "su2_cost_ratio": 0.0005272757430195294
+        "abelian_cost_ratio": 0.0002909073788860714,
+        "su2_cost_ratio": 0.0002880385955685085
       }
     ]
   },
@@ -51,12 +51,12 @@
     "cost_ratio_max": 0.25,
     "abelian_abs_err": 3.4241877141052725e-15,
     "su2_abs_err": 5.564437799421285e-13,
-    "abelian_cost_ratio": 0.00029937426212142687,
-    "su2_cost_ratio": 0.0005272757430195294,
-    "abelian_closed_form_seconds": 4.075001925230026e-06,
-    "abelian_product_seconds": 0.013611731003038585,
-    "su2_closed_form_seconds": 8.382950909435749e-06,
-    "su2_product_seconds": 0.015898609068244696,
+    "abelian_cost_ratio": 0.0002909073788860714,
+    "su2_cost_ratio": 0.0002880385955685085,
+    "abelian_closed_form_seconds": 4.149042069911957e-06,
+    "abelian_product_seconds": 0.014262416050769389,
+    "su2_closed_form_seconds": 4.893983714282513e-06,
+    "su2_product_seconds": 0.016990722040645778,
     "note": "band_holonomy closed form versus PRODUCT at substeps=4096 in the abelian and transverse-constant (A^1) regimes. Named G2 needs match <= 1e-12 and a fraction of the PRODUCT cost. Previous smoke skipped G2. No YM / mass gap."
   },
   "g3": {
@@ -64,6 +64,9 @@
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 34,
+    "leftover_tick": 70,
     "in_ci_all_passed": false,
     "need": "bound upper-bounds Magnus-truncation vs PRODUCT 4096 on a grid and a sample, zero violations, predicted-order decay",
     "violations": 0,
@@ -175,7 +178,7 @@
         "contains_zero": true
       }
     ],
-    "note": "magnus_truncation_bound contains 0 on a (a_norm, L) grid and a random sample, and refuses ||A|| L >= pi. Named G3 needs a Magnus-truncated holonomy whose error versus PRODUCT substeps=4096 is enclosed and decays at the predicted order. That evaluator is not wired. Previous sign-check stub withdrawn from named G3. Not in CI all_passed."
+    "note": "Leftover #34 leftover-recorded: magnus_truncation_bound contains 0 on a (a_norm, L) grid and a random sample, and refuses ||A|| L >= pi. Named G3 needs a Magnus-truncated holonomy whose error versus PRODUCT substeps=4096 is enclosed and decays at the predicted order. That evaluator is not wired. Previous sign-check stub withdrawn from named G3. Not in CI all_passed."
   },
   "g4": {
     "name": "g4_gauge_covariance",
@@ -205,6 +208,9 @@
     "g2_in_ci_all_passed": true,
     "g3_earned": false,
     "g3_reported": true,
+    "g3_leftover_recorded": true,
+    "g3_leftover_id": 34,
+    "g3_leftover_tick": 70,
     "g3_in_ci_all_passed": false,
     "g3_magnus_holonomy_api": false,
     "g4_earned": false,

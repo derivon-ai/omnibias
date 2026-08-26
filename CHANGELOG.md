@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomy-band G3 leftover-recorded (theory 02-14)
+
+- Leftover #34's Magnus miss now leftover-records `reported` plus
+  honesty flags on `benchmarks/holonomy_band.py`.
+- Reported: bound contains 0; no Magnus-truncated holonomy is wired.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/holonomy_band_smoke.json`.
+
 ### Added — Equality-locus G4 leftover-recorded (theory 02-12)
 
 - Leftover #29's Burgers RH / noisy-contour miss now leftover-records

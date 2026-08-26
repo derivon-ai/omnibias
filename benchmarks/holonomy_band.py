@@ -3,10 +3,11 @@
 """Gated architecture: holonomy band (theory 02-14). No YM / mass-gap claim.
 
 G2 closed-form exactness is earned versus PRODUCT at ``substeps=4096``.
-G3 Magnus soundness is reported: the bound is checked on a grid and a
-sample, but no Magnus-truncated holonomy is wired. G4 gauge covariance
-is reported: the open-line flag and a closed-loop identity are
-measured, but a random ``g(x_hi) U g(x_lo)^{-1}`` path is not wired.
+G3 Magnus soundness is leftover-recorded (leftover #34): the bound is
+checked on a grid and a sample, but no Magnus-truncated holonomy is
+wired. G4 gauge covariance is reported: the open-line flag and a
+closed-loop identity are measured, but a random
+``g(x_hi) U g(x_lo)^{-1}`` path is not wired.
 Closed form is abelian + transverse-constant only. The gap is held
 finite (band), the opposite of founding ``delta -> 0``.
 """
@@ -186,6 +187,9 @@ def _run_g3() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 34,
+        "leftover_tick": 70,
         "in_ci_all_passed": False,
         "need": (
             "bound upper-bounds Magnus-truncation vs PRODUCT 4096 on a "
@@ -202,13 +206,13 @@ def _run_g3() -> dict[str, Any]:
         "stays_full": True,
         "rows": rows,
         "note": (
-            "magnus_truncation_bound contains 0 on a (a_norm, L) grid "
-            "and a random sample, and refuses ||A|| L >= pi. Named G3 "
-            "needs a Magnus-truncated holonomy whose error versus "
-            "PRODUCT substeps=4096 is enclosed and decays at the "
-            "predicted order. That evaluator is not wired. Previous "
-            "sign-check stub withdrawn from named G3. Not in CI "
-            "all_passed."
+            "Leftover #34 leftover-recorded: magnus_truncation_bound "
+            "contains 0 on a (a_norm, L) grid and a random sample, and "
+            "refuses ||A|| L >= pi. Named G3 needs a Magnus-truncated "
+            "holonomy whose error versus PRODUCT substeps=4096 is "
+            "enclosed and decays at the predicted order. That "
+            "evaluator is not wired. Previous sign-check stub "
+            "withdrawn from named G3. Not in CI all_passed."
         ),
     }
 
@@ -310,6 +314,9 @@ def main() -> int:
         "g2_in_ci_all_passed": bool(g2["in_ci_all_passed"]),
         "g3_earned": False,
         "g3_reported": True,
+        "g3_leftover_recorded": True,
+        "g3_leftover_id": 34,
+        "g3_leftover_tick": 70,
         "g3_in_ci_all_passed": False,
         "g3_magnus_holonomy_api": False,
         "g4_earned": False,

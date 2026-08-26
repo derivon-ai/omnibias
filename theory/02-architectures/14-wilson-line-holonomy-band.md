@@ -8,7 +8,7 @@ transport crosses, so the `band` and `integral` roles lift from scalars to
 operators, closed form in the abelian and transverse-constant cases and an
 explicitly finite truncation otherwise.
 
-- **Status**: gated (G1/G2/G5 CI; G2 closed-form **earned** vs PRODUCT `substeps=4096`; G3 Magnus **reported**; G4 gauge covariance **reported** / unearned — no random-gauge API, not in CI `all_passed`; abelian + transverse-constant closed form; no YM / mass gap / continuum claim)
+- **Status**: gated (G1/G2/G5 CI; G2 closed-form **earned** vs PRODUCT `substeps=4096`; G3 Magnus leftover-recorded / unearned, leftover #34 — no Magnus holonomy API; G4 gauge covariance **reported** / unearned — no random-gauge API, not in CI `all_passed`; abelian + transverse-constant closed form; no YM / mass gap / continuum claim)
 - **Depends on**: 01-05, 01-10
 - **Blocks**: 07-04
 

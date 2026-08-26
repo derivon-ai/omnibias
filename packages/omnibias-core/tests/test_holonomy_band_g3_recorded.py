@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""02-14 G3 Magnus bound is reported, not in CI all_passed."""
+"""02-14 G3 Magnus bound is leftover-recorded, not in CI all_passed."""
 
 from __future__ import annotations
 
@@ -18,6 +18,9 @@ def test_g3_magnus_bound_is_reported_and_out_of_all_passed() -> None:
     assert g3["earned"] is False
     assert g3["passed"] is False
     assert g3["reported"] is True
+    assert g3["leftover_recorded"] is True
+    assert int(g3["leftover_id"]) == 34
+    assert int(g3["leftover_tick"]) == 70
     assert g3["in_ci_all_passed"] is False
     assert g3["magnus_holonomy_api"] is False
     assert g3["stays_full"] is True
@@ -27,6 +30,8 @@ def test_g3_magnus_bound_is_reported_and_out_of_all_passed() -> None:
     assert int(g3["n_grid"]) >= 6
     assert int(g3["n_sample"]) == 8
     assert payload["honesty"]["g3_earned"] is False
+    assert payload["honesty"]["g3_leftover_recorded"] is True
+    assert int(payload["honesty"]["g3_leftover_id"]) == 34
     assert payload["honesty"]["g3_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g3_magnus_bound" not in names
