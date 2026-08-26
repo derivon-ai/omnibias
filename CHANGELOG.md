@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — FTC-Net G4 parity earned (theory 09-03)
+
+- Spec 09-03 G4 torch/jax parity is now in CI `all_passed` on
+  the G1 integral cell.
+- Smoke: `docs/benchmarks/ftc_net_smoke.json`.
+
 ### Added — Jet-token G4 parity earned (theory 09-02)
 
 - Spec 09-02 G4 torch/jax parity is now in CI `all_passed` on

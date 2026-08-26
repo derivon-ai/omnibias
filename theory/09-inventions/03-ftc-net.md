@@ -7,7 +7,7 @@ An architecture whose **cell is the `integral` role**
 fluxes, and derivative heads are the same pack read at bias collapse
 `delta -> 0`.
 
-- **Status**: shipped (G1–G3 CI; not a VPINN; founding bias collapse)
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not a VPINN; founding bias collapse)
 - **Depends on**: 01-01, 09-01
 - **Blocks**: 09-17
 

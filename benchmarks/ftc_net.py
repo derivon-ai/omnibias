@@ -4,8 +4,8 @@
 
 G1 is the worked window identity. G2 is five-seed skill vs an
 identity-cell baseline on ``dI/dx = cos x``. G3 keeps
-``claimed_weak_form`` false. Jets are founding bias collapse, not
-temperature collapse.
+``claimed_weak_form`` false. G4 is torch/jax bit-identity on G1.
+Jets are founding bias collapse, not temperature collapse.
 """
 
 from __future__ import annotations
@@ -17,10 +17,16 @@ import time
 from pathlib import Path
 from typing import Any
 
+import jax
+import jax.numpy as jnp
+import torch
+from omnibias.core.ftc import DISCLAIMER, honesty_payload, skill_report, worked_example
+from omnibias.jax.architectures.ftc_net import ftc_block as jax_ftc_block
+from omnibias.torch.architectures.ftc_net import ftc_block as torch_ftc_block
+
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
 from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
-from omnibias.core.ftc import DISCLAIMER, honesty_payload, skill_report, worked_example
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -36,6 +42,15 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     skill = skill_report()
     g2 = bool(skill["below_1e4"] and skill["beats_identity"] and float(skill["skill"]) > 0.0)
     g3 = honesty_payload()["claimed_weak_form"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    ti, td, tc = torch_ftc_block(
+        torch.tensor(0.0), torch.tensor(1.0), torch.tensor(-0.1), torch.tensor(0.1)
+    )
+    ji, jd, jc = jax_ftc_block(
+        jnp.asarray(0.0), jnp.asarray(1.0), jnp.asarray(-0.1), jnp.asarray(0.1)
+    )
+    g4 = bool(float(ti) == float(ji) and float(td) == float(jd) and float(tc) == float(jc))
     entries = [
         {"name": "g1_ftc_identity", "passed": g1, "collapse_err": ex["collapse_err"], "ftc_err": ex["ftc_err"]},
         {
@@ -46,6 +61,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "skill": skill["skill"],
         },
         {"name": "g3_not_vpinn", "passed": g3, "claimed_weak_form": False},
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_integral": float(ti),
+            "jax_integral": float(ji),
+        },
     ]
     for entry in entries:
         print(entry["name"], "ok" if entry["passed"] else "FAIL")

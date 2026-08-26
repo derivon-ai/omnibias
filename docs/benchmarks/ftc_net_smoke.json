@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.ftc_net.v1",
-  "generated_utc": "2026-08-21T19:32:50Z",
+  "generated_utc": "2026-08-26T17:23:31Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 813.4,
+  "rss_mb_at_start": 1220.73,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -41,9 +41,15 @@
         "name": "g3_not_vpinn",
         "passed": true,
         "claimed_weak_form": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_integral": 0.09999999999999998,
+        "jax_integral": 0.09999999999999998
       }
     ]
   },
   "disclaimer": "1-D FTC integral cell; not a VPINN, not a weak form, and not CCF stretch",
-  "wall_seconds": 1.3467126920004375
+  "wall_seconds": 0.4408425920410082
 }

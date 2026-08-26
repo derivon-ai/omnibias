@@ -7,7 +7,7 @@ second pack. The founding bias collapse (`delta -> 0`) is the
 collapse head `I / delta`. Temperature collapse (`beta -> inf`,
 feasibility) does not appear. Do not conflate the two.
 
-Status is **shipped** for 09-03 (G1–G3 CI) and **shipped** for
+Status is **shipped** for 09-03 (G1–G4 CI) and **shipped** for
 09-17 (G1–G4 CI). This is a 1-D FTC identity,
 not a VPINN / weak form, and not CCF stretch.
 `claimed_weak_form` and `claimed_vpinn` stay false.
