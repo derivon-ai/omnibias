@@ -476,7 +476,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md),
   [`docs/api/enclosure_collapse.md`](docs/api/enclosure_collapse.md).
 - Wave-3 gated algebra + architectures (not shipped): `omnibias.core.mollifier`
-  (01-05; certified exponential tails, not compact support) /
+  (01-05, **shipped**; certified exponential tails, not compact support) /
   `omnibias.core.spectral_design` (01-07; pack order is a band selector; G3 reported, not in CI `all_passed`) /
   `omnibias.core.frames` (01-06; `sigma'` not admissible) /
   `omnibias.core.locus` (01-09; constraint manifold, not a PDE solver) /

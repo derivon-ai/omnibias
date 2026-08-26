@@ -7,7 +7,7 @@ A collapsing pack is a **mollifier**: the family `f_K(z; delta)` converges to th
 only a smooth function but a legitimate test-function generator, which is what a
 weak-form method needs.
 
-- **Status**: gated (G1–G4 earned in CI `all_passed`)
+- **Status**: shipped (G1–G4 earned in CI `all_passed`)
 - **Depends on**: 01-01
 - **Blocks**: 01-06, 01-10, 02-04, 02-06, 02-14, 03-04, 03-06, 07-02
 

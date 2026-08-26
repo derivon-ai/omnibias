@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Mollifier calculus shipped (theory 01-05)
+
+- Spec 01-05 status is **shipped**: G1–G4 in CI `all_passed`.
+- Certified exponential tails, not compact support.
+- Smoke: `docs/benchmarks/mollifier_calculus_smoke.json`.
+
 ### Added — Irregular Birkhoff stencils shipped (theory 01-04)
 
 - Spec 01-04 status is **shipped**: G1–G4 earned, no leftover gate.
