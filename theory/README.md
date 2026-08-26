@@ -213,6 +213,7 @@ chain rule, and not a global solver. CCF stretch stays an operator floor.
 | [08-08 implicit DEQ Newton](08-training/08-implicit-deq-newton.md) | shipped | `u = sigma(W u + x)` with exact-`sigma'` IFT; no unrolled BPTT; G1–G4 CI |
 | [08-09 certified step](08-training/09-certified-step.md) | shipped | Accept `theta'` only if a verify Lipschitz / output box stays in cap; G1–G3 CI |
 | [08-10 jet-PID optimizer](08-training/10-jet-pid-optimizer.md) | shipped | P + FTC-I + exact D on a directional jet; G1–G4 CI; not a plant PID |
+| [08-11 jet-LQR optimizer](08-training/11-jet-lqr-optimizer.md) | shipped | Scalar discrete Riccati on a directional jet; G1–G4 CI; not DARE |
 
 ### 09 Tower inventions
 

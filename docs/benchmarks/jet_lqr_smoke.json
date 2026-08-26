@@ -1,0 +1,61 @@
+{
+  "schema": "omnibias.benchmarks.jet_lqr.v1",
+  "generated_utc": "2026-08-26T18:35:35Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "jet_lqr",
+    "full": false,
+    "honesty": {
+      "global_min_claimed": false,
+      "plant_lqr_claimed": false,
+      "algebraic_riccati_claimed": false,
+      "activation_riccati_as_gain": false,
+      "mpc_claimed": false,
+      "stretch_claim": false,
+      "continuum_claimed": false,
+      "theorem_prover_verified": false,
+      "skips_chain_rule": false
+    }
+  },
+  "rss_mb_at_start": 1140.55,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_newton",
+        "passed": true,
+        "step": 1.0,
+        "damped_step": 0.5
+      },
+      {
+        "name": "g2_skill",
+        "passed": true,
+        "median_err": 0.0,
+        "singular_raised": true,
+        "g2_earned": true
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true,
+        "algebraic_riccati_claimed": false,
+        "activation_riccati_as_gain": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_step": 1.0,
+        "jax_step": 1.0
+      }
+    ]
+  },
+  "disclaimer": "local 1-D finite-horizon LQR on a directional jet; scalar discrete Riccati, not DARE, not activation Riccati, not a plant LQR, not MPC, not a global min, not CCF stretch",
+  "wall_seconds": 1.1775596189545467
+}

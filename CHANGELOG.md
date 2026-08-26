@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-LQR optimizer (theory 08-11)
+
+- `omnibias.core.control_lqr` plus `omnibias.{torch,jax}.optim_lqr`:
+  finite-horizon discrete LQR on a directional jet. `R=0`, `N=1`,
+  `Qf=1` recovers Newton. Scalar Riccati, not DARE, not the
+  activation Riccati.
+- Cookbook: [`docs/cookbook/jet-lqr.md`](docs/cookbook/jet-lqr.md).
+- Smoke: [`docs/benchmarks/jet_lqr_smoke.json`](docs/benchmarks/jet_lqr_smoke.json).
+
 ### Added — Jet-PID optimizer (theory 08-10)
 
 - `omnibias.core.control_pid` plus `omnibias.{torch,jax}.optim_pid`:

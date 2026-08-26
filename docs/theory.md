@@ -368,6 +368,8 @@ gates are earned on smoke, not in CI `all_passed`.
   reject, not robustness. Status is **shipped**.
 - **Jet-PID optimizer** ([08-10](api/jet_pid.md)): FTC-I on the
   Taylor model, not a plant PID. Status is **shipped**.
+- **Jet-LQR optimizer** ([08-11](api/jet_lqr.md)): scalar discrete
+  Riccati, not DARE. Status is **shipped**.
 - **Invention ledger** (09-01): first-bet ranking; inventions do
   not clear Hilbert stretch. Design record. Status is **shipped**.
 - **Jet-token transformer** ([09-02](api/jet_token.md)): model jet,

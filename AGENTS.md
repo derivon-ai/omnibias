@@ -551,6 +551,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.{torch,jax}.optim_pid` (08-10, **shipped**; P + FTC-I +
   exact D on a directional jet; G1–G4 CI; not a plant PID, not LQR,
   not MPC) /
+  `omnibias.core.control_lqr` /
+  `omnibias.{torch,jax}.optim_lqr` (08-11, **shipped**; scalar
+  discrete Riccati on a directional jet; G1–G4 CI; Newton at `R=0`;
+  not DARE, not activation Riccati) /
   `omnibias.core.proof.obligations.rational_stencil` (01-11, **shipped**;
   `C_j` / poisedness as finite rational Lean obligations; G1–G5 CI;
   algebra only, not the collapse; `mathlib_verified` stays false) /
@@ -731,6 +735,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/implicit.md`](docs/api/implicit.md),
   [`docs/api/certified_step.md`](docs/api/certified_step.md),
   [`docs/api/jet_pid.md`](docs/api/jet_pid.md),
+  [`docs/api/jet_lqr.md`](docs/api/jet_lqr.md),
   [`docs/api/rational_stencil.md`](docs/api/rational_stencil.md),
   [`docs/api/soft_evolution.md`](docs/api/soft_evolution.md),
   [`docs/api/arrangement_lp.md`](docs/api/arrangement_lp.md),
