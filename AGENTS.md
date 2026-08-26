@@ -500,7 +500,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.geometry.gauge.band` (02-14; abelian + transverse-constant;
   G2 closed-form earned vs PRODUCT 4096; G3 Magnus leftover-recorded; G4 gauge
   covariance earned, `random_u1_gauge`;
-  no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02; sampled
+  no Yang-Mills / mass gap) / `omnibias.graph.arrangement` (02-02, **shipped**; sampled
   subgraph; G3 vs k-NN leftover-recorded, GNN / RegionModels stay `--full`; cost
   vs n/D leftover-recorded) / `omnibias.core.line_search` /
   `omnibias.{torch,jax}.line_search` (03-12; certified Lagrange radius +

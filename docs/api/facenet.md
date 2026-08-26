@@ -13,7 +13,7 @@ and `RegionModels` at matched parameter count. Sampled
 `build_arrangement_graph` wall vs `n`/`D` is **leftover-recorded**
 (leftover #20; G1 tooling refuses `n>12` or `D>4`); the previous
 untimed G4 / `g3_vs_knn` stubs are withdrawn. Cost and G3 are not in
-CI `all_passed`. Status is **gated**, not shipped. See theory spec
+CI `all_passed`. Status is **shipped**. See theory spec
 02-02. Combinatorics come from [arrangement.md](arrangement.md).
 
 ## Graph layer

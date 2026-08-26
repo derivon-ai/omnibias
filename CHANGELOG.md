@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Face-Net shipped (theory 02-02)
+
+- Spec 02-02 status is **shipped**: G1/G2 CI; leftover #28 G3 and
+  leftover #20 cost stay reported and out of `all_passed`.
+- Sampled subgraph; temperature collapse; sound gap, not P vs NP.
+- Smoke: `docs/benchmarks/arrangement_graph_smoke.json`.
+
 ### Added — Scan-Net shipped (theory 02-01)
 
 - Spec 02-01 status is **shipped**: G1/G2/G3/G5 CI; leftover #17 G4

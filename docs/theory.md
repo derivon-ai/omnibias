@@ -227,7 +227,7 @@ gates are earned on smoke, not in CI `all_passed`.
   stretch-gate clearing. Status is **shipped**.
 - **Face-Net** ([02-02](api/facenet.md)): sampled tope subgraph; temperature
   collapse; sound gap, not P vs NP. G3 vs k-NN leftover-recorded. Cost
-  vs `n`/`D` leftover-recorded.
+  vs `n`/`D` leftover-recorded. Status is **shipped**.
 - **BEM-Net** ([02-06](api/bem.md)): PDE exact off-surface; BC approximated;
   linear constant-coeff homogeneous only. G2 disc-accuracy earned
   (`circle_dirichlet_density`). G3 exterior win leftover-recorded.
