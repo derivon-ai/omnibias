@@ -11,7 +11,7 @@ single-direction scan, five seeds) is **leftover-recorded** unearned
 stays `--full`. `EquivariantScan` wall vs `C_L` orbit size is
 **leftover-recorded** (leftover #43); the previous untimed
 `passed=True` stub is withdrawn. Cost is not in CI `all_passed`.
-Status is **gated**, not shipped. See theory spec 02-08.
+Status is **shipped**. See theory spec 02-08.
 
 ## PyTorch module
 

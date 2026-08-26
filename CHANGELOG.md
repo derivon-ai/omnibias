@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equivariant scan shipped (theory 02-08)
+
+- Spec 02-08 status is **shipped**: leftover #25 G5 and leftover #43
+  orbit cost stay reported and out of `all_passed`.
+- Gaussian-family steering; discrete `C_L`, not SO(2).
+- Smoke: `docs/benchmarks/equivariant_scan_smoke.json`.
+
 ### Added — Equivariant-scan cost leftover-recorded (theory 02-08)
 
 - Leftover #43 leftover-records `cost_orbit_vs_L` so it stays
