@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Spectral floors shipped (theory 07-05)
+
+- Spec 07-05 status is **shipped**: G1–G6 CI, no leftover gate.
+- Not a continuum spectral gap or Yang-Mills mass gap.
+- Smoke: `docs/benchmarks/spectral_trial_spaces_smoke.json`.
+
 ### Added — NS-adjacent weak form shipped (theory 07-02)
 
 - Spec 07-02 status is **shipped**: G1–G6 CI, no leftover gate.

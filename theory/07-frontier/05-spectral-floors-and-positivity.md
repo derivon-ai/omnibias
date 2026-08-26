@@ -7,7 +7,7 @@ workhorses behind almost every rigorous claim in mathematical physics, and both
 are variational — so both are limited by the trial space, which is exactly what
 multi-pack and arrangement bases are good at supplying.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; founding bias collapse, not temperature collapse; not a continuum spectral gap or Yang-Mills mass gap)
 - **Depends on**: 01-01, 01-03, 01-11, 07-01
 - **Blocks**: 07-04, 07-06
 

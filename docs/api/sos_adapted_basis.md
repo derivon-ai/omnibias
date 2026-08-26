@@ -7,7 +7,7 @@ let the same polynomial certify at a lower ambient degree
 than the total-degree basis.
 
 This chooses tightness, never soundness. Failures are
-reported (G5), not excluded. Status is **gated**. The parent
+reported (G5), not excluded. Status is **shipped**. The parent
 spectral-gap / Yang-Mills questions stay external.
 
 Home: `omnibias.sos.monomials.arrangement_adapted_basis`.

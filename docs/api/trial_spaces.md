@@ -8,7 +8,7 @@ appear. Do not conflate the two.
 
 Every bound reports `sin(theta)` against a numerical
 reference eigenvector. Interval `LDL^T` failure is a safe
-refusal. Status is **gated**, not shipped. G1–G4 and G6 are
+refusal. Status is **shipped**. G1–G4 and G6 are
 CI-gated here; G5 lives on the SOS adapted-basis page.
 
 Scope is **one fixed finite-dimensional operator**, one
