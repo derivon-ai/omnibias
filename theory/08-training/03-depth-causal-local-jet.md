@@ -7,7 +7,7 @@ before the final loss is known, so training can be causal in depth: each
 layer does a local Gauss–Newton step on a named local residual and pushes
 a compressed jet to the next layer.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; greedy warm start, not ImageNet)
 - **Depends on**: 01-01, 01-10, 08-01
 - **Blocks**: none
 

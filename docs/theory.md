@@ -342,6 +342,8 @@ gates are earned on smoke, not in CI `all_passed`.
   not clear Hilbert stretch. Design record. Status is **shipped**.
 - **Composed curvature** ([08-02](api/composed_curvature.md)): slice
   escape, not a global min. Status is **shipped**.
+- **Depth-causal local jet** ([08-03](api/local_jet.md)): greedy
+  warm start, not ImageNet. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

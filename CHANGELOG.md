@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Depth-causal local jet shipped (theory 08-03)
+
+- Spec 08-03 status is **shipped**: G1–G4 CI; greedy warm start,
+  not ImageNet.
+- Smoke: `docs/benchmarks/depth_causal_local_jet_smoke.json`.
+
 ### Added — Composed-curvature joint Newton shipped (theory 08-02)
 
 - Spec 08-02 status is **shipped**: G1–G4 CI; slice escape, not a
