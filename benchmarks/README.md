@@ -45,7 +45,7 @@ uv run python docs/img/generate_figures.py
 | `sequence_transverse.py` | `docs/benchmarks/sequence_transverse_smoke.json` / `$OMNIBIAS_SCRATCH/beyond_pde/sequence_transverse.json` | Wave-0 A5 (05-02 G5): order-0 causal `sigma` FIR vs named S4D (N=1) on AR(1); `width=T`; matched 4 params; earned |
 | `jet_vs_nested_ad.py` | `docs/benchmarks/jet_vs_nested_ad_smoke.json` / `$OMNIBIAS_SCRATCH/citation/jet_vs_ad/` | 06-05 obligation 3: 1-D Poisson `mlp_jet` vs nested AD + GN vs Adam; not CCF; extract / paper stay later |
 | `multipack_birkhoff.py` | `docs/benchmarks/multipack_birkhoff_smoke.json` | Wave-1 primitive 01-01: MultiPackUnit G1–G5; float64 order ceiling recorded; two-interface span beats OperatorBlock / OMBU / JetMLP |
-| `irregular_stencils.py` | `docs/benchmarks/irregular_stencils_smoke.json` | Wave-1 primitive 01-04: exact-Q Birkhoff weights G1–G4 |
+| `irregular_stencils.py` | `docs/benchmarks/irregular_stencils_smoke.json` | Shipped 01-04: exact-Q Birkhoff weights G1–G4 |
 | `bias_scan.py` | `docs/benchmarks/bias_scan_smoke.json` | Wave-1 primitive 01-02: BiasScan G1–G4 CI-gated; 01-13 G5; G4 is a warmed-up voxelize-then-`cmbConv1d` pipeline comparison |
 | `mollifier_calculus.py` | `docs/benchmarks/mollifier_calculus_smoke.json` | Wave-3 primitive 01-05: MollifierSpec G1–G4 CI-gated; certified exponential tails, not compact support; G4 is exact vs matched-cost Gauss on a known Poisson |
 | `spectral_design.py` | `docs/benchmarks/spectral_design_smoke.json` | Wave-3 primitive 01-07: BandPlan G1/G2/G4; G3 reported (`0/5` Mscale hits of the four-gap lstsq gate), not in `all_passed`; pack order is a band selector |

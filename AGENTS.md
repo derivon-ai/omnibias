@@ -468,7 +468,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.{torch,jax}.multipack` (01-01, **shipped**); `omnibias.core.scan` /
   `omnibias.{torch,jax}.scan` (01-02, **shipped**; `op=` is the 01-13 catalog alias);
   `omnibias.difference` irregular
-  stencils (01-04);
+  stencils (01-04, **shipped**);
   `omnibias.core.verified.enclosure_collapse` plus
   `omnibias.verify.enclosure_collapse` (01-14; Enclosure Collapse is
   `width -> 0` of a *sound enclosure*, a point plus a proof, not bias

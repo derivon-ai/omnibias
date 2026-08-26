@@ -107,7 +107,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [01-01 multipack Birkhoff collapse](01-geometry/01-multipack-birkhoff-collapse.md) | shipped | `MultiPackUnit` shipped; G1–G5 earned (float64 order ceiling recorded; two-interface span beats OperatorBlock / OMBU / JetMLP) |
 | [01-02 bias scan](01-geometry/02-bias-scan-transverse-convolution.md) | shipped | `BiasScan` / `BankSpec`; G1–G4 in CI `all_passed`; 01-13 G5 earned |
 | [01-03 arrangement geometry](01-geometry/03-hyperplane-arrangement-geometry.md) | shipped | `omnibias.partition.arrangement`; temperature collapse, sampled subgraph, sound gap not P vs NP; G1–G4 CI; cost vs `n`/`D` **leftover-recorded** (leftover #18; cutoff `n<=12`, `D<=4`), not in CI `all_passed` |
-| [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | gated | Exact-`Q` weights in `omnibias.difference`; G1–G4 earned |
+| [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | shipped | Exact-`Q` weights in `omnibias.difference`; G1–G4 earned |
 | [01-05 mollifier calculus](01-geometry/05-mollifier-distribution-calculus.md) | gated | `MollifierSpec` / `tail_bound`; certified exponential tails, not compact support; G1–G4 in CI `all_passed` |
 | [01-06 OMBU wavelet frames](01-geometry/06-ombu-wavelet-frames.md) | gated | `FrameSpec`; `sigma'` not admissible; not orthonormal / not compactly supported; G1–G3 CI; G4 denoising reported (`5/5` MSE, `0/5` skill), not in CI `all_passed` |
 | [01-07 order as frequency](01-geometry/07-order-as-frequency-spectral-design.md) | gated | `BandPlan` / `peak_frequency`; pack order is a band selector, not Littlewood-Paley completeness; G1–G2/G4 earned; G3 reported (`0/5` Mscale hits), not in CI `all_passed` |
@@ -284,4 +284,4 @@ are not spec-killing failures). Index check, not a same-commit proof.
 
 Code now exists for all three Wave-1 primitives (no new packages). **01-01**
 is shipped (G1–G5 earned). **01-02** is shipped (G1–G4 CI-gated;
-01-13 G5 earned). **01-04** is gated (G1–G4 earned).
+01-13 G5 earned). **01-04** is shipped (G1–G4 earned).

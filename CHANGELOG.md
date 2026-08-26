@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Irregular Birkhoff stencils shipped (theory 01-04)
+
+- Spec 01-04 status is **shipped**: G1–G4 earned, no leftover gate.
+- Exact-`Q` weights live in `omnibias.difference`.
+- Smoke: `docs/benchmarks/irregular_stencils_smoke.json`.
+
 ### Added — Arrangement geometry shipped (theory 01-03)
 
 - Spec 01-03 status is **shipped**: G1–G4 CI; leftover #18 cost stays

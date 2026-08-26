@@ -168,7 +168,7 @@ Three extensions of this geometry have code and CI smoke.
   Status is **shipped**.
 - **Irregular stencils** ([difference API](api/difference.md)): exact-`Q`
   Birkhoff weights for arbitrary nodes and per-node orders. Order is
-  asymptotic in the node scale `h`. G1–G4 earned.
+  asymptotic in the node scale `h`. G1–G4 earned. Status is **shipped**.
 - **Enclosure Collapse** ([01-14](api/enclosure_collapse.md)): `width -> 0`
   of a sound enclosure (a point plus a proof); Width Law plus six
   `squeeze_*` wrappers. Not a derivative and not a 0/1 step. G1–G6 gated.

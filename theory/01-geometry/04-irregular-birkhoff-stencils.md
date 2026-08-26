@@ -7,7 +7,7 @@ arbitrary per-node order sets** by solving a confluent Vandermonde system over
 the rationals, with a certified truncation bound, so the multi-pack construction
 has a rigorous numerical twin.
 
-- **Status**: gated (G1–G4 earned)
+- **Status**: shipped (G1–G4 earned)
 - **Depends on**: 01-01
 - **Blocks**: 01-11, 03-06, 07-03
 
