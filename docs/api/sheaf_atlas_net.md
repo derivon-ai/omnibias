@@ -6,7 +6,7 @@ Chart maps use founding bias collapse (`delta -> 0`) for `sigma^(n)`.
 Partition gates may harden as `beta -> inf` (temperature collapse,
 feasibility). Do not conflate the two.
 
-Status is **gated**, not shipped. Not a rewrite of metrics-only
+Status is **shipped**. Not a rewrite of metrics-only
 `AtlasSpec` blending. Not a sheaf-cohomology theorem. Not P vs NP on
 arrangements. Not CCF stretch. Empty overlaps make the cocycle
 vacuous.

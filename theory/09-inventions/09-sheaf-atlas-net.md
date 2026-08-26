@@ -6,7 +6,7 @@ Partition cells plus **jet-valued transition maps**, with a training
 loss that includes the **cocycle residual** "chart `i -> j -> k` equals
 `i -> k` to order `N`."
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not a sheaf theorem)
 - **Depends on**: 01-03, 01-10, 09-01
 - **Blocks**: none
 

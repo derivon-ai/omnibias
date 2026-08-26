@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.sheaf_atlas_net.v1",
-  "generated_utc": "2026-08-21T20:17:20Z",
+  "generated_utc": "2026-08-26T17:07:03Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 809.68,
+  "rss_mb_at_start": 1213.16,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -42,9 +42,15 @@
         "name": "g3_honesty",
         "passed": true,
         "temperature_collapse_used": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_residual": 0.0,
+        "jax_residual": 0.0
       }
     ]
   },
   "disclaimer": "jet cocycle on an atlas; not a sheaf-cohomology theorem, not P vs NP, and not CCF stretch",
-  "wall_seconds": 1.6257816799916327
+  "wall_seconds": 0.3724297989392653
 }

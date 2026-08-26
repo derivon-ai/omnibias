@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Sheaf-atlas net shipped (theory 09-09)
+
+- Spec 09-09 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Jet cocycle, not a sheaf theorem.
+- Smoke: `docs/benchmarks/sheaf_atlas_net_smoke.json`.
+
 ### Added — Characteristic-Net shipped (theory 09-08)
 
 - Spec 09-08 status is **shipped**: G1–G4 CI; G4 torch/jax parity

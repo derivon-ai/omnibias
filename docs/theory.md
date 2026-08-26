@@ -373,6 +373,9 @@ gates are earned on smoke, not in CI `all_passed`.
   softmax. Status is **shipped**.
 - **Characteristic-Net** ([09-08](api/characteristic_net.md)):
   transport along learned `v`, not 02-13. Status is **shipped**.
+- **Sheaf-atlas net** ([09-09](api/sheaf_atlas_net.md)): jet
+  cocycle on partition charts, not a sheaf theorem. Status is
+  **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

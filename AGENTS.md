@@ -640,7 +640,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (09-08, **shipped**; transport along learned `v`; G1–G4 CI; founding bias
   collapse, not temperature collapse; shock flag; not 02-13) /
   `omnibias.geometry.atlas.cocycle`
-  (09-09; jet cocycle on partition charts; G1–G4 CI; founding
+  (09-09, **shipped**; jet cocycle on partition charts; G1–G4 CI; founding
   bias collapse, not temperature collapse; not a sheaf theorem) /
   `omnibias.core.riccati_flow` + `omnibias.{torch,jax}.architectures.riccati_flow`
   (09-10; Riccati time flow; G1–G4 CI; not DEQ / CNF; not bias

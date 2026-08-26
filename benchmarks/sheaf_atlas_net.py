@@ -4,8 +4,9 @@
 
 G1 is the worked ``2x`` then ``y/2`` identity. G2 is two-interval
 Poisson with a nonempty overlap. G3 records temperature collapse
-separately from founding bias collapse. Not a sheaf-cohomology
-theorem. Not P vs NP. Not CCF stretch.
+separately from founding bias collapse. G4 is torch/jax
+bit-identity on G1. Not a sheaf-cohomology theorem. Not P vs NP.
+Not CCF stretch.
 """
 
 from __future__ import annotations
@@ -17,15 +18,24 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.geometry.atlas.cocycle import (
     DISCLAIMER,
+    AffineChart,
     honesty_payload,
     two_interval_poisson,
     worked_example,
 )
+from omnibias.geometry.atlas.jax import cocycle_residual as jax_res
+from omnibias.geometry.atlas.jax import worked_example as jax_ex
+from omnibias.geometry.atlas.torch import cocycle_residual as torch_res
+from omnibias.geometry.atlas.torch import worked_example as torch_ex
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -47,6 +57,16 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     )
     hon = honesty_payload()
     g3 = hon["temperature_collapse_used"] is False and hon["sheaf_cohomology_theorem"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    transitions = {
+        (2, 1): AffineChart(2.0),
+        (3, 2): AffineChart(0.5),
+        (3, 1): AffineChart(1.0),
+    }
+    t = torch_res(transitions, torch.tensor(0.5), ((1, 2, 3),))
+    j = jax_res(transitions, jnp.asarray(0.5), ((1, 2, 3),))
+    g4 = bool(torch_ex()["residual"] == jax_ex()["residual"] and t["residual"] == j["residual"])
     entries = [
         {
             "name": "g1_algebra",
@@ -65,6 +85,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "name": "g3_honesty",
             "passed": g3,
             "temperature_collapse_used": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_residual": t["residual"],
+            "jax_residual": j["residual"],
         },
     ]
     for entry in entries:
