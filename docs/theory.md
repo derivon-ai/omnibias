@@ -233,7 +233,7 @@ gates are earned on smoke, not in CI `all_passed`.
   leftover-recorded.
 - **Hermite ladder** ([02-10](api/ladder.md)): raw tower is not the QHO
   eigenbasis; Rodrigues reweight required. G4 FermiNet many-body
-  leftover-recorded. Anharmonic G5 may lose.
+  leftover-recorded. Anharmonic G5 leftover-recorded (may lose).
 - **Layered transfer** ([02-11](api/layered.md)): 1-D only;
   `continuum_claim=False`; distinct from `geometry.gauge.transfer`.
 - **Linearizing transforms** ([02-13](api/transforms_pde.md)): named Cole-Hopf

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""02-10 G4 many-body is leftover-recorded; G5 stays out of all_passed."""
+"""02-10 G4/G5 leftover-records stay out of all_passed."""
 
 from __future__ import annotations
 
@@ -42,8 +42,13 @@ def test_cost_is_reported_and_g4_out_of_all_passed() -> None:
     assert g5["earned"] is False
     assert g5["passed"] is False
     assert g5["reported"] is True
+    assert g5["leftover_recorded"] is True
+    assert int(g5["leftover_id"]) == 26
+    assert int(g5["leftover_tick"]) == 66
     assert g5["in_ci_all_passed"] is False
     assert g5["lost_to_grid"] is True
     assert float(g5["fd_grid_ground"]) < float(g5["oscillator_rayleigh"])
     assert payload["honesty"]["g5_anharmonic_reported"] is True
+    assert payload["honesty"]["g5_leftover_recorded"] is True
+    assert int(payload["honesty"]["g5_leftover_id"]) == 26
     assert payload["honesty"]["g5_in_ci_all_passed"] is False

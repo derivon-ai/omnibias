@@ -4,8 +4,8 @@
 
 G4 many-body FermiNet variance is leftover-recorded (leftover #21) and
 stays ``--full``. Exact-ladder orbital cost is reported, not in CI
-``all_passed``. G5 anharmonic lose/win is reported. The raw tower is
-not the QHO eigenbasis.
+``all_passed``. G5 anharmonic lose/win is leftover-recorded (leftover
+#26). The raw tower is not the QHO eigenbasis.
 """
 
 from __future__ import annotations
@@ -140,12 +140,15 @@ def _run_g5() -> dict[str, Any]:
         "oscillator_rayleigh": osc_e,
         "fd_grid_ground": grid_e,
         "lost_to_grid": lost,
+        "leftover_recorded": True,
+        "leftover_id": 26,
+        "leftover_tick": 66,
         "note": (
-            "Strongly anharmonic well V = x^2/2 + x^4. Oscillator ground "
-            "Rayleigh versus a Dirichlet FD grid on the same box. G5 is "
-            "honesty: the basis is allowed to lose. Previous "
-            "passed=True stub with no measured lose/win withdrawn. Not "
-            "in CI all_passed."
+            "Leftover #26 leftover-recorded: strongly anharmonic well "
+            "V = x^2/2 + x^4. Oscillator ground Rayleigh versus a "
+            "Dirichlet FD grid on the same box. G5 is honesty: the "
+            "basis is allowed to lose. Previous passed=True stub with "
+            "no measured lose/win withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -196,6 +199,9 @@ def main() -> int:
         "g4_stays_full": True,
         "g5_anharmonic_earned": False,
         "g5_anharmonic_reported": True,
+        "g5_leftover_recorded": True,
+        "g5_leftover_id": 26,
+        "g5_leftover_tick": 66,
         "g5_in_ci_all_passed": False,
         "cost_earned": False,
         "cost_reported": True,

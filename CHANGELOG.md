@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Hermite-ladder G5 leftover-recorded (theory 02-10)
+
+- Leftover #26's anharmonic honesty miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/hermite_ladder.py`.
+- Reported: oscillator Rayleigh loses to an FD grid on `V = x^2/2 + x^4`.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/hermite_ladder_smoke.json`.
+
 ### Added — Hermite-ladder G4 leftover-recorded (theory 02-10)
 
 - Leftover #21's FermiNet many-body miss now leftover-records `reported`

@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.hermite_ladder.v1",
-  "generated_utc": "2026-08-26T15:59:21Z",
+  "generated_utc": "2026-08-26T15:59:48Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "g2"
     ]
   },
-  "rss_mb_at_start": 813.77,
+  "rss_mb_at_start": 813.84,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -45,26 +45,26 @@
       {
         "n": 2,
         "n_points": 64,
-        "exact_wall_seconds": 0.00015248404815793037,
-        "fd_wall_seconds": 9.90680418908596e-05,
-        "fd_over_exact": 0.6496944637005775
+        "exact_wall_seconds": 0.00015005003660917282,
+        "fd_wall_seconds": 9.156297892332077e-05,
+        "fd_over_exact": 0.6102163051236694
       },
       {
         "n": 4,
         "n_points": 64,
-        "exact_wall_seconds": 0.00016608205623924732,
-        "fd_wall_seconds": 0.00010060996282845736,
-        "fd_over_exact": 0.6057846651628939
+        "exact_wall_seconds": 0.00017379201017320156,
+        "fd_wall_seconds": 0.00010635005310177803,
+        "fd_over_exact": 0.6119386788598008
       },
       {
         "n": 8,
         "n_points": 64,
-        "exact_wall_seconds": 0.00018213700968772173,
-        "fd_wall_seconds": 0.00011126499157398939,
-        "fd_over_exact": 0.6108862320994283
+        "exact_wall_seconds": 0.00018948293291032314,
+        "fd_wall_seconds": 0.00011542299762368202,
+        "fd_over_exact": 0.6091471978550619
       }
     ],
-    "median_fd_over_exact": 0.6108862320994283,
+    "median_fd_over_exact": 0.6102163051236694,
     "g4_many_body": {
       "earned": false,
       "reported": true,
@@ -89,7 +89,10 @@
     "oscillator_rayleigh": 1.249995367944166,
     "fd_grid_ground": 0.8026251115818058,
     "lost_to_grid": true,
-    "note": "Strongly anharmonic well V = x^2/2 + x^4. Oscillator ground Rayleigh versus a Dirichlet FD grid on the same box. G5 is honesty: the basis is allowed to lose. Previous passed=True stub with no measured lose/win withdrawn. Not in CI all_passed."
+    "leftover_recorded": true,
+    "leftover_id": 26,
+    "leftover_tick": 66,
+    "note": "Leftover #26 leftover-recorded: strongly anharmonic well V = x^2/2 + x^4. Oscillator ground Rayleigh versus a Dirichlet FD grid on the same box. G5 is honesty: the basis is allowed to lose. Previous passed=True stub with no measured lose/win withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "raw_tower_is_qho": false,
@@ -104,6 +107,9 @@
     "g4_stays_full": true,
     "g5_anharmonic_earned": false,
     "g5_anharmonic_reported": true,
+    "g5_leftover_recorded": true,
+    "g5_leftover_id": 26,
+    "g5_leftover_tick": 66,
     "g5_in_ci_all_passed": false,
     "cost_earned": false,
     "cost_reported": true,
