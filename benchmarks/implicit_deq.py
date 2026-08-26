@@ -5,7 +5,8 @@
 Smoke earns G1 (IFT VJP vs central FD on the section-5 scalar DEQ,
 ``||F(u*)|| <= 1e-10``, relative gap ``<= 1e-8``), G2 (named implicit
 residual ``u*[:,0] - sin(pi x)`` trained with IFT-GN, five seeds, skill
-vs ``u = 0``), and G3 (torch/jax parity on G1). The IFT is the chain
+vs ``u = 0``), G3 (torch/jax parity on G1), and G4 (docs / docstring
+name ``lax.while_loop`` vs a Python ``while``). The IFT is the chain
 rule at a fixed point, not unrolled BPTT. Not a global min and not CCF
 stretch. Bias collapse (``delta -> 0``) supplies ``sigma'``.
 """
@@ -178,6 +179,27 @@ def _run_g3() -> dict[str, Any]:
     }
 
 
+def _run_g4() -> dict[str, Any]:
+    root = Path(__file__).resolve().parents[1]
+    jax_src = (root / "packages/omnibias-jax/src/omnibias/jax/implicit.py").read_text(
+        encoding="utf-8"
+    )
+    torch_src = (
+        root / "packages/omnibias-torch/src/omnibias/torch/implicit.py"
+    ).read_text(encoding="utf-8")
+    api = (root / "docs/api/implicit.md").read_text(encoding="utf-8")
+    jax_named = "lax.while_loop" in jax_src and "lax.while_loop" in api
+    torch_named = "Python ``while``" in torch_src or "Python `while`" in api
+    passed = jax_named and torch_named
+    return {
+        "name": "g4_tracing",
+        "passed": bool(passed),
+        "jax_while_loop": "lax.while_loop" in jax_src,
+        "docs_while_loop": "lax.while_loop" in api,
+        "torch_python_while": "while" in torch_src and "torch.compile" in torch_src,
+    }
+
+
 def main(argv: list[str] | None = None) -> dict[str, Any]:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--full", action="store_true")
@@ -191,7 +213,9 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = _run_g2()
     print("G3 parity...")
     g3 = _run_g3()
-    entries = [g1, g2, g3]
+    print("G4 tracing note...")
+    g4 = _run_g4()
+    entries = [g1, g2, g3, g4]
     for e in entries:
         if not e["passed"]:
             raise AssertionError(f"{e['name']} failed: {e}")

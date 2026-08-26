@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.implicit_deq.v1",
-  "generated_utc": "2026-08-21T16:47:50Z",
+  "generated_utc": "2026-08-26T17:25:47Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
       "greedy_only_claimed_optimal": false
     }
   },
-  "rss_mb_at_start": 1081.06,
+  "rss_mb_at_start": 1339.06,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -70,11 +70,18 @@
         "name": "g3_parity",
         "passed": true,
         "u_gap": 0.0,
-        "vjp_gap": 1.1102230246251565e-16,
+        "vjp_gap": 0.0,
         "n_iter_torch": 3,
         "n_iter_jax": 3
+      },
+      {
+        "name": "g4_tracing",
+        "passed": true,
+        "jax_while_loop": true,
+        "docs_while_loop": true,
+        "torch_python_while": true
       }
     ]
   },
-  "wall_seconds": 1.1834889460005797
+  "wall_seconds": 1.1916769000235945
 }

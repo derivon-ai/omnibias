@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Implicit DEQ G4 tracing earned (theory 08-08)
+
+- Spec 08-08 G4 is now in CI `all_passed`: docs / docstring name
+  `lax.while_loop` versus a Python `while`.
+- Smoke: `docs/benchmarks/implicit_deq_smoke.json`.
+
 ### Added — FTC-Net G4 parity earned (theory 09-03)
 
 - Spec 09-03 G4 torch/jax parity is now in CI `all_passed` on

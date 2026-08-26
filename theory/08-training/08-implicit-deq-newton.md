@@ -6,7 +6,7 @@ An equilibrium layer `u = sigma(W u + x)` is differentiated by the
 implicit-function theorem with exact `sigma'`, so one linear solve
 replaces unrolled backprop through a fixed-point iteration.
 
-- **Status**: shipped (G1–G3 CI; exact-`sigma'` IFT; not unrolled BPTT)
+- **Status**: shipped (G1–G4 CI; G4 tracing note; exact-`sigma'` IFT; not unrolled BPTT)
 - **Depends on**: 01-01, 08-01
 - **Blocks**: none
 
