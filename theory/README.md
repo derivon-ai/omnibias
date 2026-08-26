@@ -175,7 +175,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | Spec | Status | One line |
 |---|---|---|
 | [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | shipped | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
-| [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | gated | Claim ladder + forbidden-claims register; guards in core tests |
+| [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | shipped | Claim ladder + forbidden-claims register; guards in core tests |
 | [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | gated | G1–G5 **earned** (42 packages, 94/94 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | Monograph spine only; no `book/` tree; drafting still forbidden |
 | [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | gated | Publish-and-use order for the shipped object; obligation-3 `jet_vs_nested_ad` earned; extract / paper / external stay later; CCF and Group 09 are not the public face |

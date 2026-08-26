@@ -7,7 +7,7 @@ benchmark in the same repository needs one written rule for which sentence each
 result licenses — and, more importantly, a written list of sentences that are
 never licensed by anything this program can produce.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 earned; claim ladder + forbidden-claims register; design record)
 - **Depends on**: 06-01
 - **Blocks**: 06-03, 07-01
 

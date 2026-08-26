@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Honesty register shipped (theory 06-02)
+
+- Spec 06-02 status is **shipped**: G1–G6 earned; design record.
+- Claim ladder + forbidden-claims register; guards in core tests.
+- Public copy: `docs/honesty.md`.
+
 ### Added — Acceptance-gates protocol shipped (theory 06-01)
 
 - Spec 06-01 status is **shipped**: G1–G5 earned; design record.

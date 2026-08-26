@@ -2,7 +2,7 @@
 
 A result in this repository licenses one sentence. The four rungs are
 strictly stronger and none implies the next. Theory spec 06-02 is the
-source; this page is the public copy.
+source; this page is the public copy. Status is **shipped**.
 
 | Rung | Earned by | Licenses | Does not license |
 |---|---|---|---|

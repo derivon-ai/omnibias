@@ -315,6 +315,9 @@ gates are earned on smoke, not in CI `all_passed`.
   on tabular; founding bias collapse on the scan. Status is **shipped**.
 - **Acceptance gates** (06-01): shared protocol in
   `benchmarks/_gates.py`. Design record. Status is **shipped**.
+- **Honesty and claim boundaries** ([06-02](honesty.md)): claim
+  ladder + forbidden-claims register. Design record. Status is
+  **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

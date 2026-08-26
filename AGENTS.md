@@ -768,7 +768,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
 - Public docs: [`docs/index.md`](docs/index.md).
 - Benchmarks (vendor-neutral): [`docs/benchmarks.md`](docs/benchmarks.md).
   PINN four-gap suite: `benchmarks/{causal_marching,geometry_sdf,operator_zero_shot,spectral_bias_fbpinn}.py`
-  with shared absolute gates in [`benchmarks/_gates.py`](benchmarks/_gates.py);
+  with shared absolute gates in [`benchmarks/_gates.py`](benchmarks/_gates.py)
+  (theory 06-01, **shipped**);
+  honesty register: [`docs/honesty.md`](docs/honesty.md) (theory 06-02,
+  **shipped**).
   default smoke writes `docs/benchmarks/*_smoke.json` (CI), `--full` writes the
   multi-seed acceptance JSON. Capability matrix:
   [`docs/benchmarks/pinn_four_gap_matrix.md`](docs/benchmarks/pinn_four_gap_matrix.md).
