@@ -18,6 +18,9 @@ def test_cost_vs_n_d_is_reported_and_out_of_all_passed() -> None:
     assert cost["earned"] is False
     assert cost["passed"] is False
     assert cost["reported"] is True
+    assert cost["leftover_recorded"] is True
+    assert int(cost["leftover_id"]) == 19
+    assert int(cost["leftover_tick"]) == 55
     assert cost["in_ci_all_passed"] is False
     assert int(cost["cutoff_n"]) == 10
     assert int(cost["cutoff_d"]) == 3
@@ -25,6 +28,8 @@ def test_cost_vs_n_d_is_reported_and_out_of_all_passed() -> None:
     ns = {(int(row["n"]), int(row["dim"])) for row in cost["rows"]}
     assert (4, 2) in ns and (10, 3) in ns
     assert payload["honesty"]["cost_earned"] is False
+    assert payload["honesty"]["cost_leftover_recorded"] is True
+    assert int(payload["honesty"]["cost_leftover_id"]) == 19
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "cost_vs_n_d" not in names

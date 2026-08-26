@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tropical cost leftover-recorded (theory 01-08)
+
+- Leftover #19's sampled `dual_subdivision` wall now leftover-records
+  `reported` plus honesty flags on `benchmarks/tropical_homotopy.py`.
+- Reported: `n` in `{4,6,8,10}` at `D=2,3`; refuses `n>10` or `D>3`.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/tropical_homotopy_smoke.json`.
+
 ### Added — Tropical G4 leftover-recorded (theory 01-08)
 
 - Leftover #32's path-following miss now leftover-records `reported`

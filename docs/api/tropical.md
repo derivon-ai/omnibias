@@ -10,8 +10,8 @@ G3 jet derivatives are CI-gated. G4 path-following is
 **leftover-recorded** unearned (leftover #32): `relaxed_hess` is
 exported, but no second-order driver is wired to `anneal_descent`. The
 previous `--full` only line is withdrawn. Sampled `dual_subdivision`
-wall vs `n`/`D` is **reported** (API refuses `n>10` or `D>3`). Cost
-and G4 are not in CI `all_passed`.
+wall vs `n`/`D` is **leftover-recorded** (leftover #19; API refuses
+`n>10` or `D>3`). Cost and G4 are not in CI `all_passed`.
 Status is **gated**, not shipped. See theory spec 01-08.
 
 ## Algebra

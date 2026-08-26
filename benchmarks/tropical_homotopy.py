@@ -85,12 +85,16 @@ def _run_cost() -> dict[str, Any]:
         "cutoff_n": COST_CUTOFF_N,
         "cutoff_d": COST_CUTOFF_D,
         "refuses_over_cutoff": bool(refused),
+        "leftover_recorded": True,
+        "leftover_id": 19,
+        "leftover_tick": 55,
         "note": (
-            "Sampled dual-subdivision wall vs n at D=2 and D=3. API "
-            "refuses n>10 or D>3 (subdivision is exponential in D). "
-            "Previous smoke-earned stub with no timing withdrawn. G4 "
-            "path-following is reported, not an anneal_descent win. "
-            "Not in CI all_passed."
+            "Leftover #19 leftover-recorded: sampled dual-subdivision "
+            "wall vs n at D=2 and D=3. API refuses n>10 or D>3 "
+            "(subdivision is exponential in D). Previous smoke-earned "
+            "stub with no timing withdrawn. G4 path-following is "
+            "leftover-recorded, not an anneal_descent win. Not in CI "
+            "all_passed."
         ),
     }
 
@@ -189,6 +193,9 @@ def main() -> int:
         "g4_path_follow_api": False,
         "cost_earned": False,
         "cost_reported": True,
+        "cost_leftover_recorded": True,
+        "cost_leftover_id": 19,
+        "cost_leftover_tick": 55,
         "cost_in_ci_all_passed": False,
         "enumeration_cutoff_n": COST_CUTOFF_N,
         "enumeration_cutoff_d": COST_CUTOFF_D,
