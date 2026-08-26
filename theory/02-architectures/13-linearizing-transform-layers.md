@@ -8,7 +8,7 @@ logarithm, differentiate, integrate — is available exactly on jets, so a layer
 can carry a nonlinear problem into a linear one, solve it there, and map back
 with no approximation anywhere in the transform.
 
-- **Status**: gated (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; 03-11 search stays designed)
+- **Status**: gated (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; G1 jet identity CI; G3 Burgers leftover-recorded / unearned, leftover #39 — no train vs direct PINN, previous `g3_burgers_init` stub withdrawn; 03-11 search stays designed)
 - **Depends on**: 01-01, 01-09, 02-09, 03-11
 - **Blocks**: 07-02
 
@@ -33,9 +33,11 @@ transforms).
 - Spec 02-09 — the tanh-method ansatz, which is the single-soliton case these
   transforms generalize.
 
-**Confirmed gap.** No Cole-Hopf, no Miura, no Backlund, no Darboux code exists.
-The jet operations that make them exact are all present and have never been used
-for this.
+**Confirmed gap (closed for the named maps).** `omnibias.core.transforms_pde`
+ships Cole-Hopf / Miura / Bäcklund / Darboux algebra, including the
+factorial-jet Cole-Hopf pushforward (`cole_hopf_jet`). G3 remains a
+training leftover (no Cole-Hopf-trained field versus a direct PINN).
+03-11 integrability search is not claimed.
 
 ## 4. Mathematics
 
@@ -267,7 +269,9 @@ numerical solve.
   grid, and their asymptotic phase shifts match the published formulas.
 - **G3 Burgers win.** A Cole-Hopf-trained field reaches relative `L2 <= 1e-8` on
   a shock-forming Burgers problem, at least `100x` better than the direct PINN
-  baseline at matched cost, over five seeds.
+  baseline at matched cost, over five seeds. **Leftover-recorded** (leftover
+  #39): no training loop is wired; the previous `g3_burgers_init`
+  `passed=True` stub is withdrawn. Not in CI `all_passed`.
 - **G4 permutability.** The two-soliton produced by the permutability formula
   agrees with the two-soliton produced by two sequential Backlund integrations
   to `<= 1e-12`.

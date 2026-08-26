@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.linearizing_transforms.v1",
-  "generated_utc": "2026-08-15T18:16:45Z",
+  "generated_utc": "2026-08-26T16:23:46Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -11,9 +11,14 @@
     "folx": "0.2.22"
   },
   "config": {
-    "mode": "smoke"
+    "mode": "smoke",
+    "g3_in_all_passed": false,
+    "gates_in_scope": [
+      "g1",
+      "g5"
+    ]
   },
-  "rss_mb_at_start": 821.41,
+  "rss_mb_at_start": 808.7,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -23,16 +28,54 @@
         "in_ci_all_passed": true
       },
       {
-        "name": "g3_burgers_init",
+        "name": "g5_negative_control",
         "passed": true,
-        "in_ci_all_passed": false,
-        "note": "--full only; named transforms only, not 03-11 search"
+        "in_ci_all_passed": true
       }
     ]
+  },
+  "g1": {
+    "name": "g1_cole_hopf",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "jet_passed": true,
+    "jet_err0": 0.0,
+    "navier_stokes_proof_claim": false
+  },
+  "g3": {
+    "name": "g3_burgers_win",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 39,
+    "leftover_tick": 81,
+    "stays_full": true,
+    "in_ci_all_passed": false,
+    "training_loop": false,
+    "need": "Cole-Hopf-trained field rel L2 <= 1e-8 on shock Burgers, 100x vs direct PINN at matched cost, five seeds",
+    "note": "Leftover #39 leftover-recorded: named G3 is a Cole-Hopf train versus a direct PINN. No training loop is wired. cole_hopf_jet is the named-map algebra, not that bake-off. Previous g3_burgers_init passed=True / smoke stub withdrawn. Not in CI all_passed."
+  },
+  "g5": {
+    "name": "g5_negative_control",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "note": "wrong nu shifts u0; the jet checker is not vacuous"
   },
   "honesty": {
     "named_only": true,
     "search_claimed": false,
-    "exactness": "to jet truncation order N"
+    "exactness": "to jet truncation order N",
+    "founding_bias_collapse": true,
+    "temperature_collapse": false,
+    "navier_stokes_proof_claim": false,
+    "g3_burgers_win_earned": false,
+    "g3_reported": true,
+    "g3_leftover_recorded": true,
+    "g3_leftover_id": 39,
+    "g3_leftover_tick": 81,
+    "g3_stays_full": true,
+    "g3_in_ci_all_passed": false,
+    "g3_training_loop": false
   }
 }

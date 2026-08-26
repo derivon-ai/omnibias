@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Linearizing-transform jet Cole-Hopf (theory 02-13)
+
+- `cole_hopf_jet` / factorial-jet multiply and reciprocal ship on
+  `omnibias.core.transforms_pde`.
+- Leftover #39 leftover-records G3 Burgers (no train vs direct PINN).
+  Previous `g3_burgers_init` `passed=True` stub withdrawn.
+- Smoke: `docs/benchmarks/linearizing_transforms_smoke.json`.
+
 ### Added — BEM-Net G2 Dirichlet density earned (theory 02-06)
 
 - `circle_dirichlet_density` / `exterior_disc_field` / `annulus_rel_l2`

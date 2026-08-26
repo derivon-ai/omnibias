@@ -12,11 +12,15 @@ from omnibias.core.transforms_pde import (
     LinearizingTransform,
     TransformKind,
     cole_hopf_from_heat_phi,
+    cole_hopf_jet,
     cole_hopf_u,
     darboux_dress,
+    factorial_jet_multiply,
+    factorial_jet_reciprocal,
     miura_v,
     named_cole_hopf,
     permutability,
+    verify_cole_hopf_burgers_jet,
     verify_transform,
 )
 
@@ -26,11 +30,15 @@ __all__ = [
     "MiuraLift",
     "TransformKind",
     "cole_hopf_from_heat_phi",
+    "cole_hopf_jet",
     "cole_hopf_u",
     "darboux_dress",
+    "factorial_jet_multiply",
+    "factorial_jet_reciprocal",
     "miura_v",
     "named_cole_hopf",
     "permutability",
+    "verify_cole_hopf_burgers_jet",
     "verify_transform",
 ]
 

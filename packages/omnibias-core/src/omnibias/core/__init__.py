@@ -253,7 +253,15 @@ from omnibias.core.transforms import (
     TransformName,
     registered_activations,
 )
-from omnibias.core.transforms_pde import LinearizingTransform, cole_hopf_u, verify_transform
+from omnibias.core.transforms_pde import (
+    LinearizingTransform,
+    cole_hopf_jet,
+    cole_hopf_u,
+    factorial_jet_multiply,
+    factorial_jet_reciprocal,
+    verify_cole_hopf_burgers_jet,
+    verify_transform,
+)
 
 try:
     __version__ = _pkg_version("omnibias-core")
@@ -336,6 +344,7 @@ __all__ = [
     "certify_locus_point",
     "chain_rule_mse_blocks",
     "coarse_grain_linear",
+    "cole_hopf_jet",
     "cole_hopf_u",
     "compile_bank",
     "contact_residual",
@@ -352,6 +361,8 @@ __all__ = [
     "eval_gaussian_derivative",
     "eval_tanh_derivative",
     "evaluate_hardy_dictionary",
+    "factorial_jet_multiply",
+    "factorial_jet_reciprocal",
     "flow_coefficients",
     "gaussian_central_moments",
     "gram_matrix",
@@ -426,6 +437,7 @@ __all__ = [
     "truncation_bound",
     "unit_direction_from_mask",
     "vanishing_moments",
+    "verify_cole_hopf_burgers_jet",
     "verify_exact",
     "verify_transform",
 ]
