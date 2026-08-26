@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomy-band G4 leftover-recorded (theory 02-14)
+
+- Leftover #35's gauge-covariance miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/holonomy_band.py`.
+- Reported: no random-gauge API; named `g(hi) U g(lo)^{-1}` path stays
+  `--full`. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/holonomy_band_smoke.json`.
+
 ### Added — Holonomy-band G3 leftover-recorded (theory 02-14)
 
 - Leftover #34's Magnus miss now leftover-records `reported` plus

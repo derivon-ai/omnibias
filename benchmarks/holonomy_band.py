@@ -5,8 +5,8 @@
 G2 closed-form exactness is earned versus PRODUCT at ``substeps=4096``.
 G3 Magnus soundness is leftover-recorded (leftover #34): the bound is
 checked on a grid and a sample, but no Magnus-truncated holonomy is
-wired. G4 gauge covariance is reported: the open-line flag and a
-closed-loop identity are measured, but a random
+wired. G4 gauge covariance is leftover-recorded (leftover #35): the
+open-line flag and a closed-loop identity are measured, but a random
 ``g(x_hi) U g(x_lo)^{-1}`` path is not wired.
 Closed form is abelian + transverse-constant only. The gap is held
 finite (band), the opposite of founding ``delta -> 0``.
@@ -243,6 +243,9 @@ def _run_g4() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 35,
+        "leftover_tick": 71,
         "in_ci_all_passed": False,
         "need": "open holonomy transforms as g(hi) U g(lo)^{-1} to <= 4 ulp; loop invariant to <= 4 ulp",
         "open_line_flagged": bool(flagged),
@@ -254,13 +257,13 @@ def _run_g4() -> dict[str, Any]:
         "random_gauge_api": False,
         "stays_full": True,
         "note": (
-            "open_line_is_gauge_dependent is True and band_holonomy "
-            "returns gauge_invariant=False. band_wilson_loop of a "
-            "forward-back pair is measured in ulps versus 1. Named G4 "
-            "also needs a random gauge on the open band, g(hi) U "
-            "g(lo)^{-1} to <= 4 ulp. That path is not wired. Previous "
-            "open-line-flag stub withdrawn from named G4. Not in CI "
-            "all_passed."
+            "Leftover #35 leftover-recorded: open_line_is_gauge_dependent "
+            "is True and band_holonomy returns gauge_invariant=False. "
+            "band_wilson_loop of a forward-back pair is measured in "
+            "ulps versus 1. Named G4 also needs a random gauge on the "
+            "open band, g(hi) U g(lo)^{-1} to <= 4 ulp. That path is "
+            "not wired. Previous open-line-flag stub withdrawn from "
+            "named G4. Not in CI all_passed."
         ),
     }
 
@@ -321,6 +324,9 @@ def main() -> int:
         "g3_magnus_holonomy_api": False,
         "g4_earned": False,
         "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 35,
+        "g4_leftover_tick": 71,
         "g4_in_ci_all_passed": False,
         "g4_random_gauge_api": False,
         "temperature_collapse": False,
