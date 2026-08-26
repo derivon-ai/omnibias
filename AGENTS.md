@@ -661,7 +661,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (09-15, **shipped**; Jackson / Hilger hybrid; G1–G4 CI; named `q -> 1` /
   `mu -> 0`, not a continuum PDE) /
   `omnibias.core.homotopy` + `omnibias.{torch,jax}.optim_homotopy`
-  (09-20; 08-04 filter on a `tau`-path; G1–G4 CI; empty ball is a
+  (09-20, **shipped**; 08-04 filter on a `tau`-path; G1–G4 CI; empty ball is a
   halt, not a continuum PDE) /
   `omnibias.core.score_matching` + `omnibias.score.{torch,jax}.score_matching`
   (09-21; Hyvärinen / DSM; G1–G4 CI; CNF exact `div` is prior art) /

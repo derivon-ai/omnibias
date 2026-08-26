@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.homotopy_continuation.v1",
-  "generated_utc": "2026-08-21T21:00:52Z",
+  "generated_utc": "2026-08-26T17:15:37Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "empty_ball_is_reject": true
     }
   },
-  "rss_mb_at_start": 809.97,
+  "rss_mb_at_start": 1218.21,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -45,9 +45,15 @@
         "passed": true,
         "stretch_claim": false,
         "empty_ball_is_reject": true
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_accepted": true,
+        "jax_accepted": true
       }
     ]
   },
   "disclaimer": "Kantorovich homotopy: 08-04 filter on a tau-path; empty ball is a halt, not a continuum theorem and not CCF stretch",
-  "wall_seconds": 1.5249976799823344
+  "wall_seconds": 0.43912725895643234
 }

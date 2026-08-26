@@ -400,6 +400,8 @@ gates are earned on smoke, not in CI `all_passed`.
   is `R_N`, not 03-10. Status is **shipped**.
 - **Jet distillation** ([09-19](api/jet_token.md)): teacher-jet
   match, not ImageNet KD. Status is **shipped**.
+- **Homotopy continuation** ([09-20](api/homotopy_continuation.md)):
+  08-04 filter on a `tau`-path. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

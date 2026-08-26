@@ -3,7 +3,8 @@
 """Frontier 09-20: Kantorovich homotopy continuation.
 
 G1 accepts the tau=0.1 quadratic step. G2 is honest halt or
-semilinear reach. G3 records no stretch claim.
+semilinear reach. G3 records no stretch claim. G4 is torch/jax
+bit-identity on G1.
 """
 
 from __future__ import annotations
@@ -15,15 +16,23 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.homotopy import (
     DISCLAIMER,
     homotopy_skill,
     honesty_payload,
     worked_example,
 )
+from omnibias.jax.optim_homotopy import homotopy_step as jax_step
+from omnibias.jax.optim_homotopy import worked_example as jax_ex
+from omnibias.torch.optim_homotopy import homotopy_step as torch_step
+from omnibias.torch.optim_homotopy import worked_example as torch_ex
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -40,6 +49,16 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["g2_earned"] and skill["honest"])
     hon = honesty_payload()
     g3 = hon["stretch_claim"] is False and hon["theorem_prover_verified"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t_trial, t_res, t_dec = torch_step(torch.tensor(1.0), 0.1)
+    j_trial, j_res, j_dec = jax_step(jnp.asarray(1.0), 0.1)
+    g4 = bool(
+        torch_ex()["theta"] == jax_ex()["theta"]
+        and t_trial == j_trial
+        and t_res == j_res
+        and t_dec.accepted == j_dec.accepted
+    )
     entries = [
         {
             "name": "g1_cell",
@@ -62,6 +81,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "passed": g3,
             "stretch_claim": False,
             "empty_ball_is_reject": True,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_accepted": t_dec.accepted,
+            "jax_accepted": j_dec.accepted,
         },
     ]
     for entry in entries:

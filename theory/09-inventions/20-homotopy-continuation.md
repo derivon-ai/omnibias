@@ -6,7 +6,7 @@ A **path of problems** (linear model to full nonlinear nest). Each
 step is taken only if the Kantorovich ball is nonempty (08-04).
 Training is a certified homotopy, not epoch soup.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; empty ball is a halt)
 - **Depends on**: 08-04, 09-01
 - **Blocks**: none
 

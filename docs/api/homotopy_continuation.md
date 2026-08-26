@@ -8,7 +8,7 @@ Jets / `sigma''` on a nest use founding bias collapse (`delta -> 0`).
 Temperature collapse (`beta -> inf`, feasibility) does not appear.
 Do not conflate the two.
 
-Status is **gated**, not shipped. Not a rewrite of one-step 08-04.
+Status is **shipped**. Not a rewrite of one-step 08-04.
 Not CCF stretch. Not a continuum PDE.
 
 Homes: `omnibias.core.homotopy`,

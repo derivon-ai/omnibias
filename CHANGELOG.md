@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Homotopy continuation shipped (theory 09-20)
+
+- Spec 09-20 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 quadratic step.
+- Empty ball is a halt, not a continuum PDE.
+- Smoke: `docs/benchmarks/homotopy_continuation_smoke.json`.
+
 ### Added — Jet distillation shipped (theory 09-19)
 
 - Spec 09-19 status is **shipped**: G1–G4 CI; G4 torch/jax parity
