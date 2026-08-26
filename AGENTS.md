@@ -663,7 +663,10 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (04-02, **shipped**; conformal slabs; G1–G6 CI; kinds do not mix; not sealable) /
   `omnibias.curvature.information`
   (04-01, **shipped**; pack Fisher metric, not scalar `A''(theta)`; G1–G5 CI;
-  `K>=3` FD packs inapplicable; founding bias collapse).
+  `K>=3` FD packs inapplicable; founding bias collapse) /
+  `omnibias.pinn.inverse`
+  (05-01, **shipped**; G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`;
+  global search earned for n=3 only).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),

@@ -7,7 +7,7 @@ interface** and **what kind of jump does it carry** — and those are exactly th
 two things the scan and the multi-pack answer natively, with the localization
 certifiable and the jump order explicit rather than inferred from a pixel grid.
 
-- **Status**: gated (G1–G7 earned)
+- **Status**: shipped (G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`; global search earned for n=3 only)
 - **Depends on**: 01-01, 01-02, 01-06, 02-01, 02-05, 02-06, 02-11, 02-12, 03-05, 03-08, 03-09, 03-13, 04-01, 04-02
 - **Blocks**: none
 

@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Inverse imaging shipped (theory 05-01)
+
+- Spec 05-01 status is **shipped**: G1–G7 earned.
+- Locally-seeded `sd ~ alpha^(n-5/2)`; global search for `n=3` only.
+- Smoke: `docs/benchmarks/inverse_imaging_smoke.json`.
+
 ### Added — Conformal slabs shipped (theory 04-02)
 
 - Spec 04-02 status is **shipped**: G1–G6 CI, no leftover gate.

@@ -3,7 +3,7 @@
 Most imaging inverse problems ask two questions — **where is the
 interface** and **what kind of jump does it carry**. The scan answers
 both: the peak location is ``tau*`` and the channel index minus two is
-the jump order. Status is **gated**, not shipped. G1–G7 are earned
+the jump order. Status is **shipped**. G1–G7 are earned
 for the locally-seeded logistic scan and the product API in
 `omnibias.pinn.inverse`.
 

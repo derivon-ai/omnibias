@@ -307,6 +307,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Conformal slabs** ([04-02](api/conformal_slabs.md)): three
   guarantee kinds stay apart; conformal is not sealable. G1–G6 CI.
   Status is **shipped**.
+- **Inverse imaging** ([05-01](api/pinn_inverse.md)): G1–G7 earned.
+  Locally-seeded `sd ~ alpha^(n-5/2)`; global search for `n=3` only.
+  Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
