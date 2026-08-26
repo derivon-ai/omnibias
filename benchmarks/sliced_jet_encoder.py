@@ -3,7 +3,8 @@
 """Frontier 09-28: sliced-jet encoder.
 
 G1 is the 2×2 reconstruct. G2 beats GAP and same-width CNN+GAP.
-G3 refuses an unnamed sparse readout. Not a ViT.
+G3 refuses an unnamed sparse readout. G5 is torch/jax
+bit-identity on G1. Not a ViT.
 """
 
 from __future__ import annotations
@@ -15,6 +16,9 @@ import time
 from pathlib import Path
 from typing import Any
 
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.sliced_jet import (
     DISCLAIMER,
     SlicedJetConfig,
@@ -22,6 +26,10 @@ from omnibias.core.sliced_jet import (
     sliced_jet_skill,
     worked_example,
 )
+from omnibias.jax.architectures.sliced_jet import SlicedJetEncoder as JaxEnc
+from omnibias.jax.architectures.sliced_jet import worked_example as jax_ex
+from omnibias.torch.architectures.sliced_jet import SlicedJetEncoder as TorchEnc
+from omnibias.torch.architectures.sliced_jet import worked_example as torch_ex
 
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
@@ -52,6 +60,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         and hon["vit_claim"] is False
         and hon["euclidean_RD_claim"] is False
     )
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    image_t = torch.tensor([[1.0, 0.0], [0.0, 0.0]])
+    image_j = jnp.asarray([[1.0, 0.0], [0.0, 0.0]])
+    t_rec = TorchEnc().reconstruct(image_t).detach().cpu().numpy()
+    j_rec = JaxEnc().reconstruct(image_j)
+    g5 = bool(torch_ex() == jax_ex() and t_rec.tolist() == j_rec.tolist())
     entries = [
         {
             "name": "g1_cell",
@@ -72,6 +87,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "passed": g4,
             "imagenet_claim": False,
             "vit_claim": False,
+        },
+        {
+            "name": "g5_parity",
+            "passed": g5,
+            "torch_rec": t_rec.tolist(),
+            "jax_rec": j_rec.tolist(),
         },
     ]
     for entry in entries:

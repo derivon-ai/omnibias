@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.sliced_jet_encoder.v1",
-  "generated_utc": "2026-08-21T21:29:40Z",
+  "generated_utc": "2026-08-26T17:22:24Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 808.94,
+  "rss_mb_at_start": 1215.2,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -48,9 +48,33 @@
         "passed": true,
         "imagenet_claim": false,
         "vit_claim": false
+      },
+      {
+        "name": "g5_parity",
+        "passed": true,
+        "torch_rec": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ],
+        "jax_rec": [
+          [
+            1.0,
+            0.0
+          ],
+          [
+            0.0,
+            0.0
+          ]
+        ]
       }
     ]
   },
   "disclaimer": "scan-jet tokens plus a named energy; not a ViT, not ImageNet, not R^D equivariance, not CCF stretch",
-  "wall_seconds": 1.3520263569662347
+  "wall_seconds": 0.36882278393022716
 }

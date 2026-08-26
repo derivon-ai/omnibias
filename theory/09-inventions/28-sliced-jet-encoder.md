@@ -6,7 +6,7 @@ A holistic encoder whose tokens are **jets of learned 1-D scans**
 (and/or `integral` mass along `w`), optionally selected by a **named**
 energy, and mixed by shipped Hopfield attention — not a patch ViT.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 CI; G5 torch/jax parity on G1; not a ViT)
 - **Depends on**: 01-02, 09-01, 09-13
 - **Blocks**: none
 

@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Sliced-jet encoder shipped (theory 09-28)
+
+- Spec 09-28 status is **shipped**: G1–G5 CI; G5 torch/jax parity
+  on the G1 reconstruct.
+- Not a ViT.
+- Smoke: `docs/benchmarks/sliced_jet_encoder_smoke.json`.
+
 ### Added — Parameter-space jets shipped (theory 09-27)
 
 - Spec 09-27 status is **shipped**: G1–G5 CI; G5 torch/jax parity

@@ -416,6 +416,8 @@ gates are earned on smoke, not in CI `all_passed`.
   export, finite rational Lean only. Status is **shipped**.
 - **Parameter-space jets** ([09-27](api/parameter_space_jets.md)):
   mixed `x`–`μ` jets, not ParamPINN. Status is **shipped**.
+- **Sliced-jet encoder** ([09-28](api/sliced_jet_encoder.md)):
+  scan-jet tokens + named energy, not a ViT. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

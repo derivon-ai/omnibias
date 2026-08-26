@@ -250,7 +250,7 @@ operator floor.
 | [09-25 world-model-as-jet](09-inventions/25-world-model-jet.md) | shipped | Next N-jet + Lohner remainder; G1–G4 CI; not NS global regularity |
 | [09-26 net-to-annihilator](09-inventions/26-net-to-annihilator.md) | shipped | Ore export + finite rational Lean only; G1–G4 CI; flags future-earned |
 | [09-27 parameter-space jets](09-inventions/27-parameter-space-jets.md) | shipped | Mixed `∂^{α,β} u / ∂x^α ∂μ^β`; G1–G5 CI; closed form iff `μ` enters the tower; not a ParamPINN package |
-| [09-28 sliced-jet encoder](09-inventions/28-sliced-jet-encoder.md) | gated | Tokens are scan jets + named energy; G1–G5 CI; not a ViT; not `R^D` |
+| [09-28 sliced-jet encoder](09-inventions/28-sliced-jet-encoder.md) | shipped | Tokens are scan jets + named energy; G1–G5 CI; not a ViT; not `R^D` |
 
 ## How to use a spec
 
