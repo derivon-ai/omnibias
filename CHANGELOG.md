@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equality locus shipped (theory 01-09)
+
+- Spec 01-09 status is **shipped**: G1–G5 CI, G6 parity.
+- Constraint manifold, not a PDE solver; 02-12 stays gated.
+- Smoke: `docs/benchmarks/equality_locus_smoke.json`.
+
 ### Added — Tropical homotopy shipped (theory 01-08)
 
 - Spec 01-08 status is **shipped**: G4 leftover #32 closed; leftover
