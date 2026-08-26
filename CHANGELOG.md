@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Multi-interface G4 leftover-recorded (theory 02-05)
+
+- Leftover #38's hard vs penalized miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/multi_interface_pinn.py`.
+- Reported: zero-coeff soft stand-in; named G4 needs an equal-budget
+  train. Training stays `--full`. Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/multi_interface_pinn_smoke.json`.
+
 ### Added — Multi-interface G3 leftover-recorded (theory 02-05)
 
 - Leftover #37's PartitionedField / FBPINN stand-in miss now leftover-records

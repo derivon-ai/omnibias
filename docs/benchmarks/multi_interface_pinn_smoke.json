@@ -1,6 +1,6 @@
 {
   "schema": "multi-interface-pinn-v1",
-  "generated_utc": "2026-08-26T15:54:33Z",
+  "generated_utc": "2026-08-26T15:55:12Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
     "g3_in_all_passed": false,
     "g4_in_all_passed": false
   },
-  "rss_mb_at_start": 1278.14,
+  "rss_mb_at_start": 1278.52,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -147,8 +147,11 @@
     "training_loop": false,
     "equal_budget": false,
     "stays_full": true,
+    "leftover_recorded": true,
+    "leftover_id": 38,
+    "leftover_tick": 60,
     "need": "hard residual at smoothing floor; soft worse at equal training budget",
-    "note": "Hard MultiInterfaceField residual versus a zero-coeff soft field. Named G4 needs hard residuals at the smoothing-error floor with no interface loss term, and hard=False strictly worse at equal training budget. That training loop is not wired. Previous g4_hard_vs_penalized passed=True zero-coeff stub withdrawn. Not in CI all_passed."
+    "note": "Leftover #38 leftover-recorded: hard MultiInterfaceField residual versus a zero-coeff soft field. Named G4 needs hard residuals at the smoothing-error floor with no interface loss term, and hard=False strictly worse at equal training budget. That training loop is not wired. Previous g4_hard_vs_penalized passed=True zero-coeff stub withdrawn. Not in CI all_passed."
   },
   "g5": {
     "name": "g5_parity",
@@ -169,6 +172,9 @@
     "g3_training_loop": false,
     "g4_earned": false,
     "g4_reported": true,
+    "g4_leftover_recorded": true,
+    "g4_leftover_id": 38,
+    "g4_leftover_tick": 60,
     "g4_in_ci_all_passed": false,
     "g4_training_loop": false,
     "g4_equal_budget": false,

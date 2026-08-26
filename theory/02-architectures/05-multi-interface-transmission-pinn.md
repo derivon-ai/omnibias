@@ -8,7 +8,7 @@ curvature); a heterogeneous multi-pack unit supplies exactly those jet
 coordinates at exactly those locations, so the interface structure is built into
 the basis instead of being learned.
 
-- **Status**: gated (`alpha -> inf` is sharpening, neither collapse; parallel interfaces only; G3 vs PartitionedField / FBPINN leftover-recorded / unearned, leftover #37 — linear stand-in; G4 hard vs penalized **reported** unearned — zero-coeff soft; training stays `--full`)
+- **Status**: gated (`alpha -> inf` is sharpening, neither collapse; parallel interfaces only; G3 vs PartitionedField / FBPINN leftover-recorded / unearned, leftover #37 — linear stand-in; G4 hard vs penalized leftover-recorded / unearned, leftover #38 — zero-coeff soft; training stays `--full`)
 - **Depends on**: 01-01, 01-07, 02-03, 02-04
 - **Blocks**: 02-11, 05-01, 07-02
 

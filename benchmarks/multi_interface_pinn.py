@@ -6,8 +6,8 @@
 interfaces only. Conditions hold to a stated smoothing tolerance.
 G3 versus PartitionedField / FBPINN / MLP is leftover-recorded
 (leftover #37): smoke is a linear stand-in, not a training bake-off.
-G4 hard versus penalized is reported unearned: smoke is zero-coeff
-soft, not an equal-budget train.
+G4 hard versus penalized is leftover-recorded (leftover #38): smoke
+is zero-coeff soft, not an equal-budget train.
 """
 
 from __future__ import annotations
@@ -177,14 +177,18 @@ def _run_g4() -> dict[str, Any]:
         "training_loop": False,
         "equal_budget": False,
         "stays_full": True,
+        "leftover_recorded": True,
+        "leftover_id": 38,
+        "leftover_tick": 60,
         "need": "hard residual at smoothing floor; soft worse at equal training budget",
         "note": (
-            "Hard MultiInterfaceField residual versus a zero-coeff soft "
-            "field. Named G4 needs hard residuals at the smoothing-error "
-            "floor with no interface loss term, and hard=False strictly "
-            "worse at equal training budget. That training loop is not "
-            "wired. Previous g4_hard_vs_penalized passed=True zero-coeff "
-            "stub withdrawn. Not in CI all_passed."
+            "Leftover #38 leftover-recorded: hard MultiInterfaceField "
+            "residual versus a zero-coeff soft field. Named G4 needs "
+            "hard residuals at the smoothing-error floor with no "
+            "interface loss term, and hard=False strictly worse at "
+            "equal training budget. That training loop is not wired. "
+            "Previous g4_hard_vs_penalized passed=True zero-coeff stub "
+            "withdrawn. Not in CI all_passed."
         ),
     }
 
@@ -259,6 +263,9 @@ def main() -> int:
         "g3_training_loop": False,
         "g4_earned": False,
         "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 38,
+        "g4_leftover_tick": 60,
         "g4_in_ci_all_passed": False,
         "g4_training_loop": False,
         "g4_equal_budget": False,

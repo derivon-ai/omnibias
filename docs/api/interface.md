@@ -16,7 +16,7 @@ G1/G2/G5 are CI-gated. G3 accuracy is **leftover-recorded** unearned
 mixed-condition three-layer versus a linear stand-in, but named G3
 needs a matched-parameter bake-off against `PartitionedField`,
 `FBPINNField`, and a plain MLP over five seeds. G4 hard versus
-penalized is **reported** unearned: the smoke
+penalized is **leftover-recorded** unearned (leftover #38): the smoke
 measures a hard residual versus a zero-coeff soft field, but named G4
 needs an equal-budget train. Those training loops are not wired.
 Previous `passed=True` stand-in stubs withdrawn. G3 and G4 are not in
