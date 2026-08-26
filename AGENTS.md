@@ -481,6 +481,12 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   collapse and not a package). Docs: [`docs/api/multipack.md`](docs/api/multipack.md),
   [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md),
   [`docs/api/enclosure_collapse.md`](docs/api/enclosure_collapse.md).
+  Finite-row smokes: [`docs/benchmarks/dirichlet_enclosure_smoke.json`](docs/benchmarks/dirichlet_enclosure_smoke.json)
+  (`Re(s)>1` only), [`docs/benchmarks/instance_gap_tightening_smoke.json`](docs/benchmarks/instance_gap_tightening_smoke.json)
+  (never tight), [`docs/benchmarks/ccf_pade_profile_smoke.json`](docs/benchmarks/ccf_pade_profile_smoke.json)
+  (profile diagnostic, stretch untouched). `seal_run` emits `diagnose_width`.
+  Jacobian O1 leftover replay lives in `omnibias.holonomic.jacobian_n2_normalize`
+  (`jacobian_conjecture_proof_claim` stays false).
 - Wave-3 gated algebra + architectures (not shipped): `omnibias.core.mollifier`
   (01-05, **shipped**; certified exponential tails, not compact support) /
   `omnibias.core.spectral_design` (01-07, **shipped**; pack order is a band selector; G3 leftover-recorded, not in CI `all_passed`) /

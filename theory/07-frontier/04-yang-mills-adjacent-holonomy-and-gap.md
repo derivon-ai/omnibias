@@ -8,7 +8,7 @@ Lehmann-Maehly variational bounds, which is the one lever that makes a certified
 lower bound tighter without enlarging the matrix. The continuum limit is not
 taken, here or anywhere.
 
-- **Status**: shipped (finite matrix; G1 tightness factor is measured; mass gap / continuum stay external)
+- **Status**: shipped (finite matrix; G1 tightness factor is measured; G4 Gram conditioning CI; mass gap / continuum stay external)
 - **Depends on**: 01-01, 02-14, 07-01, 07-05
 - **Blocks**: none
 

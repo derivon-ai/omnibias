@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.gauge_holonomy_gap.v1",
-  "generated_utc": "2026-08-15T21:29:02Z",
+  "generated_utc": "2026-08-26T17:31:04Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -14,7 +14,7 @@
     "mode": "smoke",
     "n_synthetic": 32
   },
-  "rss_mb_at_start": 774.75,
+  "rss_mb_at_start": 816.25,
   "g1": {
     "n_matrices": 21,
     "ge_generic": true,
@@ -47,6 +47,14 @@
         "name": "g3_gauge_invariance",
         "passed": true,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "g4_conditioning",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "trial_gram_condition": 4.0,
+        "threshold": 100000000.0,
+        "flagged": false
       },
       {
         "name": "g5_honesty",

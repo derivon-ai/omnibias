@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — YM-adjacent G4 conditioning earned (theory 07-04)
+
+- Spec 07-04 G4 trial-space Gram condition is now in CI
+  `all_passed` (present on the certificate; flagged above
+  `GRAM_COND_THRESHOLD`).
+- Smoke: `docs/benchmarks/gauge_holonomy_gap_smoke.json`.
+
 ### Added — leftover-record 02-13 G4 permutability (leftover #52)
 
 - Leftover #52 leftover-records G4 two-soliton permutability versus

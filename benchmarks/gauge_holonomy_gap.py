@@ -4,7 +4,8 @@
 
 Certifies a spectral gap for one fixed matrix at one spacing. Not a
 Yang-Mills / continuum / mass-gap claim. The G1 tightness factor is
-measured, not invented.
+measured, not invented. G4 reports the trial-space Gram condition
+number and flags a run above ``GRAM_COND_THRESHOLD``.
 """
 
 from __future__ import annotations
@@ -171,6 +172,36 @@ def _g6_kernel_obligation() -> bool:
     return source is not None and "spectral_gap_pos" in source
 
 
+def _g4_conditioning() -> dict[str, Any]:
+    from omnibias.geometry.gauge.transfer.certificates import (
+        seal_transfer_gap_certificate,
+    )
+    from omnibias.geometry.gauge.transfer.gap import certified_transfer_matrix_gap
+    from omnibias.geometry.gauge.transfer.matrices import su2_class_angle_transfer
+    from omnibias.geometry.gauge.transfer.trial import (
+        GRAM_COND_THRESHOLD,
+        holonomy_trial_space,
+    )
+
+    transfer = su2_class_angle_transfer(0.8, max_dynkin=3)
+    trial = holonomy_trial_space(transfer)
+    result = certified_transfer_matrix_gap(transfer, trial=trial)
+    cert = seal_transfer_gap_certificate(result, transfer)
+    cond = cert.get("trial_gram_condition")
+    present = isinstance(cond, (int, float)) and math.isfinite(float(cond))
+    expect_flag = float(cond) > GRAM_COND_THRESHOLD if present else True
+    flagged_ok = bool(trial.flagged) == expect_flag
+    passed = present and flagged_ok
+    return {
+        "name": "g4_conditioning",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "trial_gram_condition": None if not present else float(cond),
+        "threshold": GRAM_COND_THRESHOLD,
+        "flagged": bool(trial.flagged),
+    }
+
+
 def _g5_honesty() -> bool:
     from omnibias.geometry.gauge.transfer.certificates import (
         seal_transfer_gap_certificate,
@@ -202,6 +233,7 @@ def main() -> int:
     n_synth = 1000 if args.full else 32
     g2 = g1["sound"] and _synthetic_soundness(n_synth)
     g3 = _g3_gauge_invariance()
+    g4 = _g4_conditioning()
     g5 = _g5_honesty()
     g6 = _g6_kernel_obligation()
 
@@ -223,6 +255,14 @@ def main() -> int:
             "name": "g3_gauge_invariance",
             "passed": bool(g3),
             "in_ci_all_passed": True,
+        },
+        {
+            "name": "g4_conditioning",
+            "passed": bool(g4["passed"]),
+            "in_ci_all_passed": bool(g4["in_ci_all_passed"]),
+            "trial_gram_condition": g4["trial_gram_condition"],
+            "threshold": g4["threshold"],
+            "flagged": g4["flagged"],
         },
         {
             "name": "g5_honesty",
