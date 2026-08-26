@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Holonomy-band G5 parity earned (theory 02-14)
+
+- Spec 02-14 G5 torch/jax abelian holonomy parity is now in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/holonomy_band_smoke.json`.
+
 ### Added — Equality-locus G6 parity earned (theory 01-09)
 
 - Spec 01-09 G6 torch/jax Newton parity is now in CI `all_passed`.

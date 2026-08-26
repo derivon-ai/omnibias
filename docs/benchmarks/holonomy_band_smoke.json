@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.holonomy_band.v1",
-  "generated_utc": "2026-08-26T16:10:50Z",
+  "generated_utc": "2026-08-26T17:27:45Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,13 +15,15 @@
     "g2_in_all_passed": true,
     "g3_in_all_passed": false,
     "g4_in_all_passed": true,
+    "g5_in_all_passed": true,
     "gates_in_scope": [
       "g1",
       "g2",
-      "g4"
+      "g4",
+      "g5"
     ]
   },
-  "rss_mb_at_start": 828.26,
+  "rss_mb_at_start": 1228.55,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -36,14 +38,20 @@
         "in_ci_all_passed": true,
         "abelian_abs_err": 3.4241877141052725e-15,
         "su2_abs_err": 5.564437799421285e-13,
-        "abelian_cost_ratio": 0.00029562894264989237,
-        "su2_cost_ratio": 0.00031308602908713566
+        "abelian_cost_ratio": 0.0003215512645461541,
+        "su2_cost_ratio": 0.0003655418144514628
       },
       {
         "name": "g4_gauge_covariance",
         "passed": true,
         "in_ci_all_passed": true,
         "random_gauge_max_ulps": 1.4142135623730951
+      },
+      {
+        "name": "g5_parity",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "gap": 0.0
       }
     ]
   },
@@ -58,12 +66,12 @@
     "cost_ratio_max": 0.25,
     "abelian_abs_err": 3.4241877141052725e-15,
     "su2_abs_err": 5.564437799421285e-13,
-    "abelian_cost_ratio": 0.00029562894264989237,
-    "su2_cost_ratio": 0.00031308602908713566,
-    "abelian_closed_form_seconds": 4.060100764036179e-06,
-    "abelian_product_seconds": 0.01373377291020006,
-    "su2_closed_form_seconds": 5.314941518008709e-06,
-    "su2_product_seconds": 0.016975977923721075,
+    "abelian_cost_ratio": 0.0003215512645461541,
+    "su2_cost_ratio": 0.0003655418144514628,
+    "abelian_closed_form_seconds": 4.558009095489979e-06,
+    "abelian_product_seconds": 0.014175061951391399,
+    "su2_closed_form_seconds": 6.595044396817684e-06,
+    "su2_product_seconds": 0.018041833071038127,
     "note": "band_holonomy closed form versus PRODUCT at substeps=4096 in the abelian and transverse-constant (A^1) regimes. Named G2 needs match <= 1e-12 and a fraction of the PRODUCT cost. Previous smoke skipped G2. No YM / mass gap."
   },
   "g3": {
@@ -219,6 +227,14 @@
     "stays_full": false,
     "note": "Leftover #35 earned on tick #73: random_u1_gauge plus g(hi) U g(lo)^{-1} matches abelian_holonomy_gauged to <= 4 ulp on eight seeds. Open-line flag and forward-back loop identity stay. In CI all_passed."
   },
+  "g5": {
+    "name": "g5_parity",
+    "passed": true,
+    "earned": true,
+    "reported": true,
+    "in_ci_all_passed": true,
+    "gap": 0.0
+  },
   "honesty": {
     "closed_form": "abelian and transverse-constant only",
     "open_lines": "gauge-dependent",
@@ -242,6 +258,9 @@
     "g4_leftover_tick": 73,
     "g4_in_ci_all_passed": true,
     "g4_random_gauge_api": true,
+    "g5_earned": true,
+    "g5_reported": true,
+    "g5_in_ci_all_passed": true,
     "temperature_collapse": false,
     "founding_bias_collapse": false,
     "finite_band_gap": true

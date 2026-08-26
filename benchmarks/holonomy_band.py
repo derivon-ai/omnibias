@@ -7,8 +7,9 @@ G3 Magnus soundness is leftover-recorded (leftover #34): the bound is
 checked on a grid and a sample, but no Magnus-truncated holonomy is
 wired. G4 gauge covariance is earned: ``random_u1_gauge`` plus
 ``g(hi) U g(lo)^{-1}`` matches the gauged holonomy to ``<= 4`` ulp.
-Closed form is abelian + transverse-constant only. The gap is held
-finite (band), the opposite of founding ``delta -> 0``.
+G5 is torch/jax bit-identity on the abelian holonomy. Closed form is
+abelian + transverse-constant only. The gap is held finite (band),
+the opposite of founding ``delta -> 0``.
 """
 
 from __future__ import annotations
@@ -283,18 +284,43 @@ def _run_g4() -> dict[str, Any]:
     }
 
 
+def _run_g5() -> dict[str, Any]:
+    import jax
+    import torch
+    from omnibias.geometry.gauge._core.lie_algebra import u1
+    from omnibias.geometry.gauge.band._core import BandRegime, HolonomyBand
+    from omnibias.geometry.gauge.band.jax import band_holonomy as band_jax
+    from omnibias.geometry.gauge.band.torch import band_holonomy as band_torch
+
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    band = HolonomyBand((1.0,), lo=-1.0, hi=1.0, algebra=u1(), coupling=1.0)
+    u_t, _ = band_torch(band, regime=BandRegime.ABELIAN, a0=1.0)
+    u_j, _ = band_jax(band, regime=BandRegime.ABELIAN, a0=1.0)
+    gap = abs(complex(u_t[0, 0].detach()) - complex(u_j[0, 0]))
+    return {
+        "name": "g5_parity",
+        "passed": gap == 0.0,
+        "earned": gap == 0.0,
+        "reported": True,
+        "in_ci_all_passed": gap == 0.0,
+        "gap": gap,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
     args = parser.parse_args()
-    from omnibias.geometry.gauge.band._core import BandRegime, classify_regime
     from omnibias.geometry.gauge._core.lie_algebra import su, u1
+    from omnibias.geometry.gauge.band._core import BandRegime, classify_regime
 
     g1 = classify_regime(u1(), transverse_constant=False) is BandRegime.ABELIAN
     g1 = g1 and classify_regime(su(2), transverse_constant=False) is BandRegime.PRODUCT
     g2 = _run_g2()
     g3 = _run_g3()
     g4 = _run_g4()
+    g5 = _run_g5()
     entries: list[dict[str, Any]] = [
         {"name": "g1_regime", "passed": g1, "in_ci_all_passed": True},
         {
@@ -312,6 +338,12 @@ def main() -> int:
             "in_ci_all_passed": bool(g4["in_ci_all_passed"]),
             "random_gauge_max_ulps": g4["random_gauge_max_ulps"],
         },
+        {
+            "name": "g5_parity",
+            "passed": bool(g5["passed"]),
+            "in_ci_all_passed": bool(g5["in_ci_all_passed"]),
+            "gap": g5["gap"],
+        },
     ]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.holonomy_band.v1",
@@ -320,13 +352,15 @@ def main() -> int:
             "g2_in_all_passed": bool(g2["in_ci_all_passed"]),
             "g3_in_all_passed": False,
             "g4_in_all_passed": bool(g4["in_ci_all_passed"]),
-            "gates_in_scope": ["g1", "g2", "g4"],
+            "g5_in_all_passed": bool(g5["in_ci_all_passed"]),
+            "gates_in_scope": ["g1", "g2", "g4", "g5"],
         },
     )
     payload["gates"] = gates_block(entries)
     payload["g2"] = g2
     payload["g3"] = g3
     payload["g4"] = g4
+    payload["g5"] = g5
     payload["honesty"] = {
         "closed_form": "abelian and transverse-constant only",
         "open_lines": "gauge-dependent",
@@ -350,6 +384,9 @@ def main() -> int:
         "g4_leftover_tick": 73,
         "g4_in_ci_all_passed": bool(g4["in_ci_all_passed"]),
         "g4_random_gauge_api": True,
+        "g5_earned": bool(g5["earned"]),
+        "g5_reported": True,
+        "g5_in_ci_all_passed": bool(g5["in_ci_all_passed"]),
         "temperature_collapse": False,
         "founding_bias_collapse": False,
         "finite_band_gap": True,
