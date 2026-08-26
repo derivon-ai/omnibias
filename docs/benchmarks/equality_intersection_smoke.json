@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.equality_intersection.v1",
-  "generated_utc": "2026-08-25T19:06:36Z",
+  "generated_utc": "2026-08-26T16:02:13Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -17,7 +17,7 @@
       "g1"
     ]
   },
-  "rss_mb_at_start": 807.99,
+  "rss_mb_at_start": 809.24,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -33,6 +33,9 @@
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 29,
+    "leftover_tick": 69,
     "in_ci_all_passed": false,
     "rh_match": true,
     "rh_abs_err": 0.0,
@@ -81,13 +84,16 @@
     ],
     "units_fit_from_data": false,
     "stays_full": true,
-    "note": "Clean Rankine-Hugoniot speed from affine_locus on the published Burgers units (need |s-0.5|<=1e-10). Noisy contour extraction is measured on five seeds; the locus uses those published units, not a fit from samples. Named G4 needs a data-fit that beats contour with skill > 0. Previous g4_burgers_rh passed=True smoke-geometry stub withdrawn. Not in CI all_passed."
+    "note": "Leftover #29 leftover-recorded: clean Rankine-Hugoniot speed from affine_locus on the published Burgers units (need |s-0.5|<=1e-10). Noisy contour extraction is measured on five seeds; the locus uses those published units, not a fit from samples. Named G4 needs a data-fit that beats contour with skill > 0. Previous g4_burgers_rh passed=True smoke-geometry stub withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "level3_general_solver": false,
     "returns": "branch / condition / converged",
     "g4_earned": false,
     "g4_reported": true,
+    "g4_leftover_recorded": true,
+    "g4_leftover_id": 29,
+    "g4_leftover_tick": 69,
     "g4_in_ci_all_passed": false,
     "g4_units_fit_from_data": false,
     "temperature_collapse": false,

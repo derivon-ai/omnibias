@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equality-locus G4 leftover-recorded (theory 02-12)
+
+- Leftover #29's Burgers RH / noisy-contour miss now leftover-records
+  `reported` plus honesty flags on `benchmarks/equality_intersection.py`.
+- Reported: published units, not a data-fit; named skill stays `--full`.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/equality_intersection_smoke.json`.
+
 ### Added — Layered-transfer G5 leftover-recorded (theory 02-11)
 
 - Leftover #27's conservation honesty miss now leftover-records

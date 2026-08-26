@@ -2,9 +2,10 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: equality locus layer (theory 02-12). Not a PDE solver.
 
-G4 clean Rankine–Hugoniot speed is measured from ``affine_locus``. The
-noisy-data skill versus contour extraction stays ``--full``: units are
-published, not fit from samples. Founding ``delta -> 0`` only.
+G4 Burgers RH is leftover-recorded (leftover #29). Clean
+Rankine–Hugoniot speed is measured from ``affine_locus``. The noisy-data
+skill versus contour extraction stays ``--full``: units are published,
+not fit from samples. Founding ``delta -> 0`` only.
 """
 
 from __future__ import annotations
@@ -117,6 +118,9 @@ def _run_g4() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 29,
+        "leftover_tick": 69,
         "in_ci_all_passed": False,
         "rh_match": rh_match,
         "rh_abs_err": float(rh_err),
@@ -130,12 +134,14 @@ def _run_g4() -> dict[str, Any]:
         "units_fit_from_data": False,
         "stays_full": True,
         "note": (
-            "Clean Rankine-Hugoniot speed from affine_locus on the published "
-            "Burgers units (need |s-0.5|<=1e-10). Noisy contour extraction "
-            "is measured on five seeds; the locus uses those published units, "
-            "not a fit from samples. Named G4 needs a data-fit that beats "
-            "contour with skill > 0. Previous g4_burgers_rh passed=True "
-            "smoke-geometry stub withdrawn. Not in CI all_passed."
+            "Leftover #29 leftover-recorded: clean Rankine-Hugoniot "
+            "speed from affine_locus on the published Burgers units "
+            "(need |s-0.5|<=1e-10). Noisy contour extraction is "
+            "measured on five seeds; the locus uses those published "
+            "units, not a fit from samples. Named G4 needs a data-fit "
+            "that beats contour with skill > 0. Previous "
+            "g4_burgers_rh passed=True smoke-geometry stub withdrawn. "
+            "Not in CI all_passed."
         ),
     }
 
@@ -176,6 +182,9 @@ def main() -> int:
         "returns": "branch / condition / converged",
         "g4_earned": False,
         "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 29,
+        "g4_leftover_tick": 69,
         "g4_in_ci_all_passed": False,
         "g4_units_fit_from_data": False,
         "temperature_collapse": False,
