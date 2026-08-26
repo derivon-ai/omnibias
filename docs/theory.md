@@ -457,6 +457,12 @@ column in sec 5 below is the *founding* sense (`sigma'`).
 are not two biases. The integral window `S(z+b_hi)-S(z+b_lo)` is bias-geometry
 held finite, not this limit. Forcing `lo = hi` by clamping is unsound.
 
+Additional *named* collapses are catalogued in
+[`omnibias.core.collapse`](api/collapse.md) and must be distinct from
+these three on moving parameter or surviving object. They do not
+replace or redefine the founding three senses. A float residual is
+never a proof.
+
 ## 5. Operator dictionary
 
 The choice of `sigma` is not arbitrary: it picks both an inductive bias

@@ -6,6 +6,15 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Named-collapse schema
+
+- `omnibias.core.collapse`: catalogue of the founding three collapse
+  senses (bias / temperature / enclosure) plus a registry that refuses
+  rebrands (same parameter and surviving object).
+- Cookbook: [`docs/cookbook/collapse-schema.md`](docs/cookbook/collapse-schema.md).
+- A float residual is not a certificate. The three founding senses are
+  closed; new names must mint a different object.
+
 ### Added — Recommended 08-01 trainer stack
 
 - `omnibias.core.train_stack` plus `omnibias.{torch,jax}.train_stack`:

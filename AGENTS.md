@@ -481,6 +481,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   collapse and not a package). Docs: [`docs/api/multipack.md`](docs/api/multipack.md),
   [`docs/api/scan.md`](docs/api/scan.md), [`docs/api/difference.md`](docs/api/difference.md),
   [`docs/api/enclosure_collapse.md`](docs/api/enclosure_collapse.md).
+  Additional *named* collapses register in `omnibias.core.collapse` and
+  must be distinct from those three on parameter or surviving object
+  ([`docs/api/collapse.md`](docs/api/collapse.md)).
   Finite-row smokes: [`docs/benchmarks/dirichlet_enclosure_smoke.json`](docs/benchmarks/dirichlet_enclosure_smoke.json)
   (`Re(s)>1` only), [`docs/benchmarks/instance_gap_tightening_smoke.json`](docs/benchmarks/instance_gap_tightening_smoke.json)
   (never tight), [`docs/benchmarks/ccf_pade_profile_smoke.json`](docs/benchmarks/ccf_pade_profile_smoke.json)
