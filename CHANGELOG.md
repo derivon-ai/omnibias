@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pack Fisher shipped (theory 04-01)
+
+- Spec 04-01 status is **shipped**: G1–G5 earned
+  (`G_{delta,delta} ~ delta^2/720`).
+- Pack-parameter metric, not scalar `A''(theta)`; `K>=3` FD packs
+  inapplicable.
+- Smoke: `docs/benchmarks/information_geometry_smoke.json`.
+
 ### Added — Exact jet line search shipped (theory 03-12)
 
 - Spec 03-12 status is **shipped**: G1/G2/G3/G6 CI; G4 leftover #47

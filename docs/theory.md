@@ -301,6 +301,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Adaptive pack refinement** ([03-13](api/refine.md)): birth/growth
   bit-identical; death reports a bound. G4 earned. Status is
   **shipped**.
+- **Pack Fisher** ([04-01](api/pack_fisher.md)): pack-parameter metric,
+  not scalar `A''(theta)`. G1–G5 earned. Founding bias collapse.
+  Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

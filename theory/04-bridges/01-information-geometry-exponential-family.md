@@ -7,7 +7,7 @@ because the tower is exact, that metric is **closed form**, which turns natural
 gradient, model distinguishability, and the geometry of the collapse limit into
 computable objects rather than estimated ones.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 earned; pack-parameter Fisher, not scalar `A''(theta)`; `K>=3` FD packs inapplicable; founding bias collapse)
 - **Depends on**: 01-01, 01-10
 - **Blocks**: 03-01, 04-02
 

@@ -7,7 +7,7 @@ Monte Carlo fallback.
 
 This is a **metric on pack parameters**, not the scalar
 exponential-family Fisher `A''(theta)` in
-`omnibias.curvature.glm_fisher`. Status is **gated**, not shipped.
+`omnibias.curvature.glm_fisher`. Status is **shipped**.
 G1–G5 are earned. `K >= 3` central finite-difference packs change
 sign, so Fisher is refused (inapplicable, not unmeasured).
 

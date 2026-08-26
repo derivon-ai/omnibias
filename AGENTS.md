@@ -662,7 +662,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.uncertainty` + `omnibias.verify.uncertainty`
   (04-02; conformal slabs; G1–G6 CI; kinds do not mix; not sealable) /
   `omnibias.curvature.information`
-  (04-01; pack Fisher metric, not scalar `A''(theta)`; G1–G5 CI;
+  (04-01, **shipped**; pack Fisher metric, not scalar `A''(theta)`; G1–G5 CI;
   `K>=3` FD packs inapplicable; founding bias collapse).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
