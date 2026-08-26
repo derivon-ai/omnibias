@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pack-tree G3 leftover-recorded (theory 02-07)
+
+- Leftover #13's per-source Taylor / no-crossover miss now leftover-records
+  `reported` plus honesty flags on `benchmarks/pack_tree.py`.
+- Reported: hier/dense `~8.9` at `M=3200`; `crossover_m=None`. Not in
+  CI `all_passed`.
+- Smoke: `docs/benchmarks/pack_tree_smoke.json`.
+
 ### Added — Face-Net cost leftover-recorded (theory 02-02)
 
 - Leftover #20's sampled `build_arrangement_graph` wall now leftover-records

@@ -1,6 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Gated architecture: hierarchical pack tree (theory 02-07). 1-D offsets; eta=0 dense."""
+"""Gated architecture: hierarchical pack tree (theory 02-07).
+
+1-D offsets; ``eta=0`` is dense. G3 complexity is leftover-recorded
+(leftover #13): ``far_eval`` is per-source Taylor, no dense crossover.
+Not in CI ``all_passed``.
+"""
 
 from __future__ import annotations
 
@@ -93,15 +98,14 @@ def _run_g3() -> dict[str, Any]:
         (int(row["m"]) for row in rows if row["hier_over_dense"] <= G3_CROSSOVER_RATIO_MAX),
         None,
     )
-    earned = bool(
-        float(slope) <= G3_EXPONENT_MAX
-        and crossover_m is not None
-        and ratio_hi <= G3_CROSSOVER_RATIO_MAX
-    )
     return {
         "name": "g3_complexity",
-        "passed": earned,
-        "earned": earned,
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 13,
+        "leftover_tick": 58,
         "in_ci_all_passed": False,
         "m": list(G3_MS),
         "n_eval": G3_N_EVAL,
@@ -113,9 +117,10 @@ def _run_g3() -> dict[str, Any]:
         "hier_over_dense_at_m_hi": ratio_hi,
         "crossover_m": crossover_m,
         "note": (
-            "far_eval is a per-source Taylor (O(M) per z), not an O(p) "
-            "multipole. Measured hierarchical wall does not beat dense "
-            "over two decades of M; no crossover. 1-D offsets only."
+            "Leftover #13 leftover-recorded: far_eval is a per-source "
+            "Taylor (O(M) per z), not an O(p) multipole. Measured "
+            "hierarchical wall does not beat dense over two decades of "
+            "M; no crossover. 1-D offsets only. Not in CI all_passed."
         ),
     }
 
@@ -151,7 +156,11 @@ def main() -> int:
     payload["honesty"] = {
         "axis": "1-D offsets",
         "far_field": "truncation with a bound",
-        "g3_earned": bool(g3["earned"]),
+        "g3_earned": False,
+        "g3_reported": True,
+        "g3_leftover_recorded": True,
+        "g3_leftover_id": 13,
+        "g3_leftover_tick": 58,
         "g3_in_ci_all_passed": False,
         "far_eval_is_per_source_taylor": True,
     }

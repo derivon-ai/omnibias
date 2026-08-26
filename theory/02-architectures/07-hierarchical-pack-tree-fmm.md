@@ -7,7 +7,7 @@ splitting the bank into a **near-field / far-field hierarchy**, where far packs
 are represented by a low-order expansion of their aggregate, reduces this to
 near-linear cost with a controllable, computable error.
 
-- **Status**: gated (1-D offsets; `eta=0` bit-identical; G3 complexity **unearned**, not in CI `all_passed`)
+- **Status**: gated (1-D offsets; `eta=0` bit-identical; G3 complexity leftover-recorded / unearned, leftover #13 — per-source Taylor, no dense crossover, not in CI `all_passed`)
 - **Depends on**: 01-01, 01-02, 01-06, 01-07, 02-01
 - **Blocks**: 02-06, 03-07
 
@@ -228,10 +228,10 @@ Baseline: dense evaluation.
 - **G3 complexity.** Measured cost scales as predicted (near-linear in `N + M`)
   over `M` spanning two decades, with the crossover point against dense
   evaluation recorded.
-  **Unearned** — `docs/benchmarks/pack_tree_smoke.json`. `far_eval` is a
-  per-source Taylor (`O(M)` per `z`), not an `O(p)` multipole.
-  Hierarchical wall / dense is `~8.9` at `M=3200` (need `<= 1` for a
-  crossover); exponent vs `M` is `1.00`. No crossover on
+  **Leftover-recorded** (leftover #13) — `docs/benchmarks/pack_tree_smoke.json`.
+  `far_eval` is a per-source Taylor (`O(M)` per `z`), not an `O(p)`
+  multipole. Hierarchical wall / dense is `~8.9` at `M=3200` (need
+  `<= 1` for a crossover); exponent vs `M` is `1.00`. No crossover on
   `M in {32, 320, 3200}`. Not in CI `all_passed`.
 - **G4 accuracy at target.** Given a target accuracy, `separation_for_accuracy`
   produces a tree whose measured error meets the target on every test instance.

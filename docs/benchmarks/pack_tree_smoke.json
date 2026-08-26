@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.pack_tree.v1",
-  "generated_utc": "2026-08-25T17:43:30Z",
+  "generated_utc": "2026-08-26T15:53:48Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -17,7 +17,7 @@
       "g1"
     ]
   },
-  "rss_mb_at_start": 812.61,
+  "rss_mb_at_start": 813.71,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -32,6 +32,10 @@
     "name": "g3_complexity",
     "passed": false,
     "earned": false,
+    "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 13,
+    "leftover_tick": 58,
     "in_ci_all_passed": false,
     "m": [
       32,
@@ -44,33 +48,37 @@
     "rows": [
       {
         "m": 32,
-        "dense_seconds": 0.00015533703844994307,
-        "hier_seconds": 0.001394924009218812,
-        "hier_over_dense": 8.979983287555225
+        "dense_seconds": 0.00014830008149147034,
+        "hier_seconds": 0.0013463599607348442,
+        "hier_over_dense": 9.078619156472154
       },
       {
         "m": 320,
-        "dense_seconds": 0.0015550840180367231,
-        "hier_seconds": 0.014062280068174005,
-        "hier_over_dense": 9.042778335493077
+        "dense_seconds": 0.0015456529799848795,
+        "hier_seconds": 0.013756743050180376,
+        "hier_over_dense": 8.900279188356336
       },
       {
         "m": 3200,
-        "dense_seconds": 0.01581331598572433,
-        "hier_seconds": 0.1411560729611665,
-        "hier_over_dense": 8.926405637413236
+        "dense_seconds": 0.015398810966871679,
+        "hier_seconds": 0.1370995370671153,
+        "hier_over_dense": 8.903254761816688
       }
     ],
-    "hier_time_exponent_vs_m": 1.0025745090998057,
+    "hier_time_exponent_vs_m": 1.00393740031285,
     "exponent_max": 1.3,
-    "hier_over_dense_at_m_hi": 8.926405637413236,
+    "hier_over_dense_at_m_hi": 8.903254761816688,
     "crossover_m": null,
-    "note": "far_eval is a per-source Taylor (O(M) per z), not an O(p) multipole. Measured hierarchical wall does not beat dense over two decades of M; no crossover. 1-D offsets only."
+    "note": "Leftover #13 leftover-recorded: far_eval is a per-source Taylor (O(M) per z), not an O(p) multipole. Measured hierarchical wall does not beat dense over two decades of M; no crossover. 1-D offsets only. Not in CI all_passed."
   },
   "honesty": {
     "axis": "1-D offsets",
     "far_field": "truncation with a bound",
     "g3_earned": false,
+    "g3_reported": true,
+    "g3_leftover_recorded": true,
+    "g3_leftover_id": 13,
+    "g3_leftover_tick": 58,
     "g3_in_ci_all_passed": false,
     "far_eval_is_per_source_taylor": true
   }

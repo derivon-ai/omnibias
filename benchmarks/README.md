@@ -59,7 +59,7 @@ uv run python docs/img/generate_figures.py
 | `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Gated 01-12: line Hilbert; G1–G4 CI; G5 reported on CCF smoke (matched-width ratio `0.978`, need `10x`), not in `all_passed` |
 | `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Gated 02-02 Face-Net: sampled subgraph; G3 vs k-NN leftover-recorded (0-hop; GNN / RegionModels `--full`); cost vs n/D leftover-recorded |
 | `bem_net.py` | `docs/benchmarks/bem_net_smoke.json` | Gated 02-06: off-surface exact; G2 disc `--full`; G3 exterior win reported (no volume PINN); single-layer cost reported |
-| `pack_tree.py` | `docs/benchmarks/pack_tree_smoke.json` | Gated 02-07: 1-D offsets; G3 unearned (per-source Taylor, no dense crossover), not in CI `all_passed` |
+| `pack_tree.py` | `docs/benchmarks/pack_tree_smoke.json` | Gated 02-07: 1-D offsets; G3 leftover-recorded (per-source Taylor, no dense crossover), not in CI `all_passed` |
 | `equivariant_scan.py` | `docs/benchmarks/equivariant_scan_smoke.json` | Gated 02-08: gaussian steering; discrete `C_L`; G5 `--full`; orbit cost reported |
 | `soliton_tanh_method.py` | `docs/benchmarks/soliton_tanh_method_smoke.json` | Gated 02-09: tanh algebra; G4 init-win `--full`; algebraic cost reported |
 | `hermite_ladder.py` | `docs/benchmarks/hermite_ladder_smoke.json` | Gated 02-10: Rodrigues reweight; G4 many-body `--full`; exact-vs-FD reported; G5 anharmonic reported |
