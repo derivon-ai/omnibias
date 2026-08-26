@@ -9,7 +9,7 @@ dictionary.
 G1–G4 are CI-gated. G5 is a campaign artifact, **leftover-recorded**
 (leftover #11) on the CCF profile-fitting smoke (matched-width residual
 ratio `0.978`, need `10x`), **not** in CI `all_passed`. Status is
-**gated**, not shipped. See theory spec 01-12.
+**shipped**. See theory spec 01-12.
 
 ## Core algebra
 

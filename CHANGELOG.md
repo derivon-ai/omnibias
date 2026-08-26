@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Conjugate Hilbert shipped (theory 01-12)
+
+- Spec 01-12 status is **shipped**: G1–G4 CI; leftover #11 G5 stays
+  reported and out of `all_passed`.
+- Line Hilbert only; not a stretch-gate clearing.
+- Smoke: `docs/benchmarks/conjugate_hilbert_smoke.json`.
+
 ### Added — Conjugate Hilbert G5 leftover flags (theory 01-12)
 
 - Leftover #11 now leftover-records `leftover_recorded` / `leftover_id`

@@ -55,7 +55,7 @@ print(hermite_coeffs(5))             # probabilist's Hermite (Gaussian)
 | `omnibias.core.frames` | `FrameSpec` / `admissibility_constant` — `sigma'` is not admissible (theory 01-06, **shipped**) |
 | `omnibias.core.locus` | `EqualitySystem` — constraint manifold, not a PDE solver (theory 01-09, **shipped**) |
 | `omnibias.core.jets` | `contact_residual` / `is_holonomic` — vocabulary, not a discovery (theory 01-10, **shipped**; G1–G3 earned) |
-| `omnibias.core.conjugate` | line Hilbert permutation of the dictionary (theory 01-12, **gated**; G5 not in CI `all_passed`) |
+| `omnibias.core.conjugate` | line Hilbert permutation of the dictionary (theory 01-12, **shipped**; G5 leftover-recorded, leftover #11) |
 | `omnibias.core.hierarchy` | 1-D pack tree; `eta=0` bit-identical to dense (theory 02-07, **gated**) |
 | `omnibias.core.tanh_method` | travelling-wave tanh algebra, not a collapse (theory 02-09, **gated**) |
 | `omnibias.core.ladder` | Hermite raise/lower; Rodrigues reweight required (theory 02-10, **gated**) |
