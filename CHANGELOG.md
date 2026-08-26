@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — NS-adjacent weak form shipped (theory 07-02)
+
+- Spec 07-02 status is **shipped**: G1–G6 CI, no leftover gate.
+- Finite box / horizon / test space; not a continuum regularity
+  claim.
+- Smoke: `docs/benchmarks/ns_weak_form_enclosure_smoke.json`.
+
 ### Added — Frontier ledger shipped (theory 07-01)
 
 - Spec 07-01 status is **shipped**: G1–G5 earned; design record.

@@ -585,7 +585,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   as a determining-matrix nullspace; G1–G6 CI; founding bias
   collapse, not temperature collapse; in-ansatz only, not a
   classification) /
-  `omnibias.pinn.certified.weak_form` (07-02; weak-form
+  `omnibias.pinn.certified.weak_form` (07-02, **shipped**; weak-form
   width split + exact-jet Lohner; G1–G6 CI; founding bias
   collapse, not temperature collapse; not a continuum
   regularity claim) /

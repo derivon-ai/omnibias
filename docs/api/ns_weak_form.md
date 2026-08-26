@@ -3,7 +3,7 @@
 A strong residual needs `lap u`. The weak form moves one
 derivative onto a test function with a closed-form
 antiderivative, so the quadrature term drops. Status is
-**gated**, not shipped. G1–G6 are CI-gated.
+**shipped**. G1–G6 are CI-gated.
 
 This is a **finite box, finite horizon, finite test space**.
 It is not a continuum Navier-Stokes regularity claim. The

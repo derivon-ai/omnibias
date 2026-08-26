@@ -9,7 +9,7 @@ represent vortex sheets without smearing, and exact Jacobians remove
 differentiation error from the validated integrator. None of this touches global
 regularity.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; founding bias collapse, not temperature collapse; not a continuum regularity claim)
 - **Depends on**: 01-01, 01-05, 01-09, 01-12, 02-04, 02-05, 02-12, 02-13, 03-06, 03-08, 03-10, 07-01
 - **Blocks**: none
 
