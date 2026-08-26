@@ -20,7 +20,7 @@ penalized is **leftover-recorded** unearned (leftover #38): the smoke
 measures a hard residual versus a zero-coeff soft field, but named G4
 needs an equal-budget train. Those training loops are not wired.
 Previous `passed=True` stand-in stubs withdrawn. G3 and G4 are not in
-CI `all_passed`. Status is **gated**, not shipped. See theory spec
+CI `all_passed`. Status is **shipped**. See theory spec
 02-05.
 
 ## Algebra

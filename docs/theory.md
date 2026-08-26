@@ -205,7 +205,7 @@ gates are earned on smoke, not in CI `all_passed`.
   PartitionedField / FBPINN leftover-recorded. G4 hard vs penalized
   leftover-recorded. Import `Interface` from
   `omnibias.pinn.interface`, not the XPINN glue in
-  `omnibias.pinn._core.interface`.
+  `omnibias.pinn._core.interface`. Status is **shipped**.
 - **Arrangement geometry** ([01-03](api/arrangement.md)): cells / tope graph /
   `soft_membership`. `beta -> inf` is temperature collapse, not founding
   `delta -> 0`. Sampling is a subgraph. Sound gap, not P vs NP. Cost vs

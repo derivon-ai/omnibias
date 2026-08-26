@@ -75,7 +75,7 @@ uv run python docs/img/generate_figures.py
 | `scannet.py` | `docs/benchmarks/scannet_smoke.json` | Shipped 02-01: ScanNet G1/G2/G3/G5; G3 wall/point vs named k-NN over two decades is in CI `all_passed`; G4 leftover-recorded (leftover #17); on-lattice equivariance |
 | `jetkan.py` | `docs/benchmarks/jetkan_smoke.json` | Wave-3 architecture 02-03: JetKAN G1/G3/G5; G2 cost reported (~2.2x vs autodiff, need 5x); model-jet exactness, KA theorem does not justify |
 | `weak_form_vpinn.py` | `docs/benchmarks/weak_form_vpinn_smoke.json` | Shipped 02-04: exact on polynomial boxes; G4 conditioning earned vs strong collocation |
-| `multi_interface_pinn.py` | `docs/benchmarks/multi_interface_pinn_smoke.json` | Wave-3 architecture 02-05: sharpening, neither collapse; G3 leftover-recorded (linear stand-in); G4 leftover-recorded (zero-coeff; training `--full`) |
+| `multi_interface_pinn.py` | `docs/benchmarks/multi_interface_pinn_smoke.json` | Shipped 02-05: sharpening, neither collapse; G3 leftover-recorded (linear stand-in); G4 leftover-recorded (zero-coeff; training `--full`) |
 | `jet_line_search.py` | `docs/benchmarks/jet_line_search_smoke.json` | Wave-3 algorithm 03-12: G1/G2/G3/G6 CI-gated; G4 reported vs strong Wolfe (`1.83x`, need `2x`); G5 order×depth crossover reported; not in CI `all_passed` |
 | `adaptive_refinement.py` | `docs/benchmarks/adaptive_refinement_smoke.json` | Wave-3 algorithm 03-13: G1–G6 CI-gated; G4 10x vs matched-count fixed on the named BL is in CI `all_passed` |
 

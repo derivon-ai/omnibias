@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Multi-interface PINN shipped (theory 02-05)
+
+- Spec 02-05 status is **shipped**: leftover #37 G3 and leftover #38
+  G4 stay reported and out of `all_passed`.
+- Interface sharpening, neither collapse. Training stays `--full`.
+- Smoke: `docs/benchmarks/multi_interface_pinn_smoke.json`.
+
 ### Added — Weak-form VPINN shipped (theory 02-04)
 
 - Spec 02-04 status is **shipped**: G1–G5 CI; G4 conditioning earned.
