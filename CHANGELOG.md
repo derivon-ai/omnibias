@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-Hopfield shipped (theory 09-13)
+
+- Spec 09-13 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Germ memories, not vector Hopfield.
+- Smoke: `docs/benchmarks/jet_hopfield_smoke.json`.
+
 ### Added — Holonomic layer shipped (theory 09-12)
 
 - Spec 09-12 status is **shipped**: G1–G4 CI; G4 core-layer purity

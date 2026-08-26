@@ -5,7 +5,7 @@
 Store and retrieve **germs** (value plus derivatives), not vectors, so
 associative memory matches contact.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; germs, not vectors)
 - **Depends on**: 01-10, 09-01
 - **Blocks**: none
 

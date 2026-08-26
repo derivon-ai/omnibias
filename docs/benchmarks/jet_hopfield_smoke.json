@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.jet_hopfield.v1",
-  "generated_utc": "2026-08-21T20:40:22Z",
+  "generated_utc": "2026-08-26T17:09:31Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
     },
     "lam": 1.0
   },
-  "rss_mb_at_start": 808.86,
+  "rss_mb_at_start": 1242.1,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -54,9 +54,15 @@
         "name": "g3_honesty",
         "passed": true,
         "temperature_collapse_used": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_value": 0.9999999974825013,
+        "jax_value": 0.9999999974825013
       }
     ]
   },
   "disclaimer": "Jet-Hopfield stores germs and retrieves by contact; not vector Hopfield, not ImageNet, and not CCF stretch",
-  "wall_seconds": 1.2440071309683844
+  "wall_seconds": 0.4781577689573169
 }

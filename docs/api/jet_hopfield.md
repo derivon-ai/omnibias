@@ -9,7 +9,7 @@ and is labelled; the default `β` is finite. Stored profile jets may
 come from founding bias collapse (`delta -> 0`) of an OMBU
 dictionary. Do not conflate the two.
 
-Status is **gated**, not shipped. Not a rewrite of vector Hopfield.
+Status is **shipped**. Not a rewrite of vector Hopfield.
 Not ImageNet retrieval. Not CCF stretch.
 
 Homes: `omnibias.core.jet_hopfield`,

@@ -651,6 +651,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.holonomic._core.layer`
   (09-12, **shipped**; Ore annihilator layer; G1–G4 CI; D-finite
   class only) /
+  `omnibias.core.jet_hopfield` + `omnibias.{torch,jax}.architectures.jet_hopfield`
+  (09-13, **shipped**; germ memories; G1–G4 CI; contact match, not
+  vector Hopfield) /
   `omnibias.core.integral_kernel` + `omnibias.pinn.operator`
   (09-14; OMBU `integral` cell, not BEM-Net; G1–G4 CI; founding
   bias collapse, not temperature collapse) /
