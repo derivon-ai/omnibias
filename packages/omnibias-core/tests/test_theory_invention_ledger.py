@@ -205,13 +205,13 @@ def test_g5_no_new_package() -> None:
     assert "earn independent existence" in text
 
 
-def test_index_row_is_gated() -> None:
+def test_index_row_is_shipped() -> None:
     row = re.search(
         r"\| \[09-01 invention ledger\]\([^)]+\) \| (\w+) \|",
         THEORY_README.read_text(encoding="utf-8"),
     )
     assert row is not None
-    assert row.group(1) == "gated"
+    assert row.group(1) == "shipped"
 
 
 def test_invention_ledger_self_checks() -> None:

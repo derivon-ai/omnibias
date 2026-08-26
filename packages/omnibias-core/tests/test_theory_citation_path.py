@@ -118,14 +118,14 @@ def test_public_surface_already_ships() -> None:
         assert item in spec, f"spec dropped PUBLIC_SURFACE item {item!r}"
 
 
-def test_index_row_and_later_extract_stay_later() -> None:
+def test_index_row_is_shipped_and_later_extract_stays_later() -> None:
     readme = THEORY_README.read_text(encoding="utf-8")
     row = re.search(
         r"\| \[06-05 public primitive and citation path\]\([^)]+\) \| (\w+) \|",
         readme,
     )
     assert row is not None, "theory/README.md lost the 06-05 index row"
-    assert row.group(1) == "gated"
+    assert row.group(1) == "shipped"
     text = _spec_text()
     assert re.search(
         r"- \[ \] Later: freeze / extract `PUBLIC_SURFACE`",

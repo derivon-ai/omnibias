@@ -154,13 +154,13 @@ def test_g5_recommended_stack_is_implementable() -> None:
     assert "CCF_STRETCH_RESIDUAL_GATE = 1e-13" in text
 
 
-def test_index_row_is_gated() -> None:
+def test_index_row_is_shipped() -> None:
     row = re.search(
         r"\| \[08-01 training-idea ledger\]\([^)]+\) \| (\w+) \|",
         THEORY_README.read_text(encoding="utf-8"),
     )
     assert row is not None
-    assert row.group(1) == "gated"
+    assert row.group(1) == "shipped"
 
 
 def test_training_ledger_self_checks() -> None:

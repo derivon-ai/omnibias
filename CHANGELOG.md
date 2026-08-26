@@ -6,6 +6,11 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Fixed — Design-record index tests expect shipped
+
+- 06-05 / 08-01 / 09-01 ledger guards now assert the index row is
+  `shipped` (Phase 5 flip). Extract / paper / external stay later.
+
 ### Added — Equality-intersection G2/G3/G5/G6 earned (theory 02-12)
 
 - Spec 02-12 G2 IFT vs unrolled, G3 degeneracy refusal, G5 ansatz
