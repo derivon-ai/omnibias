@@ -10,8 +10,8 @@ agrees with `partition_weights`.
 G1 combinatorics (`n<=12`, `D<=4`), G2 gap soundness, and G3 vs
 `partition_weights` (<= 4 ulp) are CI-gated. G4 parity is CI-gated.
 Cost vs `n`/`D` is **leftover-recorded** (leftover #18; cutoff
-`n<=12`, `D<=4`), not in CI `all_passed`. Status is **gated**, not
-shipped. See theory spec 01-03. No `omnibias-arrangement` package.
+`n<=12`, `D<=4`), not in CI `all_passed`. Status is **shipped**.
+See theory spec 01-03. No `omnibias-arrangement` package.
 
 ## Algebra
 

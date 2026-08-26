@@ -206,7 +206,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Arrangement geometry** ([01-03](api/arrangement.md)): cells / tope graph /
   `soft_membership`. `beta -> inf` is temperature collapse, not founding
   `delta -> 0`. Sampling is a subgraph. Sound gap, not P vs NP. Cost vs
-  `n`/`D` leftover-recorded.
+  `n`/`D` leftover-recorded. Status is **shipped**.
 - **Tropical homotopy** ([01-08](api/tropical.md)): log / max-plus path;
   reuses `logsumexp_gap_bound`. G4 path-following earned
   (`path_follow` wired to `AnnealSchedule`). Cost vs `n`/`D`

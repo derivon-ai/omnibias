@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Arrangement geometry shipped (theory 01-03)
+
+- Spec 01-03 status is **shipped**: G1–G4 CI; leftover #18 cost stays
+  reported and out of `all_passed`.
+- Temperature collapse, sampled subgraph, not P vs NP.
+- Smoke: `docs/benchmarks/arrangement_geometry_smoke.json`.
+
 ### Added — Bias scan shipped (theory 01-02)
 
 - Spec 01-02 status is **shipped**: G1–G4 in CI `all_passed`, 01-13 G5 earned.

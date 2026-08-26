@@ -9,7 +9,7 @@ uses, and the soft version is a differentiable weighting of those cells.
 In jet-bundle language (01-10) the arrangement is a stratification of
 the base by the sign data of those affine functions.
 
-- **Status**: gated (G1–G4 CI; temperature collapse, sampled subgraph; cost vs `n`/`D` leftover-recorded, leftover #18, not in CI `all_passed`)
+- **Status**: shipped (G1–G4 CI; temperature collapse, sampled subgraph; cost vs `n`/`D` leftover-recorded, leftover #18, not in CI `all_passed`)
 - **Depends on**: none
 - **Blocks**: 01-08, 01-10, 02-02, 02-12, 03-02, 03-03, 03-09, 04-02, 05-02, 07-05
 
