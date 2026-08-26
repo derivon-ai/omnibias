@@ -14,6 +14,7 @@ never overstating what was proven.
 - Certificate format v1: `omnibias.core.proof.certificate` -- canonical, hash-sealed JSON for `Interval` / `TaylorModel` enclosures; tamper-evident via `verify_certificate_digest`.
 - Formal bridge: `omnibias.core.proof.lean_check` -- extracts a certificate's finite, rational obligation (spectral-gap positivity, enclosed-quantity sign, PD inertia vector), emits Lean chaining the kernel's proven `ZInterval` lemmas, and runs `lake build`.
 - The kernel: `formal/omnibias-verified-kernel` (Lean 4 core, **Mathlib-free** so CI kernel-checks it cheaply).
+- Proof engine: `omnibias.core.proof.engine` routes a named finite kind through a shipped collapse or catalog family, seals a v1 certificate, and returns a reason tree. `prove(..., lean_check=True)` forwards to `ProofMachine.evaluate`. Lean fires only when `generate_obligation` already applies. Do not mint a ninth collapse or treat natural language as a premise.
 
 ## The rules you must not break
 

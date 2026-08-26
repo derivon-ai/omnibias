@@ -6,6 +6,21 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Proof engine
+
+- `omnibias.core.proof.engine`: named-kind router
+  (`identity` / `residual` / `winding` / `pairing` / `rank` /
+  `enclosure_sign` / `gap` as enclosure of `OPT` / `catalog_family`
+  / `external`) over the existing ProofMachine and named collapses.
+  Returns a reason tree. Lean only on certificates
+  `generate_obligation` already understands.
+- Holonomic consumer `omnibias.holonomic.rank_syzygy`: integerize a
+  `Q` matrix, accept with rank collapse. Not a special-function
+  theorem.
+- Cookbook: [`docs/cookbook/proof-engine.md`](docs/cookbook/proof-engine.md).
+- A float residual is not a proof. `BLOCKED` is not falsity.
+  Continuum parents are not inferred. `gap` is not `gap_collapse`.
+
 ### Rejected — Honorable-mention collapses
 
 - Cocycle, path, `q -> 1` specialization, scale / RG, Morse, and

@@ -2,7 +2,9 @@
 
 The pure-Python mathematical core: polynomial coefficient generators
 and the backend-agnostic ActivationSpec. Named collapses besides the
-founding three senses live in [collapse.md](collapse.md).
+founding three senses live in [collapse.md](collapse.md). The
+certificate router over those collapses is
+[proof_engine.md](proof_engine.md).
 
 ## Polynomials
 

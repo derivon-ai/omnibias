@@ -14,6 +14,8 @@ This is not a package. A float residual is never a proof.
 earned it. Do not conflate the three founding senses.
 
 Home: `omnibias.core.collapse` (schema + registry). No new distribution.
+The prove/disprove router over these kinds is
+[`omnibias.core.proof.engine`](proof_engine.md).
 
 Verdict collapse (`omnibias.core.collapse.verdict`) is the first named
 sense that earned a slot: a sound residual enclosure of a finite

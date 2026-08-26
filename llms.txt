@@ -125,6 +125,9 @@ pairing collapse (`omnibias.core.collapse.pairing`; weak residual
 on a finite test pack; not a strong solution; not a PDE),
 rank collapse (`omnibias.core.collapse.rank`; exact Q syzygy; float
 SVD is not a proof),
+proof engine (`omnibias.core.proof.engine`; named-kind router over
+those collapses plus catalog_family / external; reason tree; Lean
+only on existing finite obligations; not a general theorem prover),
 certified localization (03-08; Krawczyk unique-peak enclosure;
 G1–G6 CI; founding bias collapse, not temperature collapse;
 `Inconclusive` is first-class; `local_box`; not

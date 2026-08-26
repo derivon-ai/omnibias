@@ -154,6 +154,11 @@ from omnibias.holonomic.keller import (
     verify_gallagher_map,
 )
 from omnibias.holonomic.proofmachine import build_holonomic_machine
+from omnibias.holonomic.rank_syzygy import (
+    HOLONOMIC_SYZYGY,
+    certify_holonomic_syzygy,
+    integerize_matrix,
+)
 
 try:
     __version__ = _pkg_version("omnibias-holonomic")
@@ -168,6 +173,7 @@ __all__ = [
     "AsymptoticEstimate",
     "DFinite",
     "GosperResult",
+    "HOLONOMIC_SYZYGY",
     "HolonomicLayerSpec",
     "HolonomicProof",
     "JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED",
@@ -191,6 +197,7 @@ __all__ = [
     "binomial_nk",
     "build_holonomic_machine",
     "certified_asymptotic",
+    "certify_holonomic_syzygy",
     "classify_leftover_chart",
     "creative_telescoping",
     "dfinite_add",
@@ -219,6 +226,7 @@ __all__ = [
     "guess_recurrence",
     "holonomic_jet",
     "hyper",
+    "integerize_matrix",
     "jacobian_det",
     "jacobian_n2_box_statement",
     "jacobian_n2_homog_statement",

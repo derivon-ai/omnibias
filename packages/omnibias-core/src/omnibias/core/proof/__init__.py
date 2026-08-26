@@ -93,6 +93,14 @@ from omnibias.core.proof.discovery import (
     get_proposer,
     run_discovery,
 )
+from omnibias.core.proof.engine import (
+    ENGINE_KINDS,
+    EngineKind,
+    EngineResult,
+    ReasonStep,
+    build_engine_machine,
+    prove,
+)
 from omnibias.core.proof.lean_check import (
     LeanCheckResult,
     check_certificate,
@@ -627,6 +635,9 @@ __all__ = [
     "CoordinateNewton",
     "DiscoveredEquation",
     "DiscoveryResult",
+    "ENGINE_KINDS",
+    "EngineKind",
+    "EngineResult",
     "ExactCheck",
     "FEATURE_DIM",
     "FORMAL_CLAIM_KEY",
@@ -648,6 +659,7 @@ __all__ = [
     "ProverRegistry",
     "RationalStencil",
     "RationalSupport",
+    "ReasonStep",
     "SUPPORTED_SCHEMA_VERSIONS",
     "ScoreGuidedWalk",
     "Statement",
@@ -657,6 +669,7 @@ __all__ = [
     "apply_constructor",
     "as_fraction",
     "bind_sorts",
+    "build_engine_machine",
     "canonical_json",
     "catalog_entry",
     "certificate_digest",
@@ -687,6 +700,7 @@ __all__ = [
     "make_certificate",
     "poisedness_obligation",
     "positive_definite_certificate",
+    "prove",
     "rank_class_hits",
     "register_catalog",
     "register_condition_sort",

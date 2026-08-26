@@ -22,6 +22,8 @@
 - [Winding collapse cookbook](cookbook/winding-collapse.md)
 - [Pairing collapse cookbook](cookbook/pairing-collapse.md)
 - [Rank collapse cookbook](cookbook/rank-collapse.md)
+- [Proof engine](api/proof_engine.md)
+- [Proof engine cookbook](cookbook/proof-engine.md)
 - [omnibias-torch](api/torch.md)
 - [omnibias-jax](api/jax.md)
 - [omnibias-ferminet](api/ferminet.md)

@@ -58,6 +58,11 @@ from omnibias.holonomic.keller import (
     verify_gallagher_map,
 )
 from omnibias.holonomic.keller_search import search_tangent_sweep
+from omnibias.holonomic.rank_syzygy import (
+    HOLONOMIC_SYZYGY,
+    certify_holonomic_syzygy,
+    integerize_matrix,
+)
 
 KELLER_ALPOGE_REPLAY = "keller_alpoge_replay"
 KELLER_TANGENT_SWEEP = "keller_tangent_sweep"
@@ -65,6 +70,7 @@ KELLER_TANGENT_SWEEP_DEG3 = "keller_tangent_sweep_deg3"
 HOLONOMIC_RECURRENCE_GUESS = "holonomic_recurrence_guess"
 HOLONOMIC_DFINITE_GUESS = "holonomic_dfinite_guess"
 HOLONOMIC_ALGEBRAIC_GUESS = "holonomic_algebraic_guess"
+HOLONOMIC_SYZYGY_KIND = HOLONOMIC_SYZYGY
 CONDITION_ORE = "condition_ore"
 CONDITION_DFINITE = "condition_dfinite"
 JACOBIAN_N2_DEGREE_BOX = JACOBIAN_N2_KIND
@@ -100,6 +106,11 @@ FAMILY_CATALOG: dict[str, dict[str, str]] = {
         "obligation": "a prefix-verified algebraic equation P(x, y)=0 in the degree box",
         "complete": "True",
     },
+    HOLONOMIC_SYZYGY_KIND: {
+        "parent_status": "already_true",
+        "obligation": "an exact Q syzygy of a holonomic determining matrix",
+        "complete": "True",
+    },
     JACOBIAN_N2_DEGREE_BOX: {
         "parent_status": "open",
         "obligation": (
@@ -121,8 +132,13 @@ FAMILY_CATALOG: dict[str, dict[str, str]] = {
 }
 
 
-def _blocked(detail: str) -> ProofAttempt:
-    return ProofAttempt(status="BLOCKED", certificate=None, obligations=(detail,), detail=detail)
+def _blocked(detail: str, certificate: Certificate | None = None) -> ProofAttempt:
+    return ProofAttempt(
+        status="BLOCKED",
+        certificate=certificate,
+        obligations=(detail,),
+        detail=detail,
+    )
 
 
 def _prove_alpoge(conjecture: Conjecture) -> ProofAttempt:
@@ -215,6 +231,70 @@ def _replay_sweep(certificate: Certificate) -> bool | None:
         return False
     constant = jacobian_det(built).constant_value()
     return constant is not None and str(constant) == str(certificate.get("jacobian_constant"))
+
+
+def _prove_syzygy(conjecture: Conjecture) -> ProofAttempt:
+    from omnibias.core.proof.certificate import make_certificate
+
+    raw = conjecture.data.get("matrix")
+    if not isinstance(raw, list):
+        return _blocked("holonomic_syzygy requires data.matrix")
+    try:
+        report = certify_holonomic_syzygy(raw)
+    except (TypeError, ValueError) as exc:
+        return _blocked(str(exc))
+    honesty = {
+        "unproven_claim": False,
+        "float_residual_is_proof": False,
+        "continuum_parent_inferred": False,
+        "holonomic_special_function_claim": False,
+        "jacobian_conjecture_proof_claim": False,
+        "float_svd_is_proof": False,
+    }
+    payload = {
+        "type": "engine",
+        "engine_kind": HOLONOMIC_SYZYGY_KIND,
+        "status": report.verdict.status,
+        "spec_name": "rank",
+        "surviving": report.verdict.outcome.surviving,
+        "detail": report.verdict.detail,
+        "kernel": [list(vec) for vec in report.kernel],
+        "inputs": {"matrix": integerize_matrix(raw)},
+    }
+    cert = make_certificate(claim=HOLONOMIC_SYZYGY_KIND, payload=payload, honesty=honesty)
+    if report.verdict.proved:
+        return ProofAttempt(status="PROVED", certificate=cert, detail=report.verdict.detail)
+    if report.verdict.disproved:
+        return ProofAttempt(status="DISPROVED", certificate=cert, detail=report.verdict.detail)
+    return _blocked(report.verdict.detail, cert)
+
+
+def _replay_syzygy(certificate: Certificate) -> bool | None:
+    payload = certificate.get("payload")
+    if not isinstance(payload, Mapping):
+        return False
+    inputs = payload.get("inputs")
+    if not isinstance(inputs, Mapping):
+        return False
+    try:
+        report = certify_holonomic_syzygy(inputs["matrix"])
+    except (KeyError, TypeError, ValueError):
+        return False
+    return report.verdict.status == payload.get("status")
+
+
+def _holonomic_syzygy_factory(**kwargs: Any) -> dict[str, Any]:
+    report = certify_holonomic_syzygy(kwargs["matrix"])
+    return {
+        "status": report.verdict.status,
+        "detail": report.verdict.detail,
+        "kernel": [list(vec) for vec in report.kernel],
+        "honesty": {
+            "holonomic_special_function_claim": False,
+            "jacobian_conjecture_proof_claim": False,
+            "float_svd_is_proof": False,
+        },
+    }
 
 
 def _from_discovery(result: object) -> ProofAttempt:
@@ -367,6 +447,13 @@ def holonomic_provers() -> list[FunctionProver]:
             schema_fn=_schema_errors,
             replay_fn=lambda c: bool(c.get("replay_ok")),
         ),
+        FunctionProver(
+            name=HOLONOMIC_SYZYGY_KIND,
+            kinds=frozenset({HOLONOMIC_SYZYGY_KIND}),
+            prove_fn=_prove_syzygy,
+            schema_fn=_schema_errors,
+            replay_fn=_replay_syzygy,
+        ),
     ]
 
 
@@ -385,6 +472,7 @@ def _register() -> None:
         HOLONOMIC_RECURRENCE_GUESS: "exact_search",
         HOLONOMIC_DFINITE_GUESS: "exact_search",
         HOLONOMIC_ALGEBRAIC_GUESS: "exact_search",
+        HOLONOMIC_SYZYGY_KIND: "exact_replay",
         JACOBIAN_N2_DEGREE_BOX: "exact_search",
         JACOBIAN_N2_HOMOGENEOUS: "exact_search",
     }
@@ -395,6 +483,7 @@ def _register() -> None:
         HOLONOMIC_RECURRENCE_GUESS: "P-recursive sequences",
         HOLONOMIC_DFINITE_GUESS: "D-finite functions",
         HOLONOMIC_ALGEBRAIC_GUESS: "algebraic functions",
+        HOLONOMIC_SYZYGY_KIND: "Ore / D-finite relations",
         JACOBIAN_N2_DEGREE_BOX: "jacobian_conjecture_n2",
         JACOBIAN_N2_HOMOGENEOUS: "jacobian_conjecture_n2",
     }
@@ -423,6 +512,7 @@ def _register() -> None:
             "score_guided",
             budget=int(kwargs.get("budget", 6)),
         ),
+        HOLONOMIC_SYZYGY_KIND: _holonomic_syzygy_factory,
         JACOBIAN_N2_DEGREE_BOX: _discover_jacobian_n2,
         JACOBIAN_N2_HOMOGENEOUS: _discover_jacobian_n2_homog,
     }
@@ -485,6 +575,7 @@ __all__ = [
     "HOLONOMIC_ALGEBRAIC_GUESS",
     "HOLONOMIC_DFINITE_GUESS",
     "HOLONOMIC_RECURRENCE_GUESS",
+    "HOLONOMIC_SYZYGY_KIND",
     "JACOBIAN_N2_DEGREE_BOX",
     "JACOBIAN_N2_HOMOGENEOUS",
     "KELLER_ALPOGE_REPLAY",

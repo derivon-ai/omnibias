@@ -1,7 +1,8 @@
 # Discovery engine
 
 `omnibias.core.proof.discovery` is the proposer layer on
-[`ProofMachine`](../cookbook/proof-machine.md). The checker is exact. A
+[`ProofMachine`](../cookbook/proof-machine.md). Named-collapse kinds
+use the [proof engine](proof_engine.md). The checker is exact. A
 proposer only emits candidates. Cookbook:
 [Finite discovery engine](../cookbook/discovery-loop.md).
 

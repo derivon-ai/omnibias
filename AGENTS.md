@@ -495,6 +495,13 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   test pack, not a strong solution. Rank collapse
   (`omnibias.core.collapse.rank`) is an exact `Q` syzygy; a float
   SVD is not a proof.
+  The proof engine (`omnibias.core.proof.engine`) routes a named
+  finite kind through those collapses (or a catalog family) and
+  returns a reason tree; `external` stays `BLOCKED`. A float
+  residual is not a proof. `theorem_prover_verified` stays false
+  unless a genuine `lake build` earned it. The holonomic consumer
+  is `omnibias.holonomic.rank_syzygy` (integerize then rank
+  collapse; not a special-function theorem).
   Finite-row smokes: [`docs/benchmarks/dirichlet_enclosure_smoke.json`](docs/benchmarks/dirichlet_enclosure_smoke.json)
   (`Re(s)>1` only), [`docs/benchmarks/instance_gap_tightening_smoke.json`](docs/benchmarks/instance_gap_tightening_smoke.json)
   (never tight), [`docs/benchmarks/ccf_pade_profile_smoke.json`](docs/benchmarks/ccf_pade_profile_smoke.json)

@@ -153,6 +153,7 @@ nav:
       - Package index (all 42): packages.md
       - omnibias-core: api/core.md
       - discovery engine: api/discovery.md
+      - Proof engine: api/proof_engine.md
       - multipack Birkhoff (01-01): api/multipack.md
       - bias scan (01-02): api/scan.md
       - causal transverse filter (05-02 G5): api/sequence.md
@@ -391,6 +392,7 @@ nav:
       - Navier-Stokes certified validation: cookbook/navier-stokes-certified.md
       - "Navier-Stokes tracks (numerical / certified / fractional)": cookbook/navier-stokes-tracks.md
       - Prove/disprove machine: cookbook/proof-machine.md
+      - Proof engine: cookbook/proof-engine.md
       - Finite discovery engine: cookbook/discovery-loop.md
       - Keller Jacobian replay: cookbook/keller-jacobian.md
       - Jacobian n=2 finite box: cookbook/jacobian-n2-box.md

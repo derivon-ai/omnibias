@@ -9,6 +9,8 @@ independent numpy/mpmath replay twin.
 `omnibias.core.proof.ProofMachine` gives them **one front door**: you state a
 `Conjecture`, the machine dispatches it to the right prover, runs the schema
 gate, the independent replay, and the honesty gate, and returns a `Verdict`.
+Named-collapse statements (`identity`, `residual`, `winding`, …) go through
+[`prove`](proof-engine.md) on the same machine.
 
 !!! info "What the verdicts mean"
     `PROVED` / `DISPROVED` / `BLOCKED` are defined precisely — including the

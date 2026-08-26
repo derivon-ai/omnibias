@@ -69,7 +69,13 @@ separate finite universal (`omnibias.holonomic.jacobian_n2`): integer
 maps of degree `<= d` and height `<= h` are exhausted for
 `C_box(d,h,G)`, or fail Gabber's inverse-degree test. A miss is not
 injectivity on `Q^2` and not the parent. `escalate_n2_result` sets
-`jacobian_n2_claim` only on an exact violator. The Ore condition sort
+`jacobian_n2_claim` only on an exact violator.
+`certify_holonomic_syzygy` integerizes a `Q` determining matrix and
+accepts only with rank collapse. A float SVD is not a proof. It does
+not certify a special-function identity and does not settle the
+Jacobian conjecture.
+
+The Ore condition sort
 (`condition_ore`) wraps the recurrence
 guess as a `ConditionHypothesis`. `condition_dfinite` wraps the
 differential annihilator guess when the observation carries
