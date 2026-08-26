@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet distillation shipped (theory 09-19)
+
+- Spec 09-19 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 tanh-scale loss.
+- Teacher-jet match, not ImageNet KD.
+- Smoke: `docs/benchmarks/jet_distillation_smoke.json`.
+
 ### Added — Remainder training shipped (theory 09-18)
 
 - Spec 09-18 status is **shipped**: G1–G4 CI; G4 torch/jax parity

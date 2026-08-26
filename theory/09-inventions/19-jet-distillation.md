@@ -6,7 +6,7 @@ A student matches a teacher's **N-jet**, not logits; a self-supervised
 variant matches **1-jets across views** (equivariance as a jet
 identity).
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not ImageNet KD)
 - **Depends on**: 09-01, 09-02
 - **Blocks**: none
 

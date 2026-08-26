@@ -611,8 +611,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (09-03, **shipped** / 09-17, **shipped**; integral cell + dual `r_D`/`r_I`; G1–G4 CI;
   founding bias collapse, not temperature collapse; not a VPINN) /
   `omnibias.core.jet_token` + `omnibias.{torch,jax}.architectures.jet_token`
-  + `omnibias.{torch,jax}.jet_distill` (09-02, **shipped** / 09-19; `compose_jet`
-  mix + teacher-jet match; G1–G3 CI; founding bias collapse, not
+  + `omnibias.{torch,jax}.jet_distill` (09-02, **shipped** / 09-19, **shipped**; `compose_jet`
+  mix + teacher-jet match; G1–G4 CI; founding bias collapse, not
   temperature collapse; not ImageNet) /
   `omnibias.core.exact_maml` + `omnibias.{torch,jax}.optim_maml`
   (09-16, **shipped**; inner Newton + IFT meta-grad; G1–G4 CI; founding bias

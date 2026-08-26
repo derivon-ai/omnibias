@@ -398,6 +398,8 @@ gates are earned on smoke, not in CI `all_passed`.
   not a VPINN. Status is **shipped**.
 - **Remainder training** ([09-18](api/remainder_training.md)): loss
   is `R_N`, not 03-10. Status is **shipped**.
+- **Jet distillation** ([09-19](api/jet_token.md)): teacher-jet
+  match, not ImageNet KD. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

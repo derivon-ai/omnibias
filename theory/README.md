@@ -241,7 +241,7 @@ operator floor.
 | [09-16 exact MAML](09-inventions/16-exact-maml.md) | shipped | Inner exact GN / HVP; IFT meta-grad; G1–G4 CI; not ImageNet; founding bias collapse, not temperature collapse |
 | [09-17 dual-FTC training](09-inventions/17-dual-ftc-training.md) | shipped | Dual `r_D`/`r_I` on the 09-03 cell; G1–G4 CI; not a VPINN; founding bias collapse, not temperature collapse |
 | [09-18 remainder training](09-inventions/18-remainder-training.md) | shipped | Loss is `R_N`; optional 03-13 birth hook; G1–G4 CI; not 03-10; founding bias collapse, not temperature collapse |
-| [09-19 jet distillation](09-inventions/19-jet-distillation.md) | gated | Student matches a teacher N-jet; G1–G3 CI; not ImageNet KD; founding bias collapse, not temperature collapse |
+| [09-19 jet distillation](09-inventions/19-jet-distillation.md) | shipped | Student matches a teacher N-jet; G1–G4 CI; not ImageNet KD; founding bias collapse, not temperature collapse |
 | [09-20 homotopy continuation](09-inventions/20-homotopy-continuation.md) | gated | Path of problems; each step 08-04-accepted; G1–G4 CI; empty ball is a halt |
 | [09-21 exact score matching](09-inventions/21-exact-score-matching.md) | gated | Hyvärinen on an OMBU score; G1–G4 CI; CNF exact `div` is prior art |
 | [09-22 inverse-design](09-inventions/22-inverse-design.md) | gated | Newton-on-`x` with exact `sigma'`; G1–G4 CI; not 08-03 layer invert |

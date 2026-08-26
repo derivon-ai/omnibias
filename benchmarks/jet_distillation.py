@@ -4,7 +4,8 @@
 
 G1 recovers the tanh scale. G2: a 4-parameter jet read beats
 value-only on the joint metric. G3 keeps ``imagenet_claim`` false.
-Jets are founding bias collapse, not temperature collapse.
+G4 is torch/jax bit-identity on G1. Jets are founding bias
+collapse, not temperature collapse.
 """
 
 from __future__ import annotations
@@ -16,9 +17,9 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.jet_token import (
     DISCLAIMER,
     distill_skill,
@@ -26,6 +27,14 @@ from omnibias.core.jet_token import (
     recover_tanh_scale,
     ssl_flip_residual,
 )
+from omnibias.jax.jet_distill import jet_distill_loss as jax_loss
+from omnibias.jax.jet_distill import recover_tanh_scale as jax_rec
+from omnibias.torch.jet_distill import jet_distill_loss as torch_loss
+from omnibias.torch.jet_distill import recover_tanh_scale as torch_rec
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -41,6 +50,15 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     skill = distill_skill()
     g2 = bool(skill["below_1e3"] and skill["beats_value"])
     g3 = honesty_payload()["imagenet_claim"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t_loss = torch_loss(torch.tensor([0.0, 0.5]), torch.tensor([0.0, 1.0]))
+    j_loss = jax_loss(jnp.asarray([0.0, 0.5]), jnp.asarray([0.0, 1.0]))
+    g4 = bool(
+        torch_rec()["a"] == jax_rec()["a"]
+        and torch_rec()["loss"] == jax_rec()["loss"]
+        and float(t_loss) == float(j_loss)
+    )
     entries = [
         {"name": "g1_tanh_scale", "passed": g1, "a": rec["a"], "loss": rec["loss"]},
         {
@@ -51,6 +69,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "tanh_teacher_floor": skill["tanh_teacher_floor"],
         },
         {"name": "g3_honesty", "passed": g3, "imagenet_claim": False},
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_loss": float(t_loss),
+            "jax_loss": float(j_loss),
+        },
     ]
     for entry in entries:
         print(entry["name"], "ok" if entry["passed"] else "FAIL")
