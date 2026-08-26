@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Conjugate Hilbert G5 leftover flags (theory 01-12)
+
+- Leftover #11 now leftover-records `leftover_recorded` / `leftover_id`
+  on `g5_capacity` (matched-width ratio `0.978`, need `10x`).
+- Stays reported and out of `all_passed`. Not a stretch-gate clearing.
+- Smoke: `docs/benchmarks/conjugate_hilbert_smoke.json`.
+
 ### Added — Rational stencil shipped (theory 01-11)
 
 - Spec 01-11 status is **shipped**: G1–G5 CI, kernel pass in Lean.

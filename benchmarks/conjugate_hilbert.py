@@ -167,6 +167,9 @@ def _run_g5_capacity_record() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 11,
+        "leftover_tick": 84,
         "source": "docs/benchmarks/ccf_conjugate_sweep_smoke.json",
         "n0_dense_max_abs": n0,
         "matched_width_dense_max_abs": matched,
@@ -177,9 +180,10 @@ def _run_g5_capacity_record() -> dict[str, Any]:
         "n1_unmatched_gram_cond": float(sweep["rows"][1]["gram_cond"]),
         "best_max_order": int(sweep["best"]["max_order"]),
         "note": (
-            "CCF profile-fitting subproblem. Enlargement does not cut "
-            "dense residual 10x at matched atom count; N=0 is best. "
-            "Catch-22 is not dictionary order on this grid. "
+            "Leftover #11 leftover-recorded: CCF profile-fitting "
+            "subproblem. Enlargement does not cut dense residual 10x "
+            "at matched atom count; N=0 is best. Catch-22 is not "
+            "dictionary order on this grid. "
             "Not CCF_STRETCH_RESIDUAL_GATE."
         ),
         "in_ci_all_passed": False,
@@ -206,6 +210,9 @@ def main() -> int:
         "g5_in_all_passed": False,
         "g5_earned": False,
         "g5_reported": True,
+        "g5_leftover_recorded": True,
+        "g5_leftover_id": 11,
+        "g5_leftover_tick": 84,
         "g5_in_ci_all_passed": False,
         "g5_is_ccf_profile_not_synthetic": True,
     }

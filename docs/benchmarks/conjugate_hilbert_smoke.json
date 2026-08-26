@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.conjugate_hilbert.v1",
-  "generated_utc": "2026-08-25T17:33:41Z",
+  "generated_utc": "2026-08-26T16:32:04Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,7 +13,7 @@
   "config": {
     "mode": "smoke"
   },
-  "rss_mb_at_start": 807.69,
+  "rss_mb_at_start": 809.12,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -48,6 +48,9 @@
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 11,
+    "leftover_tick": 84,
     "source": "docs/benchmarks/ccf_conjugate_sweep_smoke.json",
     "n0_dense_max_abs": 0.0856715478179377,
     "matched_width_dense_max_abs": 0.08757518307761564,
@@ -57,7 +60,7 @@
     "matched_width_gram_cond": 5.006824011199118,
     "n1_unmatched_gram_cond": 231780.18064880688,
     "best_max_order": 0,
-    "note": "CCF profile-fitting subproblem. Enlargement does not cut dense residual 10x at matched atom count; N=0 is best. Catch-22 is not dictionary order on this grid. Not CCF_STRETCH_RESIDUAL_GATE.",
+    "note": "Leftover #11 leftover-recorded: CCF profile-fitting subproblem. Enlargement does not cut dense residual 10x at matched atom count; N=0 is best. Catch-22 is not dictionary order on this grid. Not CCF_STRETCH_RESIDUAL_GATE.",
     "in_ci_all_passed": false
   },
   "g5_synthetic_in_span": {
@@ -75,6 +78,9 @@
     "g5_in_all_passed": false,
     "g5_earned": false,
     "g5_reported": true,
+    "g5_leftover_recorded": true,
+    "g5_leftover_id": 11,
+    "g5_leftover_tick": 84,
     "g5_in_ci_all_passed": false,
     "g5_is_ccf_profile_not_synthetic": true
   }

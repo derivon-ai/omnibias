@@ -56,7 +56,7 @@ uv run python docs/img/generate_figures.py
 | `jet_bundle.py` | `docs/benchmarks/jet_bundle_smoke.json` | Shipped 01-10: vocabulary, not a discovery; G1–G3 earned |
 | `enclosure_collapse.py` | `docs/benchmarks/enclosure_collapse_smoke.json` | Gated 01-14: Width Law + six squeezes; `width -> 0` of a sound enclosure (a point plus a proof); not a package |
 | `theory_homes.py` | `docs/benchmarks/theory_homes_smoke.json` | Gated 06-03: G1–G5 earned (94/94 homes; Wave-0 A4–A7 recorded; G4/G5 vacuous; 389 lines, not promoted) |
-| `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Gated 01-12: line Hilbert; G1–G4 CI; G5 reported on CCF smoke (matched-width ratio `0.978`, need `10x`), not in `all_passed` |
+| `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Gated 01-12: line Hilbert; G1–G4 CI; G5 leftover-recorded (leftover #11; matched-width ratio `0.978`, need `10x`), not in `all_passed` |
 | `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Gated 02-02 Face-Net: sampled subgraph; G3 vs k-NN leftover-recorded (0-hop; GNN / RegionModels `--full`); cost vs n/D leftover-recorded |
 | `bem_net.py` | `docs/benchmarks/bem_net_smoke.json` | Gated 02-06: off-surface exact; G2 disc earned (`circle_dirichlet_density`); G3 exterior win leftover-recorded (no volume PINN); single-layer cost reported |
 | `pack_tree.py` | `docs/benchmarks/pack_tree_smoke.json` | Gated 02-07: 1-D offsets; G3 earned (cached O(p) multipole, dense crossover) |

@@ -222,7 +222,8 @@ gates are earned on smoke, not in CI `all_passed`.
   `C_j` / poisedness as finite rational Lean obligations. Algebra
   only, not the collapse. Status is **shipped**.
 - **Conjugate Hilbert** ([01-12](api/conjugate.md)): line Hilbert only;
-  G5 is a projection defect, not a stretch-gate clearing.
+  G5 leftover-recorded (leftover #11); projection defect, not a
+  stretch-gate clearing.
 - **Face-Net** ([02-02](api/facenet.md)): sampled tope subgraph; temperature
   collapse; sound gap, not P vs NP. G3 vs k-NN leftover-recorded. Cost
   vs `n`/`D` leftover-recorded.

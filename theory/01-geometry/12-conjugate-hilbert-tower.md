@@ -9,7 +9,7 @@ simultaneously closed under differentiation *and* under `H`, which attacks the
 recorded Hilbert-and-dictionary floor at the basis level rather than by
 quadrature refinement.
 
-- **Status**: gated (G1–G4 CI; G5 campaign-artifact **reported** / unearned — matched-width ratio `0.978`, need `10x`, not in CI `all_passed`; line Hilbert only)
+- **Status**: gated (G1–G4 CI; G5 campaign-artifact **leftover-recorded** / unearned, leftover #11 — matched-width ratio `0.978`, need `10x`, not in CI `all_passed`; line Hilbert only)
 - **Depends on**: 01-01
 - **Blocks**: 02-06, 07-02, 07-03
 
@@ -292,7 +292,8 @@ bit-identical twins for use inside the CCF training loop.
   least `10x` smaller than the current Hardy span at matched atom count, and the
   reduction is reported in the campaign artifact. This gate is about the
   *dictionary*, not about the stretch residual.
-  **Unearned** — `docs/benchmarks/ccf_conjugate_sweep_smoke.json` /
+  **Unearned / leftover-recorded** (leftover #11) —
+  `docs/benchmarks/ccf_conjugate_sweep_smoke.json` /
   `docs/benchmarks/conjugate_hilbert_smoke.json`. Matched-width residual
   ratio vs N=0 is `0.978` (need `>= 10`); N=0 is best; unmatched N=1
   Gram condition is `~2.3e5`. The in-span synthetic recovery is sanity,
