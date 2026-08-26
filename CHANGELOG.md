@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Validated dynamics shipped (theory 07-06)
+
+- Spec 07-06 status is **shipped**: G1–G6 CI, no leftover gate.
+- Finite horizon; not a continuum existence theorem.
+- Smoke: `docs/benchmarks/validated_dynamics_smoke.json`.
+
 ### Added — Spectral floors shipped (theory 07-05)
 
 - Spec 07-05 status is **shipped**: G1–G6 CI, no leftover gate.

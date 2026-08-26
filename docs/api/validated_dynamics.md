@@ -8,8 +8,8 @@ evaluation per order. Temperature collapse (`beta -> inf`,
 feasibility) does not appear. Do not conflate the two.
 
 Every run emits a `WidthBudget`. The existing
-`lohner_flow` path is bit-unchanged. Status is **gated**,
-not shipped. G1–G6 are CI-gated.
+`lohner_flow` path is bit-unchanged. Status is **shipped**.
+G1–G6 are CI-gated.
 
 Scope is **one field, one initial box, one finite
 horizon**. This is not a continuum existence theorem, not

@@ -330,6 +330,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Spectral floors** ([07-05](api/trial_spaces.md)): multi-pack
   trial spaces + arrangement SOS. Not a continuum gap or YM mass
   gap. Status is **shipped**.
+- **Validated dynamics** ([07-06](api/validated_dynamics.md)):
+  finite horizon; not a continuum existence theorem. Status is
+  **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

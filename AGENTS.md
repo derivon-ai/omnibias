@@ -594,7 +594,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   bases; G1–G6 CI; founding bias collapse, not temperature
   collapse; not a continuum spectral gap or Yang-Mills mass
   gap) /
-  `omnibias.core.verified.jet_flow` (07-06; exact-Jacobian
+  `omnibias.core.verified.jet_flow` (07-06, **shipped**; exact-Jacobian
   jet Lohner + `WidthBudget`; G1–G6 CI; founding bias
   collapse, not temperature collapse; finite horizon, not a
   continuum existence theorem) /

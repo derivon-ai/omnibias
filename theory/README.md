@@ -192,7 +192,7 @@ external parent and states why the parent stays external.
 | [07-03 CCF campaign acceleration](07-frontier/03-ccf-campaign-acceleration.md) | gated | A basis-level attack on the recorded dictionary floor |
 | [07-04 Yang-Mills adjacent](07-frontier/04-yang-mills-adjacent-holonomy-and-gap.md) | gated | Holonomy trials, 6j / 3-plaquette Hamiltonians, two-scale polymer, Lipschitz SU(3) Haar, and a 2+1-D strip; the mass gap stays external |
 | [07-05 spectral floors and positivity](07-frontier/05-spectral-floors-and-positivity.md) | shipped | Multi-pack trial spaces + arrangement-adapted SOS; G1–G6 CI; founding bias collapse, not temperature collapse; not a continuum spectral gap or Yang-Mills mass gap |
-| [07-06 validated dynamics and orbits](07-frontier/06-validated-dynamics-and-orbits.md) | gated | Exact-Jacobian jet Lohner + width budget; G1–G6 CI; founding bias collapse, not temperature collapse; finite horizon, not a continuum existence theorem |
+| [07-06 validated dynamics and orbits](07-frontier/06-validated-dynamics-and-orbits.md) | shipped | Exact-Jacobian jet Lohner + width budget; G1–G6 CI; founding bias collapse, not temperature collapse; finite horizon, not a continuum existence theorem |
 | [07-07 Nobel-adjacent domains](07-frontier/07-nobel-adjacent-domain-programs.md) | gated | Exact ladder + Harris layer + exact `dT/dθ`; G0–G6 CI; tooling, not a discovery; founding bias collapse, not temperature collapse |
 
 ### 08 Tower-native training

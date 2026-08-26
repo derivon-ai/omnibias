@@ -7,7 +7,7 @@ quality of the Jacobian enclosure — and the derivative tower fixes the second
 exactly, while high-order jets attack the first by letting each step be longer
 at the same width.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; founding bias collapse, not temperature collapse; finite horizon, not a continuum existence theorem)
 - **Depends on**: 01-01, 03-10, 03-11, 07-01, 07-05
 - **Blocks**: none
 
