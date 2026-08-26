@@ -12,11 +12,11 @@ is **leftover-recorded** unearned (leftover #24): no Dirichlet
 density solve is wired, so the named annulus L2 stays `--full`.
 `single_layer` wall vs `n_quad` is **reported**; the previous untimed
 `passed=True` stub is withdrawn. Cost is not in CI `all_passed`. G3
-exterior win is **reported** unearned: pack-tree 02-07 has no dense
-crossover, and no truncated volumetric PINN loop is wired. The
-previous spec-status smoke/`--full` line is withdrawn. G3 is not in
-CI `all_passed`. Status is **gated**, not shipped. See theory spec
-02-06.
+exterior win is **leftover-recorded** unearned (leftover #30):
+pack-tree 02-07 has no dense crossover, and no truncated volumetric
+PINN loop is wired. The previous spec-status smoke/`--full` line is
+withdrawn. G3 is not in CI `all_passed`. Status is **gated**, not
+shipped. See theory spec 02-06.
 
 ## Algebra and twins
 

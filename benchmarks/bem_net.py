@@ -4,8 +4,9 @@
 
 G2 disc-accuracy is leftover-recorded (leftover #24) and stays
 ``--full``. Single-layer wall vs ``n_quad`` is reported. G3 exterior
-win is reported unearned: pack-tree 02-07 G3 has no dense crossover,
-and no volume-PINN loop is wired. Neither is in CI ``all_passed``.
+win is leftover-recorded (leftover #30): pack-tree 02-07 G3 has no
+dense crossover, and no volume-PINN loop is wired. Neither is in CI
+``all_passed``.
 """
 
 from __future__ import annotations
@@ -125,14 +126,18 @@ def _run_g3() -> dict[str, Any]:
         "pack_tree_hier_over_dense_at_m_hi": hier_over,
         "pack_tree_far_eval_is_per_source_taylor": True,
         "stays_full": True,
+        "leftover_recorded": True,
+        "leftover_id": 30,
+        "leftover_tick": 62,
         "note": (
-            "Named G3 is a 100x far-field win versus a truncated "
-            "volumetric PINN at matched cost. No density solve or "
-            "volume-PINN loop is wired. The small-N escape needed a "
-            "pack-tree (02-07) dense crossover; that leftover recorded "
-            f"hier/dense {hier_over:.2f} at M=3200 and crossover_m="
-            f"{crossover!r}. Previous spec-status smoke/--full line "
-            "withdrawn. Not in CI all_passed."
+            "Leftover #30 leftover-recorded: named G3 is a 100x "
+            "far-field win versus a truncated volumetric PINN at "
+            "matched cost. No density solve or volume-PINN loop is "
+            "wired. The small-N escape needed a pack-tree (02-07) "
+            "dense crossover; that leftover recorded hier/dense "
+            f"{hier_over:.2f} at M=3200 and crossover_m={crossover!r}. "
+            "Previous spec-status smoke/--full line withdrawn. Not in "
+            "CI all_passed."
         ),
     }
 
@@ -201,6 +206,9 @@ def main() -> int:
         "g2_stays_full": True,
         "g3_exterior_win_earned": False,
         "g3_reported": True,
+        "g3_leftover_recorded": True,
+        "g3_leftover_id": 30,
+        "g3_leftover_tick": 62,
         "g3_in_ci_all_passed": False,
         "g3_volume_pinn": False,
         "cost_earned": False,

@@ -496,7 +496,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   G3 vs PartitionedField / FBPINN leftover-recorded, G4 hard vs penalized
   leftover-recorded, training stays `--full`;
   distinct from XPINN `omnibias.pinn._core.interface`) /
-  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13; 02-09 G4 init-win unearned; 02-11 G4 inverse-design unearned, G5 conservation reported; 02-06 G2 disc-accuracy leftover-recorded, G3 exterior win reported, single-layer cost reported) /
+  `omnibias.pinn.{travelling,layered,bem,transform}` (02-09/02-11/02-06/02-13; 02-09 G4 init-win unearned; 02-11 G4 inverse-design unearned, G5 conservation reported; 02-06 G2 disc-accuracy leftover-recorded, G3 exterior win leftover-recorded, single-layer cost reported) /
   `omnibias.geometry.gauge.band` (02-14; abelian + transverse-constant;
   G2 closed-form earned vs PRODUCT 4096; G3 Magnus reported; G4 gauge
   covariance reported, no random-gauge API;

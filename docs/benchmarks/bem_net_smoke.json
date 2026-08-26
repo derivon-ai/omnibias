@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.bem_net.v1",
-  "generated_utc": "2026-08-26T15:56:19Z",
+  "generated_utc": "2026-08-26T15:56:56Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "g5"
     ]
   },
-  "rss_mb_at_start": 809.59,
+  "rss_mb_at_start": 809.98,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -45,18 +45,18 @@
     "rows": [
       {
         "n_quad": 12,
-        "one_point_wall_seconds": 7.709953933954239e-06,
-        "n_point_wall_seconds": 8.485896978527308e-05
+        "one_point_wall_seconds": 8.59296415001154e-06,
+        "n_point_wall_seconds": 8.59750434756279e-05
       },
       {
         "n_quad": 24,
-        "one_point_wall_seconds": 1.2584961950778961e-05,
-        "n_point_wall_seconds": 0.0003052690299227834
+        "one_point_wall_seconds": 1.3277051039040089e-05,
+        "n_point_wall_seconds": 0.0003087579971179366
       },
       {
         "n_quad": 48,
-        "one_point_wall_seconds": 2.3995991796255112e-05,
-        "n_point_wall_seconds": 0.0011851029703393579
+        "one_point_wall_seconds": 2.6106019504368305e-05,
+        "n_point_wall_seconds": 0.0011285509681329131
       }
     ],
     "g2_disc_accuracy": {
@@ -83,7 +83,10 @@
     "pack_tree_hier_over_dense_at_m_hi": 8.903254761816688,
     "pack_tree_far_eval_is_per_source_taylor": true,
     "stays_full": true,
-    "note": "Named G3 is a 100x far-field win versus a truncated volumetric PINN at matched cost. No density solve or volume-PINN loop is wired. The small-N escape needed a pack-tree (02-07) dense crossover; that leftover recorded hier/dense 8.90 at M=3200 and crossover_m=None. Previous spec-status smoke/--full line withdrawn. Not in CI all_passed."
+    "leftover_recorded": true,
+    "leftover_id": 30,
+    "leftover_tick": 62,
+    "note": "Leftover #30 leftover-recorded: named G3 is a 100x far-field win versus a truncated volumetric PINN at matched cost. No density solve or volume-PINN loop is wired. The small-N escape needed a pack-tree (02-07) dense crossover; that leftover recorded hier/dense 8.90 at M=3200 and crossover_m=None. Previous spec-status smoke/--full line withdrawn. Not in CI all_passed."
   },
   "honesty": {
     "pde_exact": "off-surface by construction",
@@ -99,6 +102,9 @@
     "g2_stays_full": true,
     "g3_exterior_win_earned": false,
     "g3_reported": true,
+    "g3_leftover_recorded": true,
+    "g3_leftover_id": 30,
+    "g3_leftover_tick": 62,
     "g3_in_ci_all_passed": false,
     "g3_volume_pinn": false,
     "cost_earned": false,

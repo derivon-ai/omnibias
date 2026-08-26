@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — BEM-Net G3 leftover-recorded (theory 02-06)
+
+- Leftover #30's exterior-win miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/bem_net.py`.
+- Reported: pack-tree crossover absent; no volume-PINN loop. Not in
+  CI `all_passed`.
+- Smoke: `docs/benchmarks/bem_net_smoke.json`.
+
 ### Added — BEM-Net G2 leftover-recorded (theory 02-06)
 
 - Leftover #24's disc-accuracy miss now leftover-records `reported`

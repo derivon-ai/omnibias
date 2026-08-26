@@ -221,6 +221,7 @@ gates are earned on smoke, not in CI `all_passed`.
   vs `n`/`D` leftover-recorded.
 - **BEM-Net** ([02-06](api/bem.md)): PDE exact off-surface; BC approximated;
   linear constant-coeff homogeneous only. G2 disc-accuracy leftover-recorded.
+  G3 exterior win leftover-recorded.
 - **Pack tree** ([02-07](api/hierarchy.md)): 1-D offsets; `eta=0` bit-identical
   to dense; far-field is a truncation with a bound. G3 complexity
   leftover-recorded (per-source Taylor, no dense crossover).
