@@ -63,8 +63,8 @@ multiblock primitives) lives in the separate `omnibias-ferminet`
 package; importing `omnibias.jax` does **not** trigger a FermiNet import,
 so the JAX core remains useful when FermiNet is absent.
 
-Gated Wave-1 twins (not shipped): `init_multipack` / `multipack_apply` (01-01)
-and `init_bias_scan` / `bias_scan` / `BankSpec` (01-02). Same honesty as the
+Wave-1 twins: `init_multipack` / `multipack_apply` (01-01, **shipped**)
+and `init_bias_scan` / `bias_scan` / `BankSpec` (01-02, gated). Same honesty as the
 torch modules: interior shift along `w`, `gamma` is not `delta -> 0`.
 
 Gated Wave-3 twins (not shipped): Scan-Net (`init_scan_net` / `scan_net_apply`;

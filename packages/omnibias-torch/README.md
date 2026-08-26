@@ -54,8 +54,8 @@ linear = cmbLinear(in_features=128, out_features=64, op="identity", base="tanh")
 print(list_activations())
 ```
 
-Gated Wave-1 primitives (not shipped): `MultiPackUnit` (heterogeneous Birkhoff
-packs, 01-01) and `BiasScan` / `BankSpec` (transverse scan along `w`, 01-02).
+Wave-1 primitives: `MultiPackUnit` (heterogeneous Birkhoff
+packs, 01-01, **shipped**) and `BiasScan` / `BankSpec` (transverse scan along `w`, 01-02, gated).
 `BiasScan` templates reuse the six `OperatorBlock` roles; equivariance is an
 interior lattice shift, not a circular wrap. Soft-argmax `gamma` is not
 `delta -> 0`. See [docs/api/multipack.md](../../docs/api/multipack.md) and

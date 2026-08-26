@@ -104,7 +104,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 
 | Spec | Status | One line |
 |---|---|---|
-| [01-01 multipack Birkhoff collapse](01-geometry/01-multipack-birkhoff-collapse.md) | gated | `MultiPackUnit` shipped; G1–G5 earned (float64 order ceiling recorded; two-interface span beats OperatorBlock / OMBU / JetMLP) |
+| [01-01 multipack Birkhoff collapse](01-geometry/01-multipack-birkhoff-collapse.md) | shipped | `MultiPackUnit` shipped; G1–G5 earned (float64 order ceiling recorded; two-interface span beats OperatorBlock / OMBU / JetMLP) |
 | [01-02 bias scan](01-geometry/02-bias-scan-transverse-convolution.md) | gated | `BiasScan` / `BankSpec`; G1–G4 in CI `all_passed`; 01-13 G5 earned |
 | [01-03 arrangement geometry](01-geometry/03-hyperplane-arrangement-geometry.md) | gated | `omnibias.partition.arrangement`; temperature collapse, sampled subgraph, sound gap not P vs NP; G1–G4 CI; cost vs `n`/`D` **leftover-recorded** (leftover #18; cutoff `n<=12`, `D<=4`), not in CI `all_passed` |
 | [01-04 irregular Birkhoff stencils](01-geometry/04-irregular-birkhoff-stencils.md) | gated | Exact-`Q` weights in `omnibias.difference`; G1–G4 earned |
@@ -283,5 +283,5 @@ are not spec-killing failures). Index check, not a same-commit proof.
 ## Wave-1 primitives
 
 Code now exists for all three Wave-1 primitives (no new packages). **01-01**
-is gated (G1–G5 earned). **01-02** is gated (G1–G4 CI-gated;
+is shipped (G1–G5 earned). **01-02** is gated (G1–G4 CI-gated;
 01-13 G5 earned). **01-04** is gated (G1–G4 earned).

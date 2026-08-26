@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Multipack Birkhoff shipped (theory 01-01)
+
+- Spec 01-01 status is **shipped**: G1–G5 earned, no leftover gate.
+- `MultiPackUnit` is the named Birkhoff sample, not a new package.
+- Smoke: `docs/benchmarks/multipack_birkhoff_smoke.json`.
+
 ### Added — Linearizing-transform jet Cole-Hopf (theory 02-13)
 
 - `cole_hopf_jet` / factorial-jet multiply and reciprocal ship on

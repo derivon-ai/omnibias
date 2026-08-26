@@ -152,13 +152,13 @@ and one-dimensional. The `band` role is the finite-gap case read as a *response*
 [`operator-surface.md`](operator-surface.md) for the full role table and for the
 three distinct things "integral" can mean.
 
-### Wave-1 gated primitives (not shipped)
+### Wave-1 primitives
 
-Three extensions of this geometry have code and CI smoke, still **gated**:
+Three extensions of this geometry have code and CI smoke.
 
 - **Order / packs** ([01-01](api/multipack.md)): `MultiPackUnit` evaluates a
   heterogeneous Birkhoff sample `sum_g c_g sigma^(n_g)(z + mu_g)` along one
-  `w`. G1–G5 earned.
+  `w`. G1–G5 earned. Status is **shipped**.
 - **Position / scan** ([01-02](api/scan.md)): `BiasScan` shares one pack
   template across a bank of offsets. Equivariance is an **interior lattice
   shift** along `w` (`R(z+Delta)[..., :-1]` vs `R(z)[..., 1:]`), not a

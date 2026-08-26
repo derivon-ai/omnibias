@@ -10,7 +10,7 @@ In jet-bundle language (01-10) that is a linear functional on a
 scattered jet: values of several fiber coordinates at several base
 points.
 
-- **Status**: gated (G1–G5 earned)
+- **Status**: shipped (G1–G5 earned)
 - **Depends on**: none
 - **Blocks**: 01-02, 01-04, 01-05, 01-07, 01-09, 01-10, 01-11, 01-12, 02-03, 02-04, 02-05, 02-07, 02-09, 02-10, 02-12, 02-13, 03-01, 03-10, 03-11, 03-12, 03-13, 04-01, 05-01, 07-02, 07-03, 07-04, 07-05, 07-06
 
