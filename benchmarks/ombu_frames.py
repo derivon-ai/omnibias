@@ -91,10 +91,14 @@ def _g4_denoising() -> dict[str, Any]:
         "skill_positive_wins": int(skill_wins),
         "n_seeds": len(rows),
         "per_seed": rows,
+        "leftover_recorded": True,
+        "leftover_id": 10,
+        "leftover_tick": 82,
         "in_ci_all_passed": False,
         "note": (
-            "order-2 beats matched-cost n=1 in MSE on all five seeds, but "
-            "skill versus the noisy identity is negative on all five "
+            "Leftover #10 leftover-recorded: order-2 beats matched-cost "
+            "n=1 in MSE on all five seeds, but skill versus the noisy "
+            "identity is negative on all five "
             f"(median {float(np.median([r['skill_vs_identity'] for r in rows])):.3f}). "
             "Named G4 needs both. sigma' is not admissible. Not orthonormal, "
             "not compactly supported. Not in CI all_passed."
@@ -157,6 +161,9 @@ def main() -> int:
         "littlewood_paley_completeness": False,
         "g4_earned": False,
         "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 10,
+        "g4_leftover_tick": 82,
         "g4_in_ci_all_passed": False,
     }
     if args.full:

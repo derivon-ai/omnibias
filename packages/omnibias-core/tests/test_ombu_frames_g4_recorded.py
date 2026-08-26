@@ -18,6 +18,9 @@ def test_g4_denoising_is_reported_and_out_of_all_passed() -> None:
     assert g4["earned"] is False
     assert g4["passed"] is False
     assert g4["reported"] is True
+    assert g4["leftover_recorded"] is True
+    assert int(g4["leftover_id"]) == 10
+    assert int(g4["leftover_tick"]) == 82
     assert g4["in_ci_all_passed"] is False
     assert int(g4["n_seeds"]) == 5
     assert int(g4["beats_n1_wins"]) == 5
@@ -26,6 +29,8 @@ def test_g4_denoising_is_reported_and_out_of_all_passed() -> None:
     assert g4["both_gates"] is False
     assert payload["honesty"]["g4_earned"] is False
     assert payload["honesty"]["g4_reported"] is True
+    assert payload["honesty"]["g4_leftover_recorded"] is True
+    assert int(payload["honesty"]["g4_leftover_id"]) == 10
     assert payload["honesty"]["g4_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g4_denoising" not in names

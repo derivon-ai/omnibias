@@ -478,7 +478,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
 - Wave-3 gated algebra + architectures (not shipped): `omnibias.core.mollifier`
   (01-05, **shipped**; certified exponential tails, not compact support) /
   `omnibias.core.spectral_design` (01-07; pack order is a band selector; G3 reported, not in CI `all_passed`) /
-  `omnibias.core.frames` (01-06; `sigma'` not admissible) /
+  `omnibias.core.frames` (01-06; `sigma'` not admissible; G4 leftover-recorded) /
   `omnibias.core.locus` (01-09; constraint manifold, not a PDE solver) /
   `omnibias.core.jets` (01-10; vocabulary / contact test, not a package; G1–G3 earned) /
   `omnibias.core.conjugate` (01-12; line Hilbert; G5 unearned, not `all_passed`) /

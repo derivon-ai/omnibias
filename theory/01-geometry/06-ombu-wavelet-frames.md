@@ -6,7 +6,7 @@
 and tempering is its dilation parameter, so a bias-scan bank over `(offset,
 scale)` is a **wavelet frame with an exact derivative tower on every atom**.
 
-- **Status**: gated (G1–G3 CI; G4 denoising reported / unearned — `5/5` MSE vs n=1, `0/5` skill vs identity, not in CI `all_passed`; `sigma'` not admissible)
+- **Status**: gated (G1–G3 CI; G4 denoising leftover-recorded / unearned, leftover #10 — `5/5` MSE vs n=1, `0/5` skill vs identity, not in CI `all_passed`; `sigma'` not admissible)
 - **Depends on**: 01-02, 01-05
 - **Blocks**: 01-07, 02-01, 02-07, 02-08, 02-10, 03-05, 05-01
 
@@ -199,7 +199,7 @@ order for `BiasScan`; that path already exists in spec 01-02.
 - **G4 task skill.** On a denoising task with polynomial trend plus localized
   structure, the order-`n` bank beats a matched-cost Gaussian-derivative bank in
   mean squared error, with skill `> 0` against the identity, over five seeds.
-  **Unearned** — see `docs/benchmarks/ombu_frames_smoke.json`: order-2 beats
+  **Leftover-recorded** (leftover #10) — see `docs/benchmarks/ombu_frames_smoke.json`: order-2 beats
   n=1 in MSE on `5/5` seeds, but skill versus the noisy identity is
   negative on `5/5` (median `-1.32`). Named G4 needs both. Not in CI
   `all_passed`. `sigma'` is not admissible.

@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — OMBU-frames G4 leftover flags (theory 01-06)
+
+- Leftover #10 now leftover-records `leftover_recorded` plus honesty
+  flags on `benchmarks/ombu_frames.py`.
+- Reported: order-2 MSE wins `5/5`; skill vs identity `0/5`. Not in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/ombu_frames_smoke.json`.
+
 ### Added — Mollifier calculus shipped (theory 01-05)
 
 - Spec 01-05 status is **shipped**: G1–G4 in CI `all_passed`.

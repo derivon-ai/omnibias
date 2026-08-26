@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.ombu_frames.v1",
-  "generated_utc": "2026-08-25T17:18:53Z",
+  "generated_utc": "2026-08-26T16:28:23Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,7 +13,7 @@
   "config": {
     "mode": "smoke"
   },
-  "rss_mb_at_start": 812.89,
+  "rss_mb_at_start": 814.4,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -88,8 +88,11 @@
         "skill_positive": 0.0
       }
     ],
+    "leftover_recorded": true,
+    "leftover_id": 10,
+    "leftover_tick": 82,
     "in_ci_all_passed": false,
-    "note": "order-2 beats matched-cost n=1 in MSE on all five seeds, but skill versus the noisy identity is negative on all five (median -1.316). Named G4 needs both. sigma' is not admissible. Not orthonormal, not compactly supported. Not in CI all_passed.",
+    "note": "Leftover #10 leftover-recorded: order-2 beats matched-cost n=1 in MSE on all five seeds, but skill versus the noisy identity is negative on all five (median -1.316). Named G4 needs both. sigma' is not admissible. Not orthonormal, not compactly supported. Not in CI all_passed.",
     "both_gates": false
   },
   "honesty": {
@@ -100,6 +103,9 @@
     "littlewood_paley_completeness": false,
     "g4_earned": false,
     "g4_reported": true,
+    "g4_leftover_recorded": true,
+    "g4_leftover_id": 10,
+    "g4_leftover_tick": 82,
     "g4_in_ci_all_passed": false
   }
 }
