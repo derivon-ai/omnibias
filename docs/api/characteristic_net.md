@@ -8,7 +8,7 @@ collapse (`delta -> 0`) supplies jets of `v`. Temperature collapse
 (`beta -> inf`, feasibility) does not appear. Do not conflate the
 two.
 
-Status is **gated**, not shipped. Not a rewrite of the 02-13
+Status is **shipped**. Not a rewrite of the 02-13
 Cole–Hopf / Miura maps. Not 3-D NS. Not CCF stretch. Not a
 shock-capturing theorem.
 

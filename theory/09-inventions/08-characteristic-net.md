@@ -7,7 +7,7 @@ solution along characteristics using the closed-form time `integral`
 cell, so 1-D conservation laws are method-of-characteristics layers
 rather than collocation hopes.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; shock flag; not 02-13)
 - **Depends on**: 02-13, 09-01, 09-03
 - **Blocks**: none
 

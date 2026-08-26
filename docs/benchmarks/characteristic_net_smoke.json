@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.characteristic_net.v1",
-  "generated_utc": "2026-08-21T20:13:29Z",
+  "generated_utc": "2026-08-26T17:06:36Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -21,7 +21,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 814.16,
+  "rss_mb_at_start": 1230.97,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -44,9 +44,15 @@
         "passed": true,
         "crossed_any": true,
         "unique_after_shock_claimed": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_u": 0.9607894391523232,
+        "jax_u": 0.9607894391523232
       }
     ]
   },
   "disclaimer": "characteristic transport with a time-integral window; not 02-13, not a shock-capturing theorem, not NS, and not CCF stretch",
-  "wall_seconds": 1.542314998980146
+  "wall_seconds": 0.5793030889471993
 }

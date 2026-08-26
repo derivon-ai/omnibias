@@ -637,7 +637,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   bias collapse, not temperature collapse; band skip is not a
   collapse head; `sigma'` not admissible) /
   `omnibias.pinn.characteristic` + `omnibias.pinn.{torch,jax}.characteristic`
-  (09-08; transport along learned `v`; G1–G4 CI; founding bias
+  (09-08, **shipped**; transport along learned `v`; G1–G4 CI; founding bias
   collapse, not temperature collapse; shock flag; not 02-13) /
   `omnibias.geometry.atlas.cocycle`
   (09-09; jet cocycle on partition charts; G1–G4 CI; founding

@@ -371,6 +371,8 @@ gates are earned on smoke, not in CI `all_passed`.
   couplings, not `integrate_cnf`. Status is **shipped**.
 - **Pack-MoE** ([09-07](api/pack_moe.md)): slab-mass router, not
   softmax. Status is **shipped**.
+- **Characteristic-Net** ([09-08](api/characteristic_net.md)):
+  transport along learned `v`, not 02-13. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

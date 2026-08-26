@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Characteristic-Net shipped (theory 09-08)
+
+- Spec 09-08 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Transport along learned `v`, not 02-13.
+- Smoke: `docs/benchmarks/characteristic_net_smoke.json`.
+
 ### Added — Pack-MoE shipped (theory 09-07)
 
 - Spec 09-07 status is **shipped**: G1–G4 CI; G4 torch/jax parity
