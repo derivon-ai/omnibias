@@ -668,7 +668,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (05-01, **shipped**; G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`;
   global search earned for n=3 only) /
   `omnibias.tab` arrangement + `omnibias.torch.sequence` + `omnibias.shape`
-  (05-02; G1/G2/G3/G5/G6/G7 earned; G3b leftover-recorded leftover #49,
+  (05-02, **shipped**; G1/G2/G3/G5/G6/G7 earned; G3b leftover-recorded leftover #49,
   G4 leftover-recorded leftover #50, not in CI `all_passed`).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),

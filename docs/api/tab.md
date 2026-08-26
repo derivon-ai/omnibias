@@ -66,7 +66,7 @@ claim, earned per dataset (see [Benchmarks](../benchmarks.md)), never asserted.
 
 ## Arrangement classifier (05-02)
 
-Hyperplane-arrangement view of tabular classification: ``H`` soft gates applied
+Status is **shipped**. Hyperplane-arrangement view of tabular classification: ``H`` soft gates applied
 to every input, soft cell memberships over ``2**H`` sign patterns (reusing
 ``omnibias.partition``), per-cell logits, beta anneal, an optional ``L1`` /
 sparse warm-start path, and ``certify_arrangement_gap`` (partition soft->hard

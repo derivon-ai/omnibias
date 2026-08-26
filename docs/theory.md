@@ -312,7 +312,7 @@ gates are earned on smoke, not in CI `all_passed`.
   Status is **shipped**.
 - **Beyond-PDE applications** ([05-02](api/tab.md)): G3b leftover
   #49 and G4 leftover #50 leftover-recorded. Temperature collapse
-  on tabular; founding bias collapse on the scan. Status is **gated**.
+  on tabular; founding bias collapse on the scan. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

@@ -168,7 +168,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | Spec | Status | One line |
 |---|---|---|
 | [05-01 inverse problems and imaging](05-applications/01-inverse-problems-and-imaging.md) | shipped | `omnibias.pinn.inverse`; G1–G7 earned (locally-seeded `sd ~ alpha^(n-5/2)`; global search earned for n=3 only) |
-| [05-02 beyond-PDE applications](05-applications/02-beyond-pde-applications.md) | gated | Tabular arrangements (G1/G2/G3 earned; G3b leftover-recorded leftover #49 `4/8`, G4 leftover-recorded leftover #50 `0.25`, neither in CI `all_passed`); shape topology G6/G7 earned; sequence filter **earned** (G5 vs S4D; order-0 tail, width = horizon) |
+| [05-02 beyond-PDE applications](05-applications/02-beyond-pde-applications.md) | shipped | Tabular arrangements (G1/G2/G3 earned; G3b leftover-recorded leftover #49 `4/8`, G4 leftover-recorded leftover #50 `0.25`, neither in CI `all_passed`); shape topology G6/G7 earned; sequence filter **earned** (G5 vs S4D; order-0 tail, width = horizon) |
 
 ### 06 Program
 

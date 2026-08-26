@@ -7,7 +7,7 @@ general-purpose geometry, and three domains with no differential equation in
 sight (tabular data, point clouds and implicit shapes, sequences) each get a
 concrete construction from them, with honest baselines that are hard to beat.
 
-- **Status**: gated (G1/G2/G3/G5/G6/G7 earned; G3b leftover-recorded leftover #49; G4 leftover-recorded leftover #50; not in CI `all_passed`)
+- **Status**: shipped (G1/G2/G3/G5/G6/G7 earned; G3b leftover-recorded leftover #49; G4 leftover-recorded leftover #50; not in CI `all_passed`)
 - **Depends on**: 01-02, 01-03, 02-01, 02-02, 02-08, 03-02, 03-04, 03-07, 03-09
 - **Blocks**: none
 

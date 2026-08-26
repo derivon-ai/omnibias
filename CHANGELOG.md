@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Beyond-PDE applications shipped (theory 05-02)
+
+- Spec 05-02 status is **shipped**: G1/G2/G3/G5/G6/G7 earned; G3b
+  leftover #49 and G4 leftover #50 recorded, not in `all_passed`.
+- Trees expected to win most tabular rows; sequence G5 vs S4D.
+- Smoke: `docs/benchmarks/tabular_arrangement_smoke.json`.
+
 ### Added — Beyond-PDE G3b/G4 leftover-recorded (theory 05-02)
 
 - Leftover #49 leftover-records `g3b_capacity_boost_h2` (`4/8`,
