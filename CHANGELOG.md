@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Layered transfer shipped (theory 02-11)
+
+- Spec 02-11 status is **shipped**: leftover #23 G4, leftover #46
+  stack cost, and leftover #27 G5 stay reported and out of `all_passed`.
+- 1-D ABCD; `continuum_claim=False`.
+- Smoke: `docs/benchmarks/layered_transfer_smoke.json`.
+
 ### Added — Layered-transfer cost leftover-recorded (theory 02-11)
 
 - Leftover #46 leftover-records `cost_stack_vs_periods` so it stays

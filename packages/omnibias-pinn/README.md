@@ -73,7 +73,7 @@ Alpha submodules (still under Beta `omnibias-pinn`, not separate wheels):
 * **`omnibias.pinn.travelling`** — shipped tanh-method solitons (02-09).
   Tanh algebra, not a collapse; a multi-kink sum is not the n-soliton
   formula.
-* **`omnibias.pinn.layered`** — gated 1-D transfer stacks (02-11).
+* **`omnibias.pinn.layered`** — shipped 1-D transfer stacks (02-11).
   `continuum_claim=False`. Distinct from `geometry.gauge.transfer`.
 * **`omnibias.pinn.inverse`** — gated inverse imaging (05-01). Interface
   localization, layered inversion, Stefan tracking, identifiability, and

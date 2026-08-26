@@ -63,7 +63,7 @@ uv run python docs/img/generate_figures.py
 | `equivariant_scan.py` | `docs/benchmarks/equivariant_scan_smoke.json` | Shipped 02-08: gaussian steering; discrete `C_L`; G5 leftover-recorded (`--full`); orbit cost leftover-recorded (leftover #43) |
 | `soliton_tanh_method.py` | `docs/benchmarks/soliton_tanh_method_smoke.json` | Shipped 02-09: tanh algebra; G4 init-win leftover-recorded (`--full`); algebraic cost leftover-recorded (leftover #44) |
 | `hermite_ladder.py` | `docs/benchmarks/hermite_ladder_smoke.json` | Shipped 02-10: Rodrigues reweight; G4 many-body leftover-recorded (`--full`); exact-vs-FD leftover-recorded (leftover #45); G5 anharmonic leftover-recorded |
-| `layered_transfer.py` | `docs/benchmarks/layered_transfer_smoke.json` | Gated 02-11: `continuum_claim=False`; G4 inverse-design leftover-recorded (`--full`); stack cost leftover-recorded (leftover #46); G5 conservation leftover-recorded |
+| `layered_transfer.py` | `docs/benchmarks/layered_transfer_smoke.json` | Shipped 02-11: `continuum_claim=False`; G4 inverse-design leftover-recorded (`--full`); stack cost leftover-recorded (leftover #46); G5 conservation leftover-recorded |
 | `equality_intersection.py` | `docs/benchmarks/equality_intersection_smoke.json` | Shipped 02-12: not a general PDE solver; G4 Burgers RH leftover-recorded (noisy contour `--full`) |
 | `linearizing_transforms.py` | `docs/benchmarks/linearizing_transforms_smoke.json` | Shipped 02-13: named transforms; G1 jet identity CI; G3 leftover-recorded (no train vs direct PINN); 03-11 stays designed |
 | `holonomy_band.py` | `docs/benchmarks/holonomy_band_smoke.json` | Shipped 02-14: no YM / mass-gap claim; G2 earned; G3 leftover-recorded; G4 earned (`random_u1_gauge`) |

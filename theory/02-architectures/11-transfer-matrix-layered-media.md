@@ -8,7 +8,7 @@ scattering matrices inherits exact physics (energy conservation, reciprocity,
 Bloch band structure) as algebraic identities rather than as learned
 approximations.
 
-- **Status**: gated (1-D ABCD; `continuum_claim=False`; G1–G3/G6 CI; G4 inverse-design leftover-recorded / unearned, leftover #23 — `--full`, no optimizer; stack cost **leftover-recorded**, leftover #46; G5 conservation leftover-recorded / unearned, leftover #27 — no MLP surrogate, not in CI `all_passed`)
+- **Status**: shipped (1-D ABCD; `continuum_claim=False`; G1–G3/G6 CI; G4 inverse-design leftover-recorded / unearned, leftover #23 — `--full`, no optimizer; stack cost **leftover-recorded**, leftover #46; G5 conservation leftover-recorded / unearned, leftover #27 — no MLP surrogate, not in CI `all_passed`)
 - **Depends on**: 01-02, 02-05
 - **Blocks**: 05-01, 07-07
 

@@ -16,7 +16,7 @@ untimed `passed=True` stub is withdrawn. Cost is not in CI
 `|r|^2+|t|^2-1` versus a lossless stack, and `unitarity_residual`
 refuses `lossless=False`. No MLP surrogate is wired. The previous
 untimed `passed=True` stub is withdrawn. G5 is not in CI `all_passed`.
-Status is **gated**, not shipped. See theory spec 02-11.
+Status is **shipped**. See theory spec 02-11.
 
 ## Core algebra
 
