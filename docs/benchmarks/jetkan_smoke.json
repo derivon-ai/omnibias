@@ -1,6 +1,6 @@
 {
   "schema": "jetkan-v1",
-  "generated_utc": "2026-08-26T16:35:30Z",
+  "generated_utc": "2026-08-26T17:44:55Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -17,10 +17,11 @@
     "gates_in_scope": [
       "g1",
       "g3",
+      "g4",
       "g5"
     ]
   },
-  "rss_mb_at_start": 1275.21,
+  "rss_mb_at_start": 1408.71,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -41,6 +42,18 @@
         "mse_spline_additive": 0.17805119084671928,
         "ratio_jet_over_spline": 1.2548917805658824,
         "note": "1-layer additive LS on exp(sin(pi x1)+x2^2); KA theorem does not justify depth"
+      },
+      {
+        "name": "g4_refinement",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "pack_birth_ulp": 0.0,
+        "order_growth_ulp": 0.0,
+        "pack_heldout_mse_before": 0.06938534036376469,
+        "pack_heldout_mse_after": 0.00022842133039257593,
+        "order_heldout_mse_before": 0.272559759697024,
+        "order_heldout_mse_after": 0.028840070214989324,
+        "note": "Zero-weight pack birth and GrowableOMBU order growth do not change the forward. Fitting the new DOF drops held-out MSE. Not 03-13 residual-driven birth/death."
       },
       {
         "name": "g5_parity",
@@ -68,9 +81,9 @@
     "leftover_id": 41,
     "leftover_tick": 85,
     "in_ci_all_passed": false,
-    "jet_seconds": 0.017064840998500586,
-    "autodiff_seconds": 0.03832436294760555,
-    "autodiff_over_jet": 2.245808381746595,
+    "jet_seconds": 0.04352604201994836,
+    "autodiff_seconds": 0.19023006700444967,
+    "autodiff_over_jet": 4.3704885208093485,
     "expected": 5.0,
     "order": 6,
     "widths": [
@@ -82,7 +95,7 @@
     "depth": 3,
     "warmup": 2,
     "repeats": 5,
-    "note": "Leftover #41 leftover-recorded: median wall of an order-6 directional jet vs nested 1-D autodiff of the same restriction at L=3 is below the named 5x (autodiff/jet 2.25). Previous depth-2 / order-4 / no-warmup stub withdrawn. Not in CI all_passed."
+    "note": "Leftover #41 leftover-recorded: median wall of an order-6 directional jet vs nested 1-D autodiff of the same restriction at L=3 is below the named 5x (autodiff/jet 4.37). Previous depth-2 / order-4 / no-warmup stub withdrawn. Not in CI all_passed."
   },
   "g3": {
     "name": "g3_fit_parity",
@@ -91,6 +104,18 @@
     "mse_spline_additive": 0.17805119084671928,
     "ratio_jet_over_spline": 1.2548917805658824,
     "note": "1-layer additive LS on exp(sin(pi x1)+x2^2); KA theorem does not justify depth"
+  },
+  "g4": {
+    "name": "g4_refinement",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "pack_birth_ulp": 0.0,
+    "order_growth_ulp": 0.0,
+    "pack_heldout_mse_before": 0.06938534036376469,
+    "pack_heldout_mse_after": 0.00022842133039257593,
+    "order_heldout_mse_before": 0.272559759697024,
+    "order_heldout_mse_after": 0.028840070214989324,
+    "note": "Zero-weight pack birth and GrowableOMBU order growth do not change the forward. Fitting the new DOF drops held-out MSE. Not 03-13 residual-driven birth/death."
   },
   "g5": {
     "name": "g5_parity",
@@ -107,6 +132,7 @@
     "g2_leftover_tick": 85,
     "g2_in_ci_all_passed": false,
     "g2_compares_order6_to_order6": true,
+    "g4_earned": true,
     "full_pack_birth_death_03_13": false,
     "founding_bias_collapse": true,
     "temperature_collapse": false

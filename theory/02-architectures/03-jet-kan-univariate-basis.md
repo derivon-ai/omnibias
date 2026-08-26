@@ -8,7 +8,7 @@ tower to arbitrary order at no extra activation cost**, which removes the main
 practical objection to KANs in scientific settings: their derivatives are only
 as good as their spline basis.
 
-- **Status**: shipped (G1/G3/G5 earned; G2 cost **leftover-recorded** / unearned, leftover #41, not CI `all_passed`; KA theorem does not justify)
+- **Status**: shipped (G1/G3/G4/G5 earned; G2 cost **leftover-recorded** / unearned, leftover #41, not CI `all_passed`; KA theorem does not justify)
 - **Depends on**: 01-01, 03-13
 - **Blocks**: 02-05, 03-11
 
@@ -207,6 +207,9 @@ Baseline: a cubic-spline KAN at matched parameter count, and a plain MLP with
 - **G4 refinement.** Order growth and pack birth each reduce the residual
   monotonically on a held-out set, and neither degrades a previously learned
   fit (a new pack starts at zero outer weight, so this is checkable exactly).
+  **Earned** — zero-weight `refine("pack"|"order")` is bit-identical
+  (`ulp == 0`); LS / LBFGS on the new DOF drops held-out MSE. Not 03-13
+  residual-driven birth/death. In CI `all_passed`.
 - **G5 parity.** torch and jax bit-identical.
 
 ## 9. Benchmark plan

@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Jet-KAN G4 refinement earned (theory 02-03)
+
+- Spec 02-03 G4 pack birth / order growth is now in CI `all_passed`.
+- Zero-weight `refine` is bit-identical; fitting the new DOF drops
+  held-out MSE. Not 03-13 residual-driven birth/death.
+- Smoke: `docs/benchmarks/jetkan_smoke.json`.
+
 ### Added — Pack-tree G2/G4/G5 earned (theory 02-07)
 
 - Spec 02-07 G2 bound soundness, G4 `separation_for_accuracy`, and

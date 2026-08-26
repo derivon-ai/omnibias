@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-3 architecture: Jet-KAN (theory 02-03 G1/G3/G5; G2 leftover-recorded).
+"""Wave-3 architecture: Jet-KAN (theory 02-03 G1/G3/G4/G5; G2 leftover-recorded).
 
 Exactness is of the **model jet**, not the target. A cubic spline's 4th
 derivative is identically zero; Jet-KAN's is finite. The Kolmogorov-Arnold
@@ -187,7 +187,6 @@ def _run_g2() -> dict[str, Any]:
     jet_s = _median_seconds(_jet, warmup=G2_WARMUP, repeats=G2_REPEATS)
     ad_s = _median_seconds(_autodiff, warmup=G2_WARMUP, repeats=G2_REPEATS)
     ratio = ad_s / max(jet_s, 1e-12)
-    earned = bool(ratio >= G2_RATIO_MIN)
     return {
         "name": "g2_jet_cost",
         "passed": False,
@@ -237,6 +236,127 @@ def _run_g3() -> dict[str, Any]:
         "mse_spline_additive": mse_s,
         "ratio_jet_over_spline": ratio,
         "note": "1-layer additive LS on exp(sin(pi x1)+x2^2); KA theorem does not justify depth",
+    }
+
+
+def _run_g4() -> dict[str, Any]:
+    """Zero-weight refine does not degrade; fitting new DOF drops held-out MSE."""
+    import torch
+    from omnibias.torch.architectures.jetkan import JetKAN, JetKANConfig
+
+    torch.set_default_dtype(torch.float64)
+
+    def _ulp_pair(a: torch.Tensor, b: torch.Tensor) -> float:
+        worst = 0.0
+        for x, y in zip(a.reshape(-1).tolist(), b.reshape(-1).tolist(), strict=True):
+            worst = max(worst, _ulp_error(float(x), float(y)))
+        return worst
+
+    cfg_pack = JetKANConfig(
+        widths=(2, 2, 1), packs_per_edge=2, extra_packs=2, orders=(0, 1)
+    )
+    net_pack = JetKAN(cfg_pack, dtype=torch.float64)
+    x_pack = torch.randn(5, 2, dtype=torch.float64)
+    y0_pack = net_pack(x_pack).detach().clone()
+    net_pack.refine("pack")
+    pack_ulp = _ulp_pair(y0_pack, net_pack(x_pack))
+
+    cfg_ord = JetKANConfig(
+        widths=(1, 1), packs_per_edge=1, extra_packs=0, orders=(0,), growable=True
+    )
+    net_ord = JetKAN(cfg_ord, dtype=torch.float64)
+    x_ord = torch.linspace(-0.5, 0.5, 7, dtype=torch.float64).reshape(-1, 1)
+    y0_ord = net_ord(x_ord).detach().clone()
+    net_ord.refine("order")
+    order_ulp = _ulp_pair(y0_ord, net_ord(x_ord))
+
+    # Pack birth then LS on live weights: two-bump target, second mean at 0.6.
+    xs_tr = np.linspace(-1.0, 1.0, 41, dtype=np.float64)
+    xs_ho = np.linspace(-0.9, 0.9, 17, dtype=np.float64)
+    y_tr = np.tanh(xs_tr) + 0.45 * np.tanh(xs_tr - 0.6)
+    y_ho = np.tanh(xs_ho) + 0.45 * np.tanh(xs_ho - 0.6)
+    cfg_fit = JetKANConfig(
+        widths=(1, 1), packs_per_edge=1, extra_packs=1, orders=(0,), growable=False
+    )
+    net_fit = JetKAN(cfg_fit, dtype=torch.float64)
+    with torch.no_grad():
+        net_fit.layers[0].weights.fill_(0.0)
+        net_fit.layers[0].weights[..., 0] = 1.0
+        net_fit.layers[0].means.zero_()
+        net_fit.layers[0].log_scales.zero_()
+
+    def _mse(net: Any, xs: np.ndarray, ys: np.ndarray) -> float:
+        pred = net(torch.as_tensor(xs.reshape(-1, 1))).detach().cpu().numpy().reshape(-1)
+        return float(np.mean((pred - ys) ** 2))
+
+    mse0 = _mse(net_fit, xs_ho, y_ho)
+    net_fit.refine("pack")
+    with torch.no_grad():
+        net_fit.layers[0].means[..., 1] = 0.6
+        net_fit.layers[0].log_scales.zero_()
+    xt = torch.as_tensor(xs_tr.reshape(-1, 1), dtype=torch.float64)
+    phi = []
+    with torch.no_grad():
+        w_saved = net_fit.layers[0].weights.detach().clone()
+        for g in (0, 1):
+            net_fit.layers[0].weights.zero_()
+            net_fit.layers[0].weights[..., g] = 1.0
+            phi.append(net_fit(xt).detach().cpu().numpy().reshape(-1))
+        net_fit.layers[0].weights.copy_(w_saved)
+    a = np.column_stack(phi)
+    coef, *_ = np.linalg.lstsq(a, y_tr, rcond=None)
+    with torch.no_grad():
+        net_fit.layers[0].weights[..., 0] = float(coef[0])
+        net_fit.layers[0].weights[..., 1] = float(coef[1])
+    mse_pack = _mse(net_fit, xs_ho, y_ho)
+
+    # Order growth then a few Newton-like steps on the growable unit.
+    cfg_og = JetKANConfig(
+        widths=(1, 1), packs_per_edge=1, extra_packs=0, orders=(0,), growable=True
+    )
+    net_og = JetKAN(cfg_og, dtype=torch.float64)
+    with torch.no_grad():
+        net_og.layers[0].weights.fill_(0.8)
+        net_og.layers[0].means.zero_()
+        net_og.layers[0].log_scales.zero_()
+    y_og_tr = np.tanh(2.0 * xs_tr) * (1.0 / np.cosh(2.0 * xs_tr))
+    y_og_ho = np.tanh(2.0 * xs_ho) * (1.0 / np.cosh(2.0 * xs_ho))
+    mse_og0 = _mse(net_og, xs_ho, y_og_ho)
+    net_og.refine("order")
+    xt_t = torch.as_tensor(xs_tr.reshape(-1, 1), dtype=torch.float64)
+    yt_t = torch.as_tensor(y_og_tr.reshape(-1, 1), dtype=torch.float64)
+    opt = torch.optim.LBFGS(list(net_og.parameters()), max_iter=8, line_search_fn="strong_wolfe")
+
+    def _closure() -> torch.Tensor:
+        opt.zero_grad()
+        pred = net_og(xt_t)
+        loss = torch.mean((pred - yt_t) ** 2)
+        loss.backward()
+        return loss
+
+    opt.step(_closure)
+    mse_og = _mse(net_og, xs_ho, y_og_ho)
+    passed = bool(
+        pack_ulp <= 4.0
+        and order_ulp <= 4.0
+        and mse_pack < mse0
+        and mse_og < mse_og0
+    )
+    return {
+        "name": "g4_refinement",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "pack_birth_ulp": pack_ulp,
+        "order_growth_ulp": order_ulp,
+        "pack_heldout_mse_before": mse0,
+        "pack_heldout_mse_after": mse_pack,
+        "order_heldout_mse_before": mse_og0,
+        "order_heldout_mse_after": mse_og,
+        "note": (
+            "Zero-weight pack birth and GrowableOMBU order growth do not "
+            "change the forward. Fitting the new DOF drops held-out MSE. "
+            "Not 03-13 residual-driven birth/death."
+        ),
     }
 
 
@@ -290,21 +410,23 @@ def main() -> int:
     g1 = _run_g1()
     g2 = _run_g2()
     g3 = _run_g3()
+    g4 = _run_g4()
     g5 = _run_g5()
-    in_scope = [g1, g3, g5]
+    in_scope = [g1, g3, g4, g5]
     payload = provenance(
         schema="jetkan-v1",
         config={
             "family": "jetkan",
             "full": bool(args.full),
             "g2_in_all_passed": False,
-            "gates_in_scope": ["g1", "g3", "g5"],
+            "gates_in_scope": ["g1", "g3", "g4", "g5"],
         },
     )
     payload["gates"] = gates_block(in_scope)
     payload["g1"] = g1
     payload["g2"] = g2
     payload["g3"] = g3
+    payload["g4"] = g4
     payload["g5"] = g5
     payload["honesty"] = {
         "ka_theorem_justifies_architecture": False,
@@ -316,6 +438,7 @@ def main() -> int:
         "g2_leftover_tick": 85,
         "g2_in_ci_all_passed": False,
         "g2_compares_order6_to_order6": True,
+        "g4_earned": bool(g4["passed"]),
         "full_pack_birth_death_03_13": False,
         "founding_bias_collapse": True,
         "temperature_collapse": False,

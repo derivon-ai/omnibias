@@ -11,9 +11,11 @@ Refinement in this wave is zero-weight pack birth plus optional
 GrowableOMBU order growth on torch; full 03-13 pack birth/death stays
 designed.
 
-G1/G3/G5 are CI-gated. G2 (order-6 jet vs order-6 autodiff at `L=3`) is
+G1/G3/G4/G5 are CI-gated. G2 (order-6 jet vs order-6 autodiff at `L=3`) is
 **leftover-recorded** (leftover #41; ~2.2x, need 5x), **not** in CI
-`all_passed`. Status is **shipped**. See theory spec 02-03.
+`all_passed`. G4 is zero-weight pack birth / order growth plus a
+held-out residual drop after fitting the new DOF (not 03-13). Status
+is **shipped**. See theory spec 02-03.
 
 ## PyTorch module
 

@@ -35,3 +35,21 @@ def test_g2_jet_cost_is_unearned_and_out_of_all_passed() -> None:
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g2_jet_cost" not in names
     assert payload["gates"]["all_passed"] is True
+
+
+def test_g4_refinement_is_earned_and_in_all_passed() -> None:
+    path = REPO / "docs" / "benchmarks" / "jetkan_smoke.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    g4 = payload["g4"]
+    assert g4["name"] == "g4_refinement"
+    assert g4["passed"] is True
+    assert g4["in_ci_all_passed"] is True
+    assert float(g4["pack_birth_ulp"]) <= 4.0
+    assert float(g4["order_growth_ulp"]) <= 4.0
+    assert float(g4["pack_heldout_mse_after"]) < float(g4["pack_heldout_mse_before"])
+    assert float(g4["order_heldout_mse_after"]) < float(g4["order_heldout_mse_before"])
+    assert payload["honesty"]["g4_earned"] is True
+    assert payload["honesty"]["full_pack_birth_death_03_13"] is False
+    names = [row["name"] for row in payload["gates"]["entries"]]
+    assert "g4_refinement" in names
+    assert payload["config"]["gates_in_scope"] == ["g1", "g3", "g4", "g5"]
