@@ -289,6 +289,9 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Differentiable topology** ([03-09](api/differentiable_topology.md)):
   no differentiable Betti number. Temperature collapse, not founding
   bias collapse. Status is **shipped**.
+- **Singularity tracking** ([03-10](api/singularity_tracking.md)):
+  diagnostic, not a blow-up proof. Founding bias collapse, not
+  temperature collapse. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

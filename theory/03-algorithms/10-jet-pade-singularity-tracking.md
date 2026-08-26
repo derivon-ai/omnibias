@@ -7,7 +7,7 @@ approximant locate the nearest complex singularity — so a field with an exact
 tower can **watch a singularity approach** in real time, with a certified
 remainder rather than a heuristic indicator.
 
-- **Status**: gated
+- **Status**: shipped (G1–G6 CI; founding bias collapse, not temperature collapse; diagnostic, not a blow-up proof)
 - **Depends on**: 01-01
 - **Blocks**: 03-13, 07-02, 07-03, 07-06
 

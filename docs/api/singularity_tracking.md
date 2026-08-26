@@ -2,8 +2,8 @@
 
 A high-order jet is a truncated Taylor series. Domb-Sykes ratios
 and Padé poles locate the nearest singularity; a coefficient tail
-bound turns `|x_s|` into a sound annulus. Status is **gated**,
-not shipped. G1–G6 are CI-gated.
+bound turns `|x_s|` into a sound annulus. Status is **shipped**.
+G1–G6 are CI-gated.
 
 This is a **diagnostic and an estimate, not a proof of blow-up**.
 Locating a complex singularity of truncated Taylor data at

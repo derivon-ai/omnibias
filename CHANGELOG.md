@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Singularity tracking shipped (theory 03-10)
+
+- Spec 03-10 status is **shipped**: G1–G6 CI, no leftover gate.
+- Diagnostic, not a blow-up proof. Founding bias collapse.
+- Smoke: `docs/benchmarks/singularity_tracking_smoke.json`.
+
 ### Added — Differentiable topology shipped (theory 03-09)
 
 - Spec 03-09 status is **shipped**: G1–G6 CI, no leftover gate.

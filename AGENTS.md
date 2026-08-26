@@ -573,7 +573,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   counts + 1-D Morse persistence; G1–G6 CI; temperature
   collapse, not founding bias collapse; no differentiable
   Betti number; `Inconclusive` when the gap does not separate) /
-  `omnibias.difference.singularity` (03-10; Domb-Sykes + Padé
+  `omnibias.difference.singularity` (03-10, **shipped**; Domb-Sykes + Padé
   poles + certified `|x_s|` annulus; G1–G6 CI; founding bias
   collapse, not temperature collapse; diagnostic, not a
   blow-up proof) /
