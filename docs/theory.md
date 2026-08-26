@@ -338,6 +338,8 @@ gates are earned on smoke, not in CI `all_passed`.
   **shipped**.
 - **Domain programs** ([07-07](api/domain_programs.md)): tooling,
   not a discovery. Status is **shipped**.
+- **Training-idea ledger** (08-01): recommended stack; trainers do
+  not clear Hilbert stretch. Design record. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

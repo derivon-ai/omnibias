@@ -8,7 +8,7 @@ accept/reject — and this file is the index that says which of those ideas are
 already specified, which are new Group 08 specs, which are rejected, and which
 stack is the default.
 
-- **Status**: gated
+- **Status**: shipped (G1–G5 earned; trainers do not clear Hilbert stretch; design record)
 - **Depends on**: 01-01, 01-10, 03-12, 06-01, 06-02
 - **Blocks**: 08-02, 08-03, 08-04, 08-05, 08-06, 08-07, 08-08, 08-09
 

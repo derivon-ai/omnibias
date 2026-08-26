@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Training-idea ledger shipped (theory 08-01)
+
+- Spec 08-01 status is **shipped**: G1–G5 earned; design record.
+- Trainers do not clear Hilbert stretch.
+- Guard: `packages/omnibias-core/tests/test_theory_training_ledger.py`.
+
 ### Added — Yang-Mills adjacent finite gap shipped (theory 07-04)
 
 - Spec 07-04 status is **shipped**: finite-matrix G1–G6; G1 factor
