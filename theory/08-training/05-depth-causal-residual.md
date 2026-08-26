@@ -6,7 +6,7 @@ Every hidden layer emits a spatial jet of the field `u` and a cheap PDE
 residual, so training can **march in network depth** the way
 `omnibias.pinn.train` already marches in physical time.
 
-- **Status**: gated
+- **Status**: shipped (G1–G3 CI; not time marching, not CCF Hilbert)
 - **Depends on**: 01-01, 01-10, 08-01, 08-03
 - **Blocks**: none
 

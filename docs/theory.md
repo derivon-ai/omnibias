@@ -346,6 +346,8 @@ gates are earned on smoke, not in CI `all_passed`.
   warm start, not ImageNet. Status is **shipped**.
 - **Kantorovich Newton** ([08-04](api/kantorovich_newton.md)): empty
   ball is a reject, not a continuum PDE. Status is **shipped**.
+- **Depth-causal residual** ([08-05](api/depth_residual.md)): marches
+  in network depth, not time. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

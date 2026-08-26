@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Depth-causal residual shipped (theory 08-05)
+
+- Spec 08-05 status is **shipped**: G1–G3 CI; not time marching,
+  not CCF Hilbert.
+- Smoke: `docs/benchmarks/depth_causal_residual_smoke.json`.
+
 ### Added — Kantorovich-accepted Newton shipped (theory 08-04)
 
 - Spec 08-04 status is **shipped**: G1–G3 CI; empty ball is a

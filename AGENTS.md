@@ -531,7 +531,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.{torch,jax}.train_local` (08-03, **shipped**; depth-causal local GN +
   `k`-direction `layer_jet`; G1–G4 CI; greedy warm start, not ImageNet) /
   `omnibias.pinn.train._core.depth_residual` plus
-  `omnibias.pinn.train.{torch,jax}.depth_residual` (08-05; PDE residual
+  `omnibias.pinn.train.{torch,jax}.depth_residual` (08-05, **shipped**; PDE residual
   marched in network depth; G1–G3 CI; not time marching, not CCF
   Hilbert) /
   `omnibias.core.implicit` /
