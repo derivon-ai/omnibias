@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — OMBU-frames G3 dilation earned (theory 01-06)
+
+- Spec 01-06 G3 `alpha^n` dilation exactness is now in CI
+  `all_passed`.
+- Smoke: `docs/benchmarks/ombu_frames_smoke.json`.
+
 ### Added — Tropical homotopy G3 derivatives earned (theory 01-08)
 
 - Spec 01-08 G3 closed-form `relaxed_grad` / `relaxed_hess` versus

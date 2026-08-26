@@ -2,7 +2,8 @@
 # Copyright (C) 2026 Derivon
 """Gated primitive: OMBU frames (theory 01-06). G4 denoising is unearned.
 
-G1/G2 are CI-gated. G3 lives in ``test_frames.py``. G4 is recorded and
+G1/G2/G3 are CI-gated. G3 is dilation exactness
+(``alpha^n``). G4 is recorded and
 **not** in CI ``all_passed``: the order-2 bank beats a matched-cost
 order-1 Gaussian-derivative bank in MSE, but skill versus the noisy
 identity is negative on all five seeds. ``sigma'`` is not admissible;
@@ -107,6 +108,30 @@ def _g4_denoising() -> dict[str, Any]:
     }
 
 
+def _run_g3() -> dict[str, Any]:
+    import numpy as np
+    from omnibias.core.frames import dilated_sigma_n
+
+    eps = np.finfo(np.float64).eps
+    worst = 0.0
+    for base in ("gaussian", "tanh", "sech"):
+        for n in range(0, 8):
+            for alpha in (0.7, 1.5):
+                u = -0.4
+                left = dilated_sigma_n(base, u, n, alpha)
+                right = (alpha**n) * dilated_sigma_n(base, alpha * u, n, 1.0)
+                scale = max(abs(left), abs(right), 1.0)
+                ulp = abs(left - right) / (eps * scale)
+                worst = max(worst, float(ulp))
+    passed = bool(worst <= 4.0)
+    return {
+        "name": "g3_dilation",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "worst_ulp": float(worst),
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
@@ -145,13 +170,15 @@ def main() -> int:
         "mid_band": acc_mid,
         "in_ci_all_passed": True,
     }
+    g3 = _run_g3()
     g4 = _g4_denoising()
-    ci = [g1, g2]
+    ci = [g1, g2, g3]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.ombu_frames.v1",
         config={"mode": "full" if args.full else "smoke"},
     )
     payload["gates"] = gates_block(ci)
+    payload["g3"] = g3
     payload["g4"] = g4
     payload["honesty"] = {
         "sigma_prime_admissible": False,
@@ -165,6 +192,8 @@ def main() -> int:
         "g4_leftover_id": 10,
         "g4_leftover_tick": 82,
         "g4_in_ci_all_passed": False,
+        "g3_earned": bool(g3["passed"]),
+        "g3_in_ci_all_passed": bool(g3["in_ci_all_passed"]),
     }
     if args.full:
         dest = SCRATCH / "frames"

@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.ombu_frames.v1",
-  "generated_utc": "2026-08-26T16:28:23Z",
+  "generated_utc": "2026-08-26T17:36:10Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -13,7 +13,7 @@
   "config": {
     "mode": "smoke"
   },
-  "rss_mb_at_start": 814.4,
+  "rss_mb_at_start": 814.18,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -31,8 +31,20 @@
         "B": 7.891624211939456,
         "mid_band": 6.1469495767846904,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_dilation",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "worst_ulp": 0.0
       }
     ]
+  },
+  "g3": {
+    "name": "g3_dilation",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "worst_ulp": 0.0
   },
   "g4": {
     "name": "g4_denoising",
@@ -106,6 +118,8 @@
     "g4_leftover_recorded": true,
     "g4_leftover_id": 10,
     "g4_leftover_tick": 82,
-    "g4_in_ci_all_passed": false
+    "g4_in_ci_all_passed": false,
+    "g3_earned": true,
+    "g3_in_ci_all_passed": true
   }
 }

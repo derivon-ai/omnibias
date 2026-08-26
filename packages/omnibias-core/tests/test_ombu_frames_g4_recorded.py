@@ -33,5 +33,6 @@ def test_g4_denoising_is_reported_and_out_of_all_passed() -> None:
     assert int(payload["honesty"]["g4_leftover_id"]) == 10
     assert payload["honesty"]["g4_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
+    assert "g3_dilation" in names
     assert "g4_denoising" not in names
     assert payload["gates"]["all_passed"] is True
