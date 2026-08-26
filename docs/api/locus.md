@@ -10,8 +10,8 @@ unearned (leftover #29): `affine_locus` recovers the published-unit
 speed, but the noisy-data skill versus contour extraction stays
 `--full` (units are not fit from samples). The previous smoke-geometry
 `passed=True` stub is withdrawn. G4 is not in CI `all_passed`. Spec
-01-09 status is **shipped**. Spec 02-12 stays **gated**. See theory
-specs 01-09 and 02-12.
+01-09 status is **shipped**. Spec 02-12 status is **shipped**. See
+theory specs 01-09 and 02-12.
 
 ## Core algebra
 

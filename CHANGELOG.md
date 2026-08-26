@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Equality-intersection nets shipped (theory 02-12)
+
+- Spec 02-12 status is **shipped**: leftover #29 G4 stays reported
+  and out of `all_passed`.
+- Constraint manifold, not a PDE solver. Noisy contour stays `--full`.
+- Smoke: `docs/benchmarks/equality_intersection_smoke.json`.
+
 ### Added — Jet-KAN shipped (theory 02-03)
 
 - Spec 02-03 status is **shipped**: G1/G3/G5 CI; leftover #41 G2 stays

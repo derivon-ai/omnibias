@@ -490,7 +490,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.{torch,jax}.scan_equivariant` (02-08; gaussian steering,
   discrete `C_L`; G5 leftover-recorded, orbit cost reported) / `omnibias.{torch,jax}.hierarchy` (02-07, **shipped**; 1-D offsets; G3 earned) /
   `omnibias.fields.weak` (02-04, **shipped**; exact on polynomial boxes, boundary bound
-  on by default; G4 conditioning earned vs strong collocation) / `omnibias.fields.locus` (02-12; G4 Burgers RH
+  on by default; G4 conditioning earned vs strong collocation) / `omnibias.fields.locus` (02-12, **shipped**; G4 Burgers RH
   leftover-recorded, noisy contour stays `--full`) /
   `omnibias.pinn.interface` (02-05, **shipped**; interface sharpening, not collapse;
   G3 vs PartitionedField / FBPINN leftover-recorded, G4 hard vs penalized

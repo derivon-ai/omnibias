@@ -218,7 +218,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Equality locus** ([01-09](api/locus.md) / [02-12](api/locus.md)):
   constraint manifold, not a general PDE solver. Always returns
   `branch` / `condition` / `converged`. 01-09 status is **shipped**.
-  02-12 G4 Burgers RH leftover-recorded.
+  02-12 G4 Burgers RH leftover-recorded. 02-12 status is **shipped**.
 - **Jet vocabulary** ([01-10](api/jets.md)): dictionary and contact test,
   not a discovery and not a package. Status is **shipped**.
 - **Rational stencil obligations** ([01-11](api/rational_stencil.md)):
