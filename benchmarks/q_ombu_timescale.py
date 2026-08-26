@@ -3,7 +3,8 @@
 """Frontier 09-15: q-OMBU / timescale hybrid.
 
 G1 matches D_q z^2 = 4.02. G2 is monotone as q -> 1.
-G3 records no continuum claim from the named limit.
+G3 records no continuum claim from the named limit. G4 is
+torch/jax bit-identity on G1.
 """
 
 from __future__ import annotations
@@ -15,15 +16,26 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
-from omnibias.qcalculus._core.hybrid import (
+import jax
+import jax.numpy as jnp
+import torch
+
+_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(_ROOT / "packages" / "omnibias-qcalculus" / "src"))
+from omnibias.qcalculus._core.hybrid import (  # noqa: E402
     DISCLAIMER,
     honesty_payload,
     q_limit_skill,
     worked_example,
 )
+from omnibias.qcalculus.jax.hybrid import q_ombu_forward as jax_fwd  # noqa: E402
+from omnibias.qcalculus.jax.hybrid import worked_example as jax_ex  # noqa: E402
+from omnibias.qcalculus.torch.hybrid import q_ombu_forward as torch_fwd  # noqa: E402
+from omnibias.qcalculus.torch.hybrid import worked_example as torch_ex  # noqa: E402
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -40,6 +52,15 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["monotone"])
     hon = honesty_payload()
     g3 = hon["continuum_claimed_from_q_limit"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t_y, t_r = torch_fwd(torch.tensor(2.0))
+    j_y, j_r = jax_fwd(jnp.asarray(2.0))
+    g4 = bool(
+        torch_ex()["y"] == jax_ex()["y"]
+        and float(t_y) == float(j_y)
+        and float(t_r) == float(j_r)
+    )
     entries = [
         {
             "name": "g1_cell",
@@ -58,6 +79,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "name": "g3_honesty",
             "passed": g3,
             "continuum_claimed_from_q_limit": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_y": float(t_y),
+            "jax_y": float(j_y),
         },
     ]
     for entry in entries:

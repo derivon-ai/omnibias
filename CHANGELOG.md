@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — q-OMBU / timescale shipped (theory 09-15)
+
+- Spec 09-15 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Named `q -> 1` / `mu -> 0`, not a continuum PDE.
+- Smoke: `docs/benchmarks/q_ombu_timescale_smoke.json`.
+
 ### Added — Operator family shipped (theory 01-13)
 
 - Spec 01-13 status is **shipped**: G4 first spend

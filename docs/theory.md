@@ -390,6 +390,8 @@ gates are earned on smoke, not in CI `all_passed`.
   not vector Hopfield. Status is **shipped**.
 - **Integral-kernel operator** ([09-14](api/integral_kernel.md)):
   OMBU `integral` cell, not BEM-Net. Status is **shipped**.
+- **q-OMBU / timescale** ([09-15](api/q_ombu_timescale.md)): named
+  `q -> 1` / `mu -> 0`, not a continuum PDE. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

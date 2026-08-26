@@ -10,7 +10,7 @@ use founding bias collapse for `sigma^(n)`. Do not conflate the two.
 `q == 1` is a removable singularity: use `q_ombu_limit`, never divide
 by zero.
 
-Status is **gated**, not shipped. Not a continuum PDE. Not CCF
+Status is **shipped**. Not a continuum PDE. Not CCF
 stretch. Not NS.
 
 Homes: `omnibias.qcalculus._core.hybrid`,

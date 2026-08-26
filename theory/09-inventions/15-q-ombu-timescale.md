@@ -6,7 +6,7 @@ Alternate Jackson q-derivative or Hilger delta layers with ordinary
 `sigma` layers, with a **named limit** `q -> 1` / `mu -> 0` that
 recovers the ordinary tower.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; named `q -> 1`, not a continuum PDE)
 - **Depends on**: 09-01
 - **Blocks**: none
 

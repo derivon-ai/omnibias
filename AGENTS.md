@@ -658,7 +658,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (09-14, **shipped**; OMBU `integral` cell, not BEM-Net; G1–G4 CI; founding
   bias collapse, not temperature collapse) /
   `omnibias.qcalculus._core.hybrid` + `omnibias.timescale._core.hybrid`
-  (09-15; Jackson / Hilger hybrid; G1–G4 CI; named `q -> 1` /
+  (09-15, **shipped**; Jackson / Hilger hybrid; G1–G4 CI; named `q -> 1` /
   `mu -> 0`, not a continuum PDE) /
   `omnibias.core.homotopy` + `omnibias.{torch,jax}.optim_homotopy`
   (09-20; 08-04 filter on a `tau`-path; G1–G4 CI; empty ball is a

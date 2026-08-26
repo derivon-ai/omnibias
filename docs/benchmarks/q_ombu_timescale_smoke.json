@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.q_ombu_timescale.v1",
-  "generated_utc": "2026-08-21T20:56:15Z",
+  "generated_utc": "2026-08-26T17:12:11Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -19,7 +19,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 810.58,
+  "rss_mb_at_start": 1220.23,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -44,9 +44,15 @@
         "name": "g3_honesty",
         "passed": true,
         "continuum_claimed_from_q_limit": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_y": 4.019999999999998,
+        "jax_y": 4.019999999999998
       }
     ]
   },
   "disclaimer": "q-OMBU hybrid: named q -> 1 limit, not founding bias collapse, not temperature collapse, and not a continuum PDE",
-  "wall_seconds": 1.6308282549725845
+  "wall_seconds": 0.4380084379808977
 }
