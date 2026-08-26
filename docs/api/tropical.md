@@ -13,7 +13,7 @@ with the certified gap on both arms. The driver duck-types
 `AnnealSchedule` (struct cannot import discrete). Sampled
 `dual_subdivision` wall vs `n`/`D` is **leftover-recorded** (leftover
 #19; API refuses `n>10` or `D>3`). Cost is not in CI `all_passed`.
-Status is **gated**, not shipped. See theory spec 01-08.
+Status is **shipped**. See theory spec 01-08.
 
 ## Algebra
 

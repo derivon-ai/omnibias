@@ -7,7 +7,7 @@
 every `beta`, the whole tropical picture of a hyperplane arrangement becomes a
 differentiable object with a closed-form gap to its hard limit.
 
-- **Status**: gated (G1–G4 CI; G4 path-following **earned**, leftover #32 closed on tick #72 — `path_follow` wired to `AnnealSchedule` / `tropical_anneal_descent`; reuses `logsumexp_gap_bound`; cost vs `n`/`D` leftover-recorded, leftover #19, not in CI `all_passed`)
+- **Status**: shipped (G1–G4 CI; G4 path-following **earned**, leftover #32 closed on tick #72 — `path_follow` wired to `AnnealSchedule` / `tropical_anneal_descent`; reuses `logsumexp_gap_bound`; cost vs `n`/`D` leftover-recorded, leftover #19, not in CI `all_passed`)
 - **Depends on**: 01-03
 - **Blocks**: 02-02, 03-01, 03-02, 03-03, 03-05
 

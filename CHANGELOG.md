@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tropical homotopy shipped (theory 01-08)
+
+- Spec 01-08 status is **shipped**: G4 leftover #32 closed; leftover
+  #19 cost stays reported and out of `all_passed`.
+- Reuses `logsumexp_gap_bound`; temperature collapse, not founding
+  `delta -> 0`.
+- Smoke: `docs/benchmarks/tropical_homotopy_smoke.json`.
+
 ### Added — Spectral design shipped (theory 01-07)
 
 - Spec 01-07 status is **shipped**: G1–G2/G4 CI; leftover #40 G3 stays
