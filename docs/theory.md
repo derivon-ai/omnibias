@@ -353,6 +353,8 @@ gates are earned on smoke, not in CI `all_passed`.
   **shipped**.
 - **Block exact search** ([08-07](api/block_exact_search.md)):
   coordinate sweep, not a global solver. Status is **shipped**.
+- **Implicit DEQ Newton** ([08-08](api/implicit.md)): IFT, not
+  unrolled BPTT. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

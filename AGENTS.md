@@ -535,7 +535,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   marched in network depth; G1–G3 CI; not time marching, not CCF
   Hilbert) /
   `omnibias.core.implicit` /
-  `omnibias.{torch,jax}.implicit` (08-08; `u = sigma(W u + x)` with
+  `omnibias.{torch,jax}.implicit` (08-08, **shipped**; `u = sigma(W u + x)` with
   exact-`sigma'` IFT; G1–G3 CI; not unrolled BPTT, not CCF stretch) /
   `omnibias.verify.train_step` (08-09; accept `theta'` only if a
   Lipschitz / output-box enclosure stays in cap; G1–G3 CI; empty is

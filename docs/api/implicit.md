@@ -6,7 +6,7 @@ implicit-function theorem with exact `sigma'`. One linear solve
 against `I - diag(sigma'(z)) W` replaces unrolled backprop through
 the fixed-point iteration.
 
-Status is **gated**, not shipped. G1–G3 are CI-gated. IFT is the
+Status is **shipped**. G1–G3 are CI-gated. IFT is the
 chain rule at a fixed point, not an absence of the chain rule. Not a
 global min and not CCF stretch. Bias collapse (`delta -> 0`)
 supplies `sigma'`. Anderson acceleration is extra and raises.

@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Implicit DEQ Newton shipped (theory 08-08)
+
+- Spec 08-08 status is **shipped**: G1–G3 CI; exact-`sigma'` IFT,
+  not unrolled BPTT.
+- Smoke: `docs/benchmarks/implicit_deq_smoke.json`.
+
 ### Added — Block exact search shipped (theory 08-07)
 
 - Spec 08-07 status is **shipped**: G1–G4 CI; coordinate sweep,
