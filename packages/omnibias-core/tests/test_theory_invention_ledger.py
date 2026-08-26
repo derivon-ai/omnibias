@@ -37,6 +37,7 @@ LEDGER_ARCHITECTURES = (
     "09-15",
     "09-27",
     "09-28",
+    "09-29",
 )
 LEDGER_LEARNING_RULES = (
     "09-16",
@@ -219,6 +220,6 @@ def test_invention_ledger_self_checks() -> None:
     rules = set(LEDGER_LEARNING_RULES)
     exports = set(LEDGER_EXPORTS)
     assert not (arch & rules or arch & exports or rules & exports)
-    assert len(arch | rules | exports) == 27
+    assert len(arch | rules | exports) == 28
     assert "08-03" in ALREADY_SPECIFIED
     assert "09-02" not in ALREADY_SPECIFIED

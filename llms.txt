@@ -39,7 +39,7 @@ admissible; G4 reported), `EqualitySystem` / `EqualityLocusLayer` (01-09 / 02-12
 constraint manifold, not a PDE solver; 02-12 G4 Burgers RH reported,
 noisy contour `--full`), jet vocabulary (01-10; not a
 package; G1–G3 earned), packaging homes (06-03; G1–G5 earned, allowlist
-empty, 94/94 specs, Wave-0 A4–A7 recorded; G4/G5 vacuous, not promoted), conjugate Hilbert (01-12; line only; G5 reported, not `all_passed`),
+empty, 98/98 specs, Wave-0 A4–A7 recorded; G4/G5 vacuous, not promoted), conjugate Hilbert (01-12; line only; G5 reported, not `all_passed`),
 arrangement / tropical / Face-Net (01-03 / 01-08 / 02-02; temperature
 collapse, sampled subgraph, sound gap not P vs NP; 01-03 / 01-08 / 02-02
 cost vs n/D leftover-recorded on 01-03 / 01-08, reported on 02-02; 01-08 G4 path-following leftover-recorded, no anneal
@@ -197,6 +197,8 @@ parameter-space jets (09-27; mixed `x`–`μ` jets; G1–G5 CI;
 `closed_form` iff `μ` is on the jet trunk),
 sliced-jet encoder (09-28; scan-jet tokens + named energy;
 G1–G5 CI; not a ViT),
+plant PID layer (09-29; exact I/D on an activation-of-time
+error; G1–G4 CI; not 08-10; not cruise SOTA),
 conformal slabs (04-02; three guarantee kinds; G1–G6 CI;
 conformal is not sealable). Cost /
 wall-time / FermiNet-many-body gates are

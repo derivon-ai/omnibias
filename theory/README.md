@@ -1,6 +1,6 @@
 # omnibias theory program
 
-This tree is the **forward-looking research program**: 94 implementation-ready
+This tree is the **forward-looking research program**: 98 implementation-ready
 specs that extend the omnibias primitive beyond what ships today.
 
 It is not the shipped documentation. [`docs/theory.md`](../docs/theory.md) is the
@@ -176,7 +176,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | shipped | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | shipped | Claim ladder + forbidden-claims register; guards in core tests |
-| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | shipped | G1–G5 **earned** (42 packages, 94/94 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
+| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | shipped | G1–G5 **earned** (42 packages, 98/98 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | Monograph spine only; no `book/` tree; drafting still forbidden |
 | [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | shipped | Publish-and-use order for the shipped object; obligation-3 `jet_vs_nested_ad` earned; extract / paper / external stay later; CCF and Group 09 are not the public face |
 
@@ -254,6 +254,7 @@ operator floor.
 | [09-26 net-to-annihilator](09-inventions/26-net-to-annihilator.md) | shipped | Ore export + finite rational Lean only; G1–G4 CI; flags future-earned |
 | [09-27 parameter-space jets](09-inventions/27-parameter-space-jets.md) | shipped | Mixed `∂^{α,β} u / ∂x^α ∂μ^β`; G1–G5 CI; closed form iff `μ` enters the tower; not a ParamPINN package |
 | [09-28 sliced-jet encoder](09-inventions/28-sliced-jet-encoder.md) | shipped | Tokens are scan jets + named energy; G1–G5 CI; not a ViT; not `R^D` |
+| [09-29 plant PID layer](09-inventions/29-plant-pid-layer.md) | shipped | Exact I/D on `sigma(alpha t + beta)`; G1–G4 CI; not 08-10; not cruise SOTA |
 
 ## How to use a spec
 

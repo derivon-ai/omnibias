@@ -327,7 +327,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Honesty and claim boundaries** ([06-02](honesty.md)): claim
   ladder + forbidden-claims register. Design record. Status is
   **shipped**.
-- **Packaging and rollout** (06-03): G1–G5 earned (94/94 homes).
+- **Packaging and rollout** (06-03): G1–G5 earned (98/98 homes).
   G4/G5 vacuous, not promoted. Status is **shipped**.
 - **Public primitive** (06-05): citation path; extract / paper /
   external stay later. Status is **shipped**.
@@ -430,6 +430,8 @@ gates are earned on smoke, not in CI `all_passed`.
   mixed `x`–`μ` jets, not ParamPINN. Status is **shipped**.
 - **Sliced-jet encoder** ([09-28](api/sliced_jet_encoder.md)):
   scan-jet tokens + named energy, not a ViT. Status is **shipped**.
+- **Plant PID layer** ([09-29](api/plant_pid.md)): exact I/D on
+  an activation-of-time error, not 08-10. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

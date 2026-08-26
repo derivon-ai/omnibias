@@ -25,6 +25,9 @@ safe speed limit.
 A worked, runnable walkthrough is in the
 [certified-safe-control cookbook](../cookbook/certified-safe-control.md) and
 [`docs/examples/control_learned_lagrangian_cbf.py`](https://github.com/derivon-ai/omnibias/blob/main/docs/examples/control_learned_lagrangian_cbf.py).
+A nominal SISO plant controller with exact I / D lives in
+[plant PID (09-29)](plant_pid.md); this package still owns the CBF
+filter around `a_nom`.
 
 ## Specs & containers
 

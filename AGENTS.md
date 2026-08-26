@@ -328,7 +328,7 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   a submodule back out later is cheap; un-shipping a premature distribution is not.
   See the `omnibias-dev-new-package` skill. Theory 06-03 G1–G5 are
   **shipped**; they are
-  earned on `benchmarks/theory_homes.py` (42 packages, 94/94 homes,
+  earned on `benchmarks/theory_homes.py` (42 packages, 98/98 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
   lines, not promoted). Theory 06-05 is **shipped** (document G1–G5;
   extract / paper / external stay later). Theory 07-01 is **shipped**
@@ -694,6 +694,9 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   (09-27, **shipped**; mixed `x`–`μ` jets; G1–G5 CI; not a ParamPINN package) /
   `omnibias.core.sliced_jet` + `omnibias.{torch,jax}.architectures.sliced_jet`
   (09-28, **shipped**; scan-jet tokens + named energy; G1–G5 CI; not a ViT) /
+  `omnibias.core.pid_layer` + `omnibias.{torch,jax}.plant_pid`
+  (09-29, **shipped**; exact I/D on an activation-of-time error; G1–G4
+  CI; not 08-10; not cruise SOTA) /
   `omnibias.core.uncertainty` + `omnibias.verify.uncertainty`
   (04-02, **shipped**; conformal slabs; G1–G6 CI; kinds do not mix; not sealable) /
   `omnibias.curvature.information`
@@ -782,6 +785,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/net_to_annihilator.md`](docs/api/net_to_annihilator.md),
   [`docs/api/parameter_space_jets.md`](docs/api/parameter_space_jets.md),
   [`docs/api/sliced_jet_encoder.md`](docs/api/sliced_jet_encoder.md),
+  [`docs/api/plant_pid.md`](docs/api/plant_pid.md),
   [`docs/api/conformal_slabs.md`](docs/api/conformal_slabs.md),
   [`docs/api/pack_fisher.md`](docs/api/pack_fisher.md),
   [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md). Cost /

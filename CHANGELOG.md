@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Plant PID layer (theory 09-29)
+
+- `omnibias.core.pid_layer` plus `omnibias.{torch,jax}.plant_pid`:
+  exact FTC I and Riccati D on `y = sigma(alpha t + beta)`.
+- Cookbook: [`docs/cookbook/plant-pid.md`](docs/cookbook/plant-pid.md).
+- Smoke: [`docs/benchmarks/plant_pid_smoke.json`](docs/benchmarks/plant_pid_smoke.json).
+- Not the 08-10 jet-PID trainer and not cruise-control SOTA.
+
 ### Added — Jet-MPC optimizer (theory 08-12)
 
 - `omnibias.core.control_mpc` plus `omnibias.{torch,jax}.optim_mpc`:

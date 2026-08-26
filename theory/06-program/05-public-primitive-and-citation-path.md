@@ -232,8 +232,8 @@ for this document itself; the bench smoke is wired separately.
 
 - **Scan catalog is not a larger extract.** The public object stays
   the six roles + `compose_jet`. Spec 01-13 indexes `scan(role)` and
-  named consumers; it does not enlarge `PUBLIC_SURFACE`. 09-27 and
-  09-28 are consumers, not a larger extract.
+  named consumers; it does not enlarge `PUBLIC_SURFACE`. 09-27,
+  09-28, and 09-29 are consumers, not a larger extract.
 - **Extract vs monorepo.** A too-small extract may omit `integral`
   and under-state the object; a too-large extract is the 42-package
   tree again. `PUBLIC_SURFACE` is the guard.

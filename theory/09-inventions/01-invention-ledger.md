@@ -13,7 +13,8 @@ cluster to implement first.
 - **Depends on**: 01-01, 01-10, 06-01, 06-02, 08-01
 - **Blocks**: 09-02, 09-03, 09-04, 09-05, 09-06, 09-07, 09-08, 09-09,
   09-10, 09-11, 09-12, 09-13, 09-14, 09-15, 09-16, 09-17, 09-18, 09-19,
-  09-20, 09-21, 09-22, 09-23, 09-24, 09-25, 09-26, 09-27, 09-28
+  09-20, 09-21, 09-22, 09-23, 09-24, 09-25, 09-26, 09-27, 09-28,
+  09-29
 
 ### Operator card
 
@@ -21,12 +22,12 @@ cluster to implement first.
   worth a file" without re-deriving the four knobs or the CCF floor.
 - **How it works.** Three taxonomies (architecture / learning rule / export),
   an already-specified map, a reject list, and a first-bet ranking. Every
-  09-02…09-28 names a parent row here.
+  09-02…09-29 names a parent row here.
 - **Strength.** Stops a jet-token net from being written as Jet-KAN, an
   integral-kernel operator from being written as BEM-Net, and any invention
   from being aimed at `1e-13` CCF stretch.
 - **When to use.** Before implementing any 09-* file, or when proposing a
-  twenty-ninth invention.
+  thirtieth invention.
 - **When not.** This file does not train a network and does not ship a layer.
 - **Accuracy floor.** None of its own. CCF stretch remains an operator floor
   (`~1e-1` Hilbert / dictionary), not an architecture floor.
@@ -79,7 +80,7 @@ keep.
 ### Three taxonomies
 
 An **architecture** is a hypothesis class: what a hidden state *is* and
-how a layer maps it. Specs 09-02…09-15 and 09-27…09-28 sit here. The founding **bias
+how a layer maps it. Specs 09-02…09-15 and 09-27…09-29 sit here. The founding **bias
 collapse** (`delta -> 0`) supplies `sigma^(n)` when a pack coalesces; the
 **finite-gap** knob supplies `band` / `integral` when it does not.
 
@@ -92,7 +93,7 @@ certificate beside `y`, a jet world-model, an Ore annihilator. Specs
 09-24…09-26 sit here.
 
 Faà di Bruno **is** the chain rule. No 09 spec may claim to avoid
-compositional differentiation. None of 09-02…09-28 is temperature
+compositional differentiation. None of 09-02…09-29 is temperature
 collapse (`beta -> inf`) unless it delegates to 04-02 / 05-02 / 09-07's
 router honesty or to 03-05 / 09-28 named `soft_top_k` / Hopfield `beta`.
 
@@ -122,6 +123,7 @@ router honesty or to 03-05 / 09-28 named `soft_top_k` / Hopfield `beta`.
 09-24 is **not** 08-09: a certificate on the *forward* versus on the step.
 09-27 is **not** 09-16 / 09-20 / 09-22: mixed `x`–`μ` jets versus MAML / homotopy / Newton-on-`x`.
 09-28 is **not** 09-02 / 05-01: scan-jet tokens + named energy versus `compose_jet` stream / interface inverse.
+09-29 is **not** 08-10: plant `sigma(alpha t + beta)` controller versus a `theta` trainer.
 
 ### Rejected (no spec)
 
@@ -160,7 +162,7 @@ recorded order, not a claim that later entries are unearned:
 6. **09-07 Pack-MoE** — four knobs as experts; slab-mass router.
 7. **09-18 remainder training** (with existing 03-13 birth).
 
-The remaining 09-04, 09-08…09-15, 09-20…09-23, 09-25…09-28 wait on a
+The remaining 09-04, 09-08…09-15, 09-20…09-23, 09-25…09-29 wait on a
 first-bet gate passing or failing.
 
 ### CCF / stretch floor
@@ -202,10 +204,11 @@ Yang–Mills mass gap, RH, or P vs NP.
 | 09-26 annihilator export | export | Ore + finite Lean obligation | finite rational only |
 | 09-27 parameter-space jets | architecture | Mixed `∂^{α,β} u / ∂x^α ∂μ^β` | `μ` must enter the tower; not a ParamPINN package |
 | 09-28 sliced-jet encoder | architecture | Tokens are scan jets + named energy | not a ViT; not `R^D` |
+| 09-29 plant PID | architecture | Exact I/D on activation-of-time error | not 08-10; not cruise SOTA |
 
 ## 5. Worked example
 
-**Triaging a proposed twenty-ninth invention.**
+**Triaging a proposed thirtieth invention.**
 
 *Proposal:* "A transformer whose tokens are activation vectors and whose
 attention is `omnibias.hopfield.attention`."
@@ -233,6 +236,11 @@ attention is `omnibias.hopfield.attention`."
 
 - Reject 4. 09-28 is a sliced-jet encoder on a named small image, not that claim.
 
+*Proposal:* "PID on a plant whose I term is a discrete running sum."
+
+- Discrete-sum I is prior art. Exact FTC I on `sigma(alpha t + beta)`
+  is **09-29**. PID that steps `theta` is **08-10**.
+
 ## 6. Proposed API
 
 Does not exist as code. The ledger is a table and a ranking.
@@ -242,7 +250,7 @@ Does not exist as code. The ledger is a table and a ranking.
 LEDGER_ARCHITECTURES = (
     "09-02", "09-03", "09-04", "09-05", "09-06", "09-07",
     "09-08", "09-09", "09-10", "09-11", "09-12", "09-13",
-    "09-14", "09-15", "09-27", "09-28",
+    "09-14", "09-15", "09-27", "09-28", "09-29",
 )
 LEDGER_LEARNING_RULES = (
     "09-16", "09-17", "09-18", "09-19", "09-20", "09-21",
@@ -288,7 +296,7 @@ FIRST_BET = (
 - **G5 no new package.** Every implementable spec's home fails the
   "earn independent existence" test (submodule of an existing package).
 
-These are document gates. Numerical gates live in 09-02…09-28.
+These are document gates. Numerical gates live in 09-02…09-29.
 
 ## 9. Benchmark plan
 
@@ -318,7 +326,7 @@ No CI job for the ledger.
 - **Citation path is 06-05.** Inventions are not the publish-and-use
   order. Spec 06-05 owns the frozen public surface, the first paper,
   the jet-vs-AD bench, and the external-user obligation. This ledger
-  must not be used as that path. 09-27 and 09-28 do not enlarge
+  must not be used as that path. 09-27, 09-28, and 09-29 do not enlarge
   `PUBLIC_SURFACE` and 09-28 is not a ViT.
 - **First-bet may fail.** If 09-03 + 09-17 cannot beat a named local
   baseline on a 1-D conservation identity, the integral-first story is

@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.theory_homes.v1",
-  "generated_utc": "2026-08-26T15:23:38Z",
+  "generated_utc": "2026-08-26T18:45:32Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -24,7 +24,7 @@
     "g4_in_all_passed": true,
     "g5_in_all_passed": true
   },
-  "rss_mb_at_start": 804.28,
+  "rss_mb_at_start": 805.14,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -47,7 +47,7 @@
         "earned": true,
         "reported": true,
         "in_ci_all_passed": true,
-        "n_specs": 94,
+        "n_specs": 98,
         "n_docs_only": 21,
         "n_missing_section": 0,
         "n_missing_home": 0,
@@ -175,7 +175,7 @@
     "earned": true,
     "reported": true,
     "in_ci_all_passed": true,
-    "n_specs": 94,
+    "n_specs": 98,
     "n_docs_only": 21,
     "n_missing_section": 0,
     "n_missing_home": 0,
