@@ -260,8 +260,9 @@ gates are earned on smoke, not in CI `all_passed`.
   **shipped**.
 - **Linearizing transforms** ([02-13](api/transforms_pde.md)): named Cole-Hopf
   / Miura / Bäcklund / Darboux; exactness to jet order N; G3 Burgers
-  leftover-recorded; G2 n-soliton leftover-recorded; G6 torch/jax
-  parity. 03-11 search stays designed. Status is **shipped**.
+  leftover-recorded; G2 n-soliton leftover-recorded; G4 permutability
+  leftover-recorded; G6 torch/jax parity. 03-11 search stays designed.
+  Status is **shipped**.
 - **Holonomy band** ([02-14](api/holonomy_band.md)): closed form only abelian
   + transverse-constant; open lines gauge-dependent; no Yang-Mills / mass
   gap / continuum claim. G3 Magnus leftover-recorded. G4 gauge

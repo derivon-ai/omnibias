@@ -7,8 +7,9 @@ leftover-recorded (leftover #39): no Cole-Hopf-trained field versus a
 direct PINN. Previous ``g3_burgers_init`` ``passed=True`` stub withdrawn.
 G6 is torch/jax bit-identity on the Cole-Hopf field. G2 n-soliton
 generation is leftover-recorded (leftover #51): no n=1,2,3 grid
-plus phase-shift check is wired. Not a Navier-Stokes claim. Spec
-03-11 search is not claimed.
+plus phase-shift check is wired. G4 permutability is leftover-recorded
+(leftover #52): no two-soliton versus sequential Bäcklund check
+is wired. Not a Navier-Stokes claim. Spec 03-11 search is not claimed.
 """
 
 from __future__ import annotations
@@ -103,6 +104,32 @@ def _run_g3() -> dict[str, Any]:
     }
 
 
+def _run_g4() -> dict[str, Any]:
+    return {
+        "name": "g4_permutability",
+        "passed": False,
+        "earned": False,
+        "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 52,
+        "leftover_tick": 94,
+        "stays_full": True,
+        "in_ci_all_passed": False,
+        "sequential_backlund_api": False,
+        "need": (
+            "The two-soliton produced by the permutability formula "
+            "agrees with the two-soliton produced by two sequential "
+            "Bäcklund integrations to <= 1e-12"
+        ),
+        "note": (
+            "Leftover #52 leftover-recorded: named G4 is permutability "
+            "versus sequential Bäcklund. permutability() is a scalar "
+            "formula with no sequential integration. Not in CI "
+            "all_passed."
+        ),
+    }
+
+
 def _run_g5() -> dict[str, Any]:
     from omnibias.core.transforms_pde import cole_hopf_jet, heat_plane_wave_jets
 
@@ -152,6 +179,7 @@ def main() -> int:
     g1 = _run_g1()
     g2 = _run_g2()
     g3 = _run_g3()
+    g4 = _run_g4()
     g5 = _run_g5()
     g6 = _run_g6()
     entries: list[dict[str, Any]] = [
@@ -177,6 +205,7 @@ def main() -> int:
             "mode": "full" if args.full else "smoke",
             "g2_in_all_passed": False,
             "g3_in_all_passed": False,
+            "g4_in_all_passed": False,
             "g6_in_all_passed": bool(g6["in_ci_all_passed"]),
             "gates_in_scope": ["g1", "g5", "g6"],
         },
@@ -185,6 +214,7 @@ def main() -> int:
     payload["g1"] = g1
     payload["g2"] = g2
     payload["g3"] = g3
+    payload["g4"] = g4
     payload["g5"] = g5
     payload["g6"] = g6
     payload["honesty"] = {
@@ -210,6 +240,14 @@ def main() -> int:
         "g3_stays_full": True,
         "g3_in_ci_all_passed": False,
         "g3_training_loop": False,
+        "g4_permutability_earned": False,
+        "g4_reported": True,
+        "g4_leftover_recorded": True,
+        "g4_leftover_id": 52,
+        "g4_leftover_tick": 94,
+        "g4_stays_full": True,
+        "g4_in_ci_all_passed": False,
+        "g4_sequential_backlund_api": False,
         "g6_earned": bool(g6["earned"]),
         "g6_reported": True,
         "g6_in_ci_all_passed": bool(g6["in_ci_all_passed"]),

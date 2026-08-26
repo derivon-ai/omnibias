@@ -8,7 +8,7 @@ logarithm, differentiate, integrate — is available exactly on jets, so a layer
 can carry a nonlinear problem into a linear one, solve it there, and map back
 with no approximation anywhere in the transform.
 
-- **Status**: shipped (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; G1 jet identity CI; G6 torch/jax parity CI; G2 n-soliton leftover-recorded / unearned, leftover #51 — no n=1,2,3 grid + phase-shift API; G3 Burgers leftover-recorded / unearned, leftover #39 — no train vs direct PINN, previous `g3_burgers_init` stub withdrawn; 03-11 search stays designed)
+- **Status**: shipped (named Cole-Hopf / Miura / Bäcklund / Darboux; exactness to jet order N; G1 jet identity CI; G6 torch/jax parity CI; G2 n-soliton leftover-recorded / unearned, leftover #51 — no n=1,2,3 grid + phase-shift API; G3 Burgers leftover-recorded / unearned, leftover #39 — no train vs direct PINN, previous `g3_burgers_init` stub withdrawn; G4 permutability leftover-recorded / unearned, leftover #52 — no sequential Bäcklund; 03-11 search stays designed)
 - **Depends on**: 01-01, 01-09, 02-09, 03-11
 - **Blocks**: 07-02
 
@@ -276,7 +276,8 @@ numerical solve.
   `passed=True` stub is withdrawn. Not in CI `all_passed`.
 - **G4 permutability.** The two-soliton produced by the permutability formula
   agrees with the two-soliton produced by two sequential Backlund integrations
-  to `<= 1e-12`.
+  to `<= 1e-12`. **Leftover-recorded** (leftover #52): `permutability()` is
+  a scalar formula, not sequential Bäcklund. Not in CI `all_passed`.
 - **G5 negative control.** `verify_transform` returns `False` for a deliberately
   perturbed transform (a wrong coefficient), so the checker is not vacuous.
 - **G6 parity.** torch and jax bit-identical.

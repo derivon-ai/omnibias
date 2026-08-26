@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — leftover-record 02-13 G4 permutability (leftover #52)
+
+- Leftover #52 leftover-records G4 two-soliton permutability versus
+  sequential Bäcklund.
+- `permutability()` is a scalar formula, not that check.
+- Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/linearizing_transforms_smoke.json`.
+
 ### Added — leftover-record 02-13 G2 n-soliton (leftover #51)
 
 - Leftover #51 leftover-records G2 exact n-soliton generation

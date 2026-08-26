@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.linearizing_transforms.v1",
-  "generated_utc": "2026-08-26T17:29:45Z",
+  "generated_utc": "2026-08-26T17:30:24Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -14,6 +14,7 @@
     "mode": "smoke",
     "g2_in_all_passed": false,
     "g3_in_all_passed": false,
+    "g4_in_all_passed": false,
     "g6_in_all_passed": true,
     "gates_in_scope": [
       "g1",
@@ -21,7 +22,7 @@
       "g6"
     ]
   },
-  "rss_mb_at_start": 1241.4,
+  "rss_mb_at_start": 1241.31,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -78,6 +79,20 @@
     "need": "Cole-Hopf-trained field rel L2 <= 1e-8 on shock Burgers, 100x vs direct PINN at matched cost, five seeds",
     "note": "Leftover #39 leftover-recorded: named G3 is a Cole-Hopf train versus a direct PINN. No training loop is wired. cole_hopf_jet is the named-map algebra, not that bake-off. Previous g3_burgers_init passed=True / smoke stub withdrawn. Not in CI all_passed."
   },
+  "g4": {
+    "name": "g4_permutability",
+    "passed": false,
+    "earned": false,
+    "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 52,
+    "leftover_tick": 94,
+    "stays_full": true,
+    "in_ci_all_passed": false,
+    "sequential_backlund_api": false,
+    "need": "The two-soliton produced by the permutability formula agrees with the two-soliton produced by two sequential B\u00e4cklund integrations to <= 1e-12",
+    "note": "Leftover #52 leftover-recorded: named G4 is permutability versus sequential B\u00e4cklund. permutability() is a scalar formula with no sequential integration. Not in CI all_passed."
+  },
   "g5": {
     "name": "g5_negative_control",
     "passed": true,
@@ -122,6 +137,14 @@
     "g3_stays_full": true,
     "g3_in_ci_all_passed": false,
     "g3_training_loop": false,
+    "g4_permutability_earned": false,
+    "g4_reported": true,
+    "g4_leftover_recorded": true,
+    "g4_leftover_id": 52,
+    "g4_leftover_tick": 94,
+    "g4_stays_full": true,
+    "g4_in_ci_all_passed": false,
+    "g4_sequential_backlund_api": false,
     "g6_earned": true,
     "g6_reported": true,
     "g6_in_ci_all_passed": true

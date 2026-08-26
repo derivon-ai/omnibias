@@ -11,7 +11,9 @@ parity is CI-gated. G2 n-soliton generation is
 phase-shift API. G3 Burgers win is
 **leftover-recorded** unearned (leftover #39): no Cole-Hopf-trained
 field versus a direct PINN at matched cost. The previous
-`g3_burgers_init` `passed=True` stub is withdrawn. Status is
+`g3_burgers_init` `passed=True` stub is withdrawn. G4 permutability
+is **leftover-recorded** unearned (leftover #52): no sequential
+Bäcklund. Status is
 **shipped**. See theory spec 02-13.
 
 ## Core algebra
