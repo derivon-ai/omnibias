@@ -4,7 +4,7 @@ The gaussian base carries an exact raising and lowering algebra. The
 raw tower is **not** the QHO eigenbasis; Rodrigues reweight
 (`Normalization.OSCILLATOR`) is required.
 
-G1–G3/G6 are CI-gated. G4 many-body FermiNet variance (2x, five seeds)
+G1–G3/G6 are CI-gated and **earned**. G4 many-body FermiNet variance (2x, five seeds)
 is **leftover-recorded** unearned (leftover #21): the 1-D QHO envelope
 already contains the ground state, so the named FermiNet run stays
 `--full`. Exact `apply_ladder` orbital derivatives versus central FD

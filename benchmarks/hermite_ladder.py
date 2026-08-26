@@ -2,7 +2,8 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: Hermite ladder (theory 02-10).
 
-G4 many-body FermiNet variance is leftover-recorded (leftover #21) and
+G3 is ``commutator_residual(20)``. G6 is torch/jax basis parity. G4
+many-body FermiNet variance is leftover-recorded (leftover #21) and
 stays ``--full``. Exact-ladder orbital cost is reported, not in CI
 ``all_passed``. G5 anharmonic lose/win is leftover-recorded (leftover
 #26). The raw tower is not the QHO eigenbasis.
@@ -112,6 +113,50 @@ def _run_cost() -> dict[str, Any]:
     }
 
 
+def _run_g3() -> dict[str, Any]:
+    from omnibias.core.ladder import Normalization, commutator_residual, hermite_function
+
+    x = 0.7
+    err = float(commutator_residual(20, x=x))
+    scale = max(
+        abs(hermite_function(n, x, normalization=Normalization.TOWER))
+        for n in range(21)
+    )
+    rel = err / max(scale, 1.0)
+    passed = bool(rel <= 1e-12)
+    return {
+        "name": "g3_commutator",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "residual": err,
+        "rel": float(rel),
+        "n_max": 20,
+    }
+
+
+def _run_g6() -> dict[str, Any]:
+    import jax
+    import jax.numpy as jnp
+    import torch
+    from omnibias.core.ladder import Normalization
+    from omnibias.jax.architectures.ladder import hermite_basis
+    from omnibias.torch.architectures.ladder import HermiteBasis
+
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    x = torch.tensor([-0.4, 0.0, 0.7], dtype=torch.float64)
+    y_t = HermiteBasis(6, normalization=Normalization.TOWER, learnable_scale=False)(x)
+    y_j = hermite_basis(jnp.asarray(x.numpy()), 6, normalization=Normalization.TOWER)
+    gap = float(np.max(np.abs(y_t.detach().cpu().numpy() - np.asarray(y_j))))
+    passed = bool(gap == 0.0)
+    return {
+        "name": "g6_parity",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "max_abs": gap,
+    }
+
+
 def _run_g5() -> dict[str, Any]:
     """Named leftover: anharmonic Rayleigh vs FD grid; lose is allowed."""
     from omnibias.ferminet.hermite import oscillator_phi
@@ -170,9 +215,21 @@ def main() -> int:
     g1 = abs(tower_raise(3, x) - hermite_function(4, x, normalization=Normalization.TOWER)) < 1e-12
     h = hermite_function(3, x, normalization=Normalization.TOWER)
     g2 = abs(number_operator_apply(3, x) - 3 * h) < 1e-12
+    g3 = _run_g3()
+    g6 = _run_g6()
     entries: list[dict[str, Any]] = [
         {"name": "g1_raise", "passed": g1, "in_ci_all_passed": True},
         {"name": "g2_number", "passed": g2, "in_ci_all_passed": True},
+        {
+            "name": "g3_commutator",
+            "passed": bool(g3["passed"]),
+            "in_ci_all_passed": bool(g3["in_ci_all_passed"]),
+        },
+        {
+            "name": "g6_parity",
+            "passed": bool(g6["passed"]),
+            "in_ci_all_passed": bool(g6["in_ci_all_passed"]),
+        },
     ]
     cost = _run_cost()
     g5 = _run_g5()
@@ -182,10 +239,12 @@ def main() -> int:
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
             "g5_in_all_passed": False,
-            "gates_in_scope": ["g1", "g2"],
+            "gates_in_scope": ["g1", "g2", "g3", "g6"],
         },
     )
     payload["gates"] = gates_block(entries)
+    payload["g3"] = g3
+    payload["g6"] = g6
     payload["cost"] = cost
     payload["g5"] = g5
     payload["honesty"] = {
@@ -193,6 +252,8 @@ def main() -> int:
         "rodrigues_required": True,
         "founding_bias_collapse": True,
         "temperature_collapse": False,
+        "g3_earned": bool(g3["passed"]),
+        "g6_earned": bool(g6["passed"]),
         "g4_many_body_earned": False,
         "g4_reported": True,
         "g4_leftover_recorded": True,

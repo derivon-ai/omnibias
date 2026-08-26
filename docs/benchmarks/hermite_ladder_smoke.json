@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.hermite_ladder.v1",
-  "generated_utc": "2026-08-26T16:41:20Z",
+  "generated_utc": "2026-08-26T17:59:46Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -16,10 +16,12 @@
     "g5_in_all_passed": false,
     "gates_in_scope": [
       "g1",
-      "g2"
+      "g2",
+      "g3",
+      "g6"
     ]
   },
-  "rss_mb_at_start": 813.62,
+  "rss_mb_at_start": 1217.28,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -32,8 +34,32 @@
         "name": "g2_number",
         "passed": true,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_commutator",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g6_parity",
+        "passed": true,
+        "in_ci_all_passed": true
       }
     ]
+  },
+  "g3": {
+    "name": "g3_commutator",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "residual": 9.685754776000977e-08,
+    "rel": 1.6701672017822074e-16,
+    "n_max": 20
+  },
+  "g6": {
+    "name": "g6_parity",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "max_abs": 0.0
   },
   "cost": {
     "name": "cost_exact_vs_fd_orbitals",
@@ -48,26 +74,26 @@
       {
         "n": 2,
         "n_points": 64,
-        "exact_wall_seconds": 0.00016510800924152136,
-        "fd_wall_seconds": 9.619700722396374e-05,
-        "fd_over_exact": 0.5826307740362006
+        "exact_wall_seconds": 0.00015709898434579372,
+        "fd_wall_seconds": 0.00014677201397717,
+        "fd_over_exact": 0.9342645631247823
       },
       {
         "n": 4,
         "n_points": 64,
-        "exact_wall_seconds": 0.00017046101856976748,
-        "fd_wall_seconds": 0.0001001459313556552,
-        "fd_over_exact": 0.5875004865975664
+        "exact_wall_seconds": 0.00015154597349464893,
+        "fd_wall_seconds": 9.23000043258071e-05,
+        "fd_over_exact": 0.6090561312674282
       },
       {
         "n": 8,
         "n_points": 64,
-        "exact_wall_seconds": 0.00018363900016993284,
-        "fd_wall_seconds": 0.00011237896978855133,
-        "fd_over_exact": 0.611955900895561
+        "exact_wall_seconds": 0.00019208097364753485,
+        "fd_wall_seconds": 0.00011674698907881975,
+        "fd_over_exact": 0.6078009022020494
       }
     ],
-    "median_fd_over_exact": 0.5875004865975664,
+    "median_fd_over_exact": 0.6090561312674282,
     "g4_many_body": {
       "earned": false,
       "reported": true,
@@ -102,6 +128,8 @@
     "rodrigues_required": true,
     "founding_bias_collapse": true,
     "temperature_collapse": false,
+    "g3_earned": true,
+    "g6_earned": true,
     "g4_many_body_earned": false,
     "g4_reported": true,
     "g4_leftover_recorded": true,

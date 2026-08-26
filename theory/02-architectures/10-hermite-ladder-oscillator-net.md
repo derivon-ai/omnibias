@@ -8,7 +8,7 @@ differential operators the tower supplies exactly, so an omnibias network can
 carry an exact eigenbasis and exact ladder algebra for oscillator-like
 Schrodinger problems.
 
-- **Status**: shipped (G1–G3/G6 CI; G4 FermiNet many-body leftover-recorded / unearned, leftover #21 — `--full`; exact-ladder vs FD **leftover-recorded**, leftover #45; G5 anharmonic leftover-recorded / unearned, leftover #26 — loses to FD grid, not in CI `all_passed`; Rodrigues reweight required)
+- **Status**: shipped (G1–G3/G6 **earned**; G4 FermiNet many-body leftover-recorded / unearned, leftover #21 — `--full`; exact-ladder vs FD **leftover-recorded**, leftover #45; G5 anharmonic leftover-recorded / unearned, leftover #26 — loses to FD grid, not in CI `all_passed`; Rodrigues reweight required)
 - **Depends on**: 01-01, 01-06
 - **Blocks**: 07-07
 
@@ -292,12 +292,15 @@ finite-difference grid solver at matched cost.
   normalization). A third assertion checks the **negative**: `H h_n != (n + 1/2)
   h_n`, so a refactor that silently conflates the families fails loudly.
 - **G3 commutator.** `commutator_residual(20)` is at rounding level.
+  **Earned** — relative residual `<= 1e-12`. In CI `all_passed`.
 - **G4 many-body win.** On a small FermiNet system, exact-derivative orbitals
   reduce the variational energy variance by at least `2x` at matched sample
   count, over five seeds, without changing the mean beyond error bars.
 - **G5 anharmonic honesty.** On a strongly anharmonic well, the basis is
   *allowed* to lose to the grid solver, and the result is reported.
 - **G6 parity.** torch and jax bit-identical.
+  **Earned** — `HermiteBasis` vs `hermite_basis`, `max_abs == 0`. In CI
+  `all_passed`.
 
 ## 9. Benchmark plan
 

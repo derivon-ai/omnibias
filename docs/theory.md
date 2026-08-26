@@ -251,9 +251,10 @@ gates are earned on smoke, not in CI `all_passed`.
   G4 PINN init-win leftover-recorded. Algebraic cost leftover-recorded
   (leftover #44). Status is **shipped**.
 - **Hermite ladder** ([02-10](api/ladder.md)): raw tower is not the QHO
-  eigenbasis; Rodrigues reweight required. G4 FermiNet many-body
-  leftover-recorded. Exact-vs-FD leftover-recorded (leftover #45).
-  Anharmonic G5 leftover-recorded (may lose). Status is **shipped**.
+  eigenbasis; Rodrigues reweight required. G1–G3/G6 earned. G4 FermiNet
+  many-body leftover-recorded. Exact-vs-FD leftover-recorded (leftover
+  #45). Anharmonic G5 leftover-recorded (may lose). Status is
+  **shipped**.
 - **Layered transfer** ([02-11](api/layered.md)): 1-D only;
   `continuum_claim=False`; distinct from `geometry.gauge.transfer`.
   G4 inverse-design leftover-recorded. Stack cost leftover-recorded

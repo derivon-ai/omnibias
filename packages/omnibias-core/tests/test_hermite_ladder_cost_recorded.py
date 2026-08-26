@@ -57,3 +57,16 @@ def test_cost_is_reported_and_g4_out_of_all_passed() -> None:
     assert payload["honesty"]["g5_leftover_recorded"] is True
     assert int(payload["honesty"]["g5_leftover_id"]) == 26
     assert payload["honesty"]["g5_in_ci_all_passed"] is False
+    g3 = payload["g3"]
+    assert g3["name"] == "g3_commutator"
+    assert g3["passed"] is True
+    assert g3["in_ci_all_passed"] is True
+    assert float(g3["rel"]) <= 1e-12
+    g6 = payload["g6"]
+    assert g6["name"] == "g6_parity"
+    assert g6["passed"] is True
+    assert g6["in_ci_all_passed"] is True
+    assert float(g6["max_abs"]) == 0.0
+    assert payload["honesty"]["g3_earned"] is True
+    assert payload["honesty"]["g6_earned"] is True
+    assert payload["config"]["gates_in_scope"] == ["g1", "g2", "g3", "g6"]

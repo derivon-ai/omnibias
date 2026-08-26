@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Hermite-ladder G3/G6 earned (theory 02-10)
+
+- Spec 02-10 G3 `commutator_residual(20)` and G6 torch/jax parity are
+  now in CI `all_passed`.
+- Smoke: `docs/benchmarks/hermite_ladder_smoke.json`.
+
 ### Added — Soliton tanh-method G2/G3 earned (theory 02-09)
 
 - Spec 02-09 G2 `balance_degree` and G3 `exact_residual` are now in
