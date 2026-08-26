@@ -12,6 +12,7 @@ from omnibias.dynamics import (
     PoincareSection,
     harmonic_oscillator,
     poincare_map,
+    poincare_map_jet,
 )
 
 TWO_PI = 2.0 * math.pi
@@ -75,3 +76,18 @@ def test_invalid_step_raises() -> None:
     sec = PoincareSection(normal=(0.0, 1.0), offset=0.0)
     with pytest.raises(ValueError):
         poincare_map(f, j, sec, [1.0, 0.0], 0.0)
+
+
+def test_poincare_map_jet_encloses_and_diagnoses() -> None:
+    f, j = harmonic_oscillator(1.0)
+    sec = PoincareSection(normal=(0.0, 1.0), offset=0.0, direction=1)
+    jet = poincare_map_jet(f, j, sec, [1.0, 0.0], TWO_PI / 200, max_steps=400)
+    assert jet.crossing.crossed
+    assert _contains(jet.crossing.enclosure, (-1.0, 0.0))
+    assert jet.budget.dominant in {"truncation", "jacobian", "wrapping", "rounding"}
+    payload = jet.diagnosis.to_payload()
+    assert payload["dominant"] == jet.budget.dominant
+    if payload["dominant"] == "jacobian":
+        assert payload["action"] == "shrink_step"
+        assert "bias" not in payload["reason"]
+        assert "delta" not in payload["reason"]

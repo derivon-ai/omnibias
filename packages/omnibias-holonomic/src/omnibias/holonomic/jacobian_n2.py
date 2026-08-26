@@ -38,6 +38,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from fractions import Fraction
 from itertools import product
+from types import MappingProxyType
 from typing import Any
 
 from omnibias.core.proof.discovery import (
@@ -75,6 +76,13 @@ _FORBIDDEN_PARENT_CLAIMS = (
     "unnamed_condition_complete_claim",
 )
 
+# Parent-proof claim: unearned until a sealed parent-proof gate exists.
+# A finite-box miss stays open. An exact violator sets ``jacobian_n2_claim``
+# (refutation). An elegant algebraic closure of the leftover chart could
+# later earn a genuine proof claim — that path is not wired yet, so this
+# flag stays False on every current escalate / certify path.
+JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED = False
+
 
 def default_collision_grid(*, halfwidth: int = DEFAULT_GRID_HALFWIDTH) -> tuple[Fraction, ...]:
     """Axis values for the finite collision grid ``G = axis × axis``."""
@@ -84,18 +92,58 @@ def default_collision_grid(*, halfwidth: int = DEFAULT_GRID_HALFWIDTH) -> tuple[
     return tuple(Fraction(k) for k in range(-halfwidth, halfwidth + 1))
 
 
+def reject_jacobian_proof_claim(honesty: Mapping[str, Any]) -> None:
+    """Raise if a proof claim appears without an earn path.
+
+    While :data:`JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED` is False, any
+    truthy ``jacobian_conjecture_proof_claim`` is treated as unearned
+    (forged). That is a gate status, not a claim that a parent proof is
+    impossible — an elegant leftover closure may earn it later.
+    """
+
+    if honesty.get("jacobian_conjecture_proof_claim") and not JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED:
+        raise ValueError(
+            "jacobian_conjecture_proof_claim is unearned: no sealed "
+            "parent-proof gate is wired yet "
+            "(JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED is False); "
+            "a violator earns jacobian_n2_claim only"
+        )
+
+
+def seal_jacobian_honesty(honesty: Mapping[str, Any]) -> MappingProxyType[str, bool]:
+    """Normalize honesty and return an immutable map.
+
+    When the parent-proof earn path is not yet allowed, force
+    ``jacobian_conjecture_proof_claim`` to False after rejecting a forged True.
+    """
+
+    reject_jacobian_proof_claim(honesty)
+    sealed: dict[str, bool] = {str(k): bool(v) for k, v in honesty.items()}
+    for key in _FORBIDDEN_PARENT_CLAIMS:
+        if key == "jacobian_conjecture_proof_claim" and JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED:
+            continue
+        sealed[key] = False
+    if not JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED:
+        sealed["jacobian_conjecture_proof_claim"] = False
+    reject_jacobian_proof_claim(sealed)
+    return MappingProxyType(sealed)
+
+
 def jacobian_n2_honesty(
     *,
     discovered: bool,
     n2_counterexample: bool = False,
-) -> dict[str, bool]:
+) -> MappingProxyType[str, bool]:
     """Honesty payload for the ``n=2`` box.
 
     ``jacobian_n2_claim`` is earned only by an exact violator of
     ``C_box`` that is also a parent counterexample (identical nonzero
-    constant Jacobian and a rational collision).
-    ``jacobian_conjecture_proof_claim`` stays False: a counterexample
-    disproves, it does not prove the conjecture.
+    constant Jacobian and a rational collision / Gabber fail).
+
+    ``jacobian_conjecture_proof_claim`` stays False on current paths: a
+    counterexample refutes; a miss does not prove. A later sealed
+    parent-proof gate (e.g. leftover chart closed over ``Q``) may earn
+    it — see :data:`JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED`.
     """
 
     if n2_counterexample and not discovered:
@@ -112,9 +160,9 @@ def jacobian_n2_honesty(
         "moh_degree_100_settled_claim": False,
     }
     for key in _FORBIDDEN_PARENT_CLAIMS:
-        if honesty[key] and key != "jacobian_n2_claim":
+        if honesty[key]:
             raise RuntimeError(f"forbidden honesty key {key} became True")
-    return honesty
+    return seal_jacobian_honesty(honesty)
 
 
 def n2_counterexample_earned(payload: Mapping[str, Any]) -> bool:
@@ -210,9 +258,8 @@ def n2_violation_payload(
         "gabber_fails": False if gabber is None else gabber.fails,
     }
     earned = n2_counterexample_earned(payload)
-    payload["honesty"] = jacobian_n2_honesty(
-        discovered=earned,
-        n2_counterexample=earned,
+    payload["honesty"] = dict(
+        jacobian_n2_honesty(discovered=earned, n2_counterexample=earned)
     )
     return payload
 
@@ -660,24 +707,25 @@ def escalate_n2_result(result: DiscoveryResult) -> dict[str, Any]:
     ``jacobian_n2_claim`` becomes True only when ``status == DISPROVED``
     and the check payload records an identical nonzero constant Jacobian
     plus a rational collision or a Gabber inverse failure.
-    ``jacobian_conjecture_proof_claim`` stays False (a counterexample
-    disproves; it does not prove the conjecture). A ``PROVED`` finite
-    universal does not escalate.
+    ``jacobian_conjecture_proof_claim`` stays False on this path (a
+    counterexample refutes; a finite-box ``PROVED`` does not settle the
+    parent). A sealed parent-proof earn path is separate and not wired yet.
     """
 
     payload = dict(result.check.payload) if result.check is not None else {}
     earned = result.status == "DISPROVED" and n2_counterexample_earned(payload)
     honesty = jacobian_n2_honesty(discovered=earned, n2_counterexample=earned)
+    reject_jacobian_proof_claim(honesty)
     return {
         "status": result.status,
         "parent": result.statement.parent,
-        "parent_status": result.statement.parent_status,
+        "parent_status": result.statement.parent_status if not earned else "false",
         "obligation": result.statement.obligation,
         "detail": result.detail,
         "search_incomplete": result.search_incomplete,
         "n2_counterexample": earned,
         "escalate_parent": earned,
-        "honesty": honesty,
+        "honesty": dict(honesty),
         "note": (
             "exact n=2 counterexample; parent is false"
             if earned
@@ -698,6 +746,7 @@ __all__ = [
     "CI_HOMOG_HEIGHT",
     "CI_MAX_DEGREE",
     "DEFAULT_GRID_HALFWIDTH",
+    "JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED",
     "JACOBIAN_N2_HOMOG_KIND",
     "JACOBIAN_N2_KIND",
     "JACOBIAN_N2_PARENT",
@@ -719,5 +768,7 @@ __all__ = [
     "n2_violation_payload",
     "plane_monomials",
     "rational_grid_collision",
+    "reject_jacobian_proof_claim",
+    "seal_jacobian_honesty",
     "shear_map",
 ]

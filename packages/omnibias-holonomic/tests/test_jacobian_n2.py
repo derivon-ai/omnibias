@@ -16,6 +16,7 @@ from omnibias.holonomic.jacobian_n2 import (
     CI_HOMOG_DEGREE,
     CI_HOMOG_HEIGHT,
     CI_MAX_DEGREE,
+    JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED,
     JACOBIAN_N2_HOMOG_KIND,
     JACOBIAN_N2_KIND,
     JACOBIAN_N2_PARENT,
@@ -32,6 +33,8 @@ from omnibias.holonomic.jacobian_n2 import (
     n2_violation_payload,
     plane_monomials,
     rational_grid_collision,
+    reject_jacobian_proof_claim,
+    seal_jacobian_honesty,
 )
 
 
@@ -89,6 +92,18 @@ def test_honesty_counterexample_disproves_and_does_not_prove() -> None:
 def test_honesty_rejects_counterexample_without_discovery() -> None:
     with pytest.raises(ValueError, match="n2_counterexample"):
         jacobian_n2_honesty(discovered=False, n2_counterexample=True)
+
+
+def test_proof_claim_unearned_until_gate() -> None:
+    assert JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED is False
+    with pytest.raises(ValueError, match="unearned"):
+        reject_jacobian_proof_claim({"jacobian_conjecture_proof_claim": True})
+    sealed = seal_jacobian_honesty({"jacobian_conjecture_proof_claim": False, "jacobian_n2_claim": True})
+    assert sealed["jacobian_conjecture_proof_claim"] is False
+    with pytest.raises(TypeError):
+        sealed["jacobian_conjecture_proof_claim"] = True  # type: ignore[index]
+    with pytest.raises(ValueError, match="unearned"):
+        seal_jacobian_honesty({"jacobian_conjecture_proof_claim": True})
 
 
 def test_n2_counterexample_requires_identical_jac_and_collision() -> None:

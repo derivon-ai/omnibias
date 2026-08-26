@@ -882,6 +882,8 @@ def naive_vs_lohner_wrapping() -> dict[str, float]:
 
 def seal_run(run: ValidatedRun) -> dict[str, object]:
     """Hash-sealed v1 certificate. Reserved kernel keys are never supplied."""
+    from omnibias.core.verified.enclosure_collapse import diagnose_width
+
     box = run.state.to_box()
     return dict(
         make_certificate(
@@ -894,6 +896,7 @@ def seal_run(run: ValidatedRun) -> dict[str, object]:
                 "width": run.width,
                 "box": [(iv.lo, iv.hi) for iv in box],
                 "budget": run.budget.to_payload(),
+                "diagnosis": diagnose_width(run.budget).to_payload(),
                 "disclaimer": DISCLAIMER,
             },
             honesty=_seal_honesty(),

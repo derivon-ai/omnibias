@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.gauge_spatial_strip.v1",
-  "generated_utc": "2026-08-15T22:11:04Z",
+  "generated_utc": "2026-08-26T17:53:12Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,17 +15,27 @@
     "n_sites": 2,
     "n_angles": 4
   },
-  "rss_mb_at_start": 779.09,
+  "rss_mb_at_start": 815.73,
   "gap": {
     "certified": true,
     "spectral_gap_lower": 1.0402895452002465,
     "dimension": 16,
     "method": "symmetric_power_sum_partner_chain"
   },
+  "trial_conditioning": {
+    "trial_flagged": false,
+    "gap_without_trial": 1.0402895452002465,
+    "gap_with_trial": 1.0402895452002465,
+    "tightening_factor": 1.0,
+    "earned": false,
+    "leftover": "unearned; see omnibias.core.verified.trial_spaces",
+    "continuum_claim": false,
+    "yang_mills_claim": false
+  },
   "reflection_positivity": {
     "certified": true,
     "n_forms": 2,
-    "min_lo": 13.886209927586588
+    "min_lo": 11.048782764334412
   },
   "cluster": {
     "certified": true,
@@ -56,6 +66,13 @@
         "name": "honesty",
         "passed": true,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "trial_conditioning_recorded",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "earned": false,
+        "tightening_factor": 1.0
       }
     ]
   },

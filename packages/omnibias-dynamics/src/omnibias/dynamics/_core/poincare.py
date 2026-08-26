@@ -29,7 +29,9 @@ from __future__ import annotations
 from collections.abc import Sequence
 from dataclasses import dataclass
 
+from omnibias.core.verified.enclosure_collapse import RecommendedAction, diagnose_width
 from omnibias.core.verified.interval import Interval, IntervalLike
+from omnibias.core.verified.jet_flow import WidthBudget, lohner_step_jet
 from omnibias.core.verified.lohner import JacobianEnclosure, LohnerSet, lohner_step
 from omnibias.core.verified.ode import VectorField, _apriori_enclosure
 
@@ -174,8 +176,76 @@ def poincare_map(
     return PoincareCrossing(False, tuple(state.to_box()), max_steps, (0.0, t))
 
 
+def _zero_budget() -> WidthBudget:
+    return WidthBudget(0.0, 0.0, 0.0, 0.0)
+
+
+def _merge_budget(left: WidthBudget, right: WidthBudget) -> WidthBudget:
+    return WidthBudget(
+        truncation=left.truncation + right.truncation,
+        jacobian=left.jacobian + right.jacobian,
+        wrapping=left.wrapping + right.wrapping,
+        rounding=left.rounding + right.rounding,
+    )
+
+
+@dataclass(frozen=True)
+class PoincareJetCrossing:
+    """Poincare crossing plus the jet-Lohner budget that produced it."""
+
+    crossing: PoincareCrossing
+    budget: WidthBudget
+    diagnosis: RecommendedAction
+
+
+def poincare_map_jet(
+    field: VectorField,
+    jac: JacobianEnclosure,
+    section: PoincareSection,
+    y0: Sequence[IntervalLike],
+    h: float,
+    *,
+    max_steps: int = 10000,
+    order: int = 12,
+    skip_initial_steps: int = 1,
+    refine: int = 8,
+) -> PoincareJetCrossing:
+    """:func:`poincare_map` with :func:`lohner_step_jet` and a width diagnosis.
+
+    Jacobian-dominant budgets recommend ``shrink_step``, never a smaller
+    ``delta`` / bias collapse.
+    """
+    if h <= 0.0:
+        raise ValueError("step size h must be positive")
+    state = LohnerSet.from_box(y0)
+    anchor_state = state
+    anchor_t = 0.0
+    anchor_sign = _strict_sign(section.g(state.to_box()))
+    t = 0.0
+    budget = _zero_budget()
+    for k in range(max_steps):
+        nxt, piece = lohner_step_jet(state, field, jac, order=order, h=h)
+        budget = _merge_budget(budget, piece)
+        t1 = t + h
+        sign_next = _strict_sign(section.g(nxt.to_box()))
+        if sign_next != 0:
+            crossing = anchor_sign != 0 and sign_next == -anchor_sign
+            if crossing and k + 1 > skip_initial_steps and _direction_ok(sign_next, section.direction):
+                enclosure = _localize(
+                    field, jac, section, anchor_state, t1 - anchor_t, order, refine
+                )
+                crossed = PoincareCrossing(True, enclosure, k, (anchor_t, t1))
+                return PoincareJetCrossing(crossed, budget, diagnose_width(budget))
+            anchor_state, anchor_t, anchor_sign = nxt, t1, sign_next
+        state, t = nxt, t1
+    missed = PoincareCrossing(False, tuple(state.to_box()), max_steps, (0.0, t))
+    return PoincareJetCrossing(missed, budget, diagnose_width(budget))
+
+
 __all__ = [
     "PoincareCrossing",
+    "PoincareJetCrossing",
     "PoincareSection",
     "poincare_map",
+    "poincare_map_jet",
 ]

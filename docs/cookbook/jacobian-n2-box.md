@@ -62,3 +62,37 @@ assert result.fails is False
 `PROVED` on the machine is the finite obligation. Catalog kinds
 `jacobian_n2_degree_box` and `jacobian_n2_homogeneous`. Degree `>= 2`
 walks a structured incomplete slice; a miss there is `search_incomplete`.
+
+## O1 leftover charts (not a parent proof)
+
+O1 scales each component so the leading homogeneous part is monic.
+Case C leftover is `0`. Case D leftover is a nonzero constant (the
+leading content removed by O1). Both are finite rationals. Soft CSP
+misses stay refutations, not proofs.
+`JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED` stays false until O1, O2,
+and A/B/C/D are all sealed. O2 is not sealed.
+
+```python
+from omnibias.holonomic import (
+    JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED,
+    classify_leftover_chart,
+    o1_normalize,
+)
+from omnibias.holonomic.jacobian_n2_normalize import (
+    named_case_c_shear,
+    named_case_d_content,
+)
+
+assert JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED is False
+monic = named_case_c_shear()
+scaled = named_case_d_content()
+norm = o1_normalize(scaled)
+assert norm[0] == monic[0]
+assert norm[1].homogeneous_part(2) == monic[1].homogeneous_part(2)
+case_c = classify_leftover_chart(monic)
+case_d = classify_leftover_chart(scaled)
+assert case_c.case == "C" and case_c.leftover == 0
+assert case_d.case == "D" and case_d.leftover != 0
+assert case_c.honesty()["jacobian_conjecture_proof_claim"] is False
+assert case_d.honesty()["jacobian_conjecture_proof_claim"] is False
+```

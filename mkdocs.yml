@@ -358,6 +358,9 @@ nav:
       - One-shot least-squares (spectral): cookbook/spectral-one-shot-lstsq.md
       - PINN advection-diffusion: cookbook/pinn-advection-diffusion.md
       - Enclosure Collapse: cookbook/enclosure-collapse.md
+      - Dirichlet enclosures on Re(s)>1: cookbook/dirichlet-enclosure.md
+      - Instance-gap tightening: cookbook/instance-gap.md
+      - CCF jet-Padé profile diagnostic: cookbook/ccf-pade-profile.md
       - Proof-carrying PDE certificates: cookbook/proof-carrying-pde.md
       - Proof-carrying fluid dynamics: cookbook/proof-carrying-fluid-dynamics.md
       - Train-then-certify (sealed network cert): cookbook/train-then-certify.md

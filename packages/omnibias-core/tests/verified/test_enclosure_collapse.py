@@ -122,6 +122,10 @@ def test_diagnose_width_maps_each_dominant() -> None:
         assert isinstance(rec, RecommendedAction)
         assert rec.dominant == dominant
         assert rec.action == action
+        payload = rec.to_payload()
+        assert payload["dominant"] == dominant
+        assert payload["action"] == action
+        assert payload["reason"]
 
 
 def test_mean_value_rejects_nonpositive_radius() -> None:

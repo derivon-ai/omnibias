@@ -1,0 +1,71 @@
+{
+  "schema": "omnibias.benchmark.ccf_pade_profile.v1",
+  "generated_utc": "2026-08-26T17:34:40Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke",
+    "multipack": false,
+    "irregular": false
+  },
+  "rss_mb_at_start": 809.31,
+  "diagnostic": {
+    "snapshot": "geometric_radius_2",
+    "method": "pade",
+    "failed": false,
+    "reason": "",
+    "residual": 0.0,
+    "location": [
+      2.0,
+      0.0
+    ],
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "continuum_claim": false,
+      "whole_line_certified": false,
+      "stretch_cleared": false,
+      "residual_substitute": false,
+      "dirichlet_consumed": false,
+      "disclaimer": "jet-Pad\u00e9 profile diagnostic on a fixed snapshot; not a residual, not stretch, not a continuum Navier-Stokes claim"
+    },
+    "disclaimer": "jet-Pad\u00e9 profile diagnostic on a fixed snapshot; not a residual, not stretch, not a continuum Navier-Stokes claim"
+  },
+  "stretch_gate": 1e-13,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "pade_locates_profile_pole",
+        "passed": true
+      },
+      {
+        "name": "not_a_residual_substitute",
+        "passed": true
+      },
+      {
+        "name": "stretch_untouched",
+        "passed": true
+      },
+      {
+        "name": "honesty",
+        "passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "navier_stokes_proof_claim": false,
+    "continuum_claim": false,
+    "whole_line_certified": false,
+    "stretch_cleared": false,
+    "residual_substitute": false,
+    "dirichlet_consumed": false,
+    "disclaimer": "jet-Pad\u00e9 profile diagnostic on a fixed snapshot; not a residual, not stretch, not a continuum Navier-Stokes claim"
+  }
+}

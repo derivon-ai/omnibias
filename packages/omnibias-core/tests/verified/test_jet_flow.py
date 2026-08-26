@@ -54,6 +54,12 @@ def test_g1_width_budget_on_every_run() -> None:
     assert "theorem_prover_verified" not in sealed["honesty"]
     assert honesty_payload()["theorem_prover_verified"] is False
     assert "not a continuum existence theorem" in DISCLAIMER
+    diagnosis = sealed["payload"]["diagnosis"]
+    assert diagnosis["dominant"] == run.budget.dominant
+    assert diagnosis["action"] in {"raise_order", "subdivide", "shrink_step", "stop_floor"}
+    if diagnosis["dominant"] == "jacobian":
+        assert diagnosis["action"] == "shrink_step"
+        assert "bias" not in diagnosis["reason"]
 
 
 def test_g2_jacobian_containment() -> None:

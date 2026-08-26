@@ -183,6 +183,10 @@ jobs:
         run: |
           source .venv-core/bin/activate
           python benchmarks/theory_homes.py
+      - name: Run Dirichlet Re(s)>1 width smoke
+        run: |
+          source .venv-core/bin/activate
+          python benchmarks/dirichlet_enclosure.py
 
   torch:
     name: omnibias-torch
@@ -1013,6 +1017,10 @@ jobs:
         run: |
           source .venv-difference/bin/activate
           python benchmarks/irregular_stencils.py
+      - name: Run CCF jet-Padé profile diagnostic smoke
+        run: |
+          source .venv-difference/bin/activate
+          python benchmarks/ccf_pade_profile.py
       - name: Example smoke (certified difference towers)
         run: |
           source .venv-difference/bin/activate
@@ -1621,6 +1629,10 @@ jobs:
         run: |
           source .venv-discrete/bin/activate
           JAX_PLATFORMS=cpu python docs/examples/certified_sparse_recovery.py
+      - name: Run instance-gap tightening smoke (PNP row; never tight)
+        run: |
+          source .venv-discrete/bin/activate
+          python benchmarks/instance_gap_tightening.py
 
   qubo:
     name: omnibias-qubo (alpha)

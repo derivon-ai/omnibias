@@ -44,11 +44,36 @@ def main() -> int:
         certified_strip_reflection_positivity,
         su2_spatial_strip_transfer,
     )
+    from omnibias.geometry.gauge.transfer.trial import holonomy_trial_space
 
     transfer = su2_spatial_strip_transfer(
         STRIP_COUPLING_LOCK, n_sites=SMOKE_SITES, n_angles=n_angles
     )
     gap = certified_transfer_matrix_gap(transfer)
+    trial_space = holonomy_trial_space(transfer)
+    gap_trial = certified_transfer_matrix_gap(transfer, trial=trial_space)
+    flagged = bool(gap_trial.trial_flagged)
+    factor = None
+    earned = False
+    if (
+        not flagged
+        and gap.spectral_gap_lower > 0.0
+        and gap_trial.spectral_gap_lower > 0.0
+    ):
+        factor = gap_trial.spectral_gap_lower / gap.spectral_gap_lower
+        earned = factor > 1.0 + 1e-12
+    trial_conditioning = {
+        "trial_flagged": flagged,
+        "gap_without_trial": gap.spectral_gap_lower,
+        "gap_with_trial": gap_trial.spectral_gap_lower,
+        "tightening_factor": factor,
+        "earned": earned,
+        "leftover": None
+        if earned
+        else "unearned; see omnibias.core.verified.trial_spaces",
+        "continuum_claim": False,
+        "yang_mills_claim": False,
+    }
     rp = certified_strip_reflection_positivity(transfer)
     cluster = certified_strip_cluster_tail(transfer, n_keep=2)
     honesty = True
@@ -82,6 +107,13 @@ def main() -> int:
             "passed": bool(honesty),
             "in_ci_all_passed": True,
         },
+        {
+            "name": "trial_conditioning_recorded",
+            "passed": True,
+            "in_ci_all_passed": True,
+            "earned": trial_conditioning["earned"],
+            "tightening_factor": trial_conditioning["tightening_factor"],
+        },
     ]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.gauge_spatial_strip.v1",
@@ -97,6 +129,7 @@ def main() -> int:
         "dimension": gap.dimension,
         "method": gap.method,
     }
+    payload["trial_conditioning"] = trial_conditioning
     payload["reflection_positivity"] = {
         "certified": rp.certified,
         "n_forms": len(rp.forms),

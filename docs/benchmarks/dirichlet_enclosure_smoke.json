@@ -1,0 +1,164 @@
+{
+  "schema": "omnibias.benchmark.dirichlet_enclosure.v1",
+  "generated_utc": "2026-08-26T17:34:37Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke",
+    "zeta_terms": 240
+  },
+  "rss_mb_at_start": 809.19,
+  "zeta": {
+    "n_points": 8,
+    "coverage": true,
+    "refuse_re_le_1": true,
+    "width_shrinks": true,
+    "s2_contains_pi2_6": true,
+    "s2_width": 0.008333333333441663,
+    "s2_width_ok": true
+  },
+  "zeta_rows": [
+    {
+      "s": [
+        2.0,
+        0.0
+      ],
+      "re_width": 0.008333333333441663,
+      "im_width": 0.00833333333333336,
+      "contained": true,
+      "sample_contained": true
+    },
+    {
+      "s": [
+        1.75,
+        0.0
+      ],
+      "re_width": 0.04373310380600804,
+      "im_width": 0.04373310380589858,
+      "contained": true,
+      "sample_contained": true
+    },
+    {
+      "s": [
+        1.5,
+        0.0
+      ],
+      "re_width": 0.25819888974737776,
+      "im_width": 0.25819888974716165,
+      "contained": true,
+      "sample_contained": true
+    },
+    {
+      "s": [
+        1.8,
+        0.3
+      ],
+      "re_width": 0.03117245561966953,
+      "im_width": 0.03117245561958704,
+      "contained": true,
+      "sample_contained": true
+    },
+    {
+      "s": [
+        2.0,
+        0.5
+      ],
+      "re_width": 0.00833333333344233,
+      "im_width": 0.008333333333361505,
+      "contained": true,
+      "sample_contained": true
+    },
+    {
+      "s": [
+        1.6,
+        -0.4
+      ],
+      "re_width": 0.12438041463734507,
+      "im_width": 0.1243804146372889,
+      "contained": true,
+      "sample_contained": true
+    },
+    {
+      "s": [
+        1.9,
+        0.2
+      ],
+      "re_width": 0.016017597221202,
+      "im_width": 0.016017597221105632,
+      "contained": true,
+      "sample_contained": true
+    },
+    {
+      "s": [
+        2.0,
+        -0.25
+      ],
+      "re_width": 0.00833333333344233,
+      "im_width": 0.008333333333347738,
+      "contained": true,
+      "sample_contained": true
+    }
+  ],
+  "l_function": {
+    "contained": true,
+    "refuse_re_le_1": true,
+    "re_width": 0.008333333333389039,
+    "width_ok": true
+  },
+  "theta": {
+    "contained": true,
+    "refuse_nonpositive_t": true,
+    "width": 1.9317880628477727e-14,
+    "width_ok": true
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "zeta_coverage",
+        "passed": true
+      },
+      {
+        "name": "zeta_s2_width_cap",
+        "passed": true,
+        "s2_width": 0.008333333333441663,
+        "cap": 0.08
+      },
+      {
+        "name": "zeta_width_shrinks",
+        "passed": true
+      },
+      {
+        "name": "refuse_re_le_1",
+        "passed": true
+      },
+      {
+        "name": "l_function_known_value",
+        "passed": true
+      },
+      {
+        "name": "theta_known_value",
+        "passed": true
+      },
+      {
+        "name": "honesty",
+        "passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "riemann_hypothesis_subject": false,
+    "zeros": false,
+    "continuation": false,
+    "zeta_euler_maclaurin": false,
+    "re_s_gt_1": true,
+    "note": "width-vs-reference smoke on Re(s)>1 only; the parent is a ledger non-entry"
+  }
+}

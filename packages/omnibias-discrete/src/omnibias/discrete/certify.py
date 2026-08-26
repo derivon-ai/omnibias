@@ -20,6 +20,9 @@ when even the polynomial cannot be built.
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from dataclasses import dataclass
+
 import numpy as np
 from omnibias.discrete._core.bound import lasserre_lower_bound, negative_coeff_lower_bound
 from omnibias.discrete._core.decode import is_binary
@@ -97,4 +100,76 @@ def certify_gap(
     )
 
 
-__all__ = ["certify_gap"]
+@dataclass(frozen=True)
+class TightenedGap:
+    """Best sound Lasserre sandwich among increasing relaxation levels.
+
+    ``tight`` is always ``False``. A smaller gap is a better sound floor,
+    never a P = NP claim.
+    """
+
+    certificate: GapCertificate
+    level_used: int
+    levels_tried: tuple[int, ...]
+    tight: bool = False
+
+    @property
+    def gap(self) -> float:
+        return self.certificate.absolute_gap
+
+    def honesty(self) -> dict[str, bool]:
+        return {
+            "p_vs_np_claim": False,
+            "tight": False,
+        }
+
+
+def tighten_gap(
+    problem: DiscreteProblem,
+    x: object,
+    *,
+    levels: Sequence[int] = (1, 2),
+    bisection_steps: int = 24,
+    seed_lower: float | None = None,
+    claim_label: str = "energy",
+) -> TightenedGap:
+    """Run increasing Lasserre levels and keep the best sound lower bound.
+
+    A higher level that fails or is not sound is skipped. Tightness is
+    never claimed.
+    """
+    if not levels:
+        raise ValueError("levels must be non-empty")
+    ordered = tuple(int(level) for level in levels)
+    if any(level < 0 for level in ordered):
+        raise ValueError("levels must be >= 0")
+    best: GapCertificate | None = None
+    used = ordered[0]
+    fallback: GapCertificate | None = None
+    for level in ordered:
+        nxt = certify_gap(
+            problem,
+            x,
+            level=level,
+            bisection_steps=bisection_steps,
+            seed_lower=seed_lower,
+            claim_label=claim_label,
+        )
+        if fallback is None:
+            fallback = nxt
+        if not nxt.is_sound:
+            continue
+        if best is None or nxt.lower_bound + 1e-12 >= best.lower_bound:
+            best = nxt
+            used = level
+    if best is None:
+        best = fallback
+    return TightenedGap(
+        certificate=best,
+        level_used=used,
+        levels_tried=ordered,
+        tight=False,
+    )
+
+
+__all__ = ["TightenedGap", "certify_gap", "tighten_gap"]

@@ -32,10 +32,13 @@ from omnibias.dynamics._core.orbits import (
 )
 from omnibias.dynamics._core.poincare import (
     PoincareCrossing,
+    PoincareJetCrossing,
     PoincareSection,
     poincare_map,
+    poincare_map_jet,
 )
 from omnibias.dynamics._core.variational import (
+    VariationalJetRun,
     VariationalState,
     monodromy_determinant,
     monodromy_matrix,
@@ -43,6 +46,7 @@ from omnibias.dynamics._core.variational import (
     spectral_radius_bound,
     step_transition_matrix,
     variational_flow,
+    variational_flow_jet,
     variational_step,
 )
 
@@ -51,7 +55,9 @@ __all__ = [
     "LyapunovBounds",
     "PeriodicOrbitCertificate",
     "PoincareCrossing",
+    "PoincareJetCrossing",
     "PoincareSection",
+    "VariationalJetRun",
     "VariationalState",
     "certified_lyapunov_exponent",
     "discrete_periodic_point",
@@ -62,12 +68,14 @@ __all__ = [
     "monodromy_matrix",
     "monodromy_trace",
     "poincare_map",
+    "poincare_map_jet",
     "prove_periodic_orbit",
     "radial_logistic",
     "sigma_oscillator_field",
     "spectral_radius_bound",
     "step_transition_matrix",
     "variational_flow",
+    "variational_flow_jet",
     "variational_step",
     "vector_field_from_sigma_tower",
 ]

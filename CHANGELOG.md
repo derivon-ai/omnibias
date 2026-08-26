@@ -12,6 +12,23 @@ distributions is versioned independently under semantic versioning.
   now in CI `all_passed`.
 - Smoke: `docs/benchmarks/layered_transfer_smoke.json`.
 
+### Added — Finite-row strengthenings (ledger Distance)
+
+- Dirichlet `Re(s)>1` width smoke: `docs/benchmarks/dirichlet_enclosure_smoke.json`.
+  Not a Riemann-Hypothesis subject; no zeros; no `zeta_euler_maclaurin`.
+- `tighten_gap` on named `n<=8` MaxSAT: best sound Lasserre floor among
+  levels 1 and 2. Sandwiches are never claimed tight and never P = NP.
+  Smoke: `docs/benchmarks/instance_gap_tightening_smoke.json`.
+- Two-plaquette / spatial-strip trial-conditioning factor, leftover-recorded
+  when holonomy trials do not tighten. `continuum_claim` stays false.
+- `seal_run` emits `diagnose_width`. Dynamics `variational_flow_jet` /
+  `poincare_map_jet` carry a width budget. Jacobian-dominant recommends
+  `shrink_step`.
+- Jet-Padé CCF profile diagnostic on a fixed snapshot. Stretch gate stays
+  `1e-13`. `navier_stokes_proof_claim` stays false.
+- Jacobian `n=2` O1 leading-form certificate plus Case C/D leftover replay
+  in CI. `JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED` stays false.
+
 ### Added — Hermite-ladder G3/G6 earned (theory 02-10)
 
 - Spec 02-10 G3 `commutator_residual(20)` and G6 torch/jax parity are

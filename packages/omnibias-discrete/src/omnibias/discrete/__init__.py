@@ -73,7 +73,7 @@ from omnibias.discrete._core.relax import INIT_THETA_SCALE, initial_theta
 from omnibias.discrete._core.schedule import AnnealSchedule
 from omnibias.discrete._core.solution import DiscreteSolution, GapCertificate
 from omnibias.discrete._core.union_find import UnionFind, is_forest
-from omnibias.discrete.certify import certify_gap
+from omnibias.discrete.certify import TightenedGap, certify_gap, tighten_gap
 from omnibias.discrete.proposers import AnnealDescentProposer
 
 try:
@@ -91,6 +91,7 @@ __all__ = [
     "DiscreteSolution",
     "GapCertificate",
     "INIT_THETA_SCALE",
+    "TightenedGap",
     "UnionFind",
     "__lineage__",
     "__version__",
@@ -110,4 +111,5 @@ __all__ = [
     "one_flip_descent",
     "round_relaxed",
     "spo_plus_subgradient",
+    "tighten_gap",
 ]

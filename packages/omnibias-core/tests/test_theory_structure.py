@@ -208,6 +208,7 @@ def test_pade_does_not_consume_dirichlet() -> None:
     pade_roots = (
         REPO / "packages" / "omnibias-difference" / "src",
         REPO / "packages" / "omnibias-symbolic" / "src",
+        REPO / "packages" / "omnibias-pinn" / "src" / "omnibias" / "pinn" / "certified",
     )
     offenders: list[str] = []
     for root in pade_roots:

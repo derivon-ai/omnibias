@@ -128,13 +128,23 @@ from omnibias.holonomic._core import (
 from omnibias.holonomic._core.export import AnnihilatorExport, export_annihilator
 from omnibias.holonomic._core.layer import HolonomicLayerSpec, fit_holonomic_layer, holonomic_jet
 from omnibias.holonomic.jacobian_n2 import (
+    JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED,
     JacobianN2DegreeFamily,
     JacobianN2HomogeneousFamily,
     escalate_n2_result,
     jacobian_n2_box_statement,
     jacobian_n2_homog_statement,
+    jacobian_n2_honesty,
+    reject_jacobian_proof_claim,
+    seal_jacobian_honesty,
 )
 from omnibias.holonomic.jacobian_n2_inverse import gabber_n2_test
+from omnibias.holonomic.jacobian_n2_normalize import (
+    classify_leftover_chart,
+    o1_normalize,
+    replay_leftover_certificate,
+    seal_leftover_certificate,
+)
 from omnibias.holonomic.keller import (
     alpoge_map,
     fiber_report,
@@ -160,6 +170,7 @@ __all__ = [
     "GosperResult",
     "HolonomicLayerSpec",
     "HolonomicProof",
+    "JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED",
     "JacobianN2DegreeFamily",
     "JacobianN2HomogeneousFamily",
     "OreAlgebra",
@@ -180,6 +191,7 @@ __all__ = [
     "binomial_nk",
     "build_holonomic_machine",
     "certified_asymptotic",
+    "classify_leftover_chart",
     "creative_telescoping",
     "dfinite_add",
     "dfinite_cauchy",
@@ -210,7 +222,9 @@ __all__ = [
     "jacobian_det",
     "jacobian_n2_box_statement",
     "jacobian_n2_homog_statement",
+    "jacobian_n2_honesty",
     "lclm",
+    "o1_normalize",
     "ore_divmod",
     "peval",
     "pgcd",
@@ -226,7 +240,11 @@ __all__ = [
     "q_zeilberger",
     "rational_roots",
     "recurrence_to_operator",
+    "reject_jacobian_proof_claim",
+    "replay_leftover_certificate",
     "roots_with_multiplicity",
+    "seal_jacobian_honesty",
+    "seal_leftover_certificate",
     "search_tangent_sweep",
     "shift_algebra",
     "square_free",

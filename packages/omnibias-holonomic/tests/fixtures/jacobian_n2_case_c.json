@@ -1,0 +1,7 @@
+{
+  "name": "case_c_shear",
+  "case": "C",
+  "leftover": "0",
+  "constructor": "named_case_c_shear",
+  "note": "normalized quadratic shear; leftover 0; not a parent proof"
+}

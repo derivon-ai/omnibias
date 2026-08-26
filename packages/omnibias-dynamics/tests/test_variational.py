@@ -22,6 +22,7 @@ from omnibias.dynamics import (
     radial_logistic,
     spectral_radius_bound,
     variational_flow,
+    variational_flow_jet,
 )
 from omnibias.dynamics._core.variational import VariationalState
 
@@ -134,6 +135,21 @@ def test_variational_state_initial_is_identity() -> None:
     for i in range(3):
         for k in range(3):
             assert vs.fundamental[i][k].contains(1.0 if i == k else 0.0)
+
+
+def test_variational_flow_jet_encloses_and_diagnoses() -> None:
+    f, j = harmonic_oscillator(1.0)
+    run = variational_flow_jet(f, j, [1.0, 0.0], 1.3 / 40, 40, order=10)
+    truth = rk4(harmonic_float(1.0), [1.0, 0.0], 0.0, 1.3, 4000)
+    box = run.box()
+    assert box[0].contains(truth[0]) and box[1].contains(truth[1])
+    assert run.budget.dominant in {"truncation", "jacobian", "wrapping", "rounding"}
+    assert run.diagnosis.dominant == run.budget.dominant
+    payload = run.diagnosis.to_payload()
+    if payload["dominant"] == "jacobian":
+        assert payload["action"] == "shrink_step"
+        assert "bias" not in payload["reason"]
+        assert "delta" not in payload["reason"]
 
 
 def test_invalid_arguments_raise() -> None:

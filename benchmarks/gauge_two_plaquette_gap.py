@@ -27,6 +27,51 @@ SMOKE_J_MAX = 1
 FULL_J_MAX = 2
 
 
+def _trial_conditioning(*, j_max: int) -> dict[str, Any]:
+    """Holonomy-trial tightening vs the no-trial Hamiltonian gap.
+
+    Reported only when ``trial_flagged`` is False. A factor ``<= 1`` is
+    leftover-recorded, not a CI ``all_passed`` failure.
+    """
+    from omnibias.geometry.gauge.transfer.hamiltonian import (
+        certified_hamiltonian_gap,
+        plaquette_holonomy_trial_space,
+        su2_two_plaquette_hamiltonian,
+    )
+
+    hamiltonian = su2_two_plaquette_hamiltonian(Fraction(1, 2), j_max=j_max)
+    trial = plaquette_holonomy_trial_space(hamiltonian)
+    without = certified_hamiltonian_gap(hamiltonian)
+    with_trial = certified_hamiltonian_gap(hamiltonian, trial=trial)
+    flagged = bool(with_trial.trial_flagged)
+    factor = None
+    earned = False
+    if (
+        not flagged
+        and without.spectral_gap_lower > 0.0
+        and with_trial.spectral_gap_lower > 0.0
+    ):
+        factor = with_trial.spectral_gap_lower / without.spectral_gap_lower
+        earned = factor > 1.0 + 1e-12
+    leftover = None if earned else (
+        "unearned; see omnibias.core.verified.trial_spaces"
+    )
+    return {
+        "trial_flagged": flagged,
+        "gap_without_trial": without.spectral_gap_lower,
+        "gap_with_trial": with_trial.spectral_gap_lower,
+        "tightening_factor": factor,
+        "earned": earned,
+        "leftover": leftover,
+        "continuum_claim": False,
+        "yang_mills_claim": False,
+        "note": (
+            "measured holonomy-trial factor on one two-plaquette "
+            "Hamiltonian; not a mass-gap claim"
+        ),
+    }
+
+
 def _measure_g1(*, j_max: int) -> dict[str, Any]:
     import numpy as np
     from omnibias.geometry.gauge.transfer.hamiltonian import (
@@ -180,6 +225,7 @@ def main() -> int:
     j_max = FULL_J_MAX if args.full else SMOKE_J_MAX
 
     g1 = _measure_g1(j_max=j_max)
+    trial = _trial_conditioning(j_max=j_max)
     g2 = bool(g1["sound"])
     g3 = _g3_gauss_and_trace()
     g5 = _g5_honesty()
@@ -218,12 +264,20 @@ def main() -> int:
             "passed": bool(g1["certified_at_lock"]),
             "in_ci_all_passed": True,
         },
+        {
+            "name": "trial_conditioning_recorded",
+            "passed": True,
+            "in_ci_all_passed": True,
+            "earned": trial["earned"],
+            "tightening_factor": trial["tightening_factor"],
+        },
     ]
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.gauge_two_plaquette_gap.v1",
         config={"mode": "full" if args.full else "smoke", "j_max": j_max},
     )
     payload["g1"] = g1
+    payload["trial_conditioning"] = trial
     payload["gates"] = gates_block(entries)
     payload["honesty"] = {
         "yang_mills": False,

@@ -165,9 +165,18 @@ def _schema_errors(certificate: Certificate) -> list[str]:
     for key in (
         "jacobian_conjecture_proof_claim",
         "navier_stokes_proof_claim",
+        "ten_proofs_formalization_claim",
+        "no_condition_exists_claim",
+        "unnamed_condition_complete_claim",
     ):
         if honesty.get(key):
             errors.append(f"{key} must be False")
+    try:
+        from omnibias.holonomic.jacobian_n2 import reject_jacobian_proof_claim
+
+        reject_jacobian_proof_claim(honesty)
+    except ValueError as exc:
+        errors.append(str(exc))
     if honesty.get("jacobian_n2_claim"):
         inner = certificate.get("payload")
         payload = inner if isinstance(inner, Mapping) else certificate

@@ -31,7 +31,10 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from math import nextafter
 
+from omnibias.core.verified.enclosure_collapse import RecommendedAction, diagnose_width
 from omnibias.core.verified.interval import Interval, IntervalLike
+from omnibias.core.verified.jet_flow import WidthBudget
+from omnibias.core.verified.jet_flow import variational_flow_jet as _core_variational_flow_jet
 from omnibias.core.verified.linalg import (
     IntervalMatrix,
     identity_matrix,
@@ -147,6 +150,45 @@ def monodromy_matrix(
     return variational_flow(field, jac, periodic_point, h, n_steps, order).fundamental
 
 
+@dataclass
+class VariationalJetRun:
+    """Variational flow with a jet-Lohner width budget and diagnosis."""
+
+    state: LohnerSet
+    fundamental: IntervalMatrix
+    budget: WidthBudget
+    diagnosis: RecommendedAction
+    time: float
+
+    def box(self) -> list[Interval]:
+        return self.state.to_box()
+
+
+def variational_flow_jet(
+    field: VectorField,
+    jac: JacobianEnclosure,
+    y0: Sequence[IntervalLike],
+    h: float,
+    n_steps: int,
+    order: int = 12,
+) -> VariationalJetRun:
+    """State plus fundamental matrix via the exact-Jacobian jet stepper.
+
+    Jacobian-dominant budgets recommend ``shrink_step``, never a smaller
+    ``delta`` / bias collapse.
+    """
+    state, fundamental, budget = _core_variational_flow_jet(
+        field, jac, y0, h, n_steps, order
+    )
+    return VariationalJetRun(
+        state,
+        fundamental,
+        budget,
+        diagnose_width(budget),
+        h * n_steps,
+    )
+
+
 # --------------------------------------------------------------------------- #
 # Spectral read-outs of the monodromy (Floquet diagnostics).
 # --------------------------------------------------------------------------- #
@@ -217,6 +259,7 @@ def _nth_root_down(base: float, n: int) -> float:
 
 
 __all__ = [
+    "VariationalJetRun",
     "VariationalState",
     "monodromy_determinant",
     "monodromy_matrix",
@@ -224,5 +267,6 @@ __all__ = [
     "spectral_radius_bound",
     "step_transition_matrix",
     "variational_flow",
+    "variational_flow_jet",
     "variational_step",
 ]

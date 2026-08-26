@@ -77,6 +77,13 @@ class RecommendedAction:
     action: ActionName
     reason: str
 
+    def to_payload(self) -> dict[str, str]:
+        return {
+            "dominant": self.dominant,
+            "action": self.action,
+            "reason": self.reason,
+        }
+
 
 def _factorial(n: int) -> int:
     if n < 0:
