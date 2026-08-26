@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.arrangement_geometry.v1",
-  "generated_utc": "2026-08-25T18:15:13Z",
+  "generated_utc": "2026-08-26T17:33:21Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -15,10 +15,12 @@
     "cost_in_all_passed": false,
     "gates_in_scope": [
       "g1",
-      "g2"
+      "g2",
+      "g3",
+      "g4"
     ]
   },
-  "rss_mb_at_start": 813.15,
+  "rss_mb_at_start": 1291.4,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -35,8 +37,32 @@
         "bound": 2.9992999705357164,
         "measured": 0.6324941579578052,
         "in_ci_all_passed": true
+      },
+      {
+        "name": "g3_tree_agreement",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "worst_ulp": 0.25
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "in_ci_all_passed": true,
+        "max_abs": 2.7755575615628914e-17
       }
     ]
+  },
+  "g3": {
+    "name": "g3_tree_agreement",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "worst_ulp": 0.25
+  },
+  "g4": {
+    "name": "g4_parity",
+    "passed": true,
+    "in_ci_all_passed": true,
+    "max_abs": 2.7755575615628914e-17
   },
   "cost": {
     "name": "cost_vs_n_d",
@@ -49,40 +75,40 @@
         "n": 4,
         "dim": 2,
         "max_cells": 11,
-        "wall_seconds": 0.0007257258985191584
+        "wall_seconds": 0.005034983973018825
       },
       {
         "n": 6,
         "dim": 2,
         "max_cells": 22,
-        "wall_seconds": 0.0036216939333826303
+        "wall_seconds": 0.011043198988772929
       },
       {
         "n": 8,
         "dim": 2,
         "max_cells": 37,
-        "wall_seconds": 0.005320506053976715
+        "wall_seconds": 0.01889499300159514
       },
       {
         "n": 4,
         "dim": 3,
         "max_cells": 15,
-        "wall_seconds": 0.0009343349374830723
+        "wall_seconds": 0.0026162839494645596
       },
       {
         "n": 6,
         "dim": 3,
         "max_cells": 42,
-        "wall_seconds": 0.004926067078486085
+        "wall_seconds": 0.02495965699199587
       },
       {
         "n": 8,
         "dim": 3,
         "max_cells": 93,
-        "wall_seconds": 0.014290011953562498
+        "wall_seconds": 0.038299332023598254
       }
     ],
-    "time_exponent_vs_n_d2": 2.9456465931238798,
+    "time_exponent_vs_n_d2": 1.909854914161016,
     "cutoff_n": 12,
     "cutoff_d": 4,
     "leftover_recorded": true,
@@ -103,6 +129,10 @@
     "enumeration_cutoff_n": 12,
     "enumeration_cutoff_d": 4,
     "temperature_collapse": true,
-    "founding_bias_collapse": false
+    "founding_bias_collapse": false,
+    "g3_earned": true,
+    "g3_in_ci_all_passed": true,
+    "g4_earned": true,
+    "g4_in_ci_all_passed": true
   }
 }

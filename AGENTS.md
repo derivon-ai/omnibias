@@ -494,7 +494,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   `omnibias.core.locus` (01-09, **shipped**; constraint manifold, not a PDE solver; G1–G6 CI) /
   `omnibias.core.jets` (01-10, **shipped**; vocabulary / contact test, not a package; G1–G3 earned) /
   `omnibias.core.conjugate` (01-12, **shipped**; line Hilbert; G5 leftover-recorded, leftover #11, not `all_passed`) /
-  `omnibias.partition.arrangement` (01-03, **shipped**; temperature collapse; cost vs n/D leftover-recorded) /
+  `omnibias.partition.arrangement` (01-03, **shipped**; G1–G4 CI; temperature collapse; cost vs n/D leftover-recorded) /
   `omnibias.struct._core.tropical` (01-08, **shipped**; reuses `logsumexp_gap_bound`; G4 path-following earned, `path_follow` wired to `AnnealSchedule`; cost vs n/D leftover-recorded) /
   `omnibias.{torch,jax}.architectures` Scan-Net (02-01, **shipped**; on-lattice
   equivariance; G1–G3/G5 CI; G4 leftover-recorded) and Jet-KAN (02-03, **shipped**; model-jet exactness, KA theorem does
@@ -598,8 +598,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   collapse, not temperature collapse; not a continuum
   regularity claim) /
   `omnibias.geometry.gauge.transfer` (07-04, **shipped**; holonomy
-  trials on one fixed matrix; G1 factor measured; no YM / mass gap /
-  continuum) /
+  trials on one fixed matrix; G1 factor measured; G4 Gram conditioning;
+  no YM / mass gap / continuum) /
   `omnibias.core.verified.trial_spaces` (07-05, **shipped**; multi-pack
   spectral floors + `omnibias.sos` arrangement-adapted
   bases; G1–G6 CI; founding bias collapse, not temperature

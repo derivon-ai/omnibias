@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Arrangement-geometry G3/G4 earned (theory 01-03)
+
+- Spec 01-03 G3 tree agreement and G4 torch/jax soft-path parity
+  are now in CI `all_passed`.
+- Smoke: `docs/benchmarks/arrangement_geometry_smoke.json`.
+
 ### Added — YM-adjacent G4 conditioning earned (theory 07-04)
 
 - Spec 07-04 G4 trial-space Gram condition is now in CI

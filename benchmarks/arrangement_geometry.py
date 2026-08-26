@@ -3,8 +3,9 @@
 """Gated primitive: hyperplane arrangements (theory 01-03).
 
 Sampling is a lower bound. ``beta -> inf`` is temperature collapse.
-Cost vs ``n`` / ``D`` is reported with the G1 enumeration cutoff; not
-in CI ``all_passed``.
+G3 is tree soft-membership versus ``partition_weights`` (<= 4 ulp).
+G4 is torch/jax soft-path parity. Cost vs ``n`` / ``D`` is reported
+with the G1 enumeration cutoff; not in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -99,6 +100,65 @@ def _run_cost() -> dict[str, Any]:
     }
 
 
+def _run_g3() -> dict[str, Any]:
+    from omnibias.partition._core.config import PartitionConfig
+    from omnibias.partition._core.params import init_params, region_code_matrix
+    from omnibias.partition._core.weights import partition_weights
+    from omnibias.partition.arrangement import soft_membership, tree_arrangement
+
+    cfg = PartitionConfig(n_features=3, depth=3)
+    params = init_params(cfg, rng=0)
+    arr = tree_arrangement(params.W, params.t)
+    x = np.array(
+        [[0.2, -0.1, 0.4], [1.0, 0.0, -0.5], [-0.3, 0.7, 0.1]],
+        dtype=np.float64,
+    )
+    beta = 3.5
+    pw = partition_weights(params, x, beta)
+    codes = region_code_matrix(3)
+    eps = np.finfo(np.float64).eps
+    worst = 0.0
+    for leaf in range(8):
+        signs = tuple(1 if codes[leaf, j] > 0.5 else -1 for j in range(3))
+        sm = soft_membership(arr, x, signs, beta=beta)
+        for a, b in zip(sm, pw[:, leaf], strict=True):
+            scale = max(abs(float(a)), abs(float(b)), 1.0)
+            ulp = abs(float(a) - float(b)) / (eps * scale)
+            worst = max(worst, ulp)
+    passed = bool(worst <= 4.0)
+    return {
+        "name": "g3_tree_agreement",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "worst_ulp": float(worst),
+    }
+
+
+def _run_g4() -> dict[str, Any]:
+    import jax
+    import jax.numpy as jnp
+    import torch
+    from omnibias.partition.arrangement import general_position_normals
+    from omnibias.partition.arrangement.jax import soft_membership as sm_jax
+    from omnibias.partition.arrangement.torch import soft_membership as sm_torch
+
+    jax.config.update("jax_enable_x64", True)
+    rng = np.random.default_rng(2)
+    arr = general_position_normals(4, 2, rng)
+    x = rng.normal(size=(6, 2))
+    signs = (1, -1, 1, -1)
+    t = sm_torch(arr, torch.as_tensor(x, dtype=torch.float64), signs, beta=2.5)
+    j = sm_jax(arr, jnp.asarray(x, dtype=jnp.float64), signs, beta=2.5)
+    gap = float(np.max(np.abs(t.detach().cpu().numpy() - np.asarray(j))))
+    passed = bool(gap <= 1e-14)
+    return {
+        "name": "g4_parity",
+        "passed": passed,
+        "in_ci_all_passed": passed,
+        "max_abs": gap,
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--full", action="store_true")
@@ -129,16 +189,20 @@ def main() -> int:
         "measured": cert.measured,
         "in_ci_all_passed": True,
     }
+    g3 = _run_g3()
+    g4 = _run_g4()
     cost = _run_cost()
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.arrangement_geometry.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
-            "gates_in_scope": ["g1", "g2"],
+            "gates_in_scope": ["g1", "g2", "g3", "g4"],
         },
     )
-    payload["gates"] = gates_block([g1, g2])
+    payload["gates"] = gates_block([g1, g2, g3, g4])
+    payload["g3"] = g3
+    payload["g4"] = g4
     payload["cost"] = cost
     payload["honesty"] = {
         "complete_face_lattice": False,
@@ -154,6 +218,10 @@ def main() -> int:
         "enumeration_cutoff_d": COST_CUTOFF_D,
         "temperature_collapse": True,
         "founding_bias_collapse": False,
+        "g3_earned": bool(g3["passed"]),
+        "g3_in_ci_all_passed": bool(g3["in_ci_all_passed"]),
+        "g4_earned": bool(g4["passed"]),
+        "g4_in_ci_all_passed": bool(g4["in_ci_all_passed"]),
     }
     if args.full:
         dest = (SCRATCH / "arrangement")
