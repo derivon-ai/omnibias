@@ -8,7 +8,7 @@ tower to arbitrary order at no extra activation cost**, which removes the main
 practical objection to KANs in scientific settings: their derivatives are only
 as good as their spline basis.
 
-- **Status**: gated (G1/G3/G5 earned; G2 cost **unearned**, not CI `all_passed`; KA theorem does not justify)
+- **Status**: gated (G1/G3/G5 earned; G2 cost **leftover-recorded** / unearned, leftover #41, not CI `all_passed`; KA theorem does not justify)
 - **Depends on**: 01-01, 03-13
 - **Blocks**: 02-05, 03-11
 
@@ -198,10 +198,10 @@ Baseline: a cubic-spline KAN at matched parameter count, and a plain MLP with
   error at `k = 4`.
 - **G2 jet cost.** Computing all derivatives to order `N = 6` in one pass is at
   least `5x` faster than repeated autodiff at depth `L = 3`, measured.
-  **Recorded unearned:** warmup + median wall of an order-6 directional
-  jet vs nested 1-D autodiff of the same restriction is about `2.2x`
-  (need `5x`). The previous depth-2 / order-4 / no-warmup stub is
-  withdrawn. Not in CI `all_passed`.
+  **Leftover-recorded** (leftover #41): warmup + median wall of an
+  order-6 directional jet vs nested 1-D autodiff of the same
+  restriction is about `2.2x` (need `5x`). The previous depth-2 /
+  order-4 / no-warmup stub is withdrawn. Not in CI `all_passed`.
 - **G3 fit parity.** Function-value accuracy is within `1.5x` of the spline KAN,
   so the derivative win is not bought with a worse fit.
 - **G4 refinement.** Order growth and pack birth each reduce the residual

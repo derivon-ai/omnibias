@@ -12,8 +12,8 @@ GrowableOMBU order growth on torch; full 03-13 pack birth/death stays
 designed.
 
 G1/G3/G5 are CI-gated. G2 (order-6 jet vs order-6 autodiff at `L=3`) is
-recorded **unearned** (~2.2x, need 5x), **not** in CI `all_passed`.
-Status is **gated**, not shipped. See theory spec 02-03.
+**leftover-recorded** (leftover #41; ~2.2x, need 5x), **not** in CI
+`all_passed`. Status is **gated**, not shipped. See theory spec 02-03.
 
 ## PyTorch module
 

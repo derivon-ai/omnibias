@@ -1,6 +1,6 @@
 {
   "schema": "jetkan-v1",
-  "generated_utc": "2026-08-25T18:05:03Z",
+  "generated_utc": "2026-08-26T16:35:30Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -20,7 +20,7 @@
       "g5"
     ]
   },
-  "rss_mb_at_start": 1272.44,
+  "rss_mb_at_start": 1275.21,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -64,10 +64,13 @@
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 41,
+    "leftover_tick": 85,
     "in_ci_all_passed": false,
-    "jet_seconds": 0.01723090000450611,
-    "autodiff_seconds": 0.038935779011808336,
-    "autodiff_over_jet": 2.259648596511274,
+    "jet_seconds": 0.017064840998500586,
+    "autodiff_seconds": 0.03832436294760555,
+    "autodiff_over_jet": 2.245808381746595,
     "expected": 5.0,
     "order": 6,
     "widths": [
@@ -79,7 +82,7 @@
     "depth": 3,
     "warmup": 2,
     "repeats": 5,
-    "note": "Median wall of an order-6 directional jet vs nested 1-D autodiff of the same restriction at L=3. Previous depth-2 / order-4 / no-warmup stub withdrawn. Not in CI all_passed."
+    "note": "Leftover #41 leftover-recorded: median wall of an order-6 directional jet vs nested 1-D autodiff of the same restriction at L=3 is below the named 5x (autodiff/jet 2.25). Previous depth-2 / order-4 / no-warmup stub withdrawn. Not in CI all_passed."
   },
   "g3": {
     "name": "g3_fit_parity",
@@ -99,6 +102,9 @@
     "exactness_is_model_jet": true,
     "g2_earned": false,
     "g2_reported": true,
+    "g2_leftover_recorded": true,
+    "g2_leftover_id": 41,
+    "g2_leftover_tick": 85,
     "g2_in_ci_all_passed": false,
     "g2_compares_order6_to_order6": true,
     "full_pack_birth_death_03_13": false,

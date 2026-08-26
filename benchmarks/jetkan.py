@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Wave-3 architecture: Jet-KAN (theory 02-03 G1/G3/G5; G2 cost unearned).
+"""Wave-3 architecture: Jet-KAN (theory 02-03 G1/G3/G5; G2 leftover-recorded).
 
 Exactness is of the **model jet**, not the target. A cubic spline's 4th
 derivative is identically zero; Jet-KAN's is finite. The Kolmogorov-Arnold
@@ -190,9 +190,12 @@ def _run_g2() -> dict[str, Any]:
     earned = bool(ratio >= G2_RATIO_MIN)
     return {
         "name": "g2_jet_cost",
-        "passed": bool(earned),
-        "earned": bool(earned),
+        "passed": False,
+        "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 41,
+        "leftover_tick": 85,
         "in_ci_all_passed": False,
         "jet_seconds": jet_s,
         "autodiff_seconds": ad_s,
@@ -204,8 +207,10 @@ def _run_g2() -> dict[str, Any]:
         "warmup": G2_WARMUP,
         "repeats": G2_REPEATS,
         "note": (
-            "Median wall of an order-6 directional jet vs nested 1-D "
-            "autodiff of the same restriction at L=3. Previous "
+            "Leftover #41 leftover-recorded: median wall of an "
+            "order-6 directional jet vs nested 1-D autodiff of the "
+            "same restriction at L=3 is below the named 5x "
+            f"(autodiff/jet {float(ratio):.2f}). Previous "
             "depth-2 / order-4 / no-warmup stub withdrawn. Not in CI "
             "all_passed."
         ),
@@ -304,8 +309,11 @@ def main() -> int:
     payload["honesty"] = {
         "ka_theorem_justifies_architecture": False,
         "exactness_is_model_jet": True,
-        "g2_earned": bool(g2["earned"]),
+        "g2_earned": False,
         "g2_reported": True,
+        "g2_leftover_recorded": True,
+        "g2_leftover_id": 41,
+        "g2_leftover_tick": 85,
         "g2_in_ci_all_passed": False,
         "g2_compares_order6_to_order6": True,
         "full_pack_birth_death_03_13": False,
