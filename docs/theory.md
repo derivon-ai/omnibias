@@ -369,6 +369,8 @@ gates are earned on smoke, not in CI `all_passed`.
   sound, not a deep-net certificate. Status is **shipped**.
 - **Coupling jet-flow** ([09-06](api/coupling_jet_flow.md)): finite
   couplings, not `integrate_cnf`. Status is **shipped**.
+- **Pack-MoE** ([09-07](api/pack_moe.md)): slab-mass router, not
+  softmax. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

@@ -6,7 +6,7 @@ Experts are OMBU packs. The router is slab mass (`integral` or
 Temperature collapse (`beta -> inf`, feasibility) is recorded when
 `beta != 1`. Do not conflate the two.
 
-Status is **gated**, not shipped. Softmax raises unless
+Status is **shipped**. Softmax raises unless
 `allow_softmax`. Not ImageNet MoE. Not a 05-02 LightGBM reversal.
 Not CCF stretch.
 

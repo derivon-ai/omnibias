@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Pack-MoE shipped (theory 09-07)
+
+- Spec 09-07 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 worked example.
+- Slab-mass router, not softmax.
+- Smoke: `docs/benchmarks/pack_moe_smoke.json`.
+
 ### Added — Coupling jet-flow shipped (theory 09-06)
 
 - Spec 09-06 status is **shipped**: G1–G4 CI; G4 torch/jax parity

@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.pack_moe.v1",
-  "generated_utc": "2026-08-21T19:57:50Z",
+  "generated_utc": "2026-08-26T17:05:51Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -22,7 +22,7 @@
       "theorem_prover_verified": false
     }
   },
-  "rss_mb_at_start": 813.57,
+  "rss_mb_at_start": 1223.93,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -45,9 +45,15 @@
         "passed": true,
         "router_is_softmax": false,
         "temperature_collapse_used": false
+      },
+      {
+        "name": "g4_parity",
+        "passed": true,
+        "torch_y": 2.0,
+        "jax_y": 2.0
       }
     ]
   },
   "disclaimer": "slab-mass Pack-MoE; not a softmax router, not ImageNet, not a 05-02 reversal, not CCF stretch",
-  "wall_seconds": 1.23512877401663
+  "wall_seconds": 0.41331177100073546
 }

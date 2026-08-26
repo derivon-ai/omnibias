@@ -4,9 +4,10 @@
 
 G1 is the symmetric band-gate identity. G2 is two-tone skill vs a
 single clustered pack of the same width. G3 keeps the softmax
-router off by default. Jets are founding bias collapse, not
-temperature collapse (unless ``beta != 1``). Not ImageNet. Not a
-05-02 LightGBM reversal. Not CCF stretch.
+router off by default. G4 is torch/jax bit-identity on G1.
+Jets are founding bias collapse, not temperature collapse (unless
+``beta != 1``). Not ImageNet. Not a 05-02 LightGBM reversal. Not
+CCF stretch.
 """
 
 from __future__ import annotations
@@ -18,15 +19,23 @@ import time
 from pathlib import Path
 from typing import Any
 
-sys.path.insert(0, os.path.dirname(__file__))
-from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
-from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.pack_moe import (
     DISCLAIMER,
+    ExpertWindow,
+    PackMoEConfig,
     honesty_payload,
     two_tone_skill,
     worked_example,
 )
+from omnibias.jax.architectures.pack_moe import pack_moe_forward as jax_fwd
+from omnibias.torch.architectures.pack_moe import pack_moe_forward as torch_fwd
+
+sys.path.insert(0, os.path.dirname(__file__))
+from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
+from _gates import gates_block  # type: ignore[import-not-found]  # noqa: E402
 
 SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
@@ -43,6 +52,13 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["beats_pack"] and skill["below_1e2"] and float(skill["skill"]) > 0.0)
     hon = honesty_payload()
     g3 = hon["router_is_softmax"] is False and hon["temperature_collapse_used"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    windows = (ExpertWindow(-0.2, 0.0), ExpertWindow(0.0, 0.2))
+    cfg = PackMoEConfig(router="band")
+    ty = torch_fwd(torch.tensor(0.0), (1.0, 3.0), windows, config=cfg)
+    jy = jax_fwd(jnp.asarray(0.0), (1.0, 3.0), windows, config=cfg)
+    g4 = bool(float(ty) == float(jy))
     entries = [
         {"name": "g1_router", "passed": g1, "g_a": ex["g_a"], "g_b": ex["g_b"], "y": ex["y"]},
         {
@@ -57,6 +73,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "passed": g3,
             "router_is_softmax": False,
             "temperature_collapse_used": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_y": float(ty),
+            "jax_y": float(jy),
         },
     ]
     for entry in entries:

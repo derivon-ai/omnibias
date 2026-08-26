@@ -626,7 +626,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   CI; founding bias collapse, not temperature collapse; not
   `integrate_cnf`) /
   `omnibias.core.pack_moe` + `omnibias.{torch,jax}.architectures.pack_moe`
-  (09-07; slab-mass router over pack experts; G1–G3 CI; founding
+  (09-07, **shipped**; slab-mass router over pack experts; G1–G4 CI; founding
   bias collapse, not temperature collapse; not softmax, not a
   05-02 reversal) /
   `omnibias.core.remainder_train` + `omnibias.{torch,jax}.optim_remainder`

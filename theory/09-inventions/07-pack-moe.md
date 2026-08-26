@@ -6,7 +6,7 @@ A mixture whose **experts are OMBU packs** (order / window / position)
 and whose **router is slab mass** (`integral` or `band`), not a free
 softmax MLP.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not softmax)
 - **Depends on**: 01-01, 04-02, 09-01, 09-03
 - **Blocks**: none
 
