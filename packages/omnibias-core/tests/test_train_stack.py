@@ -113,6 +113,16 @@ def test_kantorovich_path_is_never_worse() -> None:
     assert report.reason in {"ball", "empty", "bounds_failed", "never_worse", "step"}
 
 
+def test_kantorovich_accepts_near_teacher() -> None:
+    close = [0.0, 1.15, 0.1, 0.68]
+    _theta, report = recommended_stack_step(
+        _XS, _YS, close, _HIDDEN, _DIM, config=_cfg(kantorovich=True)
+    )
+    assert report.reason == "ball"
+    assert report.accepted is True
+    assert report.loss1 < report.loss0
+
+
 def test_rejects_bad_config() -> None:
     with pytest.raises(ValueError, match="jet_order"):
         TrainStackConfig(jet_order=1)

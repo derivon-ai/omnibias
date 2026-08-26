@@ -2,7 +2,11 @@
 
 Closed-form Newton plus a jet line search on a one-layer teacher /
 student. The stack must beat a short gradient-descent budget and the
-zero predictor. Bias collapse (`delta -> 0`) supplies the tower.
+zero predictor. An indefinite Hessian is damped by `|λ_min|`.
+Kantorovich (`use_kantorovich=True`) accepts a unique `φ'` ball near
+the teacher and may later return `empty` — a halt, not a failure.
+The bake-off below turns that filter off. Bias collapse (`delta -> 0`)
+supplies the tower.
 
 ```python
 from omnibias.core.train_stack import honesty_payload, worked_example

@@ -10,8 +10,15 @@ Call order (theory 08-01 §4):
    ``F(s) = φ'(s)``.
 4. Sharpness (08-06) as extra cubic damping from ``λ_max(H)``.
 
+Measured on the one-layer teacher/student: Newton + line search
+without Kantorovich reaches a lower MSE; Kantorovich accepts a unique
+``φ'`` ball near the teacher and then returns ``empty`` (a legal
+halt, not a training failure). Default keeps the 08-04 filter;
+the cookbook bake-off turns it off.
+
 08-02 composed curvature is a two-layer slice rule and is **not**
-invoked here (``used_composed`` stays false). Faà di Bruno remains the
+invoked here (``used_composed`` stays false). A two-layer hook would
+duplicate ``composed_curvature_step`` and is not added. Faà di Bruno remains the
 chain rule that forms the jet. Not a global min of a deep nest, not a
 full ``d h / d θ``, not CCF stretch. Founding bias collapse
 (``delta -> 0``) supplies ``σ^(n)``. No temperature collapse.
