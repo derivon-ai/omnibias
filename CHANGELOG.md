@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Tropical path-follow earned (theory 01-08)
+
+- `path_follow` and `tropical_anneal_descent` ship on
+  `omnibias.struct._core.tropical`, duck-typed to `AnnealSchedule`.
+- Leftover #32's G4 2x-eval win is earned on the surrounding-exponent
+  family (5/5 seeds, certified gap). In CI `all_passed`.
+- Smoke: `docs/benchmarks/tropical_homotopy_smoke.json`.
+
 ### Added — Holonomy-band G4 leftover-recorded (theory 02-14)
 
 - Leftover #35's gauge-covariance miss now leftover-records `reported`

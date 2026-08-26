@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Tropical-log homotopy G1–G3 (theory 01-08). G4 is --full only."""
+"""Tropical-log homotopy G1–G4 (theory 01-08)."""
 
 from __future__ import annotations
 
@@ -9,13 +9,18 @@ import pytest
 from omnibias.partition.arrangement import Arrangement, enumerate_cells_vertices
 from omnibias.struct._core.tropical import (
     TropicalLinear,
+    TropicalSchedule,
+    as_tropical_schedule,
     certify_tropical_gap,
     dual_subdivision,
     homotopy_gap_bound,
     newton_polytope,
+    path_follow,
     relaxed_grad,
     relaxed_hess,
     relaxed_value,
+    surrounding_tropical,
+    tropical_anneal_descent,
     tropical_value,
 )
 
@@ -92,6 +97,31 @@ def test_g3_derivatives_vs_fd() -> None:
 def test_refuse_large() -> None:
     with pytest.raises(ValueError, match="refuse"):
         TropicalLinear(np.zeros(12), np.zeros((12, 2)))
+
+
+def test_g4_path_follow_beats_anneal_evals() -> None:
+    sched = TropicalSchedule()
+    wins = 0
+    for seed in range(5):
+        poly = surrounding_tropical(6, 2, seed=seed)
+        rng = np.random.default_rng(100 + seed)
+        x0 = rng.uniform(-0.8, 0.8, size=2)
+        annealed = tropical_anneal_descent(poly, x0, schedule=sched)
+        followed = path_follow(poly, x0, schedule=sched)
+        assert followed.gap.is_sound
+        assert annealed.gap.is_sound
+        assert abs(followed.decoded - annealed.decoded) <= 1e-4
+        if annealed.n_evals >= 2 * followed.n_evals:
+            wins += 1
+    assert wins == 5
+
+
+def test_anneal_schedule_duck_type() -> None:
+    pytest.importorskip("omnibias.discrete")
+    from omnibias.discrete import AnnealSchedule
+
+    wired = as_tropical_schedule(AnnealSchedule.fast())
+    assert wired.betas() == AnnealSchedule.fast().betas()
 
 
 def test_g4_parity() -> None:

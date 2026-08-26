@@ -13,6 +13,7 @@ Large ``n, D`` are refused (subdivision is exponential in ``D``).
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 from numpy.typing import NDArray
@@ -231,18 +232,260 @@ def certify_tropical_gap(
     return TropicalGapCertificate(beta=beta, bound=bound, measured=measured)
 
 
+@dataclass(frozen=True)
+class TropicalSchedule:
+    """Temperature homotopy; duck-compatible with ``AnnealSchedule``.
+
+    ``omnibias-struct`` cannot import ``omnibias-discrete`` (discrete already
+    depends on struct). Pass an ``AnnealSchedule`` anyway: ``from_anneal``
+    and :func:`as_tropical_schedule` read the same field names and
+    ``betas()``.
+    """
+
+    beta0: float = 0.5
+    beta_growth: float = 1.6
+    stages: int = 8
+    steps: int = 24
+    step_safety: float = 0.9
+
+    def __post_init__(self) -> None:
+        if self.beta0 <= 0.0:
+            raise ValueError("beta0 must be > 0")
+        if self.beta_growth < 1.0:
+            raise ValueError("beta_growth must be >= 1")
+        if self.stages < 1 or self.steps < 1:
+            raise ValueError("stages and steps must be >= 1")
+        if not 0.0 < self.step_safety <= 1.0:
+            raise ValueError("step_safety must be in (0, 1]")
+
+    def betas(self) -> list[float]:
+        out, beta = [], self.beta0
+        for _ in range(self.stages):
+            out.append(beta)
+            beta *= self.beta_growth
+        return out
+
+    @classmethod
+    def from_anneal(cls, schedule: Any) -> TropicalSchedule:
+        """Wire ``AnnealSchedule`` (or any duck-typed schedule) into this driver."""
+        return cls(
+            beta0=float(schedule.beta0),
+            beta_growth=float(schedule.beta_growth),
+            stages=int(schedule.stages),
+            steps=int(schedule.steps),
+            step_safety=float(schedule.step_safety),
+        )
+
+
+def as_tropical_schedule(schedule: Any | None = None) -> TropicalSchedule:
+    """Accept ``TropicalSchedule``, ``AnnealSchedule``, or ``None`` (defaults)."""
+    if schedule is None:
+        return TropicalSchedule()
+    if isinstance(schedule, TropicalSchedule):
+        return schedule
+    return TropicalSchedule.from_anneal(schedule)
+
+
+@dataclass(frozen=True)
+class TropicalPathResult:
+    """Decoded tropical objective after a temperature homotopy."""
+
+    x: FloatArray
+    decoded: float
+    winner: int
+    n_evals: int
+    gap: TropicalGapCertificate
+    method: str
+
+
+def surrounding_tropical(n: int = 6, dim: int = 2, *, seed: int = 0) -> TropicalLinear:
+    """PWL family whose exponent hull contains 0 (unique unconstrained min).
+
+    Directions surround the origin so ``tropical_value`` has a unique
+    unconstrained minimizer; that is the G4 comparison family.
+    """
+    if n < dim + 1:
+        raise ValueError("need n >= dim+1 so conv(exponents) can contain 0")
+    rng = np.random.default_rng(seed)
+    if dim == 1:
+        signs = np.ones((n, 1), dtype=np.float64)
+        signs[1::2, 0] = -1.0
+        exponents = signs
+    elif dim == 2:
+        jitter = rng.uniform(-0.1, 0.1, size=n)
+        angles = np.linspace(0.0, 2.0 * np.pi, n, endpoint=False) + jitter
+        exponents = np.stack((np.cos(angles), np.sin(angles)), axis=1)
+    else:
+        raw = rng.normal(size=(n, dim))
+        norms = np.linalg.norm(raw, axis=1, keepdims=True)
+        exponents = raw / np.maximum(norms, 1e-12)
+    coeffs = rng.normal(size=n) * 0.25
+    return TropicalLinear(coeffs, exponents)
+
+
+def _clip_box(x: FloatArray, box: float) -> FloatArray:
+    if box <= 0.0:
+        raise ValueError("box must be > 0")
+    return np.clip(np.asarray(x, dtype=np.float64), -float(box), float(box))
+
+
+def _lipschitz(poly: TropicalLinear) -> float:
+    return float(np.max(np.linalg.norm(poly.exponents, axis=1))) + 1e-12
+
+
+def _decode(
+    poly: TropicalLinear,
+    x: FloatArray,
+    *,
+    beta: float,
+    n_evals: int,
+    method: str,
+) -> TropicalPathResult:
+    xv = np.asarray(x, dtype=np.float64).reshape(-1).copy()
+    decoded = float(np.asarray(tropical_value(poly, xv)).reshape(-1)[0])
+    winner = int(np.argmax(scores(poly, xv).reshape(-1)))
+    gap = certify_tropical_gap(poly, xv, beta=beta)
+    return TropicalPathResult(
+        x=xv,
+        decoded=decoded,
+        winner=winner,
+        n_evals=int(n_evals),
+        gap=gap,
+        method=method,
+    )
+
+
+def tropical_anneal_descent(
+    poly: TropicalLinear,
+    x0: FloatArray,
+    *,
+    box: float = 2.0,
+    schedule: Any | None = None,
+) -> TropicalPathResult:
+    """First-order temperature homotopy; mirrors ``anneal_descent``.
+
+    Uses :class:`TropicalSchedule` or a duck-typed ``AnnealSchedule``.
+    Each gradient step counts as one objective evaluation.
+    """
+    sched = as_tropical_schedule(schedule)
+    x = _clip_box(np.asarray(x0, dtype=np.float64).reshape(-1), box)
+    if int(x.shape[0]) != poly.dim:
+        raise ValueError(f"x0 dim {int(x.shape[0])} != poly.dim {poly.dim}")
+    lip = _lipschitz(poly)
+    n_evals = 0
+    betas = sched.betas()
+    for beta in betas:
+        eta = sched.step_safety / (beta * lip + 1e-12)
+        for _ in range(sched.steps):
+            grad = np.asarray(relaxed_grad(poly, x, beta=beta)).reshape(-1)
+            x = _clip_box(x - eta * grad, box)
+            n_evals += 1
+    return _decode(poly, x, beta=betas[-1], n_evals=n_evals, method="anneal")
+
+
+def _newton_stage(
+    poly: TropicalLinear,
+    x: FloatArray,
+    beta: float,
+    *,
+    box: float,
+    lip: float,
+    safety: float,
+    steps: int,
+) -> tuple[FloatArray, int]:
+    n_evals = 0
+    dim = poly.dim
+    eye = np.eye(dim)
+    for _ in range(steps):
+        grad = np.asarray(relaxed_grad(poly, x, beta=beta)).reshape(-1)
+        hess = np.asarray(relaxed_hess(poly, x, beta=beta)).reshape(dim, dim)
+        n_evals += 1
+        eta_g = safety / (beta * lip + 1e-12)
+        scale = float(np.linalg.norm(hess, ord="fro"))
+        if scale < 1e-12:
+            x = _clip_box(x - eta_g * grad, box)
+            continue
+        try:
+            step = np.linalg.solve(hess + 1e-8 * eye, grad)
+        except np.linalg.LinAlgError:
+            step = eta_g * grad
+        cand = _clip_box(x - safety * step, box)
+        f0 = float(np.asarray(relaxed_value(poly, x, beta=beta)).reshape(-1)[0])
+        f1 = float(np.asarray(relaxed_value(poly, cand, beta=beta)).reshape(-1)[0])
+        n_evals += 1
+        x = cand if f1 <= f0 else _clip_box(x - eta_g * grad, box)
+    return x, n_evals
+
+
+def path_follow(
+    poly: TropicalLinear,
+    x0: FloatArray,
+    *,
+    box: float = 2.0,
+    schedule: Any | None = None,
+    newton_steps: int = 2,
+    polish_steps: int = 4,
+) -> TropicalPathResult:
+    """Second-order path-follow along the same ``AnnealSchedule`` homotopy.
+
+    Each Newton step is one closed-form Hessian/grad pass plus one
+    accept/reject value eval. A short polish at the final ``beta``
+    matches the first-order decode.
+    """
+    if newton_steps < 1:
+        raise ValueError("newton_steps must be >= 1")
+    if polish_steps < 0:
+        raise ValueError("polish_steps must be >= 0")
+    sched = as_tropical_schedule(schedule)
+    x = _clip_box(np.asarray(x0, dtype=np.float64).reshape(-1), box)
+    if int(x.shape[0]) != poly.dim:
+        raise ValueError(f"x0 dim {int(x.shape[0])} != poly.dim {poly.dim}")
+    lip = _lipschitz(poly)
+    n_evals = 0
+    betas = sched.betas()
+    for beta in betas:
+        x, stage_evals = _newton_stage(
+            poly,
+            x,
+            beta,
+            box=box,
+            lip=lip,
+            safety=sched.step_safety,
+            steps=newton_steps,
+        )
+        n_evals += stage_evals
+    if polish_steps:
+        x, polish_evals = _newton_stage(
+            poly,
+            x,
+            betas[-1],
+            box=box,
+            lip=lip,
+            safety=sched.step_safety,
+            steps=polish_steps,
+        )
+        n_evals += polish_evals
+    return _decode(poly, x, beta=betas[-1], n_evals=n_evals, method="path_follow")
+
+
 __all__ = [
     "TropicalGapCertificate",
     "TropicalLinear",
+    "TropicalPathResult",
+    "TropicalSchedule",
+    "as_tropical_schedule",
     "certify_tropical_gap",
     "dual_subdivision",
     "homotopy_gap_bound",
     "newton_polytope",
+    "path_follow",
     "relaxed_grad",
     "relaxed_hess",
     "relaxed_value",
     "relaxed_weights",
     "scores",
+    "surrounding_tropical",
     "tie_locus_samples",
+    "tropical_anneal_descent",
     "tropical_value",
 ]

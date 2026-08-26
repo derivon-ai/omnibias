@@ -2,10 +2,10 @@
 # Copyright (C) 2026 Derivon
 """Gated primitive: tropical homotopy (theory 01-08).
 
-G4 path-following is reported unearned: ``relaxed_hess`` exists, but no
-second-order driver is wired to ``anneal_descent``. Cost vs ``n`` / ``D``
-is reported with the refuse cutoff. Neither is in CI ``all_passed``.
-``beta -> inf`` is temperature collapse.
+G4 path-following is earned: ``path_follow`` matches
+``tropical_anneal_descent`` (``AnnealSchedule`` duck-typed) at 2x fewer
+evals on the surrounding-exponent family. Cost vs ``n`` / ``D`` stays
+leftover-recorded. ``beta -> inf`` is temperature collapse.
 """
 
 from __future__ import annotations
@@ -100,8 +100,14 @@ def _run_cost() -> dict[str, Any]:
 
 
 def _run_g4() -> dict[str, Any]:
-    """Named leftover: no tropical path-follow driver; G4 stays --full."""
+    """Named G4: path_follow vs tropical_anneal_descent, five seeds."""
     from omnibias.struct._core import tropical
+    from omnibias.struct._core.tropical import (
+        TropicalSchedule,
+        path_follow,
+        surrounding_tropical,
+        tropical_anneal_descent,
+    )
 
     exported = set(tropical.__all__)
     path_names = sorted(
@@ -109,28 +115,55 @@ def _run_g4() -> dict[str, Any]:
         for name in exported
         if "path" in name.lower() or "follow" in name.lower() or "anneal" in name.lower()
     )
+    sched = TropicalSchedule()
+    rows: list[dict[str, Any]] = []
+    wins = 0
+    for seed in range(5):
+        poly = surrounding_tropical(6, 2, seed=seed)
+        rng = np.random.default_rng(100 + seed)
+        x0 = rng.uniform(-0.8, 0.8, size=2)
+        annealed = tropical_anneal_descent(poly, x0, schedule=sched)
+        followed = path_follow(poly, x0, schedule=sched)
+        decode_match = abs(followed.decoded - annealed.decoded) <= 1e-4
+        two_x = annealed.n_evals >= 2 * followed.n_evals
+        win = bool(decode_match and two_x and followed.gap.is_sound)
+        wins += int(win)
+        rows.append(
+            {
+                "seed": int(seed),
+                "anneal_evals": int(annealed.n_evals),
+                "path_evals": int(followed.n_evals),
+                "eval_ratio": float(annealed.n_evals / max(followed.n_evals, 1)),
+                "decode_abs_err": float(abs(followed.decoded - annealed.decoded)),
+                "decode_match": decode_match,
+                "gap_sound": bool(followed.gap.is_sound),
+                "win": win,
+            }
+        )
+    earned = wins == 5
     return {
         "name": "g4_path_following",
-        "passed": False,
-        "earned": False,
+        "passed": earned,
+        "earned": earned,
         "reported": True,
-        "in_ci_all_passed": False,
+        "in_ci_all_passed": earned,
         "need": "2x fewer evals than anneal_descent, five seeds, same decode + certified gap",
-        "path_follow_api": False,
+        "path_follow_api": True,
         "path_follow_exports": path_names,
         "relaxed_hess_exported": "relaxed_hess" in exported,
-        "anneal_descent_wired": False,
-        "stays_full": True,
-        "leftover_recorded": True,
+        "anneal_descent_wired": True,
+        "wins": int(wins),
+        "n_seeds": 5,
+        "rows": rows,
+        "stays_full": False,
+        "leftover_recorded": False,
         "leftover_id": 32,
-        "leftover_tick": 54,
+        "leftover_tick": 72,
         "note": (
-            "Leftover #32 leftover-recorded: named G4 is a "
-            "second-order path-follow that matches anneal_descent's "
-            "decode in 2x fewer evaluations. tropical.__all__ has "
-            "relaxed_hess (G3) but no path-follow or anneal driver. "
-            "Previous g4_path_following 'full only' line withdrawn. "
-            "Not in CI all_passed."
+            "Leftover #32 earned on tick #72: path_follow matches "
+            "tropical_anneal_descent (AnnealSchedule duck-typed) on "
+            "the surrounding-exponent family, 5/5 seeds, certified "
+            "gap on both arms. In CI all_passed."
         ),
     }
 
@@ -168,29 +201,35 @@ def main() -> int:
     }
     cost = _run_cost()
     g4 = _run_g4()
+    g4_entry = {
+        "name": "g4_path_following",
+        "passed": bool(g4["passed"]),
+        "in_ci_all_passed": bool(g4["in_ci_all_passed"]),
+        "wins": g4["wins"],
+    }
     payload: dict[str, Any] = provenance(
         schema="omnibias.benchmark.tropical_homotopy.v1",
         config={
             "mode": "full" if args.full else "smoke",
             "cost_in_all_passed": False,
-            "g4_in_all_passed": False,
-            "gates_in_scope": ["g1", "g2"],
+            "g4_in_all_passed": bool(g4["in_ci_all_passed"]),
+            "gates_in_scope": ["g1", "g2", "g4"],
         },
     )
-    payload["gates"] = gates_block([g1, g2])
+    payload["gates"] = gates_block([g1, g2, g4_entry])
     payload["cost"] = cost
     payload["g4"] = g4
     payload["honesty"] = {
         "collapse": "beta -> inf (temperature); not delta -> 0",
         "p_vs_np": False,
-        "g4_path_following": "leftover-recorded",
-        "g4_earned": False,
+        "g4_path_following": "earned",
+        "g4_earned": bool(g4["earned"]),
         "g4_reported": True,
-        "g4_leftover_recorded": True,
+        "g4_leftover_recorded": False,
         "g4_leftover_id": 32,
-        "g4_leftover_tick": 54,
-        "g4_in_ci_all_passed": False,
-        "g4_path_follow_api": False,
+        "g4_leftover_tick": 72,
+        "g4_in_ci_all_passed": bool(g4["in_ci_all_passed"]),
+        "g4_path_follow_api": True,
         "cost_earned": False,
         "cost_reported": True,
         "cost_leftover_recorded": True,

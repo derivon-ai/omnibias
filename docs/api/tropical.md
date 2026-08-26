@@ -6,12 +6,13 @@ them. `beta -> inf` is temperature collapse, not founding `delta -> 0`.
 Large `(n, D)` inputs are refused. Sound gap, not P vs NP.
 
 G1 gap soundness is CI-gated. G2 subdivision vs the 01-03 sampler and
-G3 jet derivatives are CI-gated. G4 path-following is
-**leftover-recorded** unearned (leftover #32): `relaxed_hess` is
-exported, but no second-order driver is wired to `anneal_descent`. The
-previous `--full` only line is withdrawn. Sampled `dual_subdivision`
-wall vs `n`/`D` is **leftover-recorded** (leftover #19; API refuses
-`n>10` or `D>3`). Cost and G4 are not in CI `all_passed`.
+G3 jet derivatives are CI-gated. G4 path-following is **earned**
+(leftover #32 closed): `path_follow` matches `tropical_anneal_descent`
+on the surrounding-exponent family at `2x` fewer evals, five seeds,
+with the certified gap on both arms. The driver duck-types
+`AnnealSchedule` (struct cannot import discrete). Sampled
+`dual_subdivision` wall vs `n`/`D` is **leftover-recorded** (leftover
+#19; API refuses `n>10` or `D>3`). Cost is not in CI `all_passed`.
 Status is **gated**, not shipped. See theory spec 01-08.
 
 ## Algebra

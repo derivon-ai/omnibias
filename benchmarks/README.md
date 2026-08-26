@@ -51,7 +51,7 @@ uv run python docs/img/generate_figures.py
 | `spectral_design.py` | `docs/benchmarks/spectral_design_smoke.json` | Wave-3 primitive 01-07: BandPlan G1/G2/G4; G3 reported (`0/5` Mscale hits of the four-gap lstsq gate), not in `all_passed`; pack order is a band selector |
 | `arrangement_geometry.py` | `docs/benchmarks/arrangement_geometry_smoke.json` | Gated 01-03: temperature collapse; sampled subgraph; cost vs n/D reported, not in CI `all_passed` |
 | `ombu_frames.py` | `docs/benchmarks/ombu_frames_smoke.json` | Gated 01-06: `sigma'` not admissible; G4 denoising reported (`5/5` MSE vs n=1, `0/5` skill vs identity), not in `all_passed` |
-| `tropical_homotopy.py` | `docs/benchmarks/tropical_homotopy_smoke.json` | Gated 01-08: reuses `logsumexp_gap_bound`; G4 path-following reported (no anneal driver); cost vs n/D reported |
+| `tropical_homotopy.py` | `docs/benchmarks/tropical_homotopy_smoke.json` | Gated 01-08: reuses `logsumexp_gap_bound`; G4 path-following earned; cost vs n/D leftover-recorded |
 | `equality_locus.py` | `docs/benchmarks/equality_locus_smoke.json` | Gated 01-09: constraint manifold, not a PDE solver |
 | `jet_bundle.py` | `docs/benchmarks/jet_bundle_smoke.json` | Gated 01-10: vocabulary, not a discovery; G1–G3 earned |
 | `enclosure_collapse.py` | `docs/benchmarks/enclosure_collapse_smoke.json` | Gated 01-14: Width Law + six squeezes; `width -> 0` of a sound enclosure (a point plus a proof); not a package |
