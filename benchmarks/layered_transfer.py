@@ -77,6 +77,9 @@ def _run_cost() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 46,
+        "leftover_tick": 90,
         "in_ci_all_passed": False,
         "rows": rows,
         "g4_inverse_design": {
@@ -98,9 +101,9 @@ def _run_cost() -> dict[str, Any]:
             ),
         },
         "note": (
-            "Leftover #23 leftover-recorded: quarter-wave stack_matrix "
+            "Leftover #46 leftover-recorded: quarter-wave stack_matrix "
             "and certified_band_gap wall vs n_periods. G4 inverse-design "
-            "is a 5-seed study under $OMNIBIAS_SCRATCH, not CI. Previous "
+            "is leftover #23 and stays --full. Previous "
             "g4_inverse_design passed=True / --full-only stub with no "
             "timing withdrawn. continuum_claim=False. Not in CI "
             "all_passed."
@@ -214,6 +217,9 @@ def main() -> int:
         "g5_in_ci_all_passed": False,
         "cost_earned": False,
         "cost_reported": True,
+        "cost_leftover_recorded": True,
+        "cost_leftover_id": 46,
+        "cost_leftover_tick": 90,
         "cost_in_ci_all_passed": False,
     }
     if args.full:

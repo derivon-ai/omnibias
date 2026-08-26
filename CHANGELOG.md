@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Layered-transfer cost leftover-recorded (theory 02-11)
+
+- Leftover #46 leftover-records `cost_stack_vs_periods` so it stays
+  reported and out of `all_passed`.
+- Leftover #23 G4 stays `--full`; leftover #27 G5 stays unearned.
+- Smoke: `docs/benchmarks/layered_transfer_smoke.json`.
+
 ### Added — Hermite ladder shipped (theory 02-10)
 
 - Spec 02-10 status is **shipped**: leftover #21 G4, leftover #45

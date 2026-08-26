@@ -9,8 +9,9 @@ G1–G3/G6 are CI-gated. G4 inverse-design (10× fewer evals vs
 gradient-free, five seeds) is **leftover-recorded** unearned (leftover
 #23): no optimizer loop is wired, so the named 5-seed eval-count win
 stays `--full`. `stack_matrix` / `certified_band_gap` wall vs
-`n_periods` is **reported**; the previous untimed `passed=True` stub is
-withdrawn. Cost is not in CI `all_passed`. G5 conservation honesty is
+`n_periods` is **leftover-recorded** (leftover #46); the previous
+untimed `passed=True` stub is withdrawn. Cost is not in CI
+`all_passed`. G5 conservation honesty is
 **leftover-recorded** unearned (leftover #27): unstructured 2×2
 `|r|^2+|t|^2-1` versus a lossless stack, and `unitarity_residual`
 refuses `lossless=False`. No MLP surrogate is wired. The previous
