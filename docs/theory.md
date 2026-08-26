@@ -340,6 +340,8 @@ gates are earned on smoke, not in CI `all_passed`.
   not a discovery. Status is **shipped**.
 - **Training-idea ledger** (08-01): recommended stack; trainers do
   not clear Hilbert stretch. Design record. Status is **shipped**.
+- **Composed curvature** ([08-02](api/composed_curvature.md)): slice
+  escape, not a global min. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 

@@ -515,7 +515,7 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   growth bit-identical; death reports a bound; G4 earned vs matched-count
   fixed on the named BL) /
   `omnibias.core.composed_curvature` /
-  `omnibias.{torch,jax}.optim_composed` (08-02; joint two-layer Newton;
+  `omnibias.{torch,jax}.optim_composed` (08-02, **shipped**; joint two-layer Newton;
   G1–G4 CI; slice escape, not a global min) /
   `omnibias.core.verified.kantorovich.kantorovich_accept_step` /
   `omnibias.{torch,jax}.optim_kantorovich` (08-04; unique-zero ball

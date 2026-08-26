@@ -6,6 +6,12 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Composed-curvature joint Newton shipped (theory 08-02)
+
+- Spec 08-02 status is **shipped**: G1–G4 CI; slice escape, not a
+  global min.
+- Smoke: `docs/benchmarks/composed_curvature_smoke.json`.
+
 ### Added — Training-idea ledger shipped (theory 08-01)
 
 - Spec 08-01 status is **shipped**: G1–G5 earned; design record.

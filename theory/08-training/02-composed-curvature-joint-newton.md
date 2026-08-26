@@ -7,7 +7,7 @@ exact coupling between consecutive layers, so a Newton step on the **joint**
 block `(W_{ell-1}, W_ell)` can leave a critical point that is a minimum of
 the current-layer slice and a saddle of the pair.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; slice escape, not a global min)
 - **Depends on**: 01-01, 01-10, 08-01
 - **Blocks**: none
 
