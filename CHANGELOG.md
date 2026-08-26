@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Soliton algebraic cost leftover-recorded (theory 02-09)
+
+- Leftover #44 leftover-records `cost_algebraic_vs_init_win` so it
+  stays reported and out of `all_passed`.
+- Leftover #22 G4 stays `--full`. Tanh algebra, not a collapse.
+- Smoke: `docs/benchmarks/soliton_tanh_method_smoke.json`.
+
 ### Added — Equivariant scan shipped (theory 02-08)
 
 - Spec 02-08 status is **shipped**: leftover #25 G5 and leftover #43

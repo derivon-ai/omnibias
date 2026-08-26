@@ -8,7 +8,7 @@ that the omnibias tanh tower already implements exactly — so a network built
 from that ansatz can represent known soliton solutions with zero residual and
 can search for new ones by solving small algebraic systems.
 
-- **Status**: gated (G1/G2/G3/G5 CI; G4 PINN init-win leftover-recorded / unearned, leftover #22 — `--full`, no train; algebraic cost **reported**, not in CI `all_passed`; tanh algebra, not a collapse)
+- **Status**: gated (G1/G2/G3/G5 CI; G4 PINN init-win leftover-recorded / unearned, leftover #22 — `--full`, no train; algebraic cost **leftover-recorded**, leftover #44, not in CI `all_passed`; tanh algebra, not a collapse)
 - **Depends on**: 01-01
 - **Blocks**: 02-13, 03-11
 

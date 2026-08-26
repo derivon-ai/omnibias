@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmark.soliton_tanh_method.v1",
-  "generated_utc": "2026-08-26T15:58:45Z",
+  "generated_utc": "2026-08-26T16:40:31Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -18,7 +18,7 @@
       "g5"
     ]
   },
-  "rss_mb_at_start": 809.25,
+  "rss_mb_at_start": 808.96,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -40,9 +40,12 @@
     "passed": false,
     "earned": false,
     "reported": true,
+    "leftover_recorded": true,
+    "leftover_id": 44,
+    "leftover_tick": 88,
     "in_ci_all_passed": false,
-    "verify_exact_wall_seconds": 0.001954248989932239,
-    "solve_ansatz_wall_seconds": 0.0019296560203656554,
+    "verify_exact_wall_seconds": 0.0019430239917710423,
+    "solve_ansatz_wall_seconds": 0.002001811983063817,
     "n_g1": 10,
     "rows": [
       {
@@ -71,7 +74,7 @@
       "need": "5x fewer PINN steps vs cold start on a perturbed problem, 5 seeds",
       "reason": "Leftover #22 leftover-recorded: no PINN training loop is wired. Algebraic verify_exact / solve_ansatz and residual L1 vs a same-degree cold ansatz are recorded; they are not the named 5x step-count win."
     },
-    "note": "Leftover #22 leftover-recorded: G1 algebraic wall plus published-vs-cold residual L1. G4 init-win is a 5-seed PINN study under $OMNIBIAS_SCRATCH, not CI. Previous g4_init_win passed=True / --full-only stub with no timing withdrawn. Tanh algebra, not a collapse. Not in CI all_passed."
+    "note": "Leftover #44 leftover-recorded: G1 algebraic wall plus published-vs-cold residual L1. G4 init-win is leftover #22 and stays --full under $OMNIBIAS_SCRATCH, not CI. Previous g4_init_win passed=True / --full-only stub with no timing withdrawn. Tanh algebra, not a collapse. Not in CI all_passed."
   },
   "honesty": {
     "algebra": "tanh polynomial, not a collapse",
@@ -86,6 +89,9 @@
     "g4_stays_full": true,
     "cost_earned": false,
     "cost_reported": true,
+    "cost_leftover_recorded": true,
+    "cost_leftover_id": 44,
+    "cost_leftover_tick": 88,
     "cost_in_ci_all_passed": false
   }
 }

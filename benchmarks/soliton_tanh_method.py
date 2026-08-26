@@ -88,6 +88,9 @@ def _run_cost() -> dict[str, Any]:
         "passed": False,
         "earned": False,
         "reported": True,
+        "leftover_recorded": True,
+        "leftover_id": 44,
+        "leftover_tick": 88,
         "in_ci_all_passed": False,
         "verify_exact_wall_seconds": float(verify_wall),
         "solve_ansatz_wall_seconds": float(solve_wall),
@@ -109,9 +112,9 @@ def _run_cost() -> dict[str, Any]:
             ),
         },
         "note": (
-            "Leftover #22 leftover-recorded: G1 algebraic wall plus "
-            "published-vs-cold residual L1. G4 init-win is a 5-seed "
-            "PINN study under $OMNIBIAS_SCRATCH, not CI. Previous "
+            "Leftover #44 leftover-recorded: G1 algebraic wall plus "
+            "published-vs-cold residual L1. G4 init-win is leftover "
+            "#22 and stays --full under $OMNIBIAS_SCRATCH, not CI. Previous "
             "g4_init_win passed=True / --full-only stub with no timing "
             "withdrawn. Tanh algebra, not a collapse. Not in CI "
             "all_passed."
@@ -165,6 +168,9 @@ def main() -> int:
         "g4_stays_full": True,
         "cost_earned": False,
         "cost_reported": True,
+        "cost_leftover_recorded": True,
+        "cost_leftover_id": 44,
+        "cost_leftover_tick": 88,
         "cost_in_ci_all_passed": False,
     }
     if args.full:
