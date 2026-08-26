@@ -6,6 +6,14 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — BEM-Net G2 leftover-recorded (theory 02-06)
+
+- Leftover #24's disc-accuracy miss now leftover-records `reported`
+  plus honesty flags on `benchmarks/bem_net.py`.
+- Reported: no Dirichlet density solve; named annulus L2 stays `--full`.
+  Not in CI `all_passed`.
+- Smoke: `docs/benchmarks/bem_net_smoke.json`.
+
 ### Added — Multi-interface G4 leftover-recorded (theory 02-05)
 
 - Leftover #38's hard vs penalized miss now leftover-records `reported`

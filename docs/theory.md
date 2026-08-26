@@ -220,7 +220,7 @@ gates are earned on smoke, not in CI `all_passed`.
   collapse; sound gap, not P vs NP. G3 vs k-NN leftover-recorded. Cost
   vs `n`/`D` leftover-recorded.
 - **BEM-Net** ([02-06](api/bem.md)): PDE exact off-surface; BC approximated;
-  linear constant-coeff homogeneous only.
+  linear constant-coeff homogeneous only. G2 disc-accuracy leftover-recorded.
 - **Pack tree** ([02-07](api/hierarchy.md)): 1-D offsets; `eta=0` bit-identical
   to dense; far-field is a truncation with a bound. G3 complexity
   leftover-recorded (per-source Taylor, no dense crossover).

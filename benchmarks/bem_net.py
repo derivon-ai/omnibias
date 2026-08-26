@@ -2,10 +2,10 @@
 # Copyright (C) 2026 Derivon
 """Gated architecture: BEM-Net (theory 02-06). Off-surface exact; BC approximated.
 
-G2 disc-accuracy stays smoke/``--full``. Single-layer wall vs ``n_quad``
-is reported. G3 exterior win is reported unearned: pack-tree 02-07 G3
-has no dense crossover, and no volume-PINN loop is wired. Neither is
-in CI ``all_passed``.
+G2 disc-accuracy is leftover-recorded (leftover #24) and stays
+``--full``. Single-layer wall vs ``n_quad`` is reported. G3 exterior
+win is reported unearned: pack-tree 02-07 G3 has no dense crossover,
+and no volume-PINN loop is wired. Neither is in CI ``all_passed``.
 """
 
 from __future__ import annotations
@@ -80,18 +80,24 @@ def _run_cost() -> dict[str, Any]:
         "rows": rows,
         "g2_disc_accuracy": {
             "earned": False,
+            "reported": True,
+            "leftover_recorded": True,
+            "leftover_id": 24,
+            "leftover_tick": 61,
             "stays_full": True,
             "need": "exterior Dirichlet disc relative L2 <= 1e-8 on a test annulus, skill > 0",
             "reason": (
-                "No Dirichlet density solve is wired. Constant-density "
-                "single_layer wall vs n_quad is recorded; that is not the "
-                "named annulus L2 gate. Dense N-point eval is the O(N^2) "
-                "honesty bound (no 2-D FMM)."
+                "Leftover #24 leftover-recorded: no Dirichlet density "
+                "solve is wired. Constant-density single_layer wall vs "
+                "n_quad is recorded; that is not the named annulus L2 "
+                "gate. Dense N-point eval is the O(N^2) honesty bound "
+                "(no 2-D FMM)."
             ),
         },
         "note": (
-            "single_layer wall vs n_quad (one far point and N exterior "
-            "points). G2 disc-accuracy is a Dirichlet L2 study under "
+            "Leftover #24 leftover-recorded: single_layer wall vs "
+            "n_quad (one far point and N exterior points). G2 "
+            "disc-accuracy is a Dirichlet L2 study under "
             "$OMNIBIAS_SCRATCH, not CI. Previous g2_disc_accuracy "
             "passed=True / smoke/--full stub with no timing withdrawn. "
             "G3 exterior win is reported from the pack-tree leftover, "
@@ -188,6 +194,10 @@ def main() -> int:
         "founding_bias_collapse": True,
         "temperature_collapse": False,
         "g2_disc_accuracy_earned": False,
+        "g2_reported": True,
+        "g2_leftover_recorded": True,
+        "g2_leftover_id": 24,
+        "g2_leftover_tick": 61,
         "g2_stays_full": True,
         "g3_exterior_win_earned": False,
         "g3_reported": True,

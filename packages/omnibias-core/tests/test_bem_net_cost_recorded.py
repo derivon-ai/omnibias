@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""02-06 single-layer cost is reported; G2/G3 stay out of all_passed."""
+"""02-06 G2 disc-accuracy is leftover-recorded; G3 stays out of all_passed."""
 
 from __future__ import annotations
 
@@ -20,10 +20,16 @@ def test_cost_is_reported_and_g2_out_of_all_passed() -> None:
     assert cost["reported"] is True
     assert cost["in_ci_all_passed"] is False
     assert cost["g2_disc_accuracy"]["earned"] is False
+    assert cost["g2_disc_accuracy"]["reported"] is True
+    assert cost["g2_disc_accuracy"]["leftover_recorded"] is True
+    assert int(cost["g2_disc_accuracy"]["leftover_id"]) == 24
+    assert int(cost["g2_disc_accuracy"]["leftover_tick"]) == 61
     assert cost["g2_disc_accuracy"]["stays_full"] is True
     ns = {int(row["n_quad"]) for row in cost["rows"]}
     assert {12, 24, 48} <= ns
     assert payload["honesty"]["g2_disc_accuracy_earned"] is False
+    assert payload["honesty"]["g2_leftover_recorded"] is True
+    assert int(payload["honesty"]["g2_leftover_id"]) == 24
     assert payload["honesty"]["cost_in_ci_all_passed"] is False
     names = [row["name"] for row in payload["gates"]["entries"]]
     assert "g2_disc_accuracy" not in names
