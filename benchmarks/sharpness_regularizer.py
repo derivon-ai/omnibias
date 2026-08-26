@@ -3,7 +3,8 @@
 """Frontier 09-23: sharpness-augmented loss.
 
 G1 is H=10 and L_sharp(0)=1. G2 trains a 1-D Poisson finite.
-G3 records that this is not the 08-06 schedule.
+G3 records that this is not the 08-06 schedule. G4 is torch/jax
+bit-identity on G1.
 """
 
 from __future__ import annotations
@@ -15,12 +16,19 @@ import time
 from pathlib import Path
 from typing import Any
 
+import jax
+import jax.numpy as jnp
+import torch
 from omnibias.core.sharp_loss import (
     DISCLAIMER,
     honesty_payload,
     sharpness_skill,
     worked_example,
 )
+from omnibias.jax.optim_sharp_loss import sharpness_augmented_loss as jax_aug
+from omnibias.jax.optim_sharp_loss import worked_example as jax_ex
+from omnibias.torch.optim_sharp_loss import sharpness_augmented_loss as torch_aug
+from omnibias.torch.optim_sharp_loss import worked_example as torch_ex
 
 sys.path.insert(0, os.path.dirname(__file__))
 from _common import provenance, write_json  # type: ignore[import-not-found]  # noqa: E402
@@ -41,6 +49,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g2 = bool(skill["g2_earned"])
     hon = honesty_payload()
     g3 = hon["is_08_06_schedule"] is False
+    jax.config.update("jax_enable_x64", True)
+    torch.set_default_dtype(torch.float64)
+    t_aug = torch_aug(None, torch.tensor(0.0))
+    j_aug = jax_aug(None, jnp.asarray(0.0))
+    g4 = bool(torch_ex() == jax_ex() and t_aug == j_aug)
     entries = [
         {
             "name": "g1_cell",
@@ -61,6 +74,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "passed": g3,
             "is_08_06_schedule": False,
             "schedule_only": False,
+        },
+        {
+            "name": "g4_parity",
+            "passed": g4,
+            "torch_aug": t_aug,
+            "jax_aug": j_aug,
         },
     ]
     for entry in entries:

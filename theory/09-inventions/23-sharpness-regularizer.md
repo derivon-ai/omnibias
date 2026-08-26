@@ -6,7 +6,7 @@ Add exact `lambda_max(H)` or `Tr(H)` to the **loss**, using exact
 HVPs — distinct from 08-06, which only *schedules* the cubic step
 size.
 
-- **Status**: gated
+- **Status**: shipped (G1–G4 CI; G4 torch/jax parity on G1; not 08-06 schedule)
 - **Depends on**: 08-06, 09-01
 - **Blocks**: none
 

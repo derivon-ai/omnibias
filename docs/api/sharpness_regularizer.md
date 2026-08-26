@@ -5,7 +5,7 @@ Founding bias collapse (`delta -> 0`) supplies `sigma''`. Temperature
 collapse (`beta -> inf`, feasibility) does not appear.
 
 This is **not** 08-06. That spec only schedules cubic `sigma` / lr.
-Ritz underestimates `lambda_max`. Status is **gated**, not shipped.
+Ritz underestimates `lambda_max`. Status is **shipped**.
 Not ImageNet SAM. Not CCF stretch.
 
 Homes: `omnibias.core.sharp_loss`,

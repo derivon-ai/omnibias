@@ -6,6 +6,13 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Sharpness regularizer shipped (theory 09-23)
+
+- Spec 09-23 status is **shipped**: G1–G4 CI; G4 torch/jax parity
+  on the G1 augmented loss.
+- Not the 08-06 schedule.
+- Smoke: `docs/benchmarks/sharpness_regularizer_smoke.json`.
+
 ### Added — Inverse design shipped (theory 09-22)
 
 - Spec 09-22 status is **shipped**: G1–G4 CI; G4 torch/jax parity

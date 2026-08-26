@@ -406,6 +406,8 @@ gates are earned on smoke, not in CI `all_passed`.
   Hyvärinen; CNF exact `div` is prior art. Status is **shipped**.
 - **Inverse design** ([09-22](api/inverse_design.md)): Newton-on-`x`,
   not a global inverse. Status is **shipped**.
+- **Sharpness regularizer** ([09-23](api/sharpness_regularizer.md)):
+  `L + mu * ritz`, not 08-06. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
