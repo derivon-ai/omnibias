@@ -29,6 +29,7 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError as _PkgNotFound
 from importlib.metadata import version as _pkg_version
 
+from omnibias.boolean.inequality import BooleanInequalityBackend
 from omnibias.boolean._core import (
     BooleanAntiderivative,
     BooleanSolution,
@@ -107,6 +108,7 @@ __lineage__ = "both"
 
 __all__ = [
     "BooleanAntiderivative",
+    "BooleanInequalityBackend",
     "BooleanSolution",
     "GF2Solution",
     "GeneralSolution",

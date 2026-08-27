@@ -26,6 +26,15 @@ distributions is versioned independently under semantic versioning.
   slice. Not JC.
 - Cookbook: [`docs/cookbook/jacobian-n2-box.md`](docs/cookbook/jacobian-n2-box.md).
 
+### Added — Inequality engine (09-30)
+
+- `omnibias.core.proof.inequality`: one `inequality_system` kind
+  with propose / rationalize / check. Linear, polynomial, Boolean,
+  and finite-CSP adapters register at import. Soft RMSE is never
+  an exact check. Not a new LP algorithm; not P vs NP.
+- Cookbook: [`docs/cookbook/inequality-engine.md`](docs/cookbook/inequality-engine.md).
+- Smoke: [`docs/benchmarks/inequality_facade_smoke.json`](docs/benchmarks/inequality_facade_smoke.json).
+
 ### Added — Proof engine
 
 - `omnibias.core.proof.engine`: named-kind router

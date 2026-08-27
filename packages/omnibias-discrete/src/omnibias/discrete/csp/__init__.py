@@ -11,6 +11,7 @@ not P vs NP.
 
 from __future__ import annotations
 
+from omnibias.discrete.csp.inequality import CspInequalityBackend
 from omnibias.discrete.csp._core import (
     CSP,
     CSPCertificate,
@@ -38,6 +39,7 @@ __all__ = [
     "CSP",
     "CSPCertificate",
     "CSPResult",
+    "CspInequalityBackend",
     "GlobalConstraint",
     "Relation",
     "Variable",

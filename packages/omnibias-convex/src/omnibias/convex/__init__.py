@@ -33,6 +33,7 @@ from omnibias.convex.certify import (
     lp_dual_lower_bound,
 )
 from omnibias.convex.problem import BarrierOptions, ConvexSolution
+from omnibias.convex.inequality import LinearInequalityBackend
 from omnibias.convex.warm_start import (
     active_set_warm_start,
     geometry_warm_start,
@@ -52,6 +53,7 @@ __all__ = [
     "Certificate",
     "CertificationError",
     "ConvexSolution",
+    "LinearInequalityBackend",
     "__lineage__",
     "__version__",
     "active_set_warm_start",

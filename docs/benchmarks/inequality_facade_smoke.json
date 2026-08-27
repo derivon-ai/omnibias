@@ -1,0 +1,184 @@
+{
+  "schema": "omnibias.benchmarks.inequality_facade.v1",
+  "generated_utc": "2026-08-26T20:56:19Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "inequality_facade",
+    "full": false
+  },
+  "rss_mb_at_start": 818.3,
+  "rows": [
+    {
+      "name": "linear_box_sat",
+      "expected": "PROVED",
+      "status": "PROVED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "linear_empty_enum",
+      "expected": "DISPROVED",
+      "status": "DISPROVED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "linear_highdim_blocked",
+      "expected": "BLOCKED",
+      "status": "BLOCKED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "poly_constant_one",
+      "expected": "PROVED",
+      "status": "PROVED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "poly_constant_neg",
+      "expected": "DISPROVED",
+      "status": "DISPROVED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "poly_x2_y2_blocked",
+      "expected": "BLOCKED",
+      "status": "BLOCKED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "boolean_and_sat",
+      "expected": "PROVED",
+      "status": "PROVED",
+      "replay_ok": true,
+      "pipeline": [
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "boolean_x_not_x_unsat",
+      "expected": "DISPROVED",
+      "status": "DISPROVED",
+      "replay_ok": true,
+      "pipeline": [
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "boolean_budget_zero",
+      "expected": "BLOCKED",
+      "status": "BLOCKED",
+      "replay_ok": true,
+      "pipeline": [
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "csp_two_var_sat",
+      "expected": "PROVED",
+      "status": "PROVED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "csp_empty_unsat",
+      "expected": "DISPROVED",
+      "status": "DISPROVED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    },
+    {
+      "name": "csp_anneal_blocked",
+      "expected": "BLOCKED",
+      "status": "BLOCKED",
+      "replay_ok": true,
+      "pipeline": [
+        "propose",
+        "rationalize",
+        "check"
+      ]
+    }
+  ],
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_dispatch",
+        "passed": true,
+        "kinds": [
+          "inequality_system"
+        ]
+      },
+      {
+        "name": "g2_catalog",
+        "passed": true,
+        "n": 12
+      },
+      {
+        "name": "g3_honesty",
+        "passed": true
+      },
+      {
+        "name": "g4_pipeline",
+        "passed": true,
+        "in_ci_all_passed": true
+      },
+      {
+        "name": "g5_enclosure_width",
+        "passed": false,
+        "earned": false,
+        "leftover_recorded": true,
+        "in_ci_all_passed": false,
+        "note": "enclosure width vs naive interval is leftover-recorded, not SOTA"
+      }
+    ]
+  },
+  "wall_seconds": 1.2339485170086846
+}

@@ -7,7 +7,7 @@ way, and the repository has already learned that lesson the expensive way — so
 this file assigns every spec a home under the "earn independent existence" rule
 and sequences them so that the cheap falsifiers run before the expensive builds.
 
-- **Status**: shipped (G1–G5 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 98/98 specs name a home, Wave-0 A4–A7 recorded, no failed falsifier / no `retired` row; G4 vacuous; G5 vacuous — not promoted: 2 external consumers, 389 lines < 2000; no new distribution)
+- **Status**: shipped (G1–G5 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 99/99 specs name a home, Wave-0 A4–A7 recorded, no failed falsifier / no `retired` row; G4 vacuous; G5 vacuous — not promoted: 2 external consumers, 389 lines < 2000; no new distribution)
 - **Depends on**: 06-01, 06-02
 - **Blocks**: none
 
@@ -46,7 +46,7 @@ Almost everything lands in an existing package.
 
 | Home | Specs |
 |---|---|
-| `omnibias-core` | 01-04 stencils, 01-05 mollifier algebra, 01-06 frames, 01-07 spectral design, 01-09 locus, 01-10 jet vocabulary (docs + contact tests), 01-11 Lean obligations, 01-12 conjugate Hilbert, 02-07 pack tree, 02-09 tanh-method algebra, 02-10 ladder algebra, 02-11 transfer algebra, 02-13 named transforms, 03-06 quadrature, 09-05 Taylor-model neuron, 09-29 plant PID algebra |
+| `omnibias-core` | 01-04 stencils, 01-05 mollifier algebra, 01-06 frames, 01-07 spectral design, 01-09 locus, 01-10 jet vocabulary (docs + contact tests), 01-11 Lean obligations, 01-12 conjugate Hilbert, 02-07 pack tree, 02-09 tanh-method algebra, 02-10 ladder algebra, 02-11 transfer algebra, 02-13 named transforms, 03-06 quadrature, 09-05 Taylor-model neuron, 09-29 plant PID algebra, 09-30 inequality engine protocol |
 | `omnibias-torch` / `omnibias-jax` (twins) | 01-01 multi-pack, 01-02 scan, 02-01 Scan-Net, 02-03 Jet-KAN, 02-07 hierarchical scan, 02-08 equivariant scan, 02-10 LadderNet, 03-12 line search, 03-13 refinement, 08-02 composed curvature, 08-03 local jet, 08-04 Kantorovich accept, 08-06 sharpness, 08-07 block search, 08-08 `implicit` DEQ, 09-02 jet-token, 09-03 FTC-Net, 09-04 Frame-UNet, 09-07 Pack-MoE, 09-10 Riccati flow, 09-11 Collapse-Net wrappers, 09-16 exact MAML, 09-18 remainder, 09-19 jet distill, 09-20 homotopy, 09-22 inverse-design, 09-23 sharpness loss, 09-28 sliced-jet encoder, 09-29 plant PID |
 | `omnibias-fields` | 02-04 weak-form VPINN, 01-09 / 02-12 equality-locus layer |
 | `omnibias-pinn` | 02-05 transmission PINN, 02-06 BEM-Net, 02-09 travelling, 02-11 layered transfer, 02-13 linearizing transforms, 05-01 inverse problems, 08-05 depth-causal residual, 09-08 Characteristic-Net, 09-14 integral-kernel operator, 09-17 dual-FTC, 09-27 parameter-space jets |
@@ -183,7 +183,7 @@ documented mistake, so it ships as `omnibias.geometry.gauge.holonomy`.
 with a written promotion criterion, which is the only case in the tree where a
 new distribution is even plausible. It did **not** land in `geometry`.
 
-**Net effect: 98 specs, 0 new packages at the start, at most 1 later.** If that
+**Net effect: 99 specs, 0 new packages at the start, at most 1 later.** If that
 number grows during implementation, the rule is being bypassed, and the tree
 inventory in `AGENTS.md` is the place it will show.
 

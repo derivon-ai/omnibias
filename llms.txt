@@ -217,6 +217,8 @@ sliced-jet encoder (09-28; scan-jet tokens + named energy;
 G1–G5 CI; not a ViT),
 plant PID layer (09-29; exact I/D on an activation-of-time
 error; G1–G4 CI; not 08-10; not cruise SOTA),
+inequality engine (09-30; propose / rationalize / check;
+G1–G4 CI; not a new LP algorithm; not P vs NP),
 conformal slabs (04-02; three guarantee kinds; G1–G6 CI;
 conformal is not sealable). Cost /
 wall-time / FermiNet-many-body gates are

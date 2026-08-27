@@ -51,6 +51,7 @@ from omnibias.sos.honesty import (
     honesty_labels,
     seal_sos_certificate,
 )
+from omnibias.sos.inequality import PolynomialInequalityBackend
 from omnibias.sos.monomials import (
     MonomialBasis,
     SOSProblem,
@@ -100,6 +101,7 @@ __all__ = [
     "GLOBAL_POLYNOMIAL",
     "MonomialBasis",
     "Polynomial",
+    "PolynomialInequalityBackend",
     "PolynomialSystem",
     "PositivstellensatzCertificate",
     "RationalPolynomial",
