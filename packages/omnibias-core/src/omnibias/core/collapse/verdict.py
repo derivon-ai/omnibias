@@ -15,7 +15,8 @@ residual of a *finite* obligation collapsing onto the singleton
 A float residual is refused. ``theorem_prover_verified`` stays false.
 Continuum parents are never inferred. Do not conflate this with
 founding bias collapse (``delta -> 0``), temperature collapse
-(``beta -> inf``), or Enclosure Collapse (``width -> 0`` of a value).
+(``beta -> inf``), or Enclosure Collapse (``width -> 0`` of a sound
+enclosure, yielding a point plus a proof).
 The surviving object here is a :class:`ObligationVerdict`.
 """
 

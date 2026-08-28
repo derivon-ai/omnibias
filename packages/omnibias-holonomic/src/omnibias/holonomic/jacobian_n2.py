@@ -183,7 +183,7 @@ def n2_counterexample_earned(payload: Mapping[str, Any]) -> bool:
     if payload.get("gabber_fails") is True:
         return True
     preimages = payload.get("rational_preimages")
-    if not isinstance(preimages, (list, tuple)) or len(preimages) < 2:
+    if not isinstance(preimages, list | tuple) or len(preimages) < 2:
         return False
     points = [_as_point(item) for item in preimages]
     if None in points:
@@ -265,7 +265,7 @@ def n2_violation_payload(
 
 
 def _as_point(item: Any) -> tuple[Fraction, ...] | None:
-    if not isinstance(item, (list, tuple)) or len(item) < 2:
+    if not isinstance(item, list | tuple) or len(item) < 2:
         return None
     try:
         return tuple(Fraction(str(coord)) for coord in item)

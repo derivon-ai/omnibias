@@ -41,13 +41,13 @@ from omnibias.pinn.inverse._core import (
 )
 
 __all__ = [
-    "SUBMODULAR_GUARANTEE",
     "BoundaryTrack",
     "GuaranteeKindError",
     "IdentifiabilityReport",
     "InterfaceEstimate",
     "InverseRegularizerError",
     "LayerStack",
+    "SUBMODULAR_GUARANTEE",
     "SensorPlan",
     "admissible_band",
     "enclose_peak",

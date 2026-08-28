@@ -1911,11 +1911,11 @@ __all__ = [
     "project_omega_hardy_torch",
     "pv_hu_from_omega",
     "pv_mapped_tail_hu_from_omega",
-    "wholeline_hp_hu_from_omega",
     "reproduce_deepmind_config",
     "residual_vector",
     "run_ccf_vorticity_neural_discovery",
     "spectral_hu_from_omega",
     "vorticity_fields",
     "wang_residual",
+    "wholeline_hp_hu_from_omega",
 ]

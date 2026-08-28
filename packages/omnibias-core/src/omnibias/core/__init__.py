@@ -222,6 +222,7 @@ from omnibias.core.scale import (
     rescale_pack,
     stiffness_matrix,
 )
+from omnibias.core.scan import BankSpec
 from omnibias.core.sharpness import (
     SharpnessReport,
     SharpnessSchedule,

@@ -52,11 +52,21 @@ curvature = ["omnibias-curvature>=0.1.0a1"]
 # The named gradient-boosting baseline + tabular dataset loaders for the
 # benchmark harness (kept out of the core deps; the refine loop needs them).
 gbm = ["lightgbm>=4.0", "scikit-learn>=1.2", "openml>=0.14"]
+# CatBoost, used both as a plain regression baseline and (via
+# loss_function="RMSEWithUncertainty") as the frozen, independent per-row
+# noise estimator theory 05-03 depends on (never an omnibias.tab model
+# judging its own noise). Kept separate from `gbm` so CI can smoke-test
+# 05-03 without pulling in RealMLP/TabM, which stay `--full`-only.
+catboost = ["catboost>=1.2"]
+# RealMLP / TabM tabular-DL baselines via pytabkit (theory 05-03 section 9).
+# Heavier than `gbm`/`catboost` (torch-based, its own training loop) and
+# stays out of CI, matching the existing "only LightGBM runs in CI" rule.
+pytabkit = ["pytabkit>=1.7"]
 keras = ["keras>=3.0", "omnibias-partition[keras]>=0.1.0a1"]
 equinox = ["omnibias-tab[jax]", "equinox"]
 all = ["omnibias-tab[torch,jax,verify,curvature]"]
 test = ["pytest>=7.0", "numpy>=1.24"]
-dev = ["omnibias-tab[all,test,gbm]", "ruff>=0.1.0", "mypy>=1.5"]
+dev = ["omnibias-tab[all,test,gbm,catboost,pytabkit]", "ruff>=0.1.0", "mypy>=1.5"]
 
 [project.urls]
 Homepage = "https://github.com/derivon-ai/omnibias"

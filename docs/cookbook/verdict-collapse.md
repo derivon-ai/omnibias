@@ -6,7 +6,7 @@ not a proof. Collapse onto `{0}` is `PROVED`. Exclusion of `0` is
 `DISPROVED`. A fat interval that still contains `0` is `BLOCKED`
 (`Inconclusive`), not false. This is not founding bias collapse
 (`delta -> 0`), not temperature collapse (`beta -> inf`), and not
-Enclosure Collapse of a value (`width -> 0`).
+Enclosure Collapse of a value (`width -> 0` of a sound enclosure, a point plus a proof).
 
 ## `{0}` proves; a fat zero does not
 

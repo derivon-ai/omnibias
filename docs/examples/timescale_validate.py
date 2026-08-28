@@ -8,7 +8,7 @@ Run:
     python docs/examples/timescale_validate.py
 
 Each *probe* turns a time-scale capability into an instrumented experiment under the
-``omnibias-dev-empirical-validation`` gates -- a high-precision reference, a best-in-class
+``omnibias-empirical-validation`` gates -- a high-precision reference, a best-in-class
 comparison against a named baseline, and a ``K >= 8`` seed sweep -- recording findings into
 a shared :class:`~omnibias.difference.validation.FindingsLedger`.
 

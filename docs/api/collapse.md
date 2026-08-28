@@ -27,8 +27,9 @@ identity: exact `Q` coefficient agreement is `{0}`; a float `||R_N||`
 is not a proof.
 
 Winding collapse (`omnibias.core.collapse.winding`) encloses
-`Δarg / 2π` on a circle and accepts only a unique integer. Not a
-blow-up proof.
+`Δarg / 2π` on a circular or axis-aligned rectangular contour and
+accepts only a unique integer. Not a blow-up proof. See
+[contour winding](contour.md).
 
 Pairing collapse (`omnibias.core.collapse.pairing`) is a certified
 weak residual on a finite test pack, not a strong solution.

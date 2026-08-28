@@ -17,10 +17,12 @@ is a recorded truncation. Exponents are refused without that order.
 from __future__ import annotations
 
 import math
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
+from numpy.typing import NDArray
 from omnibias.core.composed_curvature import eval_tanh_derivative
 from omnibias.core.multipack import PackSpec
 from omnibias.core.polynomials import hermite_coeffs
@@ -145,7 +147,11 @@ def overlap(p: ScaledPack, q: ScaledPack, *, derivative_order: int = 0) -> float
     x0 = (a2 * p.mean + b2 * q.mean) / gamma
     complete = math.exp(-a2 * b2 * (p.mean - q.mean) ** 2 / (2.0 * gamma))
     deg = np_ + nq + k
-    nodes, weights = np.polynomial.hermite_e.hermegauss(max(deg + 4, 8))
+    hermegauss = cast(
+        Callable[[int], tuple[NDArray[np.float64], NDArray[np.float64]]],
+        np.polynomial.hermite_e.hermegauss,
+    )
+    nodes, weights = hermegauss(max(deg + 4, 8))
     scale = math.sqrt(gamma)
     acc = 0.0
     for t, w in zip(nodes, weights, strict=True):
@@ -192,7 +198,7 @@ def coarse_grain_linear(
     return EffectiveOperator(slow=slow, matrix=tuple(mat), cutoff=float(cutoff), linear=True)
 
 
-def gram_matrix(packs: Sequence[ScaledPack]) -> np.ndarray:
+def gram_matrix(packs: Sequence[ScaledPack]) -> NDArray[np.float64]:
     n = len(packs)
     g = np.zeros((n, n), dtype=np.float64)
     for i, p in enumerate(packs):
@@ -201,7 +207,7 @@ def gram_matrix(packs: Sequence[ScaledPack]) -> np.ndarray:
     return g
 
 
-def stiffness_matrix(packs: Sequence[ScaledPack], *, derivative_order: int = 2) -> np.ndarray:
+def stiffness_matrix(packs: Sequence[ScaledPack], *, derivative_order: int = 2) -> NDArray[np.float64]:
     n = len(packs)
     a = np.zeros((n, n), dtype=np.float64)
     for i, p in enumerate(packs):

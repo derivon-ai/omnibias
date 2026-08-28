@@ -33,6 +33,17 @@ from omnibias.verify._core.certificates import (
     monotonicity,
     reachable_box,
 )
+from omnibias.verify._core.enclosure_collapse import (
+    SqueezeReport,
+    report_digest_ok,
+    squeeze,
+    squeeze_existence,
+    squeeze_flow,
+    squeeze_identifiability,
+    squeeze_peak,
+    squeeze_remainder,
+    squeeze_residual,
+)
 from omnibias.verify._core.global_opt import (
     GlobalMinResult,
     certified_minimize,
@@ -80,17 +91,6 @@ from omnibias.verify._core.norms import (
     certified_layer_cake_integral,
     certified_lp_norm,
     certified_sobolev_norm,
-)
-from omnibias.verify._core.enclosure_collapse import (
-    SqueezeReport,
-    report_digest_ok,
-    squeeze,
-    squeeze_existence,
-    squeeze_flow,
-    squeeze_identifiability,
-    squeeze_peak,
-    squeeze_remainder,
-    squeeze_residual,
 )
 from omnibias.verify._core.param_global import (
     GlobalTrainingCertificate,

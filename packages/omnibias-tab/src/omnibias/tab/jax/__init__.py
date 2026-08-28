@@ -5,6 +5,7 @@
 from __future__ import annotations
 
 from omnibias.tab.jax.arrangement import arrangement_forward, boosted_forward
+from omnibias.tab.jax.embed import band_feature_embed
 from omnibias.tab.jax.jet import (
     extract_arrangement_jet,
     extract_tree_jet,
@@ -16,9 +17,11 @@ from omnibias.tab.jax.model import (
     forward_arrays,
     natural_gradient_step,
 )
+from omnibias.tab.jax.pou import pou_forward_arrays, pou_tokens
 
 __all__ = [
     "arrangement_forward",
+    "band_feature_embed",
     "boosted_forward",
     "extract_arrangement_jet",
     "extract_tree_jet",
@@ -27,4 +30,6 @@ __all__ = [
     "forward",
     "forward_arrays",
     "natural_gradient_step",
+    "pou_forward_arrays",
+    "pou_tokens",
 ]

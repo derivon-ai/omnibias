@@ -22,6 +22,9 @@ assert founding["enclosure"].surviving_object == "point_plus_proof"
 
 ## A rebrand of Enclosure Collapse is refused
 
+Enclosure Collapse is `width -> 0` of a sound enclosure, whose result is a
+point plus a proof; a renamed gap parameter does not create another collapse.
+
 ```python
 from omnibias.core.collapse import CollapseSpec, register_collapse, reset_collapse_registry
 

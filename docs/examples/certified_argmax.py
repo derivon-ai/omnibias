@@ -11,7 +11,7 @@ The Gibbs law ``p_beta(i) ∝ exp(beta s_i)`` over ``N`` logits collapses onto a
 mode (``argmax``) as ``beta -> inf``. Softmax is not the contribution -- everyone has it -- the
 contribution is a **sound, closed-form certificate** of how far that collapse has gone, plus the
 exact Gibbs moments from the log-sum-exp tower. This deterministic, CPU-tiny demo exercises both
-halves under the ``omnibias-dev-empirical-validation`` gates (data-driven / verified /
+halves under the ``omnibias-empirical-validation`` gates (data-driven / verified /
 best-in-class):
 
 1. **Certified collapse (verified).** For a fixed logit vector, seal a

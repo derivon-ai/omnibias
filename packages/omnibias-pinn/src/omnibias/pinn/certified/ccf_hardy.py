@@ -54,7 +54,7 @@ from omnibias.core.verified.hardy_line import (
     hilbert_of_hardy_even_deriv_n,
     hilbert_of_hardy_odd_deriv_n,
 )
-from omnibias.core.verified.interval import Interval, sum_intervals
+from omnibias.core.verified.interval import Interval, IntervalLike, sum_intervals
 from omnibias.core.verified.kantorovich import radii_polynomial_certificate
 from omnibias.core.verified.linalg import (
     identity_matrix,
@@ -115,7 +115,7 @@ def _normalize_vorticity_atoms(
 
 def _omega_fields_point(
     y: float,
-    coeffs: Sequence[float],
+    coeffs: Sequence[IntervalLike],
     scales: Sequence[float],
     gammas: Sequence[float],
     orders: Sequence[int] | None = None,
@@ -129,7 +129,7 @@ def _omega_fields_point(
     uy = Interval.point(0.0)
     if n0:
         for c, a, g in zip(coeffs, scales, gammas, strict=True):
-            c_iv = Interval.point(float(c))
+            c_iv = Interval.from_value(c)
             om = om + c_iv * hardy_odd(y, float(a), float(g))
             omy = omy + c_iv * Interval.point(float(g)) * hardy_even(
                 y, float(a), float(g) + 1.0
@@ -144,7 +144,7 @@ def _omega_fields_point(
                 )
         return om, omy, u, uy
     for c, a, g, n_ord, par in zip(coeffs, scales, gammas, ords, pars, strict=True):
-        c_iv = Interval.point(float(c))
+        c_iv = Interval.from_value(c)
         aa, gg, nn = float(a), float(g), int(n_ord)
         if par == 1:
             om = om + c_iv * hardy_odd_deriv_n(y, aa, gg, nn)
@@ -160,7 +160,7 @@ def _omega_fields_point(
 
 
 def _vorticity_residual_interval(
-    coeffs: Sequence[float],
+    coeffs: Sequence[IntervalLike],
     scales: Sequence[float],
     gammas: Sequence[float],
     lam: float,
@@ -174,6 +174,102 @@ def _vorticity_residual_interval(
     y_iv = Interval.point(y)
     lam_iv = Interval.point(lam)
     return om + ((Interval.point(1.0) + lam_iv) * y_iv - u) * omy - om * uy
+
+
+def _vorticity_hessian_intervals(
+    coeffs: Sequence[float],
+    scales: Sequence[float],
+    gammas: Sequence[float],
+    lam: float,
+    y: float,
+    *,
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
+) -> list[list[Interval]]:
+    r"""Rigorous coefficient Hessian of the frozen-``lambda`` vorticity residual.
+
+    For fixed scales, gammas, and ``lambda``, the residual is quadratic in the
+    Hardy coefficients.  Centered second-difference stencils on *interval*
+    coefficient perturbations therefore give the exact Hessian algebraically:
+    there is no unbounded finite-difference remainder.  Outward interval
+    evaluation of each stencil value encloses its floating-point evaluation.
+    The first coefficient is the normalization direction and is excluded from
+    the free collocation variables.
+    """
+    n = len(scales)
+    if len(coeffs) != n:
+        raise ValueError("coeffs length must match scales")
+    if len(gammas) != n:
+        raise ValueError("gammas length must match scales")
+    base = [Interval.point(float(c)) for c in coeffs]
+    step = Interval.point(1.0)
+
+    def residual_at(values: Sequence[Interval]) -> Interval:
+        return _vorticity_residual_interval(
+            values,
+            scales,
+            gammas,
+            lam,
+            y,
+            orders=orders,
+            parities=parities,
+        )
+
+    center = residual_at(base)
+
+    def shifted(*directions: tuple[int, float]) -> list[Interval]:
+        values = list(base)
+        for index, sign in directions:
+            values[index] = values[index] + Interval.point(sign) * step
+        return values
+
+    hessian: list[list[Interval]] = []
+    for i in range(1, n):
+        row: list[Interval] = []
+        for j in range(1, n):
+            if i == j:
+                value = (
+                    residual_at(shifted((i, 1.0)))
+                    - Interval.point(2.0) * center
+                    + residual_at(shifted((i, -1.0)))
+                )
+            else:
+                value = (
+                    residual_at(shifted((i, 1.0), (j, 1.0)))
+                    - residual_at(shifted((i, 1.0), (j, -1.0)))
+                    - residual_at(shifted((i, -1.0), (j, 1.0)))
+                    + residual_at(shifted((i, -1.0), (j, -1.0)))
+                ) / Interval.point(4.0)
+            row.append(value)
+        hessian.append(row)
+    return hessian
+
+
+def _vorticity_hessian_abs_sum_interval(
+    coeffs: Sequence[float],
+    scales: Sequence[float],
+    gammas: Sequence[float],
+    lam: float,
+    y: float,
+    *,
+    orders: Sequence[int] | None = None,
+    parities: Sequence[int] | None = None,
+) -> Interval:
+    """An outward-rounded absolute-sum bound on the free coefficient Hessian."""
+    entries = [
+        entry.abs()
+        for row in _vorticity_hessian_intervals(
+            coeffs,
+            scales,
+            gammas,
+            lam,
+            y,
+            orders=orders,
+            parities=parities,
+        )
+        for entry in row
+    ]
+    return sum_intervals(entries) if entries else Interval.point(0.0)
 
 
 def _hardy_residual_interval(
@@ -853,7 +949,17 @@ def certified_ccf_hardy_wholeline_blowup_attempt(
             while len(row) < n:
                 row.append(Interval.point(0.0))
             a_iv.append(row[:n])
-            hess_sums.append(Interval(-1.0, 1.0))  # crude curvature bound
+            hess_sums.append(
+                _vorticity_hessian_abs_sum_interval(
+                    cs,
+                    as_,
+                    gs,
+                    lam_f,
+                    y,
+                    orders=ords,
+                    parities=pars,
+                )
+            )
     else:
         for y in ynodes:
             e_iv, row, hess_abs = _hardy_node_system(cs, as_, lam_f, y, form, s)
@@ -989,6 +1095,7 @@ def certified_ccf_hardy_wholeline_blowup_attempt(
             "residual_normal_form_Y0": float(y0_col),
             "linear_defect_Z1": float(z1_col),
             "nonlinear_curvature_Z2": float(z2_col),
+            "collocation_hessian_abs_sum_max": float(kappa2),
             "approximate_inverse_norm": float(norm_b),
             "neumann_kappa": float(neumann["kappa"]),
             "neumann_certified": bool(neumann["certified"]),

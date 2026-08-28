@@ -61,7 +61,7 @@ def directional_derivatives(
         return loss_fn(params + step * direction)
 
     s0 = torch.zeros((), dtype=params.dtype, device=params.device)
-    derivs = [float(cast(Tensor, phi(s0)))]
+    derivs = [float(phi(s0))]
     current: Callable[[Tensor], Tensor] = phi
     for _ in range(order):
         current = grad(current)

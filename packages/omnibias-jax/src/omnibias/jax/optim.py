@@ -43,11 +43,22 @@ This module provides
   loop driven by a ``residual_fn``.
 * :func:`grad_norm_weights` -- self-adaptive loss weights that equalise the per-term
   gradient norms (Wang-Teng-Perdikaris 2021 gradient-pathology balancing).
+* :func:`linf_minimax_step` / :func:`linf_minimax_minimize` -- the **L-infinity**
+  (minimax) sibling of the Gauss-Newton family above: each step proposes a
+  linearized-epigraph / Lawson-IRLS direction from :func:`linearized_linf_direction`
+  inside a shrinking trust-region ``box`` and accepts it only when the *true*
+  (non-linearized) ``max|r|`` does not increase, so the loop is a monotone descent
+  on ``max_i |r_i(theta)|`` rather than on ``0.5 sum r_i(theta)^2``. This is a
+  generic comparison utility for any ``residual_fn`` -- it makes no claim about any
+  specific model, benchmark, or certified result.
 
 For the standard L2 collocation PINN functional, the Gauss-Newton matrix ``J^T J``
 *is* the empirical Sobolev Gram matrix, so :func:`gauss_newton_step` is exactly the
 **empirical energy natural gradient** (Mueller-Zeinhofer 2023) -- the method that takes
-PINNs from ``1e-3`` to near machine precision.
+PINNs from ``1e-3`` to near machine precision. L2 Gauss-Newton and L-infinity minimax
+generally disagree on their optimum whenever one residual component is a genuine
+outlier relative to the others (see the cookbook comparison); neither is "the"
+optimizer, they minimise different norms of the same residual vector.
 """
 
 from __future__ import annotations
@@ -437,14 +448,14 @@ def cubic_regularized_newton_step(
     g = grad_fn(params)
     gnorm = float(jnp.linalg.norm(g))
     if gnorm == 0.0:
-        return cast(Array, jnp.zeros_like(params))
+        return jnp.zeros_like(params)
 
     def matvec(v: Array) -> Array:
         return cast(Array, jax.jvp(grad_fn, (params,), (v,))[1])
 
     q_basis, tri = lanczos_tridiag(matvec, g, krylov_dim)
     c = jnp.zeros((tri.shape[0],), dtype=params.dtype).at[0].set(gnorm)
-    return cast(Array, q_basis @ _solve_cubic_subproblem(tri, c, sigma))
+    return q_basis @ _solve_cubic_subproblem(tri, c, sigma)
 
 
 def _solve_cubic_subproblem(tri: Array, c: Array, sigma: float, *, iters: int = 100) -> Array:
@@ -458,14 +469,14 @@ def _solve_cubic_subproblem(tri: Array, c: Array, sigma: float, *, iters: int = 
     eps = 1e-12 + 1e-9 * max(1.0, abs(float(theta[-1])))
 
     def z_of(lam: float) -> Array:
-        return -chat / (theta + lam)
+        return cast(Array, -chat / (theta + lam))
 
     def phi(lam: float) -> float:
         return float(jnp.linalg.norm(z_of(lam))) - lam / sigma
 
     lo = lam_lo + eps
     if phi(lo) <= 0.0:
-        return vecs @ z_of(lo)
+        return cast(Array, vecs @ z_of(lo))
     hi = max(2.0 * lo, 1.0)
     for _ in range(200):
         if phi(hi) < 0.0:
@@ -477,7 +488,7 @@ def _solve_cubic_subproblem(tri: Array, c: Array, sigma: float, *, iters: int = 
             lo = mid
         else:
             hi = mid
-    return vecs @ z_of(0.5 * (lo + hi))
+    return cast(Array, vecs @ z_of(0.5 * (lo + hi)))
 
 
 def _cubic_arc_step(
@@ -591,7 +602,7 @@ def linearized_linf_direction(
         hi = jnp.max(jnp.abs(res))
         c_star = jnp.array(0.0, dtype=res.dtype)
 
-        def body(carry, _):
+        def body(carry: tuple[Array, Array, Array], _: None) -> tuple[tuple[Array, Array, Array], None]:
             lo_, hi_, c_ = carry
             t = 0.5 * (lo_ + hi_)
             # For each row, c in an interval so |r + j c| <= t.
@@ -619,7 +630,7 @@ def linearized_linf_direction(
         w = jnp.ones_like(res)
         c = jnp.zeros((p,), dtype=res.dtype)
 
-        def irls(carry, _):
+        def irls(carry: tuple[Array, Array], _xs: None) -> tuple[tuple[Array, Array], None]:
             w_, _c = carry
             sw = jnp.sqrt(w_)
             c_n, _, _, _ = jnp.linalg.lstsq(jac * sw[:, None], -res * sw, rcond=None)
@@ -660,6 +671,179 @@ def champ_barrier_residual(
     )
     excess = jnp.maximum(ar - float(tau), 0.0) * jnp.sign(res)
     return jnp.concatenate([peak, float(barrier_weight) * excess])
+
+
+@dataclass(frozen=True)
+class LinfMinimaxConfig:
+    """Hyper-parameters for :func:`linf_minimax_minimize` / :func:`linf_minimax_step`.
+
+    ``box`` is the trust-region radius passed straight through to
+    :func:`linearized_linf_direction`'s ``box`` clip -- it is not a Levenberg-Marquardt
+    damping (there is no matrix to damp; the epigraph LP / Lawson-IRLS direction is
+    already a full minimax solve of the *linearized* problem).
+    """
+
+    steps: int = 50
+    box0: float = 1.0
+    box_decrease: float = 0.5
+    box_increase: float = 1.5
+    min_box: float = 1e-10
+    max_box: float = 1e6
+    irls_iters: int = 16
+    max_line_search: int = 20
+    accept_tol: float = 0.0
+
+    def __post_init__(self) -> None:
+        if self.steps < 1:
+            raise ValueError(f"steps must be >= 1, got {self.steps}")
+        if self.box0 <= 0.0:
+            raise ValueError(f"box0 must be > 0, got {self.box0}")
+        if not 0.0 < self.box_decrease < 1.0:
+            raise ValueError(f"box_decrease must be in (0, 1), got {self.box_decrease}")
+        if self.box_increase < 1.0:
+            raise ValueError(f"box_increase must be >= 1, got {self.box_increase}")
+        if self.min_box <= 0.0:
+            raise ValueError(f"min_box must be > 0, got {self.min_box}")
+        if self.max_box < self.min_box:
+            raise ValueError(
+                f"max_box must be >= min_box, got {self.max_box} < {self.min_box}"
+            )
+        if self.irls_iters < 1:
+            raise ValueError(f"irls_iters must be >= 1, got {self.irls_iters}")
+        if self.max_line_search < 1:
+            raise ValueError(f"max_line_search must be >= 1, got {self.max_line_search}")
+        if self.accept_tol < 0.0:
+            raise ValueError(f"accept_tol must be >= 0, got {self.accept_tol}")
+
+
+def linf_minimax_step(
+    residual_fn: ResidualFn,
+    params: Array,
+    box: float,
+    *,
+    irls_iters: int = 16,
+    max_line_search: int = 20,
+    box_decrease: float = 0.5,
+    box_increase: float = 1.5,
+    min_box: float = 1e-10,
+    max_box: float = 1e6,
+    accept_tol: float = 0.0,
+) -> tuple[Array, float, bool, float]:
+    r"""One safeguarded linearized-epigraph L-infinity (minimax) step.
+
+    The **L-infinity sibling** of :func:`gauss_newton_step`: it proposes a step from
+    :func:`linearized_linf_direction` on the live Jacobian ``J = d r / d theta``
+    (exact, one :func:`jax.jacfwd`, no finite differences) inside a shrinking
+    trust-region ``box``, and accepts the step **only if it does not increase the
+    true (non-linearized) ``max|r|``** -- the same monotone-descent discipline this
+    repo's L-infinity earn path enforces by hand ("reject steps that move the peak
+    to far-field nodes for a sub-``1e-6`` gain", see the
+    ``omnibias-deepmind-campaign`` skill), generalised here into a small,
+    independent, tested primitive. On rejection the box shrinks by ``box_decrease``
+    (down to ``min_box``) and the *same* live ``(res, jac)`` linearization is
+    reused -- only the trust region shrinks, matching the LM-style backtracking of
+    :func:`gauss_newton_step`. On acceptance the box grows by ``box_increase`` (up
+    to ``max_box``) for the caller's next call.
+
+    This function does not compute or claim any application-specific result: it is
+    a generic minimax step for any ``residual_fn: theta -> r`` (any shapes).
+
+    Parameters
+    ----------
+    residual_fn:
+        Maps a flat parameter vector to a 1-D residual vector, exactly the
+        :data:`ResidualFn` convention used throughout this module.
+    params:
+        Current flat parameter vector.
+    box:
+        Trust-region radius for this call's linearized direction.
+    irls_iters:
+        Lawson-IRLS iterations forwarded to :func:`linearized_linf_direction`
+        (unused on the exact one-parameter path).
+    max_line_search:
+        Maximum number of box-shrink retries before giving up and rejecting.
+    box_decrease, box_increase:
+        Multiplicative shrink / grow factors for ``box``.
+    min_box, max_box:
+        Hard floor / ceiling on ``box``.
+    accept_tol:
+        Relative slack on the acceptance test; ``0.0`` requires the true
+        ``max|r|`` to be non-increasing (up to float noise).
+
+    Returns
+    -------
+    ``(new_params, new_box, accepted, max_abs_residual)``: on acceptance
+    ``new_params`` is the improved point and ``max_abs_residual`` is its true
+    ``max|r|``; on rejection ``new_params`` is the unchanged ``params`` and
+    ``max_abs_residual`` is ``max|r|`` at ``params``.
+    """
+    if max_line_search < 1:
+        raise ValueError(f"max_line_search must be >= 1, got {max_line_search}")
+    res0 = residual_fn(params)
+    max0 = float(jnp.max(jnp.abs(res0)))
+    jac = jax.jacfwd(residual_fn)(params)
+    trial_box = float(box)
+    for _ in range(int(max_line_search)):
+        delta = linearized_linf_direction(jac, res0, box=trial_box, irls_iters=irls_iters)
+        candidate = params + delta
+        res1 = residual_fn(candidate)
+        max1 = float(jnp.max(jnp.abs(res1)))
+        if math.isfinite(max1) and max1 <= max0 * (1.0 + accept_tol) + 1e-15:
+            new_box = min(trial_box * box_increase, max_box)
+            return candidate, new_box, True, max1
+        trial_box = max(trial_box * box_decrease, min_box)
+    return params, trial_box, False, max0
+
+
+def linf_minimax_minimize(
+    residual_fn: ResidualFn,
+    params0: Array,
+    *,
+    config: LinfMinimaxConfig | None = None,
+) -> tuple[Array, Array]:
+    r"""Minimise ``max_i |r_i(params)|`` by safeguarded linearized-epigraph steps.
+
+    The **L-infinity sibling** of :func:`martens_grosse_gauss_newton_minimize`:
+    repeatedly calls :func:`linf_minimax_step`, which never accepts a step that
+    increases the true ``max|r|``, so the returned history is non-increasing by
+    construction (unlike the L2 loss history of the Gauss-Newton drivers, which can
+    rise between accepted steps only through momentum -- here there is no such
+    channel). L2 Gauss-Newton and this L-infinity driver generally converge to
+    *different* optima whenever a residual component is a genuine outlier; this
+    function does not claim either is "better" in general, only that it minimises
+    ``max|r|`` rather than ``0.5 sum r_i^2``.
+
+    This is a generic, independent comparison utility for any ``residual_fn``; it
+    makes no claim about any specific model, benchmark, or certified result.
+
+    Returns
+    -------
+    ``(params, max_abs_history)`` where ``max_abs_history[k]`` is ``max|r|``
+    *before* step ``k`` and the final entry is ``max|r|`` at the returned
+    ``params`` -- the same before/after history convention as
+    :func:`martens_grosse_gauss_newton_minimize`.
+    """
+    cfg = LinfMinimaxConfig() if config is None else config
+    params = params0
+    box = float(cfg.box0)
+    history: list[float] = []
+    for _ in range(int(cfg.steps)):
+        res0 = residual_fn(params)
+        history.append(float(jnp.max(jnp.abs(res0))))
+        params, box, _accepted, _max1 = linf_minimax_step(
+            residual_fn,
+            params,
+            box,
+            irls_iters=int(cfg.irls_iters),
+            max_line_search=int(cfg.max_line_search),
+            box_decrease=float(cfg.box_decrease),
+            box_increase=float(cfg.box_increase),
+            min_box=float(cfg.min_box),
+            max_box=float(cfg.max_box),
+            accept_tol=float(cfg.accept_tol),
+        )
+    history.append(float(jnp.max(jnp.abs(residual_fn(params)))))
+    return params, jnp.asarray(history, dtype=jnp.float64)
 
 
 def homotopy_gauss_newton_minimize(
@@ -1015,6 +1199,7 @@ __all__ = [
     "JetLineSearchConfig",
     "KantorovichAccept",
     "LineSearchResult",
+    "LinfMinimaxConfig",
     "MartensGrosseGNConfig",
     "MatVec",
     "ResidualFn",
@@ -1050,6 +1235,8 @@ __all__ = [
     "lanczos_tridiag",
     "last_linear_block",
     "linearized_linf_direction",
+    "linf_minimax_minimize",
+    "linf_minimax_step",
     "lstsq_gauss_newton_direction",
     "make_residual_fn",
     "martens_grosse_combine",

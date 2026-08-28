@@ -214,6 +214,30 @@ collapse.
       show_root_heading: false
       heading_level: 3
 
+## Noise-aware training (05-03)
+
+Status is **gated**. Turns a frozen, independent per-row noise estimate into
+an exact curvature term (`fit_noise_aware`), a closed-form soft-binning
+feature embedding (`BandFeatureEmbedder`), and a GLS-reweighted Newton-boosting
+variant (`fit_boosted_heteroscedastic`); `--full` has run end to end (G0-G5)
+and **all three falsifiable hypothesis gates failed** -- G1 (`fit_noise_aware`),
+G2 (the embedding's pullback-metric loss), and G3 (GLS boosting) -- while G0/G1b
+(plumbing/math) passed throughout, G4 (public-suite reporting completeness)
+passed, and G5 (no-regression) failed on 3/9 public sets. See
+[noise_aware_tab.md](noise_aware_tab.md).
+
+## TabPOU (05-04)
+
+A from-scratch **axis-aligned** POU booster with closed-form Newton leaves
+and optional band embeddings / TabM residual. Status is **gated**:
+`--full` locked G0 / G5 / G6 and missed G1 / G2 / G3 (G3 not-worse-both
+`3/6`); G4 leftover-recorded. Temperature collapse only; no TabPFN-3
+claim; the 05-02 flagship LightGBM table is not replaced. Theory 05-05
+adds `fit_tabpou_joint` (threshold polish, trained embed, POU residual)
+without changing v0 `fit_tabpou` defaults. 05-05 is **shipped**: G-tree /
+G-net / G-hybrid / G5 earned; the frozen combo is sequential residual
+(H1). See [tabpou.md](tabpou.md).
+
 ## Benchmark harness (vs LightGBM)
 
 A fair, multi-seed head-to-head against gradient boosting -- the reusable engine behind the

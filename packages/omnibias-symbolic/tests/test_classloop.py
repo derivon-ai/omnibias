@@ -8,7 +8,11 @@ from fractions import Fraction
 
 import pytest
 from omnibias.core.proof import bind_sorts, select_class
-from omnibias.symbolic.classloop import discover_observation, load_discovery_stack, run_bilevel_class_loop
+from omnibias.symbolic.classloop import (
+    discover_observation,
+    load_discovery_stack,
+    run_bilevel_class_loop,
+)
 from omnibias.symbolic.conditions import (
     observation_abs,
     observation_heat,

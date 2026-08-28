@@ -29,7 +29,6 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError as _PkgNotFound
 from importlib.metadata import version as _pkg_version
 
-from omnibias.boolean.inequality import BooleanInequalityBackend
 from omnibias.boolean._core import (
     BooleanAntiderivative,
     BooleanSolution,
@@ -97,6 +96,7 @@ from omnibias.boolean._core import (
     walsh_spectrum,
     walsh_spectrum_iv,
 )
+from omnibias.boolean.inequality import BooleanInequalityBackend
 
 try:
     __version__ = _pkg_version("omnibias-boolean")

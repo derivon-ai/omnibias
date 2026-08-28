@@ -609,7 +609,7 @@ def ensemble_table_from_mc_dict(mc: Mapping[str, object]) -> EnsembleObservableT
     wilson_loops = mc.get("wilson_loops")
     shape_raw = mc.get("lattice_shape")
     lattice_shape = None
-    if isinstance(shape_raw, (list, tuple)):
+    if isinstance(shape_raw, list | tuple):
         lattice_shape = tuple(int(size) for size in shape_raw)
         t_lat = _finite_t_lat(lattice_shape)
         if t_lat is not None:
@@ -679,10 +679,10 @@ def finite_t_scan_table(
 __all__ = [
     "ENSEMBLE_ABS_P",
     "ENSEMBLE_AREA",
-    "ENSEMBLE_CHI_P",
-    "ENSEMBLE_C_P",
     "ENSEMBLE_A_LAT",
+    "ENSEMBLE_CHI_P",
     "ENSEMBLE_CREUTZ_CHI",
+    "ENSEMBLE_C_P",
     "ENSEMBLE_F21_Z",
     "ENSEMBLE_F_R",
     "ENSEMBLE_GHOST_G",
@@ -693,7 +693,6 @@ __all__ = [
     "ENSEMBLE_LAMBDA_QCD",
     "ENSEMBLE_LI2_Z",
     "ENSEMBLE_LI3_Z",
-    "ENSEMBLE_L_LAT",
     "ENSEMBLE_LOG_ABS_P",
     "ENSEMBLE_LOG_ABS_T",
     "ENSEMBLE_LOG_C_P",
@@ -704,6 +703,7 @@ __all__ = [
     "ENSEMBLE_LOG_P2_G075",
     "ENSEMBLE_LOG_P2_G1",
     "ENSEMBLE_LOG_P2_OVER_L2",
+    "ENSEMBLE_L_LAT",
     "ENSEMBLE_OMEGA",
     "ENSEMBLE_P2",
     "ENSEMBLE_P2_G025",

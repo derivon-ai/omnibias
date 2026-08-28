@@ -176,8 +176,8 @@ def certify_pinn_aposteriori(
     *,
     boundary: Sequence[BoundaryFace] = (),
     stability: StabilityEstimate | None = None,
-    stability_interior: float = 1.0,
-    stability_boundary: float = 1.0,
+    stability_interior: float | None = None,
+    stability_boundary: float | None = None,
     invariants: Sequence[StructuralInvariant] = (),
     target_residual: float | None = None,
     initial_splits: int | Sequence[int] = 1,
@@ -186,7 +186,11 @@ def certify_pinn_aposteriori(
     max_error: float | None = None,
     provenance: Mapping[str, Any] | None = None,
 ) -> CertifiedPDEPipelineResult:
-    """Convenience path from a JetMLP-like model to a sealed PDE certificate."""
+    """Convenience path from a JetMLP-like model to a sealed PDE certificate.
+
+    The caller must supply a provenance-carrying ``stability`` estimate or both
+    explicit stability constants; the core certificate refuses implicit defaults.
+    """
     bundle = verified_layer_bundle(
         net, domain=domain, boundary=boundary, provenance=provenance
     )

@@ -333,3 +333,53 @@ def test_unproved_result_still_reports_bounds() -> None:
     # bounds are still computed and inspectable
     assert result.z1 > 0.0
     assert result.a_op_norm > 0.0
+
+
+# --------------------------------------------------------------------------- #
+# Banded linear part (nearest-neighbour couplings): manufactured solution.
+# Diagonal laplacian_symbol / mu path above stays byte-identical.
+# --------------------------------------------------------------------------- #
+def test_banded_tail_inverse_uses_banded_primitive() -> None:
+    from omnibias.core.verified.radii_spectral import tail_inverse_bound_from_banded
+
+    mu = tail_inverse_bound_from_banded(5.0, {(1,): 0.5, (-1,): 0.5}, 1.05)
+    assert mu > 0.0
+    assert mu < 1.0
+
+
+def test_banded_manufactured_solution_proved() -> None:
+    from omnibias.core.verified.radii_spectral import (
+        _apply_finite_linear,
+        constant_coefficient_band,
+        tail_inverse_bound_from_banded,
+    )
+
+    dim = 1
+    nu = 1.05
+    trunc = 4
+    coupling = 0.05
+    a_star = {(0,): 0.1, (1,): 0.05, (-1,): 0.05, (2,): 0.02, (-2,): 0.02}
+    diagonal = laplacian_symbol(4.0, 1.0)
+    band = constant_coefficient_band(diagonal, {(1,): coupling, (-1,): coupling})
+    mu = tail_inverse_bound_from_banded(
+        4.0 + (trunc + 1) ** 2, {(1,): coupling, (-1,): coupling}, nu
+    )
+    quad = _convolution()
+    ab = _embed(a_star, dim, 2 * trunc, nu)
+    forcing_series = _apply_finite_linear(ab, band, nu) + quad(ab, ab)  # type: ignore[operator]
+    problem = SpectralProblem(
+        dim=dim,
+        trunc=trunc,
+        nu=nu,
+        linear_symbol=band,
+        tail_inverse_bound=mu,
+        quadratic=quad,  # type: ignore[arg-type]
+        quadratic_norm=1.0,
+        forcing={k: v for k, v in forcing_series.coeffs.items()},
+    )
+    residual = evaluate_residual(problem, a_star)
+    assert residual.norm().hi < 1e-10
+    result = quadratic_radii_certificate(problem, a_star)
+    assert result.proved
+    assert result.y0 < 1e-10
+    assert result.radius is not None and result.radius > 0.0

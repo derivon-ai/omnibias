@@ -11,8 +11,9 @@ the domain; ``{0}`` proves, exclusion of ``0`` disproves, a fat zero
 is ``BLOCKED``.
 
 Do not conflate with founding bias collapse (``delta -> 0``),
-temperature collapse (``beta -> inf``), or Enclosure Collapse of a
-value. Continuum PDE identities are not inferred.
+temperature collapse (``beta -> inf``), or Enclosure Collapse: ``width -> 0``
+of a sound enclosure, yielding a point plus a proof. Continuum PDE identities
+are not inferred.
 """
 
 from __future__ import annotations

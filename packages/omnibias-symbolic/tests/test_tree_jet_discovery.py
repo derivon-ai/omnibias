@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
+# SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
 """Soft-tree jets: NeuralJetDiscoverer recovers dy ≈ y and a two-regime per-leaf gate."""
 
@@ -6,16 +6,18 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-import torch
-from omnibias.tab import SoftTreeConfig
-from omnibias.tab.torch.jet import extract_tree_jet
-from omnibias.tab.torch.model import SoftTreeEnsemble
-from omnibias.tab.torch.train import fit_second_order
 
 
 def test_depth1_tree_exp_jet_recovers_dy_approx_y() -> None:
     pytest.importorskip("omnibias.symbolic")
+    pytest.importorskip("torch")
+    pytest.importorskip("omnibias.tab")
+    import torch
     from omnibias.symbolic.discovery import JetBundle, NeuralJetDiscoverer
+    from omnibias.tab import SoftTreeConfig
+    from omnibias.tab.torch.jet import extract_tree_jet
+    from omnibias.tab.torch.model import SoftTreeEnsemble
+    from omnibias.tab.torch.train import fit_second_order
 
     xmin, xmax = -0.6, 0.6
     n = 200
@@ -67,10 +69,15 @@ def test_depth1_tree_exp_jet_recovers_dy_approx_y() -> None:
 
 def test_neural_jet_discoverer_per_hard_leaf() -> None:
     pytest.importorskip("omnibias.symbolic")
+    pytest.importorskip("torch")
+    pytest.importorskip("omnibias.tab")
+    import torch
     from omnibias.partition._core.weights import hard_assignment
     from omnibias.symbolic.discovery import JetBundle, NeuralJetDiscoverer
     from omnibias.tab import SoftTreeConfig, tree_params
     from omnibias.tab.torch.jet import extract_tree_jet
+    from omnibias.tab.torch.model import SoftTreeEnsemble
+    from omnibias.tab.torch.train import fit_second_order
 
     xmin, xmax = -0.8, 0.8
     n = 300

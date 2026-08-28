@@ -31,10 +31,12 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Mathematics",
     "Typing :: Typed",
 ]
-dependencies = []
+dependencies = [
+    "numpy>=2.2.6",
+]
 
 [project.optional-dependencies]
-test = ["pytest>=7.0", "pytest-cov>=4.0"]
+test = ["mpmath>=1.3", "pytest>=7.0", "pytest-cov>=4.0"]
 # Optional high-precision (mpfr-class) backend for the verified-arithmetic
 # subpackage; without it the verified backend falls back to ulp-inflated libm.
 verified = ["mpmath>=1.3"]

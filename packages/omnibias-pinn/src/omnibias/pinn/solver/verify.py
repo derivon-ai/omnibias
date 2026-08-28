@@ -154,8 +154,8 @@ def certify_linear_bvp(
     pde: LinearPDE,
     *,
     boundary: Target = 0.0,
-    stability_interior: float = 1.0,
-    stability_boundary: float = 1.0,
+    stability_interior: float,
+    stability_boundary: float,
     interior_splits: int = 2,
     boundary_splits: int = 2,
     max_error: float | None = None,
@@ -168,8 +168,8 @@ def certify_linear_bvp(
     :func:`solve_least_squares`; ``pde`` is the matching verified
     :class:`~omnibias.core.verified.pde_certificate.LinearPDE` (e.g.
     ``pde_certificate.poisson(dim, source)``). The stability constants are the
-    caller's well-posedness obligation and are recorded honestly in the sealed
-    certificate. Returns the core's
+    caller's well-posedness obligation, must be supplied explicitly, and are
+    recorded honestly in the sealed certificate. Returns the core's
     :class:`~omnibias.core.verified.pde_certificate.PINNErrorCertificate`
     (``.certificate`` is sealed with ``unproven_claim: False``).
     """
@@ -216,8 +216,8 @@ def certify_poisson(
     *,
     source: float = 0.0,
     boundary: Target = 0.0,
-    stability_interior: float = 1.0,
-    stability_boundary: float = 1.0,
+    stability_interior: float,
+    stability_boundary: float,
     interior_splits: int = 2,
     boundary_splits: int = 2,
     max_error: float | None = None,

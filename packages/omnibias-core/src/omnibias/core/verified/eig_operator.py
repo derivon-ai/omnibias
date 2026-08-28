@@ -120,20 +120,22 @@ class Inertia:
     pivots: tuple[float, ...]
 
 
-def _ldlt_pivots(s: list[list[Interval]]) -> list[Interval] | None:
-    r"""The interval ``LDL^T`` pivots ``D_jj`` of a symmetric interval matrix.
+def _ldlt_pivots(
+    s: list[list[Interval]],
+) -> tuple[list[list[Interval]], list[Interval]] | None:
+    r"""The interval unit-lower factor and pivots of a symmetric matrix box.
 
     Returns ``None`` as soon as a pivot interval straddles ``0`` (its sign -- hence
     the inertia -- cannot be certified for the whole matrix box).  Otherwise the
-    returned list holds each certified pivot interval ``D_jj`` in order; each
-    encloses the corresponding exact pivot of *every* point matrix in the box
-    (inclusion-isotone arithmetic), and ``S = L D L^T`` is a congruence, so by
-    Sylvester's law of inertia the whole box shares the pivots' sign pattern.
+    returned ``(L, D)`` encloses the corresponding exact unit-lower factor and
+    pivot vector of *every* point matrix in the box.  ``S = L D L^T`` is a
+    congruence, so by Sylvester's law the whole box shares the pivot signs.
     """
     n = len(s)
     lmat = [[Interval.point(0.0) for _ in range(n)] for _ in range(n)]
     d = [Interval.point(0.0) for _ in range(n)]
     for j in range(n):
+        lmat[j][j] = Interval.point(1.0)
         dj = s[j][j]
         for k in range(j):
             dj = dj - lmat[j][k] * lmat[j][k] * d[k]
@@ -146,7 +148,7 @@ def _ldlt_pivots(s: list[list[Interval]]) -> list[Interval] | None:
             for k in range(j):
                 lij = lij - lmat[i][k] * lmat[j][k] * d[k]
             lmat[i][j] = lij * inv
-    return d
+    return lmat, d
 
 
 def interval_ldlt_inertia(matrix: Matrix) -> Inertia | None:
@@ -159,9 +161,10 @@ def interval_ldlt_inertia(matrix: Matrix) -> Inertia | None:
     (inclusion-isotone arithmetic) and ``S = L D L^T`` is a congruence
     (Sylvester's law of inertia).
     """
-    d = _ldlt_pivots(_to_sym_matrix(matrix))
-    if d is None:
+    factor = _ldlt_pivots(_to_sym_matrix(matrix))
+    if factor is None:
         return None
+    _, d = factor
     neg = sum(1 for dj in d if dj.hi < 0.0)
     return Inertia(negative=neg, positive=len(d) - neg, pivots=tuple(x.mid for x in d))
 
@@ -177,8 +180,25 @@ def interval_ldlt_pivots(matrix: Matrix) -> tuple[Interval, ...] | None:
     (lifting the positive-definiteness claim above its single scalar ``eig_min``
     shadow).  Returns ``None`` when a pivot straddles ``0``.
     """
-    d = _ldlt_pivots(_to_sym_matrix(matrix))
-    return None if d is None else tuple(d)
+    factor = _ldlt_pivots(_to_sym_matrix(matrix))
+    return None if factor is None else tuple(factor[1])
+
+
+def interval_ldlt_factor(
+    matrix: Matrix,
+) -> tuple[tuple[tuple[Interval, ...], ...], tuple[Interval, ...]] | None:
+    r"""Return the interval unit-lower ``L`` and diagonal ``D`` of ``LDL^T``.
+
+    The factorization is available only when every interval pivot excludes zero.
+    Each returned entry encloses the corresponding factor of every point matrix
+    in the input box.  It therefore composes with interval triangular solves to
+    enclose solutions of symmetric linear systems.
+    """
+    factor = _ldlt_pivots(_to_sym_matrix(matrix))
+    if factor is None:
+        return None
+    lower, diagonal = factor
+    return tuple(tuple(row) for row in lower), tuple(diagonal)
 
 
 def is_positive_definite(matrix: Matrix) -> bool:
@@ -488,6 +508,7 @@ __all__ = [
     "certified_spectral_gap",
     "count_eigenvalues_below",
     "generalized_eigenvalue_enclosure",
+    "interval_ldlt_factor",
     "interval_ldlt_inertia",
     "interval_ldlt_pivots",
     "is_positive_definite",

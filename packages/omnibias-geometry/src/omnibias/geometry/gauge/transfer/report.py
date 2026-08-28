@@ -344,11 +344,11 @@ def finite_gauge_report(spec: FiniteGaugeSpec | None = None) -> FiniteGaugeRepor
 __all__ = [
     "DEFAULT_SCALING_COUPLINGS",
     "DEFAULT_SCALING_SPACINGS",
-    "REPORT_SU3_N_CELLS",
     "FiniteGaugeReport",
     "FiniteGaugeSpec",
     "HaarIdentityCheck",
     "MeasuredG1",
+    "REPORT_SU3_N_CELLS",
     "default_finite_gauge_spec",
     "finite_gauge_report",
     "finite_gauge_spec_from_mapping",

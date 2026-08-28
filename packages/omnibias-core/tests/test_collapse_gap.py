@@ -2,9 +2,10 @@
 # Copyright (C) 2026 Derivon
 """Duality / gap collapse was evaluated and rejected as a rebrand.
 
-A primal-dual sandwich ``[L, U]`` that collapses at ``L = U`` is
-Enclosure Collapse of ``OPT``. Renaming the parameter does not mint a
-new surviving object. This file keeps the refusal, not the module.
+A primal-dual sandwich ``[L, U]`` that collapses at ``L = U`` is Enclosure
+Collapse: ``width -> 0`` of a sound enclosure, yielding a point plus a proof
+for ``OPT``. Renaming the parameter does not mint a new surviving object. This
+file keeps the refusal, not the module.
 """
 
 from __future__ import annotations

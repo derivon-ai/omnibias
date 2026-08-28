@@ -43,7 +43,7 @@ derivative*. The closed-form tower evaluates that limit **exactly**, with no
 - This is the `delta -> 0` **founding bias collapse** (a smooth *derivative*),
   **not** `beta -> inf` **temperature collapse**, the penalty of `omnibias-convex` /
   `-control` / `-routing` (a 0/1 feasibility step). Same word, different limit;
-  see `docs/theory.md` and the `omnibias-dev-core-concepts` skill.
+  see `docs/theory.md` and the `omnibias-core-concepts` skill.
 - The pure-Python core depends only on `omnibias-core`; the stencil twins need
   `omnibias-torch` / `omnibias-jax`.
 

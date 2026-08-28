@@ -51,7 +51,7 @@ it does not change what the build will accept.
 3. **New packages** must earn independent existence — a distinct domain, a
    distinct dependency / maturity tier, or a distinct audience. If a proposal
    fails that test it ships as a submodule of an existing package. See the
-   `omnibias-dev-new-package` skill and the "Don't" list in
+   `omnibias-new-package` skill and the "Don't" list in
    [`AGENTS.md`](AGENTS.md).
 
 ## Disagreement

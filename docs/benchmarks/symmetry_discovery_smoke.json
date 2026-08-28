@@ -1,14 +1,14 @@
 {
   "schema": "omnibias.benchmarks.symmetry_discovery.v1",
-  "generated_utc": "2026-08-21T18:44:37Z",
-  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "generated_utc": "2026-08-27T17:05:25Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
-    "python": "3.14.6",
-    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
     "numpy": "2.4.6",
-    "jax": "0.10.2",
-    "torch": "2.12.1+cu130",
-    "folx": "0.2.22"
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
   },
   "config": {
     "family": "symmetry_discovery",
@@ -17,13 +17,16 @@
       "point_symmetries_only": true,
       "ansatz_bounds_search": true,
       "rank_threshold_reported": true,
+      "float_svd_is_proposer": true,
+      "exact_rank_accept_required": true,
+      "exact_rank_scope": "bounded-denominator snapped finite determining matrix",
       "founding_bias_collapse": true,
       "temperature_collapse": false,
       "ns_regularity": false,
       "disclaimer": "point symmetries in the declared ansatz only; not a blow-up or regularity proof"
     }
   },
-  "rss_mb_at_start": 814.62,
+  "rss_mb_at_start": 632.05,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -33,43 +36,811 @@
         "equations": [
           {
             "name": "heat",
-            "dim": 5,
-            "expected": 5
+            "float_svd": {
+              "dim": 5,
+              "expected": 5,
+              "threshold": 2.7895653832338172e-08,
+              "separation": 8931217916724262.0,
+              "residual_checked": true
+            },
+            "exact_rank": {
+              "verdict": "PROVED",
+              "algebra_dim": 5,
+              "kernel": [
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  2,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              ],
+              "denom_bound": 1000000,
+              "max_snap_error": 0.0,
+              "row_denominators": [
+                8,
+                8,
+                8,
+                4,
+                8,
+                8,
+                8,
+                8,
+                4,
+                8,
+                8,
+                4,
+                8,
+                8,
+                8,
+                8,
+                4,
+                2,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                4,
+                4,
+                4,
+                8,
+                8,
+                8,
+                8,
+                8
+              ],
+              "max_abs_integer": 20,
+              "detail": "exact syzygy ((1, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 0, 0, 0, 0), (0, 1, 0, 0, 0, 2, 0, 0), (0, 0, 0, 0, 0, 0, 1, 0), (0, 0, 0, 0, 0, 0, 0, 1))",
+              "scope": "bounded-denominator snapped finite determining matrix"
+            },
+            "exact_accepts_float_dimension": true
           },
           {
             "name": "wave",
-            "dim": 6,
-            "expected": 6
+            "float_svd": {
+              "dim": 6,
+              "expected": 6,
+              "threshold": 7.765749373920201e-08,
+              "separation": 1.2310807387959026e+16,
+              "residual_checked": true
+            },
+            "exact_rank": {
+              "verdict": "PROVED",
+              "algebra_dim": 6,
+              "kernel": [
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              ],
+              "denom_bound": 1000000,
+              "max_snap_error": 0.0,
+              "row_denominators": [
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                2,
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                1,
+                1,
+                4,
+                4,
+                4,
+                4,
+                4,
+                2,
+                2,
+                2,
+                4,
+                4,
+                4,
+                4,
+                4,
+                1
+              ],
+              "max_abs_integer": 8,
+              "detail": "exact syzygy ((1, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 0, 0, 0, 0), (0, 0, 1, 0, 1, 0, 0, 0), (0, 1, 0, 0, 0, 1, 0, 0), (0, 0, 0, 0, 0, 0, 1, 0), (0, 0, 0, 0, 0, 0, 0, 1))",
+              "scope": "bounded-denominator snapped finite determining matrix"
+            },
+            "exact_accepts_float_dimension": true
           },
           {
             "name": "burgers",
-            "dim": 4,
-            "expected": 4
+            "float_svd": {
+              "dim": 4,
+              "expected": 4,
+              "threshold": 2.859311615561794e-08,
+              "separation": 2334101994465131.5,
+              "residual_checked": true
+            },
+            "exact_rank": {
+              "verdict": "PROVED",
+              "algebra_dim": 4,
+              "kernel": [
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  2,
+                  0,
+                  -1
+                ]
+              ],
+              "denom_bound": 1000000,
+              "max_snap_error": 0.0,
+              "row_denominators": [
+                256,
+                8,
+                512,
+                256,
+                16,
+                128,
+                512,
+                128,
+                64,
+                32,
+                512,
+                256,
+                8,
+                256,
+                512,
+                32,
+                64,
+                128,
+                512,
+                128,
+                16,
+                256,
+                512,
+                8,
+                256,
+                32,
+                16,
+                128,
+                512,
+                256,
+                16,
+                32
+              ],
+              "max_abs_integer": 727,
+              "detail": "exact syzygy ((1, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0, 1, 0), (0, 1, 0, 0, 0, 2, 0, -1))",
+              "scope": "bounded-denominator snapped finite determining matrix"
+            },
+            "exact_accepts_float_dimension": true
           },
           {
             "name": "kdv",
-            "dim": 4,
-            "expected": 4
+            "float_svd": {
+              "dim": 4,
+              "expected": 4,
+              "threshold": 3.086102007939871e-08,
+              "separation": 2051038340094409.2,
+              "residual_checked": true
+            },
+            "exact_rank": {
+              "verdict": "PROVED",
+              "algebra_dim": 4,
+              "kernel": [
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  3,
+                  0,
+                  -2
+                ]
+              ],
+              "denom_bound": 1000000,
+              "max_snap_error": 0.0,
+              "row_denominators": [
+                256,
+                8,
+                512,
+                256,
+                16,
+                128,
+                512,
+                128,
+                64,
+                32,
+                512,
+                256,
+                8,
+                256,
+                512,
+                32,
+                64,
+                128,
+                512,
+                128,
+                4,
+                256,
+                512,
+                8,
+                256,
+                64,
+                8,
+                128,
+                512,
+                256,
+                8,
+                32
+              ],
+              "max_abs_integer": 2267,
+              "detail": "exact syzygy ((1, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 0, 0, 0, 0), (0, 0, 1, 0, 0, 0, 1, 0), (0, 1, 0, 0, 0, 3, 0, -2))",
+              "scope": "bounded-denominator snapped finite determining matrix"
+            },
+            "exact_accepts_float_dimension": true
           },
           {
             "name": "laplace",
-            "dim": 6,
-            "expected": 6
+            "float_svd": {
+              "dim": 6,
+              "expected": 6,
+              "threshold": 7.765749373920201e-08,
+              "separation": 1.2310807387959026e+16,
+              "residual_checked": true
+            },
+            "exact_rank": {
+              "verdict": "PROVED",
+              "algebra_dim": 6,
+              "kernel": [
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  1,
+                  0,
+                  -1,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              ],
+              "denom_bound": 1000000,
+              "max_snap_error": 0.0,
+              "row_denominators": [
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                2,
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                4,
+                1,
+                1,
+                4,
+                4,
+                4,
+                4,
+                4,
+                2,
+                2,
+                2,
+                4,
+                4,
+                4,
+                4,
+                4,
+                1
+              ],
+              "max_abs_integer": 8,
+              "detail": "exact syzygy ((1, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 0, 0, 0, 0), (0, 0, 1, 0, -1, 0, 0, 0), (0, 1, 0, 0, 0, 1, 0, 0), (0, 0, 0, 0, 0, 0, 1, 0), (0, 0, 0, 0, 0, 0, 0, 1))",
+              "scope": "bounded-denominator snapped finite determining matrix"
+            },
+            "exact_accepts_float_dimension": true
           },
           {
             "name": "fisher",
-            "dim": 2,
-            "expected": 2
+            "float_svd": {
+              "dim": 2,
+              "expected": 2,
+              "threshold": 1.8633463986845957e-08,
+              "separation": 2000343309050010.0,
+              "residual_checked": true
+            },
+            "exact_rank": {
+              "verdict": "PROVED",
+              "algebra_dim": 2,
+              "kernel": [
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ]
+              ],
+              "denom_bound": 1000000,
+              "max_snap_error": 0.0,
+              "row_denominators": [
+                64,
+                8,
+                64,
+                64,
+                8,
+                16,
+                64,
+                64,
+                16,
+                8,
+                64,
+                64,
+                8,
+                64,
+                64,
+                8,
+                16,
+                64,
+                64,
+                16,
+                8,
+                64,
+                64,
+                8,
+                64,
+                64,
+                4,
+                16,
+                64,
+                64,
+                16,
+                8
+              ],
+              "max_abs_integer": 144,
+              "detail": "exact syzygy ((1, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 0, 0, 0, 0))",
+              "scope": "bounded-denominator snapped finite determining matrix"
+            },
+            "exact_accepts_float_dimension": true
           },
           {
             "name": "kdv_linear",
-            "dim": 5,
-            "expected": 5
+            "float_svd": {
+              "dim": 5,
+              "expected": 5,
+              "threshold": 2.9205116606596395e-08,
+              "separation": 8147265190955709.0,
+              "residual_checked": true
+            },
+            "exact_rank": {
+              "verdict": "PROVED",
+              "algebra_dim": 5,
+              "kernel": [
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  3,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1
+                ]
+              ],
+              "denom_bound": 1000000,
+              "max_snap_error": 0.0,
+              "row_denominators": [
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8,
+                8
+              ],
+              "max_abs_integer": 33,
+              "detail": "exact syzygy ((1, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 0, 0, 0, 0), (0, 1, 0, 0, 0, 3, 0, 0), (0, 0, 0, 0, 0, 0, 1, 0), (0, 0, 0, 0, 0, 0, 0, 1))",
+              "scope": "bounded-denominator snapped finite determining matrix"
+            },
+            "exact_accepts_float_dimension": true
           },
           {
             "name": "boussinesq",
-            "dim": 4,
-            "expected": 4
+            "float_svd": {
+              "dim": 4,
+              "expected": 4,
+              "threshold": 9.5254549775231e-08,
+              "separation": 1379166950731489.0,
+              "residual_checked": true
+            },
+            "exact_rank": {
+              "verdict": "PROVED",
+              "algebra_dim": 4,
+              "kernel": [
+                [
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  1,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  1,
+                  0,
+                  0,
+                  0,
+                  0,
+                  1,
+                  2
+                ]
+              ],
+              "denom_bound": 1000000,
+              "max_snap_error": 0.0,
+              "row_denominators": [
+                32,
+                32,
+                32,
+                16,
+                8,
+                32,
+                16,
+                32,
+                4,
+                32,
+                32,
+                16,
+                4,
+                32,
+                8,
+                32,
+                8,
+                2,
+                32,
+                32,
+                8,
+                32,
+                16,
+                32,
+                16,
+                16,
+                8,
+                32,
+                16,
+                32,
+                16,
+                32
+              ],
+              "max_abs_integer": 144,
+              "detail": "exact syzygy ((1, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 1, 0, 0, 0, 0), (0, 1, 0, 0, 0, 1, 0, 0), (0, 1, 0, 0, 0, 0, 1, 2))",
+              "scope": "bounded-denominator snapped finite determining matrix"
+            },
+            "exact_accepts_float_dimension": true
           }
         ]
       },
@@ -77,14 +848,14 @@
         "name": "g2_separation",
         "passed": true,
         "separations": {
-          "heat": 1.7313826931704072e+16,
-          "wave": 1.6675450577812794e+16,
-          "burgers": 5111882447394842.0,
-          "kdv": 2007651060470163.2,
-          "laplace": 1.9419403810575256e+16,
-          "fisher": 5971042130747663.0,
-          "kdv_linear": 1.0150856666562806e+16,
-          "boussinesq": 1222360454542290.2
+          "heat": 8931217916724262.0,
+          "wave": 1.2310807387959026e+16,
+          "burgers": 2334101994465131.5,
+          "kdv": 2051038340094409.2,
+          "laplace": 1.2310807387959026e+16,
+          "fisher": 2000343309050010.0,
+          "kdv_linear": 8147265190955709.0,
+          "boussinesq": 1379166950731489.0
         }
       },
       {
@@ -111,9 +882,57 @@
       {
         "name": "g6_negative",
         "passed": true,
-        "dim": 0
+        "float_svd": {
+          "dim": 0,
+          "residual_checked": true
+        },
+        "exact_rank": {
+          "verdict": "DISPROVED",
+          "algebra_dim": 0,
+          "kernel": [],
+          "denom_bound": 1000000,
+          "max_snap_error": 0.0,
+          "row_denominators": [
+            512,
+            64,
+            512,
+            512,
+            128,
+            64,
+            512,
+            512,
+            64,
+            64,
+            512,
+            512,
+            8,
+            512,
+            512,
+            8,
+            128,
+            512,
+            512,
+            64,
+            64,
+            512,
+            512,
+            64,
+            512,
+            512,
+            16,
+            64,
+            512,
+            512,
+            64,
+            8
+          ],
+          "max_abs_integer": 1024,
+          "detail": "exact kernel is trivial; no syzygy in this matrix",
+          "scope": "bounded-denominator snapped finite determining matrix"
+        },
+        "exact_accepts_float_dimension": true
       }
     ]
   },
-  "wall_seconds": 1.5775777919916436
+  "wall_seconds": 9.15108740143478
 }

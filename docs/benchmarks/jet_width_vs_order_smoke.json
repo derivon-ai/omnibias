@@ -1,0 +1,234 @@
+{
+  "schema": "omnibias.benchmarks.jet_width_vs_order.v1",
+  "generated_utc": "2026-08-27T17:05:05Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "family": "certified_jet_width_vs_order",
+    "full": false,
+    "box": [
+      -0.35,
+      0.35
+    ],
+    "layers": "one_tanh_unit",
+    "weight": 1.1,
+    "bias": 0.2,
+    "max_order": 24,
+    "grid_count": 65,
+    "random_count": 64,
+    "factorial_normalized_width_exponent": 0.0,
+    "honesty": {
+      "transcendental_backend": "mpmath",
+      "unconditional_transcendentals": true,
+      "spectral_tail_theorem": false,
+      "continuum_pde_claim": false
+    }
+  },
+  "rss_mb_at_start": 626.97,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "certified_partials_coverage",
+        "n": 3096,
+        "n_min": 1000,
+        "coverage": 1.0,
+        "median_width": 2200113561.8457484,
+        "max_width": 3.715122849413252e+23,
+        "passed": true
+      },
+      {
+        "name": "factorial_normalized_width_exponent",
+        "fitted_exponent": -0.03650344557165721,
+        "expected": 0.0,
+        "abs_error": 0.03650344557165721,
+        "tol": 0.15,
+        "decades": 1.380211241711606,
+        "min_decades": 1.0,
+        "n_points": 24,
+        "r2": 0.03704919808431717,
+        "passed": true,
+        "raw_loglog_exponent": 18.46863854932966
+      }
+    ]
+  },
+  "per_order": [
+    {
+      "order": 1.0,
+      "width": 0.41057400392775384,
+      "factorial_normalized_width": 0.41057400392775384,
+      "lo": 0.7953206830716953,
+      "hi": 1.2058946869994491
+    },
+    {
+      "order": 2.0,
+      "width": 1.8815063192019124,
+      "factorial_normalized_width": 0.9407531596009562,
+      "lo": -1.3962307760517696,
+      "hi": 0.4852755431501425
+    },
+    {
+      "order": 3.0,
+      "width": 4.2613085552184975,
+      "factorial_normalized_width": 0.7102180925364162,
+      "lo": -3.761070889403752,
+      "hi": 0.5002376658147442
+    },
+    {
+      "order": 4.0,
+      "width": 20.842969270298205,
+      "factorial_normalized_width": 0.8684570529290919,
+      "lo": -5.375790200798287,
+      "hi": 15.467179069499915
+    },
+    {
+      "order": 5.0,
+      "width": 96.30950431719454,
+      "factorial_normalized_width": 0.8025792026432879,
+      "lo": -45.7013283464417,
+      "hi": 50.608175970752825
+    },
+    {
+      "order": 6.0,
+      "width": 511.12300502614437,
+      "factorial_normalized_width": 0.7098930625363116,
+      "lo": -379.294856829541,
+      "hi": 131.8281481966033
+    },
+    {
+      "order": 7.0,
+      "width": 3826.994327715788,
+      "factorial_normalized_width": 0.7593242713721802,
+      "lo": -1517.104207525596,
+      "hi": 2309.8901201901917
+    },
+    {
+      "order": 8.0,
+      "width": 29432.634482767957,
+      "factorial_normalized_width": 0.7299760536400783,
+      "lo": -12888.415733264454,
+      "hi": 16544.2187495035
+    },
+    {
+      "order": 9.0,
+      "width": 237805.04565695382,
+      "factorial_normalized_width": 0.6553269556243216,
+      "lo": -157758.0198123431,
+      "hi": 80047.0258446107
+    },
+    {
+      "order": 10.0,
+      "width": 2532306.792062136,
+      "factorial_normalized_width": 0.6978358664192393,
+      "lo": -1136076.704181559,
+      "hi": 1396230.0878805765
+    },
+    {
+      "order": 11.0,
+      "width": 27360822.643614758,
+      "factorial_normalized_width": 0.6854462943826849,
+      "lo": -12475001.032040147,
+      "hi": 14885821.611574605
+    },
+    {
+      "order": 12.0,
+      "width": 303016301.05763537,
+      "factorial_normalized_width": 0.6325997680542933,
+      "lo": -182956587.16350034,
+      "hi": 120059713.89413498
+    },
+    {
+      "order": 13.0,
+      "width": 4097210822.633862,
+      "factorial_normalized_width": 0.6579728820937714,
+      "lo": -1889725640.6839721,
+      "hi": 2207485181.9498897
+    },
+    {
+      "order": 14.0,
+      "width": 57152096038.697945,
+      "factorial_normalized_width": 0.6555771540369209,
+      "lo": -27205067577.176765,
+      "hi": 29947028461.521175
+    },
+    {
+      "order": 15.0,
+      "width": 809873957995.9564,
+      "factorial_normalized_width": 0.6193238758932044,
+      "lo": -461430808097.95447,
+      "hi": 348443149898.0018
+    },
+    {
+      "order": 16.0,
+      "width": 13185990123578.107,
+      "factorial_normalized_width": 0.630221409007255,
+      "lo": -6093928571730.568,
+      "hi": 7092061551847.538
+    },
+    {
+      "order": 17.0,
+      "width": 225695346537609.62,
+      "factorial_normalized_width": 0.6345328192951888,
+      "lo": -110543485153795.11,
+      "hi": 115151861383814.48
+    },
+    {
+      "order": 18.0,
+      "width": 3904403136869567.0,
+      "factorial_normalized_width": 0.6098368068356307,
+      "lo": -2146782560372172.8,
+      "hi": 1757620576497393.8
+    },
+    {
+      "order": 19.0,
+      "width": 7.422013979941358e+16,
+      "factorial_normalized_width": 0.6101366972444445,
+      "lo": -3.4204044027843164e+16,
+      "hi": 4.001609577157041e+16
+    },
+    {
+      "order": 20.0,
+      "width": 1.5067761922122665e+18,
+      "factorial_normalized_width": 0.6193328737237277,
+      "lo": -7.51740496096139e+17,
+      "hi": 7.550356961161272e+17
+    },
+    {
+      "order": 21.0,
+      "width": 3.081799528861602e+19,
+      "factorial_normalized_width": 0.603198805475951,
+      "lo": -1.6530648874363159e+19,
+      "hi": 1.4287346414252857e+19
+    },
+    {
+      "order": 22.0,
+      "width": 6.691290440419821e+20,
+      "factorial_normalized_width": 0.5953101519471388,
+      "lo": -3.07454768499106e+20,
+      "hi": 3.616742755428761e+20
+    },
+    {
+      "order": 23.0,
+      "width": 1.5725112923854515e+22,
+      "factorial_normalized_width": 0.6082741274185309,
+      "lo": -7.947372969376861e+21,
+      "hi": 7.777739954477652e+21
+    },
+    {
+      "order": 24.0,
+      "width": 3.7151228494132526e+23,
+      "factorial_normalized_width": 0.5987803077637006,
+      "lo": -1.9553162059734947e+23,
+      "hi": 1.7598066434397576e+23
+    }
+  ],
+  "sample_count_per_order": 129,
+  "wall_seconds": 10.428368147462606
+}

@@ -93,6 +93,14 @@ from omnibias.core.proof.discovery import (
     get_proposer,
     run_discovery,
 )
+from omnibias.core.proof.engine import (
+    ENGINE_KINDS,
+    EngineKind,
+    EngineResult,
+    ReasonStep,
+    build_engine_machine,
+    prove,
+)
 from omnibias.core.proof.inequality import (
     INEQUALITY_KIND,
     InequalityBackend,
@@ -112,14 +120,6 @@ from omnibias.core.proof.inequality import (
     replay_inequality,
     run_inequality_pipeline,
     solve_inequality,
-)
-from omnibias.core.proof.engine import (
-    ENGINE_KINDS,
-    EngineKind,
-    EngineResult,
-    ReasonStep,
-    build_engine_machine,
-    prove,
 )
 from omnibias.core.proof.lean_check import (
     LeanCheckResult,
@@ -154,6 +154,17 @@ from omnibias.core.proof.observe import (
     Observation,
     class_hit_from_check,
     rank_class_hits,
+)
+from omnibias.core.proof.replay import (
+    DomainSubdivisionCertificate,
+    ReplayCertificateReport,
+    ReplayRecorder,
+    ReplayStep,
+    ReplayTrace,
+    SubdivisionLeaf,
+    record_ldlt_diagonal_trace,
+    seal_domain_subdivision_certificate,
+    seal_replay_certificate,
 )
 
 #: A certificate is a plain JSON-serialisable mapping (the omnibias convention).
@@ -655,6 +666,7 @@ __all__ = [
     "CoordinateNewton",
     "DiscoveredEquation",
     "DiscoveryResult",
+    "DomainSubdivisionCertificate",
     "ENGINE_KINDS",
     "EngineKind",
     "EngineResult",
@@ -686,10 +698,15 @@ __all__ = [
     "RationalSupport",
     "RationalWitness",
     "ReasonStep",
+    "ReplayCertificateReport",
+    "ReplayRecorder",
+    "ReplayStep",
+    "ReplayTrace",
     "SUPPORTED_SCHEMA_VERSIONS",
     "ScoreGuidedWalk",
     "Statement",
     "StencilCertificateReport",
+    "SubdivisionLeaf",
     "Verdict",
     "VerdictStatus",
     "apply_constructor",
@@ -736,6 +753,7 @@ __all__ = [
     "prove",
     "prove_inequality",
     "rank_class_hits",
+    "record_ldlt_diagonal_trace",
     "register_catalog",
     "register_condition_sort",
     "register_inequality_backend",
@@ -745,7 +763,9 @@ __all__ = [
     "run_inequality_pipeline",
     "schema_errors_v1",
     "seal_certificate",
+    "seal_domain_subdivision_certificate",
     "seal_poisedness_certificate",
+    "seal_replay_certificate",
     "seal_stencil_certificate",
     "select_class",
     "solve_inequality",

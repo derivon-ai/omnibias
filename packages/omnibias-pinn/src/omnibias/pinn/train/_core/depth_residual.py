@@ -6,9 +6,10 @@ After layer ``ell``, a declared decode of ``h_ell`` is a field. The same
 local differential operator ``N`` used at the last readout forms
 ``r_ell = N[u_ell] - f``. A damped Gauss-Newton step updates only that
 layer (and optionally its decode), then later layers see the corrected
-activations. This is causal in **network depth**, not in physical time
-(``omnibias.pinn.train.march``). Distinct from 08-03 (a named *proxy*
-residual).
+activations. This is causal in **network depth**, not in physical time; the
+time-marching drivers instead live in
+``omnibias.pinn.train.torch.march`` and ``omnibias.pinn.train.jax.march``.
+Distinct from 08-03 (a named *proxy* residual).
 
 Backend-free: config, the unlock predicate, 1-D Dirichlet mask towers,
 and the Leibniz product that applies a hard-BC factor to a derivative
@@ -247,12 +248,12 @@ def honesty_payload() -> dict[str, bool]:
 
 
 __all__ = [
-    "SEALED_HONESTY",
     "DepthResidualConfig",
     "DepthResidualForbidden",
     "DepthResidualReport",
     "HardBCKind",
     "LastLayerScope",
+    "SEALED_HONESTY",
     "apply_hard_bc_tower",
     "hard_bc_mask_tower",
     "honesty_payload",

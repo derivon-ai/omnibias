@@ -128,6 +128,8 @@ def test_certify_pinn_aposteriori_from_torch_jetmlp() -> None:
         net,
         [(-0.1, 0.1), (-0.1, 0.1)],
         laplace(2),
+        stability_interior=1.0,
+        stability_boundary=1.0,
         target_residual=None,
         max_splits=1,
         provenance={"seed": 0},

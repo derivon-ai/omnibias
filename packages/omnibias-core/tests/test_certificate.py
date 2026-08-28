@@ -14,6 +14,8 @@ from omnibias.core.proof import (
 )
 from omnibias.core.proof.certificate import (
     CERTIFICATE_SCHEMA_VERSION,
+    NO_TRANSCENDENTAL_BACKEND,
+    RIGOROUS_TRANSCENDENTAL_PAYLOAD_TYPES,
     THEOREM_PROVER_VERIFIED_KEY,
     TRANSCEND_BACKEND_KEY,
     UNCONDITIONAL_CLAIM_KEY,
@@ -246,13 +248,39 @@ def test_unconditional_claim_is_refused_at_seal_time_on_conditional_backend() ->
         meta={TRANSCEND_BACKEND_KEY: "mpmath"},
     )
     assert not schema_errors_v1(honest)
-    # Not asserting the claim is always fine, whatever the backend.
+    # A non-designated finite rational payload may retain an explicit legacy
+    # provenance stamp without being promoted to a rigorous enclosure.
     quiet = make_certificate(
         claim="q",
-        payload={"type": "interval"},
+        payload={"type": "rational_identity"},
         meta={TRANSCEND_BACKEND_KEY: "libm_fallback"},
     )
     assert not schema_errors_v1(quiet)
+
+
+@pytest.mark.parametrize("payload_type", sorted(RIGOROUS_TRANSCENDENTAL_PAYLOAD_TYPES))
+def test_designated_payload_refuses_conditional_transcendental_stamp(
+    payload_type: str,
+) -> None:
+    with pytest.raises(RuntimeError, match="designated rigorous payload"):
+        make_certificate(
+            claim="conditionally rigorous",
+            payload={"type": payload_type},
+            meta={TRANSCEND_BACKEND_KEY: "libm_fallback"},
+        )
+
+
+def test_schema_errors_catch_hand_built_designated_payload_on_libm() -> None:
+    hand = seal_certificate(
+        {
+            "schema_version": CERTIFICATE_SCHEMA_VERSION,
+            "claim": "hand-built conditional interval",
+            "payload": {"type": "interval"},
+            "honesty": {"unproven_claim": False},
+            "meta": {TRANSCEND_BACKEND_KEY: "libm_fallback"},
+        }
+    )
+    assert any("designated rigorous" in error for error in schema_errors_v1(hand))
 
 
 def test_schema_errors_catch_hand_built_unconditional_on_libm() -> None:
@@ -287,10 +315,9 @@ def test_certificate_cannot_silently_use_libm_fallback(
     assert enc.contains(1.0)
     assert transcend.libm_fallback_used()
 
-    # Sealing records the conditional backend honestly.
-    cert = make_certificate(claim="exploratory", payload={"type": "interval"})
-    assert certificate_transcend_backend(cert) == "libm_fallback"
-    assert not certificate_is_unconditional(cert)
+    # Designated rigorous payloads cannot merely record the conditional backend.
+    with pytest.raises(RuntimeError, match="designated rigorous payload"):
+        make_certificate(claim="exploratory", payload={"type": "interval"})
 
     # Unconditional / strict sealing cannot silently proceed on the fallback.
     with pytest.raises(RuntimeError):
@@ -305,3 +332,17 @@ def test_certificate_cannot_silently_use_libm_fallback(
             make_certificate(claim="strict", payload={"type": "interval"})
     finally:
         transcend.set_strict_backend(prev)
+        transcend.clear_libm_fallback_used()
+
+
+def test_pure_rational_interval_does_not_acquire_a_libm_stamp(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """No evaluated transcendental is distinct from a conditional fallback."""
+    from omnibias.core.verified import transcend
+
+    monkeypatch.setattr(transcend, "_mpmath", lambda: None)
+    transcend.clear_libm_fallback_used()
+    cert = make_certificate(claim="rational only", payload={"type": "interval"})
+    assert certificate_transcend_backend(cert) == NO_TRANSCENDENTAL_BACKEND
+    assert certificate_is_unconditional(cert)

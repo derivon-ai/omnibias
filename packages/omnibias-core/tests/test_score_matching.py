@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from omnibias.core.score_matching import (
     DISCLAIMER,
+    exact_div_variance,
     honesty_payload,
     score_matching_skill,
     worked_example,
@@ -25,6 +26,11 @@ def test_g2_skill() -> None:
     assert report["reached"] >= 3
     assert max(report["exact_div_variance"]) == 0.0  # type: ignore[arg-type]
     assert report["hutchinson_exact_path_variance"] == 0.0
+
+
+def test_exact_div_variance_preserves_a_constant_binary64_stream() -> None:
+    """Exact divergence is constant even when its floating sum would round."""
+    assert exact_div_variance([-1.0 / 3.0] * 64) == 0.0
 
 
 def test_g3_honesty() -> None:

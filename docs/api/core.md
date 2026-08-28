@@ -235,6 +235,56 @@ in a weighted norm) must still close. It never claims the tail bound
       show_root_heading: false
       heading_level: 3
 
+## Verified backend: certified invariant subspaces (Davis–Kahan)
+
+`eig` and `eig_operator` certify *scalar* spectral facts: one eigenvalue lower
+bound, an exact eigenvalue count (with multiplicity) below a threshold, or a
+gap between two named eigenvalues. Neither certifies that a whole **cluster**
+of eigenvalues — a genuinely degenerate ground state, or a near-degenerate
+representation multiplet — has been resolved as a *subspace*, without
+requiring the eigenvalues inside the cluster to be individually separated
+from each other. `invariant_subspace` closes that gap with a single
+certificate, `certified_invariant_subspace`, implementing the classical
+**Davis–Kahan `sin Θ` theorem** via its residual/Sylvester-equation proof, on
+top of the *existing* eigenvalue machinery (no new eigenvalue solver): the
+candidate `V`'s Ritz block `H = VᵀAV` and Gram `G = VᵀV` give a certified
+cluster bracket `[ritz_lower, ritz_upper]` via
+`generalized_eigenvalue_enclosure` on the pencil `(H, G)`; inertia bisection
+(`count_eigenvalues_below`) on `A` itself assigns the cluster to eigenvalue
+indices `p+1 .. p+k` and certifies its separation `gap` from *every other*
+eigenvalue of `A`; and a rigorously re-orthonormalized `Ṽ` (via the interval
+`LDLᵀ` factor of `G`) gives a certified **Frobenius**-norm residual
+`‖R‖_F = ‖AṼ - ṼH̃‖_F`. The bound `sin Θ(span(V), S) ≤ min(‖R‖_F / gap, √k)`
+then follows from the Sylvester equation `A₂Y - YH̃ = P_{S⊥}R` the residual
+identity induces on the orthogonal complement `S⊥` of the true invariant
+subspace `S`. Works for an **exactly degenerate** cluster and any `k ≥ 1`
+without requiring the `k` Ritz values to be separated from each other — only
+the cluster as a whole from the rest of the spectrum. When `G` cannot be
+certified positive definite (the columns of `V` are not certified
+independent) or the separation gap cannot be certified positive, the
+certificate honestly reports `certified=False` with the unresolved fields
+`None`, matching `count_eigenvalues_below`'s returns-`None`-on-failure idiom,
+rather than fabricating a bound.
+
+```python
+from omnibias.core.verified.invariant_subspace import certified_invariant_subspace
+
+# A = diag(2, 2, 5): eigenvalue 2 has an exact 2-D eigenspace, well separated from 5.
+a = [[2.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 5.0]]
+v = [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]]  # the exact 2-D eigenspace, as two basis vectors
+
+cert = certified_invariant_subspace(a, v)
+assert cert.certified
+assert cert.cluster_start_index == 1
+assert cert.gap_lower is not None and abs(cert.gap_lower - 3.0) < 1e-9
+assert cert.sin_theta_upper is not None and cert.sin_theta_upper < 1e-9  # exact eigenspace
+```
+
+::: omnibias.core.verified.invariant_subspace
+    options:
+      show_root_heading: false
+      heading_level: 3
+
 ## Verified backend: certified conditioning (the `ε→0` collapse)
 
 `conditioning` is the rigorous register of the **`ε→0` rank/regularization
@@ -518,10 +568,19 @@ quantity (sound `+ − × ÷`, `conj`, modulus). On top of it,
 of Fourier coefficients: a finite block over the box `‖k‖∞ ≤ N` plus a tail
 radius bounding `Σ_{‖k‖∞>N}|a_k|ν^{‖k‖₁}`. Convolution (`*`) keeps the kept block
 exact and folds overflow rigorously into the tail; the **bounded** nonlocal
-multipliers — Riesz `R_j = ik_j/|k|` and Leray `P_{ab} = δ_{ab} − k_a k_b/|k|²` —
-act coefficient-wise (tail factor `1`), so the SQG velocity `u = (−R₂, R₁)θ` and
-the gSQG family become rigorous diagonal operators. Requires `ν ≥ 1` (the
-analytic regime where the weight is sub-multiplicative).
+multipliers — Riesz `R_j = ik_j/|k|`, the coordinate Hilbert transform
+`−i·sign(k_j)`, and Leray `P_{ab} = δ_{ab} − k_a k_b/|k|²` — act coefficient-wise
+(tail factor `1`), so the SQG velocity `u = (−R₂, R₁)θ` and the gSQG family
+become rigorous diagonal operators. `ν ≥ 1` is the *tight* sound boundary for
+this two-sided algebra: complexifying each coordinate `x_d → x_d + is_d` shows
+`ν` is `e^h` for a strip of half-width `h = ln ν` around the real torus, and
+`ν < 1` is not a looser "formal" regime (unlike the one-sided
+`ValidatedSeries`) because it makes submultiplicativity provably fail on
+cancelling wavevectors like `i=(1,)`, `j=(−1,)`. `ν` also accepts a
+length-`d` sequence of **anisotropic** per-axis weights `(ν₁, …, ν_d)`
+(each `≥ 1`) for a direction-dependent strip — a strict superset of the
+scalar case, since every bounded-multiplier proof only uses that the weight
+is non-negative, never submultiplicativity itself.
 
 ::: omnibias.core.verified.complex_interval
     options:
@@ -529,6 +588,46 @@ analytic regime where the weight is sub-multiplicative).
       heading_level: 3
 
 ::: omnibias.core.verified.fourier
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Verified backend: self-dual Hermite-function basis
+
+`hermite_basis` is a rigorous 1-D **physicists'** Hermite-function basis
+`ψ_n(x) = H_n(x)·e^{-x²/2}`, evaluated by an interval Horner pass on the
+*exact-integer* coefficients of `H_n` (`hermite_poly_coeffs_exact`) times a
+rigorous `exp(-x²/2)` enclosure (`gaussian_weight`). Under the unitary Fourier
+transform `F[f](k) = (2π)^{-1/2}∫f(x)e^{-ikx}dx`, the Hermite functions are
+*exact* eigenfunctions, `F[ψ_n] = (−i)^n ψ_n`; because `(−i)^n` cycles through
+the four exactly-representable values `{1,−i,−1,i}`,
+`HermiteExpansion.fourier_transform_exact` applies it by exact component
+permutation/sign-flip — bit-for-bit, not an outward-rounded product — and
+since `|(−i)^n|=1` the same tail bound (`tail_bound`, reusing
+`geometric_tail_bound` under a caller-supplied geometric coefficient-decay
+hypothesis and a caller-supplied uniform bound on `|ψ_n(x)|`, e.g. the
+classical Cramér inequality `sup_x|ψ̂_n(x)| ≤ π^{-1/4}` for the
+`L²`-normalized basis) holds unchanged before and after the transform. A
+1-D Cohn–Elkies packing bound ([cohn_elkies.md](cohn_elkies.md)) uses exactly
+this: candidate test functions built from finitely many Hermite modes get an
+*exact* (not FFT-truncated) Fourier transform as the same coefficient vector
+up to the diagonal `(−i)^n` phases, turning the LP's simultaneous sign
+constraints on `f` and `f̂` into constraints on one finite coefficient vector.
+The Laguerre sibling ([laguerre_basis.md](laguerre_basis.md)) is orthogonal on
+`[0, inf)` and is **not** Fourier self-dual.
+
+```python
+from omnibias.core.verified.hermite_basis import HermiteExpansion, CRAMER_UNIFORM_BOUND
+
+expansion = HermiteExpansion.from_coeffs([1.0, 0.5, -0.25])
+transformed = expansion.fourier_transform_exact()  # c_n -> (-i)^n c_n, exact
+assert transformed.get(1).im.mid == -0.5  # (-i)^1 * 0.5 = -0.5i
+
+bound = expansion.tail_bound(coeff_bound=1.0, ratio=0.5, psi_bound=CRAMER_UNIFORM_BOUND)
+assert bound.lo >= 0.0
+```
+
+::: omnibias.core.verified.hermite_basis
     options:
       show_root_heading: false
       heading_level: 3
@@ -590,10 +689,11 @@ exact diagonal `1/ℓ(k)` on the tail (bounded by `μ`) — assembles the rigoro
 radii-polynomial bounds `(Y₀, Z₀, Z₁, Z₂)`, and (when a contracting radius exists)
 returns a sealed certificate proving a **true** zero `a*` with `‖a* − ā‖_ν ≤ r`,
 unique in that ball. `laplacian_symbol` / `laplacian_tail_inverse_bound` supply a
-coercive diagonal linear part `ℓ(k) = c₀ + c₂|k|²`. The linear part must be diagonal
-(a Fourier multiplier) and the nonlinearity `Q` bounded (`‖Q(u,v)‖ ≤ C_Q‖u‖‖v‖`);
-the non-diagonal self-similar scaling operator `α + β x·∇` of a finite-time
-singularity ansatz is the remaining ingredient and is documented as future work.
+coercive diagonal linear part `ℓ(k) = c₀ + c₂|k|²`. That diagonal path stays
+byte-identical. `BandedLinearPart` plus `tail_inverse_bound_from_banded` wires
+nearest-neighbour (constant-coefficient) couplings into the same radii-polynomial
+consumer; see [banded_tail.md](banded_tail.md). The full nonlocal IPM
+streamfunction-Poisson operator remains out of scope (`full_ipm_proved=False`).
 
 ::: omnibias.core.verified.radii_spectral
     options:

@@ -1,65 +1,91 @@
 ---
 name: omnibias-backends
-description: Compute closed-form n-th derivatives of activations and exact Taylor jets with omnibias on PyTorch, JAX, or Keras 3. Use when using omnibias to take high-order derivatives, build OperatorBlock / OMBU layers, or propagate directional / multivariate jets, or when the user mentions sigma^(n), closed-form derivatives, jets, or bit-identical backends.
+description: Compute closed-form n-th derivatives of activations and exact Taylor jets with omnibias on PyTorch, JAX, or Keras 3. Use when taking high-order derivatives, building OperatorBlock / OMBU layers, propagating directional or multivariate jets, or when the user mentions sigma^(n), closed-form derivatives, jets, or bit-identical backends.
 ---
 
-# Using omnibias: the closed-form derivative tower and jets
+# Closed-form derivative tower and jets
 
 omnibias computes `sigma^(n)(z)` in closed form for any order `n` with a single
-`sigma` evaluation, and it is **bit-identical across backends** because every
-backend imports the coefficients from `omnibias.core.polynomials`.
+`sigma` evaluation. Every backend imports coefficients from
+`omnibias.core.polynomials`, so PyTorch, JAX, and Keras 3 are **bit-identical
+by construction**.
 
-## Import map
+## Why nested AD fails
+
+Nested reverse-mode AD rebuilds a new computational graph for every extra
+derivative order. At the orders PINNs, FermiNet Laplacians, and Taylor jets
+need, that graph is the bottleneck: memory scales with order, mixed partials
+require a combinatorial explosion of sweeps, and backends diverge as soon as
+anyone forks a kernel. Generic tools give you `grad`; they do not give you
+`sigma^(n)` from one evaluation, a closed-form integral window, or a jet that
+is the same bit pattern on three frameworks.
+
+## What only this tower unlocks
+
+Riccati identities (`sigmoid' = s(1-s)`, `tanh' = 1-t^2`) plus Eulerian /
+Legendre / Hermite recurrences yield every order from one `sigma`. OperatorBlock
+dispatches six roles, including a **closed-form integral**. Directional jets
+(`mlp_jet`) and multivariate jets (`mlp_jet_mv`) propagate exact truncated
+Taylor series through deep compositions. Nested AD cannot sustain that
+workload at the orders in `docs/benchmarks/derivative_order.json` and
+`docs/benchmarks/jet_vs_nested_ad_smoke.json`.
+
+## Use
 
 | You want | Import from | Key entry points |
 | --- | --- | --- |
 | Trainable operator layers (PyTorch) | `omnibias.torch` | `OperatorBlock`, `OperatorMultiBiasUnit` (`OMBU`), `cmbLinear`, `cmbConv1d`, `cmbConv2d` |
-| Heterogeneous Birkhoff packs (gated 01-01) | `omnibias.torch` / `omnibias.jax` / `omnibias.core` | `MultiPackUnit`, `init_multipack` / `multipack_apply`, `MultiPackSpec` |
-| Transverse bias scan (gated 01-02) | `omnibias.torch` / `omnibias.jax` / `omnibias.core` | `BiasScan`, `init_bias_scan` / `bias_scan`, `BankSpec` |
-| Exact-Q irregular stencils (gated 01-04) | `omnibias.difference` | `solve_irregular_stencil`, `is_poised_exact`, `certified_irregular_error` |
-| Scan-Net (gated 02-01) | `omnibias.torch.architectures` / `omnibias.jax.architectures` | `ScanNet`, `init_scan_net` / `scan_net_apply`; on-lattice equivariance, not `R^D`; `gamma` is not `delta -> 0` |
-| Jet-KAN (gated 02-03) | `omnibias.torch.architectures` / `omnibias.jax.architectures` | `JetKAN`, `init_jet_kan` / `jet_kan_apply`; exactness of the model jet; KA theorem does not justify |
-| Hermite ladder (gated 02-10) | `omnibias.torch.architectures` / `omnibias.jax.architectures` | `HermiteBasis` / `LadderNet`, `hermite_basis` / `ladder_apply`; raw tower is not the QHO eigenbasis; Rodrigues reweight required |
-| Equivariant scan (gated 02-08) | `omnibias.torch.scan_equivariant` / `omnibias.jax.scan_equivariant` | `EquivariantScan`, `equivariant_scan_apply`; gaussian-family steering only; discrete `C_L`, not SO(2)/SO(3) |
-| Hierarchical scan (gated 02-07) | `omnibias.torch.hierarchy` / `omnibias.jax.hierarchy` | `hierarchical_scan`; 1-D offsets; `eta=0` bit-identical to dense |
+| Heterogeneous Birkhoff packs | `omnibias.torch` / `omnibias.jax` / `omnibias.core` | `MultiPackUnit`, `init_multipack` / `multipack_apply`, `MultiPackSpec` |
+| Transverse bias scan | `omnibias.torch` / `omnibias.jax` / `omnibias.core` | `BiasScan`, `init_bias_scan` / `bias_scan`, `BankSpec` |
+| Exact-Q irregular stencils | `omnibias.difference` | `solve_irregular_stencil`, `is_poised_exact`, `certified_irregular_error` |
+| Scan-Net / Jet-KAN / LadderNet | `omnibias.torch.architectures` / `omnibias.jax.architectures` | `ScanNet`, `JetKAN`, `HermiteBasis` / `LadderNet` |
+| Equivariant / hierarchical scan | `omnibias.{torch,jax}.scan_equivariant`, `.hierarchy` | `EquivariantScan`, `hierarchical_scan` |
 | Activation registry | `omnibias.torch` / `omnibias.jax` | `get_activation`, `list_activations`, `register_activation` |
-| Closed-form field value / laplacian / hessian (JAX) | `omnibias.jax` | `neural_field_value`, `neural_field_laplacian`, `neural_field_hessian`, `neural_field_value_grad_hessian` |
-| Directional Taylor jets (deep composition) | `omnibias.torch` / `omnibias.jax` | `mlp_jet`, `layer_jet`, `compose_jet`, `tower_to_jet`, `jet_to_tower` |
-| Multivariate jets: every mixed partial to order N | `omnibias.torch` / `omnibias.jax` | `mlp_jet_mv`, `jet_partials`, `jet_gradient`, `jet_hessian` |
-| Raw polynomial coefficients (pure Python) | `omnibias.core` | `sigmoid_polynomial_coeffs`, `tanh_polynomial_coeffs`, `hermite_coeffs` |
-
-## OperatorBlock roles (six, including a closed-form integral)
+| Closed-form field Laplacian (JAX) | `omnibias.jax` | `neural_field_value`, `neural_field_laplacian`, `neural_field_hessian` |
+| Directional Taylor jets | `omnibias.torch` / `omnibias.jax` | `mlp_jet`, `layer_jet`, `compose_jet`, `tower_to_jet` |
+| Multivariate jets to order N | `omnibias.torch` / `omnibias.jax` | `mlp_jet_mv`, `jet_partials`, `jet_gradient`, `jet_hessian` |
+| Raw polynomial coefficients | `omnibias.core` | `sigmoid_polynomial_coeffs`, `tanh_polynomial_coeffs`, `hermite_coeffs` |
 
 `OperatorBlock` dispatches on `op="identity"|"grad"|"laplacian"|"derivative"|"band"|"integral"`:
 
-- `identity` (K=1): `sigma(z + b)` (literal; Lemma identity).
-- `grad` (K=2) / `laplacian` (K=3): closed-form `sigma'` / `sigma''` at the bias mean.
-- `derivative` (K=n+1): closed-form `sigma^(n)` at arbitrary order `n` (`grad` / `laplacian` are the `n = 1, 2` aliases).
-- `band` (K=2): the literal window `sigma(z + b_hi) - sigma(z + b_lo)`.
-- `integral` (K=2): the **closed-form antiderivative** window `S(z + b_hi) - S(z + b_lo)` with `S' = sigma` (the `ActivationSpec.integral` kernel; e.g. `sigmoid`'s antiderivative is `softplus`). omnibias has a closed-form integral operator, not only closed-form derivatives.
+- `identity` (K=1): `sigma(z + b)`.
+- `grad` / `laplacian` / `derivative`: closed-form `sigma^(n)` (`n = 1, 2`, or arbitrary).
+- `band` (K=2): `sigma(z + b_hi) - sigma(z + b_lo)`.
+- `integral` (K=2): antiderivative window `S(z + b_hi) - S(z + b_lo)` with `S' = sigma`.
 
-`grad` / `laplacian` / `derivative` need a base with a `fastpath` kernel; `integral` needs an antiderivative kernel; `OperatorBlock` raises `TypeError` otherwise.
+Three senses of "integral": (1) this antiderivative window; (2) domain quadrature
+in `omnibias.fields`; (3) `int f dmu` in `omnibias.measure`. Canonical matrix:
+`docs/operator-surface.md`.
 
-The gated `BiasScan` templates reuse these six roles; it is **not** a seventh `OperatorBlock` role. Equivariance is an interior lattice shift along `w`, not a circular wrap. Soft-argmax `gamma` is not founding `delta -> 0` (driving `gamma` to infinity would be temperature collapse). Wave-1 status is **gated**, not shipped: see `docs/api/multipack.md`, `docs/api/scan.md`, `docs/api/difference.md`. Wave-3 `ScanNet` stacks those templates with the same six roles and the same on-lattice equivariance (not the translation group of `R^D`). Wave-3 `JetKAN` edges are multi-packs whose **model** jet is exact; the Kolmogorov-Arnold theorem does not justify the architecture. Remaining Group 02 twins (`LadderNet`, `EquivariantScan`, `hierarchical_scan`) stay gated with the same cost honesty: FermiNet / wall-time / complexity gates are smoke-earned, not in CI `all_passed`. See `docs/api/scannet.md`, `docs/api/jetkan.md`, `docs/api/ladder.md`, `docs/api/equivariant_scan.md`, `docs/api/hierarchy.md`.
+Soft-argmax `gamma -> inf` on a scan is temperature collapse; founding bias
+collapse is `delta -> 0` on K parallel hyperplanes.
 
-**"Integral" has three distinct senses -- do not conflate:** (1) the activation antiderivative window above (`OperatorBlock(op="integral")`, closed form); (2) domain quadrature `sum_q w_q u(x_q)` (`omnibias.fields` `integrate` / `l2_norm` / `sobolev_norm`, numerical); (3) the measure integral `integral f dmu` (`omnibias.measure`, numerical; certified variant in `omnibias.verify`). Ground any capability claim in the canonical operator-surface matrix (`docs/operator-surface.md`), never in memory.
+Runnable examples: `docs/examples/quickstart_torch.py`, `quickstart_jax.py`,
+`quickstart_keras.py` (set `KERAS_BACKEND` first).
 
-## Canonical runnable examples (copy from these)
+New tensors follow `torch.get_default_dtype()` / `keras.config.floatx()`.
+`n < 0` raises `ValueError`; unimplemented orders raise `NotImplementedError`.
+A jet carries partials up to the order you request.
 
-- PyTorch: `docs/examples/quickstart_torch.py`
-- JAX: `docs/examples/quickstart_jax.py`
-- Keras 3: `docs/examples/quickstart_keras.py` (set `KERAS_BACKEND` first)
+## Extend
 
-## Gotchas that bite
+- Polynomials: `omnibias.core.polynomials` only. Pair with `omnibias-derivative-tower`.
+- Torch twin: `omnibias-torch`. JAX twin: `omnibias-jax`. Keras: `omnibias-keras`.
+- Tests: `python -m pytest packages/omnibias-core/tests packages/omnibias-torch/tests packages/omnibias-jax/tests -q` and root `tests/` parity.
+- Compose with `omnibias-fields`, `omnibias-curvature`, `omnibias-verify` by those names.
 
-- **New tensors follow the framework default dtype** (`torch.get_default_dtype()` / `keras.config.floatx()`), never a hardcoded `float32`. Use `float64` when you need bit-identical cross-backend parity.
-- **`n < 0` raises `ValueError`; genuinely unimplemented orders raise `NotImplementedError`.** Catch them; do not paper over the contract.
-- **A jet only carries partials up to the order you request.** Ask for `order=2` for a Hessian, `order=3` for third derivatives; higher orders cost nothing extra per point but must be requested.
-- **Keras uses `keras.ops.*` only** and is backend-agnostic; select the backend with `KERAS_BACKEND=jax|tensorflow|torch`.
-- **Tab heads as layers.** `as_head(z, kind)` moves the head to `z.device` / `z.dtype`; logits are `(..., k)`. Keras tab layers live in `omnibias.tab.keras` (not `omnibias-keras`) and use `keras.ops`; `learnable_beta` on `ArrangementBoosted` is member-`beta` (ensemble `learning_rate` / `base` stay frozen). Equinox wrappers are an optional `[equinox]` extra (`omnibias.tab.jax.equinox_head`); tab CI **fails** if the extra is missing when `CI` is set (local `importorskip`).
+## Next invention
 
-## More detail
+A new Riccati activation whose coefficients, antiderivative kernel, and jet
+fastpath land in core once and light up OperatorBlock `derivative` + `integral`
+on all three backends, then win `derivative_order.json` against nested AD.
 
-- API: [torch](https://github.com/derivon-ai/omnibias/blob/main/docs/api/torch.md), [jax](https://github.com/derivon-ai/omnibias/blob/main/docs/api/jax.md), [core](https://github.com/derivon-ai/omnibias/blob/main/docs/api/core.md), [tab](https://github.com/derivon-ai/omnibias/blob/main/docs/api/tab.md)
-- Cookbook: [tab as a layer](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/tab-as-layer.md)
-- Theory: [closed-form derivatives](https://github.com/derivon-ai/omnibias/blob/main/docs/theory.md); [activation dictionary](https://github.com/derivon-ai/omnibias/blob/main/docs/activations.md)
+## Bakeoffs
+
+[`docs/benchmarks/`](../../../docs/benchmarks/): `laplacian_scaling.json`,
+`polylaplacian_order.json`, `derivative_order.json`, `jet_vs_nested_ad_smoke.json`.
+
+## Further references
+
+- API: `docs/api/torch.md`, `docs/api/jax.md`, `docs/api/core.md`
+- Theory: `docs/theory.md`; activations: `docs/activations.md`

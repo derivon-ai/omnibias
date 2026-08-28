@@ -262,7 +262,7 @@ L230 / L167) for the position-jitter robustness margin.
 
 ## Monorepo wiring checklist
 
-From [.claude/skills/omnibias-dev-new-package/SKILL.md](../../.claude/skills/omnibias-dev-new-package/SKILL.md):
+From [.claude/skills/omnibias-new-package/SKILL.md](../../.claude/skills/omnibias-new-package/SKILL.md):
 
 - SPDX header on every `.py`:
   `# SPDX-License-Identifier: Apache-2.0`

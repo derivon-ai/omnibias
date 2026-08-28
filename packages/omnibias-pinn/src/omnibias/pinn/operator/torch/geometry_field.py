@@ -50,7 +50,7 @@ def condition_with_geometry(
     if not hard_bc or sdf is None:
         return field
     F = int(field._n_functions)
-    if isinstance(sdf, Sequence) and not isinstance(sdf, (str, bytes)):
+    if isinstance(sdf, Sequence) and not isinstance(sdf, str | bytes):
         sdfs = list(sdf)
         if len(sdfs) == 1 and F > 1:
             sdfs = sdfs * F

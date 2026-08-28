@@ -17,6 +17,9 @@ and the closed-form variational tower in `omnibias.core.verified`.
   `(VectorField, JacobianEnclosure)` pair the validated flow expects (no autodiff),
   and `discrete_periodic_point` proves fixed points / periodic orbits of iterated
   1-D maps via a Krawczyk certificate.
+- **Cone-field hyperbolicity** — a finite orbit segment of interval Jacobians
+  expands a cone with uniform factor `eta > 1`; `log(eta)` is a topological-entropy
+  lower bound on that segment only. See [cone_field.md](cone_field.md).
 
 !!! note "Soundness, not speed"
     Every enclosure provably contains the true object over the whole time

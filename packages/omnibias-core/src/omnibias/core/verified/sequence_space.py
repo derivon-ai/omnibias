@@ -34,6 +34,20 @@ def _nu_power(nu: Interval, k: int) -> Interval:
     return nu.pow_int(k)
 
 
+def _nonneg(iv: Interval) -> Interval:
+    """Clamp a magnitude/tail enclosure to ``[0, inf)``.
+
+    Outward rounding can push the lower endpoint of an exactly-zero magnitude one
+    ulp below zero (``nextafter(0, -inf)`` is a negative subnormal, not ``0.0``),
+    which would otherwise make ``ValidatedSeries.__post_init__`` spuriously reject
+    a mathematically valid exact-zero tail. Since the enclosed quantity is a
+    non-negative norm/tail, raising the lower bound to ``0`` stays rigorous. This
+    mirrors :func:`omnibias.core.verified.fourier._nonneg`, used for exactly the
+    same reason on the two-sided sibling.
+    """
+    return Interval(max(iv.lo, 0.0), max(iv.hi, 0.0))
+
+
 def ell1_nu_norm(
     coeffs: Sequence[IntervalLike],
     nu: float,
@@ -101,6 +115,31 @@ def convolve(a: Sequence[Interval], b: Sequence[Interval]) -> list[Interval]:
     return out
 
 
+def _chebyshev_product(a: Sequence[Interval], b: Sequence[Interval]) -> list[Interval]:
+    r"""Rigorous product coefficients in the ``T_k`` Chebyshev basis.
+
+    The basis identity is ``T_i T_j = (T_{i+j} + T_{|i-j|}) / 2`` for positive
+    indices; terms involving ``T_0`` are copied once. Cauchy convolution is
+    therefore not the Chebyshev product.
+    """
+    if not a or not b:
+        return []
+    out = [Interval.point(0.0) for _ in range(len(a) + len(b) - 1)]
+    half = Interval.point(0.5)
+    for i, ai in enumerate(a):
+        for j, bj in enumerate(b):
+            term = ai * bj
+            if i == 0:
+                out[j] = out[j] + term
+            elif j == 0:
+                out[i] = out[i] + term
+            else:
+                half_term = term * half
+                out[i + j] = out[i + j] + half_term
+                out[abs(i - j)] = out[abs(i - j)] + half_term
+    return out
+
+
 @dataclass
 class ValidatedSeries:
     r"""A rigorous element of :math:`\ell^1_\nu`: finite coefficients + tail radius.
@@ -119,6 +158,8 @@ class ValidatedSeries:
     def __post_init__(self) -> None:
         if self.tail.lo < 0.0:
             raise ValueError("tail radius must be non-negative")
+        if self.chebyshev and self.nu < 1.0:
+            raise ValueError("Chebyshev ValidatedSeries requires nu >= 1")
 
     @property
     def order(self) -> int:
@@ -160,12 +201,16 @@ class ValidatedSeries:
             a = self.coeffs[k] if k < len(self.coeffs) else Interval.point(0.0)
             b = other.coeffs[k] if k < len(other.coeffs) else Interval.point(0.0)
             coeffs.append(a + b)
-        return ValidatedSeries(coeffs, self.tail + other.tail, self.nu, self.chebyshev)
+        return ValidatedSeries(coeffs, _nonneg(self.tail + other.tail), self.nu, self.chebyshev)
 
     def __mul__(self, other: ValidatedSeries) -> ValidatedSeries:
         self._check_compatible(other)
         n = min(self.order, other.order)  # keep coefficients up to this order
-        conv = convolve(self.coeffs, other.coeffs)
+        conv = (
+            _chebyshev_product(self.coeffs, other.coeffs)
+            if self.chebyshev
+            else convolve(self.coeffs, other.coeffs)
+        )
         kept = conv[: n + 1]
         overflow = conv[n + 1 :]
         # Weighted norm of the overflow coefficients (their true index starts at n+1).
@@ -181,13 +226,26 @@ class ValidatedSeries:
             + self.tail * other.low_norm()
             + self.tail * other.tail
         )
-        return ValidatedSeries(kept, overflow_norm + cross, self.nu, self.chebyshev)
+        if self.chebyshev and cross.hi > 0.0:
+            # A Chebyshev tail can fold back to every low mode through
+            # T_i*T_j = (T_{i+j}+T_|i-j|)/2. Enclose that possible contribution
+            # in each retained coefficient; the same norm bound covers the
+            # unknown high modes held in ``tail``.
+            cross_bound = Interval.point(cross.hi)
+            for k, coefficient in enumerate(kept):
+                weight = Interval.point(1.0 if k == 0 else 2.0)
+                mode_bound = cross_bound / (weight * _nu_power(nu_iv, k))
+                radius = mode_bound.hi
+                kept[k] = coefficient + Interval(-radius, radius)
+        return ValidatedSeries(kept, _nonneg(overflow_norm + cross), self.nu, self.chebyshev)
 
     def scale(self, factor: IntervalLike) -> ValidatedSeries:
         """Multiply by a scalar (constant) rigorously."""
         f = Interval.from_value(factor)
         coeffs = [c * f for c in self.coeffs]
-        return ValidatedSeries(coeffs, self.tail * Interval.point(f.mag), self.nu, self.chebyshev)
+        return ValidatedSeries(
+            coeffs, _nonneg(self.tail * Interval.point(f.mag)), self.nu, self.chebyshev
+        )
 
     def banach_algebra_bound(self, other: ValidatedSeries) -> Interval:
         """The submultiplicative bound ``||a||_nu * ||b||_nu`` on the product norm."""

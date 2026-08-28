@@ -302,8 +302,8 @@ __all__ = [
     "certify_multiple_peaks",
     "certify_peak",
     "honesty_payload",
-    "tight_deriv",
     "seal",
     "sealed_digest_ok",
+    "tight_deriv",
     "tight_deriv",
 ]

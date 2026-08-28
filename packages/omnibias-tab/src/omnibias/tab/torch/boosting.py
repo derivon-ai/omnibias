@@ -58,6 +58,59 @@ def _base_score(y: np.ndarray, task: str, k: int) -> np.ndarray:
     return base
 
 
+def _fit_weak_learner_closed_form(
+    cfg: SoftTreeConfig,
+    X: np.ndarray,
+    target: np.ndarray,
+    weight: np.ndarray,
+    *,
+    seed: int,
+) -> SoftTreeEnsemble:
+    r"""Frozen-gate (axis: greedy) closed-form Newton leaves; ``b0 = 0``."""
+    from omnibias.tab._core.forward import gate_activations, memberships_from_gates
+    from omnibias.tab._core.leaves import closed_form_leaves
+    from omnibias.tab._core.params import init_params
+
+    Xv = np.asarray(X, dtype=np.float64)
+    rv = np.asarray(target, dtype=np.float64)
+    hv = np.asarray(weight, dtype=np.float64)
+    n = Xv.shape[0]
+    k = int(cfg.n_outputs)
+    rv = rv.reshape(n, k)
+    hv = hv.reshape(n, k)
+    if cfg.split_kind == "axis":
+        from omnibias.tab.pou.grow import fit_axis_tree
+
+        params = fit_axis_tree(
+            Xv, rv, hv,
+            depth=cfg.depth, beta=float(cfg.beta_final), leaf_l2=float(cfg.leaf_l2),
+            n_quantiles=16, colsample=1.0,
+            rng=np.random.default_rng(seed), n_trees=cfg.n_trees,
+        )
+        # Preserve the caller's task on the returned module (grow uses regression).
+        params.config = SoftTreeConfig(
+            n_features=cfg.n_features, n_trees=cfg.n_trees, depth=cfg.depth,
+            split_kind="axis", task="regression", n_outputs=k,
+            beta_final=cfg.beta_final, leaf_l2=cfg.leaf_l2, seed=seed,
+        )
+    else:
+        params = init_params(cfg, seed)
+        G = gate_activations(params, Xv, float(cfg.beta_final))
+        P = memberships_from_gates(G, cfg.depth)
+        params.leaves = closed_form_leaves(P, rv, hv, float(cfg.leaf_l2))
+        params.b0[:] = 0.0
+    model = SoftTreeEnsemble(
+        SoftTreeConfig(
+            n_features=cfg.n_features, n_trees=cfg.n_trees, depth=cfg.depth,
+            split_kind=cfg.split_kind, task="regression", n_outputs=k,
+            beta_final=cfg.beta_final, leaf_l2=cfg.leaf_l2, seed=seed,
+        ),
+        params,
+    )
+    model.set_beta(cfg.beta_final)
+    return model
+
+
 def _fit_weak_learner(
     cfg: SoftTreeConfig,
     X: np.ndarray,
@@ -67,11 +120,17 @@ def _fit_weak_learner(
     steps: int,
     lr: float,
     seed: int,
+    leaf_solver: str = "adam",
 ) -> SoftTreeEnsemble:
     r"""Weighted least-squares fit of a fresh weak learner to the Newton target."""
+    if leaf_solver == "closed_form":
+        return _fit_weak_learner_closed_form(cfg, X, target, weight, seed=seed)
+    if leaf_solver != "adam":
+        raise ValueError(f"leaf_solver must be 'adam' or 'closed_form', got {leaf_solver!r}")
     torch.manual_seed(seed)
     reg_cfg = SoftTreeConfig(
         n_features=cfg.n_features, n_trees=cfg.n_trees, depth=cfg.depth,
+        split_kind=cfg.split_kind,
         task="regression", n_outputs=cfg.n_outputs, beta_final=cfg.beta_final, seed=seed,
     )
     model = SoftTreeEnsemble(reg_cfg)
@@ -89,37 +148,36 @@ def _fit_weak_learner(
     return model
 
 
-def fit_boosted(
+def _fit_boosted_impl(
     X: np.ndarray,
     y: np.ndarray,
     config: SoftTreeConfig,
     *,
-    n_stages: int = 30,
-    learning_rate: float = 0.3,
-    inner_steps: int = 60,
-    inner_lr: float = 0.05,
-    val: tuple[np.ndarray, np.ndarray] | None = None,
-    patience: int | None = None,
-    encoder: object | None = None,
+    n_stages: int,
+    learning_rate: float,
+    inner_steps: int,
+    inner_lr: float,
+    val: tuple[np.ndarray, np.ndarray] | None,
+    patience: int | None,
+    sample_weight: np.ndarray | None,
+    leaf_solver: str = "adam",
 ) -> tuple[SoftTreeEnsemble, BoostResult]:
-    r"""Fit a Newton-boosted soft-tree ensemble; returns ``(model, BoostResult)``.
+    r"""Shared stagewise-Newton-boosting loop behind :func:`fit_boosted` and
+    :func:`fit_boosted_heteroscedastic`.
 
-    ``config`` describes **one stage** (its ``n_trees`` / ``depth`` are the weak-learner
-    shape); the returned :class:`SoftTreeEnsemble` holds ``n_stages * config.n_trees`` trees.
-    Optional ``patience`` (with ``val``) keeps the prefix with best validation loss.
-
-    ``encoder`` is rejected: stagewise numpy boosting does not jointly train an
-    encoder. Use :func:`~omnibias.tab.torch.train.fit_joint` or
-    :func:`~omnibias.tab.torch.train.fit_second_order`.
+    ``sample_weight`` is ``None`` for :func:`fit_boosted` (every stage's weak learner is
+    fit under the Hessian weight ``h`` alone, unchanged) or a frozen per-row multiplier
+    (``1 / s_hat**2``, theory 05-03 section 4(d)) that is folded in as ``h * sample_weight``
+    for :func:`fit_boosted_heteroscedastic`'s ``weighting="gls"`` -- the Newton target
+    ``-g/h`` itself is untouched either way, only the weak-learner's least-squares weight
+    changes. ``sample_weight=None`` multiplies by exactly ``1.0`` nowhere (the branch is
+    skipped entirely), so :func:`fit_boosted`'s bit-identical output is unaffected by this
+    refactor.
     """
-    if encoder is not None:
-        raise TypeError(
-            "encoder= is not supported on the stagewise GBM-mirror trainers; "
-            "use fit_joint or fit_second_order"
-        )
     task, k = config.task, config.n_outputs
     Xtr = np.asarray(X, dtype=np.float64)
     n = Xtr.shape[0]
+    sw = None if sample_weight is None else np.asarray(sample_weight, dtype=np.float64).reshape(n, 1)
 
     base = _base_score(y, task, k)  # (k,)
     F = np.tile(base[None, :], (n, 1))  # (n, k)
@@ -140,8 +198,10 @@ def fit_boosted(
     for stage in range(n_stages):
         g, h = score_grad_hess(F, y, task)  # (n, k)
         target = -g / np.clip(h, _EPS, None)
+        weight = h if sw is None else h * sw
         weak = _fit_weak_learner(
-            config, Xtr, target, h, steps=inner_steps, lr=inner_lr, seed=config.seed + stage + 1
+            config, Xtr, target, weight, steps=inner_steps, lr=inner_lr,
+            seed=config.seed + stage + 1, leaf_solver=leaf_solver,
         )
         wp = weak.to_params()
         W_parts.append(wp.W)
@@ -178,9 +238,11 @@ def fit_boosted(
         n_features=config.n_features,
         n_trees=keep * config.n_trees,
         depth=config.depth,
+        split_kind=config.split_kind,
         task=task,
         n_outputs=k,
         beta_final=config.beta_final,
+        leaf_l2=config.leaf_l2,
         seed=config.seed,
     )
     from omnibias.tab._core.params import TabParams
@@ -208,4 +270,95 @@ def fit_boosted(
     )
 
 
-__all__ = ["BoostResult", "fit_boosted"]
+def fit_boosted(
+    X: np.ndarray,
+    y: np.ndarray,
+    config: SoftTreeConfig,
+    *,
+    n_stages: int = 30,
+    learning_rate: float = 0.3,
+    inner_steps: int = 60,
+    inner_lr: float = 0.05,
+    val: tuple[np.ndarray, np.ndarray] | None = None,
+    patience: int | None = None,
+    encoder: object | None = None,
+    leaf_solver: str = "adam",
+) -> tuple[SoftTreeEnsemble, BoostResult]:
+    r"""Fit a Newton-boosted soft-tree ensemble; returns ``(model, BoostResult)``.
+
+    ``config`` describes **one stage** (its ``n_trees`` / ``depth`` are the weak-learner
+    shape); the returned :class:`SoftTreeEnsemble` holds ``n_stages * config.n_trees`` trees.
+    Optional ``patience`` (with ``val``) keeps the prefix with best validation loss.
+
+    ``encoder`` is rejected: stagewise numpy boosting does not jointly train an
+    encoder. Use :func:`~omnibias.tab.torch.train.fit_joint` or
+    :func:`~omnibias.tab.torch.train.fit_second_order`.
+    """
+    if encoder is not None:
+        raise TypeError(
+            "encoder= is not supported on the stagewise GBM-mirror trainers; "
+            "use fit_joint or fit_second_order"
+        )
+    return _fit_boosted_impl(
+        X, y, config,
+        n_stages=n_stages, learning_rate=learning_rate,
+        inner_steps=inner_steps, inner_lr=inner_lr,
+        val=val, patience=patience, sample_weight=None, leaf_solver=leaf_solver,
+    )
+
+
+def fit_boosted_heteroscedastic(
+    X: np.ndarray,
+    y: np.ndarray,
+    config: SoftTreeConfig,
+    *,
+    log_scale: np.ndarray,
+    n_stages: int = 30,
+    learning_rate: float = 0.3,
+    inner_steps: int = 60,
+    inner_lr: float = 0.05,
+    weighting: str = "gls",
+    val: tuple[np.ndarray, np.ndarray] | None = None,
+    patience: int | None = None,
+) -> tuple[SoftTreeEnsemble, BoostResult]:
+    r"""``fit_boosted`` with the weak-learner weight ``h -> h / s_hat**2`` (theory 05-03
+    section 4(d)) -- a generalized-least-squares reweighting of the boosting target, in the
+    spirit of NGBoost (Duan et al. 2020): rows the frozen estimator ``s_hat`` calls
+    low-noise get more say in each stage's weak-learner fit. This is a **different,
+    older mechanism** than :func:`omnibias.tab.torch.heteroscedastic.fit_noise_aware`'s
+    zero-gradient curvature penalty (section 4(b)) -- it changes the fitted function itself,
+    not merely the optimizer's local curvature -- and is included because
+    :func:`_fit_weak_learner`'s ``weight`` parameter already exists as the exact hook this
+    needs (three lines, not new machinery), not presented as a novel idea.
+
+    ``log_scale`` is a **frozen** per-row ``log(s)`` of length ``n`` (e.g.
+    :func:`omnibias.tab.bench.fit_predict_catboost_uncertainty`'s output on train --
+    section 4(c)'s anti-circularity requirement applies here exactly as it does to
+    ``fit_noise_aware``). ``weighting="shrinkage"`` ignores ``log_scale`` and reproduces
+    :func:`fit_boosted` bit-identically -- a second G0-style plumbing check, distinct from
+    the ``weighting="gls"`` hypothesis gate (G3).
+    """
+    if weighting not in ("gls", "shrinkage"):
+        raise ValueError(f"weighting must be 'gls' or 'shrinkage', got {weighting!r}")
+    if config.task != "regression":
+        raise ValueError(
+            f"fit_boosted_heteroscedastic is regression-only (theory 05-03 section 10), "
+            f"got task={config.task!r}"
+        )
+    n = int(np.asarray(X, dtype=np.float64).shape[0])
+    if weighting == "shrinkage":
+        sample_weight = None
+    else:
+        log_scale_arr = np.asarray(log_scale, dtype=np.float64).reshape(-1)
+        if log_scale_arr.shape[0] != n:
+            raise ValueError(f"log_scale must have length n={n}, got {log_scale_arr.shape[0]}")
+        sample_weight = np.exp(-2.0 * log_scale_arr)  # 1 / s_hat**2
+    return _fit_boosted_impl(
+        X, y, config,
+        n_stages=n_stages, learning_rate=learning_rate,
+        inner_steps=inner_steps, inner_lr=inner_lr,
+        val=val, patience=patience, sample_weight=sample_weight,
+    )
+
+
+__all__ = ["BoostResult", "fit_boosted", "fit_boosted_heteroscedastic"]

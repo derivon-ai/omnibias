@@ -12,7 +12,12 @@ from omnibias.core.proof import (
     lean_check_available,
     prove,
 )
+from omnibias.core.proof.certificate import (
+    NO_TRANSCENDENTAL_BACKEND,
+    certificate_transcend_backend,
+)
 from omnibias.core.proof.lean_check import generate_obligation
+from omnibias.core.verified.interval import Interval
 
 
 @pytest.fixture(autouse=True)
@@ -75,6 +80,27 @@ def test_gap_is_enclosure_not_a_named_collapse() -> None:
     assert wrong.disproved
 
 
+def test_direct_interval_certificate_ignores_unrelated_fallback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """An endpoint-only collapse records that it used no transcendental."""
+    from omnibias.core.verified import transcend
+
+    monkeypatch.setattr(transcend, "_mpmath", lambda: None)
+    transcend.clear_libm_fallback_used()
+    try:
+        assert transcend.exp_iv(Interval.point(0.0)).contains(1.0)
+        result = prove("residual", {"lo": 0.0, "hi": 0.0})
+        assert result.proved
+        assert result.verdict.certificate is not None
+        assert (
+            certificate_transcend_backend(result.verdict.certificate)
+            == NO_TRANSCENDENTAL_BACKEND
+        )
+    finally:
+        transcend.clear_libm_fallback_used()
+
+
 def test_identity_proves_and_disproves() -> None:
     proved = prove(
         "identity",
@@ -102,8 +128,24 @@ def test_winding_pairing_rank() -> None:
     assert winding.proved
     assert winding.reason[0].surviving == 1
     assert winding.verdict.theorem_prover_verified is False
+    assert "contour" not in winding.verdict.certificate["payload"]["inputs"]
     wrong = prove("winding", {"coeffs": [0, 1], "expected": 0})
     assert wrong.disproved
+    rectangle = prove(
+        "winding",
+        {
+            "coeffs": [0, 1],
+            "expected": 1,
+            "contour": "rectangle",
+            "half_width": 2.0,
+            "half_height": 1.0,
+        },
+    )
+    assert rectangle.proved
+    rectangle_inputs = rectangle.verdict.certificate["payload"]["inputs"]
+    assert rectangle_inputs["contour"] == "rectangle"
+    assert rectangle_inputs["half_width"] == 2.0
+    assert rectangle_inputs["half_height"] == 1.0
     pairing = prove(
         "pairing",
         {"residual": [0, 1], "tests": [[1], [1, 0, 1]]},

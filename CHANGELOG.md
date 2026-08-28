@@ -6,6 +6,535 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — TabPOU joint worlds (theory 05-05)
+
+- `omnibias.tab.pou.joint`: `TabPOUJointConfig` / `fit_tabpou_joint` /
+  `polish_thresholds` (08-07 `block_exact_search` on `t`, `verify=True`).
+  Optional trained `BandFeatureEmbedder`, grouped source-feature splits,
+  pairwise depth-2 warm-start, and a POU-gated residual (`fit_joint` after
+  v0 boosting). `W` stays one-hot. Temperature collapse only.
+- `make_embedder(..., freeze=)` and `fit_tabpou(..., grouped_splits=,
+  pairwise=, freeze_embed=)`. v0 `fit_tabpou` defaults are unchanged.
+- `benchmarks/tabular_pou_joint.py`: H0–H7 then G-tree / G-net / G-hybrid /
+  G5. Smoke CI step on the `tab` job. **Shipped** from the lock JSON:
+  G-tree `3/3`, G-net `2/3` (kin8nm lost vs RealMLP/TabM), G-hybrid `6/6`,
+  G5 sound. Frozen combo is sequential residual (H1); H0/H3/H4/H6 rejected.
+  05-04 G3 stays the named boost-only v0 arm (report-only; not retuned).
+  Docs:
+  [`docs/api/tabpou.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/tabpou.md).
+  Theory spec: `theory/05-applications/05-tabpou-joint-worlds.md`.
+
+### Added — Frontier Capability Campaign remaining work (phases 2–4)
+
+Phase 1 substrate (banded tail, radii series, Frobenius, Hermite, replay, QMC
+sampling / SR) stays in tree. This slice wires the leftover engines and
+records earned vs unearned gates honestly.
+
+- **Banded Fourier radii.** `BandedLinearPart` /
+  `tail_inverse_bound_from_banded` in `omnibias.core.verified.radii_spectral`
+  consume `banded_tail_inverse_bound`. The diagonal `laplacian_symbol` path
+  stays byte-identical. A manufactured nearest-neighbour solution can close.
+- **Laguerre basis.** `omnibias.core.verified.laguerre_basis` is the exact-
+  rational sibling of Hermite on `[0, inf)`; not Fourier self-dual.
+- **IPM CAP.** `build_ipm_radii_construction` is residual + tail +
+  `radii_polynomial_certificate`. The named sub-case `ipm_banded_toy_radii`
+  can prove; `full_ipm_proved` and `navier_stokes_proof_claim` stay `False`.
+  `export_ipm_toy_cap_replay` emits a finite replay trace.
+- **Cone field.** `omnibias.dynamics._core.cone` certifies hyperbolicity of a
+  finite orbit segment and returns `log(eta)` as an entropy lower bound.
+- **L-infinity trainer.** `linf_minimax_step` beside Gauss-Newton (JAX);
+  toy residual only, not a CCF champion retrain.
+- **Symbolic certify.** `rationalize_and_certify_discovery` snaps floats to
+  `Fraction` and checks an exact residual; never `theorem_prover_verified`.
+- **Antisymmetric Slater + Bloch mixed partials.** Gaussian `log|det M|` on
+  the sampling contract with a closed-form Laplacian; real twist mixed
+  partials via `layer_jet_mv`.
+- **Hubbard ground-state sandwich.** Ritz + Temple + blocked `LDL^T` on the
+  two-site open half-filled slice; numerical `eigh` is an oracle only.
+- **NPA.** `omnibias.sos.npa` moment matrices, interval `LDL^T`, one `Z_2`
+  isotypic split; linear-Hamiltonian lower bounds only.
+- **Named `Lambda <= 0.2` attempt.** `attempt_named_lambda_bound` records a
+  cited far-field premise as an external obligation and stays
+  `certified=False`. Never infers RH. Dirichlet remains `Re(s) > 1` only.
+- **Cohn-Elkies 1-D.** Hermite self-dual test function, grid sign checks,
+  compared to published density `1`. Not `d -> inf`.
+- **Combinatorial SOS.** Planted-clique / 3-XOR oracles plus a degree-indexed
+  strictly-PD residual, distinct from `SosDegreeFamily`.
+- **Volume-uniform YM family.** Existing polymer bound on a declared growing
+  finite-lattice family of spacetime dimensions; `yang_mills_claim=False`.
+
+Docs: [`docs/api/laguerre_basis.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/laguerre_basis.md),
+[`docs/api/ipm_radii.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/ipm_radii.md),
+[`docs/api/cone_field.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/cone_field.md),
+[`docs/api/lattice_ground_state.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/lattice_ground_state.md),
+[`docs/api/npa.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/npa.md),
+[`docs/api/cohn_elkies.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/cohn_elkies.md),
+[`docs/api/debruijn_newman.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/debruijn_newman.md),
+[`docs/api/combinatorial_sos.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/combinatorial_sos.md),
+[`docs/api/volume_uniform_ym.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/volume_uniform_ym.md),
+[`docs/api/antisymmetric_slater.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/antisymmetric_slater.md).
+
+### Added — TabPOU from-scratch tabular architecture (theory 05-04)
+
+- `SoftTreeConfig.split_kind` in `{oblique, axis, sparse}` (default stays
+  `oblique` so the 05-02 flagship is bit-identical). Axis init stores a
+  one-hot feature selector per gate.
+- `omnibias.tab._core.leaves.closed_form_leaves`: the weighted-ridge Newton
+  leaf step on frozen POU memberships (LightGBM's exact leaf solve).
+- `omnibias.tab.torch.boosting.fit_boosted(..., leaf_solver=)`:
+  `"adam"` (default, flagship-safe) or `"closed_form"`.
+- `omnibias.tab.pou`: `TabPOUConfig` / `TabPreprocessor` / `TabPOU` /
+  `fit_tabpou` -- axis-aligned oblivious boosting with closed-form leaves,
+  optional `BandFeatureEmbedder` front-end, optional k-head BatchEnsemble
+  residual blended by `RegionModels.combine`. Gate hardening is temperature
+  collapse (`beta -> inf`), not founding `delta -> 0`.
+- `omnibias.tab.jax.pou`: forward twin (`pou_tokens`, `pou_forward_arrays`);
+  no trainer. Numpy / torch / jax parity at float64.
+- `benchmarks/tabular_pou.py`: G0-G6 (G0b is a matched-budget `fit_boosted`
+  report; G6 does not replace the flagship LightGBM table). Smoke CI step on
+  the `tab` job. RealMLP / TabM stay `--full`-only. `--full` locked
+  [`docs/benchmarks/tabular_pou.json`](https://github.com/derivon-ai/omnibias/blob/main/docs/benchmarks/tabular_pou.json):
+  G0/G0b/G5/G6 passed; G1/G2/G3 failed (G3 not-worse-both `3/6`); G4
+  leftover-recorded (`n_comparable=3`). Spec status **gated**; G3 is the
+  named v0 arm for 05-05 and is not retuned. Docs:
+  [`docs/api/tabpou.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/tabpou.md).
+  Theory spec: `theory/05-applications/04-tabpou-architecture.md`.
+
+### Added — Lean replay checker (Frontier Capability Campaign, phase1-lean-replay)
+
+- `omnibias.core.proof.replay`: a finite, serializable `ReplayTrace` /
+  `ReplayRecorder` for straight-line `Interval` derivations (`literal` /
+  `sub` / `mul` — scoped to exactly this vocabulary, not a speculative
+  universal IR), plus `DomainSubdivisionCertificate` /
+  `SubdivisionLeaf` recording the finite leaf list of a branch-and-bound /
+  bisection search and a `covers_no_gaps()` edge-to-edge coverage check.
+  `record_ldlt_diagonal_trace` is a thin, independent, opt-in instrumented
+  mirror of the diagonal-pivot recurrence in
+  `omnibias.core.verified.eig_operator._ldlt_pivots` (verified bit-for-bit
+  identical to `interval_ldlt_pivots`; it does not import, call, or alter
+  that module, so it changes no existing behavior). `seal_replay_certificate`
+  / `seal_domain_subdivision_certificate` seal either as a v1 certificate and
+  optionally drive the Lean kernel, following the exact `Obligation` /
+  `_seal_report` pattern already used by the rational-stencil obligations.
+- `formal/omnibias-verified-kernel/Omnibias/Replay.lean`: a generic,
+  reusable `replayOk` that re-executes every recorded `sub`/`mul` step
+  against the kernel's own proven `ZInterval.sub` / `ZInterval.mul` and
+  checks the recorded envelope (lifted to a common dyadic exponent)
+  genuinely contains the exact recomputation; `literal` steps (including a
+  `reciprocal`-derived `L`-factor entry, mirroring the trust boundary
+  `Omnibias/LDLT.lean` already documents) are trusted inputs, not
+  re-derived. `Omnibias/Subdivision.lean`'s `coversNoGaps` is a purely
+  combinatorial check that a leaf list tiles `[0, resolution]` edge-to-edge
+  with no gap and no overlap. Both carry `sorry`-free soundness theorems
+  (`containsComputed_sound`, `coversNoGaps_sound`) and stay genuinely
+  Mathlib-free.
+- `omnibias.core.proof.lean_check.generate_obligation` gains two new
+  branches (`interval_replay_trace`, `domain_subdivision`) that emit
+  concrete Lean literals against the two checkers above and `by decide`,
+  following its existing dispatch convention exactly. The replay-trace
+  branch is emitted unconditionally (Lean is the sole arbiter — a
+  numerically tampered but well-formed trace fails `lake build`'s
+  `decide`, not a Python pre-check); the domain-subdivision branch is only
+  emitted once Python's own `covers_no_gaps()` already agrees (mirroring
+  the existing positive-definite-pivot / poisedness pattern), so a
+  certificate with a genuine gap is refused before any Lean is emitted.
+- **Flag decision:** both new obligation kinds reuse the existing
+  `theorem_prover_verified` flag rather than introducing a new one — its
+  semantics ("a genuine `lake build` re-checked this certificate's finite
+  obligation") already match exactly, and every other obligation kind
+  (spectral gap, PD pivots, rational identity, stencil, PDE margin) shares
+  the same flag regardless of payload shape. It is earned only by a
+  genuine kernel pass that ran in-session and is never forged; both seal
+  functions degrade gracefully (`available=False`, `verified=False`) when
+  no Lean toolchain is present. Docs: [`docs/api/lean_replay.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/lean_replay.md).
+
+### Added — certified Frobenius / Puiseux local series (Frontier Capability Campaign, phase 1)
+
+- `omnibias.core.verified.frobenius`: rigorous local series expansions around
+  a singular / branch point, each packaged on
+  `omnibias.core.verified.sequence_space.ValidatedSeries` with an explicit
+  tail bound and the exact hypothesis it is sound under.
+  - **Frobenius series** of a regular singular point of a 2nd-order linear
+    ODE `x²y'' + x p(x) y' + q(x) y = 0`: `indicial_roots` solves the indicial
+    equation `r(r-1) + p₀r + q₀ = 0` as a certified quadratic directly with
+    `Interval.sqrt` (an exact closed form, not a bisection/Newton search);
+    `frobenius_coefficients` computes the recurrence coefficients `aₙ` of
+    `y = xʳ Σ aₙxⁿ` in `Interval` arithmetic for a caller-chosen root `r`;
+    `solve_frobenius` packages the result with a tail bound derived from a
+    caller-supplied consecutive-ratio hypothesis via the new
+    `consecutive_ratio_tail_bound` (a thin reindexing of the existing
+    `geometric_tail_bound`). When the two indicial roots differ by a
+    non-negative integer, the classical log-term second solution is *out of
+    scope*: `frobenius_coefficients` raises `ValueError` exactly when the
+    recurrence reaches the resonant order for the smaller root, while the
+    larger root's series (and the repeated-root case) compute cleanly.
+  - **Puiseux branches** of an algebraic curve `F(x, y) = 0`:
+    `newton_polygon_leading_term` performs a single Newton-polygon
+    leading-term step (given a caller-supplied ramification index `e`) to
+    recover the leading exponent/coefficient of `y = c₀x^(k₀/e) + ...`;
+    `puiseux_coefficients` then solves the local uniformizer substitution
+    `x = tᵉ` order by order for a *simple* root `c₀` of the Newton-polygon
+    edge polynomial; `solve_puiseux` packages the `t`-series the same way as
+    `solve_frobenius`. Non-simple roots, ambiguous or unsupported (degree > 2
+    / multi-power) Newton-polygon edges, and an uncertifiable ramification
+    all raise rather than guess.
+  - Tested against Bessel's equation (exact rational coefficient
+    cross-checks plus containment against `mpmath.besseli` and the repo's own
+    `besseli_point`), the algebraic branch `y² = x³`, and a geometric-series
+    branch `y = x/(1-x)` with a genuinely nonzero tail; includes
+    random-sample containment tests for both parts and a deliberately wrong
+    ratio hypothesis shown to produce a bound a true value actually escapes
+    (proving the containment tests are not vacuous). Docs:
+    [`docs/api/frobenius.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/frobenius.md).
+
+### Added — certified invariant-subspace enclosures (Davis–Kahan `sin Θ`)
+
+- `omnibias.core.verified.invariant_subspace`: `certified_invariant_subspace` /
+  `InvariantSubspaceCertificate` — a Davis–Kahan-style certified bound that a
+  candidate `k`-dimensional `span(V)` is close to a true invariant subspace of
+  a symmetric `A`, without requiring the `k` eigenvalues inside the cluster to
+  be individually separated from each other. Composes entirely from existing
+  machinery: `generalized_eigenvalue_enclosure` on the Ritz pencil `(VᵀAV, VᵀV)`
+  brackets the cluster's Ritz range; inertia bisection
+  (`count_eigenvalues_below`) on `A` itself certifies the cluster's separation
+  `gap` from the rest of the spectrum; a rigorously re-orthonormalized `Ṽ`
+  (via a new `interval_ldlt_factor` on the Gram matrix) gives a certified
+  **Frobenius**-norm residual `‖R‖_F = ‖AṼ - ṼH̃‖_F`, and
+  `sin Θ ≤ min(‖R‖_F / gap, √k)` follows from the residual/Sylvester-equation
+  proof. Exact for a genuinely degenerate cluster (`sin Θ ≈ 0` for an exact
+  eigenspace); honestly reports `certified=False` (no fabricated bound) when
+  the candidate columns are not certified independent or the cluster cannot be
+  separated from the rest of `A`'s spectrum.
+- `omnibias.core.verified.eig_operator.interval_ldlt_factor`: the interval
+  unit-lower `L` and diagonal `D` of a certified `LDLᵀ` factorization (the
+  factor, not just the pivots `interval_ldlt_pivots` already exposed),
+  reused by `invariant_subspace` for rigorous B-orthonormalization.
+- Every certified enclosure here is genuinely outward-rounded `Interval`
+  arithmetic; this is a **fixed-operator** result, not a continuum claim, and
+  is a distinct object from the existing scalar eigenvalue deflation in
+  `omnibias.core.verified.eig` (`_partner_eigenvalue_lower`'s nested-frame
+  Courant–Fischer chain still only certifies one more scalar eigenvalue, never
+  a subspace). Docs:
+  [`docs/api/core.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/core.md#verified-backend-certified-invariant-subspaces-daviskahan).
+
+### Added — reproducible quantum Monte-Carlo sampling substrate (quantum-lattice-engine, phase 1)
+
+- `omnibias.ferminet.sampling` (new module in `omnibias-ferminet`, JAX-backed,
+  ansatz-agnostic over a caller-supplied
+  `log_abs_psi_fn(params, position) -> log|psi(position)|`): the **sampling**
+  foundation for a future variational Monte Carlo (VMC) trainer.
+  `metropolis_step` / `metropolis_sample` are a reproducible random-walk
+  Metropolis-Hastings walker (explicit JAX PRNG key, symmetric Gaussian
+  proposal, stable log-space acceptance, `jax.vmap` over walkers,
+  `jax.lax.scan` over steps). `langevin_step` / `langevin_sample` are the
+  unadjusted (ULA) or Metropolis-adjusted (MALA) Langevin counterpart, driven
+  by the plain-autodiff gradient of `log|psi|` with respect to position (not
+  a closed-form-tower claim). `local_energy` /
+  `kinetic_energy_from_grad_lap` / `autodiff_grad_and_laplacian` compute the
+  local energy `E_L(r)` via the numerically stable log-domain identity
+  `lap(psi)/psi = lap(log|psi|) + |grad(log|psi|)|^2`, accepting either a
+  closed-form kinetic-energy function (e.g. reusing
+  `omnibias.ferminet.restricted.tier2_local_kinetic_energy`) or the
+  general-ansatz autodiff fallback. `autocorrelation_function` /
+  `integrated_autocorrelation_time` / `effective_sample_size` /
+  `standard_error_of_mean` / `energy_chain_diagnostics` are a Sokal-windowed,
+  FFT-vectorized autocorrelation-time and error-diagnostic estimator (handles
+  the exact-zero-variance chain of a true eigenstate without producing
+  `nan`). `log_derivative_accumulator` computes the per-sample parameter
+  log-derivative `O_p(r) = d(log|psi(params, r)|) / d(theta_p)` via
+  `jax.vmap(jax.grad(...))`, returning an `(n_samples, n_params)` array
+  shaped for the stochastic-reconfiguration covariance solve added below
+  (matching `omnibias.curvature.natural_gradient`'s `(P, P)` / `(P,)`
+  convention); lattice Hamiltonians, antisymmetric-ansatz changes, and
+  ground-state certificates remain out of scope.
+- Docs: new
+  [`docs/api/qmc_sampling.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/qmc_sampling.md)
+  page with a runnable harmonic-oscillator constant-local-energy oracle;
+  `docs/scope-and-guarantees.md` §6 updated to record the new **Numerical**
+  register alongside the existing closed-form Born-Oppenheimer pieces.
+
+### Added — stochastic reconfiguration (SR) optimizer step (quantum-lattice-engine, phase 2)
+
+- `omnibias.ferminet.stochastic_reconfiguration` (new module in
+  `omnibias-ferminet`, requires the optional `curvature` extra): the
+  natural-gradient VMC optimizer step, composing the `sampling` substrate
+  above with `omnibias-curvature`'s generic natural-gradient solve --
+  explicitly a **composition**, not a new optimizer. `sr_overlap_matrix`
+  computes the Monte-Carlo overlap (quantum geometric tensor) matrix
+  `S_ij = <O_i* O_j> - <O_i*><O_j>` as the *population* (`ddof=0`) sample
+  covariance of `log_derivative_accumulator`'s `O`; `sr_energy_gradient`
+  computes the standard VMC log-derivative-trick energy-gradient estimator
+  `g_p = 2*Re[<O_p* E_L> - <O_p*><E_L>]`. Both are **Monte-Carlo statistical
+  estimators** (ordinary sampling noise, exact only as `n_samples ->
+  infinity`); `stochastic_reconfiguration_step` feeds `(S, g)` *unmodified*
+  into `omnibias.curvature.natural_gradient.natural_gradient_step` (which
+  itself calls `damped_solve`) -- an **exact linear-algebra** solve, with
+  neither `natural_gradient.py` nor `sampling.py` touched. No
+  conjugate-gradient solve path is added (the only existing CG
+  implementation, `omnibias.torch.optim.conjugate_gradient`, is PyTorch-only
+  and every tested problem size is small enough for the existing dense
+  direct solve); `StochasticReconfigurationResult.cg_iterations` is reserved
+  (always `None` today) for a future CG path. A deterministic, fixed-seed,
+  12-step end-to-end test on the toy 1-D quantum-harmonic-oscillator
+  variational-width ansatz converges the energy estimate from `alpha=1.8`
+  (`E ~= 0.618`) to within `0.02` of the true ground-state energy `E_0 =
+  1/2` and `alpha` to within `0.02` of the true optimum `1.0`.
+- Docs: new
+  [`docs/api/stochastic_reconfiguration.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/stochastic_reconfiguration.md)
+  page with runnable estimator and end-to-end examples;
+  `docs/scope-and-guarantees.md` §6 and
+  [`docs/api/qmc_sampling.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/qmc_sampling.md)
+  updated to point at the new module instead of describing it as future
+  work.
+
+### Added — banded tail-inverse bound & one-sided radii closure (phase1-banded-tail)
+
+- `omnibias.core.verified.banded`: `banded_tail_inverse_bound` — a sound,
+  outward-rounded `Interval` bound on `||M^-1||` (the operator norm induced
+  by the unweighted sup norm `ell^infty`) for the tail of a **banded**
+  (non-diagonal) infinite-dimensional linear operator, under a row-wise
+  Gershgorin diagonal-dominance hypothesis (`|M_ii| >= diag_lower`,
+  `sum_{j!=i} |M_ij| <= off_diagonal_row_sum_upper < diag_lower`); raises
+  `ValueError` rather than fabricate a bound when that hypothesis fails.
+  Closes the diagonal-only gap in `radii_spectral`'s tail-inverse estimate
+  `mu = sup |ell(k)|^-1` without wiring into it (that integration is
+  Phase 2). `finite_band_row_sum_bound` / `geometric_band_row_sum_bound`
+  build `off_diagonal_row_sum_upper` from explicit per-offset magnitude
+  bounds or a two-sided geometric-decay envelope.
+- `omnibias.core.verified.radii_series`: a minimal one-sided counterpart of
+  `radii_spectral`'s Y0/Z0/Z1/Z2 existence-proof pipeline — audited to not
+  exist anywhere in `verified/` before this — for
+  `F(a) = ell*a + a*a - f = 0` posed in the one-sided `ValidatedSeries`
+  `ell^1_nu` Banach algebra with a diagonal scalar symbol `ell(n)`.
+  `SeriesProblem` / `SeriesRadiiResult` / `series_radii_certificate` reuse
+  `kantorovich.radii_polynomial_certificate` as the consumer and
+  `banded_tail_inverse_bound`'s `s=0` case for the tail inverse
+  (`constant_tail_inverse_bound`); `constant_symbol` / `evaluate_residual`
+  round out the public surface.
+- `sequence_space.ValidatedSeries.__add__` / `__mul__` / `scale`: fixed a
+  spurious `ValueError` when outward rounding pushed an exact-zero tail
+  radius to a negative subnormal (a `_nonneg` clamp, mirroring the one
+  already used in `fourier.py`).
+- Docs: new
+  [`docs/api/banded_tail.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/banded_tail.md)
+  page with a runnable oracle example for both primitives.
+
+### Added — self-dual Hermite-function basis; anisotropic Fourier-series weights (phase1-fourier-basis)
+
+- `omnibias.core.verified.hermite_basis`: a rigorous 1-D **physicists'**
+  Hermite-function basis `psi_n(x) = H_n(x) * exp(-x^2/2)` on top of
+  exact-integer `H_n` coefficients (`hermite_poly_coeffs_exact`) and an
+  interval Horner evaluation (`hermite_function`, `hermite_function_normalized`
+  for the `L^2`-normalized twin, `gaussian_weight`). `HermiteExpansion` wraps a
+  finite `sum_{n=0}^{N} c_n psi_n` with `ComplexInterval` coefficients,
+  `evaluate_kept` / `evaluate` (the latter symmetrically padded by
+  `tail_bound`, an explicit non-negative bound under a caller-supplied
+  geometric coefficient-decay hypothesis reusing
+  `sequence_space.geometric_tail_bound`, times a caller-supplied uniform bound
+  on `|psi_n(x)|`), and `fourier_transform_exact` — an **exact** (bit-for-bit,
+  not outward-rounded) `c_n -> (-i)^n c_n` diagonal relabelling, since the
+  Hermite functions are exact eigenfunctions of the unitary Fourier transform
+  (`F[psi_n] = (-i)^n psi_n`) and `(-i)^n` cycles through four exactly
+  representable values. `|(-i)^n| = 1` is an isometry, so the same tail bound
+  holds unchanged before and after the transform — the primitive a future
+  Cohn-Elkies sphere-packing LP bound needs (simultaneous, exactly computable
+  sign constraints on `f` and `f_hat`). `CRAMER_UNIFORM_BOUND` is the
+  rigorously-outward-rounded classical Cramer constant `pi^{-1/4}`, a
+  convenience value for the normalized basis's genuinely-uniform-in-`n`
+  `psi_bound`.
+- `omnibias.core.verified.fourier`: audited and clarified exactly what `nu`
+  means for the two-sided `ValidatedFourierSeries` (a strip of analyticity
+  around the real torus, `h = ln(nu)`, the periodic two-sided analogue of the
+  one-sided `ValidatedSeries` disk radius) and derived that `nu >= 1` is the
+  *tight* sound boundary here (not a conservative stand-in for a looser
+  regime): two-sided wavevector cancellation (e.g. `i=(1,)`, `j=(-1,)`) breaks
+  submultiplicativity for any `nu < 1`. Generalised `nu` to optionally accept
+  a length-`d` sequence of **anisotropic** per-axis weights
+  `(nu_1, ..., nu_d)` (each `>= 1`) for a direction-dependent analyticity
+  strip — a strict superset implemented so every existing scalar-`nu` call
+  site and test runs the identical bit-for-bit isotropic formula unchanged.
+  New public `NuLike` type alias and `nu_axes` property.
+- Docs: [`docs/api/core.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/core.md)
+  gained the "self-dual Hermite-function basis" section and the `fourier`
+  narrative now states the analyticity-strip derivation and the anisotropic
+  generalisation.
+
+### Added — control-systems optimization: jet-adjoint policy gradients (theory 10-01..10-04)
+
+- `omnibias.core.adjoint`: backend-free discrete adjoint (costate) recursion
+  algebra — `discrete_riccati_sweep` (the matrix generalisation of
+  `scalar_finite_horizon_lqr`, spec 08-11), `adjoint_recursion`,
+  `closed_loop_jacobian`, `policy_gradient`, `n_step_adjoint_bootstrap` /
+  `td_lambda_mix` (the PEARL-style terminal-adjoint TD(`lambda`) blend).
+- `omnibias.control.ocp`: the `DifferentiableEnvironment` protocol, `OCPSpec`,
+  `Rollout`, `rollout_generic` — the shared seam every trainer below closes
+  over.
+- `omnibias.control.{jax,torch}.adjoint`: bit-identical closed-loop Jacobian
+  assembly. `policy_jacobian_dy` is exact `dpi/dy` from the founding **bias
+  collapse** (`delta -> 0`) directional jet tower (`mlp_jet`/`layer_jet`/
+  `compose_jet`); `actor_adjoint_gradient` is the full-horizon exact policy
+  gradient (matches plain BPTT to `atol=1e-8`, gate G1).
+- `omnibias.control.{jax,torch}.policy`: five comparable single-step
+  trainers on the same rollout — `bptt_step`, `truncated_bptt_step`,
+  `zero_order_step` (an antithetic-ES model-free stand-in, **not** PPO/TD3),
+  `actor_adjoint_step` (ours, exact), `actor_adjoint_jet_step` (ours,
+  PEARL-style, bootstrapped by a PSD-quadratic `PSDTerminalHead` /
+  `fit_terminal_head`).
+- `omnibias.control.{jax,torch}.envs`: `DoubleGyrePointMass` and
+  `AdvectionDiffusionGrid` (on the existing `omnibias.pinn.solver`
+  `SpectralGrid1D` / `advection_diffusion_semidiscrete`).
+- `omnibias.control.horizon`: `certified_horizon` — a sound (interval-
+  arithmetic) truncation-window certificate derived from the enclosed
+  closed-loop discrete monodromy, reusing `omnibias.dynamics.
+  spectral_radius_bound` verbatim. Sound only within the caller-declared
+  per-step Jacobian ball; `require_enclosure_coverage` is exactly `1.0` over
+  1000 trials (`benchmarks/certified_horizon.py`, gate G5).
+- `omnibias.control.certified.gradient_bias`: `truncation_bias_bound` /
+  `terminal_adjoint_error_bound` — a sound, *conditional* bound on the
+  policy-gradient bias a short-horizon terminal-adjoint substitution
+  introduces, sourcing its Lipschitz constant from `omnibias.verify.
+  lipschitz_bound` verbatim. Coverage exactly `1.0` over 1000 draws
+  (`benchmarks/gradient_bias_enclosure.py`, gate G6).
+- `omnibias.control.bundle`: `ControllerBundle` / `build_bundle` — the
+  proof-carrying container conjoining the gradient-bias enclosure, the
+  horizon certificate, and the pre-existing `RecoverableCertificate`; a
+  missing slot downgrades the verdict to `"partial"`, never upgrades it.
+- `omnibias.control.robotics`: `DifferentiableEnvironment` adapters for
+  Brax / MuJoCo-MJX behind the same seam (raise `ImportError` without the
+  engine installed, tested against `FakeArticulatedEnvironment`); omnibias
+  contributes the optimizer and certificates, not the physics engine.
+- `omnibias.core.contact_smoothing` + `omnibias.control.{jax,torch}.contact`:
+  a smoothed one-sided contact-force law with an exact `sigma^(n)`
+  derivative tower **and** a sound one-sided enclosure of its hardening bias
+  as the smoothing sharpens (temperature collapse, `beta -> inf`); 1-D
+  point-mass only, 2-D Coulomb friction is a recorded leftover.
+- `omnibias.control.__init__.__lineage__` is now `"both"`: the pre-existing
+  CBF-QP safety filter is temperature collapse, this stack's `dpi/dy` is
+  founding bias collapse; the two are never conflated.
+- **Honest gaps, not claimed earned**: gate G4 (interactions-to-target vs
+  PPO/TD3/SHAC/PEARL) and G8 (cost parity vs SHAC on Brax/MJX) — no
+  reimplementation of those named baselines or robotics engine exists in
+  this repository. `benchmarks/actor_adjoint_control.py` reports an ungated
+  in-repo diagnostic across the arms that do exist instead. Policy-gradient
+  training finds a stationary point, never a global optimum; no HJB is
+  solved; the recoverable-set certificate stays model-relative.
+- Theory: `theory/10-control/{01-ledger,02-jet-adjoint-policy-optimization,
+  03-certified-horizon-gradient-bias,04-certified-contact}.md`. Docs:
+  [`docs/api/adjoint_control.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/adjoint_control.md),
+  [`docs/cookbook/certified-policy-gradient.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/certified-policy-gradient.md).
+  Skills: `omnibias-dev-control-research` (maintainer), `omnibias-control`
+  (consumer).
+
+### Added — noise-aware tabular training (theory 05-03)
+
+- `omnibias.tab._core.heteroscedastic.gaussian_nll_grad_hess`: the closed-form
+  gradient and exact, positive-definite Fisher block `diag(1/s**2, 2)` for the
+  heteroscedastic Gaussian NLL `y | x ~ N(u, s**2)`, `s = e^v`.
+- `omnibias.tab.torch.heteroscedastic`: `HeteroscedasticHead`
+  (two `SoftTreeEnsemble`s predicting `(f_hat, log_scale)`), `fit_heteroscedastic`,
+  and `fit_noise_aware` — a zero-gradient Gauss-Newton penalty added inside
+  `fit_second_order`'s closure that damps the exact-Newton step along
+  high-aleatoric-noise directions without changing the task loss's gradient or
+  minimizer (`lam=0.0` reproduces `fit_second_order` bit-identically, gate G0).
+  **Run `--full`, this proposal is a recorded negative result**: gate G1 (the
+  predeclared falsifier) failed on both synthetic datasets, so `fit_noise_aware`
+  is retained as a mathematically-correct, tested mechanism (G0/G1b pass) but is
+  not claimed as a benchmarked win.
+- `omnibias.core.band_embed`: vectorized numpy `band_embed` / `integral_embed`,
+  a batched threshold-grid lift of `ftc_block` / `OperatorBlock`'s `band`/
+  `integral` window formula (telescoping partition-of-unity and FTC-derivative
+  identities hold exactly for any finite `beta`).
+- `omnibias.tab.torch.embed` / `omnibias.tab.jax.embed`: `BandFeatureEmbedder`
+  (bit-identical forward parity across numpy/torch/jax) and, torch-only,
+  `local_target_consistency_loss` — a closed-form pullback-metric objective
+  (`J^T J` vs `df/dx (df/dx)^T`) replacing a sampled triplet loss, for the
+  numerical-embedding win the source paper (Kartashev, Rubachev & Babenko,
+  arXiv:2509.04430) attributes to local target consistency. **Run `--full`,
+  also a recorded negative result**: gate G2 failed on both the exact-gradient
+  synthetic set (near-wash) and the surrogate-gradient public set (decisively
+  worse), so the embedding is retained as a tested primitive but not claimed
+  as a benchmarked win.
+- `omnibias.tab.torch.boosting.fit_boosted_heteroscedastic`: generalized-least-
+  squares reweighting (`weighting="gls"`, `h_i -> h_i / s_hat_i**2`) of
+  `fit_boosted`'s existing per-sample weak-learner weight; `weighting=
+  "shrinkage"` reproduces plain `fit_boosted` bit-identically. **Run `--full`,
+  gate G3 (the predeclared 5% top-decile-RMSE win over shrinkage) also
+  failed** on both synthetic sets — a wash, not a harm — though the public
+  no-regression gate G5 does show measurable overall-RMSE regression from GLS
+  on 2 of 9 sets.
+- `omnibias.tab.bench`: a public regression suite (`NOISE_PUBLIC_SUITE`, 9
+  OpenML sets), tuned `fit_predict_catboost` / `fit_predict_catboost_uncertainty`
+  / `fit_predict_realmlp` / `fit_predict_tabm` baselines, and the two synthetic
+  generators with known ground-truth noise (`saw_wave_2d`, matching the source
+  paper's Figure 5; `mlp_heteroscedastic_20d`, with an exact `df_dx` via the
+  frozen generator MLP's analytic gradient).
+- `benchmarks/tabular_uncertainty.py`: G0-G5 acceptance gates following the
+  `--full` convention, with `--workers N` fanning every gate's independent
+  `(dataset, seed)` units across a process pool. New optional `catboost` /
+  `pytabkit` extras on `omnibias-tab`; a smoke step in the `tab` CI job. The
+  full `--full` sweep (G0-G5, 5 seeds, 8-way process-pool parallel, CPU
+  cluster) is now complete: **G0/G1b pass; G1/G2/G3 (every falsifiable
+  hypothesis gate) fail; G4 passes** (9/9-dataset win/loss report, 22% win
+  rate vs LightGBM/CatBoost/RealMLP/TabM); **G5 fails** on 3/9 datasets.
+  Theory spec: `theory/05-applications/03-data-uncertainty-training-signal.md`
+  (status `gated`).
+
+### Added — jet composition cost
+
+- `compose_jet` (`omnibias.torch.jet` / `omnibias.jax.jet`) now evaluates the
+  shifted-power recurrence only where `v = u - u_0` can contribute (`v^k` has
+  valuation `k`), cutting elementwise multiplies from `~N^3/2` to `~N^3/6`
+  (counted `3.33x` at order 16) while returning the dense kernel's values
+  bit-for-bit in eager float32 / float64. The kernel stays **cubic** in the
+  truncation order for an arbitrary derivative tower; no `O(N^2)` claim is made
+  for it. Dropping products that were exactly zero has two documented
+  consequences: an exactly-zero coefficient may carry the other sign of zero,
+  and an infinite or NaN tower entry no longer contaminates lower orders
+  through `inf * 0`.
+- `compose_jet_riccati` (both backends, plus opt-in `riccati=True` on
+  `layer_jet` / `mlp_jet`): an `O(deg(P) * N^2)` composition for the Riccati
+  class, where `sigma' = P(sigma)` closes the chain rule on the activation
+  itself. It never builds the derivative tower — one `sigma(u_0)` evaluation is
+  enough — so it also reaches past the order caps of the `tan` / `cot` / `coth`
+  fastpath kernels. It rounds differently from `compose_jet`, so the general
+  kernel remains the default. Gates: `benchmarks/jet_compose_cost.py`.
+
+### Added — verified foundations and finite exact acceptance
+
+- `IntervalArray` plus outward-rounded dense / COO matvec and dot products in
+  `omnibias.core.verified.interval_array`; `interval_solve` and triangular
+  solves provide Krawczyk and interval-LDLᵀ finite-system enclosures.
+- `omnibias.core.verified.linalg_array`: an `IntervalArray`-backed symmetric
+  LDLᵀ path (`interval_ldlt_factor_array`, `interval_ldlt_pivots_array`,
+  `interval_ldlt_inertia_array`, `is_positive_definite_array`, `IntervalLDLT`).
+  It reuses the same outward-rounded primitives in the same order as the scalar
+  `omnibias.core.verified.eig_operator` reference path, so pivot endpoints agree
+  with it exactly; a pivot straddling zero still returns `None`. The claim is
+  about the supplied finite matrix box, not a continuum spectrum.
+- Coordinate Hilbert multipliers for `ValidatedFourierSeries`, rectangular
+  contour support for winding collapse, and a certified-jet width-by-order
+  smoke benchmark. The benchmark reports finite-network coverage and a
+  factorial-normalized width law; it is not a spectral-tail theorem.
+- Lie symmetry discovery now treats float SVD as a proposer and accepts its
+  declared finite determining matrix through bounded-denominator snapping,
+  exact integer rank collapse, and a `PROVED` / `DISPROVED` / `BLOCKED`
+  `ExactSymmetryReport`.
+
+### Fixed — certification guardrails
+
+- Corrected Chebyshev-series multiplication, required explicit PDE stability
+  estimates, and reject conditional `libm_fallback` stamps for designated
+  rigorous certificate payloads.
+- Endpoint-only proof-engine certificates now record `not_used` provenance, so
+  an unrelated prior fallback cannot taint an exact interval collapse.
+- Replaced the CCF Hardy curvature placeholder with an interval-inflated
+  Hessian enclosure, declared the core NumPy dependency, and added an
+  `_INT_CAP` regression guard.
+- Added the high-precision `mpmath` backend to the core test extra, matching
+  certificate and enclosure tests that exercise its unconditional path.
+- Replaced finite Lean checks based on `native_decide` with kernel-reduced
+  `decide`; no theorem-prover tier is asserted without a genuine Lean build.
+
 ### Added — Jacobian n=2 Case A leftover (finite engine)
 
 - `omnibias.holonomic.jacobian_n2_case_a`: after `b20=b30=b40=0` on

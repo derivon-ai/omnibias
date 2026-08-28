@@ -45,7 +45,7 @@ def _public_all(mod) -> list[str]:
     names = getattr(mod, "__all__", None)
     if names is None:
         pytest.skip(f"{mod.__name__} has no __all__")
-    if not isinstance(names, Iterable) or isinstance(names, (str, bytes)):
+    if not isinstance(names, Iterable) or isinstance(names, str | bytes):
         raise AssertionError(f"{mod.__name__}.__all__ is not an iterable of names")
     return list(names)
 

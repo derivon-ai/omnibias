@@ -1,0 +1,47 @@
+{
+  "schema": "omnibias.benchmarks.certified_horizon.v1",
+  "generated_utc": "2026-08-27T22:00:41Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.13.0+cpu",
+    "folx": "absent"
+  },
+  "config": {
+    "family": "certified_horizon",
+    "full": false,
+    "n_trials": 60
+  },
+  "rss_mb_at_start": 340.62,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g5_certification_rate",
+        "passed": true,
+        "certification_rate": 1.0,
+        "n_trials": 60,
+        "n_certified": 60
+      },
+      {
+        "name": "certified_horizon_coverage",
+        "n": 60,
+        "n_min": 60,
+        "coverage": 1.0,
+        "median_width": 0.039650887521467344,
+        "max_width": 0.09017113804252061,
+        "passed": true
+      }
+    ]
+  },
+  "disclaimer": "discrete closed-loop monodromy product enclosure; founding bias collapse, not temperature collapse; sound only within the caller-declared per-step Jacobian radius; not a continuum ODE monodromy claim",
+  "median_horizon": 8.0,
+  "honesty": {
+    "n_min_1000_full_run": false,
+    "note": "the >= 1000-trial acceptance run requires --full; the default smoke uses a reduced n for CI speed"
+  },
+  "wall_seconds": 2.167136872187257
+}

@@ -32,8 +32,8 @@ from omnibias.convex.certify import (
     certify_qp_optimum,
     lp_dual_lower_bound,
 )
-from omnibias.convex.problem import BarrierOptions, ConvexSolution
 from omnibias.convex.inequality import LinearInequalityBackend
+from omnibias.convex.problem import BarrierOptions, ConvexSolution
 from omnibias.convex.warm_start import (
     active_set_warm_start,
     geometry_warm_start,

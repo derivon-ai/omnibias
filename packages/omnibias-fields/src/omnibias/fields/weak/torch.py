@@ -83,7 +83,7 @@ def _stiffness_term(
     dtype: torch.dtype,
     device: torch.device,
 ) -> tuple[Tensor, PathName]:
-    a_poly = all(isinstance(c, (int, float)) for c in diffusion)
+    a_poly = all(isinstance(c, int | float) for c in diffusion)
     if isinstance(field, tuple) and a_poly:
         # Exact: a and u polynomials => a u' is polynomial; int (a u') v' via moments of v'.
         u_coeffs = field

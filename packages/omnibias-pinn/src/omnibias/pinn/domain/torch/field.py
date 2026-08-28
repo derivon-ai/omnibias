@@ -120,7 +120,7 @@ class DistanceConstrainedField(HardBoundaryField):
         if distance_fn is None:
             if sdf is None:
                 raise ValueError("provide distance_fn or sdf")
-            phi_fn = from_sdf(sdf) if not isinstance(sdf, (Sphere, Box, Halfspace)) else from_primitive(sdf)
+            phi_fn = from_sdf(sdf) if not isinstance(sdf, Sphere | Box | Halfspace) else from_primitive(sdf)
             if normalize:
                 phi_fn = normalize_distance(phi_fn)
             distance_fn = _wrap_bc_factor(
@@ -129,7 +129,7 @@ class DistanceConstrainedField(HardBoundaryField):
                 robin_alpha=robin_alpha,
                 robin_beta=robin_beta,
             )
-        elif normalize and sdf is not None and isinstance(sdf, (Sphere, Box, Halfspace)):
+        elif normalize and sdf is not None and isinstance(sdf, Sphere | Box | Halfspace):
             distance_fn = _wrap_bc_factor(
                 normalize_distance(distance_fn),
                 mode=bc_mode,

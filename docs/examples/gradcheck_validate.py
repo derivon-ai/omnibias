@@ -12,7 +12,7 @@ is a fixed-``eps`` heuristic with a hand-tuned tolerance -- it *false-passes* a
 subtly wrong gradient (truncation hides the bug) and *false-rejects* a correct
 one (cancellation at a small ``eps``). This probe turns
 :func:`omnibias.verify.certified_gradient_check` into an instrumented experiment
-under the ``omnibias-dev-empirical-validation`` gates: a correct gradient PASSES
+under the ``omnibias-empirical-validation`` gates: a correct gradient PASSES
 across ``K>=8`` random nets, a deliberately-scaled-wrong gradient is REJECTED
 *with a Lean-checkable proof of mismatch*, and against the **named baseline**
 (naive fixed-``eps`` one-sided FD) the certified band both catches a bug the

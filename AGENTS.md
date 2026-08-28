@@ -214,7 +214,11 @@ packages/
                         #   inclusion-exclusion count enclosures. (alpha)
   omnibias-control/     # differentiable control with a model-relative safety
                         #   certificate: a batched CBF-QP safety filter and a
-                        #   recoverable-set certificate. (alpha)
+                        #   recoverable-set certificate; plus a jet-adjoint
+                        #   policy-optimization stack (exact dpi/dy policy
+                        #   gradients, a certified truncation horizon, a sound
+                        #   policy-gradient-bias enclosure, and certified
+                        #   contact smoothing). (alpha)
   omnibias-shape/       # differentiable soft shape / occupancy fields and
                         #   soft-coverage (soft-OR / log-sum-exp union) operators
                         #   with a closed-form derivative tower. (alpha)
@@ -326,7 +330,7 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   *audience*. If it fails that test, ship it as a submodule of an existing package
   and promote it to its own distribution only once it earns independence. Folding
   a submodule back out later is cheap; un-shipping a premature distribution is not.
-  See the `omnibias-dev-new-package` skill. Theory 06-03 G1–G5 are
+  See the `omnibias-new-package` skill. Theory 06-03 G1–G5 are
   **shipped**; they are
   earned on `benchmarks/theory_homes.py` (42 packages, 99/99 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
@@ -357,11 +361,9 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   benchmark artifacts are the right place for aggressive research. Distinguish
   *structural* impossibility from *absent implementation*; default to achievable
   and claim a capability plainly once its absolute acceptance gate passes (see
-  `omnibias-dev-pinn-research`, `omnibias-dev-frontier-research`, and the
+  `omnibias-pinn-research`, `omnibias-frontier`, and the
   "Discovery doctrine" / "Frontier program" sections of
-  `.cursor/rules/omnibias.md`). Clay / Nobel *parent* problems stay external
-  obligations; only finite or compact sub-obligations escalate through absolute
-  gates.
+  `.cursor/rules/omnibias.md`).
   A folded package is de-wired everywhere at once (workspace exclude, CI job,
   `mkdocs.yml` nav + `paths`, `docs/api`, `llms.txt`, `CHANGELOG.md`, `AGENTS.md`);
   `test_package_registry` enforces the workspace / folded-name / Python-floor
@@ -439,32 +441,29 @@ Lean-core and never import a backend.
 
 ## Agent tooling (skills & rules)
 
-Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
-(`.cursor/skills/`) and Claude Code (`.claude/skills/`):
+One skill catalog, one stem. Canonical files live in `.cursor/skills/omnibias-<stem>/SKILL.md`
+and are mirrored to `.claude/skills/` by `python scripts/sync_skills.py`
+(`--check` in CI). Every workspace distribution has an `omnibias-<package>`
+skill; cross-cuts include `omnibias-backends`, `omnibias-frontier`,
+`omnibias-core-concepts`, `omnibias-derivative-tower`, and the research /
+certificate / discovery skills. The catalog is checked by
+`python scripts/check_package_skills.py`.
 
-- **Consumer skills** (`omnibias-*`) teach an assistant how to *use* omnibias.
-  They are the shippable `omnibias-skills` package -- canonical source in
-  `packages/omnibias-skills/src/omnibias/skills/_bundled/skills/`; downstream
-  users run `omnibias-skills install`. The repo's copies are installed + committed
-  and a CI drift check (`omnibias-skills install --check`) keeps them
-  byte-identical to the bundle. **Do not hand-edit `.cursor/skills/omnibias-*`** --
-  edit the bundle and re-run the installer. Includes `omnibias-frontier` for
-  Clay/Nobel-*adjacent* sub-results with honesty gates.
-- **Maintainer skills** (`omnibias-dev-*`) teach an assistant how to *develop*
-  omnibias. They are hand-authored **canonically in `.cursor/skills/`** and
-  mirrored to `.claude/skills/` by `python scripts/sync_skills.py` (with `--check`
-  in CI). Edit the `.cursor` copy, then re-run the sync. Includes
-  `omnibias-dev-pinn-research`, `omnibias-dev-empirical-validation`,
-  `omnibias-dev-discovery-engine` (add a `FiniteFamily` or
-  `ConditionHypothesis` + catalog kind, or an `Observation` binder /
-  ingest packer / `discover_observation` sort), and
-  `omnibias-dev-frontier-research` (decompose famous open problems into
-  winnable sub-obligations; never forge continuum claims).
-- **Rules** (`.cursor/rules/`): one always-apply `omnibias.md` (universal
-  invariants, including Discovery doctrine and Frontier program) plus
-  path-scoped `.mdc` rules (`jax-tracing`, `verified-enclosures`,
-  `formal-lean`, `frontier-claims`). Root `CLAUDE.md` points Claude Code at
-  this file.
+The pip package `omnibias-skills` ships the **capability nine**
+(`backends`, `fields`, `pinn`, `geometry`, `curvature`, `verify`,
+`symbolic`, `frontier`, `control`), byte-identical to `.cursor/skills`.
+Edit `.cursor/skills` first; if the skill is one of the nine, copy it into
+`packages/omnibias-skills/src/omnibias/skills/_bundled/skills/` so
+`omnibias-skills install --check` stays green. Downstream users run
+`omnibias-skills install`. Repo-only skills are extra files and are ignored
+by that drift gate.
+
+- **Rules** (`.cursor/rules/`): one always-on file, `omnibias.md` — high-order
+  AD bottlenecks, how omnibias solves them, named bakeoffs, and substrate
+  invariants (JAX tracing, verified/Lean honesty, frontier/CCF). Load
+  `omnibias-<package>` (and `omnibias-frontier` / `omnibias-deepmind-campaign` /
+  `omnibias-certificate-lean`) for commands. Root `CLAUDE.md` points Claude
+  Code at this file.
 
 ## Where to look
 
@@ -741,7 +740,17 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   global search earned for n=3 only) /
   `omnibias.tab` arrangement + `omnibias.torch.sequence` + `omnibias.shape`
   (05-02, **shipped**; G1/G2/G3/G5/G6/G7 earned; G3b leftover-recorded leftover #49,
-  G4 leftover-recorded leftover #50, not in CI `all_passed`).
+  G4 leftover-recorded leftover #50, not in CI `all_passed`) /
+  `omnibias.tab.pou`
+  (05-04, **gated**; G0/G0b/G5/G6 passed; G1/G2/G3 failed, G3 not-worse-both `3/6`;
+  G4 leftover-recorded `n_comparable=3`; G3 boost-only v0 for 05-05, not retuned;
+  temperature collapse, not founding bias collapse) /
+  `omnibias.tab.pou.joint`
+  (05-05, **shipped**; frozen sequential TabM residual on v0 axis Newton trees;
+  G-tree `3/3` / G-net `2/3` / G-hybrid `6/6` / G5 earned; H0/H3/H4/H6
+  rejected; H2/H5 inconclusive; H7 report-only; kin8nm vs RealMLP/TabM is a
+  row loss inside a passing family bar; temperature collapse, not founding
+  bias collapse).
   Docs: [`docs/api/mollifier.md`](docs/api/mollifier.md),
   [`docs/api/spectral_design.md`](docs/api/spectral_design.md),
   [`docs/api/frames.md`](docs/api/frames.md),
@@ -824,9 +833,33 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
   [`docs/api/plant_pid.md`](docs/api/plant_pid.md),
   [`docs/api/conformal_slabs.md`](docs/api/conformal_slabs.md),
   [`docs/api/pack_fisher.md`](docs/api/pack_fisher.md),
-  [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md). Cost /
+  [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md),
+  [`docs/api/tabpou.md`](docs/api/tabpou.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
   `all_passed`.
+- Control-systems optimization (theory 10-01..10-04, **shipped**): a jet-adjoint
+  policy-optimization stack on `omnibias-control` -- `omnibias.core.adjoint`
+  (pure-Python discrete adjoint / Riccati recursion, the matrix generalization of
+  `scalar_finite_horizon_lqr`) + `omnibias.control.{torch,jax}.adjoint`
+  (bit-identical, directional-jet `dpi/dy`) + `omnibias.control.{torch,jax}.policy`
+  (`bptt_step` / `truncated_bptt_step` / `zero_order_step` / `actor_adjoint_step` /
+  `actor_adjoint_jet_step`, the last with a PSD-quadratic learned terminal adjoint
+  head) on a `DifferentiableEnvironment` seam (`omnibias.control.ocp`,
+  `omnibias.control.{torch,jax}.envs`) + the moat: `omnibias.control.horizon`
+  (certified truncation horizon from the enclosed closed-loop monodromy, reusing
+  `omnibias.dynamics.spectral_radius_bound`) and
+  `omnibias.control.certified.gradient_bias` (sound, conditional
+  policy-gradient-bias enclosure, reusing `omnibias.verify.lipschitz_bound`),
+  composed into a proof-carrying `omnibias.control.bundle.ControllerBundle`; plus
+  `omnibias.control.robotics` (Brax / MuJoCo-MJX `DifferentiableEnvironment`
+  adapters behind the same seam -- wrapped engine, not a native rigid-body build)
+  and `omnibias.core.contact_smoothing` + `omnibias.control.{torch,jax}.contact`
+  (certified contact-force smoothing: exact `sigma^(n)` tower plus a sound
+  one-sided hardening-bias enclosure, 1-D point-mass only). G1/G2/G5/G6/G9 CI;
+  G4 (named baseline RL sample-efficiency) and G8 (robotics cost parity) are not
+  reimplemented in this repository. Docs:
+  [`docs/api/adjoint_control.md`](docs/api/adjoint_control.md),
+  [`docs/cookbook/certified-policy-gradient.md`](docs/cookbook/certified-policy-gradient.md).
 - Field substrate + field ops: `omnibias.fields`.
 - Manifold geometry / exterior calculus: `omnibias.geometry`.
 - Fractional / score-SDE: `omnibias.fractional`, `omnibias.score`.
@@ -841,8 +874,8 @@ Two persona-scoped agent-skill libraries ship with the repo, mirrored to Cursor
 - Runnable examples: [`docs/examples/`](docs/examples/).
 - Agent skills & rules: `.cursor/skills`, `.claude/skills`, `.cursor/rules`;
   the consumer package is `omnibias.skills` (`packages/omnibias-skills`);
-  frontier doctrine: `omnibias-dev-frontier-research` + `frontier-claims.mdc`
-  + consumer `omnibias-frontier`.
+  frontier doctrine: `omnibias-frontier` + `.cursor/rules/omnibias.md`
+  (Frontier program).
 - Public docs: [`docs/index.md`](docs/index.md).
 - Benchmarks (vendor-neutral): [`docs/benchmarks.md`](docs/benchmarks.md).
   PINN four-gap suite: `benchmarks/{causal_marching,geometry_sdf,operator_zero_shot,spectral_bias_fbpinn}.py`

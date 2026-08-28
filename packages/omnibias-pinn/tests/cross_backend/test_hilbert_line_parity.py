@@ -13,6 +13,8 @@ import jax.numpy as jnp  # noqa: E402
 import torch  # noqa: E402
 from omnibias.pinn.jax.equations.ccf_compactified import (  # noqa: E402
     alpha_from_lambda,
+)
+from omnibias.pinn.jax.equations.ccf_compactified import (
     hardy_odd as hardy_odd_jax,
 )
 from omnibias.pinn.jax.hilbert_line import (  # noqa: E402

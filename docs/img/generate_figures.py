@@ -418,6 +418,90 @@ def fig_bias_collapse() -> None:
     plt.close(fig)
 
 
+def fig_bench_saw_wave_uncertainty() -> None:
+    """Theory 05-03: Figure-5-style per-arm panel + Figure-1-style decile curve.
+
+    Reads the committed scalars from ``saw_wave_figure5_smoke.json`` and the
+    (uncommitted) dense prediction grid cached under ``grid_cache_path`` by
+    ``benchmarks/tabular_uncertainty_figure.py``, so re-rendering this PNG never
+    requires re-training. This is a **diagnostic figure, not a gate** -- theory
+    05-03's actual falsifier (gate G1) is a separate multi-seed sweep; nothing
+    here carries a ``passed`` key.
+    """
+    data = _load("saw_wave_figure5_smoke.json")
+    grid_path = Path(data["grid_cache_path"])
+    if not grid_path.is_absolute():
+        grid_path = OUT.parent.parent / grid_path  # repo root, not the invocation CWD
+    if not grid_path.is_file():
+        print(f"skip fig_bench_saw_wave_uncertainty: grid cache missing at {grid_path}")
+        return
+    npz = np.load(grid_path)
+    x1, x2 = npz["x1"], npz["x2"]
+    extent = [float(x1.min()), float(x1.max()), float(x2.min()), float(x2.max())]
+    panels = [
+        ("truth", "ground truth  f(x)"),
+        ("lightgbm", "tuned GBDT (LightGBM)"),
+        ("lam0", "omnibias soft tree  ($\\lambda=0$)"),
+        ("lamP", f"omnibias, noise-damped  ($\\lambda={data['config']['lam']:g}$)"),
+    ]
+
+    _style()
+    fig = plt.figure(figsize=(15.5, 8.4))
+    gs = fig.add_gridspec(2, 5, height_ratios=[2.1, 1.0], width_ratios=[1, 1, 1, 1, 0.55], hspace=0.4)
+
+    axes = [fig.add_subplot(gs[0, i]) for i in range(4)]
+    for ax, (key, title) in zip(axes, panels, strict=True):
+        im = ax.imshow(
+            npz[key], origin="lower", extent=extent, aspect="auto", cmap="viridis", vmin=0.0, vmax=1.0
+        )
+        ax.set_title(title, fontsize=11)
+        ax.set_xlabel("$x_1$")
+    axes[0].set_ylabel("$x_2$")
+    fig.colorbar(im, ax=axes[3], fraction=0.046, pad=0.04, label="prediction")
+
+    ax_strip = fig.add_subplot(gs[0, 4], sharey=axes[0])
+    ax_strip.plot(npz["s_profile"], x2, color=ACCENT, lw=2.2)
+    ax_strip.set_xscale("log")
+    ax_strip.set_title("noise  $s(x_2)$", fontsize=11)
+    ax_strip.set_xlabel("std (log)")
+    ax_strip.yaxis.tick_right()
+
+    ax_dec = fig.add_subplot(gs[1, :])
+    dc = data["decile_curve"]
+    n_bins = dc["n_bins"]
+    xs = np.arange(n_bins)
+    raw = np.asarray(dc["raw_diff_err2_lamP_minus_lam0"])
+    smoothed = np.asarray(dc["smoothed_diff_err2_lamP_minus_lam0"])
+    ax_dec.bar(xs, raw, color=GRID, edgecolor="#aab", width=0.8, label="raw (per decile)")
+    ax_dec.plot(xs, smoothed, "o-", color=PRIMARY, lw=2.4, ms=7, label="Gaussian-smoothed")
+    ax_dec.axhline(0.0, color="#333", lw=1.0)
+    ax_dec.axhspan(min(0.0, float(smoothed.min()) * 1.15), 0.0, color=GOOD, alpha=0.06)
+    ax_dec.set_xlabel("uncertainty decile  (0 = lowest true $s(x)$, 9 = highest)")
+    ax_dec.set_ylabel("$\\Delta$ MSE\n($\\lambda{>}0$ minus $\\lambda{=}0$)")
+    ax_dec.set_title("Where the noise-damped arm wins (below 0) or loses (above 0)", fontsize=11)
+    ax_dec.legend(loc="upper center", bbox_to_anchor=(0.5, -0.22), ncol=2, fontsize=9)
+    ax_dec.text(
+        0.01,
+        0.03,
+        f"top-decile RMSE:  $\\lambda=0$ {data['top_decile_rmse']['lam0']:.4f}   "
+        f"$\\lambda{{>}}0$ {data['top_decile_rmse']['lamP']:.4f}   "
+        f"|  Spearman($\\hat s$, $s_{{true}}$) = {data['spearman_shat_strue_test']:.3f}",
+        transform=ax_dec.transAxes,
+        fontsize=9,
+        color="#555",
+    )
+
+    fig.suptitle(
+        "Theory 05-03 diagnostic -- saw_wave_2d (Kartashev et al. Figure 5 analogue).  "
+        "NOT a gate; see benchmarks/tabular_uncertainty.py for gate G1.",
+        fontsize=12,
+        fontweight="bold",
+        y=0.995,
+    )
+    fig.savefig(OUT / "saw_wave_uncertainty.png")
+    plt.close(fig)
+
+
 def main() -> None:
     fig_accuracy_cliff()
     fig_cost_vs_order()
@@ -430,6 +514,8 @@ def main() -> None:
         fig_bench_polylaplacian()
     if (BENCH / "optimizer_pinn.json").is_file():
         fig_bench_optimizers()
+    if (BENCH / "saw_wave_figure5_smoke.json").is_file():
+        fig_bench_saw_wave_uncertainty()
     print("wrote:", ", ".join(sorted(p.name for p in OUT.glob("*.png"))))
 
 

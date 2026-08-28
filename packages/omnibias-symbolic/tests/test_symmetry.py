@@ -15,6 +15,7 @@ from omnibias.symbolic.symmetry import (
     discover_symmetries,
     eta_t,
     eta_xx,
+    exact_symmetry_report,
     heat_known_coeffs,
     honesty_payload,
     matrix_condition,
@@ -48,6 +49,11 @@ def test_g1_in_ansatz_dimensions_and_heat_generators() -> None:
     for pde in suite():
         res = discover_symmetries(pr_for(pde.name), pde.restrict, basis, samples)
         assert res.algebra_dim == pde.expected_dim, pde.name
+        assert res.float_verified is True
+        assert res.verified is True
+        assert res.exact is not None
+        assert res.exact.proved is True
+        assert res.exact.algebra_dim == res.algebra_dim
         assert res.basis.name == "affine_xtu"
         assert res.disclaimer == DISCLAIMER
     heat = next(p for p in suite() if p.name == "heat")
@@ -100,11 +106,35 @@ def test_g6_negative_control() -> None:
     res = discover_symmetries(pr_for(spec.name), spec.restrict, affine_basis(), designed_samples(32))
     assert res.algebra_dim == 0
     assert res.generators == ()
+    assert res.float_verified is True
+    assert res.verified is True
+    assert res.exact is not None
+    assert res.exact.disproved is True
+
+
+def test_exact_rank_acceptance_reports_all_three_verdicts() -> None:
+    dependent = exact_symmetry_report(((1.0, 2.0), (2.0, 4.0)), denom_bound=100)
+    assert dependent.proved is True
+    assert dependent.kernel
+    assert dependent.accepts_dimension(1) is True
+    assert dependent.max_snap_error == 0.0
+
+    independent = exact_symmetry_report(((1.0, 0.0), (0.0, 1.0)), denom_bound=100)
+    assert independent.disproved is True
+    assert independent.kernel == ()
+    assert independent.accepts_dimension(0) is True
+
+    blocked = exact_symmetry_report(((float("nan"), 1.0),), denom_bound=100)
+    assert blocked.blocked is True
+    assert blocked.accepts_dimension(1) is False
+    assert "finite" in blocked.detail
 
 
 def test_honesty() -> None:
     payload = honesty_payload()
     assert payload["point_symmetries_only"] is True
+    assert payload["float_svd_is_proposer"] is True
+    assert payload["exact_rank_accept_required"] is True
     assert payload["ns_regularity"] is False
     assert payload["temperature_collapse"] is False
     assert "ansatz" in DISCLAIMER

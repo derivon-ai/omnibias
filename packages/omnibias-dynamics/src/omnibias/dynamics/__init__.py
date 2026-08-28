@@ -25,6 +25,7 @@ from importlib.metadata import PackageNotFoundError as _PkgNotFound
 from importlib.metadata import version as _pkg_version
 
 from omnibias.dynamics._core import (
+    ConeHyperbolicityCertificate,
     DiscretePeriodicOrbit,
     LyapunovBounds,
     PeriodicOrbitCertificate,
@@ -33,8 +34,12 @@ from omnibias.dynamics._core import (
     PoincareSection,
     VariationalJetRun,
     VariationalState,
+    cat_map_jacobian,
+    cat_map_unstable_generator,
+    certified_cone_hyperbolicity,
     certified_lyapunov_exponent,
     discrete_periodic_point,
+    doubling_map_jacobian,
     harmonic_oscillator,
     hopf_normal_form,
     linear_system,
@@ -45,6 +50,7 @@ from omnibias.dynamics._core import (
     poincare_map_jet,
     prove_periodic_orbit,
     radial_logistic,
+    rotation_jacobian,
     sigma_oscillator_field,
     spectral_radius_bound,
     step_transition_matrix,
@@ -64,6 +70,7 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
 __lineage__ = "bias collapse"
 
 __all__ = [
+    "ConeHyperbolicityCertificate",
     "DiscretePeriodicOrbit",
     "JetWorldConfig",
     "LyapunovBounds",
@@ -75,8 +82,12 @@ __all__ = [
     "VariationalState",
     "__lineage__",
     "__version__",
+    "cat_map_jacobian",
+    "cat_map_unstable_generator",
+    "certified_cone_hyperbolicity",
     "certified_lyapunov_exponent",
     "discrete_periodic_point",
+    "doubling_map_jacobian",
     "harmonic_oscillator",
     "hopf_normal_form",
     "linear_system",
@@ -88,6 +99,7 @@ __all__ = [
     "predict_next_jet",
     "prove_periodic_orbit",
     "radial_logistic",
+    "rotation_jacobian",
     "sigma_oscillator_field",
     "spectral_radius_bound",
     "step_transition_matrix",

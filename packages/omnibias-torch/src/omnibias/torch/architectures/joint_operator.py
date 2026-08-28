@@ -16,6 +16,7 @@ from itertools import combinations
 from typing import Any
 
 import numpy as np
+from numpy.typing import NDArray
 from omnibias.torch.activations.registry import ActivationSpec, get_activation
 
 import torch
@@ -39,13 +40,13 @@ class FittedJointOperatorRegressor:
     """A fitted joint operator model plus normalization state."""
 
     model: JointOperatorRegressor
-    x_mean: np.ndarray
-    x_scale: np.ndarray
+    x_mean: NDArray[np.float32]
+    x_scale: NDArray[np.float32]
     y_mean: float
     y_scale: float
     history: dict[str, list[float]]
 
-    def predict(self, x: np.ndarray) -> np.ndarray:
+    def predict(self, x: NDArray[Any]) -> NDArray[np.float32]:
         self.model.eval()
         # Place the input on the model's device so predict works after the
         # model has been moved to a GPU (CPU-safe no-op otherwise). The
@@ -54,7 +55,7 @@ class FittedJointOperatorRegressor:
         xs = (np.asarray(x, dtype=np.float32) - self.x_mean) / self.x_scale
         with torch.no_grad():
             xt = torch.as_tensor(xs, dtype=torch.float32, device=device)
-            pred_z: np.ndarray = self.model(xt).cpu().numpy()
+            pred_z: NDArray[np.float32] = self.model(xt).cpu().numpy()
         return pred_z * self.y_scale + self.y_mean
 
     def selected_operators(self, *, threshold: float = 0.2, top_k: int | None = None) -> list[dict[str, Any]]:
@@ -265,10 +266,10 @@ class JointOperatorRegressor(nn.Module):
 
 
 def fit_joint_operator_regressor(
-    x_train: np.ndarray,
-    y_train: np.ndarray,
-    x_val: np.ndarray | None = None,
-    y_val: np.ndarray | None = None,
+    x_train: NDArray[Any],
+    y_train: NDArray[Any],
+    x_val: NDArray[Any] | None = None,
+    y_val: NDArray[Any] | None = None,
     *,
     seed: int = 0,
     epochs: int = 400,
@@ -277,8 +278,8 @@ def fit_joint_operator_regressor(
     patience: int = 60,
     sparsity_weight: float = 1e-3,
     weight_decay: float = 1e-5,
-    train_sample_weight: np.ndarray | None = None,
-    val_sample_weight: np.ndarray | None = None,
+    train_sample_weight: NDArray[Any] | None = None,
+    val_sample_weight: NDArray[Any] | None = None,
     asymmetric_weight: float = 0.0,
     validation_asymmetric_weight: float | None = None,
     asymmetric_under_scale: float = 13.0,
@@ -286,7 +287,7 @@ def fit_joint_operator_regressor(
     standardize_x: bool = False,
     polish_readout: bool = True,
     polish_ridge: float = 1e-6,
-    validation_selection_metric: Callable[[np.ndarray, np.ndarray], float] | None = None,
+    validation_selection_metric: Callable[[NDArray[Any], NDArray[Any]], float] | None = None,
     validation_selection_complexity_weight: float = 0.0,
     model_kwargs: dict[str, Any] | None = None,
 ) -> FittedJointOperatorRegressor:
@@ -479,7 +480,9 @@ def _weighted_asymmetric_rul_loss(
     return torch.sum(weight * penalties) / torch.clamp(weight.sum(), min=1e-12)
 
 
-def _prepare_sample_weight(weight: np.ndarray | None, n_rows: int, name: str) -> np.ndarray:
+def _prepare_sample_weight(
+    weight: NDArray[Any] | None, n_rows: int, name: str
+) -> NDArray[np.float32]:
     if weight is None:
         return np.ones(n_rows, dtype=np.float32)
     out = np.asarray(weight, dtype=np.float32)

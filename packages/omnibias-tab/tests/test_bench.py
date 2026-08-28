@@ -12,6 +12,8 @@ pytest.importorskip("sklearn")
 from omnibias.tab.bench import (  # noqa: E402
     ARRANGEMENT_PUBLIC_MAX_ROWS,
     ARRANGEMENT_PUBLIC_SUITE,
+    NOISE_PUBLIC_MAX_ROWS,
+    NOISE_PUBLIC_SUITE,
     HeadToHead,
     load_dataset,
     score_predictions,
@@ -110,3 +112,77 @@ def test_train_val_test_split_60_20_20() -> None:
     assert split["Xtr"].shape[0] + split["Xva"].shape[0] + split["Xte"].shape[0] == n
     assert abs(split["Xtr"].shape[0] / n - 0.6) < 0.05
     assert np.allclose(split["Xtr"].mean(axis=0), 0.0, atol=1e-9)
+
+
+# --------------------------------------------------------------------------- #
+# Theory 05-03 G4: public regression suite + tuned CatBoost/RealMLP/TabM.    #
+# --------------------------------------------------------------------------- #
+
+
+def test_noise_public_suite_has_at_least_six_names() -> None:
+    assert len(NOISE_PUBLIC_SUITE) >= 6
+    assert len(set(NOISE_PUBLIC_SUITE)) == len(NOISE_PUBLIC_SUITE)  # no duplicates
+    assert set(NOISE_PUBLIC_MAX_ROWS) == set(NOISE_PUBLIC_SUITE)
+
+
+@pytest.mark.parametrize("name", NOISE_PUBLIC_SUITE)
+def test_noise_public_loader_regression_or_skip(name: str) -> None:
+    """Every public regression name loads as a genuinely continuous target, or skips
+    cleanly on OpenML failure (matching test_arrangement_public_loader_binary_or_skip)."""
+    max_rows = NOISE_PUBLIC_MAX_ROWS.get(name)
+    row_cap = 400 if max_rows is None else min(400, max_rows)
+    try:
+        ds = load_dataset(name, max_rows=row_cap, seed=0)
+    except RuntimeError as exc:
+        pytest.skip(f"OpenML unavailable for {name}: {exc}")
+    assert ds.task == "regression"
+    assert ds.n_outputs == 1
+    assert ds.X.ndim == 2 and ds.y.ndim == 1
+    assert ds.X.shape[0] == ds.y.shape[0] <= row_cap
+    assert np.all(np.isfinite(ds.X)) and np.all(np.isfinite(ds.y))
+    # Not the binarized-target OpenML trap noted above _OPENML_REGRESSION (a {0,1}-only
+    # target); wine_quality's integer 3-9 rating is still a legitimate, if quantized,
+    # regression target and must not trip this.
+    assert len(np.unique(ds.y)) > 2
+
+
+def test_fit_predict_catboost_regression_and_binary() -> None:
+    pytest.importorskip("catboost")
+    from omnibias.tab.bench import fit_predict_catboost
+
+    rng = np.random.default_rng(0)
+    X = rng.standard_normal((120, 4))
+    y_reg = np.sin(X[:, 0]) + 0.3 * X[:, 1]
+    pred, prob = fit_predict_catboost(X[:80], y_reg[:80], X[80:], task="regression", n_outputs=1, iterations=30)
+    assert pred.shape == (40,) and prob is None
+    rmse = float(np.sqrt(np.mean((pred - y_reg[80:]) ** 2)))
+    assert rmse < float(np.std(y_reg))  # better than a constant-mean-ish baseline
+
+    y_bin = (X[:, 0] > 0).astype(np.float64)
+    pred_b, prob_b = fit_predict_catboost(X[:80], y_bin[:80], X[80:], task="binary", n_outputs=1, iterations=30)
+    assert set(np.unique(pred_b).tolist()).issubset({0.0, 1.0})
+    assert prob_b is not None and prob_b.shape == (40,)
+
+
+def test_fit_predict_realmlp_regression_runs() -> None:
+    pytest.importorskip("pytabkit")
+    from omnibias.tab.bench import fit_predict_realmlp
+
+    rng = np.random.default_rng(1)
+    X = rng.standard_normal((80, 4))
+    y = np.sin(X[:, 0]) + 0.3 * X[:, 1] * X[:, 2]
+    pred, prob = fit_predict_realmlp(X[:60], y[:60], X[60:], seed=0, n_epochs=8)
+    assert pred.shape == (20,) and prob is None
+    assert np.all(np.isfinite(pred))
+
+
+def test_fit_predict_tabm_regression_runs() -> None:
+    pytest.importorskip("pytabkit")
+    from omnibias.tab.bench import fit_predict_tabm
+
+    rng = np.random.default_rng(2)
+    X = rng.standard_normal((80, 4))
+    y = np.sin(X[:, 0]) + 0.3 * X[:, 1] * X[:, 2]
+    pred, prob = fit_predict_tabm(X[:60], y[:60], X[60:], seed=0, n_epochs=5)
+    assert pred.shape == (20,) and prob is None
+    assert np.all(np.isfinite(pred))

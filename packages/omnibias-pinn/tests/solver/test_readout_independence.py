@@ -129,7 +129,7 @@ def _mutate_readout(field: object) -> None:
             field.c.weight.add_(0.37)
             field.c.bias.add_(-0.11)
         return
-    if isinstance(field, (SpectralVectorField, ChebyshevVectorField)):
+    if isinstance(field, SpectralVectorField | ChebyshevVectorField):
         with torch.no_grad():
             field.V.add_(0.29)
             field.b_t.add_(-0.07)

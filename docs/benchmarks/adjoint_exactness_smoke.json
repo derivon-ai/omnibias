@@ -1,0 +1,75 @@
+{
+  "schema": "omnibias.benchmarks.adjoint_exactness.v1",
+  "generated_utc": "2026-08-27T21:58:51Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.13.0+cpu",
+    "folx": "absent"
+  },
+  "config": {
+    "family": "adjoint_exactness",
+    "full": false,
+    "g2_n": 40
+  },
+  "rss_mb_at_start": 768.82,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_dpi_dy_jax",
+        "passed": true,
+        "max_abs_diff": 3.469446951953614e-18,
+        "atol": 1e-10
+      },
+      {
+        "name": "g1_dpi_dy_torch",
+        "passed": true,
+        "max_abs_diff": 0.0,
+        "atol": 1e-10
+      },
+      {
+        "name": "g1_full_pipeline_jax",
+        "passed": true,
+        "max_abs_diff": 8.881784197001252e-16,
+        "atol": 1e-08
+      },
+      {
+        "name": "g1_full_pipeline_torch",
+        "passed": true,
+        "max_abs_diff": 1.7763568394002505e-15,
+        "atol": 1e-08
+      },
+      {
+        "name": "g2_analytic_lqr_costate",
+        "passed": true,
+        "worked_example_max_abs_err": 1.7763568394002505e-15,
+        "skill_n": 40,
+        "skill_median_err": 6.938893903907228e-18,
+        "skill_all_finite": true,
+        "skill_singular_raised": true,
+        "tol": 1e-10
+      },
+      {
+        "name": "g9_full_pipeline_structural_parity",
+        "passed": true,
+        "shared_object_checks": {
+          "adjoint_recursion": true,
+          "closed_loop_jacobian": true,
+          "policy_gradient": true
+        },
+        "basis": "both backend twins call the identical omnibias.core.adjoint function objects; bit-parity is structural, not measured to a tolerance"
+      }
+    ]
+  },
+  "disclaimer": "discrete Pontryagin / DDP costate recursion; backend-free; not DARE, not a solved HJB, not a plant controller, not a global-optimum claim",
+  "honesty": {
+    "g3_control_performance": "not measured here; needs a Phase-A curve",
+    "g4_sample_efficiency": "not measured here; needs named baselines",
+    "g8_cost_parity": "not measured here; needs Brax/MJX installed"
+  },
+  "wall_seconds": 12.34626410715282
+}

@@ -10,6 +10,9 @@ import numpy as np
 import pytest
 from omnibias.core.proof import Conjecture
 from omnibias.pinn.certified.ccf_hardy import (
+    _vorticity_hessian_abs_sum_interval,
+    _vorticity_hessian_intervals,
+    _vorticity_residual_interval,
     certified_ccf_hardy_wholeline_blowup_attempt,
     certified_ccf_hardy_wholeline_blowup_attempt_schema_errors,
     refine_ccf_hardy_profile,
@@ -126,8 +129,27 @@ def test_vorticity_n0_orders_match_legacy_residual() -> None:
     assert a["honesty"]["navier_stokes_proof_claim"] is False
     assert b["honesty"]["navier_stokes_proof_claim"] is False
     for cert in (a, b):
+        report = cert["closure_report"]
+        hessian_max = max(
+            _vorticity_hessian_abs_sum_interval(
+                kwargs["coeffs"],
+                kwargs["scales"],
+                kwargs["gammas"],
+                kwargs["lam"],
+                y,
+                orders=cert["orders"],
+                parities=cert["parities"],
+            ).hi
+            for y in cert["collocation_nodes"]
+        )
+        assert report["collocation_hessian_abs_sum_max"] == pytest.approx(hessian_max)
+        assert 0.0 < hessian_max < 1.0
+        assert report["quantified_gap"]["sequence_Z2"] == pytest.approx(
+            report["nonlinear_curvature_Z2"]
+        )
+        assert "discriminant_lower" in report
         residual_ok = (
-            cert["closure_report"]["residual_certified_sup"] <= 1e-6
+            report["residual_certified_sup"] <= 1e-6
         )
         earned = bool(
             residual_ok
@@ -135,6 +157,51 @@ def test_vorticity_n0_orders_match_legacy_residual() -> None:
             and cert["sequence_space_closure_certified"]
         )
         assert cert["honesty"]["whole_line_certified"] is earned
+
+
+def test_vorticity_hessian_interval_contains_quadratic_stencils() -> None:
+    """Check the coefficient-interval Hessian on deterministic and random points."""
+    coeffs = [0.8, -0.31, 0.12]
+    scales = [0.7, 1.4, 2.2]
+    gammas = [0.62, 1.24, 0.8]
+    lam = 0.6057
+    rng = np.random.default_rng(20260827)
+    ys = [*np.linspace(-2.0, 2.0, 9), *rng.uniform(-2.0, 2.0, size=16)]
+
+    def residual_mid(values: list[float], y: float) -> float:
+        return _vorticity_residual_interval(
+            values, scales, gammas, lam, y
+        ).mid
+
+    for y in ys:
+        hessian = _vorticity_hessian_intervals(coeffs, scales, gammas, lam, float(y))
+        for i in range(1, len(coeffs)):
+            for j in range(1, len(coeffs)):
+                if i == j:
+                    plus = list(coeffs)
+                    minus = list(coeffs)
+                    plus[i] += 1.0
+                    minus[i] -= 1.0
+                    observed = residual_mid(plus, float(y))
+                    observed -= 2.0 * residual_mid(coeffs, float(y))
+                    observed += residual_mid(minus, float(y))
+                else:
+                    pp = list(coeffs)
+                    pm = list(coeffs)
+                    mp = list(coeffs)
+                    mm = list(coeffs)
+                    pp[i], pp[j] = pp[i] + 1.0, pp[j] + 1.0
+                    pm[i], pm[j] = pm[i] + 1.0, pm[j] - 1.0
+                    mp[i], mp[j] = mp[i] - 1.0, mp[j] + 1.0
+                    mm[i], mm[j] = mm[i] - 1.0, mm[j] - 1.0
+                    observed = (
+                        residual_mid(pp, float(y))
+                        - residual_mid(pm, float(y))
+                        - residual_mid(mp, float(y))
+                        + residual_mid(mm, float(y))
+                    ) / 4.0
+                enclosure = hessian[i - 1][j - 1]
+                assert enclosure.lo <= observed <= enclosure.hi
 
 
 def test_conjugate_sweep_smoke_honesty() -> None:

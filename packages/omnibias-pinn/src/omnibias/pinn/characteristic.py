@@ -248,9 +248,9 @@ def shock_flag_report() -> dict[str, object]:
 
 
 __all__ = [
+    "CharacteristicConfig",
     "DEFAULT_CONFIG",
     "DISCLAIMER",
-    "CharacteristicConfig",
     "arrival",
     "burgers_sine_ic",
     "characteristic_eval",

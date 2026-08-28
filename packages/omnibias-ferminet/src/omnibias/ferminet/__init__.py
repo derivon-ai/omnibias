@@ -3,7 +3,7 @@
 """omnibias.ferminet: FermiNet bridge for omnibias.
 
 This sub-package wires omnibias's closed-form n-th derivative kernels
-into FermiNet-style neural variational Monte Carlo. Five public surfaces:
+into FermiNet-style neural variational Monte Carlo. Seven public surfaces:
 
 * :mod:`omnibias.ferminet.folx_compat` -- folx-compatible
   ``forward_laplacian`` / ``closed_form_forward_laplacian`` /
@@ -30,6 +30,20 @@ into FermiNet-style neural variational Monte Carlo. Five public surfaces:
 * :mod:`omnibias.ferminet.multiblock_integration` -- composition of
   multi-block primitives into a FermiNet-shaped log|psi| / local
   kinetic energy.
+* :mod:`omnibias.ferminet.sampling` -- a reproducible, ansatz-agnostic
+  quantum Monte-Carlo sampling substrate: Metropolis / Langevin (MALA)
+  walkers over a caller-supplied ``log|psi|``, a local-energy
+  estimator, autocorrelation / effective-sample-size error
+  diagnostics, and a walker-level parameter log-derivative
+  accumulator. See ``docs/api/qmc_sampling.md``.
+* :mod:`omnibias.ferminet.stochastic_reconfiguration` -- the
+  stochastic-reconfiguration (SR) VMC optimizer step: Monte-Carlo
+  overlap-matrix / energy-gradient estimators built on
+  ``sampling``'s accumulator, composed unmodified with
+  :mod:`omnibias.curvature.natural_gradient`'s ``damped_solve`` /
+  ``natural_gradient_step`` for the parameter update. Requires the
+  optional ``curvature`` extra (``omnibias-ferminet[curvature]``).
+  See ``docs/api/stochastic_reconfiguration.md``.
 
 Importing :mod:`omnibias.ferminet` does **not** trigger the FermiNet
 or ``ferminet`` package import; the bridge is callable without a

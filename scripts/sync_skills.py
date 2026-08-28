@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Mirror the repo-only maintainer skills into the Claude Code skills directory.
+"""Mirror ``.cursor/skills/omnibias-*`` into ``.claude/skills/``.
 
-The maintainer library (``omnibias-dev-*``) is hand-authored **canonically** in
-``.cursor/skills/``. Both Cursor and Claude Code read the same Agent-Skill
-``SKILL.md`` format, so this script keeps a byte-identical copy under
-``.claude/skills/``. The consumer ``omnibias-*`` skills are *not* touched here --
-those are owned by the ``omnibias-skills`` package installer and its own
-``--check`` drift gate.
+Canonical Agent Skills live under ``.cursor/skills/``. Both Cursor and Claude
+Code read the same ``SKILL.md`` format, so this script keeps a byte-identical
+copy under ``.claude/skills/``. Capability skills that ``omnibias-skills``
+ships are the same files; the installer drift gate compares the bundle to
+these copies.
 
 Usage::
 
@@ -22,7 +21,7 @@ import argparse
 import sys
 from pathlib import Path
 
-_PREFIX = "omnibias-dev-"
+_PREFIX = "omnibias-"
 _SKILL_FILE = "SKILL.md"
 
 
@@ -30,11 +29,13 @@ def _repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
-def _dev_skill_dirs(cursor_skills: Path) -> list[Path]:
+def _skill_dirs(cursor_skills: Path) -> list[Path]:
     if not cursor_skills.is_dir():
         return []
     return sorted(
-        p for p in cursor_skills.iterdir() if p.is_dir() and p.name.startswith(_PREFIX)
+        p
+        for p in cursor_skills.iterdir()
+        if p.is_dir() and p.name.startswith(_PREFIX) and (p / _SKILL_FILE).is_file()
     )
 
 
@@ -44,10 +45,30 @@ def sync(repo_root: Path, *, check: bool) -> int:
 
     drifted: list[str] = []
     written: list[str] = []
-    for src_dir in _dev_skill_dirs(cursor_skills):
+    stale: list[str] = []
+    expected_names = {p.name for p in _skill_dirs(cursor_skills)}
+    if claude_skills.is_dir():
+        for dst_dir in claude_skills.iterdir():
+            if (
+                dst_dir.is_dir()
+                and dst_dir.name.startswith(_PREFIX)
+                and dst_dir.name not in expected_names
+            ):
+                rel = str((dst_dir / _SKILL_FILE).relative_to(repo_root))
+                if check:
+                    stale.append(rel)
+                else:
+                    skill = dst_dir / _SKILL_FILE
+                    if skill.is_file():
+                        skill.unlink()
+                    try:
+                        dst_dir.rmdir()
+                    except OSError:
+                        pass
+                    written.append(f"removed {rel}")
+
+    for src_dir in _skill_dirs(cursor_skills):
         src = src_dir / _SKILL_FILE
-        if not src.is_file():
-            continue
         content = src.read_text(encoding="utf-8")
         dst = claude_skills / src_dir.name / _SKILL_FILE
         current = dst.read_text(encoding="utf-8") if dst.is_file() else None
@@ -61,22 +82,23 @@ def sync(repo_root: Path, *, check: bool) -> int:
         written.append(str(dst.relative_to(repo_root)))
 
     if check:
-        if drifted:
-            print("Claude maintainer-skill mirror is stale; run: python scripts/sync_skills.py")
-            for path in drifted:
+        problems = drifted + [f"STALE: {p}" for p in stale]
+        if problems:
+            print("Claude skill mirror is stale; run: python scripts/sync_skills.py")
+            for path in problems:
                 print(f"  DRIFT: {path}")
             return 1
-        print("maintainer-skill mirror: up to date")
+        print("skill mirror: up to date")
         return 0
 
     for path in written:
         print(f"  synced: {path}")
-    print(f"maintainer-skill mirror: {len(written)} written")
+    print(f"skill mirror: {len(written)} written")
     return 0
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="Mirror omnibias-dev-* skills to .claude/skills.")
+    parser = argparse.ArgumentParser(description="Mirror omnibias-* skills to .claude/skills.")
     parser.add_argument(
         "--check",
         action="store_true",

@@ -1,0 +1,234 @@
+{
+  "schema": "omnibias.benchmarks.jet_compose_cost.v1",
+  "generated_utc": "2026-08-27T20:44:36Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "family": "jet_compose_cost",
+    "full": false,
+    "orders": [
+      4,
+      8,
+      12,
+      16
+    ],
+    "trailing_width": 512,
+    "claim": "arbitrary-tower compose_jet is cubic in the truncation order; the reduction is a ~3x constant factor at identical values. O(N^2) is claimed only for compose_jet_riccati, where sigma' = P(sigma) closes the chain rule on the activation.",
+    "timing_note": "wall clock is recorded on a shared commodity CPU and is noisy; the deterministic multiply_counts carry the cost claim, not the timings"
+  },
+  "rss_mb_at_start": 919.99,
+  "baseline": {
+    "name": "dense shifted-power compose_jet (full (k, n) convolution)"
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_torch_exact_order4",
+        "shape": [
+          5,
+          16
+        ],
+        "dtype": "float64",
+        "passed": true
+      },
+      {
+        "name": "g1_jax_exact_order4",
+        "shape": [
+          5,
+          16
+        ],
+        "dtype": "float64",
+        "passed": true
+      },
+      {
+        "name": "g1_torch_exact_order8",
+        "shape": [
+          9,
+          16
+        ],
+        "dtype": "float64",
+        "passed": true
+      },
+      {
+        "name": "g1_jax_exact_order8",
+        "shape": [
+          9,
+          16
+        ],
+        "dtype": "float64",
+        "passed": true
+      },
+      {
+        "name": "g1_torch_exact_order12",
+        "shape": [
+          13,
+          16
+        ],
+        "dtype": "float64",
+        "passed": true
+      },
+      {
+        "name": "g1_jax_exact_order12",
+        "shape": [
+          13,
+          16
+        ],
+        "dtype": "float64",
+        "passed": true
+      },
+      {
+        "name": "g1_torch_exact_order16",
+        "shape": [
+          17,
+          16
+        ],
+        "dtype": "float64",
+        "passed": true
+      },
+      {
+        "name": "g1_jax_exact_order16",
+        "shape": [
+          17,
+          16
+        ],
+        "dtype": "float64",
+        "passed": true
+      },
+      {
+        "name": "g2_multiply_count_ratio_order16",
+        "passed": true,
+        "ratio": 3.3304773561811505,
+        "min_ratio": 3.0,
+        "note": "constant factor; the kernel stays cubic in the truncation order"
+      },
+      {
+        "name": "g3_riccati_matches_tower",
+        "passed": true,
+        "max_rel": 5.795660232596059e-14,
+        "max_rel_allowed": 1e-11,
+        "rows": [
+          {
+            "activation": "sigmoid",
+            "order": 8,
+            "max_rel": 5.795660232596059e-14
+          },
+          {
+            "activation": "tanh",
+            "order": 8,
+            "max_rel": 5.835791640027965e-16
+          },
+          {
+            "activation": "exp",
+            "order": 8,
+            "max_rel": 4.441443810370745e-16
+          }
+        ]
+      },
+      {
+        "name": "g3_riccati_passes_fastpath_order_cap",
+        "passed": true,
+        "activation": "cot",
+        "order": 7,
+        "tower_path_raised": true,
+        "max_rel_vs_nested_jacfwd": 2.5724041794174235e-14
+      },
+      {
+        "name": "g4_torch_jax_agreement",
+        "passed": true,
+        "compose_jet_max_rel": 0.0,
+        "compose_jet_riccati_max_rel": 0.0,
+        "max_rel_allowed": 1e-14
+      }
+    ]
+  },
+  "multiply_counts": [
+    {
+      "order": 4,
+      "dense_multiplies": 81,
+      "reduced_multiplies": 21,
+      "ratio": 3.857142857142857,
+      "layer_tower_multiplies": 35,
+      "layer_riccati_multiplies": 26,
+      "layer_ratio": 1.3461538461538463
+    },
+    {
+      "order": 8,
+      "dense_multiplies": 433,
+      "reduced_multiplies": 121,
+      "ratio": 3.5785123966942147,
+      "layer_tower_multiplies": 165,
+      "layer_riccati_multiplies": 82,
+      "layer_ratio": 2.0121951219512195
+    },
+    {
+      "order": 12,
+      "dense_multiplies": 1249,
+      "reduced_multiplies": 365,
+      "ratio": 3.421917808219178,
+      "layer_tower_multiplies": 455,
+      "layer_riccati_multiplies": 170,
+      "layer_ratio": 2.676470588235294
+    },
+    {
+      "order": 16,
+      "dense_multiplies": 2721,
+      "reduced_multiplies": 817,
+      "ratio": 3.3304773561811505,
+      "layer_tower_multiplies": 969,
+      "layer_riccati_multiplies": 290,
+      "layer_ratio": 3.3413793103448275
+    }
+  ],
+  "timings_informational": [
+    {
+      "order": 4,
+      "trailing_width": 512,
+      "compose_dense_ms": 0.40116719901561737,
+      "compose_reduced_ms": 0.1364927738904953,
+      "compose_speedup": 2.9391094310784807,
+      "layer_tower_ms": 30.643289908766747,
+      "layer_riccati_ms": 30.373934656381607,
+      "layer_speedup": 1.0088679736567665
+    },
+    {
+      "order": 8,
+      "trailing_width": 512,
+      "compose_dense_ms": 1.6022846102714539,
+      "compose_reduced_ms": 0.6479434669017792,
+      "compose_speedup": 2.4728771754316368,
+      "layer_tower_ms": 31.80786408483982,
+      "layer_riccati_ms": 30.33280186355114,
+      "layer_speedup": 1.048629276910326
+    },
+    {
+      "order": 12,
+      "trailing_width": 512,
+      "compose_dense_ms": 5.086822435259819,
+      "compose_reduced_ms": 1.9129365682601929,
+      "compose_speedup": 2.6591694255111977,
+      "layer_tower_ms": 33.09435583651066,
+      "layer_riccati_ms": 0.9967293590307236,
+      "layer_speedup": 33.202950767592014
+    },
+    {
+      "order": 16,
+      "trailing_width": 512,
+      "compose_dense_ms": 10.298015549778938,
+      "compose_reduced_ms": 4.629272967576981,
+      "compose_speedup": 2.2245427353075375,
+      "layer_tower_ms": 34.03535857796669,
+      "layer_riccati_ms": 32.000696286559105,
+      "layer_speedup": 1.063581813132678
+    }
+  ],
+  "jax_version": "0.10.0",
+  "wall_seconds": 12.359260184690356
+}

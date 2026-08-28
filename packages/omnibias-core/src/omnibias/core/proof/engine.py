@@ -29,7 +29,9 @@ from omnibias.core.collapse.verdict import ObligationVerdict, adjudicate_residua
 from omnibias.core.collapse.winding import integers_in, winding_collapse
 from omnibias.core.proof.catalog import CatalogEntry, discover, register_catalog
 from omnibias.core.proof.certificate import (
+    NO_TRANSCENDENTAL_BACKEND,
     RESERVED_HONESTY_KEYS,
+    TRANSCEND_BACKEND_KEY,
     decode_interval,
     encode_interval,
     make_certificate,
@@ -98,8 +100,21 @@ def _seal(
     claim: str,
     payload: Mapping[str, object],
     honesty: Mapping[str, bool],
+    *,
+    no_transcendentals: bool = False,
 ) -> dict[str, Any]:
-    return make_certificate(claim=claim, payload=payload, honesty=honesty)
+    """Seal an engine result with explicit provenance where it is known.
+
+    Direct interval comparisons use only the supplied IEEE-754 endpoints and
+    outward-rounded arithmetic.  They must not inherit an unrelated
+    process-global fallback mark from an earlier transcendental computation.
+    """
+    meta = (
+        {TRANSCEND_BACKEND_KEY: NO_TRANSCENDENTAL_BACKEND}
+        if no_transcendentals
+        else None
+    )
+    return make_certificate(claim=claim, payload=payload, honesty=honesty, meta=meta)
 
 
 def _require_mapping(data: Mapping[str, Any]) -> Mapping[str, Any]:
@@ -409,7 +424,7 @@ def _prove_residual(conjecture: Conjecture) -> ProofAttempt:
         "residual": encode_interval(box),
         "inputs": {"lo": box.lo, "hi": box.hi},
     }
-    cert = _seal("residual", payload, honesty)
+    cert = _seal("residual", payload, honesty, no_transcendentals=True)
     return _attempt(verdict.status, cert, verdict.detail)
 
 
@@ -460,7 +475,7 @@ def _prove_enclosure_sign(conjecture: Conjecture) -> ProofAttempt:
         "residual": encode_interval(box),
         "inputs": {"lo": box.lo, "hi": box.hi},
     }
-    cert = _seal("enclosure_sign", payload, honesty)
+    cert = _seal("enclosure_sign", payload, honesty, no_transcendentals=True)
     return _attempt(status, cert, detail)
 
 
@@ -530,7 +545,7 @@ def _prove_gap(conjecture: Conjecture) -> ProofAttempt:
         "residual": encode_interval(box),
         "inputs": {"L": box.lo, "U": box.hi, "expected": expected},
     }
-    cert = _seal("gap", payload, honesty)
+    cert = _seal("gap", payload, honesty, no_transcendentals=True)
     return _attempt(status, cert, detail)
 
 
@@ -636,26 +651,50 @@ def _prove_winding(conjecture: Conjecture) -> ProofAttempt:
         coeffs = _coeff_list(data["coeffs"], name="coeffs")
         center = _center(data.get("center"))
         radius = _as_float(data.get("radius", 1.0), name="radius")
+        contour = _as_str(data.get("contour"), name="contour", default="circle")
+        half_width_raw = data.get("half_width")
+        half_width = (
+            None
+            if half_width_raw is None
+            else _as_float(half_width_raw, name="half_width")
+        )
+        half_height_raw = data.get("half_height")
+        half_height = (
+            None
+            if half_height_raw is None
+            else _as_float(half_height_raw, name="half_height")
+        )
         expected_raw = data.get("expected")
         expected = None if expected_raw is None else _as_int(expected_raw, name="expected")
     except (KeyError, TypeError, ValueError) as exc:
         return _blocked(str(exc))
     verdict = winding_collapse(
-        [float(item) for item in coeffs], center, radius, expected=expected
+        [float(item) for item in coeffs],
+        center,
+        radius,
+        expected=expected,
+        contour=contour,
+        half_width=half_width,
+        half_height=half_height,
     )
     honesty = _honesty(spec_name="winding", extra={"winding_collapse": True})
+    inputs: dict[str, object] = {
+        "coeffs": _json_coeffs(coeffs),
+        "center": [center.real, center.imag],
+        "radius": radius,
+        "expected": expected,
+    }
+    if contour != "circle" or half_width is not None or half_height is not None:
+        inputs["contour"] = contour
+        if half_width is not None:
+            inputs["half_width"] = half_width
+        if half_height is not None:
+            inputs["half_height"] = half_height
     return _from_obligation(
         "winding",
         "winding",
         verdict,
-        {
-            "inputs": {
-                "coeffs": _json_coeffs(coeffs),
-                "center": [center.real, center.imag],
-                "radius": radius,
-                "expected": expected,
-            }
-        },
+        {"inputs": inputs},
         honesty,
     )
 
@@ -671,10 +710,29 @@ def _replay_winding(certificate: Certificate) -> bool | None:
         coeffs = _coeffs_from_json(inputs["coeffs"])
         center = _center(inputs.get("center"))
         radius = _as_float(inputs.get("radius", 1.0), name="radius")
+        contour = _as_str(inputs.get("contour"), name="contour", default="circle")
+        half_width_raw = inputs.get("half_width")
+        half_width = (
+            None
+            if half_width_raw is None
+            else _as_float(half_width_raw, name="half_width")
+        )
+        half_height_raw = inputs.get("half_height")
+        half_height = (
+            None
+            if half_height_raw is None
+            else _as_float(half_height_raw, name="half_height")
+        )
         expected_raw = inputs.get("expected")
         expected = None if expected_raw is None else _as_int(expected_raw, name="expected")
         fresh = winding_collapse(
-            [float(item) for item in coeffs], center, radius, expected=expected
+            [float(item) for item in coeffs],
+            center,
+            radius,
+            expected=expected,
+            contour=contour,
+            half_width=half_width,
+            half_height=half_height,
         )
     except (KeyError, TypeError, ValueError):
         return False

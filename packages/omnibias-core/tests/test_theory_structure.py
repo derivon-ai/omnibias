@@ -33,6 +33,7 @@ CLAIM_FLAG_MODULES = (
     "omnibias.pinn.certified.machine",
     "omnibias.geometry.gauge.transfer",
     "omnibias.core.verified.dirichlet",
+    "omnibias.core.verified.debruijn_newman",
     "omnibias.core.verified.eig_operator",
     "omnibias.sos",
     "omnibias.qubo",
@@ -147,20 +148,21 @@ def test_group_07_entries_are_in_the_ledger() -> None:
         )
 
 
-def test_no_rh_entry_exists() -> None:
-    """There is deliberately no Riemann-Hypothesis frontier spec. If one
-    appears, this test fails and the author must justify it against the three
-    tests in the ledger."""
-    for path in FRONTIER.glob("*.md"):
-        if path.name in {"README.md", LEDGER.name}:
-            continue
-        section = path.read_text(encoding="utf-8").split("## 13.", 1)
-        blob = section[1] if len(section) == 2 else ""
-        assert not re.search(
-            r"(?i)parent:.*riemann hypothesis",
-            blob,
-        ), f"{path.name} is an RH frontier spec; the ledger forbids that"
-        assert "riemann" not in path.name.lower()
+def test_rh_entry_is_lambda_scoped() -> None:
+    """The RH row may name only a de Bruijn--Newman Lambda research program."""
+    rows = _ledger_rows(LEDGER.read_text(encoding="utf-8"))
+    rh_rows = [row for row in rows if row[0] == "RH"]
+    assert len(rh_rows) == 1, f"expected one RH ledger row, found {rh_rows!r}"
+    _key, parent, sub_obligation, gate, scope, never_write, entry, distance = rh_rows[0]
+    assert parent == "the Riemann Hypothesis"
+    assert "de bruijn" in sub_obligation.lower()
+    assert "lambda" in sub_obligation.lower()
+    assert "lambda <=" in gate.lower()
+    assert "not implemented" in scope.lower()
+    forbidden_parent_claim = "we " + "prove / disprove" + " the Riemann Hypothesis"
+    assert never_write == forbidden_parent_claim
+    assert entry == "planned Lambda program"
+    assert "non-entry" not in distance.lower()
 
 
 def test_frontier_docs_mirror_the_ledger_table() -> None:
@@ -185,8 +187,8 @@ def test_distance_column_cites_existing_artifacts() -> None:
         assert never, f"{key} has an empty never-write cell"
         assert distance, f"{key} has an empty distance cell"
         if key == "RH":
-            assert entry == "none"
-            assert "non-entry" in distance
+            assert entry == "planned Lambda program"
+            assert "no implementation" in distance
             continue
         for rel in _BENCHMARK_PATH.findall(distance):
             assert (REPO / rel).is_file(), f"{key} cites missing artifact {rel}"

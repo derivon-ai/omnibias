@@ -101,16 +101,16 @@ pip install -e packages/omnibias-keras[test]
 If you use an AI assistant (Cursor, Claude Code), the repo ships skills and rules
 that encode these conventions so changes stay correct:
 
-- **Maintainer skills** live in `.cursor/skills/omnibias-dev-*` (canonical) and
-  are mirrored to `.claude/skills/` by `python scripts/sync_skills.py`. Edit the
-  `.cursor` copy and re-run the sync (`--check` runs in CI).
-- **Consumer skills** (`omnibias-*`) are the `omnibias-skills` package; the repo's
-  committed copies under `.cursor/skills` / `.claude/skills` are produced by
-  `omnibias-skills install` and drift-checked in CI against
-  `packages/omnibias-skills/src/omnibias/skills/_bundled`. Edit the bundle, not
-  the copies.
-- **Rules** in `.cursor/rules/` (the universal `omnibias.md` plus path-scoped
-  `.mdc` rules) auto-attach by file path.
+- **Skills** live in `.cursor/skills/omnibias-*` (canonical) and are mirrored
+  to `.claude/skills/` by `python scripts/sync_skills.py`. Edit the `.cursor`
+  copy and re-run the sync (`--check` runs in CI). Every workspace package has
+  an `omnibias-<package>` skill.
+- The pip package `omnibias-skills` ships the capability nine, byte-identical
+  to `.cursor/skills`. If you edit one of those nine, copy it into
+  `packages/omnibias-skills/src/omnibias/skills/_bundled/skills/` so
+  `omnibias-skills install --check` stays green.
+- **Rules** in `.cursor/rules/`: the single always-on `omnibias.md` (AD
+  bottlenecks, bakeoffs, substrate invariants).
 
 ## Running the checks
 

@@ -179,6 +179,20 @@ quadrature; `certified` = a sound outward-rounded enclosure.
 | 3-terminal DAG ≤6 (capped) | same cost-separation predicate; miss is `BLOCKED` | exact rational | `omnibias.combinatorics.unsplittable_dags` |
 | Finite triangle-free colouring / `IsSaturated` | triple enumeration; matrix predicate | exact finite | `omnibias.combinatorics.ramsey` (not Erdős 183) |
 | Compactness / 2-degenerate templates | adjacency-list predicates | exact finite | `omnibias.combinatorics.extremal` (not Erdős 146 / 180) |
+| Banded Fourier radii (manufactured nearest-neighbour) | `BandedLinearPart` + radii polynomial | certified | `omnibias.core.verified.radii_spectral` (diagonal `laplacian_symbol` path unchanged) |
+| Laguerre function basis on `[0, inf)` | exact `Q` coeffs + interval Horner | certified | `omnibias.core.verified.laguerre_basis` (not Fourier self-dual) |
+| Cone-field hyperbolicity (finite orbit) | expanding cone of interval Jacobians | certified | `omnibias.dynamics._core.cone` (not Anosov / continuum chaos) |
+| Two-site Hubbard GS sandwich | Ritz + Temple + blocked `LDL^T` | certified | `omnibias.core.verified.lattice_ground_state` (finite lattice; not thermo limit) |
+| NPA linear-Hamiltonian lower bound | interval `LDL^T` moment matrix | certified | `omnibias.sos.npa` (lower bounds only; not full diagonalization) |
+| Cohn-Elkies 1-D Hermite packing bound | exact Fourier + grid signs | certified | `omnibias.core.verified.cohn_elkies` (loose vs density `1`; not `d -> inf`) |
+| IPM banded Fourier toy CAP | residual + tail + radii | certified toy; full IPM unearned | `omnibias.pinn.certified.ipm` (`navier_stokes_proof_claim=False`) |
+| Volume-uniform strong-coupling family | polymer glueball on growing finite `d` | certified finite family | `omnibias.geometry.gauge.transfer.strong_coupling` (`yang_mills_claim=False`) |
+| Named `Lambda <= 0.2` attempt | `Phi` / `H_t` enclosure + cited far-field | unearned (`certified=False`) | `omnibias.core.verified.debruijn_newman` (not RH; far-field stays external) |
+| Combinatorial SOS (clique / 3-XOR) | degree-indexed strictly-PD residual | certified residual; oracle on graph | `omnibias.sos.combinatorial` (not P vs NP; not `SosDegreeFamily`) |
+| Gaussian Slater `log|det M|` Laplacian | matrix identity on sampling contract | closed form | `omnibias.ferminet.antisymmetric` |
+| Bloch / twist mixed partials | multivariate jet on a real affine twist | closed form | `omnibias.ferminet.bloch` (not a complex Bloch phase) |
+| L-infinity minimax step | linearized epigraph + monotone accept | numerical | `omnibias.jax.optim.linf_minimax_step` (toy residual; not CCF champion) |
+| Rationalize-and-certify discovery | exact `Fraction` residual | exact rational | `omnibias.symbolic.certify` (never `theorem_prover_verified`) |
 
 ## Where NOT to look for a capability
 

@@ -76,7 +76,8 @@ order `N` through a deep composition in one pass, so `a_0 .. a_N` come out
 together and exactly.
 
 Concretely: getting 20 Taylor coefficients of a depth-4 network by repeated
-autodiff is prohibitive; getting them from `mlp_jet` is one pass with `O(N^2)`
+autodiff is prohibitive; getting them from `mlp_jet` is one pass with current
+`O(N^3)` shifted-power composition
 Cauchy-product work.
 
 ### Certified remainder

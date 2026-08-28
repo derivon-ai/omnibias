@@ -8,7 +8,7 @@ Run:
     python docs/examples/quadrature_validate.py
 
 Each probe turns a certified quadrature rule into an instrumented experiment
-under the ``omnibias-dev-empirical-validation`` gates -- grid-and-random
+under the ``omnibias-empirical-validation`` gates -- grid-and-random
 enclosure soundness (here a *sweep of K>=8 integrands*, each certified enclosure
 must contain the exact integral), an ``mpmath.quad`` high-precision oracle, and a
 best-in-class comparison against the named fixed-node trapezoid baseline -- and

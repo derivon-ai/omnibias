@@ -13,7 +13,8 @@ jnp = pytest.importorskip("jax.numpy")
 
 jax.config.update("jax_enable_x64", True)
 
-from omnibias.core.jet_hopfield import JetHopfieldConfig, jet_hopfield_retrieve as core_ret
+from omnibias.core.jet_hopfield import JetHopfieldConfig
+from omnibias.core.jet_hopfield import jet_hopfield_retrieve as core_ret
 from omnibias.hopfield.jax.ops.jet_hopfield import jet_hopfield_retrieve as jax_ret
 from omnibias.hopfield.torch.ops.jet_hopfield import jet_hopfield_retrieve as torch_ret
 

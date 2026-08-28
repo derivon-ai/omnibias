@@ -60,7 +60,7 @@ def _add_common(parser: argparse.ArgumentParser) -> None:
 def _build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="omnibias-skills",
-        description="Install the omnibias consumer agent-skill library.",
+        description="Install the omnibias capability agent-skill library.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 

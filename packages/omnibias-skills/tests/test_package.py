@@ -8,12 +8,14 @@ import omnibias.skills as skills
 
 _EXPECTED_SKILLS = {
     "omnibias-backends",
-    "omnibias-fields-pinn",
+    "omnibias-control",
+    "omnibias-curvature",
+    "omnibias-fields",
     "omnibias-frontier",
     "omnibias-geometry",
-    "omnibias-curvature-optim",
-    "omnibias-verify",
+    "omnibias-pinn",
     "omnibias-symbolic",
+    "omnibias-verify",
 }
 
 

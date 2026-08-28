@@ -66,8 +66,8 @@ An inequality system is a pair `(sort, existential, data)`.
 Temperature collapse (`beta -> inf`) may appear in a linear or CSP
 **proposer**. The check is not temperature collapse. Founding bias
 collapse is not in play. Enclosure Collapse may appear in the SOS
-LDLᵀ path (`width` of a pivot interval). There is **no** Farkas
-certificate: `InfeasibleProblemError` is `BLOCKED`.
+LDLᵀ path: `width -> 0` of a sound enclosure yields a point plus a proof.
+There is **no** Farkas certificate: `InfeasibleProblemError` is `BLOCKED`.
 
 ## 5. Worked example
 

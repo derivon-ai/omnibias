@@ -44,8 +44,8 @@ The enforcement machinery is real and already strict.
   retires.
 - `packages/omnibias-core/tests/test_no_leakage.py` — vendor-neutral language
   guard that self-tests its own blocklist so it cannot go vacuous.
-- `.cursor/rules/frontier-claims.mdc` and the `omnibias-dev-frontier-research`
-  skill — the doctrine in agent-facing form.
+- `.cursor/rules/omnibias.md` (Frontier program) and the
+  `omnibias-frontier` skill — the doctrine in agent-facing form.
 
 **Confirmed gap**, and it is specific: `tests/test_terminology.py`'s
 `SCANNED_ROOTS` does not include `theory`, so **this entire tree is currently
@@ -295,5 +295,5 @@ fail on synthetic violations:
 - [x] `ALLOWED` entries require a reason comment
 - [x] Reconfirm reserved-key behaviour with an explicit test
 - [x] Docs page carrying the claim ladder and forbidden-claims register
-- [x] Cross-reference from `.cursor/rules/frontier-claims.mdc`
+- [x] Cross-reference from `.cursor/rules/omnibias.md` (Frontier program)
 - [x] Index row in `theory/README.md`

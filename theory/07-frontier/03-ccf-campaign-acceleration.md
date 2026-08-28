@@ -49,7 +49,7 @@ live and its blocker is written down.
 - `omnibias.pinn.certified.ccf_hardy`, `benchmarks/ccf_hardy_rung_acceptance.py`,
   `ccf_rung1_residual_push.py`, `ccf_line_discovery.py`,
   `deepmind_campaign_tick.py`.
-- `.cursor/rules/deepmind-campaign.mdc` — the claim rules for this campaign.
+- `.cursor/rules/omnibias.md` (Frontier program / CCF) — the claim rules for this campaign.
 
 **Confirmed gap (updated).** Spectral / PV Hilbert on a free net sat at
 `O(1e-1)`–`O(1e-3)`. `hilbert_wholeline_hp` moves the *planted* `H[Q]=-P`

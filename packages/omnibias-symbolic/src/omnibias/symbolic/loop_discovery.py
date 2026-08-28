@@ -70,7 +70,7 @@ def _reject_loop_source(obj: object, label: str) -> None:
         refuse_jet_as_loop_source(obj)
     if isinstance(obj, GaugeCovariantJet) or cls_name == "GaugeCovariantJet":
         refuse_jet_as_loop_source(obj)
-    if not isinstance(obj, (LoopObservableTable, LatticeLinkField)):
+    if not isinstance(obj, LoopObservableTable | LatticeLinkField):
         raise TypeError(
             f"{label} must be a LatticeLinkField or LoopObservableTable, "
             f"got {type(obj)!r}"

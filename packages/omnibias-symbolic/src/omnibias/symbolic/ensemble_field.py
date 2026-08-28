@@ -58,7 +58,7 @@ def ensemble_field_law(
     """Fit ``NeuralFieldND`` on ensemble coordinates and extract its jet."""
     if source is not None:
         refuse_jet_as_ensemble_source(source)
-    if isinstance(table, (LatticeLinkField,)):
+    if isinstance(table, LatticeLinkField):
         refuse_jet_as_ensemble_source(table)
     if is_ensemble_cert_name(lhs_name) or any(is_ensemble_cert_name(name) for name in coord_atoms):
         raise ValueError("GEVP / transfer-gap names are not interpolant coordinates")

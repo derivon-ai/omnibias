@@ -48,8 +48,8 @@ def worked_example() -> dict[str, float]:
 
 
 __all__ = [
-    "DISCLAIMER",
     "CharacteristicConfig",
+    "DISCLAIMER",
     "characteristic_eval",
     "honesty_payload",
     "worked_example",

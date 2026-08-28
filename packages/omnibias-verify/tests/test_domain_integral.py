@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Derivon
 """Certified multivariate domain integral ``int_box f dx``.
 
-Soundness rule (``.cursor/rules/verified-enclosures.mdc``): the returned
+Soundness rule (``.cursor/rules/omnibias.md``, verified substrate): the returned
 enclosure must contain the true integral, checked against a dense deterministic
 grid quadrature **and** a random Monte-Carlo estimate. Branch-and-bound may only
 tighten -- never break soundness.

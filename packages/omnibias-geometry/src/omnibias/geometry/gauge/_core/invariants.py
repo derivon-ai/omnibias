@@ -233,12 +233,12 @@ class GaugeInvariantDictionary:
 
 
 __all__ = [
+    "GaugeInvariantDictionary",
     "IMPLEMENTED_INVARIANT_NAMES",
+    "InvariantAtom",
     "MAX_SEARCHABLE_DIM6_SU3",
     "SINGLET_DF_SQ",
     "SINGLET_TR_F3",
-    "GaugeInvariantDictionary",
-    "InvariantAtom",
     "enumerate_gauge_invariants",
     "evaluate_named_invariants",
     "representation_complexity",

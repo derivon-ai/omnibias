@@ -7,7 +7,7 @@
 The **pack-parameter** Fisher metric (theory 04-01) lives in
 [`omnibias.curvature.information`](pack_fisher.md). It is a different
 object from the scalar exponential-family
-[`fisher_information_metric`][omnibias.curvature.glm_fisher.fisher_information_metric].
+`fisher_information_metric`.
 
 ## Public alpha surface
 

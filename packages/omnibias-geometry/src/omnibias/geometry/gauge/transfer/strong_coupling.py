@@ -593,6 +593,66 @@ def certified_wilson_character_beta_domain(
     )
 
 
+@dataclass(frozen=True)
+class VolumeUniformStrongCouplingFamily:
+    """Strong-coupling polymer constants on a declared growing finite-lattice family.
+
+    ``spacetime_dims`` is a strictly increasing sequence of lattice spacetime
+    dimensions (the finite-volume family).  The polymer constants ``A, B``
+    are those of :func:`polymer_first_step` /
+    :func:`polymer_coordination_backtrack` -- they depend on dimension, not
+    on a continuum volume, and the family is **volume-uniform** in the sense
+    that each member is certified at the same locked ``beta`` with the same
+    counting rule.  ``yang_mills_claim`` is frozen ``False``.
+    """
+
+    beta: float
+    spacetime_dims: tuple[int, ...]
+    gaps: tuple[float, ...]
+    min_gap: float
+    certified: bool
+    yang_mills_claim: bool = False
+    continuum_claim: bool = False
+
+    def __post_init__(self) -> None:
+        if self.yang_mills_claim or self.continuum_claim:
+            raise ValueError("Yang-Mills / continuum claims are refused")
+
+
+def volume_uniform_strong_coupling_family(
+    beta: Scalar,
+    spacetime_dims: Sequence[int] = (2, 3, 4),
+    *,
+    counting: Counting = "two_scale",
+    n_keep: int = 3,
+) -> VolumeUniformStrongCouplingFamily:
+    """Evaluate the polymer glueball bound on a declared dimension family.
+
+    Does not rebuild the polymer majorant; it only calls
+    :func:`certified_strong_coupling_glueball_bound` at each dimension.
+    """
+    dims = tuple(int(d) for d in spacetime_dims)
+    if len(dims) < 2:
+        raise ValueError("spacetime_dims must contain at least two dimensions")
+    if dims != tuple(sorted(set(dims))):
+        raise ValueError("spacetime_dims must be strictly increasing")
+    results = [
+        certified_strong_coupling_glueball_bound(
+            beta, spacetime_dim=dim, counting=counting, n_keep=n_keep
+        )
+        for dim in dims
+    ]
+    gaps = tuple(float(item.spectral_gap_lower) for item in results)
+    certified = all(item.certified for item in results) and min(gaps) > 0.0
+    return VolumeUniformStrongCouplingFamily(
+        beta=float(beta),
+        spacetime_dims=dims,
+        gaps=gaps,
+        min_gap=float(min(gaps)),
+        certified=certified,
+    )
+
+
 __all__ = [
     "BACKTRACK_POLYMER_METHOD",
     "BETA_LOCK",
@@ -602,12 +662,13 @@ __all__ = [
     "POLYMER_BETA_DOMAIN_METHOD",
     "POLYMER_BETA_GRID",
     "POLYMER_METHOD",
+    "PolymerDomainResult",
+    "StrongCouplingGapResult",
+    "VolumeUniformStrongCouplingFamily",
     "WILSON_CHARACTER_BETA_DOMAIN_METHOD",
     "WILSON_CHARACTER_BETA_GRID",
     "WILSON_CHARACTER_CONTRAST_BETA",
     "WILSON_CHARACTER_METHOD",
-    "PolymerDomainResult",
-    "StrongCouplingGapResult",
     "WilsonCharacterDomainResult",
     "WilsonCharacterGapResult",
     "certified_polymer_beta_domain",
@@ -618,4 +679,5 @@ __all__ = [
     "polymer_coordination_backtrack",
     "polymer_first_step",
     "su2_wilson_activity",
+    "volume_uniform_strong_coupling_family",
 ]

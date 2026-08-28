@@ -8,7 +8,7 @@ Run:
     python docs/examples/qcalculus_validate.py
 
 Each *probe* turns a q-calculus capability into an instrumented experiment under the
-``omnibias-dev-empirical-validation`` gates -- an mpmath high-precision oracle, a
+``omnibias-empirical-validation`` gates -- an mpmath high-precision oracle, a
 best-in-class comparison against a named baseline, and a ``K >= 8`` seed sweep -- and
 records its gaps / flaws into a shared
 :class:`~omnibias.difference.validation.FindingsLedger` (JSON written to scratch, never

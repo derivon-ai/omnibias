@@ -544,6 +544,9 @@ domain the leading activity is still returned and must not be sealed as proved.
 
 This is counting at one coupling and one spacing. It is **not** a
 continuum claim and **not** a formalization of Osterwalder-Seiler.
+A declared growing finite-lattice family of spacetime dimensions, evaluated
+at one locked `beta` without rebuilding the polymer, is
+[volume_uniform_ym.md](volume_uniform_ym.md) (`yang_mills_claim=False`).
 
 ```python
 from omnibias.geometry.gauge.transfer import (

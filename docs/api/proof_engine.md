@@ -12,8 +12,9 @@ parents are not inferred. `theorem_prover_verified` is earned only by a
 genuine `lake build`. Pairing is not a strong solution. Rank / holonomic
 syzygy is not a special-function theorem.
 
-The `gap` *kind* is Enclosure Collapse of a claimed `OPT` sandwich. It
-does not register `gap_collapse`.
+The `gap` *kind* is Enclosure Collapse: a sound enclosure with `width -> 0`,
+yielding a point plus a proof for a claimed `OPT` sandwich.
+It does not register `gap_collapse`.
 
 Cookbook: [Proof engine](../cookbook/proof-engine.md).
 

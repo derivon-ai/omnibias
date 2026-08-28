@@ -131,9 +131,9 @@ def evaluate_weak_ym_identity(
 
 
 __all__ = [
-    "WEAK_YM_FLOOR",
     "AdjointTestBank",
     "AdjointTestOneForm",
+    "WEAK_YM_FLOOR",
     "evaluate_weak_ym_identity",
     "gaussian_adjoint_test_bank",
     "weak_yang_mills_residuals",

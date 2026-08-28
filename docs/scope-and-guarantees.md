@@ -384,11 +384,30 @@ the relevant op:
   symmetric Padé-Jastrow correlation factor's closed-form value / gradient /
   Laplacian, and the hard `NuclearCuspField` cage enforcing the Kato electron-nucleus
   cusp `u'(0) = -Z`. The hydrogen-atom oracle `E_L = -Z²/2` and the harmonic-trap
-  oracle `E_L = D·ω/2` are reproduced exactly (zero local-energy variance). **Not
-  closed-form / out of scope** (iterative or stochastic numerics, never claimed,
-  guarded by an enforcement test): VMC Monte-Carlo sampling, SCF / Hartree-Fock /
-  CI / coupled-cluster self-consistency, and Gaussian-basis electron-repulsion
-  integrals (ERI). The direct Galerkin eigensolver is a **numerical** Rayleigh-Ritz
+  oracle `E_L = D·ω/2` are reproduced exactly (zero local-energy variance).
+  `omnibias-ferminet`'s `sampling` module adds the **Numerical** register on
+  top: a reproducible random-walk Metropolis and Langevin (MALA) walker over
+  `|psi|²` (explicit PRNG key, `vmap`/`scan`-safe), a local-energy estimator
+  that reuses the closed-form Laplacian above (or an autodiff fallback for a
+  general ansatz), autocorrelation-time / effective-sample-size-corrected
+  standard-error diagnostics, and a walker-level parameter log-derivative
+  accumulator -- ordinary MCMC and plain autodiff, not a closed-form claim
+  (see [`docs/api/qmc_sampling.md`](api/qmc_sampling.md)).
+  `omnibias.ferminet.stochastic_reconfiguration` composes that substrate with
+  `omnibias-curvature`'s generic (already-shipped, unmodified)
+  `damped_solve` / `natural_gradient_step` into a full stochastic-
+  reconfiguration optimizer step: a Monte-Carlo overlap-matrix / energy-
+  gradient **statistical estimator** (`S`, `g` -- carry sampling noise, exact
+  only as `n_samples -> infinity`) feeding an **exact linear-algebra** solve
+  (deterministic given `(S, g)`) -- itself not a closed-form claim, since the
+  estimators are Monte Carlo (see
+  [`docs/api/stochastic_reconfiguration.md`](api/stochastic_reconfiguration.md)).
+  **Not closed-form / out of scope** (iterative or stochastic numerics, never
+  claimed, guarded by an enforcement test): lattice Hamiltonians,
+  antisymmetric-ansatz changes, ground-state certificates, SCF / Hartree-Fock
+  / CI / coupled-cluster self-consistency, and Gaussian-basis
+  electron-repulsion integrals (ERI).
+  The direct Galerkin eigensolver is a **numerical** Rayleigh-Ritz
   quotient (quadrature + `scipy.linalg.eigh`); it is bit-exact only in its
   analytic-basis limit -- a single unit-width Gaussian `exp(-x²/2)` is the exact
   1-D SHO ground state, so a `K = 1` solve returns `E₀ = 1/2` with no fitting error.

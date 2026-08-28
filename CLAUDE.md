@@ -2,9 +2,10 @@
 
 This file orients Claude Code in the **omnibias** repository.
 
-**Read [AGENTS.md](AGENTS.md) first.** It is the machine-oriented guide:
-repository layout, build / test / lint commands, the derivative-tower contract,
-and the do / don't list. Everything there applies to Claude Code too.
+**Read [AGENTS.md](AGENTS.md) first.** Then load the concise capability map in
+`.cursor/rules/omnibias.md` and the matching `omnibias-<package>` skill
+before changing a package. They provide the repository layout, composition
+paths, derivative-tower contract, and package-specific workflows.
 
 **Before claiming a capability, check [docs/operator-surface.md](docs/operator-surface.md)** --
 the canonical capability matrix. In particular, `OperatorBlock` has six roles
@@ -15,21 +16,19 @@ Do not state otherwise.
 
 ## Agent skills
 
-Skills live in `.claude/skills/` (mirrored from Cursor's `.cursor/skills/`):
-
-- **Maintainer skills** (`omnibias-dev-*`) cover developing omnibias itself --
-  the closed-form derivative tower, field operators, verified primitives, the
-  certificate / Lean loop, and scaffolding a new package.
-- **Consumer skills** (`omnibias-*`) cover *using* omnibias to build things.
+Skills live in `.claude/skills/` (mirrored from Cursor's `.cursor/skills/`).
+Every skill is `omnibias-<stem>/SKILL.md`: one skill per workspace
+distribution, plus cross-cuts (`backends`, `frontier`, derivative-tower,
+field, verified, formal, discovery, and research workflows).
 
 ## Keeping skills in sync (canonical sources)
 
-- Maintainer skills are hand-authored **canonically in `.cursor/skills/`** and
+- The full catalog is hand-authored **canonically in `.cursor/skills/`** and
   mirrored here by `python scripts/sync_skills.py` (CI runs it with `--check`).
   Edit the `.cursor` copy, then re-run the sync.
-- Consumer skills come from the `omnibias-skills` package (canonical source in
-  `packages/omnibias-skills/src/omnibias/skills/_bundled/skills/`); the repo's
-  committed copies are produced by `omnibias-skills install` and drift-checked in
-  CI. Edit the bundle, not the copies.
+- The pip package `omnibias-skills` ships the capability nine, byte-identical
+  to `.cursor/skills`. If you edit one of those nine, copy it into
+  `packages/omnibias-skills/src/omnibias/skills/_bundled/skills/` so
+  `omnibias-skills install --check` stays green.
 
 See the "Agent tooling" section of [AGENTS.md](AGENTS.md) for the full picture.

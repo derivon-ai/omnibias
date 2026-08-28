@@ -52,8 +52,8 @@ ALLOWED = frozenset(
         # synthetic violation its own self-test must detect.
         "packages/omnibias-core/tests/test_lineage_declared.py",
         ".cursor/rules/omnibias.md",
-        ".cursor/skills/omnibias-dev-core-concepts/SKILL.md",
-        ".claude/skills/omnibias-dev-core-concepts/SKILL.md",
+        ".cursor/skills/omnibias-core-concepts/SKILL.md",
+        ".claude/skills/omnibias-core-concepts/SKILL.md",
         # The research tree's honesty spec documents this guard, so it has to
         # name the wordings the guard retires.
         "theory/06-program/02-honesty-and-claim-boundaries.md",
@@ -117,8 +117,8 @@ def test_the_retired_collapse_wordings_are_gone() -> None:
     [
         "docs/theory.md",
         ".cursor/rules/omnibias.md",
-        ".cursor/skills/omnibias-dev-core-concepts/SKILL.md",
-        ".claude/skills/omnibias-dev-core-concepts/SKILL.md",
+        ".cursor/skills/omnibias-core-concepts/SKILL.md",
+        ".claude/skills/omnibias-core-concepts/SKILL.md",
         "AGENTS.md",
     ],
 )
@@ -155,8 +155,8 @@ _SINGLE_HYPERPLANE_AS_BIAS_COLLAPSE = re.compile(
 GEOMETRY_SOURCES = (
     "docs/theory.md",
     "docs/operator-surface.md",
-    ".cursor/skills/omnibias-dev-core-concepts/SKILL.md",
-    ".claude/skills/omnibias-dev-core-concepts/SKILL.md",
+    ".cursor/skills/omnibias-core-concepts/SKILL.md",
+    ".claude/skills/omnibias-core-concepts/SKILL.md",
 )
 
 
@@ -214,8 +214,8 @@ def test_enclosure_collapse_is_named_in_canonical_sources() -> None:
     """The third limit is Enclosure Collapse: width -> 0 of a sound enclosure."""
     for rel in (
         "docs/theory.md",
-        ".cursor/skills/omnibias-dev-core-concepts/SKILL.md",
-        ".claude/skills/omnibias-dev-core-concepts/SKILL.md",
+        ".cursor/skills/omnibias-core-concepts/SKILL.md",
+        ".claude/skills/omnibias-core-concepts/SKILL.md",
         "AGENTS.md",
     ):
         text = (REPO / rel).read_text(encoding="utf-8")

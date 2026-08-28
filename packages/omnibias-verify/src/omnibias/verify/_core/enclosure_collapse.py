@@ -41,6 +41,7 @@ from omnibias.core.verified.kantorovich import (
 )
 from omnibias.core.verified.pde_certificate import (
     LinearPDE,
+    StabilityEstimate,
     adaptive_certified_interior_residual,
     aposteriori_error_certificate,
     certified_interior_residual,
@@ -140,6 +141,7 @@ def squeeze_residual(
     splits: int | Sequence[int] | None = None,
     max_splits: int = 64,
     aposteriori: bool = False,
+    stability: StabilityEstimate | None = None,
 ) -> SqueezeReport:
     """Wrap certified interior residual; adapt splits until a width cap."""
     honesty = _base_honesty()
@@ -159,8 +161,13 @@ def squeeze_residual(
         status: SqueezeStatus = "certified"
         cert: Cert | None = None
         if aposteriori:
+            if stability is None:
+                raise ValueError(
+                    "aposteriori=True requires a provenance-carrying "
+                    "StabilityEstimate"
+                )
             result = aposteriori_error_certificate(
-                typed_layers, domain, pde, splits=splits
+                typed_layers, domain, pde, splits=splits, stability=stability
             )
             inner = result
             width = result.interior_residual
@@ -173,7 +180,7 @@ def squeeze_residual(
     if until == "ulps" and target is None:
         target = 8.0 * math.ulp(1.0)
     initial = 1 if splits is None else splits
-    if isinstance(initial, Sequence) and not isinstance(initial, (str, bytes)):
+    if isinstance(initial, Sequence) and not isinstance(initial, str | bytes):
         start: int | Sequence[int] = initial
     else:
         start = int(initial)

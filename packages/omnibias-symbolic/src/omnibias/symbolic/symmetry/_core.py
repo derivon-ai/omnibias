@@ -20,12 +20,16 @@ import cmath
 import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Literal
 
 import numpy as np
 from numpy.typing import NDArray
+from omnibias.core.collapse.rank import rank_collapse
+from omnibias.core.proof.lift import as_fraction
 
 FloatArray = NDArray[np.float64]
+ExactVerdict = Literal["PROVED", "DISPROVED", "BLOCKED"]
 DISCLAIMER = "point symmetries in the declared ansatz only; not a blow-up or regularity proof"
 
 
@@ -34,6 +38,9 @@ def honesty_payload() -> dict[str, object]:
         "point_symmetries_only": True,
         "ansatz_bounds_search": True,
         "rank_threshold_reported": True,
+        "float_svd_is_proposer": True,
+        "exact_rank_accept_required": True,
+        "exact_rank_scope": "bounded-denominator snapped finite determining matrix",
         "founding_bias_collapse": True,
         "temperature_collapse": False,
         "ns_regularity": False,
@@ -107,6 +114,64 @@ class ConservedCurrent:
 
 
 @dataclass(frozen=True)
+class ExactSymmetryReport:
+    """Exact rank result for a snapped finite determining matrix.
+
+    The float SVD proposes a dimension.  This report accepts or rejects that
+    proposal only for the explicitly recorded bounded-denominator rational
+    matrix.  It is not a proof that the sampled float jets, or a PDE away from
+    the declared samples, satisfy the exact relation.
+    """
+
+    verdict: ExactVerdict
+    kernel: tuple[tuple[int, ...], ...]
+    denom_bound: int
+    max_snap_error: float | None
+    row_denominators: tuple[int, ...]
+    max_abs_integer: int | None
+    detail: str
+
+    @property
+    def algebra_dim(self) -> int:
+        """Dimension of the exact kernel of the snapped matrix."""
+        return len(self.kernel)
+
+    @property
+    def proved(self) -> bool:
+        return self.verdict == "PROVED"
+
+    @property
+    def disproved(self) -> bool:
+        return self.verdict == "DISPROVED"
+
+    @property
+    def blocked(self) -> bool:
+        return self.verdict == "BLOCKED"
+
+    def accepts_dimension(self, proposed_dim: int) -> bool:
+        """Whether this finite exact check accepts an SVD rank proposal."""
+        if proposed_dim < 0:
+            raise ValueError("proposed_dim must be non-negative")
+        if proposed_dim == 0:
+            return self.disproved
+        return self.proved and self.algebra_dim == proposed_dim
+
+    def to_payload(self) -> dict[str, object]:
+        """JSON-ready finite-matrix evidence, including snap provenance."""
+        return {
+            "verdict": self.verdict,
+            "algebra_dim": self.algebra_dim,
+            "kernel": [list(vector) for vector in self.kernel],
+            "denom_bound": self.denom_bound,
+            "max_snap_error": self.max_snap_error,
+            "row_denominators": list(self.row_denominators),
+            "max_abs_integer": self.max_abs_integer,
+            "detail": self.detail,
+            "scope": "bounded-denominator snapped finite determining matrix",
+        }
+
+
+@dataclass(frozen=True)
 class SymmetryResult:
     generators: tuple[Generator, ...]
     singular_values: tuple[float, ...]
@@ -117,6 +182,8 @@ class SymmetryResult:
     infinite_in_ansatz: bool
     ambiguous: bool
     verified: bool
+    float_verified: bool = False
+    exact: ExactSymmetryReport | None = None
     disclaimer: str = DISCLAIMER
 
 
@@ -189,15 +256,14 @@ def _dxxx_q(gen: Generator, s: Sample) -> float:
     """Complex-step ``D_x`` of the closed-form ``D_x D_x Q``."""
     h = 1e-20
 
-    def dxx_at(xx: float) -> complex:
-        bumped = Sample(s.x + xx, s.t, s.u, s.ux, s.ut, s.uxx, s.uxt, s.utt, s.uxxx, s.uxxt, s.uxtt, s.uttt)
-        return _dxx_q(gen, bumped)
-
     # D_x acts on the x-jet chain: bump each coordinate that D_x hits.
     def bump(key: str, step: complex) -> Sample:
         kw = s.__dict__.copy()
         kw[key] = kw[key] + step
         return Sample(**kw)
+
+    def dxx_at(step: complex) -> complex:
+        return _dxx_q(gen, bump("x", step))
 
     acc = (dxx_at(1j * h) - dxx_at(0.0)).imag / h
     for key, chain in (
@@ -331,21 +397,31 @@ def _restrict_negative(s: Sample) -> Sample:
 
 
 def designed_samples(n: int = 24, *, seed: int = 0) -> tuple[Sample, ...]:
-    """Chebyshev-like grid plus a few interior points. Not a random cloud."""
-    rng = np.random.default_rng(seed)
-    nodes = np.cos(np.pi * (np.arange(n) + 0.5) / n)
+    """Deterministic dyadic sample stencil for float proposal and Q acceptance.
+
+    Every coordinate is a dyadic rational.  The determining equations in this
+    module use only rational arithmetic, so their float evaluations can be
+    reconstructed exactly by the bounded-denominator acceptance gate.  ``seed``
+    rotates the finite stencil; it does not turn it into an untracked random
+    cloud.
+    """
+    if n < 1:
+        raise ValueError("n must be positive")
     out: list[Sample] = []
-    for i, z in enumerate(nodes):
-        x = float(z)
-        t = float(nodes[(i * 3) % n] * 0.5)
-        u = float(nodes[(i * 5) % n])
-        ux = float(nodes[(i * 7) % n])
-        uxx = float(nodes[(i * 11) % n] * 0.5)
-        uxt = float(rng.uniform(-0.4, 0.4))
-        utt = float(rng.uniform(-0.4, 0.4))
-        uxxx = float(nodes[(i * 13) % n] * 0.3)
-        uxxt = float(rng.uniform(-0.3, 0.3))
-        out.append(Sample(x, t, u, ux, 0.0, uxx, uxt, utt, uxxx, uxxt, 0.0, 0.0))
+    for i in range(n):
+        index = i + 17 * seed
+        x = float(((index * 1) % 7 - 3) / 4)
+        t = float(((index * 3) % 9 - 4) / 8)
+        u = float(((index * 5) % 11 - 5) / 8)
+        ux = float(((index * 7) % 13 - 6) / 8)
+        uxx = float(((index * 11) % 15 - 7) / 8)
+        uxt = float(((index * 13) % 17 - 8) / 8)
+        utt = float(((index * 17) % 19 - 9) / 8)
+        uxxx = float(((index * 19) % 21 - 10) / 8)
+        uxxt = float(((index * 23) % 23 - 11) / 8)
+        uxtt = float(((index * 29) % 25 - 12) / 8)
+        uttt = float(((index * 31) % 27 - 13) / 8)
+        out.append(Sample(x, t, u, ux, 0.0, uxx, uxt, utt, uxxx, uxxt, uxtt, uttt))
     return tuple(out)
 
 
@@ -371,6 +447,80 @@ def determining_matrix(
         s = restrict(raw)
         rows.append([float(pr(g, s)) for g in basis.generators])
     return np.asarray(rows, dtype=np.float64)
+
+
+def exact_symmetry_report(
+    matrix: Sequence[Sequence[float]],
+    *,
+    denom_bound: int = 1_000_000,
+) -> ExactSymmetryReport:
+    """Snap, integerize, and exactly adjudicate one finite determining matrix.
+
+    Each float entry is snapped with :func:`as_fraction` at ``denom_bound``.
+    Denominators are cleared independently per row, which preserves the
+    nullspace while avoiding an unnecessary global common denominator.  The
+    resulting integer matrix is accepted by :func:`rank_collapse`.
+
+    A failure to construct this finite rational presentation returns
+    ``BLOCKED`` rather than treating a float SVD as proof.
+    """
+    if denom_bound < 1:
+        raise ValueError("denom_bound must be positive")
+    try:
+        rows = list(matrix)
+        if not rows:
+            raise ValueError("matrix must be non-empty")
+        width: int | None = None
+        integer_rows: list[list[int]] = []
+        row_denominators: list[int] = []
+        max_snap_error = 0.0
+        for row in rows:
+            values = list(row)
+            if not values:
+                raise ValueError("matrix rows must be non-empty")
+            if width is None:
+                width = len(values)
+            elif len(values) != width:
+                raise ValueError("matrix rows must share a width")
+            fractions: list[Fraction] = []
+            for value in values:
+                original = float(value)
+                if not math.isfinite(original):
+                    raise ValueError("matrix entries must be finite")
+                snapped = as_fraction(original, denom_bound=denom_bound)
+                fractions.append(snapped)
+                max_snap_error = max(max_snap_error, abs(original - float(snapped)))
+            denominator = 1
+            for fraction in fractions:
+                denominator = math.lcm(denominator, fraction.denominator)
+            integers = [int(value * denominator) for value in fractions]
+            common = 0
+            for value in integers:
+                common = math.gcd(common, abs(value))
+            if common > 1:
+                integers = [value // common for value in integers]
+            integer_rows.append(integers)
+            row_denominators.append(denominator)
+        rank = rank_collapse(integer_rows)
+    except (OverflowError, TypeError, ValueError, ZeroDivisionError) as exc:
+        return ExactSymmetryReport(
+            verdict="BLOCKED",
+            kernel=(),
+            denom_bound=denom_bound,
+            max_snap_error=None,
+            row_denominators=(),
+            max_abs_integer=None,
+            detail=f"could not construct an exact snapped matrix: {exc}",
+        )
+    return ExactSymmetryReport(
+        verdict=rank.verdict.status,
+        kernel=rank.kernel,
+        denom_bound=denom_bound,
+        max_snap_error=max_snap_error,
+        row_denominators=tuple(row_denominators),
+        max_abs_integer=max(abs(value) for row in integer_rows for value in row),
+        detail=rank.verdict.detail,
+    )
 
 
 def _svd_dim(svals: FloatArray, threshold: float) -> tuple[int, float, bool]:
@@ -412,11 +562,18 @@ def discover_symmetries(
     _, _, vt = np.linalg.svd(mat, full_matrices=True)
     gens: list[Generator] = []
     scale = max(1.0, float(np.linalg.norm(mat)))
-    for row in vt[-dim:] if dim else []:
-        if float(np.linalg.norm(mat @ row)) > 1e-8 * scale:
-            continue
-        gens.append(_combine(basis, row))
-    verified = all(float(np.linalg.norm(mat @ _coeff_of(g, basis))) <= 1e-8 * scale for g in gens)
+    if dim:
+        for row in vt[-dim:]:
+            if float(np.linalg.norm(mat @ row)) > 1e-8 * scale:
+                continue
+            gens.append(_combine(basis, row))
+    float_verified = all(
+        float(np.linalg.norm(mat @ _coeff_of(g, basis))) <= 1e-8 * scale for g in gens
+    )
+    exact = exact_symmetry_report(mat.tolist())
+    # The SVD is a proposer.  ``verified`` names only agreement with the exact
+    # bounded-denominator finite-matrix check, never a float residual.
+    verified = exact.accepts_dimension(int(dim))
     infinite = dim >= basis.n_coeff - 1
     return SymmetryResult(
         tuple(gens),
@@ -428,6 +585,8 @@ def discover_symmetries(
         infinite,
         amb and sep < 1e6,
         verified,
+        float_verified,
+        exact,
     )
 
 
@@ -642,6 +801,7 @@ def heat_known_coeffs() -> FloatArray:
 __all__ = [
     "ConservedCurrent",
     "DISCLAIMER",
+    "ExactSymmetryReport",
     "Generator",
     "LinearPoly",
     "PDESpec",
@@ -657,6 +817,7 @@ __all__ = [
     "eta_x",
     "eta_xx",
     "eta_xxx",
+    "exact_symmetry_report",
     "heat_exact_samples",
     "heat_fd_samples",
     "heat_known_coeffs",

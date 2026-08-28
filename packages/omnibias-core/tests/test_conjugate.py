@@ -188,10 +188,10 @@ def test_velocity_u_prime_is_h_omega_and_u0_zero() -> None:
     import math as _math
 
     from omnibias.core.conjugate import (
+        HardyAtom,
         hardy_omega_hilbert_atom,
         hardy_omega_velocity_atom,
         is_spatial_odd,
-        HardyAtom,
     )
 
     a, alpha = 1.1, 0.7
@@ -218,6 +218,8 @@ def test_interval_velocity_contains_float() -> None:
     from omnibias.core.conjugate import hardy_omega_velocity_atom as u_float
     from omnibias.core.verified.hardy_line import (
         hardy_omega_velocity_atom as u_iv,
+    )
+    from omnibias.core.verified.hardy_line import (
         hardy_omega_velocity_atom_iv,
     )
 

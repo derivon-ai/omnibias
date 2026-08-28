@@ -16,7 +16,7 @@ stretch. Bias collapse (``delta -> 0``) supplies the tower.
 from __future__ import annotations
 
 from collections.abc import Callable, Sequence
-from typing import NamedTuple, cast
+from typing import Any, NamedTuple, cast
 
 from omnibias.core.local_jet import (
     LocalJetConfig,
@@ -113,7 +113,7 @@ def _prepare_x(x: Array, d_in: int) -> Array:
     return x_t
 
 
-def _default_directions(d_in: int, k: int, *, dtype: jnp.dtype) -> Array:
+def _default_directions(d_in: int, k: int, *, dtype: jnp.dtype[Any]) -> Array:
     eye = jnp.eye(d_in, dtype=dtype)
     return jnp.stack([eye[i % d_in] for i in range(k)], axis=0)
 

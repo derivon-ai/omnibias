@@ -26,7 +26,6 @@ from omnibias.geometry.gauge._core.ensemble_language import (
     LatticeMetadata,
     refuse_single_config_as_ensemble,
 )
-from omnibias.geometry.gauge.lattice._core.stats import ensemble_mean_jackknife
 from omnibias.geometry.gauge.lattice._core.kernels import (
     algebra_from_links,
     gauge_transform_links,
@@ -36,6 +35,7 @@ from omnibias.geometry.gauge.lattice._core.kernels import (
     quat_mul,
     quat_power,
 )
+from omnibias.geometry.gauge.lattice._core.stats import ensemble_mean_jackknife
 
 LANDAU_RESIDUAL_ATOL = 1e-3
 LANDAU_ORBIT_ATOL = 1e-4

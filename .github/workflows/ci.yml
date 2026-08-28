@@ -153,6 +153,7 @@ jobs:
           python -m venv .venv-core
           source .venv-core/bin/activate
           pip install --upgrade pip
+          pip install numpy
           pip install -e packages/omnibias-core[test]
       - name: Run pure-Python tests (coverage floor)
         run: |
@@ -165,7 +166,6 @@ jobs:
       - name: Run equality-locus smoke (01-09 G1–G5)
         run: |
           source .venv-core/bin/activate
-          pip install numpy
           python benchmarks/equality_locus.py
       - name: Run OMBU-frames smoke (01-06 G1–G3; G4 not all_passed)
         run: |
@@ -299,12 +299,12 @@ jobs:
           pip install -e "packages/omnibias-discrete[test]"
           pip install -e "packages/omnibias-shape[test]"
           pip install -e packages/omnibias-difference
+          pip install -e packages/omnibias-partition
           pip install -e packages/omnibias-symbolic
           pip install -e packages/omnibias-pinn
           pip install -e "packages/omnibias-sos[test]"
           pip install -e packages/omnibias-verify
           pip install -e "packages/omnibias-score[torch,jax]"
-          pip install -e packages/omnibias-partition
           pip install -e "packages/omnibias-geometry[atlas]"
           pip install -e packages/omnibias-qcalculus
           pip install -e packages/omnibias-holonomic
@@ -430,6 +430,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/jet_vs_nested_ad.py
+      - name: Run certified jet-width smoke
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/jet_width_vs_order.py
       - name: Run singularity-tracking smoke (03-10 G1–G6)
         run: |
           source .venv-cross/bin/activate
@@ -1029,6 +1033,7 @@ jobs:
           # gracefully if any is absent, but CI exercises the full program.
           pip install -e packages/omnibias-dynamics
           pip install -e packages/omnibias-verify
+          pip install -e packages/omnibias-partition
           pip install -e packages/omnibias-symbolic
       - name: Run difference tests
         run: |
@@ -1137,6 +1142,8 @@ jobs:
           pip install --upgrade pip
           pip install -e packages/omnibias-core
           pip install -e packages/omnibias-difference
+          pip install -e packages/omnibias-qcalculus
+          pip install -e packages/omnibias-partition
           pip install -e packages/omnibias-symbolic
           pip install -e "packages/omnibias-holonomic[test]"
       - name: Run holonomic tests
@@ -1201,10 +1208,11 @@ jobs:
         run: |
           source .venv-skills/bin/activate
           python -m pytest packages/omnibias-skills/tests -q
-      - name: Skill drift checks (consumer bundle + maintainer mirror)
+      - name: Skill catalog and drift checks
         run: |
           source .venv-skills/bin/activate
           omnibias-skills install --check --tool all --dest .
+          python scripts/check_package_skills.py
           python scripts/sync_skills.py --check
 
   formal:
@@ -1437,6 +1445,8 @@ jobs:
           pip install -e packages/omnibias-pinn
           pip install -e "packages/omnibias-qpinn[torch,jax]"
           pip install -e "packages/omnibias-geometry[torch,jax]"
+          pip install -e packages/omnibias-difference
+          pip install -e packages/omnibias-partition
           pip install -e packages/omnibias-symbolic
           pip install pytest scipy
       - name: Run Yang-Mills certified-evidence tests (gauge + qpinn + symbolic twin)
@@ -1581,12 +1591,33 @@ jobs:
           pip install -e packages/omnibias-fields
           pip install -e packages/omnibias-geometry
           pip install -e packages/omnibias-variational
+          pip install -e packages/omnibias-difference
           pip install -e packages/omnibias-verify
-          pip install -e "packages/omnibias-control[torch,jax,test]"
+          pip install -e packages/omnibias-dynamics
+          pip install -e packages/omnibias-partition
+          pip install -e packages/omnibias-measure
+          pip install -e packages/omnibias-pinn
+          pip install -e "packages/omnibias-control[torch,jax,dynamics,pinn,test]"
       - name: Run control tests
         run: |
           source .venv-control/bin/activate
           python -m pytest packages/omnibias-control/tests -q
+      - name: Run adjoint exactness smoke (10-02 G1/G2/G9)
+        run: |
+          source .venv-control/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/adjoint_exactness.py
+      - name: Run actor-adjoint control smoke (10-02 G3; G4 diagnostic)
+        run: |
+          source .venv-control/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/actor_adjoint_control.py
+      - name: Run certified horizon smoke (10-03 G5)
+        run: |
+          source .venv-control/bin/activate
+          python benchmarks/certified_horizon.py
+      - name: Run gradient-bias enclosure smoke (10-03 G6)
+        run: |
+          source .venv-control/bin/activate
+          python benchmarks/gradient_bias_enclosure.py
 
   routing:
     name: omnibias-routing (alpha)
@@ -1712,7 +1743,7 @@ jobs:
           pip install -e packages/omnibias-discrete
           pip install -e packages/omnibias-struct
           pip install -e "packages/omnibias-partition[torch,jax]"
-          pip install -e "packages/omnibias-tab[torch,jax,verify,curvature,gbm,test]"
+          pip install -e "packages/omnibias-tab[torch,jax,verify,curvature,gbm,catboost,test]"
           pip install keras
           pip install equinox
       - name: Run tab tests
@@ -1760,6 +1791,18 @@ jobs:
         run: |
           source .venv-tab/bin/activate
           JAX_PLATFORMS=cpu python benchmarks/sequence_transverse.py
+      - name: Noise-aware tabular training smoke (05-03 G0-G5 wiring)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/tabular_uncertainty.py
+      - name: TabPOU architecture smoke (05-04 G0/G5 wiring)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/tabular_pou.py
+      - name: TabPOU joint-worlds smoke (05-05 H0/H1/G5 wiring)
+        run: |
+          source .venv-tab/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/tabular_pou_joint.py
 
   partition:
     name: omnibias-partition (alpha)
@@ -2128,7 +2171,9 @@ jobs:
           pip install --index-url https://download.pytorch.org/whl/cpu torch
           pip install keras
           pip install "mkdocs-material>=9.5" "mkdocstrings[python]>=0.24" pytest
-          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational symbolic binary boolean verify dynamics difference qcalculus timescale holonomic spiking hopfield graph shape formal sos convex control routing discrete qubo submodular nphard combinatorics logic struct tab partition keras skills; do
+          # The source distributions are not published during CI, so install them
+          # in dependency order rather than asking pip to resolve a later package.
+          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational difference partition symbolic binary boolean verify dynamics qcalculus timescale holonomic spiking struct hopfield graph shape formal sos convex control discrete qubo submodular nphard combinatorics logic routing tab keras skills; do
             pip install -e packages/omnibias-$pkg
           done
       - name: Build docs strict
@@ -2187,7 +2232,9 @@ jobs:
           pip install --upgrade pip
           pip install --index-url https://download.pytorch.org/whl/cpu torch
           pip install keras pytest
-          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational symbolic binary boolean verify dynamics difference qcalculus timescale holonomic spiking hopfield graph shape formal sos convex control routing discrete qubo submodular nphard combinatorics logic struct tab partition keras skills; do
+          # The source distributions are not published during CI, so install them
+          # in dependency order rather than asking pip to resolve a later package.
+          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational difference partition symbolic binary boolean verify dynamics qcalculus timescale holonomic spiking struct hopfield graph shape formal sos convex control discrete qubo submodular nphard combinatorics logic routing tab keras skills; do
             pip install -e packages/omnibias-$pkg
           done
       # The default `-m 'not slow'` from pyproject excludes the documents that
@@ -2233,7 +2280,9 @@ jobs:
           pip install --upgrade pip
           pip install --index-url https://download.pytorch.org/whl/cpu torch
           pip install keras matplotlib scipy pandas nbconvert ipykernel
-          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational symbolic binary boolean verify dynamics difference qcalculus timescale holonomic spiking hopfield graph shape formal sos convex control routing discrete qubo submodular nphard combinatorics logic struct tab partition keras skills; do
+          # The source distributions are not published during CI, so install them
+          # in dependency order rather than asking pip to resolve a later package.
+          for pkg in core torch jax ferminet fields pinn qpinn curvature geometry fractional measure score variational difference partition symbolic binary boolean verify dynamics qcalculus timescale holonomic spiking struct hopfield graph shape formal sos convex control discrete qubo submodular nphard combinatorics logic routing tab keras skills; do
             pip install -e packages/omnibias-$pkg
           done
           # Name the kernel explicitly: a notebook's default `python3` kernelspec

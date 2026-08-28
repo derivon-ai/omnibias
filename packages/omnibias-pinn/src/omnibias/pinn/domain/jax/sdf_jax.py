@@ -73,7 +73,7 @@ def _r_disj_jax(a: Array, b: Array, *, alpha: float = 0.0) -> Array:
 
 
 def from_sdf(sdf: SDF) -> DistanceFn:
-    if isinstance(sdf, (Sphere, Box, Halfspace)):
+    if isinstance(sdf, Sphere | Box | Halfspace):
         return from_primitive(sdf)
     if isinstance(sdf, Negate):
         child = from_sdf(sdf.child)

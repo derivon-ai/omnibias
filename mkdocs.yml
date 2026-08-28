@@ -152,9 +152,11 @@ nav:
   - Packages:
       - Package index (all 42): packages.md
       - omnibias-core: api/core.md
+      - interval arrays and verified linear solves: api/interval_array.md
       - discovery engine: api/discovery.md
       - Proof engine: api/proof_engine.md
       - Inequality engine (09-30): api/inequality.md
+      - Frobenius & Puiseux local series: api/frobenius.md
       - multipack Birkhoff (01-01): api/multipack.md
       - bias scan (01-02): api/scan.md
       - causal transverse filter (05-02 G5): api/sequence.md
@@ -205,6 +207,12 @@ nav:
       # Enclosure Collapse is width -> 0 of a sound enclosure (a point plus a proof).
       - Enclosure Collapse (01-14): api/enclosure_collapse.md
       - Named-collapse schema: api/collapse.md
+      - contour winding: api/contour.md
+      - banded tail-inverse bound & one-sided radii closure: api/banded_tail.md
+      - Laguerre basis: api/laguerre_basis.md
+      - Cohn-Elkies 1-D Hermite bound: api/cohn_elkies.md
+      - de Bruijn-Newman H_t / named Lambda attempt: api/debruijn_newman.md
+      - finite-lattice ground state: api/lattice_ground_state.md
       - certified localization (03-08): api/certified_localization.md
       - differentiable topology (03-09): api/differentiable_topology.md
       - singularity tracking (03-10): api/singularity_tracking.md
@@ -213,6 +221,7 @@ nav:
       - spectral trial spaces (07-05): api/trial_spaces.md
       - SOS adapted bases (07-05): api/sos_adapted_basis.md
       - validated dynamics (07-06): api/validated_dynamics.md
+      - cone-field hyperbolicity: api/cone_field.md
       - domain programs (07-07): api/domain_programs.md
       - FTC-Net / dual-FTC (09-03 / 09-17): api/ftc_net.md
       - jet-token / jet-distill (09-02 / 09-19): api/jet_token.md
@@ -242,17 +251,24 @@ nav:
       - Plant PID layer (09-29): api/plant_pid.md
       - Pack Fisher (04-01): api/pack_fisher.md
       - Inverse imaging (05-01): api/pinn_inverse.md
+      - Noise-aware tabular training (05-03): api/noise_aware_tab.md
+      - TabPOU (05-04 / 05-05): api/tabpou.md
       - Conformal slabs (04-02): api/conformal_slabs.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
       - omnibias-keras: api/keras.md
       - omnibias-ferminet: api/ferminet.md
+      - "ferminet.sampling (QMC)": api/qmc_sampling.md
+      - "ferminet stochastic reconfiguration": api/stochastic_reconfiguration.md
+      - "ferminet antisymmetric Slater / Bloch mixed partials": api/antisymmetric_slater.md
       - omnibias-pinn: api/pinn.md
+      - IPM radii construction / toy CAP: api/ipm_radii.md
       - omnibias-qpinn: api/qpinn.md
       - omnibias-curvature: api/curvature.md
       - omnibias-geometry: api/geometry.md
       - "omnibias.geometry.gauge": api/geometry-gauge.md
+      - volume-uniform strong-coupling family: api/volume_uniform_ym.md
       - omnibias-fractional: api/fractional.md
       - omnibias-measure: api/measure.md
       - omnibias-score: api/score.md
@@ -271,11 +287,15 @@ nav:
       - omnibias-skills: api/skills.md
       - omnibias-formal: api/formal.md
       - omnibias-sos: api/sos.md
+      - NPA moment hierarchy: api/npa.md
+      - combinatorial SOS (clique / CSP): api/combinatorial_sos.md
       - "omnibias.pinn.solver (PDE)": api/pinn-solver.md
       - "omnibias.pinn.operator (DeepONet / FNO)": api/pinn-operator.md
       - "omnibias.pinn.train (causal marching)": api/pinn-train.md
       - "omnibias.pinn.domain (SDF geometry)": api/pinn-domain.md
       - omnibias-control: api/control.md
+      - "omnibias.control adjoint (jet-adjoint policy optimization)": api/adjoint_control.md
+      - Lean replay checker (phase1-lean-replay): api/lean_replay.md
 
       - omnibias-routing: api/routing.md
       - omnibias-discrete: api/discrete.md
@@ -360,6 +380,7 @@ nav:
       - Closed-form convolution: cookbook/closed-form-convolution.md
       - Differentiable + certified LP/QP: cookbook/differentiable-certified-lp.md
       - Certified-safe learned control (CBF-QP): cookbook/certified-safe-control.md
+      - Certified policy gradients (jet-adjoint): cookbook/certified-policy-gradient.md
       - Certified differentiable routing (TSP): cookbook/certified-differentiable-routing.md
       - Differential geometry on the sphere: cookbook/geometry-sphere.md
       - Pullback metric (learned manifolds): cookbook/pullback-learned-manifolds.md

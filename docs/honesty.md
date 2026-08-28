@@ -4,6 +4,10 @@ A result in this repository licenses one sentence. The four rungs are
 strictly stronger and none implies the next. Theory spec 06-02 is the
 source; this page is the public copy. Status is **shipped**.
 
+This register constrains the wording and evidence required for a result; it
+does not constrain target selection. Ambitious targets may be investigated,
+provided the resulting claim stays within the evidence actually earned.
+
 | Rung | Earned by | Licenses | Does not license |
 |---|---|---|---|
 | **1 Empirical** | `gates_block(...)["all_passed"]` on a benchmark | "on this problem, at this size, this method achieved X" | other problems, sizes, or the true value |
@@ -29,6 +33,17 @@ except ValueError as exc:
     raised = "theorem_prover_verified" in str(exc)
 assert raised
 ```
+
+## Certificate conditions
+
+| Condition | What may be reported | What it does not license |
+|---|---|---|
+| `libm_fallback` transcendental stamp | a conditional diagnostic enclosure, with its fallback and ULP inflation stated | a rung-2 sound enclosure or a sealed designated rigorous payload |
+
+`libm_fallback` is retained for non-certificate diagnostics when a rigorous
+transcendental backend is unavailable. `make_certificate` refuses that stamp
+for designated interval, Taylor-model, positive-definite, spectral-gap, and
+PINN a-posteriori-error payloads.
 
 ## Forbidden-claims register
 

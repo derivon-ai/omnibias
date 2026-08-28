@@ -72,6 +72,33 @@ comparison. Builds on `omnibias-difference`'s umbral engine.
       show_root_heading: false
       heading_level: 4
 
+### Rationalize and certify a discovered residual
+
+`rationalize_and_certify_discovery` snaps fitted floats to `Fraction` and
+re-checks a caller-supplied residual with **exact** rational arithmetic. It
+never sets `theorem_prover_verified`. The worked example in the test suite is
+the transport PDE scaling symmetry `x d/dx + t d/dt`.
+
+```python
+from fractions import Fraction
+from omnibias.symbolic.certify import rationalize_and_certify_discovery
+
+def residual_fn(coeffs):
+    c0, c1 = coeffs
+    return [[(c0, Fraction(1)), (c1, Fraction(-1))]]
+
+result = rationalize_and_certify_discovery(
+    [1.0, 1.0], residual_fn, claim="c0 - c1 = 0"
+)
+assert result.certified
+assert all(r == 0 for r in result.residuals)
+```
+
+::: omnibias.symbolic.certify
+    options:
+      show_root_heading: false
+      heading_level: 4
+
 ### Feature libraries (Taylor / Fourier / CDF / information / fractional)
 
 Five fractional column families ship, and they are **not** interchangeable — each

@@ -108,7 +108,7 @@ certifies the emitted obligation and nothing beyond it.
 
 ## Driving the loop
 
-The `omnibias-dev-formal-agent` skill drives the formal loop through one
+The `omnibias-formal-agent` skill drives the formal loop through one
 deterministic helper, `drive_obligation`, which composes the bridge into a single
 actionable pass: `classify_obligation` -> `generate_obligation` -> `lake build`
 (via `check_certificate`) -> a `DriveReport`. The report distils a failing build

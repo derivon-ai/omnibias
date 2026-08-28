@@ -1,0 +1,40 @@
+{
+  "schema": "omnibias.benchmarks.gradient_bias_enclosure.v1",
+  "generated_utc": "2026-08-27T22:00:50Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.13.0+cpu",
+    "folx": "absent"
+  },
+  "config": {
+    "family": "gradient_bias_enclosure",
+    "full": false,
+    "n_trials": 60
+  },
+  "rss_mb_at_start": 344.68,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "gradient_bias_enclosure_coverage",
+        "n": 60,
+        "n_min": 60,
+        "coverage": 1.0,
+        "median_width": 0.02118199517394973,
+        "max_width": 0.1498060861131143,
+        "passed": true
+      }
+    ]
+  },
+  "disclaimer": "sound enclosure of the terminal-substitution policy-gradient bias, conditional on a caller-supplied adjoint-net error model; founding bias collapse, not temperature collapse; not a from-first-principles generalization bound",
+  "median_bound": 0.021181994173949732,
+  "honesty": {
+    "n_min_1000_full_run": false,
+    "note": "the >= 1000-draw acceptance run requires --full; the default smoke uses a reduced n for CI speed. terminal_error_bound is fed the exact perturbation norm in this synthetic sweep -- the case where the caller's error model is exact, not a general claim"
+  },
+  "wall_seconds": 2.2370631396770477
+}

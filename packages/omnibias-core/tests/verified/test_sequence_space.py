@@ -86,6 +86,98 @@ def test_validated_series_product_is_sound_vs_exact() -> None:
         assert Fraction(prod.tail.hi) >= dropped_norm
 
 
+def _chebyshev_product_exact(
+    a: list[Fraction], b: list[Fraction]
+) -> list[Fraction]:
+    """Exact coefficients for the standard ``T_k`` Chebyshev convention."""
+    out = [Fraction(0)] * (len(a) + len(b) - 1)
+    for i, ai in enumerate(a):
+        for j, bj in enumerate(b):
+            term = ai * bj
+            if i == 0:
+                out[j] += term
+            elif j == 0:
+                out[i] += term
+            else:
+                out[i + j] += term / 2
+                out[abs(i - j)] += term / 2
+    return out
+
+
+def test_chebyshev_validated_product_contains_retained_and_tail_modes() -> None:
+    """Chebyshev multiplication must include difference-mode tail folding."""
+    rng = random.Random(4)
+    nu = 1.0
+    for _ in range(100):
+        a_full = [Fraction(rng.randint(-3, 3)) for _ in range(6)]
+        b_full = [Fraction(rng.randint(-3, 3)) for _ in range(5)]
+        a_kept = a_full[:3]
+        b_kept = b_full[:4]
+        a_tail = sum(
+            (1 if k == 0 else 2) * abs(value) * Fraction(nu) ** k
+            for k, value in enumerate(a_full[3:], start=3)
+        )
+        b_tail = sum(
+            (1 if k == 0 else 2) * abs(value) * Fraction(nu) ** k
+            for k, value in enumerate(b_full[4:], start=4)
+        )
+        a = ValidatedSeries.from_coeffs(
+            a_kept, nu, tail=a_tail, chebyshev=True
+        )
+        b = ValidatedSeries.from_coeffs(
+            b_kept, nu, tail=b_tail, chebyshev=True
+        )
+        prod = a * b
+        exact = _chebyshev_product_exact(a_full, b_full)
+
+        for k, value in enumerate(exact[: prod.order + 1]):
+            assert prod.coeffs[k].lo <= value <= prod.coeffs[k].hi
+        dropped_norm = sum(
+            (1 if k == 0 else 2) * abs(value) * Fraction(nu) ** k
+            for k, value in enumerate(exact[prod.order + 1 :], start=prod.order + 1)
+        )
+        assert Fraction(prod.tail.hi) >= dropped_norm
+
+
+def test_chebyshev_validated_series_rejects_nu_below_one() -> None:
+    with pytest.raises(ValueError, match="nu >= 1"):
+        ValidatedSeries.from_coeffs([1.0], 0.9, chebyshev=True)
+
+
+def test_exact_zero_tail_arithmetic_does_not_spuriously_raise() -> None:
+    """Regression: scale/add/mul on an exact-zero tail must never raise.
+
+    ``Interval`` outward rounding makes ``nextafter(0.0, -inf)`` a negative
+    subnormal (not ``0.0``), so combining two exact-zero tails via the raw
+    arithmetic (``self.tail + other.tail``, ``self.tail * Interval.point(mag)``)
+    used to produce a lower bound one ulp below zero, tripping
+    ``ValidatedSeries.__post_init__``'s ``tail.lo < 0.0`` guard on a
+    mathematically valid (exactly zero) tail. ``scale``, ``__add__``, and
+    ``__mul__`` now clamp with the same ``_nonneg`` pattern already used by the
+    two-sided sibling :class:`~omnibias.core.verified.fourier.ValidatedFourierSeries`.
+    """
+    a = ValidatedSeries.from_coeffs([1.0, 2.0], 1.05, tail=0.0)
+    zero = ValidatedSeries.from_coeffs([0.0, 0.0], 1.05, tail=0.0)
+
+    scaled = a.scale(-1.0)
+    assert scaled.tail.lo >= 0.0
+    assert scaled.tail.hi < 1e-300  # still (up to rounding noise) exactly zero
+
+    summed = a + a
+    assert summed.tail.lo >= 0.0
+    assert summed.tail.hi < 1e-300
+    assert [c.mid for c in summed.coeffs] == [2.0, 4.0]
+
+    product = zero * zero
+    assert product.tail.lo >= 0.0
+    assert product.tail.hi < 1e-300
+
+    # A genuinely positive tail must still be preserved (not clamped away).
+    positive_tail = ValidatedSeries.from_coeffs([1.0], 1.05, tail=0.3)
+    doubled = positive_tail.scale(2.0)
+    assert doubled.tail.lo >= 0.6 * (1.0 - 1e-9)
+
+
 def test_banach_algebra_submultiplicative() -> None:
     rng = random.Random(1)
     nu = 1.5

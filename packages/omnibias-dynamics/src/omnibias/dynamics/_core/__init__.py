@@ -10,6 +10,14 @@ QR-Lohner flow and the radii-polynomial / Krawczyk machinery in
 
 from __future__ import annotations
 
+from omnibias.dynamics._core.cone import (
+    ConeHyperbolicityCertificate,
+    cat_map_jacobian,
+    cat_map_unstable_generator,
+    certified_cone_hyperbolicity,
+    doubling_map_jacobian,
+    rotation_jacobian,
+)
 from omnibias.dynamics._core.fields import (
     harmonic_oscillator,
     hopf_normal_form,
@@ -51,6 +59,7 @@ from omnibias.dynamics._core.variational import (
 )
 
 __all__ = [
+    "ConeHyperbolicityCertificate",
     "DiscretePeriodicOrbit",
     "LyapunovBounds",
     "PeriodicOrbitCertificate",
@@ -59,8 +68,12 @@ __all__ = [
     "PoincareSection",
     "VariationalJetRun",
     "VariationalState",
+    "cat_map_jacobian",
+    "cat_map_unstable_generator",
+    "certified_cone_hyperbolicity",
     "certified_lyapunov_exponent",
     "discrete_periodic_point",
+    "doubling_map_jacobian",
     "harmonic_oscillator",
     "hopf_normal_form",
     "linear_system",
@@ -71,6 +84,7 @@ __all__ = [
     "poincare_map_jet",
     "prove_periodic_orbit",
     "radial_logistic",
+    "rotation_jacobian",
     "sigma_oscillator_field",
     "spectral_radius_bound",
     "step_transition_matrix",

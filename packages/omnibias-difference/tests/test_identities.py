@@ -5,7 +5,7 @@
 Each builder turns a finite, rational special-number identity into a sealed
 certificate whose obligation the Mathlib-free Lean kernel discharges via the new
 ``enclosed_quantity_eq`` (equality) lemma or the existing sign lemmas. The honesty
-invariant from ``omnibias-dev-certificate-lean`` is enforced: ``theorem_prover_verified``
+invariant from ``omnibias-certificate-lean`` is enforced: ``theorem_prover_verified``
 is exactly ``lean.verified`` -- earned only by a genuine ``lake build`` pass.
 """
 

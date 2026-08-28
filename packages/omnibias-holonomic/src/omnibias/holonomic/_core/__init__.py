@@ -60,6 +60,14 @@ from omnibias.holonomic._core.petkovsek import (
     hyper,
     term_ratio_annihilates,
 )
+from omnibias.holonomic._core.poly_n import (
+    PolyN,
+    eval_map,
+    identical_jacobian_constant,
+    jacobian_det,
+    q_from_p,
+    sylvester_resultant,
+)
 from omnibias.holonomic._core.qholonomic import (
     QGosperResult,
     QRecurrence,
@@ -68,14 +76,6 @@ from omnibias.holonomic._core.qholonomic import (
     q_gosper_normal_form,
     q_shift_algebra,
     q_zeilberger,
-)
-from omnibias.holonomic._core.poly_n import (
-    PolyN,
-    eval_map,
-    identical_jacobian_constant,
-    jacobian_det,
-    q_from_p,
-    sylvester_resultant,
 )
 from omnibias.holonomic._core.rational_poly import (
     Poly,

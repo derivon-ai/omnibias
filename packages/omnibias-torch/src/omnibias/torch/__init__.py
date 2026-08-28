@@ -94,16 +94,11 @@ from omnibias.torch.information import (
     wasserstein2_gaussian,
     wassersteinp,
 )
-from omnibias.torch.line_search import (
-    JetLineSearchConfig,
-    LineSearchResult,
-    jet_line_search,
-    jet_line_search_on_ray,
-)
 from omnibias.torch.jet import (
     affine_jet,
     antiderivative_jet,
     compose_jet,
+    compose_jet_riccati,
     derivative_jet,
     jet_to_tower,
     layer_jet,
@@ -127,6 +122,12 @@ from omnibias.torch.jet_mv import (
     jet_softmax,
     layer_jet_mv,
     mlp_jet_mv,
+)
+from omnibias.torch.line_search import (
+    JetLineSearchConfig,
+    LineSearchResult,
+    jet_line_search,
+    jet_line_search_on_ray,
 )
 from omnibias.torch.moments import (
     delta_method_gaussian,
@@ -188,6 +189,12 @@ from omnibias.torch.train_local import (
     local_jet_step,
     make_input_jet,
 )
+from omnibias.torch.train_stack import (
+    TrainStackConfig,
+    TrainStackReport,
+    recommended_stack_step,
+    stack_minimize,
+)
 from omnibias.torch.transforms import (
     FourierTransform,
     LaplaceTransform,
@@ -199,12 +206,6 @@ from omnibias.torch.transforms import (
     laplace_transform,
     mellin_transform,
     region_of_convergence,
-)
-from omnibias.torch.train_stack import (
-    TrainStackConfig,
-    TrainStackReport,
-    recommended_stack_step,
-    stack_minimize,
 )
 from omnibias.torch.unit import OperatorMultiBiasUnit
 from omnibias.torch.weight_loss_jet import (
@@ -284,6 +285,7 @@ __all__ = [
     "cmbLinear",
     "compose_jet",
     "compose_jet_mv",
+    "compose_jet_riccati",
     "composed_block_hessian",
     "composed_curvature_step",
     "cross_entropy",

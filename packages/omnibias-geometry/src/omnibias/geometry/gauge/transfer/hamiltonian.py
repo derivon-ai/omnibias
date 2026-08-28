@@ -881,15 +881,15 @@ def candidate_gap(result: HamiltonianGapResult, method: str) -> float:
 
 __all__ = [
     "COUPLING_LOCK",
+    "FOUR_PLAQUETTE_ELECTRIC",
+    "GaugeHamiltonian",
+    "HamiltonianGapResult",
     "LEHMANN_HOLONOMY_METHOD",
     "LEHMANN_STANDARD_METHOD",
     "RESIDUAL_EIGENBASIS_METHOD",
     "RESIDUAL_HOLONOMY_METHOD",
     "RESIDUAL_STANDARD_METHOD",
-    "FOUR_PLAQUETTE_ELECTRIC",
     "THREE_PLAQUETTE_ELECTRIC",
-    "GaugeHamiltonian",
-    "HamiltonianGapResult",
     "candidate_gap",
     "certified_hamiltonian_gap",
     "four_plaquette_basis",

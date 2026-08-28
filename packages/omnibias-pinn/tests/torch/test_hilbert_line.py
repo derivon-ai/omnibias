@@ -21,7 +21,6 @@ from omnibias.pinn.torch.hilbert_line import (  # noqa: E402
     hilbert_wholeline_hp,
 )
 
-
 LAM = 0.6057
 ALPHA = float(alpha_from_lambda(LAM))
 

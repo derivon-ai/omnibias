@@ -21,6 +21,7 @@ from dataclasses import dataclass
 from math import comb
 
 import numpy as np
+from numpy.typing import NDArray
 
 
 @dataclass(frozen=True)
@@ -129,7 +130,7 @@ def _falling_factorial(j: int, n: int) -> float:
     return out
 
 
-def _birkhoff_vandermonde(spec: MultiPackSpec) -> np.ndarray:
+def _birkhoff_vandermonde(spec: MultiPackSpec) -> NDArray[np.float64]:
     r"""Confluent / Birkhoff Vandermonde for the incidence conditions.
 
     One row per selected ``(mean, order)`` pair (row-major over means, then

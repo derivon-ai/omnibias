@@ -6,6 +6,7 @@ from __future__ import annotations
 
 from fractions import Fraction
 
+import pytest
 from omnibias.core.multipack import MultiPackSpec, PackSpec
 from omnibias.core.proof import (
     generate_obligation,
@@ -18,6 +19,7 @@ from omnibias.core.proof import (
 )
 from omnibias.core.proof.certificate import verify_certificate_digest
 from omnibias.core.proof.lean_check import check_certificate
+from omnibias.core.proof.obligations import rational_stencil
 from omnibias.core.proof.obligations.rational_stencil import (
     PAYLOAD_POISEDNESS,
     PAYLOAD_STENCIL,
@@ -198,3 +200,26 @@ def test_malformed_stencil_payload_emits_nothing() -> None:
         honesty={},
     )
     assert generate_obligation(cert) is None
+
+
+def test_seal_report_refuses_obligation_above_integer_cap(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The CI-size cap must reject before constructing a certificate."""
+    obligation = rational_stencil.Obligation(
+        kind=PAYLOAD_STENCIL,
+        payload={"type": PAYLOAD_STENCIL, "conditions": []},
+        holds=True,
+        max_abs_int=rational_stencil._INT_CAP + 1,
+    )
+
+    def should_not_run(**_kwargs: object) -> object:
+        raise AssertionError("make_certificate must not run beyond _INT_CAP")
+
+    monkeypatch.setattr(rational_stencil, "make_certificate", should_not_run)
+    with pytest.raises(ValueError, match=r"integers exceed cap"):
+        rational_stencil._seal_report(
+            obligation,
+            claim="oversized finite rational obligation",
+            run_lean=False,
+        )

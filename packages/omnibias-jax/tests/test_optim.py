@@ -487,3 +487,196 @@ def test_linearized_linf_direction_is_exact_on_one_column() -> None:
     boxed = linearized_linf_direction(jac, res, box=0.1)
     assert abs(float(boxed[0])) <= 0.1 + 1e-12
 
+
+# --- L-infinity (minimax) trainer: beside the Gauss-Newton family above ---
+#
+# Generic comparison utility. Nothing below touches, trains, or reproduces the
+# DeepMind-style CCF/IPM campaign, any champion/ghost network, or a stretch /
+# Rung / whole_line_certified gate; every toy problem is a small synthetic
+# closed-form-verifiable instance.
+
+
+def test_linf_minimax_config_rejects_invalid_hyperparameters() -> None:
+    from omnibias.jax.optim import LinfMinimaxConfig
+
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(steps=0)
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(box0=0.0)
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(box_decrease=1.0)
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(box_increase=0.5)
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(min_box=0.0)
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(max_box=1e-3, min_box=1e-2)
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(irls_iters=0)
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(max_line_search=0)
+    with pytest.raises(ValueError):
+        LinfMinimaxConfig(accept_tol=-1.0)
+
+
+def test_linf_minimax_step_reaches_exact_minimax_in_one_step() -> None:
+    """On a linear residual, one safeguarded step already solves the exact
+    minimax problem -- the same known-exact answer as
+    ``test_linearized_linf_direction_is_exact_on_one_column``, but reached
+    through the safeguarded step (not the raw direction primitive)."""
+    from omnibias.jax.optim import linf_minimax_step
+
+    c = jnp.asarray([1.0, -0.2, 0.4])
+
+    def residual_fn(theta: Array) -> Array:
+        return theta[0] + c
+
+    theta0 = jnp.asarray([0.0])
+    new_theta, new_box, accepted, max_abs = linf_minimax_step(residual_fn, theta0, box=1.0)
+    assert accepted is True
+    assert float(new_theta[0]) == pytest.approx(-0.4, abs=1e-8)
+    assert max_abs == pytest.approx(0.6, abs=1e-8)
+    assert new_box == pytest.approx(1.5, abs=1e-8)  # box_increase=1.5 on acceptance
+
+
+def test_linf_minimax_minimize_reaches_exact_minimax_on_toy_problem() -> None:
+    from omnibias.jax.optim import LinfMinimaxConfig, linf_minimax_minimize
+
+    c = jnp.asarray([1.0, -0.2, 0.4])
+
+    def residual_fn(theta: Array) -> Array:
+        return theta[0] + c
+
+    theta0 = jnp.asarray([0.0])
+    theta1, history = linf_minimax_minimize(
+        residual_fn, theta0, config=LinfMinimaxConfig(steps=5, box0=1.0)
+    )
+    assert float(theta1[0]) == pytest.approx(-0.4, abs=1e-8)
+    assert float(history[-1]) == pytest.approx(0.6, abs=1e-8)
+    # The safeguard makes the recorded max|r| history non-increasing.
+    assert all(
+        float(history[i + 1]) <= float(history[i]) + 1e-12 for i in range(len(history) - 1)
+    )
+
+
+def test_linf_minimax_step_rejects_a_true_maxr_increasing_step() -> None:
+    """A large, unsafeguarded linearized step on a strongly nonlinear residual
+    would increase the true ``max|r|``; the step function must reject it."""
+    from omnibias.jax.optim import linearized_linf_direction, linf_minimax_step
+
+    def residual_fn(theta: Array) -> Array:
+        f = jnp.sin(3.0 * theta[0])
+        return jnp.asarray([f - 0.90, f - 0.95])
+
+    theta_bad = jnp.asarray([0.5])
+    res0 = residual_fn(theta_bad)
+    max0 = float(jnp.max(jnp.abs(res0)))
+
+    # Show the *unsafeguarded* linearized direction really would increase max|r|,
+    # so the rejection below is not vacuous.
+    jac = jax.jacfwd(residual_fn)(theta_bad)
+    raw_delta = linearized_linf_direction(jac, res0, box=1.0)
+    raw_candidate = theta_bad + raw_delta
+    raw_max = float(jnp.max(jnp.abs(residual_fn(raw_candidate))))
+    assert raw_max > max0 + 1e-9, "toy problem must exhibit true linearization mismatch"
+
+    # A single try (no chance to shrink the box) must reject and leave params unchanged.
+    new_theta, new_box, accepted, max_abs = linf_minimax_step(
+        residual_fn, theta_bad, box=1.0, max_line_search=1
+    )
+    assert accepted is False
+    assert bool(jnp.array_equal(new_theta, theta_bad))
+    assert max_abs == pytest.approx(max0, abs=1e-12)
+    assert new_box < 1.0  # box_decrease shrinks it even on a rejected try
+
+    # Given retries, the safeguard finds a smaller, genuinely improving step.
+    new_theta2, _new_box2, accepted2, max_abs2 = linf_minimax_step(
+        residual_fn, theta_bad, box=1.0, max_line_search=20
+    )
+    assert accepted2 is True
+    assert max_abs2 < max0
+
+
+# Fixed, named toy problem: 4 inliers at 0.1, 1 outlier at 0.9, fit through a
+# sigmoid link. The L2 (Gauss-Newton) and L-infinity (minimax) optima are
+# genuinely different closed-form points:
+#   L2:  sigma(theta*) = 0.26  (solves 4(s-0.1) + (s-0.9) = 0)  -> max|r| = 0.64
+#   Linf: sigma(theta*) = 0.50  (the midrange of {0.1, 0.9})    -> max|r| = 0.40
+_TOY_OUTLIER_TARGETS = jnp.asarray([0.1, 0.1, 0.1, 0.1, 0.9])
+_TOY_SEED_THETA0 = jnp.asarray([0.0])  # deterministic; no randomness in this toy problem
+_TOY_GN_STEPS = 50
+_TOY_LINF_STEPS = 50
+_TOY_GN_MAXR_GATE = 0.60  # GN must settle at max|r| >= this (true optimum is 0.64)
+_TOY_LINF_MAXR_GATE = 0.45  # Linf must settle at max|r| <= this (true optimum is 0.40)
+
+
+def _toy_outlier_residual(theta: Array) -> Array:
+    return jax.nn.sigmoid(theta[0]) - _TOY_OUTLIER_TARGETS
+
+
+def test_gn_vs_linf_disagree_on_outlier_heavy_toy_problem() -> None:
+    """Fixed, deterministic, CPU-cheap regression: on a toy problem with a
+    single outlier-heavy residual component, the L-infinity trainer reaches a
+    strictly lower true max|r| than the existing Gauss-Newton (L2) trainer,
+    under a fixed configuration (no seed search, no tuning against a live
+    run). This is a generic comparison, not a campaign result: the toy
+    residual is a 5-point sigmoid fit, unrelated to any champion network."""
+    from omnibias.jax.optim import (
+        LinfMinimaxConfig,
+        MartensGrosseGNConfig,
+        linf_minimax_minimize,
+        martens_grosse_gauss_newton_minimize,
+    )
+
+    theta_gn, _losses_gn = martens_grosse_gauss_newton_minimize(
+        _toy_outlier_residual,
+        _TOY_SEED_THETA0,
+        config=MartensGrosseGNConfig(steps=_TOY_GN_STEPS, damping=1e-3, solver="qr"),
+    )
+    maxr_gn = float(jnp.max(jnp.abs(_toy_outlier_residual(theta_gn))))
+
+    theta_linf, history_linf = linf_minimax_minimize(
+        _toy_outlier_residual,
+        _TOY_SEED_THETA0,
+        config=LinfMinimaxConfig(steps=_TOY_LINF_STEPS, box0=1.0),
+    )
+    maxr_linf = float(history_linf[-1])
+
+    # Named absolute gates (literal constants, fixed ahead of time -- see the
+    # closed-form optima recorded above the fixture).
+    assert maxr_gn >= _TOY_GN_MAXR_GATE, f"GN max|r|={maxr_gn} below expected L2 basin"
+    assert maxr_linf <= _TOY_LINF_MAXR_GATE, f"Linf max|r|={maxr_linf} above expected gate"
+    # The headline comparison this test exists to make.
+    assert maxr_linf < maxr_gn, (
+        f"Linf trainer (max|r|={maxr_linf}) must beat GN (max|r|={maxr_gn}) "
+        "on this outlier-heavy toy problem"
+    )
+    # Sanity: the two trainers land on genuinely different optima (not a tie).
+    assert abs(float(theta_gn[0]) - float(theta_linf[0])) > 0.5
+
+
+def test_martens_grosse_gauss_newton_minimize_unaffected_by_linf_addition() -> None:
+    """The pre-existing GN trainer's behavior on its own regression fixture is
+    unchanged by adding the L-infinity sibling (same numbers as
+    ``test_martens_grosse_gauss_newton_minimize_recovers_nonlinear_ls``)."""
+    from omnibias.jax.optim import (
+        MartensGrosseGNConfig,
+        martens_grosse_gauss_newton_minimize,
+    )
+
+    t = jnp.linspace(0.0, 1.0, 24)
+    true = jnp.array([2.0, -0.7])
+    y = true[0] * jnp.exp(true[1] * t)
+
+    def residual_fn(p: Array) -> Array:
+        return p[0] * jnp.exp(p[1] * t) - y
+
+    p0 = jnp.array([1.0, 0.0])
+    p1, hist = martens_grosse_gauss_newton_minimize(
+        residual_fn,
+        p0,
+        config=MartensGrosseGNConfig(steps=40, damping=1e-3, solver="qr"),
+    )
+    assert float(hist[-1]) < 1e-16
+    assert jnp.allclose(p1, true, atol=1e-6)
+

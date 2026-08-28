@@ -8,7 +8,7 @@ Run:
     python docs/examples/difference_validate.py
 
 Each *probe* turns a tier capability into an instrumented experiment under the
-``omnibias-dev-empirical-validation`` gates -- grid-and-random enclosure
+``omnibias-empirical-validation`` gates -- grid-and-random enclosure
 soundness, an mpmath high-precision oracle, and a best-in-class comparison
 against a named baseline -- and records the gaps / flaws / bugs it exposes into a
 shared :class:`~omnibias.difference.validation.FindingsLedger`. The ledger JSON

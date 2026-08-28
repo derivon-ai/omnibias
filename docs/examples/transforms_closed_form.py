@@ -22,7 +22,7 @@ decaying exponential). This script prints the reason attached to each refusal,
 because a kernel that silently returns the wrong object is worse than one that
 is absent.
 
-Gates exercised, in the ``omnibias-dev-empirical-validation`` sense:
+Gates exercised, in the ``omnibias-empirical-validation`` sense:
 
 * **analytic oracle** -- the two self-reciprocal profiles, Gaussian -> Gaussian
   and sech -> sech, reproduced to machine epsilon;

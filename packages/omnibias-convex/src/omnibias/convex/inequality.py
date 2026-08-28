@@ -50,7 +50,7 @@ def _matrix(raw: object) -> tuple[tuple[Fraction, ...], ...]:
 
 
 def _vector(raw: object) -> tuple[Fraction, ...]:
-    if not isinstance(raw, Sequence) or isinstance(raw, (str, bytes)):
+    if not isinstance(raw, Sequence) or isinstance(raw, str | bytes):
         return ()
     return tuple(_as_frac(item) for item in raw)
 

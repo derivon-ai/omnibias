@@ -46,6 +46,11 @@ dependencies = [
 [project.optional-dependencies]
 test = ["pytest>=7.0"]
 folx = ["folx>=0.1"]
+# omnibias.ferminet.stochastic_reconfiguration composes the sampling
+# substrate (this package) with the generic natural-gradient solve in
+# omnibias-curvature; kept optional so the stable core (`omnibias-ferminet`
+# on its own) never gains a hard dependency on an alpha extension package.
+curvature = ["omnibias-curvature>=0.1.0a1"]
 
 [project.urls]
 Homepage = "https://github.com/derivon-ai/omnibias"

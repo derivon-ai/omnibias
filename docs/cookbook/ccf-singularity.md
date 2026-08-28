@@ -297,7 +297,12 @@ MSNN is ineffective above that basin.
   `integral`). `omnibias.pinn.jax.discovery.ccf_hat_homotopy` is a
   signed-hat prototype (nodal init + frozen-velocity Picard + coupling
   homotopy) with hard gauge inside the Jacobian. A clustered-origin run
-  measured official-path `max|r| = 7.840e-3` (11-node cubic
+  measured official-path `max|r| = 7.660e-3` (second-stage
+  even Lorentz on the prior `7.679e-3` Lorentz /
+  `7.704e-3` sech² /
+  `7.755e-3` / `7.764e-3` / `7.774e-3` / `7.782e-3` / `7.801e-3` sech² /
+  `7.813e-3` additive compact \(C^\infty\) /
+  `7.840e-3` Gaussian-bump stack; 11-node cubic
   Hermite plus frozen dual even Chebyshev-arctan, Gaussian /
   sech / compact-C¹ / rat4 / Laplace pads, then linearized L∞
   Newton on `s=0.8`, `s=0.15`, `s=3.5`, `s=0.08`, `s=0.30`,
@@ -339,10 +344,207 @@ MSNN is ineffective above that basin.
   Dawson \(y\,\mathrm{dawsn}(y/s)\), and PirateNet
   embedding `Δbe` and even
   \(\tanh(\sinh(y/s))^2\) (Hilbert-quadratic ray
-  `s=0` on both) did not
-  promote; sinc realized `~7.0e-7`),
+  `s=0` on both), and even Fresnel–Gauss
+  (realized `~4e-11`), and even
+  \(\mathrm{erfc}((y/s)^2)\) (realized `~6e-11`), and even
+  Yukawa \(e^{-\sqrt{s^2+y^2}}\) (realized `~1e-11`;
+  frozen-U Picard `s=0`), and even spherical
+  \(j_1(y/s)/(y/s)\) (LP pred `~2.4e-6`; far-field
+  walk), and even Lorentz-cosine
+  \(\cos(y/s)/(1+(y/t)^2)\) (LP pred `~7.6e-8`;
+  far-field walk), and even
+  \(\operatorname{sinc}^2(y/s)\) (LP pred `~1.2e-7`;
+  far-field walk), and even
+  \(\operatorname{sech}(y/t)\cos(y/s)\) (realized
+  `~2e-12`), and even Yukawa-cosine
+  \(e^{-\sqrt{t^2+y^2}}\cos(y/s)\) (quadratic rays
+  `s=0`), and joint PirateNet
+  \(\alpha+\Delta b_3\) (LP pred `~4.6e-6`;
+  far-field walk), and even
+  \(\mathrm{Ai}((y/s)^2)\) (realized `~6e-12`), and even
+  modified Struve \(L_0(y/s)/(y/s)\) Yukawa
+  (realized `~4e-11`), and even Mellin-cosine
+  \(\cos(\omega\log(1+y^2))/(1+y^2)^{3/2}\)
+  (realized `~4e-11`), and even
+  Gudermannian-Chebyshev
+  \((1-\xi)T_k(2\xi-1)\) (realized `~5e-11`),
+  and even ordinary Struve
+  \(H_0(y/s)/(y/s)\) wide-Gauss (quadratic
+  rays `s=0`), and even Kummer
+  \({}_1F_1(3/2;5/2;-(y/s)^2)\) (realized
+  `~4e-11`), and even Whittaker
+  \(e^{-z/2}U(1,1,z)\) (realized `~2e-11`),
+  and homotopy \(L+t\,\mathrm{Quad}\) on
+  Mittag-Leffler \(E_{3/2}\) (raised L∞ to
+  `0.021`), and even cosine-integral
+  \(\mathrm{Ci}(c+(y/s)^2)\) (realized `~4e-11`),
+  and even log-cosh Chebyshev
+  \((1-\zeta)T_k(2\zeta-1)\) (realized `~5e-11`),
+  and even Kelvin
+  \(\mathrm{ber}(y/s)\,e^{-y^2/16}\) (realized
+  `~1.7e-8`),
+  and PirateNet first-block \(W_1\) diagonal at
+  fixed \(\alpha=\varepsilon\) (realized `~4e-11`),
+  and PirateNet first-block \(W_2\) diagonal at
+  the same \(\varepsilon\) (realized `~4e-11`),
+  and even vanishing Mathieu
+  \(\mathrm{ce}_{2n}(\arctan y;q=1)\) (realized
+  `~5e-11`),
+  and even Weber
+  \(E_1(y/s)\,e^{-y^2/16}\) (LP pred `~9e-7`;
+  rays `s=0`),
+  and even incomplete-gamma
+  \(Q(a,(y/s)^2)\) for non-erfc \(a>1\)
+  (realized `~4e-11`),
+  and even softplus(\(y^2\)) Chebyshev
+  \((1-\zeta)T_k(2\zeta-1)\) (realized `~5e-11`),
+  and even Fermi-Dirac
+  \(1/(e^{y^2/s^2}+1)\) (realized `~2e-12`),
+  and even \(\mathrm{asinh}(y^2)\) Chebyshev
+  \((1-\zeta)T_k(2\zeta-1)\) (realized `~6.5e-11`),
+  and even Lambert-W / entropy / Tsallis
+  charts \((1-\zeta)T_k\) (realized `~4.6e-11`;
+  2-parameter Hilbert-quadratic models
+  `s=t=0`),
+  and even complete-elliptic
+  \((1-\xi)(K(\xi)-\pi/2)\) /
+  \((1-\xi)(E(\xi)-\pi/2)\) (realized
+  `~5.0e-11`; 2-parameter models `s=t=0`),
+  and even \(i_0e(y^2/s^2)\) /
+  \(i_1e(y^2/s^2)\) (LP pred `~2.7e-7`;
+  rays `s=0`; L∞ walked far-field),
+  and even Jacobi \(\theta_3/\theta_4\)
+  of a Gaussian nome (realized
+  `~5.7e-11`; 2-parameter models
+  `s=t=0`),
+  and even \(\psi(c+y^2)\) (LP pred
+  `~2.6e-7`; rays `s=0`; L∞ walked
+  far-field),
+  and even \(e_q(-y^2)\) (realized
+  `~4.5e-11`; 2-parameter models
+  `s=t=0`),
+  and even Clausen
+  \(\mathrm{Cl}_2(2\arctan(y^2/s))\)
+  (realized `~4.6e-11`; 2-parameter
+  models `s=t=0`),
+  and even Debye \(D_n(c+y^2)\)
+  (realized `~3.1e-11`; 2-parameter
+  models `s=t=0`),
+  and even Gauss
+  \({}_2F_1(a,b;c;\xi)\) of
+  \(\xi=y^2/(s^2+y^2)\) (LP pred
+  `~2.8e-7`; rays `s=0`; L∞ walked
+  far-field),
+  and even Hurwitz
+  \(\zeta(s,a_0+y^2)\) (realized
+  `~4.4e-11`; 2-parameter models
+  `s=t=0`),
+  and even polylog
+  \(\mathrm{Li}_s(-e^{-y^2})\)
+  (Fermi–Dirac on \(\eta\le 0\);
+  realized `~4.4e-11`; 2-parameter
+  models `s=t=0`),
+  and even incomplete beta
+  \((1-\xi)I_\xi(a,b)\) (realized
+  `~3.3e-11`; 2-parameter models
+  `s=t=0`),
+  and even Owen \(T\) +
+  Faddeeva/Voigt (LP pred
+  `~9.5e-8`; rays `s=0`; L∞ walked
+  far-field),
+  and even
+  \((1-\xi)[\mathrm{erfinv}(\alpha\xi)]^2\)
+  (LP pred `~1.4e-7`; rays `s=0`;
+  L∞ walked far-field),
+  and even \((1-\xi)\mathrm{Li}_2(\pm\xi)\)
+  via Spence (realized `~4.2e-11`;
+  2-parameter models `s=t=0`),
+  and even
+  \((1-\xi)[\mathrm{asinh}(\alpha\xi)]^2\)
+  (realized `~4.1e-11`; 2-parameter
+  models `s=t=0`),
+  and even
+  \((1-\xi)[\arctan(\alpha\xi)]^2\) /
+  \((1-\xi)[\arcsin(\alpha\xi)]^2\)
+  (realized `~4.1e-11`; 2-parameter
+  models `s=t=0`),
+  and even
+  \((1-\xi)[\log(1+\alpha\xi)]^2\) /
+  \((1-\xi)(1-\cos(\alpha\xi))\) /
+  \((1-\xi)(K(\alpha\xi)-\pi/2)\)
+  (realized `~4.0e-11`; 2-parameter
+  models `s=t=0`),
+  and even spherical \(j_2/j_4(y/s)\) +
+  softplus-\(\xi\) (LP pred `~2.7e-7`;
+  rays `s=0`; L∞ walked far-field),
+  and even multi-\(\beta\) softplus-\(\xi\)
+  + \(P(1)/P(2)\) incomplete gamma
+  (realized `~3.9e-11`),
+  and compact \(C^\infty\) bumps at
+  `|y|≈1.50`/`0.10` + multiplicative
+  softplus-\(\xi\) (realized
+  `~1.45e-7`), then a refined
+  additive-only 9-bump \(C^\infty\) pack
+  **promoted** to `7.813e-3` (earn
+  `~2.68e-5`; `cinf_refine_best.npz`);
+  a follow-on free-bump polish realized
+  only `~1.3e-7`; joint tip unfreeze
+  earned 0 (LP pred `~1.8e-5`);
+  even sinc on the prior bump basin
+  realized `~7.0e-7`; even sinc on the
+  \(C^\infty\) tip realized only
+  `~1.27e-7`; Gaussian-windowed sinc
+  on that tip realized only
+  `~1.19e-7`; even
+  \(\operatorname{sech}^2((|y|-c)/w)\)
+  peak pads then **promoted** to
+  `7.801e-3` (earn `~1.26e-5`;
+  `sech2_cinf_best.npz`); a follow-on
+  sech² free-pad polish **promoted**
+  again to `7.782e-3` (earn `~1.93e-5`;
+  `sech2_polish_best.npz`); joint
+  warm-start amplitude unfreeze earned 0;
+  parallel free-pad stages reached
+  `7.774e-3` (`sech2_polish2_best.npz`)
+  and **promoted** to `7.764e-3`
+  (`sech2_polish3_best.npz`); a merged
+  tip+polish branch realized only
+  `7.778e-3` (`sech2_stage3b_best.npz`);
+  a fifth free-pad stage **promoted** to
+  `7.755e-3` (earn `~9.38e-6`;
+  `sech2_polish4b_best.npz`); a sixth
+  free-pad stage **promoted** to
+  `7.704e-3` (earn `~5.08e-5`;
+  `sech2_polish5b_best.npz`); a seventh
+  free-pad stage earned 0; even Lorentz
+  peak pads then **promoted** to
+  `7.679e-3` (earn `~2.47e-5`;
+  `lorentz_on_sech_best.npz`); a Lorentz
+  free-pad polish **promoted** to
+  `7.660e-3` (earn `~1.86e-5`;
+  `lorentz_polish_best.npz`); a second
+  Lorentz free-pad stage earned only
+  `~2.94e-7` (cascade saturating;
+  `hat_lorentz_polish2.json`); squared-Lorentz
+  free pads earned only `~2.53e-7`
+  (`hat_lorentz2.json`); even Gaussians
+  near `|y|≈1.20` earned only `~3.06e-7`
+  (`hat_gauss_peak.json`); compact \(C^\infty\)
+  free pads there earned only `~2.72e-7`
+  (`hat_cinf_peak.json`); even sech earned
+  only `~3.06e-7` (`hat_sech_peak.json`);
+  multiplicative `(1+g)` Lorentz earned only
+  `~3.05e-7` (`hat_mult_lorentz.json`);
+  joint Lorentz amplitude unfreeze earned 0
+  (`hat_lorentz_joint.json`); secondary-center
+  Lorentz free pads earned only `~3.09e-7`
+  (`hat_lorentz_sec.json`); joint Fourier-hi
+  pack unfreeze earned 0
+  (`hat_fourier_hi_joint.json`); joint tanh-even
+  pack unfreeze earned 0
+  (`hat_tanh_even_joint.json`)),
   scored on
-  1601-pt L∞; `HΩ(0)≈+1.007`; tanh-even parent was
+  1601-pt L∞; `HΩ(0)≈+1.006`; tanh-even parent was
   `7.847e-3`; Fourier-\(k=6..12\) parent was
   `7.876e-3`; Padé-on-`q` parent was
   `7.884e-3`; Legendre-on-`q` parent was

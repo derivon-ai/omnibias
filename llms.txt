@@ -110,6 +110,11 @@ temperature collapse; nonlinear flow is a recorded truncation),
 Enclosure Collapse (01-14; Width Law; six squeezes; `width -> 0`
 of a sound enclosure, a point plus a proof; not a package; not
 bias collapse),
+vectorized interval arrays and verified linear solves
+(`omnibias.core.verified.interval_array` /
+`omnibias.core.verified.linalg`; outward-rounded dense / COO
+matvecs and dot products; Krawczyk or interval-LDLᵀ solves; finite
+enclosures, not a continuum spectral claim),
 named-collapse schema (`omnibias.core.collapse`; founding three
 stay bias / temperature / enclosure; new names must mint a
 different surviving object; a float residual is not a proof),
@@ -119,8 +124,9 @@ claim),
 identity collapse (`omnibias.core.collapse.identity`; exact `Q`
 agreement or remainder enclosure of `f - T_N`; float `||R_N||` is
 not a proof),
-winding collapse (`omnibias.core.collapse.winding`; unique integer
-in a sound `Δarg / 2π` enclosure; not a blow-up proof),
+winding collapse (`omnibias.core.collapse.winding`; circle or
+axis-aligned rectangle; unique integer in a sound `Δarg / 2π`
+enclosure; not a blow-up proof),
 pairing collapse (`omnibias.core.collapse.pairing`; weak residual
 on a finite test pack; not a strong solution; not a PDE),
 rank collapse (`omnibias.core.collapse.rank`; exact Q syzygy; float
@@ -139,8 +145,9 @@ founding bias collapse; no differentiable Betti number;
 singularity tracking (03-10; Domb-Sykes + Padé poles +
 certified `|x_s|` annulus; G1–G6 CI; founding bias collapse,
 not temperature collapse; diagnostic, not a blow-up proof),
-Lie symmetry discovery (03-11; determining-matrix nullspace;
-G1–G6 CI; founding bias collapse, not temperature collapse;
+Lie symmetry discovery (03-11; float determining-matrix SVD
+proposer plus exact integer-rank acceptance of its snapped finite
+matrix; G1–G6 CI; founding bias collapse, not temperature collapse;
 in-ansatz point symmetries only, not a classification),
 weak-form NS-adjacent enclosures (07-02; width split +
 exact-jet Lohner; G1–G6 CI; founding bias collapse, not
@@ -362,7 +369,7 @@ certificate's rational obligations -- enclosed-quantity sign, positive-definite
 pivots, and the Newton-Kantorovich / Krawczyk contraction polynomial inequalities
 -- against Mathlib, wires a `mathlib_verified` verdict tier distinct from the
 Mathlib-free Lean kernel, exposes a deterministic loop driver `drive_obligation`
-(classify -> generate -> `lake build` -> report) behind the `omnibias-dev-formal-agent`
+(classify -> generate -> `lake build` -> report) behind the `omnibias-formal-agent`
 skill; every Lean module is `sorry`-free and the scope is finite rational
 obligations only), and
 `omnibias-sos` (certified *universal* positivity by optimization: sound
@@ -406,7 +413,26 @@ specialised to state-dependent constraints, so it is differentiable and a policy
 trained *through* it -- plus autodiff Lie-derivative CBF-row builders for generic
 control-affine and learned-Lagrangian dynamics (`lagrangian_cbf_rows`, reusing
 `omnibias-variational`), a differentiable safe rollout, and a rigorous model-relative
-recoverable-set certificate via `omnibias-verify`; torch + jax twins), and
+recoverable-set certificate via `omnibias-verify` (torch + jax twins); plus a
+**jet-adjoint policy-optimization** stack on the same package (theory 10-01..10-04,
+`__lineage__ = "both"`): a discrete adjoint (costate) recursion (`omnibias.core.adjoint`,
+the matrix generalisation of the scalar finite-horizon LQR Riccati sweep) whose
+`dpi/dy` comes from the founding **bias collapse** (`delta -> 0`) directional jet
+tower (not a finite difference, not truncated autodiff) -- five comparable trainers
+(`bptt_step`/`truncated_bptt_step`/`zero_order_step`/`actor_adjoint_step`/
+`actor_adjoint_jet_step`, the last PEARL-style with a PSD-quadratic learned terminal
+adjoint head) on a `DifferentiableEnvironment` seam (double-gyre + advection-diffusion
+built in; Brax / MuJoCo-MJX behind the same seam via `omnibias.control.robotics`) --
+plus the moat: a *certified* truncation horizon (`omnibias.control.horizon`, a sound
+enclosure of the closed-loop discrete monodromy reusing `omnibias.dynamics.
+spectral_radius_bound` verbatim) and a *sound, conditional* policy-gradient-bias
+enclosure (`omnibias.control.certified.gradient_bias`, reusing `omnibias.verify.
+lipschitz_bound` verbatim), composed into a proof-carrying `ControllerBundle`; plus
+certified contact smoothing (`omnibias.core.contact_smoothing`: exact `sigma^(n)`
+tower and a sound one-sided hardening-bias enclosure, 1-D point-mass only). Honestly
+scoped: no PPO/TD3/SHAC/PEARL reimplementation and no cost-parity measurement against
+a robotics engine ship in this repository (gates G4/G8 not claimed earned); policy
+gradient finds a stationary point, never a global optimum; no HJB solved), and
 `omnibias-routing` (certified + differentiable combinatorial **routing**: a poly-size
 TSP relaxation -- assignment / single-commodity-flow / Held-Karp -- solved differentiably
 by the temperature-collapse penalty *unrolled* for backprop, a heatmap + 2-opt tour decoder,
@@ -547,6 +573,14 @@ sound enclosure of `E(box)`). Soft-tree jets
 surrogate (`delta -> 0`); depth-1 uses `mlp_jet_mv` / `mlp_jet`; hardening
 remains `beta -> inf`. Keras CI smokes jax, tensorflow, and torch on
 `test_keras.py`. Equinox wrappers include `BoostedHead`.
+`omnibias.tab.pou` (theory 05-04, **gated**) is the from-scratch **axis-aligned POU booster**
+(`fit_tabpou`): closed-form Newton leaves, optional band/integral numerical
+embeddings, optional TabM residual; temperature collapse only; no TabPFN-3 /
+EXAONE claim; `fit_boosted(leaf_solver="adam")` stays the flagship default.
+`--full` locked G0/G5/G6 and missed G1/G2/G3 (not a GBDT win).
+Theory 05-05 (`fit_tabpou_joint`) is **shipped**: G-tree / G-net / G-hybrid / G5
+earned; the frozen combo is sequential TabM residual (H1) on v0 axis Newton
+trees; H0/H3/H4/H6 rejected; 05-04 G3 stays report-only v0.
 It ships three trainers -- an exact joint second-order
 driver over `omnibias.torch.optim` (`CubicNewton` / `TrustRegionNewtonCG` / `KFAC` /
 `NaturalGradient`), a first-order Adam baseline, and a stagewise **Newton-boosting** driver

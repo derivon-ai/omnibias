@@ -3,7 +3,7 @@
 r"""Deterministic driver for the Mathlib-backed formal loop.
 
 :func:`drive_obligation` is the small, reproducible primitive the
-``omnibias-dev-formal-agent`` skill leans on.  It turns a certificate into one
+``omnibias-formal-agent`` skill leans on.  It turns a certificate into one
 *actionable* pass of the loop: classify the finite obligation, drive
 :func:`~omnibias.formal.mathlib_check.check_certificate` (which re-derives the
 obligation exactly over ``ℚ``, emits Lean, and runs ``lake build`` -- the

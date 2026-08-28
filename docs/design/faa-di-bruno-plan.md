@@ -74,7 +74,7 @@ partial (incomplete) exponential Bell polynomials \(B_{n,k}\),
 where \(u^{(j)} = j!\,u^{[j]}\) are the *derivatives* of \(u\) (not Taylor
 coefficients). \(B_{n,k}\) is a sum over partitions of \(n\) into \(k\) parts.
 
-**Shifted-power composition (backend kernel, stable, \(O(N^2)\)).** Let
+**Shifted-power composition (backend kernel, stable, currently \(O(N^3)\)).** Let
 \(w(t) = u(t) - u^{[0]}\) (so \(w^{[0]} = 0\)). Then
 
 \[
@@ -118,12 +118,25 @@ Shown in the notebook / benchmark, not added as a core op this round.
 
 - `compose_jet(u_jet, sigma_tower)` — \(\sigma\circ u\) via shifted-power
   convolution. `u_jet` shape `(N+1, ...)`; `sigma_tower[k]` holds
-  \(\sigma^{(k)}(u^{[0]})\) with matching trailing shape.
+  \(\sigma^{(k)}(u^{[0]})\) with matching trailing shape. The recurrence is
+  evaluated only on the triangle \(n \ge k\), since \(v = u - u^{[0]}\) has
+  valuation 1 and \(v^k\) cannot contribute below order \(k\): the same values
+  bit-for-bit, roughly \(N^3/6\) instead of \(N^3/2\) elementwise multiply-adds.
+  For an arbitrary tower this is truncated power-series composition, so the cost
+  stays cubic in \(N\) — no \(O(N^2)\) claim.
+- `compose_jet_riccati(u_jet, sigma_u0, riccati_polynomial)` — the
+  \(O(\deg P \cdot N^2)\) fastpath for the Riccati class, where
+  \(\sigma' = P(\sigma)\) turns the chain rule into
+  \(b' = P(b)\,u'\) and no tower is needed. Rounds differently from
+  `compose_jet` (exact in exact arithmetic), and reaches past the fastpath order
+  caps of `tan` / `cot` / `coth`.
 - `affine_jet(z_jet, W, b)` — per-order `W @` plus bias on order 0.
-- `layer_jet(z_jet, W, b, spec, order)` — affine then activation, building the
-  tower from `spec.fastpath`.
-- `mlp_jet(x0, v, layers, order)` — full deep directional tower. `layers` is a
-  sequence of `(W, b, spec_or_None)`; `spec=None` is a pure affine readout.
+- `layer_jet(z_jet, W, b, spec, order, *, riccati=False)` — affine then
+  activation, building the tower from `spec.fastpath`; `riccati=True` opts into
+  the fastpath above and requires `spec.riccati_polynomial`.
+- `mlp_jet(x0, v, layers, order, *, riccati=False)` — full deep directional
+  tower. `layers` is a sequence of `(W, b, spec_or_None)`; `spec=None` is a pure
+  affine readout.
 - `tower_to_jet(d)` / `jet_to_tower(a)` — \(k!\) scaling between the
   derivative-tower and Taylor-jet conventions. `jet_to_tower` matches the
   `jax.experimental.jet` series convention used in the oracle test.

@@ -18,7 +18,7 @@ The many biases coalesce and the finite difference *becomes* the derivative
 This is a ``delta -> 0`` limit yielding a smooth **derivative** -- it is **not**
 **temperature collapse** -- the ``beta -> inf`` *feasibility penalty* of
 ``omnibias-convex`` / ``-control`` / ``-routing`` (a 0/1 step). Same word, opposite limit: **do not
-conflate** the two (see the ``omnibias-dev-core-concepts`` skill and
+conflate** the two (see the ``omnibias-core-concepts`` skill and
 ``docs/theory.md``).
 
 Honesty labels used throughout: **closed-form** (the sigma / sech / tanh towers

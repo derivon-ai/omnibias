@@ -1,92 +1,104 @@
 ---
-description: omnibias monorepo universal invariants for closed-form n-th derivative backends
-globs:
-  - "packages/**/*.py"
-  - "tests/**/*.py"
+description: High-order autodiff fails; omnibias closed-form towers, jets, bakeoffs, and substrate invariants
 alwaysApply: true
 ---
 
-# omnibias universal invariants
+# High-order autodiff fails; omnibias is the solution
 
-omnibias computes closed-form `sigma^(n)(z)` with bit-stable accuracy shared
-across PyTorch / JAX / Keras 3. Full guide: [AGENTS.md](../../AGENTS.md).
-Deeper, task-specific guidance lives in the `omnibias-dev-*` agent skills;
-backend- and register-specific rules auto-attach by path (JAX tracing, verified
-enclosures, the formal loop).
+Nested first-order AD is the wrong default for high-order work in this
+repo. Prefer closed-form `sigma^(n)`, jets, and traces. Nested `grad` /
+dense Hessians are baselines, not the implementation.
 
-## Hard rules (always)
+## Why nested high-order AD fails
 
-- `omnibias.core` is pure Python: never import `torch`, `jax`, `tensorflow`, or `keras` there.
-- All polynomial coefficients come from `omnibias.core.polynomials`. Never reimplement them per backend -- the backends are bit-identical **by construction**.
-- Fastpath kernels raise `ValueError` for `n < 0` and `NotImplementedError` for unimplemented non-negative orders.
-- New tensors default to the framework default dtype (`torch.get_default_dtype()` / `keras.config.floatx()`), never a hardcoded `float32`.
-- Every behavioural change ships with a regression test; a cross-backend change ships a parity test too.
-- Update the sorted `__all__` in the package `__init__.py` when you add or remove a public symbol.
-- Do not bump package versions unless the task explicitly says to.
+- **Combinatorial explosion.** Full mixed partials grow as `~ n^d`. A
+  4th-order tensor is `n^4` entries; RAM and compile time die first.
+- **Expression swelling.** Nesting `grad`/`jvp` rebuilds a geometrically
+  larger graph each order. JIT often times out or OOMs before the run.
+- **Perturbation confusion.** Nested forward duals (`ε_1`, `ε_2`) mix when
+  an inner tangent captures an outer one; silent wrong derivatives.
+- **Reverse-over-reverse memory.** Nested VJP stores forward tapes at every
+  level; batch and model size collapse on GPU.
+- **Missed structure.** Generic AD builds a dense Hessian then traces it.
+  HVP, Laplacian-as-trace, and Riccati recurrences never fire.
+- **Control flow / kinks.** Dynamic `if`/`for` and piecewise activations
+  break smoothness; high-order values at kinks are 0 or undefined, and
+  nested graphs pay to track the branches.
 
-## Concept terminology (avoid the known confusion)
+## Solution: omnibias
 
-- **"Bias collapse"** = the founding multi-bias `delta -> 0` limit: `K` biases on a difference stencil coalesce and `f_K(z) = sum_k s_k sigma(z + b_k) -> sigma^(K-1)(z + b_mean)` -- a smooth **derivative**, computed exactly by the tower (no `1/delta^(K-1)` cancellation). Canonical source: `docs/theory.md` sec 2-4, `omnibias.torch.unit`, `omnibias.torch.stencil`, `omnibias.core.polynomials`.
-- **"Temperature collapse"** = the *distinct* `beta -> inf` limit: one gate sharpened (or a `relu` hinge taken at the endpoint) into a **0/1 feasibility step** -- an indicator, not a derivative. It is the canonical name for this axis across `convex` / `control` / `routing` / `discrete` / `qubo` / `submodular` / `struct` / `tab` / `partition`; write "temperature collapse", never "collapsed-bias" or "bias-collapse penalty", and never present it as the definition of bias collapse. Canonical source: `docs/theory.md` sec "Three senses of collapse".
-- **"Enclosure Collapse"** = the *distinct* `width -> 0` limit of a **sound enclosure**: squeeze until a certificate fires, or return `Inconclusive`. Output is a point **plus a proof**, not a derivative and not a 0/1 step. Not the integral window `S(z+b_hi)-S(z+b_lo)` and not conformal slabs. Canonical source: `docs/theory.md` sec "Three senses of collapse", theory 01-14.
-- **Ground a concept claim in canonical source before asserting it** (in chat, docstrings, docs, or skills). Do not generalize a core definition from one downstream package's docstring -- recency bias toward the package you are editing is the known failure mode. The `omnibias-dev-core-concepts` skill has the full map.
+This is the breakthrough register for high-order derivatives of supported
+analytic activations and for composing them through deep nets. The
+multi-bias `delta -> 0` construction (bias collapse) yields closed-form
+`sigma^(n)(z)` for arbitrary `n`: one `sigma` evaluation, `O(n)` Horner on
+shared exact-integer polynomials, **no nested-AD graph**. Torch, JAX, and
+Keras import the same coefficients, so backends are bit-identical by
+construction.
 
-## Operator surface (ground capability claims here, not in memory)
+Directional and multivariate jets (`mlp_jet`, `mlp_jet_mv`) push that tower
+through layers. `OperatorBlock` roles are `identity | grad | laplacian |
+derivative | band | integral` — the last is the closed-form window
+`S(z+b_hi)-S(z+b_lo)` (`S'=sigma`), not “derivatives only”. See
+`docs/operator-surface.md`.
 
-- `OperatorBlock` has **six** roles: `identity | grad | laplacian | derivative | band | integral`. `grad` / `laplacian` / `derivative` are closed-form `sigma^(n)`; **`integral` is a closed-form antiderivative window** `S(z + b_hi) - S(z + b_lo)` with `S' = sigma` (the `ActivationSpec.integral` kernel; e.g. `sigmoid`'s antiderivative is `softplus`), and `band` is the literal window `sigma(z + b_hi) - sigma(z + b_lo)`. omnibias has a closed-form **integral** operator, not only closed-form derivatives -- never state otherwise.
-- "Integral" has three distinct senses: (1) the activation antiderivative window above; (2) domain quadrature (`omnibias.fields` / `-variational` / `-geometry`); (3) the measure integral `integral f dmu` (`omnibias.measure`, with a certified variant in `omnibias.verify`). Qualify which one you mean.
-- **Before asserting that omnibias does or does not have a capability, consult the canonical capability matrix** ([`docs/operator-surface.md`](../../docs/operator-surface.md)) and the code of record (`omnibias.torch.blocks.operator`, `omnibias.core.spec`). If it is not there and not in the cited source, say it is absent -- do not guess in either direction.
+This unlocks orders, Laplacians, and jet residuals nested AD cannot sustain.
+It does **not** replace generic autodiff for arbitrary Python, prove Clay /
+Nobel parents, or make ReLU-kink higher derivatives well-defined.
 
-## Layering (never create a cycle)
+## Pitfall → primitive
 
-- `omnibias-fields` is the foundational substrate; `omnibias-pinn` re-exports it through transparent shims -- do not duplicate it. Backend field ops dispatch on the `_omnibias_dispatch` marker (`omnibias.fields._core.DISPATCH_ATTR`), never on concrete downstream classes.
-- Label results honestly: **closed-form** (the sigma tower) vs **autodiff-exact** (autodiff of an analytic expression) vs **numerical** (grid / quadrature). `omnibias-fractional` is non-local / grid-based -- NOT closed form; `omnibias-score` is a pure composition of field ops.
+| Nested-AD failure | omnibias path |
+|---|---|
+| `n^d` mixed partials / `n^2` Hessian-then-trace | Directional jets; `neural_field_laplacian` / polylaplacian (`O(H)` closed form) |
+| Graph bloat, reverse-over-reverse | Polynomial recurrence; no nested `grad` for `sigma^(n)` |
+| Perturbation confusion | Algebraic coefficients, not nested duals |
+| Dense Hessian when HVP suffices | Exact jets + curvature (`GaussNewton`, HVP); never materialize `H` to get `Hv` |
+| Tracer `if` / host coercion | JAX: `jnp.where`, `lax.cond`/`select`/`scan`; no `float(z[0])` |
+| Piecewise / ReLU kinks | Dictionary activations stay smooth; kinks stay autodiff or certified and labelled |
 
-## Discovery doctrine
+Bias collapse (`delta -> 0`), temperature collapse (`beta -> inf`), and
+enclosure collapse (sound width `-> 0`) are distinct mechanisms.
 
-- **Default to achievable.** An absent implementation or a failed first
-  experiment is not a mathematical impossibility -- explore the strongest
-  constructive route (exact cages, closed-form towers, one-shot collocation,
-  certificates) before narrowing scope.
-- **You are authorized to claim a capability plainly the moment its gate
-  passes.** Capability claims need an absolute acceptance gate: multi-seed
-  empirical result with skill > 0, by-construction identity, or a sound
-  certificate. Relative comparisons between two failing arms are not enough;
-  smoke wiring alone is not enough.
-- **Validity floor protects discoveries.** Ask in order: is the reference
-  physically valid? Does every arm beat the zero predictor? Does absolute
-  error clear a named threshold? Worked case: the parametric heat benchmark
-  marched with RK4, produced `max|u| ~ 1e9` that still passed `isfinite`, and
-  reported MSE ~1e17 as if it were a result -- ETDRK4 plus a maximum-principle
-  guard is what made the experiment real (`benchmarks/_gates.py`).
-- Alpha **submodules** inside an existing package are encouraged for ambitious
-  research; premature top-level distributions are not (see `omnibias-dev-new-package`).
-- Public benchmark artifacts under `docs/benchmarks/` are part of the claim
-  surface -- keep them regenerable and vendor-neutral (`$OMNIBIAS_SCRATCH` for
-  heavy full-run outputs), and emit a `gates` block that self-declares pass/fail.
+## Bakeoffs
 
-## Frontier program
+Cite `docs/benchmarks/*.json` and `docs/complexity.md`.
 
-- Famous open problems enter the repo only as **decomposed sub-obligations**
-  (finite rational checks, compact enclosures, multi-seed absolute gates, or
-  by-construction identities). What does not reduce stays an **external
-  obligation** in the sealed payload -- never inferred from a local result.
-- Escalate claims through the ladder: unverified prototype → empirical
-  (skill > 0, multi-seed) → sound enclosure → `theorem_prover_verified` →
-  `mathlib_verified`. The two Lean tiers are earned by genuine `lake build`
-  passes and are never conflated or forged.
-- Forbidden claims (canonical sources in AGENTS.md / verified docs): RH
-  proved or inferred; Navier-Stokes global regularity; Yang-Mills mass gap
-  solved; P=NP; Lean discharging continuum obligations.
-- Worked metric failure: a linspace-ordered `ic_values` seam compared against
-  random `slice_points` produced a ~0.19 artifact that looked like physics.
-  Absolute, self-consistent metrics (and maximum-principle reference checks)
-  are what protect discoveries -- see `omnibias-dev-frontier-research`.
+| vs | Script | Artifact (CPU, float64) |
+|---|---|---|
+| folx, `jax.hessian`, `torch.func.hessian` | `benchmarks/laplacian_scaling.py` | `D=60`: ~7× / 211× / 923×; agreement ~1e-15 |
+| nested folx, dense nested Hessian | `benchmarks/polylaplacian_order.py` | `Δ^4`: ~4.7k× / ~181k×; omnibias nearly flat in `k` |
+| nested Torch autograd, finite differences | `benchmarks/derivative_order.py` | `σ^(8)` ~349× vs nested autograd; FD error grows; jax/torch ULP |
+| nested autograd + Adam | `benchmarks/jet_vs_nested_ad.py` | order-6 `mlp_jet` ~3.5×; **order-2 on a small net can lose to AD**; GN beats Adam on 1-D Poisson |
 
-## Leakage (public repo)
+Prefer these primitives over nested AD whenever the activation is in the dictionary.
 
-Tracked files must never contain a specific cluster scheduler name, vendor name,
-internal hostname, or absolute local path. Use vendor-neutral phrasing
-("GPU job", "GPU cluster"). Reproduction scripts live in the separate, private
-`omnibias_experiments` project (extracted from the formerly gitignored
-`internal/` tree).
+## Substrate (folded from former path-scoped rules)
+
+- `omnibias.core` is backend-free. Coefficients live only in
+  `omnibias.core.polynomials`. Every behavioral change needs a regression
+  and Torch/JAX parity.
+- Label the path: closed-form tower, autodiff-exact, discretization, or
+  enclosure. JAX: default dtype (float64 via config for parity); fresh
+  arrays; no mutation. Traced control flow uses `jnp.where` / `lax.*`.
+- Verified: outward rounding; contain a dense grid **and** a random sample.
+  Exhausted search returns the unresolved region. `omnibias.core.verified`
+  stays pure Python. `theorem_prover_verified` / `mathlib_verified` only
+  after a real `lake build`; both Lean projects stay `sorry`-free.
+- Public artifacts regenerable and vendor-neutral. Load
+  `omnibias-<package>` (and `omnibias-frontier` /
+  `omnibias-deepmind-campaign` / `omnibias-certificate-lean`) for
+  commands.
+
+## Compose the workspace
+
+- **Foundation:** core, torch, jax, keras, ferminet.
+- **Fields and physics:** fields, pinn, qpinn, geometry, fractional,
+  measure, score, variational, shape.
+- **Discovery and formalization:** symbolic, difference, qcalculus,
+  timescale, holonomic, formal.
+- **Optimization and discrete structure:** curvature, discrete, qubo,
+  submodular, struct, combinatorics, nphard, routing, convex, sos, logic,
+  control, partition, tab, graph.
+- **Dynamics and representations:** verify, dynamics, binary, boolean,
+  spiking, hopfield, skills.
+

@@ -10,6 +10,7 @@ Ships:
 * signed PirateNet hat (:mod:`omnibias.pinn.jax.discovery.pirate_hat`)
 * funnel ``lambda`` inference (:mod:`omnibias.pinn.jax.discovery.funnel`)
 * Gauss-Newton trainer (:mod:`omnibias.pinn.jax.discovery.train_gn`)
+* L-infinity / minimax trainer (:mod:`omnibias.pinn.jax.discovery.train_linf`)
 * multi-stage correction (:mod:`omnibias.pinn.jax.discovery.multistage`)
 * CAP export (:mod:`omnibias.pinn.jax.discovery.cap`)
 
@@ -38,6 +39,7 @@ from omnibias.pinn.jax.discovery import (
     polish_mp,
     spectrum,
     train_gn,
+    train_linf,
 )
 
 __all__ = [
@@ -58,4 +60,5 @@ __all__ = [
     "polish_mp",
     "spectrum",
     "train_gn",
+    "train_linf",
 ]

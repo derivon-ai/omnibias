@@ -89,8 +89,20 @@ def test_certify_linear_bvp_matches_convenience_wrapper() -> None:
 
     sol = _solved_poisson(source_const=0.5)
     pde_op = vpoisson(sol.system.domain.ndim, 0.5)
-    generic = verify.certify_linear_bvp(sol, pde_op, boundary=0.0)
-    conv = verify.certify_poisson(sol, source=0.5, boundary=0.0)
+    generic = verify.certify_linear_bvp(
+        sol,
+        pde_op,
+        boundary=0.0,
+        stability_interior=1.0,
+        stability_boundary=1.0,
+    )
+    conv = verify.certify_poisson(
+        sol,
+        source=0.5,
+        boundary=0.0,
+        stability_interior=1.0,
+        stability_boundary=1.0,
+    )
     assert generic.error_bound == pytest.approx(conv.error_bound, rel=1e-12)
 
 

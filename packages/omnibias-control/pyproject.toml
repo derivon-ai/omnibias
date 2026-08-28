@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "omnibias-control"
 version = "0.1.0a1"
-description = "Differentiable control for omnibias with a model-relative safety certificate: a batched, per-sample control-barrier-function (CBF-QP) safety filter (temperature-collapse projection), autodiff Lie-derivative CBF-row builders for generic control-affine and learned-Lagrangian dynamics, and a model-relative recoverable-set certificate (jax + torch)."
+description = "Differentiable control for omnibias with a model-relative safety certificate and a jet-adjoint policy-optimization stack: a batched, per-sample control-barrier-function (CBF-QP) safety filter (temperature-collapse projection), autodiff Lie-derivative CBF-row builders for generic control-affine and learned-Lagrangian dynamics, a model-relative recoverable-set certificate, closed-form dpi/dy adjoint policy gradients (founding bias collapse), a certified truncation horizon, and a sound policy-gradient-bias enclosure (jax + torch)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
@@ -35,7 +35,13 @@ jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
 # reuses omnibias-verify. Both are optional (only needed for those helpers).
 lagrangian = ["omnibias-variational>=0.1.0a1"]
 verify = ["omnibias-verify>=0.1.0a1"]
-all = ["omnibias-control[torch,jax,lagrangian,verify]"]
+# omnibias.control.horizon imports omnibias.dynamics.spectral_radius_bound at
+# module level (the certified-horizon moat reuses it verbatim); required, not
+# lazy. omnibias.control.{torch,jax}.envs lazily imports omnibias.pinn.solver
+# steppers only when the PDE environments are constructed.
+dynamics = ["omnibias-dynamics>=0.1.0a1"]
+pinn = ["omnibias-pinn>=0.1.0a1"]
+all = ["omnibias-control[torch,jax,lagrangian,verify,dynamics,pinn]"]
 test = ["pytest>=7.0", "numpy>=1.24"]
 dev = ["omnibias-control[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
 

@@ -1,0 +1,66 @@
+{
+  "schema": "tabular-uncertainty-figure5-v1",
+  "generated_utc": "2026-08-27T11:39:25Z",
+  "hardware_class": "commodity x86-64 CPU (24 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "1.26.4",
+    "jax": "absent",
+    "torch": "2.9.0+cu128",
+    "folx": "absent"
+  },
+  "config": {
+    "family": "saw_wave_figure5_diagnostic",
+    "dataset": "saw_wave_2d",
+    "n": 4000,
+    "n_train": 2800,
+    "n_test": 1200,
+    "grid": 220,
+    "lam": 3.0,
+    "seed": 0,
+    "steps": 80,
+    "n_trees": 32,
+    "depth": 2,
+    "beta_final": 16.0
+  },
+  "rss_mb_at_start": 1459.47,
+  "spearman_shat_strue_test": 0.904312624099156,
+  "top_decile_rmse": {
+    "lam0": 14.562637678947,
+    "lamP": 13.799034006817806
+  },
+  "decile_curve": {
+    "raw_diff_err2_lamP_minus_lam0": [
+      0.22532003640896928,
+      0.23846861902204203,
+      0.245319864363773,
+      0.34764680499100103,
+      0.49852166264093,
+      0.19788178524618294,
+      0.17461594062697117,
+      0.4500410151444427,
+      1.3651602154012323,
+      -21.657076646972627
+    ],
+    "smoothed_diff_err2_lamP_minus_lam0": [
+      0.23016012926675528,
+      0.24321664472986254,
+      0.28070207925967416,
+      0.34410172729780086,
+      0.35682134521383424,
+      0.2891627488204971,
+      0.22975699854628437,
+      -0.7031069798055428,
+      -5.844673435405963,
+      -14.793084601318258
+    ],
+    "n_bins": 10,
+    "decile_order": "0 = lowest true uncertainty, n_bins-1 = highest true uncertainty",
+    "sign_convention": "negative means lam>0 (noise-damped) has lower squared error than lam=0 in that decile"
+  },
+  "grid_cache_path": "$OMNIBIAS_SCRATCH/tabular_uncertainty/saw_wave_grid.npz",
+  "diagnostic": true,
+  "note": "Diagnostic panel + decile curve only -- never a gate (theory 05-03 section 10). Carries no 'passed' key and is not read by any gates['all_passed']. Gate G1 is a separate, full multi-seed lam-selection sweep in benchmarks/tabular_uncertainty.py (Phase 2).",
+  "wall_seconds": 108.31
+}

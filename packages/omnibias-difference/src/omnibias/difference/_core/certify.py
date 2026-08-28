@@ -12,7 +12,7 @@ derivative (enclosure strictly ``> 0`` or ``< 0``) carries a finite, rational
 obligation (``enclosed_quantity_pos`` / ``enclosed_quantity_neg``) the kernel can
 re-check; a *straddling* enclosure carries no such obligation (a documented gap).
 
-The honesty rule from the ``omnibias-dev-certificate-lean`` skill is enforced by
+The honesty rule from the ``omnibias-certificate-lean`` skill is enforced by
 construction: :attr:`DerivativeProofVerdict.theorem_prover_verified` is exactly
 ``lean.verified``, which the bridge sets **only** on a genuine ``lake build``
 pass. With no Lean toolchain it degrades gracefully (``available=False``,

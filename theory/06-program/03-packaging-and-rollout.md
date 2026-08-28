@@ -28,7 +28,7 @@ Nothing to build.
 - `packages/omnibias-core/tests/test_package_registry.py` — enforces
   workspace / folded-name / Python-floor consistency, so a fold is mechanically
   checkable.
-- The `omnibias-dev-new-package` skill — the scaffolding procedure when a
+- The `omnibias-new-package` skill — the scaffolding procedure when a
   package is genuinely warranted: pyproject, SPDX headers, workspace exclude,
   sorted `__all__`, CI job, `docs/api` page plus mkdocs nav, `llms.txt` and
   `CHANGELOG.md` entries.

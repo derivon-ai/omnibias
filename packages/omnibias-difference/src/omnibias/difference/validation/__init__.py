@@ -3,7 +3,7 @@
 r"""Data-driven refinement harness for omnibias-difference.
 
 Pure-Python (core-only) probe utilities that turn each tier capability into an
-*instrumented* experiment, per the ``omnibias-dev-empirical-validation`` gates:
+*instrumented* experiment, per the ``omnibias-empirical-validation`` gates:
 
 * :func:`enclosure_soundness` -- the verified-primitive rule that an enclosure
   must contain a **dense deterministic grid AND a random sample** of true values.

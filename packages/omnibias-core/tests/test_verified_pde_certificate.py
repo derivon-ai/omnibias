@@ -181,7 +181,12 @@ def test_boundary_residual_empty_is_zero() -> None:
 def test_aposteriori_exact_solution_has_tiny_error() -> None:
     # affine net is harmonic; no boundary term -> error bound ~ 0.
     cert = aposteriori_error_certificate(
-        _AFFINE, _DOMAIN, laplace(2), stability_interior=0.5, splits=2
+        _AFFINE,
+        _DOMAIN,
+        laplace(2),
+        stability_interior=0.5,
+        stability_boundary=1.0,
+        splits=2,
     )
     assert cert.error_bound < 1e-9
     assert cert.boundary_residual < 1e-300  # no boundary faces supplied
@@ -218,7 +223,18 @@ def test_aposteriori_combines_residuals() -> None:
 
 def test_aposteriori_negative_stability_raises() -> None:
     with pytest.raises(ValueError):
-        aposteriori_error_certificate(_AFFINE, _DOMAIN, laplace(2), stability_interior=-1.0)
+        aposteriori_error_certificate(
+            _AFFINE,
+            _DOMAIN,
+            laplace(2),
+            stability_interior=-1.0,
+            stability_boundary=1.0,
+        )
+
+
+def test_aposteriori_requires_explicit_stability() -> None:
+    with pytest.raises(ValueError, match="requires stability"):
+        aposteriori_error_certificate(_AFFINE, _DOMAIN, laplace(2))
 
 
 def test_aposteriori_records_stability_invariants_and_formal_margin() -> None:
@@ -274,7 +290,14 @@ def test_custom_and_quadratic_residual_hooks() -> None:
 
 
 def test_pinn_schema_rejects_forged_structural_claim() -> None:
-    cert = aposteriori_error_certificate(_AFFINE, _DOMAIN, laplace(2), splits=2).certificate
+    cert = aposteriori_error_certificate(
+        _AFFINE,
+        _DOMAIN,
+        laplace(2),
+        stability_interior=1.0,
+        stability_boundary=1.0,
+        splits=2,
+    ).certificate
     cert["payload"]["invariants"] = [{"kind": "divergence_free", "certified": True}]
     assert any("expression" in err for err in pinn_aposteriori_schema_errors(cert))
 

@@ -33,4 +33,8 @@ kernel re-checks, so a sealed certificate can earn `theorem_prover_verified`.
       heading_level: 3
       members_order: source
 
+The NPA moment hierarchy (`omnibias.sos.npa`) and the combinatorial
+degree-indexed clique / 3-XOR certificates (`omnibias.sos.combinatorial`) are
+separate landing pages: [npa.md](npa.md), [combinatorial_sos.md](combinatorial_sos.md).
+
 Status: Alpha (`0.1.0a1`).

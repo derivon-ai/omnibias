@@ -7,7 +7,8 @@ at most last-layer-only, skill vs ``u = 0``, named MSE below the zero
 field), G2 (honesty keys sealed), and G3 (torch/jax parity on a tiny
 Poisson). Local GN is greedy, not a global min, and not CCF stretch.
 Bias collapse (``delta -> 0``) supplies the jet. This is not time
-marching (``omnibias.pinn.train.march``) and not the 08-03 proxy residual.
+marching (the backend-specific ``omnibias.pinn.train.{torch,jax}.march``
+modules) and not the 08-03 proxy residual.
 Hilbert is out of scope.
 """
 

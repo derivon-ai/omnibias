@@ -9,8 +9,8 @@ Run:
 
 The intensity / hazard of a temporal point process is integrated into its
 **compensator** ``Lambda = int lambda`` -- the term normally Monte-Carlo /
-quadrature approximated. This smoke exercises the ``omnibias-dev-empirical-
-validation`` gates on that integral:
+quadrature approximated. This smoke exercises the ``omnibias-empirical-validation``
+gates on that integral:
 
 * **analytic oracle** -- the compensator, Poisson log-likelihood and the
   right-censored survival log-likelihood are checked against closed-form

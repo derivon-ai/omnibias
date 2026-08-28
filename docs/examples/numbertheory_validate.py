@@ -8,7 +8,7 @@ Run:
     python docs/examples/numbertheory_validate.py
 
 Probes the Hurwitz zeta, polylogarithm, Lerch transcendent, and exact Dirichlet
-``L`` negative-integer values under the ``omnibias-dev-empirical-validation``
+``L`` negative-integer values under the ``omnibias-empirical-validation``
 gates -- grid-and-random enclosure soundness (a sweep of ``K >= 8`` seeds, each
 certified enclosure must contain the ``mpmath`` value), an ``mpmath`` oracle, and
 a best-in-class comparison against the named naive-truncated-series baseline.

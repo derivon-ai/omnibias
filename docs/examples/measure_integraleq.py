@@ -17,7 +17,7 @@ turns it into ``(I - lam K W) u = f``, and because a ``Measure`` already *is*
 nodes and weights, that system is one outer product away from the measure
 integral the rest of the package is built on.
 
-This smoke exercises the ``omnibias-dev-empirical-validation`` gates:
+This smoke exercises the ``omnibias-empirical-validation`` gates:
 
 * **analytic oracle** -- a separable kernel has a closed-form solution, and
   ``degenerate_kernel_solve`` reproduces it exactly (the kernel is never

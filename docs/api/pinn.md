@@ -813,6 +813,10 @@ which validates both sides against the same analytic oracle.
 
 ## Proof Prep
 
+The IPM residual + tail + radii path and the named banded Fourier toy CAP
+live on [ipm_radii.md](ipm_radii.md). `navier_stokes_proof_claim` stays
+`False`; `full_ipm_proved` stays `False`.
+
 ::: omnibias.pinn.certified
     options:
       show_root_heading: false
@@ -831,6 +835,10 @@ which validates both sides against the same analytic oracle.
         - interval_square
         - interval_sqrt
         - interval_trapezoid_bound
+        - build_ipm_cap_bundle
+        - build_ipm_radii_construction
+        - ipm_banded_toy_radii
+        - export_ipm_toy_cap_replay
         - compactification_map_interval
         - coefficient_interval_boxes
         - certified_tail_bounds_from_artifact

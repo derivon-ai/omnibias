@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from omnibias.symbolic.symmetry._core import (
     DISCLAIMER,
+    ExactSymmetryReport,
     Generator,
     LinearPoly,
     PDESpec,
@@ -24,6 +25,7 @@ from omnibias.symbolic.symmetry._core import (
     discover_symmetries,
     eta_t,
     eta_xx,
+    exact_symmetry_report,
     heat_known_coeffs,
     honesty_payload,
     matrix_condition,
@@ -37,6 +39,7 @@ from omnibias.symbolic.symmetry._core import (
 
 __all__ = [
     "DISCLAIMER",
+    "ExactSymmetryReport",
     "Generator",
     "LinearPoly",
     "PDESpec",
@@ -49,6 +52,7 @@ __all__ = [
     "discover_symmetries",
     "eta_t",
     "eta_xx",
+    "exact_symmetry_report",
     "heat_known_coeffs",
     "honesty_payload",
     "matrix_condition",

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Idempotent installer for the bundled omnibias consumer skills.
+"""Idempotent installer for the bundled omnibias capability skills.
 
 The bundled skills live in ``_bundled/skills/<name>/SKILL.md`` (one canonical
 copy). Both Cursor and Claude Code consume the same Agent-Skill ``SKILL.md``
@@ -75,7 +75,7 @@ def _skill_dirs() -> list[Path]:
 
 
 def bundled_skills() -> list[SkillInfo]:
-    """Return the ``(name, description)`` of every bundled consumer skill."""
+    """Return the ``(name, description)`` of every bundled capability skill."""
     infos: list[SkillInfo] = []
     for skill_dir in _skill_dirs():
         meta = _parse_frontmatter((skill_dir / _SKILL_FILE).read_text(encoding="utf-8"))

@@ -6,9 +6,10 @@ PDE residual used at the last readout is formed from a closed-form
 wrapped by a hard Dirichlet factor, and a damped Gauss–Newton step
 updates only that layer. Later layers see the corrected activations.
 
-This marches the residual in **network depth**. It is not time marching
-(`omnibias.pinn.train.march`) and not the 08-03 proxy residual. Status
-is **shipped**. G1–G3 are CI-gated. Local GN is greedy, not
+This marches the residual in **network depth**. It is not the time-marching
+`march_solve` drivers in `omnibias.pinn.train.torch.march` and
+`omnibias.pinn.train.jax.march`, nor the 08-03 proxy residual. Status is
+**shipped**. G1–G3 are CI-gated. Local GN is greedy, not
 a global min, and not CCF stretch. Hilbert / nonlocal operators are
 out of scope. Continuum Navier–Stokes regularity is not a claim.
 

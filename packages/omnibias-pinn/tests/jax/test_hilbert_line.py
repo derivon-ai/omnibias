@@ -12,17 +12,17 @@ import pytest
 jax = pytest.importorskip("jax")
 jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp  # noqa: E402
-from omnibias.pinn.jax.equations.ccf_compactified import (  # noqa: E402
-    alpha_from_lambda,
-    hardy_even,
-    hardy_odd,
-    hilbert_transform_truncated_line,
-)
 from omnibias.pinn.jax.discovery.ccf_vorticity import (  # noqa: E402
     free_omega_vorticity_residual,
     hardy_omega_profile,
     vorticity_residual_samples,
     wang_residual,
+)
+from omnibias.pinn.jax.equations.ccf_compactified import (  # noqa: E402
+    alpha_from_lambda,
+    hardy_even,
+    hardy_odd,
+    hilbert_transform_truncated_line,
 )
 from omnibias.pinn.jax.hilbert_line import (  # noqa: E402
     hilbert_gl_single_raw_tail,
@@ -31,7 +31,6 @@ from omnibias.pinn.jax.hilbert_line import (  # noqa: E402
     hilbert_wholeline_hp,
     integrate_velocity_from_hilbert,
 )
-
 
 LAM = 0.6057
 ALPHA = float(alpha_from_lambda(LAM))
@@ -49,7 +48,8 @@ def test_wholeline_hp_beats_gl96_u48_on_planted_q(
 ) -> None:
     """Free-Ω quadrature vs exact H[Q]=-P. Stretch 1e-13 is not claimed."""
     y = jnp.linspace(-ymax, ymax, n, dtype=jnp.float64)
-    omega_fn = lambda t, a=a: hardy_odd(t, a, ALPHA)
+    def omega_fn(t, a=a):
+        return hardy_odd(t, a, ALPHA)
     values = omega_fn(y)
     h_exact = -hardy_even(y, a, ALPHA)
     h_old = hilbert_gl_single_raw_tail(
@@ -91,14 +91,16 @@ def test_wholeline_hp_beats_truncated_fft_on_hardy_q_reproduce_grid() -> None:
 
 def test_wholeline_hp_is_even_for_odd_omega() -> None:
     y = jnp.linspace(-20.0, 20.0, 401, dtype=jnp.float64)
-    omega_fn = lambda t: hardy_odd(t, 1.3, ALPHA)
+    def omega_fn(t):
+        return hardy_odd(t, 1.3, ALPHA)
     h = hilbert_wholeline_hp(y, omega_fn(y), omega_fn, decay_power=ALPHA)
     assert float(jnp.max(jnp.abs(h - h[::-1]))) < 1e-10
 
 
 def test_split_core_plus_power_tail_finite() -> None:
     y = jnp.linspace(-8.0, 8.0, 201, dtype=jnp.float64)
-    omega_fn = lambda t: t * jnp.exp(-t * t)
+    def omega_fn(t):
+        return t * jnp.exp(-t * t)
     values = omega_fn(y)
     h_core = hilbert_gl_split_core(
         y, values, omega_fn, y_trunc=8.0, y_near=2.0, n_near=64, n_far=32
@@ -129,7 +131,8 @@ def test_free_omega_wang_residual_matches_hardy_samples() -> None:
     scales = jnp.asarray([1.3])
     gammas = jnp.asarray([ALPHA])
     r_h, fields = vorticity_residual_samples(y, coeffs, scales, gammas, LAM)
-    omega_fn = lambda t: hardy_omega_profile(t, coeffs, scales, gammas)[0]
+    def omega_fn(t):
+        return hardy_omega_profile(t, coeffs, scales, gammas)[0]
     r_f, fields_f = free_omega_vorticity_residual(
         y,
         fields["omega"],
@@ -157,7 +160,8 @@ def test_official_free_omega_path_is_float64() -> None:
     scales = jnp.asarray([1.3], dtype=jnp.float64)
     gammas = jnp.asarray([ALPHA], dtype=jnp.float64)
     om, omy, _, _ = hardy_omega_profile(y, coeffs, scales, gammas)
-    omega_fn = lambda t: hardy_omega_profile(t, coeffs, scales, gammas)[0]
+    def omega_fn(t):
+        return hardy_omega_profile(t, coeffs, scales, gammas)[0]
     xi, w = _gl_pm1(16)
     assert xi.dtype == jnp.float64
     assert w.dtype == jnp.float64

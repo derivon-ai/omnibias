@@ -18,6 +18,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 _TASKS = ("binary", "multiclass", "regression")
+_SPLIT_KINDS = ("oblique", "axis", "sparse")
 
 
 @dataclass(frozen=True)
@@ -25,7 +26,10 @@ class SoftTreeConfig:
     r"""Shape + task descriptor for an ensemble of oblivious soft decision trees.
 
     The model is an ensemble of ``n_trees`` oblivious (shared-per-level) soft trees, each
-    of ``depth`` oblique split gates. ``depth == 1`` is the **additive** tier -- a pure
+    of ``depth`` split gates. ``split_kind="oblique"`` (the default, matching the 05-02
+    flagship) stores a dense direction per gate; ``"axis"`` stores a one-hot feature
+    selector so the gate is ``sigmoid(beta (x[f] - t))``; ``"sparse"`` is oblique storage
+    that a trainer may L1-sparsify. ``depth == 1`` is the **additive** tier -- a pure
     sum-of-sigmoids (Linear -> Sigmoid -> Linear), directly certifiable; ``depth >= 2`` is
     the **multiplicative** tier, whose ``2**depth`` leaf memberships are products of gates
     (native feature interactions).
@@ -38,6 +42,9 @@ class SoftTreeConfig:
         Number of soft trees summed by the ensemble.
     depth:
         Gates per tree. ``1`` -> additive; ``>= 2`` -> multiplicative (``2**depth`` leaves).
+    split_kind:
+        ``"oblique"`` (dense hyperplanes, default), ``"axis"`` (single-feature
+        thresholds) or ``"sparse"`` (oblique storage, L1-sparsified by a trainer).
     task:
         ``"binary"`` (scalar logit), ``"multiclass"`` (``n_outputs`` softmax logits) or
         ``"regression"`` (``n_outputs`` real outputs).
@@ -57,6 +64,7 @@ class SoftTreeConfig:
     n_features: int
     n_trees: int = 16
     depth: int = 1
+    split_kind: str = "oblique"
     task: str = "binary"
     n_outputs: int = 1
     beta_init: float = 1.0
@@ -72,6 +80,10 @@ class SoftTreeConfig:
             raise ValueError(f"n_trees must be >= 1, got {self.n_trees}")
         if self.depth < 1:
             raise ValueError(f"depth must be >= 1, got {self.depth}")
+        if self.split_kind not in _SPLIT_KINDS:
+            raise ValueError(
+                f"split_kind must be one of {_SPLIT_KINDS}, got {self.split_kind!r}"
+            )
         if self.task not in _TASKS:
             raise ValueError(f"task must be one of {_TASKS}, got {self.task!r}")
         if self.task == "binary" and self.n_outputs != 1:

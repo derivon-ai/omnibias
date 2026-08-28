@@ -208,6 +208,19 @@ Forward `layer_jet` plus a named local Gauss–Newton step. See
 
 ## Faà di Bruno jets
 
+`compose_jet` takes an **arbitrary** derivative tower, so it performs truncated
+power-series composition and is **cubic** in the truncation order `N`; it skips
+the products that vanish because `v = u - u_0` has valuation 1, which is a
+measured ~3x constant factor at bit-for-bit identical values, not a better
+exponent. No `O(N^2)` claim is made for it. `compose_jet_riccati` *is*
+`O(deg(P) * N^2)`, because a Riccati-class activation satisfies
+`sigma' = P(sigma)` (the `riccati_polynomial` on the `ActivationSpec`) and the
+chain rule then closes on the activation itself; it needs only `sigma(u_0)`,
+never the tower, so it also reaches past the order caps of the `tan` / `cot` /
+`coth` fastpath kernels. Opt in with `riccati=True` on `layer_jet` / `mlp_jet`;
+the default stays the general kernel so the pinned goldens keep their meaning.
+Cost and exactness gates: [`benchmarks/jet_compose_cost.py`](https://github.com/derivon-ai/omnibias/blob/main/benchmarks/jet_compose_cost.py).
+
 ::: omnibias.torch.jet
     options:
       show_root_heading: false

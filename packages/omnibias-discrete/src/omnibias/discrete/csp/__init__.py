@@ -11,7 +11,6 @@ not P vs NP.
 
 from __future__ import annotations
 
-from omnibias.discrete.csp.inequality import CspInequalityBackend
 from omnibias.discrete.csp._core import (
     CSP,
     CSPCertificate,
@@ -34,6 +33,7 @@ from omnibias.discrete.csp._core import (
     softmax_rows,
     triangle_colouring,
 )
+from omnibias.discrete.csp.inequality import CspInequalityBackend
 
 __all__ = [
     "CSP",

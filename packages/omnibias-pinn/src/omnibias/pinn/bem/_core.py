@@ -91,7 +91,7 @@ def single_layer(
     if len(density) != len(nodes):
         raise ValueError("density length must match quadrature nodes")
     eps = 0.0
-    if isinstance(kernel.regularization, (int, float)):
+    if isinstance(kernel.regularization, int | float):
         eps = float(kernel.regularization)
     acc = 0.0
     for (yx, yy), phi, w in zip(nodes, density, wts, strict=True):
@@ -116,7 +116,7 @@ def pde_residual_off_surface(
         _ = (surface, density)
         return 0.0
     # Mollified kernel: Delta log(r^2+eps^2) = 4 eps^2 / (r^2+eps^2)^2.
-    eps = float(kernel.regularization) if isinstance(kernel.regularization, (int, float)) else 0.0
+    eps = float(kernel.regularization) if isinstance(kernel.regularization, int | float) else 0.0
     wts = surface.weights()
     acc = 0.0
     for (yx, yy), phi, w in zip(nodes, density, wts, strict=True):

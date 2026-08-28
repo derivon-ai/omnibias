@@ -7,6 +7,7 @@ from __future__ import annotations
 import math
 import random
 
+import numpy as np
 import pytest
 from omnibias.core.collapse import (
     WINDING_SPEC,
@@ -104,3 +105,55 @@ def test_enclosure_contains_the_true_winding_and_avoids_zeros() -> None:
     for theta in grid:
         value = complex(math.cos(theta), math.sin(theta))
         assert abs(value) > 0.5
+
+
+def test_rectangle_contour_encloses_winding_and_validates_shape() -> None:
+    enc = winding_enclosure(
+        (0, 1),
+        0j,
+        1.0,
+        contour="rectangle",
+        half_width=2.0,
+        half_height=1.0,
+        segments=64,
+    )
+    assert enc is not None
+    assert enc.contains(1.0)
+    verdict = winding_collapse(
+        (0, 1),
+        expected=1,
+        contour="rectangle",
+        half_width=2.0,
+        half_height=1.0,
+    )
+    assert verdict.proved
+    # A deterministic grid and random perimeter samples stay away from z=0.
+    grid = [
+        complex(-2.0 + 4.0 * t, -1.0) for t in np.linspace(0.0, 1.0, 17)
+    ]
+    grid += [
+        complex(2.0, -1.0 + 2.0 * t) for t in np.linspace(0.0, 1.0, 17)
+    ]
+    grid += [
+        complex(2.0 - 4.0 * t, 1.0) for t in np.linspace(0.0, 1.0, 17)
+    ]
+    grid += [
+        complex(-2.0, 1.0 - 2.0 * t) for t in np.linspace(0.0, 1.0, 17)
+    ]
+    assert all(abs(value) >= 1.0 for value in grid)
+    rng = random.Random(20260827)
+    for _ in range(64):
+        edge = rng.randrange(4)
+        fraction = rng.random()
+        point = (
+            complex(-2.0 + 4.0 * fraction, -1.0)
+            if edge == 0
+            else complex(2.0, -1.0 + 2.0 * fraction)
+            if edge == 1
+            else complex(2.0 - 4.0 * fraction, 1.0)
+            if edge == 2
+            else complex(-2.0, 1.0 - 2.0 * fraction)
+        )
+        assert abs(point) >= 1.0
+    with pytest.raises(ValueError, match="divisible by 4"):
+        winding_enclosure((0, 1), 0j, 1.0, contour="rectangle", segments=10)

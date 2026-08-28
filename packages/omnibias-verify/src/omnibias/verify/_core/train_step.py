@@ -174,7 +174,7 @@ def _as_cell(cell: Sequence[IntervalLike] | None) -> tuple[Interval, ...] | None
         try:
             if isinstance(item, Interval):
                 iv = item
-            elif isinstance(item, Sequence) and not isinstance(item, (str, bytes)):
+            elif isinstance(item, Sequence) and not isinstance(item, str | bytes):
                 seq = list(item)
                 if len(seq) != 2:
                     return None

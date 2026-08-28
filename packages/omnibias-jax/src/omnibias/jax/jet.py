@@ -27,6 +27,42 @@ combinatorially-explicit Bell-polynomial form
 (:func:`omnibias.core.bell.faa_di_bruno_terms`) is the cross-check used in the
 test-suite, not the production path.
 
+Truncation-order cost
+---------------------
+
+:func:`compose_jet` takes an **arbitrary** derivative tower, so what it has to
+evaluate is the truncated composition of the polynomial
+``D(x) = sum_k sigma^(k)(u_0) x^k / k!`` with the valuation-1 series
+``v = u - u_0``. The kernel knows nothing about ``D`` beyond its coefficients,
+and every output coefficient ``b_n`` really does depend on all ``sigma^(k)(u_0)``
+and ``u_j`` with ``k, j <= n``, which already forces ``Omega(N^2)`` work.
+
+* Because ``v^k`` has valuation ``k``, all coefficients of ``v^k`` below order
+  ``k`` vanish identically. Restricting the recurrence to the triangle
+  ``n >= k`` removes those structurally-zero products: ``~N^3/6`` elementwise
+  multiply-adds instead of the dense ``~N^3/2``, returning the same values
+  bit-for-bit in eager execution (see :func:`compose_jet`). The exponent is
+  unchanged -- this is a constant factor, measured at 3.3x fewer multiplies at
+  ``N = 16`` in ``benchmarks/jet_compose_cost.py``.
+* Sub-cubic composition is not ruled out in theory: baby-step / giant-step
+  (Brent-Kung) reaches ``O(N^{5/2})`` when truncated multiplication is
+  schoolbook, and near-linear composition exists in the ring-operation model.
+  Both buy the exponent by transforming or reordering the coefficient axis
+  (FFT / Karatsuba style multiplication), which is *not* exact in floating
+  point -- the Taylor coefficients here span many magnitudes, so a transform
+  would trade the kernel's exactness (and the pinned cross-backend goldens) for
+  the exponent. At the truncation orders this API is used at (``N`` of order
+  ten) ``N^{5/2}`` with its larger constant is not even a win. So **no
+  ``O(N^2)`` claim is made for** :func:`compose_jet`; it is cubic in ``N``,
+  with a smaller constant than the dense form.
+* ``O(N^2)`` *is* available when the outer map is not arbitrary. An activation
+  in the Riccati class satisfies ``sigma' = P(sigma)`` for a polynomial ``P``
+  (recorded as :attr:`omnibias.core.spec.ActivationSpec.riccati_polynomial`),
+  which closes the chain rule on ``b`` itself and gives the ``O(deg(P) * N^2)``
+  recurrence in :func:`compose_jet_riccati` -- also skipping tower
+  construction. It is opt-in via ``riccati=True`` on :func:`layer_jet` /
+  :func:`mlp_jet` because it rounds differently from :func:`compose_jet`.
+
 .. important::
 
     **Bit-parity requires 64-bit JAX.** The "bit-identical twin" guarantee
@@ -47,7 +83,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from omnibias.jax.activations import JaxActivationSpec, get_activation
 
@@ -60,7 +96,7 @@ if TYPE_CHECKING:  # pragma: no cover
     LayerSpec = tuple[Array, Array | None, JaxActivationSpec | str | None]
 
 
-def _factorials(np1: int, dtype: jnp.dtype) -> Array:
+def _factorials(np1: int, dtype: jnp.dtype[Any]) -> Array:
     return jnp.array([float(math.factorial(k)) for k in range(np1)], dtype=dtype)
 
 
@@ -154,6 +190,20 @@ def compose_jet(u_jet: Array, sigma_tower: Array) -> Array:
     -------
     Array
         Jet of ``sigma(u(t))``, shape ``(N+1, ...)``.
+
+    Notes
+    -----
+    ``w(t) = u(t) - u_0`` has valuation ``1``, so ``w^k`` cannot contribute
+    below order ``k``; the recurrence therefore runs over the triangle
+    ``n >= k`` and never forms the structurally-zero coefficients. Values are
+    unchanged -- bit-for-bit against the dense form in eager execution, for
+    finite inputs -- so the win is a constant factor of about three, not a
+    better exponent. Two documented consequences of dropping products that were
+    exactly zero: a coefficient that *is* exactly zero may come out with the
+    other sign of zero (``-0.0 == 0.0``), and an infinite or NaN tower entry no
+    longer contaminates lower orders through ``inf * 0``. See the module
+    docstring for the cost discussion and :func:`compose_jet_riccati` for the
+    quadratic fastpath.
     """
     u_jet = jnp.asarray(u_jet)
     sigma_tower = jnp.asarray(sigma_tower)
@@ -164,26 +214,118 @@ def compose_jet(u_jet: Array, sigma_tower: Array) -> Array:
             f"{np1 - 1}"
         )
     zero = jnp.zeros_like(u_jet[0])
-    # w(t) = u(t) - u0 has no constant term.
-    w = [zero] + [u_jet[j] for j in range(1, np1)]
-    # P holds the Taylor coefficients of w(t)^k; start at w^0 = 1.
-    p = [jnp.ones_like(u_jet[0])] + [zero for _ in range(np1 - 1)]
-    result = [sigma_tower[0] * p[0]] + [zero for _ in range(np1 - 1)]
+    result = [sigma_tower[0] * jnp.ones_like(u_jet[0])]
+    result += [zero for _ in range(np1 - 1)]
+    # p[j] is the order-(k + j) coefficient of w^k; w^1 == u_jet[1:] exactly.
+    p = [u_jet[n] for n in range(1, np1)]
     fact = 1.0
     for k in range(1, np1):
         fact *= k
-        # p <- truncated_conv(p, w)
-        new_p = []
-        for n in range(np1):
-            acc = zero
-            for i in range(n + 1):
-                acc = acc + p[i] * w[n - i]
-            new_p.append(acc)
-        p = new_p
         dk = sigma_tower[k] / fact
-        for n in range(np1):
-            result[n] = result[n] + dk * p[n]
+        for n in range(k, np1):
+            result[n] = result[n] + dk * p[n - k]
+        if k + 1 < np1:
+            # p <- truncated_conv(p, w), keeping orders k+1 .. N of w^(k+1).
+            new_p = []
+            for n in range(k + 1, np1):
+                acc = zero
+                for i in range(k, n):
+                    acc = acc + p[i - k] * u_jet[n - i]
+                new_p.append(acc)
+            p = new_p
     return jnp.stack(result, axis=0)
+
+
+def compose_jet_riccati(
+    u_jet: Array,
+    sigma_u0: Array,
+    riccati_polynomial: Sequence[float],
+) -> Array:
+    r"""Riccati-class composition ``b = sigma(u)`` in ``O(deg(P) * N^2)``.
+
+    Specialised fastpath for an activation in the **Riccati class**, i.e. one
+    whose derivative is a polynomial in the activation itself,
+    ``sigma'(z) = P(sigma(z))`` -- the ``riccati_polynomial`` recorded on
+    :class:`omnibias.core.spec.ActivationSpec` (``sigmoid``: ``s - s^2``,
+    ``tanh``: ``1 - t^2``, ``exp``: ``E``, ``tan``: ``1 + t^2``, ...). The
+    chain rule then closes on ``b`` alone,
+
+    .. math::
+
+        b'(t) = P(b(t))\, u'(t),
+
+    so equating Taylor coefficients gives the forward recurrence
+
+    .. math::
+
+        (n+1)\, b_{n+1} = \sum_{i=0}^{n} P(b)_i \, (n-i+1)\, u_{n+1-i},
+
+    where ``P(b)`` needs the truncated powers ``b^m``, ``m <= deg(P)``, each
+    advanced one order per step. Every order costs ``O(deg(P) * n)``, hence
+    ``O(deg(P) * N^2)`` overall, and the derivative tower is never built: the
+    only activation evaluation is ``sigma_u0``.
+
+    Parameters
+    ----------
+    u_jet
+        Pre-activation jet, shape ``(N+1, ...)``.
+    sigma_u0
+        ``sigma(u_jet[0])``, broadcastable to the trailing shape of ``u_jet``.
+    riccati_polynomial
+        Ascending coefficients of ``P``, i.e. ``P(s) = sum_m c_m s^m``.
+
+    Returns
+    -------
+    Array
+        Jet of ``sigma(u(t))``, shape ``(N+1, ...)``.
+
+    Notes
+    -----
+    Mathematically identical to :func:`compose_jet` fed the exact tower, but it
+    is a *different* sequence of floating-point operations, so it agrees to
+    rounding (``~1e-13`` relative in float64) rather than bit-for-bit; against
+    its :mod:`omnibias.torch.jet` twin it agrees to a few ULP, the same footing
+    :func:`compose_jet` sits on across backends. JIT/vmap safe.
+    :func:`compose_jet` remains the default everywhere so the pinned
+    cross-backend goldens keep their meaning.
+
+    It also reaches *further* than the tower path: ``tan``, ``cot`` and ``coth``
+    have order-capped fastpath kernels, so :func:`layer_jet` raises above the
+    cap, while this recurrence needs only ``sigma(u_0)`` and ``P``.
+    """
+    u_jet = jnp.asarray(u_jet)
+    sigma_u0 = jnp.asarray(sigma_u0)
+    poly = tuple(float(c) for c in riccati_polynomial)
+    if not poly:
+        raise ValueError(
+            "riccati_polynomial must hold at least one coefficient (P of sigma)"
+        )
+    np1 = u_jet.shape[0]
+    b = [sigma_u0 * jnp.ones_like(u_jet[0])]
+    if np1 == 1:
+        return jnp.stack(b, axis=0)
+    deg = len(poly) - 1
+    du = derivative_jet(u_jet)  # du[m] = (m+1) * u_jet[m+1]
+    zero = jnp.zeros_like(b[0])
+    # powers[m] holds the coefficients of b^m computed so far; index 1 is b.
+    powers: list[list[Array]] = [[], b] + [[] for _ in range(max(deg - 1, 0))]
+    q: list[Array] = []
+    for n in range(np1 - 1):
+        for m in range(2, deg + 1):
+            acc = zero
+            for j in range(n + 1):
+                acc = acc + powers[m - 1][j] * b[n - j]
+            powers[m].append(acc)
+        qn = (zero + poly[0]) if n == 0 else zero
+        for m in range(1, deg + 1):
+            if poly[m] != 0.0:
+                qn = qn + poly[m] * powers[m][n]
+        q.append(qn)
+        acc = zero
+        for i in range(n + 1):
+            acc = acc + q[i] * du[n - i]
+        b.append(acc / float(n + 1))
+    return jnp.stack(b, axis=0)
 
 
 def _sigma_tower(spec: JaxActivationSpec, u0: Array, order: int) -> Array:
@@ -212,11 +354,19 @@ def layer_jet(
     b: Array | None,
     spec: JaxActivationSpec | str,
     order: int | None = None,
+    *,
+    riccati: bool = False,
 ) -> Array:
     """Push a jet through one ``sigma(W z + b)`` layer.
 
     The activation derivative tower is built from ``spec.fastpath``; passing an
     activation whose fastpath does not reach the jet order raises ``ValueError``.
+
+    ``riccati=True`` opts into :func:`compose_jet_riccati`, which skips the
+    tower entirely and costs ``O(N^2)`` instead of ``O(N^3)``; it requires
+    ``spec.riccati_polynomial`` and changes only the rounding, not the
+    mathematical result. The default stays ``False`` so the pinned goldens keep
+    their bit-for-bit meaning.
     """
     z_jet = jnp.asarray(z_jet)
     jet_order = z_jet.shape[0] - 1
@@ -226,6 +376,15 @@ def layer_jet(
         )
     resolved = get_activation(spec)
     u_jet = affine_jet(z_jet, W, b)
+    if riccati:
+        poly = resolved.riccati_polynomial
+        if poly is None:
+            raise ValueError(
+                f"activation {resolved.name!r} is not in the Riccati class "
+                "(no riccati_polynomial); drop riccati=True to use the general "
+                "tower kernel"
+            )
+        return compose_jet_riccati(u_jet, resolved.forward(u_jet[0]), poly)
     sigma_tower = _sigma_tower(resolved, u_jet[0], jet_order)
     return compose_jet(u_jet, sigma_tower)
 
@@ -248,6 +407,8 @@ def mlp_jet(
     v: Array,
     layers: Sequence[tuple[Array, Array | None, JaxActivationSpec | str | None]],
     order: int,
+    *,
+    riccati: bool = False,
 ) -> Array:
     """Exact directional Taylor jet of a deep MLP along ``x(t) = x0 + t v``.
 
@@ -260,6 +421,9 @@ def mlp_jet(
         (no activation); otherwise the layer computes ``sigma(W z + b)``.
     order
         Truncation order ``N``; the returned jet has ``N+1`` coefficients.
+    riccati
+        Opt into the :func:`compose_jet_riccati` fastpath in every activation
+        layer; requires all of them to be Riccati-class.
 
     Returns
     -------
@@ -272,7 +436,7 @@ def mlp_jet(
         if spec is None:
             jet = affine_jet(jet, W, b)
         else:
-            jet = layer_jet(jet, W, b, spec, order)
+            jet = layer_jet(jet, W, b, spec, order, riccati=riccati)
     return jet
 
 
@@ -363,6 +527,7 @@ __all__ = [
     "affine_jet",
     "antiderivative_jet",
     "compose_jet",
+    "compose_jet_riccati",
     "derivative_jet",
     "jet_to_tower",
     "layer_jet",

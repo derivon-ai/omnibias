@@ -12,7 +12,14 @@ from omnibias.tab.torch.arrangement import (
     fit_arrangement,
     fit_arrangement_boosted,
 )
-from omnibias.tab.torch.boosting import BoostResult, fit_boosted
+from omnibias.tab.torch.boosting import BoostResult, fit_boosted, fit_boosted_heteroscedastic
+from omnibias.tab.torch.embed import BandFeatureEmbedder, local_target_consistency_loss
+from omnibias.tab.torch.heteroscedastic import (
+    HeteroscedasticHead,
+    fit_heteroscedastic,
+    fit_noise_aware,
+    gaussian_nll_elementwise,
+)
 from omnibias.tab.torch.jet import (
     TreeJet,
     extract_arrangement_jet,
@@ -27,9 +34,11 @@ from omnibias.tab.torch.train import TrainResult, fit_first_order, fit_joint, fi
 __all__ = [
     "ArrangementBoosted",
     "ArrangementClassifier",
-    "BoostedFitResult",
+    "BandFeatureEmbedder",
     "BoostResult",
+    "BoostedFitResult",
     "FitResult",
+    "HeteroscedasticHead",
     "SoftTreeEnsemble",
     "TabHead",
     "TrainResult",
@@ -41,8 +50,14 @@ __all__ = [
     "fit_arrangement",
     "fit_arrangement_boosted",
     "fit_boosted",
+    "fit_boosted_heteroscedastic",
     "fit_first_order",
+    "fit_heteroscedastic",
     "fit_joint",
+    "fit_noise_aware",
     "fit_second_order",
+    "gaussian_nll_elementwise",
+    "local_target_consistency_loss",
     "sequential_mlp_jet",
 ]
+

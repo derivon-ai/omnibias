@@ -46,8 +46,10 @@ SUPPORTED_SCHEMA_VERSIONS = frozenset({"1.0"})
 #: enclosure was sealed (see :mod:`omnibias.core.verified.transcend`).  Stamped
 #: automatically by :func:`make_certificate` so the provenance can never be
 #: forgotten by an individual producer.  Values are ``"mpmath"`` or
-#: ``"libm_fallback"``.
+#: ``"libm_fallback"`` when a transcendental enclosure was used, and
+#: ``"not_used"`` when no transcendental enclosure fed the certificate.
 TRANSCEND_BACKEND_KEY = "transcend_backend"
+NO_TRANSCENDENTAL_BACKEND = "not_used"
 
 #: Transcendental backends whose enclosures are *unconditionally* rigorous.  The
 #: stdlib ``libm_fallback`` path is deliberately absent: it is rigorous only
@@ -59,6 +61,21 @@ UNCONDITIONAL_TRANSCEND_BACKENDS = frozenset({"arb", "mpfr", "mpmath"})
 #: Includes the legacy ``"libm"`` alias so older sealed certificates / hand-built
 #: meta still trip the seal-time and schema gates.
 CONDITIONAL_TRANSCEND_BACKENDS = frozenset({"libm", BACKEND_LIBM_FALLBACK})
+
+#: Payload kinds that represent rigorous enclosures and must never be sealed
+#: with provenance from the conditionally-rigorous libm fallback.  A certificate
+#: with no transcendental evaluation is stamped ``"not_used"`` and is allowed;
+#: this set refuses the fallback stamp itself, not rational interval algebra.
+RIGOROUS_TRANSCENDENTAL_PAYLOAD_TYPES = frozenset(
+    {
+        "interval",
+        "taylor_model",
+        "positive_definite",
+        "spectral gap",
+        "spectral_gap",
+        "pinn_aposteriori_error",
+    }
+)
 
 #: ``honesty`` key by which a producer may assert that its enclosure rests on no
 #: unverified libm assumption.  Asserting it while sealed on a conditional
@@ -242,17 +259,35 @@ def make_certificate(
       (:func:`~omnibias.core.verified.transcend.libm_fallback_used`) while the
       same unconditional / strict gate is active, sealing likewise raises: the
       payload cannot silently claim unconditional soundness.
+    * Designated rigorous enclosure payloads are refused whenever their
+      provenance records the conditional libm fallback.  Pure rational interval
+      algebra receives a ``"not_used"`` stamp and remains sealable without an
+      optional transcendental package.
     """
     honesty_out = _honesty_without_reserved(honesty)
     meta_out = dict(meta) if meta is not None else {}
-    # Prefer an explicit caller stamp; otherwise record what this process would
-    # use *and* upgrade to libm_fallback if that path already fed an enclosure
-    # (so a late mpmath import cannot launder conditional bounds).
+    # Prefer an explicit caller stamp; otherwise record the rigorous backend
+    # that actually fed the payload.  No transcendental invocation is distinct
+    # from a libm fallback: rational interval algebra must not acquire a
+    # conditional stamp simply because mpmath is optional.
     if TRANSCEND_BACKEND_KEY not in meta_out:
-        stamped = backend_name()
-        if libm_fallback_used():
-            stamped = BACKEND_LIBM_FALLBACK
+        stamped = BACKEND_LIBM_FALLBACK if libm_fallback_used() else (
+            backend_name() if backend_name() in UNCONDITIONAL_TRANSCEND_BACKENDS else NO_TRANSCENDENTAL_BACKEND
+        )
         meta_out[TRANSCEND_BACKEND_KEY] = stamped
+
+    stamped_raw = meta_out.get(TRANSCEND_BACKEND_KEY)
+    stamped = stamped_raw if isinstance(stamped_raw, str) else ""
+    payload_type_raw = payload.get("type")
+    payload_type = payload_type_raw if isinstance(payload_type_raw, str) else ""
+    designated_rigorous_payload = payload_type in RIGOROUS_TRANSCENDENTAL_PAYLOAD_TYPES
+    if designated_rigorous_payload and stamped in CONDITIONAL_TRANSCEND_BACKENDS:
+        raise RuntimeError(
+            "refusing to seal designated rigorous payload type "
+            f"{payload_type!r}: a transcendental enclosure was produced under "
+            "the conditionally-rigorous libm_fallback backend. Recompute with "
+            "mpmath before sealing."
+        )
 
     needs_rigorous = bool(honesty_out.get(UNCONDITIONAL_CLAIM_KEY, False)) or strict_backend()
     if needs_rigorous:
@@ -262,8 +297,6 @@ def make_certificate(
         # tries to launder a hand-stamped libm_fallback meta while mpmath is
         # present, the stamp check below refuses.
         require_rigorous_backend()
-        stamped_raw = meta_out.get(TRANSCEND_BACKEND_KEY)
-        stamped = stamped_raw if isinstance(stamped_raw, str) else ""
         if stamped in CONDITIONAL_TRANSCEND_BACKENDS or (
             libm_fallback_used() and stamped not in UNCONDITIONAL_TRANSCEND_BACKENDS
         ):
@@ -305,7 +338,9 @@ def certificate_is_unconditional(cert: Mapping[str, Any]) -> bool:
     An absent or unrecognised stamp answers ``False``: soundness claims default to
     the weaker reading, so unknown provenance never passes for rigorous.
     """
-    return certificate_transcend_backend(cert) in UNCONDITIONAL_TRANSCEND_BACKENDS
+    return certificate_transcend_backend(cert) in (
+        UNCONDITIONAL_TRANSCEND_BACKENDS | {NO_TRANSCENDENTAL_BACKEND}
+    )
 
 
 def interval_certificate(
@@ -399,6 +434,20 @@ def schema_errors_v1(cert: Mapping[str, Any]) -> list[str]:
                 "conditional on the platform libm error budget; install mpmath and "
                 "re-seal, or drop the claim"
             )
+    payload = cert.get("payload")
+    if isinstance(payload, Mapping):
+        payload_type = payload.get("type")
+        recorded = certificate_transcend_backend(cert)
+        if (
+            isinstance(payload_type, str)
+            and payload_type in RIGOROUS_TRANSCENDENTAL_PAYLOAD_TYPES
+            and recorded in CONDITIONAL_TRANSCEND_BACKENDS
+        ):
+            errors.append(
+                f"payload type {payload_type!r} is designated rigorous but its "
+                f"transcendental backend {recorded!r} is conditional; recompute "
+                "with mpmath before sealing"
+            )
     if "digest" in cert and not verify_certificate_digest(cert):
         errors.append("digest mismatch (tampered or stale certificate)")
     return errors
@@ -408,7 +457,9 @@ __all__ = [
     "CERTIFICATE_SCHEMA_VERSION",
     "CONDITIONAL_TRANSCEND_BACKENDS",
     "Cert",
+    "NO_TRANSCENDENTAL_BACKEND",
     "RESERVED_HONESTY_KEYS",
+    "RIGOROUS_TRANSCENDENTAL_PAYLOAD_TYPES",
     "SUPPORTED_SCHEMA_VERSIONS",
     "THEOREM_PROVER_VERIFIED_KEY",
     "TRANSCEND_BACKEND_KEY",

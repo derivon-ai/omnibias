@@ -1,0 +1,236 @@
+{
+  "schema": "omnibias.tab.pou.joint.v1",
+  "generated_utc": "2026-08-28T15:36:09Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "tier": "smoke",
+    "budget": {
+      "n_stages": 4,
+      "depth": 1,
+      "n_quantiles": 6,
+      "n_bins": 4,
+      "inner_steps": 8,
+      "residual_steps": 6,
+      "residual_k": 2,
+      "joint_steps": 6,
+      "polish_sweeps": 2,
+      "g1_n": 160,
+      "g2_n": 80,
+      "lgbm_estimators": 40,
+      "cat_iterations": 40,
+      "public_max_rows": 400
+    },
+    "seeds": [
+      0
+    ],
+    "workers": 1,
+    "hypotheses": [
+      "H0",
+      "H1"
+    ]
+  },
+  "rss_mb_at_start": 867.26,
+  "tier": "smoke",
+  "elapsed_seconds": 12.855,
+  "h0": {
+    "name": "H0",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "loss_cf_over_adam": 1.000000000007797,
+    "identity_ok": true
+  },
+  "h1": {
+    "name": "H1",
+    "passed": true,
+    "status": "wiring_only",
+    "tree_acc_drop_mean": -0.025000000000000022,
+    "kin8nm_rmse_ratio": 1.1071469057122314,
+    "wiring_only": true
+  },
+  "h2": {
+    "name": "H2",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h3": {
+    "name": "H3",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h4": {
+    "name": "H4",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h5": {
+    "name": "H5",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h6": {
+    "name": "H6",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h7": {
+    "name": "H7",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "frozen": {
+    "polish_thresholds": false,
+    "train_embed": false,
+    "use_embed": false,
+    "grouped_splits": false,
+    "joint_residual": false,
+    "use_residual": false,
+    "pairwise_warmstart": false,
+    "binarize_eval": false,
+    "n_stages": 60,
+    "note": "H7 is report-only; lock keeps n_stages=60. H3 reject forbids 17x d (use_embed stays false)."
+  },
+  "g_tree": {
+    "name": "G-tree",
+    "passed": true,
+    "wiring_only": true
+  },
+  "g_net": {
+    "name": "G-net",
+    "passed": true,
+    "wiring_only": true
+  },
+  "g_hybrid": {
+    "name": "G-hybrid",
+    "passed": true,
+    "wiring_only": true
+  },
+  "g5": {
+    "name": "G5",
+    "passed": true,
+    "is_sound": true,
+    "max_gap": 1.718545031390685,
+    "measured_max": 1.4420024454901896
+  },
+  "leftovers": [],
+  "licensed_status": "designed",
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "H0",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "loss_cf_over_adam": 1.000000000007797,
+        "identity_ok": true
+      },
+      {
+        "name": "H1",
+        "passed": true,
+        "status": "wiring_only",
+        "tree_acc_drop_mean": -0.025000000000000022,
+        "kin8nm_rmse_ratio": 1.1071469057122314,
+        "wiring_only": true
+      },
+      {
+        "name": "H2",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H3",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H4",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H5",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H6",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H7",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "G-tree",
+        "passed": true,
+        "wiring_only": true
+      },
+      {
+        "name": "G-net",
+        "passed": true,
+        "wiring_only": true
+      },
+      {
+        "name": "G-hybrid",
+        "passed": true,
+        "wiring_only": true
+      },
+      {
+        "name": "G5",
+        "passed": true,
+        "is_sound": true,
+        "max_gap": 1.718545031390685,
+        "measured_max": 1.4420024454901896
+      }
+    ]
+  },
+  "smoke_process_passed": true,
+  "licensed_sentence": "05-05 joint TabPOU: H0-H7 are hypothesis arms earned on --full; G-tree/G-net/G-hybrid/G5 are lock bars; 05-04 G3 stays report-only v0; temperature collapse only; no TabPFN-3 claim."
+}

@@ -16,7 +16,10 @@ import random
 
 import pytest
 from omnibias.core.verified.complex_interval import ComplexInterval
-from omnibias.core.verified.fourier import ValidatedFourierSeries as VFS
+from omnibias.core.verified.fourier import (
+    ValidatedFourierSeries as VFS,
+)
+from omnibias.core.verified.fourier import hilbert_symbol
 from omnibias.core.verified.interval import Interval
 
 
@@ -113,6 +116,28 @@ def test_riesz_does_not_increase_norm() -> None:
 
 
 # --------------------------------------------------------------------------- #
+# Hilbert transform: H^2 = -I off the axis-mean modes.
+# --------------------------------------------------------------------------- #
+def test_hilbert_symbol_and_squared_identity() -> None:
+    symbol = hilbert_symbol()
+    assert symbol((0,)).contains(0.0)
+    assert symbol((3,)).contains(-1j)
+    assert symbol((-3,)).contains(1j)
+
+    rng = random.Random(31)
+    coeffs = _rand_coeffs(rng, 1, 3)
+    series = VFS.from_coeffs(coeffs, 1, 3, 1.2, tail=0.2)
+    squared = series.hilbert().hilbert()
+    for wavevector, coefficient in coeffs.items():
+        if wavevector[0] == 0:
+            assert squared.get(wavevector).contains(0.0)
+        else:
+            assert squared.get(wavevector).contains(-coefficient)
+    # The Hilbert multiplier is bounded, so it preserves a nonzero tail.
+    assert squared.tail.contains(series.tail.mid)
+
+
+# --------------------------------------------------------------------------- #
 # Leray projection: divergence-free.
 # --------------------------------------------------------------------------- #
 def test_leray_projection_is_divergence_free() -> None:
@@ -177,6 +202,114 @@ def test_constant_and_zero() -> None:
 # --------------------------------------------------------------------------- #
 # Error handling.
 # --------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
+# Anisotropic per-axis nu: a genuine, sound generalisation (Part 1).
+# --------------------------------------------------------------------------- #
+def test_scalar_nu_path_is_bit_for_bit_unchanged() -> None:
+    """Passing a plain scalar `nu` (the only pre-generalisation form) must still
+    run the *exact* original isotropic formula, bit-for-bit -- this is the
+    regression the strict-superset claim depends on. (A length-`d` *sequence*
+    of equal weights is a different, merely-mathematically-equal code path --
+    see `test_anisotropic_nu_with_equal_axes_agrees_with_scalar_numerically`
+    below -- and is deliberately not asserted bit-identical here.)"""
+    rng = random.Random(41)
+    dim, n = 2, 2
+    ad = _rand_coeffs(rng, dim, n)
+    bd = _rand_coeffs(rng, dim, n)
+    a = VFS.from_coeffs(ad, dim, n, 1.3)
+    b = VFS.from_coeffs(bd, dim, n, 1.3)
+    prod = a * b
+    exact = _brute_convolution(ad, bd, dim)
+    tail_true = 0.0
+    for k, v in exact.items():
+        if all(abs(kd) <= n for kd in k):
+            assert prod.get(k).contains(v)
+        else:
+            tail_true += abs(v) * 1.3 ** sum(abs(kd) for kd in k)
+    assert prod.tail.hi >= tail_true - 1e-12
+    assert isinstance(a.nu, float)
+    assert a.nu_axes == (1.3, 1.3)
+
+
+def test_anisotropic_nu_with_equal_axes_agrees_with_scalar_numerically() -> None:
+    """An anisotropic tuple of *equal* weights computes the same weight `nu_d^|k_d|`
+    axis-by-axis (as a product of per-axis `pow_int` calls) rather than the
+    scalar path's single combined `pow_int(sum |k_d|)` call -- mathematically
+    identical, but not bit-identical (each factor rounds outward separately).
+    Both must therefore *agree numerically* (to near machine precision) and
+    both must still soundly contain the brute-force convolution."""
+    rng = random.Random(41)
+    dim, n = 2, 2
+    ad = _rand_coeffs(rng, dim, n)
+    bd = _rand_coeffs(rng, dim, n)
+    scalar = VFS.from_coeffs(ad, dim, n, 1.3)
+    aniso = VFS.from_coeffs(ad, dim, n, (1.3, 1.3))
+    assert scalar.nu_axes == aniso.nu_axes == (1.3, 1.3)
+
+    prod_scalar = scalar * VFS.from_coeffs(bd, dim, n, 1.3)
+    prod_aniso = aniso * VFS.from_coeffs(bd, dim, n, (1.3, 1.3))
+    for k in set(prod_scalar.coeffs) | set(prod_aniso.coeffs):
+        assert abs(prod_scalar.get(k).re.mid - prod_aniso.get(k).re.mid) < 1e-9
+        assert abs(prod_scalar.get(k).im.mid - prod_aniso.get(k).im.mid) < 1e-9
+    assert abs(prod_scalar.tail.hi - prod_aniso.tail.hi) < 1e-9 * prod_scalar.tail.hi
+    assert abs(scalar.norm().hi - aniso.norm().hi) < 1e-9 * scalar.norm().hi
+
+
+def test_anisotropic_nu_convolution_contains_brute_force() -> None:
+    """A genuinely direction-dependent weight must still soundly bound the tail."""
+    rng = random.Random(43)
+    dim, n = 2, 2
+    nu_axes = (1.1, 1.6)
+    ad = _rand_coeffs(rng, dim, n)
+    bd = _rand_coeffs(rng, dim, n)
+    a = VFS.from_coeffs(ad, dim, n, nu_axes)
+    b = VFS.from_coeffs(bd, dim, n, nu_axes)
+    prod = a * b
+    exact = _brute_convolution(ad, bd, dim)
+    tail_true = 0.0
+    for k, v in exact.items():
+        if all(abs(kd) <= n for kd in k):
+            assert prod.get(k).contains(v), (k, v, prod.get(k))
+        else:
+            weight = 1.0
+            for kd, nud in zip(k, nu_axes, strict=True):
+                weight *= nud ** abs(kd)
+            tail_true += abs(v) * weight
+    assert prod.tail.hi >= tail_true - 1e-12
+    assert prod.tail.lo >= 0.0
+
+
+def test_anisotropic_nu_submultiplicative_norm() -> None:
+    """Submultiplicativity holds axis-by-axis for a genuinely anisotropic weight."""
+    rng = random.Random(47)
+    dim, n = 2, 2
+    nu_axes = (1.05, 1.4)
+    a = VFS.from_coeffs(_rand_coeffs(rng, dim, n), dim, n, nu_axes)
+    b = VFS.from_coeffs(_rand_coeffs(rng, dim, n), dim, n, nu_axes)
+    prod = a * b
+    assert prod.norm().hi <= (a.norm() * b.norm()).hi + 1e-12
+    assert prod.norm().hi <= a.banach_algebra_bound(b).hi + 1e-12
+
+
+def test_anisotropic_nu_riesz_still_bounded() -> None:
+    """The bounded-multiplier proofs need only `weight >= 0`, not submultiplicativity."""
+    rng = random.Random(53)
+    dim, n = 2, 3
+    nu_axes = (1.2, 1.05)
+    a = VFS.from_coeffs(_rand_coeffs(rng, dim, n), dim, n, nu_axes, tail=0.2)
+    for j in range(dim):
+        assert a.riesz(j).norm().hi <= a.norm().hi * (1.0 + 1e-9)
+
+
+def test_anisotropic_nu_validation() -> None:
+    with pytest.raises(ValueError):
+        VFS.zero(2, 2, (1.0, 0.9))  # one axis weight < 1
+    with pytest.raises(ValueError):
+        VFS.zero(2, 2, (1.0, 1.0, 1.0))  # wrong length for dim=2
+    ok = VFS.zero(2, 2, (1.0, 1.0))
+    assert ok.nu_axes == (1.0, 1.0)
+
+
 def test_error_handling() -> None:
     with pytest.raises(ValueError):
         VFS.zero(0, 2, 1.0)  # dim < 1

@@ -515,6 +515,8 @@ __all__ = [
     "hardy_odd_deriv_n_iv",
     "hardy_odd_iv",
     "hardy_odd_matrix",
+    "hardy_omega_velocity_atom",
+    "hardy_omega_velocity_atom_iv",
     "hardy_pair",
     "hardy_radius",
     "hardy_radius_iv",
@@ -525,8 +527,6 @@ __all__ = [
     "hilbert_of_hardy_even_deriv_n",
     "hilbert_of_hardy_odd",
     "hilbert_of_hardy_odd_deriv_n",
-    "hardy_omega_velocity_atom",
-    "hardy_omega_velocity_atom_iv",
     "pochhammer",
     "pochhammer_iv",
 ]

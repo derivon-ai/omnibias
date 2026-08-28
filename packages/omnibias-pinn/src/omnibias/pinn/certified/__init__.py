@@ -82,7 +82,12 @@ from omnibias.pinn.certified.fluid_rollout import (
     rollout_diagnostics_schema_errors,
     vorticity_from_descriptor,
 )
-from omnibias.pinn.certified.ipm import build_ipm_cap_bundle
+from omnibias.pinn.certified.ipm import (
+    build_ipm_cap_bundle,
+    build_ipm_radii_construction,
+    export_ipm_toy_cap_replay,
+    ipm_banded_toy_radii,
+)
 from omnibias.pinn.certified.machine import (
     PERRON_GAP_SCHEMA_VERSION,
     build_default_machine,
@@ -403,6 +408,7 @@ __all__ = [
     "build_default_machine",
     "build_formal_proof_package",
     "build_ipm_cap_bundle",
+    "build_ipm_radii_construction",
     "build_ns_cap_bundle",
     "build_ns_proof_program_report",
     "build_ns_solve_or_falsify_report",
@@ -468,6 +474,7 @@ __all__ = [
     "energy_diagnostics",
     "exact_navier_stokes_equation_contracts",
     "exact_profile_norm_divergence_attempt",
+    "export_ipm_toy_cap_replay",
     "external_review_gate",
     "external_verification_record",
     "finite_active_tail_contraction_diagnostic",
@@ -491,6 +498,7 @@ __all__ = [
     "interval_square",
     "interval_sub",
     "interval_trapezoid_bound",
+    "ipm_banded_toy_radii",
     "kolmogorov_flow",
     "lean_formalization_package",
     "leray_project_periodic",

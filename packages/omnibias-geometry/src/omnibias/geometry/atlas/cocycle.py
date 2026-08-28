@@ -183,9 +183,9 @@ def two_interval_poisson(*, seeds: int = 5, beta: float = 1.0) -> dict[str, obje
 
 
 __all__ = [
+    "AffineChart",
     "DEFAULT_CONFIG",
     "DISCLAIMER",
-    "AffineChart",
     "SheafAtlasConfig",
     "affine_jet",
     "affine_tower",

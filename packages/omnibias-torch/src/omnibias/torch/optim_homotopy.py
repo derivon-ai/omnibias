@@ -50,8 +50,8 @@ __all__ = [
     "DISCLAIMER",
     "HomotopyConfig",
     "HomotopyReport",
-    "honesty_payload",
     "homotopy_step",
     "homotopy_train",
+    "honesty_payload",
     "worked_example",
 ]

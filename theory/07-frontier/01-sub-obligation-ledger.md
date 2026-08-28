@@ -2,12 +2,12 @@
 
 ## 1. Thesis and status
 
-Five famous problems, five finite or compact sub-obligations that the new
-primitives can actually attack, and — for each — the absolute gate that decides
-it and the sentence that must never be written. This file is the ledger the
-other six frontier specs are entries in.
+Famous problems and finite or compact sub-obligations that the new primitives
+can actually attack, and — for each — the absolute gate that decides it and the
+sentence that must never be written. This file is the ledger the other frontier
+specs are entries in.
 
-- **Status**: shipped (G1–G5 earned; RH is a non-entry; design record)
+- **Status**: shipped (G1–G5 earned; Lambda research entry recorded; design record)
 - **Depends on**: 01-11, 06-01, 06-02
 - **Blocks**: 07-02, 07-03, 07-04, 07-05, 07-06, 07-07
 
@@ -39,7 +39,7 @@ The honesty machinery is shipped and strict; this ledger indexes it.
 - `benchmarks/_gates.py` — `ccf_absolute_gates` and
   `ipm_boussinesq_scaffold_gates`, both emitting
   `navier_stokes_proof_claim: False`.
-- `.cursor/rules/frontier-claims.mdc`, `omnibias-dev-frontier-research` skill.
+- `.cursor/rules/omnibias.md` (Frontier program), `omnibias-frontier` skill.
 
 **No gap.** The flags stay enforced in those modules. This ledger plus
 `docs/frontier-ledger.md` is the single index; the distance column is updated
@@ -99,21 +99,27 @@ concentrated in the passage the sub-obligation avoids.
 
 **Parent: the Riemann Hypothesis.**
 
-- Sub-obligation: **nothing about zeros**. The legitimate work is tighter
-  enclosures of Dirichlet series, `L`-functions and Jacobi theta on `Re(s) > 1`,
-  which is where `omnibias.core.verified.dirichlet` is verified.
-- Gate: enclosure width against a high-precision reference, plus `100%`
-  coverage.
-- Sealed scope: **`Re(s) > 1` only.** Analytic continuation is not implemented
-  and must not be inferred.
-- Never write: any sentence containing "Riemann Hypothesis" and "we" as
-  subject. Additionally: **no Padé or Borel tool from spec 03-10 may be applied
-  to a Dirichlet series to claim continuation, or to say anything whatsoever
-  about zeros.** That step is one line of code and the entire open problem, and
-  spec 06-02 requires a dedicated test forbidding it.
-- Entry: none. There is no Group 07 spec for RH, deliberately, because there is
-  no legitimate sub-obligation the primitives improve. Listing it here as an
-  explicit non-entry is the point.
+- Sub-obligation: a rigorous upper-bound program for the de Bruijn–Newman
+  constant `Lambda`: certify the finite zero-counting, truncation, and
+  approximation steps required by a published reduction, plus its independently
+  proved far-field premise. A rectangle calculation alone is not a bound on
+  `Lambda`.
+- Gate: a replayable certificate of `Lambda <= t0` for a pre-registered
+  `t0 < 0.22`, including every finite count, error enclosure, and the cited
+  far-field reduction.
+- Sealed scope: named `t0`, declared contour cover, declared finite
+  approximation, and the stated far-field theorem. The current
+  `omnibias.core.verified.dirichlet` surface remains **`Re(s) > 1` only**.
+  `omnibias.core.verified.debruijn_newman` encloses `Phi(u)` and `H_t` on one
+  finite rectangle and records a named `Lambda <= 0.2` attempt that stays
+  `certified=False` because the cited far-field premise (and a genuine finite
+  contour cover) remain external obligations. That attempt does not earn the
+  ledger gate.
+- Never write: *"we prove / disprove the Riemann Hypothesis"* or infer it from
+  a bound on `Lambda`. Additionally: **no Padé or Borel tool from spec 03-10
+  may be applied to a Dirichlet series to claim continuation.**
+- Entry: planned Lambda program; no Group 07 implementation or dedicated spec
+  has been shipped.
 
 **Parent: P versus NP.**
 
@@ -181,7 +187,7 @@ side).**
 | NS | Navier-Stokes global regularity (Clay) | sound residual enclosure on one box and horizon | `require_enclosure_coverage` at 100% plus a named residual floor | one discretization, one box, one horizon | we prove global regularity for Navier-Stokes | 07-02 | `docs/benchmarks/ns_weak_form_enclosure_smoke.json` (`all_passed`; width split recorded; continuum claim false) |
 | EULER | finite-time singularity of 3D Euler / Navier-Stokes | CCF residual on a fixed grid and dictionary | `ccf_absolute_gates` stretch `1e-13` | one model equation; not Euler/NS | our CCF residual is evidence for Euler or Navier-Stokes blowup | 07-03 | `docs/benchmarks/reproduce_deepmind_ccf_smoke.json` (stretch unearned) |
 | YM | Yang-Mills existence and mass gap (Clay) | certified gap of one fixed transfer matrix | `certified_spectral_gap` strictly positive | `continuum_claim = False` | we prove the Yang-Mills mass gap | 07-04, 07-05 | `docs/benchmarks/gauge_holonomy_gap_smoke.json` (`all_passed`; `mass_gap: false`); trial factor leftover-recorded on two-plaquette / strip |
-| RH | the Riemann Hypothesis | nothing about zeros; Dirichlet enclosures on `Re(s) > 1` | enclosure width plus 100% coverage | `Re(s) > 1` only | any sentence with Riemann Hypothesis and we as subject | none | non-entry; no Group 07 spec; width smoke `docs/benchmarks/dirichlet_enclosure_smoke.json` (`Re(s)>1` only; no zeros) |
+| RH | the Riemann Hypothesis | rigorous de Bruijn–Newman `Lambda` upper-bound program via a published finite reduction | replayable `Lambda <= t0` certificate for pre-registered `t0 < 0.22` | named contour cover, finite approximation, and proved far-field premise; not implemented | we prove / disprove the Riemann Hypothesis | planned Lambda program | no implementation; `docs/benchmarks/dirichlet_enclosure_smoke.json` remains `Re(s)>1` only |
 | PNP | P versus NP | certified optimality gap on one instance | `certify_gap` sandwich, never claimed tight | per instance, per size | P = NP | qubo / discrete; 03-01, 03-03 | `docs/benchmarks/instance_gap_tightening_smoke.json` (`all_passed`; never tight) |
 | TURB | turbulence closure (Nobel-adjacent) | computed coarse-graining vs fine reference | relative error, absolute threshold, five seeds | one model, one scale ratio, one geometry | we solve the closure problem | 03-07, 07-07 | `docs/benchmarks/scale_flow_smoke.json` (`all_passed`) |
 | DYN | computer-assisted global dynamical structure | finite-horizon jet Lohner on a finite box | 07-06 width-budget / orbit gates | finite boxes and time | we prove the system is chaotic | 07-06 | `docs/benchmarks/validated_dynamics_smoke.json` (`all_passed`; attractor claim false; `seal_run` emits `diagnose_width`) |
@@ -198,6 +204,7 @@ is listed here so a new site cannot appear without a ledger row.
 | `omnibias.pinn.certified.machine` | `continuum_navier_stokes_claim` | NS |
 | `omnibias.geometry.gauge.transfer` | `continuum_claim` | YM |
 | `omnibias.core.verified.dirichlet` | `Re(s) > 1` scope | RH |
+| `omnibias.core.verified.debruijn_newman` | `rh_claim = False`; named `Lambda` attempt unearned | RH |
 | `omnibias.core.verified.eig_operator` | `certified_spectral_gap` | YM |
 | `omnibias.sos` | positivity honesty | YM |
 | `omnibias.qubo` / `omnibias.discrete` | `certify_gap` | PNP |
@@ -265,10 +272,9 @@ def test_group_07_entries_are_in_the_ledger():
     that appears in the ledger's table, and the ledger's 'never write' column is
     non-empty for that parent."""
 
-def test_no_rh_entry_exists():
-    """There is deliberately no Riemann-Hypothesis frontier spec. If one
-    appears, this test fails and the author must justify it against the three
-    tests in the ledger."""
+def test_rh_entry_is_lambda_scoped():
+    """The RH ledger row is limited to a de Bruijn–Newman Lambda program,
+    never an assertion that the parent is proved or disproved."""
 ```
 
 The second test is unusual and deliberate: it makes adding an RH spec require
@@ -290,7 +296,7 @@ deleting a test that explains why it should not exist.
 - **G2 no orphan claims.** Every certificate-emitting module that pins a claim
   flag to `False` is cross-referenced from the ledger. A new such module without
   a ledger entry fails CI.
-- **G3 RH non-entry preserved.** `test_no_rh_entry_exists` passes.
+- **G3 Lambda scope preserved.** `test_rh_entry_is_lambda_scoped` passes.
 - **G4 Padé boundary.** A test asserts no code path applies spec 03-10's Padé or
   Borel machinery to `omnibias.core.verified.dirichlet` outputs.
 - **G5 distance recorded.** Each entry records its current best result against
@@ -309,9 +315,10 @@ carries the same boundaries.
   encouraged.
 - Passing every gate in this ledger would solve none of the five parents. That
   is not a defect of the ledger; it is what "external obligation" means.
-- The RH non-entry is the most important row, because it is where the primitives
-  most tempt an overreach: an enclosure engine plus an extrapolation tool looks
-  like a continuation engine and is not.
+- The RH Lambda entry is deliberately a research target, not an RH claim.
+  An enclosure engine plus an extrapolation tool is not a continuation engine;
+  the published reduction and its far-field premise must be independently
+  established before a Lambda bound is reported.
 - Certificate tier: this spec produces none. Entries produce their own, at the
   tiers their specs state.
 - No collapse limit appears in this spec.
@@ -339,11 +346,11 @@ carries the same boundaries.
 
 - [x] `docs/frontier-ledger.md` mirroring this file's table
 - [x] `test_group_07_entries_are_in_the_ledger`
-- [x] `test_no_rh_entry_exists` with its explanatory docstring
+- [x] `test_rh_entry_is_lambda_scoped` with its explanatory docstring
 - [x] Padé-versus-`dirichlet` boundary test
 - [x] Cross-reference every claim-flag-pinning module from the ledger
 - [x] Distance-to-gate column, updated with artifact changes
-- [x] Cross-reference from `.cursor/rules/frontier-claims.mdc`
+- [x] Cross-reference from `.cursor/rules/omnibias.md` (Frontier program)
 - [x] Index row in `theory/README.md`
 
 ## 13. Parent problem and the exact reason it stays an external obligation

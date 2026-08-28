@@ -32,18 +32,30 @@ def _certificate_from_data(data: dict[str, Any]) -> Certificate:
     boundary = tuple(data.get("boundary", ()))
     if not all(isinstance(face, BoundaryFace) for face in boundary):
         raise TypeError("data['boundary'] must contain BoundaryFace objects")
+    stability = data.get("stability")
+    stability_kwargs: dict[str, object]
+    if stability is not None:
+        stability_kwargs = {"stability": stability}
+    else:
+        if "stability_interior" not in data or "stability_boundary" not in data:
+            raise ValueError(
+                "data must provide stability=StabilityEstimate or both "
+                "stability_interior and stability_boundary"
+            )
+        stability_kwargs = {
+            "stability_interior": float(data["stability_interior"]),
+            "stability_boundary": float(data["stability_boundary"]),
+        }
     built = aposteriori_error_certificate(
         layers,
         domain,
         pde,
         boundary=boundary,
-        stability=data.get("stability"),
-        stability_interior=float(data.get("stability_interior", 1.0)),
-        stability_boundary=float(data.get("stability_boundary", 1.0)),
         invariants=tuple(data.get("invariants", ())),
         max_error=data.get("max_error"),
         splits=data.get("splits", 1),
         boundary_splits=data.get("boundary_splits", 1),
+        **stability_kwargs,
     )
     return built.certificate
 

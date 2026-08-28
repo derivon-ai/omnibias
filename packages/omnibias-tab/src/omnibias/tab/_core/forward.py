@@ -35,14 +35,21 @@ def sigmoid_np(z: FloatArray) -> FloatArray:
     return out
 
 
-def gate_activations(params: TabParams, X: FloatArray, beta: float) -> FloatArray:
-    r"""Soft gate activations ``G`` of shape ``(n, n_trees, depth)`` in ``(0, 1)``."""
+def gate_activations_arrays(
+    W: FloatArray, t: FloatArray, X: FloatArray, beta: float
+) -> FloatArray:
+    r"""Soft gate activations ``G`` of shape ``(n, n_trees, depth)`` from raw arrays."""
     Xv = np.asarray(X, dtype=np.float64)
-    z = np.einsum("nd,mjd->nmj", Xv, params.W) - params.t[None, :, :]
+    z = np.einsum("nd,mjd->nmj", Xv, W) - np.asarray(t, dtype=np.float64)[None, :, :]
     return sigmoid_np(beta * z)
 
 
-def _memberships(G: FloatArray, depth: int) -> FloatArray:
+def gate_activations(params: TabParams, X: FloatArray, beta: float) -> FloatArray:
+    r"""Soft gate activations ``G`` of shape ``(n, n_trees, depth)`` in ``(0, 1)``."""
+    return gate_activations_arrays(params.W, params.t, X, beta)
+
+
+def memberships_from_gates(G: FloatArray, depth: int) -> FloatArray:
     r"""Leaf memberships ``(n, n_trees, 2**depth)`` from gates ``G`` ``(n, n_trees, depth)``.
 
     Each leaf's membership is the **soft AND** of its root-to-leaf path conditions -- the
@@ -55,6 +62,10 @@ def _memberships(G: FloatArray, depth: int) -> FloatArray:
     B = codes[None, None, :, :]  # (1, 1, L, D)
     factors = B * Gexp + (1.0 - B) * (1.0 - Gexp)  # (n, T, L, D)
     return np.prod(factors, axis=-1)  # (n, T, L)
+
+
+def _memberships(G: FloatArray, depth: int) -> FloatArray:
+    return memberships_from_gates(G, depth)
 
 
 def leaf_memberships(params: TabParams, X: FloatArray, beta: float) -> FloatArray:
@@ -116,8 +127,10 @@ def predict_np(params: TabParams, X: FloatArray, beta: float, *, hard: bool = Fa
 __all__ = [
     "forward_np",
     "gate_activations",
+    "gate_activations_arrays",
     "hard_forward_np",
     "leaf_memberships",
+    "memberships_from_gates",
     "predict_np",
     "scores_to_prob",
     "sigmoid_np",

@@ -220,6 +220,11 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/verified/enclosure_collapse.py",
     "packages/omnibias-verify/src/omnibias/verify/enclosure_collapse.py",
     "packages/omnibias-verify/src/omnibias/verify/_core/enclosure_collapse.py",
+    "packages/omnibias-core/src/omnibias/core/contact_smoothing.py",
+    "packages/omnibias-control/src/omnibias/control/jax/adjoint.py",
+    "packages/omnibias-control/src/omnibias/control/torch/adjoint.py",
+    "packages/omnibias-control/src/omnibias/control/horizon.py",
+    "packages/omnibias-control/src/omnibias/control/certified/gradient_bias.py",
 )
 
 ENCLOSURE_COLLAPSE_FILES = (

@@ -1,0 +1,100 @@
+{
+  "schema": "omnibias.benchmarks.actor_adjoint_control.v1",
+  "generated_utc": "2026-08-27T22:00:31Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.13.0+cpu",
+    "folx": "absent"
+  },
+  "config": {
+    "family": "actor_adjoint_control",
+    "full": false,
+    "n_steps": 15,
+    "horizon": 10,
+    "n_seeds": 5,
+    "g3_ratio_threshold": 0.5
+  },
+  "rss_mb_at_start": 633.23,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g3_control_vs_zero_action",
+        "key": "ratio",
+        "expected": 0.5,
+        "tol": 0.0,
+        "direction": "max",
+        "n_seeds": 5,
+        "min_seeds": 5,
+        "values": [
+          0.3292059504487877,
+          0.33010837422143957,
+          0.3250306287507856,
+          0.32863719035239836,
+          0.3302627815271129
+        ],
+        "deviations": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "seeds": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "worst_seed": 0,
+        "worst_index": 0,
+        "worst_value": 0.3292059504487877,
+        "worst_deviation": 0.0,
+        "passed": true
+      }
+    ]
+  },
+  "per_seed": [
+    {
+      "seed": 0,
+      "zero_action_cost": 22.82301281269057,
+      "trained_cost": 7.513471625106659,
+      "ratio": 0.3292059504487877
+    },
+    {
+      "seed": 1,
+      "zero_action_cost": 22.82301281269057,
+      "trained_cost": 7.534067654432369,
+      "ratio": 0.33010837422143957
+    },
+    {
+      "seed": 2,
+      "zero_action_cost": 22.82301281269057,
+      "trained_cost": 7.418178204496052,
+      "ratio": 0.3250306287507856
+    },
+    {
+      "seed": 3,
+      "zero_action_cost": 22.82301281269057,
+      "trained_cost": 7.5004908061394175,
+      "ratio": 0.32863719035239836
+    },
+    {
+      "seed": 4,
+      "zero_action_cost": 22.82301281269057,
+      "trained_cost": 7.537591694348125,
+      "ratio": 0.3302627815271129
+    }
+  ],
+  "diagnostic_g4": null,
+  "honesty": {
+    "g3_threshold_source": "measured Phase-A curve: worst-seed ratio ~0.33 at n_steps=15, horizon=10, lr=0.05 (see per_seed); threshold 0.5 leaves margin, not tuned to the observed value. a larger, less-conservative budget (n_steps=40, horizon=12) was tried first and diverged on one of 5 seeds -- these settings were kept specifically because they are the ones verified stable, per the module docstring",
+    "g4_status": "leftover-recorded, not earned: no PPO/TD3/SHAC/PEARL reimplementation exists in this repository; diagnostic_g4 compares only the four in-repo arms and is explicitly ungated (see theory/10-control/02-jet-adjoint-policy-optimization.md section 8)"
+  },
+  "wall_seconds": 93.53598924353719
+}

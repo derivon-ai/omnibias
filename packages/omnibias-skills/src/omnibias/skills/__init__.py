@@ -1,16 +1,16 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""omnibias-skills: the consumer agent-skill library for building on omnibias.
+"""omnibias-skills: the capability agent-skill library for building on omnibias.
 
 This package bundles Cursor / Claude Code *Agent Skills* that teach an AI
-coding assistant how to **use** omnibias correctly, and an idempotent installer
-that places them into a project's ``.cursor/skills`` and ``.claude/skills``
-directories. It has no runtime dependencies and no import-time side effects:
-skills are written only through an explicit :func:`install_skills` call (or the
-``omnibias-skills`` console script).
+coding assistant how to use the closed-form derivative tower, and an
+idempotent installer that places them into a project's ``.cursor/skills``
+and ``.claude/skills`` directories. It has no runtime dependencies and no
+import-time side effects: skills are written only through an explicit
+:func:`install_skills` call (or the ``omnibias-skills`` console script).
 
-Skills for *developing omnibias itself* are a separate, repo-only library
-(``.cursor/skills/omnibias-dev-*``) and are intentionally not shipped here.
+The full catalog lives in the omnibias repository; this distribution ships
+the capability nine, byte-identical to ``.cursor/skills``.
 """
 
 from __future__ import annotations

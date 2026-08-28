@@ -28,7 +28,8 @@ Public API:
 * :func:`affine_jet`, :func:`compose_jet`, :func:`layer_jet`, :func:`mlp_jet`,
   :func:`tower_to_jet`, :func:`jet_to_tower` -- exact multi-layer directional
   Taylor jets via Faà di Bruno composition of the closed-form activation
-  derivative towers.
+  derivative towers; :func:`compose_jet_riccati` is the opt-in ``O(N^2)``
+  fastpath for the Riccati class (``sigma' = P(sigma)``).
 * :func:`mlp_jet_mv`, :func:`layer_jet_mv`, :func:`compose_jet_mv`,
   :func:`jet_multiply`, :func:`affine_jet_mv`, :func:`identity_jet`,
   :func:`jet_partials`, :func:`jet_gradient`, :func:`jet_hessian` -- exact
@@ -107,16 +108,11 @@ from omnibias.jax.information import (
     wasserstein2_gaussian,
     wassersteinp,
 )
-from omnibias.jax.line_search import (
-    JetLineSearchConfig,
-    LineSearchResult,
-    jet_line_search,
-    jet_line_search_on_ray,
-)
 from omnibias.jax.jet import (
     affine_jet,
     antiderivative_jet,
     compose_jet,
+    compose_jet_riccati,
     derivative_jet,
     jet_to_tower,
     layer_jet,
@@ -148,6 +144,12 @@ from omnibias.jax.laplacian import (
     neural_field_value_and_laplacian,
     neural_field_value_grad_hessian,
     neural_field_value_grad_laplacian,
+)
+from omnibias.jax.line_search import (
+    JetLineSearchConfig,
+    LineSearchResult,
+    jet_line_search,
+    jet_line_search_on_ray,
 )
 from omnibias.jax.moments import (
     delta_method_gaussian,
@@ -225,6 +227,12 @@ from omnibias.jax.train_local import (
     local_jet_step,
     make_input_jet,
 )
+from omnibias.jax.train_stack import (
+    TrainStackConfig,
+    TrainStackReport,
+    recommended_stack_step,
+    stack_minimize,
+)
 from omnibias.jax.transforms import (
     FourierTransform,
     LaplaceTransform,
@@ -236,12 +244,6 @@ from omnibias.jax.transforms import (
     laplace_transform,
     mellin_transform,
     region_of_convergence,
-)
-from omnibias.jax.train_stack import (
-    TrainStackConfig,
-    TrainStackReport,
-    recommended_stack_step,
-    stack_minimize,
 )
 from omnibias.jax.weight_loss_jet import (
     WeightLossJetSpec,
@@ -303,6 +305,7 @@ __all__ = [
     "chi_squared_divergence",
     "compose_jet",
     "compose_jet_mv",
+    "compose_jet_riccati",
     "composed_block_hessian",
     "composed_curvature_step",
     "coulomb_potential",

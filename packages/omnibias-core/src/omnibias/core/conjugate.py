@@ -242,7 +242,7 @@ def _integrate_q(y: float, a: float, beta: float) -> float:
     if abs(beta - 1.0) < 1e-12:
         return math.log(math.hypot(a, y) / a)
     p_y = hardy_p(y, a, beta - 1.0)
-    p_0 = a ** (-(beta - 1.0))
+    p_0 = float(a ** (-(beta - 1.0)))
     return -(p_y - p_0) / (beta - 1.0)
 
 

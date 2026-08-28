@@ -20,6 +20,7 @@ from fractions import Fraction
 from typing import Literal
 
 import numpy as np
+from numpy.typing import NDArray
 from omnibias.core.mollifier import MollifierSpec
 from omnibias.core.multipack import MultiPackSpec, PackSpec, _birkhoff_vandermonde
 from omnibias.core.verified.interval import Interval
@@ -161,7 +162,9 @@ def _lebesgue_moments_exact(degree: int, lo: float, hi: float) -> list[Fraction]
     return out
 
 
-def _chebyshev_jacobi(moments: Sequence[object], n: int) -> tuple[np.ndarray, np.ndarray]:
+def _chebyshev_jacobi(
+    moments: Sequence[object], n: int
+) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     """Gautschi Chebyshev algorithm in ``Decimal`` so Jacobi entries stay accurate."""
     with localcontext() as ctx:
         ctx.prec = 80
@@ -190,7 +193,7 @@ def _chebyshev_jacobi(moments: Sequence[object], n: int) -> tuple[np.ndarray, np
         )
 
 
-def _golub_welsch(moments: Sequence[object], n: int) -> tuple[np.ndarray, np.ndarray]:
+def _golub_welsch(moments: Sequence[object], n: int) -> tuple[NDArray[np.float64], NDArray[np.float64]]:
     alpha, beta = _chebyshev_jacobi(moments, n)
     off = np.sqrt(np.maximum(beta[1:], 0.0))
     jacobi = np.diag(alpha) + np.diag(off, k=1) + np.diag(off, k=-1)
@@ -201,7 +204,9 @@ def _golub_welsch(moments: Sequence[object], n: int) -> tuple[np.ndarray, np.nda
     return nodes.astype(np.float64), weights.astype(np.float64)
 
 
-def _fixed_node_weights(nodes: Sequence[float] | np.ndarray, moments: Sequence[object]) -> np.ndarray:
+def _fixed_node_weights(
+    nodes: Sequence[float] | NDArray[np.float64], moments: Sequence[object]
+) -> NDArray[np.float64]:
     """Newton–Cotes-type linear solve via the 01-01/01-04 confluent Vandermonde."""
     packs = MultiPackSpec.from_packs(tuple(PackSpec(order=0, mean=float(x)) for x in nodes))
     vand = _birkhoff_vandermonde(packs)

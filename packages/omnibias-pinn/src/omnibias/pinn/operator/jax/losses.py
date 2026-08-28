@@ -60,7 +60,7 @@ def heat_residual_loss(
     state = field.on_grid(coords)
     u_t = jops.derivative(state, component, axis=1, order=1)
     u_xx = jops.derivative(state, component, axis=0, order=2)
-    if isinstance(diffusivity, Array) or not isinstance(diffusivity, (int, float)):
+    if isinstance(diffusivity, Array) or not isinstance(diffusivity, int | float):
         F = int(sensors.shape[0])
         Q = int(coords.shape[0])
         D = jnp.reshape(diffusivity, (F, 1))
@@ -111,7 +111,7 @@ def burgers_residual_loss(
     u_t = jops.derivative(state, component, axis=1, order=1)
     u_x = jops.derivative(state, component, axis=0, order=1)
     u_xx = jops.derivative(state, component, axis=0, order=2)
-    if isinstance(viscosity, Array) or not isinstance(viscosity, (int, float)):
+    if isinstance(viscosity, Array) or not isinstance(viscosity, int | float):
         F = int(sensors.shape[0])
         Q = int(coords.shape[0])
         nu = jnp.reshape(viscosity, (F, 1))

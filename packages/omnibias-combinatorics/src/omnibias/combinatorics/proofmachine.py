@@ -23,14 +23,14 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from omnibias.combinatorics.conditions import (
+    EdgeColouringFamily,
+    ExtremalTemplateConditionFamily,
+)
 from omnibias.combinatorics.extremal import (
     ExtremalSearchFamily,
     verify_forbidden_family,
     verify_pair_graph,
-)
-from omnibias.combinatorics.conditions import (
-    EdgeColouringFamily,
-    ExtremalTemplateConditionFamily,
 )
 from omnibias.combinatorics.minors import ForbiddenMinorFamily
 from omnibias.combinatorics.ramsey import verify_pentagon_colouring, verify_saturated_smoke

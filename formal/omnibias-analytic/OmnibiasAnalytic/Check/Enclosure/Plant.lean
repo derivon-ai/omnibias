@@ -2,7 +2,8 @@
 Locked enclosure-trace plants (A/B/C/D).
 
 Each plant is a finite rational DAG. `evalTrace` replays it. The NK plant
-then applies the existing unique-root theorem on `[5/4, 7/4]`.
+then applies the existing unique-root theorem on `[5/4, 7/4]`. The finite
+trace checks use kernel-reduced `decide`, never `native_decide`.
 
 Scope (honest). These are planted rational identities and one compact-interval
 root. They are not a continuum PDE claim, not analytic continuation of a
@@ -39,7 +40,7 @@ theorem tower_horner_coeffs : OmnibiasAnalytic.Tower.sigmoidCoeffList 2 = [0, 1,
 
 theorem tower_horner_result :
     (evalTrace towerHornerOps).getLast? = some (point (-2 / 27)) := by
-  native_decide
+  decide
 
 /-! ### B. NK bound DAG plus unique root of `x² - 2` -/
 
@@ -66,7 +67,7 @@ theorem nk_trace_bounds :
     (evalTrace nkBoundOps)[8]? = some (point (1 / 12)) ∧
     (evalTrace nkBoundOps)[10]? = some (point (1 / 3)) ∧
     (evalTrace nkBoundOps)[14]? = some (point (-1 / 8)) := by
-  native_decide
+  decide
 
 theorem nk_trace_unique_zero :
     ((evalTrace nkBoundOps)[8]? = some (point (1 / 12)) ∧
@@ -95,7 +96,7 @@ def bernoulliOps : List TraceOp :=
 theorem bernoulli_b2_zetaNeg1 :
     (evalTrace bernoulliOps)[7]? = some (point (1 / 6)) ∧
     (evalTrace bernoulliOps)[10]? = some (point (-1 / 12)) := by
-  native_decide
+  decide
 
 /-! ### D. Exact LDLᵀ of `[[2, 1], [1, 2]]` -/
 
@@ -114,6 +115,6 @@ theorem ldlt_plant_pivots_pos :
     (evalTrace ldltOps)[0]? = some (point 2) ∧
     (evalTrace ldltOps)[6]? = some (point (3 / 2)) ∧
     (0 : ℚ) < 2 ∧ (0 : ℚ) < 3 / 2 := by
-  native_decide
+  decide
 
 end OmnibiasAnalytic.Check

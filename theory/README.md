@@ -169,6 +169,9 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [05-01 inverse problems and imaging](05-applications/01-inverse-problems-and-imaging.md) | shipped | `omnibias.pinn.inverse`; G1–G7 earned (locally-seeded `sd ~ alpha^(n-5/2)`; global search earned for n=3 only) |
 | [05-02 beyond-PDE applications](05-applications/02-beyond-pde-applications.md) | shipped | Tabular arrangements (G1/G2/G3 earned; G3b leftover-recorded leftover #49 `4/8`, G4 leftover-recorded leftover #50 `0.25`, neither in CI `all_passed`); shape topology G6/G7 earned; sequence filter **earned** (G5 vs S4D; order-0 tail, width = horizon) |
+| [05-03 data uncertainty as a training signal](05-applications/03-data-uncertainty-training-signal.md) | gated | Noise-damped exact-Newton curvature, band-embedding pullback loss, and GLS-boosted reweighting for `omnibias.tab`; G0/G1b passed but **G1/G2/G3 all falsified** (5 seeds, `--full`) -- recorded as negative results, not tuned to pass; G4 public-suite report **passed** (9/9 sets, 22% win rate vs LightGBM/CatBoost/RealMLP/TabM, no aggregate-only claim); G5 no-regression **failed** on 3/9 sets |
+| [05-04 TabPOU architecture](05-applications/04-tabpou-architecture.md) | gated | Axis-aligned POU boosting with closed-form Newton leaves, band/integral numerical embeddings, and an optional TabM residual; from-scratch league (GBDT / RealMLP / TabM), not TabPFN-3; `--full` locked (`docs/benchmarks/tabular_pou.json`); **G0/G0b/G5/G6 passed**; **G1/G2/G3 failed** (G3 not-worse-both `3/6`, need `>=5/6`); G4 leftover-recorded (`n_comparable=3`); G3 stays boost-only v0 for 05-05, not retuned |
+| [05-05 TabPOU joint worlds](05-applications/05-tabpou-joint-worlds.md) | shipped | Joint tree+net TabPOU; frozen combo is sequential TabM residual (H1) on v0 axis Newton trees; G-tree `3/3` / G-net `2/3` / G-hybrid `6/6` / G5 earned (`docs/benchmarks/tabular_pou_joint.json`); H0/H3/H4/H6 rejected; H2/H5 inconclusive; H7 report-only; 05-04 G3 report-only v0; temperature collapse only |
 
 ### 06 Program
 
@@ -256,6 +259,19 @@ operator floor.
 | [09-28 sliced-jet encoder](09-inventions/28-sliced-jet-encoder.md) | shipped | Tokens are scan jets + named energy; G1–G5 CI; not a ViT; not `R^D` |
 | [09-29 plant PID layer](09-inventions/29-plant-pid-layer.md) | shipped | Exact I/D on `sigma(alpha t + beta)`; G1–G4 CI; not 08-10; not cruise SOTA |
 | [09-30 inequality engine](09-inventions/30-inequality-engine.md) | shipped | propose / rationalize / check front door; G1–G4 CI; G5 leftover-recorded, not in CI `all_passed`; not 03-02 / 03-03; not a new LP algorithm |
+
+### 10 Control-systems optimization
+
+Jet-adjoint policy optimization and its certified layer, on the existing
+`omnibias-control` package. No new package; 08-10/08-11 stay parameter-space
+trainers and 09-29 stays a scalar plant (10-01 disambiguates all three).
+
+| Spec | Status | One line |
+|---|---|---|
+| [10-01 control ledger](10-control/01-ledger.md) | shipped | Assignment table only; 08-10/08-11 stay trainers, 09-29 stays a scalar plant; no code |
+| [10-02 jet-adjoint policy optimization](10-control/02-jet-adjoint-policy-optimization.md) | shipped | `omnibias.core.adjoint` + `omnibias.control.{jax,torch}.{adjoint,policy,envs}`; closed-form `dpi/dy`; G1/G2/G9 CI-earned; G3/G4/G8 baseline benchmarks leftover-recorded |
+| [10-03 certified horizon and gradient-bias enclosure](10-control/03-certified-horizon-gradient-bias.md) | shipped | `omnibias.control.horizon` + `omnibias.control.certified.gradient_bias` + `omnibias.control.bundle`; founding bias collapse, not temperature collapse; G5/G6 smoke-earned (`n<1000`), full-scale run leftover-recorded |
+| [10-04 certified contact](10-control/04-certified-contact.md) | shipped | `omnibias.core.contact_smoothing` + `omnibias.control.{jax,torch}.contact`; exact `sigma^(n)` tower plus a sound one-sided hardening-bias enclosure; G1/G2 CI-earned; 1-D only, 2-D Coulomb block leftover-recorded |
 
 ## How to use a spec
 

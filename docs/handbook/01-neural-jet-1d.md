@@ -615,8 +615,13 @@ winner.
 
 ```python
 from omnibias.symbolic import make_symbolic_regression_dataset, discover_interpretable_surrogate
-data = make_symbolic_regression_dataset(seed=0)
-out = discover_interpretable_surrogate(data)
+data = make_symbolic_regression_dataset(n_samples=180, seed=0)
+out = discover_interpretable_surrogate(
+    data,
+    alphas=(1e-6,),
+    thresholds=(1e-3,),
+    include_cdf_band=False,
+)
 print(out["family"], "->", out["equation"])
 print(round(out["metrics"]["rmse"], 4))
 ```

@@ -1,0 +1,565 @@
+{
+  "schema": "omnibias.tab.pou.joint.v1",
+  "generated_utc": "2026-08-28T16:31:29Z",
+  "hardware_class": "commodity x86-64 CPU (38 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "tier": "lock",
+    "budget": {
+      "n_stages": 60,
+      "depth": 3,
+      "n_quantiles": 16,
+      "n_bins": 16,
+      "inner_steps": 40,
+      "residual_steps": 40,
+      "residual_k": 8,
+      "joint_steps": 40,
+      "polish_sweeps": 4,
+      "g1_n": 2000,
+      "g2_n": 800,
+      "lgbm_estimators": 200,
+      "cat_iterations": 200,
+      "public_max_rows": 3000
+    },
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "workers": 4,
+    "hypotheses": []
+  },
+  "rss_mb_at_start": 1619.09,
+  "tier": "lock",
+  "elapsed_seconds": 2237.486,
+  "h0": {
+    "name": "H0",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h1": {
+    "name": "H1",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h2": {
+    "name": "H2",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h3": {
+    "name": "H3",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h4": {
+    "name": "H4",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h5": {
+    "name": "H5",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h6": {
+    "name": "H6",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "h7": {
+    "name": "H7",
+    "passed": true,
+    "status": "wiring_only",
+    "wiring_only": true,
+    "skipped": true,
+    "reason": "not selected"
+  },
+  "frozen": {
+    "polish_thresholds": false,
+    "train_embed": false,
+    "use_embed": false,
+    "grouped_splits": false,
+    "joint_residual": false,
+    "use_residual": true,
+    "pairwise_warmstart": false,
+    "binarize_eval": false,
+    "n_stages": 60,
+    "note": "H7 is report-only; lock keeps n_stages=60. H3 reject forbids 17x d (use_embed stays false)."
+  },
+  "g_tree": {
+    "name": "G-tree",
+    "passed": true,
+    "not_worse_both": 3,
+    "n_scored": 3,
+    "rows": [
+      {
+        "name": "breast_cancer",
+        "skipped": false,
+        "task": "binary",
+        "joint_mean": 0.9608391608391609,
+        "lgbm_mean": 0.9622377622377621,
+        "cat_mean": 0.9664335664335665,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "v0_mean": 0.9566433566433565,
+        "not_worse_v0": true
+      },
+      {
+        "name": "banknote",
+        "skipped": false,
+        "task": "binary",
+        "joint_mean": 0.9994169096209913,
+        "lgbm_mean": 0.9924198250728862,
+        "cat_mean": 0.9965014577259476,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "v0_mean": 0.9994169096209913,
+        "not_worse_v0": true
+      },
+      {
+        "name": "ionosphere",
+        "skipped": false,
+        "task": "binary",
+        "joint_mean": 0.9318181818181817,
+        "lgbm_mean": 0.9363636363636363,
+        "cat_mean": 0.9318181818181817,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "v0_mean": 0.9431818181818181,
+        "not_worse_v0": true
+      }
+    ],
+    "g1": {
+      "name": "G1_vs_v0",
+      "worst_margin_vs_v0": 0.0,
+      "passed": true
+    }
+  },
+  "g_net": {
+    "name": "G-net",
+    "passed": true,
+    "not_worse_both": 2,
+    "n_comparable": 3,
+    "rows": [
+      {
+        "name": "kin8nm",
+        "skipped": false,
+        "task": "regression",
+        "joint_mean": -0.11428643920662052,
+        "lgbm_mean": -0.1376023984347386,
+        "cat_mean": -0.11644955387480845,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "v0_mean": -0.14942127176608253,
+        "not_worse_v0": true,
+        "realmlp_mean": -0.07906342728237017,
+        "tabm_mean": -0.09205453958774254,
+        "not_worse_realmlp": false,
+        "not_worse_tabm": false
+      },
+      {
+        "name": "energy_efficiency",
+        "skipped": false,
+        "task": "regression",
+        "joint_mean": -0.4795847664601759,
+        "lgbm_mean": -0.6188270960978015,
+        "cat_mean": -0.36565452783739816,
+        "not_worse_lgbm": true,
+        "not_worse_cat": false,
+        "v0_mean": -0.480892857213769,
+        "not_worse_v0": true,
+        "realmlp_mean": -4.398002332984847,
+        "tabm_mean": -2.0781596833356333,
+        "not_worse_realmlp": true,
+        "not_worse_tabm": true
+      },
+      {
+        "name": "mlp_heteroscedastic_20d",
+        "skipped": false,
+        "task": "regression",
+        "joint_mean": -36.351166002814054,
+        "realmlp_mean": -27.001252367454185,
+        "tabm_mean": -25.62100105801315,
+        "not_worse_realmlp": true,
+        "not_worse_tabm": true
+      }
+    ]
+  },
+  "g_hybrid": {
+    "name": "G-hybrid",
+    "passed": true,
+    "not_worse_v0": 6,
+    "n_scored": 6,
+    "rows": [
+      {
+        "name": "breast_cancer",
+        "skipped": false,
+        "task": "binary",
+        "joint_mean": 0.9608391608391609,
+        "lgbm_mean": 0.9622377622377621,
+        "cat_mean": 0.9664335664335665,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "v0_mean": 0.9566433566433565,
+        "not_worse_v0": true
+      },
+      {
+        "name": "banknote",
+        "skipped": false,
+        "task": "binary",
+        "joint_mean": 0.9994169096209913,
+        "lgbm_mean": 0.9924198250728862,
+        "cat_mean": 0.9965014577259476,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "v0_mean": 0.9994169096209913,
+        "not_worse_v0": true
+      },
+      {
+        "name": "ionosphere",
+        "skipped": false,
+        "task": "binary",
+        "joint_mean": 0.9318181818181817,
+        "lgbm_mean": 0.9363636363636363,
+        "cat_mean": 0.9318181818181817,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "v0_mean": 0.9431818181818181,
+        "not_worse_v0": true
+      },
+      {
+        "name": "kin8nm",
+        "skipped": false,
+        "task": "regression",
+        "joint_mean": -0.11428643920662052,
+        "lgbm_mean": -0.1376023984347386,
+        "cat_mean": -0.11644955387480845,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "v0_mean": -0.14942127176608253,
+        "not_worse_v0": true
+      },
+      {
+        "name": "energy_efficiency",
+        "skipped": false,
+        "task": "regression",
+        "joint_mean": -0.4795847664601759,
+        "lgbm_mean": -0.6188270960978015,
+        "cat_mean": -0.36565452783739816,
+        "not_worse_lgbm": true,
+        "not_worse_cat": false,
+        "v0_mean": -0.480892857213769,
+        "not_worse_v0": true
+      },
+      {
+        "name": "wine_quality",
+        "skipped": false,
+        "task": "regression",
+        "joint_mean": -0.7079865326113798,
+        "lgbm_mean": -0.6853480212462421,
+        "cat_mean": -0.6788498210969107,
+        "not_worse_lgbm": false,
+        "not_worse_cat": false,
+        "v0_mean": -0.7006940712033525,
+        "not_worse_v0": true
+      }
+    ]
+  },
+  "g5": {
+    "name": "G5",
+    "passed": true,
+    "is_sound": true,
+    "max_gap": 1.718545031390685,
+    "measured_max": 1.4420024454901887
+  },
+  "leftovers": [],
+  "licensed_status": "shipped",
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "H0",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H1",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H2",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H3",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H4",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H5",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H6",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "H7",
+        "passed": true,
+        "status": "wiring_only",
+        "wiring_only": true,
+        "skipped": true,
+        "reason": "not selected"
+      },
+      {
+        "name": "G-tree",
+        "passed": true,
+        "not_worse_both": 3,
+        "n_scored": 3,
+        "rows": [
+          {
+            "name": "breast_cancer",
+            "skipped": false,
+            "task": "binary",
+            "joint_mean": 0.9608391608391609,
+            "lgbm_mean": 0.9622377622377621,
+            "cat_mean": 0.9664335664335665,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "v0_mean": 0.9566433566433565,
+            "not_worse_v0": true
+          },
+          {
+            "name": "banknote",
+            "skipped": false,
+            "task": "binary",
+            "joint_mean": 0.9994169096209913,
+            "lgbm_mean": 0.9924198250728862,
+            "cat_mean": 0.9965014577259476,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "v0_mean": 0.9994169096209913,
+            "not_worse_v0": true
+          },
+          {
+            "name": "ionosphere",
+            "skipped": false,
+            "task": "binary",
+            "joint_mean": 0.9318181818181817,
+            "lgbm_mean": 0.9363636363636363,
+            "cat_mean": 0.9318181818181817,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "v0_mean": 0.9431818181818181,
+            "not_worse_v0": true
+          }
+        ],
+        "g1": {
+          "name": "G1_vs_v0",
+          "worst_margin_vs_v0": 0.0,
+          "passed": true
+        }
+      },
+      {
+        "name": "G-net",
+        "passed": true,
+        "not_worse_both": 2,
+        "n_comparable": 3,
+        "rows": [
+          {
+            "name": "kin8nm",
+            "skipped": false,
+            "task": "regression",
+            "joint_mean": -0.11428643920662052,
+            "lgbm_mean": -0.1376023984347386,
+            "cat_mean": -0.11644955387480845,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "v0_mean": -0.14942127176608253,
+            "not_worse_v0": true,
+            "realmlp_mean": -0.07906342728237017,
+            "tabm_mean": -0.09205453958774254,
+            "not_worse_realmlp": false,
+            "not_worse_tabm": false
+          },
+          {
+            "name": "energy_efficiency",
+            "skipped": false,
+            "task": "regression",
+            "joint_mean": -0.4795847664601759,
+            "lgbm_mean": -0.6188270960978015,
+            "cat_mean": -0.36565452783739816,
+            "not_worse_lgbm": true,
+            "not_worse_cat": false,
+            "v0_mean": -0.480892857213769,
+            "not_worse_v0": true,
+            "realmlp_mean": -4.398002332984847,
+            "tabm_mean": -2.0781596833356333,
+            "not_worse_realmlp": true,
+            "not_worse_tabm": true
+          },
+          {
+            "name": "mlp_heteroscedastic_20d",
+            "skipped": false,
+            "task": "regression",
+            "joint_mean": -36.351166002814054,
+            "realmlp_mean": -27.001252367454185,
+            "tabm_mean": -25.62100105801315,
+            "not_worse_realmlp": true,
+            "not_worse_tabm": true
+          }
+        ]
+      },
+      {
+        "name": "G-hybrid",
+        "passed": true,
+        "not_worse_v0": 6,
+        "n_scored": 6,
+        "rows": [
+          {
+            "name": "breast_cancer",
+            "skipped": false,
+            "task": "binary",
+            "joint_mean": 0.9608391608391609,
+            "lgbm_mean": 0.9622377622377621,
+            "cat_mean": 0.9664335664335665,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "v0_mean": 0.9566433566433565,
+            "not_worse_v0": true
+          },
+          {
+            "name": "banknote",
+            "skipped": false,
+            "task": "binary",
+            "joint_mean": 0.9994169096209913,
+            "lgbm_mean": 0.9924198250728862,
+            "cat_mean": 0.9965014577259476,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "v0_mean": 0.9994169096209913,
+            "not_worse_v0": true
+          },
+          {
+            "name": "ionosphere",
+            "skipped": false,
+            "task": "binary",
+            "joint_mean": 0.9318181818181817,
+            "lgbm_mean": 0.9363636363636363,
+            "cat_mean": 0.9318181818181817,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "v0_mean": 0.9431818181818181,
+            "not_worse_v0": true
+          },
+          {
+            "name": "kin8nm",
+            "skipped": false,
+            "task": "regression",
+            "joint_mean": -0.11428643920662052,
+            "lgbm_mean": -0.1376023984347386,
+            "cat_mean": -0.11644955387480845,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "v0_mean": -0.14942127176608253,
+            "not_worse_v0": true
+          },
+          {
+            "name": "energy_efficiency",
+            "skipped": false,
+            "task": "regression",
+            "joint_mean": -0.4795847664601759,
+            "lgbm_mean": -0.6188270960978015,
+            "cat_mean": -0.36565452783739816,
+            "not_worse_lgbm": true,
+            "not_worse_cat": false,
+            "v0_mean": -0.480892857213769,
+            "not_worse_v0": true
+          },
+          {
+            "name": "wine_quality",
+            "skipped": false,
+            "task": "regression",
+            "joint_mean": -0.7079865326113798,
+            "lgbm_mean": -0.6853480212462421,
+            "cat_mean": -0.6788498210969107,
+            "not_worse_lgbm": false,
+            "not_worse_cat": false,
+            "v0_mean": -0.7006940712033525,
+            "not_worse_v0": true
+          }
+        ]
+      },
+      {
+        "name": "G5",
+        "passed": true,
+        "is_sound": true,
+        "max_gap": 1.718545031390685,
+        "measured_max": 1.4420024454901887
+      }
+    ]
+  },
+  "smoke_process_passed": true,
+  "licensed_sentence": "05-05 joint TabPOU: H0-H7 are hypothesis arms earned on --full; G-tree/G-net/G-hybrid/G5 are lock bars; 05-04 G3 stays report-only v0; temperature collapse only; no TabPFN-3 claim."
+}

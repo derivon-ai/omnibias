@@ -268,7 +268,7 @@ def _build_line_cap_bundle(
             "alpha": alpha,
         },
         "residual_diagnostics": {
-            k: float(v) for k, v in result.diagnostics.items() if isinstance(v, (int, float))
+            k: float(v) for k, v in result.diagnostics.items() if isinstance(v, int | float)
         },
         "residual_samples": residual.tolist(),
         "validation_inputs": {

@@ -296,7 +296,7 @@ def _tokens_of(check: ExactCheck) -> int:
         equation = mapping.get("equation")
         if isinstance(equation, Mapping):
             coeffs = equation.get("coefficients")
-            if isinstance(coeffs, (list, tuple)):
+            if isinstance(coeffs, list | tuple):
                 nonzero = [item for item in coeffs if str(item) not in {"0", "0/1"}]
                 if nonzero:
                     return len(nonzero)
@@ -650,12 +650,12 @@ class LinearSpanFamily:
 
 
 __all__ = [
-    "FEATURE_DIM",
     "ClassGate",
     "ClassHit",
     "ClassMemory",
     "ClassSelection",
     "ClassTier",
+    "FEATURE_DIM",
     "FrequencyGate",
     "LinearSpanFamily",
     "Observation",

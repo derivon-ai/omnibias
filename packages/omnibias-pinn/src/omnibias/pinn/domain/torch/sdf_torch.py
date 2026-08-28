@@ -77,7 +77,7 @@ def _r_disj_torch(a: Tensor, b: Tensor, *, alpha: float = 0.0) -> Tensor:
 
 def from_sdf(sdf: SDF) -> DistanceFn:
     """Build a torch distance callable from any numpy SDF node."""
-    if isinstance(sdf, (Sphere, Box, Halfspace)):
+    if isinstance(sdf, Sphere | Box | Halfspace):
         return from_primitive(sdf)
     if isinstance(sdf, Negate):
         child = from_sdf(sdf.child)

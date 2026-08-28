@@ -19,7 +19,7 @@ Three registers, honestly labelled:
 
 This is the ``delta -> 0`` founding bias collapse (a smooth ``sigma^(K-1)``
 derivative), never the ``beta -> inf`` feasibility penalty; do not conflate the
-two senses (see the ``omnibias-dev-core-concepts`` skill).
+two senses (see the ``omnibias-core-concepts`` skill).
 """
 
 from __future__ import annotations

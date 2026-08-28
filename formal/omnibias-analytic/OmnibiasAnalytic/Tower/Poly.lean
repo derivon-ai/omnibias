@@ -7,7 +7,9 @@ probabilist's Hermite). They are algebraic identities on `ℤ[X]`.
 
 Coefficient *lists* are computable and match the Python exact-integer
 generators. The polynomials themselves are the mathematical recurrences
-(Mathlib's `X` is noncomputable).
+(Mathlib's `X` is noncomputable). The finite checks below use kernel-reduced
+`decide`, never `native_decide`, so they add no native evaluator to the trusted
+base.
 
 Scope. This module does not state a finite-difference collapse, a continuum
 PDE claim, or any asymptotic. A green build here means the recurrences and
@@ -81,18 +83,18 @@ def hermiteCoeffs : ℕ → List ℤ
 @[simp] theorem hermiteCoeffs_zero : hermiteCoeffs 0 = [1] := rfl
 @[simp] theorem hermiteCoeffs_one : hermiteCoeffs 1 = [0, 1] := rfl
 
-theorem sigmoidCoeffs_one : sigmoidCoeffs 1 = [0, 1, -1] := by native_decide
-theorem sigmoidCoeffs_two : sigmoidCoeffs 2 = [0, 1, -3, 2] := by native_decide
-theorem tanhCoeffs_one : tanhCoeffs 1 = [1, 0, -1] := by native_decide
-theorem sechCoeffs_one : sechCoeffs 1 = [0, -1] := by native_decide
-theorem sechCoeffs_two : sechCoeffs 2 = [-1, 0, 2] := by native_decide
-theorem hermiteCoeffs_two : hermiteCoeffs 2 = [-1, 0, 1] := by native_decide
+theorem sigmoidCoeffs_one : sigmoidCoeffs 1 = [0, 1, -1] := by decide
+theorem sigmoidCoeffs_two : sigmoidCoeffs 2 = [0, 1, -3, 2] := by decide
+theorem tanhCoeffs_one : tanhCoeffs 1 = [1, 0, -1] := by decide
+theorem sechCoeffs_one : sechCoeffs 1 = [0, -1] := by decide
+theorem sechCoeffs_two : sechCoeffs 2 = [-1, 0, 2] := by decide
+theorem hermiteCoeffs_two : hermiteCoeffs 2 = [-1, 0, 1] := by decide
 
 /-- Constant terms `Q_n(0)` are the Euler (secant) numbers `E_n` for `n ≤ 8`. -/
 theorem sech_euler_numbers :
     List.map (fun n => (sechCoeffs n).headD 0) [0, 1, 2, 3, 4, 5, 6, 7, 8] =
       [1, 0, -1, 0, 5, 0, -61, 0, 1385] := by
-  native_decide
+  decide
 
 /-! ### Mathematical recurrences on `ℤ[X]` -/
 

@@ -118,6 +118,12 @@ def exact_div_variance(divs: Sequence[float]) -> float:
     """Sample variance of an exact-div stream (must be 0 if constant)."""
     if len(divs) < 2:
         return 0.0
+    # Averaging identical binary64 values by repeated addition can itself round,
+    # producing a tiny nonzero residual below.  Constant exact-div streams are
+    # structurally zero-variance, so preserve that fact before numerical
+    # accumulation.
+    if all(div == divs[0] for div in divs[1:]):
+        return 0.0
     mu = _mean(divs)
     return _mean([(d - mu) * (d - mu) for d in divs])
 

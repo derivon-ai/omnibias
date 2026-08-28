@@ -1,0 +1,284 @@
+{
+  "schema": "omnibias.tab.pou.joint.v1",
+  "generated_utc": "2026-08-28T15:45:21Z",
+  "hardware_class": "commodity x86-64 CPU (38 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "tier": "full",
+    "budget": {
+      "n_stages": 20,
+      "depth": 2,
+      "n_quantiles": 8,
+      "n_bins": 8,
+      "inner_steps": 20,
+      "residual_steps": 20,
+      "residual_k": 4,
+      "joint_steps": 20,
+      "polish_sweeps": 3,
+      "g1_n": 800,
+      "g2_n": 400,
+      "lgbm_estimators": 100,
+      "cat_iterations": 100,
+      "public_max_rows": 2000
+    },
+    "seeds": [
+      0,
+      1,
+      2
+    ],
+    "workers": 4,
+    "hypotheses": [
+      "H0",
+      "H1",
+      "H2",
+      "H3",
+      "H4",
+      "H5",
+      "H6",
+      "H7"
+    ]
+  },
+  "rss_mb_at_start": 751.99,
+  "tier": "full",
+  "elapsed_seconds": 311.464,
+  "h0": {
+    "name": "H0",
+    "passed": true,
+    "status": "rejected",
+    "cf_mean": 0.3928907050931152,
+    "adam_mean": 0.4103483930580061,
+    "seconds_cf": 8.771,
+    "seconds_adam": 7.069,
+    "not_worse": true,
+    "faster": false,
+    "loss_cf_over_adam": 1.000000000007797,
+    "wiring_only": false
+  },
+  "h1": {
+    "name": "H1",
+    "passed": true,
+    "status": "accepted",
+    "tree_acc_drop_mean": -0.005847953216374287,
+    "kin8nm_rmse_ratio": 0.6718320158455545,
+    "wiring_only": false
+  },
+  "h2": {
+    "name": "H2",
+    "passed": true,
+    "status": "inconclusive",
+    "worst_margin_vs_v0": -0.0050000000000000044,
+    "probe_not_worse": false,
+    "probe_strict_win": true,
+    "wiring_only": false
+  },
+  "h3": {
+    "name": "H3",
+    "passed": true,
+    "status": "rejected",
+    "worst_rmse": {
+      "mlp_heteroscedastic_20d:none": 4.97974213033897,
+      "mlp_heteroscedastic_20d:frozen": 5.006039217994366,
+      "mlp_heteroscedastic_20d:trained_band": 5.041685848707393,
+      "mlp_heteroscedastic_20d:trained_integral": 5.016108251734845,
+      "kin8nm:none": 0.19628533268370574,
+      "kin8nm:frozen": 0.19058658169308262,
+      "kin8nm:trained_band": 0.18340713829646538,
+      "kin8nm:trained_integral": 0.19173752823213072
+    },
+    "winner": "frozen_or_none",
+    "wiring_only": false
+  },
+  "h4": {
+    "name": "H4",
+    "passed": true,
+    "status": "rejected",
+    "naive_rmse": 0.18378431406387855,
+    "grouped_rmse": 0.18378431406387855,
+    "colsample_rmse": 0.1858427321698711,
+    "wiring_only": false
+  },
+  "h5": {
+    "name": "H5",
+    "passed": true,
+    "status": "inconclusive",
+    "greedy_worst_margin": -0.015000000000000013,
+    "pairwise_worst_margin": 0.020000000000000018,
+    "wiring_only": false
+  },
+  "h6": {
+    "name": "H6",
+    "passed": true,
+    "status": "rejected",
+    "hybrid_holds_on_tree_probe": false,
+    "joint_beats_seq_on_net": true,
+    "wiring_only": false
+  },
+  "h7": {
+    "name": "H7",
+    "passed": true,
+    "status": "report_only",
+    "acc_n_stages_lo": 0.995,
+    "acc_n_stages_hi": 0.99,
+    "acc_colsample_0_5": 0.995,
+    "n_stages_lo": 60,
+    "n_stages_hi": 200,
+    "note": "Do not promote extra-stage boost-only as 05-05 shipped.",
+    "wiring_only": false
+  },
+  "frozen": {
+    "polish_thresholds": false,
+    "train_embed": false,
+    "use_embed": false,
+    "grouped_splits": false,
+    "joint_residual": false,
+    "use_residual": true,
+    "pairwise_warmstart": false,
+    "binarize_eval": false,
+    "n_stages": 60,
+    "note": "H7 is report-only; lock keeps n_stages=60. H3 reject forbids 17x d (use_embed stays false)."
+  },
+  "g_tree": {
+    "name": "G-tree",
+    "passed": true,
+    "wiring_only": true
+  },
+  "g_net": {
+    "name": "G-net",
+    "passed": true,
+    "wiring_only": true
+  },
+  "g_hybrid": {
+    "name": "G-hybrid",
+    "passed": true,
+    "wiring_only": true
+  },
+  "g5": {
+    "name": "G5",
+    "passed": true,
+    "is_sound": true,
+    "max_gap": 1.718545031390685,
+    "measured_max": 1.4420024454901887
+  },
+  "leftovers": [],
+  "licensed_status": "designed",
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "H0",
+        "passed": true,
+        "status": "rejected",
+        "cf_mean": 0.3928907050931152,
+        "adam_mean": 0.4103483930580061,
+        "seconds_cf": 8.771,
+        "seconds_adam": 7.069,
+        "not_worse": true,
+        "faster": false,
+        "loss_cf_over_adam": 1.000000000007797,
+        "wiring_only": false
+      },
+      {
+        "name": "H1",
+        "passed": true,
+        "status": "accepted",
+        "tree_acc_drop_mean": -0.005847953216374287,
+        "kin8nm_rmse_ratio": 0.6718320158455545,
+        "wiring_only": false
+      },
+      {
+        "name": "H2",
+        "passed": true,
+        "status": "inconclusive",
+        "worst_margin_vs_v0": -0.0050000000000000044,
+        "probe_not_worse": false,
+        "probe_strict_win": true,
+        "wiring_only": false
+      },
+      {
+        "name": "H3",
+        "passed": true,
+        "status": "rejected",
+        "worst_rmse": {
+          "mlp_heteroscedastic_20d:none": 4.97974213033897,
+          "mlp_heteroscedastic_20d:frozen": 5.006039217994366,
+          "mlp_heteroscedastic_20d:trained_band": 5.041685848707393,
+          "mlp_heteroscedastic_20d:trained_integral": 5.016108251734845,
+          "kin8nm:none": 0.19628533268370574,
+          "kin8nm:frozen": 0.19058658169308262,
+          "kin8nm:trained_band": 0.18340713829646538,
+          "kin8nm:trained_integral": 0.19173752823213072
+        },
+        "winner": "frozen_or_none",
+        "wiring_only": false
+      },
+      {
+        "name": "H4",
+        "passed": true,
+        "status": "rejected",
+        "naive_rmse": 0.18378431406387855,
+        "grouped_rmse": 0.18378431406387855,
+        "colsample_rmse": 0.1858427321698711,
+        "wiring_only": false
+      },
+      {
+        "name": "H5",
+        "passed": true,
+        "status": "inconclusive",
+        "greedy_worst_margin": -0.015000000000000013,
+        "pairwise_worst_margin": 0.020000000000000018,
+        "wiring_only": false
+      },
+      {
+        "name": "H6",
+        "passed": true,
+        "status": "rejected",
+        "hybrid_holds_on_tree_probe": false,
+        "joint_beats_seq_on_net": true,
+        "wiring_only": false
+      },
+      {
+        "name": "H7",
+        "passed": true,
+        "status": "report_only",
+        "acc_n_stages_lo": 0.995,
+        "acc_n_stages_hi": 0.99,
+        "acc_colsample_0_5": 0.995,
+        "n_stages_lo": 60,
+        "n_stages_hi": 200,
+        "note": "Do not promote extra-stage boost-only as 05-05 shipped.",
+        "wiring_only": false
+      },
+      {
+        "name": "G-tree",
+        "passed": true,
+        "wiring_only": true
+      },
+      {
+        "name": "G-net",
+        "passed": true,
+        "wiring_only": true
+      },
+      {
+        "name": "G-hybrid",
+        "passed": true,
+        "wiring_only": true
+      },
+      {
+        "name": "G5",
+        "passed": true,
+        "is_sound": true,
+        "max_gap": 1.718545031390685,
+        "measured_max": 1.4420024454901887
+      }
+    ]
+  },
+  "smoke_process_passed": true,
+  "licensed_sentence": "05-05 joint TabPOU: H0-H7 are hypothesis arms earned on --full; G-tree/G-net/G-hybrid/G5 are lock bars; 05-04 G3 stays report-only v0; temperature collapse only; no TabPFN-3 claim."
+}

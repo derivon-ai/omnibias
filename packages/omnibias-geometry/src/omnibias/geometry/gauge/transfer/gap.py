@@ -632,10 +632,10 @@ certified_gap_scaling_table = heat_kernel_gap_scaling_report
 __all__ = [
     "BIRKHOFF_METHOD",
     "DIAGONAL_SPECTRUM_METHOD",
-    "LEHMANN_METHOD",
     "EffectiveMassCurve",
     "EffectiveMassPoint",
     "GapCandidate",
+    "LEHMANN_METHOD",
     "MultistepGapResult",
     "SYMMETRIC_METHOD",
     "ScalingPoint",

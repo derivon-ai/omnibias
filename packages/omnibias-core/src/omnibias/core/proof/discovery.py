@@ -198,7 +198,7 @@ def _candidate_json(candidate: Candidate | None) -> Any:
         return None
     if isinstance(candidate, tuple):
         return [_candidate_json(part) for part in candidate]
-    if isinstance(candidate, (int, str, bool)):
+    if isinstance(candidate, int | str | bool):
         return candidate
     if isinstance(candidate, Fraction):
         return str(candidate)
@@ -434,7 +434,7 @@ def _equation_from_check(checked: ExactCheck | None) -> DiscoveredEquation | Non
     if not isinstance(kind, str) or not isinstance(pretty, str):
         return None
     coeffs = raw.get("coefficients", ())
-    if isinstance(coeffs, (list, tuple)):
+    if isinstance(coeffs, list | tuple):
         coeff_tuple = tuple(str(item) for item in coeffs)
     else:
         coeff_tuple = ()

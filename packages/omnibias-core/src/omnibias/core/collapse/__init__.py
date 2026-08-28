@@ -63,8 +63,10 @@ from omnibias.core.collapse.verdict import (
 )
 from omnibias.core.collapse.winding import (
     WINDING_SPEC,
+    ComplexEnclosureFn,
     winding_collapse,
     winding_enclosure,
+    winding_enclosure_function,
 )
 
 __all__ = [
@@ -73,6 +75,7 @@ __all__ = [
     "CollapseRegistry",
     "CollapseSpec",
     "CollapseStatus",
+    "ComplexEnclosureFn",
     "DistinctnessReport",
     "FOUNDING_COLLAPSES",
     "FOUNDING_NAMES",
@@ -108,4 +111,5 @@ __all__ = [
     "search_residuals",
     "winding_collapse",
     "winding_enclosure",
+    "winding_enclosure_function",
 ]

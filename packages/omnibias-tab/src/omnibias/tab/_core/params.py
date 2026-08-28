@@ -97,9 +97,11 @@ def init_params(
 ) -> TabParams:
     r"""Small random initialisation.
 
-    ``W`` is drawn ``N(0, weight_scale**2)`` (default ``1/sqrt(n_features)`` so an oblique
-    projection has unit-ish variance), thresholds start at ``0``, leaves are small so the
-    initial logits sit near ``0`` (``p ~ 0.5`` for classification), and ``b0 = 0``.
+    ``split_kind="axis"`` assigns each gate a single feature with a unit direction
+    (an interpretable ``x[f] > t`` split). ``oblique`` / ``sparse`` draw dense directions
+    ``N(0, weight_scale**2)`` (default ``1/sqrt(n_features)``). Thresholds start at ``0``,
+    leaves are small so the initial logits sit near ``0`` (``p ~ 0.5`` for classification),
+    and ``b0 = 0``.
     """
     gen = _as_rng(rng if rng is not None else config.seed)
     T, D, d, L, k = (
@@ -110,7 +112,13 @@ def init_params(
         config.n_outputs,
     )
     ws = weight_scale if weight_scale is not None else 1.0 / np.sqrt(d)
-    W = gen.standard_normal((T, D, d)) * ws
+    if config.split_kind == "axis":
+        W = np.zeros((T, D, d), dtype=np.float64)
+        for m in range(T):
+            for j in range(D):
+                W[m, j, int(gen.integers(0, d))] = 1.0
+    else:
+        W = gen.standard_normal((T, D, d)) * ws
     t = np.zeros((T, D), dtype=np.float64)
     leaves = gen.standard_normal((T, L, k)) * leaf_scale
     b0 = np.zeros(k, dtype=np.float64)

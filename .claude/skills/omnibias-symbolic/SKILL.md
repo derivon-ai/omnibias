@@ -1,18 +1,34 @@
 ---
 name: omnibias-symbolic
-description: Use omnibias to discover equations from data -- fit neural fields and read off exact jets, recover ODE / activation identities, and discover PDEs (heat / wave / Burgers / Laplace). Use when using omnibias for equation discovery, symbolic regression on a fitted field, or PDE identification, or when the user mentions neural-jet discovery, SINDy-style discovery, or field-law discovery.
+description: Discover ODE / PDE identities from exact neural jets — library-free SINDy, field-law recovery, piecewise automata, and AutoML surrogates. Use when inventing a new discovery loop, reading a governing equation off a fitted field, or when the user mentions neural-jet discovery or PDE identification.
 ---
 
-# Using omnibias: neural-jet equation discovery
+# Neural-jet equation discovery
 
 `omnibias.symbolic` fits a smooth neural field, reads its **exact closed-form
-jet**, and recovers the governing ODE / PDE. Everything is re-exported from the
-package root, so `from omnibias.symbolic import <name>` works for the names below.
+jet**, and recovers the governing ODE / PDE. Names below re-export from the
+package root: `from omnibias.symbolic import <name>`.
 
-Read the dense cheat-sheet first:
-[docs/handbook/ai-quickstart.md](https://github.com/derivon-ai/omnibias/blob/main/docs/handbook/ai-quickstart.md).
+## Why nested AD fails
 
-## Import map (all from `omnibias.symbolic`)
+Finite-difference SINDy on autodiff fields is noise-dominated at the orders
+that distinguish heat from wave from Burgers. Nested AD jets are truncated,
+backend-split, and expensive exactly where the library needs mixed partials.
+Generic symbolic regression never sees `sigma^(n)` exactly, so recovered PDEs
+are stencil artifacts.
+
+## What only this tower unlocks
+
+A library-free discoverer (`NeuralJetDiscoverer`) that recovers closed-form
+differential identities from exact activation jets. Field-law recovery
+(heat / wave / Burgers / Laplace) reads `extract_field_jet`. Piecewise /
+hybrid automata harden gates under temperature collapse (`beta -> inf`) then
+STLSQ-polish on the founding jet (`delta -> 0`). That split — exact jet plus
+annealed partition — is the workload nested AD + FD-SINDy cannot run.
+
+Dense cheat-sheet: `docs/handbook/ai-quickstart.md`.
+
+## Use
 
 | You want | Key entry points |
 | --- | --- |
@@ -20,31 +36,48 @@ Read the dense cheat-sheet first:
 | Fit a smooth field + its jet | `fit_neural_field_1d`, `fit_neural_field_nd`, `extract_field_jet` |
 | Gradient / Hessian / Laplacian of a fitted field | `field_gradient`, `field_laplacian` |
 | Discover a PDE (heat / wave / Burgers / Laplace) | `FieldLawDiscoverer`, `discover_field_pde_law`, `make_heat_field_split` |
-| Piecewise / hybrid automaton (oracle partition) | `fit_piecewise_law`, `fit_piecewise_ode_law`, `HybridAutomaton` |
+| Piecewise / hybrid automaton | `fit_piecewise_law`, `fit_piecewise_ode_law`, `HybridAutomaton` |
 | Learn gates from data, then harden + STLSQ | `fit_learned_piecewise_ode` |
 | Curvature / metric on learned charts | `MetricField`, `laplace_beltrami`, `pullback_metric_field`, `scalar_curvature` |
-
-## Minimal example (verified)
+| Lie point symmetries | `omnibias.symbolic.symmetry` |
+| Rationalize-and-certify | `omnibias.symbolic.certify` | `rationalize_and_certify_discovery` |
+| Piecewise SINDy on a partition | `omnibias.symbolic.piecewise` |
+| Ingest pack tables | `omnibias.symbolic.ingest` |
 
 ```python
 from omnibias.symbolic import discover_activation_identity
 
-# `exp` secretly obeys y' = y; recovered from the closed-form jet.
 result = discover_activation_identity("exp", candidate_lhs_orders=(1,))
 print(result.formula())            # -> "dy = 1*y"
 ```
 
-## Gotchas that bite
+A random-feature field is accurate inside its training box; request
+`max_order` high enough for the PDE (Hessian needs 2). Pass
+`random_state=<int>` for bit-reproducible fields on a given platform.
 
-- **A random-feature field is only accurate inside the support of its training points.** Use `n_features` in the hundreds for smooth targets and keep evaluation points inside the training box; extrapolation breaks the (exact-for-the-fitted-field) derivatives.
-- **Request the order you need.** A jet carries partials up to its `max_order`; a Hessian needs `order=2`.
-- **Pass `random_state=<int>`** to every `fit_*` / `make_*` / discoverer for bit-reproducible fields, jets, and discovered equations on a given platform.
-- **Learned gates vs unplanted tab-head.** `fit_learned_piecewise_ode` trains soft weights then hardens and STLSQ-polishes (it calls `_refine_split_threshold`). A SoftTree / Arrangement tab head is trained on the trajectory's finite-difference `du` (kinked; the field-jet `du` is smoothed), then `tree_params` / `arrangement_params` take the **fitted** split -- Arrangement is unplanted (random `W`, no `e_0`) and that path does **not** call `_refine_split_threshold`. STLSQ on the field jet is numpy / non-differentiable either way.
-- **`sampled_latent` is not IBP through an arbitrary encoder `E`.** `omnibias.tab.certify_composed` is sound IBP / `tab+tab` when ingest works; otherwise the latent box is sampled, not a sound enclosure of `E(box)`.
-- **`beta -> inf` vs `delta -> 0`.** Gate hardening (soft indicator -> 0/1 step) is the feasibility / temperature sense of collapse. Jets of a tree surrogate are the founding `delta -> 0` register. Do not conflate them.
+Cookbook: `docs/cookbook/piecewise-hybrid-automaton.md`.
 
-## More detail
+## Extend
 
-- API: [symbolic](https://github.com/derivon-ai/omnibias/blob/main/docs/api/symbolic.md)
-- Cookbook: [piecewise hybrid automaton](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/piecewise-hybrid-automaton.md)
-- Handbook chapters 1-7 (neural-jet discovery through information geometry): [handbook index](https://github.com/derivon-ai/omnibias/blob/main/docs/handbook/index.md)
+- Source: `packages/omnibias-symbolic`. Tests:
+  `python -m pytest packages/omnibias-symbolic/tests -q`.
+- Compose with `omnibias-holonomic`, `omnibias-difference`, `omnibias-fields`,
+  `omnibias-partition`, `omnibias-discovery-engine`, `omnibias-geometry`.
+- New discovery families register through `omnibias-discovery-engine`.
+
+## Next invention
+
+A planted Burgers field whose `FieldLawDiscoverer` recovers the exact
+coefficient vector from the closed-form jet at a noise level that
+finite-difference SINDy misses, then a Lie-symmetry nullspace that matches
+the determining matrix over Q.
+
+## Bakeoffs
+
+`docs/benchmarks/public_csv_discovery_smoke.json`,
+`docs/benchmarks/symmetry_discovery_smoke.json`.
+
+## Further references
+
+- API: `docs/api/symbolic.md`
+- Handbook index: `docs/handbook/index.md`

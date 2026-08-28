@@ -98,6 +98,23 @@ class SoftTreeEnsemble(nn.Module):
         out = torch.einsum("nml,mlk->nk", memberships, self.leaves) + self.b0.unsqueeze(0)
         return out.reshape(*leading, out.shape[-1])
 
+    def memberships(self, X: Tensor, beta: float | None = None) -> Tensor:
+        r"""Soft leaf memberships ``(..., n_trees, n_leaves)`` (rows sum to 1 per tree)."""
+        b = self._beta if beta is None else X.new_tensor(float(beta), dtype=self.W.dtype)
+        if X.ndim < 2:
+            raise ValueError("X must have shape (..., n_features)")
+        leading = tuple(int(s) for s in X.shape[:-1])
+        rows = X.reshape(-1, X.shape[-1])
+        z = torch.einsum("nd,mjd->nmj", rows, self.W) - self.t.unsqueeze(0)
+        g = torch.sigmoid(b * z)
+        codes = self._codes
+        assert isinstance(codes, Tensor)
+        gexp = g.unsqueeze(2)
+        bexp = codes.view(1, 1, codes.shape[0], codes.shape[1])
+        factors = bexp * gexp + (1.0 - bexp) * (1.0 - gexp)
+        memb = factors.prod(dim=-1)
+        return memb.reshape(*leading, memb.shape[1], memb.shape[2])
+
     # ----- numpy conveniences ------------------------------------------- #
     def _to_tensor(self, X: np.ndarray) -> Tensor:
         return torch.as_tensor(

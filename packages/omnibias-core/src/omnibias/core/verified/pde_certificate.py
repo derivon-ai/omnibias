@@ -155,7 +155,7 @@ class StabilityEstimate:
     """
 
     interior: float
-    boundary: float = 1.0
+    boundary: float
     source: str = "user_supplied"
     pde_family: str = "unspecified"
     domain: str = "unspecified"
@@ -180,7 +180,7 @@ class StabilityEstimate:
 
 def user_stability_estimate(
     interior: float,
-    boundary: float = 1.0,
+    boundary: float,
     *,
     source: str = "user_supplied",
     pde_family: str = "unspecified",
@@ -636,9 +636,9 @@ def aposteriori_error_certificate(
     pde: LinearPDE,
     *,
     boundary: Sequence[BoundaryFace] = (),
-    stability_interior: float = 1.0,
-    stability_boundary: float = 1.0,
     stability: StabilityEstimate | None = None,
+    stability_interior: float | None = None,
+    stability_boundary: float | None = None,
     invariants: Sequence[StructuralInvariant] = (),
     model_metadata: Mapping[str, object] | None = None,
     max_error: float | None = None,
@@ -648,19 +648,36 @@ def aposteriori_error_certificate(
 ) -> PINNErrorCertificate:
     r"""Certified a-posteriori bound ``||u_NN - u_true||_inf <= C_O R_int + C_b R_bnd``.
 
+    Pass a provenance-carrying ``stability`` record, or explicitly provide both
     ``stability_interior`` (``C_Omega``) and ``stability_boundary``
-    (``C_{partial Omega}``) must be rigorous constants for the linear, well-posed
-    BVP ``pde``; they are recorded in the certificate, which is sealed and
-    digest-verifiable.  Both residuals are computed rigorously from the certified
-    jet, so the resulting bound is a true upper bound on the network's error.
+    (``C_{partial Omega}``). They must be rigorous constants for the linear,
+    well-posed BVP ``pde``; silent ``1.0`` defaults are deliberately refused.
+    Both residuals are computed rigorously from the certified jet, so the
+    resulting bound is a true upper bound on the network's error only under the
+    recorded stability assumptions.
     """
-    estimate = stability or user_stability_estimate(
-        stability_interior,
-        stability_boundary,
-        source="legacy_arguments",
-        pde_family="linear",
-        domain="caller_supplied",
-    )
+    if stability is not None:
+        if not isinstance(stability, StabilityEstimate):
+            raise TypeError("stability must be a StabilityEstimate")
+        if stability_interior is not None or stability_boundary is not None:
+            raise ValueError(
+                "pass either stability or both stability_interior and "
+                "stability_boundary, not both"
+            )
+        estimate = stability
+    else:
+        if stability_interior is None or stability_boundary is None:
+            raise ValueError(
+                "a-posteriori PDE certification requires stability=StabilityEstimate "
+                "or both stability_interior and stability_boundary"
+            )
+        estimate = user_stability_estimate(
+            stability_interior,
+            stability_boundary,
+            source="explicit_arguments",
+            pde_family="linear",
+            domain="caller_supplied",
+        )
     if diagnostics is not None:
         r_int = diagnostics.residual
     else:

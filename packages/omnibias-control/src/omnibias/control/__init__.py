@@ -2,17 +2,28 @@
 # Copyright (C) 2026 Derivon
 """omnibias-control: differentiable control with a model-relative safety certificate.
 
-A batched, per-sample control-barrier-function (CBF-QP) **safety filter** -- the
-temperature-collapse projection layer specialised to state-dependent constraints -- with:
+This package sits on **both** founding limits, kept deliberately separate:
 
-* autodiff Lie-derivative **CBF-row builders** for any control-affine system
-  ``x_dot = f(x) + g(x) a`` (:func:`~omnibias.control.jax.builders.control_affine_cbf_rows`)
-  and for dynamics produced by a (possibly learned) **Lagrangian**
-  (:func:`~omnibias.control.jax.builders.lagrangian_cbf_rows`, reusing
-  :mod:`omnibias.variational`);
-* a differentiable **safe rollout** so a policy can be trained *through* the filter;
-* a rigorous **model-relative recoverable-set certificate**
-  (:func:`~omnibias.control.certify.certify_recoverable`, via :mod:`omnibias.verify`).
+* A batched, per-sample control-barrier-function (CBF-QP) **safety filter** -- the
+  temperature-collapse (``beta -> inf``, feasibility) projection layer specialised
+  to state-dependent constraints -- with:
+
+  * autodiff Lie-derivative **CBF-row builders** for any control-affine system
+    ``x_dot = f(x) + g(x) a`` (:func:`~omnibias.control.jax.builders.control_affine_cbf_rows`)
+    and for dynamics produced by a (possibly learned) **Lagrangian**
+    (:func:`~omnibias.control.jax.builders.lagrangian_cbf_rows`, reusing
+    :mod:`omnibias.variational`);
+  * a differentiable **safe rollout** so a policy can be trained *through* the filter;
+  * a rigorous **model-relative recoverable-set certificate**
+    (:func:`~omnibias.control.certify.certify_recoverable`, via :mod:`omnibias.verify`).
+
+* A jet-adjoint policy-optimization stack (:mod:`omnibias.control.ocp`,
+  ``.horizon``, ``.certified.gradient_bias``, the per-backend ``.adjoint`` /
+  ``.policy``) built on the **founding bias collapse** (``delta -> 0``) --
+  the closed-form derivative tower, not a ``beta -> inf`` limit -- for exact
+  ``d(pi)/dy`` and a certified truncation horizon plus a sound
+  policy-gradient-bias enclosure. Do not conflate the two: the safety filter
+  hardens with temperature; the adjoint tower is exact at every temperature.
 
 Backend solvers live under ``omnibias.control.jax`` and ``omnibias.control.torch``
 (bit-identical twins); the pure containers and the certificate are shared.
@@ -51,7 +62,7 @@ except _PkgNotFound:  # pragma: no cover - bare source checkout
     __version__ = "0.0.0+unknown"
 
 # Founding-idea lineage (see docs/theory.md "Two senses of collapse").
-__lineage__ = "temperature collapse"
+__lineage__ = "both"
 
 __all__ = [
     "CBFSpec",

@@ -35,7 +35,7 @@ The **float discovery** substrate for line-domain profiles (Hardy ansatz,
 lambda-tied compactification, Gauss–Newton / funnel / mpmath polish) lives in
 `omnibias.pinn.jax.discovery.ccf_line` and
 `omnibias.pinn.jax.equations.ccf_compactified`; see
-[CCF singularities](ccf-singularity.md#line--compactified-domain).
+[CCF singularities](ccf-singularity.md).
 
 !!! warning "Scope — this is a research phase that can end `BLOCKED`"
     A closure certifies a true zero of the **finite collocation map** near the

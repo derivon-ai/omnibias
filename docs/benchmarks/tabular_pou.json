@@ -1,0 +1,486 @@
+{
+  "schema": "omnibias.tab.pou.v1",
+  "generated_utc": "2026-08-28T17:21:53Z",
+  "hardware_class": "commodity x86-64 CPU (38 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "tier": "full",
+    "budget": {
+      "n_g1": 2000,
+      "n_stages": 60,
+      "depth": 3,
+      "n_quantiles": 16,
+      "n_bins": 16,
+      "inner_steps": 40,
+      "lgbm_estimators": 200,
+      "cat_iterations": 200,
+      "g4_max_rows": 2000,
+      "residual_steps": 40,
+      "residual_k": 8,
+      "g0b_n": 200,
+      "g2_n": 800,
+      "g2_stages": 20
+    },
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "workers": 8
+  },
+  "rss_mb_at_start": 763.85,
+  "tier": "full",
+  "elapsed_seconds": 8001.712,
+  "g0": {
+    "name": "G0",
+    "passed": true,
+    "loss_cf_over_adam": 1.000000000007797,
+    "adam_bit_identity": true,
+    "axis_one_hot": true
+  },
+  "g0b": {
+    "name": "G0b",
+    "passed": true,
+    "report_only": true,
+    "under_budget_rmse_mean": 0.17977488965996685,
+    "under_budget_rmse_std": 0.0,
+    "flagship_rmse_mean": 0.13536988393980026,
+    "flagship_rmse_std": 0.0,
+    "n_stages_under": 10,
+    "n_stages_flagship": 60,
+    "inner_steps": 40,
+    "note": "Current fit_boosted (adam, oblique) at TabConfig vs 05-03 n_stages=10; not a TabPOU pass/fail."
+  },
+  "g1": {
+    "name": "G1",
+    "passed": false,
+    "wiring_only": false,
+    "worst_margin": 0.02200000000000002,
+    "units": [
+      {
+        "seed": 0,
+        "acc_axis": 0.986,
+        "acc_oblique": 0.96,
+        "margin": 0.026000000000000023
+      },
+      {
+        "seed": 1,
+        "acc_axis": 0.994,
+        "acc_oblique": 0.954,
+        "margin": 0.040000000000000036
+      },
+      {
+        "seed": 2,
+        "acc_axis": 0.994,
+        "acc_oblique": 0.966,
+        "margin": 0.028000000000000025
+      },
+      {
+        "seed": 3,
+        "acc_axis": 0.992,
+        "acc_oblique": 0.97,
+        "margin": 0.02200000000000002
+      },
+      {
+        "seed": 4,
+        "acc_axis": 0.986,
+        "acc_oblique": 0.952,
+        "margin": 0.03400000000000003
+      }
+    ]
+  },
+  "g2": {
+    "name": "G2",
+    "passed": false,
+    "wiring_only": false,
+    "skill_ok": false,
+    "worst_rmse_raw_synth": 81.10363726184491,
+    "worst_rmse_band_synth": 81.63900283421084,
+    "worst_rmse_raw_diabetes": 61.07462521371412,
+    "worst_rmse_band_diabetes": 58.22693477391926
+  },
+  "g3": {
+    "name": "G3",
+    "passed": false,
+    "wiring_only": false,
+    "n_scored": 6,
+    "not_worse_both": 3,
+    "strict_wins": 3,
+    "rows": [
+      {
+        "name": "breast_cancer",
+        "skipped": false,
+        "task": "binary",
+        "tabpou_mean": 0.9636363636363636,
+        "tabpou_std": 0.014331399672670797,
+        "lgbm_mean": 0.9622377622377621,
+        "lgbm_std": 0.009382103402097,
+        "cat_mean": 0.9664335664335665,
+        "cat_std": 0.015946509441945988,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "win_lgbm": true,
+        "win_cat": false
+      },
+      {
+        "name": "banknote",
+        "skipped": false,
+        "task": "binary",
+        "tabpou_mean": 1.0,
+        "tabpou_std": 0.0,
+        "lgbm_mean": 0.9924198250728862,
+        "lgbm_std": 0.00604560972400227,
+        "cat_mean": 0.9965014577259476,
+        "cat_std": 0.003193717536473258,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "win_lgbm": true,
+        "win_cat": true
+      },
+      {
+        "name": "ionosphere",
+        "skipped": false,
+        "task": "binary",
+        "tabpou_mean": 0.9318181818181819,
+        "tabpou_std": 0.027835110713445237,
+        "lgbm_mean": 0.9363636363636363,
+        "lgbm_std": 0.026161055530048525,
+        "cat_mean": 0.9318181818181817,
+        "cat_std": 0.024105912994995968,
+        "not_worse_lgbm": true,
+        "not_worse_cat": true,
+        "win_lgbm": false,
+        "win_cat": false
+      },
+      {
+        "name": "kin8nm",
+        "skipped": false,
+        "task": "regression",
+        "tabpou_mean": -0.149599381633923,
+        "tabpou_std": 0.003409723134354101,
+        "lgbm_mean": -0.1376023984347386,
+        "lgbm_std": 0.0042320182774652024,
+        "cat_mean": -0.11644955387480845,
+        "cat_std": 0.0027358155080624462,
+        "not_worse_lgbm": false,
+        "not_worse_cat": false,
+        "win_lgbm": false,
+        "win_cat": false
+      },
+      {
+        "name": "wine_quality",
+        "skipped": false,
+        "task": "regression",
+        "tabpou_mean": -0.6971168325935706,
+        "tabpou_std": 0.013704473635377096,
+        "lgbm_mean": -0.6853480212462421,
+        "lgbm_std": 0.013852878753239296,
+        "cat_mean": -0.6788498210969107,
+        "cat_std": 0.012368736208645828,
+        "not_worse_lgbm": true,
+        "not_worse_cat": false,
+        "win_lgbm": false,
+        "win_cat": false
+      },
+      {
+        "name": "energy_efficiency",
+        "skipped": false,
+        "task": "regression",
+        "tabpou_mean": -0.4720132229078649,
+        "tabpou_std": 0.01930755510137177,
+        "lgbm_mean": -0.6188270960978015,
+        "lgbm_std": 0.08070294352430148,
+        "cat_mean": -0.36565452783739816,
+        "cat_std": 0.026729856873293753,
+        "not_worse_lgbm": true,
+        "not_worse_cat": false,
+        "win_lgbm": true,
+        "win_cat": false
+      }
+    ]
+  },
+  "g4": {
+    "name": "G4",
+    "passed": true,
+    "wiring_only": false,
+    "skipped": true,
+    "leftover_recorded": "G4 skipped (--skip-g4)"
+  },
+  "g5": {
+    "name": "G5",
+    "passed": true,
+    "depth1_is_sound": true,
+    "depth2_is_sound": true,
+    "depth1_max_gap": 2.9753341981312675,
+    "depth1_measured_max": 2.5187477508512255,
+    "depth2_max_gap": 9.419319250843333,
+    "depth2_measured_max": 5.454814383496749
+  },
+  "g6": {
+    "name": "G6",
+    "passed": true,
+    "flagship_table_replaced": false,
+    "optional_not_worse_4": 4,
+    "rows": [
+      {
+        "name": "breast_cancer",
+        "tabpou_mean": 0.951048951048951,
+        "lgbm_mean": 0.951048951048951,
+        "not_worse": true
+      },
+      {
+        "name": "wine",
+        "tabpou_mean": 1.0,
+        "lgbm_mean": 1.0,
+        "not_worse": true
+      },
+      {
+        "name": "digits",
+        "tabpou_mean": 0.9888888888888889,
+        "lgbm_mean": 0.9755555555555555,
+        "not_worse": true
+      },
+      {
+        "name": "diabetes",
+        "tabpou_mean": -58.27140717102027,
+        "lgbm_mean": -63.55396892048718,
+        "not_worse": true
+      }
+    ],
+    "note": "Flagship LightGBM table in docs/benchmarks.md is not replaced; TabPOU is reported separately."
+  },
+  "gates": {
+    "all_passed": false,
+    "entries": [
+      {
+        "name": "G0",
+        "passed": true,
+        "loss_cf_over_adam": 1.000000000007797,
+        "adam_bit_identity": true,
+        "axis_one_hot": true
+      },
+      {
+        "name": "G0b",
+        "passed": true,
+        "report_only": true,
+        "under_budget_rmse_mean": 0.17977488965996685,
+        "under_budget_rmse_std": 0.0,
+        "flagship_rmse_mean": 0.13536988393980026,
+        "flagship_rmse_std": 0.0,
+        "n_stages_under": 10,
+        "n_stages_flagship": 60,
+        "inner_steps": 40,
+        "note": "Current fit_boosted (adam, oblique) at TabConfig vs 05-03 n_stages=10; not a TabPOU pass/fail."
+      },
+      {
+        "name": "G1",
+        "passed": false,
+        "wiring_only": false,
+        "worst_margin": 0.02200000000000002,
+        "units": [
+          {
+            "seed": 0,
+            "acc_axis": 0.986,
+            "acc_oblique": 0.96,
+            "margin": 0.026000000000000023
+          },
+          {
+            "seed": 1,
+            "acc_axis": 0.994,
+            "acc_oblique": 0.954,
+            "margin": 0.040000000000000036
+          },
+          {
+            "seed": 2,
+            "acc_axis": 0.994,
+            "acc_oblique": 0.966,
+            "margin": 0.028000000000000025
+          },
+          {
+            "seed": 3,
+            "acc_axis": 0.992,
+            "acc_oblique": 0.97,
+            "margin": 0.02200000000000002
+          },
+          {
+            "seed": 4,
+            "acc_axis": 0.986,
+            "acc_oblique": 0.952,
+            "margin": 0.03400000000000003
+          }
+        ]
+      },
+      {
+        "name": "G2",
+        "passed": false,
+        "wiring_only": false,
+        "skill_ok": false,
+        "worst_rmse_raw_synth": 81.10363726184491,
+        "worst_rmse_band_synth": 81.63900283421084,
+        "worst_rmse_raw_diabetes": 61.07462521371412,
+        "worst_rmse_band_diabetes": 58.22693477391926
+      },
+      {
+        "name": "G3",
+        "passed": false,
+        "wiring_only": false,
+        "n_scored": 6,
+        "not_worse_both": 3,
+        "strict_wins": 3,
+        "rows": [
+          {
+            "name": "breast_cancer",
+            "skipped": false,
+            "task": "binary",
+            "tabpou_mean": 0.9636363636363636,
+            "tabpou_std": 0.014331399672670797,
+            "lgbm_mean": 0.9622377622377621,
+            "lgbm_std": 0.009382103402097,
+            "cat_mean": 0.9664335664335665,
+            "cat_std": 0.015946509441945988,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "win_lgbm": true,
+            "win_cat": false
+          },
+          {
+            "name": "banknote",
+            "skipped": false,
+            "task": "binary",
+            "tabpou_mean": 1.0,
+            "tabpou_std": 0.0,
+            "lgbm_mean": 0.9924198250728862,
+            "lgbm_std": 0.00604560972400227,
+            "cat_mean": 0.9965014577259476,
+            "cat_std": 0.003193717536473258,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "win_lgbm": true,
+            "win_cat": true
+          },
+          {
+            "name": "ionosphere",
+            "skipped": false,
+            "task": "binary",
+            "tabpou_mean": 0.9318181818181819,
+            "tabpou_std": 0.027835110713445237,
+            "lgbm_mean": 0.9363636363636363,
+            "lgbm_std": 0.026161055530048525,
+            "cat_mean": 0.9318181818181817,
+            "cat_std": 0.024105912994995968,
+            "not_worse_lgbm": true,
+            "not_worse_cat": true,
+            "win_lgbm": false,
+            "win_cat": false
+          },
+          {
+            "name": "kin8nm",
+            "skipped": false,
+            "task": "regression",
+            "tabpou_mean": -0.149599381633923,
+            "tabpou_std": 0.003409723134354101,
+            "lgbm_mean": -0.1376023984347386,
+            "lgbm_std": 0.0042320182774652024,
+            "cat_mean": -0.11644955387480845,
+            "cat_std": 0.0027358155080624462,
+            "not_worse_lgbm": false,
+            "not_worse_cat": false,
+            "win_lgbm": false,
+            "win_cat": false
+          },
+          {
+            "name": "wine_quality",
+            "skipped": false,
+            "task": "regression",
+            "tabpou_mean": -0.6971168325935706,
+            "tabpou_std": 0.013704473635377096,
+            "lgbm_mean": -0.6853480212462421,
+            "lgbm_std": 0.013852878753239296,
+            "cat_mean": -0.6788498210969107,
+            "cat_std": 0.012368736208645828,
+            "not_worse_lgbm": true,
+            "not_worse_cat": false,
+            "win_lgbm": false,
+            "win_cat": false
+          },
+          {
+            "name": "energy_efficiency",
+            "skipped": false,
+            "task": "regression",
+            "tabpou_mean": -0.4720132229078649,
+            "tabpou_std": 0.01930755510137177,
+            "lgbm_mean": -0.6188270960978015,
+            "lgbm_std": 0.08070294352430148,
+            "cat_mean": -0.36565452783739816,
+            "cat_std": 0.026729856873293753,
+            "not_worse_lgbm": true,
+            "not_worse_cat": false,
+            "win_lgbm": true,
+            "win_cat": false
+          }
+        ]
+      },
+      {
+        "name": "G4",
+        "passed": true,
+        "wiring_only": false,
+        "skipped": true,
+        "leftover_recorded": "G4 skipped (--skip-g4)"
+      },
+      {
+        "name": "G5",
+        "passed": true,
+        "depth1_is_sound": true,
+        "depth2_is_sound": true,
+        "depth1_max_gap": 2.9753341981312675,
+        "depth1_measured_max": 2.5187477508512255,
+        "depth2_max_gap": 9.419319250843333,
+        "depth2_measured_max": 5.454814383496749
+      },
+      {
+        "name": "G6",
+        "passed": true,
+        "flagship_table_replaced": false,
+        "optional_not_worse_4": 4,
+        "rows": [
+          {
+            "name": "breast_cancer",
+            "tabpou_mean": 0.951048951048951,
+            "lgbm_mean": 0.951048951048951,
+            "not_worse": true
+          },
+          {
+            "name": "wine",
+            "tabpou_mean": 1.0,
+            "lgbm_mean": 1.0,
+            "not_worse": true
+          },
+          {
+            "name": "digits",
+            "tabpou_mean": 0.9888888888888889,
+            "lgbm_mean": 0.9755555555555555,
+            "not_worse": true
+          },
+          {
+            "name": "diabetes",
+            "tabpou_mean": -58.27140717102027,
+            "lgbm_mean": -63.55396892048718,
+            "not_worse": true
+          }
+        ],
+        "note": "Flagship LightGBM table in docs/benchmarks.md is not replaced; TabPOU is reported separately."
+      }
+    ]
+  },
+  "smoke_process_passed": true,
+  "licensed_sentence": "TabPOU is a from-scratch axis-aligned POU booster; G0/G5 are wiring+certificate; G1-G4 are hypothesis gates earned only on --full; G0b is a budget-control report; G6 does not replace the flagship LightGBM table."
+}

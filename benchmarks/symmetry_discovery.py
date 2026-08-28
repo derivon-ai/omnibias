@@ -2,9 +2,9 @@
 # Copyright (C) 2026 Derivon
 """Wave-5: Lie point-symmetry discovery (theory 03-11).
 
-Smoke earns G1 (in-ansatz dimensions on eight classical
-equations; heat generators in the nullspace), G2 (singular
-value separation ``> 1e6``), G3 (finite-difference
+Smoke earns G1 (float-proposed and exact-finite-matrix accepted
+in-ansatz dimensions on eight classical equations; heat generators in
+the nullspace), G2 (singular-value separation ``> 1e6``), G3 (finite-difference
 prolongation gets the heat rank wrong), G4 (dimension stable
 across two decades of threshold), G5 (Noether current of the
 wave translations conserved to ``1e-10``), and G6 (negative
@@ -55,9 +55,23 @@ def _run_g1() -> dict[str, Any]:
     ok = True
     for pde in suite():
         res = discover_symmetries(pr_for(pde.name), pde.restrict, basis, samples)
-        match = res.algebra_dim == pde.expected_dim
+        exact = res.exact
+        match = res.algebra_dim == pde.expected_dim and res.verified
         ok = ok and match
-        rows.append({"name": pde.name, "dim": res.algebra_dim, "expected": pde.expected_dim})
+        rows.append(
+            {
+                "name": pde.name,
+                "float_svd": {
+                    "dim": res.algebra_dim,
+                    "expected": pde.expected_dim,
+                    "threshold": res.rank_threshold,
+                    "separation": res.separation,
+                    "residual_checked": res.float_verified,
+                },
+                "exact_rank": exact.to_payload() if exact is not None else None,
+                "exact_accepts_float_dimension": res.verified,
+            }
+        )
     heat = next(p for p in suite() if p.name == "heat")
     mat = determining_matrix(pr_heat, heat.restrict, basis, samples)
     scale = max(1.0, float(np.linalg.norm(mat)))
@@ -116,8 +130,24 @@ def _run_g5() -> dict[str, Any]:
 def _run_g6() -> dict[str, Any]:
     spec = negative_control()
     res = discover_symmetries(pr_for(spec.name), spec.restrict, affine_basis(), designed_samples(32))
-    ok = res.algebra_dim == 0 and res.disclaimer == DISCLAIMER
-    return {"name": "g6_negative", "passed": ok, "dim": res.algebra_dim}
+    exact = res.exact
+    ok = (
+        res.algebra_dim == 0
+        and res.disclaimer == DISCLAIMER
+        and res.verified
+        and exact is not None
+        and exact.disproved
+    )
+    return {
+        "name": "g6_negative",
+        "passed": ok,
+        "float_svd": {
+            "dim": res.algebra_dim,
+            "residual_checked": res.float_verified,
+        },
+        "exact_rank": exact.to_payload() if exact is not None else None,
+        "exact_accepts_float_dimension": res.verified,
+    }
 
 
 def main(argv: list[str] | None = None) -> dict[str, Any]:

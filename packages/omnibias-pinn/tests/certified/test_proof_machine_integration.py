@@ -27,6 +27,9 @@ def machine() -> ProofMachine:
 
 def test_default_machine_registers_every_kind(machine: ProofMachine) -> None:
     assert set(machine.kinds()) == {
+        "ccf_fractional_dissipation",
+        "ccf_hardy_wholeline_blowup",
+        "ccf_line_compactified_cap",
         "clm_blowup",
         "clm_multizero_blowup",
         "ccf_selfsimilar_blowup",
@@ -37,6 +40,7 @@ def test_default_machine_registers_every_kind(machine: ProofMachine) -> None:
         "navier_stokes_periodic_residual",
         "navier_stokes_streamfunction_residual",
         "navier_stokes_rollout_diagnostics",
+        "viscous_perturbation_enclosure",
     }
 
 
@@ -302,7 +306,13 @@ def test_supported_honest_claim_passes(machine: ProofMachine) -> None:
 def test_pinn_aposteriori_certificate_proved_with_replay(machine: ProofMachine) -> None:
     layers = [([[2.0, -3.0]], [1.0], None)]
     cert = aposteriori_error_certificate(
-        layers, [(-1.0, 1.0), (-1.0, 1.0)], laplace(2), max_error=1e-6, splits=2
+        layers,
+        [(-1.0, 1.0), (-1.0, 1.0)],
+        laplace(2),
+        stability_interior=1.0,
+        stability_boundary=1.0,
+        max_error=1e-6,
+        splits=2,
     ).certificate
     verdict = machine.evaluate(
         Conjecture(
@@ -322,7 +332,12 @@ def test_pinn_aposteriori_certificate_proved_with_replay(machine: ProofMachine) 
 def test_pinn_aposteriori_blocks_forged_unproven_claim(machine: ProofMachine) -> None:
     layers = [([[2.0, -3.0]], [1.0], None)]
     cert = aposteriori_error_certificate(
-        layers, [(-1.0, 1.0), (-1.0, 1.0)], laplace(2), splits=2
+        layers,
+        [(-1.0, 1.0), (-1.0, 1.0)],
+        laplace(2),
+        stability_interior=1.0,
+        stability_boundary=1.0,
+        splits=2,
     ).certificate
     verdict = machine.evaluate(
         Conjecture(
@@ -343,6 +358,7 @@ def test_pinn_aposteriori_blocks_threshold_miss(machine: ProofMachine) -> None:
         [(-1.0, 1.0), (-1.0, 1.0)],
         laplace(2),
         stability_interior=1.0,
+        stability_boundary=1.0,
         max_error=0.0,
         splits=2,
     ).certificate

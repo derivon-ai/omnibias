@@ -54,6 +54,7 @@ from __future__ import annotations
 
 import math
 from collections.abc import Callable
+from typing import cast
 
 from omnibias.core.spec import ActivationSpec, TransformKernels
 from omnibias.core.transforms import (
@@ -65,13 +66,54 @@ from omnibias.core.transforms import (
 
 import jax
 import jax.numpy as jnp
+import jax.scipy.special as jax_special
 from jax import Array
 from jax.nn import softplus
-from jax.scipy.special import digamma, erfcx, gammaln, zeta
+from jax.scipy.special import digamma, gammaln, zeta
 
 _SQRT_HALF_PI = math.sqrt(math.pi / 2.0)
 _SQRT_TWO_PI = math.sqrt(2.0 * math.pi)
 _INV_SQRT_TWO = 1.0 / math.sqrt(2.0)
+_INV_SQRT_PI = 1.0 / math.sqrt(math.pi)
+
+
+def _erfcx_fallback(x: Array) -> Array:
+    """JIT-safe scaled-complementary-error-function fallback.
+
+    Some supported JAX releases do not expose ``jax.scipy.special.erfcx``.
+    Directly evaluating ``exp(x**2) * erfc(x)`` would overflow for large
+    positive ``x`` even though ``erfcx(x)`` is finite.  The asymptotic branch
+    is accurate beyond 8 and the direct branch is clamped there so both
+    branches remain finite under ``jnp.where`` evaluation.
+    """
+    direct_x = jnp.minimum(x, 8.0)
+    direct = jnp.exp(direct_x * direct_x) * jax_special.erfc(direct_x)
+    tail_x = jnp.maximum(x, 8.0)
+    inverse = 1.0 / tail_x
+    inverse_sq = inverse * inverse
+    correction = 1.0 + inverse_sq * (
+        0.5
+        + inverse_sq
+        * (
+            0.75
+            + inverse_sq
+            * (
+                1.875
+                + inverse_sq
+                * (6.5625 + inverse_sq * (29.53125 + inverse_sq * 162.421875))
+            )
+        )
+    )
+    asymptotic = _INV_SQRT_PI * inverse * correction
+    return jnp.where(x > 8.0, asymptotic, direct)
+
+
+_native_erfcx = getattr(jax_special, "erfcx", None)
+_erfcx: Callable[[Array], Array]
+if callable(_native_erfcx):
+    _erfcx = cast(Callable[[Array], Array], _native_erfcx)
+else:
+    _erfcx = _erfcx_fallback
 
 
 # --------------------------------------------------------------------------- #
@@ -116,7 +158,7 @@ def _gaussian_laplace(s: Array) -> Array:
     unscaled form returns ``inf * 0 = nan`` exactly where the answer is small
     and well-conditioned.
     """
-    return _SQRT_HALF_PI * erfcx(s * _INV_SQRT_TWO)
+    return _SQRT_HALF_PI * _erfcx(s * _INV_SQRT_TWO)
 
 
 def _sigmoid_laplace(s: Array) -> Array:

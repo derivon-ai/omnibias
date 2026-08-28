@@ -19,7 +19,6 @@ from omnibias.symbolic.lift import (
     snap_sparse_equation,
     sparse_from_coeffs,
 )
-from omnibias.symbolic.propose import propose_jet_condition
 from omnibias.symbolic.proofmachine import (
     ACTIVATION_IDENTITY_EXACT,
     FAMILY_CATALOG,
@@ -27,6 +26,7 @@ from omnibias.symbolic.proofmachine import (
     RECURRENCE_SPAN,
     build_symbolic_machine,
 )
+from omnibias.symbolic.propose import propose_jet_condition
 
 
 def test_catalan_recurrence_span_hits() -> None:

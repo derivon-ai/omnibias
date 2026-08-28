@@ -253,7 +253,7 @@ def _flatten_ingest_layers(module: object) -> list[object] | None:
             name = type(sub).__name__
             if name in _INGEST_NAMES:
                 out.append(sub)
-            elif isinstance(sub, (nn.Sequential, nn.ModuleList)):
+            elif isinstance(sub, nn.Sequential | nn.ModuleList):
                 inner = from_iterable(list(sub))
                 if inner is None:
                     return None
@@ -268,7 +268,7 @@ def _flatten_ingest_layers(module: object) -> list[object] | None:
         return from_iterable(list(module))
     if isinstance(module, nn.Module):
         kids = list(module.children())
-        if len(kids) == 1 and isinstance(kids[0], (nn.Sequential, nn.ModuleList)):
+        if len(kids) == 1 and isinstance(kids[0], nn.Sequential | nn.ModuleList):
             return from_iterable(list(kids[0]))
     return None
 
