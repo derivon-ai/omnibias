@@ -6,6 +6,31 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Einselection collapse (theory 09-31)
+
+- `omnibias.core.collapse.einselection`: a sixth named collapse.
+  `DephasingModel` (pure-dephasing amplitudes + symmetric
+  nonnegative rate matrix) plus `reduced_density_matrix` /
+  `coherence_enclosure` / `einselected_distribution` /
+  `einselection_collapse` decide, on a sound `ComplexInterval` /
+  `exp_iv` enclosure, whether an einselected distribution over
+  pointer-basis populations survives at a declared sensitivity
+  `eps`. `commutator_enclosure` / `pointer_basis_verdict` separately
+  check whether a caller-supplied candidate observable commutes with
+  the interaction Hamiltonian (exact `Q` arithmetic for point
+  inputs, a sound interval fallback otherwise); `propose_pointer_basis`
+  is a float heuristic that never gates either verdict.
+- Six honesty keys stay permanently false:
+  `wave_function_collapse_claim`, `measurement_problem_resolved`,
+  `single_outcome_claim`, `born_rule_derived`,
+  `continuum_parent_inferred`, `float_residual_is_proof`. The global
+  state stays pure and entangled; `rho(t)` is an improper mixture,
+  never a single-outcome or Born-rule claim.
+  `omnibias.core.proof.engine` gains the `einselection` kind
+  (`coherence` and `pointer_basis` modes).
+  Docs: [`docs/cookbook/einselection-collapse.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/einselection-collapse.md).
+  Theory spec: `theory/09-inventions/31-einselection-collapse.md`.
+
 ### Added — TabPOU joint worlds (theory 05-05)
 
 - `omnibias.tab.pou.joint`: `TabPOUJointConfig` / `fit_tabpou_joint` /

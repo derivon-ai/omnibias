@@ -37,6 +37,13 @@ weak residual on a finite test pack, not a strong solution.
 Rank collapse (`omnibias.core.collapse.rank`) is an exact `Q` syzygy.
 A float SVD is not a proof.
 
+Einselection collapse (`omnibias.core.collapse.einselection`) decides,
+on a sound enclosure of a pure-dephasing density matrix, whether the
+off-diagonal coherence stays below a declared sensitivity `eps`;
+`PROVED` yields an einselected distribution, never a
+wave-function-collapse or single-outcome claim. See
+[cookbook](../cookbook/einselection-collapse.md).
+
 Duality / gap collapse was evaluated and **rejected**: a primal-dual
 sandwich that collapses at `L = U` is Enclosure Collapse of `OPT`.
 

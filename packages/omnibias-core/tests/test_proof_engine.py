@@ -163,6 +163,56 @@ def test_winding_pairing_rank() -> None:
     assert floated.blocked
 
 
+def test_einselection_coherence_and_pointer_basis() -> None:
+    amplitude = 1.0 / 2.0**0.5
+    disproved = prove(
+        "einselection",
+        {
+            "amplitudes": [[amplitude, 0.0], [amplitude, 0.0]],
+            "rates": [[0.0, 1.0], [1.0, 0.0]],
+            "time": 5.0,
+            "coherence_budget": 1e-6,
+        },
+    )
+    assert disproved.disproved
+    proved = prove(
+        "einselection",
+        {
+            "amplitudes": [[amplitude, 0.0], [amplitude, 0.0]],
+            "rates": [[0.0, 1.0], [1.0, 0.0]],
+            "time": 20.0,
+            "coherence_budget": 1e-6,
+        },
+    )
+    assert proved.proved
+    assert proved.reason[0].surviving == "einselected_distribution"
+    assert proved.reason[0].honesty["wave_function_collapse_claim"] is False
+    assert proved.reason[0].honesty["measurement_problem_resolved"] is False
+    assert proved.reason[0].honesty["single_outcome_claim"] is False
+    assert proved.reason[0].honesty["born_rule_derived"] is False
+
+    commuting = prove(
+        "einselection",
+        {
+            "mode": "pointer_basis",
+            "a": [[1.0, 0.0], [0.0, -1.0]],
+            "h": [[2.0, 0.0], [0.0, 3.0]],
+        },
+    )
+    assert commuting.proved
+    assert commuting.reason[0].surviving == "commuting_pointer_basis"
+
+    noncommuting = prove(
+        "einselection",
+        {
+            "mode": "pointer_basis",
+            "a": [[0.0, 1.0], [1.0, 0.0]],
+            "h": [[1.0, 0.0], [0.0, -1.0]],
+        },
+    )
+    assert noncommuting.disproved
+
+
 def test_catalog_family_square_and_exhausted_miss() -> None:
     hit = prove(
         "catalog_family",

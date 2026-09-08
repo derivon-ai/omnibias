@@ -131,6 +131,10 @@ pairing collapse (`omnibias.core.collapse.pairing`; weak residual
 on a finite test pack; not a strong solution; not a PDE),
 rank collapse (`omnibias.core.collapse.rank`; exact Q syzygy; float
 SVD is not a proof),
+einselection collapse (`omnibias.core.collapse.einselection`, theory
+09-31; sound coherence enclosure decides an einselected distribution;
+pure dephasing only; not a wave-function-collapse or single-outcome
+claim),
 proof engine (`omnibias.core.proof.engine`; named-kind router over
 those collapses plus catalog_family / external; reason tree; Lean
 only on existing finite obligations; not a general theorem prover),

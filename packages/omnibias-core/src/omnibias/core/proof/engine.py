@@ -21,6 +21,11 @@ from dataclasses import dataclass
 from fractions import Fraction
 from typing import TYPE_CHECKING, Any, Literal
 
+from omnibias.core.collapse.einselection import (
+    DephasingModel,
+    einselection_collapse,
+    pointer_basis_verdict,
+)
 from omnibias.core.collapse.identity import difference_coeffs, identity_collapse
 from omnibias.core.collapse.pairing import pairing_collapse, pairing_value
 from omnibias.core.collapse.rank import rank_collapse
@@ -44,6 +49,7 @@ from omnibias.core.proof.discovery import (
     run_discovery,
 )
 from omnibias.core.proof.lift import residual_identically_zero
+from omnibias.core.verified.complex_interval import ComplexInterval
 from omnibias.core.verified.interval import Interval
 
 if TYPE_CHECKING:
@@ -57,6 +63,7 @@ if TYPE_CHECKING:
 
 EngineKind = Literal[
     "catalog_family",
+    "einselection",
     "enclosure_sign",
     "external",
     "gap",
@@ -70,6 +77,7 @@ EngineKind = Literal[
 ENGINE_KINDS: frozenset[str] = frozenset(
     {
         "catalog_family",
+        "einselection",
         "enclosure_sign",
         "external",
         "gap",
@@ -745,6 +753,160 @@ def _replay_winding(certificate: Certificate) -> bool | None:
     )
 
 
+def _time_interval(value: object) -> Interval:
+    if isinstance(value, Interval):
+        return value
+    if isinstance(value, bool):
+        raise TypeError("time must be a real number")
+    if isinstance(value, int | float | Fraction):
+        return Interval.from_value(value)
+    return _domain_interval(value)
+
+
+def _complex_pair(value: object, *, name: str) -> complex:
+    if isinstance(value, bool):
+        raise TypeError(f"{name} must be a real or [re, im] pair")
+    if isinstance(value, int | float):
+        return complex(float(value), 0.0)
+    if isinstance(value, Sequence) and not isinstance(value, str | bytes) and len(value) == 2:
+        return complex(
+            _as_float(value[0], name=f"{name}.re"), _as_float(value[1], name=f"{name}.im")
+        )
+    raise TypeError(f"{name} must be a real number or [re, im]")
+
+
+def _amplitudes_from_json(value: object) -> tuple[ComplexInterval, ...]:
+    if not isinstance(value, Sequence) or isinstance(value, str | bytes):
+        raise TypeError("amplitudes must be a sequence")
+    return tuple(
+        ComplexInterval.point(_complex_pair(item, name="amplitude")) for item in value
+    )
+
+
+def _rates_from_json(value: object) -> tuple[tuple[Interval, ...], ...]:
+    if not isinstance(value, Sequence) or isinstance(value, str | bytes):
+        raise TypeError("rates must be a matrix")
+    rows: list[tuple[Interval, ...]] = []
+    for row in value:
+        if not isinstance(row, Sequence) or isinstance(row, str | bytes):
+            raise TypeError("rates rows must be sequences")
+        rows.append(
+            tuple(Interval.point(_as_float(item, name="rate")) for item in row)
+        )
+    return tuple(rows)
+
+
+def _complex_matrix_from_json(value: object) -> list[list[complex]]:
+    if not isinstance(value, Sequence) or isinstance(value, str | bytes):
+        raise TypeError("matrix must be a sequence of rows")
+    rows: list[list[complex]] = []
+    for row in value:
+        if not isinstance(row, Sequence) or isinstance(row, str | bytes):
+            raise TypeError("matrix rows must be sequences")
+        rows.append([_complex_pair(item, name="entry") for item in row])
+    return rows
+
+
+def _json_amplitudes(model: DephasingModel) -> list[list[float]]:
+    return [[c.re.lo, c.im.lo] for c in model.amplitudes]
+
+
+def _json_rates(model: DephasingModel) -> list[list[float]]:
+    return [[cell.lo for cell in row] for row in model.rates]
+
+
+def _prove_einselection(conjecture: Conjecture) -> ProofAttempt:
+    data = _require_mapping(conjecture.data)
+    try:
+        mode = _as_str(data.get("mode"), name="mode", default="coherence")
+    except TypeError as exc:
+        return _blocked(str(exc))
+    honesty = _honesty(
+        spec_name="einselection",
+        extra={
+            "einselection_collapse": True,
+            "wave_function_collapse_claim": False,
+            "measurement_problem_resolved": False,
+            "single_outcome_claim": False,
+            "born_rule_derived": False,
+        },
+    )
+    if mode == "pointer_basis":
+        try:
+            a_json = data["a"]
+            h_json = data["h"]
+            a_matrix = _complex_matrix_from_json(a_json)
+            h_matrix = _complex_matrix_from_json(h_json)
+        except (KeyError, TypeError) as exc:
+            return _blocked(str(exc))
+        try:
+            verdict = pointer_basis_verdict(a_matrix, h_matrix)
+        except (TypeError, ValueError) as exc:
+            return _blocked(str(exc))
+        return _from_obligation(
+            "einselection",
+            "einselection",
+            verdict,
+            {"mode": "pointer_basis", "inputs": {"a": a_json, "h": h_json}},
+            honesty,
+        )
+    try:
+        amplitudes = _amplitudes_from_json(data["amplitudes"])
+        rates = _rates_from_json(data["rates"])
+        time_iv = _time_interval(data["time"])
+        coherence_budget = _as_float(data["coherence_budget"], name="coherence_budget")
+    except (KeyError, TypeError, ValueError) as exc:
+        return _blocked(str(exc))
+    try:
+        model = DephasingModel(amplitudes=amplitudes, rates=rates)
+        verdict = einselection_collapse(model, time=time_iv, coherence_budget=coherence_budget)
+    except (TypeError, ValueError) as exc:
+        return _blocked(str(exc))
+    return _from_obligation(
+        "einselection",
+        "einselection",
+        verdict,
+        {
+            "mode": "coherence",
+            "inputs": {
+                "amplitudes": _json_amplitudes(model),
+                "rates": _json_rates(model),
+                "time": [time_iv.lo, time_iv.hi],
+                "coherence_budget": coherence_budget,
+            },
+        },
+        honesty,
+    )
+
+
+def _replay_einselection(certificate: Certificate) -> bool | None:
+    payload = _payload_of(certificate)
+    if payload is None:
+        return False
+    inputs = payload.get("inputs")
+    if not isinstance(inputs, Mapping):
+        return False
+    mode = payload.get("mode", "coherence")
+    if mode == "pointer_basis":
+        try:
+            a_matrix = _complex_matrix_from_json(inputs["a"])
+            h_matrix = _complex_matrix_from_json(inputs["h"])
+            fresh = pointer_basis_verdict(a_matrix, h_matrix)
+        except (KeyError, TypeError, ValueError):
+            return False
+        return fresh.status == payload.get("status")
+    try:
+        amplitudes = _amplitudes_from_json(inputs["amplitudes"])
+        rates = _rates_from_json(inputs["rates"])
+        model = DephasingModel(amplitudes=amplitudes, rates=rates)
+        time_iv = _time_interval(inputs["time"])
+        coherence_budget = _as_float(inputs["coherence_budget"], name="coherence_budget")
+        fresh = einselection_collapse(model, time=time_iv, coherence_budget=coherence_budget)
+    except (KeyError, TypeError, ValueError):
+        return False
+    return fresh.status == payload.get("status")
+
+
 def _test_pack(value: object) -> list[list[int | float | Fraction]]:
     if not isinstance(value, Sequence) or isinstance(value, str | bytes):
         raise TypeError("tests must be a sequence of coefficient sequences")
@@ -1058,6 +1220,7 @@ def build_engine_machine() -> ProofMachine:
         ("winding", _prove_winding, _replay_winding),
         ("pairing", _prove_pairing, _replay_pairing),
         ("rank", _prove_rank, _replay_rank),
+        ("einselection", _prove_einselection, _replay_einselection),
         ("catalog_family", _prove_catalog_family_sealed, _replay_catalog_family),
     )
     for kind, prove_fn, replay_fn in specs:

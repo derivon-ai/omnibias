@@ -401,6 +401,7 @@ nav:
       - Winding collapse: cookbook/winding-collapse.md
       - Pairing collapse: cookbook/pairing-collapse.md
       - Rank collapse: cookbook/rank-collapse.md
+      - Einselection collapse: cookbook/einselection-collapse.md
       - Dirichlet enclosures on Re(s)>1: cookbook/dirichlet-enclosure.md
       - Instance-gap tightening: cookbook/instance-gap.md
       - CCF jet-Padé profile diagnostic: cookbook/ccf-pade-profile.md

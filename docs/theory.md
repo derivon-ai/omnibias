@@ -442,6 +442,10 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Inequality engine** ([09-30](api/inequality.md)): propose /
   rationalize / check front door; not 03-02 / 03-03; not a new LP
   algorithm. Status is **shipped**.
+- **Einselection collapse** ([09-31](api/collapse.md)): sound
+  coherence enclosure decides an einselected distribution; pure
+  dephasing only; not a wave-function-collapse or single-outcome
+  claim. Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
@@ -475,7 +479,12 @@ never a proof. Verdict collapse
 ([cookbook](cookbook/verdict-collapse.md)) is one such sense: a
 sound residual enclosure of a finite obligation is `PROVED` only at
 `{0}` and `BLOCKED` (not false) when `0` sits in a positive-width
-box.
+box. Einselection collapse
+([cookbook](cookbook/einselection-collapse.md)) is another: a sound
+coherence enclosure of a pure-dephasing density matrix decides an
+einselected distribution over pointer-basis populations -- not a
+wave-function-collapse claim, a measurement-problem resolution, or a
+single-outcome claim.
 
 ## 5. Operator dictionary
 

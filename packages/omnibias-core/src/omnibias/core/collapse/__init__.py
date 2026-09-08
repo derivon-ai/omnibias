@@ -14,6 +14,17 @@ proof. ``theorem_prover_verified`` stays false unless a genuine
 
 from __future__ import annotations
 
+from omnibias.core.collapse.einselection import (
+    EINSELECTION_SPEC,
+    DephasingModel,
+    coherence_enclosure,
+    commutator_enclosure,
+    einselected_distribution,
+    einselection_collapse,
+    pointer_basis_verdict,
+    propose_pointer_basis,
+    reduced_density_matrix,
+)
 from omnibias.core.collapse.identity import (
     IDENTITY_SPEC,
     difference_coeffs,
@@ -76,7 +87,9 @@ __all__ = [
     "CollapseSpec",
     "CollapseStatus",
     "ComplexEnclosureFn",
+    "DephasingModel",
     "DistinctnessReport",
+    "EINSELECTION_SPEC",
     "FOUNDING_COLLAPSES",
     "FOUNDING_NAMES",
     "FOUNDING_SURVIVING",
@@ -92,8 +105,12 @@ __all__ = [
     "add_registry_hook",
     "adjudicate_residual",
     "are_distinct",
+    "coherence_enclosure",
+    "commutator_enclosure",
     "default_honesty",
     "difference_coeffs",
+    "einselected_distribution",
+    "einselection_collapse",
     "evaluate_difference",
     "get_collapse",
     "identity_collapse",
@@ -102,7 +119,10 @@ __all__ = [
     "list_rejected_collapses",
     "pairing_collapse",
     "pairing_value",
+    "pointer_basis_verdict",
+    "propose_pointer_basis",
     "rank_collapse",
+    "reduced_density_matrix",
     "register_collapse",
     "reject_collapse",
     "remainder_collapse",

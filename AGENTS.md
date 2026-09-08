@@ -493,7 +493,12 @@ by that drift gate.
   (`omnibias.core.collapse.pairing`) is a weak residual on a finite
   test pack, not a strong solution. Rank collapse
   (`omnibias.core.collapse.rank`) is an exact `Q` syzygy; a float
-  SVD is not a proof.
+  SVD is not a proof. Einselection collapse
+  (`omnibias.core.collapse.einselection`, theory 09-31) decides, on a
+  sound coherence enclosure of a pure-dephasing density matrix,
+  whether an einselected distribution over pointer-basis populations
+  survives; never a wave-function-collapse, measurement-problem, or
+  single-outcome claim.
   The proof engine (`omnibias.core.proof.engine`) routes a named
   finite kind through those collapses (or a catalog family) and
   returns a reason tree; `external` stays `BLOCKED`. A float
