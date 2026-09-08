@@ -567,6 +567,47 @@ def test_haar_mismatch_yields_none() -> None:
     assert generate_obligation(bogus) is None
 
 
+def test_generate_ns_convergence_ledger() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        navier_stokes_exponent_ledger,
+        seal_ledger_certificate,
+    )
+
+    cert = seal_ledger_certificate(
+        navier_stokes_exponent_ledger(), run_lean=False
+    ).certificate
+    src = generate_obligation(cert) or ""
+    assert "import OmnibiasAnalytic.Check.ConvergenceLedger" in src
+    assert "ns_manuscript_margins" in src
+    assert "waveExponent" in src
+    assert "sorry" not in src.lower()
+
+
+def test_generate_polymer_convergence_ledger() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        seal_ledger_certificate,
+        strong_coupling_polymer_ledger,
+    )
+
+    cert = seal_ledger_certificate(
+        strong_coupling_polymer_ledger(), run_lean=False
+    ).certificate
+    src = generate_obligation(cert) or ""
+    assert "import OmnibiasAnalytic.Check.ConvergenceLedger" in src
+    assert "polymer_ledger_margins" in src
+    assert "polymerBacktrack" in src
+
+
+def test_failing_ledger_emits_no_mathlib_obligation() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        failing_margin_ledger,
+        seal_ledger_certificate,
+    )
+
+    cert = seal_ledger_certificate(failing_margin_ledger(), run_lean=False).certificate
+    assert generate_obligation(cert) is None
+
+
 def test_polymer_mismatch_yields_none() -> None:
     cert = polymer_certificate("backtrack_4")
     payload = dict(cert["payload"])

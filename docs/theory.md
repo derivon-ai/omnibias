@@ -342,7 +342,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Honesty and claim boundaries** ([06-02](honesty.md)): claim
   ladder + forbidden-claims register. Design record. Status is
   **shipped**.
-- **Packaging and rollout** (06-03): G1–G5 earned (99/99 homes).
+- **Packaging and rollout** (06-03): G1–G5 earned (109/109 homes).
   G4/G5 vacuous, not promoted. Status is **shipped**.
 - **Public primitive** (06-05): citation path; extract / paper /
   external stay later. Status is **shipped**.
@@ -362,6 +362,10 @@ gates are earned on smoke, not in CI `all_passed`.
   **shipped**.
 - **Domain programs** ([07-07](api/domain_programs.md)): tooling,
   not a discovery. Status is **shipped**.
+- **Convergence ledgers** ([07-08](api/convergence_ledger.md)):
+  finite rational stage-budget of a packet ladder / polymer
+  expansion. Not Clay (A)/(B); not a continuum mass gap. Status is
+  **shipped**.
 - **Training-idea ledger** (08-01): recommended stack; trainers do
   not clear Hilbert stretch. Design record. Status is **shipped**.
 - **Composed curvature** ([08-02](api/composed_curvature.md)): slice

@@ -10,7 +10,7 @@ proves. A float residual is never an :class:`ExactCheck`.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Literal, Protocol, cast
 
@@ -51,6 +51,7 @@ _STACK_MODULES: tuple[str, ...] = (
 _PARENT_FLAGS: dict[str, bool] = {
     "jacobian_conjecture_proof_claim": False,
     "navier_stokes_proof_claim": False,
+    "yang_mills_mass_gap_claim": False,
     "unproven_claim": False,
 }
 
@@ -332,12 +333,39 @@ def _status_from_check(
     return "BLOCKED"
 
 
+def _derived_parent_flags(extra: Mapping[str, Any] | None) -> dict[str, bool]:
+    """Parent flags are earned by a discharged empty-premise ledger, never by hand."""
+    flags = {
+        "navier_stokes_proof_claim": False,
+        "yang_mills_mass_gap_claim": False,
+    }
+    if extra is None:
+        return flags
+    payload = extra.get("ledger_payload")
+    if not isinstance(payload, Mapping):
+        return flags
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        payload_earns_parent_claim,
+    )
+
+    flags["navier_stokes_proof_claim"] = payload_earns_parent_claim(
+        payload, "navier_stokes_proof_claim"
+    )
+    flags["yang_mills_mass_gap_claim"] = payload_earns_parent_claim(
+        payload, "yang_mills_mass_gap_claim"
+    )
+    return flags
+
+
 def _merge_honesty(extra: Mapping[str, Any] | None) -> dict[str, bool]:
     honesty = default_inequality_honesty()
     if extra is None:
-        return honesty
+        return {**honesty, **_derived_parent_flags(None)}
     for key, value in extra.items():
-        if isinstance(value, bool):
+        if isinstance(value, bool) and key not in (
+            "navier_stokes_proof_claim",
+            "yang_mills_mass_gap_claim",
+        ):
             honesty[str(key)] = value
     honesty["p_equals_np_claim"] = False
     honesty["new_lp_algorithm_claim"] = False
@@ -345,7 +373,7 @@ def _merge_honesty(extra: Mapping[str, Any] | None) -> dict[str, bool]:
     honesty["soft_residual_is_exact_check"] = False
     honesty["unproven_claim"] = False
     honesty["jacobian_conjecture_proof_claim"] = False
-    honesty["navier_stokes_proof_claim"] = False
+    honesty.update(_derived_parent_flags(extra))
     return honesty
 
 
@@ -409,7 +437,32 @@ def run_inequality_pipeline(
         "detail": str(extra.get("detail", "")),
     }
     honesty_raw = extra.get("honesty")
-    honesty = _merge_honesty(honesty_raw if isinstance(honesty_raw, Mapping) else None)
+    honesty_extra: dict[str, Any] = (
+        dict(honesty_raw) if isinstance(honesty_raw, Mapping) else {}
+    )
+    if str(system.data.get("type", "")) == "convergence_ledger":
+        ledger_raw = system.data.get("ledger")
+        report_raw = system.data.get("report")
+        holds = False
+        premises: list[Any] = []
+        parent = ""
+        if isinstance(ledger_raw, Mapping):
+            parent = str(ledger_raw.get("parent", ""))
+            raw_premises = ledger_raw.get("external_premises", ())
+            if isinstance(raw_premises, Sequence) and not isinstance(
+                raw_premises, str | bytes
+            ):
+                premises = list(raw_premises)
+        if isinstance(report_raw, Mapping):
+            holds = bool(report_raw.get("holds"))
+        honesty_extra["ledger_payload"] = {
+            "type": "convergence_ledger",
+            "holds": holds,
+            "external_premises": premises,
+            "parent": parent,
+        }
+        payload["ledger_payload"] = honesty_extra["ledger_payload"]
+    honesty = _merge_honesty(honesty_extra)
     if role == "empty":
         honesty["unsat_proof"] = True
     return status, payload, honesty

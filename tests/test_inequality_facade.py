@@ -69,3 +69,30 @@ def test_boolean_skips_propose() -> None:
     assert verdict.status == "PROVED"
     assert verdict.certificate is not None
     assert verdict.certificate["payload"]["pipeline"] == ["rationalize", "check"]
+
+
+def test_convergence_ledger_through_solve_inequality() -> None:
+    from omnibias.core.proof.inequality import solve_inequality
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        empty_premise_discharged_ledger,
+        failing_margin_ledger,
+        ledger_to_inequality_system,
+        navier_stokes_exponent_ledger,
+    )
+
+    ns = solve_inequality(ledger_to_inequality_system(navier_stokes_exponent_ledger()))
+    assert ns.status == "PROVED"
+    assert ns.replay_ok is True
+    assert ns.certificate is not None
+    assert ns.certificate["honesty"]["navier_stokes_proof_claim"] is False
+    assert ns.certificate["honesty"]["yang_mills_mass_gap_claim"] is False
+
+    bad = solve_inequality(ledger_to_inequality_system(failing_margin_ledger()))
+    assert bad.status == "DISPROVED"
+
+    earned = solve_inequality(
+        ledger_to_inequality_system(empty_premise_discharged_ledger())
+    )
+    assert earned.status == "PROVED"
+    assert earned.certificate is not None
+    assert earned.certificate["honesty"]["navier_stokes_proof_claim"] is True

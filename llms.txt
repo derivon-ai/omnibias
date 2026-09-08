@@ -237,7 +237,11 @@ Fermi-Dirac occupancy is the sigmoid; certified chemical
 potential via `kantorovich_accept_step`; G1–G5 CI; `beta ->
 inf` is the founding temperature collapse, no new registry
 slot requested; non-interacting fermions only, not DFT, not
-a many-body solve). Cost /
+a many-body solve),
+convergence ledgers (07-08; NS exponent ledger / YM polymer
+majorants are finite rational stage budgets; G1–G5 CI;
+parent flags derived from empty `external_premises`, never
+asserted; not Clay A/B, not a continuum mass gap). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

@@ -12,9 +12,9 @@ rung does not shrink the distance to a parent.
 
 | Parent key | Parent | Sub-obligation | Gate | Sealed scope | Never write | Entry | Distance |
 |---|---|---|---|---|---|---|---|
-| NS | Navier-Stokes global regularity (Clay) | sound residual enclosure on one box and horizon | `require_enclosure_coverage` at 100% plus a named residual floor | one discretization, one box, one horizon | we prove global regularity for Navier-Stokes | 07-02 | `docs/benchmarks/ns_weak_form_enclosure_smoke.json` (`all_passed`; width split recorded; continuum claim false) |
-| EULER | finite-time singularity of 3D Euler / Navier-Stokes | CCF residual on a fixed grid and dictionary | `ccf_absolute_gates` stretch `1e-13` | one model equation; not Euler/NS | our CCF residual is evidence for Euler or Navier-Stokes blowup | 07-03 | `docs/benchmarks/reproduce_deepmind_ccf_smoke.json` (stretch unearned) |
-| YM | Yang-Mills existence and mass gap (Clay) | certified gap of one fixed transfer matrix | `certified_spectral_gap` strictly positive | `continuum_claim = False` | we prove the Yang-Mills mass gap | 07-04, 07-05 | `docs/benchmarks/gauge_holonomy_gap_smoke.json` (`all_passed`; `mass_gap: false`); trial factor leftover-recorded on two-plaquette / strip |
+| NS | Navier-Stokes global regularity (Clay) | sound residual enclosure on one box and horizon | `require_enclosure_coverage` at 100% plus a named residual floor | one discretization, one box, one horizon | we prove global regularity for Navier-Stokes | 07-02, 07-08 | `docs/benchmarks/ns_weak_form_enclosure_smoke.json` (`all_passed`; width split recorded; Clay (C)/(D) resolved externally, unforced (A)/(B) still open; continuum claim false); `docs/benchmarks/convergence_ledger_smoke.json` |
+| EULER | finite-time singularity of 3D Euler / Navier-Stokes | CCF residual on a fixed grid and dictionary | `ccf_absolute_gates` stretch `1e-13` | one model equation; not Euler/NS | our CCF residual is evidence for Euler or Navier-Stokes blowup | 07-03 | `docs/benchmarks/reproduce_deepmind_ccf_smoke.json` (stretch unearned; unforced Euler blowup on R^3 resolved; CCF residual no longer novel against that parent) |
+| YM | Yang-Mills existence and mass gap (Clay) | certified gap of one fixed transfer matrix | `certified_spectral_gap` strictly positive | `continuum_claim = False` | we prove the Yang-Mills mass gap | 07-04, 07-05, 07-08 | `docs/benchmarks/gauge_holonomy_gap_smoke.json` (`all_passed`; `mass_gap: false`); trial factor leftover-recorded on two-plaquette / strip |
 | RH | the Riemann Hypothesis | rigorous de Bruijn–Newman `Lambda` upper-bound program via a published finite reduction | replayable `Lambda <= t0` certificate for pre-registered `t0 < 0.22` | named contour cover, finite approximation, and proved far-field premise; not implemented | we prove / disprove the Riemann Hypothesis | planned Lambda program | no implementation; `docs/benchmarks/dirichlet_enclosure_smoke.json` remains `Re(s)>1` only |
 | PNP | P versus NP | certified optimality gap on one instance | `certify_gap` sandwich, never claimed tight | per instance, per size | P = NP | qubo / discrete; 03-01, 03-03 | `docs/benchmarks/instance_gap_tightening_smoke.json` (`all_passed`; never tight) |
 | TURB | turbulence closure (Nobel-adjacent) | computed coarse-graining vs fine reference | relative error, absolute threshold, five seeds | one model, one scale ratio, one geometry | we solve the closure problem | 03-07, 07-07 | `docs/benchmarks/scale_flow_smoke.json` (`all_passed`) |
@@ -29,6 +29,13 @@ exists; the named `t0 = 0.2` attempt stays `certified=False` because the
 far-field premise is an external obligation. Padé / Borel (spec 03-10) must not
 be applied to a Dirichlet series. That attempt does not earn the ledger gate.
 
+Clay alternatives (C) and (D) (forced Navier–Stokes blowup) are resolved
+externally; unforced regularity (A)/(B) is still open. Unforced 3D Euler
+blowup on `R^3` is now proved, so a CCF residual hit is no longer novel
+against that resolved parent. Spec 07-08 certifies the finite rational
+spine of both the NS exponent ledger and the YM polymer majorants; it
+does not claim (A)/(B) or the mass gap.
+
 ## Claim-flag modules
 
 | Module | Flag | Parent key |
@@ -42,5 +49,6 @@ be applied to a Dirichlet series. That attempt does not earn the ledger gate.
 | `omnibias.sos` | positivity honesty | YM |
 | `omnibias.qubo` / `omnibias.discrete` | `certify_gap` | PNP |
 | `benchmarks/_gates.py` | `navier_stokes_proof_claim` | NS, EULER |
+| `omnibias.core.proof.obligations.convergence_ledger` | `navier_stokes_proof_claim` / `yang_mills_mass_gap_claim` | NS, YM |
 
 Source: [theory/07-frontier/01-sub-obligation-ledger.md](https://github.com/derivon-ai/omnibias/blob/main/theory/07-frontier/01-sub-obligation-ledger.md).

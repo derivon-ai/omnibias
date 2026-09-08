@@ -46,6 +46,8 @@ def test_honesty_defaults_forbid_parent_claims() -> None:
     assert honesty["unsat_from_float_infeasible"] is False
     assert honesty["soft_residual_is_exact_check"] is False
     assert honesty["jacobian_conjecture_proof_claim"] is False
+    assert honesty["navier_stokes_proof_claim"] is False
+    assert honesty["yang_mills_mass_gap_claim"] is False
 
 
 def test_soft_residual_cannot_become_exact_check() -> None:

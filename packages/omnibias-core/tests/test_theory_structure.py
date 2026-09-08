@@ -39,6 +39,7 @@ CLAIM_FLAG_MODULES = (
     "omnibias.qubo",
     "omnibias.discrete",
     "benchmarks/_gates.py",
+    "omnibias.core.proof.obligations.convergence_ledger",
 )
 _BENCHMARK_PATH = re.compile(r"`(docs/benchmarks/[^`]+\.json)`")
 _IMPORT_PADE = re.compile(

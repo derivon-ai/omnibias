@@ -644,7 +644,7 @@ def _register() -> None:
             CatalogEntry(
                 kind=kind,
                 obligation="a certified PINN / fluids enclosure (not NS global regularity)",
-                parent="Navier-Stokes global regularity",
+                parent="Navier-Stokes unforced regularity (Clay A/B)",
                 parent_status="open",
                 package="omnibias.pinn.certified",
                 mode="enclosure",
@@ -661,7 +661,7 @@ def _register() -> None:
             CatalogEntry(
                 kind=kind,
                 obligation="a residual-minimizing profile (empirical; not ExactCheck)",
-                parent="Navier-Stokes global regularity",
+                parent="Navier-Stokes unforced regularity (Clay A/B)",
                 parent_status="open",
                 package="omnibias.pinn.jax.discovery",
                 mode="empirical",

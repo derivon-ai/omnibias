@@ -1,10 +1,10 @@
 {
   "schema": "omnibias.benchmark.theory_homes.v1",
-  "generated_utc": "2026-08-26T18:45:32Z",
+  "generated_utc": "2026-09-08T19:27:57Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
-    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
     "numpy": "2.4.6",
     "jax": "0.10.2",
     "torch": "2.12.1+cu130",
@@ -24,7 +24,7 @@
     "g4_in_all_passed": true,
     "g5_in_all_passed": true
   },
-  "rss_mb_at_start": 805.14,
+  "rss_mb_at_start": 804.48,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -47,8 +47,8 @@
         "earned": true,
         "reported": true,
         "in_ci_all_passed": true,
-        "n_specs": 98,
-        "n_docs_only": 21,
+        "n_specs": 109,
+        "n_docs_only": 23,
         "n_missing_section": 0,
         "n_missing_home": 0,
         "missing_section": [],
@@ -142,11 +142,12 @@
         "n_lines": 389,
         "line_need": 2000,
         "size_met": false,
-        "n_external_consumers": 2,
+        "n_external_consumers": 3,
         "consumer_need": 2,
         "consumers_met": true,
         "external_consumers": [
           "omnibias-convex",
+          "omnibias-core",
           "omnibias-graph"
         ],
         "promotion_licensed": false,
@@ -175,8 +176,8 @@
     "earned": true,
     "reported": true,
     "in_ci_all_passed": true,
-    "n_specs": 98,
-    "n_docs_only": 21,
+    "n_specs": 109,
+    "n_docs_only": 23,
     "n_missing_section": 0,
     "n_missing_home": 0,
     "missing_section": [],
@@ -270,11 +271,12 @@
     "n_lines": 389,
     "line_need": 2000,
     "size_met": false,
-    "n_external_consumers": 2,
+    "n_external_consumers": 3,
     "consumer_need": 2,
     "consumers_met": true,
     "external_consumers": [
       "omnibias-convex",
+      "omnibias-core",
       "omnibias-graph"
     ],
     "promotion_licensed": false,

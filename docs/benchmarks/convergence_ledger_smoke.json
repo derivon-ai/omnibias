@@ -1,0 +1,86 @@
+{
+  "schema": "omnibias.benchmarks.convergence_ledger.v1",
+  "generated_utc": "2026-09-08T19:27:55Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "convergence_ledger",
+    "full": false,
+    "collapse": "none",
+    "honesty": {
+      "unproven_claim": false,
+      "collapse_limit_in_lean": false,
+      "function_class_in_lean": false,
+      "mathlib_path_used": false,
+      "navier_stokes_proof_claim": false,
+      "yang_mills_mass_gap_claim": false,
+      "continuum_pde_claim": false,
+      "continuum_claim": false
+    }
+  },
+  "rss_mb_at_start": 815.21,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_algebra_emission",
+        "passed": true,
+        "n_ledgers": 2,
+        "sizes": [
+          {
+            "name": "navier_stokes_exponent",
+            "n_obligations": 6,
+            "strength": "CONDITIONAL",
+            "holds": true
+          },
+          {
+            "name": "strong_coupling_polymer",
+            "n_obligations": 2,
+            "strength": "CONDITIONAL",
+            "holds": true
+          }
+        ],
+        "kappa_threshold": "1/200",
+        "detail": "curated ledgers discharge; Lean source is emitted; kappa < 1/200"
+      },
+      {
+        "name": "g2_negative_control",
+        "passed": true,
+        "algebra_holds": false,
+        "failing": [
+          "particular"
+        ],
+        "detail": "a failing margin is BLOCKED and named; no kernel obligation is emitted"
+      },
+      {
+        "name": "g3_no_toolchain_or_kernel",
+        "passed": true,
+        "lean_available": true,
+        "theorem_prover_verified": true,
+        "mathlib_verified": false,
+        "wall_seconds": 0.3780176870059222,
+        "detail": "no lake -> flag stays false; lake -> genuine pass"
+      },
+      {
+        "name": "g4_tamper_evidence",
+        "passed": true,
+        "detail": "editing a sealed field invalidates the digest"
+      },
+      {
+        "name": "g5_parent_flag_unforgeable",
+        "passed": true,
+        "mathlib_verified": false,
+        "detail": "curated ledgers stay CONDITIONAL; empty premises earn the flag; a hand-stamped True is refused"
+      }
+    ]
+  },
+  "wall_seconds": 1.609538855991559,
+  "n_ledgers": 2
+}

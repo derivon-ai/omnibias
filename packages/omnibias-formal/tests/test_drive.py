@@ -111,6 +111,18 @@ def test_classify_haar() -> None:
     assert classify_obligation(haar_certificate("weyl_prefactor_24")) == "haar_volume"
 
 
+def test_classify_convergence_ledger() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        navier_stokes_exponent_ledger,
+        seal_ledger_certificate,
+    )
+
+    cert = seal_ledger_certificate(
+        navier_stokes_exponent_ledger(), run_lean=False
+    ).certificate
+    assert classify_obligation(cert) == "convergence_ledger"
+
+
 def test_classify_none_for_straddling_interval() -> None:
     assert classify_obligation(interval_certificate("q", Interval(-1.0, 1.0))) is None
 
@@ -139,6 +151,14 @@ def test_classify_agrees_with_generate_obligation() -> None:
         haar_certificate("weyl_prefactor_24"),
         {"foo": "bar"},
     ]
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        navier_stokes_exponent_ledger,
+        seal_ledger_certificate,
+    )
+
+    certs.append(
+        seal_ledger_certificate(navier_stokes_exponent_ledger(), run_lean=False).certificate
+    )
     for cert in certs:
         assert (classify_obligation(cert) is None) == (generate_obligation(cert) is None)
 

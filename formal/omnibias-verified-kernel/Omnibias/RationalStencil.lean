@@ -78,4 +78,38 @@ theorem ratNez_sound {n d : Int} (h : ratNez n d = true) : n ≠ 0 ∧ d ≠ 0 :
   simp only [ratNez, Bool.and_eq_true, decide_eq_true_eq] at h
   exact h
 
+/-- Strict inequality of rationals `p/q < r/s` with positive denominators.
+Cross-multiplication `p * s < r * q` is the finite residual of a
+convergence-ledger margin. Algebra only; no PDE and no analytic class. -/
+def ratLt (p q r s : Int) : Bool :=
+  decide (0 < q) && decide (0 < s) && decide (p * s < r * q)
+
+theorem ratLt_sound {p q r s : Int} (h : ratLt p q r s = true) :
+    0 < q ∧ 0 < s ∧ p * s < r * q := by
+  simp only [ratLt, Bool.and_eq_true, decide_eq_true_eq] at h
+  exact ⟨h.1.1, h.1.2, h.2⟩
+
+/-- Conjunction of scaled strict rational inequalities. -/
+def allRatLt : List (Int × Int × Int × Int) → Bool
+  | [] => true
+  | t :: rest =>
+      ratLt t.1 t.2.1 t.2.2.1 t.2.2.2 && allRatLt rest
+
+theorem allRatLt_sound
+    (xs : List (Int × Int × Int × Int))
+    (h : allRatLt xs = true)
+    {p q r s : Int}
+    (hmem : (p, q, r, s) ∈ xs) :
+    0 < q ∧ 0 < s ∧ p * s < r * q := by
+  induction xs with
+  | nil => cases hmem
+  | cons t rest ih =>
+      simp only [allRatLt, Bool.and_eq_true] at h
+      cases List.mem_cons.mp hmem with
+      | inl heq =>
+          subst heq
+          exact ratLt_sound h.1
+      | inr hrest =>
+          exact ih h.2 hrest
+
 end Omnibias

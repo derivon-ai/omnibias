@@ -197,6 +197,7 @@ nav:
       - weight-space loss jet: api/weight_loss_jet.md
       - recommended trainer stack: api/train_stack.md
       - rational stencil obligations (01-11): api/rational_stencil.md
+      - convergence ledgers (07-08): api/convergence_ledger.md
       - soft-population evolution (03-01): api/soft_evolution.md
       - arrangement LP (03-02): api/arrangement_lp.md
       - CSP collapse (03-03): api/csp.md

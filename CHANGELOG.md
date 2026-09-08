@@ -6,6 +6,35 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Finite rational convergence ledgers (theory 07-08)
+
+- `omnibias.core.proof.obligations.convergence_ledger`: a stage-indexed
+  affine budget (`AffineForm` / `MinForm` / `StageMap` / `SideCondition` /
+  `MarginObligation` / `ConvergenceLedger`) whose margins are decided
+  exactly over `Q` by endpoint values plus slope sign. No LP solver, no
+  floats. `check_ledger` reports the binding part and the exact tipping
+  point of the governing parameter. `external_premises` is the printed
+  list of analytic facts the ledger is conditional on.
+- Two curated instances: `navier_stokes_exponent_ledger()` transcribes
+  OpenAI's `NavierStokes/ExponentLedger` (`sigma_0 = 1/5`, `step = 1/10`,
+  `kappa = 1/100000`, five `all_stage_arithmetic` margins plus the `.17`
+  bar gain whose binding threshold is `kappa < 1/200`);
+  `strong_coupling_polymer_ledger()` restates the locked Kotecký–Preiss
+  majorants `15 < 20` and `15 < 24`. Both ship with nonempty premises, so
+  the sealed outcome is `CONDITIONAL`.
+- Parent honesty flags (`navier_stokes_proof_claim`,
+  `yang_mills_mass_gap_claim`) are **derived**: they become true only when
+  every margin discharges **and** `external_premises` is empty. A
+  hand-stamped `True` is refused at seal time, matching
+  `theorem_prover_verified` discipline.
+- Kernel emitter: `allRatLt` over integer cross-multiplications in
+  `Omnibias.RationalStencil`. Mathlib-backed lemmas in
+  `OmnibiasAnalytic.Check.ConvergenceLedger` (`ns_manuscript_margins`,
+  `polymer_ledger_margins`); `mathlib_verified` is a distinct tier.
+- Docs: [`docs/api/convergence_ledger.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/convergence_ledger.md).
+  Theory spec: `theory/07-frontier/08-convergence-ledgers.md`.
+  Smoke: `docs/benchmarks/convergence_ledger_smoke.json`.
+
 ### Added — Fermi occupancy and thermodynamic potentials (theory 04-03)
 
 - `omnibias.core.occupancy`: `FermiModel` (`beta`, `mu`), `reduced_argument`,

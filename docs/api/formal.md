@@ -75,6 +75,12 @@ a green build is meaningful.
   `omnibias.formal.haar.haar_certificate`: the locked Weyl prefactor
   `6*4=24` or the Weyl dimension `(3,0)=10`. Finite arithmetic, not a
   continuum Haar theorem and not 4-D SU(3) Yang-Mills.
+- **Convergence ledger** -- a `convergence_ledger` payload from
+  `omnibias.core.proof.obligations.convergence_ledger`: a named NS
+  exponent-ledger instance or the strong-coupling polymer majorants.
+  Finite rational affine margins, not Clay (A)/(B) and not a continuum
+  mass gap. Applies `ns_manuscript_margins` /
+  `polymer_ledger_margins`.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived

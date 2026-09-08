@@ -332,7 +332,7 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   a submodule back out later is cheap; un-shipping a premature distribution is not.
   See the `omnibias-new-package` skill. Theory 06-03 G1–G5 are
   **shipped**; they are
-  earned on `benchmarks/theory_homes.py` (42 packages, 99/99 homes,
+  earned on `benchmarks/theory_homes.py` (42 packages, 109/109 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
   lines, not promoted). Theory 06-05 is **shipped** (document G1–G5;
   extract / paper / external stay later). Theory 07-01 is **shipped**
@@ -748,6 +748,12 @@ by that drift gate.
   inf` is the founding temperature collapse, evaluated only as a named
   reference, no new registry slot requested; non-interacting fermions
   only, not DFT, not a many-body solve, no thermodynamic limit) /
+  `omnibias.core.proof.obligations.convergence_ledger`
+  (07-08, **shipped**; NS exponent ledger / YM polymer majorants are
+  finite rational stage budgets; G1–G5 CI; founding bias collapse, not
+  temperature collapse; parent flags derived from empty
+  `external_premises`, never asserted; not Clay A/B, not a continuum
+  mass gap) /
   `omnibias.pinn.inverse`
   (05-01, **shipped**; G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`;
   global search earned for n=3 only) /
@@ -847,6 +853,7 @@ by that drift gate.
   [`docs/api/conformal_slabs.md`](docs/api/conformal_slabs.md),
   [`docs/api/pack_fisher.md`](docs/api/pack_fisher.md),
   [`docs/api/occupancy.md`](docs/api/occupancy.md),
+  [`docs/api/convergence_ledger.md`](docs/api/convergence_ledger.md),
   [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md),
   [`docs/api/tabpou.md`](docs/api/tabpou.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
