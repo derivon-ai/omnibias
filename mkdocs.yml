@@ -254,6 +254,7 @@ nav:
       - Noise-aware tabular training (05-03): api/noise_aware_tab.md
       - TabPOU (05-04 / 05-05): api/tabpou.md
       - Conformal slabs (04-02): api/conformal_slabs.md
+      - Fermi occupancy and thermodynamic potentials (04-03): api/occupancy.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -372,6 +373,7 @@ nav:
       - Pack Fisher metric: cookbook/pack-fisher.md
       - Inverse imaging: cookbook/pinn-inverse.md
       - Conformal slabs: cookbook/conformal-slabs.md
+      - Fermi occupancy and thermodynamic potentials: cookbook/fermi-occupancy.md
       - Limits & asymptotics (jet lim): cookbook/limits-and-asymptotics.md
       - Better-than-STE binary training: cookbook/better-than-ste-binary.md
       - Differentiable Boolean algebra: cookbook/boolean-equations.md

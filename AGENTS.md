@@ -740,6 +740,14 @@ by that drift gate.
   `omnibias.curvature.information`
   (04-01, **shipped**; pack Fisher metric, not scalar `A''(theta)`; G1–G5 CI;
   `K>=3` FD packs inapplicable; founding bias collapse) /
+  `omnibias.core.occupancy` + `omnibias.core.verified.occupancy` +
+  `omnibias.{torch,jax}.occupancy`
+  (04-03, **shipped**; Fermi-Dirac occupancy is the sigmoid, entropy /
+  grand potential are the `softplus` half of the tower; certified
+  chemical potential via `kantorovich_accept_step`; G1–G5 CI; `beta ->
+  inf` is the founding temperature collapse, evaluated only as a named
+  reference, no new registry slot requested; non-interacting fermions
+  only, not DFT, not a many-body solve, no thermodynamic limit) /
   `omnibias.pinn.inverse`
   (05-01, **shipped**; G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`;
   global search earned for n=3 only) /
@@ -838,6 +846,7 @@ by that drift gate.
   [`docs/api/plant_pid.md`](docs/api/plant_pid.md),
   [`docs/api/conformal_slabs.md`](docs/api/conformal_slabs.md),
   [`docs/api/pack_fisher.md`](docs/api/pack_fisher.md),
+  [`docs/api/occupancy.md`](docs/api/occupancy.md),
   [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md),
   [`docs/api/tabpou.md`](docs/api/tabpou.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI

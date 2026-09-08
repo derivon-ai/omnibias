@@ -231,7 +231,13 @@ error; G1–G4 CI; not 08-10; not cruise SOTA),
 inequality engine (09-30; propose / rationalize / check;
 G1–G4 CI; not a new LP algorithm; not P vs NP),
 conformal slabs (04-02; three guarantee kinds; G1–G6 CI;
-conformal is not sealable). Cost /
+conformal is not sealable),
+Fermi occupancy and thermodynamic potentials (04-03; the
+Fermi-Dirac occupancy is the sigmoid; certified chemical
+potential via `kantorovich_accept_step`; G1–G5 CI; `beta ->
+inf` is the founding temperature collapse, no new registry
+slot requested; non-interacting fermions only, not DFT, not
+a many-body solve). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

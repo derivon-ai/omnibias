@@ -1,6 +1,6 @@
 # omnibias theory program
 
-This tree is the **forward-looking research program**: 100 implementation-ready
+This tree is the **forward-looking research program**: 101 implementation-ready
 specs that extend the omnibias primitive beyond what ships today.
 
 It is not the shipped documentation. [`docs/theory.md`](../docs/theory.md) is the
@@ -162,6 +162,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [04-01 information geometry](04-bridges/01-information-geometry-exponential-family.md) | shipped | Pack-parameter Fisher in `omnibias.curvature.information`; G1–G5 earned (`G_{delta,delta} ~ delta^2/720`) |
 | [04-02 uncertainty and conformal slabs](04-bridges/02-uncertainty-calibration-and-conformal-slabs.md) | shipped | Three guarantee kinds stay apart; G1–G6 CI; conformal is not sealable |
+| [04-03 Fermi occupancy and thermodynamic potentials](04-bridges/03-fermi-occupancy-and-thermodynamic-potentials.md) | shipped | Occupancy is the sigmoid; entropy/grand-potential/Sommerfeld closed form; G1–G5 earned; temperature collapse named, no registry slot sought |
 
 ### 05 Applications
 

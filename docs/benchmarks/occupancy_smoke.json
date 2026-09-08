@@ -1,0 +1,74 @@
+{
+  "schema": "omnibias.benchmarks.occupancy.v1",
+  "generated_utc": "2026-09-08T18:23:29Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "occupancy",
+    "full": false,
+    "honesty": {
+      "founding_bias_collapse": false,
+      "temperature_collapse": false,
+      "requests_new_collapse_registry_slot": false,
+      "dft_solved_claim": false,
+      "many_body_solved_claim": false,
+      "interacting_system_claim": false,
+      "thermodynamic_limit_taken": false,
+      "phase_transition_proved": false,
+      "theorem_prover_verified": false
+    }
+  },
+  "rss_mb_at_start": 815.14,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_exactness",
+        "passed": true,
+        "worst_entropy_identity_abs": 1.1102230246251565e-16,
+        "worst_occupancy_derivative_rel": 1.0576344067633948e-13,
+        "worst_domega_dmu_abs": 1.1102230246251565e-16,
+        "detail": "entropy identity, d^n f/de^n vs mpmath dps=50, d omega/d mu = -f"
+      },
+      {
+        "name": "g2_soundness",
+        "passed": true,
+        "n_checked": 1580,
+        "detail": "occupancy_enclosure contains dense grid + random sample, orders 0..3"
+      },
+      {
+        "name": "g3_certified_chemical_potential",
+        "passed": true,
+        "n_accepted": 5,
+        "n_cases": 5,
+        "worst_containment_slack": 0.016900165938126266,
+        "halt_reason": "empty",
+        "detail": "nonempty balls contain bisection root and truth; too-tight r_max halts honestly"
+      },
+      {
+        "name": "g4_sommerfeld",
+        "passed": true,
+        "a1_enclosure_width": 5.329070518200752e-15,
+        "a2_enclosure_width": 8.437694987151191e-15,
+        "fd_a2_abs_error": 6.803446694902959e-12,
+        "detail": "closed-form zeta_even enclosure vs Ashcroft & Mermin + FD baseline"
+      },
+      {
+        "name": "g5_honesty_non_vacuity",
+        "passed": true,
+        "all_keys_false": true,
+        "static_scan_clean": true,
+        "registry_refused_rebrand": true,
+        "detail": "permanently-false keys stay false; registry refuses a beta/indicator rebrand"
+      }
+    ]
+  },
+  "wall_seconds": 2.7625495189859066
+}

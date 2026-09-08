@@ -6,6 +6,54 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Fermi occupancy and thermodynamic potentials (theory 04-03)
+
+- `omnibias.core.occupancy`: `FermiModel` (`beta`, `mu`), `reduced_argument`,
+  `occupancy` / `occupancy_derivatives` (`(-beta)^n sigma^(n)(z)`),
+  `occupancy_mu_derivatives`, `thermal_broadening`, `entropy_per_state` /
+  `entropy_derivatives` (`s(z) = softplus(z) - z sigma(z)`, closing on
+  itself via `s^(n)(z) = -(z sigma^(n)(z) + (n-1) sigma^(n-1)(z))`),
+  `grand_potential_density`, `occupancy_window` (the `band` role, a
+  closed-form antiderivative window for a constant density of states),
+  `sommerfeld_moment` / `sommerfeld_coefficient`, and
+  `zero_temperature_occupancy` -- the honest reference value for the
+  `beta -> inf` step. With `z = -beta (e - mu)` the Fermi-Dirac occupancy
+  *is* the sigmoid, so every identity is a finite-order read of the
+  existing closed-form tower, one sigmoid or softplus evaluation
+  regardless of order.
+- `omnibias.core.verified.occupancy`: the certified twin --
+  `occupancy_enclosure` / `entropy_enclosure` / `grand_potential_enclosure`
+  / `occupancy_window_enclosure` on `sigma_tower_interval` + `softplus_iv`;
+  `PolynomialDensityOfStates` plus `electron_count_enclosure` (certified
+  `trapezoid_integral` fed its own tower-derived second-derivative bound);
+  `certified_chemical_potential` -- Newton on `N(mu) - n_target` gated by
+  `kantorovich_accept_step`, with the Lipschitz bound on `d^2 N/d mu^2`
+  likewise tower-derived over the whole trial ball; an empty ball is a
+  reported halt, never an exception; `sommerfeld_coefficient_enclosure` /
+  `sommerfeld_moment_enclosure` via the closed-form `zeta_even`.
+- Bit-identical differentiable twins `omnibias.torch.occupancy` and
+  `omnibias.jax.occupancy` (`occupancy`, `occupancy_derivative`,
+  `occupancy_mu_derivative`, `thermal_broadening`, `entropy_per_state`,
+  `grand_potential_density`, `occupancy_window`), differentiable in both
+  `mu` and `beta`, `jit` / `vmap` safe.
+- `beta -> inf` here is *literally* the founding **temperature collapse**
+  (`omnibias.core.collapse.schema`'s founding spec:
+  `parameter="beta"`, `limit="inf"`, `surviving_object="indicator"`); this
+  module evaluates that limit's value directly and never requests a new
+  collapse-registry slot -- `register_collapse` correctly refuses a
+  `beta`/`indicator` spec as a rebrand of the founding `temperature`
+  collapse. Permanently-false honesty keys: `dft_solved_claim`,
+  `many_body_solved_claim`, `interacting_system_claim`,
+  `thermodynamic_limit_taken`, `phase_transition_proved`,
+  `founding_bias_collapse`, `temperature_collapse`,
+  `requests_new_collapse_registry_slot`, `theorem_prover_verified`. Scope
+  is non-interacting fermions in a single band with an externally
+  supplied (or absent) density of states -- not density-functional
+  theory, not a many-body solve, no thermodynamic limit.
+  Docs: [`docs/api/occupancy.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/api/occupancy.md),
+  [`docs/cookbook/fermi-occupancy.md`](https://github.com/derivon-ai/omnibias/blob/main/docs/cookbook/fermi-occupancy.md).
+  Theory spec: `theory/04-bridges/03-fermi-occupancy-and-thermodynamic-potentials.md`.
+
 ### Added — Einselection collapse (theory 09-31)
 
 - `omnibias.core.collapse.einselection`: a sixth named collapse.

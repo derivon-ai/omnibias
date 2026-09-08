@@ -225,6 +225,10 @@ PENALTY_FILES = (
     "packages/omnibias-control/src/omnibias/control/torch/adjoint.py",
     "packages/omnibias-control/src/omnibias/control/horizon.py",
     "packages/omnibias-control/src/omnibias/control/certified/gradient_bias.py",
+    "packages/omnibias-core/src/omnibias/core/occupancy.py",
+    "packages/omnibias-core/src/omnibias/core/verified/occupancy.py",
+    "packages/omnibias-torch/src/omnibias/torch/occupancy.py",
+    "packages/omnibias-jax/src/omnibias/jax/occupancy.py",
 )
 
 ENCLOSURE_COLLAPSE_FILES = (
