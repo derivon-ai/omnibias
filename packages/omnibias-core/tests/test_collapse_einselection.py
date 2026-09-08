@@ -77,6 +77,7 @@ def test_einselection_is_registered_and_distinct_from_all_priors() -> None:
         "winding",
         "pairing",
         "rank",
+        "relaxation",
     ):
         report = are_distinct(EINSELECTION_SPEC, get_collapse(name))
         assert report.distinct, (name, report.reasons)

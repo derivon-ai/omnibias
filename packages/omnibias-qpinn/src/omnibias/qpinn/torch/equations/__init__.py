@@ -24,6 +24,7 @@ identically over any ``omnibias.pinn.torch.fields.*`` field type
 from __future__ import annotations
 
 from omnibias.qpinn.torch.equations._types import (
+    LindbladOutput,
     NLSOutput,
     RotatingNLSOutput,
     TDSEOutput,
@@ -40,6 +41,7 @@ from omnibias.qpinn.torch.equations.klein_gordon import (
     KleinGordonOutput,
     klein_gordon,
 )
+from omnibias.qpinn.torch.equations.lindblad import Lindblad, lindblad
 from omnibias.qpinn.torch.equations.nls import NLS, nls
 from omnibias.qpinn.torch.equations.rotating_nls import RotatingNLS, rotating_nls
 from omnibias.qpinn.torch.equations.tdse import TDSE, tdse
@@ -52,6 +54,8 @@ __all__ = [
     "HelmholtzOutput",
     "KleinGordon",
     "KleinGordonOutput",
+    "Lindblad",
+    "LindbladOutput",
     "NLS",
     "NLSOutput",
     "RotatingNLS",
@@ -63,6 +67,7 @@ __all__ = [
     "dirac",
     "helmholtz",
     "klein_gordon",
+    "lindblad",
     "nls",
     "rotating_nls",
     "tdse",

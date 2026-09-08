@@ -29,9 +29,11 @@ from omnibias.core.collapse.einselection import (
 from omnibias.core.collapse.identity import difference_coeffs, identity_collapse
 from omnibias.core.collapse.pairing import pairing_collapse, pairing_value
 from omnibias.core.collapse.rank import rank_collapse
-from omnibias.core.collapse.schema import default_honesty
+from omnibias.core.collapse.relaxation import relaxation_collapse
+from omnibias.core.collapse.schema import CollapseOutcome, default_honesty
 from omnibias.core.collapse.verdict import ObligationVerdict, adjudicate_residual
 from omnibias.core.collapse.winding import integers_in, winding_collapse
+from omnibias.core.lindblad import LindbladModel
 from omnibias.core.proof.catalog import CatalogEntry, discover, register_catalog
 from omnibias.core.proof.certificate import (
     NO_TRANSCENDENTAL_BACKEND,
@@ -68,6 +70,7 @@ EngineKind = Literal[
     "external",
     "gap",
     "identity",
+    "lindblad",
     "pairing",
     "rank",
     "residual",
@@ -82,6 +85,7 @@ ENGINE_KINDS: frozenset[str] = frozenset(
         "external",
         "gap",
         "identity",
+        "lindblad",
         "pairing",
         "rank",
         "residual",
@@ -907,6 +911,191 @@ def _replay_einselection(certificate: Certificate) -> bool | None:
     return fresh.status == payload.get("status")
 
 
+def _lindblad_honesty() -> dict[str, bool]:
+    return _honesty(
+        spec_name="relaxation",
+        extra={
+            "relaxation_collapse": True,
+            "wave_function_collapse_claim": False,
+            "measurement_problem_resolved": False,
+            "single_outcome_claim": False,
+            "born_rule_derived": False,
+            "markovian_model_declared_not_derived": True,
+            "non_markovian_claim": False,
+            "general_closed_form_claim": False,
+        },
+    )
+
+
+def _lindblad_model_from_json(data: Mapping[str, Any]) -> LindbladModel:
+    hamiltonian = _complex_matrix_from_json(data["hamiltonian"])
+    jumps_raw = data["jumps"]
+    if not isinstance(jumps_raw, Sequence) or isinstance(jumps_raw, str | bytes):
+        raise TypeError("jumps must be a sequence of matrices")
+    jumps = tuple(
+        tuple(tuple(entry for entry in row) for row in _complex_matrix_from_json(jump))
+        for jump in jumps_raw
+    )
+    rates_raw = data["rates"]
+    if not isinstance(rates_raw, Sequence) or isinstance(rates_raw, str | bytes):
+        raise TypeError("rates must be a sequence")
+    rates = tuple(_as_float(item, name="rate") for item in rates_raw)
+    return LindbladModel(
+        hamiltonian=tuple(tuple(entry for entry in row) for row in hamiltonian),
+        jumps=jumps,
+        rates=rates,
+    )
+
+
+def _prove_lindblad(conjecture: Conjecture) -> ProofAttempt:
+    data = _require_mapping(conjecture.data)
+    try:
+        mode = _as_str(data.get("mode"), name="mode", default="relaxation")
+    except TypeError as exc:
+        return _blocked(str(exc))
+    honesty = _lindblad_honesty()
+    if mode == "positivity":
+        try:
+            rho = _complex_matrix_from_json(data["rho"])
+        except (KeyError, TypeError) as exc:
+            return _blocked(str(exc))
+        from omnibias.core.verified.lindblad import positivity_verdict
+
+        try:
+            verdict = positivity_verdict(rho)
+        except (TypeError, ValueError) as exc:
+            return _blocked(str(exc))
+        return _from_obligation(
+            "lindblad",
+            "relaxation",
+            verdict,
+            {"mode": "positivity", "inputs": {"rho": data["rho"]}},
+            honesty,
+        )
+    if mode == "steady_state":
+        try:
+            model = _lindblad_model_from_json(data)
+        except (KeyError, TypeError, ValueError) as exc:
+            return _blocked(str(exc))
+        from omnibias.core.verified.lindblad import (
+            hermiticity_residual_enclosure,
+            steady_state_enclosure,
+            trace_enclosure,
+        )
+
+        enclosed = steady_state_enclosure(model)
+        if enclosed is None:
+            return _blocked("steady state is not a unique certified fixed point")
+        trace = trace_enclosure(enclosed)
+        herm = hermiticity_residual_enclosure(enclosed)
+
+        if trace.contains(1.0) and herm.contains_zero():
+            outcome = CollapseOutcome(
+                status="collapsed",
+                spec_name="relaxation",
+                surviving="steady_state",
+                residual=herm,
+                detail="certified unique steady state is trace-1 and Hermitian",
+                honesty=honesty,
+            )
+            verdict = ObligationVerdict(
+                status="PROVED",
+                outcome=outcome,
+                existential=True,
+                evaluated=1,
+                complete=True,
+                detail=outcome.detail,
+            )
+        else:
+            outcome = CollapseOutcome(
+                status="inconclusive",
+                spec_name="relaxation",
+                surviving=None,
+                residual=herm,
+                detail="steady-state enclosure does not certify trace-1 Hermitian",
+                honesty=honesty,
+            )
+            verdict = ObligationVerdict(
+                status="BLOCKED",
+                outcome=outcome,
+                existential=True,
+                evaluated=1,
+                complete=False,
+                detail=outcome.detail,
+            )
+        return _from_obligation(
+            "lindblad",
+            "relaxation",
+            verdict,
+            {
+                "mode": "steady_state",
+                "inputs": {
+                    "hamiltonian": data["hamiltonian"],
+                    "jumps": data["jumps"],
+                    "rates": data["rates"],
+                },
+            },
+            honesty,
+        )
+    try:
+        model = _lindblad_model_from_json(data)
+        time_iv = _time_interval(data["time"])
+        distance_budget = _as_float(data["distance_budget"], name="distance_budget")
+        verdict = relaxation_collapse(
+            model, time=time_iv, distance_budget=distance_budget
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        return _blocked(str(exc))
+    return _from_obligation(
+        "lindblad",
+        "relaxation",
+        verdict,
+        {
+            "mode": "relaxation",
+            "inputs": {
+                "hamiltonian": data["hamiltonian"],
+                "jumps": data["jumps"],
+                "rates": data["rates"],
+                "time": [time_iv.lo, time_iv.hi],
+                "distance_budget": distance_budget,
+            },
+        },
+        honesty,
+    )
+
+
+def _replay_lindblad(certificate: Certificate) -> bool | None:
+    payload = _payload_of(certificate)
+    if payload is None:
+        return False
+    inputs = payload.get("inputs")
+    if not isinstance(inputs, Mapping):
+        return False
+    mode = payload.get("mode", "relaxation")
+    try:
+        if mode == "positivity":
+            from omnibias.core.verified.lindblad import positivity_verdict
+
+            fresh = positivity_verdict(_complex_matrix_from_json(inputs["rho"]))
+            return fresh.status == payload.get("status")
+        model = _lindblad_model_from_json(inputs)
+        if mode == "steady_state":
+            from omnibias.core.verified.lindblad import steady_state_enclosure
+
+            enclosed = steady_state_enclosure(model)
+            if enclosed is None:
+                return payload.get("status") == "BLOCKED"
+            return payload.get("status") in {"PROVED", "BLOCKED"}
+        time_iv = _time_interval(inputs["time"])
+        distance_budget = _as_float(inputs["distance_budget"], name="distance_budget")
+        fresh = relaxation_collapse(
+            model, time=time_iv, distance_budget=distance_budget
+        )
+    except (KeyError, TypeError, ValueError):
+        return False
+    return fresh.status == payload.get("status")
+
+
 def _test_pack(value: object) -> list[list[int | float | Fraction]]:
     if not isinstance(value, Sequence) or isinstance(value, str | bytes):
         raise TypeError("tests must be a sequence of coefficient sequences")
@@ -1221,6 +1410,7 @@ def build_engine_machine() -> ProofMachine:
         ("pairing", _prove_pairing, _replay_pairing),
         ("rank", _prove_rank, _replay_rank),
         ("einselection", _prove_einselection, _replay_einselection),
+        ("lindblad", _prove_lindblad, _replay_lindblad),
         ("catalog_family", _prove_catalog_family_sealed, _replay_catalog_family),
     )
     for kind, prove_fn, replay_fn in specs:

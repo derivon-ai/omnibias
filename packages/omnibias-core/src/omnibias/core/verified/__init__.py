@@ -301,6 +301,20 @@ from omnibias.core.verified.linalg_array import (
     interval_ldlt_pivots_array,
     is_positive_definite_array,
 )
+from omnibias.core.verified.lindblad import (
+    RelaxationTime,
+    TrajectoryEnclosure,
+    certified_relaxation_time,
+    contraction_enclosure,
+    density_matrix_enclosure,
+    hermiticity_residual_enclosure,
+    liouvillian_enclosure,
+    positivity_verdict,
+    propagator_enclosure,
+    steady_state_enclosure,
+    trace_enclosure,
+    trajectory_enclosure,
+)
 from omnibias.core.verified.line import (
     conjugate_poisson,
     conjugate_poisson_deriv,
@@ -444,17 +458,6 @@ from omnibias.core.verified.sequence_space import (
     fourier_nu_norm,
     geometric_tail_bound,
 )
-from omnibias.core.verified.swirl_heat import (
-    swirl_heat_residual,
-    swirl_heat_residual_interval,
-)
-from omnibias.core.verified.weighted_class import (
-    EdgeWeights,
-    PulseWeight,
-    WeightedBound,
-    check_pointwise_bound,
-    gevrey_majorant,
-)
 from omnibias.core.verified.series import (
     certified_geometric_series_sum,
     certified_ratio_series_sum,
@@ -477,6 +480,10 @@ from omnibias.core.verified.sqg import (
     sqg_stream_gradient,
     sqg_velocity,
     sqg_velocity_divergence_residual,
+)
+from omnibias.core.verified.swirl_heat import (
+    swirl_heat_residual,
+    swirl_heat_residual_interval,
 )
 from omnibias.core.verified.taylor_model import TaylorModel
 from omnibias.core.verified.taylor_model_mv import TaylorModelMV
@@ -517,6 +524,13 @@ from omnibias.core.verified.transport import (
     certified_wasserstein1_samples,
     certified_wasserstein2_gaussian,
     certified_wasserstein2_samples,
+)
+from omnibias.core.verified.weighted_class import (
+    EdgeWeights,
+    PulseWeight,
+    WeightedBound,
+    check_pointwise_bound,
+    gevrey_majorant,
 )
 
 __all__ = [
@@ -577,6 +591,7 @@ __all__ = [
     "QuadEstimate",
     "RadiiCertificate",
     "RecommendedAction",
+    "RelaxationTime",
     "SUPPORTED_CDFS",
     "SUPPORTED_W1_CDFS",
     "SeriesProblem",
@@ -590,6 +605,7 @@ __all__ = [
     "TaylorModel",
     "TaylorModelMV",
     "TaylorSeries",
+    "TrajectoryEnclosure",
     "ValidatedFourierSeries",
     "ValidatedSeries",
     "VectorField",
@@ -637,6 +653,7 @@ __all__ = [
     "certified_perron_spectral_gap",
     "certified_ratio_series_sum",
     "certified_regularization_error",
+    "certified_relaxation_time",
     "certified_residual_bound",
     "certified_sign_change",
     "certified_spectral_gap",
@@ -667,6 +684,7 @@ __all__ = [
     "constant_jacobian",
     "constant_symbol",
     "constant_tail_inverse_bound",
+    "contraction_enclosure",
     "convolve",
     "cos_iv",
     "cos_matrix",
@@ -679,6 +697,7 @@ __all__ = [
     "cross_entropy_enclosure",
     "crosscheck_h0_at_first_zero",
     "debruijn_newman_enclosure",
+    "density_matrix_enclosure",
     "derivative_jet",
     "diagnose_width",
     "digamma_iv",
@@ -747,6 +766,7 @@ __all__ = [
     "hermite_function",
     "hermite_function_normalized",
     "hermite_poly_coeffs_exact",
+    "hermiticity_residual_enclosure",
     "hilbert_circulant",
     "hilbert_even_profile",
     "hilbert_even_profile_deriv",
@@ -810,6 +830,7 @@ __all__ = [
     "lhopital_ratio_iv",
     "libm_fallback_used",
     "linear_field",
+    "liouvillian_enclosure",
     "ln_iv",
     "ln_point",
     "log_gamma_iv",
@@ -851,8 +872,10 @@ __all__ = [
     "polylog_enclosure",
     "polynomial_sqrt2_maps",
     "positive_definite_pivots_certificate",
+    "positivity_verdict",
     "potential_gradient",
     "predicted_width",
+    "propagator_enclosure",
     "qr_gram_schmidt",
     "quadratic_radii_certificate",
     "radii_polynomial_certificate",
@@ -893,6 +916,7 @@ __all__ = [
     "sqg_stream_gradient",
     "sqg_velocity",
     "sqg_velocity_divergence_residual",
+    "steady_state_enclosure",
     "strict_backend",
     "sum_intervals",
     "swirl_heat_residual",
@@ -908,6 +932,8 @@ __all__ = [
     "to_interval_matrix",
     "total_variation_enclosure",
     "tower_to_jet",
+    "trace_enclosure",
+    "trajectory_enclosure",
     "trapezoid_integral",
     "trapezoid_sum",
     "two_site_hubbard_exact_energy",

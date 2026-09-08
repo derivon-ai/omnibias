@@ -1,6 +1,6 @@
 # omnibias theory program
 
-This tree is the **forward-looking research program**: 113 implementation-ready
+This tree is the **forward-looking research program**: 114 implementation-ready
 specs that extend the omnibias primitive beyond what ships today.
 
 It is not the shipped documentation. [`docs/theory.md`](../docs/theory.md) is the
@@ -266,6 +266,7 @@ operator floor.
 | [09-29 plant PID layer](09-inventions/29-plant-pid-layer.md) | shipped | Exact I/D on `sigma(alpha t + beta)`; G1–G4 CI; not 08-10; not cruise SOTA |
 | [09-30 inequality engine](09-inventions/30-inequality-engine.md) | shipped | propose / rationalize / check front door; G1–G4 CI; G5 leftover-recorded, not in CI `all_passed`; not 03-02 / 03-03; not a new LP algorithm |
 | [09-31 einselection collapse](09-inventions/31-einselection-collapse.md) | shipped | Sound coherence enclosure decides an einselected distribution; G1–G5 CI; pure dephasing only; not a wave-function-collapse or single-outcome claim |
+| [09-32 open-system Lindblad dynamics](09-inventions/32-open-system-lindblad-dynamics.md) | shipped | GKSL semigroup + certified propagator / positivity / relaxation collapse; G1–G7 CI; thermal occupancy bridge; not a Born–Markov derivation |
 
 ### 10 Control-systems optimization
 

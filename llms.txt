@@ -135,6 +135,10 @@ einselection collapse (`omnibias.core.collapse.einselection`, theory
 09-31; sound coherence enclosure decides an einselected distribution;
 pure dephasing only; not a wave-function-collapse or single-outcome
 claim),
+relaxation collapse (`omnibias.core.collapse.relaxation`, theory
+09-32; sound contraction enclosure toward a unique GKSL steady state;
+disagrees with einselection on pure dephasing; not a general closed
+form; Markovian model declared not derived),
 proof engine (`omnibias.core.proof.engine`; named-kind router over
 those collapses plus catalog_family / external; reason tree; Lean
 only on existing finite obligations; not a general theorem prover),
@@ -238,6 +242,10 @@ potential via `kantorovich_accept_step`; G1–G5 CI; `beta ->
 inf` is the founding temperature collapse, no new registry
 slot requested; non-interacting fermions only, not DFT, not
 a many-body solve),
+open-system Lindblad dynamics (09-32; GKSL linear semigroup;
+certified propagator / positivity / relaxation time; seventh
+named collapse `relaxation`; G1–G7 CI; Markovian model
+declared not derived; not a general closed form),
 convergence ledgers (07-08; NS exponent ledger / YM polymer
 majorants are finite rational stage budgets; G1–G5 CI;
 parent flags derived from empty `external_premises`, never

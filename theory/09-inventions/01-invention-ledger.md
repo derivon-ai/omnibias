@@ -14,7 +14,7 @@ cluster to implement first.
 - **Blocks**: 09-02, 09-03, 09-04, 09-05, 09-06, 09-07, 09-08, 09-09,
   09-10, 09-11, 09-12, 09-13, 09-14, 09-15, 09-16, 09-17, 09-18, 09-19,
   09-20, 09-21, 09-22, 09-23, 09-24, 09-25, 09-26, 09-27, 09-28,
-  09-29, 09-30, 09-31
+  09-29, 09-30, 09-31, 09-32
 
 ### Operator card
 
@@ -91,15 +91,17 @@ Specs 09-16…09-23 sit here. 08-03 invert-and-match is *not* re-specified.
 An **export or app** is a forward contract or a compiled object: a
 certificate beside `y`, a jet world-model, an Ore annihilator, a
 compiled inequality `Verdict`, a coherence `Verdict`. Specs
-09-24…09-26, 09-30, and 09-31 sit here.
+09-24…09-26, 09-30, 09-31, and 09-32 sit here.
 
 Faà di Bruno **is** the chain rule. No 09 spec may claim to avoid
-compositional differentiation. None of 09-02…09-31 is temperature
+compositional differentiation. None of 09-02…09-32 is temperature
 collapse (`beta -> inf`) unless it delegates to 04-02 / 05-02 / 09-07's
 router honesty or to 03-05 / 09-28 named `soft_top_k` / Hopfield `beta`
 or to 09-30's linear / CSP proposer or 09-31's own `decoherence_rate`
 threshold decision (temperature collapse's *shape*, a threshold
-decide, not its `beta` axis or surviving indicator).
+decide, not its `beta` axis or surviving indicator) or to 09-32's
+named T=0 thermal step (the founding temperature collapse, already
+minted, not re-requested; the new slot is `relaxation`).
 
 ### Already specified (no duplicate file)
 
@@ -134,6 +136,9 @@ decide, not its `beta` axis or surviving indicator).
 `rank` collapse (which shipped without a Group 09 file): a physical
 decoherence-rate parameter and an einselected-distribution surviving
 object, not a rebrand of any of those five.
+09-32 is **not** 09-31: a `relaxation_rate` parameter and a unique
+steady-state surviving object, not einselection's decoherence-rate /
+einselected-distribution pair. On pure dephasing the two disagree.
 
 ### Rejected (no spec)
 
@@ -172,7 +177,7 @@ recorded order, not a claim that later entries are unearned:
 6. **09-07 Pack-MoE** — four knobs as experts; slab-mass router.
 7. **09-18 remainder training** (with existing 03-13 birth).
 
-The remaining 09-04, 09-08…09-15, 09-20…09-23, 09-25…09-31 wait on a
+The remaining 09-04, 09-08…09-15, 09-20…09-23, 09-25…09-32 wait on a
 first-bet gate passing or failing.
 
 ### CCF / stretch floor
@@ -217,6 +222,7 @@ Yang–Mills mass gap, RH, or P vs NP.
 | 09-29 plant PID | architecture | Exact I/D on activation-of-time error | not 08-10; not cruise SOTA |
 | 09-30 inequality engine | export | propose / rationalize / check front door | locked catalog; not a new LP algorithm |
 | 09-31 einselection collapse | export | Sound coherence enclosure decides an einselected distribution | pure dephasing only; not a single-outcome claim |
+| 09-32 open-system Lindblad | export | GKSL semigroup + certified propagator / relaxation collapse | Markovian model declared, not derived; not a general closed form |
 
 ## 5. Worked example
 
@@ -268,7 +274,7 @@ LEDGER_LEARNING_RULES = (
     "09-16", "09-17", "09-18", "09-19", "09-20", "09-21",
     "09-22", "09-23",
 )
-LEDGER_EXPORTS = ("09-24", "09-25", "09-26", "09-30", "09-31")
+LEDGER_EXPORTS = ("09-24", "09-25", "09-26", "09-30", "09-31", "09-32")
 ALREADY_SPECIFIED = (
     "08-03", "08-05", "03-06", "03-10", "03-13", "02-06",
     "08-04", "08-06", "08-09", "03-02", "05-02", "04-02",
@@ -308,7 +314,7 @@ FIRST_BET = (
 - **G5 no new package.** Every implementable spec's home fails the
   "earn independent existence" test (submodule of an existing package).
 
-These are document gates. Numerical gates live in 09-02…09-31.
+These are document gates. Numerical gates live in 09-02…09-32.
 
 ## 9. Benchmark plan
 
@@ -325,7 +331,7 @@ No CI job for the ledger.
 - Group 08 still owns trainers that step `theta` given `L`. This ledger
   owns architectures, invert-on-`x`, meta-loops, and exports.
 - Certificate tiers used by entries: empirical (most), sound enclosure
-  (09-05, 09-20, 09-24, 09-25, 09-31). `theorem_prover_verified` and
+  (09-05, 09-20, 09-24, 09-25, 09-31, 09-32). `theorem_prover_verified` and
   `mathlib_verified` appear only as *future earned* flags on 09-24 /
   09-26 and are never asserted by the spec text.
 - Navier–Stokes, Yang–Mills mass gap, RH, and P vs NP stay external.
@@ -338,8 +344,8 @@ No CI job for the ledger.
 - **Citation path is 06-05.** Inventions are not the publish-and-use
   order. Spec 06-05 owns the frozen public surface, the first paper,
   the jet-vs-AD bench, and the external-user obligation. This ledger
-  must not be used as that path. 09-27, 09-28, 09-29, 09-30, and 09-31
-  do not enlarge `PUBLIC_SURFACE` and 09-28 is not a ViT.
+  must not be used as that path. 09-27, 09-28, 09-29, 09-30, 09-31,
+  and 09-32 do not enlarge `PUBLIC_SURFACE` and 09-28 is not a ViT.
 - **First-bet may fail.** If 09-03 + 09-17 cannot beat a named local
   baseline on a 1-D conservation identity, the integral-first story is
   recorded as unearned, not deleted.

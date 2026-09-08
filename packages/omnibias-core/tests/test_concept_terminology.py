@@ -229,6 +229,16 @@ PENALTY_FILES = (
     "packages/omnibias-core/src/omnibias/core/verified/occupancy.py",
     "packages/omnibias-torch/src/omnibias/torch/occupancy.py",
     "packages/omnibias-jax/src/omnibias/jax/occupancy.py",
+    "packages/omnibias-core/src/omnibias/core/lindblad.py",
+    "packages/omnibias-core/src/omnibias/core/verified/lindblad.py",
+    "packages/omnibias-core/src/omnibias/core/collapse/relaxation.py",
+    "packages/omnibias-torch/src/omnibias/torch/lindblad.py",
+    "packages/omnibias-jax/src/omnibias/jax/lindblad.py",
+    "packages/omnibias-qpinn/src/omnibias/qpinn/_core/density.py",
+    "packages/omnibias-qpinn/src/omnibias/qpinn/torch/equations/lindblad.py",
+    "packages/omnibias-qpinn/src/omnibias/qpinn/jax/equations/lindblad.py",
+    "packages/omnibias-qpinn/src/omnibias/qpinn/torch/cage/density.py",
+    "packages/omnibias-qpinn/src/omnibias/qpinn/jax/cage/density.py",
 )
 
 ENCLOSURE_COLLAPSE_FILES = (

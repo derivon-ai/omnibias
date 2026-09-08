@@ -42,6 +42,10 @@ from omnibias.core.collapse.rank import (
     RankReport,
     rank_collapse,
 )
+from omnibias.core.collapse.relaxation import (
+    RELAXATION_SPEC,
+    relaxation_collapse,
+)
 from omnibias.core.collapse.schema import (
     FOUNDING_COLLAPSES,
     FOUNDING_NAMES,
@@ -97,6 +101,7 @@ __all__ = [
     "ObligationVerdict",
     "PAIRING_SPEC",
     "RANK_SPEC",
+    "RELAXATION_SPEC",
     "RankReport",
     "RejectedCollapse",
     "VERDICT_SPEC",
@@ -125,6 +130,7 @@ __all__ = [
     "reduced_density_matrix",
     "register_collapse",
     "reject_collapse",
+    "relaxation_collapse",
     "remainder_collapse",
     "require_sound_enclosure",
     "reset_collapse_registry",

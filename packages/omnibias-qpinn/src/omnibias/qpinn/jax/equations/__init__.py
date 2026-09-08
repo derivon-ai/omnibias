@@ -10,6 +10,7 @@ checked in ``tests/cross_backend/``).
 from __future__ import annotations
 
 from omnibias.qpinn.jax.equations._types import (
+    LindbladOutput,
     NLSOutput,
     RotatingNLSOutput,
     TDSEOutput,
@@ -26,6 +27,7 @@ from omnibias.qpinn.jax.equations.klein_gordon import (
     KleinGordonOutput,
     klein_gordon,
 )
+from omnibias.qpinn.jax.equations.lindblad import Lindblad, lindblad
 from omnibias.qpinn.jax.equations.nls import NLS, nls
 from omnibias.qpinn.jax.equations.rotating_nls import RotatingNLS, rotating_nls
 from omnibias.qpinn.jax.equations.tdse import TDSE, tdse
@@ -38,6 +40,8 @@ __all__ = [
     "HelmholtzOutput",
     "KleinGordon",
     "KleinGordonOutput",
+    "Lindblad",
+    "LindbladOutput",
     "NLS",
     "NLSOutput",
     "RotatingNLS",
@@ -49,6 +53,7 @@ __all__ = [
     "dirac",
     "helmholtz",
     "klein_gordon",
+    "lindblad",
     "nls",
     "rotating_nls",
     "tdse",

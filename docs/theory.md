@@ -467,6 +467,10 @@ gates are earned on smoke, not in CI `all_passed`.
   coherence enclosure decides an einselected distribution; pure
   dephasing only; not a wave-function-collapse or single-outcome
   claim. Status is **shipped**.
+- **Open-system Lindblad dynamics** ([09-32](api/lindblad.md)):
+  certified GKSL propagator, relaxation collapse, occupancy
+  bridge; not a Born–Markov derivation, not a general closed form.
+  Status is **shipped**.
 
 ## Three senses of "collapse" (do not conflate)
 
@@ -505,7 +509,10 @@ box. Einselection collapse
 coherence enclosure of a pure-dephasing density matrix decides an
 einselected distribution over pointer-basis populations -- not a
 wave-function-collapse claim, a measurement-problem resolution, or a
-single-outcome claim.
+single-outcome claim. Relaxation collapse
+([cookbook](cookbook/lindblad-dynamics.md)) is a seventh named slot:
+a sound contraction enclosure toward a unique GKSL steady state;
+on pure dephasing it refuses while einselection can prove.
 
 ## 5. Operator dictionary
 

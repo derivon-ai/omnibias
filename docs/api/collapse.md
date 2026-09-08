@@ -44,6 +44,14 @@ off-diagonal coherence stays below a declared sensitivity `eps`;
 wave-function-collapse or single-outcome claim. See
 [cookbook](../cookbook/einselection-collapse.md).
 
+Relaxation collapse (`omnibias.core.collapse.relaxation`) is the
+seventh named collapse: a sound contraction enclosure toward a unique
+GKSL steady state. `distance_budget` is always an explicit caller
+argument. On pure dephasing the two disagree -- einselection can
+`PROVE` while relaxation must refuse -- which is the sharp argument
+that they are not rebrands. See
+[Lindblad dynamics](../cookbook/lindblad-dynamics.md).
+
 Duality / gap collapse was evaluated and **rejected**: a primal-dual
 sandwich that collapses at `L = U` is Enclosure Collapse of `OPT`.
 

@@ -1,0 +1,82 @@
+{
+  "schema": "omnibias.benchmarks.lindblad.v1",
+  "generated_utc": "2026-09-08T21:11:18Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "lindblad",
+    "full": false,
+    "honesty": {
+      "founding_bias_collapse": false,
+      "temperature_collapse": false,
+      "requests_new_collapse_registry_slot": true,
+      "wave_function_collapse_claim": false,
+      "measurement_problem_resolved": false,
+      "single_outcome_claim": false,
+      "born_rule_derived": false,
+      "markovian_model_declared_not_derived": true,
+      "non_markovian_claim": false,
+      "general_closed_form_claim": false,
+      "thermodynamic_limit_taken": false,
+      "continuum_limit_taken": false,
+      "quantum_advantage_claim": false,
+      "theorem_prover_verified": false,
+      "mathlib_verified": false,
+      "float_residual_is_proof": false
+    }
+  },
+  "rss_mb_at_start": 817.8,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_exactness",
+        "passed": true,
+        "dephasing_max_abs": 1.1102230246251565e-16,
+        "bloch_max_abs": 1.6653345369377348e-16,
+        "detail": "pure dephasing vs einselection; Bloch closed form; tower length"
+      },
+      {
+        "name": "g2_soundness",
+        "passed": true,
+        "detail": "density_matrix_enclosure contains float truth on a grid"
+      },
+      {
+        "name": "g3_state_validity",
+        "passed": true,
+        "detail": "trace 1, Hermitian, mixed PROVED, pure BLOCKED"
+      },
+      {
+        "name": "g4_certified_relaxation_time",
+        "passed": true,
+        "t_float": 1.0018096465846391,
+        "t_certified": 1.3808250427246094,
+        "detail": "conservative vs spectral-abscissa oracle; dephasing halt"
+      },
+      {
+        "name": "g5_occupancy_bridge",
+        "passed": true,
+        "detail": "steady excited population is occupancy(FermiModel(beta, mu=0), omega)"
+      },
+      {
+        "name": "g6_registry_and_disagreement",
+        "passed": true,
+        "detail": "relaxation distinct from einselection; dephasing disagreement"
+      },
+      {
+        "name": "g7_lohner_wrapping",
+        "passed": true,
+        "width_ratio": 1.397058823529412,
+        "detail": "QR-Lohner beats naive interval flow at a fixed horizon"
+      }
+    ]
+  },
+  "wall_seconds": 4.461174729018239
+}

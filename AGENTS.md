@@ -498,7 +498,11 @@ by that drift gate.
   sound coherence enclosure of a pure-dephasing density matrix,
   whether an einselected distribution over pointer-basis populations
   survives; never a wave-function-collapse, measurement-problem, or
-  single-outcome claim.
+  single-outcome claim. Relaxation collapse
+  (`omnibias.core.collapse.relaxation`, theory 09-32) decides, on a
+  sound contraction enclosure of a uniquely relaxing GKSL generator,
+  whether every initial state is within `eps` of the unique steady
+  state; on pure dephasing it refuses while einselection can prove.
   The proof engine (`omnibias.core.proof.engine`) routes a named
   finite kind through those collapses (or a catalog family) and
   returns a reason tree; `external` stays `BLOCKED`. A float
@@ -748,6 +752,14 @@ by that drift gate.
   inf` is the founding temperature collapse, evaluated only as a named
   reference, no new registry slot requested; non-interacting fermions
   only, not DFT, not a many-body solve, no thermodynamic limit) /
+  `omnibias.core.lindblad` + `omnibias.core.verified.lindblad` +
+  `omnibias.core.collapse.relaxation` +
+  `omnibias.{torch,jax}.lindblad`
+  (09-32, **shipped**; GKSL linear semigroup; certified propagator /
+  positivity / relaxation time; seventh named collapse `relaxation`;
+  G1–G7 CI; founding bias collapse, not temperature collapse except
+  the named T=0 occupancy step; Markovian model declared not derived;
+  not a general closed form) /
   `omnibias.core.proof.obligations.convergence_ledger`
   (07-08, **shipped**; NS exponent ledger / YM polymer majorants are
   finite rational stage budgets; G1–G5 CI; founding bias collapse, not
@@ -868,6 +880,7 @@ by that drift gate.
   [`docs/api/conformal_slabs.md`](docs/api/conformal_slabs.md),
   [`docs/api/pack_fisher.md`](docs/api/pack_fisher.md),
   [`docs/api/occupancy.md`](docs/api/occupancy.md),
+  [`docs/api/lindblad.md`](docs/api/lindblad.md),
   [`docs/api/convergence_ledger.md`](docs/api/convergence_ledger.md),
   [`docs/api/anisotropic_profile.md`](docs/api/anisotropic_profile.md),
   [`docs/api/stress_cone.md`](docs/api/stress_cone.md),

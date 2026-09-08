@@ -13,6 +13,10 @@ from omnibias.qpinn.torch.cage.cusp import (
     make_nuclear_cusp_field,
     nuclear_cusp_slope,
 )
+from omnibias.qpinn.torch.cage.density import (
+    DensityMatrixField,
+    make_density_matrix_field,
+)
 from omnibias.qpinn.torch.cage.hermitian import (
     hermitian_projection,
     hermiticity_loss,
@@ -29,12 +33,14 @@ from omnibias.qpinn.torch.cage.parity import (
 
 __all__ = [
     "BlochPeriodicField",
+    "DensityMatrixField",
     "NormConservationField",
     "NuclearCuspField",
     "ParityProjectedField",
     "hermitian_projection",
     "hermiticity_loss",
     "make_bloch_periodic_field",
+    "make_density_matrix_field",
     "make_norm_conservation_field",
     "make_nuclear_cusp_field",
     "make_parity_projected_field",

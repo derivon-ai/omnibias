@@ -213,6 +213,57 @@ def test_einselection_coherence_and_pointer_basis() -> None:
     assert noncommuting.disproved
 
 
+def test_lindblad_positivity_steady_state_and_dephasing_refusal() -> None:
+    mixed = prove(
+        "lindblad",
+        {
+            "mode": "positivity",
+            "rho": [
+                [[0.7, 0.0], [0.0, 0.0]],
+                [[0.0, 0.0], [0.3, 0.0]],
+            ],
+        },
+    )
+    assert mixed.proved
+    pure = prove(
+        "lindblad",
+        {
+            "mode": "positivity",
+            "rho": [
+                [[0.0, 0.0], [0.0, 0.0]],
+                [[0.0, 0.0], [1.0, 0.0]],
+            ],
+        },
+    )
+    assert pure.blocked
+    thermal = prove(
+        "lindblad",
+        {
+            "mode": "steady_state",
+            "hamiltonian": [[[0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [1.0, 0.0]]],
+            "jumps": [
+                [[[0.0, 0.0], [1.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]]],
+                [[[0.0, 0.0], [0.0, 0.0]], [[1.0, 0.0], [0.0, 0.0]]],
+            ],
+            "rates": [0.8, 0.8 * __import__("math").exp(-1.0)],
+        },
+    )
+    assert thermal.proved or thermal.blocked
+    dephasing = prove(
+        "lindblad",
+        {
+            "hamiltonian": [[[0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]]],
+            "jumps": [[[[1.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [-1.0, 0.0]]]],
+            "rates": [0.5],
+            "time": 20.0,
+            "distance_budget": 1e-6,
+        },
+    )
+    assert dephasing.blocked
+    assert dephasing.reason[0].honesty["wave_function_collapse_claim"] is False
+    assert dephasing.reason[0].honesty["markovian_model_declared_not_derived"] is True
+
+
 def test_catalog_family_square_and_exhausted_miss() -> None:
     hit = prove(
         "catalog_family",

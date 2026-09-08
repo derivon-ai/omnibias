@@ -260,6 +260,7 @@ nav:
       - TabPOU (05-04 / 05-05): api/tabpou.md
       - Conformal slabs (04-02): api/conformal_slabs.md
       - Fermi occupancy and thermodynamic potentials (04-03): api/occupancy.md
+      - Open-system Lindblad dynamics (09-32): api/lindblad.md
       - omnibias-fields: api/fields.md
       - omnibias-torch: api/torch.md
       - omnibias-jax: api/jax.md
@@ -409,6 +410,7 @@ nav:
       - Pairing collapse: cookbook/pairing-collapse.md
       - Rank collapse: cookbook/rank-collapse.md
       - Einselection collapse: cookbook/einselection-collapse.md
+      - Lindblad dynamics: cookbook/lindblad-dynamics.md
       - Dirichlet enclosures on Re(s)>1: cookbook/dirichlet-enclosure.md
       - Instance-gap tightening: cookbook/instance-gap.md
       - CCF jet-Padé profile diagnostic: cookbook/ccf-pade-profile.md

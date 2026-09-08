@@ -6,6 +6,26 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Open-system Lindblad dynamics (theory 09-32)
+
+- `omnibias.core.lindblad`: time-independent GKSL generator as a linear
+  semigroup (`rho(t) = exp(t L) rho(0)`, `d^n rho/dt^n = L^n rho(t)`
+  from one propagator). Qubit Bloch and pure-dephasing families are
+  closed form; general `d` is a numerical propagator. Thermal excited
+  population delegates to `occupancy(FermiModel(beta, mu=0), omega)`.
+- `omnibias.core.verified.lindblad`: realified `interval_matrix_exp`
+  propagator, QR-Lohner trajectory, realified LDL^T positivity, unique
+  steady-state Krawczyk enclosure, certified relaxation time. No
+  admissible step is a first-class `None` refusal.
+- `omnibias.core.collapse.relaxation`: seventh named collapse
+  (`parameter=relaxation_rate`, surviving object `steady_state`).
+  Disagrees with einselection on pure dephasing. `distance_budget` is
+  never defaulted.
+- Bit-identical twins `omnibias.{torch,jax}.lindblad` and a qpinn
+  split-real residual plus hard `rho = G G^dag / Tr` cage.
+- Proof-engine kind `lindblad` (modes `positivity` / `steady_state` /
+  `relaxation`). Smoke: `docs/benchmarks/lindblad_smoke.json`.
+
 ### Added — NS construction fragments (theory 07-09 .. 07-12)
 
 - `omnibias.pinn.certified.anisotropic` (07-09): Lemma 4.1 operators

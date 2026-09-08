@@ -27,6 +27,13 @@ from omnibias.qpinn._core.complex import (
     psi_phase,
     psi_value,
 )
+from omnibias.qpinn._core.density import (
+    LindbladSpec,
+    is_rho_group,
+    make_rho_components,
+    parse_rho_entry_name,
+    rho_entry_names,
+)
 from omnibias.qpinn._core.parity import (
     project_parity_even_derivative,
     project_parity_odd_derivative,
@@ -66,6 +73,7 @@ __all__ = [
     "BOHR_TO_ANGSTROM",
     "HARTREE_TO_CM",
     "HARTREE_TO_EV",
+    "LindbladSpec",
     "PAULI_X",
     "PAULI_Y",
     "PAULI_Z",
@@ -81,8 +89,11 @@ __all__ = [
     "gamma_matrices",
     "gamma_partial_psi",
     "is_psi_group",
+    "is_rho_group",
     "make_psi_components",
+    "make_rho_components",
     "make_spinor_components",
+    "parse_rho_entry_name",
     "pauli_dot",
     "pauli_matrices",
     "project_parity_even_derivative",
@@ -91,6 +102,7 @@ __all__ = [
     "psi_density",
     "psi_phase",
     "psi_value",
+    "rho_entry_names",
     "spinor_value",
     "thomas_fermi_density_2d",
     "thomas_fermi_mu_2d",

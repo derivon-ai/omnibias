@@ -3,16 +3,16 @@
 **Quantum-physics-informed neural networks with closed-form n-th
 derivative operators**, built on top of `omnibias-pinn`. Cross-backend
 (PyTorch + JAX) residuals for Schrodinger / Gross-Pitaevskii /
-Helmholtz / Klein-Gordon / Dirac, plus hard-conservation cages for
-norm, Bloch periodicity, and operator Hermiticity.
+Helmholtz / Klein-Gordon / Dirac / Lindblad, plus hard-conservation cages for
+norm, Bloch periodicity, operator Hermiticity, and density-matrix positivity.
 
 The package surfaces three layers:
 
 | Layer | Purpose | Example |
 | --- | --- | --- |
-| **_core** | Backend-agnostic encoding helpers + spinor / atomic-units constants | `make_psi_components`, `make_spinor_components`, `gamma_matrices` |
-| **equations** | Prebuilt PDE residuals returning `NamedTuple` outputs | `TISE`, `TDSE`, `NLS`, `Helmholtz`, `KleinGordon`, `Dirac` |
-| **cage** | Hard-conservation layers (norm, Bloch, Hermitian) + soft loss helpers | `NormConservationField`, `BlochPeriodicField`, `hermitian_projection` |
+| **_core** | Backend-agnostic encoding helpers + spinor / atomic-units constants | `make_psi_components`, `make_rho_components`, `make_spinor_components`, `gamma_matrices` |
+| **equations** | Prebuilt PDE residuals returning `NamedTuple` outputs | `TISE`, `TDSE`, `NLS`, `Helmholtz`, `KleinGordon`, `Dirac`, `Lindblad` |
+| **cage** | Hard-conservation layers (norm, Bloch, Hermitian, density-matrix) + soft loss helpers | `NormConservationField`, `BlochPeriodicField`, `hermitian_projection`, `DensityMatrixField` |
 
 Plus diagnostics:
 

@@ -90,7 +90,24 @@ class RotatingNLSOutput(NamedTuple):
     diag: dict[str, float]
 
 
+class LindbladOutput(NamedTuple):
+    """Output of :class:`omnibias.qpinn.torch.equations.Lindblad`.
+
+    Attributes
+    ----------
+    residual
+        Flattened split-real residual ``d rho/dt - L[rho]`` of shape
+        ``(B, 2 d**2)``.
+    diag
+        Diagnostic dict.
+    """
+
+    residual: Tensor
+    diag: dict[str, float]
+
+
 __all__ = [
+    "LindbladOutput",
     "NLSOutput",
     "RotatingNLSOutput",
     "TDSEOutput",
