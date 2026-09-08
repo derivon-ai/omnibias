@@ -42,8 +42,6 @@ derivative | band | integral` — the last is the closed-form window
 `docs/operator-surface.md`.
 
 This unlocks orders, Laplacians, and jet residuals nested AD cannot sustain.
-It does **not** replace generic autodiff for arbitrary Python, prove Clay /
-Nobel parents, or make ReLU-kink higher derivatives well-defined.
 
 ## Pitfall → primitive
 

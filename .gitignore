@@ -85,3 +85,6 @@ artifacts/
 
 # Local build / scratch outputs
 out/
+
+# CatBoost writes this next to the process cwd during tabular baselines.
+catboost_info/
