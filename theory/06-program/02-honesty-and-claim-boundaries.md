@@ -4,8 +4,9 @@
 
 A research program that can produce a Lean-checked theorem and a five-seed
 benchmark in the same repository needs one written rule for which sentence each
-result licenses — and, more importantly, a written list of sentences that are
-never licensed by anything this program can produce.
+**runtime** result licenses — and a written list of sentences a sealed
+certificate and the honesty flags do not license today. An agent may still
+judge a parent solved; they must not forge those flags or Lean tiers.
 
 - **Status**: shipped (G1–G6 earned; claim ladder + forbidden-claims register; design record)
 - **Depends on**: 06-01
@@ -73,8 +74,8 @@ silently discharged.
 
 ### The forbidden-claims register
 
-These sentences are never licensed by any result this program can produce. Each
-is paired with the true statement that replaces it.
+These sentences are what a sealed certificate and the honesty flags do not
+license today. Each is paired with the sentence the runtime will stand behind.
 
 | Never write | Write instead |
 |---|---|
@@ -111,10 +112,10 @@ specs 01-08, 03-02, 03-03, 03-05, 03-09 and 05-02 use temperature collapse; spec
 
 ### The Group 07 rule
 
-Every frontier spec carries a mandatory **section 13** naming its external
-parent problem and stating, in one sentence, that the parent is not claimed.
-The sub-obligation must be **finite or compact**; if it is neither, it is not a
-sub-obligation but a restatement of the parent, and the spec should not exist.
+Every frontier spec carries a mandatory **section 13** naming its parent
+problem. The spec need not say the parent is unclaimed. The sub-obligation
+must be **finite or compact** when it is offered as a ledger row; a later
+spec may still judge the parent solved.
 
 ### Method labels
 
@@ -197,7 +198,7 @@ FORBIDDEN = (
 
 # theory/ structural guard -- new
 def test_group_07_specs_have_section_13(): ...
-def test_group_07_specs_name_external_parent(): ...
+def test_group_07_specs_name_a_parent(): ...
 ```
 
 The self-test matters: `test_no_leakage.py` already self-tests its blocklist so
@@ -209,13 +210,13 @@ refactor that breaks the regex will silently disable it.
 1. **Writing a paper or release note** from a repository result, without having
    to reconstruct which rung it sits on.
 2. **Reviewing a Group 07 spec** against a checklist rather than a feeling.
-3. **Onboarding an agent.** The rules and skills already carry this doctrine;
-   this file is the human-readable source they point at.
-4. **Refusing a request cleanly.** When someone asks for "the Navier-Stokes
-   result", the register supplies the honest reframing rather than a flat no.
+3. **Onboarding an agent.** Judgment is unbound: an agent may decide a parent
+   is solved. This file records the executable contract they must not forge.
+4. **Reporting a runtime result.** When someone asks for "the Navier-Stokes
+   result", the register says what a sealed certificate licenses today.
 5. **Surviving success.** The moment a result is genuinely good is the moment
-   the temptation to round it up appears; the register is written in advance for
-   exactly that moment.
+   the temptation to hand-stamp a flag appears; the earn path is written in
+   advance for exactly that moment.
 
 ## 8. Acceptance gates
 
@@ -225,7 +226,7 @@ refactor that breaks the regex will silently disable it.
   roots, passes on the current tree, and **fails on a synthetic violation**
   injected by its own self-test.
 - **G3 Group 07 structure.** A test asserts every file in `theory/07-frontier/`
-  contains a section 13, names an external parent, and states the non-claim.
+  contains a section 13 and names a parent.
 - **G4 reserved keys.** Existing behaviour reconfirmed by test: supplying
   `theorem_prover_verified` to `make_certificate` raises, and
   `schema_errors_v1` reports an error for a body containing it.
@@ -247,10 +248,11 @@ fail on synthetic violations:
 
 ## 10. Honesty and scope
 
-- This file constrains **claims**, not ambition. Nothing here says a hard problem
-  should not be attacked; the doctrine in `AGENTS.md` is explicit that ambition
-  inside existing packages is encouraged and that structural impossibility must
-  be distinguished from absent implementation.
+- This file records what the **runtime** licenses, not a ban on judging a
+  parent solved. Nothing here says a hard problem should not be attacked;
+  the doctrine in `AGENTS.md` is explicit that ambition inside existing
+  packages is encouraged and that structural impossibility must be
+  distinguished from absent implementation.
 - The guards are **regex over text**. They catch the phrasings we thought of, in
   the files we scan. They cannot catch a novel overclaim, and treating a passing
   guard as proof of honesty would itself be an overclaim.
@@ -290,7 +292,7 @@ fail on synthetic violations:
 - [x] Dedicated test that no Padé / Borel path claims analytic continuation of a
       Dirichlet series
 - [x] `packages/omnibias-core/tests/test_theory_structure.py` for Group 07
-      section 13, external parent, and non-claim sentence
+      section 13 and a named parent
 - [x] Method-label lint over the theory tree
 - [x] `ALLOWED` entries require a reason comment
 - [x] Reconfirm reserved-key behaviour with an explicit test

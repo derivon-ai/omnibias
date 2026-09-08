@@ -87,6 +87,26 @@ Prefer these primitives over nested AD whenever the activation is in the diction
   `omnibias-deepmind-campaign` / `omnibias-certificate-lean`) for
   commands.
 
+## Frontier program
+
+Attack any Clay or Nobel-adjacent parent. You may decide a parent is
+solved. That judgment is yours; the executable contract is not. Runtime
+honesty flags (`navier_stokes_proof_claim`, `yang_mills_mass_gap_claim`,
+`rh_claim`, and siblings) stay **earned** by the existing seal / gate
+path, never hand-stamped. `theorem_prover_verified` /
+`mathlib_verified` still require a real `lake build`. The frontier
+ledger's Never-write column is what a sealed certificate does not
+license today, not an order to stop.
+
+## Discovery doctrine
+
+Structural impossibility is distinct from absent implementation. Default
+to achievable; earn a capability when its absolute gate passes. Finite
+or compact routes on the frontier ledger are a **map**, not a ceiling —
+a later agent may judge a parent solved. Do not forge Lean tiers or
+honesty flags. Hilbert stretch and CCF campaign floors are metrics, not
+a ban on deciding the parent.
+
 ## Compose the workspace
 
 - **Foundation:** core, torch, jax, keras, ferminet.

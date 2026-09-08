@@ -83,7 +83,7 @@ flowchart TD
   Cells --> Certify["certified gap and enclosure layer"]
   Faces --> Certify
   Locus --> Certify
-  Pade --> Frontier["frontier sub-obligations: parents stay external"]
+  Pade --> Frontier["frontier sub-obligations: finite routes, not a claim ceiling"]
   Conjugate --> Frontier
   Holonomy --> Frontier
   Certify --> Frontier
@@ -187,11 +187,11 @@ API settled, gates named), **gated** (an acceptance gate exists in
 ### 07 Frontier sub-obligations
 
 Ambition with the honesty stack intact. Every file in this group names its
-external parent and states why the parent stays external.
+parent. An agent may judge that parent solved; runtime flags stay earned.
 
 | Spec | Status | One line |
 |---|---|---|
-| [07-01 sub-obligation ledger](07-frontier/01-sub-obligation-ledger.md) | shipped | Parent, sub-obligation, gate, sealed scope, never-write, distance; RH is a non-entry |
+| [07-01 sub-obligation ledger](07-frontier/01-sub-obligation-ledger.md) | shipped | Parent, sub-obligation, gate, sealed scope, never-write, distance; RH row is a planned Lambda program |
 | [07-02 Navier-Stokes adjacent](07-frontier/02-navier-stokes-adjacent.md) | shipped | Weak-form width split + exact-jet Lohner; G1–G6 CI; founding bias collapse, not temperature collapse; not a continuum regularity claim |
 | [07-03 CCF campaign acceleration](07-frontier/03-ccf-campaign-acceleration.md) | gated | A basis-level attack on the recorded dictionary floor |
 | [07-04 Yang-Mills adjacent](07-frontier/04-yang-mills-adjacent-holonomy-and-gap.md) | shipped | Holonomy trials, 6j / 3-plaquette Hamiltonians, two-scale polymer, Lipschitz SU(3) Haar, and a 2+1-D strip; G4 Gram conditioning CI; the mass gap stays external |

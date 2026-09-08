@@ -336,10 +336,10 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
   lines, not promoted). Theory 06-05 is **shipped** (document G1–G5;
   extract / paper / external stay later). Theory 07-01 is **shipped**
-  ([`docs/frontier-ledger.md`](docs/frontier-ledger.md); RH is a
-  non-entry). Theory 08-01 is **shipped** (training-idea ledger;
-  trainers do not clear Hilbert stretch). Theory 09-01 is **shipped**
-  (invention ledger; inventions do not clear Hilbert stretch).
+  ([`docs/frontier-ledger.md`](docs/frontier-ledger.md); RH row is a
+  planned Lambda program). Theory 08-01 is **shipped** (training-idea
+  ledger; Hilbert stretch is a campaign metric, not a ban). Theory
+  09-01 is **shipped** (invention ledger; same stretch metric).
 
 ## Don't
 
@@ -417,8 +417,8 @@ Lean-core and never import a backend.
   `sequence_space` (geometric-decay tail bounds), `kantorovich` (radii-polynomial
   existence), `lohner` (QR-Lohner / TM validated flow), `eig_operator`
   (Lehmann-Maehly-Goerisch eigenvalue *lower* bounds), `dirichlet` (Dirichlet /
-  zeta / `L` / Jacobi-theta enclosures on `Re(s) > 1` only; continuation and the
-  Riemann Hypothesis are recorded external obligations, never inferred). Every
+  zeta / `L` / Jacobi-theta enclosures on `Re(s) > 1` only; the shipped
+  module does not continue past that half-plane). Every
   enclosure must contain a dense deterministic grid **and** a random sample of
   true values.
 - **Certificate format v1** (`omnibias.core.proof.certificate`): canonical,

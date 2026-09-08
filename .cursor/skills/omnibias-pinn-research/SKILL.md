@@ -59,6 +59,10 @@ JSON.
 `docs/benchmarks/pinn_four_gap_matrix.md`; laplacian / polylaplacian /
 derivative_order JSON under `docs/benchmarks/`.
 
+Hilbert stretch and the CCF campaign floor are metrics, not a ban on
+deciding a Clay or Nobel-adjacent parent is solved. Runtime honesty
+flags stay earned.
+
 ## Further references
 
 - `docs/benchmarks.md`, `docs/honesty.md`

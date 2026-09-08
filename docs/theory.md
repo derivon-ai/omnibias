@@ -346,8 +346,8 @@ gates are earned on smoke, not in CI `all_passed`.
   G4/G5 vacuous, not promoted. Status is **shipped**.
 - **Public primitive** (06-05): citation path; extract / paper /
   external stay later. Status is **shipped**.
-- **Sub-obligation ledger** ([07-01](frontier-ledger.md)): RH is a
-  non-entry. Design record. Status is **shipped**.
+- **Sub-obligation ledger** ([07-01](frontier-ledger.md)): RH row is a
+  planned Lambda program. Design record. Status is **shipped**.
 - **NS-adjacent weak form** ([07-02](api/ns_weak_form.md)): finite
   box / horizon / test space. Not a continuum regularity claim.
   Status is **shipped**.

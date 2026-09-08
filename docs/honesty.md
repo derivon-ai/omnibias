@@ -4,9 +4,9 @@ A result in this repository licenses one sentence. The four rungs are
 strictly stronger and none implies the next. Theory spec 06-02 is the
 source; this page is the public copy. Status is **shipped**.
 
-This register constrains the wording and evidence required for a result; it
-does not constrain target selection. Ambitious targets may be investigated,
-provided the resulting claim stays within the evidence actually earned.
+This register records what the **runtime** does not license. An agent may
+still judge a parent solved; they must not forge honesty flags or Lean
+tiers. The table is the executable contract, not an order to stop.
 
 | Rung | Earned by | Licenses | Does not license |
 |---|---|---|---|
@@ -47,7 +47,8 @@ PINN a-posteriori-error payloads.
 
 ## Forbidden-claims register
 
-These sentences are never licensed by any result this program can produce.
+These sentences are what a sealed certificate and the honesty flags do
+not license today.
 
 | Never write | Write instead |
 |---|---|

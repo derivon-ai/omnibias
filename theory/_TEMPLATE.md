@@ -66,10 +66,12 @@ benchmarks. Name the artifact path under `$OMNIBIAS_SCRATCH` (default
 
 ## 10. Honesty and scope
 
-<What is NOT claimed. The two-collapse note if either limit appears. The
-certificate tier if any: empirical gate, sound enclosure, `theorem_prover_verified`
-(earned only by a genuine Lean kernel pass), or `mathlib_verified` (a distinct
-tier, never conflated with the kernel one).>
+<What the shipped runtime does not license. An agent may judge a parent
+solved; they must not forge honesty flags or Lean tiers. The two-collapse
+note if either limit appears. The certificate tier if any: empirical gate,
+sound enclosure, `theorem_prover_verified` (earned only by a genuine Lean
+kernel pass), or `mathlib_verified` (a distinct tier, never conflated with
+the kernel one).>
 
 ## 11. Open questions and risks
 
@@ -85,6 +87,12 @@ risks section has not been thought about hard enough.>
 - [ ] <CI job>
 - [ ] <regenerate the `__all__` block of any touched `__init__.py`>
 - [ ] <index row in `theory/README.md` updated>
+
+## 13. Parent problem
+
+<Required for Group 07. Name the parent this spec attacks. The spec need
+not say the parent is unclaimed. Do not forge runtime honesty flags or
+Lean tiers.>
 
 ---
 

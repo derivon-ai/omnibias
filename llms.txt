@@ -297,8 +297,8 @@ Stretch `1e-13` is reported separately when measured. Prior basis spike floors
 d1/d2, linearized MSNN, hybrid Hilbert, CubicGN `--full`) measures dense floors
 near ~9e-2 under nontrivial gauge on CPU full probes (smoke ~2e-1) — still above
 the 1e-4 plan bar and absolute gates. Gates remain unearned and thresholds were
-not moved. Clay NS / Yang–Mills parents stay
-external obligations (`navier_stokes_proof_claim=False`).
+not moved. Runtime `navier_stokes_proof_claim` stays False unless
+the existing earn path fires.
 `omnibias-fields`; hosts `omnibias.pinn.operator` for neural operator learning
 (DeepONet with closed-form trunk-jet query derivatives through order 4, so a
 shipped KS residual runs unchanged on one jet; multi-head `ConditioningSpec` for

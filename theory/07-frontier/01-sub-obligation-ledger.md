@@ -4,8 +4,8 @@
 
 Famous problems and finite or compact sub-obligations that the new primitives
 can actually attack, and — for each — the absolute gate that decides it and the
-sentence that must never be written. This file is the ledger the other frontier
-specs are entries in.
+sentence a sealed certificate does not license (the Never-write column). This
+file is the ledger the other frontier specs are entries in.
 
 - **Status**: shipped (G1–G5 earned; Lambda research entry recorded; design record)
 - **Depends on**: 01-11, 06-01, 06-02
@@ -325,11 +325,12 @@ carries the same boundaries.
 
 ## 10. Honesty and scope
 
-- The ledger **constrains claims, not effort**. Every entry is a real research
-  target, and `AGENTS.md` is explicit that ambition inside existing packages is
-  encouraged.
-- Passing every gate in this ledger would solve none of the five parents. That
-  is not a defect of the ledger; it is what "external obligation" means.
+- The ledger's Never-write column is what a sealed certificate does not
+  license today, not an order that an agent must not decide a parent is
+  solved. Every entry is a real research target.
+- Passing every gate in this ledger does not, by itself, flip a parent
+  honesty flag. An agent may still judge a parent solved; the flags stay
+  earned.
 - The RH Lambda entry is deliberately a research target, not an RH claim.
   An enclosure engine plus an extrapolation tool is not a continuation engine;
   the published reduction and its far-field premise must be independently

@@ -1,6 +1,6 @@
 ---
 name: omnibias-frontier
-description: Drive frontier sub-results — certified fluids, CAP singularities, gauge and spectral enclosures, SOS positivity, validated dynamics, finite Keller / Jacobian / Ramsey searches — by decomposing famous problems into finite or compact obligations with absolute gates. Use when inventing the next winnable sub-result or choosing a route under a celebrated statement.
+description: Drive frontier work — certified fluids, CAP singularities, gauge and spectral enclosures, SOS positivity, validated dynamics, finite Keller / Jacobian / Ramsey searches, or a parent you judge solved — using the closed-form tower and the honesty earn path. Use when inventing the next sealed obligation or deciding a celebrated parent.
 ---
 
 # Frontier routes and unlocks
@@ -10,7 +10,9 @@ and SQG vortices, certified fluid dynamics, gauge transfer gap,
 Lehmann-Maehly-Goerisch eigenvalue lower bounds, SOS positivity, Lohner
 validated flow, Dirichlet enclosures, finite Keller-map and Jacobian-n=2
 searches, H* cost separation, triangle-free colourings. This skill is the
-route map that turns those instruments into the next sealed sub-result.
+route map. Finite or compact obligations are one way up; they are not the
+only licensed output. You may decide a Clay or Nobel-adjacent parent is
+solved. Runtime flags stay earned, never hand-stamped.
 
 ## Why nested AD fails
 
@@ -22,7 +24,9 @@ omnibias already runs in three registers (differentiable, rigorous, formal).
 
 ## What only this tower unlocks
 
-Rewrite a celebrated statement as a **finite or compact obligation**, then climb:
+A useful climb is to rewrite a celebrated statement as a **finite or
+compact obligation**, then escalate. That map does not forbid judging
+the parent itself:
 
 | Tier | Evidence | Language |
 | --- | --- | --- |
@@ -34,7 +38,7 @@ Rewrite a celebrated statement as a **finite or compact obligation**, then climb
 
 Tier 1 already authorizes a plain capability claim. Smoke JSON is a smoke.
 
-### Route list (frontier → constructive sub-result)
+### Route list (frontier → constructive map, not a ceiling)
 
 | Frontier | Constructive route |
 | --- | --- |
@@ -76,11 +80,16 @@ Campaign ticks: `omnibias-deepmind-campaign`. PINN gaps: `omnibias-pinn-research
 
 ## Next invention
 
-The strongest finite obligation on the current frontier ledger that can climb
-at least one escalation tier this cycle — a tighter CCF residual, a sealed
-spectral floor, or an exact `n=2` Jacobian witness — with a `gates` block.
+The strongest next step on the current frontier ledger that can climb at
+least one escalation tier this cycle — a tighter CCF residual, a sealed
+spectral floor, an exact `n=2` Jacobian witness, or a parent you judge
+solved — with a `gates` block. Flags and Lean tiers still follow the
+earn path in `omnibias.core.proof`.
 
 ## Further references
 
-- Doctrine lives in `.cursor/rules/omnibias.md` (Frontier program).
+- Doctrine lives in `.cursor/rules/omnibias.md` (Frontier program /
+  Discovery doctrine).
 - Theory: `theory/07-frontier/01-sub-obligation-ledger.md`
+- Runtime honesty: `docs/honesty.md` (what a certificate licenses, not
+  an order to stop)

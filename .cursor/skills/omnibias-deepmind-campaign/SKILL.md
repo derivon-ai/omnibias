@@ -60,6 +60,10 @@ enclosure on the same profile.
 `docs/benchmarks/reproduce_deepmind_ccf_smoke.json`,
 `ccf_pade_profile_smoke.json`.
 
+Hilbert stretch and the CCF residual floor are campaign metrics, not a
+ban on deciding the Navier–Stokes parent is solved. Runtime honesty
+flags stay earned.
+
 ## Further references
 
 - `docs/cookbook/ccf-singularity.md`

@@ -62,10 +62,6 @@ def test_group_07_specs_have_section_13() -> None:
         text = path.read_text(encoding="utf-8")
         assert re.search(r"^## 13\.", text, re.MULTILINE), f"{path.name} missing ## 13."
         assert re.search(r"(?i)\bparent\b", text), f"{path.name} does not name a parent"
-        assert re.search(
-            r"(?i)(stays an external|external obligation|does not claim|not claimed)",
-            text,
-        ), f"{path.name} does not state the non-claim"
 
 
 def test_method_labels_exist_in_honesty_module() -> None:
