@@ -31,18 +31,25 @@ def run_euler3d_axisym_free_discovery(
 ) -> dict[str, object]:
     """Smoke discovery artifact for boundary-free axisymmetric candidates."""
     cfg = AxisymFreeDiscoveryConfig() if cfg is None else cfg
-    rng = np.random.default_rng(cfg.seed)
     r = np.linspace(0.05, 1.0, cfg.n_radial)
     z = np.linspace(-1.0, 1.0, cfg.n_axial)
     R, Z = np.meshgrid(r, z, indexing="ij")
     amp = np.exp(-((R - 0.4) ** 2 + Z**2) / 0.2)
-    residual_proxy = rng.normal(scale=1e-3, size=amp.shape) + 0.01 * (amp - amp.mean())
+    from fractions import Fraction
+
+    from omnibias.pinn.certified.anisotropic import locked_profile_residual_abs
+
+    residual_abs = [
+        float(locked_profile_residual_abs(Fraction(int(ri * 20), 20), Fraction(0)))
+        for ri in r
+    ]
     return {
         "lam": float(cfg.lam_init),
+        "seed": int(cfg.seed),
         "radial": r.tolist(),
         "axial": z.tolist(),
         "swirl_amplitude": amp.tolist(),
-        "residual_proxy_max_abs": float(np.max(np.abs(residual_proxy))),
+        "residual_proxy_max_abs": float(max(residual_abs)),
         "domain": {
             "type": "boundary_free_axisymmetric_compactified",
             "compactification": asdict(compactified_r3_metadata()),
@@ -54,9 +61,11 @@ def run_euler3d_axisym_free_discovery(
             "navier_stokes_proof_claim": False,
             "continuum_navier_stokes_claim": False,
             "notes": (
-                "Boundary-free axisymmetric scaffold on compactified coordinates; "
-                "not a Clay-level CAP."
+                "Boundary-free axisymmetric scaffold; residual is the locked "
+                "07-09 profile identity, still empirical discovery. Not a "
+                "Clay-level CAP and not a forced-blowup reproof."
             ),
+            "forced_blowup_reproof_claim": False,
         },
     }
 

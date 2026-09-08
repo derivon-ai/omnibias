@@ -332,7 +332,7 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   a submodule back out later is cheap; un-shipping a premature distribution is not.
   See the `omnibias-new-package` skill. Theory 06-03 G1–G5 are
   **shipped**; they are
-  earned on `benchmarks/theory_homes.py` (42 packages, 109/109 homes,
+  earned on `benchmarks/theory_homes.py` (42 packages, 113/113 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
   lines, not promoted). Theory 06-05 is **shipped** (document G1–G5;
   extract / paper / external stay later). Theory 07-01 is **shipped**
@@ -754,6 +754,21 @@ by that drift gate.
   temperature collapse; parent flags derived from empty
   `external_premises`, never asserted; not Clay A/B, not a continuum
   mass gap) /
+  `omnibias.pinn.certified.anisotropic`
+  (07-09, **shipped**; Lemma 4.1 operators / axis germ / source jets;
+  G1–G5 CI; founding bias collapse, not temperature collapse; not a
+  forced-blowup reproof) /
+  `omnibias.core.proof.obligations.stress_cone`
+  (07-10, **shipped**; exact 2x2 cone membership + scale ledger;
+  G1–G5 CI; founding bias collapse, not temperature collapse; not a
+  forced-blowup reproof) /
+  `omnibias.core.verified.weighted_class`
+  (07-11, **shipped**; fixed-order W/M/S bound + finite Gevrey
+  majorant; G1–G5 CI; not a Gevrey theorem; not a forced-blowup
+  reproof) /
+  `omnibias.core.verified.swirl_heat` + `omnibias.core.pulse_envelope`
+  (07-12, **shipped**; radial m=1 identity + exact-D envelope; G1–G6
+  CI; h=0 CI plant; not a 3-D heat theorem) /
   `omnibias.pinn.inverse`
   (05-01, **shipped**; G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`;
   global search earned for n=3 only) /
@@ -854,6 +869,10 @@ by that drift gate.
   [`docs/api/pack_fisher.md`](docs/api/pack_fisher.md),
   [`docs/api/occupancy.md`](docs/api/occupancy.md),
   [`docs/api/convergence_ledger.md`](docs/api/convergence_ledger.md),
+  [`docs/api/anisotropic_profile.md`](docs/api/anisotropic_profile.md),
+  [`docs/api/stress_cone.md`](docs/api/stress_cone.md),
+  [`docs/api/weighted_class.md`](docs/api/weighted_class.md),
+  [`docs/api/swirl_heat_pulse.md`](docs/api/swirl_heat_pulse.md),
   [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md),
   [`docs/api/tabpou.md`](docs/api/tabpou.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI

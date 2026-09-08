@@ -390,6 +390,22 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/convergence_ledger.py
+      - name: Run anisotropic-profile smoke (07-09 G1–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/anisotropic_profile.py
+      - name: Run stress-cone smoke (07-10 G1–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/stress_cone.py
+      - name: Run weighted-class smoke (07-11 G1–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/weighted_class.py
+      - name: Run swirl-heat-pulse smoke (07-12 G1–G6)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/swirl_heat_pulse.py
       - name: Run soft-evolution smoke (03-01 G1–G6)
         run: |
           source .venv-cross/bin/activate
@@ -1272,7 +1288,8 @@ jobs:
           pip install -e packages/omnibias-core[test]
           python -m pytest packages/omnibias-core/tests/test_lean_check.py \
             packages/omnibias-core/tests/test_rational_stencil.py \
-            packages/omnibias-core/tests/test_convergence_ledger.py -q
+            packages/omnibias-core/tests/test_convergence_ledger.py \
+            packages/omnibias-core/tests/test_stress_cone.py -q
 
   spiking:
     name: omnibias-spiking (alpha)

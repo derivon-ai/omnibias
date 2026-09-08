@@ -1,6 +1,6 @@
 # omnibias theory program
 
-This tree is the **forward-looking research program**: 100 implementation-ready
+This tree is the **forward-looking research program**: 113 implementation-ready
 specs that extend the omnibias primitive beyond what ships today.
 
 It is not the shipped documentation. [`docs/theory.md`](../docs/theory.md) is the
@@ -180,7 +180,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | shipped | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | shipped | Claim ladder + forbidden-claims register; guards in core tests |
-| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | shipped | G1–G5 **earned** (42 packages, 109/109 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
+| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | shipped | G1–G5 **earned** (42 packages, 113/113 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | Monograph spine only; no `book/` tree; drafting still forbidden |
 | [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | shipped | Publish-and-use order for the shipped object; obligation-3 `jet_vs_nested_ad` earned; extract / paper / external stay later; CCF and Group 09 are not the public face |
 
@@ -199,6 +199,10 @@ external parent and states why the parent stays external.
 | [07-06 validated dynamics and orbits](07-frontier/06-validated-dynamics-and-orbits.md) | shipped | Exact-Jacobian jet Lohner + width budget; G1–G6 CI; founding bias collapse, not temperature collapse; finite horizon, not a continuum existence theorem |
 | [07-07 Nobel-adjacent domains](07-frontier/07-nobel-adjacent-domain-programs.md) | shipped | Exact ladder + Harris layer + exact `dT/dθ`; G0–G6 CI; tooling, not a discovery; founding bias collapse, not temperature collapse |
 | [07-08 convergence ledgers](07-frontier/08-convergence-ledgers.md) | shipped | Finite rational stage-budget of a packet ladder / polymer expansion; G1–G5 CI; founding bias collapse, not temperature collapse; not Clay (A)/(B); not a continuum mass gap |
+| [07-09 similarity profile](07-frontier/09-similarity-profile-axis-germ.md) | shipped | Lemma 4.1 operators + axis germ + source jets; G1–G5 CI; founding bias collapse, not temperature collapse; not a forced-blowup reproof |
+| [07-10 stress cone](07-frontier/10-admissible-stress-cone.md) | shipped | Exact 2x2 cone membership + scale ledger; G1–G5 CI; founding bias collapse, not temperature collapse; not a forced-blowup reproof |
+| [07-11 weighted class](07-frontier/11-weighted-coefficient-class.md) | shipped | Fixed-order W/M/S bound + finite Gevrey majorant; G1–G5 CI; not a Gevrey theorem; not a forced-blowup reproof |
+| [07-12 heat + pulse](07-frontier/12-heat-exterior-pulse-envelope.md) | shipped | Radial m=1 swirl-heat identity + exact-D envelope; G1–G6 CI; h=0 CI plant; not a 3-D heat theorem |
 
 ### 08 Tower-native training
 

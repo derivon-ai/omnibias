@@ -77,10 +77,15 @@ a green build is meaningful.
   continuum Haar theorem and not 4-D SU(3) Yang-Mills.
 - **Convergence ledger** -- a `convergence_ledger` payload from
   `omnibias.core.proof.obligations.convergence_ledger`: a named NS
-  exponent-ledger instance or the strong-coupling polymer majorants.
-  Finite rational affine margins, not Clay (A)/(B) and not a continuum
-  mass gap. Applies `ns_manuscript_margins` /
-  `polymer_ledger_margins`.
+  exponent-ledger instance, the strong-coupling polymer majorants, or
+  the NS scale ledger (`h < 1/100` and `h < 1/6`). Finite rational
+  affine margins, not Clay (A)/(B) and not a continuum mass gap.
+  Applies `ns_manuscript_margins` / `polymer_ledger_margins` /
+  `ns_scale_margins`.
+- **Stress cone** -- a `stress_cone` payload from
+  `omnibias.core.proof.obligations.stress_cone`: the locked interior
+  cone `T = (1, 1)` against `(e_1, e_2)`. Finite 2x2 Cramer algebra,
+  not a forced-blowup reproof. Applies `locked_cone_interior`.
 - **Tower coefficients** -- a `tower_coeffs` payload from
   `omnibias.formal.tower.tower_coeffs_certificate`: the exact integer list of
   one family (`sigmoid` / `tanh` / `sech` / `hermite`) at a finite order, re-derived
@@ -107,7 +112,8 @@ implies `unproven_claim`.
 Every module in `formal/omnibias-analytic/` is `sorry`-free. The track discharges
 finite rational inequalities, a unique root of a named polynomial on a compact
 box, replay of a planted rational enclosure DAG, named compact-box residual
-/ finite-matrix gap plants, and named SU(2) / SU(3) Casimir identities. Infinite analytic
+/ finite-matrix gap plants, named SU(2) / SU(3) Casimir identities, finite
+convergence-ledger margins, and the locked 2x2 stress cone. Infinite analytic
 statements -- continuum regularity, asymptotics -- are not expressed here at
 all, so they can never be silently discharged here either. A green build
 certifies the emitted obligation and nothing beyond it.

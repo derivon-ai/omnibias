@@ -7,7 +7,7 @@ way, and the repository has already learned that lesson the expensive way — so
 this file assigns every spec a home under the "earn independent existence" rule
 and sequences them so that the cheap falsifiers run before the expensive builds.
 
-- **Status**: shipped (G1–G5 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 109/109 specs name a home, Wave-0 A4–A7 recorded, no failed falsifier / no `retired` row; G4 vacuous; G5 vacuous — not promoted: 2 external consumers, 389 lines < 2000; no new distribution)
+- **Status**: shipped (G1–G5 **earned** on `theory_homes` smoke — 42 packages, allowlist empty, 113/113 specs name a home, Wave-0 A4–A7 recorded, no failed falsifier / no `retired` row; G4 vacuous; G5 vacuous — not promoted: 2 external consumers, 389 lines < 2000; no new distribution)
 - **Depends on**: 06-01, 06-02
 - **Blocks**: none
 

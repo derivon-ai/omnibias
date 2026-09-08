@@ -298,12 +298,22 @@ from omnibias.pinn.certified.sqg import (
     certified_sqg_steady_vortex,
     certified_sqg_steady_vortex_schema_errors,
 )
+from omnibias.pinn.certified.anisotropic import (
+    AxisRegularProfile,
+    SimilarityScales,
+    axis_germ,
+    coefficient_source_jet,
+    leading_tangential_residual,
+    locked_axis_regular_profile,
+    profile_operators,
+)
 from omnibias.pinn.certified.viscous_perturbation import (
     verify_viscous_perturbation_enclosure,
     viscous_perturbation_enclosure,
 )
 
 __all__ = [
+    "AxisRegularProfile",
     "AxisymmetricBasisMetadata",
     "AxisymmetricCompactifiedMetadata",
     "AxisymmetricFunctionSpaceMetadata",
@@ -359,6 +369,7 @@ __all__ = [
     "SQG_SELFSIMILAR_SCHEMA_VERSION",
     "SQG_VORTEX_SCHEMA_VERSION",
     "ScalarInterval",
+    "SimilarityScales",
     "StreamfunctionField",
     "TailBound",
     "TheoremGradeFunctionSpaceContract",
@@ -373,6 +384,7 @@ __all__ = [
     "assemble_axisymmetric_active_subspace_operator",
     "assemble_axisymmetric_linearized_operator",
     "available_fixtures",
+    "axis_germ",
     "axisymmetric_axis_smoothness_certificate",
     "axisymmetric_basis_count",
     "axisymmetric_basis_metadata",
@@ -456,6 +468,7 @@ __all__ = [
     "certified_taylor_green_residual",
     "classical_assumptions_readiness_gate",
     "coefficient_interval_boxes",
+    "coefficient_source_jet",
     "compactification_map_interval",
     "compactified_coefficient_set",
     "compactified_r3_metadata",
@@ -500,8 +513,10 @@ __all__ = [
     "interval_trapezoid_bound",
     "ipm_banded_toy_radii",
     "kolmogorov_flow",
+    "leading_tangential_residual",
     "lean_formalization_package",
     "leray_project_periodic",
+    "locked_axis_regular_profile",
     "manufactured_abc_flow",
     "navier_stokes_periodic_residual_schema_errors",
     "nonlinear_tail_remainder_certificate",
@@ -513,6 +528,7 @@ __all__ = [
     "pinn_aposteriori_proof_schema_errors",
     "pressure_poisson_residual_periodic",
     "primitive_residual_periodic",
+    "profile_operators",
     "proof_contract_bundle",
     "proof_obligation_bundle",
     "prove_navier_stokes_periodic_residual",

@@ -40,6 +40,11 @@ CLAIM_FLAG_MODULES = (
     "omnibias.discrete",
     "benchmarks/_gates.py",
     "omnibias.core.proof.obligations.convergence_ledger",
+    "omnibias.pinn.certified.anisotropic",
+    "omnibias.core.proof.obligations.stress_cone",
+    "omnibias.core.verified.weighted_class",
+    "omnibias.core.verified.swirl_heat",
+    "omnibias.core.pulse_envelope",
 )
 _BENCHMARK_PATH = re.compile(r"`(docs/benchmarks/[^`]+\.json)`")
 _IMPORT_PADE = re.compile(

@@ -6,6 +6,38 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — NS construction fragments (theory 07-09 .. 07-12)
+
+- `omnibias.pinn.certified.anisotropic` (07-09): Lemma 4.1 operators
+  `T_b` / `Z_b` over `Fraction`, a locked axis-regular similarity
+  profile, a remainder-zero axis `TaylorModel` germ, and
+  `jet_multiply` source jets. Discovery residual in
+  `euler3d_axisym` is the locked profile residual, not a random
+  proxy. Not a forced-blowup reproof; `forced_blowup_reproof_claim`
+  stays false. Smoke: `docs/benchmarks/anisotropic_profile_smoke.json`.
+- `omnibias.core.proof.obligations.stress_cone` (07-10): exact 2x2
+  interior-cone membership via Cramer weights. Parallel and
+  opposite-cone cases are `BLOCKED` and named. Kernel emission
+  reuses `allRatLt`; Mathlib `Check.StressCone.locked_cone_interior`.
+  `navier_stokes_scale_ledger()` records `h < 1/100` (binding) and
+  `h < 1/6` plus a `kappa_s` side condition. Premises stay nonempty.
+  Smokes: `docs/benchmarks/stress_cone_smoke.json` and the existing
+  `convergence_ledger` runner.
+- `omnibias.core.verified.weighted_class` (07-11): fixed-order
+  `W/M/S` bound plus a finite-order Gevrey majorant (`k <= k_max`).
+  A violating sample is named. Not a Gevrey-class theorem. Smoke:
+  `docs/benchmarks/weighted_class_smoke.json`.
+- `omnibias.core.verified.swirl_heat` + `omnibias.holonomic.swirl_heat`
+  + `omnibias.core.pulse_envelope` (07-12): radial `m = 1` swirl-heat
+  identity at the `h = 0` CI plant (`K = 1/r`); holonomic
+  `prove("identity")` payload; exact-`D` logistic envelope vs the
+  sigmoid tower (not FD) with a mollifier tail. `h != 0` is leftover
+  recorded. Smoke: `docs/benchmarks/swirl_heat_pulse_smoke.json`.
+- Catalog parents for the new kinds are
+  `"Navier-Stokes forced blowup (Clay C/D)"` with
+  `parent_status="already_true"`. Unforced (A)/(B) enclosure kinds
+  stay `open`. `navier_stokes_proof_claim` is never asserted.
+
 ### Added — Finite rational convergence ledgers (theory 07-08)
 
 - `omnibias.core.proof.obligations.convergence_ledger`: a stage-indexed

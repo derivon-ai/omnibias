@@ -17,9 +17,9 @@ Status is **shipped**. G1–G5 are CI-gated
 (`benchmarks/convergence_ledger.py`). Parent-level honesty flags
 (`navier_stokes_proof_claim`, `yang_mills_mass_gap_claim`) are
 **derived**: they become true only when every margin discharges **and**
-`external_premises` is empty. Both curated ledgers ship with a printed
-premise list, so the honest outcome today is `CONDITIONAL`. See theory
-spec
+`external_premises` is empty. The three curated ledgers (NS exponent,
+polymer, NS scale) ship with a printed premise list, so the honest
+outcome today is `CONDITIONAL`. See theory spec
 [07-08](https://github.com/derivon-ai/omnibias/blob/main/theory/07-frontier/08-convergence-ledgers.md).
 
 Home: `omnibias.core.proof.obligations.convergence_ledger`.

@@ -164,4 +164,12 @@ theorem polymer_ledger_margins :
       polymerBacktrack 4 < polymerCrude 4 :=
   ⟨polymer_backtrack_lt_first_step, polymer_backtrack_lt_crude⟩
 
+/-! ## Navier–Stokes scale ledger (geometry / energy) -/
+
+/-- Manuscript ``h = 1/200`` is below both the geometry bound ``1/100``
+and the energy bound ``1/6``. Finite rational algebra only. -/
+theorem ns_scale_margins :
+    (1 / 200 : ℚ) < 1 / 100 ∧ (1 / 200 : ℚ) < 1 / 6 := by
+  constructor <;> norm_num
+
 end OmnibiasAnalytic.Check

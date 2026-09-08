@@ -89,6 +89,25 @@ def test_ns_ledger_discharges_and_recovers_kappa_threshold() -> None:
     assert ledger.external_premises
 
 
+def test_scale_ledger_discharges_with_binding_h() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        navier_stokes_scale_ledger,
+    )
+
+    ledger = navier_stokes_scale_ledger()
+    report = check_ledger(ledger)
+    assert report.holds
+    assert report.strength == "CONDITIONAL"
+    assert report.binding_threshold is not None
+    param, sense, value = report.binding_threshold
+    assert param == "h"
+    assert sense == "lt"
+    assert value == Fraction(1, 100)
+    flags = honesty_payload(ledger, report)
+    assert flags["navier_stokes_proof_claim"] is False
+    assert ledger.external_premises
+
+
 def test_polymer_ledger_matches_check_polymer() -> None:
     ledger = strong_coupling_polymer_ledger()
     report = check_ledger(ledger)

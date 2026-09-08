@@ -1145,6 +1145,58 @@ def strong_coupling_polymer_ledger() -> ConvergenceLedger:
     )
 
 
+NS_SCALE_EXTERNAL_PREMISES: tuple[str, ...] = (
+    "analytic classes of the slow base and the high-frequency packets",
+    "construction of each pulse family and the cutoff summation",
+    "PDE residual estimates that the scale ledger treats as given",
+)
+
+
+def navier_stokes_scale_ledger() -> ConvergenceLedger:
+    """Geometry / energy / ``kappa_s`` side conditions of the forced construction.
+
+    ``h = 1/200``, ``kappa_s = 1/100000``. Margins are ``h < 1/100``
+    (geometry) and ``h < 1/6`` (energy). Binding threshold is the
+    stricter geometry bound. Degenerate stage. Premises stay nonempty.
+    """
+    h = AffineForm.variable("h")
+    return ConvergenceLedger(
+        name="navier_stokes_scale",
+        stage=StageMap(var="n", step=Fraction(0), initial=Fraction(0)),
+        parameters={"h": Fraction(1, 200), "kappa_s": Fraction(1, 100000)},
+        side_conditions=(
+            SideCondition(h, "ge", Fraction(0), name="h_nonneg"),
+            SideCondition(h, "lt", Fraction(1, 100), name="h_geometry"),
+            SideCondition(h, "lt", Fraction(1, 6), name="h_energy"),
+            SideCondition(
+                AffineForm.variable("kappa_s"), "ge", Fraction(0), name="kappa_s_nonneg"
+            ),
+            SideCondition(
+                AffineForm.variable("kappa_s"),
+                "le",
+                Fraction(1, 100000),
+                name="kappa_s_admissible",
+            ),
+        ),
+        obligations=(
+            MarginObligation(
+                "geometry",
+                AffineForm.constant(0),
+                MinForm.singleton(AffineForm.constant(Fraction(1, 100))),
+                next_quantity=h,
+            ),
+            MarginObligation(
+                "energy",
+                AffineForm.constant(0),
+                MinForm.singleton(AffineForm.constant(Fraction(1, 6))),
+                next_quantity=h,
+            ),
+        ),
+        parent="Navier-Stokes forced blowup (Clay C/D)",
+        external_premises=NS_SCALE_EXTERNAL_PREMISES,
+    )
+
+
 def failing_margin_ledger() -> ConvergenceLedger:
     """Deliberately broken particular-gain ledger (negative control)."""
     wave = _affine(Fraction(1, 2), sigma=1)
@@ -1220,6 +1272,7 @@ def curated_convergence_ledgers() -> tuple[ConvergenceLedger, ...]:
     return (
         navier_stokes_exponent_ledger(),
         strong_coupling_polymer_ledger(),
+        navier_stokes_scale_ledger(),
     )
 
 
@@ -1254,6 +1307,7 @@ __all__ = [
     "MinForm",
     "NS_EXTERNAL_PREMISES",
     "NS_PARENT",
+    "NS_SCALE_EXTERNAL_PREMISES",
     "PARENT_CLAIM_KEYS",
     "PAYLOAD_LEDGER",
     "ResidualReport",
@@ -1272,6 +1326,7 @@ __all__ = [
     "ledger_obligation",
     "ledger_to_inequality_system",
     "navier_stokes_exponent_ledger",
+    "navier_stokes_scale_ledger",
     "payload_earns_parent_claim",
     "replay_ledger_certificate",
     "seal_ledger_certificate",

@@ -444,6 +444,17 @@ from omnibias.core.verified.sequence_space import (
     fourier_nu_norm,
     geometric_tail_bound,
 )
+from omnibias.core.verified.swirl_heat import (
+    swirl_heat_residual,
+    swirl_heat_residual_interval,
+)
+from omnibias.core.verified.weighted_class import (
+    EdgeWeights,
+    PulseWeight,
+    WeightedBound,
+    check_pointwise_bound,
+    gevrey_majorant,
+)
 from omnibias.core.verified.series import (
     certified_geometric_series_sum,
     certified_ratio_series_sum,
@@ -525,6 +536,7 @@ __all__ = [
     "DeBruijnNewmanZeroCount",
     "DerivOracle",
     "E_IV",
+    "EdgeWeights",
     "EigenvalueCountCertificate",
     "EigenvalueLowerBound",
     "FAR_FIELD_CITATION",
@@ -561,6 +573,7 @@ __all__ = [
     "PUBLISHED_1D_PACKING_DENSITY",
     "PerronGapCertificate",
     "PolynomialDensityOfStates",
+    "PulseWeight",
     "QuadEstimate",
     "RadiiCertificate",
     "RecommendedAction",
@@ -581,6 +594,7 @@ __all__ = [
     "ValidatedSeries",
     "VectorField",
     "Wavevector",
+    "WeightedBound",
     "WidthLaw",
     "advection_diffusion",
     "affine_jet",
@@ -634,6 +648,7 @@ __all__ = [
     "certify_finite_ground_state",
     "certify_zero_radii",
     "characteristic_polynomial_enclosure",
+    "check_pointwise_bound",
     "chi_squared_enclosure",
     "clear_libm_fallback_used",
     "clenshaw_curtis_integral",
@@ -702,6 +717,7 @@ __all__ = [
     "geometric_series_closed_form",
     "geometric_tail_bound",
     "geometric_tail_enclosure",
+    "gevrey_majorant",
     "grand_potential_enclosure",
     "hardy_angle",
     "hardy_even",
@@ -879,6 +895,8 @@ __all__ = [
     "sqg_velocity_divergence_residual",
     "strict_backend",
     "sum_intervals",
+    "swirl_heat_residual",
+    "swirl_heat_residual_interval",
     "symmetric_eigenvalue_residual_enclosure",
     "tail_inverse_bound_from_banded",
     "tanh_iv",

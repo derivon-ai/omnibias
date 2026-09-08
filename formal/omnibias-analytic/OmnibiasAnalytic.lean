@@ -12,7 +12,8 @@ named SU(2) / SU(3) Casimir identities (`Check.Casimir`),
 named polymer-coordination identities (`Check.Polymer`),
 named Racah 6j identities (`Check.SixJ`), and
 the Weyl-volume prefactor (`Check.HaarVolume`),
-and finite rational convergence-ledger margins (`Check.ConvergenceLedger`).
+and finite rational convergence-ledger margins (`Check.ConvergenceLedger`),
+and the locked admissible-stress cone (`Check.StressCone`).
 `Tower` is the Riccati / Eulerian / Hermite derivative tower (polynomial
 recurrences plus `iteratedDeriv` link theorems). `Generated` is the
 bridge-overwritten obligation under test.
@@ -39,5 +40,6 @@ import OmnibiasAnalytic.Check.Polymer
 import OmnibiasAnalytic.Check.SixJ
 import OmnibiasAnalytic.Check.HaarVolume
 import OmnibiasAnalytic.Check.ConvergenceLedger
+import OmnibiasAnalytic.Check.StressCone
 import OmnibiasAnalytic.Tower
 import OmnibiasAnalytic.Generated

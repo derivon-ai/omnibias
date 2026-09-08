@@ -114,6 +114,7 @@ def test_classify_haar() -> None:
 def test_classify_convergence_ledger() -> None:
     from omnibias.core.proof.obligations.convergence_ledger import (
         navier_stokes_exponent_ledger,
+        navier_stokes_scale_ledger,
         seal_ledger_certificate,
     )
 
@@ -121,6 +122,20 @@ def test_classify_convergence_ledger() -> None:
         navier_stokes_exponent_ledger(), run_lean=False
     ).certificate
     assert classify_obligation(cert) == "convergence_ledger"
+    scale = seal_ledger_certificate(
+        navier_stokes_scale_ledger(), run_lean=False
+    ).certificate
+    assert classify_obligation(scale) == "convergence_ledger"
+
+
+def test_classify_stress_cone() -> None:
+    from omnibias.core.proof.obligations.stress_cone import (
+        locked_interior_cone,
+        seal_cone_certificate,
+    )
+
+    cert = seal_cone_certificate(locked_interior_cone(), run_lean=False).certificate
+    assert classify_obligation(cert) == "stress_cone"
 
 
 def test_classify_none_for_straddling_interval() -> None:
@@ -153,12 +168,21 @@ def test_classify_agrees_with_generate_obligation() -> None:
     ]
     from omnibias.core.proof.obligations.convergence_ledger import (
         navier_stokes_exponent_ledger,
+        navier_stokes_scale_ledger,
         seal_ledger_certificate,
+    )
+    from omnibias.core.proof.obligations.stress_cone import (
+        locked_interior_cone,
+        seal_cone_certificate,
     )
 
     certs.append(
         seal_ledger_certificate(navier_stokes_exponent_ledger(), run_lean=False).certificate
     )
+    certs.append(
+        seal_ledger_certificate(navier_stokes_scale_ledger(), run_lean=False).certificate
+    )
+    certs.append(seal_cone_certificate(locked_interior_cone(), run_lean=False).certificate)
     for cert in certs:
         assert (classify_obligation(cert) is None) == (generate_obligation(cert) is None)
 

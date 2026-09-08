@@ -342,7 +342,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Honesty and claim boundaries** ([06-02](honesty.md)): claim
   ladder + forbidden-claims register. Design record. Status is
   **shipped**.
-- **Packaging and rollout** (06-03): G1–G5 earned (109/109 homes).
+- **Packaging and rollout** (06-03): G1–G5 earned (113/113 homes).
   G4/G5 vacuous, not promoted. Status is **shipped**.
 - **Public primitive** (06-05): citation path; extract / paper /
   external stay later. Status is **shipped**.
@@ -366,6 +366,15 @@ gates are earned on smoke, not in CI `all_passed`.
   finite rational stage-budget of a packet ladder / polymer
   expansion. Not Clay (A)/(B); not a continuum mass gap. Status is
   **shipped**.
+- **Similarity profile** ([07-09](api/anisotropic_profile.md)):
+  Lemma 4.1 operators, axis germ, source jets. Not a forced-blowup
+  reproof. Status is **shipped**.
+- **Stress cone** ([07-10](api/stress_cone.md)): exact 2x2 cone
+  membership plus the `(h, κ_s)` scale ledger. Status is **shipped**.
+- **Weighted class** ([07-11](api/weighted_class.md)): fixed-order
+  bound, not a Gevrey theorem. Status is **shipped**.
+- **Swirl heat + pulse** ([07-12](api/swirl_heat_pulse.md)): radial
+  `m = 1` identity plus exact-`D` envelope. Status is **shipped**.
 - **Training-idea ledger** (08-01): recommended stack; trainers do
   not clear Hilbert stretch. Design record. Status is **shipped**.
 - **Composed curvature** ([08-02](api/composed_curvature.md)): slice

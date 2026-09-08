@@ -1,0 +1,60 @@
+{
+  "schema": "omnibias.benchmarks.anisotropic_profile.v1",
+  "generated_utc": "2026-09-08T20:15:11Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "anisotropic_profile",
+    "full": false,
+    "honesty": {
+      "unproven_claim": false,
+      "navier_stokes_proof_claim": false,
+      "continuum_navier_stokes_claim": false,
+      "forced_blowup_reproof_claim": false,
+      "continuum_pde_claim": false,
+      "theorem_prover_verified": false,
+      "mathlib_verified": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false
+    }
+  },
+  "rss_mb_at_start": 817.68,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_lemma_41",
+        "passed": true,
+        "detail": "T_b, Z_b match Lemma 4.1"
+      },
+      {
+        "name": "g2_minus_div_T",
+        "passed": true,
+        "detail": "R + div T = 0"
+      },
+      {
+        "name": "g3_axis_germ",
+        "passed": true,
+        "detail": "TM remainder is {0}"
+      },
+      {
+        "name": "g4_source_jet",
+        "passed": true,
+        "detail": "jet_multiply matches Cauchy product"
+      },
+      {
+        "name": "g5_honesty",
+        "passed": true,
+        "detail": "parent flags stay false"
+      }
+    ]
+  },
+  "wall_seconds": 1.0154340090230107
+}

@@ -598,6 +598,36 @@ def test_generate_polymer_convergence_ledger() -> None:
     assert "polymerBacktrack" in src
 
 
+def test_generate_scale_ledger() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        navier_stokes_scale_ledger,
+        seal_ledger_certificate,
+    )
+
+    cert = seal_ledger_certificate(
+        navier_stokes_scale_ledger(), run_lean=False
+    ).certificate
+    src = generate_obligation(cert) or ""
+    assert "import OmnibiasAnalytic.Check.ConvergenceLedger" in src
+    assert "ns_scale_margins" in src
+    assert "1 / 200" in src
+    assert "sorry" not in src.lower()
+
+
+def test_generate_stress_cone() -> None:
+    from omnibias.core.proof.obligations.stress_cone import (
+        locked_interior_cone,
+        seal_cone_certificate,
+    )
+
+    cert = seal_cone_certificate(locked_interior_cone(), run_lean=False).certificate
+    src = generate_obligation(cert) or ""
+    assert "import OmnibiasAnalytic.Check.StressCone" in src
+    assert "locked_cone_interior" in src
+    assert "coneLambda1" in src
+    assert "sorry" not in src.lower()
+
+
 def test_failing_ledger_emits_no_mathlib_obligation() -> None:
     from omnibias.core.proof.obligations.convergence_ledger import (
         failing_margin_ledger,

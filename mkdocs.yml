@@ -198,6 +198,10 @@ nav:
       - recommended trainer stack: api/train_stack.md
       - rational stencil obligations (01-11): api/rational_stencil.md
       - convergence ledgers (07-08): api/convergence_ledger.md
+      - anisotropic similarity profile (07-09): api/anisotropic_profile.md
+      - admissible stress cone (07-10): api/stress_cone.md
+      - weighted coefficient class (07-11): api/weighted_class.md
+      - swirl-heat + pulse envelope (07-12): api/swirl_heat_pulse.md
       - soft-population evolution (03-01): api/soft_evolution.md
       - arrangement LP (03-02): api/arrangement_lp.md
       - CSP collapse (03-03): api/csp.md

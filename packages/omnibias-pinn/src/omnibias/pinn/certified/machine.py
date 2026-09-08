@@ -656,6 +656,35 @@ def _register() -> None:
                 "honesty": {"navier_stokes_proof_claim": False},
             },
         )
+    for kind in (
+        "anisotropic_profile",
+        "weighted_class",
+        "swirl_heat_identity",
+        "pulse_envelope",
+    ):
+        register_catalog(
+            CatalogEntry(
+                kind=kind,
+                obligation=(
+                    "a finite or jet fragment of the constructed forced "
+                    "blowup (not a Clay C/D reproof)"
+                ),
+                parent="Navier-Stokes forced blowup (Clay C/D)",
+                parent_status="already_true",
+                package="omnibias.pinn.certified",
+                mode="exact_replay",
+                complete=True,
+                existential=False,
+            ),
+            lambda kind=kind, **_k: {
+                "kind": kind,
+                "mode": "exact_replay",
+                "honesty": {
+                    "navier_stokes_proof_claim": False,
+                    "forced_blowup_reproof_claim": False,
+                },
+            },
+        )
     for kind in ("ccf_residual_discovery", "boussinesq_residual_discovery"):
         register_catalog(
             CatalogEntry(
