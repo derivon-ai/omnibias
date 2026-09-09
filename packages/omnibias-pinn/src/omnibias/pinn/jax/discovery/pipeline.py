@@ -203,7 +203,7 @@ class CCFHardyAdapter:
 
 @dataclass
 class IPMAdapter:
-    """IPM self-similar smoke discovery + CAP bundle (scaffold until absolute gates)."""
+    """IPM self-similar CubicGN discovery + CAP remainder leftover."""
 
     name: str = "ipm"
     n: int = 12
@@ -214,6 +214,12 @@ class IPMAdapter:
         from omnibias.pinn.jax.discovery import ipm
         from omnibias.pinn.jax.discovery.lambda_laws import predict_lambda_init
 
+        optimizer = str(kwargs.get("optimizer", "cubic_gn"))
+        if optimizer.lower() in {"adam", "sgd"}:
+            raise ValueError(
+                "IPMAdapter earn path forbids Adam/SGD; use CubicGN "
+                f"(got optimizer={optimizer!r})"
+            )
         order = int(kwargs.get("order", 1))
         if "lam_init" in kwargs:
             lam0 = float(kwargs["lam_init"])
@@ -224,6 +230,7 @@ class IPMAdapter:
             lam_init=lam0,
             seed=int(seed),
             steps=int(kwargs.get("steps", self.steps)),
+            method="cubic",
         )
         out = ipm.run_ipm_discovery(cfg)
         max_r = max(
@@ -236,7 +243,7 @@ class IPMAdapter:
             "lam": float(out["lam"]),
             "max_abs_residual": max_r,
             "claimed_order": order,
-            "optimizer": "adam_smoke_scaffold",
+            "optimizer": "cubic_gn",
             "result": out,
         }
 
@@ -249,7 +256,7 @@ class IPMAdapter:
 
 @dataclass
 class BoussinesqAdapter:
-    """Boussinesq self-similar smoke discovery + CAP (scaffold until absolute gates)."""
+    """Boussinesq self-similar CubicGN discovery + CAP remainder leftover."""
 
     name: str = "boussinesq"
     n: int = 12
@@ -260,6 +267,12 @@ class BoussinesqAdapter:
         from omnibias.pinn.jax.discovery import boussinesq
         from omnibias.pinn.jax.discovery.lambda_laws import predict_lambda_init
 
+        optimizer = str(kwargs.get("optimizer", "cubic_gn"))
+        if optimizer.lower() in {"adam", "sgd"}:
+            raise ValueError(
+                "BoussinesqAdapter earn path forbids Adam/SGD; use CubicGN "
+                f"(got optimizer={optimizer!r})"
+            )
         order = int(kwargs.get("order", 1))
         try:
             lam0 = float(
@@ -274,6 +287,7 @@ class BoussinesqAdapter:
             lam_init=lam0,
             seed=int(seed),
             steps=int(kwargs.get("steps", self.steps)),
+            method="cubic",
         )
         out = boussinesq.run_boussinesq_discovery(cfg)
         max_r = max(
@@ -286,7 +300,7 @@ class BoussinesqAdapter:
             "lam": float(out["lam"]),
             "max_abs_residual": max_r,
             "claimed_order": order,
-            "optimizer": "adam_smoke_scaffold",
+            "optimizer": "cubic_gn",
             "result": out,
         }
 
@@ -297,12 +311,58 @@ class BoussinesqAdapter:
         return build_boussinesq_cap_bundle(dict(raw))
 
 
+@dataclass
+class NSCoreAdapter:
+    """Finite exact-Q NS-core profile search (theory 07-14)."""
+
+    name: str = "ns_core"
+    budget: int = 64
+
+    def discover(self, *, seed: int = 0, **kwargs: Any) -> dict[str, Any]:
+        del seed
+        from omnibias.pinn.jax.discovery.ns_core import run_ns_core_search
+
+        optimizer = str(kwargs.get("optimizer", "score_guided"))
+        if optimizer.lower() in {"adam", "sgd"}:
+            raise ValueError(
+                "NSCoreAdapter forbids Adam/SGD; use the exact-Q score-guided "
+                f"search (got optimizer={optimizer!r})"
+            )
+        payload = run_ns_core_search(
+            budget=int(kwargs.get("budget", self.budget)),
+            collect=bool(kwargs.get("collect", False)),
+            proposer=str(kwargs.get("proposer", "score_guided")),
+        )
+        payload["lam"] = 0.0
+        payload["max_abs_residual"] = 0.0 if payload.get("status") == "PROVED" else 1.0
+        payload["optimizer"] = "score_guided_exact_q"
+        return payload
+
+    def certify(self, discovery: Mapping[str, Any], **kwargs: Any) -> dict[str, Any]:
+        del kwargs
+        from omnibias.pinn.certified.anisotropic import honesty_payload
+
+        return {
+            "schema_version": "ns-core-search-1",
+            "status": discovery.get("status"),
+            "search_incomplete": bool(discovery.get("search_incomplete", False)),
+            "non_origin_witnesses": list(discovery.get("non_origin_witnesses", [])),
+            "origin_only": bool(discovery.get("origin_only", False)),
+            "honesty": {
+                **honesty_payload(),
+                "navier_stokes_proof_claim": False,
+                "forced_blowup_reproof_claim": False,
+            },
+        }
+
+
 __all__ = [
     "BoussinesqAdapter",
     "CCFHardyAdapter",
     "CCF_RUNG1_LAMBDA",
     "CCF_RUNG1_RESIDUAL_GATE",
     "IPMAdapter",
+    "NSCoreAdapter",
     "PipelineConfig",
     "PipelineResult",
     "ProblemAdapter",

@@ -1,6 +1,6 @@
 # omnibias theory program
 
-This tree is the **forward-looking research program**: 114 implementation-ready
+This tree is the **forward-looking research program**: 115 implementation-ready
 specs that extend the omnibias primitive beyond what ships today.
 
 It is not the shipped documentation. [`docs/theory.md`](../docs/theory.md) is the
@@ -180,9 +180,9 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | shipped | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | shipped | Claim ladder + forbidden-claims register; guards in core tests |
-| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | shipped | G1–G5 **earned** (42 packages, 113/113 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
+| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | shipped | G1–G5 **earned** (42 packages, 118/118 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | Monograph spine only; no `book/` tree; drafting still forbidden |
-| [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | shipped | Publish-and-use order for the shipped object; obligation-3 `jet_vs_nested_ad` earned; extract / paper / external stay later; CCF and Group 09 are not the public face |
+| [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | shipped | `PUBLIC_SURFACE` frozen; methods outline is jet-vs-AD 1-D Poisson; extract / paper / external stay later; CCF and Group 09 are not the public face |
 
 ### 07 Frontier sub-obligations
 
@@ -193,7 +193,7 @@ parent. An agent may judge that parent solved; runtime flags stay earned.
 |---|---|---|
 | [07-01 sub-obligation ledger](07-frontier/01-sub-obligation-ledger.md) | shipped | Parent, sub-obligation, gate, sealed scope, never-write, distance; RH row is a planned Lambda program |
 | [07-02 Navier-Stokes adjacent](07-frontier/02-navier-stokes-adjacent.md) | shipped | Weak-form width split + exact-jet Lohner; G1–G6 CI; founding bias collapse, not temperature collapse; not a continuum regularity claim |
-| [07-03 CCF campaign acceleration](07-frontier/03-ccf-campaign-acceleration.md) | gated | A basis-level attack on the recorded dictionary floor |
+| [07-03 CCF campaign acceleration](07-frontier/03-ccf-campaign-acceleration.md) | gated | Stretch leftover-recorded #55; Hardy N>0 dictionary; never weaken `1e-13`; not Euler/NS |
 | [07-04 Yang-Mills adjacent](07-frontier/04-yang-mills-adjacent-holonomy-and-gap.md) | shipped | Holonomy trials, 6j / 3-plaquette Hamiltonians, two-scale polymer, Lipschitz SU(3) Haar, and a 2+1-D strip; G4 Gram conditioning CI; the mass gap stays external |
 | [07-05 spectral floors and positivity](07-frontier/05-spectral-floors-and-positivity.md) | shipped | Multi-pack trial spaces + arrangement-adapted SOS; G1–G6 CI; founding bias collapse, not temperature collapse; not a continuum spectral gap or Yang-Mills mass gap |
 | [07-06 validated dynamics and orbits](07-frontier/06-validated-dynamics-and-orbits.md) | shipped | Exact-Jacobian jet Lohner + width budget; G1–G6 CI; founding bias collapse, not temperature collapse; finite horizon, not a continuum existence theorem |
@@ -203,6 +203,10 @@ parent. An agent may judge that parent solved; runtime flags stay earned.
 | [07-10 stress cone](07-frontier/10-admissible-stress-cone.md) | shipped | Exact 2x2 cone membership + scale ledger; G1–G5 CI; founding bias collapse, not temperature collapse; not a forced-blowup reproof |
 | [07-11 weighted class](07-frontier/11-weighted-coefficient-class.md) | shipped | Fixed-order W/M/S bound + finite Gevrey majorant; G1–G5 CI; not a Gevrey theorem; not a forced-blowup reproof |
 | [07-12 heat + pulse](07-frontier/12-heat-exterior-pulse-envelope.md) | shipped | Radial m=1 swirl-heat identity + exact-D envelope; G1–G6 CI; h=0 CI plant; not a 3-D heat theorem |
+| [07-13 jet-flat forced blowup](07-frontier/13-jet-flat-forced-blowup.md) | shipped | Axis-flat leading stress + bounded core energy; G1–G6 CI; not Clay (C)/(D); not a forced-blowup reproof |
+| [07-14 similarity profile search](07-frontier/14-similarity-profile-search.md) | shipped | Finite axis-regular jet family + profile residual + cone reject; G1–G5 CI; founding bias collapse, not temperature collapse; not a forced-blowup reproof |
+| [07-15 IPM remainder CAP](07-frontier/15-ipm-remainder-cap.md) | shipped | CubicGN + smoke-grid residual hull; leftover #53 toy radii only; G1–G5 CI; not Navier-Stokes |
+| [07-16 Boussinesq remainder CAP](07-frontier/16-boussinesq-remainder-cap.md) | shipped | CubicGN twin + leftover #54; G1–G5 CI; lambda_n stays a hypothesis; not Navier-Stokes |
 
 ### 08 Tower-native training
 

@@ -837,8 +837,11 @@ live on [ipm_radii.md](ipm_radii.md). `navier_stokes_proof_claim` stays
         - interval_trapezoid_bound
         - build_ipm_cap_bundle
         - build_ipm_radii_construction
+        - enclose_ipm_grid_residual
         - ipm_banded_toy_radii
         - export_ipm_toy_cap_replay
+        - enclose_boussinesq_grid_residual
+        - build_boussinesq_cap_bundle
         - compactification_map_interval
         - coefficient_interval_boxes
         - certified_tail_bounds_from_artifact

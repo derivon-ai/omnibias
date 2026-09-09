@@ -258,7 +258,20 @@ weighted class (07-11; fixed-order W/M/S bound + finite
 Gevrey majorant; G1–G5 CI; not a Gevrey theorem),
 swirl-heat + pulse envelope (07-12; radial m=1 identity +
 exact-D envelope; G1–G6 CI; h=0 CI plant; not a 3-D heat
-theorem). Cost /
+theorem),
+jet-flat forced concentrating field (07-13; axis-flat leading
+stress + bounded core energy; G1–G6 CI; not Clay C/D; not a
+forced-blowup reproof),
+NS-core profile search (07-14, **shipped**; finite axis-regular
+jet family + profile residual + cone reject; G1–G5 CI;
+founding bias collapse, not temperature collapse; not a
+forced-blowup reproof),
+IPM remainder CAP (07-15, **shipped**; CubicGN + smoke-grid
+residual hull; leftover #53 toy radii only; G1–G5 CI; not
+Navier-Stokes),
+Boussinesq remainder CAP (07-16, **shipped**; CubicGN twin;
+leftover #54; G1–G5 CI; lambda_n stays a hypothesis; not
+Navier-Stokes). Cost /
 wall-time / FermiNet-many-body gates are
 smoke-earned, not in CI `all_passed`.
 

@@ -342,7 +342,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Honesty and claim boundaries** ([06-02](honesty.md)): claim
   ladder + forbidden-claims register. Design record. Status is
   **shipped**.
-- **Packaging and rollout** (06-03): G1–G5 earned (113/113 homes).
+- **Packaging and rollout** (06-03): G1–G5 earned (118/118 homes).
   G4/G5 vacuous, not promoted. Status is **shipped**.
 - **Public primitive** (06-05): citation path; extract / paper /
   external stay later. Status is **shipped**.
@@ -375,6 +375,18 @@ gates are earned on smoke, not in CI `all_passed`.
   bound, not a Gevrey theorem. Status is **shipped**.
 - **Swirl heat + pulse** ([07-12](api/swirl_heat_pulse.md)): radial
   `m = 1` identity plus exact-`D` envelope. Status is **shipped**.
+- **Jet-flat forced field** ([07-13](api/forced_flat_blowup.md)):
+  axis-flat leading stress plus bounded core energy. Not a Clay
+  (C)/(D) reproof. Status is **shipped**.
+- **Similarity profile search** ([07-14](api/ns_core_search.md)):
+  finite axis-regular jet family scored on the profile residual,
+  not `R = r^2`. Not a forced-blowup reproof. Status is **shipped**.
+- **IPM remainder CAP** ([07-15](api/ipm_remainder_cap.md)):
+  CubicGN plus a smoke-grid residual hull. Leftover #53: only the
+  banded toy radii closes. Not Navier-Stokes. Status is **shipped**.
+- **Boussinesq remainder CAP** ([07-16](api/boussinesq_remainder_cap.md)):
+  CubicGN twin. Leftover #54. `lambda_n` stays a hypothesis. Not
+  Navier-Stokes. Status is **shipped**.
 - **Training-idea ledger** (08-01): recommended stack; trainers do
   not clear Hilbert stretch. Design record. Status is **shipped**.
 - **Composed curvature** ([08-02](api/composed_curvature.md)): slice

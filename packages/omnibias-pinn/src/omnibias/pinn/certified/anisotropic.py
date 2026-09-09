@@ -16,10 +16,12 @@ an extension of :mod:`omnibias.pinn.certified.navier_stokes`.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from fractions import Fraction
 from typing import Any
 
+from omnibias.core.proof.discovery import ExactCheck, Statement
+from omnibias.core.proof.obligations.stress_cone import ConeQuery, check_cone
 from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.jet_mv import jet_multiply
 from omnibias.core.verified.taylor_model import TaylorModel
@@ -98,30 +100,34 @@ class ProfileJet:
 
 @dataclass(frozen=True)
 class AxisRegularProfile:
-    """Polynomial swirl ``F = c (1 + a X)`` so ``E / sqrt(2X)`` is polynomial.
+    """Polynomial swirl ``F = c (1 + a X + quad X^2)``.
 
-    ``U = eta * X`` vanishes on the axis in ``X``; ``Pi`` is the exact
-    radial integral of ``E^2 / (2X) = F^2``.
+    The 07-09 lock is ``quad = 0`` and ``U = eta * X``. The 07-14 search
+    family uses the same ``F`` with a quadratic term and the poly
+    radial velocity ``U_poly = eta * X * (1 + a X + quad X^2)``.
+    ``Pi`` is the exact radial integral of ``E^2 / (2X) = F^2``.
     """
 
     h: Fraction
     c: Fraction
     a: Fraction
+    quad: Fraction = Fraction(0)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "h", _as_frac(self.h))
         object.__setattr__(self, "c", _as_frac(self.c))
         object.__setattr__(self, "a", _as_frac(self.a))
+        object.__setattr__(self, "quad", _as_frac(self.quad))
 
     @property
     def scales(self) -> SimilarityScales:
         return SimilarityScales(self.h)
 
     def F(self, X: Fraction) -> Fraction:
-        return self.c * (1 + self.a * X)
+        return self.c * (1 + self.a * X + self.quad * X * X)
 
     def F_X(self, X: Fraction) -> Fraction:
-        return self.c * self.a
+        return self.c * (self.a + 2 * self.quad * X)
 
     def F_eta(self, X: Fraction) -> Fraction:
         return Fraction(0)
@@ -131,17 +137,49 @@ class AxisRegularProfile:
         return ProfileJet(self.F(X), self.F_X(X), self.F_eta(X))
 
     def U(self, X: Fraction, eta: Fraction) -> Fraction:
+        """07-09 lock: ``U = eta * X`` (independent of the swirl poly)."""
         return eta * X
+
+    def U_poly(self, X: Fraction, eta: Fraction) -> Fraction:
+        """Search-family velocity ``U = eta * X * (1 + a X + quad X^2)``."""
+        return eta * X * (1 + self.a * X + self.quad * X * X)
+
+    def U_poly_X(self, X: Fraction, eta: Fraction) -> Fraction:
+        return eta * (1 + 2 * self.a * X + 3 * self.quad * X * X)
 
     def Pi(self, X: Fraction) -> Fraction:
         """Exact antiderivative of ``F^2`` with ``Pi(0) = 0``."""
         c2 = self.c * self.c
         a = self.a
-        return c2 * (X + a * X * X + (a * a * X * X * X) / 3)
+        q = self.quad
+        return c2 * (
+            X
+            + a * X * X
+            + (a * a + 2 * q) * X * X * X / 3
+            + (a * q) * X * X * X * X / 2
+            + (q * q) * X * X * X * X * X / 5
+        )
+
+    def Pi_X(self, X: Fraction) -> Fraction:
+        """Exact ``partial_X Pi``. Equals ``F^2`` on this family."""
+        c2 = self.c * self.c
+        a = self.a
+        q = self.quad
+        return c2 * (
+            1
+            + 2 * a * X
+            + (a * a + 2 * q) * X * X
+            + 2 * a * q * X * X * X
+            + q * q * X * X * X * X
+        )
 
     def V0(self, X: Fraction, eta: Fraction) -> Fraction:
-        """Incompressibility fragment: ``V_0 = -X U_X`` at this lock."""
+        """Incompressibility fragment for the 07-09 lock ``U = eta X``."""
         return -(X * eta)
+
+    def V0_poly(self, X: Fraction, eta: Fraction) -> Fraction:
+        """Incompressibility ``V_0 = -X U_X`` on the search-family ``U``."""
+        return -(X * self.U_poly_X(X, eta))
 
 
 def locked_axis_regular_profile() -> AxisRegularProfile:
@@ -303,7 +341,10 @@ def axis_germ(
         raise ValueError(f"axis germ order must be >= 1, got {order}")
     coeffs = [Interval.point(0.0) for _ in range(order + 1)]
     coeffs[0] = Interval.from_rational(prof.c)
-    coeffs[1] = Interval.from_rational(prof.c * prof.a)
+    if order >= 1:
+        coeffs[1] = Interval.from_rational(prof.c * prof.a)
+    if order >= 2:
+        coeffs[2] = Interval.from_rational(prof.c * prof.quad)
     return TaylorModel(0.0, float(radius), coeffs, Interval.point(0.0))
 
 
@@ -325,6 +366,8 @@ def profile_jet_coeffs(profile: AxisRegularProfile | None = None, order: int = 1
     coeffs[0] = prof.c
     if order >= 1:
         coeffs[1] = prof.c * prof.a
+    if order >= 2:
+        coeffs[2] = prof.c * prof.quad
     return tuple(coeffs)
 
 
@@ -379,6 +422,220 @@ def locked_profile_residual_abs(
     return residual_plus_div(LOCKED_R).__abs__()
 
 
+NS_CORE_C_BOX: tuple[Fraction, ...] = (Fraction(-1), Fraction(1), Fraction(2))
+NS_CORE_A_BOX: tuple[Fraction, ...] = (Fraction(-1), Fraction(1), Fraction(3))
+NS_CORE_B_BOX: tuple[Fraction, ...] = (Fraction(-1), Fraction(0), Fraction(1))
+NS_CORE_ORIGIN: tuple[Fraction, Fraction, Fraction] = (
+    Fraction(1),
+    Fraction(1),
+    Fraction(0),
+)
+NS_CORE_SECOND_WITNESS: tuple[Fraction, Fraction, Fraction] = (
+    Fraction(1),
+    Fraction(3),
+    Fraction(-1),
+)
+NS_CORE_OPPOSITE: tuple[Fraction, Fraction, Fraction] = (
+    Fraction(-1),
+    Fraction(-1),
+    Fraction(0),
+)
+NS_CORE_TARGET_T: Fraction = Fraction(1)
+
+
+def profile_from_coeffs(
+    c: Fraction | int | str,
+    a: Fraction | int | str,
+    b: Fraction | int | str = 0,
+    *,
+    h: Fraction | int | str = LOCKED_H,
+) -> AxisRegularProfile:
+    """Axis-regular germ ``F = c (1 + a X + b X^2)``."""
+    return AxisRegularProfile(h=_as_frac(h), c=_as_frac(c), a=_as_frac(a), quad=_as_frac(b))
+
+
+def implied_stress(profile: AxisRegularProfile) -> tuple[Fraction, Fraction]:
+    """Coefficient-space stress ``T = (c, a)`` for the 07-10 cone."""
+    return (profile.c, profile.a)
+
+
+def profile_similarity_residual(
+    profile: AxisRegularProfile,
+    *,
+    X: Fraction = LOCKED_X,
+    eta: Fraction = LOCKED_ETA,
+    b: Fraction = LOCKED_B,
+    target: Fraction = NS_CORE_TARGET_T,
+) -> Fraction:
+    """Profile-PDE residual ``T_b(F) - target`` at a named similarity point.
+
+    This is **not** the independent plant ``R = r^2``.
+    """
+    values = lemma_41_values(profile, X=X, eta=eta, b=b)
+    return values["T_b"] - target
+
+
+def enclose_profile_residual(residual: Fraction) -> Interval:
+    """Sound enclosure of an exact-``Q`` residual."""
+    return Interval.from_rational(residual)
+
+
+def residual_enclosure_verdict(box: Interval) -> str:
+    """``PROVED`` only on ``{0}``; exclusion of 0 is ``DISPROVED``."""
+    if box.lo == 0.0 and box.hi == 0.0:
+        return "PROVED"
+    if box.hi < 0.0 or box.lo > 0.0:
+        return "DISPROVED"
+    return "BLOCKED"
+
+
+def ns_core_statement() -> Statement:
+    return Statement(
+        name="ns_core_profile_search",
+        obligation=(
+            "a second axis-regular jet in the finite (c, a, b) box whose "
+            "profile-PDE residual is {0} and whose implied T is interior-cone"
+        ),
+        parent="Navier-Stokes forced blowup (Clay C/D)",
+        parent_status="already_true",
+        existential=True,
+    )
+
+
+def _in_box(
+    candidate: tuple[Fraction, Fraction, Fraction],
+) -> bool:
+    c, a, b = candidate
+    return c in NS_CORE_C_BOX and a in NS_CORE_A_BOX and b in NS_CORE_B_BOX
+
+
+def _as_coeff_triple(candidate: Any) -> tuple[Fraction, Fraction, Fraction] | None:
+    if not isinstance(candidate, tuple) or len(candidate) != 3:
+        return None
+    try:
+        triple = (
+            _as_frac(candidate[0]),
+            _as_frac(candidate[1]),
+            _as_frac(candidate[2]),
+        )
+    except (TypeError, ValueError, ZeroDivisionError):
+        return None
+    if not _in_box(triple):
+        return None
+    return triple
+
+
+def check_ns_core_candidate(candidate: Any) -> ExactCheck | None:
+    """Exact 07-14 witness test: Lemma 4.1, cone, profile residual."""
+    triple = _as_coeff_triple(candidate)
+    if triple is None:
+        return None
+    c, a, b = triple
+    profile = profile_from_coeffs(c, a, b)
+    values = lemma_41_values(profile)
+    residual = values["T_b"] - NS_CORE_TARGET_T
+    enclosure = enclose_profile_residual(residual)
+    verdict = residual_enclosure_verdict(enclosure)
+    pi_res = profile.Pi_X(LOCKED_X) - profile.F(LOCKED_X) * profile.F(LOCKED_X)
+    incompress = profile.V0_poly(LOCKED_X, Fraction(1, 2)) + LOCKED_X * profile.U_poly_X(
+        LOCKED_X, Fraction(1, 2)
+    )
+    germ = axis_germ(profile, order=2)
+    germ_zero = germ.remainder.lo == 0.0 and germ.remainder.hi == 0.0
+    cone = check_cone(
+        ConeQuery(
+            v1=(Fraction(1), Fraction(0)),
+            v2=(Fraction(0), Fraction(1)),
+            T=implied_stress(profile),
+            sense="gt",
+            name=f"ns_core_{c}_{a}_{b}",
+        )
+    )
+    residual_ok = verdict == "PROVED" and residual == 0
+    identities_ok = pi_res == 0 and incompress == 0 and germ_zero
+    ok = residual_ok and identities_ok and cone.holds
+    honesty = honesty_payload()
+    return ExactCheck(
+        ok=ok,
+        payload={
+            "c": str(c),
+            "a": str(a),
+            "b": str(b),
+            "is_origin": triple == NS_CORE_ORIGIN,
+            "T_b": str(values["T_b"]),
+            "Z_b": str(values["Z_b"]),
+            "profile_residual": str(residual),
+            "residual_verdict": verdict,
+            "enclosure": {"lo": enclosure.lo, "hi": enclosure.hi},
+            "pi_identity": str(pi_res),
+            "incompressibility": str(incompress),
+            "axis_remainder_zero": germ_zero,
+            "cone": cone.to_mapping(),
+            "cone_status": cone.strength,
+            "cone_reason": cone.reason,
+            "external_premises": [
+                "WKB pulses / joining / cutoff of the constructed blowup",
+                "analytic classes of the slow base and high-frequency packets",
+            ],
+            "equation": {
+                "kind": "polynomial_identity",
+                "pretty": "T_b(F) - 1 = 0 at (X, eta) = (1, 0)",
+                "coefficients": (str(c), str(a), str(b)),
+            },
+            "honesty": honesty,
+        },
+    )
+
+
+@dataclass
+class NSCoreProfileFamily:
+    """Finite ``(c, a, b)`` box of axis-regular jets (theory 07-14)."""
+
+    name: str = "ns_core_profile_search"
+    complete: bool = True
+    statement: Statement = field(default_factory=ns_core_statement)
+
+    def cardinality(self) -> int:
+        return len(NS_CORE_C_BOX) * len(NS_CORE_A_BOX) * len(NS_CORE_B_BOX)
+
+    def origin(self) -> tuple[Fraction, Fraction, Fraction]:
+        return NS_CORE_ORIGIN
+
+    def neighbors(
+        self, candidate: Any
+    ) -> Sequence[tuple[Fraction, Fraction, Fraction]]:
+        triple = _as_coeff_triple(candidate)
+        if triple is None:
+            return ()
+        c, a, b = triple
+        out: list[tuple[Fraction, Fraction, Fraction]] = []
+        for box, value, rebuild in (
+            (NS_CORE_C_BOX, c, lambda x: (x, a, b)),
+            (NS_CORE_A_BOX, a, lambda x: (c, x, b)),
+            (NS_CORE_B_BOX, b, lambda x: (c, a, x)),
+        ):
+            try:
+                idx = box.index(value)
+            except ValueError:
+                continue
+            if idx > 0:
+                out.append(rebuild(box[idx - 1]))
+            if idx + 1 < len(box):
+                out.append(rebuild(box[idx + 1]))
+        return tuple(out)
+
+    def score(self, candidate: Any) -> Fraction:
+        triple = _as_coeff_triple(candidate)
+        if triple is None:
+            return Fraction(-10**6)
+        profile = profile_from_coeffs(*triple)
+        residual = profile_similarity_residual(profile)
+        return -abs(residual)
+
+    def check(self, candidate: Any) -> ExactCheck | None:
+        return check_ns_core_candidate(candidate)
+
+
 __all__ = [
     "AxisRegularProfile",
     "LOCKED_A_POLY",
@@ -388,22 +645,37 @@ __all__ = [
     "LOCKED_H",
     "LOCKED_R",
     "LOCKED_X",
+    "NSCoreProfileFamily",
+    "NS_CORE_A_BOX",
+    "NS_CORE_B_BOX",
+    "NS_CORE_C_BOX",
+    "NS_CORE_OPPOSITE",
+    "NS_CORE_ORIGIN",
+    "NS_CORE_SECOND_WITNESS",
+    "NS_CORE_TARGET_T",
     "ProfileJet",
     "SimilarityScales",
     "apply_T_b",
     "apply_Z_b",
     "assert_honesty",
     "axis_germ",
+    "check_ns_core_candidate",
     "coefficient_source_jet",
+    "enclose_profile_residual",
     "honesty_payload",
+    "implied_stress",
     "leading_tangential_residual",
     "lemma_41_values",
     "locked_axis_regular_profile",
     "locked_profile_residual_abs",
     "locked_residual_poly",
+    "ns_core_statement",
+    "profile_from_coeffs",
     "profile_jet_coeffs",
     "profile_operators",
+    "profile_similarity_residual",
     "radial_div",
+    "residual_enclosure_verdict",
     "residual_plus_div",
     "stress_from_residual_poly",
 ]

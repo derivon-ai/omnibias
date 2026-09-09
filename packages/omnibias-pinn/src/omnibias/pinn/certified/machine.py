@@ -622,6 +622,22 @@ def build_default_machine() -> ProofMachine:
     return machine
 
 
+def _ns_core_factory(**kwargs: Any) -> Any:
+    from omnibias.core.proof.discovery import run_discovery
+    from omnibias.pinn.certified.anisotropic import (
+        NSCoreProfileFamily,
+        ns_core_statement,
+    )
+
+    return run_discovery(
+        ns_core_statement(),
+        NSCoreProfileFamily(),
+        str(kwargs.get("proposer", "score_guided")),
+        budget=int(kwargs.get("budget", 64)),
+        collect=bool(kwargs.get("collect", False)),
+    )
+
+
 def _register() -> None:
     enclosure = (
         "clm_blowup",
@@ -656,11 +672,29 @@ def _register() -> None:
                 "honesty": {"navier_stokes_proof_claim": False},
             },
         )
+    register_catalog(
+        CatalogEntry(
+            kind="ns_core_profile_search",
+            obligation=(
+                "a second axis-regular jet whose profile-PDE residual is "
+                "{0} and whose implied T is interior-cone (not a Clay C/D "
+                "reproof)"
+            ),
+            parent="Navier-Stokes forced blowup (Clay C/D)",
+            parent_status="already_true",
+            package="omnibias.pinn.certified",
+            mode="exact_search",
+            complete=True,
+            existential=True,
+        ),
+        lambda **k: _ns_core_factory(**k),
+    )
     for kind in (
         "anisotropic_profile",
         "weighted_class",
         "swirl_heat_identity",
         "pulse_envelope",
+        "jet_flat_forced_blowup",
     ):
         register_catalog(
             CatalogEntry(

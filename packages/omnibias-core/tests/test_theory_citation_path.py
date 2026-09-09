@@ -127,10 +127,15 @@ def test_index_row_is_shipped_and_later_extract_stays_later() -> None:
     assert row is not None, "theory/README.md lost the 06-05 index row"
     assert row.group(1) == "shipped"
     text = _spec_text()
+    assert "PUBLIC_SURFACE_FROZEN = True" in text
+    assert re.search(r"- \[x\] Freeze `PUBLIC_SURFACE`", text)
     assert re.search(
-        r"- \[ \] Later: freeze / extract `PUBLIC_SURFACE`",
+        r"- \[ \] Later: extract `PUBLIC_SURFACE`",
         text,
     ), "extract must stay a later item, not this pass"
+    assert "Methods-paper outline" in text
+    assert "1-D Poisson" in text
+    assert "not CCF" in text.lower() or "not CCF stretch" in text
 
 
 def test_citation_path_self_checks() -> None:

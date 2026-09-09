@@ -1,0 +1,56 @@
+{
+  "schema": "omnibias.benchmarks.ipm_remainder_cap.v1",
+  "generated_utc": "2026-09-08T21:36:01Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "ipm",
+    "full": false,
+    "leftover": {
+      "leftover_id": 53,
+      "leftover_recorded": true,
+      "named_closing_object": "ipm_banded_toy_radii",
+      "note": "full streamfunction-Poisson remainder stays external; only the banded Fourier toy radii closes"
+    }
+  },
+  "rss_mb_at_start": 1398.7,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_cubic_gn",
+        "passed": true,
+        "detail": "CubicGN; Adam forbidden"
+      },
+      {
+        "name": "g2_enclosure",
+        "passed": true,
+        "detail": "interval hull contains a truth sample"
+      },
+      {
+        "name": "g3_full_unproved",
+        "passed": true,
+        "detail": "full_ipm_proved stays false"
+      },
+      {
+        "name": "g4_leftover_toy",
+        "passed": true,
+        "detail": "leftover #53: only ipm_banded_toy_radii closes",
+        "leftover_recorded": true
+      },
+      {
+        "name": "g5_honesty",
+        "passed": true,
+        "detail": "not Navier-Stokes"
+      }
+    ]
+  },
+  "wall_seconds": 3.4271854020189494
+}

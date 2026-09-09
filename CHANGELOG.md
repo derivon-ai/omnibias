@@ -6,6 +6,32 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — CCF stretch leftover (theory 07-03)
+
+- Hardy `N>0` `{P,Q}` dictionary did not clear stretch. Leftover #55
+  records that fact. `CCF_STRETCH_RESIDUAL_GATE` stays `1e-13`. Not an
+  Euler/NS claim. Smoke:
+  `docs/benchmarks/reproduce_deepmind_ccf_smoke.json`.
+
+### Added — NS-core profile search (theory 07-14)
+
+- `omnibias.pinn.certified.anisotropic`: finite `(c, a, b)` family
+  of axis-regular jets scored on the similarity residual
+  `T_b(F) - 1`, not the independent plant `R = r^2`. Cone-opposite
+  coefficients are named `BLOCKED`. A non-origin witness
+  `(1, 3, -1)` is in the box. `forced_blowup_reproof_claim` stays
+  false. Smoke: `docs/benchmarks/ns_core_search_smoke.json`.
+
+### Added — IPM / Boussinesq remainder CAP (theory 07-15, 07-16)
+
+- IPM and Boussinesq discovery leave Adam: CubicGN on the closed-form
+  Gaussian-poly jets. Named smoke-grid residual hulls contain a truth
+  sample. `full_ipm_proved` / `full_boussinesq_proved` stay false.
+  Leftover #53: only `ipm_banded_toy_radii` closes. Leftover #54:
+  Boussinesq remainder stays a grid hull; `lambda_n` is a hypothesis.
+  Smokes: `docs/benchmarks/ipm_remainder_cap_smoke.json`,
+  `docs/benchmarks/boussinesq_remainder_cap_smoke.json`.
+
 ### Added — Open-system Lindblad dynamics (theory 09-32)
 
 - `omnibias.core.lindblad`: time-independent GKSL generator as a linear
@@ -25,6 +51,17 @@ distributions is versioned independently under semantic versioning.
   split-real residual plus hard `rho = G G^dag / Tr` cage.
 - Proof-engine kind `lindblad` (modes `positivity` / `steady_state` /
   `relaxation`). Smoke: `docs/benchmarks/lindblad_smoke.json`.
+
+### Added — Jet-flat forced concentrating field (theory 07-13)
+
+- `omnibias.pinn.certified.forced_flat`: paper (4.8)–(4.11) leading
+  stress `T_0` as a regularized axis jet, exact-`Q` correction of
+  the linear slope `a=(1+h)/4` (the `X^2` coefficient does not
+  enter), core `||u||_infty ~ tau^{-A}` and energy
+  `O(tau^{1/2-3h})` monomials, mollifier cutoff plus from-rest
+  ramp. A different weaker object than Clay (C)/(D);
+  `forced_blowup_reproof_claim` stays false. Smoke:
+  `docs/benchmarks/forced_flat_blowup_smoke.json`.
 
 ### Added — NS construction fragments (theory 07-09 .. 07-12)
 

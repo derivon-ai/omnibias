@@ -12,7 +12,7 @@ Hilbert error. 03-10 jet–Padé locates a singularity; it is not a residual.
 The conjugate tower, GN, and certificates are in place — they are not the
 missing piece.
 
-- **Status**: gated
+- **Status**: gated (stretch leftover-recorded #55; Hardy N>0 dictionary did not clear `1e-13`)
 - **Depends on**: 01-01, 01-04, 01-07, 01-12, 03-10, 07-01
 - **Blocks**: none
 
@@ -312,7 +312,9 @@ The gate constants are **not touched**. `CCF_STRETCH_RESIDUAL_GATE` stays
 - [ ] Jet-Padé diagnostic, with a test asserting it never touches
       `omnibias.core.verified.dirichlet`
 - [ ] `deepmind_campaign_tick.py` reporting the new arm's `orders_to_stretch`
-- [ ] Gate constants untouched; test asserting `CCF_STRETCH_RESIDUAL_GATE`
+- [x] Leftover #55: Hardy N>0 `{P,Q}` dictionary did not clear stretch;
+      `CCF_STRETCH_RESIDUAL_GATE` stays `1e-13`; not Euler/NS
+- [x] Gate constants untouched; test asserting `CCF_STRETCH_RESIDUAL_GATE`
       is still `1e-13`
 - [ ] Heavy artifacts under `$OMNIBIAS_SCRATCH`, only gates JSON committed
 - [ ] Index row in `theory/README.md`

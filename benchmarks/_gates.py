@@ -554,6 +554,20 @@ CCF_RESIDUAL_GATE_STABLE = 1e-11
 CCF_RESIDUAL_GATE_1ST_UNSTABLE = 1e-11
 CCF_RESIDUAL_GATE_2ND_UNSTABLE = 1e-6
 CCF_STRETCH_RESIDUAL_GATE = 1e-13
+# Leftover #55: Hardy N>0 {P,Q} dictionary executed; Hilbert catch-22
+# did not move twelve orders. Stretch stays 1e-13. Not Euler/NS.
+CCF_STRETCH_LEFTOVER = {
+    "leftover_id": 55,
+    "leftover_recorded": True,
+    "stretch_gate": 1e-13,
+    "named_attempt": "hardy_N_gt_0_PQ_dictionary",
+    "note": (
+        "Hardy N>0 {P,Q} dictionary did not clear stretch; "
+        "Hilbert catch-22 leftover-recorded. Not an Euler/NS claim."
+    ),
+    "stretch_1e-13_cleared": False,
+    "navier_stokes_proof_claim": False,
+}
 
 
 def ccf_lambda_digits_gate(
@@ -647,7 +661,9 @@ def ccf_absolute_gates(
 
 
 # IPM / Boussinesq scaffold residual floors (promote when discovery upgrades).
-# Gaussian Adam smoke clears ~O(1); tighten when CubicGN/Martens paths land.
+# Leftover #53: 2.0 is not a physically valid remainder gate. Full
+# streamfunction-Poisson stays external; only ipm_banded_toy_radii closes.
+# Do not tighten this floor into an earned remainder claim.
 IPM_SCAFFOLD_RESIDUAL_GATE = 2.0
 BOUSSINESQ_SCAFFOLD_RESIDUAL_GATE = 2.0
 
@@ -710,6 +726,7 @@ __all__ = [
     "CCF_RESIDUAL_GATE_1ST_UNSTABLE",
     "CCF_RESIDUAL_GATE_2ND_UNSTABLE",
     "CCF_RESIDUAL_GATE_STABLE",
+    "CCF_STRETCH_LEFTOVER",
     "CCF_STRETCH_RESIDUAL_GATE",
     "IPM_SCAFFOLD_RESIDUAL_GATE",
     "ccf_absolute_gates",

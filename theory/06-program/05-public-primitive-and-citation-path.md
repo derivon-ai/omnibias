@@ -8,7 +8,7 @@ in which to **publish and use** that object so it can be addressed
 later without being mistaken for Group 09 inventions, a CCF residual,
 or a prize claim.
 
-- **Status**: shipped (G1–G5 document gates earned; obligation-3 `jet_vs_nested_ad` earned; extract / paper / external stay later; design record)
+- **Status**: shipped (G1–G5 document gates earned; obligation-3 `jet_vs_nested_ad` earned; `PUBLIC_SURFACE` frozen as a document list; methods-paper outline is jet-vs-AD 1-D Poisson; extract / paper / external stay later; design record)
 - **Depends on**: 06-01, 06-02, 09-01
 - **Blocks**: none
 
@@ -159,6 +159,24 @@ spec as the first-paper claim fails this spec's G3.
 - Matches obligation 4 after the small surface (obligation 2) is
   frozen. **Allowed** as paper two in the dependency order.
 
+### Methods-paper outline (obligation 3 vehicle)
+
+Showcase is **jets vs nested AD on 1-D Poisson**, not CCF stretch,
+not Group 09, not Clay.
+
+1. **Object (already frozen).** `PUBLIC_SURFACE`: coefficient tables,
+   six `OperatorBlock` roles, `compose_jet` / `mlp_jet`.
+2. **Theorem sentence.** Riccati tower cost vs nested `grad`;
+   bit-identical torch/jax (obligation 4; later paper).
+3. **Method benchmark.** `benchmarks/jet_vs_nested_ad.py` on 1-D
+   Poisson: `mlp_jet` vs nested AD (agreement + order-6 wall); exact-J
+   `GaussNewton` vs named Adam on the same residual. Smoke
+   `docs/benchmarks/jet_vs_nested_ad_smoke.json`.
+4. **Not the vehicle.** CCF Hilbert stretch, Group 08 trainers, Group
+   09 inventions, Clay (C)/(D) or (A)/(B).
+5. **Later.** Extract of `PUBLIC_SURFACE` as an installable; DOI;
+   one external reproduction.
+
 ## 6. Proposed API
 
 Does not exist as a module. The later extract is a **subset** of
@@ -166,6 +184,7 @@ shipped symbols, not a new API.
 
 ```python
 # documentation only — the frozen public surface (already shipped)
+PUBLIC_SURFACE_FROZEN = True
 PUBLIC_SURFACE = (
     "omnibias.core.polynomials.sigmoid_polynomial_coeffs",
     "omnibias.core.polynomials.tanh_polynomial_coeffs",
@@ -248,8 +267,12 @@ for this document itself; the bench smoke is wired separately.
 - [x] `theory/06-program/05-public-primitive-and-citation-path.md`
       (this file); document gates G1–G5 earned by
       `test_theory_citation_path.py`
-- [ ] Later: freeze / extract `PUBLIC_SURFACE` as an installable
-      artifact (not this pass)
+- [x] Freeze `PUBLIC_SURFACE` as the document list (this pass;
+      `PUBLIC_SURFACE_FROZEN = True`)
+- [x] Methods-paper outline: jets vs nested AD on 1-D Poisson
+      (not CCF, not Group 09, not Clay)
+- [ ] Later: extract `PUBLIC_SURFACE` as an installable
+      artifact
 - [ ] Later: algebra + complexity + bit-identity paper
 - [x] `benchmarks/jet_vs_nested_ad.py` plus smoke JSON
       (obligation 3 numerical; extract / paper / external stay later)

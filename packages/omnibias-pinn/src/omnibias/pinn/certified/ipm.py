@@ -20,6 +20,7 @@ from typing import Any
 
 import numpy as np
 from omnibias.core.proof.replay import ReplayRecorder, ReplayTrace
+from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.fourier import ValidatedFourierSeries, Wavevector
 from omnibias.core.verified.kantorovich import radii_polynomial_certificate
 from omnibias.core.verified.radii_spectral import (
@@ -33,6 +34,81 @@ from omnibias.core.verified.radii_spectral import (
     quadratic_radii_certificate,
     tail_inverse_bound_from_banded,
 )
+
+
+IPM_REMAINDER_LEFTOVER = {
+    "leftover_id": 53,
+    "leftover_recorded": True,
+    "named_closing_object": "ipm_banded_toy_radii",
+    "note": (
+        "full streamfunction-Poisson remainder stays external; "
+        "only the banded Fourier toy radii closes"
+    ),
+}
+
+
+def _ipm_residual_numpy(
+    y1: float,
+    y2: float,
+    theta: float,
+    theta_y1: float,
+    theta_y2: float,
+    psi_lap: float,
+    psi_y1: float,
+    psi_y2: float,
+    lam: float,
+) -> tuple[float, float]:
+    omega = -theta_y1
+    u1 = psi_y2
+    u2 = -psi_y1
+    adv = u1 * theta_y1 + u2 * theta_y2
+    r_theta = (1.0 + lam) * (y1 * theta_y1 + y2 * theta_y2) - lam * theta + adv
+    r_psi = psi_lap - omega
+    return r_theta, r_psi
+
+
+def enclose_ipm_grid_residual(discovery: dict[str, Any]) -> dict[str, Any]:
+    """Named interval hull of the smoke-grid residual plus a truth sample.
+
+    The hull contains the independently recomputed sample at grid index 0.
+    It is not a remainder for the full streamfunction-Poisson operator.
+    ``full_ipm_proved`` stays false; leftover #53 records that only
+    :func:`ipm_banded_toy_radii` closes.
+    """
+    theta = np.asarray(discovery["residual_theta"], dtype=np.float64).ravel()
+    psi = np.asarray(discovery["residual_psi"], dtype=np.float64).ravel()
+    packed = np.concatenate([theta, psi])
+    hull = Interval.hull(*(float(x) for x in packed))
+    vin = discovery.get("validation_inputs") or {}
+    truth_ok = False
+    truth = 0.0
+    if vin:
+        truth_rt, truth_rp = _ipm_residual_numpy(
+            float(np.asarray(vin["y1"]).ravel()[0]),
+            float(np.asarray(vin["y2"]).ravel()[0]),
+            float(np.asarray(vin["theta"]).ravel()[0]),
+            float(np.asarray(vin["theta_y1"]).ravel()[0]),
+            float(np.asarray(vin["theta_y2"]).ravel()[0]),
+            float(np.asarray(vin["psi_lap"]).ravel()[0]),
+            float(np.asarray(vin["psi_y1"]).ravel()[0]),
+            float(np.asarray(vin["psi_y2"]).ravel()[0]),
+            float(vin["lambda"]),
+        )
+        truth = float(max(abs(truth_rt), abs(truth_rp)))
+        truth_ok = hull.contains(truth_rt) and hull.contains(truth_rp)
+    return {
+        "lo": hull.lo,
+        "hi": hull.hi,
+        "contains_truth_sample": bool(truth_ok),
+        "truth_sample_abs": truth,
+        "full_ipm_proved": False,
+        "leftover": dict(IPM_REMAINDER_LEFTOVER),
+        "honesty": {
+            "navier_stokes_proof_claim": False,
+            "continuum_pde_claim": False,
+            "full_ipm_proved": False,
+        },
+    }
 
 
 def build_ipm_cap_bundle(discovery: dict[str, Any]) -> dict[str, Any]:
@@ -52,6 +128,8 @@ def build_ipm_cap_bundle(discovery: dict[str, Any]) -> dict[str, Any]:
             "exact_solution_claim": False,
             "formulation": "streamfunction_poisson_residual",
         },
+        "full_ipm_proved": False,
+        "remainder": enclose_ipm_grid_residual(discovery),
     }
 
 
@@ -190,8 +268,10 @@ def export_ipm_toy_cap_replay(result: dict[str, Any]) -> ReplayTrace:
 
 
 __all__ = [
+    "IPM_REMAINDER_LEFTOVER",
     "build_ipm_cap_bundle",
     "build_ipm_radii_construction",
+    "enclose_ipm_grid_residual",
     "export_ipm_toy_cap_replay",
     "ipm_banded_toy_radii",
 ]

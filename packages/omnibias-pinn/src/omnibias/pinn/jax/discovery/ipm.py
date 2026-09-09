@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import jax
 import jax.numpy as jnp
 import numpy as np
 from jax import Array
@@ -19,11 +18,14 @@ class IPMDiscoveryConfig:
     lam_init: float = 0.5
     seed: int = 0
     steps: int = 50
-    lr: float = 1e-2
+    lr: float = 1e-2  # retained for API compatibility; unused on the CubicGN path
+    method: str = "cubic"
 
 
 def run_ipm_discovery(cfg: IPMDiscoveryConfig) -> dict[str, object]:
-    """Fit Gaussian amplitudes for (Theta, Psi) under the streamfunction residual."""
+    """Fit Gaussian amplitudes for (Theta, Psi) by CubicGN (Adam forbidden)."""
+    from omnibias.pinn.jax.discovery.train_gn import GNConfig, gauss_newton_minimize
+
     xs = jnp.linspace(-1.0, 1.0, cfg.n)
     y1, y2 = jnp.meshgrid(xs, xs, indexing="ij")
     y1 = y1.reshape(-1)
@@ -41,26 +43,29 @@ def run_ipm_discovery(cfg: IPMDiscoveryConfig) -> dict[str, object]:
         psi = apsi * y2 * g
         psi_y1 = -2.0 * y1 * psi
         psi_y2 = apsi * g * (1.0 - 2.0 * y2 * y2)
-        # lap(y2 e^{-r^2}) = y2 * (4 r^2 - 6) e^{-r^2} wait: use FD-free closed form
-        # psi = a y2 e^{-r^2}; Delta = a e^{-r^2} ( -4 y2 + 4 y2 r^2 - 2 y2? )
-        # Direct: d11 psi = a y2 (-2 + 4 y1^2) e^{-r^2}
-        #         d22 psi = a [(-2 + 4 y2^2) y2? no] d2(g)= -2 y2 g; d2(y2 g)= g + y2 d2 g
-        #         = g - 2 y2^2 g; d22 = d2(g - 2 y2^2 g)
         psi_lap = apsi * g * (-6.0 * y2 + 4.0 * y2 * (y1 * y1 + y2 * y2))
         return theta, ty1, ty2, psi, psi_y1, psi_y2, psi_lap
 
-    def loss(params: tuple[Array, Array]) -> Array:
+    def residual_fn(params: tuple[Array, Array]) -> Array:
         ath, apsi = params
         th, ty1, ty2, psi, py1, py2, plap = fields(ath, apsi)
         rt, rp = ipm_selfsimilar_residual_samples(
             y1, y2, th, ty1, ty2, psi, py1, py2, plap, lam
         )
-        return jnp.mean(rt * rt + rp * rp)
+        return jnp.concatenate([rt, rp])
 
-    params: tuple[Array, Array] = (a_th, a_psi)
-    for _ in range(cfg.steps):
-        g = jax.grad(loss)(params)
-        params = (params[0] - cfg.lr * g[0], params[1] - cfg.lr * g[1])
+    method = str(cfg.method)
+    if method.lower() in {"adam", "sgd"}:
+        raise ValueError(
+            "run_ipm_discovery earn path forbids Adam/SGD; use CubicGN "
+            f"(got method={method!r})"
+        )
+    params0: tuple[Array, Array] = (a_th, a_psi)
+    params, _losses = gauss_newton_minimize(
+        residual_fn,
+        params0,
+        config=GNConfig(steps=int(cfg.steps), method="cubic", seed=int(cfg.seed)),
+    )
     th, ty1, ty2, psi, py1, py2, plap = fields(*params)
     rt, rp = ipm_selfsimilar_residual_samples(
         y1, y2, th, ty1, ty2, psi, py1, py2, plap, lam
@@ -72,6 +77,7 @@ def run_ipm_discovery(cfg: IPMDiscoveryConfig) -> dict[str, object]:
         "max_abs_residual_theta": float(jnp.max(jnp.abs(rt))),
         "max_abs_residual_psi": float(jnp.max(jnp.abs(rp))),
         "honesty": {"unproven_claim": False, "navier_stokes_proof_claim": False},
+        "optimizer": "cubic_gn",
         "y1": np.asarray(y1),
         "y2": np.asarray(y2),
         "theta": np.asarray(th),

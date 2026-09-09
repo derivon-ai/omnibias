@@ -6,7 +6,6 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-import jax
 import jax.numpy as jnp
 import numpy as np
 from jax import Array
@@ -27,11 +26,12 @@ class BoussinesqDiscoveryConfig:
     lam_init: float = 1.5
     seed: int = 0
     steps: int = 50
-    lr: float = 1e-2
+    lr: float = 1e-2  # retained for API compatibility; unused on CubicGN
     compactified: bool = False
     theta_decay_power: float = 0.0
     psi_decay_power: float = 0.0
     y_max: float = 2.0
+    method: str = "cubic"
 
 
 def _honesty(compactified: bool) -> dict[str, object]:
@@ -93,7 +93,18 @@ def _pack_discovery(
     }
 
 
+def _require_cubic(method: str) -> None:
+    if str(method).lower() in {"adam", "sgd"}:
+        raise ValueError(
+            "run_boussinesq_discovery earn path forbids Adam/SGD; use CubicGN "
+            f"(got method={method!r})"
+        )
+
+
 def _run_compactified(cfg: BoussinesqDiscoveryConfig) -> dict[str, object]:
+    from omnibias.pinn.jax.discovery.train_gn import GNConfig, gauss_newton_minimize
+
+    _require_cubic(cfg.method)
     xs = jnp.linspace(-cfg.y_max, cfg.y_max, cfg.n)
     y1, y2 = jnp.meshgrid(xs, xs, indexing="ij")
     y1 = y1.reshape(-1)
@@ -133,15 +144,18 @@ def _run_compactified(cfg: BoussinesqDiscoveryConfig) -> dict[str, object]:
             out["psi_lap"],
         )
 
-    def loss(p: Array) -> Array:
+    def residual_fn(p: Array) -> Array:
         om, ow1, ow2, th, tw1, tw2, psi, py1, py2, plap = fields_from(p)
         ro, rt, rp = boussinesq_selfsimilar_residual_samples(
             y1, y2, om, ow1, ow2, th, tw1, tw2, psi, py1, py2, plap, lam
         )
-        return jnp.mean(ro * ro + rt * rt + rp * rp)
+        return jnp.concatenate([ro, rt, rp])
 
-    for _ in range(cfg.steps):
-        params = params - cfg.lr * jax.grad(loss)(params)
+    params, _losses = gauss_newton_minimize(
+        residual_fn,
+        params,
+        config=GNConfig(steps=int(cfg.steps), method="cubic", seed=int(cfg.seed)),
+    )
     packed = fields_from(params)
     ro, rt, rp = boussinesq_selfsimilar_residual_samples(
         y1, y2, *packed, lam
@@ -178,7 +192,12 @@ def _run_compactified(cfg: BoussinesqDiscoveryConfig) -> dict[str, object]:
 
 def run_boussinesq_discovery(cfg: BoussinesqDiscoveryConfig) -> dict[str, object]:
     if cfg.compactified:
-        return _run_compactified(cfg)
+        packed = _run_compactified(cfg)
+        packed["optimizer"] = "cubic_gn"
+        return packed
+    from omnibias.pinn.jax.discovery.train_gn import GNConfig, gauss_newton_minimize
+
+    _require_cubic(cfg.method)
     xs = jnp.linspace(0.0, 1.0, cfg.n)
     y1, y2 = jnp.meshgrid(xs, xs, indexing="ij")
     y1 = y1.reshape(-1)
@@ -205,22 +224,20 @@ def run_boussinesq_discovery(cfg: BoussinesqDiscoveryConfig) -> dict[str, object
         )
         return omega, ow1, ow2, theta, tw1, tw2, psi, psi_y1, psi_y2, psi_lap
 
-    def loss(params: tuple[Array, Array, Array]) -> Array:
+    def residual_fn(params: tuple[Array, Array, Array]) -> Array:
         ao, at, ap = params
         om, ow1, ow2, th, tw1, tw2, psi, py1, py2, plap = fields(ao, at, ap)
         ro, rt, rp = boussinesq_selfsimilar_residual_samples(
             y1, y2, om, ow1, ow2, th, tw1, tw2, psi, py1, py2, plap, lam
         )
-        return jnp.mean(ro * ro + rt * rt + rp * rp)
+        return jnp.concatenate([ro, rt, rp])
 
-    params: tuple[Array, Array, Array] = (a_om, a_th, a_psi)
-    for _ in range(cfg.steps):
-        g = jax.grad(loss)(params)
-        params = (
-            params[0] - cfg.lr * g[0],
-            params[1] - cfg.lr * g[1],
-            params[2] - cfg.lr * g[2],
-        )
+    params0: tuple[Array, Array, Array] = (a_om, a_th, a_psi)
+    params, _losses = gauss_newton_minimize(
+        residual_fn,
+        params0,
+        config=GNConfig(steps=int(cfg.steps), method="cubic", seed=int(cfg.seed)),
+    )
     om, ow1, ow2, th, tw1, tw2, psi, py1, py2, plap = fields(*params)
     ro, rt, rp = boussinesq_selfsimilar_residual_samples(
         y1, y2, om, ow1, ow2, th, tw1, tw2, psi, py1, py2, plap, lam
@@ -228,7 +245,7 @@ def run_boussinesq_discovery(cfg: BoussinesqDiscoveryConfig) -> dict[str, object
     # U1 = psi_y2; d_y1 U1 at origin ~ evaluate mixed derivative of ansatz at 0
     u1_y1_0 = float(params[2])  # ap * d/dy1 (y1 g (1-2 y2^2)) at 0 = ap
     lam_inferred = float(infer_lambda_from_streamfunction_u1_y1(u1_y1_0))
-    return _pack_discovery(
+    packed = _pack_discovery(
         lam=float(lam),
         lam_inferred=lam_inferred,
         ro=ro,
@@ -239,6 +256,8 @@ def run_boussinesq_discovery(cfg: BoussinesqDiscoveryConfig) -> dict[str, object
         fields=(om, ow1, ow2, th, tw1, tw2, psi, py1, py2, plap),
         compactified=False,
     )
+    packed["optimizer"] = "cubic_gn"
+    return packed
 
 
 __all__ = ["BoussinesqDiscoveryConfig", "run_boussinesq_discovery"]

@@ -78,6 +78,15 @@
     "continuum_claim": false,
     "arm": "reproduce",
     "hardy_cap_deferred_until_stretch": true,
-    "metric": "wang_vorticity_dense_neural_matched_hilbert"
+    "metric": "wang_vorticity_dense_neural_matched_hilbert",
+    "leftover": {
+      "leftover_id": 55,
+      "leftover_recorded": true,
+      "stretch_gate": 1e-13,
+      "named_attempt": "hardy_N_gt_0_PQ_dictionary",
+      "note": "Hardy N>0 {P,Q} dictionary did not clear stretch; Hilbert catch-22 leftover-recorded. Not an Euler/NS claim.",
+      "stretch_1e-13_cleared": false,
+      "navier_stokes_proof_claim": false
+    }
   }
 }

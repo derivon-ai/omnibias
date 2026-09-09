@@ -406,6 +406,22 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/swirl_heat_pulse.py
+      - name: Run forced-flat-blowup smoke (07-13 G1–G6)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/forced_flat_blowup.py
+      - name: Run NS-core-search smoke (07-14 G1–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/ns_core_search.py
+      - name: Run IPM-remainder-CAP smoke (07-15 G1–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/ipm_remainder_cap.py
+      - name: Run Boussinesq-remainder-CAP smoke (07-16 G1–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/boussinesq_remainder_cap.py
       - name: Run soft-evolution smoke (03-01 G1–G6)
         run: |
           source .venv-cross/bin/activate

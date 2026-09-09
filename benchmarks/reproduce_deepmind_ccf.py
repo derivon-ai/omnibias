@@ -36,6 +36,7 @@ sys.path.insert(0, str(ROOT))
 from _gates import (  # noqa: E402
     CCF_LAMBDA_1ST_UNSTABLE,
     CCF_RESIDUAL_GATE_1ST_UNSTABLE,
+    CCF_STRETCH_LEFTOVER,
     CCF_STRETCH_RESIDUAL_GATE,
     ccf_lambda_digits_gate,
     ccf_residual_gate,
@@ -330,6 +331,7 @@ def run_once(
             "arm": "reproduce",
             "hardy_cap_deferred_until_stretch": not bool(stretch_gate["passed"]),
             "metric": "wang_vorticity_dense_neural_matched_hilbert",
+            "leftover": dict(CCF_STRETCH_LEFTOVER),
         },
     }
     return payload

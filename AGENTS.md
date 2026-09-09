@@ -332,7 +332,7 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   a submodule back out later is cheap; un-shipping a premature distribution is not.
   See the `omnibias-new-package` skill. Theory 06-03 G1–G5 are
   **shipped**; they are
-  earned on `benchmarks/theory_homes.py` (42 packages, 113/113 homes,
+  earned on `benchmarks/theory_homes.py` (42 packages, 118/118 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
   lines, not promoted). Theory 06-05 is **shipped** (document G1–G5;
   extract / paper / external stay later). Theory 07-01 is **shipped**
@@ -781,6 +781,20 @@ by that drift gate.
   `omnibias.core.verified.swirl_heat` + `omnibias.core.pulse_envelope`
   (07-12, **shipped**; radial m=1 identity + exact-D envelope; G1–G6
   CI; h=0 CI plant; not a 3-D heat theorem) /
+  `omnibias.pinn.certified.forced_flat`
+  (07-13, **shipped**; axis-flat leading stress + bounded core energy;
+  G1–G6 CI; founding bias collapse, not temperature collapse; not a
+  forced-blowup reproof) /
+  `omnibias.pinn.certified.anisotropic` + `omnibias.pinn.jax.discovery.ns_core`
+  (07-14, **shipped**; finite axis-regular jet family + profile
+  residual + cone reject; G1–G5 CI; founding bias collapse, not
+  temperature collapse; not a forced-blowup reproof) /
+  `omnibias.pinn.certified.ipm` + `omnibias.pinn.jax.discovery.ipm`
+  (07-15, **shipped**; CubicGN + smoke-grid residual hull; leftover #53
+  toy radii only; G1–G5 CI; not Navier-Stokes) /
+  `omnibias.pinn.certified.boussinesq` + `omnibias.pinn.jax.discovery.boussinesq`
+  (07-16, **shipped**; CubicGN twin; leftover #54; G1–G5 CI;
+  `lambda_n` stays a hypothesis; not Navier-Stokes) /
   `omnibias.pinn.inverse`
   (05-01, **shipped**; G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`;
   global search earned for n=3 only) /
@@ -886,6 +900,10 @@ by that drift gate.
   [`docs/api/stress_cone.md`](docs/api/stress_cone.md),
   [`docs/api/weighted_class.md`](docs/api/weighted_class.md),
   [`docs/api/swirl_heat_pulse.md`](docs/api/swirl_heat_pulse.md),
+  [`docs/api/forced_flat_blowup.md`](docs/api/forced_flat_blowup.md),
+  [`docs/api/ns_core_search.md`](docs/api/ns_core_search.md),
+  [`docs/api/ipm_remainder_cap.md`](docs/api/ipm_remainder_cap.md),
+  [`docs/api/boussinesq_remainder_cap.md`](docs/api/boussinesq_remainder_cap.md),
   [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md),
   [`docs/api/tabpou.md`](docs/api/tabpou.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI
