@@ -342,7 +342,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Honesty and claim boundaries** ([06-02](honesty.md)): claim
   ladder + forbidden-claims register. Design record. Status is
   **shipped**.
-- **Packaging and rollout** (06-03): G1–G5 earned (118/118 homes).
+- **Packaging and rollout** (06-03): G1–G5 earned (119/119 homes).
   G4/G5 vacuous, not promoted. Status is **shipped**.
 - **Public primitive** (06-05): citation path; extract / paper /
   external stay later. Status is **shipped**.
@@ -387,6 +387,10 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Boussinesq remainder CAP** ([07-16](api/boussinesq_remainder_cap.md)):
   CubicGN twin. Leftover #54. `lambda_n` stays a hypothesis. Not
   Navier-Stokes. Status is **shipped**.
+- **Pulse-family composition** ([07-17](api/pulse_family_composition.md)):
+  locked occupancy pulse composed into the 07-13 field. Scale
+  premises untouched. Not a forced-blowup reproof. Status is
+  **shipped**.
 - **Training-idea ledger** (08-01): recommended stack; trainers do
   not clear Hilbert stretch. Design record. Status is **shipped**.
 - **Composed curvature** ([08-02](api/composed_curvature.md)): slice

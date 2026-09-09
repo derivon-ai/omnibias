@@ -16,6 +16,7 @@ from omnibias.pinn.certified.forced_flat import (
     assert_honesty,
     axis_sources,
     axis_T0,
+    compose_locked_pulse_family,
     core_energy_scale,
     core_linfty_scale,
     correct_axis_stress,
@@ -131,6 +132,31 @@ def test_forced_field_payload() -> None:
     assert control["axis_T0"][0] != 0
 
 
+def test_compose_locked_pulse_family() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        NS_SCALE_EXTERNAL_PREMISES,
+    )
+
+    report = compose_locked_pulse_family()
+    assert report["kind"] == "pulse_family_composition"
+    assert report["tower_ok"] is True
+    assert report["composed_axis_zero"] is True
+    assert report["product_rule_ok"] is True
+    assert report["enclosure_ok"] is True
+    assert report["identity_holds"] is True
+    assert report["leftover_id"] is None
+    assert report["honesty"]["navier_stokes_proof_claim"] is False
+    assert report["honesty"]["forced_blowup_reproof_claim"] is False
+    assert report["honesty"]["pulses_leftover"] is False
+    assert report["honesty"]["joining_leftover"] is True
+    assert report["honesty"]["uniqueness_leftover"] is True
+    assert report["honesty"]["c_infinity_through_t1_leftover"] is True
+    assert honesty_payload()["pulses_leftover"] is True
+    assert "construction of each pulse family and the cutoff summation" in (
+        NS_SCALE_EXTERNAL_PREMISES
+    )
+
+
 def test_catalog_kind_is_registered() -> None:
     import omnibias.pinn.certified.machine  # noqa: F401
     from omnibias.core.proof.catalog import catalog_entry
@@ -141,3 +167,8 @@ def test_catalog_kind_is_registered() -> None:
     assert entry.parent_status == "already_true"
     assert entry.kind != "stress_cone"
     assert entry.mode == "exact_replay"
+    composed = catalog_entry("pulse_family_composition")
+    assert composed is not None
+    assert composed.parent == "Navier-Stokes forced blowup (Clay C/D)"
+    assert composed.parent_status == "already_true"
+    assert composed.mode == "exact_replay"

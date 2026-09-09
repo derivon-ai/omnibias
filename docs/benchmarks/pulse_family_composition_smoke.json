@@ -1,0 +1,66 @@
+{
+  "schema": "omnibias.benchmarks.pulse_family_composition.v1",
+  "generated_utc": "2026-09-09T04:43:23Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "pulse_family_composition",
+    "full": false,
+    "honesty": {
+      "unproven_claim": false,
+      "navier_stokes_proof_claim": false,
+      "continuum_navier_stokes_claim": false,
+      "forced_blowup_reproof_claim": false,
+      "continuum_pde_claim": false,
+      "theorem_prover_verified": false,
+      "mathlib_verified": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "c_infinity_through_t1_leftover": true,
+      "pulses_leftover": false,
+      "joining_leftover": true,
+      "uniqueness_leftover": true,
+      "remaining_q_powers_leftover": true
+    },
+    "leftover_id": null
+  },
+  "rss_mb_at_start": 818.7,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_tower_grid",
+        "passed": true,
+        "detail": "P' matches the sigmoid tower on the locked occupancy grid"
+      },
+      {
+        "name": "g2_composed_zero_product_rule",
+        "passed": true,
+        "detail": "corrected P T_0 = (0,0); growth/decay P' T = (\u00b11/2) P T"
+      },
+      {
+        "name": "g3_enclosure",
+        "passed": true,
+        "detail": "P T_rtheta enclosure contains the locked grid and a random sample"
+      },
+      {
+        "name": "g4_honesty",
+        "passed": true,
+        "detail": "parent flags false; 07-17 pulses leftover flipped; cycle leftover named"
+      },
+      {
+        "name": "g5_scale_premises_untouched",
+        "passed": true,
+        "detail": "NS_SCALE_EXTERNAL_PREMISES still names pulse family + cutoff summation"
+      }
+    ]
+  },
+  "wall_seconds": 1.1108845150156412
+}

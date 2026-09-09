@@ -695,6 +695,7 @@ def _register() -> None:
         "swirl_heat_identity",
         "pulse_envelope",
         "jet_flat_forced_blowup",
+        "pulse_family_composition",
     ):
         register_catalog(
             CatalogEntry(

@@ -115,7 +115,9 @@ Types: `AffineForm`, `MinForm`, `StageMap`, `SideCondition`,
 - **G4.** Editing a sealed field invalidates the digest.
 - **G5.** Curated ledgers cannot produce a true parent flag; a
   hand-stamped `True` is refused; an empty-premise discharged toy ledger
-  *does* flip the derived flag. `mathlib_verified` stays false on the
+  with `parent == NS_PARENT` (Clay A/B) *does* flip the derived flag.
+  A discharged empty-premise C/D ledger, or a `"navier"` / `"euler"`
+  substring, does **not**. `mathlib_verified` stays false on the
   kernel path.
 
 ## 9. Benchmark plan
@@ -128,7 +130,9 @@ gates run in CI; the kernel pass is the Lean job.
 
 Lean certifies the **algebra**. It does not define analytic classes,
 construct a correction, or prove a PDE. Clay unforced regularity
-(A)/(B) stays an external obligation. Continuum / thermodynamic limit,
+(A)/(B) stays an external obligation. `navier_stokes_proof_claim`
+requires `parent == NS_PARENT` and empty A/B premises; C/D empty
+premises do not earn it. Continuum / thermodynamic limit,
 Osterwalder–Schrader reconstruction, and a spacing-uniform gap lower
 bound stay an external obligation on the Yang–Mills side. The
 forbidden phrase on the honesty register is unchanged.

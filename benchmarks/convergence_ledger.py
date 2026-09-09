@@ -26,6 +26,7 @@ from omnibias.core.proof.certificate import make_certificate, verify_certificate
 from omnibias.core.proof.obligations.convergence_ledger import (
     check_ledger,
     curated_convergence_ledgers,
+    empty_premise_cd_ledger,
     empty_premise_discharged_ledger,
     failing_margin_ledger,
     honesty_payload,
@@ -142,6 +143,8 @@ def _run_g5() -> dict[str, Any]:
     polymer = seal_ledger_certificate(strong_coupling_polymer_ledger(), run_lean=False)
     slope = check_ledger(unbounded_slope_ledger(holds=True))
     earned = seal_ledger_certificate(empty_premise_discharged_ledger(), run_lean=False)
+    cd = empty_premise_cd_ledger()
+    cd_report = check_ledger(cd)
     honesty = honesty_payload()
     forged = False
     try:
@@ -159,6 +162,8 @@ def _run_g5() -> dict[str, Any]:
         and ns.certificate["honesty"]["navier_stokes_proof_claim"] is False
         and polymer.certificate["honesty"]["yang_mills_mass_gap_claim"] is False
         and earned.certificate["honesty"]["navier_stokes_proof_claim"] is True
+        and cd_report.holds
+        and honesty_payload(cd, cd_report)["navier_stokes_proof_claim"] is False
         and slope.holds
         and not forged
         and honesty["navier_stokes_proof_claim"] is False
@@ -169,8 +174,8 @@ def _run_g5() -> dict[str, Any]:
         "passed": passed,
         "mathlib_verified": False,
         "detail": (
-            "curated ledgers stay CONDITIONAL; empty premises earn the flag; "
-            "a hand-stamped True is refused"
+            "curated ledgers stay CONDITIONAL; empty A/B premises earn the "
+            "flag; empty C/D premises do not; a hand-stamped True is refused"
         ),
     }
 

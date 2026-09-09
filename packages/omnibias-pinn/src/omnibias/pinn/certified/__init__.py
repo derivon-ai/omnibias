@@ -103,6 +103,7 @@ from omnibias.pinn.certified.fluid_rollout import (
 from omnibias.pinn.certified.forced_flat import (
     JetFlatProfile,
     axis_T0,
+    compose_locked_pulse_family,
     core_energy_scale,
     core_linfty_scale,
     correct_axis_stress,
@@ -498,6 +499,7 @@ __all__ = [
     "compactification_map_interval",
     "compactified_coefficient_set",
     "compactified_r3_metadata",
+    "compose_locked_pulse_family",
     "compactified_sandbox_replay_grid",
     "componentwise_radii_polynomial_certificate",
     "conditioning_preserving_ansatz_report",

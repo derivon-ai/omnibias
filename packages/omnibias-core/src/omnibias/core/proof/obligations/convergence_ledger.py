@@ -21,8 +21,12 @@ certificate. ``mathlib_verified`` is a distinct tier and is never
 set here. Parent-level honesty flags
 (``navier_stokes_proof_claim``, ``yang_mills_mass_gap_claim``) are
 **derived**: they become true only when every margin discharges
-**and** ``external_premises`` is empty. They cannot be stamped by
-hand.
+**and** ``external_premises`` is empty. ``navier_stokes_proof_claim``
+additionally requires ``parent == NS_PARENT`` (Clay A/B). A
+discharged C/D ledger, even with empty premises, does not earn it.
+A ``"navier"`` / ``"euler"`` substring is not enough. They cannot
+be stamped by hand. ``forced_blowup_reproof_claim`` is not derived
+here.
 """
 
 from __future__ import annotations
@@ -48,6 +52,7 @@ ClaimStrength = Literal["BLOCKED", "CONDITIONAL", "PROVED"]
 _SENSE_FLIP: dict[Sense, Sense] = {"le": "ge", "lt": "gt", "ge": "le", "gt": "lt"}
 
 NS_PARENT = "Navier-Stokes unforced regularity (Clay A/B)"
+NS_CD_PARENT = "Navier-Stokes forced blowup (Clay C/D)"
 YM_PARENT = "Yang-Mills existence and mass gap (Clay)"
 
 PARENT_CLAIM_KEYS: frozenset[str] = frozenset(
@@ -812,6 +817,11 @@ def claim_strength(ledger: ConvergenceLedger, report: LedgerReport | None = None
     return decided.strength
 
 
+def parent_earns_navier_stokes_claim(parent: str) -> bool:
+    """A/B parent string only. C/D must not earn the A/B flag."""
+    return str(parent).strip() == NS_PARENT
+
+
 def derived_parent_flags(
     ledger: ConvergenceLedger,
     report: LedgerReport | None = None,
@@ -819,12 +829,13 @@ def derived_parent_flags(
     """Parent flags earned only by a discharged ledger with empty premises."""
     decided = report if report is not None else check_ledger(ledger)
     earned = decided.holds and not ledger.external_premises
-    parent = ledger.parent.lower()
+    parent = ledger.parent
+    parent_l = parent.lower()
     return {
         "navier_stokes_proof_claim": earned
-        and ("navier" in parent or "euler" in parent),
+        and parent_earns_navier_stokes_claim(parent),
         "yang_mills_mass_gap_claim": earned
-        and ("yang" in parent or "mills" in parent),
+        and ("yang" in parent_l or "mills" in parent_l),
     }
 
 
@@ -853,11 +864,12 @@ def payload_earns_parent_claim(payload: Mapping[str, Any], key: str) -> bool:
         return False
     if nonempty:
         return False
-    parent = str(candidate.get("parent", "")).lower()
+    parent = str(candidate.get("parent", ""))
     if key == "navier_stokes_proof_claim":
-        return "navier" in parent or "euler" in parent
+        return parent_earns_navier_stokes_claim(parent)
     if key == "yang_mills_mass_gap_claim":
-        return "yang" in parent or "mills" in parent
+        parent_l = parent.lower()
+        return "yang" in parent_l or "mills" in parent_l
     return False
 
 
@@ -1192,7 +1204,7 @@ def navier_stokes_scale_ledger() -> ConvergenceLedger:
                 next_quantity=h,
             ),
         ),
-        parent="Navier-Stokes forced blowup (Clay C/D)",
+        parent=NS_CD_PARENT,
         external_premises=NS_SCALE_EXTERNAL_PREMISES,
     )
 
@@ -1249,8 +1261,17 @@ def unbounded_slope_ledger(*, holds: bool) -> ConvergenceLedger:
 
 def empty_premise_discharged_ledger() -> ConvergenceLedger:
     """Toy ledger that earns a parent flag (empty premises, all margins hold)."""
+    return _empty_premise_toy(parent=NS_PARENT, name="empty_premise_toy")
+
+
+def empty_premise_cd_ledger() -> ConvergenceLedger:
+    """Discharged empty-premise C/D ledger: must not earn the A/B flag."""
+    return _empty_premise_toy(parent=NS_CD_PARENT, name="empty_premise_cd_control")
+
+
+def _empty_premise_toy(*, parent: str, name: str) -> ConvergenceLedger:
     return ConvergenceLedger(
-        name="empty_premise_toy",
+        name=name,
         stage=StageMap(var="s", step=Fraction(1), initial=Fraction(0)),
         parameters={},
         side_conditions=(
@@ -1263,7 +1284,7 @@ def empty_premise_discharged_ledger() -> ConvergenceLedger:
                 MinForm.singleton(AffineForm.constant(2)),
             ),
         ),
-        parent=NS_PARENT,
+        parent=parent,
         external_premises=(),
     )
 
@@ -1305,6 +1326,7 @@ __all__ = [
     "LedgerReport",
     "MarginObligation",
     "MinForm",
+    "NS_CD_PARENT",
     "NS_EXTERNAL_PREMISES",
     "NS_PARENT",
     "NS_SCALE_EXTERNAL_PREMISES",
@@ -1320,6 +1342,7 @@ __all__ = [
     "curated_convergence_ledgers",
     "derived_parent_flags",
     "digest_is_valid",
+    "empty_premise_cd_ledger",
     "empty_premise_discharged_ledger",
     "failing_margin_ledger",
     "honesty_payload",
@@ -1327,6 +1350,7 @@ __all__ = [
     "ledger_to_inequality_system",
     "navier_stokes_exponent_ledger",
     "navier_stokes_scale_ledger",
+    "parent_earns_navier_stokes_claim",
     "payload_earns_parent_claim",
     "replay_ledger_certificate",
     "seal_ledger_certificate",

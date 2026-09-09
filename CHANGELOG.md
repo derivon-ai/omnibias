@@ -6,6 +6,23 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — NS parent-flag A/B lock (theory 07-08)
+
+- `navier_stokes_proof_claim` is earned only when a discharged ledger
+  has empty premises **and** `parent == NS_PARENT` (Clay A/B). A
+  discharged empty-premise C/D ledger, or a `"navier"` / `"euler"`
+  substring, does not flip the flag. `forced_blowup_reproof_claim`
+  stays non-derivable.
+
+### Added — Pulse-family composition (theory 07-17)
+
+- Locked occupancy pulse from 07-12 composed into the 07-13 forced
+  field. `P'` matches the tower on a finite grid; corrected
+  `P T_0 = (0,0)`; uncorrected `P T_{rθ}` is enclosed (grid + sample).
+  07-17 flips `pulses_leftover` only for that identity. Scale-ledger
+  premises stay printed. Parent flags stay false. Smoke:
+  `docs/benchmarks/pulse_family_composition_smoke.json`.
+
 ### Added — CCF stretch leftover (theory 07-03)
 
 - Hardy `N>0` `{P,Q}` dictionary did not clear stretch. Leftover #55

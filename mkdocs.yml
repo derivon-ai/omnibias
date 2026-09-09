@@ -206,6 +206,7 @@ nav:
       - NS-core profile search (07-14): api/ns_core_search.md
       - IPM remainder CAP (07-15): api/ipm_remainder_cap.md
       - Boussinesq remainder CAP (07-16): api/boussinesq_remainder_cap.md
+      - pulse-family composition (07-17): api/pulse_family_composition.md
       - soft-population evolution (03-01): api/soft_evolution.md
       - arrangement LP (03-02): api/arrangement_lp.md
       - CSP collapse (03-03): api/csp.md

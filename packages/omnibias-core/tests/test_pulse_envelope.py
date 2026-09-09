@@ -11,11 +11,14 @@ from omnibias.core.pulse_envelope import (
     DECAY_RATE,
     GROWTH_RATE,
     assert_honesty,
+    enclose_pulse_on_box,
     honesty_payload,
     locked_decay_envelope,
     locked_growth_envelope,
     locked_mid_envelope,
+    locked_pulse_grid_matches_tower,
     mollifier_tail_contains_truth,
+    pulse_product_contains_grid_and_sample,
     riccati_sigma_prime,
     tower_sigma_prime,
 )
@@ -36,6 +39,13 @@ def test_g4_pulse_derivative_matches_tower() -> None:
 
 def test_g5_mollifier_tail_contains_truth() -> None:
     assert mollifier_tail_contains_truth(half_width=3.0) is True
+
+
+def test_locked_pulse_grid_and_enclosure() -> None:
+    assert locked_pulse_grid_matches_tower()
+    box = enclose_pulse_on_box()
+    assert box.contains(float(locked_growth_envelope().value()))
+    assert pulse_product_contains_grid_and_sample(Fraction(599, 400))
 
 
 def test_g6_honesty() -> None:

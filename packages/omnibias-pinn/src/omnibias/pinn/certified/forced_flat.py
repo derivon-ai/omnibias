@@ -30,8 +30,15 @@ from fractions import Fraction
 from typing import Any
 
 from omnibias.core.pulse_envelope import (
+    DECAY_RATE,
+    GROWTH_RATE,
     PulseEnvelope,
+    locked_decay_envelope,
+    locked_growth_envelope,
+    locked_pulse_grid,
+    locked_pulse_grid_matches_tower,
     mollifier_tail_contains_truth,
+    pulse_product_contains_grid_and_sample,
 )
 from omnibias.pinn.certified.anisotropic import (
     DX,
@@ -372,6 +379,70 @@ def forced_field(
     return payload
 
 
+def composition_honesty_payload(*, identity_holds: bool) -> dict[str, bool]:
+    """07-17 honesty. Parent flags stay false. Named leftovers stay named.
+
+    ``pulses_leftover`` flips only when the locked-pulse identity holds.
+    Joining, uniqueness, and ``C^infty`` through ``t=1`` stay leftover.
+    """
+    flags = honesty_payload()
+    flags["pulses_leftover"] = not identity_holds
+    return flags
+
+
+def compose_locked_pulse_family() -> dict[str, Any]:
+    """Compose the locked 07-12 pulse grid into the 07-13 forced field.
+
+    One named pulse family. Not cutoff summation, not joining, not a
+    Clay (C)/(D) reproof. Does not trim ``NS_SCALE_EXTERNAL_PREMISES``.
+    """
+    tower_ok = locked_pulse_grid_matches_tower()
+    corrected = locked_jet_flat_profile()
+    uncorrected = uncorrected_jet_flat_profile()
+    t0_c = axis_T0(corrected)
+    t0_u = axis_T0(uncorrected)
+    composed_zero = True
+    grid_rows: list[dict[str, Any]] = []
+    for env in locked_pulse_grid():
+        p = env.value()
+        p_prime = env.derivative()
+        composed = (p * t0_c[0], p * t0_c[1])
+        if composed != (0, 0):
+            composed_zero = False
+        grid_rows.append(
+            {
+                "name": env.name,
+                "P": p,
+                "P_prime": p_prime,
+                "composed_corrected": composed,
+                "composed_uncorrected": (p * t0_u[0], p * t0_u[1]),
+            }
+        )
+    growth = locked_growth_envelope()
+    decay = locked_decay_envelope()
+    product_rule_ok = (
+        growth.derivative() * t0_u[0] == GROWTH_RATE * growth.value() * t0_u[0]
+        and decay.derivative() * t0_u[0] == DECAY_RATE * decay.value() * t0_u[0]
+    )
+    enclosure_ok = pulse_product_contains_grid_and_sample(t0_u[0])
+    identity_holds = tower_ok and composed_zero and product_rule_ok and enclosure_ok
+    leftover_id = None if identity_holds else 56
+    flags = assert_honesty(composition_honesty_payload(identity_holds=identity_holds))
+    return {
+        "kind": "pulse_family_composition",
+        "tower_ok": tower_ok,
+        "composed_axis_zero": composed_zero,
+        "product_rule_ok": product_rule_ok,
+        "enclosure_ok": enclosure_ok,
+        "identity_holds": identity_holds,
+        "leftover_id": leftover_id,
+        "grid": grid_rows,
+        "uncorrected_axis_T0": t0_u,
+        "corrected_axis_T0": t0_c,
+        "honesty": flags,
+    }
+
+
 __all__ = [
     "JetFlatProfile",
     "LOCKED_A_UNCORRECTED",
@@ -387,6 +458,8 @@ __all__ = [
     "assert_honesty",
     "axis_T0",
     "axis_sources",
+    "compose_locked_pulse_family",
+    "composition_honesty_payload",
     "core_energy_scale",
     "core_linfty_scale",
     "correct_axis_stress",

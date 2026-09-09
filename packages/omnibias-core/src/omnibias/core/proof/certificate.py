@@ -240,8 +240,9 @@ def _parent_claims_from_payload(
             raise ValueError(
                 f"honesty.{key} is declared true but the payload does not "
                 "earn it; parent flags are derived from a discharged "
-                "convergence ledger with empty external_premises, never "
-                "asserted by hand"
+                "convergence ledger with empty external_premises "
+                "(navier_stokes_proof_claim requires parent == NS_PARENT), "
+                "never asserted by hand"
             )
         if earned:
             out[key] = True

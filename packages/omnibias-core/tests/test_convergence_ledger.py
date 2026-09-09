@@ -10,6 +10,8 @@ import pytest
 from omnibias.core.proof.certificate import make_certificate, verify_certificate_digest
 from omnibias.core.proof.lean_check import generate_obligation, lean_check_available
 from omnibias.core.proof.obligations.convergence_ledger import (
+    NS_CD_PARENT,
+    NS_PARENT,
     PARENT_CLAIM_KEYS,
     PAYLOAD_LEDGER,
     AffineForm,
@@ -20,12 +22,14 @@ from omnibias.core.proof.obligations.convergence_ledger import (
     StageMap,
     check_ledger,
     curated_convergence_ledgers,
+    empty_premise_cd_ledger,
     empty_premise_discharged_ledger,
     failing_margin_ledger,
     honesty_payload,
     ledger_obligation,
     ledger_to_inequality_system,
     navier_stokes_exponent_ledger,
+    parent_earns_navier_stokes_claim,
     replay_ledger_certificate,
     seal_ledger_certificate,
     stage_invariant,
@@ -170,14 +174,65 @@ def test_open_upper_bound_uses_endpoint_value() -> None:
     assert check_ledger(ledger(Fraction(2))).holds is False
 
 
+def _empty_premise_ledger(*, parent: str) -> ConvergenceLedger:
+    return ConvergenceLedger(
+        name="empty_premise_control",
+        stage=StageMap(var="s", step=Fraction(1), initial=Fraction(0)),
+        parameters={},
+        side_conditions=(
+            SideCondition(AffineForm.variable("s"), "ge", Fraction(0), name="s_nonneg"),
+        ),
+        obligations=(
+            MarginObligation(
+                "constant_gain",
+                AffineForm.variable("s"),
+                MinForm.singleton(AffineForm.constant(2)),
+            ),
+        ),
+        parent=parent,
+        external_premises=(),
+    )
+
+
 def test_empty_premises_earn_parent_flag() -> None:
     ledger = empty_premise_discharged_ledger()
     report = check_ledger(ledger)
     assert report.holds
     assert report.strength == "PROVED"
+    assert ledger.parent == NS_PARENT
     sealed = seal_ledger_certificate(ledger, run_lean=False)
     assert sealed.certificate["honesty"]["navier_stokes_proof_claim"] is True
     assert sealed.certificate["honesty"]["yang_mills_mass_gap_claim"] is False
+
+
+def test_cd_empty_premises_do_not_earn_ab_flag() -> None:
+    ledger = empty_premise_cd_ledger()
+    report = check_ledger(ledger)
+    assert report.holds
+    assert report.strength == "PROVED"
+    assert parent_earns_navier_stokes_claim(ledger.parent) is False
+    flags = honesty_payload(ledger, report)
+    assert flags["navier_stokes_proof_claim"] is False
+    sealed = seal_ledger_certificate(ledger, run_lean=False)
+    assert sealed.certificate["honesty"]["navier_stokes_proof_claim"] is False
+    with pytest.raises(ValueError, match="navier_stokes_proof_claim"):
+        make_certificate(
+            claim="forged C/D as A/B",
+            payload=ledger_obligation(ledger).payload,
+            honesty={"navier_stokes_proof_claim": True},
+        )
+
+
+def test_navier_or_euler_substring_does_not_earn() -> None:
+    for parent in (
+        "finite-time singularity of 3D Euler / Navier-Stokes",
+        "Navier-Stokes forced blowup (Clay C/D)",
+        "some euler paper",
+    ):
+        ledger = _empty_premise_ledger(parent=parent)
+        report = check_ledger(ledger)
+        assert report.holds
+        assert honesty_payload(ledger, report)["navier_stokes_proof_claim"] is False
 
 
 def test_cannot_forge_parent_flag_on_nonempty_premises() -> None:

@@ -1,6 +1,6 @@
 {
   "schema": "omnibias.benchmarks.convergence_ledger.v1",
-  "generated_utc": "2026-09-08T20:15:19Z",
+  "generated_utc": "2026-09-09T04:43:25Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
     "python": "3.14.6",
@@ -25,7 +25,7 @@
       "continuum_claim": false
     }
   },
-  "rss_mb_at_start": 815.27,
+  "rss_mb_at_start": 815.63,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -71,7 +71,7 @@
         "lean_available": true,
         "theorem_prover_verified": true,
         "mathlib_verified": false,
-        "wall_seconds": 0.5311307949887123,
+        "wall_seconds": 0.3585034290153999,
         "detail": "no lake -> flag stays false; lake -> genuine pass"
       },
       {
@@ -83,10 +83,10 @@
         "name": "g5_parent_flag_unforgeable",
         "passed": true,
         "mathlib_verified": false,
-        "detail": "curated ledgers stay CONDITIONAL; empty premises earn the flag; a hand-stamped True is refused"
+        "detail": "curated ledgers stay CONDITIONAL; empty A/B premises earn the flag; empty C/D premises do not; a hand-stamped True is refused"
       }
     ]
   },
-  "wall_seconds": 1.5354932409827597,
+  "wall_seconds": 1.4817182520055212,
   "n_ledgers": 3
 }
