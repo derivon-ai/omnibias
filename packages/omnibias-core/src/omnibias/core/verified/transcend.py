@@ -264,6 +264,16 @@ def sigmoid_iv(x: Interval) -> Interval:
     return Interval(max(lo, 0.0), min(hi, 1.0))
 
 
+def sinh_iv(x: Interval) -> Interval:
+    r"""Guaranteed enclosure of ``sinh(x) = (e^x - e^{-x}) / 2`` over ``x``.
+
+    ``sinh`` is odd and strictly increasing, so composing the two monotone
+    :func:`exp_iv` enclosures is rigorous on any interval, including one that
+    straddles zero.
+    """
+    return (exp_iv(x) - exp_iv(-x)) * Interval.point(0.5)
+
+
 def cosh_iv(x: Interval) -> Interval:
     r"""Guaranteed enclosure of ``cosh(x) = (e^x + e^{-x}) / 2`` over ``x``.
 
@@ -647,6 +657,7 @@ __all__ = [
     "sigmoid_iv",
     "sin_iv",
     "sin_point",
+    "sinh_iv",
     "softplus_iv",
     "strict_backend",
     "tanh_iv",

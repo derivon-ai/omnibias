@@ -437,8 +437,11 @@ the relevant op:
   *provably contains* the `mpmath` value (`zeta(2) = π²/6`, `zeta(4) = π⁴/90`,
   `beta(2) = Catalan`). **Mandatory majorant / boundary:** the tail bound is the
   integral-test `p`-series majorant, valid **only** for `Re(s) > 1`; the constructor
-  raises for `Re(s) ≤ 1`. Analytic continuation past `Re(s) = 1` -- the functional
-  equation, the critical strip, and the **Riemann Hypothesis** -- is a recorded
+  raises for `Re(s) ≤ 1`. The *series* register stays in that half-plane. A
+  separate finite evaluator (`zeta_via_functional_equation` for `Re(s) < 0`,
+  Euler–Maclaurin in the strip, and an approximate functional equation on a named
+  compact) encloses the continued *value* on named rectangles; that is numerical /
+  compact, not a continuation theorem. The **Riemann Hypothesis** is a recorded
   *external* proof obligation, never inferred, and nothing here makes any statement
   about zeros of `zeta` / `L`.
 - **Number theory & cryptography -- centralized out-of-scope boundary.** omnibias is an

@@ -36,6 +36,7 @@ bridge.
 - Lohner / TM validated flow: `lohner`, `jet_flow`.
 - Eigenvalue *lower* bounds: `eig_operator` (Lehmann-Maehly-Goerisch).
 - Dirichlet / zeta / L / Jacobi-theta on `Re(s) > 1`: `dirichlet`.
+- Finite zeta evaluator (FE for `Re(s)<0`, AFE on a named compact, winding 0 off the strip): `gamma_complex`, `xi`, `riemann_siegel`. Not RH.
 - Enclosure Collapse is `width -> 0` of a *sound enclosure* (a point plus a proof): `enclosure_collapse`.
 
 Contain a grid and a random sample. Exhausted search returns the unresolved

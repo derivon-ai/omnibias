@@ -329,6 +329,8 @@ class TestNumberTheoryBoundary:
         # i.e. it never silently "continues" past Re(s) = 1.
         with pytest.raises(ValueError, match="Re"):
             zeta_enclosure(complex(0.5, 14.134725))  # near the first zeta zero
+        with pytest.raises(ValueError, match="Re"):
+            zeta_enclosure(-1.0)
 
 
 class TestComplexExp:

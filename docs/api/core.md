@@ -336,14 +336,44 @@ but proves nothing about the *location* of zeros.
 !!! warning "Continuation is numerical only — no RH"
     The absolutely-convergent tail majorant is valid **only** for `Re(s) > 1`;
     `zeta_enclosure` and friends refuse `Re(s) ≤ 1`. `zeta_euler_maclaurin` supplies
-    a *numerical* critical-strip enclosure, and the special values above are exact,
-    but the Riemann Hypothesis remains a recorded *external* proof obligation —
+    a *numerical* critical-strip enclosure, `zeta_via_functional_equation` encloses
+    the continued *value* for `Re(s) < 0` by multiplying `chi(s)` into a right
+    half-plane series, and `zeta_approximate_functional_equation` is an AFE on a
+    named compact (`|t| ≤ T_MAX`). None of these is a continuation theorem. The
+    Riemann Hypothesis remains a recorded *external* proof obligation —
     never inferred. A small enclosed magnitude near a putative zero is **not** a
     claim that `ζ` vanishes there. Nothing here makes a statement about the location
     of zeros of `ζ` / `L`, primality, factoring, or any cryptographic hardness
     assumption (see [scope & guarantees](../scope-and-guarantees.md) §6).
 
 ::: omnibias.core.verified.dirichlet
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+## Verified backend: complex Gamma, xi, and a finite evaluator
+
+`gamma_complex` encloses `log`, `exp`, `sin` / `cos`, and `Gamma` on complex
+rectangles (Stirling in a right sector, multiplicative reflection on the left).
+`xi` encloses `chi(s)` and `xi(s)`, dispatches `zeta_continued`, and records a
+functional-equation residual `xi(s) - xi(1-s)` as Enclosure Collapse of a finite
+obligation (not an identity over `Q`). A rectangle in `Re(s) > 1` has winding
+`0`; a strip contour is allowed to return BLOCKED and is never a zero
+certificate. `riemann_siegel` adds a Hardy–Littlewood AFE with a cited
+Titchmarsh §4.13 remainder majorant on a locked compact and **refuses**
+outside it.
+
+::: omnibias.core.verified.gamma_complex
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.core.verified.xi
+    options:
+      show_root_heading: false
+      heading_level: 3
+
+::: omnibias.core.verified.riemann_siegel
     options:
       show_root_heading: false
       heading_level: 3

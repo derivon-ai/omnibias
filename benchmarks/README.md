@@ -77,6 +77,7 @@ uv run python docs/img/generate_figures.py
 | `enclosure_collapse.py` | `docs/benchmarks/enclosure_collapse_smoke.json` | Shipped 01-14: Width Law + six squeezes; `width -> 0` of a sound enclosure (a point plus a proof); not a package |
 | `jet_width_vs_order.py` | `docs/benchmarks/jet_width_vs_order_smoke.json` / `$OMNIBIAS_SCRATCH/jet_width_vs_order/jet_width_vs_order.json` | Certified 1-D `certified_partials` width sweep; grid + random coverage; raw factorial envelope and factorial-normalized width exponent; finite MLP evidence, not a spectral-tail theorem |
 | `dirichlet_enclosure.py` | `docs/benchmarks/dirichlet_enclosure_smoke.json` | `Re(s)>1` width + coverage; no zeros / no RH subject |
+| `certified_continuation.py` | `docs/benchmarks/certified_continuation_smoke.json` | Finite FE / AFE / winding / `H_t` pack; not RH |
 | `instance_gap_tightening.py` | `docs/benchmarks/instance_gap_tightening_smoke.json` | Named n<=8 Lasserre 1 vs 2; never tight; never P = NP |
 | `ccf_pade_profile.py` | `docs/benchmarks/ccf_pade_profile_smoke.json` | Jet-Padé profile diagnostic; stretch 1e-13 untouched |
 | `theory_homes.py` | `docs/benchmarks/theory_homes_smoke.json` | Shipped 06-03: G1–G5 earned (125/125 homes; Wave-0 A4–A7 recorded; G4/G5 vacuous; 389 lines, not promoted) |

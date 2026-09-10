@@ -12,8 +12,9 @@ the de Bruijn-Newman constant ``Lambda``, and it never will by itself -- a
 real line, at *every* ``t`` up to ``t0``), which this module does not attempt
 and which is recorded as an external premise everywhere this module is used.
 See ``theory/07-frontier/01-sub-obligation-ledger.md``'s RH row and
-``theory/07-frontier/08-de-bruijn-newman-heat-flow.md``. Never read a result
-from this module as evidence for or against the Riemann Hypothesis.
+``docs/frontier-ledger.md`` (planned Lambda program; no implementation).
+Never read a result from this module as evidence for or against the
+Riemann Hypothesis.
 
 Mathematics
 -----------
@@ -123,6 +124,7 @@ does not depend on ``z``.
 from __future__ import annotations
 
 import math
+from collections.abc import Sequence
 from dataclasses import dataclass
 
 from omnibias.core.verified.complex_interval import ComplexInterval
@@ -248,10 +250,7 @@ def phi_series_tail_bound(u: Interval, n_terms: int) -> float:
             f"(got {ratio.hi!r}); this should never happen for u >= 0"
         )
     bound = (
-        _PHI_MAJORANT_CONST
-        * Interval.point(growth_hi)
-        * term_n1
-        / (Interval.point(1.0) - ratio)
+        _PHI_MAJORANT_CONST * Interval.point(growth_hi) * term_n1 / (Interval.point(1.0) - ratio)
     ).hi
     return max(bound, 0.0)
 
@@ -298,9 +297,7 @@ class DeBruijnNewmanContract:
                 "truncation does not satisfy 4*pi*e^(4U) > (9+b) + 2*t*U "
                 "(outer tail bound would not converge); increase truncation"
             )
-        quad_margin = (
-            Interval.point(8.0) * PI_IV * self._e4U() - Interval.point(self.t)
-        )
+        quad_margin = Interval.point(8.0) * PI_IV * self._e4U() - Interval.point(self.t)
         if quad_margin.lo <= 0.0:
             raise ValueError(
                 "truncation does not satisfy 8*pi*e^(4U) > t "
@@ -382,12 +379,9 @@ def debruijn_newman_outer_tail_bound(
     )
     if kappa.lo <= 0.0:
         raise ValueError(
-            "outer tail bound requires kappa > 0 on this image box; "
-            "increase truncation U"
+            "outer tail bound requires kappa > 0 on this image box; increase truncation U"
         )
-    exponent = (
-        Interval.point(9.0 + b) * U_iv + t_iv * U_iv.pow_int(2) - PI_IV * e4U
-    )
+    exponent = Interval.point(9.0 + b) * U_iv + t_iv * U_iv.pow_int(2) - PI_IV * e4U
     growth = exp_iv(exponent)
     return _PHI_MAJORANT_CONST * Interval.point(_PHI_TAIL_SAFETY) * growth / kappa
 
@@ -620,11 +614,97 @@ def attempt_named_lambda_bound(
     )
 
 
+@dataclass(frozen=True)
+class FiniteHtRectanglePack:
+    """A declared finite list of real-axis ``H_t`` rectangles on a bounded interval.
+
+    Local certified counts do **not** make a cover of ``R`` for all
+    ``t in [0, t0]``. ``finite_cover_certified`` is frozen ``False``.
+    ``rh_claim`` is frozen ``False``.
+    """
+
+    t: float
+    real_interval: tuple[float, float]
+    counts: tuple[DeBruijnNewmanZeroCount, ...]
+    n_certified: int
+    n_blocked: int
+    finite_cover_certified: bool = False
+    rh_claim: bool = False
+
+    def __post_init__(self) -> None:
+        if self.rh_claim:
+            raise ValueError("rh_claim must stay False (never infer RH from a pack)")
+        if self.finite_cover_certified:
+            raise ValueError(
+                "finite_cover_certified must stay False "
+                "(a local pack is not a cover of R for all t in [0, t0])"
+            )
+
+
+def finite_ht_rectangle_pack(
+    *,
+    t: float = 0.0,
+    boxes: Sequence[tuple[float, float]] | None = None,
+    half_height: float = 0.25,
+    truncation: float = 1.0,
+    phi_terms: int = 4,
+    panels: int = 8,
+    contour_segments: int = 8,
+    real_lo: float = 0.0,
+    real_hi: float = 32.0,
+) -> FiniteHtRectanglePack:
+    """Count ``H_t`` zeros on a declared finite pack of real-axis rectangles.
+
+    Default boxes live in ``[0, 32]`` (the first ``H_0`` zero is at
+    ``2 gamma_1 ≈ 28.27``). Each box reuses :func:`count_debruijn_newman_zeros`.
+    BLOCKED boxes are first-class. The pack is not a whole-line cover.
+    """
+    declared = (
+        tuple(boxes)
+        if boxes is not None
+        else (
+            (4.0, 4.0),
+            (16.0, 4.0),
+            (H0_FIRST_ZERO, 2.0),
+        )
+    )
+    counts: list[DeBruijnNewmanZeroCount] = []
+    n_certified = 0
+    n_blocked = 0
+    for center_re, half_width in declared:
+        contract = DeBruijnNewmanContract(
+            t=t,
+            center=complex(center_re, 0.0),
+            half_width=half_width,
+            half_height=half_height,
+            truncation=truncation,
+            phi_terms=phi_terms,
+            panels=panels,
+            contour_segments=contour_segments,
+        )
+        result = count_debruijn_newman_zeros(contract)
+        counts.append(result)
+        if result.certified:
+            n_certified += 1
+        else:
+            n_blocked += 1
+    return FiniteHtRectanglePack(
+        t=float(t),
+        real_interval=(float(real_lo), float(real_hi)),
+        counts=tuple(counts),
+        n_certified=n_certified,
+        n_blocked=n_blocked,
+        finite_cover_certified=False,
+        rh_claim=False,
+    )
+
+
 __all__ = [
     "DeBruijnNewmanContract",
     "DeBruijnNewmanZeroCount",
     "FAR_FIELD_CITATION",
     "FIRST_RIEMANN_ZERO_IMAG",
+    "FiniteHtRectanglePack",
     "H0_FIRST_ZERO",
     "LambdaBoundAttempt",
     "PHI_DEFAULT_TERMS",
@@ -634,6 +714,7 @@ __all__ = [
     "crosscheck_h0_at_first_zero",
     "debruijn_newman_enclosure",
     "debruijn_newman_outer_tail_bound",
+    "finite_ht_rectangle_pack",
     "phi_enclosure",
     "phi_series_tail_bound",
 ]

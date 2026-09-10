@@ -418,6 +418,7 @@ nav:
       - Einselection collapse: cookbook/einselection-collapse.md
       - Lindblad dynamics: cookbook/lindblad-dynamics.md
       - Dirichlet enclosures on Re(s)>1: cookbook/dirichlet-enclosure.md
+      - Finite continuation primitives: cookbook/certified-continuation.md
       - Instance-gap tightening: cookbook/instance-gap.md
       - CCF jet-Padé profile diagnostic: cookbook/ccf-pade-profile.md
       - Proof-carrying PDE certificates: cookbook/proof-carrying-pde.md

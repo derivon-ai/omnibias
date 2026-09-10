@@ -10,6 +10,7 @@ from omnibias.core.verified.debruijn_newman import (
     H0_FIRST_ZERO,
     PRE_REGISTERED_T0,
     attempt_named_lambda_bound,
+    finite_ht_rectangle_pack,
     phi_enclosure,
 )
 from omnibias.core.verified.interval import Interval
@@ -39,3 +40,25 @@ def test_named_lambda_attempt_is_unearned_and_not_rh() -> None:
 def test_named_lambda_refuses_t0_at_or_above_022() -> None:
     with pytest.raises(ValueError, match="t0"):
         attempt_named_lambda_bound(t0=0.22)
+
+
+def test_finite_ht_pack_is_local_and_not_a_cover() -> None:
+    pack = finite_ht_rectangle_pack(
+        boxes=((2.0, 1.0),),
+        half_height=0.2,
+        truncation=1.0,
+        phi_terms=4,
+        panels=8,
+        contour_segments=8,
+        real_lo=0.0,
+        real_hi=32.0,
+    )
+    assert pack.finite_cover_certified is False
+    assert pack.rh_claim is False
+    assert pack.n_certified + pack.n_blocked == 1
+    assert len(pack.counts) == 1
+    attempt = attempt_named_lambda_bound()
+    assert attempt.certified is False
+    assert attempt.finite_cover_certified is False
+    assert "far-field" in attempt.missing_piece.lower()
+    assert "cover" in attempt.missing_piece.lower()

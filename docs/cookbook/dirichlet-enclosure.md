@@ -47,4 +47,5 @@ Dirichlet series.
 ## See also
 
 - API: [`omnibias.core.verified.dirichlet`](../api/core.md)
+- Finite evaluator (not RH): [certified-continuation](certified-continuation.md)
 - Ledger: [`frontier-ledger.md`](../frontier-ledger.md)

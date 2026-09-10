@@ -1,0 +1,127 @@
+{
+  "schema": "omnibias.benchmark.certified_continuation.v1",
+  "generated_utc": "2026-09-10T18:45:25Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "mode": "smoke"
+  },
+  "rss_mb_at_start": 816.4,
+  "gamma": {
+    "coverage": true,
+    "n_points": 5,
+    "refuse_poles": true
+  },
+  "gamma_rows": [
+    {
+      "z": [
+        1.0,
+        0.0
+      ],
+      "contained": true,
+      "re_width": 1.1302070390684095e-13
+    },
+    {
+      "z": [
+        0.5,
+        0.0
+      ],
+      "contained": true,
+      "re_width": 1.9095836023552695e-13
+    },
+    {
+      "z": [
+        -0.5,
+        0.0
+      ],
+      "contained": true,
+      "re_width": 1.1528555887707628e-12
+    },
+    {
+      "z": [
+        1.2,
+        0.4
+      ],
+      "contained": true,
+      "re_width": 9.547918011776348e-14
+    },
+    {
+      "z": [
+        -0.7,
+        0.5
+      ],
+      "contained": true,
+      "re_width": 5.728750807065809e-13
+    }
+  ],
+  "functional_equation": {
+    "residual_contains_zero": true,
+    "residual_width_ok": true,
+    "zeta_minus_one_known": true,
+    "re_width": 0.00636619772454561,
+    "im_width": 0.006366197723694677
+  },
+  "afe": {
+    "contained": true,
+    "refuse_outside_compact": true,
+    "re_width": 15.062340220447163,
+    "im_width": 15.06234022044624
+  },
+  "winding": {
+    "count": 0,
+    "isolated_zero": true,
+    "winding_lo": -0.0005064081247761081,
+    "winding_hi": 0.0005070124155086956
+  },
+  "ht_pack": {
+    "n_certified": 0,
+    "n_blocked": 1,
+    "finite_cover_certified": false,
+    "rh_claim": false,
+    "lambda_certified": false,
+    "lambda_finite_cover": false,
+    "lambda_rh_claim": false
+  },
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "gamma_sample_coverage",
+        "passed": true
+      },
+      {
+        "name": "fe_residual_contains_zero",
+        "passed": true
+      },
+      {
+        "name": "afe_compact",
+        "passed": true
+      },
+      {
+        "name": "winding_zero_re_gt_1",
+        "passed": true
+      },
+      {
+        "name": "ht_pack_honesty",
+        "passed": true
+      }
+    ]
+  },
+  "honesty": {
+    "rh_claim": false,
+    "continuation_theorem": false,
+    "zeros": false,
+    "gabcke_remainder": false,
+    "pade": false,
+    "finite_cover_certified": false,
+    "lambda_certified": false,
+    "note": "numerical enclosure of the continued value, functional-equation evaluator, and AFE on a named compact; not a continuation theorem and not an RH claim"
+  }
+}
