@@ -342,7 +342,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Honesty and claim boundaries** ([06-02](honesty.md)): claim
   ladder + forbidden-claims register. Design record. Status is
   **shipped**.
-- **Packaging and rollout** (06-03): G1–G5 earned (123/123 homes).
+- **Packaging and rollout** (06-03): G1–G5 earned (125/125 homes).
   G4/G5 vacuous, not promoted. Status is **shipped**.
 - **Public primitive** (06-05): citation path; extract / paper /
   external stay later. Status is **shipped**.
@@ -404,6 +404,13 @@ gates are earned on smoke, not in CI `all_passed`.
   3-D force-free ABC BKM slab plus continuation. Leftover #57
   reused. `three_d_claim` false. Not Clay (A)/(B). Status is
   **shipped**.
+- **Unforced 3-D TG IC** ([07-22](api/unforced_slab.md)):
+  classical 3-D Taylor–Green is an IC, not closed-form decay.
+  Continuation Halt `three_d_tg_not_closed_form`. Leftover #59.
+  Not Clay (A)/(B). Status is **shipped**.
+- **Unforced ABC long chain** ([07-23](api/unforced_slab.md)):
+  four ABC slabs cover `[0, 2]`. Leftover #57 reused. Not Clay
+  (A)/(B). Status is **shipped**.
 - **Training-idea ledger** (08-01): recommended stack; trainers do
   not clear Hilbert stretch. Design record. Status is **shipped**.
 - **Composed curvature** ([08-02](api/composed_curvature.md)): slice

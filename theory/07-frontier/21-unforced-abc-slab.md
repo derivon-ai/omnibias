@@ -12,7 +12,7 @@ accept under the 07-19 continuation budget; manufactured growth is
 
 - **Status**: shipped (G1–G5 CI; founding bias collapse, not temperature collapse; leftover #57 reused; not Clay A/B)
 - **Depends on**: 07-18
-- **Blocks**: none
+- **Blocks**: 07-23
 
 ## 2. Where it lands
 

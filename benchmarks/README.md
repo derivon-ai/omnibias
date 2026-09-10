@@ -53,6 +53,8 @@ uv run python docs/img/generate_figures.py
 | `unforced_slab_continuation.py` | `docs/benchmarks/unforced_slab_continuation_smoke.json` | Shipped 07-19: continue or Halt; leftover #57; not Clay A/B |
 | `force_is_essential.py` | `docs/benchmarks/force_is_essential_smoke.json` | Shipped 07-20: unforced limit of 07-13 is BLOCKED; leftover #58 `f0_not_a_corollary`; not Clay A/B |
 | `unforced_abc_slab.py` | `docs/benchmarks/unforced_abc_slab_smoke.json` | Shipped 07-21: 3-D force-free ABC BKM slab + continuation; leftover #57 reused; not Clay A/B |
+| `unforced_tg3d_ic.py` | `docs/benchmarks/unforced_tg3d_ic_smoke.json` | Shipped 07-22: 3-D TG is an IC, not closed-form decay; leftover #59; not Clay A/B |
+| `unforced_abc_long_chain.py` | `docs/benchmarks/unforced_abc_long_chain_smoke.json` | Shipped 07-23: four ABC slabs cover `[0, 2]`; leftover #57 reused; not Clay A/B |
 | `inverse_imaging.py` | `docs/benchmarks/inverse_imaging_smoke.json` / `inverse_imaging.json` | Shipped 05-01: Wave-0 falsifier A7 (G7) plus product API G1–G6: locally-seeded `sd(tau_hat) ~ alpha^(n - 5/2)`; `omnibias.pinn.inverse` localization / layered / Stefan / sensors |
 | `tabular_arrangement.py` | `docs/benchmarks/tabular_arrangement_smoke.json` / `tabular_arrangement.json` | Shipped 05-02 G1/G2: H=2 arrangement vs tuned LightGBM on constructed oblique XOR / axis AND; fair early-stop protocol (train Xtr, stop Xva, score Xte, no train+val refit) |
 | `tabular_arrangement_public.py` | `docs/benchmarks/tabular_arrangement_public_smoke.json` / `tabular_arrangement_public.json` | Shipped 05-02 G3: same fair protocol on eight public binary datasets (full win/loss table; G4 leftover-recorded leftover #50 from eight-dataset artifact, predictiveness `0.25`, not in `all_passed`) |
@@ -77,7 +79,7 @@ uv run python docs/img/generate_figures.py
 | `dirichlet_enclosure.py` | `docs/benchmarks/dirichlet_enclosure_smoke.json` | `Re(s)>1` width + coverage; no zeros / no RH subject |
 | `instance_gap_tightening.py` | `docs/benchmarks/instance_gap_tightening_smoke.json` | Named n<=8 Lasserre 1 vs 2; never tight; never P = NP |
 | `ccf_pade_profile.py` | `docs/benchmarks/ccf_pade_profile_smoke.json` | Jet-Padé profile diagnostic; stretch 1e-13 untouched |
-| `theory_homes.py` | `docs/benchmarks/theory_homes_smoke.json` | Shipped 06-03: G1–G5 earned (123/123 homes; Wave-0 A4–A7 recorded; G4/G5 vacuous; 389 lines, not promoted) |
+| `theory_homes.py` | `docs/benchmarks/theory_homes_smoke.json` | Shipped 06-03: G1–G5 earned (125/125 homes; Wave-0 A4–A7 recorded; G4/G5 vacuous; 389 lines, not promoted) |
 | `conjugate_hilbert.py` | `docs/benchmarks/conjugate_hilbert_smoke.json` | Shipped 01-12: line Hilbert; G1–G4 CI; G5 leftover-recorded (leftover #11; matched-width ratio `0.978`, need `10x`), not in `all_passed` |
 | `arrangement_graph.py` | `docs/benchmarks/arrangement_graph_smoke.json` | Shipped 02-02 Face-Net: sampled subgraph; G3 vs k-NN leftover-recorded (0-hop; GNN / RegionModels `--full`); cost vs n/D leftover-recorded |
 | `bem_net.py` | `docs/benchmarks/bem_net_smoke.json` | Shipped 02-06: off-surface exact; G2 disc earned (`circle_dirichlet_density`); G4 `eps^2` regularization order earned; G3 exterior win leftover-recorded (no volume PINN); single-layer cost leftover-recorded (leftover #42) |

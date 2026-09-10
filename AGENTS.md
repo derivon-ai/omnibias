@@ -332,7 +332,7 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   a submodule back out later is cheap; un-shipping a premature distribution is not.
   See the `omnibias-new-package` skill. Theory 06-03 G1–G5 are
   **shipped**; they are
-  earned on `benchmarks/theory_homes.py` (42 packages, 123/123 homes,
+  earned on `benchmarks/theory_homes.py` (42 packages, 125/125 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
   lines, not promoted). Theory 06-05 is **shipped** (document G1–G5;
   extract / paper / external stay later). Theory 07-01 is **shipped**
@@ -813,6 +813,14 @@ by that drift gate.
   (07-21, **shipped**; 3-D force-free ABC BKM slab + continuation;
   leftover #57 reused; G1–G5 CI; founding bias collapse, not
   temperature collapse; not Clay A/B) /
+  `omnibias.pinn.certified.unforced`
+  (07-22, **shipped**; 3-D TG IC + t=0 ω hull; continuation Halt
+  `three_d_tg_not_closed_form`; leftover #59; G1–G5 CI; founding
+  bias collapse, not temperature collapse; not Clay A/B) /
+  `omnibias.pinn.certified.unforced`
+  (07-23, **shipped**; four ABC slabs cover `[0, 2]`; leftover #57
+  reused; G1–G5 CI; founding bias collapse, not temperature
+  collapse; not Clay A/B) /
   `omnibias.pinn.inverse`
   (05-01, **shipped**; G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`;
   global search earned for n=3 only) /

@@ -1,20 +1,27 @@
-# Force-free BKM slabs (07-18, 07-19, 07-21)
+# Force-free BKM slabs (07-18, 07-19, 07-21, 07-22, 07-23)
 
 One periodic box, one horizon, `f = 0`. Plants are the exact 2-D
-Taylor–Green vortex and the exact 3-D ABC flow. The BKM time integral
+Taylor–Green vortex and the exact 3-D ABC flow. Classical 3-D
+Taylor–Green is an initial condition, not a closed-form decaying
+solution: continuation Halts. The BKM time integral
 of a sound `||ω||_∞` bound is an outward-rounded `Interval`. Weak
 residuals on TG reuse 07-02. Continuation accepts a decaying slab
-strictly below a named rational budget, or returns `Halt`.
+strictly below a named rational budget, or returns `Halt`. Four ABC
+slabs cover `[0, 2]`, not `[0, ∞)`.
 
 Status is **shipped**. G1–G5 are CI-gated
 (`benchmarks/unforced_bkm_slab.py`,
 `benchmarks/unforced_slab_continuation.py`,
-`benchmarks/unforced_abc_slab.py`). This is A/B
+`benchmarks/unforced_abc_slab.py`,
+`benchmarks/unforced_tg3d_ic.py`,
+`benchmarks/unforced_abc_long_chain.py`). This is A/B
 *architecture*, not Clay (A)/(B). See theory specs
 [07-18](https://github.com/derivon-ai/omnibias/blob/main/theory/07-frontier/18-unforced-bkm-slab.md),
 [07-19](https://github.com/derivon-ai/omnibias/blob/main/theory/07-frontier/19-unforced-slab-continuation.md),
+[07-21](https://github.com/derivon-ai/omnibias/blob/main/theory/07-frontier/21-unforced-abc-slab.md),
+[07-22](https://github.com/derivon-ai/omnibias/blob/main/theory/07-frontier/22-unforced-tg3d-ic.md),
 and
-[07-21](https://github.com/derivon-ai/omnibias/blob/main/theory/07-frontier/21-unforced-abc-slab.md).
+[07-23](https://github.com/derivon-ai/omnibias/blob/main/theory/07-frontier/23-unforced-abc-long-chain.md).
 
 Home: `omnibias.pinn.certified.unforced`. Do not grow
 `omnibias.pinn.certified.navier_stokes`.
@@ -115,4 +122,68 @@ assert isinstance(growing, Halt)
 abc_chain = locked_two_abc_slab_continuation()
 assert abc_chain["n_slabs"] == 2
 assert abc_chain["leftover_id"] == 57
+```
+
+## 3-D Taylor–Green IC (07-22)
+
+Classical 3-D Taylor–Green is a force-free initial condition, not an
+exact decaying Navier–Stokes solution. The `t = 0` vorticity hull is
+`|A| √6`. Continuation that would reuse the ABC exponential returns
+`Halt` / `BLOCKED` / `three_d_tg_not_closed_form`. Leftover **#59**.
+Leftover **#57** is untouched.
+
+```python
+from omnibias.pinn.certified.unforced import (
+    THREE_D_TG_NOT_EXACT_LEFTOVER,
+    UNFORCED_CONTINUATION_LEFTOVER,
+    Halt,
+    force_free_tg3d_ic,
+    locked_force_free_tg3d_slab,
+    try_continue_tg3d_slab,
+    LOCKED_HORIZON,
+)
+
+tg3d = force_free_tg3d_ic()
+assert tg3d["dimension"] == 3
+assert tg3d["force_zero"] is True
+assert tg3d["exact_solution"] is False
+assert tg3d["omega0_contains_grid_and_sample"] is True
+assert tg3d["honesty"]["three_d_claim"] is False
+assert tg3d["honesty"]["navier_stokes_proof_claim"] is False
+assert tg3d["leftover_id"] == 59
+assert THREE_D_TG_NOT_EXACT_LEFTOVER["three_d_tg_not_exact"] is True
+assert UNFORCED_CONTINUATION_LEFTOVER["leftover_id"] == 57
+halted = try_continue_tg3d_slab(
+    locked_force_free_tg3d_slab(),
+    remaining_budget=1,
+    next_horizon=LOCKED_HORIZON,
+)
+assert isinstance(halted, Halt)
+assert halted.reason == "BLOCKED"
+assert halted.detail == "three_d_tg_not_closed_form"
+```
+
+## Longer ABC chain (07-23)
+
+Four locked decaying ABC slabs cover `[0, 2]`. Cover end time is `2`,
+not `∞`. Manufactured growth is `Halt` / `BLOCKED`. Empty remaining
+budget is `search_incomplete`. Leftover **#57** is reused. The A/B
+premise `"[0, infinity) is not a finite union of CI slabs"` stays.
+
+```python
+from omnibias.pinn.certified.unforced import (
+    INFINITE_TIME_PREMISE,
+    locked_n_abc_slab_continuation,
+)
+
+long_chain = locked_n_abc_slab_continuation(n_slabs=4)
+assert long_chain["accepted"] is True
+assert long_chain["n_slabs"] == 4
+assert long_chain["cover_end"] == 2.0
+assert long_chain["covers_infinite_time"] is False
+assert long_chain["growing_reason"] == "BLOCKED"
+assert long_chain["empty_budget_reason"] == "search_incomplete"
+assert long_chain["leftover_id"] == 57
+assert long_chain["honesty"]["three_d_claim"] is False
+assert INFINITE_TIME_PREMISE in NS_AB_EXTERNAL_PREMISES
 ```

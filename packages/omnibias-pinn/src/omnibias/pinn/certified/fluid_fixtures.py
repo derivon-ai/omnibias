@@ -10,6 +10,10 @@ certificates in :mod:`omnibias.pinn.certified.fluid`.  Two families are shipped:
   ``u = e^{-2\nu t}(\sin x\cos y,\,-\cos x\sin y)`` with the matching pressure.
   This is the **laminar correctness baseline**: the momentum residual,
   divergence and pressure-Poisson residual are all machine zero.
+* :func:`taylor_green_vortex_3d` -- the classical 3-D Taylor--Green *initial
+  condition* on ``[0, 2\pi)^3``.  Vortex stretching means there is no
+  ``e^{-ν k² t}`` law; ``exact_solution`` is false.  Kolmogorov is forced and
+  is not this plant.
 * :func:`kolmogorov_flow` -- the exact steady low-mode forced shear flow
   ``u = (A\sin(k y),\,0)`` balanced by ``f = \nu A k^2(\sin(k y),\,0)``.  This is
   the entry point into the **forced / chaotic-facing** regime (the laminar base
@@ -299,8 +303,84 @@ def beltrami_abc_flow(
     )
 
 
+def taylor_green_vortex_3d(
+    n: int,
+    *,
+    viscosity: float,
+    density: float = 1.0,
+    time: float = 0.0,
+    amplitude: float = 1.0,
+) -> PeriodicFlowSample:
+    r"""Classical 3-D Taylor--Green *initial condition* on ``[0, 2\pi)^3``.
+
+    At ``t = 0``
+
+    .. math::
+
+        u = A\,(\sin x\cos y\cos z,\; -\cos x\sin y\cos z,\; 0).
+
+    The field is divergence-free and force-free.  Unlike the 2-D Taylor--Green
+    vortex and ABC flow, the nonlinear term is **not** a pure gradient: vortex
+    stretching is present, so there is no closed-form ``e^{-ν k² t}`` decay.
+    ``exact_solution`` is therefore false, and ``time`` must be ``0``.  This is
+    an IC, not an exact unsteady Navier--Stokes plant.
+    """
+    if n < 4:
+        raise ValueError(f"taylor_green_vortex_3d needs n >= 4, got {n}")
+    if viscosity < 0.0:
+        raise ValueError("viscosity must be non-negative")
+    if density <= 0.0:
+        raise ValueError("density must be positive")
+    if float(time) != 0.0:
+        raise ValueError(
+            "taylor_green_vortex_3d is an initial condition; time must be 0"
+        )
+    length = 2.0 * np.pi
+    axis = _periodic_axis(n, length)
+    x, y, z = np.meshgrid(axis, axis, axis, indexing="ij")
+    velocity = amplitude * np.stack([
+        np.sin(x) * np.cos(y) * np.cos(z),
+        -np.cos(x) * np.sin(y) * np.cos(z),
+        np.zeros_like(x),
+    ])
+    # Classical IC pressure; not a decaying exact-solution claim.
+    pressure = (
+        0.0625
+        * density
+        * (amplitude**2)
+        * (np.cos(2.0 * x) + np.cos(2.0 * y))
+        * (np.cos(2.0 * z) + 2.0)
+    )
+    velocity_t = np.zeros_like(velocity)
+    forcing = np.zeros_like(velocity)
+    descriptor: dict[str, Any] = {
+        "descriptor_version": FLUID_FIXTURE_DESCRIPTOR_VERSION,
+        "name": "taylor_green_vortex_3d",
+        "dimension": 3,
+        "n": int(n),
+        "lengths": [length, length, length],
+        "viscosity": float(viscosity),
+        "density": float(density),
+        "time": 0.0,
+        "amplitude": float(amplitude),
+        "exact_solution": False,
+        "forced": False,
+    }
+    return PeriodicFlowSample(
+        velocity=velocity,
+        pressure=pressure,
+        velocity_t=velocity_t,
+        forcing=forcing,
+        viscosity=float(viscosity),
+        density=float(density),
+        lengths=(length, length, length),
+        descriptor=descriptor,
+    )
+
+
 _FIXTURE_BUILDERS = {
     "taylor_green_vortex": taylor_green_vortex,
+    "taylor_green_vortex_3d": taylor_green_vortex_3d,
     "kolmogorov_flow": kolmogorov_flow,
     "beltrami_abc_flow": beltrami_abc_flow,
 }
@@ -345,6 +425,14 @@ def regenerate_periodic_flow(descriptor: dict[str, Any]) -> PeriodicFlowSample:
             wavenumber=int(descriptor.get("wavenumber", 1)),
             time=float(descriptor.get("time", 0.0)),
         )
+    if name == "taylor_green_vortex_3d":
+        return taylor_green_vortex_3d(
+            int(descriptor["n"]),
+            viscosity=float(descriptor["viscosity"]),
+            density=float(descriptor.get("density", 1.0)),
+            time=float(descriptor.get("time", 0.0)),
+            amplitude=float(descriptor.get("amplitude", 1.0)),
+        )
     raise ValueError(f"unknown fluid fixture descriptor name: {name!r}")
 
 
@@ -382,4 +470,5 @@ __all__ = [
     "regenerate_periodic_flow",
     "save_periodic_flow_sample",
     "taylor_green_vortex",
+    "taylor_green_vortex_3d",
 ]

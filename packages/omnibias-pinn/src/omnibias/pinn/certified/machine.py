@@ -732,6 +732,53 @@ def _register() -> None:
             },
         },
     )
+    register_catalog(
+        CatalogEntry(
+            kind="unforced_tg3d_ic",
+            obligation=(
+                "classical 3-D Taylor-Green is an IC, not a closed-form "
+                "decaying plant (not Clay A/B)"
+            ),
+            parent="Navier-Stokes unforced regularity (Clay A/B)",
+            parent_status="open",
+            package="omnibias.pinn.certified.unforced",
+            mode="enclosure",
+            complete=True,
+            existential=False,
+        ),
+        lambda **_k: {
+            "kind": "unforced_tg3d_ic",
+            "mode": "enclosure",
+            "honesty": {
+                "navier_stokes_proof_claim": False,
+                "three_d_claim": False,
+                "three_d_tg_claim": False,
+            },
+        },
+    )
+    register_catalog(
+        CatalogEntry(
+            kind="unforced_abc_long_chain",
+            obligation=(
+                "four finite force-free 3-D ABC slabs covering a finite "
+                "horizon (not Clay A/B, not [0, infinity))"
+            ),
+            parent="Navier-Stokes unforced regularity (Clay A/B)",
+            parent_status="open",
+            package="omnibias.pinn.certified.unforced",
+            mode="enclosure",
+            complete=True,
+            existential=False,
+        ),
+        lambda **_k: {
+            "kind": "unforced_abc_long_chain",
+            "mode": "enclosure",
+            "honesty": {
+                "navier_stokes_proof_claim": False,
+                "three_d_claim": False,
+            },
+        },
+    )
     for kind in (
         "anisotropic_profile",
         "weighted_class",

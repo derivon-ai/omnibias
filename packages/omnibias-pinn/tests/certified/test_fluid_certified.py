@@ -124,6 +124,7 @@ def test_symbolic_replay_catches_forged_residual_sup() -> None:
 def test_regenerate_periodic_flow_round_trip() -> None:
     assert set(available_fixtures()) == {
         "taylor_green_vortex",
+        "taylor_green_vortex_3d",
         "kolmogorov_flow",
         "beltrami_abc_flow",
     }

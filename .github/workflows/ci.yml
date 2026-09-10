@@ -442,6 +442,14 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/unforced_abc_slab.py
+      - name: Run unforced-TG3D-IC smoke (07-22 G1–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/unforced_tg3d_ic.py
+      - name: Run unforced-ABC-long-chain smoke (07-23 G1–G5)
+        run: |
+          source .venv-cross/bin/activate
+          python benchmarks/unforced_abc_long_chain.py
       - name: Run soft-evolution smoke (03-01 G1–G6)
         run: |
           source .venv-cross/bin/activate

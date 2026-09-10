@@ -6,7 +6,7 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
-### Added — Honest A/B special-case climb (theory 07-20, 07-21)
+### Added — Honest A/B special-case climb (theory 07-20, 07-21, 07-22, 07-23)
 
 - `unforced_limit_of_forced_flat` records that deleting the 07-13
   force does not yield an unforced solution (`BLOCKED`, leftover
@@ -17,6 +17,13 @@ distributions is versioned independently under semantic versioning.
   stays false. Smokes:
   `docs/benchmarks/force_is_essential_smoke.json`,
   `docs/benchmarks/unforced_abc_slab_smoke.json`.
+- Classical 3-D Taylor–Green is named as an IC, not a closed-form
+  decaying plant. Continuation Halts with
+  `three_d_tg_not_closed_form`. Leftover #59. Leftover #57 is
+  untouched. Smoke: `docs/benchmarks/unforced_tg3d_ic_smoke.json`.
+- Four locked decaying ABC slabs cover `[0, 2]`, not `[0, ∞)`.
+  Leftover #57 is reused. Smoke:
+  `docs/benchmarks/unforced_abc_long_chain_smoke.json`.
 
 ### Added — A/B architecture slabs (theory 07-18, 07-19)
 

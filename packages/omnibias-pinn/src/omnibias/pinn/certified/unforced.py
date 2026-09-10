@@ -1,10 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-r"""Force-free BKM slabs and continuation (theory 07-18, 07-19, 07-21).
+r"""Force-free BKM slabs and continuation (theory 07-18, 07-19, 07-21, 07-22, 07-23).
 
 One periodic box, one finite horizon, ``f = 0``. Plants are the exact
-2-D Taylor--Green vortex and the exact 3-D ABC flow. The BKM time
-integral of a sound ``||ω||_∞`` bound is an outward-rounded
+2-D Taylor--Green vortex and the exact 3-D ABC flow. Classical 3-D
+Taylor--Green is an initial condition, not a closed-form decaying
+plant: continuation Halts. The BKM time integral of a sound
+``||ω||_∞`` bound is an outward-rounded
 :class:`~omnibias.core.verified.interval.Interval`. Weak residuals on
 TG reuse 07-02. Continuation accepts a decaying slab strictly below a
 named rational budget, or returns ``Halt``.
@@ -36,6 +38,7 @@ from omnibias.pinn.certified.fluid_fixtures import (
     PeriodicFlowSample,
     beltrami_abc_flow,
     taylor_green_vortex,
+    taylor_green_vortex_3d,
 )
 from omnibias.pinn.certified.weak_form import (
     certified_weak_residual,
@@ -57,6 +60,8 @@ LOCKED_ABC_K = 1
 # Manufactured growth uses a faster rate so the Halt control exceeds BKM_BUDGET.
 ABC_GROWING_RATE_MULT = Fraction(16)
 THREE_D_AB_PREMISE = "three-dimensional unforced NS, not 2-D Taylor-Green"
+INFINITE_TIME_PREMISE = "[0, infinity) is not a finite union of CI slabs"
+LOCKED_ABC_CHAIN_SLABS = 4
 UNFORCED_CONTINUATION_LEFTOVER: dict[str, object] = {
     "leftover_id": 57,
     "covers_infinite_time": False,
@@ -66,6 +71,18 @@ UNFORCED_CONTINUATION_LEFTOVER: dict[str, object] = {
     "detail": (
         "a finite n_slabs cover does not imply [0, infinity), all smooth "
         "data, 3-D unforced NS, or a bridge theorem"
+    ),
+}
+THREE_D_TG_NOT_EXACT_LEFTOVER: dict[str, object] = {
+    "leftover_id": 59,
+    "three_d_tg_not_exact": True,
+    "covers_infinite_time": False,
+    "all_data": False,
+    "three_d": False,
+    "bridge_theorem": False,
+    "detail": (
+        "classical 3-D Taylor-Green is an initial condition, not a "
+        "closed-form decaying Navier-Stokes plant"
     ),
 }
 _FORBIDDEN = (
@@ -181,7 +198,7 @@ class Continue:
 
 @dataclass(frozen=True)
 class Halt:
-    """Stop continuation: budget exceeded, growing vorticity, or empty budget."""
+    """Stop continuation: budget exceeded, growing vorticity, empty budget, or a non-closed-form plant."""
 
     reason: Literal["BLOCKED", "search_incomplete"]
     detail: str
@@ -753,18 +770,245 @@ def locked_two_abc_slab_continuation() -> dict[str, Any]:
     }
 
 
+@dataclass(frozen=True)
+class Tg3dSlab:
+    """Classical 3-D Taylor--Green IC window. Evolution is not closed form."""
+
+    t0: Fraction = LOCKED_T0
+    horizon: Fraction = LOCKED_HORIZON
+    amplitude: Fraction = LOCKED_AMPLITUDE
+    nu: Fraction = LOCKED_NU
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "t0", Fraction(self.t0))
+        object.__setattr__(self, "horizon", Fraction(self.horizon))
+        object.__setattr__(self, "amplitude", Fraction(self.amplitude))
+        object.__setattr__(self, "nu", Fraction(self.nu))
+        if self.horizon <= 0:
+            raise ValueError("horizon must be positive")
+        if self.nu <= 0:
+            raise ValueError("nu must be positive")
+
+    @property
+    def t1(self) -> Fraction:
+        return self.t0 + self.horizon
+
+
+def tg3d_honesty_payload() -> dict[str, object]:
+    flags = honesty_payload()
+    flags["three_d_tg_claim"] = False
+    flags["exact_3d_tg_plant"] = False
+    flags["disclaimer"] = (
+        "3-D Taylor-Green is an IC, not a closed-form decaying NS plant; "
+        "not Clay (A)/(B)"
+    )
+    return flags
+
+
+def enclose_tg3d_omega0(amplitude: Fraction) -> Interval:
+    """Sound range for ``|ω₀|``: ``[0, |A| √6]`` via Euclidean component hulls."""
+    amp = Interval.from_rational(abs(amplitude))
+    hi = amp * Interval.from_value(6).sqrt()
+    return Interval.hull(Interval.from_value(0), hi)
+
+
+def _tg3d_omega0_speed(x: Any, y: Any, z: Any, amplitude: float) -> Any:
+    wx = amplitude * (-np.cos(x) * np.sin(y) * np.sin(z))
+    wy = amplitude * (-np.sin(x) * np.cos(y) * np.sin(z))
+    wz = amplitude * (2.0 * np.sin(x) * np.sin(y) * np.cos(z))
+    return np.sqrt(wx * wx + wy * wy + wz * wz)
+
+
+def tg3d_omega0_contains_grid_and_sample(
+    sample: PeriodicFlowSample,
+    *,
+    n_sample: int = 8,
+    seed: int = 0,
+) -> bool:
+    amp_frac = Fraction(sample.descriptor["amplitude"]).limit_denominator()
+    hull = enclose_tg3d_omega0(amp_frac)
+    amp = float(sample.descriptor["amplitude"])
+    n = int(sample.grid_shape[0])
+    length = float(sample.lengths[0])
+    axis = length * np.arange(n, dtype=float) / n
+    x, y, z = np.meshgrid(axis, axis, axis, indexing="ij")
+    speeds = _tg3d_omega0_speed(x, y, z, amp)
+    for val in np.asarray(speeds, dtype=float).ravel():
+        if not hull.contains(float(val)):
+            return False
+    rng = np.random.default_rng(seed)
+    pts = rng.uniform(0.0, length, size=(n_sample, 3))
+    for px, py, pz in pts:
+        val = float(_tg3d_omega0_speed(float(px), float(py), float(pz), amp))
+        if not hull.contains(val):
+            return False
+    return True
+
+
+def locked_force_free_tg3d_slab() -> Tg3dSlab:
+    return Tg3dSlab(
+        t0=LOCKED_T0,
+        horizon=LOCKED_HORIZON,
+        amplitude=LOCKED_AMPLITUDE,
+        nu=LOCKED_NU,
+    )
+
+
+def try_continue_tg3d_slab(
+    slab: Tg3dSlab,
+    *,
+    remaining_budget: int,
+    next_horizon: Fraction,
+    threshold: Fraction = BKM_BUDGET,
+) -> Halt:
+    """Refuse ABC / 2-D TG exponential continuation on the 3-D TG IC.
+
+    Empty ``remaining_budget`` is ``search_incomplete``. A positive budget
+    is ``BLOCKED`` / ``three_d_tg_not_closed_form``: there is no
+    ``e^{-ν k² t}`` law to integrate.
+    """
+    del next_horizon, threshold, slab
+    if remaining_budget <= 0:
+        return Halt(
+            reason="search_incomplete",
+            detail="empty remaining budget",
+            remaining_budget=int(remaining_budget),
+        )
+    return Halt(
+        reason="BLOCKED",
+        detail="three_d_tg_not_closed_form",
+        remaining_budget=int(remaining_budget),
+    )
+
+
+def force_free_tg3d_ic() -> dict[str, Any]:
+    """Build the locked 07-22 3-D Taylor--Green IC plus honesty."""
+    slab = locked_force_free_tg3d_slab()
+    sample = taylor_green_vortex_3d(
+        LOCKED_N,
+        viscosity=float(LOCKED_VISCOSITY),
+        density=float(LOCKED_DENSITY),
+        time=0.0,
+        amplitude=float(slab.amplitude),
+    )
+    force_zero = bool(np.all(sample.forcing == 0.0)) and (
+        sample.descriptor.get("forced") is False
+    )
+    exact_solution = bool(sample.descriptor.get("exact_solution"))
+    dimension = int(sample.descriptor.get("dimension", 0))
+    halted = try_continue_tg3d_slab(
+        slab,
+        remaining_budget=1,
+        next_horizon=LOCKED_HORIZON,
+    )
+    ledger = navier_stokes_ab_architecture_ledger()
+    ledger_report = check_ledger(ledger)
+    flags = assert_honesty(tg3d_honesty_payload())
+    leftover = dict(THREE_D_TG_NOT_EXACT_LEFTOVER)
+    return {
+        "slab": slab,
+        "force_zero": force_zero,
+        "plant_unforced": force_zero,
+        "dimension": dimension,
+        "exact_solution": exact_solution,
+        "omega0_contains_grid_and_sample": tg3d_omega0_contains_grid_and_sample(
+            sample
+        ),
+        "halt_reason": halted.reason,
+        "halt_detail": halted.detail,
+        "horizon": float(LOCKED_HORIZON),
+        "honesty": flags,
+        "ledger_strength": ledger_report.strength,
+        "ledger_holds": ledger_report.holds,
+        "ledger_premises": list(ledger.external_premises),
+        "ab_premises_nonempty": bool(NS_AB_EXTERNAL_PREMISES),
+        "three_d_premise_present": THREE_D_AB_PREMISE in NS_AB_EXTERNAL_PREMISES,
+        "leftover": leftover,
+        "leftover_id": leftover["leftover_id"],
+        "leftover_57_untouched": UNFORCED_CONTINUATION_LEFTOVER["leftover_id"] == 57,
+    }
+
+
+def locked_n_abc_slab_continuation(
+    *,
+    n_slabs: int = LOCKED_ABC_CHAIN_SLABS,
+) -> dict[str, Any]:
+    """Walk ``n_slabs`` locked decaying ABC windows, plus Halt controls.
+
+    Default ``n_slabs=4`` covers ``[0, 2]``. Cover end time is finite.
+    Leftover ``#57`` is reused. ``[0, ∞)`` stays an external premise.
+    """
+    if n_slabs < 1:
+        raise ValueError("n_slabs must be a positive integer")
+    last: AbcSlab = locked_force_free_abc_slab()
+    remaining = int(n_slabs) - 1
+    accepted_count = 1
+    halted: Halt | None = None
+    for _ in range(int(n_slabs) - 1):
+        result = try_continue_abc_slab(
+            last,
+            remaining_budget=remaining,
+            next_horizon=LOCKED_HORIZON,
+        )
+        if isinstance(result, Halt):
+            halted = result
+            break
+        if not isinstance(result.next_slab, AbcSlab):
+            halted = Halt(
+                reason="BLOCKED",
+                detail="unexpected_non_abc_slab",
+                remaining_budget=result.remaining_budget,
+            )
+            break
+        accepted_count += 1
+        remaining = result.remaining_budget
+        last = result.next_slab
+    empty = try_continue_abc_slab(
+        last,
+        remaining_budget=0,
+        next_horizon=LOCKED_HORIZON,
+    )
+    growing = try_continue_abc_slab(
+        locked_force_free_abc_slab(growing=True),
+        remaining_budget=1,
+        next_horizon=LOCKED_HORIZON,
+    )
+    flags = assert_honesty(abc_honesty_payload())
+    leftover = dict(UNFORCED_CONTINUATION_LEFTOVER)
+    cover_end = last.t1
+    return {
+        "accepted": halted is None and accepted_count == int(n_slabs),
+        "n_slabs": accepted_count,
+        "cover_end": float(cover_end),
+        "cover_end_rational": str(cover_end),
+        "covers_infinite_time": False,
+        "empty_budget_reason": empty.reason if isinstance(empty, Halt) else None,
+        "growing_reason": growing.reason if isinstance(growing, Halt) else None,
+        "growing_detail": growing.detail if isinstance(growing, Halt) else None,
+        "leftover": leftover,
+        "leftover_id": leftover["leftover_id"],
+        "honesty": flags,
+        "infinite_time_premise_present": INFINITE_TIME_PREMISE in NS_AB_EXTERNAL_PREMISES,
+        "three_d_premise_present": THREE_D_AB_PREMISE in NS_AB_EXTERNAL_PREMISES,
+    }
+
+
 __all__ = [
     "ABC_GROWING_RATE_MULT",
     "AbcSlab",
     "BKM_BUDGET",
     "Continue",
     "Halt",
+    "INFINITE_TIME_PREMISE",
     "LOCKED_ABC_AMPLITUDE",
+    "LOCKED_ABC_CHAIN_SLABS",
     "LOCKED_HORIZON",
     "LOCKED_N",
     "LOCKED_NU",
     "TG_OMEGA_LINF_FACTOR",
     "THREE_D_AB_PREMISE",
+    "THREE_D_TG_NOT_EXACT_LEFTOVER",
+    "Tg3dSlab",
     "UNFORCED_CONTINUATION_LEFTOVER",
     "UnforcedSlab",
     "abc_honesty_payload",
@@ -775,14 +1019,21 @@ __all__ = [
     "enclose_abc_u0_linf",
     "enclose_bkm_integral",
     "enclose_omega_linf",
+    "enclose_tg3d_omega0",
     "force_free_abc_bkm_slab",
     "force_free_bkm_slab",
+    "force_free_tg3d_ic",
     "honesty_payload",
     "integrand_contains_grid_and_sample",
     "locked_force_free_abc_slab",
     "locked_force_free_slab",
+    "locked_force_free_tg3d_slab",
+    "locked_n_abc_slab_continuation",
     "locked_two_abc_slab_continuation",
     "locked_two_slab_continuation",
+    "tg3d_honesty_payload",
+    "tg3d_omega0_contains_grid_and_sample",
     "try_continue_abc_slab",
     "try_continue_slab",
+    "try_continue_tg3d_slab",
 ]

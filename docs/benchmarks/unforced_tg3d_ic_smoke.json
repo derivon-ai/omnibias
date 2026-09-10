@@ -1,0 +1,69 @@
+{
+  "schema": "omnibias.benchmarks.unforced_tg3d_ic.v1",
+  "generated_utc": "2026-09-10T17:51:33Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "unforced_tg3d_ic",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "continuum_navier_stokes_claim": false,
+      "forced_blowup_reproof_claim": false,
+      "three_d_claim": false,
+      "infinite_time_leftover": true,
+      "all_data_leftover": true,
+      "bridge_theorem_leftover": true,
+      "unforced_majorant_leftover": true,
+      "theorem_prover_verified": false,
+      "mathlib_verified": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "disclaimer": "3-D Taylor-Green is an IC, not a closed-form decaying NS plant; not Clay (A)/(B)",
+      "three_d_tg_claim": false,
+      "exact_3d_tg_plant": false
+    },
+    "leftover_id": 59,
+    "dimension": 3,
+    "exact_solution": false
+  },
+  "rss_mb_at_start": 819.16,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_tg3d_force_free_not_exact",
+        "passed": true,
+        "detail": "3-D TG fixture is force-free and exact_solution false"
+      },
+      {
+        "name": "g2_tg3d_omega0_enclosure",
+        "passed": true,
+        "detail": "t=0 vorticity hull contains a grid and a sample of |omega|"
+      },
+      {
+        "name": "g3_tg3d_continuation_halt",
+        "passed": true,
+        "detail": "07-19 budget Halt/BLOCKED/three_d_tg_not_closed_form"
+      },
+      {
+        "name": "g4_honesty_leftover_59",
+        "passed": true,
+        "detail": "parent flags false; leftover #59; leftover #57 untouched"
+      },
+      {
+        "name": "g5_ab_ledger_3d_premise",
+        "passed": true,
+        "detail": "catalog parent A/B open; NS_AB 3-D premise stays"
+      }
+    ]
+  },
+  "wall_seconds": 1.1421836640220135
+}

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Theory 07-18 / 07-19: force-free BKM slabs and continuation."""
+"""Theory 07-18 .. 07-23: force-free BKM slabs, 3-D TG IC, ABC chain."""
 
 from __future__ import annotations
 
@@ -168,6 +168,14 @@ def test_catalog_kinds_are_ab_open() -> None:
     assert abc is not None
     assert abc.parent == "Navier-Stokes unforced regularity (Clay A/B)"
     assert abc.parent_status == "open"
+    tg3d = catalog_entry("unforced_tg3d_ic")
+    assert tg3d is not None
+    assert tg3d.parent == "Navier-Stokes unforced regularity (Clay A/B)"
+    assert tg3d.parent_status == "open"
+    long_chain = catalog_entry("unforced_abc_long_chain")
+    assert long_chain is not None
+    assert long_chain.parent == "Navier-Stokes unforced regularity (Clay A/B)"
+    assert long_chain.parent_status == "open"
 
 
 def test_forcing_array_is_numpy_zero() -> None:
@@ -284,3 +292,154 @@ def test_abc_g5_three_d_premise_stays() -> None:
     assert THREE_D_AB_PREMISE in ledger.external_premises
     assert report["three_d_premise_present"] is True
     assert report["ledger_strength"] == "CONDITIONAL"
+
+
+def test_tg3d_g1_fixture_is_3d_force_free_not_exact() -> None:
+    from omnibias.pinn.certified.fluid_fixtures import taylor_green_vortex_3d
+    from omnibias.pinn.certified.unforced import force_free_tg3d_ic
+
+    report = force_free_tg3d_ic()
+    assert report["force_zero"] is True
+    assert report["plant_unforced"] is True
+    assert report["dimension"] == 3
+    assert report["exact_solution"] is False
+    sample = taylor_green_vortex_3d(16, viscosity=0.1, amplitude=1.0)
+    assert sample.descriptor["exact_solution"] is False
+    assert sample.descriptor["forced"] is False
+    assert np.all(sample.forcing == 0.0)
+
+
+def test_tg3d_g2_omega0_enclosure_contains_grid_and_sample() -> None:
+    from omnibias.pinn.certified.unforced import force_free_tg3d_ic
+
+    report = force_free_tg3d_ic()
+    assert report["omega0_contains_grid_and_sample"] is True
+
+
+def test_tg3d_g3_continuation_halts_not_closed_form() -> None:
+    from omnibias.pinn.certified.unforced import (
+        LOCKED_HORIZON,
+        Halt,
+        force_free_tg3d_ic,
+        locked_force_free_tg3d_slab,
+        try_continue_tg3d_slab,
+    )
+
+    result = try_continue_tg3d_slab(
+        locked_force_free_tg3d_slab(),
+        remaining_budget=1,
+        next_horizon=LOCKED_HORIZON,
+    )
+    assert isinstance(result, Halt)
+    assert result.reason == "BLOCKED"
+    assert result.detail == "three_d_tg_not_closed_form"
+    report = force_free_tg3d_ic()
+    assert report["halt_reason"] == "BLOCKED"
+    assert report["halt_detail"] == "three_d_tg_not_closed_form"
+    empty = try_continue_tg3d_slab(
+        locked_force_free_tg3d_slab(),
+        remaining_budget=0,
+        next_horizon=LOCKED_HORIZON,
+    )
+    assert isinstance(empty, Halt)
+    assert empty.reason == "search_incomplete"
+
+
+def test_tg3d_g4_honesty_leftover_59() -> None:
+    from omnibias.pinn.certified.unforced import (
+        THREE_D_TG_NOT_EXACT_LEFTOVER,
+        UNFORCED_CONTINUATION_LEFTOVER,
+        force_free_tg3d_ic,
+        tg3d_honesty_payload,
+    )
+
+    flags = tg3d_honesty_payload()
+    assert flags["navier_stokes_proof_claim"] is False
+    assert flags["three_d_claim"] is False
+    assert flags["three_d_tg_claim"] is False
+    assert flags["exact_3d_tg_plant"] is False
+    report = force_free_tg3d_ic()
+    assert report["honesty"]["navier_stokes_proof_claim"] is False
+    assert report["honesty"]["three_d_claim"] is False
+    assert report["leftover_id"] == 59
+    assert THREE_D_TG_NOT_EXACT_LEFTOVER["leftover_id"] == 59
+    assert THREE_D_TG_NOT_EXACT_LEFTOVER["three_d_tg_not_exact"] is True
+    assert report["leftover_57_untouched"] is True
+    assert UNFORCED_CONTINUATION_LEFTOVER["leftover_id"] == 57
+
+
+def test_tg3d_g5_catalog_and_3d_premise() -> None:
+    from omnibias.pinn.certified.unforced import (
+        THREE_D_AB_PREMISE,
+        force_free_tg3d_ic,
+    )
+
+    report = force_free_tg3d_ic()
+    ledger = navier_stokes_ab_architecture_ledger()
+    checked = check_ledger(ledger)
+    assert checked.strength == "CONDITIONAL"
+    assert THREE_D_AB_PREMISE in NS_AB_EXTERNAL_PREMISES
+    assert report["three_d_premise_present"] is True
+    assert report["ledger_strength"] == "CONDITIONAL"
+
+
+def test_tg3d_time_must_be_zero() -> None:
+    import pytest
+    from omnibias.pinn.certified.fluid_fixtures import taylor_green_vortex_3d
+
+    with pytest.raises(ValueError, match="initial condition"):
+        taylor_green_vortex_3d(8, viscosity=0.1, time=0.1)
+
+
+def test_abc_long_chain_g1_four_slabs_cover_two() -> None:
+    from omnibias.pinn.certified.unforced import locked_n_abc_slab_continuation
+
+    chain = locked_n_abc_slab_continuation(n_slabs=4)
+    assert chain["accepted"] is True
+    assert chain["n_slabs"] == 4
+    assert chain["cover_end"] == 2.0
+    assert chain["covers_infinite_time"] is False
+
+
+def test_abc_long_chain_g2_growing_blocked() -> None:
+    from omnibias.pinn.certified.unforced import locked_n_abc_slab_continuation
+
+    chain = locked_n_abc_slab_continuation(n_slabs=4)
+    assert chain["growing_reason"] == "BLOCKED"
+    assert chain["growing_detail"] == "growing_vorticity"
+
+
+def test_abc_long_chain_g3_empty_budget() -> None:
+    from omnibias.pinn.certified.unforced import locked_n_abc_slab_continuation
+
+    chain = locked_n_abc_slab_continuation(n_slabs=4)
+    assert chain["empty_budget_reason"] == "search_incomplete"
+
+
+def test_abc_long_chain_g4_reuses_leftover_57() -> None:
+    from omnibias.pinn.certified.unforced import (
+        UNFORCED_CONTINUATION_LEFTOVER,
+        locked_n_abc_slab_continuation,
+    )
+
+    chain = locked_n_abc_slab_continuation(n_slabs=4)
+    assert chain["leftover_id"] == 57
+    assert chain["covers_infinite_time"] is False
+    assert chain["honesty"]["three_d_claim"] is False
+    assert chain["honesty"]["navier_stokes_proof_claim"] is False
+    assert UNFORCED_CONTINUATION_LEFTOVER["leftover_id"] == 57
+
+
+def test_abc_long_chain_g5_infinite_time_premise_stays() -> None:
+    from omnibias.pinn.certified.unforced import (
+        INFINITE_TIME_PREMISE,
+        locked_n_abc_slab_continuation,
+    )
+
+    chain = locked_n_abc_slab_continuation(n_slabs=4)
+    ledger = navier_stokes_ab_architecture_ledger()
+    checked = check_ledger(ledger)
+    assert checked.strength == "CONDITIONAL"
+    assert INFINITE_TIME_PREMISE in NS_AB_EXTERNAL_PREMISES
+    assert INFINITE_TIME_PREMISE in ledger.external_premises
+    assert chain["infinite_time_premise_present"] is True
