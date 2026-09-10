@@ -40,6 +40,8 @@ from omnibias.core.pulse_envelope import (
     mollifier_tail_contains_truth,
     pulse_product_contains_grid_and_sample,
 )
+from omnibias.core.verified.interval import Interval
+from omnibias.core.verified.transcend import exp_iv, ln_iv
 from omnibias.pinn.certified.anisotropic import (
     DX,
     LOCKED_H,
@@ -443,7 +445,87 @@ def compose_locked_pulse_family() -> dict[str, Any]:
     }
 
 
+F0_NOT_A_COROLLARY_LEFTOVER: dict[str, object] = {
+    "leftover_id": 58,
+    "f0_not_a_corollary": True,
+    "detail": (
+        "setting f = 0 on the concentrating field is not a corollary of "
+        "Clay C/D; force is part of the construction"
+    ),
+}
+
+
+def anisotropy_ratio_scale(
+    tau: Fraction | int | str,
+    profile: ProfileLike | None = None,
+) -> ScaleMonomial:
+    """``ℓ_r / ℓ_z ≍ τ^h``. Prefactor ``1``, exponent ``h`` exact over ``Q``."""
+    prof = _as_flat(profile)
+    tt = _as_frac(tau)
+    if tt <= 0:
+        raise ValueError("tau must be positive")
+    return ScaleMonomial(
+        prefactor=Fraction(1),
+        exponent=prof.h,
+        tau=tt,
+        name="anisotropy",
+    )
+
+
+def enclose_anisotropy_ratio(
+    tau: Fraction | int | str,
+    profile: ProfileLike | None = None,
+) -> Interval:
+    """Enclose ``τ^h = exp(h ln τ)``."""
+    scale = anisotropy_ratio_scale(tau, profile)
+    tau_iv = Interval.from_rational(scale.tau)
+    h_iv = Interval.from_rational(scale.exponent)
+    return exp_iv(h_iv * ln_iv(tau_iv))
+
+
+def unforced_limit_of_forced_flat() -> dict[str, Any]:
+    """Treat the 07-13 field without the stress correction as unforced.
+
+    The uncorrected axis jet excludes ``{0}``. The ``f = 0`` plant is
+    ``BLOCKED``. Anisotropy thins as ``τ`` decreases. Not Clay (A)/(B).
+    """
+    uncorrected = uncorrected_jet_flat_profile()
+    corrected, _a_star = correct_axis_stress(uncorrected)
+    jet_u = axis_T0(uncorrected)
+    jet_c = axis_T0(corrected)
+    ratio_hi = enclose_anisotropy_ratio(LOCKED_TAU_HI, uncorrected)
+    ratio_lo = enclose_anisotropy_ratio(LOCKED_TAU_LO, uncorrected)
+    energy = core_energy_scale(LOCKED_TAU_HI, uncorrected)
+    linfty = core_linfty_scale(LOCKED_TAU_HI, uncorrected)
+    flags = assert_honesty()
+    leftover = dict(F0_NOT_A_COROLLARY_LEFTOVER)
+    plant_blocked = jet_u != (0, 0)
+    return {
+        "kind": "force_is_essential",
+        "uncorrected_axis_T0": jet_u,
+        "corrected_axis_T0": jet_c,
+        "f0_plant": "BLOCKED" if plant_blocked else "accepted",
+        "f0_reason": "force_is_part_of_the_construction",
+        "anisotropy_thins": (
+            LOCKED_TAU_LO < LOCKED_TAU_HI
+            and uncorrected.h > 0
+            and ratio_lo.hi < ratio_hi.lo
+        ),
+        "anisotropy_lo": [ratio_lo.lo, ratio_lo.hi],
+        "anisotropy_hi": [ratio_hi.lo, ratio_hi.hi],
+        "energy_exponent": energy.exponent,
+        "linfty_exponent": linfty.exponent,
+        "energy_vanishes_while_linfty_explodes": (
+            energy.exponent > 0 and linfty.exponent < 0
+        ),
+        "leftover": leftover,
+        "leftover_id": leftover["leftover_id"],
+        "honesty": flags,
+    }
+
+
 __all__ = [
+    "F0_NOT_A_COROLLARY_LEFTOVER",
     "JetFlatProfile",
     "LOCKED_A_UNCORRECTED",
     "LOCKED_B_POLY",
@@ -455,6 +537,7 @@ __all__ = [
     "LOCKED_X_BOX",
     "LOCKED_X_CORE",
     "ScaleMonomial",
+    "anisotropy_ratio_scale",
     "assert_honesty",
     "axis_T0",
     "axis_sources",
@@ -463,6 +546,7 @@ __all__ = [
     "core_energy_scale",
     "core_linfty_scale",
     "correct_axis_stress",
+    "enclose_anisotropy_ratio",
     "energy_box_prefactor",
     "forced_field",
     "from_rest_ramp",
@@ -473,4 +557,5 @@ __all__ = [
     "logarithmic_slope",
     "on_window_ramp",
     "uncorrected_jet_flat_profile",
+    "unforced_limit_of_forced_flat",
 ]

@@ -93,6 +93,43 @@ def test_ns_ledger_discharges_and_recovers_kappa_threshold() -> None:
     assert ledger.external_premises
 
 
+def test_ab_architecture_ledger_stays_conditional_and_refuses_stamp() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        NS_AB_EXTERNAL_PREMISES,
+        NS_EXTERNAL_PREMISES,
+        navier_stokes_ab_architecture_ledger,
+    )
+
+    ledger = navier_stokes_ab_architecture_ledger()
+    report = check_ledger(ledger)
+    assert report.holds
+    assert report.strength == "CONDITIONAL"
+    assert ledger.parent == NS_PARENT
+    assert ledger.external_premises == NS_AB_EXTERNAL_PREMISES
+    assert NS_AB_EXTERNAL_PREMISES
+    joined = " ".join(NS_AB_EXTERNAL_PREMISES).lower()
+    assert "bridge" in joined
+    assert "taylor-green" in joined or "taylor–green" in joined
+    assert "three-dimensional" in joined
+    assert "infinity" in joined
+    assert "majorant" in joined
+    flags = honesty_payload(ledger, report)
+    assert flags["navier_stokes_proof_claim"] is False
+    assert stage_invariant(ledger)
+    sealed = seal_ledger_certificate(ledger, run_lean=False)
+    assert sealed.certificate["honesty"]["navier_stokes_proof_claim"] is False
+    with pytest.raises(ValueError, match="navier_stokes_proof_claim"):
+        make_certificate(
+            claim="forged A/B architecture",
+            payload=ledger_obligation(ledger).payload,
+            honesty={"navier_stokes_proof_claim": True},
+        )
+    # C/D exponent premises stay the construction spine; emptying them
+    # is not an A/B earn path.
+    assert NS_EXTERNAL_PREMISES
+    assert "analytic classes of the slow base" in NS_EXTERNAL_PREMISES[0]
+
+
 def test_scale_ledger_discharges_with_binding_h() -> None:
     from omnibias.core.proof.obligations.convergence_ledger import (
         navier_stokes_scale_ledger,

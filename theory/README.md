@@ -180,7 +180,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 |---|---|---|
 | [06-01 acceptance gates](06-program/01-acceptance-gates-and-benchmarks.md) | shipped | Shared protocol; enclosure / parity / cost helpers + artifact classifier |
 | [06-02 honesty and claim boundaries](06-program/02-honesty-and-claim-boundaries.md) | shipped | Claim ladder + forbidden-claims register; guards in core tests |
-| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | shipped | G1–G5 **earned** (42 packages, 119/119 homes, Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
+| [06-03 packaging and rollout](06-program/03-packaging-and-rollout.md) | shipped | G1–G5 **earned** (42 packages, 123/123 homes, Wave-0 A4–A7 recorded); G4 vacuous; G5 vacuous — 2 consumers, 389 lines, not promoted); no new distribution |
 | [06-04 book outline](06-program/04-book-outline.md) | concept | Monograph spine only; no `book/` tree; drafting still forbidden |
 | [06-05 public primitive and citation path](06-program/05-public-primitive-and-citation-path.md) | shipped | `PUBLIC_SURFACE` frozen; methods outline is jet-vs-AD 1-D Poisson; extract / paper / external stay later; CCF and Group 09 are not the public face |
 
@@ -208,6 +208,10 @@ parent. An agent may judge that parent solved; runtime flags stay earned.
 | [07-15 IPM remainder CAP](07-frontier/15-ipm-remainder-cap.md) | shipped | CubicGN + smoke-grid residual hull; leftover #53 toy radii only; G1–G5 CI; not Navier-Stokes |
 | [07-16 Boussinesq remainder CAP](07-frontier/16-boussinesq-remainder-cap.md) | shipped | CubicGN twin + leftover #54; G1–G5 CI; lambda_n stays a hypothesis; not Navier-Stokes |
 | [07-17 pulse-family composition](07-frontier/17-pulse-family-composition.md) | shipped | Locked pulse composed into the 07-13 field; G1–G5 CI; scale premises untouched; not a forced-blowup reproof |
+| [07-18 unforced BKM slab](07-frontier/18-unforced-bkm-slab.md) | shipped | Force-free 2-D TG slab + Interval BKM integral + 07-02 weak residual; G1–G5 CI; not Clay A/B |
+| [07-19 unforced slab continuation](07-frontier/19-unforced-slab-continuation.md) | shipped | Accept decaying TG / Halt on growing vorticity; leftover #57; G1–G5 CI; not Clay A/B |
+| [07-20 force is essential](07-frontier/20-force-is-essential.md) | shipped | Uncorrected 07-13 jet excludes `{0}`; leftover #58 `f0_not_a_corollary`; G1–G5 CI; not Clay A/B |
+| [07-21 unforced ABC slab](07-frontier/21-unforced-abc-slab.md) | shipped | 3-D force-free ABC BKM slab + continuation; leftover #57 reused; G1–G5 CI; not Clay A/B |
 
 ### 08 Tower-native training
 

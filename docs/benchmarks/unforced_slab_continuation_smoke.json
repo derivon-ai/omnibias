@@ -1,0 +1,66 @@
+{
+  "schema": "omnibias.benchmarks.unforced_slab_continuation.v1",
+  "generated_utc": "2026-09-09T15:25:47Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "unforced_slab_continuation",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "continuum_navier_stokes_claim": false,
+      "forced_blowup_reproof_claim": false,
+      "three_d_claim": false,
+      "infinite_time_leftover": true,
+      "all_data_leftover": true,
+      "bridge_theorem_leftover": true,
+      "unforced_majorant_leftover": true,
+      "theorem_prover_verified": false,
+      "mathlib_verified": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "disclaimer": "finite force-free TG slab / continuation; not Clay (A)/(B); not a 3-D continuum majorant"
+    },
+    "leftover_id": 57,
+    "n_slabs": 2
+  },
+  "rss_mb_at_start": 818.87,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_two_slabs_accept",
+        "passed": true,
+        "detail": "locked decaying TG slabs [0, 1/2] then [1/2, 1] accept"
+      },
+      {
+        "name": "g2_growing_blocked",
+        "passed": true,
+        "detail": "manufactured growing vorticity returns Halt/BLOCKED"
+      },
+      {
+        "name": "g3_empty_budget",
+        "passed": true,
+        "detail": "empty remaining budget is search_incomplete; parent flag false"
+      },
+      {
+        "name": "g4_leftover_57",
+        "passed": true,
+        "detail": "leftover #57 records infinite-time / all-data / 3-D / bridge"
+      },
+      {
+        "name": "g5_ab_ledger_conditional",
+        "passed": true,
+        "detail": "navier_stokes_ab_architecture_ledger stays CONDITIONAL with nonempty premises"
+      }
+    ]
+  },
+  "wall_seconds": 1.0384565760032274
+}

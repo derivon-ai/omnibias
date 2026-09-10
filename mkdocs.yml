@@ -207,6 +207,7 @@ nav:
       - IPM remainder CAP (07-15): api/ipm_remainder_cap.md
       - Boussinesq remainder CAP (07-16): api/boussinesq_remainder_cap.md
       - pulse-family composition (07-17): api/pulse_family_composition.md
+      - force-free BKM slabs (07-18, 07-19, 07-21): api/unforced_slab.md
       - soft-population evolution (03-01): api/soft_evolution.md
       - arrangement LP (03-02): api/arrangement_lp.md
       - CSP collapse (03-03): api/csp.md

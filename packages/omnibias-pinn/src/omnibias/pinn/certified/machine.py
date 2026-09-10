@@ -689,6 +689,49 @@ def _register() -> None:
         ),
         lambda **k: _ns_core_factory(**k),
     )
+    for kind in ("unforced_bkm_slab", "unforced_slab_continuation"):
+        register_catalog(
+            CatalogEntry(
+                kind=kind,
+                obligation=(
+                    "a finite force-free Taylor-Green slab or continuation "
+                    "(not Clay A/B)"
+                ),
+                parent="Navier-Stokes unforced regularity (Clay A/B)",
+                parent_status="open",
+                package="omnibias.pinn.certified.unforced",
+                mode="enclosure",
+                complete=True,
+                existential=False,
+            ),
+            lambda kind=kind, **_k: {
+                "kind": kind,
+                "mode": "enclosure",
+                "honesty": {"navier_stokes_proof_claim": False},
+            },
+        )
+    register_catalog(
+        CatalogEntry(
+            kind="unforced_abc_slab",
+            obligation=(
+                "a finite force-free 3-D ABC slab or continuation (not Clay A/B)"
+            ),
+            parent="Navier-Stokes unforced regularity (Clay A/B)",
+            parent_status="open",
+            package="omnibias.pinn.certified.unforced",
+            mode="enclosure",
+            complete=True,
+            existential=False,
+        ),
+        lambda **_k: {
+            "kind": "unforced_abc_slab",
+            "mode": "enclosure",
+            "honesty": {
+                "navier_stokes_proof_claim": False,
+                "three_d_claim": False,
+            },
+        },
+    )
     for kind in (
         "anisotropic_profile",
         "weighted_class",
@@ -696,6 +739,7 @@ def _register() -> None:
         "pulse_envelope",
         "jet_flat_forced_blowup",
         "pulse_family_composition",
+        "force_is_essential",
     ):
         register_catalog(
             CatalogEntry(

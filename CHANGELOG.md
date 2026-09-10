@@ -6,6 +6,30 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Honest A/B special-case climb (theory 07-20, 07-21)
+
+- `unforced_limit_of_forced_flat` records that deleting the 07-13
+  force does not yield an unforced solution (`BLOCKED`, leftover
+  #58 `f0_not_a_corollary`). Anisotropy thins as `τ` decreases.
+- Force-free 3-D ABC BKM slab and continuation on
+  `beltrami_abc_flow`. `three_d_claim` stays false; leftover #57 is
+  reused; the A/B 3-D premise stays. `navier_stokes_proof_claim`
+  stays false. Smokes:
+  `docs/benchmarks/force_is_essential_smoke.json`,
+  `docs/benchmarks/unforced_abc_slab_smoke.json`.
+
+### Added — A/B architecture slabs (theory 07-18, 07-19)
+
+- Force-free 2-D Taylor–Green BKM slab with an Interval time integral
+  and the 07-02 weak residual. Continuation accepts two locked decaying
+  windows or returns `Halt` (`BLOCKED` / `search_incomplete`).
+  `NS_AB_EXTERNAL_PREMISES` stays nonempty;
+  `navier_stokes_ab_architecture_ledger` is `CONDITIONAL`. Leftover #57
+  records infinite time / all data / 3-D / the bridge theorem.
+  `navier_stokes_proof_claim` stays false. Smokes:
+  `docs/benchmarks/unforced_bkm_slab_smoke.json`,
+  `docs/benchmarks/unforced_slab_continuation_smoke.json`.
+
 ### Added — NS parent-flag A/B lock (theory 07-08)
 
 - `navier_stokes_proof_claim` is earned only when a discharged ledger

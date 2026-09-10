@@ -46,6 +46,7 @@ CLAIM_FLAG_MODULES = (
     "omnibias.core.verified.swirl_heat",
     "omnibias.core.pulse_envelope",
     "omnibias.pinn.certified.forced_flat",
+    "omnibias.pinn.certified.unforced",
 )
 _BENCHMARK_PATH = re.compile(r"`(docs/benchmarks/[^`]+\.json)`")
 _IMPORT_PADE = re.compile(

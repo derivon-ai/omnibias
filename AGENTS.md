@@ -332,7 +332,7 @@ KERAS_BACKEND=torch      python -m pytest packages/omnibias-keras/tests -q
   a submodule back out later is cheap; un-shipping a premature distribution is not.
   See the `omnibias-new-package` skill. Theory 06-03 G1–G5 are
   **shipped**; they are
-  earned on `benchmarks/theory_homes.py` (42 packages, 119/119 homes,
+  earned on `benchmarks/theory_homes.py` (42 packages, 123/123 homes,
   Wave-0 A4–A7 recorded; G4 vacuous; G5 vacuous — 2 consumers, 389
   lines, not promoted). Theory 06-05 is **shipped** (document G1–G5;
   extract / paper / external stay later). Theory 07-01 is **shipped**
@@ -798,6 +798,21 @@ by that drift gate.
   `omnibias.core.pulse_envelope` + `omnibias.pinn.certified.forced_flat`
   (07-17, **shipped**; locked pulse composed into the 07-13 field;
   G1–G5 CI; scale premises untouched; not a forced-blowup reproof) /
+  `omnibias.pinn.certified.unforced`
+  (07-18, **shipped**; force-free TG slab + Interval BKM integral +
+  07-02 weak residual; G1–G5 CI; founding bias collapse, not
+  temperature collapse; not Clay A/B) /
+  `omnibias.pinn.certified.unforced`
+  (07-19, **shipped**; continue or Halt; leftover #57; G1–G5 CI;
+  founding bias collapse, not temperature collapse; not Clay A/B) /
+  `omnibias.pinn.certified.forced_flat`
+  (07-20, **shipped**; unforced limit of the 07-13 field is BLOCKED;
+  leftover #58 `f0_not_a_corollary`; G1–G5 CI; founding bias collapse,
+  not temperature collapse; not Clay A/B) /
+  `omnibias.pinn.certified.unforced`
+  (07-21, **shipped**; 3-D force-free ABC BKM slab + continuation;
+  leftover #57 reused; G1–G5 CI; founding bias collapse, not
+  temperature collapse; not Clay A/B) /
   `omnibias.pinn.inverse`
   (05-01, **shipped**; G1–G7 earned; locally-seeded `sd ~ alpha^(n-5/2)`;
   global search earned for n=3 only) /
@@ -908,6 +923,7 @@ by that drift gate.
   [`docs/api/ipm_remainder_cap.md`](docs/api/ipm_remainder_cap.md),
   [`docs/api/boussinesq_remainder_cap.md`](docs/api/boussinesq_remainder_cap.md),
   [`docs/api/pulse_family_composition.md`](docs/api/pulse_family_composition.md),
+  [`docs/api/unforced_slab.md`](docs/api/unforced_slab.md),
   [`docs/api/pinn_inverse.md`](docs/api/pinn_inverse.md),
   [`docs/api/tabpou.md`](docs/api/tabpou.md). Cost /
   wall-time / FermiNet-many-body gates are smoke-earned, not in CI

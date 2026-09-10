@@ -45,3 +45,34 @@ assert energy.exponent == Fraction(97, 200)
 assert from_rest_ramp().value() == 0
 assert honesty_payload()["forced_blowup_reproof_claim"] is False
 ```
+
+## Force is essential (07-20)
+
+Deleting the 07-13 stress correction does **not** produce an unforced
+Navier–Stokes solution. The uncorrected axis jet excludes `{0}` over
+`Q`. Anisotropy `ℓ_r / ℓ_z ≍ τ^h` thins as `τ` decreases. Core energy
+vanishes while `‖u‖_∞` explodes. That is Clay (C)/(D) geometry.
+Setting `f = 0` is a different PDE, leftover **#58**.
+
+```python
+from omnibias.core.proof.obligations.convergence_ledger import (
+    NS_AB_EXTERNAL_PREMISES,
+)
+from omnibias.pinn.certified.forced_flat import (
+    F0_NOT_A_COROLLARY_LEFTOVER,
+    unforced_limit_of_forced_flat,
+)
+
+report = unforced_limit_of_forced_flat()
+assert report["f0_plant"] == "BLOCKED"
+assert report["f0_reason"] == "force_is_part_of_the_construction"
+assert report["anisotropy_thins"] is True
+assert report["corrected_axis_T0"] == (0, 0)
+assert report["uncorrected_axis_T0"] != (0, 0)
+assert report["leftover_id"] == 58
+assert F0_NOT_A_COROLLARY_LEFTOVER["f0_not_a_corollary"] is True
+assert report["honesty"]["navier_stokes_proof_claim"] is False
+assert "three-dimensional unforced NS, not 2-D Taylor-Green" in (
+    NS_AB_EXTERNAL_PREMISES
+)
+```

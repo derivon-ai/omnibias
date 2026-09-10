@@ -56,6 +56,24 @@ assert polymer.strength == "CONDITIONAL"
 assert polymer.failing == ()
 ```
 
+The A/B architecture ledger is finite horizon / slab-count arithmetic
+with a printed premise list. It does not earn Clay (A)/(B).
+
+```python
+from omnibias.core.proof.obligations.convergence_ledger import (
+    NS_AB_EXTERNAL_PREMISES,
+    check_ledger,
+    navier_stokes_ab_architecture_ledger,
+)
+
+ab = navier_stokes_ab_architecture_ledger()
+ab_report = check_ledger(ab)
+assert ab_report.holds
+assert ab_report.strength == "CONDITIONAL"
+assert NS_AB_EXTERNAL_PREMISES
+assert ab.external_premises == NS_AB_EXTERNAL_PREMISES
+```
+
 A deliberately failing margin is named, not swallowed.
 
 ```python

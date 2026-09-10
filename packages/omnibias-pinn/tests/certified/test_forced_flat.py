@@ -172,3 +172,83 @@ def test_catalog_kind_is_registered() -> None:
     assert composed.parent == "Navier-Stokes forced blowup (Clay C/D)"
     assert composed.parent_status == "already_true"
     assert composed.mode == "exact_replay"
+    essential = catalog_entry("force_is_essential")
+    assert essential is not None
+    assert essential.parent == "Navier-Stokes forced blowup (Clay C/D)"
+    assert essential.parent_status == "already_true"
+    assert essential.mode == "exact_replay"
+
+
+def test_g1_unforced_limit_is_blocked() -> None:
+    from omnibias.pinn.certified.forced_flat import unforced_limit_of_forced_flat
+
+    report = unforced_limit_of_forced_flat()
+    assert report["uncorrected_axis_T0"] == (Fraction(599, 400), Fraction(0))
+    assert report["uncorrected_axis_T0"] != (0, 0)
+    assert report["f0_plant"] == "BLOCKED"
+    assert report["f0_reason"] == "force_is_part_of_the_construction"
+
+
+def test_g2_anisotropy_thins_on_locked_pair() -> None:
+    from omnibias.pinn.certified.forced_flat import (
+        enclose_anisotropy_ratio,
+        unforced_limit_of_forced_flat,
+    )
+
+    report = unforced_limit_of_forced_flat()
+    assert report["anisotropy_thins"] is True
+    lo = enclose_anisotropy_ratio(LOCKED_TAU_LO)
+    hi = enclose_anisotropy_ratio(LOCKED_TAU_HI)
+    assert lo.hi < hi.lo
+    assert LOCKED_TAU_LO < LOCKED_TAU_HI
+
+
+def test_g3_zero_jet_only_after_stress_correction() -> None:
+    from omnibias.pinn.certified.forced_flat import unforced_limit_of_forced_flat
+
+    report = unforced_limit_of_forced_flat()
+    assert report["corrected_axis_T0"] == (0, 0)
+    assert report["uncorrected_axis_T0"] != (0, 0)
+    assert axis_T0(uncorrected_jet_flat_profile()) != (0, 0)
+    assert axis_T0(locked_jet_flat_profile()) == (0, 0)
+
+
+def test_g4_leftover_58_and_ab_premises_untouched() -> None:
+    from omnibias.core.proof.obligations.convergence_ledger import (
+        NS_AB_EXTERNAL_PREMISES,
+    )
+    from omnibias.pinn.certified.forced_flat import (
+        F0_NOT_A_COROLLARY_LEFTOVER,
+        unforced_limit_of_forced_flat,
+    )
+
+    report = unforced_limit_of_forced_flat()
+    assert report["leftover_id"] == 58
+    assert F0_NOT_A_COROLLARY_LEFTOVER["leftover_id"] == 58
+    assert F0_NOT_A_COROLLARY_LEFTOVER["f0_not_a_corollary"] is True
+    flags = report["honesty"]
+    assert flags["navier_stokes_proof_claim"] is False
+    assert flags["forced_blowup_reproof_claim"] is False
+    assert flags["continuum_navier_stokes_claim"] is False
+    assert "three-dimensional unforced NS, not 2-D Taylor-Green" in (
+        NS_AB_EXTERNAL_PREMISES
+    )
+    assert len(NS_AB_EXTERNAL_PREMISES) == 5
+    assert report["energy_vanishes_while_linfty_explodes"] is True
+
+
+def test_module_does_not_import_navier_stokes() -> None:
+    from pathlib import Path
+
+    src = (
+        Path(__file__).resolve().parents[2]
+        / "src"
+        / "omnibias"
+        / "pinn"
+        / "certified"
+        / "forced_flat.py"
+    )
+    text = src.read_text(encoding="utf-8")
+    assert "from omnibias.pinn.certified.navier_stokes" not in text
+    assert "import omnibias.pinn.certified.navier_stokes" not in text
+    assert "from omnibias.pinn.certified import navier_stokes" not in text

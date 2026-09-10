@@ -1,0 +1,68 @@
+{
+  "schema": "omnibias.benchmarks.unforced_bkm_slab.v1",
+  "generated_utc": "2026-09-09T15:25:58Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.6",
+    "platform": "Linux-7.0.0-30-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.22"
+  },
+  "config": {
+    "family": "unforced_bkm_slab",
+    "full": false,
+    "honesty": {
+      "navier_stokes_proof_claim": false,
+      "continuum_navier_stokes_claim": false,
+      "forced_blowup_reproof_claim": false,
+      "three_d_claim": false,
+      "infinite_time_leftover": true,
+      "all_data_leftover": true,
+      "bridge_theorem_leftover": true,
+      "unforced_majorant_leftover": true,
+      "theorem_prover_verified": false,
+      "mathlib_verified": false,
+      "founding_bias_collapse": true,
+      "temperature_collapse": false,
+      "disclaimer": "finite force-free TG slab / continuation; not Clay (A)/(B); not a 3-D continuum majorant"
+    },
+    "bkm_integral": [
+      0.9516258196404009,
+      0.9516258196404087
+    ]
+  },
+  "rss_mb_at_start": 818.9,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_force_free",
+        "passed": true,
+        "detail": "Taylor-Green fixture force is the zero array; plant is unforced"
+      },
+      {
+        "name": "g2_weak_covers",
+        "passed": true,
+        "detail": "07-02 weak-form certificate covers the box"
+      },
+      {
+        "name": "g3_bkm_enclosure",
+        "passed": true,
+        "detail": "BKM integral enclosure is bounded, contains exact + integrand samples"
+      },
+      {
+        "name": "g4_honesty",
+        "passed": true,
+        "detail": "parent flags false; A/B leftovers named"
+      },
+      {
+        "name": "g5_ab_ledger_conditional",
+        "passed": true,
+        "detail": "navier_stokes_ab_architecture_ledger stays CONDITIONAL with nonempty premises"
+      }
+    ]
+  },
+  "wall_seconds": 1.0663237439875957
+}

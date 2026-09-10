@@ -342,7 +342,7 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Honesty and claim boundaries** ([06-02](honesty.md)): claim
   ladder + forbidden-claims register. Design record. Status is
   **shipped**.
-- **Packaging and rollout** (06-03): G1–G5 earned (119/119 homes).
+- **Packaging and rollout** (06-03): G1–G5 earned (123/123 homes).
   G4/G5 vacuous, not promoted. Status is **shipped**.
 - **Public primitive** (06-05): citation path; extract / paper /
   external stay later. Status is **shipped**.
@@ -390,6 +390,19 @@ gates are earned on smoke, not in CI `all_passed`.
 - **Pulse-family composition** ([07-17](api/pulse_family_composition.md)):
   locked occupancy pulse composed into the 07-13 field. Scale
   premises untouched. Not a forced-blowup reproof. Status is
+  **shipped**.
+- **Unforced BKM slab** ([07-18](api/unforced_slab.md)):
+  force-free 2-D Taylor–Green slab plus an Interval BKM integral.
+  Not Clay (A)/(B). Status is **shipped**.
+- **Unforced slab continuation** ([07-19](api/unforced_slab.md)):
+  accept decaying TG or Halt on growing vorticity. Leftover #57.
+  Not Clay (A)/(B). Status is **shipped**.
+- **Force is essential** ([07-20](api/forced_flat_blowup.md)):
+  deleting the 07-13 force is `BLOCKED`. Leftover #58
+  `f0_not_a_corollary`. Not Clay (A)/(B). Status is **shipped**.
+- **Unforced ABC slab** ([07-21](api/unforced_slab.md)):
+  3-D force-free ABC BKM slab plus continuation. Leftover #57
+  reused. `three_d_claim` false. Not Clay (A)/(B). Status is
   **shipped**.
 - **Training-idea ledger** (08-01): recommended stack; trainers do
   not clear Hilbert stretch. Design record. Status is **shipped**.

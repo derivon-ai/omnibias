@@ -68,6 +68,14 @@ NS_EXTERNAL_PREMISES: tuple[str, ...] = (
     "PDE residual estimates that the ledger treats as given",
 )
 
+NS_AB_EXTERNAL_PREMISES: tuple[str, ...] = (
+    "bridge theorem: a finite slab cover does not imply unforced global regularity",
+    "all smooth initial data, not Taylor-Green",
+    "three-dimensional unforced NS, not 2-D Taylor-Green",
+    "[0, infinity) is not a finite union of CI slabs",
+    "no uniform unforced 3-D vorticity majorant",
+)
+
 YM_EXTERNAL_PREMISES: tuple[str, ...] = (
     "continuum / thermodynamic limit of the lattice theory",
     "Osterwalder-Schrader reconstruction",
@@ -1209,6 +1217,41 @@ def navier_stokes_scale_ledger() -> ConvergenceLedger:
     )
 
 
+def navier_stokes_ab_architecture_ledger() -> ConvergenceLedger:
+    """Finite A/B *architecture* arithmetic. Premises stay nonempty.
+
+    Locked horizon ``H = 1/2`` and two-slab count. Margins only say
+    ``H < 1`` and ``n_slabs < 10``. This is not Clay (A)/(B).
+    """
+    horizon = AffineForm.variable("H")
+    n_slabs = AffineForm.variable("n_slabs")
+    return ConvergenceLedger(
+        name="navier_stokes_ab_architecture",
+        stage=StageMap(var="n", step=Fraction(0), initial=Fraction(0)),
+        parameters={"H": Fraction(1, 2), "n_slabs": Fraction(2)},
+        side_conditions=(
+            SideCondition(horizon, "ge", Fraction(0), name="horizon_nonneg"),
+            SideCondition(n_slabs, "ge", Fraction(1), name="at_least_one_slab"),
+        ),
+        obligations=(
+            MarginObligation(
+                "horizon_lt_one",
+                AffineForm.constant(0),
+                MinForm.singleton(AffineForm.constant(1)),
+                next_quantity=horizon,
+            ),
+            MarginObligation(
+                "n_slabs_lt_ten",
+                AffineForm.constant(0),
+                MinForm.singleton(AffineForm.constant(10)),
+                next_quantity=n_slabs,
+            ),
+        ),
+        parent=NS_PARENT,
+        external_premises=NS_AB_EXTERNAL_PREMISES,
+    )
+
+
 def failing_margin_ledger() -> ConvergenceLedger:
     """Deliberately broken particular-gain ledger (negative control)."""
     wave = _affine(Fraction(1, 2), sigma=1)
@@ -1326,6 +1369,7 @@ __all__ = [
     "LedgerReport",
     "MarginObligation",
     "MinForm",
+    "NS_AB_EXTERNAL_PREMISES",
     "NS_CD_PARENT",
     "NS_EXTERNAL_PREMISES",
     "NS_PARENT",
@@ -1348,6 +1392,7 @@ __all__ = [
     "honesty_payload",
     "ledger_obligation",
     "ledger_to_inequality_system",
+    "navier_stokes_ab_architecture_ledger",
     "navier_stokes_exponent_ledger",
     "navier_stokes_scale_ledger",
     "parent_earns_navier_stokes_claim",
