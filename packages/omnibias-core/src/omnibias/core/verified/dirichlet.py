@@ -35,7 +35,7 @@ that wall are provided and clearly labelled:
   power of ``pi``), read off the Bernoulli / Euler numbers;
 * an **attempted critical-strip enclosure** (:func:`zeta_euler_maclaurin`) is a
   **numerical** verified enclosure of the analytically-continued value via the
-  Euler-Maclaurin formula (DLMF 25.2.3) with a rigorous remainder.
+  Euler-Maclaurin formula (DLMF 25.2.9) with a rigorous remainder.
 
 Honesty / scope
 ---------------
@@ -269,7 +269,7 @@ def zeta_euler_maclaurin(
     r"""**Attempted** critical-strip enclosure of ``zeta(s)`` via Euler-Maclaurin.
 
     Extends the ``Re(s) > 1`` wall of :func:`zeta_enclosure` using the
-    Euler-Maclaurin continuation (DLMF 25.2.3): with ``N = num_sum_terms`` and
+    Euler-Maclaurin continuation (DLMF 25.2.9): with ``N = num_sum_terms`` and
     ``n = order`` correction terms,
 
     .. math::
@@ -278,14 +278,18 @@ def zeta_euler_maclaurin(
         + \sum_{k=1}^{n} \frac{B_{2k}}{(2k)!}\,(s)_{2k-1}\,N^{-s-2k+1} + R_{n},
 
     valid (and here rigorously enclosed) for ``Re(s) > -(2n+1)`` and ``s != 1``.
-    The remainder is bounded by DLMF 25.2.4,
+    Integrate the periodic Bernoulli remainder once more in DLMF 25.2.9.
+    The next correction plus the absolute integral bound gives
 
     .. math::
 
-        |R_n| \le \Bigl|\tfrac{s+2n+1}{\sigma+2n+1}\Bigr|\,
+        |R_n| \le \left(1+\tfrac{|s+2n+1|}{\sigma+2n+1}\right)\,
                   \Bigl|\tfrac{B_{2n+2}}{(2n+2)!}\,(s)_{2n+1}\,N^{-s-2n-1}\Bigr|,
 
     enclosed as the axis-aligned square containing that disc.
+    Here ``|periodic B_(2n+2)(x)| <= |B_(2n+2)|`` follows from its
+    absolutely convergent Fourier series. The integral converges for
+    ``sigma+2n+1 > 0``. Every factor in this upper bound is rounded outward.
 
     Honesty / scope
     ---------------
@@ -300,7 +304,8 @@ def zeta_euler_maclaurin(
         raise ValueError(f"order must be >= 1, got {order}")
     s_ci = ComplexInterval.from_value(s)
     # Remainder denominator sigma + 2n + 1 must be provably positive.
-    denom_re_lo = s_ci.re.lo + (2 * order + 1)
+    shift_iv = Interval.from_rational(2 * order + 1)
+    denom_re_lo = (s_ci.re + shift_iv).lo
     if denom_re_lo <= 0.0:
         raise ValueError(
             f"Euler-Maclaurin continuation needs Re(s) > -(2*order+1) = "
@@ -332,14 +337,18 @@ def zeta_euler_maclaurin(
         n_term = n_power_neg_s(num_sum_terms, shifted)  # N^{-(s+2k-1)}
         total = total + ComplexInterval.from_value(b_over_fac) * poch * n_term
 
-    # Rigorous remainder bound (DLMF 25.2.4).
+    # Next Bernoulli correction plus the absolute periodic-Bernoulli integral.
     b_rem = abs(bernoulli_number_exact(2 * order + 2) / Fraction(math.factorial(2 * order + 2)))
     poch_rem = _rising_factorial_ci(s_ci, 2 * order + 1)
-    shifted_rem = s_ci + ComplexInterval.from_parts(Interval.point(float(2 * order + 1)))
+    shifted_rem = s_ci + ComplexInterval.from_parts(shift_iv)
     n_rem = n_power_neg_s(num_sum_terms, shifted_rem)  # N^{-(s+2n+1)}
-    num_factor = (s_ci + ComplexInterval.from_parts(Interval.point(float(2 * order + 1)))).mag
-    factor_bound = num_factor / denom_re_lo  # |(s+2n+1)/(sigma+2n+1)| upper bound
-    r_bound = float(Interval.from_rational(b_rem).hi) * poch_rem.mag * n_rem.mag * factor_bound
+    factor_bound = 1 + Interval.point(shifted_rem.mag) / Interval.point(denom_re_lo)
+    r_bound = (
+        Interval.from_rational(b_rem)
+        * Interval.point(poch_rem.mag)
+        * Interval.point(n_rem.mag)
+        * factor_bound
+    ).hi
     remainder = ComplexInterval.from_parts(Interval(-r_bound, r_bound), Interval(-r_bound, r_bound))
     return total + remainder
 

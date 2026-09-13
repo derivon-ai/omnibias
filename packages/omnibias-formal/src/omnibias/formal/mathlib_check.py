@@ -1000,7 +1000,14 @@ def _gen_sign(cert: Mapping[str, Any]) -> str | None:
 #: Ordered obligation generators.  The label is the obligation *class* reported
 #: by :func:`classify_obligation`; :func:`generate_obligation` returns the first
 #: non-``None`` source.  A single source of truth keeps the two in lockstep.
+def _gen_realization_replay(cert: Mapping[str, Any]) -> str | None:
+    from omnibias.core.proof.realization_replay import generate_replay_obligation
+
+    return generate_replay_obligation(cert, mathlib=True)
+
+
 _GENERATORS: tuple[tuple[str, Callable[[Mapping[str, Any]], str | None]], ...] = (
+    ("realization_replay", _gen_realization_replay),
     ("positive_definite", _gen_positive_definite),
     ("radii_polynomial", _gen_radii_polynomial),
     ("krawczyk", _gen_krawczyk),
@@ -1095,28 +1102,26 @@ def check_certificate(
             False, False, obligation, "Lean toolchain or analytic checkout unavailable"
         )
 
+    from omnibias.core.proof.lean_lock import generated_lean_obligation
+
     generated = root / _GENERATED_REL
-    original = generated.read_text(encoding="utf-8") if generated.exists() else None
     try:
-        generated.write_text(obligation, encoding="utf-8")
-        proc = subprocess.run(
-            ["lake", "build"],
-            cwd=str(root),
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            check=False,
-        )
-        ok = proc.returncode == 0
-        detail = (
-            "Mathlib kernel accepted the obligation" if ok else (proc.stderr or proc.stdout)[-2000:]
-        )
-        return MathlibCheckResult(ok, True, obligation, detail)
+        with generated_lean_obligation(root, generated, obligation):
+            proc = subprocess.run(
+                ["lake", "build"],
+                cwd=str(root),
+                capture_output=True,
+                text=True,
+                timeout=timeout,
+                check=False,
+            )
+            ok = proc.returncode == 0
+            detail = (
+                "Mathlib kernel accepted the obligation" if ok else (proc.stderr or proc.stdout)[-2000:]
+            )
+            return MathlibCheckResult(ok, True, obligation, detail)
     except (OSError, subprocess.SubprocessError) as exc:  # pragma: no cover - env dependent
         return MathlibCheckResult(False, False, obligation, f"lake invocation failed: {exc}")
-    finally:
-        if original is not None:
-            generated.write_text(original, encoding="utf-8")
 
 
 __all__ = [

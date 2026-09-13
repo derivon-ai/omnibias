@@ -359,9 +359,15 @@ rectangles (Stirling in a right sector, multiplicative reflection on the left).
 functional-equation residual `xi(s) - xi(1-s)` as Enclosure Collapse of a finite
 obligation (not an identity over `Q`). A rectangle in `Re(s) > 1` has winding
 `0`; a strip contour is allowed to return BLOCKED and is never a zero
-certificate. `riemann_siegel` adds a Hardy–Littlewood AFE with a cited
-Titchmarsh §4.13 remainder majorant on a locked compact and **refuses**
-outside it.
+certificate. `riemann_siegel` computes Hardy–Littlewood AFE main terms on a
+locked compact and encloses their residual using an independent
+Euler–Maclaurin enclosure of the same rectangle. The optional
+`remainder_factor` must be finite and at least one: it only inflates this
+computed bound. This incurs Euler–Maclaurin evaluation cost; an independent
+fast AFE remainder theorem is not implemented. Rectangles that leave the
+compact, including those whose imaginary interval meets zero, are refused.
+If the chi-factor enclosure is unresolved on a wide rectangle, the evaluator
+returns the Euler–Maclaurin enclosure directly.
 
 ::: omnibias.core.verified.gamma_complex
     options:

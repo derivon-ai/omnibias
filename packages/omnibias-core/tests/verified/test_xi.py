@@ -5,10 +5,12 @@
 from __future__ import annotations
 
 import math
+import random
 
 import pytest
 from omnibias.core.verified.complex_interval import ComplexInterval
 from omnibias.core.verified.dirichlet import zeta_enclosure, zeta_euler_maclaurin
+from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.xi import (
     chi_factor,
     continuation_honesty,
@@ -39,9 +41,68 @@ def test_zeta_continued_halfplane_matches_series() -> None:
     assert right.re.contains(pi2_over_6)
 
 
-def test_zeta_via_fe_trivial_zero() -> None:
-    enc = zeta_via_functional_equation(-2.0)
-    assert enc.re.contains(0.0) and enc.im.contains(0.0)
+@pytest.mark.parametrize("s", [-2.0, -4.0, -6.0, -20.0])
+def test_zeta_via_fe_trivial_zero(s: float) -> None:
+    assert zeta_via_functional_equation(s) == ComplexInterval.zero()
+
+
+@pytest.mark.parametrize("s", [-2.0 - 1e-13, -2.0 + 1e-13])
+def test_zeta_via_fe_near_trivial_zero_is_nonzero(s: float) -> None:
+    mp = pytest.importorskip("mpmath")
+    enc = zeta_via_functional_equation(s)
+    with mp.workdps(60):
+        true = complex(mp.zeta(mp.mpf(s)))
+    assert true.real != 0.0
+    assert not enc.re.contains(0.0)
+    assert _encloses(enc, true), (s, enc, true)
+
+
+def test_zeta_via_fe_tiny_nonzero_rectangle_encloses_grid_and_random() -> None:
+    mp = pytest.importorskip("mpmath")
+    # The old tolerance shortcut mapped this entire nonzero rectangle to {0}.
+    box = ComplexInterval(Interval(-2.0 + 2e-13, -2.0 + 8e-13), Interval(-1e-14, 1e-14))
+    enc = zeta_via_functional_equation(box)
+    assert not enc.re.contains(0.0)
+    rng = random.Random(712)
+    points = [
+        complex(box.re.lo + i * (box.re.hi - box.re.lo) / 8, -1e-14 + j * 2e-14 / 8)
+        for i in range(9)
+        for j in range(9)
+    ]
+    points.extend(
+        complex(rng.uniform(box.re.lo, box.re.hi), rng.uniform(box.im.lo, box.im.hi))
+        for _ in range(30)
+    )
+    with mp.workdps(60):
+        for s in points:
+            true = complex(mp.zeta(mp.mpc(s.real, s.imag)))
+            assert _encloses(enc, true), (s, enc, true)
+
+
+@pytest.mark.parametrize(
+    "box",
+    [
+        ComplexInterval(Interval(-2.0 - 1e-13, -2.0 + 1e-13), Interval(-1e-13, 1e-13)),
+        ComplexInterval(Interval.point(-2.0), Interval(-1e-13, 1e-13)),
+        ComplexInterval(Interval(-2.0 - 1e-13, -2.0 + 1e-13), Interval.point(0.0)),
+    ],
+)
+def test_zeta_via_fe_tiny_pole_crossing_rectangles_are_refused(box: ComplexInterval) -> None:
+    # These boxes contain a trivial zero and nonzero values, so {0} is unsound.
+    with pytest.raises(ValueError, match="pole"):
+        zeta_via_functional_equation(box)
+
+
+def test_zeta_via_fe_nearest_nonzero_float_is_refused() -> None:
+    # Outward rounding cannot separate this Gamma argument from its pole.
+    with pytest.raises(ValueError, match="pole"):
+        zeta_via_functional_equation(math.nextafter(-2.0, 0.0))
+
+
+def test_zeta_continued_zero_encloses_negative_half() -> None:
+    enc = zeta_continued(0.0)
+    assert _encloses(enc, -0.5 + 0.0j)
+    assert not enc.re.contains(0.0)
 
 
 def test_zeta_via_fe_encloses_mpmath_left_half() -> None:
@@ -53,9 +114,10 @@ def test_zeta_via_fe_encloses_mpmath_left_half() -> None:
         assert _encloses(enc, true), (s, enc, true)
 
 
-def test_zeta_via_fe_refuses_nonnegative_real_part() -> None:
+@pytest.mark.parametrize("s", [0.0, 1e-13, 0.5])
+def test_zeta_via_fe_refuses_nonnegative_real_part(s: float) -> None:
     with pytest.raises(ValueError, match="Re\\(s\\) < 0"):
-        zeta_via_functional_equation(0.5)
+        zeta_via_functional_equation(s)
     with pytest.raises(ValueError, match="pole"):
         zeta_continued(1.0)
 

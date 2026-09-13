@@ -6,11 +6,12 @@ r"""A fixed-box certified zero count for the genuine de Bruijn-Newman ``H_t``.
 sound argument-principle zero *count* of the real de Bruijn-Newman function
 ``H_t`` inside one declared, finite complex rectangle, at one declared,
 finite truncation and series-term budget. It does **not** produce a bound on
-the de Bruijn-Newman constant ``Lambda``, and it never will by itself -- a
-``Lambda <= t0`` certificate additionally needs an independently published
-**far-field** theorem (the behaviour of ``H_t`` over the *entire* unbounded
-real line, at *every* ``t`` up to ``t0``), which this module does not attempt
-and which is recorded as an external premise everywhere this module is used.
+the de Bruijn-Newman constant ``Lambda``, and it never will by itself.
+To prove ``Lambda <= t0``, it suffices to prove that ``H_t0`` has only real
+zeros globally, at the single fixed parameter ``t = t0``. The proposed
+finite-reduction route additionally needs a **far-field** theorem excluding
+non-real zeros beyond the bounded region at that same parameter. This module
+does not discharge that theorem; it is recorded as an external premise.
 See ``theory/07-frontier/01-sub-obligation-ledger.md``'s RH row and
 ``docs/frontier-ledger.md`` (planned Lambda program; no implementation).
 Never read a result from this module as evidence for or against the
@@ -90,14 +91,16 @@ Two genuinely different rigorous ingredients are combined, each finite:
 
 Neither ingredient is a far-field theorem: both apply only inside one
 declared, finite rectangle and one declared, finite truncation ``U``. The
-**far-field premise** a genuine ``Lambda <= t0`` bound additionally needs --
-control of ``H_t(x+iy)`` for *every* real ``x`` (not one bounded rectangle)
-and *every* ``t`` up to ``t0`` (not one fixed value) -- is an independently
-published theorem (the Riemann-Siegel-type asymptotics of Polymath15's
-paper, arXiv:1904.12438, section on "zero-free regions") that this module
-neither states, proves, nor invokes as if it were established here. Every
-public function in this module is scoped to one fixed rectangle and is
-honestly a **local, finite** statement.
+**far-field premise** for the proposed ``Lambda <= t0`` reduction is control
+of ``H_t0(x+iy)`` outside the bounded region, sufficient to exclude every
+non-real zero there. Published Riemann-Siegel-type asymptotics (Polymath15,
+arXiv:1904.12438, section on "zero-free regions") provide relevant estimates,
+but this module does not discharge their hypotheses for the named attempt.
+Together with a complete finite-region real-zero proof, such control at
+``t = t0`` would suffice. Requiring only real zeros for every ``t in [0, t0]``
+would be stronger: the assertion at ``t = 0`` already implies RH. The local
+evaluators and counts here remain **finite** statements at their declared
+fixed parameter.
 
 Quadrature choice
 ------------------
@@ -566,10 +569,12 @@ def attempt_named_lambda_bound(
 ) -> LambdaBoundAttempt:
     """Attempt ``Lambda <= t0`` with a cited far-field premise as an external obligation.
 
-    A complete proof would need (i) a finite contour cover of every relevant
-    zero of ``H_t`` for all ``t in [0, t0]`` and (ii) an independently
-    published far-field theorem that no zeros hide at infinity (Polymath15 /
-    Rodgers--Tao style).  This function **records** both obligations.  It
+    This finite-reduction route needs (i) a complete contour cover proving
+    that every relevant zero of ``H_t0`` in the bounded region is real and
+    (ii) a far-field theorem excluding non-real zeros outside that region,
+    both at the single parameter ``t = t0``. Global real-rootedness of
+    ``H_t0`` suffices for ``Lambda <= t0``. This function **records** the two
+    unresolved obligations. It
     does not run an unbounded cover, does not import
     :mod:`omnibias.core.verified.dirichlet`, and does not apply Padé / Borel
     to a Dirichlet series.
@@ -592,13 +597,14 @@ def attempt_named_lambda_bound(
     missing: list[str] = []
     if not finite_cover:
         missing.append(
-            "finite contour cover of H_t zeros along the real line for all "
-            f"t in [0, {t0}] (local rectangles are not a cover)"
+            "complete finite contour cover proving that every relevant H_t0 "
+            f"zero in the bounded region is real at t0={t0} "
+            "(local rectangles are not a complete cover)"
         )
     if not far_field_premise_discharged:
         missing.append(
             "cited far-field premise "
-            "(Polymath15 / Rodgers-Tao unbounded-line zero-free region) "
+            f"(exclusion of non-real H_t0 zeros outside the bounded region at t0={t0}) "
             "is an external obligation, not discharged in this repository"
         )
     certified = finite_cover and far_field_premise_discharged
@@ -618,8 +624,8 @@ def attempt_named_lambda_bound(
 class FiniteHtRectanglePack:
     """A declared finite list of real-axis ``H_t`` rectangles on a bounded interval.
 
-    Local certified counts do **not** make a cover of ``R`` for all
-    ``t in [0, t0]``. ``finite_cover_certified`` is frozen ``False``.
+    Local certified counts do **not** establish a whole-line real-zero
+    theorem at the pack's fixed ``t``. ``finite_cover_certified`` is frozen ``False``.
     ``rh_claim`` is frozen ``False``.
     """
 
@@ -637,7 +643,7 @@ class FiniteHtRectanglePack:
         if self.finite_cover_certified:
             raise ValueError(
                 "finite_cover_certified must stay False "
-                "(a local pack is not a cover of R for all t in [0, t0])"
+                "(a local pack does not establish a whole-line real-zero theorem at its fixed t)"
             )
 
 

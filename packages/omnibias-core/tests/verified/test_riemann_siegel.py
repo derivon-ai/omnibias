@@ -4,8 +4,13 @@
 
 from __future__ import annotations
 
+import math
+import random
+
 import pytest
+from omnibias.core.verified.complex_interval import ComplexInterval
 from omnibias.core.verified.dirichlet import zeta_euler_maclaurin
+from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.riemann_siegel import (
     T_MAX,
     T_MIN,
@@ -24,6 +29,22 @@ def test_afe_honesty() -> None:
     assert h["rh_claim"] is False
     assert h["pade"] is False
     assert h["gabcke_remainder"] is False
+    assert h["independent_afe_remainder"] is False
+    assert h["euler_maclaurin_residual"] is True
+
+
+@pytest.mark.parametrize("factor", [1e-12, 0.99, 0.0, -1.0, math.inf, -math.inf, math.nan])
+def test_afe_refuses_shrinking_or_nonfinite_residual_factor(factor: float) -> None:
+    # The old arbitrary positive factor gave a false enclosure at .5+10j.
+    with pytest.raises(ValueError, match="finite and at least 1"):
+        zeta_approximate_functional_equation(0.5 + 10j, remainder_factor=factor)
+
+
+@pytest.mark.parametrize("imaginary", [Interval(0, 10), Interval(-10, 10), Interval(6, 10)])
+def test_afe_checks_the_entire_imaginary_interval(imaginary: Interval) -> None:
+    box = ComplexInterval(Interval.point(0.5), imaginary)
+    with pytest.raises(ValueError, match="throughout the rectangle"):
+        zeta_approximate_functional_equation(box)
 
 
 def test_afe_refuses_outside_compact() -> None:
@@ -43,6 +64,32 @@ def test_afe_encloses_mpmath_on_named_pack() -> None:
         with mp.workdps(40):
             true = complex(mp.zeta(mp.mpc(s.real, s.imag)))
         assert _encloses(enc, true), (s, enc, true)
+
+
+def test_minimal_residual_inflation_encloses_whole_rectangles() -> None:
+    mp = pytest.importorskip("mpmath")
+    rng = random.Random(1604)
+    for imag in (Interval(7, 12), Interval(-20, -15), Interval(30, 40)):
+        box = ComplexInterval(Interval(0.25, 0.75), imag)
+        bound = zeta_approximate_functional_equation(box, remainder_factor=1)
+        samples = [complex(0.25 + j/20, imag.lo + k*imag.width/10)
+                   for j in range(11) for k in range(11)]
+        samples += [complex(rng.uniform(box.re.lo, box.re.hi), rng.uniform(imag.lo, imag.hi))
+                    for _ in range(25)]
+        with mp.workdps(45):
+            for s in samples:
+                actual = mp.zeta(mp.mpc(s.real, s.imag))
+                assert mp.mpf(bound.re.lo) <= actual.real <= mp.mpf(bound.re.hi)
+                assert mp.mpf(bound.im.lo) <= actual.imag <= mp.mpf(bound.im.hi)
+
+
+def test_old_small_factor_counterexample_at_minimum_valid_inflation() -> None:
+    mp = pytest.importorskip("mpmath")
+    bound = zeta_approximate_functional_equation(0.5 + 10j, remainder_factor=1)
+    with mp.workdps(60):
+        actual = mp.zeta(mp.mpc(0.5, 10))
+        assert mp.mpf(bound.re.lo) <= actual.real <= mp.mpf(bound.re.hi)
+        assert mp.mpf(bound.im.lo) <= actual.imag <= mp.mpf(bound.im.hi)
 
 
 def test_afe_and_em_overlap_contain_sample() -> None:

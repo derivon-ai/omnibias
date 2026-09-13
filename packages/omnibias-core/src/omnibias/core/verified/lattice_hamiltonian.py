@@ -422,7 +422,7 @@ def restrict_to_indices(matrix: FloatArray, indices: IntArray) -> FloatArray:
     """The principal submatrix of ``matrix`` on ``indices`` (a diagonal-symmetry sector)."""
     if indices.size == 0:
         raise ValueError("sector is empty")
-    return cast(FloatArray, np.asarray(matrix)[np.ix_(indices, indices)])
+    return np.asarray(matrix)[np.ix_(indices, indices)]
 
 
 def z2_parity_basis(n_sites: int, parity: Literal[1, -1]) -> FloatArray:

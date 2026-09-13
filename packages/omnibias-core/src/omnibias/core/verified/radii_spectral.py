@@ -146,10 +146,17 @@ def constant_coefficient_band(
     ``cos(x)``, which couples ``d = \pm 1`` with the constant coefficient
     ``1/2``).
     """
-    # Each closure binds its own `_c` as a default argument so every offset
-    # keeps its own constant rather than all closing over the loop's last value.
+    # The factory binds each constant separately, preserving one closure per offset.
+    def constant_symbol(value: ComplexLike) -> Symbol:
+        coefficient = ComplexInterval.from_value(value)
+
+        def evaluate(_wavevector: Wavevector) -> ComplexInterval:
+            return coefficient
+
+        return evaluate
+
     couplings: dict[Wavevector, Symbol] = {
-        tuple(d): (lambda k, _c=ComplexInterval.from_value(value): _c)
+        tuple(d): constant_symbol(value)
         for d, value in coupling_constants.items()
     }
     return BandedLinearPart(diagonal, couplings)

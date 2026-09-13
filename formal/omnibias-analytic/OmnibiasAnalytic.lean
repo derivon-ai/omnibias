@@ -24,7 +24,9 @@ replay of a planted rational enclosure DAG, named compact-box residual /
 finite-matrix gap plants, named SU(2) / SU(3) Casimir identities, and
 named polymer-coordination identities, named Racah 6j identities,
 and the integer Weyl-volume prefactor `6*4=24`.
-It makes no continuum or asymptotic claim.
+The Dynamics modules additionally check real-variable derivative and zero-count
+implications under explicit analytic hypotheses. They do not establish full
+physical passage estimates, global cycle capture, or Hilbert XVI.
 -/
 
 import OmnibiasAnalytic.Check.EnclosedSign
@@ -42,4 +44,15 @@ import OmnibiasAnalytic.Check.HaarVolume
 import OmnibiasAnalytic.Check.ConvergenceLedger
 import OmnibiasAnalytic.Check.StressCone
 import OmnibiasAnalytic.Tower
+import OmnibiasAnalytic.RealizationReplay
+import OmnibiasAnalytic.RealizationAlgebra
+import OmnibiasAnalytic.Dynamics.Hilbert16Rolle
+import OmnibiasAnalytic.Dynamics.Hilbert16Parabola
+import OmnibiasAnalytic.Dynamics.Hilbert16Resonance
+import OmnibiasAnalytic.Dynamics.Hilbert16ReturnMap
+import OmnibiasAnalytic.Dynamics.Hilbert16Scale
+import OmnibiasAnalytic.Dynamics.Hilbert16ChiScale
+import OmnibiasAnalytic.Dynamics.Hilbert16SaddleNode
+import OmnibiasAnalytic.Dynamics.Hilbert16TwoBlowup
+import OmnibiasAnalytic.Dynamics.Hilbert16ScaleDichotomy
 import OmnibiasAnalytic.Generated

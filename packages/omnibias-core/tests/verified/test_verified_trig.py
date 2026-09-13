@@ -40,7 +40,9 @@ _INTERVALS = [
 def _samples(lo: float, hi: float, n: int = 400) -> list[float]:
     if hi <= lo:
         return [lo]
-    return [lo + (hi - lo) * i / n for i in range(n + 1)]
+    # Rounded interpolation can put the final point outside the input box
+    # (e.g. 0.10000000000000003 when hi=0.1). Test only the declared domain.
+    return [max(lo, min(hi, lo + (hi - lo) * i / n)) for i in range(n + 1)]
 
 
 @pytest.mark.parametrize(("lo", "hi"), _INTERVALS)

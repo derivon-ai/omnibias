@@ -429,7 +429,7 @@ class KindMetaFamily:
     def check(self, candidate: Candidate) -> ExactCheck | None:
         if not isinstance(candidate, str) or candidate not in self.sorts:
             return None
-        sort = cast(ConditionSort, candidate)
+        sort = candidate
         family = self._resolved.get(sort)
         if family is None:
             return ExactCheck(

@@ -40,7 +40,7 @@ theorem tower_horner_coeffs : OmnibiasAnalytic.Tower.sigmoidCoeffList 2 = [0, 1,
 
 theorem tower_horner_result :
     (evalTrace towerHornerOps).getLast? = some (point (-2 / 27)) := by
-  decide
+  decide +kernel
 
 /-! ### B. NK bound DAG plus unique root of `x² - 2` -/
 
@@ -67,7 +67,7 @@ theorem nk_trace_bounds :
     (evalTrace nkBoundOps)[8]? = some (point (1 / 12)) ∧
     (evalTrace nkBoundOps)[10]? = some (point (1 / 3)) ∧
     (evalTrace nkBoundOps)[14]? = some (point (-1 / 8)) := by
-  decide
+  decide +kernel
 
 theorem nk_trace_unique_zero :
     ((evalTrace nkBoundOps)[8]? = some (point (1 / 12)) ∧
@@ -96,7 +96,7 @@ def bernoulliOps : List TraceOp :=
 theorem bernoulli_b2_zetaNeg1 :
     (evalTrace bernoulliOps)[7]? = some (point (1 / 6)) ∧
     (evalTrace bernoulliOps)[10]? = some (point (-1 / 12)) := by
-  decide
+  decide +kernel
 
 /-! ### D. Exact LDLᵀ of `[[2, 1], [1, 2]]` -/
 
@@ -115,6 +115,6 @@ theorem ldlt_plant_pivots_pos :
     (evalTrace ldltOps)[0]? = some (point 2) ∧
     (evalTrace ldltOps)[6]? = some (point (3 / 2)) ∧
     (0 : ℚ) < 2 ∧ (0 : ℚ) < 3 / 2 := by
-  decide
+  decide +kernel
 
 end OmnibiasAnalytic.Check

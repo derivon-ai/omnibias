@@ -153,17 +153,6 @@ from omnibias.core.proof.obligations.convergence_ledger import (
     seal_ledger_certificate,
     strong_coupling_polymer_ledger,
 )
-from omnibias.core.proof.obligations.stress_cone import (
-    PAYLOAD_CONE,
-    ConeCertificateReport,
-    ConeQuery,
-    ConeReport,
-    check_cone,
-    cone_obligation,
-    locked_interior_cone,
-    replay_cone_certificate,
-    seal_cone_certificate,
-)
 from omnibias.core.proof.obligations.rational_stencil import (
     Obligation,
     RationalStencil,
@@ -174,6 +163,17 @@ from omnibias.core.proof.obligations.rational_stencil import (
     seal_poisedness_certificate,
     seal_stencil_certificate,
     stencil_consistency_obligation,
+)
+from omnibias.core.proof.obligations.stress_cone import (
+    PAYLOAD_CONE,
+    ConeCertificateReport,
+    ConeQuery,
+    ConeReport,
+    check_cone,
+    cone_obligation,
+    locked_interior_cone,
+    replay_cone_certificate,
+    seal_cone_certificate,
 )
 from omnibias.core.proof.observe import (
     FEATURE_DIM,

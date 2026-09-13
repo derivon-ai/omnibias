@@ -22,6 +22,7 @@ Riemann Hypothesis.
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 from omnibias.core.verified.complex_interval import ComplexInterval, ComplexLike
@@ -57,16 +58,16 @@ def _contains_one(s: ComplexInterval) -> bool:
     return (s - ComplexInterval.one()).modulus().lo <= 0.0
 
 
-def _is_near_nonpositive_even_integer(s: ComplexInterval, *, tol: float = 1e-12) -> bool:
-    if s.re.width > tol or s.im.width > tol:
-        return False
-    if not s.im.contains(0.0):
-        return False
-    x = s.re.mid
-    if x > tol:
-        return False
-    n = round(x)
-    return n % 2 == 0 and abs(x - n) <= tol
+def _is_negative_even_integer(s: ComplexInterval) -> bool:
+    """Whether the entire rectangle is one exact, strictly negative even integer."""
+    x = s.re.lo
+    return (
+        x == s.re.hi
+        and s.im.lo == s.im.hi == 0.0
+        and math.isfinite(x)
+        and x < 0.0
+        and x % 2.0 == 0.0
+    )
 
 
 def chi_factor(s: ComplexLike) -> ComplexInterval:
@@ -90,16 +91,20 @@ def zeta_via_functional_equation(
 ) -> ComplexInterval:
     r"""``zeta(s) = chi(s) zeta(1-s)`` for ``Re(s) < 0``, using the series on the right.
 
-    Requires ``Re(s).hi < 0`` so that ``Re(1-s).lo > 1``. Negative even integers
-    (trivial zeros) return the exact ``0`` without evaluating ``chi``.
+    Requires ``Re(s).hi < 0`` so that ``Re(1-s).lo > 1``. Exact singleton
+    negative even integers (trivial zeros) return the exact ``0`` without
+    evaluating ``chi``. Other rectangles, however narrow, use the interval
+    evaluator; it may refuse a rectangle that meets a Gamma pole or cannot
+    separate the denominator from zero. In particular, ``s = 0`` is outside
+    this function's domain; :func:`zeta_continued` encloses its value instead.
     """
     s_ci = _as_ci(s)
-    if _is_near_nonpositive_even_integer(s_ci):
-        return ComplexInterval.zero()
     if s_ci.re.hi >= 0.0:
         raise ValueError(
             f"zeta_via_functional_equation requires Re(s) < 0; got Re.hi={s_ci.re.hi!r}"
         )
+    if _is_negative_even_integer(s_ci):
+        return ComplexInterval.zero()
     right = zeta_enclosure(ComplexInterval.one() - s_ci, num_terms=num_terms)
     return chi_factor(s_ci) * right
 

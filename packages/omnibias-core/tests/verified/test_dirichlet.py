@@ -16,6 +16,8 @@ Rigor checks (every enclosure must *contain* the ``mpmath`` ground truth):
 
 from __future__ import annotations
 
+import random
+
 import pytest
 
 mp = pytest.importorskip("mpmath")
@@ -178,6 +180,26 @@ class TestZetaEulerMaclaurin:
         # continued to Re(s) < 0 must still bracket the exact value zeta(-2) = 0.
         enc = zeta_euler_maclaurin(complex(-2.0, 0.0), num_sum_terms=30, order=8)
         assert enc.re.contains(0.0) and enc.im.contains(0.0)
+
+    @pytest.mark.parametrize("order", [1, 2, 3])
+    def test_remainder_near_extended_domain_boundary_on_whole_box(self, order: int) -> None:
+        # Exercise the once-integrated remainder beyond the initial sigma>-2n
+        # domain, with very short sums so the analytic tail is material.
+        sigma = Interval(-2*order - 0.75, -2*order - 0.25)
+        imaginary = Interval(0.5, 1.5)
+        enc = zeta_euler_maclaurin(
+            ComplexInterval(sigma, imaginary), num_sum_terms=2, order=order
+        )
+        samples = [complex(sigma.lo + j*sigma.width/10, 0.5 + k/10)
+                   for j in range(11) for k in range(11)]
+        rng = random.Random(1605 + order)
+        samples += [complex(rng.uniform(sigma.lo, sigma.hi), rng.uniform(0.5, 1.5))
+                    for _ in range(25)]
+        with mp.workdps(50):
+            for s in samples:
+                actual = mp.zeta(mp.mpc(s.real, s.imag))
+                assert mp.mpf(enc.re.lo) <= actual.real <= mp.mpf(enc.re.hi)
+                assert mp.mpf(enc.im.lo) <= actual.imag <= mp.mpf(enc.im.hi)
 
 
 class TestNPowerNegS:

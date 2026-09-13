@@ -167,7 +167,8 @@ def two_site_hubbard_exact_energy(*, hopping: float, u: float) -> float:
     This is an analytic oracle for the certificate, not a continuum claim.
     """
     half = 0.5 * float(u)
-    return half - (half * half + 4.0 * float(hopping) * float(hopping)) ** 0.5
+    energy: float = half - (half * half + 4.0 * float(hopping) * float(hopping)) ** 0.5
+    return energy
 
 
 def hubbard_half_filled_ground_state(

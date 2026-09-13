@@ -11,8 +11,11 @@ needs to replace float64 padding with theorem-grade bounds.
 Layers
 ------
 * :mod:`~omnibias.core.verified.interval` -- rigorous interval arithmetic.
-* :mod:`~omnibias.core.verified.transcend` -- guaranteed ``exp``/``tanh``/``sigmoid``
-  enclosures (``mpmath`` when present, else ulp-inflated libm).
+* :mod:`~omnibias.core.verified.transcend` -- directed ``exp``/``tanh``/``sigmoid``
+  enclosures with optional mpmath; the libm fallback is conditional and refused
+  in certificate mode.
+* :mod:`~omnibias.core.verified.clamped_biharmonic` -- exact full Green-operator
+  constants and a conditional rational contraction gate for a clamped cubic beam.
 * :mod:`~omnibias.core.verified.coeffs` -- exact-integer tower coefficients +
   interval Horner.
 * :mod:`~omnibias.core.verified.sigma` -- rigorous ``sigma^(k)`` tower enclosure.
@@ -37,6 +40,12 @@ from omnibias.core.verified.banded import (
     banded_tail_inverse_bound,
     finite_band_row_sum_bound,
     geometric_band_row_sum_bound,
+)
+from omnibias.core.verified.clamped_biharmonic import (
+    ClampedCubicContraction,
+    clamped_biharmonic_green_kernel,
+    clamped_biharmonic_inverse_norm,
+    clamped_cubic_contraction,
 )
 from omnibias.core.verified.coeffs import (
     bernoulli_number_exact,
@@ -576,6 +585,7 @@ __all__ = [
     "CONTINUUM_PDE_CLAIM_KEY",
     "CRAMER_UNIFORM_BOUND",
     "CertifiedGoFResult",
+    "ClampedCubicContraction",
     "Coeff",
     "CohnElkiesBound",
     "ComplexInterval",
@@ -710,6 +720,9 @@ __all__ = [
     "check_pointwise_bound",
     "chi_factor",
     "chi_squared_enclosure",
+    "clamped_biharmonic_green_kernel",
+    "clamped_biharmonic_inverse_norm",
+    "clamped_cubic_contraction",
     "clear_libm_fallback_used",
     "clenshaw_curtis_integral",
     "cohn_elkies_hermite_bound",

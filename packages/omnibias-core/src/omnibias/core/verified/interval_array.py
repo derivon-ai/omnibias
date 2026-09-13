@@ -146,7 +146,7 @@ class IntervalArray:
     @property
     def mid(self) -> FloatArray:
         """A representable midpoint array contained in each interval."""
-        midpoint = cast(FloatArray, 0.5 * self.lo + 0.5 * self.hi)
+        midpoint = 0.5 * self.lo + 0.5 * self.hi
         midpoint = cast(
             FloatArray,
             np.where(np.isneginf(self.lo) & np.isposinf(self.hi), 0.0, midpoint),
@@ -163,7 +163,7 @@ class IntervalArray:
     @property
     def width(self) -> FloatArray:
         """Outward-rounded widths."""
-        return _succ(cast(FloatArray, self.hi - self.lo))
+        return _succ(self.hi - self.lo)
 
     @property
     def mag(self) -> FloatArray:
@@ -184,11 +184,11 @@ class IntervalArray:
             lo, hi, points = np.broadcast_arrays(self.lo, self.hi, values)
         except ValueError as exc:
             raise ValueError("containment value is not broadcastable") from exc
-        return cast(BoolArray, (lo <= points) & (points <= hi))
+        return (lo <= points) & (points <= hi)
 
     def contains_zero(self) -> BoolArray:
         """Elementwise test for whether zero belongs to each interval."""
-        return cast(BoolArray, (self.lo <= 0.0) & (0.0 <= self.hi))
+        return (self.lo <= 0.0) & (0.0 <= self.hi)
 
     def _broadcast(
         self, other: IntervalArray | Interval | ArrayLike

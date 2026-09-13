@@ -9,11 +9,12 @@ as :math:`\tanh`.  This module supplies guaranteed enclosures of ``exp``,
 
 Two backends, selected automatically:
 
-* **mpmath (preferred).**  When ``mpmath`` is importable the base point is
-  evaluated at high working precision and rounded *outward* to a double bracket.
-  Because the high-precision error (~1e-60) is astronomically smaller than a
-  double ulp, the resulting bracket rigorously contains the true value.  This is
-  the ``mpfr``-class backend named in the certified-evidence contract.
+* **mpmath (preferred).** Elementary functions use its directed interval
+  context. Composites retain intervals throughout. Error-function tails use
+  explicit positive-series or integration-by-parts remainder bounds; Bessel I
+  uses a positive series. Already enclosed endpoints are rounded outward to
+  binary64, including gradual underflow. A high-precision point value and an
+  assumed extra ulp are not used as an enclosure proof.
 * **stdlib fallback.**  Without mpmath the value is taken from the platform
   ``math`` libm and inflated by :data:`FALLBACK_ULPS` representable steps in each
   direction.  This is rigorous *provided* the libm error is below
@@ -40,6 +41,7 @@ import importlib
 import math
 from collections.abc import Iterator
 from contextlib import contextmanager
+from threading import local
 from typing import Any
 
 from omnibias.core.verified.interval import Interval, _pred, _succ
@@ -59,6 +61,7 @@ BACKEND_LIBM_FALLBACK: str = "libm_fallback"
 
 _MPMATH: Any | None = None
 _MPMATH_RESOLVED: bool = False
+_DIRECTED_CONTEXT = local()
 
 #: When ``True`` the libm fallback in :func:`_enclose_point` is *refused* (it
 #: raises) instead of returning the :data:`FALLBACK_ULPS`-inflated bracket, whose
@@ -168,47 +171,130 @@ def _inflate(value: float, ulps: int) -> tuple[float, float]:
     return lo, hi
 
 
-def _bracket_mpf(mp: Any, y: Any) -> tuple[float, float]:
-    """Outward double bracket of a high-precision value ``y`` (+1 ulp safety)."""
-    f = float(y)
-    yf = mp.mpf(f)
-    lo = f
-    hi = f
-    if yf > y:
-        lo = _pred(f)
-    elif yf < y:
-        hi = _succ(f)
-    # one extra safety ulp absorbs the (negligible) mpmath truncation error.
-    return _pred(lo), _succ(hi)
+def _iv_context(mp: Any) -> Any:
+    """Private directed context, unaffected by caller precision changes."""
+    context = getattr(_DIRECTED_CONTEXT, "context", None)
+    if context is None or getattr(_DIRECTED_CONTEXT, "owner", None) is not mp:
+        context = mp.ctx_iv.MPIntervalContext()
+        _DIRECTED_CONTEXT.context = context
+        _DIRECTED_CONTEXT.owner = mp
+    context.dps = MPMATH_DPS
+    return context
+
+
+def _outward_endpoint(mp: Any, raw: Any, *, upper: bool) -> float:
+    """Round a proved dyadic endpoint, including gradual underflow/overflow.
+
+    mpmath documents that to_float's directed modes alone are insufficient
+    near underflow. Compare to the exact dyadic and move a float if needed.
+    """
+    value = float(mp.libmp.to_float(raw))
+    if math.isnan(value):
+        raise ValueError("NaN directed transcendental endpoint")
+    comparison = mp.libmp.mpf_cmp(mp.libmp.from_float(value), raw)
+    if upper and comparison < 0:
+        return _succ(value)
+    if not upper and comparison > 0:
+        return _pred(value)
+    return value
+
+
+def _bracket_iv(mp: Any, value: Any) -> tuple[float, float]:
+    left, right = value._mpi_
+    return (_outward_endpoint(mp, left, upper=False),
+            _outward_endpoint(mp, right, upper=True))
+
+
+def _erfc_nonnegative(context: Any, x: Any) -> Any:
+    r"""Proved erfc enclosure for an interval contained in [0,infinity).
+
+    For x<=8, erf(x)=2 exp(-x²)/sqrt(pi) sum_{k>=0}
+    x(2x²)^k/(2k+1)!!. Positive terms have decreasing ratios; a geometric
+    majorant bounds the entire remainder.
+
+    For x>8, integration by parts gives erfc(x)=exp(-x²)/(x sqrt(pi))
+    (sum_{k<n} (-1)^k (2k-1)!!/(2x²)^k + R_n), where R_n has sign
+    (-1)^n and |R_n| <= (2n-1)!!/(2x²)^n.
+    """
+    one = context.mpf(1)
+    if x == 0:
+        return one
+    square = x*x
+    target = context.mpf(2)**-180
+    if x.a <= 8:
+        term = total = x
+        enclosure = None
+        for k in range(4096):
+            ratio = 2*square/(2*k + 3)
+            if ratio.b < context.mpf("0.5"):
+                tail = term*ratio/(one-ratio)
+                summed = context.mpf([total.a, (total+tail).b])
+                enclosure = one-2*context.exp(-square)/context.sqrt(context.pi)*summed
+                if tail.b <= target*total.a:
+                    break
+            term = term*ratio
+            total = total+term
+        if enclosure is None:
+            raise ValueError("erf positive series did not establish a remainder bound")
+    else:
+        term = total = one
+        enclosure = None
+        previous = context.inf
+        prefactor = context.exp(-square)/(x*context.sqrt(context.pi))
+        for n in range(1, 4097):
+            following = term*(2*n-1)/(2*square)
+            if following.b >= previous:
+                break
+            correction = context.mpf([0, following.b])
+            enclosed_sum = total-correction if n % 2 else total+correction
+            enclosure = prefactor*enclosed_sum
+            if following.b <= target:
+                break
+            total = total-following if n % 2 else total+following
+            previous = following.b
+            term = following
+        if enclosure is None:
+            raise ValueError("erfc tail did not establish a remainder bound")
+    return context.mpf([max(context.mpf(0), enclosure.a),
+                        min(one, enclosure.b)])
+
+
+def _directed_point(mp: Any, name: str, x: float) -> tuple[float, float]:
+    context = _iv_context(mp)
+    arg = context.mpf(x)
+    if name == "exp":
+        value = context.exp(arg)
+    elif name == "tanh":
+        e = context.exp(-2*abs(arg))
+        value = (1-e)/(1+e)
+        if x < 0:
+            value = -value
+    elif name == "sigmoid":
+        e = context.exp(-abs(arg))
+        value = 1/(1+e) if x >= 0 else e/(1+e)
+    elif name in ("sin", "cos", "log"):
+        value = getattr(context, name)(arg)
+    elif name == "atan":
+        value = context.atan2(arg, context.mpf(1))
+    elif name in ("erf", "gauss_cdf"):
+        magnitude = abs(arg)
+        if name == "gauss_cdf":
+            magnitude = magnitude/context.sqrt(context.mpf(2))
+        tail = _erfc_nonnegative(context, magnitude)
+        if name == "erf":
+            value = 1-tail if x >= 0 else tail-1
+        else:
+            value = 1-tail/2 if x >= 0 else tail/2
+    else:
+        raise ValueError(f"unknown transcendental {name!r}")
+    return _bracket_iv(mp, value)
 
 
 def _enclose_point(name: str, x: float) -> tuple[float, float]:
     """Rigorous double bracket of ``fn(x)`` for a scalar double ``x``."""
     mp = _mpmath()
     if mp is not None:
-        with mp.workdps(MPMATH_DPS):
-            arg = mp.mpf(x)
-            if name == "exp":
-                y = mp.e**arg
-            elif name == "tanh":
-                y = mp.tanh(arg)
-            elif name == "sigmoid":
-                y = mp.mpf(1) / (mp.mpf(1) + mp.e ** (-arg))
-            elif name == "cos":
-                y = mp.cos(arg)
-            elif name == "sin":
-                y = mp.sin(arg)
-            elif name == "atan":
-                y = mp.atan(arg)
-            elif name == "log":
-                y = mp.log(arg)
-            elif name == "erf":
-                y = mp.erf(arg)
-            elif name == "gauss_cdf":
-                y = (mp.mpf(1) + mp.erf(arg / mp.sqrt(2))) / mp.mpf(2)
-            else:  # pragma: no cover - guarded by callers
-                raise ValueError(f"unknown transcendental {name!r}")
-        return _bracket_mpf(mp, y)
+        return _directed_point(mp, name, x)
     if _STRICT_BACKEND:
         raise RuntimeError(
             "transcend strict mode is on but mpmath is unavailable: refusing the "
@@ -234,7 +320,7 @@ def _enclose_point(name: str, x: float) -> tuple[float, float]:
     elif name == "erf":
         v = math.erf(x)
     elif name == "gauss_cdf":
-        v = 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
+        v = 0.5 * math.erfc(-x / math.sqrt(2.0))
     else:  # pragma: no cover - guarded by callers
         raise ValueError(f"unknown transcendental {name!r}")
     return _inflate(v, FALLBACK_ULPS)
@@ -379,7 +465,7 @@ def sin_iv(x: Interval) -> Interval:
     return Interval(max(lo, -1.0), min(hi, 1.0))
 
 
-_HALF_PI_HI = 1.5707963267948966  # nextafter-safe upper bound on pi/2
+_HALF_PI_HI = (PI_IV * Interval.point(0.5)).hi
 
 
 def atan_iv(x: Interval) -> Interval:
@@ -478,8 +564,7 @@ def softplus_iv(x: Interval) -> Interval:
 #: Largest argument the mpmath-free :func:`besseli_iv` series accepts.  ``I_n(z)``
 #: grows like ``e^z``, so beyond roughly ``z = 709`` the individual series terms
 #: overflow a double and the "enclosure" would degenerate to ``[inf, inf]`` -- an
-#: *unsound* bound.  Refusing early is the only honest option; mpmath has no such
-#: limit.
+#: *unsound* bound.  Refusing early is the only honest option; the same explicit series cap is applied with mpmath installed.
 BESSELI_SERIES_MAX_ARG: float = 600.0
 
 #: Term budget for the mpmath-free :func:`besseli_iv` series.  Convergence needs
@@ -519,7 +604,7 @@ def _besseli_series(n: int, z: float) -> Interval:
         raise ValueError(
             f"besseli series fallback requires z <= {BESSELI_SERIES_MAX_ARG} "
             f"(got {z}): the terms would overflow a double and the enclosure "
-            "would stop being sound. Install mpmath for larger arguments."
+            "would stop being sound. Larger arguments are not supported by this series."
         )
     if z == 0.0:
         return Interval.point(1.0 if n == 0 else 0.0)
@@ -527,16 +612,16 @@ def _besseli_series(n: int, z: float) -> Interval:
     half_sq = half * half
     term = Interval.point(1.0)
     for j in range(1, n + 1):
-        term = term * half / Interval.point(float(j))
+        term = term * half / Interval.from_value(j)
     total = term
     one = Interval.point(1.0)
     widest_valid: Interval | None = None
     for k in range(1, BESSELI_SERIES_MAX_TERMS + 1):
-        term = term * half_sq / Interval.point(float(k * (k + n)))
+        term = term * half_sq / Interval.from_value(k * (k + n))
         total = total + term
         # Bounds t_{k+1}/t_k and, because the denominator only grows, every
         # ratio after it as well.
-        ratio = half_sq / Interval.point(float((k + 1) * (k + n + 1)))
+        ratio = half_sq / Interval.from_value((k + 1) * (k + n + 1))
         if ratio.hi >= 0.5:
             continue
         tail_hi = (Interval(0.0, term.hi) * ratio / (one - ratio)).hi
@@ -553,13 +638,7 @@ def _besseli_series(n: int, z: float) -> Interval:
 
 def _besseli_nonneg_point(n: int, z: float) -> Interval:
     """Rigorous enclosure of ``I_n(z)`` at a scalar ``z >= 0`` with order ``n >= 0``."""
-    mp = _mpmath()
-    if mp is None:
-        return _besseli_series(n, z)
-    with mp.workdps(MPMATH_DPS):
-        y = mp.besseli(n, mp.mpf(z))
-    lo, hi = _bracket_mpf(mp, y)
-    return Interval(max(lo, 0.0), hi)  # I_n >= 0 on z >= 0
+    return _besseli_series(n, z)
 
 
 def _besseli_point_signed(n: int, z: float) -> Interval:
@@ -576,7 +655,9 @@ def besseli_point(n: int, z: float) -> Interval:
     The order must be an integer; negative orders are folded through the exact
     identity ``I_{-n} = I_n``.
     """
-    return _besseli_point_signed(abs(int(n)), z)
+    if type(n) is not int:
+        raise ValueError("Bessel order must be an exact integer")
+    return _besseli_point_signed(abs(n), z)
 
 
 def besseli_iv(n: int, x: Interval) -> Interval:
@@ -595,10 +676,11 @@ def besseli_iv(n: int, x: Interval) -> Interval:
       interval straddling zero attains its lower bound in the interior, not at an
       endpoint, and its upper bound at whichever endpoint is farther from zero.
 
-    Enclosures come from mpmath when available and otherwise from the
-    unconditionally rigorous ascending series in :func:`_besseli_series`.
+    Enclosures always use the unconditionally rigorous ascending series in :func:`_besseli_series`.
     """
-    order = abs(int(n))
+    if type(n) is not int:
+        raise ValueError("Bessel order must be an exact integer")
+    order = abs(n)
     if order % 2 == 1:
         return Interval(
             _besseli_point_signed(order, x.lo).lo,

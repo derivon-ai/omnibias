@@ -80,12 +80,12 @@ def _square_endpoints(matrix: IntervalArrayLike) -> tuple[FloatArray, FloatArray
 
 def _entry(values: FloatArray, row: int, column: int) -> FloatArray:
     """A length-one view of one matrix entry, keeping every operand array-typed."""
-    return cast(FloatArray, values[row, column : column + 1])
+    return values[row, column : column + 1]
 
 
 def _item(values: FloatArray, index: int) -> FloatArray:
     """A length-one view of one vector entry."""
-    return cast(FloatArray, values[index : index + 1])
+    return values[index : index + 1]
 
 
 def _ldlt_endpoints(
@@ -118,8 +118,8 @@ def _ldlt_endpoints(
                 square_lo, square_hi, _item(pivot_lo, k), _item(pivot_hi, k)
             )
             diagonal_lo, diagonal_hi = (
-                _pred(cast(FloatArray, diagonal_lo - term_hi)),
-                _succ(cast(FloatArray, diagonal_hi - term_lo)),
+                _pred(diagonal_lo - term_hi),
+                _succ(diagonal_hi - term_lo),
             )
 
         # A NaN endpoint fails both comparisons, so it is reported as
@@ -129,15 +129,15 @@ def _ldlt_endpoints(
         pivot_lo[j] = diagonal_lo[0]
         pivot_hi[j] = diagonal_hi[0]
 
-        inverse_lo = _pred(cast(FloatArray, 1.0 / diagonal_hi))
-        inverse_hi = _succ(cast(FloatArray, 1.0 / diagonal_lo))
+        inverse_lo = _pred(1.0 / diagonal_hi)
+        inverse_hi = _succ(1.0 / diagonal_lo)
 
         below = slice(j + 1, n)
         column_lo = cast(FloatArray, np.array(lo[below, j], dtype=np.float64, copy=True))
         column_hi = cast(FloatArray, np.array(hi[below, j], dtype=np.float64, copy=True))
         for k in range(j):
-            below_lo = cast(FloatArray, lower_lo[below, k])
-            below_hi = cast(FloatArray, lower_hi[below, k])
+            below_lo = lower_lo[below, k]
+            below_hi = lower_hi[below, k]
             pair_lo, pair_hi = _mul_bounds(
                 below_lo, below_hi, _entry(lower_lo, j, k), _entry(lower_hi, j, k)
             )
@@ -145,8 +145,8 @@ def _ldlt_endpoints(
                 pair_lo, pair_hi, _item(pivot_lo, k), _item(pivot_hi, k)
             )
             column_lo, column_hi = (
-                _pred(cast(FloatArray, column_lo - term_hi)),
-                _succ(cast(FloatArray, column_hi - term_lo)),
+                _pred(column_lo - term_hi),
+                _succ(column_hi - term_lo),
             )
         scaled_lo, scaled_hi = _mul_bounds(column_lo, column_hi, inverse_lo, inverse_hi)
         lower_lo[below, j] = scaled_lo
@@ -200,7 +200,7 @@ def interval_ldlt_inertia_array(matrix: IntervalArrayLike) -> Inertia | None:
     if factor is None:
         return None
     _, _, pivot_lo, pivot_hi = factor
-    midpoint = cast(FloatArray, 0.5 * (pivot_lo + pivot_hi))
+    midpoint = 0.5 * (pivot_lo + pivot_hi)
     midpoint = cast(FloatArray, np.minimum(np.maximum(midpoint, pivot_lo), pivot_hi))
     negative = int(np.count_nonzero(pivot_hi < 0.0))
     return Inertia(
