@@ -170,7 +170,7 @@ def quantile_thresholds(x_ref: ArrayLike, n_bins: int) -> FloatArray:
     for i in range(1, edges.size):
         if edges[i] <= edges[i - 1]:
             edges[i] = edges[i - 1] + eps
-    return cast(FloatArray, edges)
+    return edges
 
 
 __all__ = [

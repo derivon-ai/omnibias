@@ -14,6 +14,14 @@ Certified neural-network verification on top of the rigorous derivative tower
   JAX `(W, b)` parameter stack into the neutral `Network` so verification never
   touches the framework again. Equal weights produce **bit-identical** networks.
 
+The alpha [neuromanifold consumers](neuromanifold.md) add source-bound
+collision-transition certificates and local slice / affine-quotient minima.
+[Realization algebra](realization-algebra.md) separates exact-image membership,
+closure witnesses, and bounded-domain exclusion. [Scientific certificates](neuromanifold-science.md)
+cover declared identifiability, reduction, and finite quantum-geometry operands.
+Install the `neuromanifold` extra for these geometry consumers. Analytic
+dependencies remain explicit when replaying their finite obligations in Lean.
+
 !!! note "Soundness, not completeness"
     Every enclosure provably contains the true output set, so a "certified"
     verdict is a proof. The verifier is **not complete**: it returns an

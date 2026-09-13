@@ -19,6 +19,7 @@ from __future__ import annotations
 import math
 from collections.abc import Callable
 from dataclasses import dataclass
+from typing import Protocol, runtime_checkable
 
 DISCLAIMER = (
     "mixed x-mu jets; closed_form iff mu is on the jet trunk; "
@@ -38,10 +39,37 @@ def honesty_payload() -> dict[str, bool]:
 
 @dataclass(frozen=True)
 class ParameterJetSpec:
+    """One selected physical-parameter mixed partial.
+
+    ``param_order`` is the actual scalar-parameter derivative order.
+    ``space_multi_index`` selects coordinate derivatives; its empty default
+    preserves the legacy pure-parameter partial. ``space_order`` caps that
+    index's total degree. General neural-weight subspaces use realization jets.
+    """
+
     space_order: int = 1
     param_order: int = 1
     method: str = "closed_form"
     mu_in_jet_trunk: bool = True
+    space_multi_index: tuple[int, ...] = ()
+
+    def __post_init__(self) -> None:
+        if self.space_order < 0 or self.param_order < 0:
+            raise ValueError("jet orders must be nonnegative")
+        if self.method not in {"closed_form", "autodiff", "finite_difference"}:
+            raise ValueError("method must be closed_form, autodiff, or finite_difference")
+        object.__setattr__(self, "space_multi_index", tuple(self.space_multi_index))
+        if any(n < 0 for n in self.space_multi_index) or sum(self.space_multi_index) > self.space_order:
+            raise ValueError("space_multi_index exceeds the requested space_order")
+
+
+@runtime_checkable
+class ScalarParameterJetProvider(Protocol):
+    """An explicit closed-form field provider; plain callables are not relabeled."""
+
+    def mixed_parameter_jet(
+        self, coords: tuple[float, float], parameters: float, *, spec: ParameterJetSpec,
+    ) -> float: ...
 
 
 DEFAULT_SPEC = ParameterJetSpec()
@@ -78,9 +106,22 @@ def mixed_jet(
     spec: ParameterJetSpec | None = None,
     wave: float = 1.0,
 ) -> float:
-    """``∂u/∂μ`` at ``(x, t, μ)``. Raises if ``closed_form`` without a jet trunk."""
-    del field
+    """A supplied scalar jet provider, or the named manufactured heat example.
+
+    Core has no autodiff backend. Use a tensor backend for ``method='autodiff'``;
+    the old numerical comparison is explicitly named ``finite_difference``.
+    """
     cfg = DEFAULT_SPEC if spec is None else spec
+    if cfg.method == "autodiff":
+        raise NotImplementedError("core has no autodiff backend; use a tensor mixed_jet or method='finite_difference'")
+    if field is not None:
+        if cfg.method == "closed_form":
+            if not cfg.mu_in_jet_trunk:
+                raise ValueError("closed_form requires mu_in_jet_trunk=True")
+            if not isinstance(field, ScalarParameterJetProvider):
+                raise TypeError("closed_form field must implement mixed_parameter_jet")
+            return field.mixed_parameter_jet(coords, parameters, spec=cfg)
+        raise TypeError("core finite_difference is the manufactured example; use a tensor callable adapter for a field")
     if cfg.method == "closed_form":
         if not cfg.mu_in_jet_trunk:
             raise ValueError(
@@ -88,11 +129,25 @@ def mixed_jet(
                 "(set mu_in_jet_trunk=True)"
             )
         x, t = coords
-        return fourier_heat_du_dmu(x, t, parameters, wave=wave)
-    if cfg.method == "autodiff":
+        spatial = cfg.space_multi_index or (0, 0)
+        if len(spatial) != 2:
+            raise ValueError("the heat example needs a two-coordinate space_multi_index")
+        kx, kt = spatial
+        n = cfg.param_order
+        time_factor = sum(
+            math.comb(kt, j) * math.factorial(n) / math.factorial(n - j)
+            * t ** (n - j) * (-parameters * wave * wave) ** (kt - j)
+            for j in range(min(n, kt) + 1)
+        )
+        return ((-wave * wave) ** n * time_factor * wave ** kx
+                * math.exp(-parameters * wave * wave * t)
+                * math.sin(wave * x + kx * math.pi / 2))
+    if cfg.method == "finite_difference":
+        if cfg.param_order != 1 or any(cfg.space_multi_index):
+            raise NotImplementedError("the finite-difference example supports the first parameter derivative only")
         x, t = coords
         return _central_fd(lambda mu: fourier_heat(x, t, mu, wave=wave), parameters, 1e-6)
-    raise ValueError(f"method must be 'closed_form' or 'autodiff', got {cfg.method!r}")
+    raise ValueError(f"unknown method {cfg.method!r}")
 
 
 def worked_example() -> dict[str, float]:
@@ -148,6 +203,7 @@ __all__ = [
     "DEFAULT_SPEC",
     "DISCLAIMER",
     "ParameterJetSpec",
+    "ScalarParameterJetProvider",
     "fourier_heat",
     "fourier_heat_du_dmu",
     "honesty_payload",

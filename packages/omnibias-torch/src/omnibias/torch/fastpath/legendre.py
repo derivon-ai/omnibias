@@ -45,7 +45,18 @@ def tanh_nth_derivative(z: Tensor, n: int) -> Tensor:
     return _horner(coeffs, t)
 
 
+
+def tanh_tower(z: Tensor, max_order: int) -> Tensor:
+    """All derivatives through max_order from one native tanh evaluation."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    value = torch.tanh(z)
+    rows = [value] + [_horner(tanh_polynomial_coeffs(n), value) for n in range(1, max_order + 1)]
+    return torch.stack(rows, dim=0)
+
+
 __all__ = [
     "tanh_nth_derivative",
     "tanh_polynomial_coeffs",
+    "tanh_tower",
 ]

@@ -32,6 +32,7 @@ from torch import Tensor
 if TYPE_CHECKING:  # pragma: no cover
     from collections.abc import Callable
 
+    from omnibias.core.realization.schema import RealizationSpec
     from omnibias.core.spec import ActivationSpec
 
 
@@ -263,6 +264,8 @@ def compose_jet_riccati(
 
 def _sigma_tower(spec: ActivationSpec[Tensor], u0: Tensor, order: int) -> Tensor:
     """Stack ``sigma^(k)(u0)`` for ``k = 0..order`` with a clear order-cap error."""
+    if spec.tower is not None and spec.fastpath is not None:
+        return spec.tower(u0, order)
     rows = [spec.forward(u0)]
     fp: Callable[[Tensor, int], Tensor] | None = spec.fastpath
     for k in range(1, order + 1):
@@ -444,8 +447,38 @@ def removable_value(jet: Tensor) -> Tensor:
     return torch.as_tensor(jet)[0]
 
 
+
+def affine_joint_jet(input_jet: Tensor, weight_jet: Tensor, bias_jet: Tensor | None = None) -> Tensor:
+    """Live directional product with jet-valued weights and biases."""
+    from omnibias.torch.realization import affine_joint_jet as impl
+
+    return impl(input_jet, weight_jet, bias_jet)
+
+
+def mlp_joint_jet(
+    input_jet: Tensor,
+    parameter_jet: Tensor,
+    spec: RealizationSpec,
+    *,
+    order: int,
+    max_coefficients: int = 1_000_000,
+) -> Tensor:
+    """Propagate Taylor-normalized input and parameter jets in one direction.
+
+    Delegates to the shared realization adapter, including its coefficient
+    budget and six operator roles. Inputs, weights and biases remain live.
+    """
+    from omnibias.torch.realization import realization_jet
+
+    return realization_jet(
+        input_jet, parameter_jet, spec, dim=1, order=order,
+        max_coefficients=max_coefficients,
+    )
+
+
 __all__ = [
     "affine_jet",
+    "affine_joint_jet",
     "antiderivative_jet",
     "compose_jet",
     "compose_jet_riccati",
@@ -455,6 +488,7 @@ __all__ = [
     "lhopital_ratio",
     "limit_of_ratio",
     "mlp_jet",
+    "mlp_joint_jet",
     "removable_value",
     "tower_to_jet",
 ]

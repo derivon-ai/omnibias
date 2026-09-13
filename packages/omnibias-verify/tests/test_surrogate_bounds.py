@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import math
 import random
+from decimal import Decimal, localcontext
 
 import pytest
 from omnibias.core.proof import lean_check_available
@@ -30,8 +31,12 @@ def _kernel_true(kernel: str, u: float) -> float:
     if kernel == "tanh":
         return 1.0 - math.tanh(u) ** 2
     if kernel == "logistic":
-        s = 1.0 / (1.0 + math.exp(-u))
-        return 4.0 * s * (1.0 - s)
+        # Rounded sigmoid followed by 1-s loses tail digits; it is not a
+        # reference for the real kernel enclosed by the rigorous implementation.
+        with localcontext() as context:
+            context.prec = 100
+            e = (-Decimal.from_float(u)).exp()
+            return float(4 * e / (1 + e) ** 2)
     if kernel == "gaussian":
         return math.exp(-0.5 * u * u)
     if kernel == "cauchy":
@@ -69,6 +74,33 @@ def test_region_enclosure_grid_and_random(kernel: str) -> None:
     samples += [rng.uniform(lo, hi) for _ in range(60)]
     for z in samples:
         assert region.contains(_kernel_true(kernel, beta * z))
+
+
+def test_logistic_encloses_high_precision_exact_input_product() -> None:
+    """Do not round beta*z or the reference before comparing with endpoints."""
+    rng = random.Random(7301)
+    samples = [i * 0.137 for i in range(-40, 41)]
+    samples += [rng.uniform(-6, 6) for _ in range(81)]
+    with localcontext() as context:
+        context.prec = 100
+        for beta in (0.5, 1.0, 3.0):
+            for z in samples:
+                u = Decimal.from_float(beta) * Decimal.from_float(z)
+                e = (-u).exp()
+                reference = 4 * e / (1 + e) ** 2
+                enclosure = surrogate_kernel_iv(beta, z, kernel="logistic")
+                assert Decimal.from_float(enclosure.lo) <= reference
+                assert reference <= Decimal.from_float(enclosure.hi)
+
+
+@pytest.mark.parametrize("beta,z", [(1.0, 4.247), (3.0, 2.055)])
+def test_logistic_tail_reference_is_not_cancelled_float_sigmoid(beta: float, z: float) -> None:
+    enclosure = surrogate_kernel_iv(beta, z, kernel="logistic")
+    assert enclosure.contains(_kernel_true("logistic", beta * z))
+    # Independent Decimal reference also resolves the numerical failure mechanism.
+    s = 1.0 / (1.0 + math.exp(-beta * z))
+    rounded_reference = 4.0 * s * (1.0 - s)
+    assert abs(rounded_reference - _kernel_true("logistic", beta * z)) > 1e-16
 
 
 @pytest.mark.parametrize("kernel", list(KERNELS))

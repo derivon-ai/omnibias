@@ -135,11 +135,45 @@ def gaussian_nth_derivative(z: Array, n: int) -> Array:
     return sign * poly * g
 
 
+
+def sigmoid_tower(z: Array, max_order: int) -> Array:
+    """All derivatives through max_order from one native sigmoid evaluation."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    value = jax_sigmoid(z)
+    rows = [value] + [_horner(sigmoid_polynomial_coeffs(n), value) for n in range(1, max_order + 1)]
+    return jnp.stack(rows, axis=0)
+
+
+
+def tanh_tower(z: Array, max_order: int) -> Array:
+    """All derivatives through max_order from one native tanh evaluation."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    value = jnp.tanh(z)
+    rows = [value] + [_horner(tanh_polynomial_coeffs(n), value) for n in range(1, max_order + 1)]
+    return jnp.stack(rows, axis=0)
+
+
+def softplus_tower(z: Array, max_order: int) -> Array:
+    """Softplus value and its sigmoid derivative tower with one sigmoid call."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    rows = [softplus_nth_derivative(z, 0)]
+    if max_order:
+        derivatives = sigmoid_tower(z, max_order - 1)
+        rows.extend(derivatives[n] for n in range(max_order))
+    return jnp.stack(rows, axis=0)
+
+
 __all__ = [
     "gaussian_forward",
     "gaussian_nth_derivative",
     "jax_sigmoid",
     "sigmoid_nth_derivative",
+    "sigmoid_tower",
     "softplus_nth_derivative",
+    "softplus_tower",
     "tanh_nth_derivative",
+    "tanh_tower",
 ]

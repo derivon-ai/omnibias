@@ -14,10 +14,12 @@ import math
 from omnibias.torch.activations.registry import ActivationSpec, register_activation
 from omnibias.torch.fastpath.eulerian import (
     sigmoid_nth_derivative,
+    sigmoid_tower,
     softplus_nth_derivative,
+    softplus_tower,
 )
 from omnibias.torch.fastpath.hermite import gaussian_forward, gaussian_nth_derivative
-from omnibias.torch.fastpath.legendre import tanh_nth_derivative
+from omnibias.torch.fastpath.legendre import tanh_nth_derivative, tanh_tower
 from omnibias.torch.transforms import GAUSSIAN_TRANSFORMS, SIGMOID_TRANSFORMS, TANH_TRANSFORMS
 
 import torch
@@ -47,6 +49,7 @@ SIGMOID = register_activation(
         forward=_sigmoid,
         derivative=_sigmoid_derivative,
         fastpath=sigmoid_nth_derivative,
+        tower=sigmoid_tower,
         integral=_sigmoid_integral,
         riccati_polynomial=(0.0, 1.0, -1.0),  # P(s) = s - s^2
         noise_model="bernoulli",
@@ -84,6 +87,7 @@ TANH = register_activation(
         forward=_tanh,
         derivative=_tanh_derivative,
         fastpath=tanh_nth_derivative,
+        tower=tanh_tower,
         integral=_tanh_integral,
         riccati_polynomial=(1.0, 0.0, -1.0),  # P(t) = 1 - t^2
         noise_model="symmetric_bernoulli",
@@ -114,6 +118,7 @@ SOFTPLUS = register_activation(
         forward=_softplus,
         derivative=_softplus_derivative,
         fastpath=softplus_nth_derivative,
+        tower=softplus_tower,
         riccati_polynomial=None,  # softplus itself is not in Riccati form,
         # but its derivative tower from order >= 1 is (sigmoid's tower).
         noise_model="bernoulli",

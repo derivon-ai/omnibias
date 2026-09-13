@@ -7,6 +7,11 @@ with cross-backend (PyTorch + JAX) parity: metric, Christoffel symbols,
 covariant derivative, the Laplace-Beltrami operator, Riemann / Ricci / scalar
 curvature, geodesics, and exterior calculus.
 
+The alpha [neuromanifold extensions](neuromanifold.md) add joint parameter
+jets, observation metrics, exact affine quotient charts, collision coordinates,
+and weighted extrinsic geometry. [Scientific adapters](neuromanifold-science.md)
+include generic residual-family continuation and boundary exploration.
+
 ## Two exact mechanisms
 
 `omnibias-geometry` is **exact** end-to-end. **Field-function** derivatives
@@ -25,7 +30,8 @@ project-wide definition of "closed-form" vs "autodiff-exact".
 
 A `ChartSpec` describes an immersion `phi: R^d -> R^n` (an analytic or
 neural-network "chart"). `metric_spec_from_chart` turns it into the pullback
-metric `g = J^T h J` (`J = d phi / dx` by forward-mode autodiff, `h` the ambient
+metric `g = J^T h J` (`J = d phi / dx` from an optional supplied `jacobian`
+provider or the labeled forward-mode autodiff fallback, `h` the ambient
 metric, Euclidean by default), and `pullback_metric` evaluates it batched. Because
 every connection / curvature / field operator only reads `manifold.metric.g_point`,
 the entire stack (Christoffel, Riemann/Ricci/scalar curvature, Laplace-Beltrami,
@@ -142,3 +148,57 @@ derivatives stay autodiff-exact.
 
 The JAX backend (`omnibias.geometry.jax.ops`) is the bit-identical twin;
 cross-backend tests assert agreement to `rtol=1e-9` in float64.
+
+## Exact projective curve and surface certificates
+
+The alpha `omnibias.geometry.algebraic` submodule accepts exact rational
+homogeneous polynomials. All-chart polynomial Bezout identities exclude
+complex projective singularities. Opposite signs on whole rectangular
+boundaries, checked with rational Bernstein coefficients, certify distinct
+ovals and their nesting. The result asserts a complete real scheme only when
+the component lower bound reaches Harnack's bound. A bounded search returning
+no smoothness witness is inconclusive.
+
+```python
+from fractions import Fraction
+from omnibias.core.realization.polynomial import SparsePolynomial
+from omnibias.geometry.algebraic import (
+    HomogeneousPlaneCurve, RationalRectangle, RectangularAnnulus,
+    certify_curve, find_smoothness_witness, replay_curve_certificate,
+)
+
+X, Y, Z = (SparsePolynomial.variable(3, axis) for axis in range(3))
+curve = HomogeneousPlaneCurve(X**2 + Y**2 - Z**2)
+witness = find_smoothness_witness(curve, max_multiplier_degree=0)
+assert witness is not None
+half = Fraction(1, 2)
+annulus = RectangularAnnulus(
+    RationalRectangle(-half, half, -half, half),
+    RationalRectangle(-2, 2, -2, 2),
+)
+curve_certificate = certify_curve(curve, witness, [annulus])
+assert curve_certificate.complete_real_scheme
+assert replay_curve_certificate(curve, curve_certificate)
+```
+
+The separate `omnibias.geometry.algebraic_surfaces` submodule proves a
+restricted quartic baseline directly from its coefficients. For
+`sum((X_i**2-W**2)**2) - epsilon*W**4`, rational `0 < epsilon < 1`, it
+certifies complex nonsingularity and a complete real locus of eight spheres
+bounding disjoint balls. Other families are unsupported.
+
+```python
+from omnibias.geometry.algebraic_surfaces import (
+    separable_quartic_polynomial, certify_separable_quartic_surface,
+    replay_separable_quartic_surface,
+)
+
+surface = separable_quartic_polynomial(Fraction(1, 16))
+surface_certificate = certify_separable_quartic_surface(surface)
+assert surface_certificate.component_count == 8
+assert replay_separable_quartic_surface(surface, surface_certificate)
+```
+
+These certificates replay exact polynomial and sign obligations in Python.
+The topological implications are documented analytic arguments; no Lean
+verification tier or general Hilbert XVI classification is inferred.

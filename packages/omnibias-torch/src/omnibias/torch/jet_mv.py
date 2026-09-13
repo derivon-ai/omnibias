@@ -32,6 +32,7 @@ import torch
 from torch import Tensor
 
 if TYPE_CHECKING:  # pragma: no cover
+    from omnibias.core.realization.schema import RealizationSpec
     from omnibias.core.spec import ActivationSpec
 
 
@@ -379,8 +380,61 @@ def jet_hessian(jet: Tensor, dim: int, order: int) -> Tensor:
     return torch.stack(rows, dim=0)
 
 
+
+def affine_joint_jet_mv(
+    input_jet: Tensor, weight_jet: Tensor, bias_jet: Tensor | None = None,
+    *, dim: int, order: int,
+) -> Tensor:
+    """Live multivariate product with jet-valued weights and biases."""
+    from omnibias.torch.realization import affine_joint_jet_mv as impl
+
+    return impl(input_jet, weight_jet, bias_jet, dim=dim, order=order)
+
+
+def mlp_joint_jet_mv(
+    input_jet: Tensor,
+    parameter_jet: Tensor,
+    spec: RealizationSpec,
+    *,
+    dim: int,
+    order: int,
+    max_coefficients: int = 1_000_000,
+) -> Tensor:
+    """Propagate joint input/parameter Taylor jets in an explicit finite basis."""
+    from omnibias.torch.realization import realization_jet
+
+    return realization_jet(
+        input_jet, parameter_jet, spec, dim=dim, order=order,
+        max_coefficients=max_coefficients,
+    )
+
+
+def parameter_jet(
+    x: Tensor,
+    theta: Tensor,
+    spec: RealizationSpec,
+    basis: Tensor,
+    order: int,
+    *,
+    input_basis: Tensor | None = None,
+    max_coefficients: int = 1_000_000,
+) -> Tensor:
+    """Seed live joint Taylor jets from explicit parameter and input directions.
+
+    ``basis`` is P-by-q; ``input_basis`` broadcasts to x.shape + (q,).
+    The coefficient budget is checked by the realization implementation.
+    """
+    from omnibias.torch.realization import parameter_jet as impl
+
+    return impl(
+        x, theta, spec, basis, order, input_basis=input_basis,
+        max_coefficients=max_coefficients,
+    )
+
+
 __all__ = [
     "affine_jet_mv",
+    "affine_joint_jet_mv",
     "compose_jet_mv",
     "identity_jet",
     "jet_attention",
@@ -393,4 +447,6 @@ __all__ = [
     "jet_softmax",
     "layer_jet_mv",
     "mlp_jet_mv",
+    "mlp_joint_jet_mv",
+    "parameter_jet",
 ]

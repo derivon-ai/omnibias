@@ -59,9 +59,15 @@ def multipack_response(
     fp = spec.fastpath
     slots = sorted(set(index))
     slot_u = {s: z + means_a[s] for s in slots}
+    towers: dict[int, Array] = {}
+    if spec.tower is not None:
+        for slot in slots:
+            highest = max(n for g, n in enumerate(orders) if index[g] == slot)
+            towers[slot] = spec.tower(slot_u[slot], highest)
     out: Array | None = None
     for g, n in enumerate(orders):
-        term = weights_a[g] * fp(slot_u[index[g]], n)
+        value = towers[index[g]][n] if spec.tower is not None else fp(slot_u[index[g]], n)
+        term = weights_a[g] * value
         out = term if out is None else out + term
     assert out is not None
     return out

@@ -141,6 +141,10 @@ class ActivationSpec(Generic[TensorT]):
     limit_pos_inf: float | None = None
     limit_neg_inf: float | None = None
     transforms: TransformKernels[TensorT] | None = None
+    #: Optional shared-evaluation tower, shape ``(max_order + 1, *z.shape)``.
+    #: Providers preserve the per-order kernel's rounding and share base values.
+    #: This accelerates a present fastpath; clearing fastpath disables derivatives.
+    tower: Callable[[TensorT, int], TensorT] | None = None
 
 
 def saturation_limit(spec: ActivationSpec[TensorT], sign: float) -> float | None:

@@ -93,8 +93,31 @@ def softplus_nth_derivative(z: Tensor, n: int) -> Tensor:
     return sigmoid_nth_derivative(z, n - 1)
 
 
+
+def sigmoid_tower(z: Tensor, max_order: int) -> Tensor:
+    """All derivatives through max_order from one native sigmoid evaluation."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    value = torch.sigmoid(z)
+    rows = [value] + [_horner(sigmoid_polynomial_coeffs(n), value) for n in range(1, max_order + 1)]
+    return torch.stack(rows, dim=0)
+
+
+def softplus_tower(z: Tensor, max_order: int) -> Tensor:
+    """Softplus value and its sigmoid derivative tower with one sigmoid call."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    rows = [torch.nn.functional.softplus(z)]
+    if max_order:
+        derivatives = sigmoid_tower(z, max_order - 1)
+        rows.extend(derivatives[n] for n in range(max_order))
+    return torch.stack(rows, dim=0)
+
+
 __all__ = [
     "sigmoid_nth_derivative",
     "sigmoid_polynomial_coeffs",
+    "sigmoid_tower",
     "softplus_nth_derivative",
+    "softplus_tower",
 ]

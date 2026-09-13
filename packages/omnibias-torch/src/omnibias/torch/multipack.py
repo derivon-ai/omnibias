@@ -8,7 +8,8 @@ Closed-form evaluation of
 
 via the activation fastpath. With ``share_means=True`` (default), packs that
 share a mean in the :class:`~omnibias.core.multipack.MultiPackSpec` share one
-mean Parameter -- one activation call per distinct mean. Founding bias
+mean Parameter. A registered tower provider evaluates the base once per
+distinct mean; other activations retain the per-order fastpath fallback. Founding bias
 collapse ``delta -> 0`` only -- no temperature collapse.
 """
 
@@ -57,12 +58,17 @@ def multipack_response(
             raise ValueError(f"order must be >= 0, got {n}")
 
     fp = spec.fastpath
-    # One fastpath call per distinct mean slot, then fan out orders.
     slots = sorted(set(index))
     slot_u: dict[int, Tensor] = {s: z + means[s] for s in slots}
+    towers: dict[int, Tensor] = {}
+    if spec.tower is not None:
+        for slot in slots:
+            highest = max(n for g, n in enumerate(orders) if index[g] == slot)
+            towers[slot] = spec.tower(slot_u[slot], highest)
     out: Tensor | None = None
     for g, n in enumerate(orders):
-        term = weights[g] * fp(slot_u[index[g]], n)
+        value = towers[index[g]][n] if spec.tower is not None else fp(slot_u[index[g]], n)
+        term = weights[g] * value
         out = term if out is None else out + term
     assert out is not None
     return out
@@ -84,7 +90,7 @@ class MultiPackUnit(nn.Module):
         Whether means / outer weights are ``nn.Parameter`` or frozen buffers.
     share_means:
         If true (default), packs with equal means in ``spec`` share one mean
-        Parameter (one activation evaluation per distinct mean).
+        Parameter (one base evaluation per mean with a registered tower).
     dtype:
         Parameter dtype; ``None`` resolves to ``torch.get_default_dtype()``.
     """

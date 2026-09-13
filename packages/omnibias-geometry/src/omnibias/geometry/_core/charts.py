@@ -26,10 +26,12 @@ geodesics) works on the learned manifold unchanged.
 
 Honesty note
 ------------
-``J`` is obtained by forward-mode autodiff of ``phi``. For an analytic (or
-neural-network) chart this is the *exact* Jacobian, not a finite-difference
-approximation. ``phi`` must therefore be written with backend ops so it is
-``vmap``- and autodiff-compatible.
+By default, ``J`` is obtained by forward-mode autodiff of ``phi``. A supplied
+``jacobian`` callback can instead provide analytic chart derivatives. The
+consumer checks its shape; agreement with ``d phi / dx`` remains the provider's
+contract. ``derivative_provenance`` records that contract without certifying it.
+Callbacks evaluated by the consumer must use compatible backend operations.
+Further derivatives of the induced metric still use backend autodiff.
 
 This module is pure Python (no torch / jax): it only stores callables and
 metadata, exactly like :class:`omnibias.geometry._core.manifold.MetricSpec`.
@@ -57,8 +59,9 @@ class ChartSpec(Generic[TensorT]):
     ----------
     phi
         Callable mapping a single domain point ``x`` of shape ``(d,)`` to its
-        ambient image of shape ``(n,)``. It must be written with backend ops so
-        it is ``vmap``- and autodiff-compatible.
+        ambient image of shape ``(n,)``. It must be ``vmap``-compatible when an
+        ambient metric evaluates it, and forward-autodiff-compatible when no
+        Jacobian provider is supplied.
     domain_dim
         The chart (manifold) dimension ``d``.
     ambient_dim
@@ -70,6 +73,16 @@ class ChartSpec(Generic[TensorT]):
         the Euclidean identity, i.e. ``g = J^T J``.
     name
         Human-readable label (e.g. ``"sphere_S2"``).
+    jacobian
+        Optional per-point callback returning ``d phi / dx`` with shape
+        ``(ambient_dim, domain_dim)``. It must preserve backend tensors and any
+        live parameter dependence. Without this callback, the consumer uses
+        forward-mode autodiff of ``phi``.
+    derivative_provenance
+        Descriptive metadata for the derivative provider. Set this explicitly
+        for a supplied analytic/jet provider; the default describes the
+        forward-autodiff fallback. This label does not check mathematical
+        agreement between the provider and ``phi``.
     """
 
     phi: ChartFn
@@ -77,6 +90,8 @@ class ChartSpec(Generic[TensorT]):
     ambient_dim: int
     ambient_metric: AmbientMetricFn | None = field(default=None)
     name: str = "chart"
+    jacobian: ChartFn | None = None
+    derivative_provenance: str = "forward_autodiff"
 
     def __post_init__(self) -> None:
         if self.domain_dim < 1:

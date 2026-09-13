@@ -74,6 +74,8 @@ import jax.numpy as jnp
 from jax import Array
 
 if TYPE_CHECKING:  # pragma: no cover
+    from omnibias.core.realization.schema import RealizationSpec
+
     LayerSpec = tuple[Array, Array | None, JaxActivationSpec | str | None]
 
 
@@ -459,8 +461,61 @@ def jet_hessian(jet: Array, dim: int, order: int) -> Array:
     return jnp.stack(rows, axis=0)
 
 
+
+def affine_joint_jet_mv(
+    input_jet: Array, weight_jet: Array, bias_jet: Array | None = None,
+    *, dim: int, order: int,
+) -> Array:
+    """Live multivariate product with jet-valued weights and biases."""
+    from omnibias.jax.realization import affine_joint_jet_mv as impl
+
+    return impl(input_jet, weight_jet, bias_jet, dim=dim, order=order)
+
+
+def mlp_joint_jet_mv(
+    input_jet: Array,
+    parameter_jet: Array,
+    spec: RealizationSpec,
+    *,
+    dim: int,
+    order: int,
+    max_coefficients: int = 1_000_000,
+) -> Array:
+    """Propagate joint input/parameter Taylor jets in an explicit finite basis."""
+    from omnibias.jax.realization import realization_jet
+
+    return realization_jet(
+        input_jet, parameter_jet, spec, dim=dim, order=order,
+        max_coefficients=max_coefficients,
+    )
+
+
+def parameter_jet(
+    x: Array,
+    theta: Array,
+    spec: RealizationSpec,
+    basis: Array,
+    order: int,
+    *,
+    input_basis: Array | None = None,
+    max_coefficients: int = 1_000_000,
+) -> Array:
+    """Seed live joint Taylor jets from explicit parameter and input directions.
+
+    ``basis`` is P-by-q; ``input_basis`` broadcasts to x.shape + (q,).
+    The coefficient budget is checked by the realization implementation.
+    """
+    from omnibias.jax.realization import parameter_jet as impl
+
+    return impl(
+        x, theta, spec, basis, order, input_basis=input_basis,
+        max_coefficients=max_coefficients,
+    )
+
+
 __all__ = [
     "affine_jet_mv",
+    "affine_joint_jet_mv",
     "compose_jet_mv",
     "identity_jet",
     "jet_attention",
@@ -473,4 +528,6 @@ __all__ = [
     "jet_softmax",
     "layer_jet_mv",
     "mlp_jet_mv",
+    "mlp_joint_jet_mv",
+    "parameter_jet",
 ]

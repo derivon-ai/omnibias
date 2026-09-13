@@ -43,7 +43,18 @@ def tanh_nth_derivative(z: Any, n: int) -> Any:
     return _horner(tanh_polynomial_coeffs(n), t)
 
 
+
+def tanh_tower(z: Any, max_order: int) -> Any:
+    """All derivatives through max_order from one native tanh evaluation."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    value = ops.tanh(z)
+    rows = [value] + [_horner(tanh_polynomial_coeffs(n), value) for n in range(1, max_order + 1)]
+    return ops.stack(rows, axis=0)
+
+
 __all__ = [
     "tanh_nth_derivative",
     "tanh_polynomial_coeffs",
+    "tanh_tower",
 ]

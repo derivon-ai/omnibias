@@ -59,8 +59,31 @@ def softplus_nth_derivative(z: Any, n: int) -> Any:
     return sigmoid_nth_derivative(z, n - 1)
 
 
+
+def sigmoid_tower(z: Any, max_order: int) -> Any:
+    """All derivatives through max_order from one native sigmoid evaluation."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    value = ops.sigmoid(z)
+    rows = [value] + [_horner(sigmoid_polynomial_coeffs(n), value) for n in range(1, max_order + 1)]
+    return ops.stack(rows, axis=0)
+
+
+def softplus_tower(z: Any, max_order: int) -> Any:
+    """Softplus value and its sigmoid derivative tower with one sigmoid call."""
+    if max_order < 0:
+        raise ValueError("max_order must be nonnegative")
+    rows = [ops.softplus(z)]
+    if max_order:
+        derivatives = sigmoid_tower(z, max_order - 1)
+        rows.extend(derivatives[n] for n in range(max_order))
+    return ops.stack(rows, axis=0)
+
+
 __all__ = [
     "sigmoid_nth_derivative",
     "sigmoid_polynomial_coeffs",
+    "sigmoid_tower",
     "softplus_nth_derivative",
+    "softplus_tower",
 ]

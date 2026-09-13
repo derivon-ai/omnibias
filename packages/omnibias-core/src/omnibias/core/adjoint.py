@@ -61,11 +61,14 @@ import random
 import statistics
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
 from numpy.typing import NDArray
 
 FloatArray = NDArray[np.float64]
+_MatrixArray = np.ndarray[tuple[int, int], np.dtype[np.float64]]
+_VectorArray = np.ndarray[tuple[int], np.dtype[np.float64]]
 
 DISCLAIMER = (
     "discrete Pontryagin / DDP costate recursion; backend-free; not DARE, "
@@ -89,22 +92,22 @@ def honesty_payload() -> dict[str, bool]:
     }
 
 
-def _as_matrix(name: str, value: Sequence[Sequence[float]]) -> FloatArray:
+def _as_matrix(name: str, value: Sequence[Sequence[float]] | FloatArray) -> _MatrixArray:
     out = np.asarray(value, dtype=np.float64)
     if out.ndim != 2:
         raise ValueError(f"{name} must be 2-D, got shape {out.shape}")
     if not np.all(np.isfinite(out)):
         raise ValueError(f"{name} must be finite")
-    return out
+    return cast(_MatrixArray, out)
 
 
-def _as_vector(name: str, value: Sequence[float]) -> FloatArray:
+def _as_vector(name: str, value: Sequence[float] | FloatArray) -> _VectorArray:
     out = np.asarray(value, dtype=np.float64)
     if out.ndim != 1:
         raise ValueError(f"{name} must be 1-D, got shape {out.shape}")
     if not np.all(np.isfinite(out)):
         raise ValueError(f"{name} must be finite")
-    return out
+    return cast(_VectorArray, out)
 
 
 def closed_loop_jacobian(a: FloatArray, b: FloatArray, dpi_dy: FloatArray) -> FloatArray:
@@ -125,7 +128,7 @@ def total_state_cost_gradient(
     y_m = _as_vector("dl_dy", dl_dy)
     u_m = _as_vector("dl_du", dl_du)
     d_m = _as_matrix("dpi_dy", dpi_dy)
-    out = y_m + d_m.T @ u_m
+    out: FloatArray = y_m + d_m.T @ u_m
     return out
 
 

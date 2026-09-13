@@ -16,10 +16,12 @@ from typing import Any
 from omnibias.keras.activations.registry import ActivationSpec, register_activation
 from omnibias.keras.fastpath.eulerian import (
     sigmoid_nth_derivative,
+    sigmoid_tower,
     softplus_nth_derivative,
+    softplus_tower,
 )
 from omnibias.keras.fastpath.hermite import gaussian_forward, gaussian_nth_derivative
-from omnibias.keras.fastpath.legendre import tanh_nth_derivative
+from omnibias.keras.fastpath.legendre import tanh_nth_derivative, tanh_tower
 
 from keras import ops
 
@@ -48,6 +50,7 @@ SIGMOID = register_activation(
         forward=_sigmoid,
         derivative=_sigmoid_derivative,
         fastpath=sigmoid_nth_derivative,
+        tower=sigmoid_tower,
         integral=_sigmoid_integral,
         riccati_polynomial=(0.0, 1.0, -1.0),
         noise_model="bernoulli",
@@ -81,6 +84,7 @@ TANH = register_activation(
         forward=_tanh,
         derivative=_tanh_derivative,
         fastpath=tanh_nth_derivative,
+        tower=tanh_tower,
         integral=_tanh_integral,
         riccati_polynomial=(1.0, 0.0, -1.0),
         noise_model="symmetric_bernoulli",
@@ -109,6 +113,7 @@ SOFTPLUS = register_activation(
         forward=_softplus,
         derivative=_softplus_derivative,
         fastpath=softplus_nth_derivative,
+        tower=softplus_tower,
         riccati_polynomial=None,
         noise_model="bernoulli",
         operator_role=(
