@@ -91,3 +91,12 @@ def test_poincare_map_jet_encloses_and_diagnoses() -> None:
         assert payload["action"] == "shrink_step"
         assert "bias" not in payload["reason"]
         assert "delta" not in payload["reason"]
+
+
+def test_sign_bracket_preserves_nontransverse_cubic_crossing_semantics() -> None:
+    # x=t-1/2, y=x^3 changes sign, but y'=3x^2 vanishes at its zero.
+    # The legacy API reports the bracket without earning transversality.
+    from omnibias.core.verified.interval import Interval
+    from omnibias.dynamics._core.poincare import _guaranteed_cross
+
+    assert _guaranteed_cross(Interval.point(-0.125), Interval.point(0.125), 1)

@@ -9,14 +9,15 @@ existence machinery, and the closed-form variational tower in
 
 * **variational / monodromy flow** -- propagate a state *and* its fundamental
   (variational) matrix rigorously, the basis for Floquet / stability analysis;
-* **Poincare-section enclosures** -- a rigorous return map across a hyperplane;
+* **Poincare-section enclosures** -- validated crossing locations on a hyperplane;
 * **certified Lyapunov-exponent bounds** -- two-sided enclosures of the leading
   exponent from the validated variational flow;
 * **periodic-orbit existence** -- a radii-polynomial proof that a true periodic
   orbit lives in an explicit ball around a numerical guess.
 
-Everything is *sound by construction*: an enclosure provably contains the true
-object, and an existence claim is a proof, never a heuristic.
+Each enclosure has its stated input and scope contract. The legacy crossing
+API does not certify a first transversal return; the stronger source-bound
+event API lives in :mod:`omnibias.dynamics.return_maps`.
 """
 
 from __future__ import annotations

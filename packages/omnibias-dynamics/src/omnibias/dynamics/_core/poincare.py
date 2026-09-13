@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
-r"""Rigorous Poincare-section return map.
+r"""Rigorous sign-bracketed Poincare-section crossings.
 
 A **Poincare section** is a hyperplane :math:`\Sigma = \{y : \langle \hat n, y
 \rangle = c\}`; the return map sends a point of :math:`\Sigma` to the next point
@@ -20,8 +20,11 @@ The strategy here is sound by construction:
    contains the whole trajectory segment, hence the crossing point) and *flatten*
    it onto :math:`\Sigma` by solving ``g = 0`` for the dominant coordinate.
 
-The returned :class:`PoincareCrossing` encloses the true crossing point of every
-trajectory that started in the initial box.
+The returned :class:`PoincareCrossing` encloses a crossing point of every
+trajectory that started in the initial box. A sign change alone does not prove
+transversality, uniqueness, or exclusion of earlier crossings. The finite-time
+first-hit certificates in :mod:`omnibias.dynamics.return_maps` check those
+additional obligations for exact polynomial sources.
 """
 
 from __future__ import annotations
@@ -58,7 +61,11 @@ class PoincareSection:
 
 @dataclass(frozen=True)
 class PoincareCrossing:
-    """The rigorous enclosure of a return-map crossing (or a no-crossing report)."""
+    """A sign-bracketed crossing enclosure, or absence of a detected bracket.
+
+    ``crossed`` does not assert a transverse, unique, or first return.
+    ``crossed=False`` does not exclude crossings between the sampled endpoints.
+    """
 
     crossed: bool
     enclosure: tuple[Interval, ...]
@@ -85,7 +92,7 @@ def _direction_ok(sign_after: int, direction: int) -> bool:
 
 
 def _guaranteed_cross(g_prev: Interval, g_next: Interval, direction: int) -> bool:
-    """Whether a transversal crossing is *certain* on the step (matching direction)."""
+    """Whether opposite endpoint signs guarantee a crossing in the requested direction."""
     up = g_prev.hi < 0.0 and g_next.lo > 0.0
     down = g_prev.lo > 0.0 and g_next.hi < 0.0
     if direction > 0:
@@ -146,12 +153,14 @@ def poincare_map(
     skip_initial_steps: int = 1,
     refine: int = 8,
 ) -> PoincareCrossing:
-    r"""Enclose the first transversal return of the flow to ``section``.
+    r"""Enclose the first detected sign bracket in the requested direction.
 
     ``skip_initial_steps`` ignores crossings in the first few steps so a start
     point *on* the section is not reported as its own image.  Returns a
     :class:`PoincareCrossing` with ``crossed=False`` if no guaranteed crossing is
-    found within ``max_steps``.
+    found within ``max_steps``. Neither the skipped steps nor the sampled
+    endpoints exclude earlier crossings. Transversality and uniqueness are
+    not checked by this routine.
     """
     if h <= 0.0:
         raise ValueError("step size h must be positive")
@@ -191,7 +200,7 @@ def _merge_budget(left: WidthBudget, right: WidthBudget) -> WidthBudget:
 
 @dataclass(frozen=True)
 class PoincareJetCrossing:
-    """Poincare crossing plus the jet-Lohner budget that produced it."""
+    """Sign-bracketed crossing plus a width budget, not return-map derivatives."""
 
     crossing: PoincareCrossing
     budget: WidthBudget
