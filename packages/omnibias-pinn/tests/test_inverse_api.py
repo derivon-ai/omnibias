@@ -76,3 +76,13 @@ def test_honesty_flags() -> None:
     assert h["conformal_merged"] is False
     assert h["temperature_collapse"] is False
     assert h["not_pde_coefficient_inverse"] is True
+
+
+@pytest.mark.parametrize("model", ["unrelated", "", object(), lambda theta: theta])
+def test_legacy_location_apis_reject_unsupported_supplied_models(model):
+    parameters = {"tau": 0.37, "alpha": 25.0}
+    candidates = np.linspace(0., 1., 5)
+    with pytest.raises(ValueError, match="location"):
+        identifiability(model, parameters, candidates)
+    with pytest.raises(ValueError, match="location"):
+        place_sensors(model, parameters, candidates, budget=2)

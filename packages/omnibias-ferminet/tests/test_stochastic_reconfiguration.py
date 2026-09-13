@@ -40,7 +40,6 @@ from omnibias.ferminet.stochastic_reconfiguration import (  # noqa: E402
     stochastic_reconfiguration_step,
 )
 
-
 # ---------------------------------------------------------------------------
 # 1. Hand-computable S / g estimators
 # ---------------------------------------------------------------------------
@@ -88,8 +87,8 @@ class TestOverlapMatrixAndEnergyGradient:
 
     def test_overlap_matrix_is_symmetric_and_psd(self):
         rng = np.random.default_rng(0)
-        O = rng.normal(size=(50, 4))
-        S = np.asarray(sr_overlap_matrix(jnp.asarray(O)))
+        scores = rng.normal(size=(50, 4))
+        S = np.asarray(sr_overlap_matrix(jnp.asarray(scores)))
         np.testing.assert_allclose(S, S.T, atol=1e-12)
         eigvals = np.linalg.eigvalsh(S)
         assert np.all(eigvals >= -1e-10)
@@ -101,19 +100,19 @@ class TestOverlapMatrixAndEnergyGradient:
         n = 30
         varying = rng.normal(size=n)
         constant = np.full(n, 3.14)
-        O = np.stack([varying, constant], axis=1)
+        scores = np.stack([varying, constant], axis=1)
         E_L = rng.normal(size=n)
-        S = np.asarray(sr_overlap_matrix(jnp.asarray(O)))
-        g = np.asarray(sr_energy_gradient(jnp.asarray(O), jnp.asarray(E_L)))
+        S = np.asarray(sr_overlap_matrix(jnp.asarray(scores)))
+        g = np.asarray(sr_energy_gradient(jnp.asarray(scores), jnp.asarray(E_L)))
         np.testing.assert_allclose(S[1, :], 0.0, atol=1e-10)
         np.testing.assert_allclose(S[:, 1], 0.0, atol=1e-10)
         np.testing.assert_allclose(g[1], 0.0, atol=1e-10)
 
     def test_output_shapes(self):
-        O = jnp.zeros((10, 5), dtype=jnp.float64)
+        scores = jnp.zeros((10, 5), dtype=jnp.float64)
         E_L = jnp.zeros((10,), dtype=jnp.float64)
-        assert sr_overlap_matrix(O).shape == (5, 5)
-        assert sr_energy_gradient(O, E_L).shape == (5,)
+        assert sr_overlap_matrix(scores).shape == (5, 5)
+        assert sr_energy_gradient(scores, E_L).shape == (5,)
 
 
 class TestValidationGuards:

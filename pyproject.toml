@@ -122,6 +122,9 @@ omnibias-core = { workspace = true }
 omnibias-torch = { workspace = true }
 omnibias-jax = { workspace = true }
 omnibias-ferminet = { workspace = true }
+# Resolve the optional FermiNet SR/test bridge from this checkout. Curvature
+# remains an extension distribution and is not a stable workspace member.
+omnibias-curvature = { path = "packages/omnibias-curvature", editable = true }
 
 [dependency-groups]
 dev = [
@@ -236,7 +239,14 @@ mypy_path = [
     "packages/omnibias-torch/src",
     "packages/omnibias-jax/src",
     "packages/omnibias-ferminet/src",
+    # Optional FermiNet curvature imports resolve here; the authored curvature
+    # surface has its own strict gate rather than the stable blanket gate.
+    "packages/omnibias-curvature/src",
 ]
+
+[[tool.mypy.overrides]]
+module = ["omnibias.curvature.*"]
+follow_imports = "silent"
 
 [[tool.mypy.overrides]]
 module = ["torch.*", "jax.*", "jaxlib.*", "folx.*", "ferminet.*", "kfac_jax.*"]

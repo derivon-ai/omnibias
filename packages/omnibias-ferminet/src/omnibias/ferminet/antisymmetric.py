@@ -48,7 +48,8 @@ def gaussian_slater_log_abs_psi(params: Params, position: Array) -> Array:
     """``log|det M|`` for the Gaussian Slater matrix (sampling contract)."""
     matrix = gaussian_orbital_matrix(params["centers"], params["alphas"], position)
     sign, logabs = jnp.linalg.slogdet(matrix)
-    return logabs + 0.0 * sign  # keep ``sign`` in the graph; log|det| is the value
+    result: Array = logabs + 0.0 * sign  # keep ``sign`` in the graph; log|det| is the value
+    return result
 
 
 def gaussian_slater_closed_form_laplacian(params: Params, position: Array) -> Array:

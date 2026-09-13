@@ -120,7 +120,11 @@ def test_actor_adjoint_jet_step_matches_full_adjoint_with_true_terminal_head_jax
     jax.config.update("jax_enable_x64", True)
     import jax.numpy as jnp
     from omnibias.control.jax.envs import DoubleGyrePointMass
-    from omnibias.control.jax.policy import PSDTerminalHead, actor_adjoint_jet_step, actor_adjoint_step
+    from omnibias.control.jax.policy import (
+        PSDTerminalHead,
+        actor_adjoint_jet_step,
+        actor_adjoint_step,
+    )
 
     env = DoubleGyrePointMass()
     layers = _layers_jax(jax.random.PRNGKey(6))
@@ -152,11 +156,11 @@ def test_fit_terminal_head_reduces_regression_error_jax():
 
     head0 = PSDTerminalHead(l_matrix=0.01 * jnp.eye(2), target=target)
     err0 = sum(
-        float(jnp.sum((head0.value_gradient(s) - g) ** 2)) for s, g in zip(states, true_grads)
+        float(jnp.sum((head0.value_gradient(s) - g) ** 2)) for s, g in zip(states, true_grads, strict=False)
     )
     fitted = fit_terminal_head(head0, states, true_grads, lr=0.05, steps=200)
     err1 = sum(
-        float(jnp.sum((fitted.value_gradient(s) - g) ** 2)) for s, g in zip(states, true_grads)
+        float(jnp.sum((fitted.value_gradient(s) - g) ** 2)) for s, g in zip(states, true_grads, strict=False)
     )
     assert err1 < err0 * 0.1
 
@@ -164,7 +168,11 @@ def test_fit_terminal_head_reduces_regression_error_jax():
 def test_actor_adjoint_jet_step_matches_full_adjoint_with_true_terminal_head_torch():
     import torch
     from omnibias.control.torch.envs import DoubleGyrePointMass
-    from omnibias.control.torch.policy import PSDTerminalHead, actor_adjoint_jet_step, actor_adjoint_step
+    from omnibias.control.torch.policy import (
+        PSDTerminalHead,
+        actor_adjoint_jet_step,
+        actor_adjoint_step,
+    )
 
     torch.set_default_dtype(torch.float64)
     env = DoubleGyrePointMass()

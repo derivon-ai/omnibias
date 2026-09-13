@@ -34,7 +34,11 @@ def test_policy_jacobian_dy_matches_autodiff_jax():
     import jax
 
     jax.config.update("jax_enable_x64", True)
-    from omnibias.control.jax.adjoint import policy_jacobian_dtheta, policy_jacobian_dy, policy_forward
+    from omnibias.control.jax.adjoint import (
+        policy_forward,
+        policy_jacobian_dtheta,
+        policy_jacobian_dy,
+    )
 
     layers = _small_layers_jax(jax.random.PRNGKey(0))
     y = jax.numpy.array([0.3, -0.2])
@@ -49,7 +53,11 @@ def test_policy_jacobian_dy_matches_autodiff_jax():
 
 def test_policy_jacobian_dy_matches_autodiff_torch():
     import torch
-    from omnibias.control.torch.adjoint import policy_forward, policy_jacobian_dtheta, policy_jacobian_dy
+    from omnibias.control.torch.adjoint import (
+        policy_forward,
+        policy_jacobian_dtheta,
+        policy_jacobian_dy,
+    )
 
     torch.set_default_dtype(torch.float64)
     layers = _small_layers_torch(0)
@@ -95,7 +103,11 @@ def test_actor_adjoint_gradient_matches_full_bptt_jax():
 
 def test_actor_adjoint_gradient_matches_full_bptt_torch():
     import torch
-    from omnibias.control.torch.adjoint import actor_adjoint_gradient, flatten_layers, policy_forward
+    from omnibias.control.torch.adjoint import (
+        actor_adjoint_gradient,
+        flatten_layers,
+        policy_forward,
+    )
     from omnibias.control.torch.envs import DoubleGyrePointMass
 
     torch.set_default_dtype(torch.float64)

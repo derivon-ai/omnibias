@@ -1941,9 +1941,14 @@ wheels = [
 name = "omnibias-core"
 version = "0.4.0"
 source = { editable = "packages/omnibias-core" }
+dependencies = [
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+]
 
 [package.optional-dependencies]
 test = [
+    { name = "mpmath" },
     { name = "pytest" },
     { name = "pytest-cov" },
 ]
@@ -1953,11 +1958,38 @@ verified = [
 
 [package.metadata]
 requires-dist = [
+    { name = "mpmath", marker = "extra == 'test'", specifier = ">=1.3" },
     { name = "mpmath", marker = "extra == 'verified'", specifier = ">=1.3" },
+    { name = "numpy", specifier = ">=2.2.6" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0" },
     { name = "pytest-cov", marker = "extra == 'test'", specifier = ">=4.0" },
 ]
 provides-extras = ["test", "verified"]
+
+[[package]]
+name = "omnibias-curvature"
+version = "0.1.0a1"
+source = { editable = "packages/omnibias-curvature" }
+dependencies = [
+    { name = "jax", version = "0.6.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "jax", version = "0.10.2", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "numpy", version = "2.2.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11'" },
+    { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11'" },
+    { name = "omnibias-core" },
+    { name = "omnibias-jax" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "jax", specifier = ">=0.4.30" },
+    { name = "numpy", specifier = ">=1.23" },
+    { name = "omnibias-core", specifier = ">=0.2.0" },
+    { name = "omnibias-jax", specifier = ">=0.2.0" },
+    { name = "omnibias-torch", marker = "extra == 'torch'", specifier = ">=0.2.0" },
+    { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0" },
+    { name = "torch", marker = "extra == 'torch'", specifier = ">=2.0" },
+]
+provides-extras = ["torch", "test"]
 
 [[package]]
 name = "omnibias-ferminet"
@@ -1975,10 +2007,14 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+curvature = [
+    { name = "omnibias-curvature" },
+]
 folx = [
     { name = "folx" },
 ]
 test = [
+    { name = "omnibias-curvature" },
     { name = "pytest" },
 ]
 
@@ -1989,10 +2025,12 @@ requires-dist = [
     { name = "jaxlib", specifier = ">=0.4.30" },
     { name = "numpy", specifier = ">=1.23" },
     { name = "omnibias-core", editable = "packages/omnibias-core" },
+    { name = "omnibias-curvature", marker = "extra == 'curvature'", editable = "packages/omnibias-curvature" },
+    { name = "omnibias-curvature", marker = "extra == 'test'", editable = "packages/omnibias-curvature" },
     { name = "omnibias-jax", editable = "packages/omnibias-jax" },
     { name = "pytest", marker = "extra == 'test'", specifier = ">=7.0" },
 ]
-provides-extras = ["test", "folx"]
+provides-extras = ["test", "folx", "curvature"]
 
 [[package]]
 name = "omnibias-jax"

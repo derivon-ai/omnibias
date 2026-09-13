@@ -385,8 +385,9 @@ def identifiability(
     noise_std: float = 0.05,
     floor: float = 1e-6,
 ) -> IdentifiabilityReport:
-    """Fisher eigenvalues; small ones are named unidentifiable directions."""
-    _ = model
+    """Legacy scalar location Fisher; general models use ``observation`` APIs."""
+    if not isinstance(model, str) or model != "location":
+        raise ValueError("legacy identifiability supports model='location'; use ObservationModel for general models")
     points = np.asarray(data_design, dtype=float).reshape(-1)
     tau = float(params["tau"])
     alpha = float(params.get("alpha", 25.0))
@@ -409,7 +410,8 @@ def place_sensors(
     noise_std: float = 0.05,
 ) -> SensorPlan:
     """Greedy D-optimal design on the location Fisher; reports ``1 - 1/e``."""
-    _ = model
+    if not isinstance(model, str) or model != "location":
+        raise ValueError("legacy place_sensors supports model='location'; use candidate_information for general models")
     xs = np.asarray(candidates, dtype=float).reshape(-1)
     k = int(budget)
     if k < 1 or k > xs.size:

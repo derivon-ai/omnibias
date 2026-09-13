@@ -23,6 +23,7 @@ def test_legacy_json_bundle_still_packs_residuals() -> None:
     )
     assert bundle["honesty"]["navier_stokes_proof_claim"] is False
     assert bundle["schema_version"] == "ipm-cap-2"
+    assert bundle["remainder"]["contains_truth_sample"] is False
 
 
 def test_packed_residual_radii_refuses_large_residual() -> None:

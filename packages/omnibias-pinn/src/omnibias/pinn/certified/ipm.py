@@ -20,8 +20,8 @@ from typing import Any
 
 import numpy as np
 from omnibias.core.proof.replay import ReplayRecorder, ReplayTrace
-from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.fourier import ValidatedFourierSeries, Wavevector
+from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.kantorovich import radii_polynomial_certificate
 from omnibias.core.verified.radii_spectral import (
     BandedLinearPart,
@@ -34,7 +34,6 @@ from omnibias.core.verified.radii_spectral import (
     quadratic_radii_certificate,
     tail_inverse_bound_from_banded,
 )
-
 
 IPM_REMAINDER_LEFTOVER = {
     "leftover_id": 53,
@@ -82,7 +81,20 @@ def enclose_ipm_grid_residual(discovery: dict[str, Any]) -> dict[str, Any]:
     vin = discovery.get("validation_inputs") or {}
     truth_ok = False
     truth = 0.0
-    if vin:
+    truth_fields = (
+        "y1",
+        "y2",
+        "theta",
+        "theta_y1",
+        "theta_y2",
+        "psi_lap",
+        "psi_y1",
+        "psi_y2",
+        "lambda",
+    )
+    # Older bundles carry descriptive grid metadata rather than pointwise
+    # derivative operands. Retain them without claiming a checked truth sample.
+    if all(field in vin for field in truth_fields):
         truth_rt, truth_rp = _ipm_residual_numpy(
             float(np.asarray(vin["y1"]).ravel()[0]),
             float(np.asarray(vin["y2"]).ravel()[0]),
@@ -171,14 +183,18 @@ def build_ipm_radii_construction(
         },
     )
     bundle = build_ipm_cap_bundle(discovery)
-    bundle["radii"] = None if cert is None else {
-        "radius": cert.radius,
-        "y0": cert.y0,
-        "z0": cert.z0,
-        "z1": cert.z1,
-        "z2": cert.z2,
-        "proved": True,
-    }
+    bundle["radii"] = (
+        None
+        if cert is None
+        else {
+            "radius": cert.radius,
+            "y0": cert.y0,
+            "z0": cert.z0,
+            "z1": cert.z1,
+            "z2": cert.z2,
+            "proved": True,
+        }
+    )
     bundle["proved"] = cert is not None
     bundle["full_ipm_proved"] = False
     bundle["named_subcase"] = "packed_residual_radii"
@@ -214,13 +230,9 @@ def ipm_banded_toy_radii(
         (-2,): 0.02,
     }
     diagonal = laplacian_symbol(4.0, 1.0)
-    band: BandedLinearPart = constant_coefficient_band(
-        diagonal, {(1,): coupling, (-1,): coupling}
-    )
+    band: BandedLinearPart = constant_coefficient_band(diagonal, {(1,): coupling, (-1,): coupling})
     diag_lower = 4.0 + 1.0 * (trunc + 1) ** 2
-    mu = tail_inverse_bound_from_banded(
-        diag_lower, {(1,): abs(coupling), (-1,): abs(coupling)}, nu
-    )
+    mu = tail_inverse_bound_from_banded(diag_lower, {(1,): abs(coupling), (-1,): abs(coupling)}, nu)
     quad = _convolution()
     ab = _embed(a_star, dim, 2 * trunc, nu)
     f_series = _apply_finite_linear(ab, band, nu) + quad(ab, ab)  # type: ignore[operator]

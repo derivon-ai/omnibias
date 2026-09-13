@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
 from omnibias.pinn.certified.ipm import (
     IPM_REMAINDER_LEFTOVER,
     build_ipm_cap_bundle,

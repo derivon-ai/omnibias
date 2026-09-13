@@ -44,7 +44,8 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-test = ["pytest>=7.0"]
+# Dense and operator SR regression tests exercise the optional curvature bridge.
+test = ["pytest>=7.0", "omnibias-curvature>=0.1.0a1"]
 folx = ["folx>=0.1"]
 # omnibias.ferminet.stochastic_reconfiguration composes the sampling
 # substrate (this package) with the generic natural-gradient solve in

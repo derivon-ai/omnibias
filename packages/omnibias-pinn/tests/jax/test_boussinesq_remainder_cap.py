@@ -6,7 +6,6 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
-
 from omnibias.pinn.certified.boussinesq import (
     BOUSSINESQ_REMAINDER_LEFTOVER,
     build_boussinesq_cap_bundle,
