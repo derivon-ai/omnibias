@@ -3,8 +3,9 @@
 r"""Jet-Padé singularity location (theory 03-10).
 
 A high-order jet is a truncated Taylor series. Domb-Sykes and
-Padé poles estimate the nearest singularity; a coefficient tail
-bound turns ``|x_s|`` into a sound annulus. This is a diagnostic
+Padé poles estimate the nearest singularity; a proved geometric upper
+tail gives only a lower convergence radius, never a finite upper radius.
+This is a diagnostic
 and an estimate, not a proof of blow-up.
 
 Jets come from the founding bias collapse (``delta -> 0``).
@@ -22,11 +23,10 @@ import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from fractions import Fraction
-from math import inf, nextafter
+from math import inf
 from typing import Literal
 
 from omnibias.core.verified.interval import Interval
-from omnibias.core.verified.sequence_space import geometric_tail_bound
 from omnibias.difference._core.generating import _polynomial_roots  # type: ignore[import-not-found]
 from omnibias.difference._core.pade import (  # type: ignore[import-not-found]
     pade_approximant,
@@ -208,10 +208,39 @@ def both_estimates(
     return SingularityEstimate(loc, exp, "both", gap, None, False, "")
 
 
-def _abs_lo(iv: Interval) -> float:
-    if iv.lo <= 0.0 <= iv.hi:
-        return 0.0
-    return min(abs(iv.lo), abs(iv.hi))
+def convergence_radius_from_geometric_tail(
+    coeffs: Sequence[Interval | float],
+    *,
+    tail_bound: Interval,
+    tail_ratio: float,
+) -> Interval:
+    r"""Enclose the convergence radius in ``[1/q, +inf]`` from an upper tail.
+
+    The caller must establish ``|a_k| <= M*q**k`` for EVERY
+    ``k >= len(coeffs)``, where ``M=tail_bound.hi`` is finite and
+    ``q=tail_ratio > 0``. This is an infinite-tail mathematical contract,
+    not a conclusion from the finite coefficients. Cauchy-Hadamard gives
+    ``limsup |a_k|**(1/k) <= q``, hence radius ``R >= 1/q``.
+
+    If ``M=0``, the declared series is a polynomial and ``[+inf,+inf]``
+    is returned. No finite prefix can supply a positive LOWER limsup
+    bound: polynomial and entire continuations have the same prefix.
+    Therefore this API never supplies a finite upper radius or proves a
+    singularity exists. ``coeffs`` validates the declared finite prefix;
+    it does not tighten this asymptotic bound.
+    """
+    if not math.isfinite(tail_ratio) or tail_ratio <= 0.0:
+        raise ValueError("tail_ratio must be positive and finite")
+    if tail_bound.lo < 0.0 or not math.isfinite(tail_bound.hi):
+        raise ValueError("tail_bound must be nonnegative and finite")
+    ivs = [c if isinstance(c, Interval) else Interval.from_value(c) for c in coeffs]
+    if len(ivs) < 2:
+        raise ValueError("need at least two coefficients")
+    if any(not math.isfinite(iv.lo) or not math.isfinite(iv.hi) for iv in ivs):
+        raise ValueError("finite prefix coefficients required")
+    if tail_bound.hi == 0.0:
+        return Interval(inf, inf)
+    return Interval(max(0.0, Interval.point(tail_ratio).reciprocal().lo), inf)
 
 
 def certified_singularity_annulus(
@@ -220,26 +249,15 @@ def certified_singularity_annulus(
     tail_bound: Interval,
     tail_ratio: float,
 ) -> Interval:
-    """Sound enclosure of ``|x_s|`` from Cauchy-Hadamard plus a geometric tail."""
-    if float(tail_ratio) <= 0.0:
-        raise ValueError("tail_ratio must be > 0")
-    ivs = [c if isinstance(c, Interval) else Interval.from_value(c) for c in coeffs]
-    if len(ivs) < 2:
-        raise ValueError("need at least two coefficients")
-    l_hi = nextafter(float(tail_ratio) * max(1.0, tail_bound.hi) ** (1.0 / float(len(ivs))), inf)
-    l_lo = 0.0
-    for k in range(1, len(ivs)):
-        hi = nextafter(ivs[k].mag ** (1.0 / float(k)), inf)
-        raw_lo = _abs_lo(ivs[k])
-        lo = nextafter(raw_lo ** (1.0 / float(k)), 0.0) if raw_lo > 0.0 else 0.0
-        l_hi = max(l_hi, hi)
-        l_lo = max(l_lo, lo)
-    # Weighted tail in sequence space must be finite for the majorant to exist.
-    _ = geometric_tail_bound(float(tail_bound.hi), float(tail_ratio), nu=0.5 / float(tail_ratio), n_trunc=len(ivs) - 1)
-    if l_lo <= 0.0 or l_hi <= 0.0:
-        raise ValueError("cannot enclose |x_s|: limsup lower bound is not positive")
-    # |x_s| = 1 / limsup |a_k|^{1/k}, outward-rounded.
-    return Interval(nextafter(1.0 / l_hi, 0.0), nextafter(1.0 / l_lo, inf))
+    """Legacy name for :func:`convergence_radius_from_geometric_tail`.
+
+    The upper endpoint is now ALWAYS infinity. Older releases incorrectly
+    inferred a finite upper radius from a finite prefix. Consumers requiring
+    singularity existence must provide a separate infinite-tail argument.
+    """
+    return convergence_radius_from_geometric_tail(
+        coeffs, tail_bound=tail_bound, tail_ratio=tail_ratio
+    )
 
 
 def remainder_on_safe_disc(
@@ -312,6 +330,7 @@ __all__ = [
     "agreement",
     "both_estimates",
     "certified_singularity_annulus",
+    "convergence_radius_from_geometric_tail",
     "domb_sykes",
     "fit_blowup",
     "honesty_payload",

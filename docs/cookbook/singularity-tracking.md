@@ -6,7 +6,7 @@ The result is a diagnostic, not a blow-up proof.
 ```python
 from omnibias.difference.singularity import (
     DISCLAIMER,
-    certified_singularity_annulus,
+    convergence_radius_from_geometric_tail,
     domb_sykes,
     pade_estimate,
 )
@@ -21,13 +21,27 @@ assert abs((ds.exponent or 0.0) - 1.0) < 1e-8
 pd = pade_estimate(coeffs, numer_deg=0, denom_deg=1)
 assert pd.location is not None
 assert abs(pd.location.real - 0.3) < 1e-8
-enc = certified_singularity_annulus(
+enc = convergence_radius_from_geometric_tail(
     [Interval.from_value(c) for c in coeffs],
     tail_bound=Interval.point(1.0),
     tail_ratio=10.0 / 3.0,
 )
 assert enc.lo <= 0.3 <= enc.hi
+assert enc.hi == float("inf")
 assert DISCLAIMER.startswith("diagnostic")
+```
+
+For this known geometric series, its exact coefficient formula proves the
+infinite tail hypothesis. The supplied upper tail proves only a lower
+convergence radius. The finite prefix and tail majorant also allow entire
+functions, so they cannot establish a finite upper radius. A declared zero
+tail instead proves that the series is a polynomial:
+
+```python
+polynomial_radius = convergence_radius_from_geometric_tail(
+    (1.0, 1.0), tail_bound=Interval.point(0), tail_ratio=0.5,
+)
+assert polynomial_radius.lo == polynomial_radius.hi == float("inf")
 ```
 
 `exp` has an essential singularity at infinity, so Domb-Sykes

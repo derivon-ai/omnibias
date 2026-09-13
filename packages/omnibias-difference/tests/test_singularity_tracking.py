@@ -15,6 +15,7 @@ from omnibias.difference.singularity import (
     SingularityTrack,
     agreement,
     certified_singularity_annulus,
+    convergence_radius_from_geometric_tail,
     domb_sykes,
     honesty_payload,
     pade_estimate,
@@ -71,6 +72,40 @@ def test_g2_annulus_sound() -> None:
         c = [Interval.from_value(rho**k) for k in range(8)]
         enc = certified_singularity_annulus(c, tail_bound=Interval.point(1.0), tail_ratio=rho)
         assert enc.lo <= xs <= enc.hi
+        assert enc.hi == float("inf")
+
+
+def test_polynomial_prefix_never_proves_a_finite_singularity_radius() -> None:
+    for coefficients in ((1.0, 1.0), (1.0, 1.0, 0.0, 0.0, 0.0)):
+        for api in (certified_singularity_annulus, convergence_radius_from_geometric_tail):
+            radius = api(coefficients, tail_bound=Interval.point(0), tail_ratio=0.5)
+            assert radius.lo == radius.hi == float("inf")
+            loose = api(coefficients, tail_bound=Interval.point(1), tail_ratio=0.5)
+            assert loose.lo <= 2 and loose.hi == float("inf")
+
+
+def test_finite_prefix_cannot_tighten_asymptotic_upper_tail_radius() -> None:
+    # Arbitrarily large finite coefficients leave the radius unchanged.
+    for prefix in ((0., 0.), (1., 1e200), (1., -1e200)):
+        radius = convergence_radius_from_geometric_tail(
+            prefix, tail_bound=Interval(0, 1e200), tail_ratio=4,
+        )
+        assert radius.lo <= 0.25 <= radius.hi and radius.hi == float("inf")
+        assert radius.lo > 0.249
+
+
+@pytest.mark.parametrize("ratio", [0.0, -1.0, float("inf"), float("nan")])
+def test_radius_rejects_invalid_geometric_ratio(ratio) -> None:
+    with pytest.raises(ValueError):
+        convergence_radius_from_geometric_tail((1., 1.), tail_bound=Interval.point(1), tail_ratio=ratio)
+
+
+def test_radius_rejects_invalid_prefix_or_tail_contract() -> None:
+    for tail in (Interval(-1, 1), Interval(0, float("inf"))):
+        with pytest.raises(ValueError):
+            convergence_radius_from_geometric_tail((1., 1.), tail_bound=tail, tail_ratio=1)
+    with pytest.raises(ValueError):
+        convergence_radius_from_geometric_tail((1., float("inf")), tail_bound=Interval.point(1), tail_ratio=1)
 
 
 def test_g4_agreement_and_hard_case() -> None:

@@ -3,7 +3,7 @@
 """Wave-5: jet-Padé singularity tracking (theory 03-10).
 
 Smoke earns G1 (known poles / branch points; essential
-singularities report failure), G2 (annulus contains ``|x_s|``),
+singularities report failure), G2 (upper tail proves a lower convergence radius),
 G3 (``mlp_jet`` vs autodiff: 20x on ``--full`` / order 20, smoke
 uses order 8), G4 (Domb-Sykes / Padé agreement; disagreement
 flags a hard pair), G5 (model-track ``t_c`` within 1 percent),
@@ -31,7 +31,7 @@ from omnibias.core.verified.interval import Interval
 from omnibias.difference.singularity import (
     DISCLAIMER,
     agreement,
-    certified_singularity_annulus,
+    convergence_radius_from_geometric_tail,
     domb_sykes,
     honesty_payload,
     pade_estimate,
@@ -72,26 +72,32 @@ def _run_g2() -> dict[str, Any]:
     n = 0
     for rho in (2.0, 2.5, 3.0, 4.0, 5.0):
         xs = 1.0 / rho
-        enc = certified_singularity_annulus(
+        enc = convergence_radius_from_geometric_tail(
             [Interval.from_value(rho**k) for k in range(8)],
             tail_bound=Interval.point(1.0),
             tail_ratio=rho,
         )
         n += 1
-        if not (enc.lo <= xs <= enc.hi):
+        if not (enc.lo <= xs <= enc.hi and enc.hi == float("inf")):
             violations += 1
     for _ in range(16):
         rho = float(rng.uniform(2.0, 6.0))
         xs = 1.0 / rho
-        enc = certified_singularity_annulus(
+        enc = convergence_radius_from_geometric_tail(
             [Interval.from_value(rho**k) for k in range(8)],
             tail_bound=Interval.point(1.0),
             tail_ratio=rho,
         )
         n += 1
-        if not (enc.lo <= xs <= enc.hi):
+        if not (enc.lo <= xs <= enc.hi and enc.hi == float("inf")):
             violations += 1
-    return {"name": "g2_annulus", "passed": violations == 0, "n": n, "violations": violations}
+    polynomial = convergence_radius_from_geometric_tail(
+        (1., 1.), tail_bound=Interval.point(0), tail_ratio=0.5,
+    )
+    entire = polynomial.lo == polynomial.hi == float("inf")
+    return {"name": "g2_lower_radius", "passed": violations == 0 and entire,
+            "n": n, "violations": violations, "zero_tail_is_entire": entire,
+            "finite_upper_radius_claim": False}
 
 
 def _run_g3(*, full: bool) -> dict[str, Any]:

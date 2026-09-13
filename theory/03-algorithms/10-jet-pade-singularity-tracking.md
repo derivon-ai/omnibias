@@ -83,12 +83,11 @@ Cauchy-product work.
 ### Certified remainder
 
 `pade_certified_remainder` bounds the error of the Padé approximant on a stated
-domain. Combined with the geometric tail bounds of `sequence_space`, the
-statement "the nearest singularity lies in this annulus" becomes a sound
-enclosure rather than a fit.
-
-That is the difference between this and a standard singularity-tracking
-heuristic, and it is the part worth building carefully.
+domain. A proved geometric upper tail supplies a lower convergence radius;
+it does not prove that a singularity exists or put it in a bounded annulus.
+An entire polynomial can share any prescribed finite prefix. A finite upper
+radius therefore needs an independent infinite lower-tail or noncancellation
+argument. The former prefix-based annulus claim was unsound and is withdrawn.
 
 ### Tracking in time
 
@@ -197,8 +196,8 @@ class SingularityEstimate:
 
 def domb_sykes(coeffs: Sequence[float], *, drop_first: int = 1) -> SingularityEstimate: ...
 def pade_singularities(coeffs, *, l: int, m: int) -> tuple[complex, ...]: ...
-def certified_singularity_annulus(coeffs, *, tail_bound: Interval) -> Interval:
-    """Sound enclosure of |x_s| from coefficient bounds plus a tail bound."""
+def convergence_radius_from_geometric_tail(coeffs, *, tail_bound: Interval, tail_ratio: float) -> Interval:
+    """Lower convergence radius from a proved infinite upper tail; upper endpoint is infinity."""
 def agreement(a: SingularityEstimate, b: SingularityEstimate) -> float:
     """Disagreement between methods is the honest uncertainty signal."""
 ```
@@ -243,8 +242,11 @@ direct numerical singularity search.
   recovered to `<= 1e-6` relative where the method applies, and the method
   *reports failure* on the essential-singularity cases rather than returning a
   confident wrong answer.
-- **G2 enclosure soundness.** `certified_singularity_annulus` contains the true
-  `|x_s|` on every instance of a randomized suite, with zero violations.
+- **G2 enclosure soundness.** `convergence_radius_from_geometric_tail` contains
+  the true convergence radius under its proved infinite upper-tail contract.
+  The upper endpoint is infinity, including polynomial continuations of a
+  nonzero prefix; a zero tail gives infinite radius. A finite prefix never
+  establishes a lower asymptotic limsup or a finite upper radius.
 - **G3 coefficient cost.** Obtaining 20 exact coefficients from a depth-4
   network via `mlp_jet` is at least `20x` faster than repeated autodiff, and
   bit-identical to it where autodiff is feasible.

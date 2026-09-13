@@ -1,5 +1,10 @@
 {
   "schema": "omnibias.benchmarks.singularity_tracking.v1",
+  "historical_evidence_correction": {
+    "invalidated_gate": "g2_annulus",
+    "reason": "A finite coefficient prefix supplies no positive lower asymptotic limsup. The old finite upper singularity radius was unsound; the corrected upper-tail API has an infinite upper endpoint.",
+    "other_entries": "Original historical measurements retained; not rerun by this correction."
+  },
   "generated_utc": "2026-08-21T18:34:18Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
@@ -25,7 +30,7 @@
   },
   "rss_mb_at_start": 1558.95,
   "gates": {
-    "all_passed": true,
+    "all_passed": false,
     "entries": [
       {
         "name": "g1_recovery",
@@ -34,7 +39,8 @@
       },
       {
         "name": "g2_annulus",
-        "passed": true,
+        "passed": false,
+        "invalidated": true,
         "n": 21,
         "violations": 0
       },
