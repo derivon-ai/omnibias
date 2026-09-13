@@ -1,5 +1,93 @@
 # omnibias.geometry.gauge — non-abelian gauge theory
 
+Static-source research primitives now include exact
+[charged Gauss-law dimensions](gauge-charged-sectors.md) and
+[vacuum-subtracted graph energy bounds](static-sources.md). These include
+all-spin written implications on specified finite graphs. Their positive
+finite energies do not assert bulk confinement or a continuum mass gap.
+
+The [actual-vacuum local bounds](gauge-vacuum-local.md) derive conditional
+Poincare constants independent of surrounding volume at bounded incidence.
+Their separate dense influence gate retains its finite-size limitation.
+
+The [vacuum Fourier contraction](gauge-vacuum-fourier.md) adds a written
+strong-coupling theorem uniform over finite graph families, with exact
+rational replay. It constructs the actual logarithmic vacuum, proves a
+neutral gap and variance factorization, and optionally bounds distant
+influences. The [charged cut argument](gauge-charged-confinement.md) uses
+this actual-vacuum curvature to bound static-source energy above and below
+by positive multiples of source separation, uniformly over the stated
+strong-coupling graph families. [Hamiltonian rectangle
+enclosures](gauge-charged-amplitude.md) turn those bounds into two-sided
+exponential amplitude bounds. A separate [SU(3) representation
+argument](gauge-su3-vacuum-fourier.md) supplies corresponding finite-family
+gap and static-source bounds. These results concern fixed lattice
+couplings; their replay certificates do not establish a continuum theory.
+
+[Joint vacuum enclosures](gauge-joint-vacuum.md) control a true
+two-coordinate density against the product of its own marginals.
+[Shared-strip refinement](gauge-shared-strip-refinement.md) retains the
+actual interacting coarse pair and controls all physical conditional
+modes on a thirteen-edge SU(2) graph. Its finite gap and joint logarithm
+bounds have separate gates; neither establishes an all-scale induction.
+The [nested reduction](gauge-shared-strip-two-step.md) now carries that
+actual joint marginal through a second physical reduction. Its local
+conditional derivative estimate and two successive Schur bounds are
+verified on the same fixed graph.
+
+The [periodic corner construction](gauge-periodic-corner.md) supplies a
+uniform harmonic comparison and an actual global upper energy-density
+bound at small coupling. The [quantitative open-box lower
+bound](gauge-periodic-corner-box.md) controls the interacting exterior.
+Together they give the written neutral-vacuum inequality
+\(\langle S-A(D)\rangle_0\ge15\kappa/56\) for periodic sides
+\(N\ge8192\) and \(0<\kappa\le2^{-330}\), with exact rational replay.
+The full nonlinear operator analysis is not formalized, and this vacuum
+comparison does not assert positive excitation coercivity or a continuum gap.
+
+The [non-Abelian matrix comparison](gauge-commutator-matrix.md) gives an
+explicit singlet excitation bound on the full configuration space, using
+exact scalar Sturm certificates. Its [compact three-loop extension](gauge-compact-commutator.md)
+controls commuting flat directions and proves a center-even gap throughout
+a stated small-coupling interval; the other seven center sectors have
+separate energy bounds. [Physical conditional blocks](gauge-physical-blocks.md)
+retain internal Gauss constraints and all boundary flux on an actual theta
+vacuum. These finite model results do not establish a volume-uniform or
+continuum Yang–Mills gap.
+
+The [weak theta block theorem](gauge-theta-weak-blocks.md) gives actual
+conditional quantum gaps \(2/15,4/25\) for \(0<\kappa\le1/64\),
+retaining all boundary flux on the specified seven-edge graph.
+[Plaquette paths](gauge-plaquette-path.md) have gap \(m/33\) at every
+positive coupling. [Forest projection certificates](gauge-forest-projection.md)
+check the available-gauge boundary condition separately from measure premises.
+These fixed-graph conditional laws do not supply ambient-lattice or continuum
+control.
+
+The [ambient conditional bound](gauge-ambient-conditional.md) applies directly
+to the actual positive vacuum on any finite Wilson-word graph, at every
+positive coupling. Its constants depend on the selected block and all
+touching plaquettes; they are independent of the exterior configuration and
+ambient volume. Positive exponential and factored dyadic bounds remain exact
+below floating-point range. This local result still requires physical
+correlation control to obtain a gap for the growing lattice.
+
+The [actual theta kernel-tail theorem](gauge-theta-kernel-tail.md) controls
+the true two-plaquette vacuum's correlation kernel normalized by its own
+marginals. Two-sided barriers and an original-link Bochner estimate give
+an explicit all-mode tail uniform in rescaled weak-coupling coordinates.
+The tail source does not certify a complete kernel approximation or a
+numerical coupling threshold, and retains its fixed-graph scope.
+
+The separate [explicit theta contraction](gauge-theta-kernel-threshold.md)
+combines those tails with a [smooth quaternion quasimode](gauge-theta-quasimode.md)
+and actual own-marginal floors. It certifies physical radial-cycle correlation
+at most \(143/480\) for every \(0<\kappa\le2^{-17022271}\), on the same
+fixed graph. The symbolic exponent avoids floating underflow. The
+[finite-strip extension](gauge-strip-kernel-tail.md) gives actual tails for
+any cycle bipartition on each finite open strip, with constants that grow
+with its length; it does not provide a volume-uniform contraction.
+
 > **Folded package.** This is the alpha `omnibias.geometry.gauge` submodule of
 > `omnibias-geometry` (formerly the standalone `omnibias-gauge` package). Imports
 > use `omnibias.geometry.gauge`; the numerics are unchanged.
@@ -285,15 +373,29 @@ continuum mass-gap claim.
 The JAX backend (`omnibias.geometry.gauge.jax.ops`) is the bit-identical twin; the
 cross-backend tests assert agreement to `rtol=1e-9` in float64.
 
-## Stochastic quantisation (continuum)
+## Stochastic-flow array operators
 
-`omnibias.geometry.gauge.{torch,jax}.ops` also expose the Parisi-Wu / DeTurck-gauged
-gradient-flow right-hand side `gauge_flow_rhs` (the Yang-Mills gradient-flow
-drift `-D_mu F^{mu nu}` plus an optional DeTurck gauge-fixing term) and a
-`langevin_step` that adds scaled Gaussian noise to that drift. These are the
-bit-identical twins of the lattice updater below and realize the
-DeTurck-Zwanziger parabolic-flow picture as a tested numerical operator (they do
-**not** constitute a rigorous stochastic-quantisation construction).
+`omnibias.geometry.gauge.{torch,jax}.ops` expose `gauge_flow_rhs` and
+`langevin_step`. The drift is the supplied Yang–Mills/DeTurck array expression;
+`langevin_step` computes the numerical Euler–Maruyama update
+`A + dt * drift + sqrt(2 * dt * temperature) * noise`.
+`noise` has standard-normal array coordinates. The caller must provide any
+spatial-cell or covariance normalization required by the chosen discretization.
+Torch draws from `generator` when noise is omitted; JAX instead requires `key`.
+Matching explicit arrays permits a reproducible backend comparison.
+
+The continuum stochastic-quantisation interpretation requires Euclidean,
+parabolic dynamics, a compatible action and noise metric, treatment of gauge
+redundancy and a constructed stochastic process. The API also accepts other
+`signature` values; accepting them does not establish these hypotheses.
+The array operator and the group-valued lattice updater below are distinct
+algorithms. Neither constructs a renormalized continuum stochastic YM theory.
+
+A finite Euler step generally changes the invariant law. Already for
+`dX = -lambda * X * dt + sqrt(2 * T) * dB`, stable Euler steps have stationary
+variance `T / (lambda * (1 - dt * lambda / 2))`, rather than `T / lambda`.
+Thus `langevin_step` does not guarantee exact sampling of `exp(-S/T)` at finite
+`dt`; no time-step bias correction is applied.
 
 ## Lattice Monte-Carlo (evidence)
 
@@ -705,3 +807,62 @@ assert pack.su3_gap.certified
 assert pack.three_plaquette.certified
 assert pack.wilson_character_domain.certified
 ```
+
+## Constructive Hamiltonian inverses and source bounds
+
+The separate constructive Hamiltonian APIs now include the
+[all-coupling compact neutral plaquette](gauge-weak-plaquette.md),
+[correlated quadratic vacuum](gauge-quadratic-vacuum.md),
+[conditional scale-normalized Schur budgets](gauge-scale-gap-budget.md),
+[general gauge-polar bilinear theorem](gauge-graph-bilinear-cancellation.md),
+[volume-independent polar vacuum source](gauge-wilson-polar-source.md),
+[actual exterior-conditioned blocks](gauge-wilson-conditional-block.md),
+[directional theta inverse](gauge-adjacent-cone-inverse.md),
+[spherical-product source](gauge-adjacent-cone-vacuum.md),
+[actual-measure gap comparison](gauge-adjacent-gap-comparison.md),
+[full-spin adjacent reference inverse](gauge-adjacent-resolvent.md),
+[preconditioned actual adjacent vacuum](gauge-adjacent-vacuum.md),
+[conditional finite-graph Fourier tail](gauge-finite-graph-resolvent.md),
+and [actual cubic static-source bounds](gauge-wilson-static-source.md).
+They live in `omnibias.geometry.gauge.transfer`. Their proof pages identify
+the original electric graph, the coefficient norm, the entire omitted-spin
+tail and each certificate's earned scope. Reference inversion, nonlinear
+construction of an actual vacuum, and continuum reconstruction remain
+separate obligations. Exact rational replay does not by itself earn Lean
+or a continuum claim.
+
+## Exact Stieltjes pair boxes
+
+`stieltjes_pair_box(s1, lower1, upper1, s2, lower2, upper2)` accepts only
+integers and `Fraction` values. For the explicitly conditional model
+`D(s) = integral rho(dt)/(s+t)`, with positive rho on nonnegative mass squared,
+finite listed values, and no contact/subtraction terms, D must be nonnegative
+and nonincreasing while s*D is nondecreasing. A strict violation throughout
+the supplied box gives `INCOMPATIBLE`; otherwise the necessary test returns
+`INCONCLUSIVE`. It does not decide spectral-measure existence.
+
+```python
+from fractions import Fraction as Q
+from omnibias.geometry.gauge import (
+    replay_stieltjes_pair_certificate,
+    stieltjes_pair_box,
+)
+
+check = stieltjes_pair_box(1, Q(19, 10), Q(21, 10), 4, Q(1, 5), Q(3, 10))
+assert check["status"] == "INCOMPATIBLE"  # 1*lower1 > 4*upper2
+assert replay_stieltjes_pair_certificate(check["certificate"])
+assert check["physical_exclusion_claim"] is False
+assert check["theorem_prover_verified"] is False
+```
+
+If no obstruction is found and `lower1 > upper2 > 0`, the report can provide
+`(s2*upper2-s1*lower1)/(lower1-upper2)` as a **conditional upper bound** on the
+support infimum in mass-squared units. Its direction is not a lower gap bound.
+Full-envelope replay recomputes arithmetic, claim scope and honesty fields;
+a newly hashed promotion is rejected.
+
+This is `EXACT_RATIONAL` arithmetic on supplied boxes. Statistical error bars
+are not automatically sound enclosures. The positive-representation premise
+for a gauge-fixed gluon is unverified, as are physical identification and all
+continuum implications. Neither a box exclusion nor a passing necessary test
+licenses a Yang–Mills, spectral-existence, physical-gap or Lean claim.

@@ -162,14 +162,14 @@ def test_glueball_correlator_physics_regression() -> None:
     )
     corr = out["glueball_correlator"]
     err = out["glueball_correlator_err"]
+    assert all(math.isfinite(c) for c in corr)
+    assert all(math.isfinite(e) and e >= 0.0 for e in err)
     assert corr[0] > 0.0
-    assert corr[1] > 0.0
     assert corr[0] >= corr[1]
+    # Reflection positivity concerns the population correlator. A finite
+    # sample can have an unresolved negative estimate; retain the existing
+    # uncertainty check without demanding successful mass extraction.
     assert corr[1] > -3.0 * err[1]
-    m0 = effective_mass(torch.tensor(corr, dtype=torch.float64), tau=0)
-    m1 = effective_mass(torch.tensor(corr, dtype=torch.float64), tau=1)
-    assert math.isfinite(m0) and m0 > 0.0
-    assert math.isfinite(m1) and m1 > 0.0
 
 
 def test_effective_mass_positive_on_synthetic_exponential() -> None:
@@ -178,6 +178,19 @@ def test_effective_mass_positive_on_synthetic_exponential() -> None:
     m_eff = effective_mass(corr, tau=1)
     assert m_eff > 0.0
     assert abs(m_eff - mass) < 1e-6
+
+
+def test_finite_sample_can_be_negative_without_an_effective_mass() -> None:
+    # This sample has nonzero probability under independent symmetric signs,
+    # whose population off-diagonal connected correlator is zero. Population
+    # positivity cannot be imposed on every measured sample.
+    samples = torch.tensor([[1., -1., 1., -1.], [1., -1., 1., -1.]],
+                           dtype=torch.float64)
+    corr, _ = connected_correlator_ensemble(samples)
+    assert corr[0].item() == 1.0
+    assert corr[1].item() == -1.0
+    assert math.isnan(effective_mass(corr, tau=0))
+    assert math.isnan(effective_mass(corr, tau=1))
 
 
 def test_cold_start_plaquette_high_beta() -> None:

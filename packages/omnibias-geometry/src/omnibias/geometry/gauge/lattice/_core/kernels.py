@@ -116,10 +116,16 @@ def quat_to_matrix(xp: Any, q: Any) -> Any:
 
 
 def matrix_to_quat(xp: Any, u: Any) -> Any:
-    """Project a 2x2 matrix onto the nearest unit quaternion (last two axes 2x2)."""
+    """Extract quaternion coefficients and normalize (last two axes 2x2).
+
+    This is the nearest SU(2) matrix in Frobenius norm when the projected
+    coefficient norm exceeds ``normalize_quaternion``'s numerical floor.
+    A zero projection remains zero; no unit-quaternion minimizer is selected
+    in that degenerate case.
+    """
     q0 = 0.5 * (u[..., 0, 0].real + u[..., 1, 1].real)
-    q1 = 0.5 * (u[..., 0, 1].real + u[..., 1, 0].real)
-    q2 = 0.5 * (u[..., 0, 1].imag - u[..., 1, 0].imag)
+    q1 = 0.5 * (u[..., 0, 1].imag + u[..., 1, 0].imag)
+    q2 = 0.5 * (u[..., 0, 1].real - u[..., 1, 0].real)
     q3 = 0.5 * (u[..., 0, 0].imag - u[..., 1, 1].imag)
     return normalize_quaternion(xp, _stack(xp, (q0, q1, q2, q3), -1))
 
@@ -170,8 +176,12 @@ def staple_sum(xp: Any, links: Any, mu: int) -> Any:
 def staple_hat_and_magnitude(xp: Any, staple: Any) -> tuple[Any, Any]:
     """Return unit direction ``U_hat`` and scalar magnitude ``a = ||staple||``."""
     a = _norm_last(xp, staple, keepdim=False)
-    safe = _clamp_min(xp, a, 1e-30)
-    u_hat = staple / safe[..., None]
+    nonzero = a > 0.0
+    safe = xp.where(nonzero, a, xp.ones_like(a))
+    candidate = staple / safe[..., None]
+    # The zero-staple conditional is Haar; any unit reference direction is
+    # valid. A zero quaternion would instead leave the group under an update.
+    u_hat = xp.where(nonzero[..., None], candidate, _identity_quat_like(xp, staple))
     return u_hat, a
 
 
@@ -327,7 +337,12 @@ def landau_gauge_overrelax(
 def ape_smear_spatial_links(
     xp: Any, links: Any, *, n_steps: int = 10, alpha: float = 0.5
 ) -> Any:
-    """APE smear spatial links (mu=0,1,2); project back to SU(2) by normalization."""
+    """Mix spatial links with the average of their four APE staples.
+
+    ``alpha`` is the normalized staple-average mixing weight, followed by
+    projection to SU(2). Earlier unnormalized code at weight ``a`` corresponds
+    to this convention at ``4*a/(1+3*a)`` for nonnegative ``a``.
+    """
     spatial = (0, 1, 2)
     cur = links
     for _ in range(n_steps):
@@ -353,7 +368,7 @@ def ape_smear_spatial_links(
                     xp, quat_mul(xp, quat_conj(xp, u_nu_bwd), u_mu_bwd), u_nu_bwd_fwd
                 )
                 staple = staple + fwd + bwd
-            smeared = (1.0 - alpha) * cur[mu] + alpha * staple
+            smeared = (1.0 - alpha) * cur[mu] + (alpha / 4.0) * staple
             new_dirs.append(normalize_quaternion(xp, smeared))
         cur = _stack(xp, new_dirs, 0)
     return cur

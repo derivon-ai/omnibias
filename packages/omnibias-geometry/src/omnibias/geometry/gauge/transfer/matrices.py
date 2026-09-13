@@ -33,7 +33,7 @@ import math
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from fractions import Fraction
-from typing import Literal
+from typing import Literal, cast
 
 from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.transcend import PI_IV, besseli_iv, cos_iv, exp_iv
@@ -132,7 +132,13 @@ def encode_scalar(value: Scalar) -> str:
 
 def decode_scalar(text: str) -> Scalar:
     """Inverse of :func:`encode_scalar`, preserving rational-versus-double exactly."""
-    return Fraction(text) if "/" in text else float(text)
+    if "/" in text:
+        return Fraction(text)
+    # An integer token is exact, including integers too large for binary64.
+    # Converting it to float also used to change canonical replay metadata 1→1.0.
+    if text.lstrip("+-").isdigit():
+        return int(text)
+    return float(text)
 
 
 def _diagonal(values: Sequence[Interval]) -> tuple[tuple[Interval, ...], ...]:
@@ -584,7 +590,10 @@ def su3_wilson_transfer(
         for q in range(max_dynkin + 1)
     ]
     coefficients = tuple(
-        su3_wilson_haar_coefficient(rep.dynkin, beta, n_cells=n_cells) for rep in irreps
+        su3_wilson_haar_coefficient(
+            cast(tuple[int, int], rep.dynkin), beta, n_cells=n_cells
+        )
+        for rep in irreps
     )
     ordered = sorted(
         zip(irreps, coefficients, strict=True),

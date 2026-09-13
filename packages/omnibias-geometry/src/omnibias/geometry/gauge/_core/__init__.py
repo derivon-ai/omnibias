@@ -208,6 +208,10 @@ from omnibias.geometry.gauge._core.spectral_density import (
     refuse_spectral_as_mass_gap,
     refuse_unregularized_spectral_inverse,
 )
+from omnibias.geometry.gauge._core.stieltjes import (
+    replay_stieltjes_pair_certificate,
+    stieltjes_pair_box,
+)
 from omnibias.geometry.gauge._core.weak_ym import (
     WEAK_YM_FLOOR,
     AdjointTestBank,
@@ -385,6 +389,7 @@ __all__ = [
     "refuse_single_config_as_ensemble",
     "refuse_spectral_as_mass_gap",
     "refuse_unregularized_spectral_inverse",
+    "replay_stieltjes_pair_certificate",
     "representation_complexity",
     "run_wilson_flow",
     "scale_from_string_tension",
@@ -392,6 +397,7 @@ __all__ = [
     "sorted_index_sets",
     "spatial_l_lat",
     "static_potential_from_wilson",
+    "stieltjes_pair_box",
     "su",
     "su2_spin_matrices",
     "symmetric_power",

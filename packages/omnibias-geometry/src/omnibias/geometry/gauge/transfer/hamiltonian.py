@@ -30,9 +30,12 @@ must recouple with it.  The locked selection rule is therefore
     M1 : (j1, js) → (j1 ± 1/2, js ± 1/2)   (independent signs)
     M2 : (j2, js) → (j2 ± 1/2, js ± 1/2)
 
-Default ``magnetic="sixj"`` inserts the locked recoupling
-``phase × √[(2j+1)…] × 6j`` from :mod:`.sixj`.  ``magnetic="character"``
-keeps the older amplitude-1 operator so the two can be compared.
+Default ``magnetic="sixj"`` inserts the two-vertex recoupling
+``√[(2j+1)(2j'+1)(2js+1)(2js'+1)] × 6j²`` from :mod:`.sixj`.
+Independent normalized Haar contractions identify this operator on the
+two-plaquette graph. ``magnetic="character"`` keeps the older amplitude-1
+matrix for comparison. Three- and four-plaquette consumers of the same
+helper require their own graph-level operator identification.
 
 The certified gap is ``λ1 - λ0`` of this finite matrix (not
 ``-ln(λ1/λ0)``).  Continuum existence and a uniform-in-spacing gap stay
@@ -50,7 +53,11 @@ from typing import Literal
 
 import numpy as np
 from omnibias.core.verified.eig import symmetric_eigenvalue_residual_enclosure
-from omnibias.core.verified.eig_operator import certified_spectral_gap, ritz_upper_bound
+from omnibias.core.verified.eig_operator import (
+    certified_spectral_gap,
+    interval_ldlt_inertia,
+    ritz_upper_bound,
+)
 from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.linalg import inf_norm_matrix, to_interval_matrix
 from omnibias.geometry.gauge.transfer.gap import GapCandidate
@@ -122,7 +129,7 @@ class HamiltonianGapResult:
 
     @property
     def certified(self) -> bool:
-        return self.spectral_gap_lower > 0.0
+        return math.isfinite(self.spectral_gap_lower) and self.spectral_gap_lower > 0.0
 
 
 def _casimir_jj(two_j: int) -> Fraction:
@@ -240,6 +247,8 @@ def su2_two_plaquette_hamiltonian(
             "j_max": int(j_max),
             "n_plaquettes": 2,
             "magnetic": kind,
+            "operator_revision": "theta_two_vertex_v2" if kind == "sixj" else "character_matrix_v1",
+            "operator_identification": "normalized_haar_theta" if kind == "sixj" else "unverified_comparison_matrix",
         },
         mode_labels=labels,
     )
@@ -279,7 +288,10 @@ def su2_three_plaquette_hamiltonian(
     j_max: int = 1,
     magnetic: Magnetic = "sixj",
 ) -> GaugeHamiltonian:
-    """The three-plaquette SU(2) Kogut–Susskind Hamiltonian at one ``g²``.
+    """A finite three-plaquette SU(2) recoupling matrix at one ``g²``.
+
+    The graph-level identification with KS character multiplication is
+    unverified; the independently identified theta formula covers two plaquettes.
 
     Basis ``|j1, j2, j3, js12, js23⟩`` with triangles ``(j1, j2, js12)``
     and ``(j2, j3, js23)``.  Electric weights are the locked 3-square-chain
@@ -345,6 +357,8 @@ def su2_three_plaquette_hamiltonian(
             "j_max": int(j_max),
             "n_plaquettes": 3,
             "magnetic": kind,
+            "operator_revision": "chain_two_vertex_helper_v2" if kind == "sixj" else "character_matrix_v1",
+            "operator_identification": "unverified_multi_plaquette_graph",
         },
         mode_labels=labels,
     )
@@ -464,6 +478,8 @@ def su2_four_plaquette_hamiltonian(
             "j_max": int(j_max),
             "n_plaquettes": 4,
             "magnetic": kind,
+            "operator_revision": "chain_two_vertex_helper_v2" if kind == "sixj" else "character_matrix_v1",
+            "operator_identification": "unverified_multi_plaquette_graph",
         },
         mode_labels=labels,
     )
@@ -568,13 +584,35 @@ def plaquette_holonomy_trial_space(
     )
 
 
+@dataclass(frozen=True)
+class _HamiltonianGapCandidate(GapCandidate):
+    """Keep the endpoints which actually established this gap together."""
+
+    lambda0_upper: float = float("nan")
+    lambda1_lower: float = float("nan")
+
+
 def _shifted_ratio(lambda0_upper: float, lambda1_lower: float, shift: float) -> float:
-    """``(λ0_up + s) / (λ1_lo + s)`` after a positive shift of the spectrum."""
     if shift <= 0.0:
         raise ValueError("shift must be positive")
     if lambda1_lower <= lambda0_upper:
         return 1.0
-    return (lambda0_upper + shift) / (lambda1_lower + shift)
+    numerator = Interval.point(lambda0_upper) + Interval.point(shift)
+    denominator = Interval.point(lambda1_lower) + Interval.point(shift)
+    return (numerator / denominator).hi
+
+
+def _certifies_count_below(
+    matrix: Sequence[Sequence[Interval]], separator: float, count: int,
+) -> bool:
+    """Full-matrix inertia, not a count of proposed residual intervals."""
+    if not math.isfinite(separator):
+        return False
+    shift = Interval.point(separator)
+    shifted = [[entry - shift if i == j else entry
+                for j, entry in enumerate(row)] for i, row in enumerate(matrix)]
+    inertia = interval_ldlt_inertia(shifted)
+    return inertia is not None and inertia.negative == count
 
 
 def _residual_gap_from_vectors(
@@ -584,13 +622,12 @@ def _residual_gap_from_vectors(
     method: str,
     require_complete: bool,
 ) -> GapCandidate:
-    """Residual enclosures of the supplied vectors; gap from the two lowest.
+    """Propose a separator from residuals, then certify its eigenvalue index.
 
-    When ``require_complete`` is true the vector count must equal the
-    matrix dimension and the two lowest enclosures must sit strictly
-    below the rest, so they can be labelled ``(λ0, λ1)``.  Higher
-    degeneracies may overlap.  A short trial list only yields a
-    variational pair and is tagged as such.
+    Individual residual enclosures each contain an eigenvalue, but even n
+    trial vectors do not establish multiplicity or complete spectral coverage.
+    Full-matrix inertia must show exactly one eigenvalue below the proposed
+    lower bound for the first excitation. Higher degeneracies may overlap.
     """
     if len(vectors) < 2:
         return GapCandidate(
@@ -640,22 +677,30 @@ def _residual_gap_from_vectors(
             spectral_gap_lower=0.0,
             detail="incomplete residual cover does not label λ0, λ1",
         )
-    gap = float(ordered[1].lo - ordered[0].hi)
-    if gap <= 0.0:
+    upper = float(ordered[0].hi)  # Above at least one eigenvalue, hence above λ0.
+    lower = None
+    for separator in (float(ordered[1].lo), 0.5 * (upper + ordered[1].lo)):
+        if separator > upper and _certifies_count_below(matrix, separator, 1):
+            lower = separator
+            break
+    if lower is None:
         return GapCandidate(
-            method=method,
-            subdominant_ratio_upper=1.0,
-            spectral_gap_lower=0.0,
+            method=method, subdominant_ratio_upper=1.0, spectral_gap_lower=0.0,
+            detail="full-matrix inertia did not certify exactly one eigenvalue below the separator",
+        )
+    gap = (Interval.point(lower) - Interval.point(upper)).lo
+    if not math.isfinite(gap) or gap <= 0.0:
+        return GapCandidate(
+            method=method, subdominant_ratio_upper=1.0, spectral_gap_lower=0.0,
             detail="non-positive residual gap",
         )
     shift = inf_norm_matrix(to_interval_matrix(matrix)) + 1.0
-    ratio = _shifted_ratio(ordered[0].hi, ordered[1].lo, shift)
-    return GapCandidate(
-        method=method,
-        subdominant_ratio_upper=float(ratio),
-        spectral_gap_lower=gap,
+    ratio = _shifted_ratio(upper, lower, shift)
+    return _HamiltonianGapCandidate(
+        method=method, subdominant_ratio_upper=float(ratio), spectral_gap_lower=gap,
         partners_deflated=max(0, len(vectors) - 1),
-        detail=f"λ0_hi={ordered[0].hi:.6g} λ1_lo={ordered[1].lo:.6g}",
+        detail=f"inertia=1 λ0_hi={upper:.6g} λ1_lo={lower:.6g}",
+        lambda0_upper=upper, lambda1_lower=lower,
     )
 
 
@@ -738,15 +783,21 @@ def _lehmann_gap(
             rho = 0.5 * (first.hi + second.lo)
             if rho < lam1_up:
                 rho = lam1_up + 0.25 * max(second.lo - lam1_up, 0.0)
+        # The reduced Gram pencil requires this full-operator premise.
+        # A separator above three eigenvalues cannot be passed as n_below=2.
+        if not _certifies_count_below(matrix, rho, 2):
+            raise ValueError("full-matrix inertia must certify exactly two eigenvalues below rho")
         cert = certified_spectral_gap(a0, a1, a2, rho, lam1_up)
         if not cert.certified:
             raise ValueError("Lehmann gap not certified")
         shift = inf_norm_matrix(to_interval_matrix(matrix)) + 1.0
         ratio = _shifted_ratio(cert.lambda1_upper, cert.lambda2_lower, shift)
-        return GapCandidate(
+        return _HamiltonianGapCandidate(
             method=method,
             subdominant_ratio_upper=float(ratio),
-            spectral_gap_lower=float(cert.gap_lower),
+            spectral_gap_lower=(Interval.point(cert.lambda2_lower) - Interval.point(cert.lambda1_upper)).lo,
+            lambda0_upper=float(cert.lambda1_upper),
+            lambda1_lower=float(cert.lambda2_lower),
             partners_deflated=max(0, len(vecs) - 1),
             detail=f"gram_cond={trial.gram_condition:.3g} rho={rho:.6g}",
         )
@@ -766,9 +817,10 @@ def certified_hamiltonian_gap(
 ) -> HamiltonianGapResult:
     """Certify a lower bound on ``λ1 - λ0`` of one fixed Hamiltonian.
 
-    Always runs a complete residual cover from the midpoint eigensolver
-    (sound once the ``n`` enclosures are pairwise disjoint) and a generic
-    standard-basis residual.  Optional ``trial=`` adds holonomy residual
+    Runs residual proposals from the midpoint eigensolver and certifies the
+    excitation's index by full-matrix interval inertia. Residual intervals
+    alone are not a complete spectral cover. A generic standard-basis
+    residual is also reported.  Optional ``trial=`` adds holonomy residual
     and Lehmann–Maehly candidates.  Existing transfer callers are unchanged.
     """
     matrix = hamiltonian.matrix()
@@ -793,9 +845,7 @@ def certified_hamiltonian_gap(
             # n_below=2 wants λ2 <= ρ <= λ3.  A later degeneracy (three-plaquette
             # λ3=λ4) must not block that slot.
             if len(ordered) >= 3 and ordered[1].hi < ordered[2].lo:
-                rho = float(ordered[1].hi)
-            elif len(ordered) >= 4 and ordered[2].hi < ordered[3].lo:
-                rho = float(ordered[2].hi)
+                rho = float(0.5 * (ordered[1].hi + ordered[2].lo))
         except (ValueError, ZeroDivisionError):
             rho = None
             lambda1_upper = None
@@ -844,11 +894,10 @@ def certified_hamiltonian_gap(
     winner = max(candidates, key=lambda item: item.spectral_gap_lower)
     if winner.spectral_gap_lower > 0.0:
         shift = inf_norm_matrix(to_interval_matrix(matrix)) + 1.0
-        # Recover λ0_hi, λ1_lo from the winning gap and a Ritz upper on the
-        # lowest residual vector we have (midpoint ground state).
-        ground = _midpoint_eigenvectors(hamiltonian)[0]
-        lam0_up = symmetric_eigenvalue_residual_enclosure(matrix, ground).hi
-        lam1_lo = lam0_up + winner.spectral_gap_lower
+        # Do not add the gap to an unrelated (possibly larger) upper bound.
+        assert isinstance(winner, _HamiltonianGapCandidate)
+        lam0_up = winner.lambda0_upper
+        lam1_lo = winner.lambda1_lower
         ratio = _shifted_ratio(lam0_up, lam1_lo, shift)
     else:
         lam0_up = 0.0

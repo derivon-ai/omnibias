@@ -265,12 +265,21 @@ def langevin_step(
     noise: Tensor | None = None,
     generator: torch.Generator | None = None,
 ) -> Tensor:
-    r"""One Euler-Maruyama Langevin step ``A + dt * drift + sqrt(2 dt T) * xi``.
+    r"""One numerical Euler-Maruyama update ``A + dt*drift + sqrt(2*dt*T)*xi``.
 
-    Realizes the Parisi-Wu stochastic quantisation of Yang-Mills: the stationary
-    measure of this stochastic flow is ``exp(-S[A]/T)``. Pass an explicit
-    ``noise`` array (otherwise drawn from ``generator``) for reproducible /
-    cross-backend-comparable trajectories.
+    This is a finite-step array operator, not an exact invariant-measure sampler.
+    A Gibbs stationary law for a continuous Langevin diffusion requires a
+    compatible Euclidean action, gradient/noise metric, gauge treatment and
+    well-defined dynamics. Arbitrary ``signature`` values do not supply those
+    hypotheses; Lorentzian signatures are not the Euclidean parabolic setting.
+    The update does not construct a continuum stochastic Yang-Mills theory.
+
+    ``noise`` represents standard-normal array coordinates; its covariance is
+    multiplied by ``2*dt*temperature``. Any spatial-cell or covariance scaling
+    belongs to the caller's discretization. Pass an explicit ``noise`` array,
+    or draw from ``generator``.
+    Matching explicit arrays permits cross-backend comparisons without matching
+    backend random generators. No time-discretization bias correction is made.
     """
     rhs = gauge_flow_rhs_from_arrays(
         A, dA, ddA, algebra=algebra, coupling=coupling, signature=signature, deturck=deturck

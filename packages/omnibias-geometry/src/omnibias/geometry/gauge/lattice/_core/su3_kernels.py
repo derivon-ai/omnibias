@@ -160,22 +160,47 @@ def _quat_to_matrix(q: np.ndarray) -> np.ndarray:
     )
 
 
-def _sample_q0(a: np.ndarray, beta: float, rng: np.random.Generator) -> np.ndarray:
+def _sample_q0(
+    a: np.ndarray,
+    beta: float,
+    rng: np.random.Generator,
+    *,
+    max_iter: int | None = 10_000,
+) -> np.ndarray:
+    r"""Numerical SU(2) subgroup marginal ``sqrt(1-q0^2) exp(beta*a*q0)``.
+
+    A generous default budget permits retries; exhaustion always raises
+    instead of returning rejected proposals. ``max_iter=None`` explicitly
+    opts into unbounded continuation.
+    Floating inverse-CDF arithmetic and the uniform proposal approximation
+    for ``abs(beta*a) <= 1e-10`` are numerical, not an exact measure certificate.
+    """
+    if max_iter is not None and (type(max_iter) is not int or max_iter < 1):
+        raise ValueError("max_iter must be a positive integer or None")
     w = beta * a
+    if not np.all(np.isfinite(w)):
+        raise ValueError("SU(2) heat-bath weights must be finite")
+    magnitude = np.abs(w)
+    nonzero = magnitude > 1e-10
+    w_safe = np.where(nonzero, magnitude, 1.0)
     q0 = np.zeros_like(a)
     accepted = np.zeros(a.shape, dtype=bool)
-    cand = np.zeros_like(a)
-    for _ in range(24):
+    iterations = 0
+    while not np.all(accepted):
+        if max_iter is not None and iterations >= max_iter:
+            raise RuntimeError("SU(2) heat-bath rejection budget exhausted; no sample returned")
         r = rng.random(a.shape)
-        w_safe = np.where(np.abs(w) > 1e-10, w, 1.0)
         cand_exp = 1.0 + np.log(r + (1.0 - r) * np.exp(-2.0 * w_safe)) / w_safe
         cand_unif = 2.0 * rng.random(a.shape) - 1.0
-        cand = np.where(np.abs(w) > 1e-10, cand_exp, cand_unif)
+        cand = np.where(nonzero, cand_exp, cand_unif)
+        cand = np.where(w < 0, -cand, cand)
         u = rng.random(a.shape)
-        accept = (u * u <= np.maximum(1.0 - cand * cand, 0.0)) & (~accepted)
+        # Zero RNG output must not accept an endpoint or infinite proposal.
+        accept = (u * u < np.maximum(1.0 - cand * cand, 0.0)) & (~accepted)
         q0 = np.where(accept, cand, q0)
         accepted = accepted | accept
-    return np.where(accepted, q0, cand)
+        iterations += 1
+    return q0
 
 
 def _su2_project(block: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -194,7 +219,12 @@ def _su2_project(block: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         axis=-1,
     )
     radius = np.linalg.norm(q, axis=-1)
-    unit = q / np.maximum(radius[..., None], 1e-30)
+    safe_radius = np.where(radius > 0, radius, 1.0)
+    unit = q / safe_radius[..., None]
+    identity = np.zeros_like(q)
+    identity[..., 0] = 1.0
+    # Zero coupling leaves a Haar draw; use a group identity, not zero.
+    unit = np.where((radius > 0)[..., None], unit, identity)
     return radius, _quat_to_matrix(unit)
 
 

@@ -259,11 +259,21 @@ def langevin_step(
     noise: Array | None = None,
     key: Array | None = None,
 ) -> Array:
-    r"""One Euler-Maruyama Langevin step ``A + dt * drift + sqrt(2 dt T) * xi``.
+    r"""One numerical Euler-Maruyama update ``A + dt*drift + sqrt(2*dt*T)*xi``.
 
-    The jax twin of :func:`omnibias.geometry.gauge.torch.ops.langevin_step`; with the same
-    explicit ``noise`` array it returns a bit-identical update. Supply a
-    ``jax.random`` ``key`` when ``noise`` is not given.
+    This is a finite-step array operator, not an exact invariant-measure sampler.
+    A Gibbs stationary law for a continuous Langevin diffusion requires a
+    compatible Euclidean action, gradient/noise metric, gauge treatment and
+    well-defined dynamics. Arbitrary ``signature`` values do not supply those
+    hypotheses; Lorentzian signatures are not the Euclidean parabolic setting.
+    The update does not construct a continuum stochastic Yang-Mills theory.
+
+    ``noise`` represents standard-normal array coordinates; its covariance is
+    multiplied by ``2*dt*temperature``. Any spatial-cell or covariance scaling
+    belongs to the caller's discretization. Pass an explicit ``noise`` array,
+    or supply a ``jax.random`` ``key``.
+    Matching explicit arrays permits cross-backend comparisons without matching
+    backend random generators. No time-discretization bias correction is made.
     """
     rhs = gauge_flow_rhs_from_arrays(
         A, dA, ddA, algebra=algebra, coupling=coupling, signature=signature, deturck=deturck

@@ -720,8 +720,14 @@ def replay_hamiltonian_gap(cert: Certificate) -> bool | None:
     parameters = cert.get("parameters")
     if not isinstance(parameters, Mapping) or not parameters:
         return None
+    if hamiltonian_gap_schema_errors(cert):
+        return False
     try:
         hamiltonian = rebuild_hamiltonian(parameters)
+        # A changed recoupling convention defines a different matrix. Historical
+        # single-vertex certificates cannot silently replay against the correction.
+        if dict(parameters) != hamiltonian.parameters:
+            return False
         trial = (
             plaquette_holonomy_trial_space(hamiltonian)
             if cert.get("trial_gram_condition") is not None
@@ -736,10 +742,22 @@ def replay_hamiltonian_gap(cert: Certificate) -> bool | None:
     sealed_gap = _as_float(cert.get("spectral_gap_lower"))
     if sealed_ratio is None or sealed_gap is None:
         return False
-    tolerance = 1e-9
-    if sealed_ratio < fresh.subdominant_ratio_upper - tolerance:
+    if sealed_ratio < fresh.subdominant_ratio_upper:
         return False
-    return not sealed_gap > fresh.spectral_gap_lower + tolerance
+    if sealed_gap > fresh.spectral_gap_lower:
+        return False
+    sealed_ground = _as_float(cert.get("lambda0_upper"))
+    sealed_excited = _as_float(cert.get("lambda1_lower"))
+    if sealed_ground is None or sealed_ground < fresh.lambda0_upper:
+        return False
+    if sealed_excited is None or sealed_excited > fresh.lambda1_lower:
+        return False
+    expected = seal_hamiltonian_gap_certificate(fresh, hamiltonian, claim=str(cert.get("claim", "")))
+    # Weaker numerical bounds remain valid, but scope, identity and all remaining
+    # derived fields must be canonical, including any alleged verification tier.
+    numerical = {"digest", "subdominant_ratio_upper", "spectral_gap_lower", "lambda0_upper", "lambda1_lower"}
+    return ({key: value for key, value in cert.items() if key not in numerical}
+            == {key: value for key, value in expected.items() if key not in numerical})
 
 
 STRIP_RP_SCHEMA_VERSION = "verified-strip-rp-1"

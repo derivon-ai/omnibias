@@ -10,6 +10,7 @@ functional checkerboard updates.
 
 from __future__ import annotations
 
+from functools import partial
 from typing import TYPE_CHECKING
 
 import jax
@@ -80,40 +81,81 @@ def staple_hat_and_magnitude(staple: Array) -> tuple[Array, Array]:
     return kernels.staple_hat_and_magnitude(jnp, staple)
 
 
+@partial(jax.jit, static_argnames=("max_iter",))
 def _sample_q0_kp(
     a: Array,
     beta: float,
     key: Array,
     *,
-    max_iter: int = 40,
+    max_iter: int | None = 10_000,
 ) -> Array:
-    r"""Exact Kennedy-Pendleton ``q0`` sample, density ``~ sqrt(1-q0^2) exp(w q0)``.
+    r"""Rejection sample the Haar-weighted density ``sqrt(1-q0^2) exp(w q0)``.
 
-    ``w = beta * a``. A candidate is drawn from the exponential part
-    ``p_exp(q0) ~ exp(w q0)`` by inverse-CDF (uniform on ``[-1,1]`` in the
-    ``w -> 0`` limit) and accepted with probability ``sqrt(1-q0^2)`` via the
-    Kennedy-Pendleton trick ``u^2 <= 1 - q0^2``. The ``sqrt(1-q0^2)`` factor is
-    the SU(2) Haar marginal, so this reproduces the true heat-bath conditional.
-    Sites unaccepted after ``max_iter`` rounds keep their last candidate.
+    The inverse-CDF proposal and acceptance law match the torch backend.
+    Floating-point inverse-CDF arithmetic and the uniform approximation for
+    ``abs(w) <= 1e-10`` are numerical. A tracer-safe loop retries pending
+    sites with a generous default budget. Exhaustion raises (also under jit),
+    never returning rejected proposals. ``max_iter=None`` explicitly opts
+    into unbounded continuation. Nonfinite weights fail without entering an unbounded loop.
+    The compiled loop is cached by shape/dtype and retry budget; weights and
+    the random key remain dynamic across calls.
     """
+    if max_iter is not None and (type(max_iter) is not int or max_iter < 1):
+        raise ValueError("max_iter must be a positive integer or None")
     w = beta * a
-    nonzero = jnp.abs(w) > 1e-10
-    w_safe = jnp.where(nonzero, w, jnp.ones_like(w))
-    q0 = jnp.zeros_like(a)
-    cand = jnp.zeros_like(a)
-    accepted = jnp.zeros(a.shape, dtype=bool)
-    loop_key = key
-    for _ in range(max_iter):
+    valid_weights = jnp.all(jnp.isfinite(w))
+    magnitude = jnp.abs(w)
+    nonzero = magnitude > 1e-10
+    w_safe = jnp.where(nonzero, magnitude, jnp.ones_like(w))
+
+    def pending(state):
+        iterations, _, _, accepted = state
+        active = valid_weights & jnp.any(~accepted)
+        if max_iter is not None:
+            active = active & (iterations < max_iter)
+        return active
+
+    def propose(state):
+        iterations, loop_key, q0, accepted = state
         loop_key, k_r, k_u, k_acc = jax.random.split(loop_key, 4)
         r = jax.random.uniform(k_r, a.shape, dtype=a.dtype)
         cand_exp = 1.0 + jnp.log(r + (1.0 - r) * jnp.exp(-2.0 * w_safe)) / w_safe
         cand_unif = 2.0 * jax.random.uniform(k_u, a.shape, dtype=a.dtype) - 1.0
         cand = jnp.where(nonzero, cand_exp, cand_unif)
+        cand = jnp.where(w < 0, -cand, cand)
         u = jax.random.uniform(k_acc, a.shape, dtype=a.dtype)
-        accept = (u * u <= jnp.maximum(1.0 - cand * cand, 0.0)) & (~accepted)
+        # Zero RNG output must not accept an endpoint or infinite proposal.
+        accept = (u * u < jnp.maximum(1.0 - cand * cand, 0.0)) & (~accepted)
         q0 = jnp.where(accept, cand, q0)
-        accepted = accepted | accept
-    return jnp.where(accepted, q0, cand)
+        return iterations + 1, loop_key, q0, accepted | accept
+
+    _, _, q0, accepted = jax.lax.while_loop(
+        pending, propose,
+        (jnp.asarray(0), key, jnp.zeros_like(a), jnp.zeros(a.shape, dtype=bool)),
+    )
+
+    def require_complete(valid, complete):
+        # This callback executes on host values, never on traced tensors.
+        if not bool(valid):
+            raise ValueError("SU(2) heat-bath weights must be finite")
+        if not bool(complete):
+            raise RuntimeError("SU(2) heat-bath rejection budget exhausted; no sample returned")
+        return 0
+
+    complete = jnp.all(accepted)
+    # An ordered io_callback is guaranteed to execute, unlike debug.callback.
+    # This keeps failure observable even if jit callers discard the sample.
+    # The sampler supports eager/jit use; ordered callbacks are not a vmap API.
+    jax.lax.cond(
+        valid_weights & complete,
+        lambda _: jnp.asarray(0, dtype=jnp.int32),
+        lambda _: jax.experimental.io_callback(
+            require_complete, jax.ShapeDtypeStruct((), jnp.int32),
+            valid_weights, complete, ordered=True,
+        ),
+        operand=None,
+    )
+    return q0
 
 
 def _sample_unit_sphere(key: Array, shape: tuple[int, ...], *, dtype: jnp.dtype) -> Array:

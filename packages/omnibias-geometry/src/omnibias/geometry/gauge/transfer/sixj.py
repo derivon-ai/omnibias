@@ -53,15 +53,15 @@ def _delta_sq(two_a: int, two_b: int, two_c: int) -> Fraction:
     )
 
 
-def racah_sixj(
+def _racah_factors(
     two_j1: int,
     two_j2: int,
     two_j3: int,
     two_j4: int,
     two_j5: int,
     two_j6: int,
-) -> Interval:
-    """Enclosure of ``{j1 j2 j3; j4 j5 j6}`` from integer ``two_j = 2j`` labels."""
+) -> tuple[Fraction, Fraction]:
+    """Exact squared radical and rational Racah sum, shared by both APIs."""
     labels = (two_j1, two_j2, two_j3, two_j4, two_j5, two_j6)
     if any(not isinstance(value, int) or isinstance(value, bool) for value in labels):
         raise ValueError(f"sixj labels must be integers, got {labels!r}")
@@ -71,14 +71,13 @@ def racah_sixj(
         and _triangle(two_j4, two_j2, two_j6)
         and _triangle(two_j4, two_j5, two_j3)
     ):
-        return Interval.point(0.0)
+        return Fraction(0), Fraction(0)
     delta2 = (
         _delta_sq(two_j1, two_j2, two_j3)
         * _delta_sq(two_j1, two_j5, two_j6)
         * _delta_sq(two_j4, two_j2, two_j6)
         * _delta_sq(two_j4, two_j5, two_j3)
     )
-    prefactor = Interval.from_value(delta2).sqrt()
     t_lo = max(
         (two_j1 + two_j2 + two_j3) // 2,
         (two_j1 + two_j5 + two_j6) // 2,
@@ -107,7 +106,35 @@ def racah_sixj(
         for value in denoms:
             den *= math.factorial(value)
         acc += Fraction(((-1) ** t) * math.factorial(t + 1), den)
-    return prefactor * Interval.from_value(acc)
+    return delta2, acc
+
+
+def racah_sixj(
+    two_j1: int,
+    two_j2: int,
+    two_j3: int,
+    two_j4: int,
+    two_j5: int,
+    two_j6: int,
+) -> Interval:
+    """Enclosure of ``{j1 j2 j3; j4 j5 j6}`` from integer ``two_j = 2j`` labels."""
+    delta2, acc = _racah_factors(two_j1, two_j2, two_j3, two_j4, two_j5, two_j6)
+    if acc == 0:
+        return Interval.point(0.0)
+    return Interval.from_value(delta2).sqrt() * Interval.from_value(acc)
+
+
+def racah_sixj_squared(
+    two_j1: int,
+    two_j2: int,
+    two_j3: int,
+    two_j4: int,
+    two_j5: int,
+    two_j6: int,
+) -> Fraction:
+    """Exact rational square of a real SU(2) Racah symbol; no float squaring."""
+    delta2, acc = _racah_factors(two_j1, two_j2, two_j3, two_j4, two_j5, two_j6)
+    return delta2 * acc * acc
 
 
 def magnetic_sixj_amplitude(
@@ -117,15 +144,17 @@ def magnetic_sixj_amplitude(
     two_j_a_prime: int,
     two_j_s_prime: int,
 ) -> Interval:
-    r"""Locked two-plaquette magnetic recoupling.
+    r"""Fundamental character multiplication on the two-vertex theta graph.
 
-    ``phase × √[(2j_a+1)(2j_a'+1)(2j_s+1)(2j_s'+1)] × {j_a j_s j_spec; j_s' j_a' 1/2}``
+    ``√[(2j_a+1)(2j_a'+1)(2j_s+1)(2j_s'+1)] × {j_a j_s j_spec; j_s' j_a' 1/2}²``
 
-    with ``phase = (-1)^{j_a + j_spec + j_s' + 1/2}``.  ``2j+1 = two_j + 1``.
-    The Hamiltonian symmetrises directed amplitudes so the matrix stays
-    Hermitian.
+    Both trivalent vertices contribute a Racah factor.  In the normalized
+    Haar projector basis their phases cancel, and the amplitude is symmetric
+    before any matrix symmetrization.  A single Racah factor is incorrect:
+    it makes the vacuum-to-fundamental amplitude sqrt(2), instead of 1.
+    For zero spectator the character recurrence gives amplitude exactly 1.
     """
-    six = racah_sixj(
+    six_squared = racah_sixj_squared(
         two_j_a,
         two_j_s,
         two_j_spectator,
@@ -139,8 +168,9 @@ def magnetic_sixj_amplitude(
         * Interval.from_value(two_j_s + 1)
         * Interval.from_value(two_j_s_prime + 1)
     )
-    phase = Interval.from_value((-1) ** ((two_j_a + two_j_spectator + two_j_s_prime + 1) // 2))
-    return phase * dim.sqrt() * six
+    if six_squared == 0:
+        return Interval.point(0.0)
+    return dim.sqrt() * Interval.from_value(six_squared)
 
 
 __all__ = [
@@ -148,4 +178,5 @@ __all__ = [
     "VANISHING_SIXJ",
     "magnetic_sixj_amplitude",
     "racah_sixj",
+    "racah_sixj_squared",
 ]

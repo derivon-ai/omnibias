@@ -3,8 +3,8 @@
 r"""Deterministic SU(2) Luscher Wilson flow on quaternion links.
 
 This is not continuum ``yang_mills_gradient_flow_rhs`` (a jet of ``A``)
-and not lattice Langevin (stochastic). Energy decrease and a planted
-``t² E(t)`` crossing are the only gates. ``yang_mills_claim`` stays false.
+and not lattice Langevin (stochastic). Energy decrease and single-configuration
+``t² E(t)`` crossings are diagnostics; an ensemble average is not supplied. ``yang_mills_claim`` stays false.
 """
 
 from __future__ import annotations
@@ -30,7 +30,12 @@ from omnibias.geometry.gauge.lattice._core.kernels import (
 
 
 def mean_plaquette_energy(links: np.ndarray) -> float:
-    """``1 - mean_P`` with ``P = (1/2) Re tr U_{μν}``. Identity links have energy 0."""
+    """Dimensionless deficit ``1 - mean_P``, ``P = (1/2) Re tr U_{μν}``.
+
+    This preserves the plaquette-proxy API. The conventional four-dimensional
+    SU(2) Wilson-flow density is ``a^4 E = 24 * mean_plaquette_energy(links)``.
+    Identity links have zero deficit.
+    """
     traces: list[float] = []
     for mu in range(4):
         for nu in range(mu + 1, 4):
@@ -39,7 +44,12 @@ def mean_plaquette_energy(links: np.ndarray) -> float:
 
 
 def wilson_flow_step(links: np.ndarray, eps: float) -> np.ndarray:
-    """One Euler Luscher step ``U ← exp(ε Im(Σ U†)) U``."""
+    """One Lie-Euler Wilson-flow step ``U ← exp(ε Im(Σ U†)) U``.
+
+    ``eps`` advances ``t/a^2``. With generators ``i σ^a / 2`` and Wilson
+    ``β = 4/g0^2``, the factor ``g0^2`` in the flow cancels that in the action;
+    the quaternion vector exponent shown here needs no extra time factor.
+    """
     new_dirs = []
     for mu in range(4):
         staple = staple_sum(np, links, mu)
@@ -54,15 +64,25 @@ def run_wilson_flow(
     n_steps: int = 8,
     eps: float = 0.02,
 ) -> dict[str, Any]:
-    """Smoke Wilson flow on one SU(2) configuration. Not a continuum scale."""
+    """Numerical Wilson flow on one SU(2) configuration.
+
+    ``flow_time`` is ``t/a^2`` and ``energy`` is the lattice-site mean of ``a^4 E``
+    with ``E`` normalized by Luscher (2010), eq. (3.1):
+    ``a^4 E(x) = 2 sum_{mu<nu} Re tr(I - U_munu(x))``. The SU(2) trace
+    and six planes therefore give ``24 * (1 - mean_P)``.
+
+    Returned ``t0``/``w0`` are crossings of this single-configuration curve.
+    A physical ensemble scale requires averaging the energy curves before
+    extracting a crossing, together with integration and statistical errors.
+    """
     links = np.asarray(field.links, dtype=np.float64)
     times = [0.0]
-    energies = [mean_plaquette_energy(links)]
+    energies = [24.0 * mean_plaquette_energy(links)]
     cur = links
     for step in range(int(n_steps)):
         cur = wilson_flow_step(cur, float(eps))
         times.append(float(eps) * (step + 1))
-        energies.append(mean_plaquette_energy(cur))
+        energies.append(24.0 * mean_plaquette_energy(cur))
     t = np.asarray(times, dtype=np.float64)
     e = np.asarray(energies, dtype=np.float64)
     decreased = bool(e[-1] <= e[0] + 1e-12)
@@ -72,14 +92,20 @@ def run_wilson_flow(
         t0 = t0_from_energy_curve(t, e, target=WILSON_FLOW_C)
     except ValueError:
         t0 = None
-    try:
-        w0 = w0_from_energy_curve(t, e, target=WILSON_FLOW_C)
-    except ValueError:
-        w0 = None
+    if t.size >= 2:
+        try:
+            w0 = w0_from_energy_curve(t, e, target=WILSON_FLOW_C)
+        except ValueError:
+            w0 = None
     return {
         "flow_time": t,
         "energy": e,
         "energy_decreased": decreased,
+        "flow_time_units": "t/a^2",
+        "energy_units": "a^4 E",
+        "energy_normalization": "2 sum_{mu<nu} Re tr(I-U_munu); SU(2)",
+        "scale_scope": "single_configuration_crossing",
+        "ensemble_scale_claim": False,
         "t0": None if t0 is None else t0.value,
         "w0": None if w0 is None else w0.value,
         "yang_mills_claim": False,

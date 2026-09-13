@@ -90,37 +90,45 @@ def _sample_q0_kp(
     beta: float,
     *,
     generator: torch.Generator | None,
-    max_iter: int = 40,
+    max_iter: int | None = 10_000,
 ) -> torch.Tensor:
-    r"""Exact Kennedy-Pendleton ``q0`` sample, density ``~ sqrt(1-q0^2) exp(w q0)``.
+    r"""Rejection sample the Haar-weighted density ``sqrt(1-q0^2) exp(w q0)``.
 
-    ``w = beta * a``. A candidate is drawn from the exponential part
-    ``p_exp(q0) ~ exp(w q0)`` by inverse-CDF (uniform on ``[-1,1]`` in the
-    ``w -> 0`` limit) and accepted with probability ``sqrt(1-q0^2)`` via the
-    Kennedy-Pendleton trick ``u^2 <= 1 - q0^2``. The ``sqrt(1-q0^2)`` factor is
-    the SU(2) Haar marginal, so this reproduces the true heat-bath conditional
-    (validated against numerical quadrature in the tests). Sites unaccepted after
-    ``max_iter`` rounds (probability ``~ (1 - <accept>)^max_iter``, negligible)
-    keep their last candidate.
+    ``w = beta * a``. The inverse-CDF proposal has density proportional to
+    ``exp(abs(w) q0)``; reflection handles negative w. Accepting with
+    probability ``sqrt(1-q0^2)`` supplies the SU(2) Haar marginal.
+    Floating-point inverse-CDF arithmetic and the uniform approximation for
+    ``abs(w) <= 1e-10`` are numerical. A generous default budget permits retries;
+    exhaustion always raises, never returning rejected proposals. Passing
+    ``max_iter=None`` explicitly opts into unbounded continuation.
     """
+    if max_iter is not None and (type(max_iter) is not int or max_iter < 1):
+        raise ValueError("max_iter must be a positive integer or None")
     w = beta * a
-    nonzero = w.abs() > 1e-10
-    w_safe = torch.where(nonzero, w, torch.ones_like(w))
+    if not bool(torch.isfinite(w).all()):
+        raise ValueError("SU(2) heat-bath weights must be finite")
+    magnitude = w.abs()
+    nonzero = magnitude > 1e-10
+    w_safe = torch.where(nonzero, magnitude, torch.ones_like(w))
     q0 = torch.zeros_like(a)
-    cand = torch.zeros_like(a)
     accepted = torch.zeros_like(a, dtype=torch.bool)
-    for _ in range(max_iter):
-        if bool(accepted.all()):
-            break
+    iterations = 0
+    while not bool(accepted.all()):
+        if max_iter is not None and iterations >= max_iter:
+            raise RuntimeError("SU(2) heat-bath rejection budget exhausted; no sample returned")
         r = torch.rand(a.shape, device=a.device, dtype=a.dtype, generator=generator)
         cand_exp = 1.0 + torch.log(r + (1.0 - r) * torch.exp(-2.0 * w_safe)) / w_safe
         cand_unif = 2.0 * torch.rand(a.shape, device=a.device, dtype=a.dtype, generator=generator) - 1.0
         cand = torch.where(nonzero, cand_exp, cand_unif)
+        cand = torch.where(w < 0, -cand, cand)
         u = torch.rand(a.shape, device=a.device, dtype=a.dtype, generator=generator)
-        accept = (u * u <= (1.0 - cand * cand).clamp_min(0.0)) & (~accepted)
+        # Strict comparison refuses zero-density endpoints, including an
+        # infinite inverse-CDF proposal when a finite RNG returns zero.
+        accept = (u * u < (1.0 - cand * cand).clamp_min(0.0)) & (~accepted)
         q0 = torch.where(accept, cand, q0)
         accepted = accepted | accept
-    return torch.where(accepted, q0, cand)
+        iterations += 1
+    return q0
 
 
 def _sample_unit_sphere(
