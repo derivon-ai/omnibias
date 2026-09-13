@@ -38,6 +38,9 @@ files stay vendor-neutral.
 | Multipack / scan | `omnibias.core.multipack`, `omnibias.core.scan` |
 | Verified register | `omnibias.core.verified` |
 | Proof engine | `omnibias.core.proof` |
+| Realization descriptions / exact polynomial image | `omnibias.core.realization` |
+| Collision moment and Taylor remainder arithmetic | `omnibias.core.confluence` |
+| Source-bound finite witness replay | `omnibias.core.proof.realization_replay`, `realization_algebra_replay` |
 
 Every backend imports these coefficients. Forking them is the most
 expensive mistake in the workspace.
@@ -71,3 +74,17 @@ Heavy regeneration follows the workspace compute rule, not a skill taboo.
 - Capability matrix: [`docs/operator-surface.md`](../../../docs/operator-surface.md)
 - Package index: [`docs/packages.md`](../../../docs/packages.md)
 - Repository map: [`AGENTS.md`](../../../AGENTS.md)
+
+## Neuromanifold arithmetic
+
+`ParameterLayout`, `ObservationSpec`, and `RealizationSpec` are backend-free.
+Observation kinds distinguish complete polynomial coefficients from finite values,
+derivatives, residuals, activation windows, and domain/measure integrals. Exact
+polynomial MLP compilation includes biases and resource budgets. Membership is
+complete only for the declared linear and homogeneous quadratic families; other
+architectures verify witnesses or return explicit incomplete searches. Preserve
+exact-image versus closure membership and parameter-domain scope. Irrational
+witnesses use isolating intervals, Sturm arithmetic, rational coordinates and
+nonzero denominator checks. Both Lean routes replay finite arithmetic from source
+operands; analytic and continuum implications remain explicit dependencies.
+See `docs/api/realization-algebra.md` and `docs/api/neuromanifold.md`.

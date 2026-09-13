@@ -127,13 +127,6 @@ from omnibias.holonomic._core import (
 )
 from omnibias.holonomic._core.export import AnnihilatorExport, export_annihilator
 from omnibias.holonomic._core.layer import HolonomicLayerSpec, fit_holonomic_layer, holonomic_jet
-from omnibias.holonomic.swirl_heat import (
-    SWIRL_HEAT_KIND,
-    named_swirl_heat_generators,
-    prove_swirl_heat_identity,
-    replay_swirl_heat_identity,
-    swirl_heat_identity_payload,
-)
 from omnibias.holonomic.jacobian_n2 import (
     JACOBIAN_CONJECTURE_PROOF_CLAIM_ALLOWED,
     JacobianN2DegreeFamily,
@@ -177,6 +170,13 @@ from omnibias.holonomic.rank_syzygy import (
     HOLONOMIC_SYZYGY,
     certify_holonomic_syzygy,
     integerize_matrix,
+)
+from omnibias.holonomic.swirl_heat import (
+    SWIRL_HEAT_KIND,
+    named_swirl_heat_generators,
+    prove_swirl_heat_identity,
+    replay_swirl_heat_identity,
+    swirl_heat_identity_payload,
 )
 
 try:

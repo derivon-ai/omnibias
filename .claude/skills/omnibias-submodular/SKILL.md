@@ -51,6 +51,15 @@ not a complexity-class statement.
 
 ## Extend
 
+`omnibias.submodular.design.information_design_problem` adapts fixed independent
+observation factors and an SPD prior to `InformationLogDet` with a cardinality
+budget. Reuse the existing greedy/oracle machinery. Do not label weighted
+log determinant as the multilinear extension, or transfer its submodular
+guarantee to nuisance-profiled, correlated-block, or robust design objectives.
+The generic observation producers stay in permissive `pinn.inverse` and never
+import this consumer. See `docs/api/neuromanifold-science.md` for scope and the
+twenty-seed equal-observation-budget acceptance run.
+
 - Source: [`packages/omnibias-submodular`](../../../packages/omnibias-submodular).
 - Namespace: `omnibias.submodular`. Inspect `__init__.py` and `docs/packages.md` before changing a public seam.
 - Tests: `python -m pytest packages/omnibias-submodular/tests -q`.

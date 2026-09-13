@@ -52,6 +52,21 @@ junctions need smooth normals; non-smooth junctions fail explicitly.
 
 ## Extend
 
+General inverse experiments use `omnibias.pinn.inverse.observation.ObservationModel`
+with explicit parameter Jacobians; `observation_information` supports fixed
+correlated noise. Parameter-dependent covariance requires explicit
+`LikelihoodScores`; `information_factor` then supplies the correct score rows
+for nuisance profiling. Optional directional-jet providers power finite-order
+`observation_visibility`; neither first-order rank nor finite visibility proves
+global identification. `inverse.design` provides D/A/E scores and torch/JAX
+gradients; E is differentiable at a simple smallest eigenvalue and its explicit
+gradient refuses multiplicity. Legacy location APIs accept only `model="location"`.
+`select_design` offers deterministic greedy or budgeted exhaustive D/A/E subset
+selection with explicit enumeration status and no automatic approximation factor.
+Use the separate `verify.neuromanifold.scientific` interval consumer for
+whole-box sufficient rank certificates; do not import it into the permissive
+inverse producers. See `docs/api/neuromanifold-science.md` for executable examples.
+
 - Source: `packages/omnibias-pinn`. Substrate stays in `omnibias-fields`.
 - Tests: `python -m pytest packages/omnibias-pinn/tests -q`.
 - Research doctrine: `omnibias-pinn-research`. Compose with `omnibias-fields`,

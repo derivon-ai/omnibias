@@ -263,7 +263,8 @@ jobs:
           pip install --upgrade pip
           pip install -e packages/omnibias-core
           pip install -e packages/omnibias-jax
-          pip install -e packages/omnibias-ferminet[test]
+          pip install -e packages/omnibias-curvature
+          pip install -e "packages/omnibias-ferminet[test,curvature]"
       - name: Run ferminet bridge tests
         run: |
           source .venv-fn/bin/activate
@@ -310,9 +311,17 @@ jobs:
           pip install -e packages/omnibias-verify
           pip install -e "packages/omnibias-score[torch,jax]"
           pip install -e "packages/omnibias-geometry[atlas]"
+          pip install -e packages/omnibias-curvature
+          pip install -e packages/omnibias-dynamics
+          pip install -e packages/omnibias-submodular
           pip install -e packages/omnibias-qcalculus
           pip install -e packages/omnibias-holonomic
           pip install pytest
+      - name: Run neuromanifold benchmark smokes
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/neuromanifold_collisions.py
+          JAX_PLATFORMS=cpu python benchmarks/neuromanifold_science.py
       - name: Run cross-backend parity tests
         run: |
           source .venv-cross/bin/activate
@@ -1056,7 +1065,10 @@ jobs:
           pip install -e packages/omnibias-torch
           pip install -e packages/omnibias-jax
           pip install -e packages/omnibias-difference
-          pip install -e "packages/omnibias-verify[torch,jax,test]"
+          pip install -e packages/omnibias-fields
+          pip install -e packages/omnibias-geometry
+          pip install -e packages/omnibias-struct
+          pip install -e "packages/omnibias-verify[torch,jax,neuromanifold,test]"
       - name: Run verify tests
         run: |
           source .venv-verify/bin/activate

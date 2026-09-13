@@ -6,6 +6,82 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — Hilbert XVI next-atlas scale dichotomy
+
+- `HILBERT16-NEXT-ATLAS.md` records six on-path attempts against the
+  two kill sequences. A derived blow-up event jet, a logarithmic
+  inner chart, residence-time exclusion, outgoing-section redesign,
+  and a joint `(sep, L)` chart all fail; the shared finding is a
+  scale dichotomy on `sep = exp(-1/epsilon^2)`. The kill sequence
+  remains admitted. G1 stays failed; G4 is not opened.
+- Lean `Hilbert16ScaleDichotomy` and `benchmarks/hilbert16_next_atlas.py`
+  replay exact identities only. Parent honesty flags stay false.
+
+### Added — Hilbert XVI two-blow-up covering and chart-cell ledger
+
+- `HILBERT16-TWO-BLOWUP.md` records charts WF/WS in the existing
+  `(u, W)` coordinates: the outgoing factor is a W-ratio, but no pair
+  covers `sep = exp(-1/epsilon^2)`. No C2 remainder is claimed.
+- `HILBERT16-SHRINKING-ROOT.md` §7 records the SR2 rematch failure of
+  `L_n = 1/n` onto existing height / grazing / exponential charts.
+- `HILBERT16-CHART-CELLS.md` and `omnibias.dynamics.chart_cells` keep a
+  finite cell ledger. One Maletto `(n, W, T)` quartic is replayed;
+  complex smoothness is certified, the complete real scheme stays
+  blocked. G1 stays failed; G4 is not opened.
+- Lean `Hilbert16TwoBlowup` and `benchmarks/hilbert16_two_blowup.py`
+  replay exact W-identities, named scale paths, and the ledger. Parent
+  honesty flags stay false.
+
+### Added — Hilbert XVI saddle-node and shrinking-root failure record
+
+- `HILBERT16-SADDLE-NODE.md` records the exact double-root field and a
+  fold-versus-separation scale tension: no single blow-up scale bounds
+  both `sigma * kappa` and the outgoing height factor on
+  `sep = exp(-1/epsilon^2)`. No C2 remainder is claimed.
+- `HILBERT16-SHRINKING-ROOT.md` retains incoming first-hit at `V = u`
+  and records the outgoing saddle colliding with the centre along
+  `L_n = 1/n`. G1 stays failed; G4 is not opened.
+- Lean `Hilbert16SaddleNode` and `benchmarks/hilbert16_saddle_node.py`
+  replay the exact identities only. Parent honesty flags stay false.
+
+### Added — Hilbert XVI χ-atlas and G1/G4 failure record
+
+- `HILBERT16-COALESCING-CAPTURE.md` records the linear matching coordinate
+  `chi=(sep/r) kappa`, the frozen-exponent obstruction, a shrinking-rectangle
+  first-derivative bound under `epsilon |log sep| <= 1`, and an explicit
+  G1/G4 failure (super-small separation and `L -> 0`). Lean
+  `Hilbert16ChiScale` checks the exact linear identities only.
+- `benchmarks/hilbert16_coalescing_capture.py` replays those identities and
+  a concrete frozen-`gamma` witness. Parent honesty flags stay false.
+
+### Added — Neuromanifold geometry and certified collision transitions
+
+- Joint input/parameter jets and shared activation towers preserve the six
+  operator roles. Centered collision pairs attain zero spread; preallocated
+  banks carry versioned proposals, optimizer-state policies, and rollback.
+- Exact polynomial realization algebra distinguishes real images, closure
+  witnesses, algebraic parameters, and bounded incomplete searches. Observation
+  geometry adds symmetry actions, regular affine quotients, extrinsic curvature,
+  and whole-box stationary-point enclosures in the certified consumer.
+- Scientific adapters cover residual continuation and simple branch switching,
+  likelihood/observation information, D/A/E design, finite-grammar reduction,
+  and chunked matrix-free QGT/SR. Source-bound finite witness replay builds in
+  both Lean projects, with analytic dependencies kept explicit.
+- Public scope, independent acceptance cases, and measured 20-seed benchmarks
+  are documented in `docs/api/neuromanifold.md` and
+  `docs/benchmarks/neuromanifold-acceptance.md`. Existing distribution boundaries
+  and package versions are unchanged.
+
+### Fixed — Neuromanifold integration compatibility
+
+- Supplied heat/physical-parameter models and legacy location model names are
+  validated instead of silently ignored; the old scalar heat default remains.
+  Backend `autodiff` now performs actual autodiff, and the historical core
+  finite-difference spelling remains a documented deprecated alias.
+- Pullback charts validate supplied Jacobian shapes and preserve dtype/device.
+  Finite replay rejects mismatched source matrices, quotient dimensions, and
+  claimed stationary-point boxes even after certificate re-sealing.
+
 ### Added — Honest A/B special-case climb (theory 07-20, 07-21, 07-22, 07-23)
 
 - `unforced_limit_of_forced_flat` records that deleting the 07-13

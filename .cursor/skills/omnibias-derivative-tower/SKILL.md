@@ -40,6 +40,19 @@ have. Bakeoff: `docs/benchmarks/jet_vs_nested_ad_smoke.json`,
 - Multivariate: `omnibias.{torch,jax}.jet_mv` (`mlp_jet_mv`, `layer_jet_mv`,
   `compose_jet_mv`, `identity_jet`, `jet_partials`, `jet_gradient`, `jet_hessian`).
 - `ActivationSpec` in `omnibias.core.spec`; backends specialise the tensor type.
+- Its optional `tower(z, max_order)` shares one activation evaluation across
+  orders. MultiPack uses that provider once per shared mean, preserves accumulation
+  order, and labels custom per-order fallback costs. A missing derivative fastpath
+  remains unsupported even if a provider survives `dataclasses.replace`.
+- Joint input/parameter jets live in `omnibias.{torch,jax}.realization` and are
+  exported from the jet modules. Use an explicit direction basis and a coefficient
+  budget; full parameter bases require opt-in. Differentiate live widths and
+  endpoints for all six operator roles. Integral atoms use the antiderivative at
+  order zero and shifted activation towers at higher orders.
+- Collision coordinates use `rho=h^2` with an attained zero boundary and stable
+  centered pairs. Near-zero evaluation is a finite even series with an explicit
+  remainder, while polynomial controls terminate exactly. See
+  `docs/api/neuromanifold.md`; do not call a finite cluster expansion exact.
 
 Fastpath: `n < 0` raises `ValueError`; unimplemented orders raise
 `NotImplementedError`. New tensors use the framework default dtype.

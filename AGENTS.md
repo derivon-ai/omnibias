@@ -433,11 +433,12 @@ Lean-core and never import a backend.
   certificate; asserting the claim without a pass blocks the verdict. No Lean
   toolchain present -> the bridge degrades gracefully (flag stays `False`).
 - The Lean kernel is deliberately **Mathlib-free** (Lean 4 core only) so CI
-  kernel-checks it cheaply. Both Lean projects are **`sorry`-free**, and their
-  scope is *finite, rational* obligations. Infinite analytic obligations --
-  limits, continuum statements, asymptotics -- are out of scope and are not
-  expressed in Lean at all, so they can never be silently discharged. Do not
-  claim otherwise.
+  kernel-checks it cheaply. Both Lean projects are **`sorry`-free**. The small
+  kernel checks finite rational obligations. The Mathlib-backed Dynamics
+  modules additionally prove real-variable limits, derivative identities and
+  zero-count implications under explicit hypotheses. Actual uniform passage
+  estimates, complete cycle capture and Hilbert XVI remain separate obligations;
+  a finite replay or an abstract implication does not discharge those premises.
 
 ## Agent tooling (skills & rules)
 
@@ -635,7 +636,8 @@ by that drift gate.
   collapse, not founding bias collapse; no differentiable
   Betti number; `Inconclusive` when the gap does not separate) /
   `omnibias.difference.singularity` (03-10, **shipped**; Domb-Sykes + Padé
-  poles + certified `|x_s|` annulus; G1–G6 CI; founding bias
+  poles + a one-sided convergence-radius bound from a declared geometric tail;
+  the former finite singularity annulus was invalidated; founding bias
   collapse, not temperature collapse; diagnostic, not a
   blow-up proof) /
   `omnibias.symbolic.symmetry` (03-11, **shipped**; Lie point symmetries

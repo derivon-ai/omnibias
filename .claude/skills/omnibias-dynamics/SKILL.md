@@ -38,8 +38,37 @@ Pure Python on `omnibias.core.verified` (QR-Lohner / TM).
 | Lyapunov exponent bound | `omnibias.dynamics` (`certified_lyapunov_exponent`) |
 | Cone-field hyperbolicity | `omnibias.dynamics` (`certified_cone_hyperbolicity`; finite orbit; not Anosov) |
 | Jet world model | `omnibias.dynamics._core.jet_world` |
+| Exact-source regular stopped events and state/parameter derivatives | `omnibias.dynamics.return_maps` (`certify_stopped_event`, `verify_stopped_event`) |
+| Polynomial/exponential zero bounds and actual regular return counts | `omnibias.dynamics.cyclicity` |
+| Replay a finite polynomial parameter/height cover | `omnibias.dynamics.hilbert16` |
+
+The legacy `poincare_map` reports an endpoint-sign crossing enclosure only.
+Stronger regular-event claims require `return_maps`: a polynomial field and
+sections generate the actual variational equations, transversality and first
+eligible-event checks. Grazing or ambiguous admission remains unresolved.
+`cyclicity` does not turn a fitted displacement into an exact physical one,
+and `hilbert16` does not prove a graphic atlas is complete. Read
+`packages/omnibias-dynamics/HILBERT16-PROGRAM.md` for the implemented evidence,
+source versions, and outstanding singular-passage and coverage obligations.
+The coalescing χ-atlas is `HILBERT16-COALESCING-CAPTURE.md`. The
+saddle-node, shrinking-root, and two-blow-up follow-ups are
+`HILBERT16-SADDLE-NODE.md`, `HILBERT16-SHRINKING-ROOT.md`, and
+`HILBERT16-TWO-BLOWUP.md`. The next-atlas / scale-dichotomy findings
+are `HILBERT16-NEXT-ATLAS.md`. The chart-cell ledger is
+`HILBERT16-CHART-CELLS.md`. G1 and G4 remain failed there, and
+`full_hilbert16_solved` stays false.
 
 ## Extend
+
+`omnibias.dynamics.continuation.certify_segment` encloses a root uniformly for
+every parameter in an interval; `certify_join` proves common-endpoint
+uniqueness rather than accepting overlapping boxes. `certify_event` combines
+an augmented-system root with supplied sound fold/Hopf normal-form conditions.
+It does not automatically derive interval Lyapunov coefficients. Numerical
+predictors and generic derivative callbacks live upstream in
+`omnibias.geometry.continuation`; the certified module remains pure Python.
+The analytic Bratu family and explicit continuum limits of the claim are
+documented in `docs/api/neuromanifold-science.md`.
 
 - Source: [`packages/omnibias-dynamics`](../../../packages/omnibias-dynamics).
 - Namespace: `omnibias.dynamics`. Inspect `__init__.py` and `docs/packages.md` before changing a public seam.

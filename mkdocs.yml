@@ -280,7 +280,70 @@ nav:
       - omnibias-qpinn: api/qpinn.md
       - omnibias-curvature: api/curvature.md
       - omnibias-geometry: api/geometry.md
+      - Neuromanifold and collision charts: api/neuromanifold.md
+      - Exact realization algebra: api/realization-algebra.md
+      - Neuromanifold scientific adapters: api/neuromanifold-science.md
       - "omnibias.geometry.gauge": api/geometry-gauge.md
+      - Stochastic gauge heat kernels: api/gauge-stochastic-heat-kernel.md
+      - Small-time gauge heat kernels: api/gauge-stochastic-small-time.md
+      - Original-link cube controls: api/gauge-stochastic-cube.md
+      - Anchored three-face seam: api/gauge-anchored-seam.md
+      - Actual corner vacuum: api/gauge-corner-vacuum.md
+      - Periodic corner and global upper trial: api/gauge-periodic-corner.md
+      - Periodic corner box lower bound: api/gauge-periodic-corner-box.md
+      - Non-Abelian matrix singlet gap: api/gauge-commutator-matrix.md
+      - Compact commutator sector gaps: api/gauge-compact-commutator.md
+      - Physical blocks and vacuum overlap: api/gauge-physical-blocks.md
+      - Plaquette path conditionals: api/gauge-plaquette-path.md
+      - Weak theta block gaps: api/gauge-theta-weak-blocks.md
+      - Ambient conditional gap bounds: api/gauge-ambient-conditional.md
+      - Actual theta kernel tails: api/gauge-theta-kernel-tail.md
+      - Smooth theta vacuum error: api/gauge-theta-quasimode.md
+      - Explicit theta contraction: api/gauge-theta-kernel-threshold.md
+      - Actual finite-strip tails: api/gauge-strip-kernel-tail.md
+      - Strip face charges and frustration: api/gauge-strip-face-obstruction.md
+      - vMF and interacting reference gaps: api/gauge-vmf-poincare.md
+      - Forest projections: api/gauge-forest-projection.md
+      - Charged SU(2) representation sectors: api/gauge-charged-sectors.md
+      - Static SU(2) source bounds: api/static-sources.md
+      - Actual SU(2) vacuum local bounds: api/gauge-vacuum-local.md
+      - SU(2) vacuum Fourier contraction: api/gauge-vacuum-fourier.md
+      - SU(2) static confinement bounds: api/gauge-charged-confinement.md
+      - Hamiltonian rectangle enclosures: api/gauge-charged-amplitude.md
+      - SU(3) vacuum Fourier contraction: api/gauge-su3-vacuum-fourier.md
+      - Invariant vacuum corrections: api/gauge-invariant-vacuum-fourier.md
+      - Exact vacuum constraints: api/gauge-vacuum-constraints.md
+      - Coarse holonomy refinement: api/gauge-theta-refinement.md
+      - Actual-vacuum refinement: api/gauge-theta-vacuum-refinement.md
+      - Central character enclosures: api/gauge-character-algebra.md
+      - Joint vacuum enclosures: api/gauge-joint-vacuum.md
+      - Actual shared-strip refinement: api/gauge-shared-strip-refinement.md
+      - Nested actual-vacuum reductions: api/gauge-shared-strip-two-step.md
+      - Spatial marginal majorants: api/gauge-marginal-majorant.md
+      - Exact Wilson residual vacuum: api/gauge-wilson-residual-source.md
+      - Wilson linear inverse source: api/gauge-wilson-linear-source.md
+      - Gauge-polar bilinear cancellation: api/gauge-graph-bilinear-cancellation.md
+      - Volume-independent polar vacuum: api/gauge-wilson-polar-source.md
+      - Actual conditional block gaps: api/gauge-wilson-conditional-block.md
+      - All-coupling neutral plaquette: api/gauge-weak-plaquette.md
+      - Correlated quadratic vacuum: api/gauge-quadratic-vacuum.md
+      - Scale-normalized Schur budgets: api/gauge-scale-gap-budget.md
+      - Actual weak-field moments: api/gauge-wilson-large-field.md
+      - Nonabelian jets and block localization: api/gauge-nonabelian-small-field.md
+      - Isolated block physical kinetic metric: api/gauge-isolated-block-kinetic.md
+      - Exterior Wilson attachment increments: api/gauge-wilson-attachment.md
+      - Attached cube curvature feedback: api/gauge-wilson-cube.md
+      - Reference diffusion inverse: api/gauge-reference-resolvent.md
+      - Plaquette full-spin inverse: api/gauge-plaquette-resolvent.md
+      - Adjacent full-spin inverse: api/gauge-adjacent-resolvent.md
+      - Adjacent preconditioned vacuum: api/gauge-adjacent-vacuum.md
+      - Theta spherical product bound: api/gauge-theta-bilinear.md
+      - Theta directional inverse: api/gauge-adjacent-cone-inverse.md
+      - Theta cone vacuum: api/gauge-adjacent-cone-vacuum.md
+      - Theta actual gap comparison: api/gauge-adjacent-gap-comparison.md
+      - Finite graph Fourier inverse: api/gauge-finite-graph-resolvent.md
+      - Wilson static-source bounds: api/gauge-wilson-static-source.md
+      - Strip marginal hierarchy: api/gauge-strip-marginal-hierarchy.md
       - volume-uniform strong-coupling family: api/volume_uniform_ym.md
       - omnibias-fractional: api/fractional.md
       - omnibias-measure: api/measure.md
@@ -459,6 +522,9 @@ nav:
   - Examples: examples.md
   - Benchmarks: benchmarks.md
   - PINN four-gap matrix: benchmarks/pinn_four_gap_matrix.md
+  - Neuromanifold collision benchmarks: benchmarks/neuromanifold-collisions.md
+  - Neuromanifold science benchmarks: benchmarks/neuromanifold-science.md
+  - Neuromanifold acceptance map: benchmarks/neuromanifold-acceptance.md
   - Licensing: licensing.md
   - Reproducibility: reproducibility.md
   - CI hardening: ci-hardening.md

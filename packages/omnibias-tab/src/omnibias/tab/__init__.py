@@ -55,8 +55,8 @@ from omnibias.tab._core.forward import (
     predict_np,
     scores_to_prob,
 )
-from omnibias.tab._core.loss import loss_value, metric, score_grad_hess
 from omnibias.tab._core.leaves import closed_form_leaves
+from omnibias.tab._core.loss import loss_value, metric, score_grad_hess
 from omnibias.tab._core.params import TabParams, init_params
 from omnibias.tab.arrangement import (
     arrangement_params,

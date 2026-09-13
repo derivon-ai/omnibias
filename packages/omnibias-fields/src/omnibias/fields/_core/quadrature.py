@@ -32,11 +32,16 @@ Rules
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from itertools import product
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 from numpy.typing import NDArray
+
+if TYPE_CHECKING:
+    from omnibias.core.verified.interval import Interval
 
 
 @dataclass(frozen=True, eq=False)
@@ -241,7 +246,7 @@ def integrate_certified(
     values: object,
     rule: object,
     *,
-    deriv_bound: object | None,
+    deriv_bound: Interval | None,
     degree: int | None = None,
 ) -> object:
     """Enclosure of ``sum w_i f(x_i)`` plus a Peano remainder.
@@ -260,7 +265,7 @@ def integrate_certified(
     vals = np.asarray(values, dtype=np.float64).reshape(-1)
     if vals.size != rule.n_nodes:
         raise ValueError("values must match the rule nodes")
-    main = Interval.point(rule.apply(vals))
+    main = Interval.point(rule.apply(cast(Sequence[float], vals)))
     deg = int(degree) if degree is not None else int(rule.degree)
     return main + certified_error(rule, deriv_bound=deriv_bound, degree=deg)
 

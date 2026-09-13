@@ -19,6 +19,19 @@ quadrature (`omnibias-fields`), and the measure integral `integral f dmu`
 (`omnibias-measure`, with a certified variant in `omnibias-verify`). Canonical
 capability matrix: `docs/operator-surface.md`.
 
+Neuromanifold extensions: explicit realization/observation schemas and exact
+polynomial images in `omnibias.core.realization`; joint input/parameter jets and
+stable centered-pair coordinates in `omnibias.{torch,jax}.realization` /
+`.confluence` / `.confluent_bank`; observation metrics, exact affine quotient
+charts and extrinsic geometry in `omnibias.geometry.neuromanifold`. Certified
+collision commits and local quotient minima live in `omnibias.verify.neuromanifold`.
+Scientific consumers cover finite residual continuation, observation/design,
+effective-law reduction and matrix-free QGT/SR. Finite operand replay earns
+Lean flags through actual builds; analytic hypotheses remain explicit.
+Scope and examples: `docs/api/neuromanifold.md`,
+`docs/api/realization-algebra.md`, `docs/api/neuromanifold-science.md`.
+Acceptance and measured limits: `docs/benchmarks/neuromanifold-acceptance.md`.
+
 Wave-1 primitives (gated, no new packages): `MultiPackUnit` (01-01; G1–G5
 earned), `BiasScan` / `BankSpec` (01-02 / 01-13; G1–G4 CI-gated;
 interior lattice shift along `w`, not a circular wrap of `tanh'`;

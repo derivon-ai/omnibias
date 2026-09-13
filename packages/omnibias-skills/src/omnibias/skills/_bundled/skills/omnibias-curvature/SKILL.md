@@ -48,6 +48,13 @@ Torch helpers: extra `omnibias-curvature[torch]`.
 
 ## Extend
 
+For a supplied JAX SPD operator, `omnibias.curvature.operators.pcg_solve`
+returns the solution plus convergence, residual, iteration, and breakdown
+diagnostics without constructing a dense matrix. Check convergence before
+accepting a step; its implicit derivative assumes the solve converged.
+`omnibias.ferminet.operator_sr` is the live-pytree QGT consumer. See
+`docs/api/neuromanifold-science.md` and its equal-budget benchmark ledger.
+
 - Source: `packages/omnibias-curvature`. Optimizers also live in `omnibias.torch.optim`.
 - Tests: `python -m pytest packages/omnibias-curvature/tests -q`.
 - Compose with `omnibias-torch`, `omnibias-jax`, `omnibias-geometry` (pullback

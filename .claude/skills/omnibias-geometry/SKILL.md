@@ -21,7 +21,8 @@ and they have no holonomy-band or atlas-cocycle consumer on a partition chart.
 
 ## What only this tower unlocks
 
-`pullback_metric` reads the chart's own jet (`g = J^T h J`) in closed form.
+`pullback_metric` consumes a supplied chart Jacobian (`g = J^T h J`) when
+provided, and otherwise uses its labeled forward-mode autodiff fallback.
 `grad f`, `hess f`, and the field part of `Delta_g f` are exact `sigma^(n)`.
 Gauge transfer and holonomy-band primitives compose the same substrate.
 That combination — exact field jets plus an analytic metric — is the workload
@@ -51,6 +52,26 @@ Cookbook: `docs/cookbook/geometry-sphere.md`,
 `docs/cookbook/pullback-learned-manifolds.md`.
 
 ## Extend
+
+Neuromanifold APIs live in `omnibias.geometry.neuromanifold`: explicit
+realizations with live JVP/VJP and parameter jets, observation metrics, symmetry
+actions, weighted tangent/normal geometry, and exact affine quotient charts.
+Numerical rank is a diagnostic; a certified lower/upper rank needs a checked
+minor/factorization. A sampled Jacobian kernel never establishes a nonlinear
+symmetry. Monomial curves have a supported exact stratum classifier; general
+singularities remain finite-order diagnostics. Collision banks live in the
+backend packages; their certified acceptance lives downstream in verify.
+See `docs/api/neuromanifold.md` and its 16-gap acceptance map. The geometry
+package must not import the copyleft certified consumers.
+
+`geometry.continuation` follows finite residual branches and localizes fold/Hopf
+systems. `continuation_directional.directional_residual_family` adapts first
+through third directional callbacks under an explicit dense-coefficient budget.
+`continuation_switch.switch_equilibrium_branch` corrects transverse seeds at
+supported simple equilibrium branch points and refuses deficient/degenerate
+cases. It is a numerical producer; validated segments/events live downstream
+in dynamics. An analytic Bratu branch supplies the PDE reference. None of these
+finite systems silently establishes continuum discretization error or coverage.
 
 - Source: `packages/omnibias-geometry`. Field ops stay in `omnibias-fields`.
 - Tests: `python -m pytest packages/omnibias-geometry/tests -q`.

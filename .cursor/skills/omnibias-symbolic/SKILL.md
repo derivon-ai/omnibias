@@ -59,6 +59,15 @@ Cookbook: `docs/cookbook/piecewise-hybrid-automaton.md`.
 
 ## Extend
 
+Effective-model proposals use `omnibias.symbolic.reduction`: `ParameterTerm`
+and `ParameterReduction` encode fixing, coalescence, and integer-power
+parameter paths; `reduction_candidate` accepts an explicit reduced model for
+singular paths. `evaluate_reduction` reports errors on evaluated inputs only.
+`geometry.continuation.follow_model_boundary` proposes numerical geodesic paths;
+rank loss is not a limiting theorem. Uniform value/derivative error requires
+the separate `verify.neuromanifold.scientific.certify_reduction` callback
+consumer, with unresolved boxes retained. See `docs/api/neuromanifold-science.md`.
+
 - Source: `packages/omnibias-symbolic`. Tests:
   `python -m pytest packages/omnibias-symbolic/tests -q`.
 - Compose with `omnibias-holonomic`, `omnibias-difference`, `omnibias-fields`,

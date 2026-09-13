@@ -28,6 +28,19 @@ This is the rigorous register of the one tower.
 
 ## Use
 
+`omnibias.verify.neuromanifold` checks source-bound collision proposals, whole-box
+hyperdual slice minima, and minima of explicitly factored affine-quotient losses.
+Return the stationary-point enclosure, not the evaluation center. A nonlinear
+symmetry needs an additional exact invariance witness; damping is not a quotient.
+Confluence budgets include the runtime series truncation and stored-coordinate
+conversion errors, with backend floating evaluation rounding labeled separately.
+Do not certify spatial derivatives across an unvalidated runtime branch switch.
+`formalize_confluence` and `formalize_minimum` replay original finite operands
+in both Lean projects; analytic remainder and enclosure hypotheses remain explicit.
+`omnibias.verify.neuroalgebra` supplies complete bounded-domain exclusion only
+when every subdivision is resolved. See `docs/api/neuromanifold.md` and
+`docs/api/realization-algebra.md` for supported scopes and adversarial tests.
+
 | You want | Import from | Key entry points |
 | --- | --- | --- |
 | Rigorous scalars | `omnibias.core.verified.interval` | `Interval` (outward-rounded) |

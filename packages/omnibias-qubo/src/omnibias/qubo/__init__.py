@@ -3,14 +3,14 @@
 r"""omnibias-qubo: differentiable + certified quadratic Boolean optimization.
 
 Minimizing a quadratic pseudo-Boolean energy ``E(x) = x^T Q x + c^T x`` over
-``x in {0, 1}^n`` (QUBO / Ising) is NP-hard, so no poly-time differentiable map yields
-the *exact* global optimum (that would imply P = NP, and the exact argmin's gradient is
-a.e. zero). The sound "differentiable QUBO" this package delivers is a three-part object
--- **yes, if** you accept a certified gap instead of an exactness claim:
+``x in {0, 1}^n`` (QUBO / Ising) is NP-hard. An exact solver with a polynomial
+worst-case bit-complexity bound on every rational instance would imply P = NP;
+this package establishes no such bound. At a unique discrete optimum the argmin
+is locally constant in the coefficients. The package provides three components:
 
 1. a **differentiable annealed relaxation** -- a soft assignment
    ``x = sigmoid(beta z) in (0, 1)^n`` descended on the closed-form energy gradient while
-   ``beta -> inf`` collapses it onto a binary vertex, *unrolled* for backprop so a model
+   increasing ``beta`` encourages binary assignments, *unrolled* for backprop so a model
    predicting ``Q`` / ``c`` trains *through* the optimizer
    (:mod:`omnibias.qubo.jax` / :mod:`omnibias.qubo.torch`, bit-identical twins);
 2. a **heuristic decoder** -- rounding + 1-flip local search (:func:`decode_qubo`), an
@@ -18,7 +18,8 @@ a.e. zero). The sound "differentiable QUBO" this package delivers is a three-par
 3. a **rigorous optimality-gap certificate** (:func:`certify_qubo_gap`): a Lasserre / SOS
    bound over the Boolean hypercube (:mod:`omnibias.sos`) or a cheap spectral / box-QP
    bound (:mod:`omnibias.convex`) is a *lower* bound on the true optimum, so
-   ``lower <= optimum <= energy`` is a certified gap -- never asserted zero.
+   ``lower <= optimum <= energy`` is a certified gap. It need not vanish; a rigorously
+   closed gap establishes optimality for that instance, without a complexity claim.
 
 The relaxation layers need a ``jax`` / ``torch`` backend; the SOS certificate needs the
 ``sos`` extra and the spectral seal the ``convex`` extra (each degrades gracefully).

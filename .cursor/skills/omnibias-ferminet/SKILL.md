@@ -48,6 +48,16 @@ Pair with `omnibias-jax` for the bit-identical field Laplacian.
 
 ## Extend
 
+`omnibias.ferminet.operator_sr.qgt_operator` and `matrixfree_sr_step` use
+chunked JVP/VJP actions on live real parameter pytrees, including complex log
+amplitudes. They avoid full score-table and parameter-square covariance
+materialization. A failed PCG solve leaves parameters unchanged. Preserve the
+existing dense SR result/defaults; this is a separate operator interface.
+Sampling labels do not certify population covariance. Exact rational finite
+score tables can instead be checked by `verify.neuromanifold.scientific`;
+the permissive FermiNet module never imports that consumer. Examples and
+limitations: `docs/api/neuromanifold-science.md`.
+
 - Source: [`packages/omnibias-ferminet`](../../../packages/omnibias-ferminet).
 - Namespace: `omnibias.ferminet`. Inspect `__init__.py` and `docs/packages.md` before changing a public seam.
 - Tests: `python -m pytest packages/omnibias-ferminet/tests -q`.

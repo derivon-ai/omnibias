@@ -12,9 +12,10 @@ schedule / certificate containers so ``omnibias.nphard`` presents one coherent s
 * :data:`AnnealSchedule` -- the ``beta -> inf`` homotopy that drives the annealed
   relaxation (owned by the discrete substrate, re-exported here).
 * :data:`NPHardCertificate` -- an alias of the discrete substrate's ``GapCertificate``:
-  a **gap-shaped** container ``lower_bound <= optimum <= energy``. For an NP-hard family
-  the gap is honestly **non-tight** -- there is no ``is_optimal`` / ``is_exact`` field,
-  by design (that would be a P = NP claim).
+  a **gap-shaped** container ``lower_bound <= optimum <= energy``. The gap can be
+  non-tight; the container has no ``is_optimal`` / ``is_exact`` field. A rigorously
+  closed gap would prove this instance's optimality, without implying a polynomial
+  worst-case algorithm or P = NP.
 
 Terminology: the relaxation that consumes these containers hardens
 ``sigmoid(beta z)`` as ``beta -> inf`` -- the feasibility / temperature sense of
@@ -28,8 +29,8 @@ from __future__ import annotations
 from omnibias.discrete import AnnealSchedule, GapCertificate
 
 # The rigorous optimality-gap certificate is the discrete substrate's gap-shaped
-# container; the NP-hard alias documents that the gap is generally non-tight (there is,
-# by design, no exactness / is_optimal field -- that would be a P = NP claim).
+# container. Its gap is generally non-tight; instance optimality and worst-case
+# algorithmic complexity are separate claims.
 NPHardCertificate = GapCertificate
 
 __all__ = [

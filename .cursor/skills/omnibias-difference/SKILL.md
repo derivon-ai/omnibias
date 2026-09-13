@@ -53,8 +53,10 @@ becomes `sigma^(K-1)` exactly.
 
 ## Next invention
 
-A poised irregular stencil whose rational C_j Lean obligation and certified |x_s|
-annulus are sealed in one `prove()` call.
+A poised irregular stencil whose rational C_j Lean obligation and convergence-
+radius lower bound are sealed in one `prove()` call. A geometric upper tail
+cannot prove a finite upper singularity radius; a finite prefix supplies no
+positive lower asymptotic limsup.
 
 
 ## Bakeoffs
