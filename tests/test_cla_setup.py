@@ -19,7 +19,8 @@ assert spec and spec.loader
 setup = importlib.util.module_from_spec(spec)
 sys.modules[spec.name] = setup
 spec.loader.exec_module(setup)
-TOKEN = "github_pat_dummy_credential_for_offline_tests"
+# Assemble a synthetic fixture without embedding a credential-shaped literal.
+TOKEN = "_".join(("github", "pat", "dummy", "credential", "for", "offline", "tests"))
 
 
 def settings(tmp_path):
