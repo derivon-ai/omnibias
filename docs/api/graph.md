@@ -14,3 +14,18 @@ parameter gradients.
 
 Install this distribution with `pip install omnibias-graph`; select its
 backend extras when needed. See [guarantees](../guarantees.md).
+
+<!-- BEGIN GENERATED API INVENTORY -->
+
+Version **0.1.0a1** · Python **>=3.10** · **3 - Alpha** · Apache-2.0
+
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
+
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-graph/src/omnibias/graph). Modules below are relative to `omnibias.graph`; underscored modules are internal.
+
+`arrangement`, `arrangement.jax`, `arrangement.torch`, `jax`, `jax.ops`, `jax.ops.relaxation`, `jax.ops.spectral`, `torch`, `torch.ops`, `torch.ops.relaxation`, `torch.ops.spectral`.
+
+</details>
+
+<!-- END GENERATED API INVENTORY -->

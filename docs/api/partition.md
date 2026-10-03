@@ -17,3 +17,22 @@ limit is distinct from the small-spacing derivative construction.
 
 Install this distribution with `pip install omnibias-partition`; select its
 backend extras when needed. See [guarantees](../guarantees.md).
+
+<!-- BEGIN GENERATED API INVENTORY -->
+
+Version **0.1.0a1** · Python **>=3.10** · **3 - Alpha** · Apache-2.0
+
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
+
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-partition/src/omnibias/partition). Modules below are relative to `omnibias.partition`; underscored modules are internal.
+
+`arrangement`, `arrangement.jax`, `arrangement.torch`, `certify`, `jax`, `jax.weights`, `keras`, `keras.weights`, `registry`, `torch`, `torch.weights`.
+
+Exports from `omnibias.partition`:
+
+`Arrangement`, `CellGapCertificate`, `PartitionConfig`, `PartitionGapCertificate`, `PartitionParams`, `RegionModels`, `certify_cell_gap`, `certify_partition_gap`, `combine_outputs`, `gate_activations`, `hard_assignment`, `hard_weights`, `hardened_rules`, `init_params`, `max_cells`, `partition_weights`, `region_code_matrix`, `region_rule`, `soft_membership`.
+
+</details>
+
+<!-- END GENERATED API INVENTORY -->

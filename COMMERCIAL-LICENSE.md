@@ -20,28 +20,29 @@ This page covers the three dual-licensed distributions retained here:
 carry their own license files and commercial notices.
 
 Their SPDX expression is `AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial`.
-See [`LICENSING.md`](LICENSING.md) for the full tier table.
+See [`LICENSING.md`](LICENSING.md) for the generated package inventory.
 
 Note also that no permissive package depends on a copyleft one, through
 required or optional dependencies — enforced in CI. So installing a Tier-P
 package with any set of extras cannot pull an AGPL package into your tree and
 cannot create an obligation by accident.
 
-## When you need this
+## When to discuss a commercial agreement
 
-You need a commercial license if you use one of the three packages above and do
-**not** want to comply with the [GNU AGPL-3.0](LICENSES/AGPL-3.0-or-later.txt)
-— most commonly because you intend to:
+For the dual-licensed packages, request an agreement when the
+[GNU AGPL-3.0](LICENSES/AGPL-3.0-or-later.txt) terms do not fit your intended
+use. Common requirements include:
 
 - ship a copyleft-tier package inside a **proprietary / closed-source**
   application;
 - run a **hosted or SaaS** offering on top of a modified copyleft-tier package
   without publishing your modified source (the AGPL §13 trigger);
 - redistribute a copyleft-tier package under terms other than the AGPL; or
-- require a **warranty, indemnity, or support commitment**.
+- purchase a **warranty, indemnity, or support commitment** by agreement.
 
-If you are doing open-source work, internal research, or are happy to comply
-with the AGPL, you do **not** need this — just use the AGPL branch.
+If you comply with the AGPL terms, a separate commercial license is not
+required. Support agreements are also available for Apache-licensed packages;
+purchasing support does not restrict their existing Apache grants.
 
 ## What the commercial license grants (typical terms)
 

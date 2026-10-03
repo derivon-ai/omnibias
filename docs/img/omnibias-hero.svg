@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="600" viewBox="0 0 1280 600" role="img" aria-labelledby="title desc">
+  <title id="title">omnibias — derivatives and decisions, ready to train</title>
+  <desc id="desc">High-order neural derivatives without nested spatial autodiff. Smooth decision gates with parameter gradients. Two paths connect reusable mathematical primitives to learning.</desc>
+  <defs>
+    <linearGradient id="background" x2="1" y2="1">
+      <stop stop-color="#081625"/>
+      <stop offset="1" stop-color="#132842"/>
+    </linearGradient>
+    <linearGradient id="accent" x2="1">
+      <stop stop-color="#65edd1"/>
+      <stop offset="1" stop-color="#afbbff"/>
+    </linearGradient>
+    <pattern id="grid" width="36" height="36" patternUnits="userSpaceOnUse">
+      <circle cx="1" cy="1" r="1" fill="#bdd3ef" opacity=".10"/>
+    </pattern>
+    <marker id="arrow" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+      <path d="M0 0L6 3L0 6" fill="none" stroke="#829ab7" stroke-width="1.3"/>
+    </marker>
+  </defs>
+  <rect width="1280" height="600" rx="22" fill="url(#background)"/>
+  <rect width="1280" height="600" rx="22" fill="url(#grid)"/>
+  <path d="M0 596H1280" stroke="url(#accent)" stroke-width="8"/>
+  <g font-family="DejaVu Sans, Arial, sans-serif">
+    <g transform="translate(58 48)">
+      <path d="M0 18Q14 -5 27 18T54 18" fill="none" stroke="#65edd1" stroke-width="5" stroke-linecap="round"/>
+      <text x="72" y="29" font-size="35" font-weight="700" letter-spacing="-1" fill="#f4f8ff">omnibias</text>
+      <text x="1138" y="23" text-anchor="end" font-size="12" letter-spacing="2.2" fill="#a9bfd8">MATH THAT TRAINS</text>
+    </g>
+    <text x="58" y="155" font-size="45" font-weight="700" letter-spacing="-1.4" fill="#f4f8ff">Differentiate deeper.</text>
+    <text x="58" y="211" font-size="45" font-weight="700" letter-spacing="-1.4" fill="#65edd1">Make decisions trainable.</text>
+    <text x="60" y="258" font-size="19" fill="#b6c8df">High-order neural derivatives. Smooth gates. One composable foundation.</text>
+    <g transform="translate(58 302)">
+      <rect width="566" height="202" rx="16" fill="#102838" stroke="#284d59"/>
+      <text x="24" y="37" font-size="12" font-weight="700" letter-spacing="2" fill="#65edd1">THE DERIVATIVE PATH</text>
+      <text x="24" y="78" font-size="24" font-weight="700" fill="#f4f8ff">Spatial derivatives, carried forward.</text>
+      <text x="24" y="112" font-size="16" fill="#b6c8df">Taylor jets propagate through supported networks.</text>
+      <rect x="24" y="138" width="138" height="39" rx="8" fill="#1b3947"/>
+      <text x="93" y="163" font-size="14" text-anchor="middle" fill="#d7fff4">coordinates</text>
+      <path d="M174 158H197" stroke="#829ab7" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="211" y="138" width="122" height="39" rx="8" fill="#1b3947"/>
+      <text x="272" y="163" font-size="14" text-anchor="middle" fill="#d7fff4">derivative jet</text>
+      <path d="M345 158H368" stroke="#829ab7" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="382" y="138" width="160" height="39" rx="8" fill="#1b3947"/>
+      <text x="462" y="163" font-size="14" text-anchor="middle" fill="#d7fff4">physics residual</text>
+    </g>
+    <g transform="translate(648 302)">
+      <rect width="574" height="202" rx="16" fill="#192640" stroke="#39476c"/>
+      <text x="24" y="37" font-size="12" font-weight="700" letter-spacing="2" fill="#b7bfff">THE DECISION PATH</text>
+      <text x="24" y="78" font-size="24" font-weight="700" fill="#f4f8ff">Soft branches, learned together.</text>
+      <text x="24" y="112" font-size="16" fill="#b6c8df">Train splits and regional models with gradients.</text>
+      <rect x="24" y="138" width="138" height="39" rx="8" fill="#283553"/>
+      <text x="93" y="163" font-size="14" text-anchor="middle" fill="#e4e5ff">features</text>
+      <path d="M174 158H197" stroke="#829ab7" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="211" y="138" width="122" height="39" rx="8" fill="#283553"/>
+      <text x="272" y="163" font-size="14" text-anchor="middle" fill="#e4e5ff">soft gates</text>
+      <path d="M345 158H368" stroke="#829ab7" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <rect x="382" y="138" width="168" height="39" rx="8" fill="#283553"/>
+      <text x="466" y="163" font-size="14" text-anchor="middle" fill="#e4e5ff">regional models</text>
+    </g>
+    <text x="640" y="551" text-anchor="middle" font-size="16" fill="#b6c8df">Both paths keep parameter gradients. Build the model your problem needs.</text>
+  </g>
+</svg>

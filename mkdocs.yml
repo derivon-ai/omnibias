@@ -16,6 +16,7 @@ plugins:
   - search
 
 markdown_extensions:
+  - md_in_html
   - tables
   - fenced_code
   - toc:

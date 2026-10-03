@@ -1,6 +1,15 @@
 omnibias
 Copyright (C) 2026 Derivon
 
-Each package includes its own license. See LICENSING.md and the license tier
-mapping in pyproject.toml. The repository-level Apache-2.0 license does not
-replace the separate licenses of the convex, discrete or SOS packages.
+omnibias was founded and authored by Vardan Grigoryants.
+
+Packages have separate licenses: Apache-2.0 for the permissive infrastructure,
+and AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial for the certified
+optimization tier. LICENSING.md and each package's LICENSE identify its terms.
+
+The repository-root LICENSE is AGPL and does not override package-specific
+grants. A commercial grant requires a signed agreement from Derivon; contact
+info@derivon.ai. Neither license tier grants trademark rights. See TRADEMARKS.md.
+
+The software is supplied without warranty except as expressly agreed in a
+signed agreement. The applicable license texts govern.

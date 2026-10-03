@@ -43,10 +43,29 @@ intentionally stops if that version already exists.
 
 ## Current migration status
 
-The existing published artifacts remain unchanged. Extracted consumers must
-resolve their unpublished dependencies and audit transitive licenses before
-shipping. A successful local import is not a release-readiness claim. Keep their
-last published versions available while preparing compatible successor releases.
+The existing published artifacts remain unchanged. The extracted consumers'
+dependency and license boundaries are validated against local wheels. Public
+release still requires backing up their repositories, assigning compatible new
+versions and publishing their dependencies in order. Keep the last published
+versions available while preparing those successor releases.
 
 See [PyPI Trusted Publishing](https://docs.pypi.org/trusted-publishers/adding-a-publisher/)
 and [PyPI filename reuse](https://pypi.org/help/#file-name-reuse).
+
+## Installed-wheel integration gate
+
+Run the shared validator against extracted local projects before preparing a
+release. It builds a wheelhouse, installs each consumer's declared dependencies
+in isolation, and rejects editable/source leakage and overlapping wheel files:
+
+```bash
+uv run --no-sync python scripts/validate_wheels.py --projects-root ../omnibias_projects --numerical
+```
+
+Consumer `wheel-tests.toml` files select extras, representative imports and test
+paths. Test files are copied into scratch directories; source checkouts are not
+added to the import path. Detailed logs and the JSON report are written under
+`artifacts/wheel-validation/`. Use `--no-build --only <distribution>` to retry a
+failed environment after verifying its wheel is current. Rebuild after source
+or metadata changes. These commands can run in consumer CI once its checkout
+and dependency wheel artifacts are available; they do not create remote repos.
