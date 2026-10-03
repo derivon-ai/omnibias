@@ -55,15 +55,16 @@ and [PyPI filename reuse](https://pypi.org/help/#file-name-reuse).
 ## Installed-wheel integration gate
 
 Run the shared validator against extracted local projects before preparing a
-release. It builds a wheelhouse, installs each consumer's declared dependencies
+release. It builds each wheel from a fresh source archive, installs each consumer's declared dependencies
 in isolation, and rejects editable/source leakage and overlapping wheel files:
 
 ```bash
 uv run --no-sync python scripts/validate_wheels.py --projects-root ../omnibias_projects --numerical
 ```
 
-Consumer `wheel-tests.toml` files select extras, representative imports and test
-paths. Test files are copied into scratch directories; source checkouts are not
+Consumer `wheel-tests.toml` files select numerical `extras`, representative imports and test
+paths. Optional `base_extras` select a required runtime choice for import-only
+validation (Keras selects its Torch backend). Test files are copied into scratch directories; source checkouts are not
 added to the import path. Detailed logs and the JSON report are written under
 `artifacts/wheel-validation/`. Use `--no-build --only <distribution>` to retry a
 failed environment after verifying its wheel is current. Rebuild after source

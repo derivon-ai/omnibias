@@ -33,6 +33,7 @@ nav:
   - License transition: license-transition.md
   - Commercial strategy: commercial-strategy.md
   - Numerical maintenance: development/numerical-contracts.md
+  - Migration validation: development/open-core-migration.md
   - API entry points:
       - core: api/core.md
       - torch: api/torch.md

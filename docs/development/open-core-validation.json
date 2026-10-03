@@ -1,0 +1,1526 @@
+{
+  "schema": 1,
+  "baseline_commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+  "scope": "Local prospective source transition; no publication or version changes",
+  "context": {
+    "always_loaded_before_bytes": 8021,
+    "always_loaded_after_bytes": 4467,
+    "always_loaded_reduction_percent": 44.30868968956489,
+    "main_catalog_inclusive_before_bytes": 12763,
+    "main_catalog_inclusive_after_bytes": 34779,
+    "active_ecosystem_before_bytes": 191963,
+    "active_ecosystem_after_bytes": 101869,
+    "canonical_skills": 47,
+    "repositories": 32,
+    "installer_bundled_skills": 43,
+    "benchmark_blocks_before": 4,
+    "benchmark_blocks_after": 1,
+    "measurement": "UTF-8 bytes, not token counts; archives excluded"
+  },
+  "license_counts": {
+    "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial": 21,
+    "Apache-2.0": 22,
+    "Apache-2.0 AND (AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial)": 1
+  },
+  "main_distribution_count": 16,
+  "ecosystem_distribution_count": 44,
+  "unchanged_versions_checked": 44,
+  "published_apache_metadata_scenarios": [
+    {
+      "distribution": "omnibias-core",
+      "scenario": "base",
+      "requested_extras": [],
+      "omnibias_closure": [
+        "omnibias-core"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-core",
+      "scenario": "all-declared-extras",
+      "requested_extras": [
+        "test",
+        "verified"
+      ],
+      "omnibias_closure": [
+        "omnibias-core"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-torch",
+      "scenario": "base",
+      "requested_extras": [],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-torch"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-torch",
+      "scenario": "all-declared-extras",
+      "requested_extras": [
+        "test",
+        "examples"
+      ],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-torch"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-jax",
+      "scenario": "base",
+      "requested_extras": [],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-jax"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-jax",
+      "scenario": "all-declared-extras",
+      "requested_extras": [
+        "test",
+        "examples"
+      ],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-jax"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-ferminet",
+      "scenario": "base",
+      "requested_extras": [],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-ferminet",
+        "omnibias-jax",
+        "omnibias-research"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-ferminet",
+      "scenario": "all-declared-extras",
+      "requested_extras": [
+        "test",
+        "folx"
+      ],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-ferminet",
+        "omnibias-jax",
+        "omnibias-research"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-keras",
+      "scenario": "base",
+      "requested_extras": [],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-keras"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-keras",
+      "scenario": "all-declared-extras",
+      "requested_extras": [
+        "tf",
+        "jax",
+        "torch",
+        "test"
+      ],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-keras"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-fields",
+      "scenario": "base",
+      "requested_extras": [],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-fields"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-fields",
+      "scenario": "all-declared-extras",
+      "requested_extras": [
+        "torch",
+        "jax",
+        "all",
+        "difference",
+        "test",
+        "dev"
+      ],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-difference",
+        "omnibias-fields",
+        "omnibias-jax",
+        "omnibias-torch"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-pinn",
+      "scenario": "base",
+      "requested_extras": [],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-fields",
+        "omnibias-pinn",
+        "omnibias-research"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-pinn",
+      "scenario": "all-declared-extras",
+      "requested_extras": [
+        "torch",
+        "jax",
+        "integral",
+        "all",
+        "test",
+        "dev"
+      ],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-fields",
+        "omnibias-jax",
+        "omnibias-measure",
+        "omnibias-pinn",
+        "omnibias-research",
+        "omnibias-torch"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-geometry",
+      "scenario": "base",
+      "requested_extras": [],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-fields",
+        "omnibias-geometry",
+        "omnibias-research"
+      ],
+      "errors": []
+    },
+    {
+      "distribution": "omnibias-geometry",
+      "scenario": "all-declared-extras",
+      "requested_extras": [
+        "torch",
+        "jax",
+        "all",
+        "test",
+        "dev"
+      ],
+      "omnibias_closure": [
+        "omnibias-core",
+        "omnibias-fields",
+        "omnibias-geometry",
+        "omnibias-jax",
+        "omnibias-research",
+        "omnibias-torch"
+      ],
+      "errors": []
+    }
+  ],
+  "wheel_audit": {
+    "disjoint_ownership": true,
+    "license_bytes_and_record_hashes_checked": true,
+    "commercial_reference_bundles_complete": true,
+    "wheels": [
+      {
+        "distribution": "omnibias-binary",
+        "wheel": "omnibias_binary-0.1.0a1-py3-none-any.whl",
+        "sha256": "8f17a481a14c07b7acc89eb525c92108f0177f4d7a582981a18745a90d6ddad3",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 16
+      },
+      {
+        "distribution": "omnibias-boolean",
+        "wheel": "omnibias_boolean-0.1.0a1-py3-none-any.whl",
+        "sha256": "dbd3440d16b8376c44596100d644067a25164d9c3cf532a4272f5a79caa99d59",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 29
+      },
+      {
+        "distribution": "omnibias-combinatorics",
+        "wheel": "omnibias_combinatorics-0.1.0a1-py3-none-any.whl",
+        "sha256": "4b66d14a3ccb27722d4013f0fe1261a72eedb0799376cf10b5d72330b75998a7",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 27
+      },
+      {
+        "distribution": "omnibias-control",
+        "wheel": "omnibias_control-0.1.0a1-py3-none-any.whl",
+        "sha256": "f4a1ea6c93ca7189ec42dfa830d9206a0ba127a2561cef28d189ec4f69c6c2e9",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 32
+      },
+      {
+        "distribution": "omnibias-convex",
+        "wheel": "omnibias_convex-0.1.0a1-py3-none-any.whl",
+        "sha256": "a601b7adf034f0a4e967b283a80f3c47159206baefe3a6270b78c1f563a00e39",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 24
+      },
+      {
+        "distribution": "omnibias-core",
+        "wheel": "omnibias_core-0.4.0-py3-none-any.whl",
+        "sha256": "d227e2517d39acac6fcdbfb5e68f5ca123da50eebf4c34094684e1fac1fbf6f7",
+        "version": "0.4.0",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 109
+      },
+      {
+        "distribution": "omnibias-curvature",
+        "wheel": "omnibias_curvature-0.1.0a1-py3-none-any.whl",
+        "sha256": "789655e39486c8db9e1933a53c8a99332304bab775a42daf76c17fd3ada0ca3c",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE",
+          "NOTICE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 21
+      },
+      {
+        "distribution": "omnibias-difference",
+        "wheel": "omnibias_difference-0.1.0a1-py3-none-any.whl",
+        "sha256": "7c7b82929ea98352cc09445ffdc63e608843c1e03fefd122265b6d284963fa9b",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 28
+      },
+      {
+        "distribution": "omnibias-discrete",
+        "wheel": "omnibias_discrete-0.1.0a1-py3-none-any.whl",
+        "sha256": "639f2224a004e06041e86cf5e6253ace2b89649559a66cd594b614fa70a82477",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 25
+      },
+      {
+        "distribution": "omnibias-dynamics",
+        "wheel": "omnibias_dynamics-0.1.0a1-py3-none-any.whl",
+        "sha256": "3f2b0175acfdefdb15db82d5deaaffd479665f9b9804ee911fa85becc7b08052",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 139
+      },
+      {
+        "distribution": "omnibias-ferminet",
+        "wheel": "omnibias_ferminet-0.2.0-py3-none-any.whl",
+        "sha256": "1e9383997e43fce844ad03b9666d6356855623e32ae695f7a58b789daeed1e46",
+        "version": "0.2.0",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 17
+      },
+      {
+        "distribution": "omnibias-fields",
+        "wheel": "omnibias_fields-0.1.0-py3-none-any.whl",
+        "sha256": "67f96b2b47daaa957cf991c46f4beb9d5f28e81def9387bf83a55cccd1e56fff",
+        "version": "0.1.0",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 52
+      },
+      {
+        "distribution": "omnibias-formal",
+        "wheel": "omnibias_formal-0.1.0a1-py3-none-any.whl",
+        "sha256": "e9078d8868d2612d9da40d66838e22c8110c45553d8cd159f684d8f5ca1995d3",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 20
+      },
+      {
+        "distribution": "omnibias-fractional",
+        "wheel": "omnibias_fractional-0.1.0-py3-none-any.whl",
+        "sha256": "ffe5789c7c10a7c0c73abb88e26bc546483cada68fad15d4d7c22e7c842e5a70",
+        "version": "0.1.0",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 29
+      },
+      {
+        "distribution": "omnibias-geometry",
+        "wheel": "omnibias_geometry-0.2.0-py3-none-any.whl",
+        "sha256": "ab058c5535c132e8917f886a461e938778ca0db4f67445272fd6bb5e876bcd08",
+        "version": "0.2.0",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 187
+      },
+      {
+        "distribution": "omnibias-graph",
+        "wheel": "omnibias_graph-0.1.0a1-py3-none-any.whl",
+        "sha256": "616d9e20a2c292b9599596887ad774df527e229da6c1d419db2153d9e23f005d",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE",
+          "NOTICE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 21
+      },
+      {
+        "distribution": "omnibias-holonomic",
+        "wheel": "omnibias_holonomic-0.1.0a1-py3-none-any.whl",
+        "sha256": "586155c4e89221061274048e3dd3cc26dbfe8141aab243134bdeda4c767cb78f",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 46
+      },
+      {
+        "distribution": "omnibias-hopfield",
+        "wheel": "omnibias_hopfield-0.1.0a1-py3-none-any.whl",
+        "sha256": "10ca22f87fc957f296e4dd65a67b150276db7fb2340721b9a386486c33207437",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE",
+          "NOTICE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 17
+      },
+      {
+        "distribution": "omnibias-jax",
+        "wheel": "omnibias_jax-0.4.0-py3-none-any.whl",
+        "sha256": "35fa484a8600b8aedbb956a1ec8e591553220db5422883dca57fcb3286a5ac99",
+        "version": "0.4.0",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 38
+      },
+      {
+        "distribution": "omnibias-keras",
+        "wheel": "omnibias_keras-0.0.1a1-py3-none-any.whl",
+        "sha256": "20623157092bdb1a148162d313aaedab5e6b766db4878737ca57e97328da4526",
+        "version": "0.0.1a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 32
+      },
+      {
+        "distribution": "omnibias-logic",
+        "wheel": "omnibias_logic-0.1.0a1-py3-none-any.whl",
+        "sha256": "2d75586ab1472902f5fca7c11ad32fcc433205040daa183a320a07980c8b92a1",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 26
+      },
+      {
+        "distribution": "omnibias-measure",
+        "wheel": "omnibias_measure-0.1.0a1-py3-none-any.whl",
+        "sha256": "a92311194d158565fcfbd9be8d9c7765870109f979f0fd319d8ea4bf8a1df906",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 25
+      },
+      {
+        "distribution": "omnibias-nphard",
+        "wheel": "omnibias_nphard-0.1.0a1-py3-none-any.whl",
+        "sha256": "d7f906f29ea2b32c04577003ec7690841ae7a266d8a1977e0cf37e9d4a0ca83e",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 25
+      },
+      {
+        "distribution": "omnibias-partition",
+        "wheel": "omnibias_partition-0.1.0a1-py3-none-any.whl",
+        "sha256": "309013b26cda35c8faeccfea16b5b920dc1a6d047ad506421fce0886a3c1f453",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE",
+          "NOTICE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 26
+      },
+      {
+        "distribution": "omnibias-pinn",
+        "wheel": "omnibias_pinn-0.1.0-py3-none-any.whl",
+        "sha256": "389577e7ef55b709aa02bd47253ca4f730303935c7c58a9f5982dc35b7ab9289",
+        "version": "0.1.0",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 275
+      },
+      {
+        "distribution": "omnibias-qcalculus",
+        "wheel": "omnibias_qcalculus-0.1.0a1-py3-none-any.whl",
+        "sha256": "b582e9c828fd4a8b1ad68eb3a2c568d51be05c4ff11336c452fcc3e6da88423d",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 20
+      },
+      {
+        "distribution": "omnibias-qpinn",
+        "wheel": "omnibias_qpinn-0.0.2a1-py3-none-any.whl",
+        "sha256": "1a05b90bfa71ded970e21237b9a939ed8689933deb9a187cf6393377941b9e27",
+        "version": "0.0.2a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 64
+      },
+      {
+        "distribution": "omnibias-qubo",
+        "wheel": "omnibias_qubo-0.1.0a1-py3-none-any.whl",
+        "sha256": "2f7d4616c114a8bb42f34cf3f588519ea0a4b0cf43454b37e8413ceb5539530e",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 20
+      },
+      {
+        "distribution": "omnibias-research",
+        "wheel": "omnibias_research-0.1.0a1-py3-none-any.whl",
+        "sha256": "e3b9616762ad837283130c0e43b273bdee7d9597eff33652f7b89338d4053c13",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE-Apache-2.0"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 167
+      },
+      {
+        "distribution": "omnibias-research-certified",
+        "wheel": "omnibias_research_certified-0.1.0a1-py3-none-any.whl",
+        "sha256": "2d9ab3bde7653031ec899133edf70d86d9f42aa600cc844822bc54b1a5608536",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0 AND (AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial)",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE-AGPL-3.0-or-later.txt",
+          "LICENSE-Apache-2.0.txt",
+          "LICENSE-LicenseRef-omnibias-Commercial.txt",
+          "NOTICE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 74
+      },
+      {
+        "distribution": "omnibias-routing",
+        "wheel": "omnibias_routing-0.1.0a1-py3-none-any.whl",
+        "sha256": "2bb091c8ef9de543501e9e8c7f37f0649d98958af6bf5488a3dfe1f2903a38ed",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 20
+      },
+      {
+        "distribution": "omnibias-score",
+        "wheel": "omnibias_score-0.1.0a1-py3-none-any.whl",
+        "sha256": "71a1570851ae14867e240982e3f8954c0d39e07c94d1f1706b59b87fe1af8d08",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 26
+      },
+      {
+        "distribution": "omnibias-shape",
+        "wheel": "omnibias_shape-0.1.0a1-py3-none-any.whl",
+        "sha256": "7bff7342e7f12e3e7697e86b3dedcbbc1ad23b7b5803027098de335ad85ecd0e",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE",
+          "NOTICE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 27
+      },
+      {
+        "distribution": "omnibias-skills",
+        "wheel": "omnibias_skills-0.1.0a1-py3-none-any.whl",
+        "sha256": "a200252f3d9fef8539358c5117652c78e8908f1a96a0326e0705a115eb1fc998",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 98
+      },
+      {
+        "distribution": "omnibias-sos",
+        "wheel": "omnibias_sos-0.1.0a1-py3-none-any.whl",
+        "sha256": "ecde2c6a2fb722544912a860cf6c3f2ce7b598de3ec250dd32f063165a5037fc",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 20
+      },
+      {
+        "distribution": "omnibias-spiking",
+        "wheel": "omnibias_spiking-0.1.0a1-py3-none-any.whl",
+        "sha256": "9f38ecb6c65724d82e1644a006daab2007736241b5c14aa0f8b90b3d36624d3d",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 14
+      },
+      {
+        "distribution": "omnibias-struct",
+        "wheel": "omnibias_struct-0.1.0a1-py3-none-any.whl",
+        "sha256": "4db86c600c6686e869277483251d08c64921a8329417d6d1fde001d11d5c0c01",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE",
+          "NOTICE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 66
+      },
+      {
+        "distribution": "omnibias-submodular",
+        "wheel": "omnibias_submodular-0.1.0a1-py3-none-any.whl",
+        "sha256": "9c96a6fba0fad745a5cb9296f08aa04536edc5136c372b9841764be21962b7bd",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 30
+      },
+      {
+        "distribution": "omnibias-symbolic",
+        "wheel": "omnibias_symbolic-0.1.0-py3-none-any.whl",
+        "sha256": "2f360381c595bd3e9b2d4e31dd81f8b675ec46a8a2ea7294ba06f521f062e5e9",
+        "version": "0.1.0",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE",
+          "NOTICE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 49
+      },
+      {
+        "distribution": "omnibias-tab",
+        "wheel": "omnibias_tab-0.1.0a1-py3-none-any.whl",
+        "sha256": "3545f1e6434c4a14be8264e5827cc9e8c109d9cf440f144a2be3f160df5c6727",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 48
+      },
+      {
+        "distribution": "omnibias-timescale",
+        "wheel": "omnibias_timescale-0.1.0a1-py3-none-any.whl",
+        "sha256": "4b51fa28e12b090a468de4a2a5ac9a5809a3c1f2b103b80309234d9bd4f90cf9",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 18
+      },
+      {
+        "distribution": "omnibias-torch",
+        "wheel": "omnibias_torch-0.4.0-py3-none-any.whl",
+        "sha256": "2f11bb583638357c2d7f4059ba347859403f01bc123a9d7321bcf31312f30aaa",
+        "version": "0.4.0",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 57
+      },
+      {
+        "distribution": "omnibias-variational",
+        "wheel": "omnibias_variational-0.1.0a1-py3-none-any.whl",
+        "sha256": "311e7098ee8854e38493c17ff830d28ebf6e882c0dc468a38b576cdf53705c97",
+        "version": "0.1.0a1",
+        "license_expression": "Apache-2.0",
+        "license_files": [
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 40
+      },
+      {
+        "distribution": "omnibias-verify",
+        "wheel": "omnibias_verify-0.1.0a1-py3-none-any.whl",
+        "sha256": "2137e01baad7412c3a7f90ac9a3c52cdbd849030c14bb0e0b3971b040ac4b87e",
+        "version": "0.1.0a1",
+        "license_expression": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+        "license_files": [
+          "COMMERCIAL-LICENSE.md",
+          "LICENSE"
+        ],
+        "license_files_byte_identical": true,
+        "record_entries": 51
+      }
+    ]
+  },
+  "isolated_installations": [
+    {
+      "name": "omnibias-binary",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.binary"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "8f17a481a14c07b7acc89eb525c92108f0177f4d7a582981a18745a90d6ddad3"
+    },
+    {
+      "name": "omnibias-boolean",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.boolean"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "dbd3440d16b8376c44596100d644067a25164d9c3cf532a4272f5a79caa99d59"
+    },
+    {
+      "name": "omnibias-combinatorics",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.combinatorics"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "4b66d14a3ccb27722d4013f0fe1261a72eedb0799376cf10b5d72330b75998a7"
+    },
+    {
+      "name": "omnibias-control",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.control"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "f4a1ea6c93ca7189ec42dfa830d9206a0ba127a2561cef28d189ec4f69c6c2e9"
+    },
+    {
+      "name": "omnibias-convex",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.convex"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "a601b7adf034f0a4e967b283a80f3c47159206baefe3a6270b78c1f563a00e39"
+    },
+    {
+      "name": "omnibias-core",
+      "version": "0.4.0",
+      "extras": [],
+      "modules": [
+        "omnibias.core"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "d227e2517d39acac6fcdbfb5e68f5ca123da50eebf4c34094684e1fac1fbf6f7"
+    },
+    {
+      "name": "omnibias-curvature",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.curvature"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "789655e39486c8db9e1933a53c8a99332304bab775a42daf76c17fd3ada0ca3c"
+    },
+    {
+      "name": "omnibias-difference",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.difference"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "7c7b82929ea98352cc09445ffdc63e608843c1e03fefd122265b6d284963fa9b"
+    },
+    {
+      "name": "omnibias-discrete",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.discrete"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "639f2224a004e06041e86cf5e6253ace2b89649559a66cd594b614fa70a82477"
+    },
+    {
+      "name": "omnibias-dynamics",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.dynamics"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "3f2b0175acfdefdb15db82d5deaaffd479665f9b9804ee911fa85becc7b08052"
+    },
+    {
+      "name": "omnibias-ferminet",
+      "version": "0.2.0",
+      "extras": [],
+      "modules": [
+        "omnibias.ferminet"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "1e9383997e43fce844ad03b9666d6356855623e32ae695f7a58b789daeed1e46"
+    },
+    {
+      "name": "omnibias-fields",
+      "version": "0.1.0",
+      "extras": [],
+      "modules": [
+        "omnibias.fields"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "67f96b2b47daaa957cf991c46f4beb9d5f28e81def9387bf83a55cccd1e56fff"
+    },
+    {
+      "name": "omnibias-formal",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.formal"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "e9078d8868d2612d9da40d66838e22c8110c45553d8cd159f684d8f5ca1995d3"
+    },
+    {
+      "name": "omnibias-fractional",
+      "version": "0.1.0",
+      "extras": [],
+      "modules": [
+        "omnibias.fractional"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "ffe5789c7c10a7c0c73abb88e26bc546483cada68fad15d4d7c22e7c842e5a70"
+    },
+    {
+      "name": "omnibias-geometry",
+      "version": "0.2.0",
+      "extras": [],
+      "modules": [
+        "omnibias.geometry"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "ab058c5535c132e8917f886a461e938778ca0db4f67445272fd6bb5e876bcd08"
+    },
+    {
+      "name": "omnibias-graph",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.graph"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "616d9e20a2c292b9599596887ad774df527e229da6c1d419db2153d9e23f005d"
+    },
+    {
+      "name": "omnibias-holonomic",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.holonomic"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "586155c4e89221061274048e3dd3cc26dbfe8141aab243134bdeda4c767cb78f"
+    },
+    {
+      "name": "omnibias-hopfield",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.hopfield"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "10ca22f87fc957f296e4dd65a67b150276db7fb2340721b9a386486c33207437"
+    },
+    {
+      "name": "omnibias-jax",
+      "version": "0.4.0",
+      "extras": [],
+      "modules": [
+        "omnibias.jax"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "35fa484a8600b8aedbb956a1ec8e591553220db5422883dca57fcb3286a5ac99"
+    },
+    {
+      "name": "omnibias-keras",
+      "version": "0.0.1a1",
+      "extras": [
+        "torch"
+      ],
+      "modules": [
+        "omnibias.keras"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "20623157092bdb1a148162d313aaedab5e6b766db4878737ca57e97328da4526"
+    },
+    {
+      "name": "omnibias-logic",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.logic"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "2d75586ab1472902f5fca7c11ad32fcc433205040daa183a320a07980c8b92a1"
+    },
+    {
+      "name": "omnibias-measure",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.measure"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "a92311194d158565fcfbd9be8d9c7765870109f979f0fd319d8ea4bf8a1df906"
+    },
+    {
+      "name": "omnibias-nphard",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.nphard"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "d7f906f29ea2b32c04577003ec7690841ae7a266d8a1977e0cf37e9d4a0ca83e"
+    },
+    {
+      "name": "omnibias-partition",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.partition"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "309013b26cda35c8faeccfea16b5b920dc1a6d047ad506421fce0886a3c1f453"
+    },
+    {
+      "name": "omnibias-pinn",
+      "version": "0.1.0",
+      "extras": [],
+      "modules": [
+        "omnibias.pinn"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "389577e7ef55b709aa02bd47253ca4f730303935c7c58a9f5982dc35b7ab9289"
+    },
+    {
+      "name": "omnibias-qcalculus",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.qcalculus"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "b582e9c828fd4a8b1ad68eb3a2c568d51be05c4ff11336c452fcc3e6da88423d"
+    },
+    {
+      "name": "omnibias-qpinn",
+      "version": "0.0.2a1",
+      "extras": [],
+      "modules": [
+        "omnibias.qpinn"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "1a05b90bfa71ded970e21237b9a939ed8689933deb9a187cf6393377941b9e27"
+    },
+    {
+      "name": "omnibias-qubo",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.qubo"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "2f7d4616c114a8bb42f34cf3f588519ea0a4b0cf43454b37e8413ceb5539530e"
+    },
+    {
+      "name": "omnibias-research",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.research"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "e3b9616762ad837283130c0e43b273bdee7d9597eff33652f7b89338d4053c13"
+    },
+    {
+      "name": "omnibias-research-certified",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.research.discrete.csp",
+        "omnibias.research.sos.npa"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "2d9ab3bde7653031ec899133edf70d86d9f42aa600cc844822bc54b1a5608536"
+    },
+    {
+      "name": "omnibias-routing",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.routing"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "2bb091c8ef9de543501e9e8c7f37f0649d98958af6bf5488a3dfe1f2903a38ed"
+    },
+    {
+      "name": "omnibias-score",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.score"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "71a1570851ae14867e240982e3f8954c0d39e07c94d1f1706b59b87fe1af8d08"
+    },
+    {
+      "name": "omnibias-shape",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.shape"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "7bff7342e7f12e3e7697e86b3dedcbbc1ad23b7b5803027098de335ad85ecd0e"
+    },
+    {
+      "name": "omnibias-skills",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.skills"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "a200252f3d9fef8539358c5117652c78e8908f1a96a0326e0705a115eb1fc998"
+    },
+    {
+      "name": "omnibias-sos",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.sos"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "ecde2c6a2fb722544912a860cf6c3f2ce7b598de3ec250dd32f063165a5037fc"
+    },
+    {
+      "name": "omnibias-spiking",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.spiking"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "9f38ecb6c65724d82e1644a006daab2007736241b5c14aa0f8b90b3d36624d3d"
+    },
+    {
+      "name": "omnibias-struct",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.struct"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "4db86c600c6686e869277483251d08c64921a8329417d6d1fde001d11d5c0c01"
+    },
+    {
+      "name": "omnibias-submodular",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.submodular"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "9c96a6fba0fad745a5cb9296f08aa04536edc5136c372b9841764be21962b7bd"
+    },
+    {
+      "name": "omnibias-symbolic",
+      "version": "0.1.0",
+      "extras": [],
+      "modules": [
+        "omnibias.symbolic"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "2f360381c595bd3e9b2d4e31dd81f8b675ec46a8a2ea7294ba06f521f062e5e9"
+    },
+    {
+      "name": "omnibias-tab",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.tab"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "3545f1e6434c4a14be8264e5827cc9e8c109d9cf440f144a2be3f160df5c6727"
+    },
+    {
+      "name": "omnibias-timescale",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.timescale"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "4b51fa28e12b090a468de4a2a5ac9a5809a3c1f2b103b80309234d9bd4f90cf9"
+    },
+    {
+      "name": "omnibias-torch",
+      "version": "0.4.0",
+      "extras": [],
+      "modules": [
+        "omnibias.torch"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "2f11bb583638357c2d7f4059ba347859403f01bc123a9d7321bcf31312f30aaa"
+    },
+    {
+      "name": "omnibias-variational",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.variational"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "311e7098ee8854e38493c17ff830d28ebf6e882c0dc468a38b576cdf53705c97"
+    },
+    {
+      "name": "omnibias-verify",
+      "version": "0.1.0a1",
+      "extras": [],
+      "modules": [
+        "omnibias.verify"
+      ],
+      "test_paths": [],
+      "status": "passed",
+      "wheel_sha256": "2137e01baad7412c3a7f90ac9a3c52cdbd849030c14bb0e0b3971b040ac4b87e"
+    }
+  ],
+  "numerical_profiles": [
+    {
+      "name": "ferminet",
+      "passed": 15,
+      "skipped": 1
+    },
+    {
+      "name": "pinn",
+      "passed": 171,
+      "skipped": 3
+    },
+    {
+      "name": "geometry",
+      "passed": 21,
+      "skipped": 0
+    },
+    {
+      "name": "holonomic_without_symbolic",
+      "passed": 10,
+      "skipped": 0
+    },
+    {
+      "name": "certified_representative",
+      "passed": 123,
+      "skipped": 0
+    },
+    {
+      "name": "certified_remaining_integrations",
+      "passed": 131,
+      "skipped": 0
+    }
+  ],
+  "certified_extras_without_test_extra": [
+    {
+      "extra": "ferminet",
+      "status": "passed"
+    },
+    {
+      "extra": "geometry",
+      "status": "passed"
+    },
+    {
+      "extra": "pinn",
+      "status": "passed"
+    },
+    {
+      "extra": "information",
+      "status": "passed"
+    }
+  ],
+  "additional_regressions": {
+    "installer": 26,
+    "ecosystem_license_guard": 17,
+    "fbpinn_values_and_parameter_gradients": 14
+  },
+  "source_overrides": {
+    "project_maps": 29,
+    "retained": 147,
+    "redundant": 0
+  },
+  "local_consumer_commits": [
+    {
+      "name": "omnibias-combinatorics",
+      "commit": "93bf05f47d6964da3d79266306ea9b573ab1067e",
+      "parent": "d41845a252f31f6f6b697471894bda1cc9087b73",
+      "clean": true
+    },
+    {
+      "name": "omnibias-control",
+      "commit": "6d965f3849135bce511f590a30f31982cbaa2afe",
+      "parent": "fbe65047cb2d77bddd7697078f0ab9af77ef527f",
+      "clean": true
+    },
+    {
+      "name": "omnibias-dynamics",
+      "commit": "c96dfcdb1b890e4bd1c1e8392df3c132ce11750d",
+      "parent": "597e3f7ca0d12634bc0a2d2b2f259ac3954870c6",
+      "clean": true
+    },
+    {
+      "name": "omnibias-ferminet",
+      "commit": "d16b6bd1325a005ac8ad4242a087c1959882f1ac",
+      "parent": "65fa1fe96e1ab7fa420dff9fc1b1a69b39f8ff6c",
+      "clean": true
+    },
+    {
+      "name": "omnibias-formal",
+      "commit": "b2f5738b3a2a1c67c59ee6f8fea969465e5b812a",
+      "parent": "83e9b00053a5241d262e3b32cfe3bae90d76b372",
+      "clean": true
+    },
+    {
+      "name": "omnibias-fractional",
+      "commit": "190b4bf3bbac0c62cc988c0c44659376da1dc198",
+      "parent": "16e8e7494094ba0ebfbff1d96010b9b6ac873f1b",
+      "clean": true
+    },
+    {
+      "name": "omnibias-geometry",
+      "commit": "95cb16ef7094d8b54d6b62e4d168d5e7c1113209",
+      "parent": "63fd62646e9aba8da03a9c2fac36d36bce872b39",
+      "clean": true
+    },
+    {
+      "name": "omnibias-holonomic",
+      "commit": "54773104a9422c2d28343033e54e7d1136b9c65c",
+      "parent": "6303977e06d3b60297857c3c957b51dbb4f0107e",
+      "clean": true
+    },
+    {
+      "name": "omnibias-hopfield",
+      "commit": "bbf4178f2ec2cf06c101a556be9b36f49e5b8187",
+      "parent": "8c5abd7f8921b19bee05c9450f7433f8bd7559f8",
+      "clean": true
+    },
+    {
+      "name": "omnibias-logic",
+      "commit": "d1da18ee6f725b2346fdb9753ae070a6cec4d66d",
+      "parent": "ce60e986de50359d7f1a96cd2250eac73153f01f",
+      "clean": true
+    },
+    {
+      "name": "omnibias-measure",
+      "commit": "acdfa8c526497e5e71834e1326ffd1edf226e279",
+      "parent": "55b992da473800ec3ba4895e1d28013883c9b0cc",
+      "clean": true
+    },
+    {
+      "name": "omnibias-nphard",
+      "commit": "2d1b9488501bb16029841c79cc4f482bafbfc727",
+      "parent": "46e7c756f24cccdf3fabd536c08964f8ec343e95",
+      "clean": true
+    },
+    {
+      "name": "omnibias-pinn",
+      "commit": "ebea3f77298a9ff949ae386ad90949928e09c04d",
+      "parent": "7359cbfd01064b4e8c56c24c600fd62519f3db6e",
+      "clean": true
+    },
+    {
+      "name": "omnibias-qpinn",
+      "commit": "1fa7634e8f8c1d6e62f0a59c953414712fa012b0",
+      "parent": "43b2754c8af305d5fa1d6207a1f1f5d6bc9dc2e2",
+      "clean": true
+    },
+    {
+      "name": "omnibias-qubo",
+      "commit": "7ba98f88dd8f6a734b278bf31277078c4c25bd6a",
+      "parent": "092fc58d8e18ff185995ad6a23b167d1bf0be8a7",
+      "clean": true
+    },
+    {
+      "name": "omnibias-routing",
+      "commit": "e0aa370fa7fc57fb3b3bc88ca6e485bc67475fdb",
+      "parent": "5c70b68a21499f528849354b21f83e5d20d9c5a3",
+      "clean": true
+    },
+    {
+      "name": "omnibias-score",
+      "commit": "50baac469d42482f83628aed20f7e020640aa2a9",
+      "parent": "8af6828b9d3115ae8b21df02d7953028ea8e3767",
+      "clean": true
+    },
+    {
+      "name": "omnibias-shape",
+      "commit": "fec451d575f0af9d83e2923bf5fce31987fb16a1",
+      "parent": "00e266eeda18a5c7d6a45d1b7ad4513025f73b46",
+      "clean": true
+    },
+    {
+      "name": "omnibias-skills",
+      "commit": "2e9ee96075303973899f29b638b826988182c78d",
+      "parent": "3939117fc5f8dd5356d8ad8ad6ad51bfdbb3861b",
+      "clean": true
+    },
+    {
+      "name": "omnibias-spiking",
+      "commit": "aaa72e0d14aae9741d79c79d09bc08de66c99f8b",
+      "parent": "5b57e137a0cc054f7c36b184003d94b453f13f29",
+      "clean": true
+    },
+    {
+      "name": "omnibias-submodular",
+      "commit": "845d9e99b5f293c8c530fbf663719d8c86b35140",
+      "parent": "5cc77dcde3bada60c3f7aaf5e69931a225015921",
+      "clean": true
+    },
+    {
+      "name": "omnibias-symbolic",
+      "commit": "06be90506ba3bd72876a50d85d23b1493e9dc0dc",
+      "parent": "1e9b58ecc949e4f0bc6baa972c3c3ea97962b470",
+      "clean": true
+    },
+    {
+      "name": "omnibias-tab",
+      "commit": "6602fcbd1876118f39fe3c09d083f3597afbe14b",
+      "parent": "2de0afab47448c32df67158402f6a52f17357611",
+      "clean": true
+    },
+    {
+      "name": "omnibias-timescale",
+      "commit": "2fb63ec0bf21170a944d44544624c43def322cdf",
+      "parent": "dd70f3649a546a56515ef65e6b3d6e9356d20638",
+      "clean": true
+    },
+    {
+      "name": "omnibias-variational",
+      "commit": "8d81a6e648ceadcf65e06be15d8c090fd4aa0187",
+      "parent": "854c5b91c898c2e9a397444b9c0d3b417e53abe6",
+      "clean": true
+    },
+    {
+      "name": "omnibias-verify",
+      "commit": "65cb9e3c1eb3e005f23d831d1332142f9632d3cd",
+      "parent": "80e03470d463af4715ec1a2544c8e45e5481edd8",
+      "clean": true
+    },
+    {
+      "name": "omnibias-research",
+      "commit": "e834ef898789d0e4e168c9ea4b660e5e1f6c2884",
+      "parent": "a5814dc7a39868a8a0fb24ad153d62dd7972d48b",
+      "clean": true
+    }
+  ],
+  "preserved_unrelated_work": "Laboratory and pre-existing application working-tree edits were not included in consumer commits."
+}

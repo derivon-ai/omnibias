@@ -9,7 +9,7 @@ description = "Certified universal positivity by optimization: sound Sum-of-Squa
 readme = "README.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "COMMERCIAL-LICENSE.md"]
 authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
 maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
 keywords = [

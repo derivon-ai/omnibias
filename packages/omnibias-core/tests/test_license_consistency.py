@@ -167,6 +167,10 @@ def test_each_pyproject_declares_its_tier_as_a_pep639_expression() -> None:
             files = project.get("license-files", [])
             if "LICENSE" not in files or any(not list(pkg_dir.glob(pattern)) for pattern in files):
                 offenders[dist] = f"license-files must include LICENSE and resolve: {files!r}"
+            elif "LicenseRef-omnibias-Commercial" in wanted:
+                bundled = {path.name for pattern in files for path in pkg_dir.glob(pattern)}
+                if "COMMERCIAL-LICENSE.md" not in bundled:
+                    offenders[dist] = "commercial alternative must bundle COMMERCIAL-LICENSE.md"
     assert not offenders, f"PEP 639 metadata drift: {offenders}"
 
 
