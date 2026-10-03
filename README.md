@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(max-width: 600px)" srcset="docs/img/omnibias-hero-mobile.svg">
-  <img src="docs/img/omnibias-hero.svg" width="1280" alt="omnibias: differentiate deeper; make decisions trainable. Derivative jets connect coordinates to physics residuals, and soft gates connect features to regional models. Both preserve parameter gradients.">
+  <img src="docs/img/omnibias-hero.svg" width="1280" alt="omnibias — high-order derivatives, direct and trainable. Riccati derivative polynomials and tanh derivative curves.">
 </picture>
 
 [![CI](https://github.com/derivon-ai/omnibias/actions/workflows/ci.yml/badge.svg)](https://github.com/derivon-ai/omnibias/actions/workflows/ci.yml)
@@ -37,7 +37,9 @@ memory and evaluation dominate the actual learning problem. Computing many
 mixed partials compounds the cost.
 
 omnibias takes a direct route. For supported activations, polynomial recurrences
-evaluate `σ⁽ⁿ⁾(z)` without recursive autodiff. Taylor composition carries these
+evaluate `σ⁽ⁿ⁾(z)` without recursive autodiff. Sigmoid and tanh need **one base
+activation evaluation plus a derivative polynomial**, regardless of the number
+of backward passes a nested approach would build. Taylor composition carries these
 derivatives through affine layers and nonlinearities. A single propagation
 returns the requested directional jet; a multivariate jet returns mixed
 partials. The spatial derivative is an ordinary differentiable tensor
@@ -59,6 +61,59 @@ curvature-sensitive objectives and derivative-based scientific models.
 PyTorch and JAX provide the network-jet APIs. Keras 3 provides activation and
 operator layers across its supported backends. These are complementary
 surfaces; choose the backend and primitive your application actually needs.
+
+## Derivative performance, by workload
+
+Activation derivatives, direct Laplacians and general deep-network jets use
+separate algorithms. The specialized paths exploit activation identities and
+operator contractions; composing every derivative through a deep MLP does
+more work. See the [full measurements](docs/performance.md) for all baselines,
+accuracy checks, compilation costs and reproduction commands.
+
+| Workload | omnibias | Baseline | Speedup |
+| --- | ---: | ---: | ---: |
+| Activation derivative · `n = 8` | 0.1405 ms | 30.9908 ms · Torch nested autograd | **220×** |
+| Laplacian · `D = 60` | 0.0227 ms | 0.5544 ms · JAX dense Hessian | **24.4×** |
+| Repeated Laplacian · `Δ³` | 0.0134 ms | 66.4122 ms · JAX dense nested | **4,974×** |
+| Repeated Laplacian · `Δ⁴` | 0.0129 ms | 64.8343 ms · folx nested | **5,036×** |
+
+![Activation derivatives, Laplacians and repeated Laplacians compared with autodiff baselines on their respective workloads.](docs/img/specialized-derivatives.svg)
+
+Float64 CPU, nine timed repeats. Activation: 20,000 tanh inputs, Torch eager.
+Laplacian: 64 points, 32 hidden units. Repeated Laplacian: 32 points, 16 hidden
+units, 16 dimensions. Operator comparisons use JAX JIT with **runtime inputs
+and weights**; compilation is recorded separately. All successful methods
+pass independent 80-digit accuracy checks at sampled inputs. Dense `Δ⁴` reached
+the 3 GiB process budget; no speedup is claimed for that unfinished run.
+
+[Activation data](docs/benchmarks/derivative_order.json) ·
+[Laplacian data](docs/benchmarks/laplacian_scaling.json) ·
+[Repeated-Laplacian data](docs/benchmarks/polylaplacian_order.json)
+
+The independent deep-MLP comparison remains available in the
+[performance guide](docs/performance.md#general-deep-network-jets), including
+JAX Taylor-mode AD and cases where it wins.
+
+## High-dimensional physics without a full derivative tensor
+
+The one-layer identity is direct:
+
+$$
+\Delta^k f(x) = \sum_h c_h\,\sigma^{(2k)}(w_h\cdot x+\beta_h)\,\lVert w_h\rVert^{2k}.
+$$
+
+No dense Hessian or order-`2k` spatial tensor is needed. Deep MLPs use
+`deep_field_laplacian` to propagate the Laplacian directly, with **no fixed
+input-dimension ceiling** and retained parameter gradients. Both backends
+exercise this path at **5,000 dimensions**, beyond the full mixed-jet budget.
+For fixed layer widths and depth, work and memory grow linearly with dimension.
+
+In automatic mode, deep repeated Laplacians use exact support enumeration
+while it fits the configured budget, then a reported directional estimator. Full
+mixed jets still have combinatorial output size. The
+[5,000-dimensional training example](docs/derivatives.md#a-deep-laplacian-in-5000-dimensions)
+and [operator guarantees](docs/guarantees.md#laplacians-without-the-mixed-jet-dimension-ceiling)
+explain which path to choose.
 
 ## Install, then differentiate
 
@@ -144,43 +199,6 @@ does not acquire a derivative at its jump. See the
 [partition API](docs/api/partition.md) for hardening, regional models and
 scoped soft-to-hard certificates.
 
-## Performance you can inspect
-
-![Derivative evaluation time versus order for PyTorch eager and JAX compiled execution, including nested autodiff and JAX Taylor-mode baselines.](docs/img/derivative-benchmark.svg)
-
-This run measures **input-derivative evaluation**, not end-to-end training:
-a `1 → 8 → 8 → 1` tanh MLP, 128 points, float64, CPU, fixed weights and seed,
-nine timed repeats. JAX timings synchronize results and exclude compilation;
-PyTorch runs eagerly with one thread. Compare methods within each panel:
-framework execution and thread policies differ.
-
-| Order | Torch nested AD | Torch omnibias | JAX nested AD | JAX Taylor AD | JAX omnibias |
-| --- | ---: | ---: | ---: | ---: | ---: |
-| 2 | **0.211 ms** | 0.261 ms | **0.016 ms** | 0.024 ms | 0.024 ms |
-| 4 | 0.799 ms | **0.481 ms** | 0.064 ms | 0.034 ms | **0.029 ms** |
-| 6 | 4.885 ms | **0.703 ms** | 0.309 ms | **0.077 ms** | 0.147 ms |
-
-At order six, omnibias was **6.9× faster than nested PyTorch autograd** in this
-run. At order two, nested autodiff won in both backends.
-JAX's existing Taylor-mode `jet` also beat omnibias at order six. Taylor-mode AD is an
-important alternative, and the comparison includes it rather than treating
-nested autodiff as the only baseline.
-
-The [measurement artifact](docs/benchmarks/readme_derivatives.json) records
-every result, separate compilation and first-call times, sample timings,
-source hashes, working-tree status, versions and independent **80-digit mpmath**
-accuracy checks. A dirty working tree labels its recorded revision as the base
-commit; source hashes identify the measured files.
-Rerun the bounded experiment on your hardware:
-
-```bash
-uv run python benchmarks/readme_derivatives.py
-```
-
-Results go to `artifacts/`, or `$OMNIBIAS_SCRATCH` when set. The
-[benchmark guide](benchmarks/README.md) covers other derivative workloads.
-Speed depends on architecture, order, batch size, dtype and execution mode.
-
 ## Attach a guarantee to the quantity you actually checked
 
 `omnibias.core.verified` supplies outward-rounded interval arithmetic and
@@ -247,10 +265,33 @@ closed-source use under its terms. The certified optimization tier offers
 **AGPL-3.0-or-later or a commercial agreement**. Package boundaries and license
 metadata are checked in CI; see [Licensing](LICENSING.md) for the exact grants.
 
-Building a product, deploying privately or evaluating a demanding workload?
-Contact **[info@derivon.ai](mailto:info@derivon.ai)** for commercial licensing,
-integration and support. [Derivon](https://derivon.ai/) maintains omnibias.
+## Contact
 
-**[Contribute](CONTRIBUTING.md)** · **[Agent guide](AGENTS.md)** ·
-**[Report an issue](https://github.com/derivon-ai/omnibias/issues)** ·
-**[Security](SECURITY.md)** · **[Cite this project](CITATION.cff)**
+omnibias is built and maintained by **[Derivon](https://derivon.ai/)**.
+See [Governance](GOVERNANCE.md) and [Maintainers](MAINTAINERS.md) for how
+project decisions are made.
+
+| Topic | Contact |
+| --- | --- |
+| Commercial licensing, integration and support | [info@derivon.ai](mailto:info@derivon.ai) |
+| Technical questions and partnerships | [info@derivon.ai](mailto:info@derivon.ai) |
+| Bug reports and feature requests | [GitHub Issues](https://github.com/derivon-ai/omnibias/issues) |
+| Security reports | [Security policy](SECURITY.md) |
+
+Contributions are welcome under the [CLA](CLA.md). Read
+[Contributing](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md),
+and the [agent guide](AGENTS.md) before making a change.
+
+## Citation
+
+```bibtex
+@software{omnibias,
+  title   = {omnibias: closed-form n-th derivatives of activations},
+  author  = {Grigoryants, Vardan},
+  year    = {2026},
+  version = {0.4.0},
+  url     = {https://github.com/derivon-ai/omnibias}
+}
+```
+
+GitHub's “Cite this repository” button reads [CITATION.cff](CITATION.cff).

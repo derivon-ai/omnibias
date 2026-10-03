@@ -38,11 +38,13 @@ def test_committed_measurement_retains_baselines_accuracy_and_compile_cost():
                 assert result["compile_ms"] is None
 
 
-def test_readme_speedup_and_chart_match_the_measurement():
+def test_deep_jet_guide_and_chart_match_the_measurement():
     payload = json.loads(ARTIFACT.read_text())
     methods = next(row["methods"] for row in payload["rows"] if row["order"] == 6)
     expected = round(methods["torch_nested_ad"]["median_ms"] / methods["torch_omnibias"]["median_ms"], 1)
-    readme = (ROOT / "README.md").read_text()
+    readme = (ROOT / "docs/performance.md").read_text().split(
+        "## General deep-network jets\n", 1
+    )[1]
     claim = re.search(r"\*\*([0-9.]+)× faster than nested PyTorch autograd\*\*", readme)
     assert claim is not None
     assert float(claim.group(1)) == pytest.approx(expected)

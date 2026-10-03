@@ -9,11 +9,13 @@ metadata needed to interpret the measurements.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import platform
 import resource
 import statistics
+import subprocess
 import sys
 import time
 from collections.abc import Callable
@@ -90,3 +92,41 @@ def write_json(name: str, payload: dict[str, Any]) -> Path:
     path = output_dir / name
     path.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8")
     return path
+
+
+def measure(function: Callable[[], Any], *, repeats: int = 9, warmup: int = 2) -> dict[str, Any]:
+    """Time synchronous evaluation; preserve individual samples and first-call cost."""
+    def evaluate() -> None:
+        result = function()
+        if hasattr(result, "block_until_ready"):
+            result.block_until_ready()
+
+    start = time.perf_counter()
+    evaluate()
+    first_ms = (time.perf_counter() - start) * 1000
+    for _ in range(warmup):
+        evaluate()
+    samples = []
+    for _ in range(repeats):
+        start = time.perf_counter()
+        evaluate()
+        samples.append((time.perf_counter() - start) * 1000)
+    return {"first_execution_ms": first_ms, "median_ms": statistics.median(samples),
+            "samples_ms": samples}
+
+
+def source_provenance(paths: list[str]) -> dict[str, Any]:
+    """Identify the measured source even when measurements precede their commit."""
+    dirty = bool(subprocess.check_output(
+        ["git", "status", "--porcelain", "--untracked-files=normal"], cwd=REPO_ROOT, text=True
+    ).strip())
+    return {
+        "source_revision": subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
+        ).strip(),
+        "source_worktree_dirty": dirty,
+        "source_revision_kind": "base_commit" if dirty else "exact_commit",
+        "source_sha256": {
+            path: hashlib.sha256((REPO_ROOT / path).read_bytes()).hexdigest() for path in paths
+        },
+    }

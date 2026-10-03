@@ -26,6 +26,7 @@ nav:
   - Home: index.md
   - PINN integration: pinn.md
   - Derivative APIs: derivatives.md
+  - Performance: performance.md
   - Guarantees and limits: guarantees.md
   - Package map: packages.md
   - API entry points:

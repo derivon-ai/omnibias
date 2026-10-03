@@ -5,6 +5,7 @@
 | One activation derivative | `omnibias.torch.activations` | `omnibias.jax.activations` |
 | Network derivatives along a direction | `omnibias.torch.jet` | `omnibias.jax.jet` |
 | All mixed partials through an order | `omnibias.torch.jet_mv` | `omnibias.jax.jet_mv` |
+| Direct one-layer or deep Laplacian | `omnibias.torch.laplacian` | `omnibias.jax.laplacian` |
 | Field gradient, divergence or Laplacian | `omnibias.fields.torch.ops` | `omnibias.fields.jax.ops` |
 
 ## Taylor normalization
@@ -73,3 +74,35 @@ Bias coalescence (`delta → 0`) yields derivatives. Temperature hardening
 (`beta → infinity`) makes a soft partition or relaxation approach a discrete
 choice. These are different limits; a hardening bound is not a derivative
 error bound.
+
+## A deep Laplacian in 5,000 dimensions
+
+When the residual needs a Laplacian, request that contraction directly.
+`deep_field_laplacian` avoids the combinatorial allocation of a full mixed
+jet while keeping gradients into the trainable weights:
+
+```python
+import torch
+from omnibias.torch.laplacian import deep_field_laplacian
+
+dim = 5000
+weight = torch.full((4, dim), 0.01, requires_grad=True)
+layers = [
+    (weight, torch.zeros(4), "tanh"),
+    (torch.eye(4), torch.zeros(4), "tanh"),
+    (torch.ones(1, 4), None, None),
+]
+points = torch.full((2, dim), 0.02)
+laplacian = deep_field_laplacian(points, layers)
+laplacian.square().mean().backward()
+assert laplacian.shape == (2, 1)
+assert weight.grad is not None
+assert bool(torch.all(torch.isfinite(weight.grad)))
+```
+
+For a one-hidden-layer field, `neural_field_polylaplacian` evaluates the
+repeated Laplacian directly from `sigma^(2k)` and weight norms. For deep
+networks, `deep_field_polylaplacian_with_report` distinguishes exact support
+enumeration from the sampled fallback. Read the
+[dimension and accuracy contract](guarantees.md#laplacians-without-the-mixed-jet-dimension-ceiling)
+before choosing between these APIs and full mixed derivatives.

@@ -20,6 +20,42 @@ size remains even when the derivatives are computed without nested autodiff.
 The Riccati directional composition path is quadratic in order; the general
 composition path is cubic. Benchmark the actual model and requested orders.
 
+## Laplacians without the mixed-jet dimension ceiling
+
+The specialized one-hidden-layer operator uses
+`Delta^k f(x) = sum_h c_h sigma^(2k)(w_h.x + beta_h) ||w_h||^(2k)`.
+It contracts the requested operator directly, avoiding a dense Hessian or a
+full order-`2k` derivative tensor. Computing the preactivations still costs
+work proportional to the input dimension. Tanh's individual derivative
+fastpath evaluates one tanh and a polynomial of degree `n + 1`: one activation
+evaluation is not constant total arithmetic as `n` grows.
+
+Deep linear-chain MLPs also have a direct `deep_field_laplacian` path. It
+propagates activation Jacobians and Laplacians without allocating a `D x D`
+identity or enumerating mixed partials. For fixed depth and layer widths, its
+work and memory grow linearly with input dimension `D`. Both backends include
+a 5,000-dimensional regression beyond the full mixed-jet allocation budget.
+There is no fixed input-dimension cap on this path; available memory and
+compute still bound a practical run. Parameter gradients are retained.
+
+Deep repeated Laplacians have three explicit modes:
+
+| Requested operator | Method | Meaning of the result |
+| --- | --- | --- |
+| `k = 1` | Forward Laplacian | Exact differentiation, subject to floating-point rounding |
+| `k >= 2`, `support` | Jets over coordinate supports of size at most `k` | Exact differentiation; work grows with the number of supports |
+| `k >= 2`, `estimator` | Sampled directional derivatives | Unbiased in expectation; a finite run is an estimate |
+
+`auto` selects support enumeration or sampling according to the budget;
+explicitly forcing `support` bypasses that budget. Use
+`deep_field_polylaplacian_with_report` to inspect the selected method. Its
+current concentration report uses the observed range from the first batch
+element and output. Treat that report as a diagnostic, not a validated
+confidence bound for unseen draws or other outputs. Sampling is not an exact
+finite-sample value or an interval-arithmetic proof. Full Hessians,
+full mixed jets and other architectures do not inherit the contraction path's
+dimension behavior.
+
 ## Precision and training
 
 Core coefficients are shared across backends. Framework functions, devices,

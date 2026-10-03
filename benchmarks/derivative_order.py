@@ -14,7 +14,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _common import enable_x64, median_time_ms, provenance, write_json  # noqa: E402
+from _common import enable_x64, measure, provenance, source_provenance, write_json  # noqa: E402
 from _reference import derivative_reference, error_metrics  # noqa: E402
 
 enable_x64()
@@ -32,7 +32,7 @@ N_POINTS = 20_000
 ORDERS = list(range(1, 9))
 H_FD = 5e-2
 WARMUP = 2
-REPEATS = 5
+REPEATS = 9
 REFERENCE_POINTS = 33
 
 
@@ -45,6 +45,7 @@ def _fd_nth(values_on_pad: np.ndarray, n: int, h: float) -> np.ndarray:
 
 
 def main() -> None:
+    torch.set_num_threads(1)
     spec_t = torch_get("tanh")
     spec_j = jax_get("tanh")
     torch_fastpath = spec_t.fastpath
@@ -61,7 +62,8 @@ def main() -> None:
         def cf(nn: int = n) -> torch.Tensor:
             return torch_fastpath(zt, nn)
 
-        t_cf = median_time_ms(cf, warmup=WARMUP, repeats=REPEATS)
+        measured_cf = measure(cf, warmup=WARMUP, repeats=REPEATS)
+        t_cf = measured_cf["median_ms"]
         closed_form = cf().detach().numpy()
         reference = derivative_reference(mp.tanh, z_np[reference_indices], n)
 
@@ -69,16 +71,20 @@ def main() -> None:
         def nested(nn: int = n) -> torch.Tensor:
             zz = zt.clone().requires_grad_(True)
             y = spec_t.forward(zz).sum()
-            g = torch.autograd.grad(y, zz, create_graph=True)[0]
-            for _ in range(nn - 1):
-                g = torch.autograd.grad(g.sum(), zz, create_graph=True)[0]
+            g = torch.autograd.grad(y, zz, create_graph=nn > 1)[0]
+            for depth in range(nn - 1):
+                g = torch.autograd.grad(g.sum(), zz, create_graph=depth < nn - 2)[0]
             return g
 
-        t_ag = median_time_ms(nested, warmup=max(1, WARMUP - 1), repeats=3)
+        measured_ag = measure(nested, warmup=WARMUP, repeats=REPEATS)
+        t_ag = measured_ag["median_ms"]
         ag = nested().detach().numpy()
 
         # jax closed-form (parity)
         jv = np.asarray(jax_fastpath(zj, n), dtype=np.float64)
+
+        for values in (closed_form, ag, jv):
+            np.testing.assert_allclose(values[reference_indices], reference, rtol=2e-10, atol=1e-9)
 
         # finite differences
         half = n + 2
@@ -90,6 +96,7 @@ def main() -> None:
         rows.append(
             {
                 "n": n,
+                "measurements": {"closed_form": measured_cf, "nested_autograd": measured_ag},
                 "time_ms": {
                     "closed_form": round(t_cf, 4),
                     "nested_autograd": round(t_ag, 4),
@@ -111,7 +118,7 @@ def main() -> None:
         )
 
     payload = provenance(
-        schema="omnibias/derivative-order/v2",
+        schema="omnibias/derivative-order/v3",
         config={
             "activation": "tanh",
             "n_points": N_POINTS,
@@ -121,8 +128,18 @@ def main() -> None:
             "reference": "mpmath.diff(tanh), 80 decimal digits, rounded to float64",
             "reference_points": REFERENCE_POINTS,
             "relative_error_floor": 1e-3,
+            "torch_threads": 1, "repeats": REPEATS, "warmup": WARMUP,
+            "execution": "PyTorch eager, one CPU thread; JAX closed form for accuracy only",
+            "timing_scope": "activation derivative evaluation only; final derivative graph not retained",
+            "accuracy_rtol": 2e-10, "accuracy_atol": 1e-9,
         },
     )
+    payload.update(source_provenance([
+        "benchmarks/derivative_order.py", "benchmarks/_common.py", "benchmarks/_reference.py",
+        "packages/omnibias-torch/src/omnibias/torch/fastpath/legendre.py",
+        "packages/omnibias-jax/src/omnibias/jax/_fastpath.py",
+        "packages/omnibias-core/src/omnibias/core/polynomials.py",
+    ]))
     payload["rows"] = rows
     path = write_json("derivative_order.json", payload)
     print(f"wrote {path}")
