@@ -86,5 +86,8 @@ artifacts/
 # Local build / scratch outputs
 out/
 
+# Private GitHub setup configuration (paths only; credentials stay outside the repo).
+/.local/github/
+
 # CatBoost writes this next to the process cwd during tabular baselines.
 catboost_info/

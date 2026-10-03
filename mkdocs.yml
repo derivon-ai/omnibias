@@ -24,6 +24,7 @@ markdown_extensions:
 
 nav:
   - Home: index.md
+  - Capabilities and mechanisms: capabilities.md
   - PINN integration: pinn.md
   - Derivative APIs: derivatives.md
   - Performance: performance.md

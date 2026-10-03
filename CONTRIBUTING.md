@@ -31,3 +31,35 @@ records the signature.
 
 Maintainers: [RELEASE.md](RELEASE.md) describes independent package releases and
 Trusted Publishing setup.
+
+## Maintaining CLA authentication
+
+CLA Assistant stores signatures in the private `derivon-ai/cla-signatures`
+repository on its initialized `main` branch. Its fine-grained token needs
+that repository selected under resource owner `derivon-ai`, with **Contents:
+read and write** and any required organization approval. The normal GitHub CLI
+login separately needs permission to manage secrets in `derivon-ai/omnibias`.
+
+Create `.local/github/cla.yml` (git-ignored) containing paths and settings only:
+
+```yaml
+token_file: ~/.config/omnibias/cla-token
+repository: derivon-ai/omnibias
+signatures_repository: derivon-ai/cla-signatures
+branch: main
+```
+
+Point `token_file` to the existing file containing one token. Keep that file
+outside the checkout. Check access, then upload directly to the Actions secret:
+
+```bash
+uv run --group docs python scripts/setup_cla_secret.py
+uv run --group docs python scripts/setup_cla_secret.py --apply
+```
+
+The helper never displays or copies the token into YAML; upload uses standard
+input with command output captured. A 404 can mean missing repository access
+or a missing branch. A successful preflight checks read access; the token still
+needs write permission for signature persistence. Let CLA Assistant create its
+signature file, then rerun the failed workflow. An unsigned contributor must
+personally accept the CLA; authentication setup does not provide a signature.

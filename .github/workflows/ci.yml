@@ -26,6 +26,7 @@ jobs:
       - run: uv run --no-sync mypy --strict packages/omnibias-core/src packages/omnibias-torch/src packages/omnibias-jax/src
       - run: uv run --no-sync python scripts/license_headers.py --check
       - run: uv run --no-sync python scripts/generate_inventory.py --check
+      - run: uv run --no-sync python scripts/generate_capability_evidence.py --check
       - run: uv run --no-sync pytest tests -q
       - run: uv run --no-sync mkdocs build --strict
       - name: Build distributions and verify packaging

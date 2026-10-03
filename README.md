@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(max-width: 600px)" srcset="docs/img/omnibias-hero-mobile.svg">
-  <img src="docs/img/omnibias-hero.svg" width="1280" alt="omnibias — high-order derivatives, direct and trainable. Riccati derivative polynomials and tanh derivative curves.">
+  <img src="docs/img/omnibias-hero.svg" width="1280" alt="omnibias. Math that trains. Differentiate deeper. Make decisions differentiable.">
 </picture>
 
 [![CI](https://github.com/derivon-ai/omnibias/actions/workflows/ci.yml/badge.svg)](https://github.com/derivon-ai/omnibias/actions/workflows/ci.yml)
@@ -16,39 +16,45 @@
 Train physics-informed networks with derivative towers—and extend them with
 smooth, trainable decisions.
 
-omnibias is a mathematical foundation for **Physics-Informed Neural Networks
-(PINNs)** and differentiable models. It turns activation identities into
-reusable derivative towers, propagates Taylor jets through supported networks,
-and provides smooth routing primitives for models with trainable decisions.
-Spatial derivatives remain differentiable with respect to model parameters:
-build a physics residual, a regional model or a soft tree, then train it with
-the optimizer that fits your problem.
+omnibias turns activation identities into derivative towers, trainable fields
+and smooth decisions. It **removes the nested high-order spatial-autodiff
+bottleneck for supported models**: derivatives travel forward through the
+network, without recursively growing backward graphs. Parameter gradients
+remain available for learning. Build high-order physics residuals, regional
+models and soft trees on the same mathematical foundation.
 
 **[Start with a PINN →](docs/pinn.md)** ·
 **[Choose an API →](docs/derivatives.md)** ·
-**[Explore the packages →](docs/packages.md)** ·
+**[What this unlocks →](docs/capabilities.md)** ·
 **[Commercial support →](mailto:info@derivon.ai)**
 
-## The expensive derivative does not have to be another backward pass
+## Differentiate deeper
 
-A fourth-order PDE residual needs fourth spatial derivatives. Building those
-by repeatedly differentiating a reverse-mode graph can make graph construction,
-memory and evaluation dominate the actual learning problem. Computing many
-mixed partials compounds the cost.
+Repeated spatial autodiff can make graph construction, memory and evaluation
+explode as derivative order rises. That growth can make a
+high-order PINN residual impractical before training begins.
 
-omnibias takes a direct route. For supported activations, polynomial recurrences
-evaluate `σ⁽ⁿ⁾(z)` without recursive autodiff. Sigmoid and tanh need **one base
-activation evaluation plus a derivative polynomial**, regardless of the number
-of backward passes a nested approach would build. Taylor composition carries these
-derivatives through affine layers and nonlinearities. A single propagation
-returns the requested directional jet; a multivariate jet returns mixed
-partials. The spatial derivative is an ordinary differentiable tensor
-expression, so parameter training still uses the framework you already know.
+omnibias evaluates supported `σ⁽ⁿ⁾(z)` directly, then composes Taylor jets
+through the network. Sigmoid and tanh need **one base activation evaluation
+plus a derivative polynomial**. Specialized operator contractions avoid
+building derivative tensors that the residual never needs. This bypasses the
+nested graph bottleneck. High-order numerical instability is checked separately
+against independent references: direct formulas can still suffer floating-point
+cancellation, and their arithmetic grows with order.
 
-The result is a practical separation: **forward propagation for spatial
-derivatives, ordinary autodiff for parameter learning**. It is useful wherever
-a loss depends on derivatives of a learned function—not only PINNs, but also
-curvature-sensitive objectives and derivative-based scientific models.
+The founding idea is **bias collapse**. A properly weighted, normalized pack
+of nearby activations converges to a derivative:
+
+$$
+\lim_{\delta\to0}\frac{1}{\delta^n}
+\sum_{j=0}^{n}(-1)^{n-j}\binom{n}{j}\sigma(z+j\delta)
+=\sigma^{(n)}(z).
+$$
+
+The kernels evaluate the analytic limit, avoiding subtraction of nearly equal
+samples. Shared polynomial recurrences supply the backends; Taylor composition
+supplies the network derivatives. **Forward spatial derivatives. Ordinary
+parameter autodiff.**
 
 | Build with | What omnibias provides |
 | --- | --- |
@@ -58,17 +64,16 @@ curvature-sensitive objectives and derivative-based scientific models.
 | **Curvature-aware learning** | Parameter-curvature primitives and optimizers for supported objectives |
 | **Scoped numerical guarantees** | Outward-rounded intervals, Taylor models and checker-backed certificates |
 
-PyTorch and JAX provide the network-jet APIs. Keras 3 provides activation and
-operator layers across its supported backends. These are complementary
-surfaces; choose the backend and primitive your application actually needs.
+PyTorch and JAX provide network jets; Keras 3 provides activation and operator
+layers. The [capability map](docs/capabilities.md) connects each mechanism to
+its API and evidence.
 
 ## Derivative performance, by workload
 
-Activation derivatives, direct Laplacians and general deep-network jets use
-separate algorithms. The specialized paths exploit activation identities and
-operator contractions; composing every derivative through a deep MLP does
-more work. See the [full measurements](docs/performance.md) for all baselines,
-accuracy checks, compilation costs and reproduction commands.
+Activation derivatives, direct Laplacians and general deep-network jets are
+different workloads. These specialized paths exploit activation identities
+and operator contractions. [Full measurements](docs/performance.md) include
+accuracy, compilation, reproduction commands and every baseline.
 
 | Workload | omnibias | Baseline | Speedup |
 | --- | ---: | ---: | ---: |
@@ -124,9 +129,8 @@ pip install omnibias-torch
 # Alternatives: omnibias-jax or omnibias-keras
 ```
 
-This README describes the current source tree. Published packages can lag the
-branch, especially alpha extensions. To run both examples against this exact
-checkout, install the workspace; no application repository is required:
+Published packages can lag this branch. To run both examples against this
+exact checkout, install the primitive workspace:
 
 ```bash
 git clone https://github.com/derivon-ai/omnibias.git
@@ -155,18 +159,16 @@ loss.backward()
 assert weight.grad is not None
 ```
 
-This is a derivative-and-gradient demonstration. A PDE solution also needs
-appropriate boundary conditions, collocation and independent validation.
-The [PINN guide](docs/pinn.md) adds those ingredients and an optimizer step;
+The [PINN guide](docs/pinn.md) adds boundary conditions and an optimizer step;
 the [derivative guide](docs/derivatives.md) covers mixed partials and JAX.
+A derivative demonstration is the starting point for a validated PDE solution.
 
-## Give your network a smooth if/else
+## Make decisions differentiable
 
-A hard split routes an input to one branch. A soft split learns the routing:
-`g(x) = sigmoid(β(w·x − t))`. Two branches become
-`(1 − g)·f₀(x) + g·f₁(x)`, keeping gradients into the threshold, split direction
-and branch models. Multiple splits form nonnegative regional weights that sum
-to one. This lets conditional structure participate in learning.
+A smooth if/else learns its routing: `g(x) = sigmoid(β(w·x − t))`.
+Two branches become `(1 − g)·f₀(x) + g·f₁(x)`, with gradients into thresholds,
+split directions and branch models. Multiple splits form nonnegative regional
+weights that sum to one. Conditional structure becomes trainable.
 
 **A two-leaf soft tree with trainable regional models:**
 
@@ -193,36 +195,47 @@ GBM-style Newton boosting and trainable neural/tree compositions on these
 primitives; those are distinct training paths, not an automatic conversion
 of an existing hard GBM into a differentiable network.
 
-Increasing `β` sharpens routing toward a hard partition away from split ties.
-The finite-temperature model is the differentiable one; an exact hard if/else
-does not acquire a derivative at its jump. See the
-[partition API](docs/api/partition.md) for hardening, regional models and
-scoped soft-to-hard certificates.
+**Temperature hardening** (`β → ∞`) approaches a hard partition away from
+ties. It is distinct from bias collapse (`δ → 0`): a smooth branch trains with
+gradients; an exact hard jump stays discontinuous. The
+[partition API](docs/api/partition.md) covers regional models and hardening.
 
-## Attach a guarantee to the quantity you actually checked
+## Math that trains
 
-`omnibias.core.verified` supplies outward-rounded interval arithmetic and
-Taylor-model enclosures. Optimization primitives add certificates for their
-supported problems. These tools can bound a stated quantity over a stated
-domain under explicit assumptions; they do not turn a sampled training loss
-into a proof about every point in a continuous domain.
+Derivative-aware residuals also enable **curvature-aware optimization**.
+`omnibias.torch.optim` offers Gauss–Newton, cubic regularization, trust-region
+Newton-CG, natural-gradient and KFAC methods. Parameter curvature is computed
+on the trainable residual; exact Hessian, Gauss–Newton and factorized
+approximations remain distinct choices. The [curvature guide](docs/capabilities.md#curvature-aware-training)
+explains their scope and preserves the historical optimizer evidence.
 
-Certificate digests protect integrity. Formal-verification flags require the
-corresponding checker to pass. This distinction makes the result inspectable:
-read the model, domain, assumptions and earned checks alongside the numerical
-bound. The [guarantees](docs/guarantees.md) define that contract.
+The external **omnibias-pinn** consumer builds four complementary routes on
+this foundation:
+
+| Training obstacle | Constructive route |
+| --- | --- |
+| Time-dependent residuals compete across an interval | Gated causal marching with window handoff |
+| Curved boundaries are difficult to enforce by penalties | Distance-based hard boundary ansätze |
+| Each physical parameter requires another solve | Conditioned neural operators |
+| Gradient descent underfits high frequencies | Multilevel representations and a one-shot least-squares route |
+
+These routes have [historical acceptance evidence](docs/capabilities.md#four-pinn-integration-routes),
+with explicit workloads and remaining limits. They complement the derivative
+engine; no single derivative formula guarantees that every PDE will train.
+
+## Guarantees with a stated scope
+
+Outward-rounded intervals and Taylor models bound supported quantities on
+stated domains. Certificates carry their assumptions; digests protect
+integrity, and verification flags require a checker to pass. A sampled
+residual alone is not a global solution proof. Read the
+[guarantees](docs/guarantees.md) for precision, operator and certificate scope.
 
 ## A small foundation, room for your application
 
-The core owns shared coefficients and combinatorics; backend packages realize
-them as tensors; field and decision primitives compose them. The same
-Riccati identities behind sigmoid and tanh feed higher derivatives without
-duplicating coefficient implementations across frameworks.
-
-Two useful limits remain distinct: shrinking a bias spacing yields a
-derivative, while increasing inverse temperature sharpens a soft decision.
-The [derivative guide](docs/derivatives.md) explains the normalization and
-the [guarantees](docs/guarantees.md) spell out precision and cost.
+Sixteen distributions keep shared algebra, backends and reusable primitives
+here. Solvers and products live in separate repositories. Start with a backend;
+add fields, partitions or curvature when your model needs them.
 
 <!-- BEGIN GENERATED PACKAGE INVENTORY -->
 
@@ -247,16 +260,10 @@ the [guarantees](docs/guarantees.md) spell out precision and cost.
 
 <!-- END GENERATED PACKAGE INVENTORY -->
 
-The table is generated from package metadata. Solvers, products and research
-applications live in separate repositories; they do not expand the primitive
-API by default. A PINN integration can begin with a backend, then add `fields`,
-`partition` or `curvature` as its requirements grow.
-
-High-order derivatives still have floating-point limits. Full mixed jets
-still contain combinatorially many coefficients. Exact differentiation does
-not guarantee good optimization or convergence to a PDE solution. Shared
-coefficients support tested backend parity, not universal bit identity across
-every device and compiler.
+Generated from package metadata; the [package guide](docs/packages.md) includes
+maturity and dependencies. Shared coefficients support tested backend parity,
+not universal bit identity across devices. Full mixed jets still have
+combinatorial size; request the directional derivative or operator you need.
 
 ## Open core. A commercial path when you need one.
 

@@ -4,6 +4,8 @@ This guide uses PyTorch and a scalar network on `0 <= x <= 1`. Its fourth-order
 residual is `d^4u/dx^4 - 24`, with `u(0) = u'(0) = u(1) = u'(1) = 0`.
 The manufactured solution is `x**2 * (1 - x)**2`. A jet computes the spatial
 derivatives; ordinary parameter autodiff differentiates the training loss.
+This removes the need to construct a nested fourth-order spatial-autodiff
+graph while keeping the residual trainable.
 
 Install `omnibias-torch`, then run this complete optimizer step:
 
@@ -56,3 +58,39 @@ For multiple coordinates and mixed partials, see the
 [derivative guide](derivatives.md). For field state, cached activation towers
 and named operators, see [fields](api/fields.md). The higher-level solver is
 a separate consumer repository at `../omnibias_projects/omnibias-pinn/`.
+
+## Choose the next training ingredient
+
+Start with the derivative the residual actually needs. A directional jet
+avoids unnecessary mixed partials; a direct Laplacian avoids constructing a
+full Hessian. The [derivative guide](derivatives.md) includes a deep Laplacian
+with parameter gradients in 5,000 dimensions.
+
+For small and medium smooth objectives, inspect
+`omnibias.torch.optim` for Gauss–Newton, cubic regularization, trust-region
+Newton-CG and structured curvature methods. Distinguish residual-based
+Gauss–Newton from a full loss Hessian, and follow the chosen optimizer's
+closure contract. Compare held-out solution error and wall time, not step
+count alone. The [capability guide](capabilities.md#curvature-aware-training)
+maps the families and preserves historical optimizer results.
+
+For application-level difficulties, the external **omnibias-pinn** consumer
+provides the following module families; these are not part of this workspace:
+
+| Need | Integration route |
+| --- | --- |
+| Respect causal ordering in a time-dependent problem | `train`: gated marching windows with explicit handoff |
+| Enforce supported curved Dirichlet boundaries | `domain`: distance-based constrained fields |
+| Learn a family of parameterized operators | `operator`: conditioned DeepONet and FNO models |
+| Represent and learn higher-frequency structure | `torch.fields` / `jax.fields`: Fourier, multiscale and FBPINN fields; research experiments also compare one-shot least-squares readouts |
+
+Soft regional models are another option: `omnibias.partition` supplies
+trainable gates and a partition of unity, while the consumer supplies the
+PDE-specific coupling. Smooth routing preserves gradients into experts and
+gates; it does not automatically enforce interface conditions.
+
+The [four-route evidence](capabilities.md#four-pinn-integration-routes) states
+what the historical acceptance tests demonstrated and what remains
+problem-dependent. Revalidate the extracted consumers on your workload;
+derivatives, optimization, boundary satisfaction and solution accuracy are
+separate things to measure.
