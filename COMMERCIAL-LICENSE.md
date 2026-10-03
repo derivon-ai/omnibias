@@ -10,20 +10,14 @@
 
 ## First: check whether you actually need one
 
-**Most of omnibias does not require a commercial license, ever.** The 28
-packages in the permissive tier — the derivative tower and everything built
-directly on it, including `omnibias-core`, `omnibias-torch`, `omnibias-jax`,
-`omnibias-keras`, `omnibias-fields`, `omnibias-pinn`, and `omnibias-geometry` —
-are **Apache-2.0**. Ship them in a closed-source product, run them behind a
-hosted API, redistribute them: no copyleft, no §13 disclosure, no conversation
-with us required.
+The 13 permissive distributions in this repository use **Apache-2.0**, including
+`omnibias-core`, `omnibias-torch`, `omnibias-jax`, `omnibias-keras`, and
+`omnibias-fields`. Commercial use is permitted under that license without a
+separate commercial agreement.
 
-This page is only about the **14 copyleft-tier packages**:
-
-`omnibias-verify`, `omnibias-formal`, `omnibias-sos`, `omnibias-dynamics`,
-`omnibias-convex`, `omnibias-discrete`, `omnibias-qubo`, `omnibias-logic`,
-`omnibias-nphard`, `omnibias-submodular`, `omnibias-combinatorics`,
-`omnibias-routing`, `omnibias-tab`, `omnibias-control`.
+This page covers the three dual-licensed distributions retained here:
+`omnibias-convex`, `omnibias-discrete`, and `omnibias-sos`. Extracted projects
+carry their own license files and commercial notices.
 
 Their SPDX expression is `AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial`.
 See [`LICENSING.md`](LICENSING.md) for the full tier table.
@@ -35,7 +29,7 @@ cannot create an obligation by accident.
 
 ## When you need this
 
-You need a commercial license if you use one of the 14 packages above and do
+You need a commercial license if you use one of the three packages above and do
 **not** want to comply with the [GNU AGPL-3.0](LICENSES/AGPL-3.0-or-later.txt)
 — most commonly because you intend to:
 

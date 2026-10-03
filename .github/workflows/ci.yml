@@ -1,41 +1,41 @@
 name: CI
-on: [push, pull_request, workflow_dispatch]
+on: [push, pull_request, workflow_dispatch, workflow_call]
 permissions:
   contents: read
 concurrency:
-  group: ci-${{ github.ref }}
+  group: ${{ github.workflow }}-ci-${{ github.ref }}
   cancel-in-progress: true
 jobs:
   quality:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     env:
       KERAS_BACKEND: torch
       JAX_PLATFORMS: cpu
       OMP_NUM_THREADS: '2'
       OMNIBIAS_DOCS_SNIPPETS_STRICT: '1'
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
       - run: uv sync --locked --all-packages --group docs --python 3.12
-      - run: uv run ruff check packages tests scripts benchmarks
-      - run: uv run mypy --strict packages/omnibias-core/src packages/omnibias-torch/src packages/omnibias-jax/src
-      - run: uv run python scripts/license_headers.py --check
-      - run: uv run pytest tests -q
-      - run: uv run mkdocs build --strict
+      - run: uv run --no-sync ruff check packages tests scripts benchmarks
+      - run: uv run --no-sync mypy --strict packages/omnibias-core/src packages/omnibias-torch/src packages/omnibias-jax/src
+      - run: uv run --no-sync python scripts/license_headers.py --check
+      - run: uv run --no-sync pytest tests -q
+      - run: uv run --no-sync mkdocs build --strict
       - name: Build distributions and verify packaging
         run: |
           for package in packages/*; do
             uv build "$package" --out-dir dist
           done
-          uv run python scripts/check_packaging.py
-          uv run twine check dist/*
+          uv run --no-sync python scripts/check_packaging.py
+          uv run --no-sync twine check dist/*
       - name: Test installed wheels
         run: |
           uv venv /tmp/omnibias-wheels --python 3.12
           uv pip install --python /tmp/omnibias-wheels/bin/python dist/*.whl mpmath
           /tmp/omnibias-wheels/bin/python scripts/import_smoke.py
   package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -45,24 +45,24 @@ jobs:
       JAX_PLATFORMS: cpu
       OMP_NUM_THREADS: '2'
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
       - run: uv sync --locked --all-packages --python 3.12
-      - run: uv run pytest packages/omnibias-${{ matrix.package }}/tests -q
+      - run: uv run --no-sync pytest packages/omnibias-${{ matrix.package }}/tests -q
   core-python:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
         python-version: ['3.10', '3.11', '3.12', '3.13', '3.14']
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
       - run: uv venv --python ${{ matrix.python-version }}
       - run: uv pip install -e 'packages/omnibias-core[test]' hypothesis
       - run: .venv/bin/python -m pytest packages/omnibias-core/tests -q
   keras-backends:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
       matrix:
@@ -72,14 +72,14 @@ jobs:
       JAX_PLATFORMS: cpu
       OMP_NUM_THREADS: '2'
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
-      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: astral-sh/setup-uv@37802adc94f370d6bfd71619e3f0bf239e1f3b78
       - run: uv sync --locked --all-packages --python 3.12 --extra tf
-      - run: uv run pytest packages/omnibias-keras/tests tests/test_keras_parity.py -q
+      - run: uv run --no-sync pytest packages/omnibias-keras/tests tests/test_keras_parity.py -q
   kernel:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
       - name: Install pinned Lean toolchain
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh | sh -s -- -y --default-toolchain none

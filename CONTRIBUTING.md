@@ -28,3 +28,6 @@ Review [LICENSING.md](LICENSING.md) before adding cross-package dependencies.
 
 Contributions require acceptance of the existing [CLA](CLA.md); the PR bot
 records the signature.
+
+Maintainers: [RELEASE.md](RELEASE.md) describes independent package releases and
+Trusted Publishing setup.
