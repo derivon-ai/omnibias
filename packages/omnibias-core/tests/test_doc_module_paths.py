@@ -43,6 +43,7 @@ ALLOWLIST: frozenset[str] = frozenset(
         "omnibias.md",  # the always-apply rule file .cursor/rules/omnibias.md
         "omnibias.ipynb",  # a notebook filename
         "omnibias.ai",  # the documentation domain, https://omnibias.ai/
+        "omnibias.git",  # repository clone URL suffix, not a Python module
         # TOML table paths in the root pyproject, not importable modules.
         "omnibias.license_tiers",
         "omnibias.license_expressions",
