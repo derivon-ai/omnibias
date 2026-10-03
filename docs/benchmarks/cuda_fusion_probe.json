@@ -1,0 +1,54 @@
+{
+  "torch": "2.12.1+cu130",
+  "device": "NVIDIA T1200 Laptop GPU",
+  "dtype": "float64",
+  "points": 20000,
+  "input_interval": [
+    -2,
+    2
+  ],
+  "warmups": 5,
+  "repeats": 25,
+  "oracle_points": [
+    -0.9,
+    -0.3,
+    0,
+    0.3,
+    0.9
+  ],
+  "scope": "activation-only forward runtime; sample gradient correctness",
+  "results": [
+    {
+      "order": 4,
+      "median_gpu_event_ms": {
+        "eager": 0.08796799927949905,
+        "compiled": 0.11856000125408173
+      },
+      "compile_and_first_call_seconds": 1.4077964609896298,
+      "max_absolute_error_80_digit_oracle": {
+        "eager": 4.440892098500626e-16,
+        "compiled": 4.440892098500626e-16
+      },
+      "max_gradient_absolute_error_80_digit_oracle": {
+        "eager": 2.6645352591003757e-15,
+        "compiled": 8.881784197001252e-16
+      }
+    },
+    {
+      "order": 8,
+      "median_gpu_event_ms": {
+        "eager": 0.13913600146770477,
+        "compiled": 0.06963200122117996
+      },
+      "compile_and_first_call_seconds": 0.39175674598664045,
+      "max_absolute_error_80_digit_oracle": {
+        "eager": 2.1600499167107046e-12,
+        "compiled": 2.7284841053187847e-12
+      },
+      "max_gradient_absolute_error_80_digit_oracle": {
+        "eager": 9.094947017729282e-12,
+        "compiled": 1.0345502232667059e-11
+      }
+    }
+  ]
+}

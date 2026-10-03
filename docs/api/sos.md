@@ -7,7 +7,7 @@ Polynomial positivity certificates.
 - `Polynomial`, `MonomialBasis`, `SOSProblem`: polynomial problem data.
 - `certify_sos`, `certify_sos_rational`: construct checked decompositions.
 - `certify_nonneg_on_set`: constrained positivity.
-- `replay_sos_certificate`: replay the certificate's finite checks.
+- `lean_check_sos`: check supported finite obligations with the optional Lean kernel.
 
 A valid decomposition proves the stated polynomial claim on its specified
 set. Failure to find a decomposition is inconclusive. Numerical solver output,

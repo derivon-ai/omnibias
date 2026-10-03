@@ -56,6 +56,15 @@ samples. Shared polynomial recurrences supply the backends; Taylor composition
 supplies the network derivatives. **Forward spatial derivatives. Ordinary
 parameter autodiff.**
 
+<details>
+<summary>Watch bias collapse: nearby activations become a derivative</summary>
+
+![Bias collapse, illustrated with tanh](docs/img/explain/bias-collapse.gif)
+
+[Static image](docs/img/explain/bias-collapse.png). The animation illustrates
+the limit; runtime kernels evaluate its analytic formula directly.
+</details>
+
 | Build with | What omnibias provides |
 | --- | --- |
 | **High-order physics residuals** | Directional jets, mixed partials, specialized Laplacian and repeated-Laplacian paths |
@@ -199,6 +208,15 @@ of an existing hard GBM into a differentiable network.
 ties. It is distinct from bias collapse (`δ → 0`): a smooth branch trains with
 gradients; an exact hard jump stays discontinuous. The
 [partition API](docs/api/partition.md) covers regional models and hardening.
+
+<details>
+<summary>Watch temperature collapse: smooth gates become sharper decisions</summary>
+
+![Temperature collapse and a mixture of regional experts](docs/img/explain/temperature-collapse.gif)
+
+[Static image](docs/img/explain/temperature-collapse.png). Finite temperature
+keeps the route smooth; the hard limit needs an explicit tie policy.
+</details>
 
 ## Math that trains
 

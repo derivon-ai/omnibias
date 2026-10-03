@@ -34,6 +34,7 @@ nav:
   - Commercial strategy: commercial-strategy.md
   - Numerical maintenance: development/numerical-contracts.md
   - Migration validation: development/open-core-migration.md
+  - Merge-readiness audit: development/merge-readiness-audit.md
   - API entry points:
       - core: api/core.md
       - torch: api/torch.md
