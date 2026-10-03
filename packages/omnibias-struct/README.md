@@ -12,4 +12,8 @@ python -m pytest packages/omnibias-struct/tests -q
 ```
 
 See the [main guide](../../README.md) for architecture and supported workflows.
-License: Apache-2.0; see [LICENSE](LICENSE).
+License: AGPL-3.0-or-later **or commercial**; see [LICENSE](LICENSE).
+
+This source edition adopts the dual license prospectively; earlier Apache grants
+remain available under their original terms. See [NOTICE](NOTICE) and
+[commercial licensing](COMMERCIAL-LICENSE.md).

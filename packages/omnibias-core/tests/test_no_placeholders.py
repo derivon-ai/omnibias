@@ -59,6 +59,8 @@ def _guarded_files() -> list[Path]:
     files += REPO_ROOT.glob("scripts/*")
     files += REPO_ROOT.glob("examples/**/*.sh")
     files += REPO_ROOT.glob("examples/**/*.py")
+    files += REPO_ROOT.glob(".agents/skills/**/*.md")
+    files += REPO_ROOT.glob(".cursor/rules/*.mdc")
     files += REPO_ROOT.glob(".cursor/skills/**/*.md")
     files += REPO_ROOT.glob(".claude/skills/**/*.md")
     for rel in _LEGAL_DOCS:

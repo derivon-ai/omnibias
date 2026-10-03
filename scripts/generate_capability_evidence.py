@@ -13,12 +13,7 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
-TARGETS = (
-    "AGENTS.md",
-    ".cursor/rules/omnibias.md",
-    ".cursor/skills/omnibias-backends/SKILL.md",
-    ".cursor/skills/omnibias-pinn/SKILL.md",
-)
+TARGETS = (".cursor/rules/omnibias.mdc",)
 ARTIFACTS = ("derivative_order", "laplacian_scaling", "polylaplacian_order")
 BEGIN = "<!-- BEGIN GENERATED CAPABILITY EVIDENCE -->"
 END = "<!-- END GENERATED CAPABILITY EVIDENCE -->"

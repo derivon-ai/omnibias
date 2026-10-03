@@ -27,7 +27,7 @@ Version **0.1.0a1** · Python **>=3.10** · **3 - Alpha** · Apache-2.0
 
 [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-difference/src/omnibias/difference). Modules below are relative to `omnibias.difference`; underscored modules are internal.
 
-`jax`, `singularity`, `torch`, `umbral`, `validation`.
+`jax`, `recurrence`, `singularity`, `torch`, `umbral`, `validation`.
 
 Exports from `omnibias.difference`:
 

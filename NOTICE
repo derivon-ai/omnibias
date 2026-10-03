@@ -4,8 +4,8 @@ Copyright (C) 2026 Derivon
 omnibias was founded and authored by Vardan Grigoryants.
 
 Packages have separate licenses: Apache-2.0 for the permissive infrastructure,
-and AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial for the certified
-optimization tier. LICENSING.md and each package's LICENSE identify its terms.
+and AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial for the advanced
+optimization and decision tier. LICENSING.md and each package's LICENSE identify its terms.
 
 The repository-root LICENSE is AGPL and does not override package-specific
 grants. A commercial grant requires a signed agreement from Derivon; contact

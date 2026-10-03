@@ -7,7 +7,7 @@ The derivative and field infrastructure is **Apache-2.0**. Use it in research,
 commercial software, private deployments and closed-source products under the
 Apache terms. A separate commercial license is not required for that tier.
 
-The certified optimization tier is available under **AGPL-3.0-or-later OR
+The advanced optimization and decision tier is available under **AGPL-3.0-or-later OR
 LicenseRef-omnibias-Commercial**. Follow the AGPL terms, or obtain a signed
 commercial agreement from **[info@derivon.ai](mailto:info@derivon.ai)**. See the
 [commercial offer](COMMERCIAL-LICENSE.md) for licensing, support and deployment
@@ -16,15 +16,15 @@ options.
 ## Package licenses
 
 This inventory is generated from package metadata and the license-tier registry.
-Each distribution ships its own license; repository separation changes neither
-its existing grants nor its package license.
+Each distribution ships its own license. The prospective transition below changes
+selected future source editions while preserving historical grants.
 
 <!-- BEGIN GENERATED LICENSE INVENTORY -->
 
 | License choice | Distributions |
 | --- | --- |
-| AGPL-3.0-or-later **or commercial** | [convex](packages/omnibias-convex/LICENSE), [discrete](packages/omnibias-discrete/LICENSE), [sos](packages/omnibias-sos/LICENSE) |
-| Apache-2.0 | [binary](packages/omnibias-binary/LICENSE), [boolean](packages/omnibias-boolean/LICENSE), [core](packages/omnibias-core/LICENSE), [curvature](packages/omnibias-curvature/LICENSE), [difference](packages/omnibias-difference/LICENSE), [fields](packages/omnibias-fields/LICENSE), [graph](packages/omnibias-graph/LICENSE), [jax](packages/omnibias-jax/LICENSE), [keras](packages/omnibias-keras/LICENSE), [partition](packages/omnibias-partition/LICENSE), [qcalculus](packages/omnibias-qcalculus/LICENSE), [struct](packages/omnibias-struct/LICENSE), [torch](packages/omnibias-torch/LICENSE) |
+| AGPL-3.0-or-later **or commercial** | [convex](packages/omnibias-convex/LICENSE), [curvature](packages/omnibias-curvature/LICENSE), [discrete](packages/omnibias-discrete/LICENSE), [graph](packages/omnibias-graph/LICENSE), [partition](packages/omnibias-partition/LICENSE), [sos](packages/omnibias-sos/LICENSE), [struct](packages/omnibias-struct/LICENSE) |
+| Apache-2.0 | [binary](packages/omnibias-binary/LICENSE), [boolean](packages/omnibias-boolean/LICENSE), [core](packages/omnibias-core/LICENSE), [difference](packages/omnibias-difference/LICENSE), [fields](packages/omnibias-fields/LICENSE), [jax](packages/omnibias-jax/LICENSE), [keras](packages/omnibias-keras/LICENSE), [qcalculus](packages/omnibias-qcalculus/LICENSE), [torch](packages/omnibias-torch/LICENSE) |
 
 <!-- END GENERATED LICENSE INVENTORY -->
 
@@ -57,3 +57,20 @@ Apache or dual-license grant. Read the package license when selecting a dependen
 Contributors retain their copyright and grant the rights described in the
 [CLA](CLA.md), supporting both licensing tiers. Neither tier grants rights to
 the omnibias name or logo; see [TRADEMARKS.md](TRADEMARKS.md).
+
+## Prospective transition
+
+The eight previously published packages remain Apache: core, torch, jax, keras,
+fields, FermiNet, PINN and geometry. Future editions of curvature, graph,
+partition and struct join the dual tier; external symbolic, hopfield and shape
+follow their engine dependencies. Difference, qcalculus and holonomic remain Apache.
+
+The [historical inventory](docs/license-transition-baseline.json) records all 44
+versions, license expressions and repository commits before this transition.
+Previously distributed Apache code remains available under those grants,
+including code distributed through GitHub before its first PyPI release.
+This change does not replace old artifacts or revoke existing permissions.
+See [migration details](docs/license-transition.md) before upgrading integrations.
+
+New private industrial products may be offered separately. That policy does not
+restrict the Apache substrate or imply that every commercial AGPL user must pay.

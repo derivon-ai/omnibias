@@ -22,7 +22,10 @@ from email.parser import BytesParser
 from pathlib import Path
 from typing import Any, cast
 
-import tomllib
+if sys.version_info >= (3, 11):
+    import tomllib
+else:
+    import tomli as tomllib
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -73,13 +76,26 @@ def run(command: list[str], *, cwd: Path, log: Path, env: dict[str, str]) -> Non
         raise RuntimeError(f"Command failed ({result.returncode}); see {log}")
 
 
+def build_wheel(project: Path, wheelhouse: Path, *, log: Path, env: dict[str, str]) -> None:
+    """Build from a source archive so deleted modules cannot survive in build/lib."""
+    with tempfile.TemporaryDirectory(prefix="omnibias-sdist-") as scratch:
+        source = Path(scratch)
+        run(["uv", "build", "--sdist", "--no-sources", str(project), "--out-dir", str(source)],
+            cwd=source, log=log, env=env)
+        archives = list(source.glob("*.tar.gz"))
+        if len(archives) != 1:
+            raise ValueError(f"Expected one source archive for {project.name}, got {len(archives)}")
+        run(["uv", "build", "--wheel", "--no-sources", str(archives[0]),
+             "--out-dir", str(wheelhouse)], cwd=source, log=log, env=env)
+
+
 def validate(project: Path, wheel: Path, constraints: Path, output: Path,
              env: dict[str, str], *, numerical: bool) -> dict[str, Any]:
     data = project_data(project)
     name = data["name"]
     profile_path = project / "wheel-tests.toml"
     profile = tomllib.loads(profile_path.read_text()) if profile_path.exists() else {}
-    extras = profile.get("extras", []) if numerical else []
+    extras = profile.get("extras" if numerical else "base_extras", [])
     modules = profile.get("modules" if numerical else "base_modules", []) or [
         "omnibias." + name.removeprefix("omnibias-").replace("-", "_")
     ]
@@ -152,8 +168,7 @@ def main() -> int:
         for project in projects:
             name = project_data(project)["name"]
             print("build", name, flush=True)
-            run(["uv", "build", "--wheel", "--no-sources", str(project), "--out-dir", str(wheelhouse)],
-                cwd=output, log=output / "build.log", env=env)
+            build_wheel(project, wheelhouse, log=output / "build.log", env=env)
     wheels = wheel_index(wheelhouse)
     if set(wheels) != names:
         raise ValueError(f"Wheelhouse coverage differs: {set(wheels) ^ names}")

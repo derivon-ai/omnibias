@@ -60,5 +60,8 @@ def test_primitive_source_does_not_import_external_consumers() -> None:
 
 def test_context_has_one_canonical_guide() -> None:
     assert "AGENTS.md" in (ROOT / "CLAUDE.md").read_text()
-    assert "AGENTS.md" in (ROOT / ".cursor/rules/omnibias.md").read_text()
-    assert not list((ROOT / ".claude/skills").glob("*/SKILL.md"))
+    assert ".cursor/rules/omnibias.mdc" in (ROOT / "AGENTS.md").read_text()
+    assert "AGENTS.md" in (ROOT / ".cursor/rules/omnibias.mdc").read_text()
+    assert {path.parent.name for path in (ROOT / ".agents/skills").glob("*/SKILL.md")} == set(_projects())
+    for retired in (".cursor/skills", ".claude/skills", ".codex/skills"):
+        assert not list((ROOT / retired).rglob("SKILL.md"))

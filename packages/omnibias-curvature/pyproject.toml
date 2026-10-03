@@ -8,8 +8,8 @@ version = "0.1.0a1"
 description = "Closed-form parameter Hessian / Gauss-Newton Fisher / KFAC factors for one-hidden-layer Riccati fields, built on the omnibias closed-form σ' / σ'' primitives."
 readme = "README.md"
 requires-python = ">=3.10"
-license = "Apache-2.0"
-license-files = ["LICENSE"]
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE", "NOTICE", "COMMERCIAL-LICENSE.md"]
 authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
 maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
 keywords = ["second-order-optimization", "fisher-information", "kfac", "riccati", "natural-gradient", "closed-form-hessian"]

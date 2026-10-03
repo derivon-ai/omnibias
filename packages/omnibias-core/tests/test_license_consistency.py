@@ -163,8 +163,10 @@ def test_each_pyproject_declares_its_tier_as_a_pep639_expression() -> None:
             offenders[dist] = f"license is {declared!r}, want the SPDX string {wanted!r}"
         elif declared != wanted:
             offenders[dist] = f"{declared!r} != {wanted!r}"
-        elif project.get("license-files") != ["LICENSE"]:
-            offenders[dist] = f"license-files is {project.get('license-files')!r}, want ['LICENSE']"
+        else:
+            files = project.get("license-files", [])
+            if "LICENSE" not in files or any(not list(pkg_dir.glob(pattern)) for pattern in files):
+                offenders[dist] = f"license-files must include LICENSE and resolve: {files!r}"
     assert not offenders, f"PEP 639 metadata drift: {offenders}"
 
 

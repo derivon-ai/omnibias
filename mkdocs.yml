@@ -30,6 +30,9 @@ nav:
   - Performance: performance.md
   - Guarantees and limits: guarantees.md
   - Package map: packages.md
+  - License transition: license-transition.md
+  - Commercial strategy: commercial-strategy.md
+  - Numerical maintenance: development/numerical-contracts.md
   - API entry points:
       - core: api/core.md
       - torch: api/torch.md

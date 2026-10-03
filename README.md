@@ -9,7 +9,7 @@
 [![Docs](https://img.shields.io/badge/read-the_docs-087f72)](https://omnibias.ai/)
 [![PyPI](https://img.shields.io/pypi/v/omnibias-torch?label=PyPI%20%C2%B7%20torch)](https://pypi.org/project/omnibias-torch/)
 [![Open core](https://img.shields.io/badge/core-Apache--2.0-087f72)](LICENSING.md)
-[![Commercial licensing](https://img.shields.io/badge/certified_tier-AGPL_or_commercial-5964b4)](COMMERCIAL-LICENSE.md)
+[![Commercial licensing](https://img.shields.io/badge/advanced_engines-AGPL_or_commercial-5964b4)](COMMERCIAL-LICENSE.md)
 
 **High-order derivatives without nested spatial autodiff.**
 
@@ -245,17 +245,17 @@ add fields, partitions or curvature when your model needs them.
 | [omnibias-boolean](docs/api/boolean.md) | 0.1.0a1 | Apache-2.0 |
 | [omnibias-convex](docs/api/convex.md) | 0.1.0a1 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-core](docs/api/core.md) | 0.4.0 | Apache-2.0 |
-| [omnibias-curvature](docs/api/curvature.md) | 0.1.0a1 | Apache-2.0 |
+| [omnibias-curvature](docs/api/curvature.md) | 0.1.0a1 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-difference](docs/api/difference.md) | 0.1.0a1 | Apache-2.0 |
 | [omnibias-discrete](docs/api/discrete.md) | 0.1.0a1 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-fields](docs/api/fields.md) | 0.1.0 | Apache-2.0 |
-| [omnibias-graph](docs/api/graph.md) | 0.1.0a1 | Apache-2.0 |
+| [omnibias-graph](docs/api/graph.md) | 0.1.0a1 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-jax](docs/api/jax.md) | 0.4.0 | Apache-2.0 |
 | [omnibias-keras](docs/api/keras.md) | 0.0.1a1 | Apache-2.0 |
-| [omnibias-partition](docs/api/partition.md) | 0.1.0a1 | Apache-2.0 |
+| [omnibias-partition](docs/api/partition.md) | 0.1.0a1 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-qcalculus](docs/api/qcalculus.md) | 0.1.0a1 | Apache-2.0 |
 | [omnibias-sos](docs/api/sos.md) | 0.1.0a1 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-struct](docs/api/struct.md) | 0.1.0a1 | Apache-2.0 |
+| [omnibias-struct](docs/api/struct.md) | 0.1.0a1 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-torch](docs/api/torch.md) | 0.4.0 | Apache-2.0 |
 
 <!-- END GENERATED PACKAGE INVENTORY -->
@@ -268,9 +268,10 @@ combinatorial size; request the directional derivative or operator you need.
 ## Open core. A commercial path when you need one.
 
 The derivative and field packages are **Apache-2.0**, including commercial and
-closed-source use under its terms. The certified optimization tier offers
-**AGPL-3.0-or-later or a commercial agreement**. Package boundaries and license
-metadata are checked in CI; see [Licensing](LICENSING.md) for the exact grants.
+closed-source use under its terms. The advanced optimization and decision tier offers
+**AGPL-3.0-or-later or a commercial agreement**. Historical Apache grants remain
+intact; see the [transition](docs/license-transition.md). Package boundaries and
+license metadata are checked in CI; see [Licensing](LICENSING.md) for the exact grants.
 
 ## Contact
 

@@ -92,6 +92,7 @@ def test_incompatible_protocol_and_ambiguous_workload_fail() -> None:
 
 def test_write_check_and_marker_failure_preserve_authored_guidance(tmp_path: Path, monkeypatch) -> None:
     monkeypatch.setattr(generator, "ROOT", tmp_path)
+    monkeypatch.setattr(generator, "TARGETS", ("first.md", "nested/last.md"))
     data = generator.read_artifacts(ROOT)
     artifacts = tmp_path / "docs/benchmarks"
     artifacts.mkdir(parents=True)

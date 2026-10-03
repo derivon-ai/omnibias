@@ -1,0 +1,5 @@
+# Keras intentionally requires an explicit backend choice.
+base_extras = ["torch"]
+extras = ["torch", "test"]
+base_modules = ["omnibias.keras"]
+modules = ["omnibias.keras"]

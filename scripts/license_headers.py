@@ -131,15 +131,21 @@ def rewrite(text: str, expression: str) -> str:
         prefix.append(lines[i])
         i += 1
 
-    # Drop any existing SPDX / copyright lines in the leading comment block.
+    # Replace SPDX while preserving every existing copyright notice.
+    notices: list[str] = []
     while i < len(lines):
         line = lines[i]
-        if SPDX_LINE.match(line) or COPYRIGHT_LINE.match(line):
+        if COPYRIGHT_LINE.match(line):
+            notices.append(line)
+            i += 1
+            continue
+        if SPDX_LINE.match(line):
             i += 1
             continue
         break
 
-    header = f"# SPDX-License-Identifier: {expression}\n{COPYRIGHT}\n"
+    copyright_text = "".join(notices) if notices else COPYRIGHT + "\n"
+    header = f"# SPDX-License-Identifier: {expression}\n" + copyright_text
     return "".join(prefix) + header + "".join(lines[i:])
 
 

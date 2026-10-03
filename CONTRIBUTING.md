@@ -23,7 +23,8 @@ Use shared core polynomial coefficients, preserve parameter gradients, and
 state numerical and approximation limits. Do not change versions unless the
 release task asks for it.
 
-[AGENTS.md](AGENTS.md) records the numerical and repository contracts.
+[AGENTS.md](AGENTS.md) routes repository maintenance; the
+[numerical contracts](docs/development/numerical-contracts.md) cover shared math invariants.
 Review [LICENSING.md](LICENSING.md) before adding cross-package dependencies.
 
 Contributions require acceptance of the existing [CLA](CLA.md); the PR bot
