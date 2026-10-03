@@ -10,10 +10,9 @@ break: ``test_audit_regressions`` asserts the float32 passthrough, the
 ``test_fastpath_stability`` cases rely on float32 catastrophic cancellation,
 and the float32 :class:`JointOperatorRegressor` path desyncs from its inputs.
 
-The autouse fixture below resets to the process-original default (captured at
-conftest import time, before any test module's import-time set could leak in)
-and restores it afterwards, so every test is hermetic regardless of collection
-order or what any other test sets.
+The autouse fixture sets float32 explicitly for each test and restores its
+incoming state afterwards. Tests requiring float64 use their own fixture.
+Collection order cannot determine the precision contract.
 """
 
 from __future__ import annotations
@@ -21,16 +20,11 @@ from __future__ import annotations
 import pytest
 import torch
 
-# Captured before any test module is imported, so this is the genuine process
-# default (float32) even if a module sets float64 at import time.
-_ORIGINAL_DEFAULT_DTYPE = torch.get_default_dtype()
-
 
 @pytest.fixture(autouse=True)
 def _restore_default_dtype() -> object:
-    if torch.get_default_dtype() is not _ORIGINAL_DEFAULT_DTYPE:
-        torch.set_default_dtype(_ORIGINAL_DEFAULT_DTYPE)
     prev = torch.get_default_dtype()
+    torch.set_default_dtype(torch.float32)
     try:
         yield
     finally:

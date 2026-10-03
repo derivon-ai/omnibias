@@ -51,7 +51,13 @@ docs = ["mkdocs-material>=9.5", "mkdocstrings[python]>=0.24"]
 testpaths = ["packages", "tests"]
 pythonpath = ["tests", "benchmarks", "packages/omnibias-fields/tests", "packages/omnibias-struct/tests"]
 addopts = "-m 'not slow' --import-mode=importlib --strict-markers"
-filterwarnings = ["error", "ignore::DeprecationWarning:torch.*", "ignore::DeprecationWarning:jax.*"]
+filterwarnings = [
+    "error",
+    "ignore::DeprecationWarning:torch.*",
+    "ignore::DeprecationWarning:jax.*",
+    # NumPy 2 copy-keyword warning from Keras' upstream tensor conversion adapter.
+    'ignore:.*__array__ implementation.*copy keyword.*:DeprecationWarning:keras\.src\.backend\.(torch|jax|tensorflow)\.core',
+]
 markers = [
     "slow: expensive optional checks", "slow_gpu: optional GPU check",
     "gpu: requires a GPU", "needs_research: requires an external experiment",
