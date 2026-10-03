@@ -24,6 +24,7 @@ certificate itself.
 
 from __future__ import annotations
 
+import math
 import shutil
 import subprocess
 from collections.abc import Mapping, Sequence
@@ -121,6 +122,20 @@ def generate_obligation(cert: Mapping[str, Any]) -> str | None:
       lies in the point interval ``[0, 0]``).  This is how a special-number identity
       (a Bernoulli recurrence, ``zeta(1-2m) = -B_2m/(2m)``, ...) -- scaled to a
       common ``Int`` denominator -- earns a kernel-checked *equality*, not a sign.
+    * **integer matrix syzygy** -- an ``integer_matrix_syzygy`` payload makes Lean
+      recompute every exact matrix-vector dot product and require zero.
+    * **polynomial identity over Q** -- a ``polynomial_identity_q`` payload carries
+      cleared-denominator coefficient rows and strict rational margins. Lean
+      independently recomputes every integer product/sum and every cross-multiplied
+      positivity inequality. The producer remains responsible for enumerating the
+      polynomial coefficients and Bernstein subdivision leaves.
+    * **rational box-cover tiling** -- a ``box_cover_tiling`` payload carries a
+      recursive axis-bisection tree. Lean reconstructs both child boxes at every
+      split, checks every terminal box exactly, and checks each leaf count is at
+      most the declared uniform bound.
+    * **winding integer isolation** -- a ``winding_integer_isolation`` payload lifts
+      both binary64 endpoints to one exact dyadic denominator and asks Lean to prove
+      that the reported integer is the unique integer in the closed interval.
     * **PDE finite margin** -- a ``pinn_aposteriori_error`` payload may carry
       ``finite_obligation.margin = threshold - error_bound``.  The kernel checks
       only the finite inequality, not the analytic PDE theorem.
@@ -130,6 +145,16 @@ def generate_obligation(cert: Mapping[str, Any]) -> str | None:
     * **stencil poisedness** -- a ``rational_poisedness`` payload yields
       ``allIntGe`` (Polya) and ``ratNez`` (nonzero determinant). Neither
       payload states a collapse or a remainder over a function class.
+    * **LN chain closure** -- an ``ln_chain_closure`` payload carries the
+      coefficient-by-coefficient rational equalities obtained after expanding
+      a finite differential-polynomial chain.  Python first rechecks every
+      equality; Lean independently discharges the resulting ``allRatEq`` list.
+      This proves finite algebra only, not membership of a physical map in the
+      declared chain.
+    * **LN format bound** -- an ``ln_format_bound`` payload carries strict
+      rational format inequalities.  Python first rechecks each inequality;
+      Lean independently discharges the resulting ``allRatLt`` list.  Sup
+      enclosures and holomorphic extension hypotheses remain external.
     * **interval replay trace** -- an ``interval_replay_trace`` payload
       (:meth:`omnibias.core.proof.replay.ReplayTrace.to_payload`) yields
       ``Omnibias.Replay.replayOk [...] = true`` via ``decide``: the Lean
@@ -176,6 +201,146 @@ def generate_obligation(cert: Mapping[str, Any]) -> str | None:
     )
     footer = "\nend Omnibias.Generated\n"
 
+    box_cover = _extract_box_cover_tiling(cert)
+    if box_cover is not None:
+        parent, tree, uniform_bound = box_cover
+
+        def rat_literal(value: tuple[int, int]) -> str:
+            return f"(({value[0]} : Int), ({value[1]} : Int))"
+
+        def box_literal(
+            box: list[tuple[tuple[int, int], tuple[int, int]]],
+        ) -> str:
+            return "[" + ", ".join(
+                f"({rat_literal(lo)}, {rat_literal(hi)})"
+                for lo, hi in box
+            ) + "]"
+
+        def tree_literal(node: tuple[Any, ...]) -> str:
+            if node[0] == "leaf":
+                return (
+                    f"(CoverTree.leaf {box_literal(node[1])} "
+                    f"({node[2]} : Int))"
+                )
+            return (
+                f"(CoverTree.split {node[1]} {rat_literal(node[2])} "
+                f"{tree_literal(node[3])} {tree_literal(node[4])})"
+            )
+
+        body = (
+            "/-- Exact rational intervals and recursive axis-bisection covers. -/\n"
+            "abbrev RatQ := Int × Int\n"
+            "abbrev RatIv := RatQ × RatQ\n\n"
+            "def ratLt (a b : RatQ) : Bool :=\n"
+            "  decide (0 < a.2 ∧ 0 < b.2 ∧ a.1 * b.2 < b.1 * a.2)\n\n"
+            "def ratEq (a b : RatQ) : Bool :=\n"
+            "  decide (0 < a.2 ∧ 0 < b.2 ∧ a.1 * b.2 = b.1 * a.2)\n\n"
+            "def intervalValid (a : RatIv) : Bool := ratLt a.1 a.2\n\n"
+            "def boxValid (box : List RatIv) : Bool :=\n"
+            "  !box.isEmpty && box.all intervalValid\n\n"
+            "def boxEq (a b : List RatIv) : Bool :=\n"
+            "  a.length == b.length && (a.zip b).all (fun pair =>\n"
+            "    ratEq pair.1.1 pair.2.1 && ratEq pair.1.2 pair.2.2)\n\n"
+            "inductive CoverTree where\n"
+            "  | leaf (box : List RatIv) (count : Int)\n"
+            "  | split (axis : Nat) (cut : RatQ) (left right : CoverTree)\n\n"
+            "def checkTree (bound : Int) (expected : List RatIv) : CoverTree -> Bool\n"
+            "  | .leaf box count =>\n"
+            "      boxValid box && boxEq expected box && decide (0 ≤ count ∧ count ≤ bound)\n"
+            "  | .split axis cut left right =>\n"
+            "      match expected[axis]? with\n"
+            "      | none => false\n"
+            "      | some interval =>\n"
+            "          ratLt interval.1 cut && ratLt cut interval.2 &&\n"
+            "          checkTree bound (expected.set axis (interval.1, cut)) left &&\n"
+            "          checkTree bound (expected.set axis (cut, interval.2)) right\n\n"
+            "set_option maxRecDepth 100000\n\n"
+            "/-- Every recursive child pair exactly tiles its parent and every\n"
+            "terminal count obeys the same finite bound. -/\n"
+            "theorem obligation :\n"
+            f"    boxValid {box_literal(parent)} &&\n"
+            f"    checkTree ({uniform_bound} : Int) {box_literal(parent)} "
+            f"{tree_literal(tree)} = true := by\n"
+            "  decide\n"
+        )
+        return header + body + footer
+
+    polynomial_identity = _extract_polynomial_identity_q(cert)
+    if polynomial_identity is not None:
+        equations, positive = polynomial_identity
+        row_literals = ", ".join(
+            "(["
+            + ", ".join(f"(({left} : Int), ({right} : Int))" for left, right in terms)
+            + f"], ({rhs} : Int))"
+            for terms, rhs in equations
+        )
+        positive_literals = ", ".join(
+            f"((0 : Int), (1 : Int), ({num} : Int), ({den} : Int))"
+            for num, den in positive
+        )
+        body = (
+            "/-- Cleared-denominator coefficient identities. Each pair is one\n"
+            "integer product; Lean recomputes every sum independently. -/\n"
+            "def productSum : List (Int × Int) -> Int\n"
+            "  | [] => 0\n"
+            "  | (a, b) :: rest => a * b + productSum rest\n\n"
+            "def coefficientRow (row : List (Int × Int) × Int) : Bool :=\n"
+            "  productSum row.1 == row.2\n\n"
+            "def polynomialIdentity (rows : List (List (Int × Int) × Int)) : Bool :=\n"
+            "  !rows.isEmpty && rows.all coefficientRow\n\n"
+            "set_option maxRecDepth 100000\n\n"
+            "/-- The identity rows and every signed Bernstein margin are exact.\n"
+            "Topology and the Harnack implication remain external. -/\n"
+            "theorem obligation :\n"
+            f"    polynomialIdentity [{row_literals}] = true ∧\n"
+            f"    allRatLt [{positive_literals}] = true := by\n"
+            "  decide\n"
+        )
+        return stencil_header + body + footer
+
+    matrix_syzygy = _extract_integer_matrix_syzygy(cert)
+    if matrix_syzygy is not None:
+        matrix, vector = matrix_syzygy
+        row_literals = ", ".join(
+            "[" + ", ".join(f"({value} : Int)" for value in row) + "]"
+            for row in matrix
+        )
+        vector_literal = ", ".join(f"({value} : Int)" for value in vector)
+        body = (
+            "/-- Exact cleared-denominator Q[h] syzygy. Lean recomputes every\n"
+            "matrix-vector product; no floating rank or Python residual is trusted. -/\n"
+            "def dotInt : List Int -> List Int -> Int\n"
+            "  | [], [] => 0\n"
+            "  | a :: xs, b :: ys => a * b + dotInt xs ys\n"
+            "  | _, _ => 1\n\n"
+            "def rowSyzygy (row vector : List Int) : Bool :=\n"
+            "  row.length == vector.length && dotInt row vector == 0\n\n"
+            "def matrixSyzygy (matrix : List (List Int)) (vector : List Int) : Bool :=\n"
+            "  !matrix.isEmpty && !vector.isEmpty && matrix.all (fun row => rowSyzygy row vector)\n\n"
+            f"theorem obligation : matrixSyzygy [{row_literals}] [{vector_literal}] = true := by\n"
+            "  decide\n"
+        )
+        return header + body + footer
+
+    winding_isolation = _extract_winding_integer_isolation(cert)
+    if winding_isolation is not None:
+        lo_num, hi_num, denominator, integer = winding_isolation
+        body = (
+            "/-- The reported winding number is the unique integer in the exact\n"
+            "dyadic lift of the outward binary64 enclosure. The analytic argument-\n"
+            "principle enclosure is a trusted certificate input, not re-derived. -/\n"
+            "def windingIsolated (lo hi denominator integer : Int) : Bool :=\n"
+            "  decide (0 < denominator ∧\n"
+            "    (integer - 1) * denominator < lo ∧\n"
+            "    lo ≤ integer * denominator ∧\n"
+            "    integer * denominator ≤ hi ∧\n"
+            "    hi < (integer + 1) * denominator)\n\n"
+            "theorem obligation :\n"
+            f"    windingIsolated ({lo_num}) ({hi_num}) ({denominator}) ({integer}) = true := by\n"
+            "  decide\n"
+        )
+        return header + body + footer
+
     stencil_pairs = _extract_stencil_pairs(cert)
     if stencil_pairs is not None:
         lits = ", ".join(
@@ -186,6 +351,31 @@ def generate_obligation(cert: Mapping[str, Any]) -> str | None:
             "cross-multiplication p*s = r*q with nonzero denominators. Algebra\n"
             "only; no collapse and no remainder over a function class. -/\n"
             f"theorem obligation : allRatEq [{lits}] = true := by decide\n"
+        )
+        return stencil_header + body + footer
+
+    ln_chain_pairs = _extract_ln_chain_closure(cert)
+    if ln_chain_pairs is not None:
+        lits = ", ".join(
+            f"(({p}), {q}, {r}, {s})" for p, q, r, s in ln_chain_pairs
+        )
+        body = (
+            "/-- Finite LN-chain coefficient identities.  Python and Lean\n"
+            "independently compare exact rational coefficients.  This is\n"
+            "algebra only; no physical Dulac/LN membership is asserted. -/\n"
+            f"theorem obligation : allRatEq [{lits}] = true := by decide\n"
+        )
+        return stencil_header + body + footer
+
+    ln_format_pairs = _extract_ln_format_bound(cert)
+    if ln_format_pairs is not None:
+        lits = ", ".join(
+            f"(({p}), {q}, {r}, {s})" for p, q, r, s in ln_format_pairs
+        )
+        body = (
+            "/-- Finite strict rational LN-format inequalities.  Holomorphic\n"
+            "extension and interval sup bounds are trusted external premises. -/\n"
+            f"theorem obligation : allRatLt [{lits}] = true := by decide\n"
         )
         return stencil_header + body + footer
 
@@ -500,6 +690,83 @@ def _extract_stencil_pairs(
     return pairs
 
 
+def _normal_rational(raw: Any) -> tuple[int, int] | None:
+    """Parse and normalize a rational pair, refusing a zero denominator."""
+    pair = _int_pair(raw)
+    if pair is None:
+        return None
+    num, den = pair
+    if den == 0:
+        return None
+    if den < 0:
+        num, den = -num, -den
+    return num, den
+
+
+def _extract_ln_chain_closure(
+    cert: Mapping[str, Any],
+) -> list[tuple[int, int, int, int]] | None:
+    """Recheck coefficient equalities from an ``ln_chain_closure`` payload."""
+    payload = cert.get("payload")
+    if not (
+        isinstance(payload, Mapping)
+        and payload.get("type") == "ln_chain_closure"
+    ):
+        return None
+    raw = payload.get("identities")
+    if not (
+        isinstance(raw, Sequence)
+        and not isinstance(raw, str | bytes)
+        and raw
+        and len(raw) <= 100_000
+    ):
+        return None
+    pairs: list[tuple[int, int, int, int]] = []
+    for row in raw:
+        if not isinstance(row, Mapping):
+            return None
+        lhs = _normal_rational(row.get("lhs"))
+        rhs = _normal_rational(row.get("rhs"))
+        if lhs is None or rhs is None:
+            return None
+        if lhs[0] * rhs[1] != rhs[0] * lhs[1]:
+            return None
+        pairs.append((lhs[0], lhs[1], rhs[0], rhs[1]))
+    return pairs
+
+
+def _extract_ln_format_bound(
+    cert: Mapping[str, Any],
+) -> list[tuple[int, int, int, int]] | None:
+    """Recheck strict rational inequalities from an ``ln_format_bound`` payload."""
+    payload = cert.get("payload")
+    if not (
+        isinstance(payload, Mapping)
+        and payload.get("type") == "ln_format_bound"
+    ):
+        return None
+    raw = payload.get("inequalities")
+    if not (
+        isinstance(raw, Sequence)
+        and not isinstance(raw, str | bytes)
+        and raw
+        and len(raw) <= 100_000
+    ):
+        return None
+    pairs: list[tuple[int, int, int, int]] = []
+    for row in raw:
+        if not isinstance(row, Mapping):
+            return None
+        lhs = _normal_rational(row.get("lhs"))
+        rhs = _normal_rational(row.get("rhs"))
+        if lhs is None or rhs is None:
+            return None
+        if lhs[0] * rhs[1] >= rhs[0] * lhs[1]:
+            return None
+        pairs.append((lhs[0], lhs[1], rhs[0], rhs[1]))
+    return pairs
+
+
 def _extract_poisedness(
     cert: Mapping[str, Any],
 ) -> tuple[list[tuple[int, int]], int, int] | None:
@@ -603,6 +870,256 @@ def _extract_cone_weights(
             return None
         pairs.append((0, 1, num, den))
     return pairs
+
+
+def _extract_integer_matrix_syzygy(
+    cert: Mapping[str, Any],
+) -> tuple[list[list[int]], list[int]] | None:
+    """Pull a structurally valid integer matrix and proposed kernel vector."""
+
+    payload = cert.get("payload")
+    if not (
+        isinstance(payload, Mapping)
+        and payload.get("type") == "integer_matrix_syzygy"
+    ):
+        return None
+    raw_matrix, raw_vector = payload.get("matrix"), payload.get("vector")
+    if not (
+        isinstance(raw_matrix, Sequence)
+        and not isinstance(raw_matrix, str | bytes)
+        and raw_matrix
+        and isinstance(raw_vector, Sequence)
+        and not isinstance(raw_vector, str | bytes)
+        and raw_vector
+        and len(raw_matrix) <= 4096
+        and len(raw_vector) <= 4096
+    ):
+        return None
+    if not all(
+        isinstance(value, int) and not isinstance(value, bool)
+        for value in raw_vector
+    ):
+        return None
+    vector = [int(value) for value in raw_vector]
+    matrix: list[list[int]] = []
+    for raw_row in raw_matrix:
+        if not (
+            isinstance(raw_row, Sequence)
+            and not isinstance(raw_row, str | bytes)
+            and len(raw_row) == len(vector)
+            and all(
+                isinstance(value, int) and not isinstance(value, bool)
+                for value in raw_row
+            )
+        ):
+            return None
+        matrix.append([int(value) for value in raw_row])
+    return matrix, vector
+
+
+def _extract_polynomial_identity_q(
+    cert: Mapping[str, Any],
+) -> tuple[list[tuple[list[tuple[int, int]], int]], list[tuple[int, int]]] | None:
+    """Pull structurally bounded coefficient rows and strict rational margins."""
+    payload = cert.get("payload")
+    if not (
+        isinstance(payload, Mapping)
+        and payload.get("type") == "polynomial_identity_q"
+    ):
+        return None
+    raw_equations = payload.get("equations")
+    raw_positive = payload.get("positive")
+    if not (
+        isinstance(raw_equations, Sequence)
+        and not isinstance(raw_equations, str | bytes)
+        and raw_equations
+        and len(raw_equations) <= 4096
+        and isinstance(raw_positive, Sequence)
+        and not isinstance(raw_positive, str | bytes)
+        and len(raw_positive) <= 262144
+    ):
+        return None
+    equations: list[tuple[list[tuple[int, int]], int]] = []
+    term_count = 0
+    for raw_row in raw_equations:
+        if not isinstance(raw_row, Mapping):
+            return None
+        raw_terms, rhs = raw_row.get("terms"), raw_row.get("rhs")
+        if not (
+            isinstance(raw_terms, Sequence)
+            and not isinstance(raw_terms, str | bytes)
+            and raw_terms
+            and isinstance(rhs, int)
+            and not isinstance(rhs, bool)
+        ):
+            return None
+        terms: list[tuple[int, int]] = []
+        for raw_term in raw_terms:
+            if not (
+                isinstance(raw_term, Sequence)
+                and not isinstance(raw_term, str | bytes)
+                and len(raw_term) == 2
+                and all(
+                    isinstance(value, int) and not isinstance(value, bool)
+                    for value in raw_term
+                )
+            ):
+                return None
+            terms.append((int(raw_term[0]), int(raw_term[1])))
+        term_count += len(terms)
+        if term_count > 262144:
+            return None
+        equations.append((terms, int(rhs)))
+    positive: list[tuple[int, int]] = []
+    for raw_value in raw_positive:
+        pair = _int_pair(raw_value)
+        if pair is None or pair[1] == 0:
+            return None
+        num, den = pair
+        if den < 0:
+            num, den = -num, -den
+        positive.append((num, den))
+    return equations, positive
+
+
+def _extract_box_cover_tiling(
+    cert: Mapping[str, Any],
+) -> tuple[
+    list[tuple[tuple[int, int], tuple[int, int]]],
+    tuple[Any, ...],
+    int,
+] | None:
+    """Pull a bounded recursive exact-Q bisection tree."""
+    payload = cert.get("payload")
+    if not (
+        isinstance(payload, Mapping)
+        and payload.get("type") == "box_cover_tiling"
+    ):
+        return None
+    raw_parent = payload.get("parent")
+    raw_tree = payload.get("tree")
+    uniform_bound = payload.get("uniform_bound")
+    if not (
+        isinstance(uniform_bound, int)
+        and not isinstance(uniform_bound, bool)
+        and uniform_bound >= 0
+    ):
+        return None
+
+    def parse_box(
+        raw: Any,
+    ) -> list[tuple[tuple[int, int], tuple[int, int]]] | None:
+        if not (
+            isinstance(raw, Sequence)
+            and not isinstance(raw, str | bytes)
+            and raw
+            and len(raw) <= 256
+        ):
+            return None
+        output: list[tuple[tuple[int, int], tuple[int, int]]] = []
+        for interval in raw:
+            if not (
+                isinstance(interval, Sequence)
+                and not isinstance(interval, str | bytes)
+                and len(interval) == 2
+            ):
+                return None
+            lo, hi = _int_pair(interval[0]), _int_pair(interval[1])
+            if lo is None or hi is None or lo[1] == 0 or hi[1] == 0:
+                return None
+            output.append((lo, hi))
+        return output
+
+    parent = parse_box(raw_parent)
+    if parent is None:
+        return None
+    nodes = 0
+
+    def parse_tree(raw: Any, depth: int = 0) -> tuple[Any, ...] | None:
+        nonlocal nodes
+        nodes += 1
+        if nodes > 4096 or depth > 64 or not isinstance(raw, Mapping):
+            return None
+        kind = raw.get("kind")
+        if kind == "leaf":
+            box = parse_box(raw.get("box"))
+            count = raw.get("count")
+            if (
+                box is None
+                or len(box) != len(parent)
+                or not isinstance(count, int)
+                or isinstance(count, bool)
+            ):
+                return None
+            return ("leaf", box, int(count))
+        if kind != "split":
+            return None
+        axis, cut = raw.get("axis"), _int_pair(raw.get("cut"))
+        if (
+            not isinstance(axis, int)
+            or isinstance(axis, bool)
+            or not 0 <= axis < len(parent)
+            or cut is None
+            or cut[1] == 0
+        ):
+            return None
+        left = parse_tree(raw.get("left"), depth + 1)
+        right = parse_tree(raw.get("right"), depth + 1)
+        if left is None or right is None:
+            return None
+        return ("split", int(axis), cut, left, right)
+
+    tree = parse_tree(raw_tree)
+    if tree is None:
+        return None
+    return parent, tree, int(uniform_bound)
+
+
+def _float_leaf(value: Any) -> float | None:
+    if isinstance(value, bool):
+        return None
+    if isinstance(value, int | float):
+        return float(value)
+    if isinstance(value, str):
+        try:
+            return float.fromhex(value)
+        except ValueError:
+            return None
+    if isinstance(value, Mapping) and set(value) == {"__f64__"}:
+        tagged = value.get("__f64__")
+        if isinstance(tagged, str):
+            try:
+                return float.fromhex(tagged)
+            except ValueError:
+                return None
+    return None
+
+
+def _extract_winding_integer_isolation(
+    cert: Mapping[str, Any],
+) -> tuple[int, int, int, int] | None:
+    """Lift a reported binary64 winding enclosure to exact dyadic integers."""
+
+    payload = cert.get("payload")
+    if not (
+        isinstance(payload, Mapping)
+        and payload.get("type") == "winding_integer_isolation"
+    ):
+        return None
+    lo, hi = _float_leaf(payload.get("lo")), _float_leaf(payload.get("hi"))
+    integer = payload.get("integer")
+    if (
+        lo is None
+        or hi is None
+        or not math.isfinite(lo)
+        or not math.isfinite(hi)
+        or lo > hi
+        or not isinstance(integer, int)
+        or isinstance(integer, bool)
+    ):
+        return None
+    lo_num, hi_num, exponent = _dyadic_triple(lo, hi)
+    return lo_num, hi_num, 1 << exponent, int(integer)
 
 
 def _extract_rational_identity(

@@ -230,13 +230,31 @@ def test_cache_is_per_state_and_reused_across_orders(coords, specs):
         coordinate_spec=cs, components=comps, hidden=5, depth=1, jet_order=3, seed=4,
     )
     s1 = field(coords)
-    tops.laplacian(s1, "u")
+    tops.hessian(s1, "u")
     assert sorted(s1.extra[JET_CACHE_KEY]) == [3]
     tops.gradient(s1, "u")
     assert sorted(s1.extra[JET_CACHE_KEY]) == [3], "a cached order-3 hidden jet must serve order 1"
 
     s2 = field(coords)
     assert JET_CACHE_KEY not in s2.extra or not s2.extra[JET_CACHE_KEY]
+
+
+def test_laplacian_fast_lane_bypasses_the_jet_cache(coords, specs):
+    """Tier A never builds the multivariate hidden jet; it caches a triple in
+    :data:`FAST_LANE_CACHE_KEY` instead. A later ``gradient`` reuses that triple
+    without populating :data:`JET_CACHE_KEY`."""
+    from omnibias.pinn.torch.fields.jet_mlp import FAST_LANE_CACHE_KEY
+
+    cs, comps = specs
+    field = build_jet_mlp_vector_field(
+        coordinate_spec=cs, components=comps, hidden=5, depth=1, jet_order=3, seed=4,
+    )
+    state = field(coords)
+    tops.laplacian(state, "u")
+    assert JET_CACHE_KEY not in state.extra or not state.extra[JET_CACHE_KEY]
+    assert FAST_LANE_CACHE_KEY in state.extra
+    tops.gradient(state, "u")
+    assert JET_CACHE_KEY not in state.extra or not state.extra[JET_CACHE_KEY]
 
 
 def test_value_only_never_pays_for_a_jet(coords, specs):
@@ -304,15 +322,29 @@ def test_siren_field_high_order(coords, specs):
 
 
 def test_gradients_flow_to_parameters(coords, specs):
+    """Every parameter that can influence the Laplacian gets a gradient.
+
+    The one structural exception is the final (readout) layer's *bias*: an
+    additive constant never affects any derivative of order >= 1, so a
+    Laplacian-only loss has no path to it. The Tier A forward-Laplacian
+    recursion (:func:`omnibias.torch.laplacian.deep_field_laplacian`) reflects
+    this exactly -- it never even touches that tensor, unlike the old
+    full-jet row-extraction path, which incidentally traced through it (via a
+    zero-valued row) and produced a zero (not ``None``) gradient.
+    """
     cs, comps = specs
     field = build_jet_mlp_vector_field(
         coordinate_spec=cs, components=comps, hidden=6, depth=2, seed=0,
     )
+    readout_bias = field.net.linears[-1].bias
     loss = tops.laplacian(field(coords), "u").pow(2).mean()
     loss.backward()
-    grads = [p.grad for p in field.parameters()]
-    assert all(g is not None for g in grads)
-    assert any(g.abs().max() > 0 for g in grads if g is not None)
+    named_grads = [(n, p, p.grad) for n, p in field.named_parameters()]
+    for name, param, grad in named_grads:
+        if param is readout_bias:
+            continue
+        assert grad is not None, f"{name} got no gradient from the Laplacian loss"
+    assert any(g.abs().max() > 0 for _, _, g in named_grads if g is not None)
 
 
 def test_dtype_and_dispatch_tag(specs):

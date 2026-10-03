@@ -5,7 +5,10 @@ r"""Sparse n-variate polynomials over :class:`~fractions.Fraction`.
 A :class:`PolyN` is a finite map from exponent tuples to rational coefficients.
 Arithmetic is exact. The Jacobian determinant (``n <= 3``) and the univariate
 Sylvester resultant are the algebra used by Keller replay / tangent-sweep and
-the ``n=2`` finite lie; there is no Groebner basis.
+the ``n=2`` finite lie. An exact-``Q`` Groebner basis engine (Buchberger with
+both pair-skipping criteria, ideal / radical membership with a cofactor
+witness) is :mod:`omnibias.holonomic._core.groebner`, built on top of this
+module.
 """
 
 from __future__ import annotations

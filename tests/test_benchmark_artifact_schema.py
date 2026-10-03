@@ -4,6 +4,9 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 from _schema import (
     classify_artifact,
     exemption_reason,
@@ -70,3 +73,27 @@ def test_per_seed_may_repeat_seeds_across_conditions() -> None:
 
 def test_directory_is_nonempty() -> None:
     assert iter_benchmark_artifacts(), "docs/benchmarks/ must keep JSON artifacts"
+
+
+def test_route2_smoke_preserves_search_evidence_schema() -> None:
+    path = Path(__file__).parents[1] / "docs/benchmarks/hilbert16_route2_sweep_smoke.json"
+    payload = json.loads(path.read_text())
+    assert payload["schema"] == "omnibias.benchmarks.hilbert16_route2_sweep.v2"
+    tier = payload["gates"]["entries"][0]["payload"]["tiers"][0]
+    campaign = payload["gates"]["entries"][0]["payload"]
+    assert len(campaign["checkpoint_digest"]) == 64
+    assert tier["cardinality"] >= tier["evaluated"]
+    assert tier["basis_dimension"] == 9
+    assert "branch_offset" in tier["lattice"]
+    assert tier["search_incomplete"] is True
+    assert tier["history"]
+    assert tier["ancestry"]
+    checked = tier["history"][0]["payload"]
+    assert {
+        "margin_float",
+        "exact_lift",
+        "farkas_attempted",
+        "farkas_digest",
+        "evidence_scope",
+    } <= checked.keys()
+    assert tier["history"][0]["candidate"]["symmetry"] == "d4"

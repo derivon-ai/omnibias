@@ -4,9 +4,10 @@
 
 Smoke earns G1 (jet vs closed-form orders 0..6), G2 (Lagrange remainder
 sound on exp), G3 (never-worse), and G6 (torch/jax parity). G4 (2x fewer
-weighted evals vs strong Wolfe on a target-loss trajectory) and G5
-(order x depth crossover vs a named Wolfe trial budget) are measured
-and recorded, not in CI ``all_passed``. The polynomial is a model; CCF
+weighted evals vs strong Wolfe on a target-loss trajectory) is measured
+on the named quadratic; ``passed`` follows that measurement and stays
+out of CI ``all_passed``. G5 (order x depth crossover vs a named Wolfe
+trial budget) stays leftover-recorded. The polynomial is a model; CCF
 stretch is not a trainer gate.
 """
 
@@ -178,7 +179,13 @@ def _cubic_step(
     b: float,
     fb: float,
 ) -> float:
-    """Safeguarded quadratic interpolant of a minimizer on the open interval."""
+    """Quadratic interpolant of a minimizer on the open interval.
+
+    An interior trial is the interpolant. The 0.1 bracket inset applies only
+    when that trial leaves ``(lo, hi)``. Insetting an already-interior
+    minimizer on ``f = x^2 + 800 y^2`` accepted ``s = 1e-3`` (strong Wolfe
+    at ``c2 = 0.9``) and never reached ``s ≈ 6.25e-4``.
+    """
     lo, hi = (a, b) if a < b else (b, a)
     if hi - lo < 1e-16:
         return 0.5 * (a + b)
@@ -189,6 +196,8 @@ def _cubic_step(
         trial = a - dfa * (b - a) * (b - a) / (2.0 * denom)
         if not math.isfinite(trial):
             trial = 0.5 * (a + b)
+    if lo < trial < hi:
+        return trial
     pad = 0.1 * (hi - lo)
     return min(max(trial, lo + pad), hi - pad)
 
@@ -314,7 +323,7 @@ def _run_g4(*, full: bool) -> dict[str, Any]:
     single-step stub is withdrawn.
     """
     import torch
-    from omnibias.core.line_search import JetLineSearchConfig
+    from omnibias.core.line_search import GradientSecant, JetLineSearchConfig
     from omnibias.torch.line_search import jet_line_search
 
     torch.set_default_dtype(torch.float64)
@@ -346,6 +355,9 @@ def _run_g4(*, full: bool) -> dict[str, Any]:
             theta = theta0.clone()
             units = 0.0
             outer = 0
+            prev_g: tuple[float, ...] | None = None
+            prev_step: float | None = None
+            used: tuple[float, ...] = ()
             for outer in range(G4_MAX_OUTER):
                 val = float(loss_fn(theta))
                 if val <= G4_TARGET:
@@ -353,8 +365,25 @@ def _run_g4(*, full: bool) -> dict[str, Any]:
                 g = _flat_grad(loss_fn, theta)
                 direction = -g
                 units += 1.0
-                result = jet_line_search(loss_fn, theta, direction, config=cfg)
+                g_tuple = tuple(float(x) for x in g.detach())
+                d_tuple = tuple(-x for x in g_tuple)
+                secant = None
+                if prev_g is not None and prev_step is not None and prev_step > 0.0:
+                    secant = GradientSecant(
+                        previous_gradient=prev_g,
+                        previous_step=prev_step,
+                        current_gradient=g_tuple,
+                        direction=d_tuple,
+                        used_curvatures=used,
+                    )
+                result = jet_line_search(
+                    loss_fn, theta, direction, config=cfg, secant=secant
+                )
                 units += jet_step_cost
+                if result.consumed_curvature is not None and not result.fell_back:
+                    used = (*used, float(result.consumed_curvature))
+                prev_g = g_tuple
+                prev_step = float(result.step)
                 theta = theta + float(result.step) * direction
             return units, G4_MAX_OUTER, float(loss_fn(theta)) <= G4_TARGET
 
@@ -419,12 +448,37 @@ def _run_g4(*, full: bool) -> dict[str, Any]:
     jet_mean = float(np.mean(jet_units))
     wolfe_mean = float(np.mean(wolfe_units))
     ratio = wolfe_mean / jet_mean if jet_mean > 0.0 else 0.0
+    both_hit = jet_hits == n_seeds and wolfe_hits == n_seeds
+    earned = bool(both_hit and ratio >= G4_RATIO_MIN)
+    if earned:
+        note = (
+            "Leftover #47 closed: steepest descent on f=x^2+cond y^2 "
+            "to the named target. Jet counted as order nested grads + "
+            "value + verify plus one outer grad per accepted step. The "
+            "first step is the directional polynomial minimizer; later "
+            "steps may be an unused secant-plane inverse eigenvalue when "
+            "the order-2 model decreases and verify=True holds. Strong "
+            "Wolfe counted as phi + dphi (including s=0) plus the same "
+            "outer grad; an interior cubic/quadratic trial is kept. Both "
+            "arms hit every seed. Not in CI all_passed."
+        )
+    else:
+        note = (
+            "Leftover #47 leftover-recorded: steepest descent on "
+            "f=x^2+cond y^2 to a named target. Jet counted as order "
+            "nested grads + value + verify plus one outer grad per "
+            "step. Strong Wolfe counted as phi + dphi (including "
+            "s=0) plus the same outer grad. Both arms must hit and "
+            f"wolfe/jet must reach {G4_RATIO_MIN}. Measured "
+            f"wolfe/jet={ratio:.6g}, jet_hits={jet_hits}, "
+            f"wolfe_hits={wolfe_hits}. Not in CI all_passed."
+        )
     return {
         "name": "g4_step_count_win",
-        "passed": False,
-        "earned": False,
+        "passed": earned,
+        "earned": earned,
         "reported": True,
-        "leftover_recorded": True,
+        "leftover_recorded": not earned,
         "leftover_id": 47,
         "leftover_tick": 91,
         "in_ci_all_passed": False,
@@ -443,16 +497,7 @@ def _run_g4(*, full: bool) -> dict[str, Any]:
         "family": "illcond_quadratic",
         "conds": list(G4_CONDS),
         "rows": rows,
-        "note": (
-            "Leftover #47 leftover-recorded: steepest descent on "
-            "f=x^2+cond y^2 to a named target. Jet counted as order "
-            "nested grads + value + verify plus one outer grad per "
-            "step. Strong Wolfe counted as phi + dphi (including "
-            "s=0) plus the same outer grad. Recorded ratio is a "
-            "Wolfe-miss artifact on the stiffest seed; true "
-            "matched-outer ratio is below 2x. Previous Armijo "
-            "single-step stub withdrawn. Not in CI all_passed."
-        ),
+        "note": note,
     }
 
 
@@ -622,6 +667,12 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
     g6 = _run_g6()
     print("G4 step-count attempt...")
     g4 = _run_g4(full=full)
+    print(
+        "G4 wolfe/jet="
+        f"{float(g4['wolfe_over_jet']):.6g} "
+        f"jet_hits={g4['jet_hits']} wolfe_hits={g4['wolfe_hits']} "
+        f"earned={g4['earned']}"
+    )
     print("G5 crossover table...")
     g5 = _run_g5()
     entries = [g1, g2, g3, g6]
@@ -647,9 +698,9 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
             "navier_stokes_proof_claim": False,
             "ccf_stretch_cleared": False,
             "global_min_claim": False,
-            "g4_earned": False,
+            "g4_earned": bool(g4["earned"]),
             "g4_reported": True,
-            "g4_leftover_recorded": True,
+            "g4_leftover_recorded": bool(g4["leftover_recorded"]),
             "g4_leftover_id": 47,
             "g4_leftover_tick": 91,
             "g5_earned": False,

@@ -55,7 +55,102 @@ saddle-node, shrinking-root, and two-blow-up follow-ups are
 `HILBERT16-SADDLE-NODE.md`, `HILBERT16-SHRINKING-ROOT.md`, and
 `HILBERT16-TWO-BLOWUP.md`. The next-atlas / scale-dichotomy findings
 are `HILBERT16-NEXT-ATLAS.md`. The chart-cell ledger is
-`HILBERT16-CHART-CELLS.md`. G1 and G4 remain failed there, and
+`HILBERT16-CHART-CELLS.md`. The canonical slow-line zeta / Cauchy
+majorant is `HILBERT16-CANONICAL-ZETA.md`. The fold-compact Cauchy
+majorant is `HILBERT16-FOLD-ZETA.md`. Frozen-Z C2 identities are
+`HILBERT16-PHYSICAL-C2.md`. The unfrozen-Z `Z_x` first-log-derivative
+gap is `HILBERT16-Z-X-GAP.md`. The holomorphic `Z_v` bound is
+`HILBERT16-Z-V-BOUND.md`. The slow-line `Z_V` chain is
+`HILBERT16-Z-SLOW-V.md`. The matching-chart fold I-map `Z_x` bound is
+`HILBERT16-FOLD-Z-X.md`. The kill-line Stage-B height inflation is
+`HILBERT16-STAGE-B.md`. The kill-line Stage-A shrinking-rectangle
+wall is `HILBERT16-STAGE-A.md`. The kill-line `chi_b` threshold is
+`HILBERT16-CHI-B.md`. The kill-line `dx_e` leading factors are
+`HILBERT16-DX-E-LEADING.md`. The kill-line uniform-in-`chi` `dx_e`
+majorant is `HILBERT16-DX-E-UNIF.md`. The kill-line Stage-C `a_min`
+floor is `HILBERT16-STAGE-C.md`. The kill-line Stage-C exit energy is
+`HILBERT16-STAGE-C-EXIT.md`. The kill-line Stage-C leading `T_h` floor
+is `HILBERT16-STAGE-C-TH.md`. The kill-line Stage-C start gap at `y_1=1`
+is `HILBERT16-STAGE-C-GAP.md`. The kill-line Stage-C C=0 `T(h)` envelope
+is `HILBERT16-STAGE-C-ENV.md`. The kill-line Stage-C C=2 integrating
+factor is `HILBERT16-STAGE-C-IF.md`. The kill-line Stage-C C=2 `T(h)`
+majorant is `HILBERT16-STAGE-C-INT.md`. The kill-line Stage-C C=2 lower
+`T(h)` envelope is `HILBERT16-STAGE-C-LO.md`. The kill-line Stage-C C=2
+tight `T(h)` ratio is `HILBERT16-STAGE-C-K.md`. The kill-line Stage-C C=2
+`T-h` bootstrap is `HILBERT16-STAGE-C-BOOT.md`. The kill-line Stage-C
+continuation rectangle is `HILBERT16-STAGE-C-RECT.md`. The kill-line
+Stage-C comparison first-hit of `h=1` is `HILBERT16-STAGE-C-HIT.md`.
+The kill-line Stage-C comparison first-hit of `E_out` is
+`HILBERT16-STAGE-C-SEC.md`. The kill-line Stage-C Lohner first-hit of
+matching-chart `x=4` from Stage-C start is
+`HILBERT16-STAGE-C-ONESHOT.md`. The shrinking-eps Stage-C Lohner pack
+is `HILBERT16-STAGE-C-ONESHOT-EPS.md`. The parametric-eps Stage-C
+Lohner cover of `[23/400, 1/16]` is `HILBERT16-STAGE-C-EPS-SPAN.md`.
+The chart-O matching-chart Lohner pack is
+`HILBERT16-STAGE-C-ORIGIN.md`. The parametric-sep chart-O Lohner
+cover of `[3/2, 2]` is `HILBERT16-STAGE-C-ORIGIN-SPAN.md`. The
+nearer-interface cover of `[7/4, 2]` from `x=1/8` is
+`HILBERT16-STAGE-C-ORIGIN-IFACE.md`. The `x=1/16` cover of
+`[15/8, 2]` is `HILBERT16-STAGE-C-ORIGIN-NEAR.md`. The `x=1/32`
+cover of `[31/16, 2]` is `HILBERT16-STAGE-C-ORIGIN-X32.md`. The
+uniform-in-`r1` comparison first-hit on `eps` in `[1/32, 1/16]` is
+`HILBERT16-STAGE-C-COMPARE.md`. The comparison first-hit for every
+`eps` in `(0, 1/16]` is `HILBERT16-STAGE-C-UNIFORM.md`. The comparison
+first-hit from every start in `(0, 1/2]` is `HILBERT16-STAGE-C-INTERFACE.md`.
+The kill-line `sep * S_pre` bound on every `sep` in `(0, 1]` is
+`HILBERT16-SEP-SPRE.md`. The `dx_e` factors on `lambda1` in
+`[-4, -2]` are `HILBERT16-DX-E-OFF.md`. The same factors for every
+`lambda1 <= -2` are `HILBERT16-DX-E-RAY.md`. The same factors for
+`lambda1` in `[-3/2, -2)` are `HILBERT16-DX-E-NEAR.md`. The same
+factors for every `lambda1` in `(-3/2, 0)` are `HILBERT16-DX-E-OPEN.md`.
+The intrinsic eta-section obstruction at D-C and chart O is
+`HILBERT16-WEIGHTED-SECTION.md`.
+The frozen-section one-scale no-go and its moving-section counterexample are
+`HILBERT16-QUASIHOMOGENEOUS-DICHOTOMY.md`.
+The direct `tau`/log-W bounded-format obstruction and open normalized route are
+`HILBERT16-LN-FORMAT-BARRIER.md`.
+The complex fixed-real-time flow, local event branch, regular-event cover, and
+eight-cell physical outgoing `E_out` cover across the cubic model's `sep=0` /
+`r1=0` limits, which still lack the incoming branch, full physical singular
+return family, and LN membership, are
+`HILBERT16-COMPLEX-NORMAL-FLOW.md`.
+The conditional Picard--Fuchs/Abelian zero-count transfer and open DRR
+physical-return premises are `HILBERT16-ABELIAN-DRR-TRANSFER.md`.
+The finite quadratic Bautin-jet stabilization and exact all-orders inference
+barrier are `HILBERT16-BAUTIN-STABILIZATION-BARRIER.md`.
+The Songling four-cycle reproduction-readiness and binary64 precision barrier
+are `HILBERT16-SONGLING-LOWER-BOUND.md`.
+The Part-A exact polygonal barrier and reduced Positivstellensatz audit is
+`HILBERT16-PART-A-POLYGON-SOS.md`.
+The shrinking-root x-corridor is
+`HILBERT16-OUTGOING-CORRIDOR.md`. The post-corridor `(V,h)` hypotheses
+are `HILBERT16-POST-CORRIDOR.md`. The alpha-0 `T-h` envelope is
+`HILBERT16-HEIGHT-ENVELOPE.md`. The `C=2` leading `|q|` ratio is
+`HILBERT16-Q-RATIO-C2.md`. The `C=0` `k=1+O(nu)` jet is
+`HILBERT16-K-ZETA-REMAINDER.md`. The kill-compact `Z` majorant is
+`HILBERT16-KILL-ZETA.md`. The cancelled-N holomorphic `Z` bound is
+`HILBERT16-CANCELLED-N.md`. The `C!=0` height-mix identities are
+`HILBERT16-HEIGHT-MIX.md`. The `T_h`-gap identities are
+`HILBERT16-ORBIT-TH.md`. The comparison-bootstrap `T-h` integral is
+`HILBERT16-TH-INTEGRAL.md`. The cubic `(V,h)` Lohner orbit is
+`HILBERT16-VH-ORBIT.md`. Matching-chart `E_out` first-hit is
+`HILBERT16-E-OUT-SECTION.md`. The shrinking-eps `E_out` pack is
+`HILBERT16-E-OUT-EPS.md`. The kill-line comparison speed bound is
+`HILBERT16-E-OUT-SPEED.md`. The incoming GRAZING comparison speed bound is
+`HILBERT16-E-SIGMA-SPEED.md`. The incoming `V=1/4` first-hit is
+`HILBERT16-E-SIGMA-IN.md`. The declared-point `E_sigma` first-hit is
+`HILBERT16-E-SIGMA-HIT.md`. The comparison GRAZING `E_sigma` zero from
+`V=0` is `HILBERT16-E-SIGMA-FROM0.md`. The uniform cancelled-height
+comparison is `HILBERT16-E-SIGMA-UNIF.md`. The orbit-aligned wall
+`E_sigma` hit is `HILBERT16-E-SIGMA-WALL.md`. The wall-box `h`-interval
+cover is `HILBERT16-E-SIGMA-BOX.md`. The L=0 whole-wall `h`-span
+cover is `HILBERT16-E-SIGMA-SPAN.md`. The L-pack wall-span cover is
+`HILBERT16-E-SIGMA-PACK.md`. The shrinking-eps aligned pack is
+`HILBERT16-E-SIGMA-EPS.md`. The one-shot Lohner-from-`V=0` hit is
+`HILBERT16-E-SIGMA-ONESHOT.md`. The shrinking-eps one-shot pack is
+`HILBERT16-E-SIGMA-ONESHOT-EPS.md`. The compact aligned parametric-eps
+cover is `HILBERT16-E-SIGMA-EPS-SPAN.md`. The lower aligned parametric-eps
+cover is `HILBERT16-E-SIGMA-EPS-LO.md`. G1 and G4 remain failed there, and
 `full_hilbert16_solved` stays false.
 
 ## Extend

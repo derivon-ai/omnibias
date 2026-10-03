@@ -1,0 +1,35 @@
+{
+  "schema": "omnibias.benchmarks.hilbert16_df1a.v1",
+  "generated_utc": "2026-09-15T13:45:57Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.0rc1",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "absent"
+  },
+  "config": {
+    "family": "hilbert16_df1a",
+    "full": false
+  },
+  "rss_mb_at_start": 626.86,
+  "benchmark": "hilbert16_df1a",
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_df1a_replay",
+        "passed": true,
+        "cyclicity_bound": 3,
+        "displacement_bound": 4,
+        "compactification_certified": true,
+        "entry_exit_certified": true,
+        "detail": "declared interior model reproduces published <=3 bound"
+      }
+    ]
+  },
+  "full_hilbert16_solved": false,
+  "wall_seconds": 5.699167013168335
+}

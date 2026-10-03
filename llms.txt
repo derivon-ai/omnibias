@@ -182,6 +182,48 @@ validated dynamics and orbits (07-06; exact-Jacobian jet
 Lohner + width budget; G1–G6 CI; founding bias collapse,
 not temperature collapse; finite horizon, not a continuum
 existence theorem),
+certified Abelian-integral zero count (general exact
+hyperelliptic Picard--Fuchs Q-syzygy; cubic elliptic
+rank-two Gauss--Manin system propagated through an
+exactly checked overcomplete `(A,B,J0,J1)` view +
+argument-principle upper count + Krawczyk lower count; exact
+critical-strip check records the distinguished action's
+hypergeometric zero-free domain; GA1–GA8 smoke and finite
+Lean obligations earned; one genuine mixed form and one
+finite rational coefficient-box bound, not Petrov's
+degree-uniform sharp theorem, a uniform degree bound, or
+finiteness of H(n);
+`docs/api/abelian_zero_count.md`),
+exact-Q Poincare compactification and finite Dulac models
+(`omnibias.dynamics.compactify` / `.dulac` / `.graphic`;
+U1/U2/U3 chart coefficient replay, invariant equator,
+rational and resonant `x=exp(-kappa)` confluent-exponential
+zero bounds, interval-ratio power-compensator cover; GD1–GD6;
+physical return membership, uniform remainder, graphic
+cyclicity, DRR-case closure, and full Hilbert XVI all false;
+`docs/api/dulac_cyclicity.md`),
+an exact-Q Buchberger Groebner engine (`omnibias.holonomic._core.groebner`;
+lex/grlex/degrevlex, multivariate division, both Buchberger criteria,
+reduced basis, ideal/radical membership with a cofactor witness,
+`GroebnerBudget` refuses loudly; `docs/api/groebner.md`) feeding a
+focal-value/Bautin engine, derived singular return maps, collar membership,
+and an H16 obligation ledger (`omnibias.dynamics.focal` / `.bautin` /
+`.saddle_normal_form` / `.membership` / `.hilbert16_ledger`; exact
+homological-equation Poincare-Lyapunov focal values, the Bautin ideal's
+Groebner basis with `bautin_ideal_stabilization_proved` always false,
+exact Poincare-Dulac resonant normal forms at a rational hyperbolic
+saddle, a first-order **derived** (not declared) Dulac corner expansion,
+sound collar-membership agreement plus a genuine unique-cycle proof, and
+a machine-checked obligation ledger whose `full_hilbert16_solved` /
+`hilbert16_part_a_solved` / `hilbert16_part_b_quadratic_solved` flags are
+**derived**, never asserted, and false on every shipped ledger; GF1-GF7
+smoke, ledger GH1-GH4 smoke; `docs/api/focal_bautin.md`),
+exact Viro patchwork (Newton lattices, unimodular
+triangulations, projective T-curve nesting, exact-Q
+regular-height/Farkas replay, incomplete CSP/annealed
+search, and polygonal direct acceptance; GP1–GP4 earned,
+GP5 false, no 22-oval realization claimed;
+`docs/api/patchwork_octic.md`),
 Nobel-adjacent domain programs (07-07; exact oscillator
 ladder + Harris resistive layer + exact `dT/dθ`; G0–G6 CI;
 founding bias collapse, not temperature collapse; tooling,
@@ -255,6 +297,11 @@ potential via `kantorovich_accept_step`; G1–G5 CI; `beta ->
 inf` is the founding temperature collapse, no new registry
 slot requested; non-interacting fermions only, not DFT, not
 a many-body solve),
+deep-network Laplacian fast lane (09-33; Tier A/B/C `Delta^k`
+without multi-index blowup; exact Laplacian; exact-or-enclosed
+`Delta^k`; G1–G5 CI; founding bias collapse, not temperature
+collapse; not O(1) at arbitrary order; not bit-identical across
+backends),
 open-system Lindblad dynamics (09-32; GKSL linear semigroup;
 certified propagator / positivity / relaxation time; seventh
 named collapse `relaxation`; G1–G7 CI; Markovian model
@@ -777,6 +824,33 @@ Case A leftover `omnibias.holonomic.jacobian_n2_case_a` seals
 `(b11,b21,b31)` over `Q` at the origin only.
 `omnibias.holonomic.jacobian_n2_case_a_b02` seals `(b02,b03,b04)`
 over `Q` at the origin only; the Case A chart then empties.
+`omnibias.holonomic.twin_prime` is a finite research ledger: exact-Q
+shifted-prime local factors, coefficientwise FI equation (3.1), a 3-D
+log-polyhedral terminal-shell atlas, admissible tuples, and matrix close-pair
+witnesses. A0 finite local algebra, A1a combinatorial replay, A1b0 exact
+dyadic/rho/13-leaf routing subchecks, A1b1 signed fixed-2 determinant replay,
+A2g atlas geometry, and A2k kernel-cell arithmetic are earned; the rational
+shell is exactly `1/38` of the classical log-volume and the candidate kernel
+credit is exactly `41/640`. The loss-budgeted fixed-2 completion lemma and full
+asymptotic-sieve replay, remainder and terminal-shell Möbius estimates,
+uniform limit, and every infinite prime-gap claim remain blocked. The 26 A0
+rational obligations through `p=97` passed the Lean kernel. The bounded-gap
+track records the named `k=40`, gap-186 baseline and the exact admissible
+`k=39`, diameter-182 target. Its pure-rational manifest replay regenerates the
+97-component / 149-form source inventory with dimensions changing from 40/39
+to 39/38. The authenticated source generator also rewrites the hidden midpoint
+offset to exact `39/2`; Arb/FLINT forms and a source-valid `k=39` crossing are
+not yet known. Completed numerical receipts can be independently replayed and
+hash-sealed, including all 97 task parameters and exact final-margin arithmetic.
+The authenticated split-convolution path has completed the full k=40 baseline,
+with independently replayed margin \(2.33604523\times10^{-5}>1/50000\);
+this is not a bitwise comparison with the unavailable corrected-FLINT build.
+The k=39 optimization seam fixes 77-variable interval-Gram ordering,
+sign-aware contraction, and a proved global source-rounding reserve; the
+coefficient-independent matrices are not yet extracted.
+Diagnostics: `docs/benchmarks/twin_prime_sieve_smoke.json` and
+`docs/benchmarks/twin_prime_bounded_gap_smoke.json`; API:
+`docs/api/twin_prime_sieve.md`.
 Cookbook: `docs/cookbook/jacobian-n2-box.md`.
 `omnibias-struct` is the **dynamic-programming** register of the `beta -> inf` family:
 certified differentiable **soft Viterbi / shortest-path / CTC**, where the DP `max`

@@ -44,7 +44,7 @@ from omnibias.torch.optim import (
     CubicGaussNewton,
     GaussNewton,
     functional_residual_fn,
-    martens_grosse_gauss_newton_minimize,
+    lstsq_gauss_newton_direction,
 )
 from torch import Tensor
 
@@ -96,6 +96,28 @@ class CCFVorticityNeuralConfig:
     grad_norm_alpha: float = 2.0
     grad_norm_eps: float = 1e-8
     exp_core: bool = True
+    # Signed hat + nodal bump, with (a, b) eliminating Ω(gauge)=gauge_value
+    # and HΩ(0)=(2+λ)/2. Positive-only hats have HΩ(0)<0 and cannot cancel r'(0).
+    hard_core_cancel: bool = False
+    core_node: float = 0.532
+    # ``nodal`` is (y²-a²)/(y²+a²). Its (Ω(gauge), HΩ(0)) ratio nearly
+    # matches the constraint, so the solved net weight collapses.
+    # ``origin_gauss`` is a narrow even hat: Ω(gauge)≈0 while HΩ(0)≠0,
+    # so the net keeps an O(1) gauge weight.
+    core_family: Literal["nodal", "origin_gauss"] = "nodal"
+    core_width: float = 0.2
+    mg_damping_strategy: Literal["classic", "nielsen"] = "classic"
+    # ``l2`` is mean-square Gauss–Newton. ``linf`` accepts a step only when
+    # the true max |r| falls (Lawson IRLS direction). ``reject_max_increase``
+    # keeps an L2 step only when that same max does not rise: L2 alone
+    # lowers the mean and walks the stretch peak back up.
+    residual_norm: Literal["l2", "linf"] = "l2"
+    reject_max_increase: bool = False
+    # Picard step: the Wang residual stays linear in (Ω, Ω_y) with U held
+    # fixed, so the exact-JVP step does not differentiate the Hilbert.
+    # Each new residual evaluation rebuilds U from the current profile.
+    freeze_velocity: bool = False
+    hilbert_n_far: int = 64
     # d1/d2 + adaptive collocation
     d1_weight: float = 0.1
     d2_weight: float = 0.01
@@ -111,6 +133,10 @@ class CCFVorticityNeuralConfig:
     hilbert_n_aux: int = 128  # GL near-panel (hp) or [-Y,Y] (pv_mapped_tail)
     hilbert_core_frac: float = 0.9  # mask Wang residual on the |y|~Y junction
     hilbert_y_near: float = 2.0  # hp origin-centered panel half-width
+    # Train on the stretch score nodes (linspace, |y| < score_abs_max) so
+    # Gauss–Newton cannot drive a coarse random grid down while dense L∞ rises.
+    score_collocation: bool = False
+    score_abs_max: float = 38.0
     dense_n_val: int = 4001
     device: str = "cpu"  # "cuda" when available; T1200 supports float64
     # Random Fourier features of compactified q (depth>=2 JetMLP only).
@@ -1012,6 +1038,179 @@ def omega_from_net(
     return omega, omega_y, q, nn_core
 
 
+def h0_target(lam: float) -> float:
+    """Core-cancel value ``HΩ(0)=(2+λ)/2`` from ``r'(0)=0`` for odd ``Ω``."""
+    return 0.5 * (2.0 + float(lam))
+
+
+def nodal_bump_omega(
+    y: Tensor,
+    *,
+    lam: float,
+    node: float = 0.532,
+) -> tuple[Tensor, Tensor]:
+    """Odd envelope lift of the even nodal hat ``(y²-a²)/(y²+a²)``.
+
+    Negative on the core of ``R+`` so ``HΩ(0)`` can be positive. Parameter-free.
+    """
+    y = torch.as_tensor(y).reshape(-1).to(dtype=torch.float64)
+    a2 = float(node) ** 2
+    y2 = y * y
+    den = y2 + a2
+    hat = (y2 - a2) / den
+    hat_y = (4.0 * a2 * y) / (den * den)
+    alpha = float(alpha_from_lambda(lam))
+    psi, psi_y = apply_envelope(y, hat, hat_y, power=alpha + 1.0)
+    return y * psi, psi + y * psi_y
+
+
+def core_correction_omega(
+    y: Tensor,
+    *,
+    lam: float,
+    node: float = 0.532,
+    family: str = "nodal",
+    width: float = 0.2,
+) -> tuple[Tensor, Tensor]:
+    """Core-cancel companion profile.
+
+    ``origin_gauss`` is the even hat ``exp(-(y/w)^2)``. A narrow width makes
+    ``Ω`` at the gauge point negligible while ``HΩ(0)`` stays nonzero, so
+    the 2×2 assigns an O(1) weight to the network.
+    """
+    if family == "nodal":
+        return nodal_bump_omega(y, lam=lam, node=node)
+    if family != "origin_gauss":
+        raise ValueError(f"core family must be nodal or origin_gauss, got {family!r}")
+    y = torch.as_tensor(y).reshape(-1).to(dtype=torch.float64)
+    w = float(width)
+    if w <= 0.0:
+        raise ValueError(f"core_width must be positive, got {w}")
+    hat = torch.exp(-(y * y) / (w * w))
+    hat_y = hat * (-2.0 * y / (w * w))
+    alpha = float(alpha_from_lambda(lam))
+    psi, psi_y = apply_envelope(y, hat, hat_y, power=alpha + 1.0)
+    return y * psi, psi + y * psi_y
+
+
+_BUMP_FUNCTIONALS: dict[
+    tuple[float, float, float, int, int, int, float, float, str, float],
+    tuple[float, float],
+] = {}
+
+
+def _hp_call_kwargs(cfg: CCFVorticityNeuralConfig) -> dict[str, float | int]:
+    n_near = int(cfg.hilbert_n_aux) if int(cfg.hilbert_n_aux) >= 4 else 128
+    n_tail = int(cfg.hilbert_n_quad) if int(cfg.hilbert_n_quad) >= 8 else 96
+    return {
+        "decay_power": float(alpha_from_lambda(cfg.lam)),
+        "y_trunc": float(cfg.y_max),
+        "n_near": n_near,
+        "n_far": int(cfg.hilbert_n_far),
+        "n_tail": n_tail,
+        "y_near": float(cfg.hilbert_y_near),
+    }
+
+
+def _bump_functionals(cfg: CCFVorticityNeuralConfig, *, device: torch.device) -> tuple[float, float]:
+    """Cached ``(Ω_b(gauge), HΩ_b(0))`` for the nodal bump. No autograd."""
+    key = (
+        round(float(cfg.lam), 12),
+        round(float(cfg.core_node), 12),
+        round(float(cfg.y_max), 12),
+        int(cfg.hilbert_n_aux),
+        int(cfg.hilbert_n_quad),
+        int(cfg.hilbert_n_far),
+        round(float(cfg.hilbert_y_near), 12),
+        round(float(cfg.gauge_point), 12),
+        str(cfg.core_family),
+        round(float(cfg.core_width), 12),
+    )
+    hit = _BUMP_FUNCTIONALS.get(key)
+    if hit is not None:
+        return hit
+    kw = _hp_call_kwargs(cfg)
+    with torch.no_grad():
+        g_pt = torch.tensor([float(cfg.gauge_point)], dtype=torch.float64, device=device)
+        z_pt = torch.tensor([0.0], dtype=torch.float64, device=device)
+
+        def bump_fn(t: Tensor) -> Tensor:
+            return core_correction_omega(
+                t,
+                lam=cfg.lam,
+                node=cfg.core_node,
+                family=cfg.core_family,
+                width=cfg.core_width,
+            )[0]
+
+        g_b = float(bump_fn(g_pt).reshape(()))
+        ob0 = bump_fn(z_pt)
+
+        uy0, _ = wholeline_hp_hu_from_omega(z_pt, ob0, omega_fn=bump_fn, **kw)  # type: ignore[arg-type]
+        h_b = float(uy0.reshape(()))
+    _BUMP_FUNCTIONALS[key] = (g_b, h_b)
+    return g_b, h_b
+
+
+def core_cancel_coefficients(
+    net: CompactifiedOmegaOMBU,
+    cfg: CCFVorticityNeuralConfig,
+) -> tuple[Tensor, Tensor]:
+    """Solve ``a Ω_net + b Ω_bump`` for the gauge and ``HΩ(0)=(2+λ)/2``.
+
+    Falls back to a pure gauge scale when the 2×2 is singular.
+    """
+    if cfg.exp_core:
+        raise ValueError("hard_core_cancel requires exp_core=False (signed hat)")
+    if cfg.train_hilbert != "wholeline_hp":
+        raise ValueError("hard_core_cancel requires train_hilbert='wholeline_hp'")
+    device = next(net.parameters()).device
+    dtype = torch.float64
+    g_pt = torch.tensor([float(cfg.gauge_point)], dtype=dtype, device=device)
+    z_pt = torch.tensor([0.0], dtype=dtype, device=device)
+    g_n = omega_from_net(net, g_pt, lam=cfg.lam, exp_core=False)[0].reshape(())
+
+    def net_fn(t: Tensor) -> Tensor:
+        return omega_from_net(net, t, lam=cfg.lam, exp_core=False)[0]
+
+    om0 = net_fn(z_pt)
+    uy0, _ = wholeline_hp_hu_from_omega(
+        z_pt, om0, omega_fn=net_fn, **_hp_call_kwargs(cfg)  # type: ignore[arg-type]
+    )
+    h_n = uy0.reshape(())
+    g_b, h_b = _bump_functionals(cfg, device=device)
+    target = float(h0_target(cfg.lam))
+    gauge = float(cfg.gauge_value)
+    det = g_n * float(h_b) - float(g_b) * h_n
+    singular = float(det.detach().abs()) < 1e-10 or float(g_n.detach().abs()) < 1e-14
+    if singular:
+        a = gauge / (g_n + 1e-30)
+        b = torch.zeros((), dtype=dtype, device=device)
+        return a, b
+    a = (gauge * float(h_b) - float(g_b) * target) / det
+    b = (g_n * target - gauge * h_n) / det
+    return a, b
+
+
+def mix_core_cancel(
+    net: CompactifiedOmegaOMBU,
+    y: Tensor,
+    a: Tensor | float,
+    b: Tensor | float,
+    *,
+    lam: float,
+    node: float,
+    family: str = "nodal",
+    width: float = 0.2,
+) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+    """``a Ω_net + b Ω_correction`` with analytic ``Ω_y``."""
+    on, ony, q, nn_core = omega_from_net(net, y, lam=lam, exp_core=False)
+    ob, oby = core_correction_omega(
+        y, lam=lam, node=node, family=family, width=width
+    )
+    return a * on + b * ob, a * ony + b * oby, q, nn_core
+
+
 def wang_residual(
     y: Tensor,
     omega: Tensor,
@@ -1067,7 +1266,9 @@ def vorticity_fields(
     hilbert_n_aux: int = 0,
     hilbert_core_frac: float = 0.9,
     hilbert_y_near: float = 2.0,
+    hilbert_n_far: int = 64,
     y_trunc: float | None = None,
+    freeze_velocity: bool = False,
 ) -> tuple[Tensor, Tensor, Tensor, Tensor]:
     """Return ``(r_abs, defect, coeffs, uy)`` for the chosen Hilbert mode."""
     if train_hilbert == "hardy_projection":
@@ -1126,6 +1327,7 @@ def vorticity_fields(
             omega_fn=omega_pos_fn,
             y_trunc=y_trunc,
             n_near=n_near,
+            n_far=int(hilbert_n_far),
             n_tail=n_tail,
             y_near=float(hilbert_y_near),
         )
@@ -1139,6 +1341,9 @@ def vorticity_fields(
         uy, u = spectral_hu_from_omega(y, omega, n_uniform=hilbert_n_uniform)
         coeffs = torch.zeros(scales.shape[0], dtype=y.dtype, device=y.device)
         defect = torch.zeros((), dtype=y.dtype, device=y.device)
+    if freeze_velocity:
+        u = u.detach()
+        uy = uy.detach()
     r = wang_residual(y, omega, omega_y, u, uy, lam=lam)
     if train_hilbert == "pv_mapped_tail":
         Y = float(y_trunc) if y_trunc is not None else float(torch.max(torch.abs(y)))
@@ -1158,9 +1363,35 @@ def residual_vector(
     parities: Tensor | None = None,
 ) -> Tensor:
     """Stacked residual for CubicGaussNewton."""
-    omega, omega_y, _, nn_core = omega_from_net(
-        net, y, lam=cfg.lam, exp_core=cfg.exp_core
-    )
+    omega_pos_fn: Callable[[Tensor], Tensor] | None
+    if cfg.hard_core_cancel:
+        a_cc, b_cc = core_cancel_coefficients(net, cfg)
+        # Picard: (a, b) rebuild HΩ(0) from a fresh Hilbert. Detach them
+        # with U so the exact-JVP / Adam step does not differentiate that
+        # transform. The next residual evaluation recomputes both.
+        if cfg.freeze_velocity:
+            a_cc = a_cc.detach()
+            b_cc = b_cc.detach()
+        omega, omega_y, _, nn_core = mix_core_cancel(
+            net, y, a_cc, b_cc, lam=cfg.lam, node=cfg.core_node,
+            family=cfg.core_family,
+            width=cfg.core_width,
+        )
+
+        def omega_pos_fn(t: Tensor, _a: Tensor = a_cc, _b: Tensor = b_cc) -> Tensor:
+            return mix_core_cancel(net, t, _a, _b, lam=cfg.lam, node=cfg.core_node,
+            family=cfg.core_family,
+            width=cfg.core_width,)[0]
+
+    else:
+        omega, omega_y, _, nn_core = omega_from_net(
+            net, y, lam=cfg.lam, exp_core=cfg.exp_core
+        )
+        omega_pos_fn = (
+            _omega_pos_fn_from_net(net, lam=cfg.lam, exp_core=cfg.exp_core)
+            if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
+            else None
+        )
     r_abs, defect, _, _ = vorticity_fields(
         y,
         omega,
@@ -1172,16 +1403,14 @@ def residual_vector(
         hilbert_n_uniform=cfg.hilbert_n_uniform,
         orders=orders,
         parities=parities,
-        omega_pos_fn=(
-            _omega_pos_fn_from_net(net, lam=cfg.lam, exp_core=cfg.exp_core)
-            if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
-            else None
-        ),
+        omega_pos_fn=omega_pos_fn,
         hilbert_n_quad=int(cfg.hilbert_n_quad),
         hilbert_n_aux=int(cfg.hilbert_n_aux),
         hilbert_core_frac=float(cfg.hilbert_core_frac),
         hilbert_y_near=float(cfg.hilbert_y_near),
+        hilbert_n_far=int(cfg.hilbert_n_far),
         y_trunc=float(cfg.y_max),
+        freeze_velocity=bool(cfg.freeze_velocity),
     )
     r_train = (
         gradient_normalize(
@@ -1193,6 +1422,10 @@ def residual_vector(
         if cfg.use_grad_norm
         else r_abs
     )
+    if cfg.score_collocation:
+        r_train = torch.where(
+            torch.abs(y) < float(cfg.score_abs_max), r_train, torch.zeros_like(r_train)
+        )
     parts: list[Tensor] = [r_train]
     if cfg.d1_weight > 0.0 or cfg.d2_weight > 0.0:
         d1, d2 = _grid_derivatives(r_train, y)
@@ -1200,16 +1433,20 @@ def residual_vector(
             parts.append(math.sqrt(cfg.d1_weight) * d1)
         if cfg.d2_weight > 0.0:
             parts.append(math.sqrt(cfg.d2_weight) * d2)
-    yg = torch.tensor([cfg.gauge_point], dtype=y.dtype, device=y.device)
-    om_g, _, _, _ = omega_from_net(net, yg, lam=cfg.lam, exp_core=cfg.exp_core)
-    gauge = (om_g - cfg.gauge_value) * math.sqrt(cfg.gauge_weight)
+    # The mix already pins Ω(gauge) and HΩ(0). A penalty on the unmixed net
+    # pulls against that 2×2 and is not the scored profile.
+    if not cfg.hard_core_cancel:
+        yg = torch.tensor([cfg.gauge_point], dtype=y.dtype, device=y.device)
+        om_g, _, _, _ = omega_from_net(net, yg, lam=cfg.lam, exp_core=cfg.exp_core)
+        gauge = (om_g - cfg.gauge_value) * math.sqrt(cfg.gauge_weight)
+        parts.append(gauge.reshape(-1))
     max_abs = torch.max(torch.abs(omega))
     anti = torch.relu(
         torch.as_tensor(float(cfg.omega_peak_floor), dtype=y.dtype, device=y.device)
         - max_abs
     )
     anti = anti * math.sqrt(cfg.nontrivial_weight)
-    parts.extend([gauge.reshape(-1), anti.reshape(1)])
+    parts.append(anti.reshape(1))
     if cfg.proj_defect_weight > 0.0:
         parts.append(defect.reshape(1) * math.sqrt(cfg.proj_defect_weight))
     return torch.cat(parts)
@@ -1332,6 +1569,11 @@ def dense_neural_vorticity_residual(
     hilbert_n_aux: int = 128,
     hilbert_core_frac: float = 0.9,
     hilbert_y_near: float = 2.0,
+    hilbert_n_far: int = 64,
+    hard_core_cancel: bool = False,
+    core_node: float = 0.532,
+    core_family: str = "nodal",
+    core_width: float = 0.2,
     gauge_point: float = 0.5,
     gauge_value: float = 0.05,
     dtype: torch.dtype = torch.float64,
@@ -1346,7 +1588,55 @@ def dense_neural_vorticity_residual(
     y = torch.linspace(
         -float(y_max), float(y_max), int(n_val), dtype=dtype, device=next(net.parameters()).device
     )
-    omega, omega_y, _, _ = omega_from_net(net, y, lam=lam, exp_core=exp_core)
+    omega_pos_fn: Callable[[Tensor], Tensor] | None
+    if hard_core_cancel:
+        score_cfg = CCFVorticityNeuralConfig(
+            lam=float(lam),
+            y_max=float(y_max),
+            exp_core=False,
+            hard_core_cancel=True,
+            core_node=float(core_node),
+            core_family=core_family,  # type: ignore[arg-type]
+            core_width=float(core_width),
+            train_hilbert=train_hilbert if train_hilbert == "wholeline_hp" else "wholeline_hp",
+            hilbert_n_quad=int(hilbert_n_quad),
+            hilbert_n_aux=int(hilbert_n_aux),
+            hilbert_n_far=int(hilbert_n_far),
+            hilbert_y_near=float(hilbert_y_near),
+            gauge_point=float(gauge_point),
+            gauge_value=float(gauge_value),
+        )
+        a_cc, b_cc = core_cancel_coefficients(net, score_cfg)
+        omega, omega_y, _, _ = mix_core_cancel(
+            net,
+            y,
+            a_cc,
+            b_cc,
+            lam=float(lam),
+            node=float(core_node),
+            family=core_family,
+            width=float(core_width),
+        )
+
+        def omega_pos_fn(t: Tensor, _a: Tensor = a_cc, _b: Tensor = b_cc) -> Tensor:
+            return mix_core_cancel(
+                net,
+                t,
+                _a,
+                _b,
+                lam=float(lam),
+                node=float(core_node),
+                family=core_family,
+                width=float(core_width),
+            )[0]
+
+    else:
+        omega, omega_y, _, _ = omega_from_net(net, y, lam=lam, exp_core=exp_core)
+        omega_pos_fn = (
+            _omega_pos_fn_from_net(net, lam=lam, exp_core=exp_core)
+            if train_hilbert in _HILBERT_NEEDS_OMEGA_FN
+            else None
+        )
     # Anti-ghost must see the *raw* profile. Hard-rescaling to gauge before the
     # check would make gauge failure unreachable (always pass after rescale).
     y_np0 = y.detach().cpu().numpy()
@@ -1354,11 +1644,13 @@ def dense_neural_vorticity_residual(
     g_raw = float(np.interp(gauge_point, y_np0, om_np0))
     omega_max_raw = float(np.max(np.abs(om_np0)))
     scale = 1.0
-    if abs(g_raw) > 1e-14:
+    # Hard core-cancel already pins the gauge. A second rescale would move HΩ(0)
+    # off (2+λ)/2 because the Wang residual is quadratic.
+    if (not hard_core_cancel) and abs(g_raw) > 1e-14:
         scale = float(gauge_value) / g_raw
         omega = omega * scale
         omega_y = omega_y * scale
-    r, defect, _, _ = vorticity_fields(
+    r, defect, _, uy_score = vorticity_fields(
         y,
         omega,
         omega_y,
@@ -1370,14 +1662,19 @@ def dense_neural_vorticity_residual(
         orders=orders,
         parities=parities,
         omega_pos_fn=(
-            _omega_pos_fn_from_net(net, lam=lam, exp_core=exp_core, scale=scale)
-            if train_hilbert in _HILBERT_NEEDS_OMEGA_FN
-            else None
+            omega_pos_fn
+            if hard_core_cancel
+            else (
+                _omega_pos_fn_from_net(net, lam=lam, exp_core=exp_core, scale=scale)
+                if train_hilbert in _HILBERT_NEEDS_OMEGA_FN
+                else None
+            )
         ),
         hilbert_n_quad=int(hilbert_n_quad),
         hilbert_n_aux=int(hilbert_n_aux),
         hilbert_core_frac=float(hilbert_core_frac),
         hilbert_y_near=float(hilbert_y_near),
+        hilbert_n_far=int(hilbert_n_far),
         y_trunc=float(y_max),
     )
     r_np = r.detach().cpu().numpy()
@@ -1412,6 +1709,8 @@ def dense_neural_vorticity_residual(
         "projection_defect_report": defect_f,
         "n_val": float(n_val),
         "y_max": float(y_max),
+        "h0": float(np.interp(0.0, y_np, uy_score.detach().cpu().numpy())),
+        "h0_target": float(h0_target(lam)),
         "train_hilbert": 0.0,  # placeholder; string in caller extras
     }
 
@@ -1426,10 +1725,32 @@ def _resample_collocation(
     n_pts: int,
     rng: np.random.Generator,
 ) -> None:
+    if cfg.score_collocation:
+        return
     with torch.no_grad():
-        omega, omega_y, _, nn_core = omega_from_net(
-            net, residual_mod.y, lam=cfg.lam, exp_core=cfg.exp_core
-        )
+        if cfg.hard_core_cancel:
+            a_cc, b_cc = core_cancel_coefficients(net, cfg)
+            omega, omega_y, _, nn_core = mix_core_cancel(
+                net, residual_mod.y, a_cc, b_cc, lam=cfg.lam, node=cfg.core_node,
+            family=cfg.core_family,
+            width=cfg.core_width,
+            )
+
+            def _res_fn(t: Tensor, _a: Tensor = a_cc, _b: Tensor = b_cc) -> Tensor:
+                return mix_core_cancel(net, t, _a, _b, lam=cfg.lam, node=cfg.core_node,
+            family=cfg.core_family,
+            width=cfg.core_width,)[0]
+
+            resample_fn: Callable[[Tensor], Tensor] | None = _res_fn
+        else:
+            omega, omega_y, _, nn_core = omega_from_net(
+                net, residual_mod.y, lam=cfg.lam, exp_core=cfg.exp_core
+            )
+            resample_fn = (
+                _omega_pos_fn_from_net(net, lam=cfg.lam, exp_core=cfg.exp_core)
+                if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
+                else None
+            )
         r_abs, _, _, _ = vorticity_fields(
             residual_mod.y,
             omega,
@@ -1441,15 +1762,12 @@ def _resample_collocation(
             hilbert_n_uniform=cfg.hilbert_n_uniform,
             orders=getattr(residual_mod, "orders_buf", residual_mod.orders),
             parities=getattr(residual_mod, "parities_buf", residual_mod.parities),
-            omega_pos_fn=(
-                _omega_pos_fn_from_net(net, lam=cfg.lam, exp_core=cfg.exp_core)
-                if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
-                else None
-            ),
+            omega_pos_fn=resample_fn,
             hilbert_n_quad=int(cfg.hilbert_n_quad),
             hilbert_n_aux=int(cfg.hilbert_n_aux),
             hilbert_core_frac=float(cfg.hilbert_core_frac),
             hilbert_y_near=float(cfg.hilbert_y_near),
+            hilbert_n_far=int(cfg.hilbert_n_far),
             y_trunc=float(cfg.y_max),
         )
         r_w = (
@@ -1485,6 +1803,71 @@ def _load_flat_params(module: nn.Module, params: Tensor) -> None:
             offset += n
 
 
+def _linf_trust_steps(
+    residual_fn: Callable[[Tensor], Tensor],
+    params: Tensor,
+    *,
+    steps: int,
+) -> tuple[Tensor, list[float]]:
+    """Lawson-IRLS direction; accept only when true ``max|r|`` decreases.
+
+    L2 Gauss–Newton on this residual lowers the mean square while the peak
+    that the stretch gate reads stays put or grows. The direction is the
+    damped least-squares step on Lawson weights (the L∞ successor of a
+    Gauss–Newton step). The line search is on ``max|r|``, not on ``||r||``.
+    """
+    from torch.func import jacrev
+
+    mu = 1e-3
+    radius = 0.25
+    history: list[float] = []
+    for s in range(int(steps)):
+        res = residual_fn(params)
+        max0 = float(torch.max(torch.abs(res)))
+        jac = jacrev(residual_fn)(params)
+        w = torch.ones_like(res)
+        delta = torch.zeros_like(params)
+        for _ in range(8):
+            sw = torch.sqrt(torch.clamp(w, min=0.0))
+            delta = lstsq_gauss_newton_direction(jac * sw[:, None], res * sw, mu)
+            lin = res + jac @ delta
+            w = w * (lin.detach().abs() + 1e-15)
+            w = w / torch.clamp(w.mean(), min=1e-30)
+        dn = float(torch.linalg.vector_norm(delta))
+        if dn > radius and dn > 0.0:
+            delta = delta * (radius / dn)
+        alpha = 1.0
+        accepted = False
+        max1 = max0
+        cand = params
+        for _ in range(12):
+            trial = params + alpha * delta
+            trial_max = float(torch.max(torch.abs(residual_fn(trial))))
+            if math.isfinite(trial_max) and trial_max < max0:
+                cand = trial
+                max1 = trial_max
+                accepted = True
+                break
+            alpha *= 0.5
+        if accepted and alpha >= 1.0 - 1e-12:
+            params = cand.detach()
+            radius = min(radius * 1.5, 8.0)
+        elif accepted:
+            params = cand.detach()
+            radius = max(radius * alpha * 2.0, 1e-4)
+        else:
+            radius = max(radius * 0.5, 1e-4)
+        history.append(max1 if accepted else max0)
+        if s % 5 == 0 or s + 1 == int(steps):
+            print(
+                f"[linf] step={s + 1}/{int(steps)} train_max={max1:.6e} "
+                f"radius={radius:.3e} step_norm={dn:.3e} alpha={alpha:.3e} "
+                f"accepted={accepted}",
+                flush=True,
+            )
+    return params, history
+
+
 def run_ccf_vorticity_neural_discovery(
     cfg: CCFVorticityNeuralConfig | None = None,
     *,
@@ -1510,14 +1893,20 @@ def run_ccf_vorticity_neural_discovery(
     device = torch.device(cfg.device if (not cfg.device.startswith("cuda") or torch.cuda.is_available()) else "cpu")
     rng = np.random.default_rng(int(cfg.seed))
     n_pts = int(cfg.n_adaptive if cfg.n_adaptive is not None else cfg.n_grid)
-    y_np = _hybrid_sample_y(
-        y_max=float(cfg.y_max),
-        n=n_pts,
-        origin_fraction=cfg.origin_fraction,
-        weights=None,
-        y_pool=np.linspace(-cfg.y_max, cfg.y_max, max(n_pts, 33)),
-        rng=rng,
-    )
+    if cfg.score_collocation:
+        y_full = np.linspace(-float(cfg.y_max), float(cfg.y_max), n_pts)
+        y_np = y_full[np.abs(y_full) < float(cfg.score_abs_max)]
+        if y_np.size < 8:
+            y_np = y_full
+    else:
+        y_np = _hybrid_sample_y(
+            y_max=float(cfg.y_max),
+            n=n_pts,
+            origin_fraction=cfg.origin_fraction,
+            weights=None,
+            y_pool=np.linspace(-cfg.y_max, cfg.y_max, max(n_pts, 33)),
+            rng=rng,
+        )
     y = torch.as_tensor(y_np, dtype=cfg.dtype, device=device)
     if int(cfg.max_order) > 0:
         scales_np, gammas_np, orders_np, parities_np = hardy_dictionary_ordered(
@@ -1549,14 +1938,17 @@ def run_ccf_vorticity_neural_discovery(
         ).to(device=device, dtype=cfg.dtype)
 
     def _cold_bias_fill(module: CompactifiedOmegaOMBU) -> None:
+        # Zero bias is the trivial-hat start. Core-cancel needs a signed O(1)
+        # hat so the net is not a multiple of the nodal bump.
+        fill = 1.0 if cfg.hard_core_cancel else 0.0
         with torch.no_grad():
             if module._ombu is not None:
-                module._ombu.c.bias.fill_(0.0)
+                module._ombu.c.bias.fill_(fill)
             elif module.mlp is not None:
                 last = module.mlp.linears[-1]
                 assert isinstance(last, nn.Linear)
                 if last.bias is not None:
-                    last.bias.fill_(0.0)
+                    last.bias.fill_(fill)
 
     net = _new_net()
     warm_ok = False
@@ -1586,18 +1978,52 @@ def run_ccf_vorticity_neural_discovery(
     adam_steps = 0 if warm_state_dict is not None else int(cfg.adam_warmup_steps)
     if adam_steps > 0:
         opt_adam = torch.optim.Adam(net.parameters(), lr=cfg.adam_lr)
-        for _ in range(adam_steps):
+        for adam_i in range(adam_steps):
             opt_adam.zero_grad(set_to_none=True)
             rv = residual_mod()
             loss = 0.5 * torch.mean(rv * rv)
             loss.backward()
             opt_adam.step()
+            if adam_i == 0 or (adam_i + 1) % 100 == 0 or adam_i + 1 == adam_steps:
+                print(
+                    f"[adam] step={adam_i + 1}/{adam_steps} "
+                    f"rms={math.sqrt(2.0 * float(loss.detach())):.6e}",
+                    flush=True,
+                )
 
     history: list[float] = []
     best_r = float("inf")
     optimizer_label = str(cfg.optimizer)
 
-    if cfg.optimizer == "martens_grosse" and int(cfg.mg_steps) > 0:
+    if (
+        cfg.optimizer == "martens_grosse"
+        and int(cfg.mg_steps) > 0
+        and cfg.residual_norm == "linf"
+    ):
+        optimizer_label = "LinfIRLS"
+        chunk = max(1, int(cfg.resample_every) if cfg.resample_every > 0 else cfg.mg_steps)
+        steps_left = int(cfg.mg_steps)
+        while steps_left > 0:
+            n_chunk = min(chunk, steps_left)
+            flat0, residual_fn = functional_residual_fn(residual_mod)
+            params, max_hist = _linf_trust_steps(residual_fn, flat0, steps=n_chunk)
+            _load_flat_params(residual_mod, params)
+            history.extend(max_hist)
+            cur = history[-1] if history else float("inf")
+            if cur < best_r:
+                best_r = cur
+            steps_left -= n_chunk
+            if steps_left > 0 and cfg.resample_every > 0:
+                _resample_collocation(
+                    net,
+                    residual_mod,
+                    cfg=cfg,
+                    scales=scales,
+                    gammas=gammas,
+                    n_pts=n_pts,
+                    rng=rng,
+                )
+    elif cfg.optimizer == "martens_grosse" and int(cfg.mg_steps) > 0:
         optimizer_label = f"MartensGrosseGN({cfg.mg_solver})"
         # Periodic resample: chunk MG steps between collocation refreshes.
         chunk = max(1, int(cfg.resample_every) if cfg.resample_every > 0 else cfg.mg_steps)
@@ -1606,23 +2032,80 @@ def run_ccf_vorticity_neural_discovery(
         while steps_left > 0 and not mg_failed:
             n_chunk = min(chunk, steps_left)
             flat0, residual_fn = functional_residual_fn(residual_mod)
+            # Exact-JVP QR/CG Gauss–Newton with a real LM trust region.
+            # martens_grosse_combine rescales a damped step by alpha > 1
+            # (it undoes mu), so every later trial misses the decrease and
+            # mu runs to max_damping. The learning-rate combine is the
+            # paper's KFAC add-on, not a replacement for the damped solve.
+            gn_chunk = GaussNewton(
+                damping=1e-3,
+                damping_decrease=0.25,
+                damping_increase=2.0,
+                max_line_search=16,
+                solver=cfg.mg_solver,
+                damping_strategy=cfg.mg_damping_strategy,
+                use_martens_grosse=False,
+                cg_max_iter=40,
+                cg_tol=1e-6,
+            )
+            params = flat0
+            loss_hist: list[float] = []
             try:
-                params, loss_hist = martens_grosse_gauss_newton_minimize(
-                    residual_fn,
-                    flat0,
-                    steps=n_chunk,
-                    damping=1e-3,
-                    solver=cfg.mg_solver,
-                    use_martens_grosse=True,
-                )
-            except RuntimeError:
+                rmax_prev: float | None = None
+                for s in range(n_chunk):
+                    params_before = params
+                    params, info = gn_chunk.step(residual_fn, params)
+                    reverted = False
+                    accepted = bool(info.accepted)
+                    loss_report = float(info.loss)
+                    if cfg.reject_max_increase:
+                        with torch.no_grad():
+                            r_now = residual_fn(params)
+                            rmax_now = float(torch.max(torch.abs(r_now)))
+                        if rmax_prev is None:
+                            with torch.no_grad():
+                                rmax_prev = float(
+                                    torch.max(torch.abs(residual_fn(params_before)))
+                                )
+                        if rmax_now > rmax_prev:
+                            params = params_before
+                            gn_chunk.damping = min(float(gn_chunk.damping) * 8.0, 1e8)
+                            reverted = True
+                            accepted = False
+                        else:
+                            rmax_prev = rmax_now
+                    kept = loss_report
+                    if reverted:
+                        kept = loss_hist[-1] if loss_hist else loss_report
+                    loss_hist.append(kept)
+                    if n_chunk <= 40 or s % 10 == 0 or s + 1 == n_chunk:
+                        rms = math.sqrt(2.0 * max(float(info.loss), 0.0))
+                        with torch.no_grad():
+                            r_now = residual_fn(params)
+                            rmax = float(torch.max(torch.abs(r_now)))
+                        print(
+                            f"[mg] step={s + 1}/{n_chunk} train_rms={rms:.6e} "
+                            f"train_max={rmax:.6e} "
+                            f"damping={gn_chunk.damping:.3e} accepted={accepted} "
+                            f"reverted={reverted}",
+                            flush=True,
+                        )
+            except RuntimeError as exc:
+                print(f"[mg] failed: {type(exc).__name__}: {exc}", flush=True)
                 mg_failed = True
                 optimizer_label = "MartensGrosseGN_failed_fallback_CubicGN"
+                if loss_hist:
+                    _load_flat_params(residual_mod, params)
                 break
             _load_flat_params(residual_mod, params)
             for loss in loss_hist:
                 history.append(float(math.sqrt(2.0 * max(float(loss), 0.0))))
             cur = history[-1] if history else float("inf")
+            print(
+                f"[mg] chunk_rms={cur:.6e} damping={gn_chunk.damping:.3e} "
+                f"steps_left={steps_left - n_chunk}",
+                flush=True,
+            )
             if cur < best_r:
                 best_r = cur
             steps_left -= n_chunk
@@ -1743,15 +2226,24 @@ def run_ccf_vorticity_neural_discovery(
         device=device,
     )
     with torch.no_grad():
-        omega, omega_y, _, _ = omega_from_net(
-            net, y_eval, lam=cfg.lam, exp_core=cfg.exp_core
-        )
+        if cfg.hard_core_cancel:
+            a_cc, b_cc = core_cancel_coefficients(net, cfg)
+            omega, omega_y, _, _ = mix_core_cancel(
+                net, y_eval, a_cc, b_cc, lam=cfg.lam, node=cfg.core_node,
+            family=cfg.core_family,
+            width=cfg.core_width,
+            )
+        else:
+            a_cc, b_cc = None, None
+            omega, omega_y, _, _ = omega_from_net(
+                net, y_eval, lam=cfg.lam, exp_core=cfg.exp_core
+            )
     y_np = y_eval.detach().cpu().numpy()
     om_np = omega.detach().cpu().numpy()
     omy_np = omega_y.detach().cpu().numpy()
     g_sample = float(np.interp(cfg.gauge_point, y_np, om_np))
     scale = 1.0
-    if abs(g_sample) > 1e-14:
+    if (not cfg.hard_core_cancel) and abs(g_sample) > 1e-14:
         scale = float(cfg.gauge_value) / g_sample
         om_np = om_np * scale
         omy_np = omy_np * scale
@@ -1770,16 +2262,27 @@ def run_ccf_vorticity_neural_discovery(
             orders=orders_t,
             parities=parities_t,
             omega_pos_fn=(
-                _omega_pos_fn_from_net(
-                    net, lam=cfg.lam, exp_core=cfg.exp_core, scale=scale
+                (
+                    lambda t, _a=a_cc, _b=b_cc: mix_core_cancel(
+                        net, t, _a, _b, lam=cfg.lam, node=cfg.core_node,
+            family=cfg.core_family,
+            width=cfg.core_width,
+                    )[0]
                 )
-                if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
-                else None
+                if cfg.hard_core_cancel
+                else (
+                    _omega_pos_fn_from_net(
+                        net, lam=cfg.lam, exp_core=cfg.exp_core, scale=scale
+                    )
+                    if cfg.train_hilbert in _HILBERT_NEEDS_OMEGA_FN
+                    else None
+                )
             ),
             hilbert_n_quad=int(cfg.hilbert_n_quad),
             hilbert_n_aux=int(cfg.hilbert_n_aux),
             hilbert_core_frac=float(cfg.hilbert_core_frac),
             hilbert_y_near=float(cfg.hilbert_y_near),
+            hilbert_n_far=int(cfg.hilbert_n_far),
             y_trunc=float(cfg.y_max),
         )
         try:
@@ -1809,6 +2312,9 @@ def run_ccf_vorticity_neural_discovery(
         hilbert_n_aux=int(cfg.hilbert_n_aux),
         hilbert_core_frac=float(cfg.hilbert_core_frac),
         hilbert_y_near=float(cfg.hilbert_y_near),
+        hilbert_n_far=int(cfg.hilbert_n_far),
+        hard_core_cancel=bool(cfg.hard_core_cancel),
+        core_node=float(cfg.core_node),
         gauge_point=cfg.gauge_point,
         gauge_value=cfg.gauge_value,
         dtype=cfg.dtype,
@@ -1839,6 +2345,8 @@ def run_ccf_vorticity_neural_discovery(
             "reproduction_dense_max_abs_for_gate": float(
                 dense["reproduction_dense_max_abs_for_gate"]
             ),
+            "h0": float(dense["h0"]),
+            "h0_target": float(dense["h0_target"]),
         },
         config=cfg,
         extra={
@@ -1849,6 +2357,8 @@ def run_ccf_vorticity_neural_discovery(
             "hilbert": cfg.train_hilbert,
             "residual_form": "wang_vorticity",
             "use_grad_norm": cfg.use_grad_norm,
+            "hard_core_cancel": bool(cfg.hard_core_cancel),
+            "mg_damping_strategy": cfg.mg_damping_strategy,
             "train_history_max_abs": history,
             "rung_metric_uses_fft": cfg.train_hilbert == "truncated_line_spectral",
             "net": net,
@@ -1898,7 +2408,10 @@ __all__ = [
     "deepmind_signed_hat_config",
     "dense_neural_vorticity_residual",
     "grad_norm_downweights_peak",
+    "core_cancel_coefficients",
+    "core_correction_omega",
     "gradient_normalize",
+    "h0_target",
     "hardy_corrected_hu_from_omega",
     "hardy_dictionary",
     "hardy_dictionary_ordered",
@@ -1906,6 +2419,8 @@ __all__ = [
     "hilbert_pv_line",
     "hilbert_pv_mapped_tail",
     "hilbert_wholeline_hp",
+    "mix_core_cancel",
+    "nodal_bump_omega",
     "omega_from_net",
     "project_omega_hardy",
     "project_omega_hardy_torch",

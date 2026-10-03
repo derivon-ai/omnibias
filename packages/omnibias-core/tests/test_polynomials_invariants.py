@@ -536,7 +536,7 @@ def test_bell_and_multi_index_orders_are_bounded() -> None:
         bell_number(MAX_BELL_NUMBER_ORDER + 1)
 
     # One joint bound on the result size, since the count grows in both args.
-    with pytest.raises(ValueError, match="MAX_MULTI_INDICES"):
+    with pytest.raises(ValueError, match="multi-index budget"):
         multi_indices(6, 60)
     assert len(multi_indices(3, 4)) == 35
     assert MAX_MULTI_INDICES > 0

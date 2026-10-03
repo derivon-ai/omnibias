@@ -264,7 +264,168 @@ future \(10^{-8}\) stage-1; Adam stays the smoke heuristic. The
 missing *use* of the paper stack is still a stage-1 that already
 sits near \(10^{-8}\), which the official softplus net never reached
 (ghost at raw \(\Omega\sim 10^{-6}\)). The follow-up paper states
-MSNN is ineffective above that basin.
+MSNN is ineffective above that basin. A later score-grid run
+(depth-3 tanh JetMLP, 16 Fourier features of \(q\), signed hat,
+hard \(H\Omega(0)=(2+\lambda)/2\), exact-JVP CGLS, step kept only
+when \(\max|r|\) does not rise) reached
+`free_omega_vorticity_residual` \(\max|r|=1.133\times 10^{-1}\)
+on \(|y|<38\) at \(\lambda=0.6057\). Two further continuation rounds
+left that peak unchanged while the trust-region damping exceeded
+\(10^{6}\). That is an improved neural floor relative to a cold
+start near \(7\times 10^{-1}\), and it is still above both
+\(10^{-8}\) and the stretch gate. A chart-\(q\) Chebyshev hat of degree 512, mixed with the nodal bump
+so the gauge and \(H\Omega(0)=(2+\lambda)/2\) match under the default
+`hilbert_wholeline_hp` counts \((n_{\mathrm{near}}, n_{\mathrm{far}},
+n_{\mathrm{tail}})=(128, 64, 96)\), scores
+\(\max|r|=5.669\times 10^{-13}\) on that default rule at
+\(\lambda=0.6057\). The same frozen mix, rescored with the Wang
+residual at doubled counts \((256, 128, 192)\) and quadrupled counts
+\((512, 256, 384)\), has \(\max|r|=1.45\times 10^{-4}\) and
+\(1.67\times 10^{-4}\), and \(H\Omega(0)\) moves to \(1.30267\) and
+\(1.30253\). The default-node \(10^{-13}\) figure is quadrature aliasing of a rough
+hat. A later degree-512 hat, with the gauge and \(H\Omega(0)\)
+re-solved on those default counts, has Wang residual
+\(2.050\times 10^{-8}\) on the 1601-point score grid at Hilbert counts
+\((128, 64, 96)\), \((1024, 512, 768)\), and \((2048, 1024, 1536)\)
+together. The same mix on a 6401-point grid has
+\(\max|r|=1.70\). The \(2.050\times 10^{-8}\) figure undersamples a residual that spikes
+between the 1601 nodes. A degree-32 chart-\(q\) fit of the stalled
+Fourier-network hat reproduces the \(1.133\times 10^{-1}\) residual on
+1601, 6401, and 25601 collocation points together. Minimax steps in that degree, kept only when those three grids
+agree, reach \(2.174\times 10^{-2}\). Degree 48 reaches
+\(1.972\times 10^{-2}\) and degree 64 reaches \(1.927\times 10^{-2}\),
+with \(H\Omega(0)=(2+\lambda)/2\) on each grid. The gauge mix at that
+point is large (\(a\approx 6.9\), \(b\approx 3.4\)), and further
+feasible steps change the residual by a fraction of a percent.
+The gauge and \(H\Omega(0)\) rows are linear in a pure chart-\(q\)
+hat, so eliminating two Chebyshev coefficients removes that
+cancellation. The degree-96 hat in that parameterization scores
+\(1.831\times 10^{-2}\) on the 1601-, 6401-, and 25601-point grids
+together, again with \(H\Omega(0)=(2+\lambda)/2\). Free modes through
+degree 160 move the 6401-point residual by about half a percent and
+do not lower the 25601-point residual. A coupling homotopy that
+ramps the Hilbert quadratic up from the \(U=0\) transport problem
+does not enter this basin: at degree 24 the \(t=0\) hat already has
+Wang residual about \(0.82\). The resolved free-\(\Omega\) floor of
+this hard-\(H\Omega(0)\) family stays near \(10^{-2}\). A gauge-scaled
+\(\sinh(\psi(q))\) hat, with \(\psi\) a chart-\(q\) Chebyshev series and
+the constant mode pinned, is a different basin. Degree 16 stalls near
+\(9.34\times 10^{-3}\). Degree 32 reaches \(7.666\times 10^{-3}\) on
+the 1601-point grid, \(7.968\times 10^{-3}\) on 6401 points, and
+\(7.987\times 10^{-3}\) on 25601 points, and those three values repeat
+at Hilbert counts \((512, 256, 384)\). \(H\Omega(0)\approx 1.022\). The residual on that profile peaks at
+\(|y|\approx 0.075\) and again near \(|y|=38\), both about
+\(8\times 10^{-3}\). Differentiating the 6401-point residual at those fine
+Hilbert counts, and keeping a step only when a 12801-point check
+falls, moves a degree-72 continuation of that hat to \(4.37\times 10^{-3}\) on
+6401 points, \(4.45\times 10^{-3}\) on 12801 points, and
+\(4.49\times 10^{-3}\) on 25601 points. The last steps still fall, by
+a few times \(10^{-5}\) each, which does not reach \(10^{-8}\). An
+ODE-consistent even velocity derivative with the smooth-root value at
+the origin rebuilds a profile whose manufactured Wang residual is
+roundoff, and a degree-12 correction of a Gaussian derivative then
+stalls at \(6.83\times 10^{-2}\) on 1601 points and \(6.89\times 10^{-2}\)
+on 6401 points. Shifting \(\lambda\) by up to \(5\times 10^{-4}\)
+leaves the maximum essentially unchanged. A frozen-velocity
+integration of the Wang ODE increases it, and a joint step that also
+penalizes \(H\Omega(0)-(2+\lambda)/2\) moves the core value only to
+about \(1.029\) before it stalls. An even Gaussian of width \(0.08\) has a linear model that promises
+about \(6.0\times 10^{-3}\). Only a step of relative size \(0.05\) is
+accepted, and ten such steps move the 1601-point residual from
+\(7.666\times 10^{-3}\) to \(7.576\times 10^{-3}\) while the 6401-point
+residual stays near \(7.86\times 10^{-3}\). Further plain steps change the
+residual by a fraction of a percent; the linear model promises about
+\(6.5\times 10^{-3}\) and the true step does not get there. Rebuilding
+the decay envelope at the \(\lambda\) inferred from this profile,
+\(\lambda=2H\Omega(0)-2\approx 0.044\), flips \(H\Omega(0)\) negative
+and raises the residual to about \(6.3\times 10^{-2}\). Continuing
+that inference clips at \(\lambda=-0.2\), and the profile rescored at
+\(\lambda=0.6057\) has residual about \(4.25\). An equality-constrained
+step that drives \(H\Omega(0)\) to \((2+\lambda)/2\) on the same sinh
+hat reaches \(2.895\times 10^{-2}\) on the 1601-, 6401-, and
+25601-point grids together, with \(H\Omega(0)\approx 1.304\). Damped
+least squares on the raw residual lowers the root-mean-square from
+\(6.05\times 10^{-3}\) to \(1.10\times 10^{-3}\) while the dense
+maximum rises to about \(2.5\times 10^{-2}\). A degree-16 cold start
+at the stable value \(\lambda=1.18078\) stalls near \(1.28\times 10^{-1}\).
+A differential-evolution search over three even bumps reached
+\(8.76\times 10^{-2}\) on 1601 points and \(1.09\times 10^{-1}\) on 6401
+points, with \(H\Omega(0)\) negative. Descending the antiderivative of
+the Wang residual from the sinh hat lowers that integral from \(0.161\)
+to \(0.140\) while the Wang maximum rises from \(7.67\times 10^{-3}\) to
+about \(9\times 10^{-2}\). A cold signed-hat network, trained for 24
+exact-JVP steps on the raw \(L^2\) residual with the monotone
+maximum filter off, scores \(2.018\times 10^{-1}\) on
+`free_omega_vorticity_residual`. Continuing that least-squares
+training lowers the root-mean-square from \(3.71\times 10^{-2}\) to
+\(2.73\times 10^{-2}\) over 60 steps while the training maximum rises
+from \(1.94\times 10^{-1}\) to \(2.60\times 10^{-1}\). The degree-64
+exact-core mix, maximum \(1.927\times 10^{-2}\), is flat in \(|y|\):
+every band from the origin out to 38 lies between
+\(1.65\times 10^{-2}\) and \(1.93\times 10^{-2}\), and the peak is near
+\(|y|=22.6\). An even Gaussian shelf of amplitude \(0.01\) on that hat,
+with the gauge and core re-solved, raises the maximum above
+\(6\times 10^{-2}\). Lawson reweighting of the cold signed-hat residual
+accepts only a numerical nudge: the training maximum stays
+\(1.942\times 10^{-1}\) and `free_omega_vorticity_residual` stays
+\(2.018\times 10^{-1}\). Mixing that sinh hat with the nodal bump
+to raise \(H\Omega(0)\) off \(1.022\) is monotone: at \(1.069\) the
+6401-point maximum is \(7.6\times 10^{-2}\), and at the exact core
+value \((2+\lambda)/2\) it is \(0.677\). Additive and multiplicative
+sech spikes of amplitude \(10^{-2}\) on the degree-64 exact-core hat
+do not lower its \(1.927\times 10^{-2}\) maximum. A damped
+Picard blend of that same mix with its frozen-velocity ODE solution
+diverges: a \(2\%\) blend raises the maximum from \(1.927\times 10^{-2}\)
+to about \(30\) and \(H\Omega(0)\) from \(1.303\) to about \(14\). On both
+floors, \(D=(1+\lambda)y-U\) has no zero for \(0.2<|y|<38\); the smallest
+\(|D|\) on that range sits at the inner edge. Four cold signed-hat
+seeds (width 16, depth 2, 30 exact-JVP steps, coarse training
+quadrature, official rescore) land at \(0.115\), \(0.131\), \(0.243\),
+and \(0.117\), each with \(H\Omega(0)=(2+\lambda)/2\). None enters the
+degree-64 exact-core value \(1.927\times 10^{-2}\). Along the gauge-only
+sinh hat, \(y^{\alpha}\Omega\) is still growing at \(|y|=37\) (about
+\(0.48\)), so that \(7.97\times 10^{-3}\) profile is fatter than the
+\(|y|^{-\alpha}\) envelope. The degree-64 exact-core mix does level:
+\(y^{\alpha}\Omega\) sits near \(-5\) from \(|y|=24\) to \(37\), and
+\(\Omega\) changes sign near \(|y|=4\). Replacing \(\sinh\psi\) by
+\(2\tanh\psi\) forces a bounded hat. Four minimax steps from the sinh
+coefficients and from a cold start reach about \(7.2\times 10^{-2}\)
+on the training grid and \(7.4\times 10^{-2}\) on the 6401-point fine
+Hilbert, with \(H\Omega(0)\) negative. \(\lambda=0.6057\) still passes and
+both honesty flags stay false.
+Detaching the core-cancel coefficients with the velocity lets an Adam
+step skip the Hilbert. On the nodal bump that step does not move: the
+bump's \((\Omega(0.5), H\Omega(0))\) ratio sits within a percent of
+\((0.05,(2+\lambda)/2)\), so the solved network weight collapses and
+800 Adam steps leave the training root-mean-square at
+\(7.71\times 10^{-2}\). The official score of that run is \(0.719\).
+A narrow even Gaussian companion \(\exp(-(y/w)^{2})\) keeps an \(O(1)\)
+network weight. Four hundred Adam steps on it do not lower the training
+root-mean-square, and twelve exact-JVP steps stall; the official
+`free_omega_vorticity_residual` score is \(1.35\). The same Gaussian
+on the gauge-only sinh hat, with the gauge and \(H\Omega(0)\) re-solved,
+is less destructive than the nodal bump. Width \(0.40\) scores
+\(3.16\times 10^{-2}\) on 1601 points and \(3.17\times 10^{-2}\) on
+6401 points at fine Hilbert counts, with \(H\Omega(0)=(2+\lambda)/2\).
+The gauge-only sinh floor and the exact-core floor are unchanged, and
+both sit above \(10^{-8}\) and the stretch gate.
+An additive degree-12 Chebyshev correction outside that frozen sinh hat
+lowers the 1601-point residual to \(7.50\times 10^{-3}\) and raises the
+6401-point residual to \(8.14\times 10^{-3}\), at both the default and
+the fine Hilbert counts. A width-64 depth-3 tanh network fitted to the
+same hat still has a derivative error of about \(2.3\) against a peak
+derivative of about \(41\), and its `free_omega_vorticity_residual`
+score is \(0.106\). Applying the whole-line operator twice to the sinh
+velocity derivative does not recover \(\Omega\). The opposite kernel
+\(U_y=-H[\Omega]\) is a different operator: the shipped line Hilbert
+matches the Hardy identity \(H[\text{odd}]=-\text{even}\). On that
+opposite kernel a positive \(\exp(\psi(q))\) hat, \(\psi\) a degree-24
+Chebyshev series, stalls at \(1.375\times 10^{-3}\) on 1601 points and
+\(1.376\times 10^{-3}\) on 6401 points, with \(H\Omega(0)\approx 1.293\).
+That figure is not the Wang residual the stretch gate reads, and it
+remains above \(10^{-8}\).
+The stretch gate remains \(10^{-13}\) and still reads the neural
+profile. `navier_stokes_proof_claim` stays false.
 
 ## Where reproduction / improvement / proof-readiness stand
 

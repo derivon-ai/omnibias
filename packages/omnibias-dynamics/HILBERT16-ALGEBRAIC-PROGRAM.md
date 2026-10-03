@@ -49,8 +49,10 @@ algebraically unresolved. Those six are:
 | `1 + 1<7> + 1<12>` | Open | Excluded |
 | `1 + 1<9> + 1<10>` | Open | Excluded |
 
-The paper excludes the maximal `(p,n)=(3,19)` column from T-curves. This does
-not exclude algebraic realization. Its archive of 2,367 nonempty octic schemes
+Theorem 21 characterizes the four achievable maximal T-curve columns; Corollary
+22 excludes the `(p,n)=(3,19)` column. That exclusion does not touch the two
+open `(19,3)` schemes (`4 + 1<2 + 1<14>>` and `14 + 1<2 + 1<4>>`). Its archive
+of 2,367 nonempty octic schemes
 is not exhaustive. Nonmaximal octics, higher degrees, and rigid-isotopy
 refinements therefore remain explicit inventory obligations.
 

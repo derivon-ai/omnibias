@@ -20,6 +20,7 @@ from omnibias.core.collapse.winding import (
     arg_iv,
     contains_origin,
     integers_in,
+    winding_collapse_function,
     winding_enclosure,
 )
 from omnibias.core.verified.complex_interval import ComplexInterval
@@ -86,6 +87,12 @@ def test_wrong_expected_winding_is_disproved() -> None:
 
 def test_constant_has_winding_zero() -> None:
     assert winding_collapse((1,), expected=0).proved
+
+
+def test_function_winding_collapse_uses_interval_evaluator() -> None:
+    verdict = winding_collapse_function(lambda z: z, expected=1)
+    assert verdict.proved
+    assert verdict.outcome.surviving == 1
 
 
 def test_zero_polynomial_is_blocked() -> None:

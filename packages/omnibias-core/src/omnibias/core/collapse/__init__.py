@@ -80,6 +80,7 @@ from omnibias.core.collapse.winding import (
     WINDING_SPEC,
     ComplexEnclosureFn,
     winding_collapse,
+    winding_collapse_function,
     winding_enclosure,
     winding_enclosure_function,
 )
@@ -136,6 +137,7 @@ __all__ = [
     "reset_collapse_registry",
     "search_residuals",
     "winding_collapse",
+    "winding_collapse_function",
     "winding_enclosure",
     "winding_enclosure_function",
 ]

@@ -608,3 +608,168 @@ def test_max_order_recovers_planted_q2_atom() -> None:
     hit = np.where((orders == 2) & (parities == 1))[0]
     assert hit.size == 1
     assert abs(float(coeffs[hit[0]])) > 0.5
+
+
+def test_hard_core_cancel_pins_gauge_and_h0() -> None:
+    """Odd smooth root needs HΩ(0)=(2+λ)/2. The mix pins that and the gauge."""
+    cfg = cvn.reproduce_deepmind_config(
+        hidden=4,
+        depth=1,
+        exp_core=False,
+        hard_core_cancel=True,
+        y_max=4.0,
+        hilbert_n_aux=12,
+        hilbert_n_quad=12,
+        hilbert_n_far=8,
+        n_grid=9,
+        mg_steps=0,
+        qr_gn_steps=0,
+        adam_warmup_steps=0,
+        dense_n_val=11,
+        use_grad_norm=False,
+        d1_weight=0.0,
+        d2_weight=0.0,
+        resample_every=0,
+        device="cpu",
+        n_scales=2,
+        n_gamma_multiples=1,
+    )
+    result = cvn.run_ccf_vorticity_neural_discovery(cfg)
+    net = result.extra["net"]
+    with torch.no_grad():
+        a_cc, b_cc = cvn.core_cancel_coefficients(net, cfg)
+        g = cvn.mix_core_cancel(
+            net,
+            torch.tensor([cfg.gauge_point], dtype=torch.float64),
+            a_cc,
+            b_cc,
+            lam=cfg.lam,
+            node=cfg.core_node,
+        )[0]
+        z = torch.tensor([0.0], dtype=torch.float64)
+        om0 = cvn.mix_core_cancel(
+            net, z, a_cc, b_cc, lam=cfg.lam, node=cfg.core_node
+        )[0]
+
+        def fn(t: torch.Tensor) -> torch.Tensor:
+            return cvn.mix_core_cancel(
+                net, t, a_cc, b_cc, lam=cfg.lam, node=cfg.core_node
+            )[0]
+
+        uy0, _ = cvn.wholeline_hp_hu_from_omega(
+            z,
+            om0,
+            decay_power=1.0 / (1.0 + cfg.lam),
+            omega_fn=fn,
+            y_trunc=cfg.y_max,
+            n_near=cfg.hilbert_n_aux,
+            n_far=cfg.hilbert_n_far,
+            n_tail=cfg.hilbert_n_quad,
+            y_near=cfg.hilbert_y_near,
+        )
+    assert abs(float(g) - cfg.gauge_value) < 1e-8
+    assert abs(float(uy0) - cvn.h0_target(cfg.lam)) < 1e-6
+    assert result.diagnostics["omega_max_abs"] >= 0.02
+    assert result.extra["hard_core_cancel"] is True
+
+
+def test_linf_trust_step_lowers_max_abs() -> None:
+    """L∞ steps must not trade a lower mean square for a higher peak."""
+
+    def residual(p: torch.Tensor) -> torch.Tensor:
+        return torch.stack(
+            (
+                p[0] - 1.0,
+                10.0 * (p[1] - 0.2),
+                0.01 * p[0],
+            )
+        )
+
+    p0 = torch.zeros(2, dtype=torch.float64)
+    r0 = float(torch.max(torch.abs(residual(p0))))
+    _p1, hist = cvn._linf_trust_steps(residual, p0, steps=6)
+    assert r0 > 1.0
+    assert hist
+    assert hist[-1] < 0.5 * r0
+    assert all(hist[i] <= hist[0] + 1e-12 for i in range(len(hist)))
+
+
+def test_freeze_velocity_preserves_residual_value() -> None:
+    """Detaching U does not change the Wang residual at the linearization point."""
+    y = torch.linspace(-2.0, 2.0, 21, dtype=torch.float64)
+    omega = torch.sin(y)
+    omega_y = torch.cos(y)
+    scales = torch.ones(2, dtype=torch.float64)
+    gammas = torch.ones(2, dtype=torch.float64)
+    kw = dict(
+        lam=0.6057,
+        scales=scales,
+        gammas=gammas,
+        train_hilbert="pv_line",
+        hilbert_n_uniform=None,
+    )
+    r_live, *_ = cvn.vorticity_fields(y, omega, omega_y, freeze_velocity=False, **kw)
+    r_frz, *_ = cvn.vorticity_fields(y, omega, omega_y, freeze_velocity=True, **kw)
+    assert torch.allclose(r_live, r_frz)
+
+
+def test_origin_gauss_core_keeps_an_order_one_net_weight() -> None:
+    """A narrow origin Gaussian must not collapse the solved net coefficient."""
+    torch.manual_seed(0)
+    net = cvn.CompactifiedOmegaOMBU(hidden=4, depth=1, activation="tanh")
+    cfg = cvn.CCFVorticityNeuralConfig(
+        hidden=4,
+        depth=1,
+        lam=0.6057,
+        exp_core=False,
+        hard_core_cancel=True,
+        core_family="origin_gauss",
+        core_width=0.2,
+        train_hilbert="wholeline_hp",
+        hilbert_n_aux=8,
+        hilbert_n_far=4,
+        hilbert_n_quad=8,
+        hilbert_y_near=1.0,
+        y_max=4.0,
+        device="cpu",
+    )
+    a, b = cvn.core_cancel_coefficients(net, cfg)
+    a_f = float(a.detach())
+    b_f = float(b.detach())
+    assert a_f == a_f and b_f == b_f
+    assert abs(a_f) > 0.1, (a_f, b_f)
+
+
+def test_freeze_velocity_detaches_core_cancel_hilbert() -> None:
+    """Picard freeze backprops through the net, not the core-cancel Hilbert."""
+    torch.manual_seed(0)
+    net = cvn.CompactifiedOmegaOMBU(hidden=4, depth=1, activation="tanh")
+    cfg = cvn.CCFVorticityNeuralConfig(
+        hidden=4,
+        depth=1,
+        n_grid=11,
+        lam=0.6057,
+        exp_core=False,
+        hard_core_cancel=True,
+        freeze_velocity=True,
+        train_hilbert="wholeline_hp",
+        hilbert_n_aux=8,
+        hilbert_n_far=4,
+        hilbert_n_quad=8,
+        hilbert_y_near=1.0,
+        y_max=4.0,
+        d1_weight=0.0,
+        d2_weight=0.0,
+        use_grad_norm=False,
+        device="cpu",
+    )
+    y = torch.linspace(-4.0, 4.0, 11, dtype=torch.float64)
+    scales = torch.ones(2, dtype=torch.float64)
+    gammas = torch.ones(2, dtype=torch.float64)
+    r = cvn.residual_vector(net, y, cfg=cfg, scales=scales, gammas=gammas)
+    assert torch.isfinite(r).all()
+    loss = 0.5 * torch.sum(r * r)
+    loss.backward()
+    grads = [p.grad for p in net.parameters() if p.grad is not None]
+    assert grads
+    assert all(torch.isfinite(g).all() for g in grads)

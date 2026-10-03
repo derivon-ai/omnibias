@@ -1,0 +1,68 @@
+{
+  "actual_return_ln_membership_proved": false,
+  "branch_enclosure": {
+    "im": [
+      -0.0011505459615598766,
+      0.0011505459615598766
+    ],
+    "re": [
+      0.4988467195641143,
+      0.5011477994649393
+    ]
+  },
+  "branch_status": "unique_root",
+  "complex_normal_event_branch_certified": true,
+  "complex_physical_return_family_certified": false,
+  "epsilon_cell": {
+    "im": [
+      -1.0000000000000002e-06,
+      1.0000000000000002e-06
+    ],
+    "re": [
+      0.062499,
+      0.062501
+    ]
+  },
+  "event_target": "-314767/5000000",
+  "full_hilbert16_solved": false,
+  "g3_passed": false,
+  "honesty": {
+    "_honesty_reasons": {
+      "actual_return_ln_membership_proved": {
+        "detail": "Needs an exact differential-polynomial chain for the physical first-hit family, not coordinate functions or a variational upper bound.",
+        "reason": "unimplemented"
+      },
+      "complex_physical_return_family_certified": {
+        "detail": "The local cubic normal-form event branch is not the full physical quadratic singular return family or its complete atlas.",
+        "reason": "unimplemented"
+      },
+      "full_hilbert16_solved": {
+        "detail": "Re-derived from H16Obligation entries; never stamped by hand.",
+        "reason": "derived_false"
+      },
+      "g3_passed": {
+        "detail": "The actual jointly parameterized return and admission family lacks a uniformly bounded LN, Pfaffian-over-LN, or quasianalytic format.",
+        "reason": "gate_open"
+      }
+    },
+    "actual_return_ln_membership_proved": false,
+    "complex_normal_event_branch_certified": true,
+    "complex_physical_return_family_certified": false,
+    "full_hilbert16_solved": false,
+    "g3_passed": false
+  },
+  "real_first_hit_replayed": true,
+  "real_first_hit_status": "certified",
+  "schema": "hilbert16-complex-event-branch-v1",
+  "scope": "Unique complex event-time branch and first real crossing for one interior epsilon cell of the cubic normal-form comparison field. Not the full singular quadratic return family, not uniform at sep=0 or r1=0, not LN membership, not G3, and not Hilbert XVI.",
+  "time_domain": {
+    "im": [
+      -0.02,
+      0.02
+    ],
+    "re": [
+      0.44999999999999996,
+      0.55
+    ]
+  }
+}

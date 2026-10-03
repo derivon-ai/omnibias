@@ -22,8 +22,14 @@ from omnibias.fields._core.coords import CoordinateSpec
 from omnibias.fields._core.state import FieldState
 from omnibias.jax.activations import JaxActivationSpec, get_activation
 from omnibias.jax.architectures.pinn import JetMLP, make_jet_mlp
+from omnibias.jax.laplacian import (
+    deep_field_laplacian,
+    deep_field_polylaplacian,
+    deep_field_value_grad_laplacian,
+    restrict_first_layer,
+)
 from omnibias.pinn.jax.fields.base import FieldBase
-from omnibias.pinn.jax.fields.jet_mlp import _JetFieldOps
+from omnibias.pinn.jax.fields.jet_mlp import FAST_LANE_CACHE_KEY, _JetFieldOps
 from omnibias.pinn.operator._core.branch import BranchHeadLayout
 from omnibias.pinn.operator._core.conditioning import ConditioningSpec
 from omnibias.pinn.operator._core.spec import OperatorSpec
@@ -224,8 +230,146 @@ class DeepONetField(_JetFieldOps, FieldBase):
         return None
 
     def _compute_hidden_jet(self, coords: Array, order: int) -> Array:
-        """Batched full trunk jet of shape ``(Q, M, p)``."""
+        """Batched full trunk jet of shape ``(Q, M, p)`` (trunk basis + partials)."""
         return jax.vmap(lambda xi: self.net._point_jet(xi, order))(coords)
+
+    def _fast_lane_layer_groups(self) -> list[list]:
+        return [self.net._layer_specs()]
+
+    def _align_coeffs_bias(self, batch: int) -> tuple[Array, Array]:
+        """Broadcast branch coeffs/bias to match a trunk batch dimension."""
+        coeffs = self.coeffs
+        bias = self.bias
+        F = coeffs.shape[0]
+        if self.shared_query_size is not None:
+            Q = self.shared_query_size
+            if batch != F * Q:
+                raise ValueError(f"batch {batch} != F*Q = {F}*{Q}")
+            coeffs_b = jnp.repeat(coeffs, Q, axis=0)
+            if bias.ndim == 1:
+                bias_b = jnp.broadcast_to(bias[None, :], (batch, bias.shape[0]))
+            else:
+                bias_b = jnp.repeat(bias, Q, axis=0)
+            return coeffs_b, bias_b
+        if F == 1 and batch != 1:
+            coeffs_b = jnp.broadcast_to(coeffs, (batch, coeffs.shape[1], coeffs.shape[2]))
+            if bias.ndim == 1:
+                bias_b = jnp.broadcast_to(bias[None, :], (batch, bias.shape[0]))
+            else:
+                bias_b = jnp.broadcast_to(bias, (batch, bias.shape[1]))
+            return coeffs_b, bias_b
+        if F == batch:
+            bias_b = (
+                bias
+                if bias.ndim == 2
+                else jnp.broadcast_to(bias[None, :], (batch, bias.shape[0]))
+            )
+            return coeffs, bias_b
+        raise ValueError(
+            f"cannot align coeffs batch F={F} with trunk batch {batch}; use on_grid()"
+        )
+
+    def _fast_lane_contract(self, outputs: list[Array], name: str) -> Array:
+        """Contract trunk basis Laplacians with per-sample branch coefficients."""
+        ci = self.components.index(name)
+        trunk_basis = outputs[0]
+        coeffs_b, _bias_b = self._align_coeffs_bias(trunk_basis.shape[0])
+        return jnp.einsum("bp,bcp->bc", trunk_basis, coeffs_b)[:, ci]
+
+    def _trunk_query_coords(self, coords: Array) -> Array:
+        if self.shared_query_size is not None:
+            return coords[: self.shared_query_size]
+        return coords
+
+    def _tier_a_value_grad_lap_on_coords(
+        self, coords: Array, layers: list, state: FieldState[Array]
+    ) -> tuple[Array, Array, Array]:
+        cache = cast(
+            dict[str, Array],
+            cast(dict[str, Any], state.extra).setdefault(FAST_LANE_CACHE_KEY, {}),
+        )
+        if "trunk_tier_a" not in cache:
+            cache["trunk_tier_a"] = deep_field_value_grad_laplacian(coords, layers)
+        return cache["trunk_tier_a"]  # type: ignore[return-value]
+
+    def _fast_lane_group_polylaplacian(
+        self,
+        state: FieldState[Array],
+        layers: list,
+        k: int,
+        *,
+        mode: str = "auto",
+        budget: int | None = None,
+        n_directions: int = 256,
+        seed: int = 0,
+    ) -> Array:
+        coords = cast(Array, state.coords)
+        trunk_coords = self._trunk_query_coords(coords)
+        cache = cast(
+            dict[str, Array],
+            cast(dict[str, Any], state.extra).setdefault(FAST_LANE_CACHE_KEY, {}),
+        )
+        cache_key = f"trunk_lap_k{k}"
+        if cache_key in cache:
+            trunk_out = cache[cache_key]
+        else:
+            sa = self._spatial_axis_indices()
+            D = self.coordinate_spec.ndim
+            if k == 1 and len(sa) == D:
+                _, _, trunk_out = self._tier_a_value_grad_lap_on_coords(
+                    trunk_coords, layers, state
+                )
+            elif len(sa) == D:
+                if k == 1:
+                    trunk_out = deep_field_laplacian(trunk_coords, layers)
+                else:
+                    trunk_out = deep_field_polylaplacian(
+                        trunk_coords,
+                        layers,
+                        k,
+                        mode=mode,
+                        budget=budget,
+                        n_directions=n_directions,
+                        seed=seed,
+                    )
+            else:
+                sa_tuple = tuple(self._spatial_axis_indices())
+                if k == 1:
+                    W0, b0, spec0 = layers[0]
+                    W0 = jnp.asarray(W0)
+                    shifts = trunk_coords @ W0.T
+                    if b0 is not None:
+                        shifts = shifts + jnp.asarray(b0)
+                    y0 = jnp.zeros(
+                        (trunk_coords.shape[0], len(sa_tuple)),
+                        dtype=trunk_coords.dtype,
+                    )
+                    W_local = W0[:, jnp.asarray(sa_tuple)]
+                    batched_layers = [(W_local, shifts, spec0), *layers[1:]]
+                    trunk_out = deep_field_laplacian(y0, batched_layers)
+                else:
+
+                    def one_point(xi: Array) -> Array:
+                        local_layers = restrict_first_layer(layers, xi, sa_tuple)
+                        y0 = jnp.zeros((len(sa_tuple),), dtype=xi.dtype)
+                        return deep_field_polylaplacian(
+                            y0,
+                            local_layers,
+                            k,
+                            mode=mode,
+                            budget=budget,
+                            n_directions=n_directions,
+                            seed=seed,
+                        )
+
+                    trunk_out = jax.vmap(one_point)(trunk_coords)
+            cache[cache_key] = trunk_out
+        if (
+            self.shared_query_size is not None
+            and trunk_out.shape[0] == self.shared_query_size
+        ):
+            trunk_out = jnp.tile(trunk_out, (self.n_functions, 1))
+        return trunk_out
 
     def _contract(
         self, trunk_jet: Array, coeffs: Array, bias: Array

@@ -1,0 +1,73 @@
+{
+  "actual_return_ln_membership_proved": false,
+  "branch_enclosure": {
+    "im": [
+      -0.0007293877546938482,
+      0.0007293877546938482
+    ],
+    "re": [
+      0.37268163592530285,
+      0.571780441500444
+    ]
+  },
+  "branch_status": "unique_root",
+  "chart_o_endpoint_included": true,
+  "complex_separation_event_cover_certified": true,
+  "d_c_endpoint_included": true,
+  "derivative_modulus": [
+    0.0008209466909637168,
+    0.0010947973986371953
+  ],
+  "full_hilbert16_solved": false,
+  "g3_passed": false,
+  "honesty": {
+    "_honesty_reasons": {
+      "actual_return_ln_membership_proved": {
+        "detail": "Needs an exact differential-polynomial chain for the physical first-hit family, not coordinate functions or a variational upper bound.",
+        "reason": "unimplemented"
+      },
+      "full_hilbert16_solved": {
+        "detail": "Re-derived from H16Obligation entries; never stamped by hand.",
+        "reason": "derived_false"
+      },
+      "g3_passed": {
+        "detail": "The actual jointly parameterized return and admission family lacks a uniformly bounded LN, Pfaffian-over-LN, or quasianalytic format.",
+        "reason": "gate_open"
+      },
+      "physical_overlap_matching_proved": {
+        "detail": "A regular comparison event spanning sep endpoints does not construct the singular physical entry/exit continuations on both overlaps.",
+        "reason": "unimplemented"
+      }
+    },
+    "actual_return_ln_membership_proved": false,
+    "complex_separation_event_cover_certified": true,
+    "full_hilbert16_solved": false,
+    "g3_passed": false,
+    "physical_overlap_matching_proved": false
+  },
+  "physical_overlap_matching_proved": false,
+  "real_first_hit_replayed": true,
+  "real_first_hit_status": "certified",
+  "schema": "hilbert16-complex-separation-cover-v1",
+  "scope": "One regular V-event branch of the cubic comparison field spans sep=0 through sep=2. This does not construct or match the singular physical entry/exit sections, does not control the full return family, is not LN membership, not G3, and not Hilbert XVI.",
+  "separation_cell": {
+    "im": [
+      -0.001,
+      0.001
+    ],
+    "re": [
+      0.0,
+      2.0
+    ]
+  },
+  "time_domain": {
+    "im": [
+      -0.05,
+      0.05
+    ],
+    "re": [
+      0.3333333333333333,
+      0.6666666666666667
+    ]
+  }
+}

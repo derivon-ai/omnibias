@@ -52,7 +52,7 @@ The event identity is unchanged. On a `chi = O(1)` locus,
 `sigma * kappa = (sqrt(epsilon) / sep) * chi * r1`. The kill sequence
 
     sep_n = exp(-1 / epsilon_n^2),    kappa_n = 1 / sep_n,
-    L = 1,    lambda1 = -3
+    lambda1 = -3,    L_n = (9 - sep_n^2) / 4
 
 still makes `sigma * kappa` unbounded. Chart WF covers `sep = 0` and the
 restricted tail `kappa = O(epsilon^{-1/2})`. It does not cover that

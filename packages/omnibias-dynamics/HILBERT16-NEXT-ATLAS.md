@@ -139,6 +139,31 @@ The W-ratio explodes. A section at `h ~ epsilon^3 sep^2` would make the
 ratio order one and would lose uniform physical transversality
 (`hdot -> 0`). That is a new closing map. It is not introduced.
 
+The subsequent [weighted-section assessment](HILBERT16-WEIGHTED-SECTION.md)
+tests that map intrinsically as `eta=eta0`. It is transverse for each fixed
+`sep>0`, but the ordinary `q=sep^2` hit-time derivatives grow as `q^-1`
+and `q^-2` at `D intersect C`, while the chart-O matching speed vanishes
+with `r1`. Weighted transversality therefore does not supply the missing
+physical C2 overlap theorem.
+
+The subsequent
+[quasi-homogeneous dichotomy](HILBERT16-QUASIHOMOGENEOUS-DICHOTOMY.md)
+upgrades the frozen-section calculation to every rational monomial scale
+`sigma=epsilon^a sep^b`: event boundedness requires `b>=1`, while a
+bounded-above W-ratio to frozen `h=epsilon^N` requires `b<=0`.  No scale
+satisfies both.  This is not an impossibility theorem over weighted atlases,
+because the moving section `h=epsilon^3 sep^2` cancels both scalar factors
+exactly.  The weighted-section assessment, not the scale dichotomy, supplies
+the negative overlap evidence for that escape.
+
+The [direct LN-format audit](HILBERT16-LN-FORMAT-BARRIER.md) then treats the
+corrected kill sequence as the primary G3 test.  Every finite `tau`/log-W
+truncation has an exact two-function chain with fixed degree and coefficient
+size, but its annulus outer radius and chain sup norm grow like `n`.  Hence
+the direct return-factor representation has no uniform LN format.  This does
+not exclude an exact positive normalization of the physical displacement;
+that zero-equivalent normalized chain is the remaining H3 falsifier.
+
 ## 5. Joint `(sep, L)` cannot cover both axes
 
 The exact identity `2 r1 + sep + lambda1 = 0` holds whenever
@@ -181,9 +206,28 @@ first-hit theorem on `L_n = 1/n`. Item 3 has no C2 remainder: the leading
 inner jet being affine is not a remainder for `log D'`. Item 4 is unmatched
 on `D ∩ C` at `sep = 0` and on `O ∩` anything.
 
-**G1 does not pass.** The named remaining holes are the scale dichotomy
-on `sep = exp(-1/epsilon^2)` (admitted, uncovered) and the shrinking-root
-collision `L_n = 1/n`, `lambda1 = -2`. Do not open G4.
+The intrinsic weighted-section hypothesis does not repair item 4:
+`h=epsilon^3 sep^2 eta0` collapses to `h=0` on `D ∩ C`, and its intrinsic
+speed collapses on the chart-O matching interface.
+
+Nor does quantifying frozen-section monomial weights repair item 4.  It proves
+a one-scale no-go and simultaneously exhibits the moving-section exception;
+it cannot quantify over all charts or replace the missing overlap theorem.
+
+The direct LN format barrier also cannot repair item 4 or bypass it: its
+finite chains encode the divergent matching data, not the physical first-hit
+map.  G3 remains blocked until a normalized physical map has uniform complex
+cells, closure, and norm bounds.
+
+**G1 does not pass.** The named remaining holes are a bound on `rho` plus
+the inner-chart remainder, physical C2 of `log D'`, and outgoing first-hit
+on `L_n = 1/n`. The super-small W-ratio is absorbed as a first-derivative
+identity by
+[the tracked-product note](HILBERT16-ENTRY-EXIT-LEADING.md); the `sep = 0`
+leading derivative is the
+[fold I-map](HILBERT16-FOLD-LEADING.md); chart O has a two-root I-map
+(`omnibias.dynamics.shrinking_root_leading`). None of these close G1.
+Do not open G4.
 
 ## 8. Reproduction
 

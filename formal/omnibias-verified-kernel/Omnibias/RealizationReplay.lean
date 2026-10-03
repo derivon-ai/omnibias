@@ -1,6 +1,6 @@
 /- SPDX-License-Identifier: Apache-2.0
 Copyright (C) 2026 Derivon -/
-import Std
+import Omnibias.Certificate
 
 /-! Operand-bound finite rational replay. The operands of every multiplication,
 polynomial evaluation, and selected minor occur in the generated proposition.

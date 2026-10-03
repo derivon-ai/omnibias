@@ -104,24 +104,21 @@ fixed parameter.
 
 Quadrature choice
 ------------------
-The inner integral over ``u in [0, U]`` is enclosed by a **natural-interval-
-extension (box) rule**: each panel's contribution is bounded by its width
-times the *interval-arithmetic enclosure of the whole integrand evaluated
-directly on that panel* (``Phi`` via :func:`phi_enclosure`, the ``exp(t u^2)``
-factor via :func:`~omnibias.core.verified.transcend.exp_iv`, ``cos(zu)`` via
-the same real-primitive composition
-:mod:`omnibias.core.verified.heat_kernel` uses). This is deliberately a
-*coarser* (first-order) rule than :mod:`omnibias.core.verified.quadrature`'s
-derivative-bound rules (trapezoid, Gauss-Legendre, ...): ``Phi`` is itself an
-infinite series, so a rigorous closed-form second ``u``-derivative would
-require differentiating that series term-by-term and re-deriving a fresh
-tail bound for the differentiated series. The box rule needs no derivative
-bound at all -- soundness follows immediately from interval-arithmetic
-containment (if ``F(I)`` encloses ``f`` over ``I``, then
-``width(I) * F(I)`` encloses ``int_I f``) -- at the cost of needing more
-panels for the same tightness. Given ``Phi``'s super-exponential decay this
-trade is cheap in practice: the panel count is fixed at construction and
-does not depend on ``z``.
+The inner integral over ``u in [0, U]`` is a **Taylor product rule**. On
+each panel the amplitude ``f(u) = Phi(u) exp(t u^2)`` is expanded about the
+midpoint (jet of the partial series, plus a Cauchy tail ball). Powers of the
+offset times ``cos(zu)`` and ``sin(zu)`` are integrated in closed form, so
+the oscillation cancels inside the main term instead of inside an interval
+sum. The Lagrange remainder uses a panel enclosure of ``f^{(P)}``. A plain
+box rule cannot resolve a zero of ``H_0``: panel widths add, and the
+absolute enclosure stays near ``∫ Phi`` while ``H_0`` near ``2 gamma_1`` is
+many orders smaller.
+
+When the argument ``z`` is a positive-width rectangle, ``H`` is expanded
+about the midpoint through order 2. The holomorphic integral remainder is a
+disk of radius ``|Δz|^3 / 6`` times a moment bound on ``|H'''|``. A
+degenerate argument returns the order-0 integral. The outer ``u > U`` tail
+is unchanged.
 """
 
 from __future__ import annotations
@@ -129,9 +126,11 @@ from __future__ import annotations
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
+from fractions import Fraction
+from functools import lru_cache
 
 from omnibias.core.verified.complex_interval import ComplexInterval
-from omnibias.core.verified.interval import Interval, sum_intervals
+from omnibias.core.verified.interval import Interval
 from omnibias.core.verified.transcend import (
     PI_IV,
     cos_iv,
@@ -147,11 +146,18 @@ from omnibias.core.verified.transcend import (
 PHI_DEFAULT_TERMS: int = 8
 
 
-def _cos_complex(z: ComplexInterval) -> ComplexInterval:
-    """Enclose ``cos(z)`` from real interval transcendental primitives."""
-    cosh = (exp_iv(z.im) + exp_iv(-z.im)) * 0.5
-    sinh = (exp_iv(z.im) - exp_iv(-z.im)) * 0.5
-    return ComplexInterval(cos_iv(z.re) * cosh, -sin_iv(z.re) * sinh)
+def _exp_complex(z: ComplexInterval) -> ComplexInterval:
+    """Enclose ``exp(z)`` from real interval transcendental primitives."""
+    mag = exp_iv(z.re)
+    return ComplexInterval(mag * cos_iv(z.im), mag * sin_iv(z.im))
+
+
+def _cosh_hi(value: float) -> float:
+    """Rigorous upper bound on ``cosh(value)`` for a real ``value``."""
+    if value <= 0.0:
+        return 1.0
+    v = Interval.point(value)
+    return ((exp_iv(v) + exp_iv(-v)) * Interval.point(0.5)).hi
 
 
 #: Rigorous upper bound on ``q(0) = exp(-pi)``, the largest value the decay
@@ -389,37 +395,478 @@ def debruijn_newman_outer_tail_bound(
     return _PHI_MAJORANT_CONST * Interval.point(_PHI_TAIL_SAFETY) * growth / kappa
 
 
+#: Amplitude Taylor order. Main terms use derivatives ``0 .. P-1``; the
+#: panel remainder is controlled by ``f^{(P)}``.
+_U_TAYLOR_ORDER = 4
+#: Disk radius for the Cauchy tail of the omitted ``Phi`` terms.
+_TAIL_CAUCHY_R = 0.1
+#: Argument boxes thinner than this use a Lipschitz ball about the midpoint.
+_TINY_ARGUMENT = 1e-8
+
+
+def _panel_nodes(truncation: float, panels: int) -> tuple[float, ...]:
+    """Monotone float nodes covering ``[0, truncation]`` exactly."""
+    nodes = [0.0]
+    span = Interval.point(truncation)
+    for index in range(1, panels):
+        bound = (span * Interval.from_rational(Fraction(index, panels))).lo
+        if bound < nodes[-1]:
+            bound = nodes[-1]
+        if bound > truncation:
+            bound = truncation
+        nodes.append(bound)
+    nodes.append(float(truncation))
+    return tuple(nodes)
+
+
+def _exp_jet(coeffs: Sequence[Interval]) -> list[Interval]:
+    """Taylor coefficients of ``exp(F)`` from those of ``F`` (``c_k = F^{(k)}/k!``)."""
+    out: list[Interval] = [exp_iv(coeffs[0])]
+    for k in range(1, len(coeffs)):
+        acc = Interval.point(0.0)
+        for j in range(k):
+            acc = acc + Interval.from_value(j + 1) * coeffs[j + 1] * out[k - 1 - j]
+        out.append(acc / Interval.from_value(k))
+    return out
+
+
+def _scale_jet(factor: Interval, coeffs: Sequence[Interval]) -> list[Interval]:
+    return [factor * coeff for coeff in coeffs]
+
+
+def _add_jet(left: Sequence[Interval], right: Sequence[Interval]) -> list[Interval]:
+    return [a + b for a, b in zip(left, right, strict=True)]
+
+
+def _mul_jet(left: Sequence[Interval], right: Sequence[Interval]) -> list[Interval]:
+    out: list[Interval] = []
+    for k in range(len(left)):
+        acc = Interval.point(0.0)
+        for i in range(k + 1):
+            acc = acc + left[i] * right[k - i]
+        out.append(acc)
+    return out
+
+
+def _identity_jet(u: Interval, order: int) -> list[Interval]:
+    coeffs = [u]
+    if order >= 1:
+        coeffs.append(Interval.point(1.0))
+    coeffs.extend(Interval.point(0.0) for _ in range(order - 1))
+    return coeffs
+
+
+def _phi_jet(u: Interval, n_terms: int, order: int) -> list[Interval]:
+    """Taylor coefficients of the partial ``Phi`` sum, highest index ``order``."""
+    total = [Interval.point(0.0) for _ in range(order + 1)]
+    two_pi2 = Interval.point(2.0) * PI_IV.pow_int(2)
+    three_pi = Interval.point(3.0) * PI_IV
+    four = Interval.point(4.0)
+    for n in range(1, n_terms + 1):
+        n2 = float(n * n)
+        n4 = n2 * n2
+        amplitude = _add_jet(
+            _scale_jet(two_pi2 * Interval.point(n4), _exp_jet(_scale_jet(Interval.point(9.0), _identity_jet(u, order)))),
+            _scale_jet(-(three_pi * Interval.point(n2)), _exp_jet(_scale_jet(Interval.point(5.0), _identity_jet(u, order)))),
+        )
+        decay = _exp_jet(_scale_jet(-(PI_IV * Interval.point(n2)), _exp_jet(_scale_jet(four, _identity_jet(u, order)))))
+        total = _add_jet(total, _mul_jet(amplitude, decay))
+    return total
+
+
+def _heat_jet(t: float, u: Interval, order: int) -> list[Interval]:
+    if t == 0.0:
+        coeffs = [Interval.point(1.0)]
+        coeffs.extend(Interval.point(0.0) for _ in range(order))
+        return coeffs
+    u_jet = _identity_jet(u, order)
+    return _exp_jet(_scale_jet(Interval.point(t), _mul_jet(u_jet, u_jet)))
+
+
+def _decay_base_hi(x_lo: float, y_abs: float) -> float:
+    """Upper bound on ``exp(-pi exp(4 x_lo) cos(4 y_abs))``."""
+    rate = PI_IV * exp_iv(Interval.point(4.0) * Interval.point(x_lo)) * cos_iv(
+        Interval.point(4.0) * Interval.point(y_abs)
+    )
+    if rate.lo <= 0.0:
+        raise ValueError("Phi decay bound is not positive on this Cauchy rectangle")
+    return exp_iv(-Interval.point(rate.lo)).hi
+
+
+def _tail_modulus_hi(x_lo: float, x_hi: float, y_abs: float, n_terms: int) -> float:
+    """Upper bound on the omitted ``|Phi|`` tail over a complex rectangle."""
+    if x_lo > x_hi:
+        x_lo, x_hi = x_hi, x_lo
+    q_hi = _decay_base_hi(x_lo, y_abs)
+    g9 = exp_iv(Interval.point(9.0) * Interval.point(x_hi)).hi
+    g5 = exp_iv(Interval.point(5.0) * Interval.point(x_hi)).hi
+    two_pi2 = (Interval.point(2.0) * PI_IV.pow_int(2)).hi
+    three_pi = (Interval.point(3.0) * PI_IV).hi
+    q_iv = Interval.point(q_hi)
+    explicit = Interval.point(0.0)
+    last = n_terms + 8
+    for n in range(n_terms + 1, last + 1):
+        n2 = n * n
+        term = (
+            Interval.point(two_pi2) * Interval.from_value(n2 * n2) * Interval.point(g9)
+            + Interval.point(three_pi) * Interval.from_value(n2) * Interval.point(g5)
+        ) * q_iv.pow_int(n2)
+        explicit = explicit + term
+    n1 = last + 1
+    const = (
+        Interval.point(two_pi2) * Interval.point(g9) + Interval.point(three_pi) * Interval.point(g5)
+    )
+    term_n1 = Interval.from_value(n1**4) * q_iv.pow_int(n1 * n1)
+    ratio = (
+        Interval.from_value((n1 + 1) ** 4)
+        / Interval.from_value(n1**4)
+        * q_iv.pow_int(2 * n1 + 1)
+    )
+    if ratio.hi >= 1.0:
+        raise ValueError("Phi tail ratio is not < 1 on this Cauchy rectangle")
+    geometric = const * term_n1 / (Interval.point(1.0) - ratio)
+    return (explicit + geometric).hi
+
+
+def _tail_coeff_radii(
+    x_lo: float, x_hi: float, highest: int, n_terms: int
+) -> tuple[float, ...]:
+    """Cauchy bounds on ``|tail^{(k)}/k!|`` for ``k = 0 .. highest``."""
+    modulus = _tail_modulus_hi(x_lo - _TAIL_CAUCHY_R, x_hi + _TAIL_CAUCHY_R, _TAIL_CAUCHY_R, n_terms)
+    mod_iv = Interval.point(modulus)
+    radius = Interval.point(_TAIL_CAUCHY_R)
+    power = Interval.point(1.0)
+    out: list[float] = []
+    for _k in range(highest + 1):
+        out.append((mod_iv / power).hi)
+        power = power * radius
+    return tuple(out)
+
+
+def _widen_jet(coeffs: Sequence[Interval], radii: Sequence[float]) -> list[Interval]:
+    return [coeff + Interval(-rad, rad) for coeff, rad in zip(coeffs, radii, strict=True)]
+
+
+def _amplitude_jet(t: float, u: Interval, n_terms: int, order: int, radii: Sequence[float]) -> list[Interval]:
+    phi = _widen_jet(_phi_jet(u, n_terms, order), radii)
+    if t == 0.0:
+        return phi
+    return _mul_jet(phi, _heat_jet(t, u, order))
+
+
+def _finite_jet(coeffs: Sequence[Interval]) -> bool:
+    return all(math.isfinite(coeff.lo) and math.isfinite(coeff.hi) for coeff in coeffs)
+
+
+@dataclass(frozen=True)
+class _PanelQuad:
+    a: float
+    b: float
+    m: float
+    alpha: float
+    beta: float
+    jet: tuple[Interval, ...]
+    deriv_mag: float
+    box_only: bool
+    amp_hi: float
+
+
+@lru_cache(maxsize=16)
+def _prepared_panels(
+    t: float, truncation: float, phi_terms: int, panels: int
+) -> tuple[_PanelQuad, ...]:
+    """Panel jets for one ``(t, U, N, panels)`` contract. Independent of ``z``."""
+    order = _U_TAYLOR_ORDER
+    built: list[_PanelQuad] = []
+    nodes = _panel_nodes(truncation, panels)
+    for index in range(len(nodes) - 1):
+        a = nodes[index]
+        b = nodes[index + 1]
+        if not b > a:
+            continue
+        u_panel = Interval(a, b)
+        amp = phi_enclosure(u_panel, phi_terms).hi
+        heat = exp_iv(Interval.point(t) * u_panel.pow_int(2)).hi
+        amp_hi = (Interval.point(amp) * Interval.point(heat)).hi
+        m = (a + b) * 0.5
+        if m < a:
+            m = a
+        if m > b:
+            m = b
+        alpha = a - m
+        beta = b - m
+        point_radii = _tail_coeff_radii(m, m, order - 1, phi_terms)
+        point_jet = _amplitude_jet(t, Interval.point(m), phi_terms, order - 1, point_radii)
+        panel_radii = _tail_coeff_radii(a, b, order, phi_terms)
+        panel_jet = _amplitude_jet(t, u_panel, phi_terms, order, panel_radii)
+        box_only = amp_hi < 1e-14 or not _finite_jet(point_jet) or not _finite_jet(panel_jet)
+        deriv_mag = 0.0 if box_only else math.factorial(order) * panel_jet[order].mag
+        if not math.isfinite(deriv_mag):
+            box_only = True
+            deriv_mag = 0.0
+        built.append(
+            _PanelQuad(
+                a=a,
+                b=b,
+                m=m,
+                alpha=alpha,
+                beta=beta,
+                jet=tuple(point_jet),
+                deriv_mag=deriv_mag,
+                box_only=box_only,
+                amp_hi=amp_hi,
+            )
+        )
+    return tuple(built)
+
+
+def _g_powers_series(
+    s: ComplexInterval, alpha: float, beta: float, count: int
+) -> list[ComplexInterval]:
+    """``∫_alpha^beta w^k exp(s w) dw`` by power series, for ``s`` near ``0``."""
+    n_terms = 10
+    width = Interval.point(beta) - Interval.point(alpha)
+    w_max = max(abs(alpha), abs(beta))
+    s_mag = s.mag
+    out: list[ComplexInterval] = []
+    for k in range(count):
+        acc = ComplexInterval.zero()
+        s_power = ComplexInterval.one()
+        fact = 1
+        for n in range(n_terms):
+            q = k + n
+            integ = (
+                Interval.point(beta).pow_int(q + 1) - Interval.point(alpha).pow_int(q + 1)
+            ) / Interval.from_value(q + 1)
+            acc = acc + s_power * (ComplexInterval.from_value(integ) / float(fact))
+            s_power = s_power * s
+            fact *= n + 1
+        rem_iv = (
+            width
+            * Interval.point(s_mag).pow_int(n_terms)
+            * Interval.point(w_max).pow_int(k + n_terms)
+            / Interval.from_value(math.factorial(n_terms))
+            * exp_iv(Interval.point(s_mag * w_max))
+        )
+        rad = max(rem_iv.hi, 0.0)
+        out.append(ComplexInterval(acc.re + Interval(-rad, rad), acc.im + Interval(-rad, rad)))
+    return out
+
+
+def _g_powers(s: ComplexInterval, alpha: float, beta: float, count: int) -> list[ComplexInterval]:
+    """``G_k = ∫_alpha^beta w^k exp(s w) dw`` for ``k = 0 .. count-1``."""
+    if count < 1:
+        return []
+    modulus2 = s.re.pow_int(2) + s.im.pow_int(2)
+    if modulus2.lo <= 1e-12:
+        return _g_powers_series(s, alpha, beta, count)
+    exp_b = _exp_complex(s * beta)
+    exp_a = _exp_complex(s * alpha)
+    inv_s = ComplexInterval.one() / s
+    out = [(exp_b - exp_a) * inv_s]
+    a_pow = Interval.point(1.0)
+    b_pow = Interval.point(1.0)
+    a_iv = Interval.point(alpha)
+    b_iv = Interval.point(beta)
+    for k in range(1, count):
+        a_pow = a_pow * a_iv
+        b_pow = b_pow * b_iv
+        boundary = ComplexInterval.from_value(b_pow) * exp_b - ComplexInterval.from_value(a_pow) * exp_a
+        out.append(boundary * inv_s - out[k - 1] * (float(k) * inv_s))
+    return out
+
+
+def _monomial_trig(
+    z: ComplexInterval, alpha: float, beta: float, m: float, highest: int
+) -> tuple[list[ComplexInterval], list[ComplexInterval]]:
+    """``∫ w^k cos(z(w+m)) dw`` and the sine twin, ``k = 0 .. highest``."""
+    iz = ComplexInterval.imag_unit() * z
+    gp = _g_powers(iz, alpha, beta, highest + 1)
+    gm = _g_powers(-iz, alpha, beta, highest + 1)
+    phase_p = _exp_complex(iz * m)
+    phase_m = _exp_complex((-iz) * m)
+    half = Interval.point(0.5)
+    inv_2i = ComplexInterval.one() / (ComplexInterval.imag_unit() * 2.0)
+    cos_terms: list[ComplexInterval] = []
+    sin_terms: list[ComplexInterval] = []
+    for k in range(highest + 1):
+        ep = phase_p * gp[k]
+        em = phase_m * gm[k]
+        cos_terms.append((ep + em) * half)
+        sin_terms.append((ep - em) * inv_2i)
+    return cos_terms, sin_terms
+
+
+def _u_remainder(panel: _PanelQuad, q: int, y_abs: float) -> float:
+    """Lagrange ball for ``∫ (f - T) u^q trig`` on one panel."""
+    if panel.box_only:
+        cosh = _cosh_hi(y_abs * panel.b)
+        width = Interval.point(panel.b) - Interval.point(panel.a)
+        bound = (
+            Interval.point(panel.amp_hi)
+            * Interval.point(panel.b).pow_int(q)
+            * Interval.point(cosh)
+            * width
+        )
+        return max(bound.hi, 0.0)
+    half_span = max(abs(panel.alpha), abs(panel.beta))
+    cosh = _cosh_hi(y_abs * panel.b)
+    bound = (
+        Interval.point(2.0)
+        * Interval.point(half_span).pow_int(_U_TAYLOR_ORDER + 1)
+        / Interval.from_value(_U_TAYLOR_ORDER + 1)
+        * Interval.point(panel.deriv_mag)
+        / Interval.from_value(math.factorial(_U_TAYLOR_ORDER))
+        * Interval.point(panel.b).pow_int(q)
+        * Interval.point(cosh)
+    )
+    return max(bound.hi, 0.0)
+
+
+def _eval_moments(
+    z0: complex, prepared: tuple[_PanelQuad, ...], max_q: int
+) -> tuple[list[ComplexInterval], list[ComplexInterval]]:
+    """Inner integrals ``∫_0^U f(u) u^q cos/sin(z0 u) du`` for ``q <= max_q``."""
+    z = ComplexInterval.point(z0)
+    y_abs = abs(z0.imag)
+    icos = [ComplexInterval.zero() for _ in range(max_q + 1)]
+    isin = [ComplexInterval.zero() for _ in range(max_q + 1)]
+    radii = [0.0 for _ in range(max_q + 1)]
+    highest = (_U_TAYLOR_ORDER - 1) + max_q
+    for panel in prepared:
+        if panel.box_only:
+            for q in range(max_q + 1):
+                radii[q] += _u_remainder(panel, q, y_abs)
+            continue
+        jcos, jsin = _monomial_trig(z, panel.alpha, panel.beta, panel.m, highest)
+        for q in range(max_q + 1):
+            acc_c = ComplexInterval.zero()
+            acc_s = ComplexInterval.zero()
+            for i in range(q + 1):
+                scale = Interval.from_value(math.comb(q, i)) * Interval.point(panel.m).pow_int(q - i)
+                for j in range(_U_TAYLOR_ORDER):
+                    coeff = panel.jet[j] * scale
+                    acc_c = acc_c + jcos[j + i] * coeff
+                    acc_s = acc_s + jsin[j + i] * coeff
+            icos[q] = icos[q] + acc_c
+            isin[q] = isin[q] + acc_s
+            radii[q] += _u_remainder(panel, q, y_abs)
+    out_c: list[ComplexInterval] = []
+    out_s: list[ComplexInterval] = []
+    for q in range(max_q + 1):
+        rad = radii[q]
+        out_c.append(ComplexInterval(icos[q].re + Interval(-rad, rad), icos[q].im + Interval(-rad, rad)))
+        out_s.append(ComplexInterval(isin[q].re + Interval(-rad, rad), isin[q].im + Interval(-rad, rad)))
+    return out_c, out_s
+
+
+def _outer_moment_tail(t: float, truncation: float, y_abs: float, n: int) -> float:
+    """Upper bound on ``∫_U^∞ u^n |Phi| exp(t u^2) exp(y u) du``."""
+    u_iv = Interval.point(truncation)
+    e4u = exp_iv(Interval.point(4.0) * u_iv)
+    kappa = (
+        Interval.point(4.0) * PI_IV * e4u
+        - Interval.point(9.0 + y_abs)
+        - Interval.point(2.0) * Interval.point(t) * u_iv
+    )
+    if kappa.lo <= 0.0:
+        raise ValueError("moment tail requires kappa > 0; increase truncation")
+    exponent = (
+        Interval.point(9.0 + y_abs) * u_iv
+        + Interval.point(t) * u_iv.pow_int(2)
+        - PI_IV * e4u
+    )
+    prefactor = _PHI_MAJORANT_CONST * Interval.point(_PHI_TAIL_SAFETY) * exp_iv(exponent)
+    if n == 0:
+        return (prefactor / kappa).hi
+    rate = kappa - Interval.from_value(n) / u_iv
+    if rate.lo <= 0.0:
+        raise ValueError("moment tail needs kappa > n/U; increase truncation")
+    # (U+w)^n <= U^n exp(n w / U), so the w-integral is at most U^n / (kappa - n/U).
+    return (prefactor * u_iv.pow_int(n) / rate).hi
+
+
+@lru_cache(maxsize=64)
+def _moment_majorant(
+    t: float, truncation: float, phi_terms: int, panels: int, n: int, y_abs: float
+) -> float:
+    """Upper bound on ``∫_0^∞ u^n |f(u)| exp(y |u|) du``."""
+    total = Interval.point(0.0)
+    nodes = _panel_nodes(truncation, panels)
+    for index in range(len(nodes) - 1):
+        a = nodes[index]
+        b = nodes[index + 1]
+        if not b > a:
+            continue
+        u_panel = Interval(a, b)
+        phi_hi = phi_enclosure(u_panel, phi_terms).hi
+        heat = exp_iv(Interval.point(t) * u_panel.pow_int(2))
+        exp_y = exp_iv(Interval.point(y_abs) * u_panel)
+        width = Interval.point(b) - Interval.point(a)
+        total = total + Interval.point(phi_hi) * heat * exp_y * Interval.point(b).pow_int(n) * width
+    outer = _outer_moment_tail(t, truncation, y_abs, n)
+    return (total + Interval.point(outer)).hi
+
+
+def _widen_complex(value: ComplexInterval, radius: float) -> ComplexInterval:
+    ball = Interval(-radius, radius)
+    return ComplexInterval(value.re + ball, value.im + ball)
+
+
+def _derivatives_at(
+    z0: complex, contract: DeBruijnNewmanContract, prepared: tuple[_PanelQuad, ...], max_order: int
+) -> tuple[ComplexInterval, ...]:
+    """``H, H', ...`` through ``max_order`` at the point ``z0``, tails included."""
+    icos, isin = _eval_moments(z0, prepared, max_order)
+    y_abs = abs(z0.imag)
+    point = ComplexInterval.point(z0)
+    out: list[ComplexInterval] = []
+    for order in range(max_order + 1):
+        if order % 4 == 0:
+            main = icos[order]
+        elif order % 4 == 1:
+            main = -isin[order]
+        elif order % 4 == 2:
+            main = -icos[order]
+        else:
+            main = isin[order]
+        if order == 0:
+            tail = debruijn_newman_outer_tail_bound(point, contract).hi
+        else:
+            tail = _outer_moment_tail(contract.t, contract.truncation, y_abs, order)
+        out.append(_widen_complex(main, tail))
+    return tuple(out)
+
+
 def debruijn_newman_enclosure(
     z: ComplexInterval, contract: DeBruijnNewmanContract
 ) -> ComplexInterval:
     """Enclose the genuine de Bruijn-Newman ``H_t(z)`` over a complex rectangle.
 
-    Inner integral over ``u in [0, U]`` via the box (natural-interval-
-    extension) rule described in the module docstring; outer ``u > U`` tail
-    via :func:`debruijn_newman_outer_tail_bound`.
+    Inner integral by the Taylor product rule in the module docstring; outer
+    ``u > U`` tail via :func:`debruijn_newman_outer_tail_bound`. A wide ``z``
+    is reduced to a point expansion plus a holomorphic third-derivative ball.
     """
-    t_iv = Interval.point(contract.t)
-    real_panels: list[Interval] = []
-    imag_panels: list[Interval] = []
-    for index in range(contract.panels):
-        u0 = contract.truncation * index / contract.panels
-        u1 = contract.truncation * (index + 1) / contract.panels
-        u_panel = Interval(u0, u1)
-        phi_iv = phi_enclosure(u_panel, contract.phi_terms)
-        heat_iv = exp_iv(t_iv * u_panel.pow_int(2))
-        amplitude = ComplexInterval.from_value(phi_iv * heat_iv)
-        cosine = _cos_complex(z * ComplexInterval.from_value(u_panel))
-        panel_value = amplitude * cosine
-        width = Interval.point(u1) - Interval.point(u0)
-        real_panels.append(width * panel_value.re)
-        imag_panels.append(width * panel_value.im)
-    real = sum_intervals(real_panels)
-    imag = sum_intervals(imag_panels)
-    tail = debruijn_newman_outer_tail_bound(z, contract).hi
-    return ComplexInterval(
-        real + Interval(-tail, tail),
-        imag + Interval(-tail, tail),
+    prepared = _prepared_panels(contract.t, contract.truncation, contract.phi_terms, contract.panels)
+    z0 = complex(0.5 * (z.re.lo + z.re.hi), 0.5 * (z.im.lo + z.im.hi))
+    delta = z - ComplexInterval.point(z0)
+    y_box = z.im.mag
+    if delta.mag <= _TINY_ARGUMENT:
+        value = _derivatives_at(z0, contract, prepared, 0)[0]
+        lip = _moment_majorant(
+            contract.t, contract.truncation, contract.phi_terms, contract.panels, 1, y_box
+        )
+        radius = (Interval.point(delta.mag) * Interval.point(lip)).hi
+        return _widen_complex(value, radius)
+    value, first, second = _derivatives_at(z0, contract, prepared, 2)
+    main = value + first * delta + second * delta * delta * Interval.point(0.5)
+    third = _moment_majorant(
+        contract.t, contract.truncation, contract.phi_terms, contract.panels, 3, y_box
     )
+    radius = (
+        Interval.point(delta.mag).pow_int(3) / Interval.from_value(6) * Interval.point(third)
+    ).hi
+    return _widen_complex(main, radius)
 
 
 def count_debruijn_newman_zeros(
@@ -663,7 +1110,10 @@ def finite_ht_rectangle_pack(
 
     Default boxes live in ``[0, 32]`` (the first ``H_0`` zero is at
     ``2 gamma_1 ≈ 28.27``). Each box reuses :func:`count_debruijn_newman_zeros`.
-    BLOCKED boxes are first-class. The pack is not a whole-line cover.
+    BLOCKED boxes are first-class: a winding enclosure that does not isolate
+    one integer stays ``certified=False`` with ``count is None``. The pack is
+    not a whole-line cover. :func:`declared_local_ht_rectangle_pack` is a
+    concrete ``t=0`` budget that isolates the first zero and one empty box.
     """
     declared = (
         tuple(boxes)
@@ -705,6 +1155,39 @@ def finite_ht_rectangle_pack(
     )
 
 
+def declared_local_ht_rectangle_pack() -> FiniteHtRectanglePack:
+    """Local ``t = 0`` pack on ``[0, 32]`` that isolates one winding integer.
+
+    Shared budgets: ``half_height=0.5``, ``truncation=0.55``, ``phi_terms=4``,
+    ``panels=32``, ``contour_segments=8``. The rectangles are
+
+    * center ``4``, half-width ``1`` — inside ``[0, 32]``, does not contain
+      ``H0_FIRST_ZERO``;
+    * center ``H0_FIRST_ZERO``, half-width ``1`` — that first ``H_0`` zero;
+    * center ``H0_FIRST_ZERO - 1``, half-width ``1`` — the zero lies on the
+      right edge, so the contour image contains zero and the count stays
+      blocked.
+
+    ``finite_cover_certified`` and ``rh_claim`` stay false. This is not a
+    ``Lambda`` bound and not a statement about the Riemann hypothesis.
+    """
+    return finite_ht_rectangle_pack(
+        t=0.0,
+        boxes=(
+            (4.0, 1.0),
+            (H0_FIRST_ZERO, 1.0),
+            (H0_FIRST_ZERO - 1.0, 1.0),
+        ),
+        half_height=0.5,
+        truncation=0.55,
+        phi_terms=4,
+        panels=32,
+        contour_segments=8,
+        real_lo=0.0,
+        real_hi=32.0,
+    )
+
+
 __all__ = [
     "DeBruijnNewmanContract",
     "DeBruijnNewmanZeroCount",
@@ -718,6 +1201,7 @@ __all__ = [
     "attempt_named_lambda_bound",
     "count_debruijn_newman_zeros",
     "crosscheck_h0_at_first_zero",
+    "declared_local_ht_rectangle_pack",
     "debruijn_newman_enclosure",
     "debruijn_newman_outer_tail_bound",
     "finite_ht_rectangle_pack",

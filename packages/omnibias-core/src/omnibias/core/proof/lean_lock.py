@@ -4,9 +4,7 @@
 
 from __future__ import annotations
 
-import hashlib
 import sys
-import tempfile
 import threading
 import time
 from collections.abc import Iterator
@@ -27,8 +25,9 @@ def lean_project_lock(root: Path) -> Iterator[None]:
     key = str(root.resolve())
     with _registry_guard:
         mutex = _project_locks.setdefault(key, threading.Lock())
-    digest = hashlib.sha256(key.encode()).hexdigest()
-    lockfile = Path(tempfile.gettempdir()) / f"omnibias-lean-{digest}.lock"
+    lock_directory = root / ".lake"
+    lock_directory.mkdir(parents=True, exist_ok=True)
+    lockfile = lock_directory / "omnibias-bridge.lock"
     with mutex, lockfile.open("a+b") as handle:
         if sys.platform == "win32":  # pragma: no cover - platform specific
             import msvcrt

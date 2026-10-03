@@ -189,10 +189,28 @@ def test_cached_higher_order_jet_serves_lower_orders(coords, specs):
         coordinate_spec=cs, components=comps, hidden=5, depth=1, jet_order=3, seed=4,
     )
     state = field(coords)
-    ops.laplacian(state, "u")
+    ops.hessian(state, "u")
     assert sorted(state.extra[JET_CACHE_KEY]) == [3]
     ops.gradient(state, "u")
     assert sorted(state.extra[JET_CACHE_KEY]) == [3]
+
+
+def test_laplacian_fast_lane_bypasses_the_jet_cache(coords, specs):
+    """Tier A never builds the multivariate hidden jet; it caches a triple in
+    :data:`FAST_LANE_CACHE_KEY` instead. A later ``gradient`` reuses that triple
+    without populating :data:`JET_CACHE_KEY`."""
+    from omnibias.pinn.jax.fields.jet_mlp import FAST_LANE_CACHE_KEY
+
+    cs, comps = specs
+    field = make_jet_mlp_vector_field(
+        coordinate_spec=cs, components=comps, hidden=5, depth=1, jet_order=3, seed=4,
+    )
+    state = field(coords)
+    ops.laplacian(state, "u")
+    assert JET_CACHE_KEY not in state.extra or not state.extra[JET_CACHE_KEY]
+    assert FAST_LANE_CACHE_KEY in state.extra
+    ops.gradient(state, "u")
+    assert JET_CACHE_KEY not in state.extra or not state.extra[JET_CACHE_KEY]
 
 
 def test_value_only_never_pays_for_a_jet(coords, specs):

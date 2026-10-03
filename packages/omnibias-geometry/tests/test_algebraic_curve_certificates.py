@@ -8,11 +8,14 @@ from math import comb
 from random import Random
 
 import pytest
+from omnibias.core.proof.lean_check import generate_obligation, lean_check_available
 from omnibias.core.realization.polynomial import AlgebraBudgetExceeded, SparsePolynomial
 from omnibias.geometry.algebraic import (
     ChartBezoutIdentity,
     HomogeneousPlaneCurve,
+    PolygonalAnnulus,
     ProjectiveSmoothnessWitness,
+    RationalPolygon,
     RationalRectangle,
     RectangularAnnulus,
     affine_chart,
@@ -20,6 +23,7 @@ from omnibias.geometry.algebraic import (
     find_smoothness_witness,
     replay_curve_certificate,
     segment_bernstein_coefficients,
+    verify_curve_certificate_formally,
 )
 
 
@@ -29,6 +33,15 @@ def _variables():
 
 def _square(cx, cy, radius):
     return RationalRectangle(cx - radius, cx + radius, cy - radius, cy + radius)
+
+
+def _square_polygon(cx, cy, radius):
+    return RationalPolygon((
+        (cx - radius, cy - radius),
+        (cx + radius, cy - radius),
+        (cx + radius, cy + radius),
+        (cx - radius, cy + radius),
+    ))
 
 
 def test_conic_actual_polynomial_and_source_bound_replay():
@@ -110,6 +123,67 @@ def test_sixteen_oval_octic_with_exact_complex_smoothness_identities():
     assert cert.barrier_parents == (-1,) * 16
     assert not cert.complete_real_scheme
     assert replay_curve_certificate(curve, cert)
+    obligation = generate_obligation(cert.formal_seal)
+    assert obligation is not None and "polynomialIdentity" in obligation
+    formal = verify_curve_certificate_formally(cert)
+    if lean_check_available():  # pragma: no cover - Lean-equipped environment only
+        assert formal.theorem_prover_verified
+    else:
+        assert not formal.finite_obligation.available
+
+
+def test_sixteen_oval_octic_recertifies_through_polygonal_annuli():
+    x, y, z = _variables()
+    px = (x**2 - z**2) * (x**2 - 9 * z**2)
+    py = (y**2 - z**2) * (y**2 - 9 * z**2)
+    curve = HomogeneousPlaneCurve(px**2 + py**2 - Q(1, 16) * z**8)
+    witness = find_smoothness_witness(curve, max_multiplier_degree=12)
+    assert witness is not None
+    annuli = [
+        PolygonalAnnulus(
+            _square_polygon(a, b, Q(1, 1024)),
+            _square_polygon(a, b, Q(1, 32)),
+        )
+        for a in (-3, -1, 1, 3)
+        for b in (-3, -1, 1, 3)
+    ]
+    cert = certify_curve(curve, witness, annuli)
+    assert (cert.component_lower_bound, cert.harnack_upper_bound) == (16, 22)
+    assert cert.barrier_parents == (-1,) * 16
+    assert cert.boundary_signs == ((-1, 1),) * 16
+    assert not cert.complete_real_scheme
+    assert replay_curve_certificate(curve, cert)
+
+
+def test_nonrectangular_polygonal_annulus_certifies_whole_edges():
+    x, y, z = _variables()
+    curve = HomogeneousPlaneCurve(x**2 + y**2 - z**2)
+    witness = find_smoothness_witness(curve, max_multiplier_degree=0)
+    assert witness is not None
+    def diamond(radius):
+        return RationalPolygon((
+            (radius, 0),
+            (0, radius),
+            (-radius, 0),
+            (0, -radius),
+        ))
+
+    annulus = PolygonalAnnulus(diamond(Q(1, 2)), diamond(2))
+    cert = certify_curve(curve, witness, [annulus])
+    assert cert.complete_real_scheme
+    assert cert.boundary_signs == ((-1, 1),)
+    assert replay_curve_certificate(curve, cert)
+
+
+def test_polygon_geometry_is_checked_exactly():
+    with pytest.raises(ValueError, match="simple"):
+        RationalPolygon(((0, 0), (3, 2), (0, 3), (2, 0)))
+    with pytest.raises(TypeError, match="not floats"):
+        RationalPolygon(((0.0, 0), (1, 0), (0, 1)))
+    inner = _square_polygon(0, 0, 1)
+    shifted = _square_polygon(2, 0, 2)
+    with pytest.raises(ValueError, match="strictly contain"):
+        PolygonalAnnulus(inner, shifted)
 
 
 def test_annuli_in_a_declared_nondefault_projective_chart():

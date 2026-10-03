@@ -7,13 +7,16 @@ bound on `|phi^(N+1)|` is supplied; `verify=True` is the never-worse
 backstop.
 
 Status is **shipped**. G1/G2/G3/G6 are CI-gated. G4
-(target-loss step count vs strong Wolfe) is **leftover-recorded**
-unearned (leftover #47; ratio `1.83`, need `2x`; Wolfe misses the
-stiffest seed). G5 reports the order×depth crossover versus a
-four-trial Wolfe budget (favourable at `N=2`, over budget from `N=4`)
-and is **leftover-recorded** (leftover #48), **not** in CI
-`all_passed`. The win is a constant factor in a specific regime, not
-an asymptotic one. Jets come from the founding bias collapse
+(target-loss step count vs strong Wolfe) is **earned** (leftover #47
+closed; ratio `2.32`, need `2x`; both arms hit 5/5) and is **not** in
+CI `all_passed`. The first accepted step is the directional polynomial
+minimizer. A later step may be an unused inverse eigenvalue of the
+secant Hessian in the plane of the last two gradients when the order-2
+model decreases and `verify=True` holds. G5 reports the order×depth
+crossover versus a four-trial Wolfe budget (favourable at `N=2`, over
+budget from `N=4`) and is **leftover-recorded** (leftover #48), **not**
+in CI `all_passed`. The win is a constant factor in a specific regime,
+not an asymptotic one. Jets come from the founding bias collapse
 (`delta -> 0`). No temperature collapse appears. See theory spec 03-12.
 
 `taylor_line_min` (order 2/3, no certified radius) is unchanged.

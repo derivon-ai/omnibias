@@ -11,6 +11,9 @@ The alpha [neuromanifold extensions](neuromanifold.md) add joint parameter
 jets, observation metrics, exact affine quotient charts, collision coordinates,
 and weighted extrinsic geometry. [Scientific adapters](neuromanifold-science.md)
 include generic residual-family continuation and boundary exploration.
+The pure exact-Q [Viro patchwork](patchwork_octic.md) submodule validates
+projective T-curve nesting, regular heights, Farkas alternatives, polygonal
+curve barriers, and direct coefficient-level algebraic-curve certificates.
 
 ## Two exact mechanisms
 

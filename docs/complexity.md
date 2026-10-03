@@ -319,9 +319,37 @@ cases. Reported outputs agree to `≤ 3×10⁻¹³` where both methods complete.
 
 - The closed-form complexity above is for the **one-layer field** that
   `omnibias.jax.laplacian` ships — exactly the FermiNet local-kinetic-energy
-  primitive benchmarked here. Arbitrary deep ansätze need the closed-form path
-  threaded through every layer; that is the multi-layer **jet** machinery
-  (`omnibias.jax.jet`, `jet_mv`), whose own scaling is benchmarked separately.
+  primitive benchmarked here. Deep ansätze have their own fast lane now (the
+  next bullet); the general multi-layer **jet** machinery (`omnibias.jax.jet`,
+  `jet_mv`) remains the path for mixed partials beyond a Laplacian /
+  poly-Laplacian contraction, and its own scaling is benchmarked separately.
+- **Deep-network Laplacian / poly-Laplacian fast lane** (09-33). Threading a
+  deep ansatz through the full multivariate jet
+  (`mlp_jet_mv`) materialises every mixed partial to the requested order —
+  `comb(D + 2k, D)` of them — and hits
+  `omnibias.core.multi_index.MAX_MULTI_INDICES` well before `D` reaches the
+  thousands. `omnibias.{jax,torch}.laplacian.deep_field_laplacian` /
+  `deep_field_polylaplacian` remove that ceiling with a three-tier dispatch
+  (`omnibias.core.contraction.select_mode`), never materialising the full jet:
+
+  | Tier | Applies when | Cost | Ceiling |
+  |---|---|---|---|
+  | A — forward-Laplacian recursion | `k = 1`, any `D` | `O(B·H·D)` per layer (Jacobian-carrying recursion), no combinatorial term | none |
+  | B — support-grouped local jets | `k ≥ 2`, design fits `budget` | `O(support_jet_count(D,k)·H·k)` local multivariate jet reads, exact | grows with `D`, `k`; refuses past `budget` (falls to Tier C) |
+  | C — unbiased sphere estimator | `k ≥ 2`, any `D` | `O(n_directions·H·k)`; exact only in expectation | none, exact only in expectation |
+
+  Measured on CPU (`benchmarks/deep_laplacian_scaling.py`, `D=256`, depth 3,
+  hidden 16): Tier A beat nested `torch.func.hessian` trace by **13.2×** and
+  agreed with it to `1.0×10⁻¹⁶` absolute. The headline ceiling-removal case is
+  `D=5000`, depth 2: Tier A succeeds while `mlp_jet_mv` raises immediately
+  (`MAX_MULTI_INDICES`, 12.5M multi-indices needed). Torch-vs-JAX agreement is
+  `8.9×10⁻¹⁶` absolute at the configs tested — a tight float64 numerical
+  match, not literal bit-identity; the shared pure-Python fastpath polynomial
+  evaluation is bit-exact in isolation, but the recursion's intermediate
+  `tensordot`/`sum` steps pick up a 1–2 ULP gap between backends. State the
+  capability precisely: **exact and ceiling-free for the Laplacian;
+  exact-or-enclosed at any dimension for `Δᵏ`**, never "O(1) at arbitrary
+  order." Details: [`docs/api/deep_laplacian.md`](api/deep_laplacian.md).
 - Dimension-independent contraction work assumes the current weight norms
   are available. Computing those norms costs `O(H·D)`; the forward dense
   matmul costs `O(B·H·D)`; the requested order contributes polynomial work.
@@ -365,6 +393,7 @@ uv run python benchmarks/laplacian_scaling.py
 uv run python benchmarks/polylaplacian_order.py
 uv run python benchmarks/derivative_order.py
 uv run python benchmarks/optimizer_pinn.py
+uv run python benchmarks/deep_laplacian_scaling.py
 ```
 
 Artifacts land in [`docs/benchmarks/`](https://github.com/derivon-ai/omnibias/tree/main/docs/benchmarks). See

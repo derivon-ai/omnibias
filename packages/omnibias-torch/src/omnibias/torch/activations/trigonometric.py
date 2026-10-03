@@ -15,7 +15,7 @@ Activation          n-th derivative formula                    Max fastpath orde
 ``cosh(z)``         alternating ``cosh / sinh``                every n
 ``tan(z)``          Riccati ``P(t) = 1 + t^2``                 n in {0, 1, 2, 3}
 ``cot(z)``          Riccati ``P(c) = -(1 + c^2)``              n in {0, 1, 2, 3}
-``sech(z)``         ``sech * (1 - 2 sech^2)`` etc.             n in {0, 1, 2}
+``sech(z)``         ``sech * (1 - 2 sech^2)`` etc.             n in {0, 1, 2, 3}
 ``coth(z)``         Riccati ``P(c) = 1 - c^2`` (tanh-like)     n in {0, 1, 2, 3}
 ==================  =========================================  ===================
 

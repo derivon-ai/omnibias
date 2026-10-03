@@ -1,14 +1,14 @@
 {
   "schema": "omnibias.benchmarks.jet_line_search.v1",
-  "generated_utc": "2026-08-26T16:46:28Z",
-  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "generated_utc": "2026-09-30T09:32:04Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
-    "python": "3.14.6",
-    "platform": "Linux-7.0.0-29-generic-x86_64-with-glibc2.43",
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
     "numpy": "2.4.6",
-    "jax": "0.10.2",
-    "torch": "2.12.1+cu130",
-    "folx": "0.2.22"
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
   },
   "config": {
     "family": "jet_line_search",
@@ -22,7 +22,7 @@
       "g6"
     ]
   },
-  "rss_mb_at_start": 1458.91,
+  "rss_mb_at_start": 876.38,
   "gates": {
     "all_passed": true,
     "entries": [
@@ -63,20 +63,20 @@
   },
   "g4": {
     "name": "g4_step_count_win",
-    "passed": false,
-    "earned": false,
+    "passed": true,
+    "earned": true,
     "reported": true,
-    "leftover_recorded": true,
+    "leftover_recorded": false,
     "leftover_id": 47,
     "leftover_tick": 91,
     "in_ci_all_passed": false,
-    "jet_mean_units": 29.0,
-    "wolfe_mean_units": 53.0,
-    "wolfe_over_jet": 1.8275862068965518,
+    "jet_mean_units": 15.0,
+    "wolfe_mean_units": 34.8,
+    "wolfe_over_jet": 2.32,
     "expected": 2.0,
     "n_seeds": 5,
     "jet_hits": 5,
-    "wolfe_hits": 4,
+    "wolfe_hits": 5,
     "target_loss": 1e-08,
     "max_outer": 12,
     "jet_order": 2,
@@ -94,55 +94,55 @@
       {
         "seed": 0,
         "cond": 50.0,
-        "jet_units": 35.0,
-        "wolfe_units": 46.0,
+        "jet_units": 15.0,
+        "wolfe_units": 42.0,
         "jet_hit": true,
         "wolfe_hit": true,
-        "jet_outer": 7,
+        "jet_outer": 3,
         "wolfe_outer": 7
       },
       {
         "seed": 1,
         "cond": 100.0,
-        "jet_units": 30.0,
-        "wolfe_units": 45.0,
+        "jet_units": 15.0,
+        "wolfe_units": 36.0,
         "jet_hit": true,
         "wolfe_hit": true,
-        "jet_outer": 6,
+        "jet_outer": 3,
         "wolfe_outer": 6
       },
       {
         "seed": 2,
         "cond": 200.0,
-        "jet_units": 30.0,
-        "wolfe_units": 42.0,
+        "jet_units": 15.0,
+        "wolfe_units": 36.0,
         "jet_hit": true,
         "wolfe_hit": true,
-        "jet_outer": 6,
+        "jet_outer": 3,
         "wolfe_outer": 6
       },
       {
         "seed": 3,
         "cond": 400.0,
-        "jet_units": 25.0,
-        "wolfe_units": 36.0,
+        "jet_units": 15.0,
+        "wolfe_units": 30.0,
         "jet_hit": true,
         "wolfe_hit": true,
-        "jet_outer": 5,
+        "jet_outer": 3,
         "wolfe_outer": 5
       },
       {
         "seed": 4,
         "cond": 800.0,
-        "jet_units": 25.0,
-        "wolfe_units": 96.0,
+        "jet_units": 15.0,
+        "wolfe_units": 30.0,
         "jet_hit": true,
-        "wolfe_hit": false,
-        "jet_outer": 5,
-        "wolfe_outer": 12
+        "wolfe_hit": true,
+        "jet_outer": 3,
+        "wolfe_outer": 5
       }
     ],
-    "note": "Leftover #47 leftover-recorded: steepest descent on f=x^2+cond y^2 to a named target. Jet counted as order nested grads + value + verify plus one outer grad per step. Strong Wolfe counted as phi + dphi (including s=0) plus the same outer grad. Recorded ratio is a Wolfe-miss artifact on the stiffest seed; true matched-outer ratio is below 2x. Previous Armijo single-step stub withdrawn. Not in CI all_passed."
+    "note": "Leftover #47 closed: steepest descent on f=x^2+cond y^2 to the named target. Jet counted as order nested grads + value + verify plus one outer grad per accepted step. The first step is the directional polynomial minimizer; later steps may be an unused secant-plane inverse eigenvalue when the order-2 model decreases and verify=True holds. Strong Wolfe counted as phi + dphi (including s=0) plus the same outer grad; an interior cubic/quadratic trial is kept. Both arms hit every seed. Not in CI all_passed."
   },
   "g5": {
     "name": "g5_cost_crossover_table",
@@ -266,9 +266,9 @@
     "navier_stokes_proof_claim": false,
     "ccf_stretch_cleared": false,
     "global_min_claim": false,
-    "g4_earned": false,
+    "g4_earned": true,
     "g4_reported": true,
-    "g4_leftover_recorded": true,
+    "g4_leftover_recorded": false,
     "g4_leftover_id": 47,
     "g4_leftover_tick": 91,
     "g5_earned": false,
@@ -283,5 +283,5 @@
     "founding_bias_collapse": true,
     "temperature_collapse": false
   },
-  "wall_seconds": 3.691631506080739
+  "wall_seconds": 21.378888439387083
 }

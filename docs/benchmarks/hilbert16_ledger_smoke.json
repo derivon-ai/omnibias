@@ -1,0 +1,87 @@
+{
+  "schema": "omnibias.benchmarks.hilbert16_ledger.v1",
+  "generated_utc": "2026-09-29T13:38:09Z",
+  "hardware_class": "commodity x86-64 CPU (63 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "family": "hilbert16_ledger",
+    "full": false
+  },
+  "rss_mb_at_start": 643.66,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "gh1_shipped_ledger_open",
+        "passed": true,
+        "status": "BLOCKED",
+        "n_blocking": 30,
+        "parent_flags": {
+          "hilbert16_part_a_solved": false,
+          "hilbert16_part_b_quadratic_solved": false,
+          "full_hilbert16_solved": false,
+          "h16_uniform_finiteness_proved": false
+        },
+        "detail": "every gate/DRR/part-A entry present; every derived parent flag false"
+      },
+      {
+        "name": "gh2_certificate_round_trip",
+        "passed": true,
+        "round_trip": true,
+        "tampered_digest_rejected": true,
+        "tampered_seal_rejected": true,
+        "detail": "sealed ledger snapshot replays and rejects every tamper"
+      },
+      {
+        "name": "gh3_parent_claim_unforgeable",
+        "passed": true,
+        "genuine_flag": false,
+        "forgery_rejected": true,
+        "detail": "the flag is re-derived from entries, never trusted from a stored boolean"
+      },
+      {
+        "name": "gh4_synthetic_full_discharge_earns_flag",
+        "passed": true,
+        "full_flags": {
+          "hilbert16_part_a_solved": true,
+          "hilbert16_part_b_quadratic_solved": true,
+          "full_hilbert16_solved": true,
+          "h16_uniform_finiteness_proved": true
+        },
+        "local_only_flags": {
+          "hilbert16_part_a_solved": true,
+          "hilbert16_part_b_quadratic_solved": false,
+          "full_hilbert16_solved": false,
+          "h16_uniform_finiteness_proved": true
+        },
+        "detail": "a synthetic all-discharged ledger earns the flag; DISCHARGED_LOCAL_SCOPE alone does not"
+      }
+    ]
+  },
+  "wall_seconds": 23.77019072137773,
+  "shipped_ledger": {
+    "status": "BLOCKED",
+    "n_entries": 145,
+    "parent_flags": {
+      "hilbert16_part_a_solved": false,
+      "hilbert16_part_b_quadratic_solved": false,
+      "full_hilbert16_solved": false,
+      "h16_uniform_finiteness_proved": false
+    }
+  },
+  "honesty": {
+    "hilbert16_part_a_solved": false,
+    "hilbert16_part_b_quadratic_solved": false,
+    "full_hilbert16_solved": false,
+    "h16_uniform_finiteness_proved": false,
+    "drr_case_closed": false
+  },
+  "disclaimer": "The obligation ledger and its derived parent flags are sound machinery, replayed here on both the shipped (open) ledger and a synthetic fully-discharged one built only for gate GH4. This is not a claim that Hilbert's 16th problem, or any of its gates or DRR cases, is solved."
+}

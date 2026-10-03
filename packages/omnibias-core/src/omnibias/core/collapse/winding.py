@@ -411,6 +411,78 @@ def winding_collapse(
     )
 
 
+def winding_collapse_function(
+    function: ComplexEnclosureFn,
+    center: complex = 0j,
+    radius: float = 1.0,
+    *,
+    expected: int | None = None,
+    segments: int = 32,
+    max_segments: int = 256,
+    contour: str = "circle",
+    half_width: float | None = None,
+    half_height: float | None = None,
+) -> ObligationVerdict:
+    """Collapse a function's certified contour winding onto one integer."""
+
+    if max_segments < segments:
+        raise ValueError("max_segments must be >= segments")
+    current = segments
+    last: Interval | None = None
+    while current <= max_segments:
+        last = winding_enclosure_function(
+            function,
+            center,
+            radius,
+            segments=current,
+            contour=contour,
+            half_width=half_width,
+            half_height=half_height,
+        )
+        if last is not None:
+            hits = integers_in(last)
+            if len(hits) == 1:
+                value = hits[0]
+                if expected is None or expected == value:
+                    outcome = CollapseOutcome(
+                        status="collapsed",
+                        spec_name="winding",
+                        surviving=value,
+                        residual=last,
+                        detail=f"function winding enclosure collapsed onto {value}",
+                        honesty=_honesty(),
+                    )
+                    return ObligationVerdict(
+                        status="PROVED",
+                        outcome=outcome,
+                        existential=True,
+                        evaluated=current,
+                        complete=True,
+                        detail=outcome.detail,
+                    )
+                outcome = CollapseOutcome(
+                    status="excluded",
+                    spec_name="winding",
+                    surviving=value,
+                    residual=last,
+                    detail=f"function winding is {value}, not expected {expected}",
+                    honesty=_honesty(),
+                )
+                return ObligationVerdict(
+                    status="DISPROVED",
+                    outcome=outcome,
+                    existential=True,
+                    evaluated=current,
+                    complete=True,
+                    detail=outcome.detail,
+                )
+        current *= 2
+    return _blocked(
+        "function winding enclosure did not isolate a unique integer",
+        last,
+    )
+
+
 def _reseed() -> None:
     try:
         get_collapse("winding")
@@ -433,6 +505,7 @@ __all__ = [
     "horner_complex",
     "integers_in",
     "winding_collapse",
+    "winding_collapse_function",
     "winding_enclosure",
     "winding_enclosure_function",
 ]

@@ -1,0 +1,238 @@
+{
+  "schema": "omnibias.benchmarks.hilbert16_route2_sweep.v2",
+  "generated_utc": "2026-09-15T19:38:35Z",
+  "hardware_class": "commodity x86-64 CPU (63 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "family": "hilbert16_route2_sweep",
+    "full": true,
+    "tiers": [
+      "d4"
+    ],
+    "budget": 4,
+    "max_depth": 0,
+    "fine": true
+  },
+  "rss_mb_at_start": 706.51,
+  "benchmark": "hilbert16_route2_sweep",
+  "gates": {
+    "all_passed": false,
+    "entries": [
+      {
+        "name": "route2_layout_lp_sweep",
+        "passed": false,
+        "payload": {
+          "hit": false,
+          "tiers": [
+            {
+              "kind": "finite_discovery",
+              "status": "BLOCKED",
+              "family": "route2_wide_deep_d4_fine_depth0",
+              "symmetry": "d4",
+              "budget": 4,
+              "evaluated": 4,
+              "cardinality": 73728,
+              "frontier_size": 43,
+              "seen": 47,
+              "search_incomplete": true,
+              "exhausted": false,
+              "witness": null,
+              "last_payload": {
+                "margin_float": -1.3908647540851796e-07,
+                "converged": true,
+                "symmetry": "d4",
+                "constraint_count": 1584,
+                "anchor": 16,
+                "detail": "normalized max-margin is nonpositive",
+                "farkas_digest": null,
+                "honesty": {
+                  "fixed_layout_excluded": false,
+                  "global_nonrealizability_claim": false,
+                  "full_hilbert16_solved": false
+                }
+              },
+              "last_candidate": {
+                "coordinates": [
+                  3,
+                  3,
+                  3,
+                  3,
+                  0,
+                  3
+                ],
+                "subdivision_depth": 0,
+                "anchor": 16
+              },
+              "score_checkpoint_count": 40,
+              "top_scores": [
+                {
+                  "candidate": {
+                    "coordinates": [
+                      3,
+                      3,
+                      3,
+                      3,
+                      0,
+                      3
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-29005/208539327169"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      2,
+                      2,
+                      3,
+                      3,
+                      0,
+                      3
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-68333/449445632274"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      2,
+                      3,
+                      2,
+                      3,
+                      0,
+                      3
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-82195/343781989131"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      2,
+                      3,
+                      3,
+                      3,
+                      0,
+                      2
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-160783/622323434531"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      2,
+                      3,
+                      3,
+                      2,
+                      0,
+                      3
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-111324/429041571847"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      2,
+                      3,
+                      3,
+                      3,
+                      1,
+                      3
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-247391/952629803843"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      2,
+                      3,
+                      3,
+                      3,
+                      0,
+                      3
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-255469/983735790444"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      2,
+                      3,
+                      3,
+                      0,
+                      3
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-92705/350432036992"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      3,
+                      2,
+                      3,
+                      0,
+                      3
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-236734/704897379455"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      3,
+                      3,
+                      3,
+                      0,
+                      2
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-320004/883012729235"
+                }
+              ],
+              "max_subdivision_depth": 0
+            }
+          ],
+          "checkpoint": "/u/vardang/scratch/h16_route2_fine_d4.json"
+        },
+        "detail": "finite best-first search; only a sealed curve is a hit"
+      }
+    ]
+  },
+  "full_hilbert16_solved": false,
+  "hilbert16_part_a_solved": false,
+  "wall_seconds": 361.3767876625061
+}

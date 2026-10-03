@@ -1,0 +1,326 @@
+{
+  "schema": "omnibias.benchmarks.abelian_zero_count.v2",
+  "generated_utc": "2026-09-14T17:03:49Z",
+  "hardware_class": "commodity x86-64 CPU (92 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "quadrature_panels": 64,
+    "continuation_steps": 6,
+    "continuation_order": 12,
+    "segments": 8,
+    "max_segments": 16,
+    "full": false,
+    "lean": true,
+    "problem": {
+      "p": [
+        -1,
+        1
+      ],
+      "q": [
+        0,
+        1
+      ],
+      "energy_factor": [
+        [
+          -1,
+          64
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "base_h": [
+        0,
+        1
+      ],
+      "base_roots": [
+        [
+          -1,
+          1
+        ],
+        [
+          0,
+          1
+        ],
+        [
+          1,
+          1
+        ]
+      ],
+      "quadrature_panels": 64,
+      "continuation_steps": 6,
+      "continuation_order": 12,
+      "moment_factor": [],
+      "declared_factor_roots": [
+        [
+          -1,
+          8
+        ],
+        [
+          1,
+          8
+        ]
+      ]
+    }
+  },
+  "rss_mb_at_start": 635.53,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "ga1_exact_picard_fuchs",
+        "passed": true,
+        "operator": [
+          [
+            [
+              15,
+              1
+            ]
+          ],
+          [
+            [
+              0,
+              1
+            ],
+            [
+              216,
+              1
+            ]
+          ],
+          [
+            [
+              -16,
+              1
+            ],
+            [
+              0,
+              1
+            ],
+            [
+              108,
+              1
+            ]
+          ]
+        ],
+        "matrix_shape": [
+          12,
+          9
+        ],
+        "rank_kernel_dimension": 1,
+        "perturbed_operator_rejected": true
+      },
+      {
+        "name": "ga2_validated_continuation",
+        "passed": true,
+        "closed_loop_contains_initial_jet": true,
+        "independent_real_energy_crosschecks": [
+          {
+            "h": [
+              -120,
+              343
+            ],
+            "continued": [
+              "-0x1.cc96b9adae4c8p-5",
+              "0x1.3913b24b376d2p-4"
+            ],
+            "independent_quadrature": [
+              "0x1.1c37096fe8204p-7",
+              "0x1.2f12c62345ff5p-7"
+            ],
+            "overlap": true
+          },
+          {
+            "h": [
+              120,
+              343
+            ],
+            "continued": [
+              "0x1.65b2fa611f79fp-5",
+              "0x1.8f4d6e2963a91p-2"
+            ],
+            "independent_quadrature": [
+              "0x1.9e3437c1c96dfp-3",
+              "0x1.bf9ee81a30f02p-3"
+            ],
+            "overlap": true
+          }
+        ],
+        "bbjt_overlap": "not_applicable_to_phase_one_depressed_cubic_instance"
+      },
+      {
+        "name": "ga3_argument_principle_upper_count",
+        "passed": true,
+        "action_zero_free_domain": {
+          "left": [
+            -7205759403792795,
+            36028797018963968
+          ],
+          "right": [
+            7205759403792795,
+            36028797018963968
+          ],
+          "critical_offset_squared": [
+            4,
+            27
+          ],
+          "left_inside": true,
+          "right_inside": true,
+          "verified": true,
+          "analytic_input": "Euler representation of z*2F1(1/6,5/6;2;z) on C minus [1,infinity)"
+        },
+        "upper_status": "PROVED",
+        "upper_count": 2,
+        "winding_enclosure": [
+          "0x1.b88c3b187660cp+0",
+          "0x1.318f8ccc457e7p+1"
+        ],
+        "zero_on_contour_status": "BLOCKED"
+      },
+      {
+        "name": "ga4_krawczyk_lower_count",
+        "passed": true,
+        "lower_count": 2,
+        "boxes": [
+          [
+            [
+              "-0x1.0024ecb308c9fp-3",
+              "-0x1.ffb62699ee6c2p-4"
+            ]
+          ],
+          [
+            [
+              "0x1.ffd711f77d9d9p-4",
+              "0x1.0014770441313p-3"
+            ]
+          ]
+        ],
+        "kappa": [
+          0.07042809838683865,
+          0.03903371557399484
+        ]
+      },
+      {
+        "name": "ga5_exact_count_sandwich",
+        "passed": true,
+        "exact_count": 2,
+        "scope": "one certified forced-factor two-zero instance in Petrov's elliptic setting; not Petrov's parameter-uniform sharp theorem"
+      },
+      {
+        "name": "ga6_seal_and_finite_lean",
+        "passed": true,
+        "digest_replay": true,
+        "lean_requested": true,
+        "picard_fuchs_lean_verified": true,
+        "winding_integer_lean_verified": true,
+        "formal_scope": "finite rational syzygy and winding integer isolation only"
+      },
+      {
+        "name": "ga7_genuine_mixed_one_form",
+        "passed": true,
+        "beta": [
+          [
+            1,
+            1000
+          ]
+        ],
+        "exact_count": 2,
+        "boxes": [
+          [
+            [
+              "-0x1.f895a8b680979p-4",
+              "-0x1.f582eb9bbd8d2p-4"
+            ]
+          ],
+          [
+            [
+              "0x1.f6fe6c0898822p-4",
+              "0x1.f88fd2f9e7975p-4"
+            ]
+          ]
+        ],
+        "declared_factor_roots_excluded": true,
+        "forced_factor_instance": false,
+        "irrational_zeros_verified": false,
+        "gauss_manin_differential_rank": 2,
+        "period_view_components": 4,
+        "exact_period_reduction_replayed": true,
+        "reason": "The certified boxes exclude the two declared planted roots. Finite-width boxes do not prove irrationality because each contains rationals."
+      },
+      {
+        "name": "ga8_parameter_uniform_box_cover",
+        "passed": true,
+        "coefficient_box": {
+          "alpha": [
+            [
+              [
+                -1,
+                64
+              ],
+              [
+                -1,
+                64
+              ]
+            ],
+            [
+              [
+                0,
+                1
+              ],
+              [
+                0,
+                1
+              ]
+            ],
+            [
+              [
+                1,
+                1
+              ],
+              [
+                1,
+                1
+              ]
+            ]
+          ],
+          "beta": [
+            [
+              [
+                9,
+                10000
+              ],
+              [
+                11,
+                10000
+              ]
+            ]
+          ]
+        },
+        "status": "PROVED",
+        "uniform_bound": 2,
+        "leaves": 1,
+        "box_cover_tiling_lean_verified": true,
+        "leaf_winding_lean_verified": true,
+        "scope": "finite rational beta interval for one cubic Hamiltonian and one regular contour; not a degree-uniform Petrov or H(2) theorem"
+      }
+    ]
+  },
+  "certificate_digest": "sha256:a96e028ffe1eb6691b10cb5ead0838bb329e00f34b22fc3e4983132dd8996309",
+  "picard_fuchs_digest": "sha256:0a76511c401427114b8429a5f3e0cc68805b3863f38a474431e01ea5e67c2f97",
+  "genuine_certificate_digest": "sha256:1113614f5300686ac65097a463597513ad1f42c796e0b8f7c1e3655e2b55de0f",
+  "uniform_cover_digest": "sha256:3daaf657955a894dc9f199f85cff96df051be099eddaeaa73d191a4486f17474",
+  "contour_refinement_sweep": [],
+  "disclaimer": "Instance-level and finite rational coefficient-box infinitesimal Hilbert-XVI counts. Not Petrov's degree-uniform theorem; no H(n), H(2), singular-passage, or full Hilbert-XVI claim.",
+  "wall_seconds": 149.1323382910341
+}

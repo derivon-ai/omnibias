@@ -8,6 +8,7 @@ import math
 
 import pytest
 from omnibias.core.line_search import (
+    GradientSecant,
     JetLineSearchConfig,
     apply_verification,
     certified_truncation_radius,
@@ -116,6 +117,92 @@ def test_explicit_cap_with_bound_is_certified() -> None:
     )
     assert certified
     assert radius == 1.0
+
+
+def _illcond_step(
+    theta: list[float],
+    cond: float,
+    *,
+    prev: tuple[tuple[float, float], float] | None,
+    used: tuple[float, ...],
+) -> tuple[float, float | None, float]:
+    """One steepest step. Returns ``(step, consumed_curvature, new_loss)``."""
+    x, y = theta
+    value = x * x + cond * y * y
+    grad = (2.0 * x, 2.0 * cond * y)
+    grad_sq = grad[0] * grad[0] + grad[1] * grad[1]
+    curv = grad[0] * (2.0 * grad[0]) + grad[1] * (2.0 * cond * grad[1])
+    secant = None
+    if prev is not None:
+        prev_g, prev_step = prev
+        secant = GradientSecant(
+            previous_gradient=prev_g,
+            previous_step=prev_step,
+            current_gradient=grad,
+            direction=(-grad[0], -grad[1]),
+            used_curvatures=used,
+        )
+
+    def actual(step: float, grad: tuple[float, float] = grad) -> float:
+        return (x - step * grad[0]) ** 2 + cond * (y - step * grad[1]) ** 2
+
+    result = run_model_line_search(
+        (value, -grad_sq, curv),
+        config=JetLineSearchConfig(order=2, trust_radius=1.0, verify=True),
+        actual_fn=actual,
+        secant=secant,
+    )
+    assert result.actual_value is not None
+    assert result.actual_value <= value + 1e-12
+    assert not result.fell_back
+    return result.step, result.consumed_curvature, result.actual_value
+
+
+def test_secant_eigenstep_hits_named_quadratic_in_three_steps() -> None:
+    """G4 suite: polynomial minimizer, then two unused inverse eigenvalues."""
+    for cond in (50.0, 100.0, 200.0, 400.0, 800.0):
+        theta = [-1.2, 0.8]
+        prev: tuple[tuple[float, float], float] | None = None
+        used: tuple[float, ...] = ()
+        steps = 0
+        for _ in range(6):
+            value = theta[0] ** 2 + cond * theta[1] ** 2
+            if value <= 1e-8:
+                break
+            grad = (2.0 * theta[0], 2.0 * cond * theta[1])
+            step, consumed, _new = _illcond_step(theta, cond, prev=prev, used=used)
+            if consumed is not None:
+                used = (*used, consumed)
+            theta = [theta[0] - step * grad[0], theta[1] - step * grad[1]]
+            prev = (grad, step)
+            steps += 1
+        final = theta[0] ** 2 + cond * theta[1] ** 2
+        assert steps == 3
+        assert final <= 1e-8
+        assert len(used) == 2
+
+
+def test_secant_ignored_when_direction_is_not_negative_gradient() -> None:
+    derivs = (1.0, -2.0, 6.0, -12.0, 48.0)
+    plain = select_model_step(
+        derivs,
+        radius=1.0,
+        config=JetLineSearchConfig(order=4, verify=False),
+    )
+    secant = GradientSecant(
+        previous_gradient=(1.0, 0.0),
+        previous_step=0.2,
+        current_gradient=(0.0, 1.0),
+        direction=(1.0, 0.0),
+        used_curvatures=(),
+    )
+    result = run_model_line_search(
+        derivs,
+        config=JetLineSearchConfig(order=4, trust_radius=1.0, verify=False),
+        secant=secant,
+    )
+    assert result.consumed_curvature is None
+    assert result.step == pytest.approx(plain.step)
 
 
 def test_poly_eval_matches_hand() -> None:

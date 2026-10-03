@@ -75,6 +75,11 @@ from omnibias.holonomic.rank_syzygy import (
     certify_holonomic_syzygy,
     integerize_matrix,
 )
+from omnibias.holonomic.twin_prime import (
+    ASYMPTOTIC_SIEVE_KIND,
+    certify_asymptotic_sieve_local_product,
+    seal_asymptotic_sieve_local_product,
+)
 
 KELLER_ALPOGE_REPLAY = "keller_alpoge_replay"
 KELLER_TANGENT_SWEEP = "keller_tangent_sweep"
@@ -91,6 +96,14 @@ JACOBIAN_N2_CASE_A_B02 = CASE_A_B02_KIND
 JACOBIAN_N2_CASE_A_B31 = CASE_A_B31_KIND
 
 FAMILY_CATALOG: dict[str, dict[str, str]] = {
+    ASYMPTOTIC_SIEVE_KIND: {
+        "parent_status": "open",
+        "obligation": (
+            "a finite exact-Q prefix of the shifted-prime local-factor identity "
+            "H*G=2*C_2; no infinite Euler product or prime-gap parent is inferred"
+        ),
+        "complete": "True",
+    },
     KELLER_ALPOGE_REPLAY: {
         "parent_status": "already_false",
         "obligation": "det J(F)+2 ≡ 0 and an explicit 3-to-1 rational witness",
@@ -217,6 +230,10 @@ def _schema_errors(certificate: Certificate) -> list[str]:
         "ten_proofs_formalization_claim",
         "no_condition_exists_claim",
         "unnamed_condition_complete_claim",
+        "twin_prime_conjecture_proof_claim",
+        "hardy_littlewood_asymptotic_claim",
+        "mobius_bilinear_estimate_proved",
+        "uniform_asymptotic_passage_proved",
     ):
         if honesty.get(key):
             errors.append(f"{key} must be False")
@@ -328,6 +345,46 @@ def _holonomic_syzygy_factory(**kwargs: Any) -> dict[str, Any]:
             "float_svd_is_proof": False,
         },
     }
+
+
+def _prove_asymptotic_sieve_local_factors(conjecture: Conjecture) -> ProofAttempt:
+    try:
+        report = certify_asymptotic_sieve_local_product(
+            int(conjecture.data.get("prime_limit", 97))
+        )
+    except (TypeError, ValueError) as exc:
+        return _blocked(str(exc))
+    certificate = seal_asymptotic_sieve_local_product(report)
+    if report.proved:
+        return ProofAttempt(
+            status="PROVED",
+            certificate=certificate,
+            detail="finite shifted-prime local-factor prefix verified exactly",
+        )
+    return _blocked("finite local-factor identity failed", certificate)
+
+
+def _replay_asymptotic_sieve_local_factors(
+    certificate: Certificate,
+) -> bool | None:
+    payload = certificate.get("payload")
+    if not isinstance(payload, Mapping):
+        return False
+    try:
+        report = certify_asymptotic_sieve_local_product(int(payload["prime_limit"]))
+    except (KeyError, TypeError, ValueError):
+        return False
+    return (
+        report.proved
+        and payload.get("combined_product")
+        == report.to_payload()["combined_product"]
+        and payload.get("twin_product") == report.to_payload()["twin_product"]
+    )
+
+
+def _asymptotic_sieve_local_factory(**kwargs: Any) -> dict[str, Any]:
+    report = certify_asymptotic_sieve_local_product(int(kwargs.get("prime_limit", 97)))
+    return seal_asymptotic_sieve_local_product(report)
 
 
 def _from_discovery(result: object) -> ProofAttempt:
@@ -483,6 +540,13 @@ def _prove_algebraic_guess(conjecture: Conjecture) -> ProofAttempt:
 def holonomic_provers() -> list[FunctionProver]:
     return [
         FunctionProver(
+            name=ASYMPTOTIC_SIEVE_KIND,
+            kinds=frozenset({ASYMPTOTIC_SIEVE_KIND}),
+            prove_fn=_prove_asymptotic_sieve_local_factors,
+            schema_fn=_schema_errors,
+            replay_fn=_replay_asymptotic_sieve_local_factors,
+        ),
+        FunctionProver(
             name="keller_alpoge_replay",
             kinds=frozenset({KELLER_ALPOGE_REPLAY}),
             prove_fn=_prove_alpoge,
@@ -575,6 +639,7 @@ def build_holonomic_machine() -> ProofMachine:
 
 def _register() -> None:
     modes = {
+        ASYMPTOTIC_SIEVE_KIND: "exact_replay",
         KELLER_ALPOGE_REPLAY: "exact_replay",
         KELLER_TANGENT_SWEEP: "exact_search",
         KELLER_TANGENT_SWEEP_DEG3: "exact_search",
@@ -588,6 +653,7 @@ def _register() -> None:
         JACOBIAN_N2_CASE_A_B31: "exact_replay",
     }
     parents = {
+        ASYMPTOTIC_SIEVE_KIND: "Twin Prime Conjecture",
         KELLER_ALPOGE_REPLAY: "Jacobian conjecture n>=3",
         KELLER_TANGENT_SWEEP: "Jacobian conjecture n>=3",
         KELLER_TANGENT_SWEEP_DEG3: "Jacobian conjecture n>=3",
@@ -601,6 +667,7 @@ def _register() -> None:
         JACOBIAN_N2_CASE_A_B31: "jacobian_conjecture_n2",
     }
     factories = {
+        ASYMPTOTIC_SIEVE_KIND: _asymptotic_sieve_local_factory,
         KELLER_ALPOGE_REPLAY: lambda **_k: verify_alpoge_map().as_dict(),
         KELLER_TANGENT_SWEEP: lambda **kwargs: search_tangent_sweep(
             deg_p=2,
@@ -684,6 +751,7 @@ register_catalog(
 
 
 __all__ = [
+    "ASYMPTOTIC_SIEVE_KIND",
     "CONDITION_DFINITE",
     "CONDITION_ORE",
     "FAMILY_CATALOG",

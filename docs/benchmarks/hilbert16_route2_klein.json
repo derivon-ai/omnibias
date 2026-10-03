@@ -1,0 +1,250 @@
+{
+  "schema": "omnibias.benchmarks.hilbert16_route2_sweep.v2",
+  "generated_utc": "2026-09-15T19:59:10Z",
+  "hardware_class": "commodity x86-64 CPU (92 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "family": "hilbert16_route2_sweep",
+    "full": true,
+    "tiers": [
+      "klein"
+    ],
+    "budget": 1,
+    "max_depth": 0,
+    "fine": false,
+    "origin_candidate": null
+  },
+  "rss_mb_at_start": 691.92,
+  "benchmark": "hilbert16_route2_sweep",
+  "gates": {
+    "all_passed": false,
+    "entries": [
+      {
+        "name": "route2_layout_lp_sweep",
+        "passed": false,
+        "payload": {
+          "hit": false,
+          "tiers": [
+            {
+              "kind": "finite_discovery",
+              "status": "BLOCKED",
+              "family": "route2_wide_deep_klein_coarse_depth0",
+              "symmetry": "klein",
+              "budget": 1,
+              "evaluated": 1,
+              "cardinality": 65610,
+              "frontier_size": 43,
+              "seen": 44,
+              "search_incomplete": true,
+              "exhausted": false,
+              "witness": null,
+              "last_payload": {
+                "margin_float": -3.0891106101510327e-06,
+                "converged": true,
+                "symmetry": "klein",
+                "constraint_count": 1584,
+                "anchor": 22,
+                "detail": "normalized max-margin is nonpositive",
+                "farkas_digest": null,
+                "honesty": {
+                  "fixed_layout_excluded": false,
+                  "global_nonrealizability_claim": false,
+                  "full_hilbert16_solved": false
+                }
+              },
+              "last_candidate": {
+                "coordinates": [
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1,
+                  1
+                ],
+                "subdivision_depth": 0,
+                "anchor": 22
+              },
+              "score_checkpoint_count": 30,
+              "top_scores": [
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 22
+                  },
+                  "score": "-3082946/998004406145"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 23
+                  },
+                  "score": "-3724419/408529475969"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 26
+                  },
+                  "score": "-17972269/862461365799"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 16
+                  },
+                  "score": "-9116862/436749081649"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 27
+                  },
+                  "score": "-20123989/863092862437"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 15
+                  },
+                  "score": "-7575556/296678213539"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 17
+                  },
+                  "score": "-11042081/401386528062"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 21
+                  },
+                  "score": "-29984014/613294500261"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 20
+                  },
+                  "score": "-59113133/794902598526"
+                },
+                {
+                  "candidate": {
+                    "coordinates": [
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1,
+                      1
+                    ],
+                    "subdivision_depth": 0,
+                    "anchor": 24
+                  },
+                  "score": "-84473307/971248997974"
+                }
+              ],
+              "max_subdivision_depth": 0
+            }
+          ],
+          "checkpoint": "/u/vardang/scratch/h16_route2_klein.json"
+        },
+        "detail": "finite best-first search; only a sealed curve is a hit"
+      }
+    ]
+  },
+  "full_hilbert16_solved": false,
+  "hilbert16_part_a_solved": false,
+  "wall_seconds": 91.81316423416138
+}

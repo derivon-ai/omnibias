@@ -737,6 +737,16 @@ def test_tampered_certificate_is_rejected_before_lean() -> None:
     assert "digest" in result.detail
 
 
+def test_generate_hilbert16_cyclicity_obligation() -> None:
+    from omnibias.dynamics.df2a import reproduce_df2a_cyclicity
+
+    certificate = reproduce_df2a_cyclicity()
+    src = generate_obligation(certificate.seal)
+    assert src is not None
+    assert "df2a_cyclicity_le_three" in src
+    assert "namespace OmnibiasAnalytic.Generated" in src
+
+
 def test_check_certificate_graceful_without_toolchain() -> None:
     cert = interval_certificate("q", Interval(0.5, 2.0))
     result = check_certificate(cert)

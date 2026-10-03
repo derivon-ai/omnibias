@@ -1,0 +1,73 @@
+{
+  "schema": "omnibias.benchmarks.hilbert16_route2_sweep.v2",
+  "generated_utc": "2026-09-15T19:18:50Z",
+  "hardware_class": "commodity x86-64 CPU (63 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.22.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "family": "hilbert16_route2_sweep",
+    "full": true,
+    "tiers": [
+      "d4"
+    ],
+    "budget": 8,
+    "max_depth": 0
+  },
+  "rss_mb_at_start": 742.95,
+  "benchmark": "hilbert16_route2_sweep",
+  "gates": {
+    "all_passed": false,
+    "entries": [
+      {
+        "name": "route2_layout_lp_sweep",
+        "passed": false,
+        "payload": {
+          "hit": false,
+          "tiers": [
+            {
+              "kind": "finite_discovery",
+              "status": "BLOCKED",
+              "family": "route2_wide_deep_d4_depth0",
+              "symmetry": "d4",
+              "budget": 8,
+              "evaluated": 8,
+              "cardinality": 39366,
+              "frontier_size": 95,
+              "seen": 103,
+              "search_incomplete": true,
+              "exhausted": false,
+              "witness": null,
+              "last_payload": {
+                "margin_float": -5.243574366190101e-07,
+                "converged": true,
+                "symmetry": "d4",
+                "constraint_count": 1584,
+                "anchor": 16,
+                "detail": "normalized max-margin is nonpositive",
+                "farkas_digest": null,
+                "honesty": {
+                  "fixed_layout_excluded": false,
+                  "global_nonrealizability_claim": false,
+                  "full_hilbert16_solved": false
+                }
+              },
+              "score_checkpoint_count": 96,
+              "max_subdivision_depth": 0
+            }
+          ],
+          "checkpoint": "/u/vardang/scratch/h16_route2_near_d4.json"
+        },
+        "detail": "finite best-first search; only a sealed curve is a hit"
+      }
+    ]
+  },
+  "full_hilbert16_solved": false,
+  "hilbert16_part_a_solved": false,
+  "wall_seconds": 1205.2556743621826
+}

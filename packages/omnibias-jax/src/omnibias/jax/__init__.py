@@ -155,6 +155,7 @@ from omnibias.jax.lindblad import (
     thermal_population,
 )
 from omnibias.jax.line_search import (
+    GradientSecant,
     JetLineSearchConfig,
     LineSearchResult,
     jet_line_search,
@@ -290,6 +291,7 @@ __all__ = [
     "DEQSolverUnknown",
     "FINITE_RESIDUAL_CLAIM",
     "FourierTransform",
+    "GradientSecant",
     "JaxActivationSpec",
     "JetLineSearchConfig",
     "KantorovichAccept",

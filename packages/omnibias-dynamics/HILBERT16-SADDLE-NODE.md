@@ -98,7 +98,10 @@ with residence `T` at least `log(eta0 / eta_e) / X` and
         <= exp(C * epsilon * sigma * T)
         <= C' * exp(C * sigma * kappa) * (poly(sigma, epsilon)).
 
-The product `sigma * kappa` is the obstruction.
+The product `sigma * kappa` is the obstruction of that Gronwall
+majorant. It is not the leading derivative of the slow-line map: the
+[fold I-map](HILBERT16-FOLD-LEADING.md) gives
+`dx/dkappa = delta^2 / (r - delta)`, which decays as `~ r / kappa^2`.
 
 On a `chi = O(1)` locus, `kappa = chi * r1 / sep` with `r1` bounded
 below on `L >= Lmin`. Then
@@ -112,7 +115,7 @@ below on `L >= Lmin`. Then
   on the χ-atlas kill sequence
 
       sep_n = exp(-1 / epsilon_n^2),    kappa_n = 1 / sep_n,
-      L = 1,    lambda1 = -3,
+      lambda1 = -3,    L_n = (9 - sep_n^2) / 4,
 
   one has `sigma_n / sep_n >= sqrt(epsilon_n) * exp(1 / epsilon_n^2)`,
   so `sigma * kappa` is unbounded. The first-derivative event factor

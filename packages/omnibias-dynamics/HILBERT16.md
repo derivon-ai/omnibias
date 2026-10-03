@@ -85,8 +85,8 @@ below work on that coverage and majorant obligation.
 | Exact negative-lambda limiting resonance in the strict positive-Delta canonical compact | Actual two-scale correction, sharp regular multiplier, fixed-band and positive-base comparisons, connected admission | At most one cycle across every admitted 0<H<=Hmax in the selected small-label itinerary; any such cycle is hyperbolic attracting |
 | Varying detuning through the negative-lambda resonance on a fixed strict positive-Delta canonical compact | Actual singular C2(kappa) remainder, actual O(u^2) label jets, fixed-field regular logarithmic jets, and one convex-core count | Uniformly at most three distinct cycles for |Gamma|<=Gamma0 and every admitted 0<H<=Hmax in the selected small-label itinerary; analytic estimates remain outside Lean |
 | Strict first-root saddle, lambda1<0 and lambda1^2-4L bounded strictly positive | Uniform invariant rectangle, exact event-determinant cancellation, outgoing continuation, incoming lower sensitivity, and connected admission | At most two cycles across all positive heights admitted by the stated small-label itinerary; every height and every nearby cycle are not asserted to be admitted |
-| Coalescing-root χ-atlas on the selected small-label itinerary | Exact linear χ-identities, frozen-exponent obstruction, shrinking-rectangle first derivative when epsilon times |log sep| is at most one | G1 and G4 fail; super-small sep and L->0 remain named falsifiers |
-| Saddle-node blow-up at vanishing separation | Exact double-root identity and linear `X_exit = 1`; fold and separation scales | Scale tension on the super-small-sep sequence; no C2 remainder |
+| Coalescing-root χ-atlas on the selected small-label itinerary | Exact linear χ-identities, frozen-exponent obstruction, tracked `sep^2` product, fold I-map `dx/dkappa ~ r/kappa^2` | G1 and G4 fail; remainder versus `B_eps`, chart O, and first-hit remain |
+| Saddle-node blow-up at vanishing separation | Exact double-root identity and linear `X_exit = 1`; fold I-map leading derivative | Gronwall scale tension is not the leading map; remainder versus `B_eps` open |
 | Shrinking-root layer `r1 -> 0` at fixed negative `lambda1` | Exact `r1 = 2 L / (|lambda1| + sep)`; incoming first-hit at `V = u` retained | Outgoing saddle collides with the centre along `L_n = 1/n`; SR2 rematch fails on the selected itinerary |
 | Two-blow-up covering in `(u, W)` | Exact `epsilon W = h^epsilon` and outgoing W-ratio; charts WF and WS | Same super-small-sep kill sequence; no C2 remainder; G1 stays failed |
 | Nonzero discriminant boundary with compact positive endpoints | Exact central chart and a residence-time contradiction | Such passages are excluded for sufficiently small parameters |
@@ -774,7 +774,8 @@ certificates for those cutoffs or formal analytic verification.
    sequences (fold-versus-separation scale tension, rewritten as a
    W-ratio and then as a scale dichotomy; outgoing saddle colliding
    with the centre; SR2 rematch failing on the selected itinerary;
-   log-intermediate charts LI/WL not a third scale). The
+   log-intermediate charts LI/WL not a third scale; fold I-map leading
+   derivative at `sep = 0`). The
    [chart-cell ledger](HILBERT16-CHART-CELLS.md) records those labels.
    G1 remains failed; G4 is not opened.
    Keep the existing sections, positive-label overlaps and connected

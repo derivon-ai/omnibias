@@ -6,7 +6,7 @@ A directional jet of the loss gives the exact Taylor polynomial along a search
 direction in **one** forward pass, so the line-search subproblem becomes root
 finding on a known polynomial instead of a sequence of trial evaluations.
 
-- **Status**: shipped (G1/G2/G3/G6 CI; G4 step-count **leftover-recorded** / unearned vs strong Wolfe, leftover #47 (`1.83x`, need `2x`), not in CI `all_passed`; G5 order×depth crossover **leftover-recorded**, leftover #48, not in CI `all_passed`)
+- **Status**: shipped (G1/G2/G3/G6 CI; G4 step-count **earned** vs strong Wolfe, leftover #47 closed (`2.32x`, need `2x`, both arms hit 5/5), not in CI `all_passed`; G5 order×depth crossover **leftover-recorded**, leftover #48, not in CI `all_passed`)
 - **Depends on**: 01-01
 - **Blocks**: 03-01, 03-13
 
@@ -67,6 +67,16 @@ Then:
   polynomial evaluations.
 - Wolfe conditions are polynomial inequalities, checkable exactly on intervals
   rather than tested at sample points.
+
+On a quadratic, one exact minimizer along `-grad` does not finish the
+steepest-descent trajectory: the next gradient is orthogonal and the
+stiff mode returns. After that first polynomial step, the order-2 jet
+still supplies `g^T H g = phi''(0)`. With the previous gradient this
+closes the Hessian on the plane of the last two gradients. An unused
+inverse eigenvalue `1/λ` inside the trust radius is accepted when the
+directional model decreases. `verify=True` remains the never-worse
+backstop. That schedule is what earns G4; `select_model_step` itself
+still returns the polynomial minimizer.
 
 ### Cost accounting, honestly
 
@@ -244,9 +254,15 @@ fixed step size.
 - **G4 step-count win.** On a suite of ill-conditioned problems, the jet line
   search reaches a target loss in at least `2x` fewer *total function
   evaluations* (counting the jet at its true cost) than strong Wolfe, over five
-  seeds. **Recorded unearned:** reachable `x^2 + cond y^2` trajectories give
-  Wolfe/jet `1.83` (need `2`); the stiffest seed is a Wolfe miss. The previous
-  Armijo single-step stub is withdrawn. Not in CI `all_passed`.
+  seeds. **Earned:** steepest descent on `x^2 + cond y^2` from `(-1.2, 0.8)`,
+  conds `(50, 100, 200, 400, 800)`, target `1e-8`, at most 12 outer steps,
+  order-2 jet, `verify=True`. The first step is the directional polynomial
+  minimizer. Later steps may be an unused inverse eigenvalue of the secant
+  Hessian on the plane of the last two gradients, accepted only when the
+  order-2 model decreases. Wolfe is strong Wolfe (`c1=1e-4`, `c2=0.9`) with
+  the cubic/quadratic trial kept when it lies in the open bracket. Measured
+  Wolfe/jet `2.32` (jet mean 15 units, Wolfe mean 34.8), both arms hit 5/5.
+  Leftover #47 is closed. Not in CI `all_passed`.
 - **G5 honest regime.** The benchmark reports the crossover in `N` and in
   network depth beyond which the jet's cost exceeds its benefit, rather than
   only showing the favourable regime. **Reported:** `mlp_jet` vs a named

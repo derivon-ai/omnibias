@@ -291,24 +291,23 @@ grazing / thin-height region. No separate cycle counts are added.
 
 ### 5.5 What this does not prove
 
-The estimate requires `epsilon |log sep| <= 1`. It does not cover
-
-- `sep = 0` (the rectangle has width zero; the saddle is a saddle-node),
-- `0 < sep < exp(-1 / sqrt(epsilon))` (the outgoing variational factor
-  `(h_max / h_e)^{C epsilon}` is not proved bounded),
-- C2 remainders in `kappa` or `chi` on chart D (only the first
-  derivative of the incoming/outgoing labels),
-- admission of every positive height, or of every nearby cycle.
-
-The sequence
+The estimate of §5.3 required `epsilon |log sep| <= 1` only because the
+outgoing factor was left untracked. The [tracked-product companion](HILBERT16-ENTRY-EXIT-LEADING.md)
+absorbs `(h_1 / h_e)^{C epsilon}` against `sep^2`. The first-derivative
+bound then extends, as a written argument, to every `sep in (0, sep0]`
+for small `epsilon`, including
 
     sep_n = exp(-1 / epsilon_n^2),    epsilon_n = 1 / n,
-    L = 1,    lambda1 = -3,    kappa_n = 1 / sep_n
+    lambda1 = -3,    L_n = (9 - sep_n^2) / 4,
+    kappa_n = 1 / sep_n.
 
-has `chi_n` of order one and `epsilon_n |log sep_n| = 1 / epsilon_n`
-unbounded. It is a kill sequence for the outgoing remainder of
-section 5.3, not a counterexample to finite cyclicity. Any G1 claim
-that ignores it is false.
+That sequence is no longer a first-derivative falsifier of the product.
+It remains a G1 falsifier: the argument is not a C2 remainder, not a
+first-hit completeness theorem, and not a cover of `sep = 0` or chart O.
+
+The formerly printed tuple `L=1`, `lambda1=-3` was not a point of this
+family: it forces `sep=sqrt(5)`.  The corrected coefficient path above is the
+unique one with fixed `lambda1=-3` and the declared super-small separation.
 
 ## 6. Central fold at vanishing separation
 
@@ -367,22 +366,29 @@ G1 requires all four of:
 4. endpoint matching on overlaps.
 
 Item 1 is only a labelled atlas. Charts N and F are existing written
-arguments. Chart D has a first-derivative χ-bound under
-`epsilon |log sep| <= 1`. Charts C (at `sep = 0`) and O are not closed.
+arguments. Chart D has a written first-derivative χ-bound on all
+`sep in (0, sep0]`, after the tracked product of
+[HILBERT16-ENTRY-EXIT-LEADING.md](HILBERT16-ENTRY-EXIT-LEADING.md). Charts C (at `sep = 0`) and O are not closed.
 
 Item 2 fails: the first-root note already refuses to assert that every
 height is admitted, and chart O has no first-hit theorem.
 
 Item 3 fails: the joined / varying-detuning zero count uses two `kappa`
-derivatives of `log D'`. Chart D supplies no C2 remainder. The
-super-small-`sep` sequence of section 5.5 makes even the first-derivative
-outgoing factor unproved.
+derivatives of `log D'`. Chart D supplies no C2 remainder.
 
 Item 4 fails on O ∩ D and on D ∩ C at `sep = 0`.
 
-**G1 does not pass.** The named falsifiers are the super-small
-separation sequence of section 5.5 and the shrinking-root sequence of
-section 7. Do not proceed to a cyclicity claim on a partial atlas.
+The [weighted-section assessment](HILBERT16-WEIGHTED-SECTION.md) tests
+`h=epsilon^3 sep^2 eta0` as an intrinsic section. Its ordinary
+`q=sep^2` hit-time derivatives are singular at D ∩ C, and its chart-O
+matching speed vanishes with `r1`; it therefore does not repair item 4.
+
+**G1 does not pass.** The named remaining holes are a bound on `rho` plus
+the inner-chart remainder, physical C2 of `log D'`, outgoing first-hit on
+the shrinking-root sequence of section 7, and complete first-hit. The
+leading `sep = 0` map is recorded in
+[HILBERT16-FOLD-LEADING.md](HILBERT16-FOLD-LEADING.md). Do not proceed to
+a cyclicity claim on a partial atlas.
 
 ## 9. G4 verdict: fail
 
@@ -439,6 +445,15 @@ next, in that order, on the same sections. All fail:
    and the W-ratio to an existing `epsilon^N` section. The super-small
    sequence remains admitted. The two kill axes are disjoint at fixed
    `lambda1 < 0`. No C2 remainder is claimed.
+5. [LN/exp cell test](HILBERT16-LN-PASSAGE.md) proves the elementary
+   log-chart Cauchy and monomial-eigenvalue lemmas, then localizes two exact
+   failures.  On the corrected coefficient path
+   `L=(9-sep^2)/4`, the matching W-ratio remains unbounded; on the
+   shrinking-root path the proposed radius `r1-theta*sep` becomes negative.
+   Finite chain and guard checks therefore do not establish physical LN
+   membership, first-hit completeness, C2 remainders, or overlap matching.
+   The full GL1–GL7 sweep through `n=2000` and both finite Lean obligations
+   pass with those physical and parent flags deliberately false.
 
 **G1 remains failed.** The four G1 items of section 8 are still open.
 G4 is not opened. G2, remaining DRR cases, and algebraic G5 stay

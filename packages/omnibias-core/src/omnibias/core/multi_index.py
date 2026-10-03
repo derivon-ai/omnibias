@@ -44,17 +44,47 @@ from math import comb, factorial
 
 MultiIndex = tuple[int, ...]
 
-#: Ceiling on how many multi-indices a single request may materialise. The count
-#: is ``comb(dim + order, dim)``, which grows fast in *both* arguments, so one
-#: joint bound on the result size is the honest guard -- capping ``dim`` and
-#: ``order`` separately would still admit a combinatorial explosion. Checked
-#: before anything is allocated, since the count itself is cheap.
+#: Default ceiling on how many multi-indices a single request may materialise.
+#: The count is ``comb(dim + order, dim)``, which grows fast in *both*
+#: arguments, so one joint bound on the result size is the honest guard --
+#: capping ``dim`` and ``order`` separately would still admit a combinatorial
+#: explosion. Checked before anything is allocated, since the count itself is
+#: cheap. Settable via :func:`set_multi_index_budget`.
 MAX_MULTI_INDICES: int = 200_000
+
+#: Process-wide budget actually enforced by :func:`_check_shape`. Starts equal
+#: to :data:`MAX_MULTI_INDICES`; :func:`set_multi_index_budget` overrides it.
+_multi_index_budget: int = MAX_MULTI_INDICES
 
 #: Bound on each memo. These tables are keyed on caller-supplied ``(dim, order)``,
 #: so an unbounded memo would pin every shape ever requested for the process's
 #: lifetime.
 _CACHE_SIZE: int = 128
+
+
+def set_multi_index_budget(budget: int | None) -> None:
+    """Override the process-wide multi-index materialisation ceiling.
+
+    Pass ``None`` to restore the default (:data:`MAX_MULTI_INDICES`).
+    Raising this ceiling is a real memory hazard: ``comb(dim + order, dim)``
+    grows combinatorially in both arguments. For a deep network's Laplacian
+    or poly-Laplacian, prefer the ceiling-free contraction kernels
+    (``deep_field_laplacian`` / ``deep_field_polylaplacian`` in
+    :mod:`omnibias.jax.laplacian` / :mod:`omnibias.torch.laplacian`) over
+    raising this budget -- they never materialise the full multivariate jet.
+    """
+    global _multi_index_budget
+    if budget is None:
+        _multi_index_budget = MAX_MULTI_INDICES
+        return
+    if budget < 1:
+        raise ValueError(f"budget must be >= 1, got {budget}")
+    _multi_index_budget = int(budget)
+
+
+def get_multi_index_budget() -> int:
+    """Current process-wide multi-index materialisation ceiling."""
+    return _multi_index_budget
 
 
 def _check_shape(dim: int, order: int) -> None:
@@ -63,11 +93,16 @@ def _check_shape(dim: int, order: int) -> None:
     if order < 0:
         raise ValueError(f"order must be >= 0, got {order}")
     count = comb(dim + order, dim)
-    if count > MAX_MULTI_INDICES:
+    if count > _multi_index_budget:
         raise ValueError(
-            f"dim={dim}, order={order} needs {count} multi-indices, above "
-            f"MAX_MULTI_INDICES ({MAX_MULTI_INDICES}); lower the total order or the "
-            "dimension"
+            f"dim={dim}, order={order} needs {count} multi-indices, above the "
+            f"multi-index budget ({_multi_index_budget}); lower the total order "
+            "or the dimension, raise the budget with set_multi_index_budget "
+            "(a real memory hazard), or -- for a deep network's Laplacian / "
+            "poly-Laplacian -- use the ceiling-free deep_field_laplacian / "
+            "deep_field_polylaplacian kernels in omnibias.jax.laplacian / "
+            "omnibias.torch.laplacian instead, which never materialise the "
+            "full multivariate jet"
         )
 
 
@@ -167,10 +202,13 @@ def multi_index_factorial(alpha: MultiIndex) -> int:
 
 
 __all__ = [
+    "MAX_MULTI_INDICES",
     "MultiIndex",
+    "get_multi_index_budget",
     "index_position",
     "multi_index_factorial",
     "multi_indices",
     "multiply_table",
     "num_multi_indices",
+    "set_multi_index_budget",
 ]

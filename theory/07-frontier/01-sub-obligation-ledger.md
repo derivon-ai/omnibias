@@ -126,6 +126,39 @@ rational spine of the packet-iteration arithmetic; it does not claim (A)/(B).
 - Entry: planned Lambda program; no Group 07 implementation or dedicated spec
   has been shipped.
 
+**Parent: the Twin Prime Conjecture.**
+
+- Sub-obligation: exact shifted-prime local-factor identities, coefficientwise
+  FI equation (3.1), a 3-D log-polyhedral terminal-shell atlas isolating the
+  still-required Möbius bilinear estimate, and source-valid finite
+  variational certificates for bounded-gap research.
+- Gate: A0 exact local factors; A1a finite combinatorial replay; A1b0 exact
+  dyadic/rho/term-routing subchecks; A1b1 exact signed fixed-\(2\) determinant
+  replay; A1 complete Friedlander–Iwaniec reduction replay; A2g exact
+  terminal-shell geometry; A2k exact kernel-cell credit; A2d a loss-budgeted
+  fixed-\(2\) determinant completion; A2 source-complete strict analytic
+  reduction; A3 one new uniform saving on a remaining cell; A4 every analytic
+  cell and asymptotic passage discharged; BG0 an exact \(k=40\to39\)
+  input-manifest replay; BG1 a source-valid \(k=39\) generalized-Rayleigh
+  crossing for the diameter-182 tuple.
+- Sealed scope: finite rational identities, a declared finite cell atlas, or
+  one finite variational witness. The current implementation earns A0, A1a,
+  A1b0, and A2g: FI (3.1) is replayed coefficientwise through \(n=128\);
+  dyadic selection, finite rho insertion, all 13 routing leaves, and the signed
+  determinant transform are checked; the fixed rational shell is exactly
+  \(1/38\) of the classical log-volume; and the candidate kernel cell has exact
+  credit \(41/640\). The completion lemma is absent. BG0 reproduces the pinned
+  97-component/149-form source manifest with dimensions 39/38. The authenticated
+  split evaluator completed and independently replayed the full \(k=40\)
+  baseline above \(1/50000\); equivalence to the unavailable corrected-FLINT
+  build is not claimed. No \(k=39\) candidate crossing is known. A2d, A1–A4,
+  and BG1 remain blocked.
+- Never write: *"we prove the Twin Prime Conjecture"* from a finite prefix,
+  finite-scale cancellation, or a first-moment bounded-gap certificate.
+- Entry: `omnibias.holonomic.twin_prime`;
+  `docs/benchmarks/twin_prime_sieve_smoke.json`;
+  `docs/benchmarks/twin_prime_bounded_gap_smoke.json`.
+
 **Parent: P versus NP.**
 
 - Sub-obligation: **certified optimality gaps** for specific instances of
@@ -195,8 +228,10 @@ gate is retained as a recorded empirical floor.
 |---|---|---|---|---|---|---|---|
 | NS | Navier-Stokes global regularity (Clay) | sound residual enclosure on one box and horizon | `require_enclosure_coverage` at 100% plus a named residual floor | one discretization, one box, one horizon | we prove global regularity for Navier-Stokes | 07-02, 07-08, 07-09, 07-10, 07-11, 07-12, 07-13, 07-14, 07-17, 07-18, 07-19, 07-20, 07-21, 07-22, 07-23 | `docs/benchmarks/ns_weak_form_enclosure_smoke.json` (`all_passed`; width split recorded; Clay (C)/(D) resolved externally, unforced (A)/(B) still open; continuum claim false); `docs/benchmarks/convergence_ledger_smoke.json`; `docs/benchmarks/anisotropic_profile_smoke.json`; `docs/benchmarks/stress_cone_smoke.json`; `docs/benchmarks/weighted_class_smoke.json`; `docs/benchmarks/swirl_heat_pulse_smoke.json`; `docs/benchmarks/forced_flat_blowup_smoke.json`; `docs/benchmarks/ns_core_search_smoke.json`; `docs/benchmarks/pulse_family_composition_smoke.json`; `docs/benchmarks/unforced_bkm_slab_smoke.json`; `docs/benchmarks/unforced_slab_continuation_smoke.json`; `docs/benchmarks/force_is_essential_smoke.json`; `docs/benchmarks/unforced_abc_slab_smoke.json`; `docs/benchmarks/unforced_tg3d_ic_smoke.json`; `docs/benchmarks/unforced_abc_long_chain_smoke.json` |
 | EULER | finite-time singularity of 3D Euler / Navier-Stokes | CCF residual on a fixed grid and dictionary | `ccf_absolute_gates` stretch `1e-13` | one model equation; not Euler/NS | our CCF residual is evidence for Euler or Navier-Stokes blowup | 07-03, 07-15, 07-16 | `docs/benchmarks/reproduce_deepmind_ccf_smoke.json` (stretch unearned; leftover #55 Hardy N>0 dictionary; unforced Euler blowup on R^3 resolved; CCF residual no longer novel against that parent); `docs/benchmarks/ipm_remainder_cap_smoke.json`; `docs/benchmarks/boussinesq_remainder_cap_smoke.json` |
+| H16 | Hilbert's sixteenth problem (selected algebraic scheme and infinitesimal limit-cycle register) | exact projective patchwork/regular-height search for the open 22-oval octic; genuine mixed Abelian count and a finite rational coefficient-box bound; exact-Q Poincare compactification and finite Dulac-model bounds; finite LN/exp obstruction localized on quadratic G1; an exact-Q Groebner basis engine; Poincare-Lyapunov focal-value/Bautin-ideal computation on a declared normal-form family; resonant Poincare-Dulac normal forms with a derived (not declared) first-order Dulac corner map; sound collar-membership agreement with a genuine unique-cycle proof; a machine-checked H16 obligation ledger with derived parent flags | GP1–GP4 replay and GP5 requires a direct 22-oval coefficient certificate; GA1–GA8 require the mixed two-zero count and exact box tiling; GD1–GD6 require chart identities, rational/resonant model bounds, an interval-ratio cover, finite Lean replay, and open-case refusal; GL1–GL7 preserve finite-chain honesty without flipping G1; GF1–GF7 require Groebner reduced-basis/cofactor replay, focal-value round-trip, Bautin basis-length-3 literature replay, normal-form round-trip, corner-derivation cross-check, collar-membership proof, and `GraphicTarget` wiring; ledger GH1–GH4 require the shipped ledger's open state, certificate round-trip, tamper rejection, and a synthetic full-discharge genuinely earning the parent flags | patchwork search is incomplete and GP5 is false; Abelian uniformity is only \(\beta_0\in[9/10000,11/10000]\) for one cubic and contour; Dulac bounds apply only to declared finite models without physical return-map membership or uniform remainders; physical bounded-format membership, singular first-hit, C2 remainders, and overlap matching remain open; the Bautin ideal is for one declared normal-form family, not the actual singular return map of an arbitrary graphic; the derived corner map is first-order only, not exponentiated; collar membership is sound only away from the corner | we prove the 22-oval target exists; we prove H(n) is finite; we prove finite cyclicity of a Roussarie graphic; the Hilbert-16 obligation ledger is solved | exact-Q patchwork/search track; mixed-period finite coefficient cover; finite Dulac-model track; coalescing-passage LN/exp negative assessment; focal/Bautin/normal-form/membership/ledger track | `docs/benchmarks/patchwork_octic_smoke.json` (GP1–GP4 pass; `search_incomplete`; no target hit, GP5 false); `docs/benchmarks/abelian_zero_count_smoke.json` (GA1–GA8 pass; genuine \(\beta\ne0\) count 2; finite coefficient-box bound 2; irrationality unclaimed); `docs/benchmarks/dulac_cyclicity_smoke.json` (GD1–GD6 pass; model bounds 2/2/0; physical membership, remainder, DRR closure, and full H16 false); `docs/benchmarks/hilbert16_ln_passage_smoke.json` (`all_passed` negative assessment; corrected kill A has unbounded matching W-ratio, proposed kill-B radius is negative, `g1_passed=false`; H(2) and H(n) remain unclaimed); `docs/benchmarks/hilbert16_focal_smoke.json` (GF1–GF7 pass; Groebner/focal/Bautin/normal-form/corner/collar/wiring all replay; `bautin_ideal_stabilization_proved` and `physical_return_membership_proved` false); `docs/benchmarks/hilbert16_ledger_smoke.json` (GH1–GH4 pass; every derived parent flag false; a synthetic fully-discharged ledger genuinely earns `full_hilbert16_solved`) |
 | YM | Yang-Mills existence and mass gap (Clay) | certified gap of one fixed transfer matrix | `certified_spectral_gap` strictly positive | `continuum_claim = False` | we prove the Yang-Mills mass gap | 07-04, 07-05, 07-08 | `docs/benchmarks/gauge_holonomy_gap_smoke.json` (`all_passed`; `mass_gap: false`); trial factor leftover-recorded on two-plaquette / strip |
 | RH | the Riemann Hypothesis | rigorous de Bruijn–Newman `Lambda` upper-bound program via a published finite reduction | replayable `Lambda <= t0` certificate for pre-registered `t0 < 0.22` | named contour cover, finite approximation, and proved far-field premise; not implemented | we prove / disprove the Riemann Hypothesis | planned Lambda program | no implementation; `docs/benchmarks/dirichlet_enclosure_smoke.json` remains `Re(s)>1` only |
+| TWIN | Twin Prime Conjecture | exact shifted-prime local factors, coefficientwise FI (3.1), exact dyadic/rho/term routing, a signed fixed-\(2\) determinant transform, a 3-D terminal atlas, and a parameterized \(k=39\), diameter-182 target | A0 local factors; A1a combinatorial replay; A1b0 structural subchecks; A1b1 fixed-\(2\) determinant replay; A1 full replay; A2g terminal geometry; A2k kernel-cell credit; A2d loss-budgeted determinant completion; A2 source-complete reduction; A3 one new uniform cell saving; A4 all cells close; BG0 exact \(k=40\to39\) input-manifest replay; BG1 source-valid \(k=39\) crossing | A0/A1a/A1b0/A1b1/A2g/A2k/BG0 finite arithmetic and the complete authenticated-split \(k=40\) baseline replay earned; equivalence to the unavailable corrected-FLINT build, A2d, A1–A4, and BG1 remain blocked | we prove the Twin Prime Conjecture | `omnibias.holonomic.twin_prime` | `docs/benchmarks/twin_prime_sieve_smoke.json`; `docs/benchmarks/twin_prime_bounded_gap_smoke.json`; `docs/benchmarks/twin_prime_k40_numerical_receipt_sealed.json` (finite artifacts only; parent and analytic estimates false) |
 | PNP | P versus NP | certified optimality gap on one instance | `certify_gap` sandwich, never claimed tight | per instance, per size | P = NP | qubo / discrete; 03-01, 03-03 | `docs/benchmarks/instance_gap_tightening_smoke.json` (`all_passed`; never tight) |
 | TURB | turbulence closure (Nobel-adjacent) | computed coarse-graining vs fine reference | relative error, absolute threshold, five seeds | one model, one scale ratio, one geometry | we solve the closure problem | 03-07, 07-07 | `docs/benchmarks/scale_flow_smoke.json` (`all_passed`) |
 | DYN | computer-assisted global dynamical structure | finite-horizon jet Lohner on a finite box | 07-06 width-budget / orbit gates | finite boxes and time | we prove the system is chaotic | 07-06 | `docs/benchmarks/validated_dynamics_smoke.json` (`all_passed`; attractor claim false; `seal_run` emits `diagnose_width`) |
@@ -214,6 +249,7 @@ is listed here so a new site cannot appear without a ledger row.
 | `omnibias.geometry.gauge.transfer` | `continuum_claim` | YM |
 | `omnibias.core.verified.dirichlet` | `Re(s) > 1` scope | RH |
 | `omnibias.core.verified.debruijn_newman` | `rh_claim = False`; named `Lambda` attempt unearned | RH |
+| `omnibias.holonomic.twin_prime` | `twin_prime_conjecture_proof_claim = False`; asymptotic premises unearned | TWIN |
 | `omnibias.core.verified.eig_operator` | `certified_spectral_gap` | YM |
 | `omnibias.sos` | positivity honesty | YM |
 | `omnibias.qubo` / `omnibias.discrete` | `certify_gap` | PNP |
@@ -373,9 +409,9 @@ carries the same boundaries.
 
 ## 13. Parent problem and the exact reason it stays an external obligation
 
-**Parents: all five listed above** — Navier-Stokes global regularity, the
-Yang-Mills mass gap, the Riemann Hypothesis, P versus NP, and turbulence
-closure.
+**Parents: all listed above**, including Navier-Stokes global regularity, the
+Yang-Mills mass gap, the Riemann Hypothesis, the Twin Prime Conjecture,
+P versus NP, and turbulence closure.
 
 Each remains an external obligation for the same structural reason, stated
 plainly: **every object this repository can certify is finite, and every one of
@@ -387,4 +423,4 @@ continuation of a function beyond the half-plane where its series converges. No
 finite collection of finite certificates bridges that, and no tightening of
 constants changes the kind of statement being made.
 
-This ledger does not claim, imply, or provide evidence for any of the five.
+This ledger does not claim, imply, or provide evidence for any parent.

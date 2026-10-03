@@ -1,0 +1,59 @@
+{
+  "schema": "omnibias.benchmarks.hilbert16_campaign_verify.v1",
+  "generated_utc": "2026-09-15T13:46:09Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.0rc1",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "absent"
+  },
+  "config": {
+    "family": "hilbert16_campaign_verify",
+    "full": false
+  },
+  "rss_mb_at_start": 627.36,
+  "benchmark": "hilbert16_campaign_verify",
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "parent_flags_derived_false",
+        "passed": true,
+        "flags": {
+          "hilbert16_part_a_solved": false,
+          "hilbert16_part_b_quadratic_solved": false,
+          "full_hilbert16_solved": false
+        },
+        "detail": "no parent Hilbert-16 claim is earned on the shipped ledger"
+      },
+      {
+        "name": "part_a_target_trees_22_ovals",
+        "passed": true,
+        "selected": "14 + 1<2 + 1<4>>",
+        "detail": "both corrected (19,3) trees encode exactly 22 ovals"
+      },
+      {
+        "name": "drr_inventory_complete",
+        "passed": true,
+        "open_count": 9,
+        "detail": "121-graphic inventory is present"
+      },
+      {
+        "name": "g1_chart_reaudit_route_specific",
+        "passed": true,
+        "detail": "chart-dependent gamma=s/r cancels the kappa term at a point; does not close the atlas without a uniform majorant"
+      },
+      {
+        "name": "open_endpoint_df_1b_blocked",
+        "passed": true,
+        "status": "open",
+        "detail": "entry-exit balance and boundary slow-divergence sign remain open"
+      }
+    ]
+  },
+  "full_hilbert16_solved": false,
+  "wall_seconds": 4.416231155395508
+}

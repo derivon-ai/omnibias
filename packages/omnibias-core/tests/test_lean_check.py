@@ -129,6 +129,256 @@ def test_generate_rational_identity_none_when_malformed() -> None:
     assert generate_obligation(bad) is None
 
 
+def test_generate_ln_chain_closure_and_format_obligations() -> None:
+    chain = make_certificate(
+        claim="finite LN chain closure",
+        payload={
+            "type": "ln_chain_closure",
+            "identities": [
+                {"lhs": [2, 3], "rhs": [4, 6]},
+                {"lhs": [-5, 7], "rhs": [5, -7]},
+            ],
+        },
+        honesty={},
+        meta={"transcend_backend": "not_used"},
+    )
+    chain_src = generate_obligation(chain)
+    assert chain_src is not None
+    assert "allRatEq" in chain_src
+    assert "no physical Dulac/LN membership" in chain_src
+
+    fmt = make_certificate(
+        claim="finite LN format bound",
+        payload={
+            "type": "ln_format_bound",
+            "inequalities": [
+                {"lhs": [2, 3], "rhs": [3, 4]},
+                {"lhs": [-1, 2], "rhs": [0, 1]},
+            ],
+        },
+        honesty={},
+        meta={"transcend_backend": "not_used"},
+    )
+    fmt_src = generate_obligation(fmt)
+    assert fmt_src is not None
+    assert "allRatLt" in fmt_src
+
+
+def test_ln_finite_obligations_refuse_false_malformed_and_tampered_data() -> None:
+    false_chain = make_certificate(
+        claim="false closure",
+        payload={
+            "type": "ln_chain_closure",
+            "identities": [{"lhs": [1, 2], "rhs": [2, 3]}],
+        },
+        honesty={},
+    )
+    assert generate_obligation(false_chain) is None
+    malformed_format = make_certificate(
+        claim="malformed format",
+        payload={
+            "type": "ln_format_bound",
+            "inequalities": [{"lhs": [1, 0], "rhs": [2, 1]}],
+        },
+        honesty={},
+    )
+    assert generate_obligation(malformed_format) is None
+
+    valid = make_certificate(
+        claim="finite LN format bound",
+        payload={
+            "type": "ln_format_bound",
+            "inequalities": [{"lhs": [1, 3], "rhs": [1, 2]}],
+        },
+        honesty={},
+    )
+    tampered = dict(valid)
+    tampered["payload"] = {
+        "type": "ln_format_bound",
+        "inequalities": [{"lhs": [2, 3], "rhs": [1, 2]}],
+    }
+    result = check_certificate(tampered)
+    assert result.verified is False
+    assert result.obligation == ""
+    assert "digest" in result.detail
+
+
+def test_generate_integer_matrix_syzygy_obligation() -> None:
+    cert = make_certificate(
+        claim="exact matrix syzygy",
+        payload={
+            "type": "integer_matrix_syzygy",
+            "matrix": [[1, 2, 3], [4, 5, 6]],
+            "vector": [1, -2, 1],
+        },
+        honesty={},
+    )
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "def matrixSyzygy" in src
+    assert "dotInt row vector == 0" in src
+    assert "by\n  decide" in src
+
+
+def test_generate_polynomial_identity_q_obligation() -> None:
+    cert = make_certificate(
+        claim="exact polynomial identity and margins",
+        payload={
+            "type": "polynomial_identity_q",
+            "equations": [
+                {"terms": [[2, 3], [-1, 1]], "rhs": 5},
+                {"terms": [[7, 0]], "rhs": 0},
+            ],
+            "positive": [[1, 2], [9, 7]],
+        },
+        honesty={},
+    )
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "def polynomialIdentity" in src
+    assert "a * b + productSum rest" in src
+    assert "allRatLt" in src
+    assert "by\n  decide" in src
+
+    malformed = make_certificate(
+        claim="malformed polynomial identity",
+        payload={
+            "type": "polynomial_identity_q",
+            "equations": [],
+            "positive": [],
+        },
+        honesty={},
+    )
+    assert generate_obligation(malformed) is None
+
+
+def test_polynomial_identity_q_round_trip_when_available() -> None:
+    true_cert = make_certificate(
+        claim="true polynomial identity",
+        payload={
+            "type": "polynomial_identity_q",
+            "equations": [{"terms": [[2, 3], [-1, 1]], "rhs": 5}],
+            "positive": [[1, 2]],
+        },
+        honesty={},
+    )
+    false_cert = make_certificate(
+        claim="false polynomial identity",
+        payload={
+            "type": "polynomial_identity_q",
+            "equations": [{"terms": [[2, 3]], "rhs": 7}],
+            "positive": [[1, 2]],
+        },
+        honesty={},
+    )
+    true_result = check_certificate(true_cert)
+    false_result = check_certificate(false_cert)
+    if lean_check_available():  # pragma: no cover - Lean-equipped environment only
+        assert true_result.verified
+        assert not false_result.verified
+    else:
+        assert not true_result.available and not true_result.verified
+        assert not false_result.available and not false_result.verified
+
+
+def test_box_cover_tiling_round_trip_when_available() -> None:
+    certificate = make_certificate(
+        claim="exact rational box cover",
+        payload={
+            "type": "box_cover_tiling",
+            "parent": [[[0, 1], [1, 1]], [[-1, 1], [1, 1]]],
+            "uniform_bound": 2,
+            "tree": {
+                "kind": "split",
+                "axis": 0,
+                "cut": [1, 2],
+                "left": {
+                    "kind": "leaf",
+                    "box": [[[0, 1], [1, 2]], [[-1, 1], [1, 1]]],
+                    "count": 2,
+                },
+                "right": {
+                    "kind": "leaf",
+                    "box": [[[1, 2], [1, 1]], [[-1, 1], [1, 1]]],
+                    "count": 1,
+                },
+            },
+        },
+        honesty={},
+    )
+    src = generate_obligation(certificate)
+    assert src is not None
+    assert "inductive CoverTree" in src
+    assert "expected.set axis" in src
+    assert "count ≤ bound" in src
+    result = check_certificate(certificate)
+    if lean_check_available():  # pragma: no cover - Lean-equipped environment only
+        assert result.verified
+    else:
+        assert not result.available and not result.verified
+
+    malformed = make_certificate(
+        claim="malformed rational box cover",
+        payload={
+            "type": "box_cover_tiling",
+            "parent": [],
+            "uniform_bound": 2,
+            "tree": {"kind": "leaf", "box": [], "count": 2},
+        },
+        honesty={},
+    )
+    assert generate_obligation(malformed) is None
+
+
+def test_generate_winding_integer_isolation_obligation() -> None:
+    cert = make_certificate(
+        claim="unique winding integer",
+        payload={
+            "type": "winding_integer_isolation",
+            "lo": 1.9,
+            "hi": 2.1,
+            "integer": 2,
+        },
+        honesty={},
+    )
+    src = generate_obligation(cert)
+    assert src is not None
+    assert "unique integer" in src
+    assert "def windingIsolated" in src
+    assert "integer - 1" in src
+    assert "by\n  decide" in src
+
+
+def test_new_finite_obligations_round_trip_when_available() -> None:
+    matrix_cert = make_certificate(
+        claim="exact matrix syzygy",
+        payload={
+            "type": "integer_matrix_syzygy",
+            "matrix": [[1, 2, 3], [4, 5, 6]],
+            "vector": [1, -2, 1],
+        },
+        honesty={},
+    )
+    winding_cert = make_certificate(
+        claim="unique winding integer",
+        payload={
+            "type": "winding_integer_isolation",
+            "lo": 1.9,
+            "hi": 2.1,
+            "integer": 2,
+        },
+        honesty={},
+    )
+    matrix_result = check_certificate(matrix_cert)
+    winding_result = check_certificate(winding_cert)
+    if lean_check_available():  # pragma: no cover - Lean-equipped environment only
+        assert matrix_result.verified
+        assert winding_result.verified
+    else:
+        assert not matrix_result.available and not matrix_result.verified
+        assert not winding_result.available and not winding_result.verified
+
+
 def test_rational_identity_round_trip_when_available() -> None:
     # A true identity earns a genuine kernel pass (only when lake is present); a
     # false one is rejected. Without a toolchain the bridge degrades gracefully.

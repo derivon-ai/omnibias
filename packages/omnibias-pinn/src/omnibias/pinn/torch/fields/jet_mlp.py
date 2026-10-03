@@ -51,12 +51,12 @@ float64 round-off.
 
 from __future__ import annotations
 
-import math
 from collections.abc import Sequence
 from typing import TYPE_CHECKING, cast
 
 import torch
-from omnibias.core.multi_index import index_position, multi_index_factorial, multi_indices
+from omnibias.core.contraction import polylaplacian_multinomial_terms
+from omnibias.core.multi_index import index_position, multi_index_factorial
 from omnibias.pinn._core.components import ComponentSpec
 from omnibias.pinn._core.coords import CoordinateSpec
 from omnibias.pinn.torch.fields.base import FieldBase
@@ -67,6 +67,12 @@ from omnibias.torch.architectures.pinn import (
     _JetMLPCore,
     make_siren,
 )
+from omnibias.torch.laplacian import (
+    deep_field_laplacian,
+    deep_field_polylaplacian,
+    deep_field_value_grad_laplacian,
+    restrict_first_layer,
+)
 from torch import Tensor
 from torch.func import vmap
 
@@ -75,20 +81,8 @@ if TYPE_CHECKING:  # pragma: no cover
 
 #: ``FieldState.extra`` key under which the per-evaluation jet cache lives.
 JET_CACHE_KEY = "_jet_mlp_jets"
-
-
-def _polylaplacian_terms(n_spatial: int, k: int) -> tuple[tuple[tuple[int, ...], int], ...]:
-    r"""Multinomial expansion of ``Delta^k = (sum_i d_i^2)^k``.
-
-    Returns ``(beta, k! / beta!)`` pairs over the spatial axes with ``|beta| = k``,
-    so that ``Delta^k f = sum_beta (k! / beta!) D^{2 beta} f``.
-    """
-    k_fact = math.factorial(k)
-    return tuple(
-        (beta, k_fact // multi_index_factorial(beta))
-        for beta in multi_indices(n_spatial, k)
-        if sum(beta) == k
-    )
+#: ``FieldState.extra`` key for the cached Tier A ``(value, grad, laplacian)`` triple.
+FAST_LANE_CACHE_KEY = "_jet_mlp_fast_lane"
 
 
 class _JetFieldBase(FieldBase):
@@ -192,6 +186,153 @@ class _JetFieldBase(FieldBase):
             for a in self.coordinate_spec.spatial_axes
         )
 
+    def _fast_lane_layer_groups(self) -> list[list]:
+        """``(W, b, spec)`` chains consumed by the deep-field kernels.
+
+        Default: one group from :meth:`~omnibias.torch.architectures.pinn._JetMLPCore._layer_specs`.
+        Band mixtures override via :meth:`_band_layer_specs`.
+        """
+        band_specs = getattr(self.net, "_band_layer_specs", None)
+        if band_specs is not None:
+            try:
+                return band_specs()
+            except NotImplementedError:
+                pass
+        return [self.net._layer_specs()]
+
+    def _fast_lane_contract(self, outputs: Sequence[Tensor], name: str) -> Tensor:
+        """Combine per-group fast-lane outputs and select one component."""
+        ci = self.components.index(name)
+        total = outputs[0]
+        for out in outputs[1:]:
+            total = total + out
+        return total[:, ci]
+
+    def _tier_a_value_grad_lap(
+        self, state: FieldState, layers: list
+    ) -> tuple[Tensor, Tensor, Tensor]:
+        """Cached Tier A ``(value, grad, laplacian)`` for one layer group."""
+        cache = cast("dict[str, Tensor]", state.extra.setdefault(FAST_LANE_CACHE_KEY, {}))
+        if "tier_a" in cache:
+            return cache["tier_a"]  # type: ignore[return-value]
+        sa = self._spatial_axis_indices()
+        D = self.coordinate_spec.ndim
+        if len(sa) == D:
+            triple = deep_field_value_grad_laplacian(state.coords, layers)
+        else:
+            sa_tuple = tuple(sa)
+            W0, b0, spec0 = layers[0]
+            W0 = torch.as_tensor(W0)
+            shifts = state.coords @ W0.t()
+            if b0 is not None:
+                shifts = shifts + torch.as_tensor(b0)
+            y0 = torch.zeros(
+                state.coords.shape[0],
+                len(sa_tuple),
+                dtype=state.coords.dtype,
+                device=state.coords.device,
+            )
+            W_local = W0[:, sa_tuple]
+            batched_layers = [(W_local, shifts, spec0), *layers[1:]]
+            triple = deep_field_value_grad_laplacian(y0, batched_layers)
+        cache["tier_a"] = triple
+        return triple
+
+    def _hessian_index_tables(
+        self, D: int, jet_order: int, device: torch.device, dtype: torch.dtype
+    ) -> tuple[Tensor, Tensor]:
+        key = (D, jet_order, str(device), str(dtype))
+        tables = cast(
+            "dict[tuple[int, int, str, str], tuple[Tensor, Tensor]]",
+            getattr(self, "_hessian_table_cache", None),
+        )
+        if tables is None:
+            tables = {}
+            self._hessian_table_cache = tables
+        if key not in tables:
+            pos = index_position(D, jet_order)
+            idx = [
+                [
+                    pos[tuple((1 if k == i else 0) + (1 if k == j else 0) for k in range(D))]
+                    for j in range(D)
+                ]
+                for i in range(D)
+            ]
+            coeff = [
+                [
+                    multi_index_factorial(
+                        tuple((1 if k == i else 0) + (1 if k == j else 0) for k in range(D))
+                    )
+                    for j in range(D)
+                ]
+                for i in range(D)
+            ]
+            tables[key] = (
+                torch.as_tensor(idx, dtype=torch.long, device=device),
+                torch.as_tensor(coeff, dtype=dtype, device=device),
+            )
+        return tables[key]
+
+    def _fast_lane_group_polylaplacian(
+        self,
+        state: FieldState,
+        layers: list,
+        k: int,
+        *,
+        mode: str = "auto",
+        budget: int | None = None,
+        n_directions: int = 256,
+        seed: int = 0,
+    ) -> Tensor:
+        sa = self._spatial_axis_indices()
+        D = self.coordinate_spec.ndim
+        if k == 1 and len(sa) == D:
+            _, _, lap = self._tier_a_value_grad_lap(state, layers)
+            return lap
+        if len(sa) == D:
+            if k == 1:
+                return deep_field_laplacian(state.coords, layers)
+            return deep_field_polylaplacian(
+                state.coords,
+                layers,
+                k,
+                mode=mode,
+                budget=budget,
+                n_directions=n_directions,
+                seed=seed,
+            )
+        sa_tuple = tuple(sa)
+        if k == 1:
+            W0, b0, spec0 = layers[0]
+            W0 = torch.as_tensor(W0)
+            shifts = state.coords @ W0.t()
+            if b0 is not None:
+                shifts = shifts + torch.as_tensor(b0)
+            y0 = torch.zeros(
+                state.coords.shape[0],
+                len(sa_tuple),
+                dtype=state.coords.dtype,
+                device=state.coords.device,
+            )
+            W_local = W0[:, sa_tuple]
+            batched_layers = [(W_local, shifts, spec0), *layers[1:]]
+            return deep_field_laplacian(y0, batched_layers)
+
+        def one_point(xi: Tensor) -> Tensor:
+            local_layers = restrict_first_layer(layers, xi, sa_tuple)
+            y0 = torch.zeros(len(sa_tuple), dtype=xi.dtype, device=xi.device)
+            return deep_field_polylaplacian(
+                y0,
+                local_layers,
+                k,
+                mode=mode,
+                budget=budget,
+                n_directions=n_directions,
+                seed=seed,
+            )
+
+        return vmap(one_point)(state.coords)
+
     # -- state-method path consumed by the fields ops dispatch ("jet_mlp") ------- #
 
     def forward_values(self, coords: Tensor) -> Tensor:
@@ -236,6 +377,11 @@ class _JetFieldBase(FieldBase):
 
     def gradient_full(self, state: FieldState, name: str) -> Tensor:
         """``nabla f_name`` over *all* axes, shape ``(B, D)``."""
+        fast_cache = state.extra.get(FAST_LANE_CACHE_KEY, {})
+        if isinstance(fast_cache, dict) and "tier_a" in fast_cache:
+            _, grad, _ = fast_cache["tier_a"]
+            ci = self.components.index(name)
+            return grad[:, :, ci]
         D = self.coordinate_spec.ndim
         cols = [
             self._partial(state, name, tuple(1 if j == i else 0 for j in range(D)), 1)
@@ -244,38 +390,46 @@ class _JetFieldBase(FieldBase):
         return torch.stack(cols, dim=-1)
 
     def hessian_full(self, state: FieldState, name: str) -> Tensor:
-        """Full Hessian over all axes, shape ``(B, D, D)``."""
+        """Full Hessian over all axes, shape ``(B, D, D)``.
+
+        Reads the ``D^2`` entries off the *cached* jet in one vectorised
+        gather instead of ``D^2`` separate ``_partial`` calls (each of which
+        re-indexed the jet on its own): materialising a dense ``D x D``
+        Hessian is inherently ``O(D^2)`` in its output size, but the old
+        Python double loop paid that cost again in dispatch overhead.
+        """
         D = self.coordinate_spec.ndim
-        rows = []
-        for i in range(D):
-            row = []
-            for j in range(D):
-                alpha = tuple(
-                    (1 if k == i else 0) + (1 if k == j else 0) for k in range(D)
-                )
-                row.append(self._partial(state, name, alpha, 2))
-            rows.append(torch.stack(row, dim=-1))
-        return torch.stack(rows, dim=-2)
+        jet, jet_order = self._jet_at_least(state, 2)
+        ci = self.components.index(name)
+        idx_t, coeff_t = self._hessian_index_tables(D, jet_order, jet.device, jet.dtype)
+        gathered = jet[:, idx_t, ci]  # (B, D, D)
+        return gathered * coeff_t
 
     def laplacian(self, state: FieldState, name: str) -> Tensor:
-        """``Delta f_name`` over the spatial axes, shape ``(B,)``."""
+        """``Delta f_name`` over the spatial axes, shape ``(B,)`` (Tier A, no ceiling).
+
+        Routes to :func:`omnibias.torch.laplacian.deep_field_laplacian` on the
+        network's own ``(W, b, spec)`` layer list -- the forward-Laplacian
+        recursion, exact at every input dimension ``D`` and never bounded by
+        :data:`omnibias.core.multi_index.MAX_MULTI_INDICES`.
+        """
         return self.polylaplacian(state, name, k=1)
 
-    def polylaplacian(self, state: FieldState, name: str, *, k: int) -> Tensor:
-        r"""``Delta^k f_name`` via the multinomial expansion of ``(sum_i d_i^2)^k``.
+    def _polylaplacian_via_jet(self, state: FieldState, name: str, *, k: int) -> Tensor:
+        r"""Fallback for a network with no linear-chain ``(W, b, spec)`` layer list.
 
-        Every term is a row of the *same* order-``2k`` jet, so the cost is one jet
-        regardless of ``k`` -- the multivariate analogue of the one-layer field's
-        ``sigma^{(2k)}`` shortcut.
+        Non-chain architectures -- :class:`~omnibias.torch.architectures.attention.AttentionJetMLP`
+        (a non-local softmax mixture) and :class:`~omnibias.torch.architectures.multiscale.MscaleMLP`
+        (a sum of band subnetworks) -- both raise ``NotImplementedError`` from
+        ``_layer_specs()`` by design, so :meth:`polylaplacian` falls back here: the
+        multinomial expansion of ``(sum_i d_i^2)^k`` read off rows of the *cached*
+        order-``2k`` jet. This is the pre-fast-lane path and is still subject to
+        :data:`omnibias.core.multi_index.MAX_MULTI_INDICES`.
         """
-        if k < 1:
-            raise ValueError(f"polylaplacian k must be >= 1, got {k}")
         sa = self._spatial_axis_indices()
-        if not sa:
-            raise ValueError("polylaplacian requires at least one spatial axis")
         D = self.coordinate_spec.ndim
         out: Tensor | None = None
-        for beta, coeff in _polylaplacian_terms(len(sa), k):
+        for beta, coeff in polylaplacian_multinomial_terms(len(sa), k):
             acc = [0] * D
             for axis, b in zip(sa, beta, strict=True):
                 acc[axis] = 2 * b
@@ -283,6 +437,50 @@ class _JetFieldBase(FieldBase):
             out = coeff * term if out is None else out + coeff * term
         assert out is not None
         return out
+
+    def polylaplacian(
+        self,
+        state: FieldState,
+        name: str,
+        *,
+        k: int,
+        mode: str = "auto",
+        budget: int | None = None,
+        n_directions: int = 256,
+        seed: int = 0,
+    ) -> Tensor:
+        r"""``Delta^k f_name``, exact or exact-in-expectation at every input dimension.
+
+        ``k=1`` uses the ceiling-free forward-Laplacian recursion (Tier A).
+        ``k >= 2`` routes to :func:`omnibias.torch.laplacian.deep_field_polylaplacian`,
+        which picks the exact support-grouped local jets (Tier B) while it fits
+        a budget, else an unbiased sphere-average estimator (Tier C).
+
+        Non-chain architectures (e.g. :class:`~omnibias.torch.architectures.attention.AttentionJetMLP`)
+        fall back to :meth:`_polylaplacian_via_jet`.
+        """
+        if k < 1:
+            raise ValueError(f"polylaplacian k must be >= 1, got {k}")
+        sa = self._spatial_axis_indices()
+        if not sa:
+            raise ValueError("polylaplacian requires at least one spatial axis")
+        try:
+            groups = self._fast_lane_layer_groups()
+        except NotImplementedError:
+            return self._polylaplacian_via_jet(state, name, k=k)
+        outputs = [
+            self._fast_lane_group_polylaplacian(
+                state,
+                group_layers,
+                k,
+                mode=mode,
+                budget=budget,
+                n_directions=n_directions,
+                seed=seed,
+            )
+            for group_layers in groups
+        ]
+        return self._fast_lane_contract(outputs, name)
 
     def biharmonic(self, state: FieldState, name: str) -> Tensor:
         """``Delta^2 f_name`` of shape ``(B,)``."""
@@ -535,6 +733,7 @@ def make_siren_vector_field(
 
 
 __all__ = [
+    "FAST_LANE_CACHE_KEY",
     "FourierFeatureVectorField",
     "JET_CACHE_KEY",
     "JetMLPVectorField",

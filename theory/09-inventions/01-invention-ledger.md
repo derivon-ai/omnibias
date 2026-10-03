@@ -14,7 +14,7 @@ cluster to implement first.
 - **Blocks**: 09-02, 09-03, 09-04, 09-05, 09-06, 09-07, 09-08, 09-09,
   09-10, 09-11, 09-12, 09-13, 09-14, 09-15, 09-16, 09-17, 09-18, 09-19,
   09-20, 09-21, 09-22, 09-23, 09-24, 09-25, 09-26, 09-27, 09-28,
-  09-29, 09-30, 09-31, 09-32
+  09-29, 09-30, 09-31, 09-32, 09-33
 
 ### Operator card
 
@@ -223,6 +223,7 @@ Yang–Mills mass gap, RH, or P vs NP.
 | 09-30 inequality engine | export | propose / rationalize / check front door | locked catalog; not a new LP algorithm |
 | 09-31 einselection collapse | export | Sound coherence enclosure decides an einselected distribution | pure dephasing only; not a single-outcome claim |
 | 09-32 open-system Lindblad | export | GKSL semigroup + certified propagator / relaxation collapse | Markovian model declared, not derived; not a general closed form |
+| 09-33 deep Laplacian fast lane | export | Tier A/B/C deep-network `Delta^k` without multi-index blowup | exact Laplacian; `Delta^k` exact-or-enclosed; not O(1) at arbitrary order; not bit-identical across backends |
 
 ## 5. Worked example
 

@@ -400,20 +400,37 @@ def test_multiscale_fields_carry_the_jet_mlp_tag_and_cache(coords, specs, builde
 
 @pytest.mark.parametrize("builder", ["adaptive", "mscale"])
 def test_gradients_flow_to_every_parameter(coords, specs, builder):
+    """Every parameter that can influence the Laplacian gets a gradient.
+
+    ``adaptive`` has a linear-chain ``_layer_specs()`` and so takes the Tier A
+    fast lane (:func:`omnibias.torch.laplacian.deep_field_laplacian`), which
+    never touches the final (readout) layer's *bias* -- an additive constant
+    cannot affect any derivative of order >= 1, so that parameter is
+    structurally excluded here (see the analogous exception in
+    ``test_torch_jet_mlp_field.test_gradients_flow_to_parameters``).
+    ``mscale`` has no such single chain (``_layer_specs()`` raises
+    ``NotImplementedError``) and falls back to the pre-fast-lane row
+    extraction, which happens to trace a zero gradient through every
+    parameter including that bias.
+    """
     cs, comps = specs
-    field = (
-        build_adaptive_jet_mlp_vector_field(
+    if builder == "adaptive":
+        field = build_adaptive_jet_mlp_vector_field(
             coordinate_spec=cs, components=comps, hidden=6, depth=2,
         )
-        if builder == "adaptive"
-        else build_mscale_vector_field(
+        excluded = {field.net.linears[-1].bias}
+    else:
+        field = build_mscale_vector_field(
             coordinate_spec=cs, components=comps, hidden=8, depth=2, scales=(1.0, 4.0),
         )
-    )
+        excluded = set()
     tops.laplacian(field(coords), "u").pow(2).mean().backward()
-    grads = [p.grad for p in field.parameters()]
-    assert all(g is not None for g in grads)
-    assert any(float(g.abs().max()) > 0 for g in grads if g is not None)
+    named_grads = [(n, p, p.grad) for n, p in field.named_parameters()]
+    for name, param, grad in named_grads:
+        if any(param is e for e in excluded):
+            continue
+        assert grad is not None, f"{name} got no gradient from the Laplacian loss"
+    assert any(float(g.abs().max()) > 0 for _, _, g in named_grads if g is not None)
 
 
 # -- the feedback loop: measured spectrum -> band scales -> field ------------- #

@@ -17,6 +17,7 @@ from collections.abc import Callable, Sequence
 from typing import Any
 
 from omnibias.core.line_search import (
+    GradientSecant,
     JetLineSearchConfig,
     LineSearchResult,
     run_model_line_search,
@@ -110,8 +111,15 @@ def jet_line_search(
     *,
     config: JetLineSearchConfig | None = None,
     next_derivative_bound: float | None = None,
+    secant: GradientSecant | None = None,
 ) -> LineSearchResult:
-    """Parameter-direction jet line search with optional certified radius."""
+    """Parameter-direction jet line search with optional certified radius.
+
+    ``secant`` is the previous steepest step. When it is present the driver
+    may accept an unused inverse eigenvalue of the secant-plane Hessian
+    instead of the single-ray minimizer. ``verify=True`` stays the
+    never-worse backstop. The jet is the founding bias collapse.
+    """
     cfg = config if config is not None else JetLineSearchConfig()
     extra = 1 if (cfg.trust_radius == "certified" and next_derivative_bound is None) else 0
     derivs = directional_derivatives(loss_fn, params, direction, cfg.order + extra)
@@ -129,6 +137,7 @@ def jet_line_search(
         config=cfg,
         next_derivative_bound=bound,
         actual_fn=actual if cfg.verify else None,
+        secant=secant,
     )
 
 
@@ -164,6 +173,7 @@ def jet_line_search_on_ray(
 
 
 __all__ = [
+    "GradientSecant",
     "JetLineSearchConfig",
     "Layer",
     "LineSearchResult",

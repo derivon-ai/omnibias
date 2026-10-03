@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "checked_as_of": "2026-09-13",
+  "checked_as_of": "2026-09-14",
   "scope": "Full original Hilbert XVI: real algebraic curve and surface arrangements, and dynamical number/placement of polynomial limit cycles.",
   "status_definitions": {
     "published_result": "A result in a verified published source; this label does not assert a new independent reproof.",
@@ -12,6 +12,27 @@
     "The DRR ledger is not an exhaustive certified 2026 inventory.",
     "Repository proofs are internally audited written arguments, not established literature or a novelty claim."
   ],
+  "located_membership_gap": {
+    "checked_as_of": "2026-09-14",
+    "scope": "Joint representation of the actual coalescing saddle-node Dulac or first-hit map, in state and original parameters across the no-root and double-root boundary, as an LN/exp-definable family of uniformly bounded format.",
+    "sources": [
+      "krs_2009",
+      "rss_2007",
+      "binyamini_2024",
+      "bnz_sharp_cd_2022",
+      "novikov_zak_2023",
+      "bcn_complex_cells_2026",
+      "carmon_2026",
+      "dms_2016",
+      "mv_2024",
+      "hk_2026",
+      "ilyashenko_2024",
+      "rss_2024",
+      "speissegger_2026"
+    ],
+    "finding": "No reviewed source supplies this parametric bounded-format membership theorem. This is a bounded literature-search finding, not a theorem that no such result exists.",
+    "does_not_establish": "Impossibility of such a representation, absence from all literature, or failure of LN/exp methods after a separate membership and format proof."
+  },
   "sources": [
     {
       "id": "hilbert_1902",
@@ -118,14 +139,37 @@
       "url": "https://arxiv.org/html/2510.02770v1",
       "publication_url": "https://doi.org/10.1088/1361-6544/ae9443",
       "version": "Read arXiv:2510.02770v1, 2025-10-03; published Nonlinearity 39, 085026 on 2026-08-19",
-      "review_basis": "Primary preprint theorem/proof text and published metadata",
-      "scope": "Degenerate entry-exit formulas in a strict weighted chart; section 6 uses the same five-parameter quadratic family as the repository.",
+      "review_basis": "Primary preprint Lemma 2.2, hypothesis (2.7), Theorems 2.4 and 2.7, Remark 2.3, and section 6; published metadata",
+      "scope": "Degenerate entry-exit formulas in the strict weighted chart where P_lambda(x_2) <= -c for every real x_2 and every lambda in a compact Lambda. For n=1, Theorem 2.4 gives a C^k correction in (epsilon, epsilon log epsilon^{-1}); section 6 applies it to the relevant quadratic normal form under 4 lambda_0 + lambda_1^2 < 0.",
       "premises": [
-        "Strict negative drift polynomial on a compact normalized parameter set",
+        "Hypothesis (2.7): P_lambda(x_2) <= -c uniformly on R times a compact Lambda, so P_lambda has no real root",
         "Specified principal-value entry-exit balance and compact outer endpoints",
-        "For higher even multiplicity additional central balance can be necessary"
+        "For n=1 in section 6, the strict discriminant inequality 4 lambda_0 + lambda_1^2 < 0",
+        "For n >= 2, Theorem 2.7 shows failure of the entry-exit relation when the stated central integral is nonzero",
+        "Remark 2.3 leaves the remaining blow-up charts outside the analyzed chart to further work"
       ],
-      "does_not_establish": "Full I_2^1/I_4^1 cyclicity, coalescing-root coverage, or all blow-up charts; cyclicity sequel is cited as work in progress."
+      "does_not_establish": "The double-root boundary 4 lambda_0 + lambda_1^2 = 0, where (2.7) fails; coalescing-root coverage, the remaining blow-up charts, full I_2^1/I_4^1 cyclicity, or a bounded-format LN/exp representation. A cyclicity sequel is cited as work in progress."
+    },
+    {
+      "id": "dms_2016",
+      "title": "The entry-exit function and geometric singular perturbation theory",
+      "authors": [
+        "Peter De Maesschalck",
+        "Stephen Schecter"
+      ],
+      "year": 2016,
+      "status": "published_result",
+      "url": "https://arxiv.org/abs/1511.01815",
+      "publication_url": "https://doi.org/10.1016/j.jde.2016.01.008",
+      "version": "Journal of Differential Equations 260(8), 6697-6715; arXiv:1511.01815",
+      "review_basis": "Primary Theorem 1.1, Corollary 1.2 and Proposition 5.1",
+      "scope": "Geometric blow-up proof of the entry-exit relation for the stated planar slow-fast systems. Theorem 1.1 writes the return map as a C-infinity function of (x_0, epsilon, epsilon log epsilon), and removes the logarithmic variable under the stated flatness property; Proposition 5.1 exhibits genuine finite-smoothness logarithmic behavior.",
+      "premises": [
+        "The systems (1.1)-(1.3) and the transformed quadratic problem (1.9)-(1.10)",
+        "A fixed entry point near x_0 star, a fixed positive return section z = z_0, and sufficiently small epsilon",
+        "The extra flatness property in z for the stronger smooth-in-epsilon conclusion"
+      ],
+      "does_not_establish": "Uniform passage through a coalescing real-root boundary in the Huzak-Kristiansen polynomial P_lambda, definability in one effective o-minimal structure, or a bounded LN/exp format for an original-parameter Dulac family."
     },
     {
       "id": "mv_2024",
@@ -139,13 +183,14 @@
       "url": "https://arxiv.org/pdf/2105.09785",
       "publication_url": "https://doi.org/10.1016/j.jde.2024.05.037",
       "version": "Journal of Differential Equations 404, 43-107",
-      "review_basis": "Primary text, Theorem A and Corollary B",
-      "scope": "Uniform hyperbolic Dulac expansions, compensators, incomplete Mellin coefficient formulas, and selected coefficient meromorphic continuation with poles of order at most two.",
+      "review_basis": "Primary abstract, Theorem A, Proposition 2.9 and Corollary B",
+      "scope": "For each base parameter and each finite L > 0, hyperbolic Dulac-map and Dulac-time expansions with a remainder uniformly L-flat in parameters. Theorem A gives formulas for selected universal coefficients; Corollary B gives their meromorphic continuation with poles of order at most two along discrete rational resonance loci.",
       "premises": [
         "Hyperbolicity ratio in the stated positive parameter domains",
-        "Prescribed flatness order and parameter regularity"
+        "A fixed finite flatness order L and a neighborhood of a fixed unfolded parameter",
+        "The coefficient-specific domains away from their resonance sets; analyticity for Corollary B"
       ],
-      "does_not_establish": "All-coefficient meromorphic continuation, stated as conjectural, or the saddle-node limit."
+      "does_not_establish": "One all-orders expansion with a uniform format, meromorphic continuation for coefficients beyond those listed in Theorem A, removal of resonance poles, or the saddle-node/coalescing limit."
     },
     {
       "id": "ilyashenko_2024",
@@ -232,13 +277,36 @@
       "status": "published_result",
       "url": "https://arxiv.org/pdf/math/0612745",
       "version": "Journal fuer die reine und angewandte Mathematik 636, 1-45",
-      "review_basis": "Primary full text",
-      "scope": "An o-minimal, model-complete structure containing the specified nonresonant hyperbolic transition germs.",
+      "review_basis": "Primary introduction, Corollary 0, section 8 and Proposition 8.1",
+      "scope": "A polynomially bounded, model-complete o-minimal structure containing the specified nonresonant hyperbolic transition germs. Proposition 8.1 treats a small analytic unfolding of a fixed polycycle and obtains a qualitatively uniform fixed-point bound.",
       "premises": [
-        "Nonresonant hyperbolic singularities",
-        "The constructed quasianalytic function class"
+        "Every vertex is an isolated hyperbolic singularity with irrational eigenvalue ratio",
+        "The small analytic unfolding has the same singular points and the same linear part at each vertex, so each irrational ratio is independent of the parameter",
+        "Fixed transverse sections and charts, analytic regular connectors, and the constructed quasianalytic class Q"
       ],
-      "does_not_establish": "Joint definability of all coefficient families, resonances, saddle-nodes, or all singular return maps."
+      "does_not_establish": "Resonances, varying eigenvalue ratios, saddle-nodes, coalescing singularities, or all singular return maps. Proposition 8.1 invokes qualitative o-minimal uniform finiteness and gives no effective numeric bound or bounded-format estimate."
+    },
+    {
+      "id": "rss_2007",
+      "title": "Quasi-analytic solutions of analytic ordinary differential equations and o-minimal structures",
+      "authors": [
+        "Jean-Philippe Rolin",
+        "Fernando Sanz",
+        "Reinhard Schäfke"
+      ],
+      "year": 2007,
+      "status": "published_result",
+      "url": "https://arxiv.org/abs/math/0505073",
+      "publication_url": "https://doi.org/10.1112/plms/pdm016",
+      "version": "Proceedings of the London Mathematical Society 95(2), 413-442; arXiv:math/0505073v2",
+      "review_basis": "Primary abstract, Theorems 2.2 and 2.4 prime, and the asymptotic-linking example (2.5)",
+      "scope": "Uses asymptotic theory at irregular singular ODEs to obtain quasianalyticity and o-minimal, model-complete structures generated by solutions satisfying the paper's hypotheses. Distinct solutions in example (2.5) are asymptotically linked, and their generated structures admit no common o-minimal extension.",
+      "premises": [
+        "The strong quasianalyticity or analytic-transcendence hypotheses stated for the selected solution",
+        "The paper's irregular-singular analytic ODE form",
+        "For incompatibility, two distinct solutions of the specific example (2.5)"
+      ],
+      "does_not_establish": "That the actual coalescing saddle-node Dulac family is one of the incompatible examples, that it is outside R_LN,exp, or that no family-specific common effective structure can contain it. It rules out assuming a common o-minimal extension for arbitrary irregular-singular solutions without proof."
     },
     {
       "id": "rss_2024",
@@ -287,14 +355,145 @@
       "year": 2024,
       "status": "preprint_claim",
       "url": "https://arxiv.org/html/2405.16963v1",
-      "version": "arXiv:2405.16963v1",
-      "review_basis": "Primary text, effective o-minimality and Pfaffian-extension theorems",
-      "scope": "Effective zero/component bounds for LN and associated structures, primitive recursive in the specified format.",
+      "version": "arXiv:2405.16963v1, 2024-05-27",
+      "review_basis": "Primary v1, Theorems 1-3 and the LN-cell and format definitions in section 2",
+      "scope": "Theorem 1 states effective cell decomposition for already-definable sets. Theorem 2 makes R_LN effectively o-minimal and model complete; Theorem 3 does so for its Pfaffian extension, hence in particular for R_LN,exp, with bounds in the specified defining format.",
       "premises": [
-        "Admissible complex-cell representation",
-        "Bounds on chain/degree/coefficient/domain/norm data in the format"
+        "A proved LN or Pfaffian-over-LN representation on admissible complex cells",
+        "Bounds on chain, degree, coefficient, domain and norm data encoded in the format",
+        "For the regular-flat-connection application, regular singularities and quasiunipotent monodromy"
       ],
-      "does_not_establish": "Uniform bounded-format representation of actual singular planar return families; merely having a differential equation is insufficient."
+      "does_not_establish": "Membership, let alone uniformly bounded-format membership, of the actual coalescing saddle-node Dulac or first-hit family. The effective conclusions apply after a representation and its format have been supplied; merely satisfying a differential equation is insufficient."
+    },
+    {
+      "id": "bnz_sharp_cd_2022",
+      "title": "Sharply o-minimal structures and sharp cellular decomposition",
+      "authors": [
+        "Gal Binyamini",
+        "Dmitri Novikov",
+        "Benny Zack"
+      ],
+      "year": 2022,
+      "status": "preprint_claim",
+      "url": "https://arxiv.org/pdf/2209.10972v2",
+      "metadata_url": "https://arxiv.org/abs/2209.10972",
+      "version": "arXiv:2209.10972v2, 2026-02-24",
+      "review_basis": "Primary v2, Theorems 1.35-1.36 and section 1.8",
+      "scope": "Sharp cellular decomposition after passing from a P-sharply-o-minimal filtration to its star-filtration: cell count and degrees are polynomially controlled at fixed format.",
+      "premises": [
+        "A P-sharply-o-minimal structure with its declared format-degree filtration",
+        "Use of the associated star-filtration or an equivalent reduced filtration",
+        "Effectivity only when the starting sharp structure carries the required effective data"
+      ],
+      "does_not_establish": "That a coalescing Dulac family is definable in such a structure, that its format remains bounded at the double-root boundary, or any LN/exp membership theorem."
+    },
+    {
+      "id": "novikov_zak_2023",
+      "title": "Fortifying the Yomdin-Gromov Algebraic Lemma",
+      "authors": [
+        "Dmitri Novikov",
+        "Benny Zack"
+      ],
+      "year": 2023,
+      "status": "preprint_claim",
+      "url": "https://arxiv.org/pdf/2301.04953v1",
+      "metadata_url": "https://arxiv.org/abs/2301.04953",
+      "version": "arXiv:2301.04953v1, 2023-01-12",
+      "review_basis": "Primary v1, Theorems 1.18-1.19 and Remarks 1.21-1.22",
+      "scope": "Cylindrical C^r parametrizations of cylindrical cell decompositions in sharply o-minimal structures, with format-degree control; the effective conclusion is conditional on starting with an effective sharp structure.",
+      "premises": [
+        "A sharply o-minimal structure and a cylindrical decomposition of declared format and degree",
+        "Fixed finite smoothness order r",
+        "For effective output, an effective underlying sharp structure as in Remark 1.22"
+      ],
+      "does_not_establish": "Polynomial dependence on r in the general sharp setting, definability of a new dynamical family, or uniform bounded-format LN/exp membership at coalescence."
+    },
+    {
+      "id": "bcn_complex_cells_2026",
+      "title": "Complex cells in sharply o-minimal structures",
+      "authors": [
+        "Gal Binyamini",
+        "Oded Carmon",
+        "Dmitry Novikov"
+      ],
+      "year": 2026,
+      "status": "preprint_claim",
+      "url": "https://arxiv.org/html/2603.25380v1",
+      "metadata_url": "https://arxiv.org/abs/2603.25380v1",
+      "version": "arXiv:2603.25380v1, 2026-03-26",
+      "review_basis": "Primary v1, Theorems 2.38 and 2.40",
+      "scope": "Sharp complex-cell parametrization and preparation, uniform in definable families and polynomially effective in the degrees of the relevant sets and functions.",
+      "premises": [
+        "A sharply o-minimal expansion with sharp cell decomposition and a declared format-degree filtration",
+        "Input cells, hypersurfaces or cellular maps already belong to the stated complexity class",
+        "The extension-width parameters in the theorem statements"
+      ],
+      "does_not_establish": "That the actual coalescing first-hit map is definable in the input structure or has bounded format, nor an LN/exp membership criterion for irregular or saddle-node transition maps."
+    },
+    {
+      "id": "carmon_2026",
+      "title": "Analytically generated sharply o-minimal structures",
+      "authors": [
+        "Oded Carmon"
+      ],
+      "year": 2026,
+      "status": "preprint_claim",
+      "url": "https://arxiv.org/html/2604.06144v1",
+      "metadata_url": "https://arxiv.org/abs/2604.06144",
+      "version": "arXiv:2604.06144v1, 2026-04-07",
+      "review_basis": "Primary v1, Theorems 3.1, 4.1 and 5.3",
+      "scope": "Polynomially effective real-cell parametrization and preparation in analytically generated sharply o-minimal structures. Theorem 4.1 gives C^r Yomdin-Gromov charts with polynomial dependence on r and input degree.",
+      "premises": [
+        "An analytically generated sharply o-minimal structure with sharp cell decomposition",
+        "The set or function is already in the declared format-degree class",
+        "A fixed finite smoothness order r for the C^r parametrization"
+      ],
+      "does_not_establish": "Analytic generation or bounded-format definability of the coalescing Dulac family, preservation of format through its double-root limit, or a dynamical LN/exp membership theorem."
+    },
+    {
+      "id": "bny_2010",
+      "title": "On the Number of Zeros of Abelian Integrals: A Constructive Solution of the Infinitesimal Hilbert Sixteenth Problem",
+      "authors": [
+        "Gal Binyamini",
+        "Dmitry Novikov",
+        "Sergei Yakovenko"
+      ],
+      "year": 2010,
+      "status": "published_result",
+      "url": "https://arxiv.org/abs/0808.2952",
+      "publication_url": "https://doi.org/10.1007/s00222-010-0244-0",
+      "version": "Inventiones Mathematicae 181(2), 227-289; arXiv:0808.2952v3",
+      "review_basis": "Primary abstract and theorem statement",
+      "scope": "A constructive degree-uniform double-exponential bound for zeros of Abelian integrals, hence for limit cycles born from nonsingular ovals under small non-conservative perturbations of polynomial Hamiltonian fields.",
+      "premises": [
+        "Polynomial Hamiltonian and polynomial perturbing one-form of bounded degree",
+        "Nonsingular real energy-level ovals",
+        "The Abelian integral is the first nonzero displacement term in the stated infinitesimal setting"
+      ],
+      "does_not_establish": "Finiteness of the full Hilbert number H(n), singular-boundary cyclicity, a sharp zero count for a named instance, or the arrangement part of Hilbert XVI."
+    },
+    {
+      "id": "bbjt_2024",
+      "title": "Efficient and Validated Numerical Evaluation of Abelian Integrals",
+      "authors": [
+        "Florent Brehard",
+        "Nicolas Brisebarre",
+        "Mioara Joldes",
+        "Warwick Tucker"
+      ],
+      "year": 2024,
+      "status": "published_result",
+      "url": "https://hal.science/hal-03561096v2",
+      "publication_url": "https://doi.org/10.1145/3637550",
+      "version": "ACM Transactions on Mathematical Software 50(1), article 4, 1-38",
+      "review_basis": "Primary full text, Algorithms OvalValid and AbIntValid, Theorems 7.1-7.2",
+      "scope": "Validated real-energy evaluation of Abelian integrals by trigonometric interpolation and quasi-Newton-Kantorovich oval validation; rigorous sign alternations prove H(4) >= 24 and reproduce the cubic Z(3) >= 13 lower-bound instance.",
+      "premises": [
+        "A validated periodic oval parametrization at each sampled regular energy",
+        "Outward interval arithmetic and the paper's interpolation and quadrature bounds",
+        "Poincare-Pontryagin transfer for sufficiently small perturbation"
+      ],
+      "does_not_establish": "An argument-principle upper count for the Abelian integral, exclusion of additional zeros between samples, a degree-uniform bound, or the full Hilbert XVI problem."
     },
     {
       "id": "melnikov_2026",
@@ -434,6 +633,26 @@
         "The Hilbert number H(n) as a supremum over degree-n planar polynomial fields"
       ],
       "does_not_establish": "Finiteness of H(2), a chart covering, a C2 remainder, or G1."
+    },
+    {
+      "id": "galias_tucker_2022",
+      "title": "The Songling system has exactly four limit cycles",
+      "authors": [
+        "Zbigniew Galias",
+        "Warwick Tucker"
+      ],
+      "year": 2022,
+      "status": "published_result",
+      "url": "https://doi.org/10.1016/j.amc.2021.126691",
+      "version": "Applied Mathematics and Computation 415 (2022), 126691",
+      "review_basis": "Primary open-access article, theorem and interval-enclosure lemmas",
+      "scope": "Rigorous multiple-precision interval proof that the named Songling quadratic system has exactly four limit cycles, with section-root and multiplier enclosures.",
+      "premises": [
+        "The exact Songling coefficients lambda=-10^-200, epsilon=-10^-52, delta=-10^-13",
+        "CAPD and MPFR interval computations using up to 2048-bit precision",
+        "The cited local normal-form uniqueness theorem near the origin"
+      ],
+      "does_not_establish": "Finiteness or an upper bound for H(2), a degree-uniform bound, any open DRR graphic, or Hilbert XVI."
     },
     {
       "id": "generic_bautin_2026",

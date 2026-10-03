@@ -32,9 +32,14 @@ from omnibias.fields._core.state import FieldState
 from omnibias.pinn.operator._core.branch import BranchHeadLayout
 from omnibias.pinn.operator._core.conditioning import ConditioningSpec
 from omnibias.pinn.operator._core.spec import OperatorSpec
-from omnibias.pinn.torch.fields.jet_mlp import _JetFieldBase
+from omnibias.pinn.torch.fields.jet_mlp import FAST_LANE_CACHE_KEY, _JetFieldBase
 from omnibias.torch.activations.registry import ActivationSpec, get_activation
 from omnibias.torch.architectures.pinn import JetMLP, _JetMLPCore
+from omnibias.torch.laplacian import (
+    deep_field_laplacian,
+    deep_field_polylaplacian,
+    restrict_first_layer,
+)
 from torch import Tensor
 from torch.func import vmap
 
@@ -333,6 +338,138 @@ class DeepONetField(_JetFieldBase):
     def _compute_hidden_jet(self, coords: Tensor, order: int) -> Tensor:
         """Batched trunk jet of shape ``(Q, M, p)`` (readout-independent)."""
         return vmap(lambda xi: self._core._point_hidden_jet(xi, order))(coords)
+
+    def _fast_lane_layer_groups(self) -> list[list]:
+        return [self._core._layer_specs()]
+
+    def _align_coeffs_bias(self, batch: int) -> tuple[Tensor, Tensor]:
+        """Broadcast branch coeffs/bias to match a trunk batch dimension."""
+        coeffs = self.coeffs
+        bias = self.bias
+        F = coeffs.shape[0]
+        if self._shared_query_size is not None:
+            Q = self._shared_query_size
+            if batch != F * Q:
+                raise ValueError(f"batch {batch} != F*Q = {F}*{Q}")
+            coeffs_b = coeffs.repeat_interleave(Q, dim=0)
+            if bias.ndim == 1:
+                bias_b = bias.unsqueeze(0).expand(batch, -1)
+            else:
+                bias_b = bias.repeat_interleave(Q, dim=0)
+            return coeffs_b, bias_b
+        if F == 1 and batch != 1:
+            coeffs_b = coeffs.expand(batch, -1, -1)
+            bias_b = bias.expand(batch, -1)
+            return coeffs_b, bias_b
+        if F == batch:
+            bias_b = bias if bias.ndim == 2 else bias.unsqueeze(0).expand(batch, -1)
+            return coeffs, bias_b
+        raise ValueError(
+            f"cannot align coeffs batch F={F} with trunk batch {batch}; use on_grid()"
+        )
+
+    def _fast_lane_contract(self, outputs: list[Tensor], name: str) -> Tensor:
+        """Contract trunk basis Laplacians with per-sample branch coefficients."""
+        ci = self.components.index(name)
+        trunk_basis = outputs[0]  # (B, p)
+        coeffs_b, _bias_b = self._align_coeffs_bias(trunk_basis.shape[0])
+        return torch.einsum("bp,bcp->bc", trunk_basis, coeffs_b)[:, ci]
+
+    def _trunk_query_coords(self, coords: Tensor) -> Tensor:
+        if self._shared_query_size is not None:
+            return coords[: self._shared_query_size]
+        return coords
+
+    def _fast_lane_group_polylaplacian(
+        self,
+        state: FieldState[Tensor],
+        layers: list,
+        k: int,
+        *,
+        mode: str = "auto",
+        budget: int | None = None,
+        n_directions: int = 256,
+        seed: int = 0,
+    ) -> Tensor:
+        coords = cast(Tensor, state.coords)
+        trunk_coords = self._trunk_query_coords(coords)
+        cache = cast(
+            dict[str, Tensor],
+            cast(dict[str, Any], state.extra).setdefault(FAST_LANE_CACHE_KEY, {}),
+        )
+        cache_key = f"trunk_lap_k{k}"
+        if cache_key in cache:
+            trunk_out = cache[cache_key]
+        else:
+            sa = self._spatial_axis_indices()
+            D = self.coordinate_spec.ndim
+            if k == 1 and len(sa) == D:
+                _, _, trunk_out = self._tier_a_value_grad_lap_on_coords(
+                    trunk_coords, layers, state
+                )
+            elif len(sa) == D:
+                if k == 1:
+                    trunk_out = deep_field_laplacian(trunk_coords, layers)
+                else:
+                    trunk_out = deep_field_polylaplacian(
+                        trunk_coords,
+                        layers,
+                        k,
+                        mode=mode,
+                        budget=budget,
+                        n_directions=n_directions,
+                        seed=seed,
+                    )
+            else:
+                sa_tuple = tuple(self._spatial_axis_indices())
+                if k == 1:
+                    W0, b0, spec0 = layers[0]
+                    W0 = torch.as_tensor(W0)
+                    shifts = trunk_coords @ W0.t()
+                    if b0 is not None:
+                        shifts = shifts + torch.as_tensor(b0)
+                    y0 = torch.zeros(
+                        trunk_coords.shape[0],
+                        len(sa_tuple),
+                        dtype=trunk_coords.dtype,
+                        device=trunk_coords.device,
+                    )
+                    W_local = W0[:, sa_tuple]
+                    batched_layers = [(W_local, shifts, spec0), *layers[1:]]
+                    trunk_out = deep_field_laplacian(y0, batched_layers)
+                else:
+
+                    def one_point(xi: Tensor) -> Tensor:
+                        local_layers = restrict_first_layer(layers, xi, sa_tuple)
+                        y0 = torch.zeros(len(sa_tuple), dtype=xi.dtype, device=xi.device)
+                        return deep_field_polylaplacian(
+                            y0,
+                            local_layers,
+                            k,
+                            mode=mode,
+                            budget=budget,
+                            n_directions=n_directions,
+                            seed=seed,
+                        )
+
+                    trunk_out = vmap(one_point)(trunk_coords)
+            cache[cache_key] = trunk_out
+        if self._shared_query_size is not None and trunk_out.shape[0] == self._shared_query_size:
+            trunk_out = trunk_out.repeat(self._n_functions, 1)
+        return trunk_out
+
+    def _tier_a_value_grad_lap_on_coords(
+        self, coords: Tensor, layers: list, state: FieldState[Tensor]
+    ) -> tuple[Tensor, Tensor, Tensor]:
+        from omnibias.torch.laplacian import deep_field_value_grad_laplacian
+
+        cache = cast(
+            dict[str, Tensor],
+            cast(dict[str, Any], state.extra).setdefault(FAST_LANE_CACHE_KEY, {}),
+        )
+        if "trunk_tier_a" not in cache:
+            cache["trunk_tier_a"] = deep_field_value_grad_laplacian(coords, layers)
+        return cache["trunk_tier_a"]  # type: ignore[return-value]
 
     def _contract(
         self, trunk_jet: Tensor, coeffs: Tensor, bias: Tensor

@@ -78,7 +78,10 @@ packages/
                         #   graininess mu->0 recovers the derivative tower. (alpha)
   omnibias-holonomic/   # D-finite / holonomic engine: Ore (skew-polynomial)
                         #   algebra, Gosper + creative telescoping, and
-                        #   Lean-certified binomial identities. (alpha)
+                        #   Lean-certified binomial identities. Also hosts an
+                        #   exact-Q Groebner basis engine (Buchberger, both
+                        #   criteria, reduced basis, ideal/radical membership
+                        #   with a cofactor witness, budget-refusing). (alpha)
   omnibias-symbolic/    # neural-jet equation discovery: library-free SINDy,
                         #   AutoML surrogates, PDE coeff recovery, Blasius.
                         #   Uses omnibias-jax fastpaths. (alpha)
@@ -100,7 +103,18 @@ packages/
   omnibias-dynamics/    # validated dynamics: QR-Lohner variational/monodromy
                         #   flow, Poincare-section enclosures, certified Lyapunov
                         #   bounds, periodic-orbit proofs (radii polynomial).
-                        #   Pure-Python; builds on omnibias.core.verified. (alpha)
+                        #   Hosts cubic elliptic mixed Abelian counts (not
+                        #   Petrov-uniform), exact-Q Poincare compactification,
+                        #   and finite Dulac-model nonoscillation bounds (no
+                        #   physical return membership or graphic cyclicity).
+                        #   Also hosts a Poincare-Lyapunov focal-value / Bautin
+                        #   engine, resonant Poincare-Dulac normal forms with a
+                        #   derived (not declared) Dulac corner map, sound
+                        #   collar-membership certificates, and a machine-checked
+                        #   Hilbert-16 obligation ledger with derived (never
+                        #   stamped) parent flags. Pure-Python; builds on
+                        #   core.verified + holonomic (its exact-Q Groebner
+                        #   engine). (alpha)
   omnibias-sos/         # certified positivity: Sum-of-Squares / Positivstellensatz
                         #   decompositions with a rigorous interval LDL^T PSD
                         #   certificate that can earn theorem_prover_verified.
@@ -439,6 +453,17 @@ Lean-core and never import a backend.
   zero-count implications under explicit hypotheses. Actual uniform passage
   estimates, complete cycle capture and Hilbert XVI remain separate obligations;
   a finite replay or an abstract implication does not discharge those premises.
+  The Hilbert-XVI LN/exp experiment lives in
+  `omnibias.core.verified.log_noetherian` and
+  `omnibias.dynamics.ln_passage`. It certifies finite coordinate-chain algebra,
+  not physical Dulac-map membership. The GL1-GL7 replay records route-specific
+  negatives, not a G1 impossibility theorem: `frozen_exponent_obstruction`
+  quantifies over a single frozen `(C, gamma)` majorant (not over charts); the
+  W-ratio explosion is proven only over already-built outgoing sections at
+  `h ~ 1, epsilon^3, epsilon^4`; the negative radius `r1-theta*sep` refutes one
+  proposed wall. `g1_passed` stays false as a gate result until every chart cell
+  closes. Do not flip a parent flag from the GL1-GL7 negative assessment
+  artifact.
 
 ## Agent tooling (skills & rules)
 
@@ -555,8 +580,8 @@ by that drift gate.
   subgraph; G3 vs k-NN leftover-recorded, GNN / RegionModels stay `--full`; cost
   vs n/D leftover-recorded) / `omnibias.core.line_search` /
   `omnibias.{torch,jax}.line_search` (03-12, **shipped**; certified Lagrange radius +
-  `verify=True` never-worse; G4 leftover-recorded vs strong Wolfe, G5
-  leftover-recorded, not in CI `all_passed`) /
+  `verify=True` never-worse; G4 earned vs strong Wolfe, leftover #47 closed,
+  `2.32x`, not in CI `all_passed`; G5 leftover-recorded, leftover #48) /
   `omnibias.core.refine` / `omnibias.{torch,jax}.refine` (03-13, **shipped**; birth and
   growth bit-identical; death reports a bound; G4 earned vs matched-count
   fixed on the named BL) /
@@ -762,6 +787,13 @@ by that drift gate.
   G1–G7 CI; founding bias collapse, not temperature collapse except
   the named T=0 occupancy step; Markovian model declared not derived;
   not a general closed form) /
+  `omnibias.core.contraction` +
+  `omnibias.{torch,jax}.laplacian`
+  (09-33, **shipped**; deep-network Laplacian / poly-Laplacian fast lane;
+  Tier A forward recursion, Tier B support-grouped local jets, Tier C sphere
+  estimator with stderr; G1–G5 CI; founding bias collapse, not temperature
+  collapse; exact Laplacian, exact-or-enclosed `Delta^k`; not O(1) at arbitrary
+  order; not bit-identical across backends) /
   `omnibias.core.proof.obligations.convergence_ledger`
   (07-08, **shipped**; NS exponent ledger / YM polymer majorants are
   finite rational stage budgets; G1–G5 CI; founding bias collapse, not
@@ -872,6 +904,7 @@ by that drift gate.
   [`docs/api/local_jet.md`](docs/api/local_jet.md),
   [`docs/api/depth_residual.md`](docs/api/depth_residual.md),
   [`docs/api/implicit.md`](docs/api/implicit.md),
+  [`docs/api/deep_laplacian.md`](docs/api/deep_laplacian.md),
   [`docs/api/certified_step.md`](docs/api/certified_step.md),
   [`docs/api/jet_pid.md`](docs/api/jet_pid.md),
   [`docs/api/jet_lqr.md`](docs/api/jet_lqr.md),

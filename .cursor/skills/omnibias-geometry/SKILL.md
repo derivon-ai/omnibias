@@ -73,6 +73,12 @@ cases. It is a numerical producer; validated segments/events live downstream
 in dynamics. An analytic Bratu branch supplies the PDE reference. None of these
 finite systems silently establishes continuum discretization error or coverage.
 
+For Hilbert-XVI Part A, `omnibias.geometry.algebraic` certifies rational
+polygonal oval barriers and `omnibias.geometry.part_a_obstruction` audits the
+22-annulus wide/deep layout against the fixed-layout/SOS obstruction boundary.
+A fixed polygon layout or symmetry ansatz never excludes an isotopy scheme
+without a proved reduction covering every realization.
+
 - Source: `packages/omnibias-geometry`. Field ops stay in `omnibias-fields`.
 - Tests: `python -m pytest packages/omnibias-geometry/tests -q`.
 - Compose with `omnibias-fields`, `omnibias-pinn`, `omnibias-variational`,

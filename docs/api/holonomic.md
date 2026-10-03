@@ -79,6 +79,15 @@ Jacobian conjecture. Case A leftover
 `(b11, b21, b31)` and `(b02, b03, b04)` subsystems over `Q` at the
 origin only; the Case A chart then empties. The parent stays open.
 
+Twin-prime research (`omnibias.holonomic.twin_prime` and
+`omnibias.holonomic.twin_prime_bounded_gap`) follows the same finite-parent
+boundary. It certifies exact asymptotic-sieve local-factor prefixes, rational
+Möbius-bilinear cell partitions, fixed-\(2\) determinant algebra, matrix
+close-pair inequalities, and the parameterized PrimeGaps186 input manifest.
+The Arb/FLINT forms, remainder and Möbius cancellation estimates, uniform
+asymptotic passage, and every infinite prime-gap conclusion stay external.
+See [Twin-prime sieve research ledger](twin_prime_sieve.md).
+
 The Ore condition sort
 (`condition_ore`) wraps the recurrence
 guess as a `ConditionHypothesis`. `condition_dfinite` wraps the

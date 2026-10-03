@@ -82,7 +82,7 @@ API-stability contract -- the public surface may shift between alpha releases.
 | Package | Version | Status | Scope |
 |---|---|---|---|
 | omnibias-verify | 0.1.0a1 | Alpha | Certified neural-network verification: Taylor-model / interval propagation (smooth + ReLU / GELU / max-pool) with branch-and-bound, yielding robustness / Lipschitz / monotonicity / reachable-set certificates. |
-| omnibias-dynamics | 0.1.0a1 | Alpha | Computer-assisted dynamics: validated variational / monodromy flows, Poincare-section enclosures, certified Lyapunov bounds, and radii-polynomial periodic-orbit proofs. |
+| omnibias-dynamics | 0.1.0a1 | Alpha | Computer-assisted dynamics: validated variational / monodromy flows, Poincare-section enclosures, certified Lyapunov bounds, radii-polynomial periodic-orbit proofs, an instance-level certified cubic Abelian-integral zero count, exact-Q Poincare compactification, finite Dulac-model nonoscillation bounds, a Poincare-Lyapunov focal-value / Bautin engine, resonant normal forms with a derived (not declared) Dulac corner map, sound collar-membership certificates, and a machine-checked Hilbert-16 obligation ledger with derived (never asserted) parent flags (no physical return-map membership, graphic-cyclicity, or Hilbert-16 claim). |
 | omnibias-formal | 0.1.0a1 | Alpha | Mathlib-backed formal checker: drives the `formal/omnibias-analytic` Lean project to discharge a certificate's rational obligations, reporting a `mathlib_verified` tier. |
 
 ### Tooling

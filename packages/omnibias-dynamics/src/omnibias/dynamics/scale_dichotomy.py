@@ -83,6 +83,12 @@ def kill_sep(eps: float) -> float:
     return math.exp(-1.0 / (eps * eps))
 
 
+def kill_L(eps: float) -> float:
+    """Coefficient forced by ``sep²=lambda1²-4L`` on the coalescing path."""
+    sep = kill_sep(eps)
+    return (KILL_LAMBDA1**2 - sep**2) / 4.0
+
+
 def log_inner_coordinate(eps: float, sep: float) -> float:
     return eps * math.log(1.0 / sep)
 
@@ -115,6 +121,7 @@ def scale_dichotomy_witness(*, eps: float = KILL_EPS) -> dict[str, object]:
     sep = kill_sep(eps)
     kappa = 1.0 / sep
     lam1 = KILL_LAMBDA1
+    L = kill_L(eps)
     r1 = first_root(lam1, sep)
     chi = chi_on_kill(lam1, sep, kappa)
     fold = math.sqrt(eps)
@@ -140,6 +147,8 @@ def scale_dichotomy_witness(*, eps: float = KILL_EPS) -> dict[str, object]:
     return {
         "epsilon": eps,
         "sep": sep,
+        "L": L,
+        "quadratic_relation_residual": sep**2 - (lam1**2 - 4.0 * L),
         "chi": chi,
         "log_inner": log_inner_coordinate(eps, sep),
         "log_inner_is_1_over_eps": abs(log_inner_coordinate(eps, sep) - 1.0 / eps) < 1e-12,
@@ -156,19 +165,26 @@ def existing_section_explosion(*, eps: float = KILL_EPS) -> dict[str, object]:
         "epsilon": eps,
         "sep_sigma": sep,
         "factors": factors,
-        "all_existing_sections_explode": all(value > 10.0 for value in factors.values()),
+        "all_existing_sections_explode": all(abs(value) > 10.0 for value in factors.values()),
+        "closing_map_tautological": True,
         "new_closing_map": False,
     }
 
 
 def kill_sequence_admission(*, eps: float = KILL_EPS) -> dict[str, object]:
     sep = kill_sep(eps)
+    L = kill_L(eps)
     kappa = 1.0 / sep
     chi = chi_on_kill(KILL_LAMBDA1, sep, kappa)
     incoming_tbox = 0.4
     incoming_u = 1.0
     return {
         "incoming_first_hit_retained": incoming_tbox < incoming_u**2 / 2.0,
+        "L": L,
+        "quadratic_relation_residual": sep**2 - (KILL_LAMBDA1**2 - 4.0 * L),
+        "fixed_L_1_tuple_is_invalid": abs(
+            sep**2 - (KILL_LAMBDA1**2 - 4.0)
+        ) > 1.0,
         "chi_order_one": abs(chi - 1.0 / rstar(KILL_LAMBDA1)) < 1e-9,
         "compact_positive_exclusion_applies": False,
         "weighted_drift_vanishes_in_chi_chart": True,
@@ -260,7 +276,11 @@ def idea_findings() -> Mapping[str, Mapping[str, object]]:
                 "all have exploding W-ratio on the kill sequence when sigma = sep."
             ),
             "falsified": "A smaller existing outgoing section with bounded W-ratio",
-            "constraint": "Only h ~ epsilon^3 sep^2 would bound the ratio; that is a new closing map.",
+            "constraint": (
+                "A frozen existing section cannot bound the W-ratio. The "
+                "tracked product with exp(Psi_pre)=O(sep^2) absorbs that "
+                "factor in the first derivative; it is not a new closing map."
+            ),
             **sections,
         },
         "E_joint_sep_L": {

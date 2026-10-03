@@ -17,6 +17,28 @@ disjoint from the prior 947 geometries. They found no target and no new
 height certificates, including two- and three-flip realizations of the known
 20-oval scheme retaining the fourteen-oval inner nest. Other changed
 triangulations remain topology screens unless supplied with such a certificate.
+
+The in-repository attack now has a separately replayable exact substrate:
+`omnibias.geometry.patchwork` validates every face, crossing, unimodular
+determinant, quadrant sign, projective T-curve component, and rooted
+complement-region tree. `omnibias.geometry.patchwork_height_lp` assembles all
+strict lower-hull inequalities and accepts only exact-Q feasible points or
+exact Farkas alternatives; GP2 replays the standard six-point nonregular
+planar triangulation, not merely a synthetic contradictory system. The bounded
+search wraps triangulation/sign pairs as
+an incomplete `FiniteFamily`; CSP and annealed descent propose signs, while the
+exact tree and rational heights decide acceptance.
+
+GP1--GP4 pass in `docs/benchmarks/patchwork_octic_smoke.json`: the quartic
+four-oval replay, regular-height/Farkas checks, polygonal recertification of the
+known 16-oval octic, and an honest `search_incomplete` result. GP5 remains
+false: no 22-oval target candidate or direct coefficient-level realization was
+found. The submitted eight-seed sweep evaluated 16,384 exact candidates over
+64 triangulations per seed and likewise returned `search_incomplete`. The
+16-oval certificate's finite Bezout identities and Bernstein margins
+also pass the Mathlib-free `polynomial_identity_q` Lean obligation where the
+toolchain is present; that formal scope does not include the Harnack/topology
+implication.
 One annular layout has
 an exact Farkas exclusion, confined to its fixed sampled sign prescription.
 The other numerical failures are not impossibility certificates. Full reports
@@ -39,9 +61,12 @@ As checked on 13 September 2026, Geiselmann et al.,
 [*Limits of combinatorial patchworking*, arXiv:2602.06888v4](https://arxiv.org/pdf/2602.06888v4),
 Table 1 on printed page 17, marks this exact scheme as having unknown
 algebraic realizability. Section 4.3 also leaves its realization by T-curves
-open. Theorem 21 excludes T-curves for the \((3,19)\) column, which does not
-include this target. A pseudo-holomorphic realization does not provide the
-required algebraic polynomial.
+open. Theorem 21 lists the four achievable maximal T-curve columns
+\((19,3),(15,7),(11,11),(7,15)\); Corollary 22 excludes the \((3,19)\)
+column, which is different from this target's \((p,n)=(19,3)\). The paper
+names two algebraically open \((19,3)\) schemes: this wide/deep target and the
+sibling `14 + 1<2 + 1<4>>`. A pseudo-holomorphic realization does not provide
+the required algebraic polynomial.
 
 An exact comparison object is the rooted region tree with vertices
 \(0,\ldots,22\):
@@ -176,8 +201,10 @@ exhaustive search or an obstruction to algebraic realization.
 Existing [rational polynomial arithmetic](../omnibias-holonomic/src/omnibias/holonomic/_core/poly_n.py),
 [convex optimization support](../omnibias-convex/src/omnibias/convex),
 and [verified arithmetic](../omnibias-core/src/omnibias/core/verified)
-can support candidate certificates. Projective topology checks and exact
-witness translation still need to be supplied for this target.
+now feed exact projective topology, lower-hull, Farkas, and direct
+coefficient-level acceptance checks. What remains is a candidate attaining the
+declared rooted tree and, independently, rational annuli that make its explicit
+coefficient polynomial pass the direct 22-oval verifier.
 
 A construction or general obstruction would settle this one open
 degree-eight configuration. It would not settle the remaining degree-eight

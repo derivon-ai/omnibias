@@ -39,6 +39,12 @@ FORBIDDEN: tuple[tuple[str, str, str], ...] = (
         "we proved the Riemann Hypothesis",
     ),
     (
+        "twin_prime",
+        r"(prove[sd]?|solv(e[sd]?|ing)|settle[sd]?)\s+"
+        r"(the\s+)?Twin\s+Prime\s+Conjecture",
+        "we solved the Twin Prime Conjecture",
+    ),
+    (
         "p_eq_np",
         r"\bP\s*=\s*NP\b",
         "therefore P = NP and the decoder is exact",
@@ -151,7 +157,7 @@ def test_every_pattern_catches_its_bait() -> None:
 
 
 def test_forbidden_set_is_not_empty() -> None:
-    assert len(FORBIDDEN) >= 5
+    assert len(FORBIDDEN) >= 6
 
 
 def test_tree_has_no_affirmative_forbidden_claim() -> None:

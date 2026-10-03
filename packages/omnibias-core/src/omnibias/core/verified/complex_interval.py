@@ -22,12 +22,13 @@ weighted-norm tail accounting never relies on cancellation anyway.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Union
 
 from omnibias.core.verified.interval import Interval, IntervalLike
 
 #: Anything promotable to a :class:`ComplexInterval`.
-ComplexLike = Union["ComplexInterval", Interval, complex, float, int]
+ComplexLike = Union["ComplexInterval", Interval, complex, float, int, Fraction]
 
 
 @dataclass(frozen=True)
@@ -100,7 +101,11 @@ class ComplexInterval:
     def __truediv__(self, other: ComplexLike) -> ComplexInterval:
         o = ComplexInterval.from_value(other)
         # z / w = z * conj(w) / |w|^2
-        denom = o.re * o.re + o.im * o.im  # real, must exclude 0
+        denom = o.re.pow_int(2) + o.im.pow_int(2)  # real, must exclude 0
+        if denom.contains_zero():
+            raise ZeroDivisionError(
+                "complex interval division requires a denominator box excluding zero"
+            )
         num = self * o.conj()
         return ComplexInterval(num.re / denom, num.im / denom)
 
@@ -120,7 +125,7 @@ class ComplexInterval:
         # squaring an exact 0 rounds the lower endpoint one ulp below 0; the
         # radicand is a true sum of squares, so clamp before the sqrt.
         arg = Interval(max(arg.lo, 0.0), arg.hi)
-        return arg.sqrt().hi
+        return float(arg.sqrt().hi)
 
     def modulus(self) -> Interval:
         """Enclosure ``[min |z|, max |z|]`` of the modulus over the rectangle.
@@ -138,7 +143,7 @@ class ComplexInterval:
 
     def contains(self, z: complex | float | int) -> bool:
         zz = complex(z)
-        return self.re.contains(zz.real) and self.im.contains(zz.imag)
+        return bool(self.re.contains(zz.real) and self.im.contains(zz.imag))
 
     def __repr__(self) -> str:
         return f"ComplexInterval(re={self.re!r}, im={self.im!r})"

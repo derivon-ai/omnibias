@@ -3,7 +3,7 @@
 """Exact rational certificates for smooth projective plane curves.
 
 Three polynomial Bezout identities exclude complex projective singularities.
-Opposite strict signs on rectangular annulus boundaries force distinct ovals.
+Opposite strict signs on rational polygonal-annulus boundaries force distinct ovals.
 When these ovals (and the obligatory odd-degree pseudoline) attain Harnack's
 bound, their checked nesting gives the complete real scheme, up to ambient
 isotopy. It does not determine rigid isotopy or complex orientations.
@@ -21,8 +21,11 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 from fractions import Fraction
-from math import comb
+from math import comb, lcm
+from typing import Any
 
+from omnibias.core.proof.certificate import Cert, make_certificate, verify_certificate_digest
+from omnibias.core.proof.lean_check import LeanCheckResult, check_certificate
 from omnibias.core.realization.polynomial import (
     AlgebraBudgetExceeded,
     Rational,
@@ -221,6 +224,135 @@ class RectangularAnnulus:
             raise ValueError("the outer rectangle must strictly contain the inner rectangle")
 
 
+RationalPoint = tuple[Fraction, Fraction]
+
+
+def _orientation_q(a: RationalPoint, b: RationalPoint, c: RationalPoint) -> int:
+    value = (
+        (b[0] - a[0]) * (c[1] - a[1])
+        - (b[1] - a[1]) * (c[0] - a[0])
+    )
+    return (value > 0) - (value < 0)
+
+
+def _point_on_segment_q(a: RationalPoint, b: RationalPoint, p: RationalPoint) -> bool:
+    return (
+        _orientation_q(a, b, p) == 0
+        and min(a[0], b[0]) <= p[0] <= max(a[0], b[0])
+        and min(a[1], b[1]) <= p[1] <= max(a[1], b[1])
+    )
+
+
+def _segments_intersect_q(
+    a: RationalPoint,
+    b: RationalPoint,
+    c: RationalPoint,
+    d: RationalPoint,
+) -> bool:
+    o1, o2 = _orientation_q(a, b, c), _orientation_q(a, b, d)
+    o3, o4 = _orientation_q(c, d, a), _orientation_q(c, d, b)
+    if o1 * o2 < 0 and o3 * o4 < 0:
+        return True
+    return (
+        (o1 == 0 and _point_on_segment_q(a, b, c))
+        or (o2 == 0 and _point_on_segment_q(a, b, d))
+        or (o3 == 0 and _point_on_segment_q(c, d, a))
+        or (o4 == 0 and _point_on_segment_q(c, d, b))
+    )
+
+
+@dataclass(frozen=True)
+class RationalPolygon:
+    """A simple closed polygon with exact rational vertices."""
+
+    vertices: tuple[RationalPoint, ...]
+
+    def __post_init__(self) -> None:
+        vertices = tuple(
+            (rational(vertex[0]), rational(vertex[1]))
+            for vertex in self.vertices
+        )
+        if len(vertices) < 3 or len(set(vertices)) != len(vertices):
+            raise ValueError("a polygon needs at least three distinct vertices")
+        area_twice = sum(
+            vertices[i][0] * vertices[(i + 1) % len(vertices)][1]
+            - vertices[i][1] * vertices[(i + 1) % len(vertices)][0]
+            for i in range(len(vertices))
+        )
+        if area_twice == 0:
+            raise ValueError("polygon area must be nonzero")
+        for i in range(len(vertices)):
+            a, b = vertices[i], vertices[(i + 1) % len(vertices)]
+            if a == b:
+                raise ValueError("polygon edges must be nondegenerate")
+            for j in range(i + 1, len(vertices)):
+                if j in (i, (i + 1) % len(vertices)) or i == (j + 1) % len(vertices):
+                    continue
+                c, d = vertices[j], vertices[(j + 1) % len(vertices)]
+                if _segments_intersect_q(a, b, c, d):
+                    raise ValueError("polygon boundary must be simple")
+        if area_twice < 0:
+            vertices = (vertices[0], *reversed(vertices[1:]))
+        object.__setattr__(self, "vertices", vertices)
+
+    @property
+    def edges(self) -> tuple[tuple[RationalPoint, RationalPoint], ...]:
+        return tuple(
+            (self.vertices[i], self.vertices[(i + 1) % len(self.vertices)])
+            for i in range(len(self.vertices))
+        )
+
+    def contains_strictly(self, point: Sequence[Rational]) -> bool:
+        """Exact odd-crossing containment, excluding the boundary."""
+        p = (rational(point[0]), rational(point[1]))
+        if any(_point_on_segment_q(a, b, p) for a, b in self.edges):
+            return False
+        inside = False
+        for a, b in self.edges:
+            if (a[1] > p[1]) == (b[1] > p[1]):
+                continue
+            crossing_x = a[0] + (p[1] - a[1]) * (b[0] - a[0]) / (b[1] - a[1])
+            if crossing_x > p[0]:
+                inside = not inside
+        return inside
+
+    def strictly_contains(self, other: RationalPolygon) -> bool:
+        return (
+            not _polygon_boundaries_intersect(self, other)
+            and all(self.contains_strictly(vertex) for vertex in other.vertices)
+        )
+
+    def disjoint(self, other: RationalPolygon) -> bool:
+        return (
+            not _polygon_boundaries_intersect(self, other)
+            and not self.contains_strictly(other.vertices[0])
+            and not other.contains_strictly(self.vertices[0])
+        )
+
+
+def _polygon_boundaries_intersect(a: RationalPolygon, b: RationalPolygon) -> bool:
+    return any(
+        _segments_intersect_q(a0, a1, b0, b1)
+        for a0, a1 in a.edges
+        for b0, b1 in b.edges
+    )
+
+
+@dataclass(frozen=True)
+class PolygonalAnnulus:
+    """The closed region between two strictly nested rational polygons."""
+
+    inner: RationalPolygon
+    outer: RationalPolygon
+
+    def __post_init__(self) -> None:
+        if not self.outer.strictly_contains(self.inner):
+            raise ValueError("the outer polygon must strictly contain the inner polygon")
+
+
+BarrierAnnulus = RectangularAnnulus | PolygonalAnnulus
+
+
 def segment_bernstein_coefficients(
     polynomial: SparsePolynomial,
     start: Sequence[Rational],
@@ -265,31 +397,113 @@ def _edge_margin(
                _edge_margin(polynomial, midpoint, end, sign, depth - 1))
 
 
+def _edge_positive_coefficients(
+    polynomial: SparsePolynomial,
+    start: RationalPoint,
+    end: RationalPoint,
+    sign: int,
+    depth: int,
+) -> tuple[Fraction, ...]:
+    signed = tuple(
+        sign * coefficient
+        for coefficient in segment_bernstein_coefficients(polynomial, start, end)
+    )
+    if min(signed) > 0:
+        return signed
+    if depth == 0:
+        raise ValueError("whole-edge strict sign is not certified at this subdivision depth")
+    midpoint = (Fraction(start[0] + end[0], 2), Fraction(start[1] + end[1], 2))
+    return (
+        *_edge_positive_coefficients(polynomial, start, midpoint, sign, depth - 1),
+        *_edge_positive_coefficients(polynomial, midpoint, end, sign, depth - 1),
+    )
+
+
+def _boundary_vertices(
+    boundary: RationalRectangle | RationalPolygon,
+) -> tuple[RationalPoint, ...]:
+    return tuple(
+        (rational(vertex[0]), rational(vertex[1]))
+        for vertex in boundary.vertices
+    )
+
+
 def _boundary_sign(
-    polynomial: SparsePolynomial, rectangle: RationalRectangle, depth: int,
+    polynomial: SparsePolynomial,
+    boundary: RationalRectangle | RationalPolygon,
+    depth: int,
 ) -> tuple[int, Fraction]:
-    vertices = rectangle.vertices
+    vertices = _boundary_vertices(boundary)
     value = polynomial.evaluate(vertices[0])
     if value == 0:
         raise ValueError("a boundary vertex lies on the curve")
     sign = 1 if value > 0 else -1
-    margin = min(_edge_margin(polynomial, vertices[i], vertices[(i + 1) % 4], sign, depth)
-                 for i in range(4))
+    margin = min(_edge_margin(
+        polynomial,
+        vertices[i],
+        vertices[(i + 1) % len(vertices)],
+        sign,
+        depth,
+    )
+                 for i in range(len(vertices)))
     return sign, margin
 
 
-def _nesting(annuli: tuple[RectangularAnnulus, ...]) -> tuple[int, ...]:
+def _boundary_positive_coefficients(
+    polynomial: SparsePolynomial,
+    boundary: RationalRectangle | RationalPolygon,
+    sign: int,
+    depth: int,
+) -> tuple[Fraction, ...]:
+    vertices = _boundary_vertices(boundary)
+    return tuple(
+        coefficient
+        for i in range(len(vertices))
+        for coefficient in _edge_positive_coefficients(
+            polynomial,
+            vertices[i],
+            vertices[(i + 1) % len(vertices)],
+            sign,
+            depth,
+        )
+    )
+
+
+def _as_polygon(shape: RationalRectangle | RationalPolygon) -> RationalPolygon:
+    return shape if isinstance(shape, RationalPolygon) else RationalPolygon(shape.vertices)
+
+
+def _shape_contains(
+    outer: RationalRectangle | RationalPolygon,
+    inner: RationalRectangle | RationalPolygon,
+) -> bool:
+    return _as_polygon(outer).strictly_contains(_as_polygon(inner))
+
+
+def _shape_disjoint(
+    a: RationalRectangle | RationalPolygon,
+    b: RationalRectangle | RationalPolygon,
+) -> bool:
+    return _as_polygon(a).disjoint(_as_polygon(b))
+
+
+def _nesting(annuli: tuple[BarrierAnnulus, ...]) -> tuple[int, ...]:
     for i, a in enumerate(annuli):
         for b in annuli[i + 1:]:
-            if not (a.outer.disjoint(b.outer) or a.inner.strictly_contains(b.outer)
-                    or b.inner.strictly_contains(a.outer)):
-                raise ValueError("annuli must have separated or strictly nested enclosing rectangles")
+            if not (
+                _shape_disjoint(a.outer, b.outer)
+                or _shape_contains(a.inner, b.outer)
+                or _shape_contains(b.inner, a.outer)
+            ):
+                raise ValueError("annuli must have separated or strictly nested boundaries")
     parents = []
     for i, annulus in enumerate(annuli):
         containers = [j for j, candidate in enumerate(annuli)
-                      if j != i and candidate.inner.strictly_contains(annulus.outer)]
+                      if j != i and _shape_contains(candidate.inner, annulus.outer)]
         immediate = [j for j in containers if not any(
-            k != j and annuli[j].inner.strictly_contains(annuli[k].outer) for k in containers)]
+            k != j and _shape_contains(annuli[j].inner, annuli[k].outer)
+            for k in containers
+        )]
         parents.append(immediate[0] if immediate else -1)
     return tuple(parents)
 
@@ -301,12 +515,13 @@ class ProjectiveCurveCertificate:
     ``barrier_parents`` indexes the input annuli, with -1 denoting the exterior.
     It is the entire oval nesting forest only if ``complete_real_scheme`` is
     true. In the other case additional curve components have not been excluded.
-    No formal theorem-prover verification is claimed by this Python replay.
+    ``formal_seal`` carries the finite Bezout/sign obligation; its Lean result
+    is reported separately and does not formalize the topological implication.
     """
 
     curve_digest: str
     smoothness: ProjectiveSmoothnessWitness
-    annuli: tuple[RectangularAnnulus, ...]
+    annuli: tuple[BarrierAnnulus, ...]
     fixed_axis: int
     subdivision_depth: int
     boundary_signs: tuple[tuple[int, int], ...]
@@ -316,12 +531,108 @@ class ProjectiveCurveCertificate:
     harnack_upper_bound: int
     pseudoline_count: int
     complete_real_scheme: bool
+    formal_seal: Cert
+
+
+@dataclass(frozen=True)
+class ProjectiveCurveFormalVerification:
+    """Lean verdict for the finite identities/signs, not the topology theorem."""
+
+    finite_obligation: LeanCheckResult
+    theorem_prover_verified: bool
+
+
+def _bezout_coefficient_equations(
+    curve: HomogeneousPlaneCurve,
+    smoothness: ProjectiveSmoothnessWitness,
+) -> list[dict[str, Any]]:
+    equations: list[dict[str, Any]] = []
+    for chart in smoothness.charts:
+        contributions: dict[
+            tuple[int, int],
+            list[tuple[Fraction, Fraction]],
+        ] = {}
+        for axis, multiplier in enumerate(chart.multipliers):
+            derivative = affine_chart(curve.polynomial.derivative(axis), chart.fixed_axis)
+            for left_index, left in multiplier.terms:
+                for right_index, right in derivative.terms:
+                    index = (
+                        left_index[0] + right_index[0],
+                        left_index[1] + right_index[1],
+                    )
+                    contributions.setdefault(index, []).append((left, right))
+        for index in sorted(contributions):
+            products = contributions[index]
+            denominator = 1
+            for left, right in products:
+                denominator = lcm(
+                    denominator,
+                    left.denominator * right.denominator,
+                )
+            terms = [
+                [
+                    left.numerator * right.numerator,
+                    denominator // (left.denominator * right.denominator),
+                ]
+                for left, right in products
+            ]
+            equations.append({
+                "chart": chart.fixed_axis,
+                "monomial": list(index),
+                "terms": terms,
+                "rhs": denominator if index == (0, 0) else 0,
+            })
+    return equations
+
+
+def _curve_formal_seal(
+    curve: HomogeneousPlaneCurve,
+    smoothness: ProjectiveSmoothnessWitness,
+    polynomial: SparsePolynomial,
+    barriers: tuple[BarrierAnnulus, ...],
+    signs: tuple[tuple[int, int], ...],
+    subdivision_depth: int,
+) -> Cert:
+    positive = [
+        coefficient
+        for annulus, (inner_sign, outer_sign) in zip(barriers, signs, strict=True)
+        for boundary, sign in (
+            (annulus.inner, inner_sign),
+            (annulus.outer, outer_sign),
+        )
+        for coefficient in _boundary_positive_coefficients(
+            polynomial,
+            boundary,
+            sign,
+            subdivision_depth,
+        )
+    ]
+    payload = {
+        "type": "polynomial_identity_q",
+        "source_digest": curve.digest,
+        "equations": _bezout_coefficient_equations(curve, smoothness),
+        "positive": [[value.numerator, value.denominator] for value in positive],
+        "formal_scope": (
+            "finite Bezout coefficient identities and signed Bernstein margins; "
+            "not separation, Harnack, isotopy, or algebraic realization"
+        ),
+    }
+    return make_certificate(
+        claim="finite exact-Q smoothness identities and whole-boundary signs",
+        payload=payload,
+        honesty={
+            "finite_curve_obligations_exact_q": True,
+            "topological_implication_formally_verified": False,
+            "full_hilbert16_solved": False,
+        },
+        meta={"transcend_backend": "not_used"},
+    )
 
 
 def certify_curve(
     curve: HomogeneousPlaneCurve,
     smoothness: ProjectiveSmoothnessWitness,
-    annuli: Sequence[RectangularAnnulus],
+    annuli: Sequence[BarrierAnnulus],
     *,
     fixed_axis: int = 2,
     subdivision_depth: int = 8,
@@ -354,16 +665,39 @@ def certify_curve(
     upper = (curve.degree - 1) * (curve.degree - 2) // 2 + 1
     if lower > upper:
         raise ValueError("the supplied barriers contradict Harnack's bound")
-    return ProjectiveCurveCertificate(curve.digest, smoothness, barriers, fixed_axis,
-                                      subdivision_depth, tuple(signs), tuple(margins), parents,
-                                      lower, upper, pseudoline, lower == upper)
+    formal_seal = _curve_formal_seal(
+        curve,
+        smoothness,
+        polynomial,
+        barriers,
+        tuple(signs),
+        subdivision_depth,
+    )
+    return ProjectiveCurveCertificate(
+        curve.digest,
+        smoothness,
+        barriers,
+        fixed_axis,
+        subdivision_depth,
+        tuple(signs),
+        tuple(margins),
+        parents,
+        lower,
+        upper,
+        pseudoline,
+        lower == upper,
+        formal_seal,
+    )
 
 
 def replay_curve_certificate(
     curve: HomogeneousPlaneCurve, certificate: ProjectiveCurveCertificate,
 ) -> bool:
     """Recompute identities, geometry, signs, and every reported conclusion."""
-    if curve.digest != certificate.curve_digest:
+    if (
+        curve.digest != certificate.curve_digest
+        or not verify_certificate_digest(certificate.formal_seal)
+    ):
         return False
     try:
         expected = certify_curve(curve, certificate.smoothness, certificate.annuli,
@@ -374,11 +708,23 @@ def replay_curve_certificate(
     return expected == certificate
 
 
+def verify_curve_certificate_formally(
+    certificate: ProjectiveCurveCertificate,
+) -> ProjectiveCurveFormalVerification:
+    """Run the Mathlib-free kernel on the finite curve obligation."""
+    result = check_certificate(certificate.formal_seal)
+    return ProjectiveCurveFormalVerification(result, result.verified)
+
+
 __all__ = [
     "ChartBezoutIdentity",
     "HomogeneousPlaneCurve",
+    "PolygonalAnnulus",
     "ProjectiveCurveCertificate",
+    "ProjectiveCurveFormalVerification",
     "ProjectiveSmoothnessWitness",
+    "RationalPoint",
+    "RationalPolygon",
     "RationalRectangle",
     "RectangularAnnulus",
     "affine_chart",
@@ -386,4 +732,5 @@ __all__ = [
     "find_smoothness_witness",
     "replay_curve_certificate",
     "segment_bernstein_coefficients",
+    "verify_curve_certificate_formally",
 ]

@@ -153,7 +153,7 @@ API settled, gates named), **gated** (an acceptance gate exists in
 | [03-09 differentiable topology](03-algorithms/09-differentiable-topology-of-arrangements.md) | shipped | Soft Euler / component counts + 1-D Morse persistence; G1–G6 CI; temperature collapse, not founding bias collapse; no differentiable Betti number; `Inconclusive` when the gap does not separate |
 | [03-10 jet-Pade singularity tracking](03-algorithms/10-jet-pade-singularity-tracking.md) | shipped | Domb-Sykes + Padé poles + certified `|x_s|` annulus; G1–G6 CI; founding bias collapse, not temperature collapse; diagnostic, not a blow-up proof |
 | [03-11 Lie symmetry discovery](03-algorithms/11-lie-symmetry-discovery-and-equivariant-ansatz.md) | shipped | Point symmetries in a declared ansatz; G1–G6 CI; founding bias collapse, not temperature collapse; in-ansatz rank, not a classification |
-| [03-12 exact jet line search](03-algorithms/12-exact-jet-line-search.md) | shipped | Certified radius + `verify=True` never-worse; G1/G2/G3/G6 CI; G4 step-count **leftover-recorded** (leftover #47; strong Wolfe, 1.83x, need 2x), G5 order×depth crossover **leftover-recorded** (leftover #48), not CI `all_passed` |
+| [03-12 exact jet line search](03-algorithms/12-exact-jet-line-search.md) | shipped | Certified radius + `verify=True` never-worse; G1/G2/G3/G6 CI; G4 step-count **earned** (leftover #47 closed; strong Wolfe, 2.32x, need 2x, both arms hit), G5 order×depth crossover **leftover-recorded** (leftover #48), not CI `all_passed` |
 | [03-13 adaptive pack refinement](03-algorithms/13-adaptive-pack-refinement.md) | shipped | Birth/growth bit-identical; death reports a bound; G1–G6 CI; G4 **earned** (indicator birth vs matched-count fixed on the named BL) |
 
 ### 04 Cross-domain bridges
@@ -278,6 +278,7 @@ operator floor.
 | [09-30 inequality engine](09-inventions/30-inequality-engine.md) | shipped | propose / rationalize / check front door; G1–G4 CI; G5 leftover-recorded, not in CI `all_passed`; not 03-02 / 03-03; not a new LP algorithm |
 | [09-31 einselection collapse](09-inventions/31-einselection-collapse.md) | shipped | Sound coherence enclosure decides an einselected distribution; G1–G5 CI; pure dephasing only; not a wave-function-collapse or single-outcome claim |
 | [09-32 open-system Lindblad dynamics](09-inventions/32-open-system-lindblad-dynamics.md) | shipped | GKSL semigroup + certified propagator / positivity / relaxation collapse; G1–G7 CI; thermal occupancy bridge; not a Born–Markov derivation |
+| [09-33 deep Laplacian fast lane](09-inventions/33-deep-laplacian-fast-lane.md) | shipped | Tier A/B/C deep-network `Delta^k` without multi-index blowup; G1–G5 CI; founding bias collapse, not temperature collapse; not O(1) at arbitrary order |
 
 ### 10 Control-systems optimization
 

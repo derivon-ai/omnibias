@@ -39,6 +39,11 @@ Propose in float, certify with Interval LDL^T.
 | Combinatorial SOS (clique / 3-XOR) | `omnibias.sos.combinatorial` (not `SosDegreeFamily`; not P vs NP) |
 | Arrangement-adapted bases | `omnibias.core.verified.trial_spaces` + sos |
 
+For an emptiness claim, first supply a finite basic semialgebraic set and
+state exactly what its variables cover. A Positivstellensatz for one fixed
+layout or symmetry ansatz excludes only that set; it does not exclude every
+geometric realization without a separately proved complete reduction.
+
 ## Extend
 
 - Source: [`packages/omnibias-sos`](../../../packages/omnibias-sos).

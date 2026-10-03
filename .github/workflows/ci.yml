@@ -515,6 +515,10 @@ jobs:
         run: |
           source .venv-cross/bin/activate
           python benchmarks/jet_vs_nested_ad.py
+      - name: Run deep-Laplacian-scaling smoke (deep fast lane G1-G5)
+        run: |
+          source .venv-cross/bin/activate
+          JAX_PLATFORMS=cpu python benchmarks/deep_laplacian_scaling.py
       - name: Run certified jet-width smoke
         run: |
           source .venv-cross/bin/activate

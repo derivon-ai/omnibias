@@ -18,6 +18,7 @@ def test_generated_obligation_restores_on_failure_and_absent_file(tmp_path):
     with generated_lean_obligation(tmp_path, generated, "new"):
         assert generated.read_text() == "new"
     assert generated.read_text() == "original"
+    assert (tmp_path / ".lake" / "omnibias-bridge.lock").is_file()
 
 
 def test_threads_cannot_overwrite_another_active_obligation(tmp_path):

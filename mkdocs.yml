@@ -190,6 +190,7 @@ nav:
       - depth-causal local jet (08-03): api/local_jet.md
       - depth-causal residual (08-05): api/depth_residual.md
       - implicit DEQ Newton (08-08): api/implicit.md
+      - deep-network Laplacian fast lane: api/deep_laplacian.md
       - certified step (08-09): api/certified_step.md
       - jet-PID optimizer (08-10): api/jet_pid.md
       - jet-LQR optimizer (08-11): api/jet_lqr.md
@@ -198,6 +199,7 @@ nav:
       - recommended trainer stack: api/train_stack.md
       - rational stencil obligations (01-11): api/rational_stencil.md
       - convergence ledgers (07-08): api/convergence_ledger.md
+      - twin-prime sieve research ledger: api/twin_prime_sieve.md
       - anisotropic similarity profile (07-09): api/anisotropic_profile.md
       - admissible stress cone (07-10): api/stress_cone.md
       - weighted coefficient class (07-11): api/weighted_class.md
@@ -219,6 +221,11 @@ nav:
       - Enclosure Collapse (01-14): api/enclosure_collapse.md
       - Named-collapse schema: api/collapse.md
       - contour winding: api/contour.md
+      - certified Abelian-integral zero count: api/abelian_zero_count.md
+      - Poincare compactification and finite Dulac cyclicity: api/dulac_cyclicity.md
+      - Exact-Q Groebner engine: api/groebner.md
+      - Focal/Bautin engine, derived corner maps, H16 ledger: api/focal_bautin.md
+      - exact Viro patchwork and octic target: api/patchwork_octic.md
       - banded tail-inverse bound & one-sided radii closure: api/banded_tail.md
       - Laguerre basis: api/laguerre_basis.md
       - Cohn-Elkies 1-D Hermite bound: api/cohn_elkies.md

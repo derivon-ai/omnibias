@@ -133,6 +133,7 @@ from omnibias.torch.lindblad import (
     thermal_population,
 )
 from omnibias.torch.line_search import (
+    GradientSecant,
     JetLineSearchConfig,
     LineSearchResult,
     jet_line_search,
@@ -261,6 +262,7 @@ __all__ = [
     "EquivariantScan",
     "FINITE_RESIDUAL_CLAIM",
     "FourierTransform",
+    "GradientSecant",
     "GrowStrategy",
     "GrowableOMBU",
     "GrowableOperatorMultiBiasUnit",

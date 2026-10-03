@@ -64,6 +64,7 @@ uv run python docs/img/generate_figures.py
 | `shape_topology.py` | `docs/benchmarks/shape_topology_smoke.json` / `$OMNIBIAS_SCRATCH/beyond_pde/shape_topology.json` | Shipped 05-02 G6/G7: soft Euler gap containment + topology-regularized genus vs a named soft-disk implicit; G4 unearned; G5 failed |
 | `sequence_transverse.py` | `docs/benchmarks/sequence_transverse_smoke.json` / `$OMNIBIAS_SCRATCH/beyond_pde/sequence_transverse.json` | Shipped 05-02 G5 / Wave-0 A5: order-0 causal `sigma` FIR vs named S4D (N=1) on AR(1); `width=T`; matched 4 params; earned |
 | `jet_vs_nested_ad.py` | `docs/benchmarks/jet_vs_nested_ad_smoke.json` / `$OMNIBIAS_SCRATCH/citation/jet_vs_ad/` | Shipped 06-05 obligation 3: 1-D Poisson `mlp_jet` vs nested AD + GN vs Adam; not CCF; extract / paper stay later |
+| `deep_laplacian_scaling.py` | `docs/benchmarks/deep_laplacian_scaling_smoke.json` / `$OMNIBIAS_SCRATCH/citation/deep_laplacian/` | Shipped (no theory number assigned yet): deep-network Laplacian fast lane G1 exactness vs `mlp_jet_mv`, G2 no-ceiling at `D=5000`, G3 cost parity vs nested AD, G4 torch/JAX numerical parity (tight tolerance, honestly not bit-exact), G5 Tier C estimator unbiasedness; not CCF, not Group 09 |
 | `multipack_birkhoff.py` | `docs/benchmarks/multipack_birkhoff_smoke.json` | Wave-1 primitive 01-01: MultiPackUnit G1–G5; float64 order ceiling recorded; two-interface span beats OperatorBlock / OMBU / JetMLP |
 | `irregular_stencils.py` | `docs/benchmarks/irregular_stencils_smoke.json` | Shipped 01-04: exact-Q Birkhoff weights G1–G4 |
 | `bias_scan.py` | `docs/benchmarks/bias_scan_smoke.json` | Wave-1 primitive 01-02: BiasScan G1–G4 CI-gated; 01-13 G5, **shipped**; G4 is a warmed-up voxelize-then-`cmbConv1d` pipeline comparison |
@@ -101,7 +102,7 @@ uv run python docs/img/generate_figures.py
 | `jetkan.py` | `docs/benchmarks/jetkan_smoke.json` | Shipped 02-03: JetKAN G1/G3/G4/G5; G2 leftover-recorded (leftover #41; ~2.2x vs autodiff, need 5x); model-jet exactness, KA theorem does not justify |
 | `weak_form_vpinn.py` | `docs/benchmarks/weak_form_vpinn_smoke.json` | Shipped 02-04: exact on polynomial boxes; G4 conditioning earned vs strong collocation |
 | `multi_interface_pinn.py` | `docs/benchmarks/multi_interface_pinn_smoke.json` | Shipped 02-05: sharpening, neither collapse; G3 leftover-recorded (linear stand-in); G4 leftover-recorded (zero-coeff; training `--full`) |
-| `jet_line_search.py` | `docs/benchmarks/jet_line_search_smoke.json` | Shipped 03-12: G1/G2/G3/G6 CI-gated; G4 leftover-recorded vs strong Wolfe (leftover #47; `1.83x`, need `2x`); G5 leftover-recorded (leftover #48); not in CI `all_passed` |
+| `jet_line_search.py` | `docs/benchmarks/jet_line_search_smoke.json` | Shipped 03-12: G1/G2/G3/G6 CI-gated; G4 earned vs strong Wolfe (leftover #47 closed; `2.32x`, need `2x`, both arms hit); G5 leftover-recorded (leftover #48); not in CI `all_passed` |
 | `adaptive_refinement.py` | `docs/benchmarks/adaptive_refinement_smoke.json` | Shipped 03-13: G1–G6 CI-gated; G4 10x vs matched-count fixed on the named BL is in CI `all_passed` |
 
 All runs are **float64**, **CPU** (`JAX_PLATFORMS=cpu`). Each JSON carries

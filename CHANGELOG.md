@@ -6,6 +6,726 @@ distributions is versioned independently under semantic versioning.
 
 ## [Unreleased]
 
+### Added — k=39 bounded-gap kernels and direct receipt
+
+- Extracted the five 77-by-77 k=39 interval kernels (denominator, J0, Jplus,
+  Jtail, source_loss). `certify_prime_gap_quadratic_receipt` accepts the
+  dyadic endpoints, pinned and generated source digests, 160/224/192 policy,
+  descriptor order, and 97-task inventory. `quadratic_kernels_extracted` is
+  true only on that certificate. The rounding reserve does not claim
+  extraction, and a candidate screen is not a crossing.
+- Completed the direct k=39 numerical receipt: all 97 components and 149 raw
+  forms on the authenticated evaluator. The recomputed margin is
+  `-5040770402079525193269995987/860722528790000000000000000000`, below
+  `1/50000`, so `finite_k39_crossing_found` stays false. Source-valid
+  crossing, `h1_182_claim`, DHL transfer, and the twin-prime claim stay false.
+
+### Changed — exact jet line search G4
+
+- Earned theory 03-12 G4 on the named ill-conditioned quadratic. After the
+  directional polynomial minimizer, an unused inverse eigenvalue of the
+  secant-plane Hessian is accepted when the order-2 model decreases and
+  `verify=True` holds. Strong Wolfe keeps an interior cubic/quadratic
+  trial. Measured Wolfe/jet is `2.32` with both arms hitting 5/5.
+  Leftover #47 is closed in the artifact note. G4 stays out of CI
+  `all_passed`. G5 (leftover #48) stays leftover-recorded.
+
+### Added — Hilbert-XVI complex physical outgoing cover
+
+- Added `omnibias.dynamics.complex_physical_e_out`: eight rational complex
+  separation cells cover `sep in [0,2]`, isolate the physical outgoing
+  `E_out` event branch of the cubic comparison field, and match adjacent
+  branches by shared-boundary uniqueness. Exact-source stopped events
+  independently certify the first transverse real crossing on every cell.
+  The incoming `E_sigma` branch, full quadratic return map, bounded
+  Log-Noetherian format, G3, and Hilbert XVI remain explicitly open.
+
+### Added — finite twin-prime sieve research ledger
+
+- Added `omnibias.holonomic.twin_prime`: exact rational shifted-prime
+  local-factor identities, admissible-tuple checks, rational Möbius-bilinear
+  cell partitions, a 3-D log-polyhedral FI terminal-shell atlas, exact PSD
+  matrix close-pair certificates, and hash-sealed finite witnesses. The
+  rational fallback leaves exactly `1/38` of the classical log-volume; the
+  moving shell records the exponent arithmetic
+  `131 - (127 + 1) = 3`, the minimal integer cutoff power supplying FI's
+  required three-log saving. All three finite atlas-arithmetic obligations
+  passed genuine Lean kernel builds. Every remainder, terminal-shell
+  Möbius-cancellation, source-validity, and uniform-asymptotic premise remains
+  explicit and false in the parent honesty payload.
+- Added the rational terminal-shell family. Its unresolved normalized-log
+  fraction is exactly `(32/19) * epsilon`, so it can tend to zero without
+  supplying any fixed-shift Möbius cancellation. This records that cell-volume
+  minimization is not an analytic-progress metric.
+- Added a coefficientwise replay of Friedlander--Iwaniec equation (3.1).
+  It certifies the Vaughan identity for every arithmetic function on each
+  declared finite divisor lattice, unique assignment of the three terminal
+  regions, and exact dyadic coverage. The smoke gate covers \(n\le128\), and
+  all three aggregate rational obligations passed genuine Lean kernel builds;
+  logarithmic smoothing and all analytic estimates remain external.
+- Added exact structural FI subchecks: squared-rational selection of the
+  dyadic dilation, pointwise interval ownership, finite upper-sieve
+  \(\rho\)-insertion, and a complete 13-leaf analytic routing ledger. The
+  validator rejects missing, duplicate, misrouted, shift-averaged, and
+  explicitly circular inputs; full smoothing and range replay remain blocked.
+- Added the exact signed fixed-\(2\) determinant route for the FI terminal
+  shell. Formal \(\log p\)-coefficient vectors replay
+  \(\Lambda(n)=\sum_{qk=n}\mu(q)\log k\) and
+  \(\gamma_C(s)\mu(rs)\) on finite squarefree divisor lattices without shift
+  averaging or termwise absolute values. Exact ledgers record Wright's relevant
+  exponent ranges, the candidate cell's \(41/640\) kernel credit, and its
+  \(1009/16000\) completion-loss budget. The required fixed-\(2\) completion
+  lemma remains absent, so no Möbius bilinear estimate is claimed.
+- Added the exact bounded-gap target seam and
+  `benchmarks/twin_prime_bounded_gap.py`. The named PrimeGaps186 baseline
+  records its 77 coefficients, 98,304 grid, 97 loss components, 149 raw
+  forms, and reported margin. The next target is the admissible 39-tuple of
+  diameter 182. Rational generalized-Rayleigh crossings can be sealed, but
+  their source-form, outward-loss, support, distribution, and DHL premises
+  remain external; no \(k=39\) candidate crossing is currently known.
+- Added `omnibias.holonomic.twin_prime_bounded_gap`, an independent pure-rational
+  replay of the input manifest pinned by PrimeGaps186. It reproduces the
+  \(k=40\) 29/43 ladders, 28/39 retained prefixes, six groups, 97 components,
+  52 outer plus 45 inner tasks, 149 raw forms, and convolution length 98,264.
+  Reparameterizing to \(k=39\) gives face dimension 38 and convolution length
+  98,265 while preserving the exact source schedule and physical shell
+  upper maxima. Arb/FLINT forms and any numerical crossing remain blocked.
+- Added `scripts/parameterize_primegaps186.py`, a fail-closed source generator
+  for the pinned evaluator. It authenticates the upstream SHA-256 and rewrites
+  all audited dimension dependencies, including the hidden radial midpoint
+  offset \(k/2\) (exactly \(39/2\)), both face-moment calls, masks,
+  normalization, driver guards, and receipt text. Generated source compiles;
+  numerical equivalence and the \(k=39\) Arb/FLINT run remain pending.
+- The standard `python-flint==0.9.0` wheel was confirmed to fail the upstream
+  signed-FFT regression. Since the corrected FLINT patch is unpublished, the
+  generated evaluator now replaces its sole signed polynomial product with
+  the exact positive/negative-part identity \(PQ=P_+Q-P_-Q\), and requires
+  separate nonnegative integer and signed-split Arb regressions.
+  `certify_signed_convolution_split` independently proves the corresponding
+  enclosure identity over exact rational coefficient intervals. This does not
+  earn baseline equivalence until the full \(k=40\) output is reproduced.
+- Added `certify_prime_gap_numerical_receipt`, an independent exact consumer
+  for completed evaluator runs. It replays every task parameter against the
+  97-task manifest, checks the 149-form inventory, and recomputes rounded cap
+  arithmetic, every raw/component ceiling, source loss, quotient, final margin,
+  pass status, and the
+  published \(k=40\) margin-floor comparison.
+- Added fail-closed evaluator checkpoint/resume support. It extracts only
+  complete cap/source JSON events, verifies each resumed task against the exact
+  inventory, rejects conflicting duplicates, durably flushes new rows, and
+  still requires all 97 components before assembling a receipt. This recovered
+  75 completed components after an externally terminated baseline run.
+- Added the \(k=39\) quadratic-extraction acceptance seam: the authenticated
+  77-variable descriptor order, exact sign-aware contraction of 3,003-entry
+  symmetric interval matrices, and a complete two-stage source-rounding reserve
+  of approximately \(9.70094937136989\cdot10^{-11}\). The contracts are earned;
+  coefficient-independent cap/source matrices remain to be extracted.
+- Completed the checkpointed authenticated-split \(k=40\) numerical baseline:
+  all 97 components and 149 raw forms replay to the exact finite margin
+  `69162467338708766984467/2960664736250000000000000000`, above `1/50000`.
+  The independent receipt checker sealed the task inventory and final
+  arithmetic; it does not formally verify Arb or claim equivalence to the
+  unavailable corrected-FLINT build.
+- Added a fail-closed quadratic-receipt consumer for the \(k=39\) search. It
+  binds both source digests, the 77 coefficient descriptors, all 97 task keys,
+  the arithmetic policy, and all 15,015 exact-dyadic upper-triangle entries for
+  \(I,J_0,J_+,J_{\rm tail},S\). Rational candidate screening applies signed
+  interval contraction and both rounding reserves, while honesty flags keep
+  matrix provenance and the complete direct receipt unearned.
+- Added `benchmarks/twin_prime_sieve.py` and its smoke artifact. The bilinear
+  values use finite-scale floating logarithms and are diagnostics, not
+  cancellation bounds. A frozen unseen-scale check at \(2^{22}\) separated
+  shifted-prime mass (`0.0194102 < 0.025`) from the parity control
+  (`0.109110 > 0.08`). The finite A0 local-factor, A1a combinatorial-replay,
+  A1b0 structural-subcheck, and A2g atlas-geometry gates are earned; A1–A4
+  and every infinite prime-gap conclusion remain blocked.
+- Emitted 26 finite rational obligations for the local factors through
+  \(p=97\) and their prefix product; every obligation passed a genuine Lean
+  kernel build. This formal tier is finite and does not cover Euler-product
+  convergence or any sieve asymptotic.
+
+### Added — Hilbert-16 fold I-map leading derivative
+
+- Added `omnibias.dynamics.e_out_speed`: kill-line comparison
+  `F=f+4 eps^3 g` is increasing with `-Vdot >= 3 eps^3`; hitting
+  time of `V=-rho` is at most `(rho-eps)/(3 eps^3)` for every
+  `eps in (0, 1/16]`. `O(1/eps^3)` comparison majorant, not Lohner
+  for every `eps` or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16EOutSpeed`.
+- Added `omnibias.dynamics.e_sigma_speed`: incoming reverse cubic has
+  `F(0)=-4 eps^3(1+eps)` and `phi(0)<0` on `eps in (0, 1/16]`; time
+  to cross `Delta V=1` is at most `1/(4 eps^3(1+eps))`. Lohner
+  wrapping refuses a certified `E_sigma` first-hit. Not G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaSpeed`.
+- Added `omnibias.dynamics.e_sigma_in`: incoming reverse cubic from
+  GRAZING start `V=0`, `h=4 eps^3` has unique transverse first-hit of
+  `V=1/4` on `L in {9/25, 1/16, 0}`. Lohner wrapping still refuses
+  `E_sigma`. Not G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaIn`.
+- Added `omnibias.dynamics.e_sigma_hit`: declared incoming point
+  `(V,h)=(3/4,1/4)` has unique transverse first-hit of GRAZING
+  `E_sigma` on `L in {9/25, 1/16, 0}`. The GRAZING start `V=0`
+  still excludes `E_sigma` on this compact horizon. Not G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaHit`.
+- Added `omnibias.dynamics.e_sigma_from0`: comparison tube from
+  GRAZING `V=0` isolates a unique increasing `E_sigma` zero on
+  `L in {9/25, 1/16, 0}` at `eps=1/16`. Lohner wrapping still
+  refuses `certify_stopped_event` from `V=0`. Not G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaFrom0`.
+- Added `omnibias.dynamics.e_sigma_unif`: cancelled height majorant
+  on `eps in [0, 1/8]` keeps `E_sigma>0` on eight Interval slabs.
+  A single slab wraps. Not a Lohner event for every `eps` or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaUnif`.
+- Added `omnibias.dynamics.e_sigma_wall`: orbit-aligned
+  `(V,h)=(1/4,1/40)` inside the certified GRAZING-from-`V=0`
+  `V=1/4` return box has unique transverse GRAZING `E_sigma` on
+  `L in {9/25, 1/16, 0}`. Not a single Lohner run from `V=0` or G1.
+  Lean: `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaWall`.
+- Added `omnibias.dynamics.e_sigma_box`: twelve `h`-slabs covering
+  `[1/50, 4/125]` at `V=1/4` certify GRAZING `E_sigma` at `L=0`, a
+  declared sub-box of every L-pack wall box. Not the whole wall
+  `h`-interval, not a single Lohner run from `V=0` or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaBox`.
+- Added `omnibias.dynamics.e_sigma_span`: twenty-one `h`-slabs covering
+  `[19/1000, 1/25]` at `V=1/4` certify GRAZING `E_sigma` at `L=0`, a
+  declared span containing the whole `L=0` wall box. Not the
+  `L in {9/25, 1/16}` walls, not a single Lohner run from `V=0` or G1.
+  Lean: `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaSpan`.
+- Added `omnibias.dynamics.e_sigma_pack`: eighteen `h`-slabs covering
+  `[17/1000, 7/200]` at `V=1/4` certify GRAZING `E_sigma` on
+  `L in {9/25, 1/16}`, a declared span containing both remaining
+  wall boxes. Not a single Lohner run from `V=0` or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaPack`.
+- Added `omnibias.dynamics.e_sigma_eps`: aligned `(V,h)=(1/4,1/40)`
+  certifies GRAZING `E_sigma` at `eps=1/n` for `n in {16, 20, 25}` on
+  `L=0`; each GRAZING-from-`V=0` `V=1/4` box contains that point.
+  Not a wall-span cover at every `n`, not a single Lohner run from
+  `V=0` or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaEps`.
+- Added `omnibias.dynamics.e_sigma_oneshot`: a single
+  `certify_stopped_event` from GRAZING `V=0`, `h=4 eps^3` hits
+  GRAZING `E_sigma` on `L in {9/25, 1/16, 0}` at `eps=1/16`. Not
+  uniform in `eps`, not `Z_x` C2 or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaOneshot`.
+- Added `omnibias.dynamics.e_sigma_oneshot_eps`: a single
+  `certify_stopped_event` from GRAZING `V=0` hits GRAZING `E_sigma`
+  at `eps=1/n` for `n in {16, 20, 25}` on `L=0`. Not uniform in
+  `eps`, not `Z_x` C2 or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaOneshotEps`.
+- Added `omnibias.dynamics.z_v_bound`: holomorphic `Z_v` identities
+  and an Interval enclosure `|Z_v|<1/4` on the cancelled-N kill
+  compact, excluding 0. Not fold `Z_x`, `sep>0`, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ZVBound`.
+- Added `omnibias.dynamics.z_slow_v`: slow-line `Z_V=-Z_v/ell`
+  identities, an Interval enclosure `|Z_V|<1/4` on the cancelled-N
+  kill compact, and holomorphic `|Z_v|<1/4` on the fold wall
+  `r in [1.4, 1.6]`. Not fold I-map `Z_x`, `sep>0`, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ZSlowV`.
+- Added `omnibias.dynamics.fold_z_x`: matching-chart `Z_x=Z_v eps/ell`
+  identities and an Interval enclosure `|Z_x|<1/100` on the fold
+  I-map compact `r in [1.4, 1.6]`, `eps in [0, 0.02]`. Not `sep>0`
+  or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16FoldZX`.
+- Added `omnibias.dynamics.stage_b`: kill-line Stage-B Picard
+  inclusion `|Delta x|<1/3` on `lambda1=-2`, `sep in (0, 1]`,
+  `eps in [0, 1/16]`, with a positive tracked exponent. Not Stage
+  A/C, C2, first-hit, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageB`.
+- Added `omnibias.dynamics.stage_a`: kill-line Stage-A wall
+  identities `B_-(a)=theta(1+theta)sep^2` and
+  `B_-'(bnd)=-sep(1-2 theta)` at `theta=1/8`, plus Interval
+  `a>1/4` and leading `Psi_pre` factor `<1/4` on `sep in [0, 1]`.
+  Not `dx_e/dkappa`, `chi`, Stage C, first-hit, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageA`.
+- Added `omnibias.dynamics.chi_b`: kill-line `chi_b` identities
+  `(1+theta)/theta=9`, decay `c=1/16`, worst-case `(K+1)/r1=8`,
+  plus a two-slab Interval enclosure `sep*S_pre<3` and `chi_b<9`
+  on `sep in [1/2^16, 1]`. Not `dx_e/dkappa`, Stage C, first-hit,
+  or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16ChiB`.
+- Added `omnibias.dynamics.dx_e_leading`: kill-line `dx_e` leading
+  identities (prefactor `3/8`, slope half `3/8`, net floor `3/16`)
+  plus Interval prefactor `<1/2` and threshold net exponent `>1/8`
+  after the `y0` log remainder on the `chi_b` compact. Not the
+  uniform-in-`chi` bound, Stage C, first-hit, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16DxELeading`.
+- Added `omnibias.dynamics.dx_e_unif`: kill-line uniform-in-`chi`
+  `dx_e` identities (extra coefficient `3/32`, written `c=1/16`
+  weaker by `1/32`, lift `27/32`) plus Interval `C<2` and extra
+  `>1/16` on the `chi_b` compact. Not Stage C, first-hit, `dx_e`
+  off the kill line, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16DxEUnif`.
+- Added `omnibias.dynamics.stage_c`: kill-line Stage-C `a_min`
+  identities (written `1/2`, integrating factor `4`, declared
+  floor `1/4`) plus Interval `end_lo>1/4` and `1/x<8` on the
+  Stage-B end box. Not an outgoing orbit, first-hit, C2, or G1.
+  Lean: `OmnibiasAnalytic.Dynamics.Hilbert16StageC`.
+- Added `omnibias.dynamics.stage_c_exit`: kill-line Stage-C exit
+  identities (`T_e/eps^2 = 1/8` at `x=1/2`, `eps y0 = 1/256`,
+  gap room `31/256`) plus Interval `T_e/eps^2 in (1/16, 1)` and
+  `T_e > h_e` on the Stage-B end box. Not an outgoing orbit,
+  first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCExit`.
+- Added `omnibias.dynamics.stage_c_th`: kill-line Stage-C leading
+  `T_h` identities (midpoint product `-sep^2/4`, worst `3/4`,
+  room `1/4`) plus Interval `T_h>1/2` on the Stage-B end box at
+  `y_1=1`. Not an outgoing orbit, first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCTh`.
+- Added `omnibias.dynamics.stage_c_gap`: kill-line Stage-C start-gap
+  identities (wall `1/8-1/16=1/16`, `h_1` cube `1/4096`, exact wall
+  `T-h=1/4096` at `eps=1/16`) plus Interval `(T_e-h_1)/eps^2>1/32`
+  at `y_1=1`. Not an outgoing orbit, first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCGap`.
+- Added `omnibias.dynamics.stage_c_env`: kill-line Stage-C C=0
+  envelope identities (wall `T_e/eps^2=1/8` below 1, declared
+  `c=1/32`, `c+room=1`) plus Interval
+  `(1/32)(eps^2+h)<=T(h)<=eps^2+h`. Not a C≠0 orbit, first-hit,
+  C2, or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16StageCEnv`.
+- Added `omnibias.dynamics.stage_c_if`: kill-line Stage-C C=2
+  integrating-factor identities (`2*3=6`, `2*6=12`, edge
+  `12(1/4-1/16)=9/4`) plus Interval exponent `<=3` and
+  `(h/h_1)^{C eps}<32`. Not `T(h)<=C(eps^2+h)` after the remaining
+  integral, first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCIf`.
+- Added `omnibias.dynamics.stage_c_int`: kill-line Stage-C C=2
+  T(h)-integral identities (`C eps=1/8`, `1-alpha=7/8`, slope
+  `16/7`) plus Interval `T(h)<=64(eps^2+h)`. Not first-hit, C2, or
+  G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16StageCInt`.
+- Added `omnibias.dynamics.stage_c_lo`: kill-line Stage-C C=2
+  lower-envelope identities (`1/2-1/32=15/32`, `1+1/16=17/16`,
+  wrapping `15/512`) plus Interval `T(h)>=(1/32)(eps^2+h)`. Not
+  first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCLo`.
+- Added `omnibias.dynamics.stage_c_k`: kill-line Stage-C C=2
+  tight-ratio identities (`6*(1/16)=3/8`, `3*2=6`, `6-16/7=26/7`)
+  plus Interval `T(h)<=6(eps^2+h)` from the edge factor. Not
+  `T-h=O(eps)`, first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCK`.
+- Added `omnibias.dynamics.stage_c_boot`: kill-line Stage-C C=2
+  T-h bootstrap identities (`1+6=7`, `2*6+3=15`, `2*7*3=42`) plus
+  Interval `T-h<1`. Not `O(eps)`, first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCBoot`.
+- Added `omnibias.dynamics.stage_c_rect`: kill-line Stage-C
+  continuation-rectangle identities (`1+1=2`, `2*2=4`,
+  `(1/16)*(1/4)=1/64`) plus Interval left wall `<3` and right wall
+  `>0`. Not first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCRect`.
+- Added `omnibias.dynamics.stage_c_hit`: kill-line Stage-C
+  comparison first-hit identities (`1/(1/64)=64`, `64*3=192`,
+  `1-1/4096=4095/4096`) plus Interval time `<1024` to `h=1`. Not
+  Lohner, signed-label section, chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCHit`.
+- Added `omnibias.dynamics.stage_c_sec`: kill-line Stage-C
+  `E_out` comparison first-hit identities (`1/4-1/12=1/6`,
+  `(1/2)/2=1/4`, `1/64+1/256=5/256`) plus Interval `E_out>0` at
+  start, `dE/dh<0`, and `h_hit<1/8`. Not Lohner, chart O, C2, or
+  G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16StageCSec`.
+- Added `omnibias.dynamics.stage_c_oneshot`: kill-line Stage-C
+  Lohner first-hit identities (`(1/4)/(1/16)=4`, `120*(1/20)=6`,
+  `80*(1/20)=4`) plus unique transverse first-hit of matching-chart
+  `x=4` from `(x,y)=(1/4,1)` on `sep in {0, 3/5, 1}` at `eps=1/16`.
+  A short horizon of 80 steps does not certify. Not every `eps`,
+  chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCOneshot`.
+- Added `omnibias.dynamics.stage_c_oneshot_eps`: kill-line Stage-C
+  shrinking-eps Lohner identities (`(1/4)/(1/20)=5`,
+  `(1/4)/(1/25)=25/4`, `160*(1/20)=8`) plus unique transverse
+  first-hit of matching-chart `x=n/4` from `(x,y)=(1/4,1)` at
+  `eps=1/n` for `n in {16, 20, 25}`. A short horizon of 120 steps
+  at `n=20` does not certify. Not every `eps`, chart O, C2, or G1.
+  Lean: `OmnibiasAnalytic.Dynamics.Hilbert16StageCOneshotEps`.
+- Added `omnibias.dynamics.stage_c_eps_span`: kill-line Stage-C
+  parametric-eps Lohner identities (`23/400+1/200=1/16`,
+  `4*(1/800)=1/200`, `800*(1/16)=50`) plus unique transverse
+  first-hit of matching-chart `4 eps x=1` from `(x,y)=(1/4,1)` on
+  four slabs of width `1/800` covering `[23/400, 1/16]`. A single
+  slab over that compact is unresolved. Not every `eps`, chart O,
+  C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCEpsSpan`.
+- Added `omnibias.dynamics.stage_c_origin`: kill-line matching-chart
+  Lohner identities (`1-2/2=0`, `1-(3/2)/2=1/4`, `1-(7/4)/2=1/8`)
+  plus unique transverse first-hit of matching-chart `x=4` from
+  `(x,y)=(1/4,1)` on `sep in {3/2, 7/4, 2}` (`r1 in {1/4, 1/8, 0}`)
+  at `eps=1/16`. A short horizon of 120 steps at `sep=2` does not
+  certify. Not every `r1`, complete first-hit on chart O, C2, or G1.
+  Lean: `OmnibiasAnalytic.Dynamics.Hilbert16StageCOrigin`.
+- Added `omnibias.dynamics.stage_c_origin_span`: kill-line parametric-sep
+  matching-chart Lohner identities (`3/2+1/2=2`, `8*(1/16)=1/2`,
+  `16*(1/2)=8`) plus unique transverse first-hit of matching-chart
+  `x=4` from `(x,y)=(1/4,1)` on eight slabs of width `1/16` covering
+  `[3/2, 2]`. A single slab over that compact is unresolved. Not every
+  `r1`, complete first-hit on chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCOriginSpan`.
+- Added `omnibias.dynamics.stage_c_origin_iface`: kill-line nearer-interface
+  matching-chart Lohner identities (`7/4+1/4=2`, `8*(1/32)=1/4`,
+  `32*(1/4)=8`) plus unique transverse first-hit of matching-chart
+  `x=4` from `(x,y)=(1/8,1)` on eight slabs of width `1/32` covering
+  `[7/4, 2]`. A single slab over that compact is unresolved. Not every
+  `r1`, complete first-hit on chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCOriginIface`.
+- Added `omnibias.dynamics.stage_c_origin_near`: kill-line nearer-interface
+  matching-chart Lohner identities (`15/8+1/8=2`, `8*(1/64)=1/8`,
+  `64*(1/8)=8`) plus unique transverse first-hit of matching-chart
+  `x=4` from `(x,y)=(1/16,1)` on eight slabs of width `1/64` covering
+  `[15/8, 2]`. A single slab over that compact is unresolved. A short
+  horizon of 160 steps at `sep=2` does not certify. Not every `r1`,
+  complete first-hit on chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCOriginNear`.
+- Added `omnibias.dynamics.stage_c_origin_x32`: kill-line nearer-interface
+  matching-chart Lohner identities (`31/16+1/16=2`, `8*(1/128)=1/16`,
+  `128*(1/16)=8`) plus unique transverse first-hit of matching-chart
+  `x=4` from `(x,y)=(1/32,1)` on eight slabs of width `1/128` covering
+  `[31/16, 2]`. A single slab over that compact is unresolved. A short
+  horizon of 160 steps at `sep=2` does not certify. Not every `r1`,
+  complete first-hit on chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCOriginX32`.
+- Added `omnibias.dynamics.stage_c_compare`: kill-line comparison
+  identities (`2*1-1^2=1`, `(1/4)/(1/32)=8`, `310*(1/40)=31/4`) plus a
+  phase-wise Interval speed bound from `(x,y)=(1/4,1)` that reaches
+  `x=8` for every `r1` in `[0,1]` and every `eps` in `[1/32, 1/16]`.
+  Freezing `y` at `1` stalls. Not every `eps`, a Lohner tube, the
+  shrinking interface, complete first-hit on chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCCompare`.
+- Added `omnibias.dynamics.stage_c_uniform`: kill-line neck identities
+  (`1/4+7/4=2`, `70*(1/40)=7/4`, `2*(4-1/4)/(1/16)=120`) plus a
+  phase-wise `dy/dx` bound that keeps `dx/dσ >= eps/2` from
+  `(x,y)=(1/4,1)` for every `r1` in `[0,1]` and every `eps` in
+  `(0, 1/16]`, so the matching section `x=(1/4)/eps` is hit. Holding
+  `y` at `1` stalls. Not a Lohner tube, `eps>1/16`, the shrinking
+  interface, complete first-hit on chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCUniform`.
+- Added `omnibias.dynamics.stage_c_interface`: entrance identities
+  (`1+(1/2)*(1/2-2)=1/4`, `60*(1/40)=3/2`, `5*(1/4)/(1/16)^2=320`) plus
+  a neck bound from `x=1/2` that keeps `dx/dσ >= eps/5` for every start
+  in `(0, 1/2]`, every `r1` in `[0,1]`, and every `eps` in `(0, 1/16]`.
+  An interface `r1(1+theta)` in that interval is included. Holding `y`
+  at `1` stalls. Not a Lohner tube, the height-section flag, `eps>1/16`,
+  complete first-hit on chart O, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16StageCInterface`.
+- Added `omnibias.dynamics.sep_spre`: kill-line identities
+  (`2^48 * 2^{-48}=1`, `4/(1/2)=8`, `(3/16)(4-11/5)=27/80`) plus a
+  dyadic-plus-tail enclosure `sep * S_pre < 11/5` and `chi_b <= 8`
+  for every `sep` in `(0, 1]`. The `dx_e` log remainder on that
+  interval keeps the net exponent above `1/8`. Feeding `S = 4` into
+  the net floor stalls. Not `dx_e` off the kill line, uniform-in-chi,
+  Stage C, first-hit, C2, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16SepSpre`.
+- Added `omnibias.dynamics.dx_e_off`: identities (`1-5/8=3/8`,
+  `1/(1/2)=2`, `11/5+2=21/5`) plus an Interval enclosure
+  `h(sep/r1)<11/5` on `u in (0, 2]`. For every `lambda1` in
+  `[-4, -2]` and every `sep` in `(0, 1]`, the net exponent stays
+  above `1/8`, `chi_b <= 21/5`, and `C < 2`. Comparing `h` with
+  `1` stalls. Not `lambda1 < -4`, `lambda1` in `(-2, 0)`, Stage C,
+  first-hit, or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16DxEOff`.
+- Added `omnibias.dynamics.dx_e_ray`: identities (`2*1=2`,
+  `(3/8)/2=3/16`, `11/5+2=21/5`). For every `rstar >= 1` and every
+  `sep` in `(0, 1]`, the residence bound `X <= 2 rstar` keeps the
+  net exponent above `1/8`, `chi_b <= 21/5`, and `C < 2`. Dropping
+  the `rstar` surplus stalls. Not `lambda1` in `(-2, 0)`, Stage C,
+  first-hit, or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16DxERay`.
+- Added `omnibias.dynamics.dx_e_near`: identities (`3/4-5/8=1/8`,
+  `1/(1/4)=4`, `11/5+3=26/5`). For every `lambda1` in `[-3/2, -2)`
+  and every `sep` in `(0, 1]`, `h(u) < 11/5` on `u <= 4`, the net
+  exponent stays above `1/8`, `chi_b <= 26/5`, and `C < 2`. Dropping
+  the `rstar` surplus stalls. Not `lambda1` in `(-3/2, 0)`, Stage C,
+  first-hit, or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16DxENear`.
+- Added `omnibias.dynamics.dx_e_open`: identities
+  (`1-(5/8)*(8/5)=0`, `11/5+5=36/5`, `3/16-1/20=11/80`). For every
+  `lambda1` in `(-3/2, 0)` and every `sep` in
+  `(0, min(1, (8/5) rstar))`, the cap
+  `eps <= (1/6)/-(2 ln sep + ln(1/16))` keeps the net exponent
+  above `1/8` and `C < (1/5)/a`. Holding `eps = 1/16` at
+  `sep = 1/4096` stalls. Not Stage C, first-hit, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16DxEOpen`.
+- Added `omnibias.dynamics.weighted_section`: an exact negative assessment
+  of the proposed intrinsic `eta`-section. Weighted scalar hit-time
+  derivatives stay finite while ordinary `q=sep^2` derivatives grow as
+  `q^-1` and `q^-2` at D-C, and the chart-O matching speed vanishes with
+  `r1`. This falsifies H1 as a G1 discharge, not every possible closing
+  map. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16WeightedSection`.
+- Added `omnibias.dynamics.quasihomogeneous_dichotomy`: an exact
+  kill-sequence classification excluding every rational monomial scale
+  against a frozen `eps^N` section. The moving `eps^3 sep^2` section is an
+  exact scalar counterexample to excluding all weighted atlases, so G1 and
+  the Hilbert-XVI parent remain false. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16QuasihomogeneousDichotomy`.
+- Added `omnibias.dynamics.ln_format_barrier`: every finite direct
+  `tau`/log-W truncation has a certified two-function LN chain with fixed
+  degree and coefficients, while its outer radius and chain sup norm grow
+  linearly on the corrected kill sequence. This blocks the direct H3 format
+  route but leaves exact zero-preserving normalization open. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16LNFormatBarrier`.
+- Added `omnibias.core.verified.complex_ode` and
+  `omnibias.core.verified.complex_rootfind`, plus
+  `omnibias.dynamics.{complex_normal_flow,complex_event_branch,complex_separation_cover}`:
+  outward-rounded complexified flow and parametric complex interval Newton
+  isolate one event-time branch on an interior epsilon rectangle of the cubic
+  Hilbert-XVI normal-form comparison field and continue one regular event
+  across the complex `sep` rectangle containing both `sep=0` and `r1=0`.
+  Independent exact-source real stopped-event replays prove the first
+  transverse crossings. These are not the physical singular entry/exit map,
+  the full quadratic return family, LN membership, or G3.
+- Added `omnibias.dynamics.abelian_return_transfer`: exact rational threshold
+  arithmetic transfers a supplied Abelian zero cover to a supplied
+  first-order physical-return expansion. The named Picard--Fuchs identity
+  passes, but open DRR `I_2^1`/`I_4^1` lack a Hamiltonian reduction, derived
+  return remainder, and singular endpoint capture. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16AbelianReturnTransfer`.
+- Added `omnibias.dynamics.bautin_stabilization_barrier`: H5 derives
+  `V1` through `V4` for Bautin's normalized quadratic family and certifies
+  `V4 in (V1,V2,V3)` with exact-Q cofactors. A formal next coefficient with
+  nonzero Gröbner remainder proves that finite jets alone do not establish
+  the all-orders tail. `finite_order_stabilization_verified` is now separate
+  from the always-false `bautin_ideal_stabilization_proved`; G2 remains open.
+  Lean: `OmnibiasAnalytic.Dynamics.Hilbert16BautinJetBarrier`.
+- Added `omnibias.dynamics.songling_lower_bound`: H6 transcribes the exact
+  Songling quadratic source and published four-cycle section data. It proves
+  that binary64 interval cancellation encloses the governing
+  `8*epsilon=-8*10^-52` perturbation by an interval containing zero.
+  Galias--Tucker's rigorous 2048-bit exactly-four-cycle theorem predates this
+  audit; omnibias does not replay its four returns. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16SonglingPrecision`.
+- Added `omnibias.geometry.part_a_obstruction`: H7 validates the exact
+  22-annulus polygonal layout for the wide/deep open `(19,3)` octic target,
+  certifies a toy Positivstellensatz emptiness witness, and records the
+  45-variable SOS Gram growth. No finite basic-closed encoding or symmetry
+  reduction covers every realization, so neither open scheme is obstructed
+  and no 22-oval polynomial is produced. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16PartAPolygonSOS`.
+- Added `omnibias.dynamics.e_sigma_eps_lo`: six `eps`-slabs
+  covering `[1/64, 1/16]` from aligned `(V,h)=(1/4,1/40)` certify
+  GRAZING `E_sigma` at `L=0`; the last slab certifies on
+  `L in {9/25, 1/16}`. Not every `eps`, not Lohner from `V=0` on
+  that compact, not `Z_x` C2 or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaEpsLo`.
+- Added `omnibias.dynamics.e_sigma_eps_span`: three `eps`-slabs
+  covering `[1/25, 1/16]` from aligned `(V,h)=(1/4,1/40)` certify
+  GRAZING `E_sigma` at `L=0`; the last slab certifies on
+  `L in {9/25, 1/16}`. Not every `eps`, not Lohner from `V=0` on
+  that compact, not `Z_x` C2 or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ESigmaEpsSpan`.
+- Added `omnibias.dynamics.z_x_gap`: unfrozen-Z first-log-derivative
+  gap identities including `Z_x` versus the lifted fold. Not a bound
+  on `Z_x`, `sep>0`, or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ZXGap`.
+- Added `omnibias.dynamics.e_out_eps`: matching-chart `E_out` first-hit
+  on the finite shrinking pack `eps=1/n` for `n in {16, 20, 25}` at
+  `L=0` inside `T=n^2/8`. Not a uniform-in-`eps` theorem or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16EOutEps`.
+- Added `omnibias.dynamics.e_out_section`: matching-chart `E_out`
+  first-hit of `x=rho/nu` under `V=-eps x` on `L in {9/25, 1/16, 0}`
+  including the kill limit; GRAZING `E_sigma` excluded. Not uniform
+  `eps->0` or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16EOutSection`.
+- Added `omnibias.dynamics.vh_orbit`: QR-Lohner prefix of the cubic
+  `(V,h)` field plus certified first-hit of `V=-1/4`. Not the physical
+  `E_sigma` section or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16VhOrbit`.
+- Added `omnibias.dynamics.th_integral`: comparison-bootstrap integral of
+  `(T-h)_h` after `T<=K(eps^2+h)`; majorant `< 9 eps` on a declared
+  compact. Not a Lohner orbit or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ThIntegral`.
+- Added `omnibias.dynamics.orbit_th`: actual-versus-comparison `T_h`
+  gap equals `k-1` at flux touching. Not an integrated `T-h` orbit or
+  G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16OrbitTh`.
+- Added `omnibias.dynamics.height_mix`: `C!=0` `ell`/`V` mixing with
+  `|g_h|=O(nu^2)` on a declared compact. Not `T-h` along the orbit or
+  G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16HeightMix`.
+- Added `omnibias.dynamics.cancelled_n`: cancelled-N holomorphic `Z`
+  on `lambda1=-2`, `L in [0, 1]`, with `2 eps |V| |Z| < 1` on a
+  declared real slow-line compact. Not `T-h` along the orbit, `C!=0`
+  `|g_h|`, or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16CancelledN`.
+- Added `omnibias.dynamics.q_ratio_c2`: on `lambda1=-2` the leading
+  `|q|` ratio is `<2` for every `x`, uniformly in `r1->0`. Not
+  `k=1+O(eps)` or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16QRatioC2`.
+- Added `omnibias.dynamics.k_zeta_remainder`: on `C=0`, `A=1` the
+  normal `k` is `1+O(nu)` with exact `O(nu^2)` remainder versus the
+  `V`-jet; cubic correction past two-root leading is `eps^4 x^3/3`.
+  Not a `Z` bound or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16KZetaRemainder`.
+- Added `omnibias.dynamics.kill_zeta`: Cauchy majorant for `Z` on
+  `lambda1=-2`, `L in [0, 1]`, including the kill limit `L=0`.
+  Rectangular and not small enough for `C=2+delta` or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16KillZeta`.
+- Added `omnibias.dynamics.height_envelope`: `C=0` comparison conserves
+  `T-h = T_e-h_e`; `|q|/(eps(eps^2+T))` at matching is independent of
+  `eps` and bounded as `r1->0`. Not height-section first-hit or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16HeightEnvelope`.
+- Added `omnibias.dynamics.post_corridor`: after the shrinking-root
+  x-corridor, `T_*=Theta(eps^2)` and `(h/h_e)^(C eps)->1`
+  independently of `r1`; leading `T_h > 1/2` at a fixed `y0`. Not
+  height-section first-hit or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16PostCorridor`.
+- Added `omnibias.dynamics.outgoing_corridor`: cleared two-root I-map
+  from `r1(1+theta)` to a compact `x_*`, with `r1 log r1` majorized by
+  `2 sqrt(r1)-2 r1`. Not height-section first-hit or G1. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16OutgoingCorridor`.
+- Added `omnibias.dynamics.physical_c2`: frozen-Z first-log-derivative
+  and C2 remainder identities versus the lifted fold. Not `Z_x`,
+  `sep>0`, or G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16PhysicalC2`.
+- Added `omnibias.dynamics.fold_zeta`: Cauchy majorant for `Z` on a
+  declared real fold compact `rstar in [1.4, 1.6]` with Picard-included
+  `k`. Disc identities `lambda1^2 = 4 L = 4 r^2`. Not physical C2 or
+  G1. Lean: `OmnibiasAnalytic.Dynamics.Hilbert16FoldZeta`.
+- Added `omnibias.dynamics.canonical_zeta`: algebraic `r=-1` slow-line
+  `zeta` on the `lambda0=lambda1=0` slice, with a rectangular Cauchy
+  majorant for `Z` at `(0,0)`. The fold `(L, lambda1)` compact is
+  `omnibias.dynamics.fold_zeta`. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16CanonicalZeta`.
+- Added `omnibias.dynamics.fold_leading`: exact `sep = 0` slow-line
+  I-map first derivative `dx/dkappa = delta^2/(r-delta)` and leading C2
+  of `log(dx/dkappa)`. Gronwall `sigma*kappa` is not the leading map;
+  G1 stays open (remainder versus `B_eps`, chart O, first-hit). Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16FoldLeading`.
+- Added `omnibias.dynamics.shrinking_root_leading`: exact two-root
+  I-map and the `r1 -> 0` remainder. Outgoing first-hit of the large
+  first-root section stays open. Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16ShrinkingRoot`.
+
+### Added — Tracked Hilbert-16 entry-exit product
+
+- Added `omnibias.dynamics.entry_exit_leading`: exact slow-line
+  partial-fraction leading map and the tracked
+  `sep^2 * (h_1/(eps^3 mu sep^2))^(C eps)` product identity. The
+  super-small W-ratio is absorbed in the first derivative; G1 stays
+  open (`sep = 0`, C2, chart O). Lean:
+  `OmnibiasAnalytic.Dynamics.Hilbert16EntryExit`.
+
+### Added — Focal/Bautin engine, derived Dulac corner maps, collar membership, H16 ledger
+
+- Added `omnibias.holonomic._core.groebner`: a genuine exact-`Q` Buchberger
+  engine (`lex`/`grlex`/`degrevlex`, multivariate division, both Buchberger
+  pair-skipping criteria, reduced/monic/minimal basis, `ideal_member` /
+  `radical_member` with a replayable cofactor witness, and a
+  `GroebnerBudget` that raises `GroebnerBudgetExceeded` loudly rather than
+  running unbounded).
+- Added `omnibias.dynamics.focal`: exact homological-equation
+  Poincare-Lyapunov focal values, solved degree by degree over `Q` (or
+  `Q[params]`), with `certify_focal_values` sealing the single `F_dot`
+  identity as a `polynomial_identity_q` obligation. The first nonzero focal
+  value is a genuine gauge-independent invariant; later ones are documented
+  as gauge-dependent.
+- Added `omnibias.dynamics.bautin`: the Bautin (focal-value) ideal's
+  Groebner basis and center-variety membership on top of the new engine,
+  including Bautin's classical quadratic family (basis length 3,
+  cross-checked against an independent `sympy` Groebner computation in the
+  test suite) and a Hamiltonian structural-zero example.
+  `bautin_ideal_stabilization_proved` is always `False`.
+- Added `omnibias.dynamics.saddle_normal_form`: exact Poincare-Dulac
+  resonant normal forms at a hyperbolic saddle with rational eigenvalues,
+  and `dulac_corner_expansion`, a first-order **derived** (no longer
+  hand-declared) `x^r log x` corner map read mechanically off the normal
+  form's resonant monomials, plus `derive_return_map` composing it with a
+  certified regular-arc return Jacobian.
+- Added `omnibias.dynamics.membership`: `certify_collar_membership`, a
+  sound interval-overlap agreement between a declared and a field-derived
+  Dulac model on a collar `x in [delta, delta0]` bounded away from the
+  corner, including an `interval_newton` unique-limit-cycle proof when the
+  enclosure allows it. `corner_window_external` stays `True` and
+  `physical_return_membership_proved` stays `False` on every certificate.
+- Added `omnibias.dynamics.hilbert16_ledger`: a machine-checked Hilbert-16
+  obligation ledger (every gate `G1`-`G6`, every dated DRR case, and the
+  Part-A 22-oval-octic target as one `H16Obligation` each) whose
+  `full_hilbert16_solved` / `hilbert16_part_a_solved` /
+  `hilbert16_part_b_quadratic_solved` parent flags are **derived** from the
+  entries and can never be stamped or forged from a stored payload.
+  `DISCHARGED_LOCAL_SCOPE` records this plan's genuinely new narrow results
+  without letting them leak into a parent claim. Every flag is `False` on
+  the shipped ledger.
+- Wired the new certificates into `omnibias.dynamics.graphic.GraphicTarget`
+  as optional inputs: `focal_values_computed` and
+  `bautin_ideal_stabilization_proved` now genuinely reflect an attached
+  certificate instead of being hardcoded, and a new
+  `collar_return_membership_proved` flag reports an attached
+  `collar_status`. `physical_return_membership_proved`,
+  `graphic_finite_cyclicity_proved`, `drr_case_closed`, and
+  `full_hilbert16_solved` remain `False`.
+- Added `benchmarks/hilbert16_focal.py` (gates GF1-GF7) and
+  `benchmarks/hilbert16_ledger.py` (gates G1-G4), plus
+  `docs/api/groebner.md` and `docs/api/focal_bautin.md`.
+
+### Added — Hilbert XVI symbolic finite fronts
+
+- Added `omnibias.geometry.patchwork`: exact Newton lattices, complete
+  unimodular-triangulation checks, Viro quadrant signs, projective T-curve
+  components, and rooted complement-region nesting. GP1 replays a four-oval
+  quartic exactly.
+- Added exact rational regular-height systems and both feasible and Farkas
+  infeasibility certificates. Floating convex optimization is proposal-only;
+  all accepted inequalities and dual identities replay over `Q`, including
+  the standard six-point nonregular planar triangulation.
+- Generalized algebraic-curve barriers to rational simple polygonal annuli.
+  The existing 16-oval octic recertifies through that path. Its exact Bezout
+  coefficient identities and signed Bernstein margins feed the new
+  `polynomial_identity_q` Mathlib-free Lean obligation.
+- Moved generated-obligation locking beside the shared Lean build artifacts,
+  so concurrent formal checks cannot overwrite one another across compute hosts.
+- Added an incomplete `FiniteFamily` patchwork search with CSP and annealed
+  sign proposals, plus explicit-\(F_t\) direct acceptance. The smoke reports
+  `search_incomplete`; an eight-seed, 16,384-candidate sweep agrees. No 22-oval
+  target hit is claimed and GP5 remains false.
+- Extended `omnibias.dynamics.abelian` to a four-component
+  `(A, B, J0, J1)` view of the rank-two cubic Gauss--Manin system and the
+  nonsingular base quadrature for `B = integral x*y dx`. The exact identities
+  reducing `A,B` to `J0,J1` are replayed explicitly. GA7 certifies two zeros of a genuine
+  `alpha*A + beta*B` instance with `beta != 0`; both old planted roots are
+  excluded and `forced_factor_instance=False`.
+- Added interval-coefficient winding with bisection on blocked leaves and a
+  finite rational coefficient cover with uniform bound two. The new
+  `box_cover_tiling` obligation makes Lean reconstruct every rational split
+  and check all leaf bounds, with a linked winding-isolation obligation for
+  every leaf. This is a finite coefficient-box infinitesimal
+  result, not `H(2) < infinity` or a full Hilbert-XVI solution.
+- Added `omnibias.dynamics.compactify`: exact-Q Poincare charts `U1/U2/U3`,
+  invariant-equator coefficient identities, exact rational equator roots, and
+  interval-Newton isolation of the remaining simple real roots.
+- Added `omnibias.dynamics.dulac` and `.graphic`: rational and resonant finite
+  Dulac expansions map exactly through `x=exp(-kappa)` to the existing
+  confluent-exponential zero counter; interval exponent boxes use the verified
+  power compensator and an exact rational cover. Named model bounds are two,
+  two, and zero. They are truncated-model bounds only: physical return-map
+  membership, a uniform remainder theorem, graphic finite cyclicity, DRR-case
+  closure, and full Hilbert XVI remain false.
+- Added GD1--GD6 in `benchmarks/dulac_cyclicity.py`. The final gate preserves
+  the saddle-node-at-infinity coalescing-root and central-capture obstruction
+  as `BLOCKED`; exact compactification is not presented as a repair of G1/G4.
+
+### Added — Hilbert XVI LN/exp passage obstruction
+
+- Added a strict finite Log-Noetherian substrate in
+  `omnibias.core.verified.log_noetherian`: LN fibers/cells, exact-Q chain
+  closure, split format/sup bounds, logarithmic-chart Cauchy and monomial
+  estimates, sealed replay, and minimal-kernel `ln_chain_closure` /
+  `ln_format_bound` obligations. It does not assert physical Dulac-map
+  membership.
+- `omnibias.dynamics.ln_passage` and `HILBERT16-LN-PASSAGE.md` test the
+  proposed cell cover. The printed `L=1, lambda1=-3` kill tuple is rejected
+  by `sep^2=lambda1^2-4L`; on the corrected path
+  `L=(9-sep^2)/4` the matching W-ratio still diverges. The proposed
+  shrinking-root radius `r1-theta*sep` is eventually negative.
+- GL1–GL7 in `docs/benchmarks/hilbert16_ln_passage_smoke.json` pass as a
+  finite negative assessment: coordinate algebra and a regular stopped event
+  replay, with physical LN membership, singular first-hit completeness, C2
+  remainders, G1, G4, and full Hilbert XVI all false.
+
+### Added — certified Abelian-integral zero count (historical baseline)
+
+- Added a cubic elliptic forced-factor argument-principle track:
+  `omnibias.holonomic.certify_picard_fuchs` derives and certifies the exact
+  `Q[h]` syzygy, while `omnibias.core.verified.continue_dfinite` provides
+  realified validated complex continuation.
+- `omnibias.dynamics.abelian` combines nonsingular turning-point quadrature,
+  an argument-principle upper count, and Krawczyk simple-real-zero lower
+  boxes. The named `H=y^2+x^3-x`, `r(h)=h^2-1/64` instance collapses to
+  exactly two zeros after an exact critical-strip check records the
+  hypergeometric zero-free domain for the distinguished action; a zero on
+  the contour is `BLOCKED`. This is not a reproduction of Petrov's
+  parameter-uniform sharp theorem.
+- GA1–GA6 introduced the forced-factor baseline in
+  `docs/benchmarks/abelian_zero_count_smoke.json`. Genuine Lean builds check
+  only the cleared-denominator matrix syzygy and winding integer isolation.
+  GA7–GA8 now extend that artifact with the mixed-period instance and finite
+  rational coefficient cover described above. None is a degree-uniform bound
+  or a finiteness claim for `H(n)`.
+
 ### Added — Hilbert XVI next-atlas scale dichotomy
 
 - `HILBERT16-NEXT-ATLAS.md` records six on-path attempts against the
@@ -155,6 +875,20 @@ distributions is versioned independently under semantic versioning.
   Boussinesq remainder stays a grid hull; `lambda_n` is a hypothesis.
   Smokes: `docs/benchmarks/ipm_remainder_cap_smoke.json`,
   `docs/benchmarks/boussinesq_remainder_cap_smoke.json`.
+
+### Added — Deep-network Laplacian fast lane (theory 09-33)
+
+- `omnibias.core.contraction`: support-grouped multinomial tables,
+  `select_mode`, `DEFAULT_SUPPORT_BUDGET`, and `polylaplacian_normalizer`.
+- `omnibias.{torch,jax}.laplacian`: `deep_field_value_grad_laplacian`,
+  `deep_field_laplacian`, `deep_field_polylaplacian`,
+  `deep_field_polylaplacian_with_report`, `restrict_first_layer`. Three-tier
+  dispatch: Tier A forward-Laplacian recursion (`k = 1`, any `D`); Tier B
+  exact support-grouped local jets (`k >= 2`, budget-limited); Tier C unbiased
+  sphere estimator with stderr and `hoeffding_enclosure`.
+- PINN field rewire on `JetMLPVectorField` plus `_fast_lane_layer_groups` /
+  `_fast_lane_contract` hooks for DeepONet and Mscale band mixtures.
+- Smoke: `docs/benchmarks/deep_laplacian_scaling_smoke.json`.
 
 ### Added — Open-system Lindblad dynamics (theory 09-32)
 

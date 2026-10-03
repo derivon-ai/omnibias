@@ -146,6 +146,7 @@ from omnibias.core.lindblad import (
     honesty_payload as lindblad_honesty_payload,
 )
 from omnibias.core.line_search import (
+    GradientSecant,
     JetLineSearchConfig,
     LineSearchResult,
     certified_truncation_radius,
@@ -344,6 +345,7 @@ __all__ = [
     "FermiModel",
     "FlowSystem",
     "FrameSpec",
+    "GradientSecant",
     "HardyAtom",
     "HardyDictionary",
     "Indicator",

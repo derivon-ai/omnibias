@@ -1,0 +1,365 @@
+{
+  "schema": "omnibias.benchmarks.hilbert16_ln_passage.v1",
+  "generated_utc": "2026-09-14T13:28:55Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.14.0rc1",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "absent"
+  },
+  "config": {
+    "full": false,
+    "lean": false,
+    "max_n": 128,
+    "seed": 16041
+  },
+  "rss_mb_at_start": 629.77,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "gl1_exact_coordinate_chain",
+        "passed": true,
+        "perturbed_chain_rejected": true
+      },
+      {
+        "name": "gl2_delta_sup_enclosures",
+        "passed": true,
+        "dense_and_seeded_random_contained": true,
+        "zero_delta_margin_refused": true,
+        "deterministic_points": 27,
+        "random_points": 32
+      },
+      {
+        "name": "gl3_conditional_log_c2",
+        "passed": true,
+        "physical_uniform_c2": false
+      },
+      {
+        "name": "gl4_kill_a_failure_localized",
+        "passed": true,
+        "printed_fixed_L_tuple_rejected": true
+      },
+      {
+        "name": "gl5_kill_b_failure_localized",
+        "passed": true,
+        "old_fixed_theta_wall_fails": true
+      },
+      {
+        "name": "gl6_admission_refusal_is_explicit",
+        "passed": true,
+        "physical_first_hit_complete": false
+      },
+      {
+        "name": "gl7_seals_and_formal_tier",
+        "passed": true,
+        "lean_requested": false,
+        "theorem_prover_verified": false
+      }
+    ]
+  },
+  "coordinate_evidence": {
+    "chain_valid": true,
+    "sup_enclosures": {
+      "epsilon": [
+        "0x1.9999999999997p-6",
+        "0x1.0000000000003p-3"
+      ],
+      "sep": [
+        "0x1.0c6f7a0b5ed8ap-20",
+        "0x1.0000000000003p+1"
+      ],
+      "W": [
+        "0x1.ffffffffffffdp-2",
+        "0x1.0000000000003p+3"
+      ],
+      "radius": [
+        "0x1.fffffffffffffp-1",
+        "0x1.0000000000001p+0"
+      ]
+    },
+    "format": {
+      "cell_format": [
+        7,
+        1
+      ],
+      "combinatorial_part": [
+        20,
+        1
+      ],
+      "sup_contribution": {
+        "lo": 0.0,
+        "hi": 11.125000000000007
+      }
+    },
+    "certificate_valid": true,
+    "conditional_c2_bound": [
+      "-0x0.0000000000001p-1022",
+      "0x1.cb7bd25caa600p+5"
+    ],
+    "weighted_coordinate_replay": true,
+    "physical_phi_member": false,
+    "physical_uniform_c2": false,
+    "reason": "the exact chain contains coordinate polynomials only; tau/log, the physical first-hit map, and their holomorphic sup bounds are absent",
+    "certificate_digest": "sha256:8c38356abb247fa528b630ed3acb4a31f369d7af7b38a1d7447c6636ebc02106",
+    "closure_obligation_digest": "sha256:efb9c0bd96e7c6458e68fd1e2a8d96c276a1ed9cafe610628ffe8cf62d9ad739",
+    "format_obligation_digest": "sha256:bc9f803a1e39b71212af2d6dd9c5ba0aa8652d2035e40d76b53823ca900b3f2e"
+  },
+  "kill_a_sweep": [
+    {
+      "name": "kill_super_small_sep_corrected",
+      "cell": "cellA",
+      "pointwise_in_cell": true,
+      "uniform_format_bounded": false,
+      "positive_radius_margin": true,
+      "failing_chain_function": "physical_outgoing_matching_W_ratio",
+      "reason": "tau=epsilon*log(1/sep)=1/epsilon and every existing-section log(W_max/W_e)=2/epsilon+O(epsilon*|log epsilon|) diverges",
+      "values": {
+        "epsilon": 0.25,
+        "log_sep": -16.0,
+        "sep": 1.1253517471925912e-07,
+        "lambda1": -3.0,
+        "L": 2.249999999999997,
+        "tau": 4.0,
+        "quadratic_relation_holds": true,
+        "log_W_ratio_eps_0": 9.039720770839917,
+        "log_W_ratio_eps_3": 8.0,
+        "log_W_ratio_eps_4": 7.653426409720027
+      }
+    },
+    {
+      "name": "kill_super_small_sep_corrected",
+      "cell": "cellA",
+      "pointwise_in_cell": true,
+      "uniform_format_bounded": false,
+      "positive_radius_margin": true,
+      "failing_chain_function": "physical_outgoing_matching_W_ratio",
+      "reason": "tau=epsilon*log(1/sep)=1/epsilon and every existing-section log(W_max/W_e)=2/epsilon+O(epsilon*|log epsilon|) diverges",
+      "values": {
+        "epsilon": 0.125,
+        "log_sep": -64.0,
+        "sep": 1.603810890548638e-28,
+        "lambda1": -3.0,
+        "L": 2.25,
+        "tau": 8.0,
+        "quadratic_relation_holds": true,
+        "log_W_ratio_eps_0": 16.779790578129937,
+        "log_W_ratio_eps_3": 16.0,
+        "log_W_ratio_eps_4": 15.74006980729002
+      }
+    },
+    {
+      "name": "kill_super_small_sep_corrected",
+      "cell": "cellA",
+      "pointwise_in_cell": true,
+      "uniform_format_bounded": false,
+      "positive_radius_margin": true,
+      "failing_chain_function": "physical_outgoing_matching_W_ratio",
+      "reason": "tau=epsilon*log(1/sep)=1/epsilon and every existing-section log(W_max/W_e)=2/epsilon+O(epsilon*|log epsilon|) diverges",
+      "values": {
+        "epsilon": 0.08333333333333333,
+        "log_sep": -144.0,
+        "sep": 2.8946403116483003e-63,
+        "lambda1": -3.0,
+        "L": 2.25,
+        "tau": 12.0,
+        "quadratic_relation_holds": true,
+        "log_W_ratio_eps_0": 24.621226662447,
+        "log_W_ratio_eps_3": 24.0,
+        "log_W_ratio_eps_4": 23.792924445851
+      }
+    },
+    {
+      "name": "kill_super_small_sep_corrected",
+      "cell": "cellA",
+      "pointwise_in_cell": true,
+      "uniform_format_bounded": false,
+      "positive_radius_margin": true,
+      "failing_chain_function": "physical_outgoing_matching_W_ratio",
+      "reason": "tau=epsilon*log(1/sep)=1/epsilon and every existing-section log(W_max/W_e)=2/epsilon+O(epsilon*|log epsilon|) diverges",
+      "values": {
+        "epsilon": 0.0625,
+        "log_sep": -256.0,
+        "sep": 6.616261056709485e-112,
+        "lambda1": -3.0,
+        "L": 2.25,
+        "tau": 16.0,
+        "quadratic_relation_holds": true,
+        "log_W_ratio_eps_0": 32.51986038541996,
+        "log_W_ratio_eps_3": 32.0,
+        "log_W_ratio_eps_4": 31.826713204860013
+      }
+    }
+  ],
+  "kill_b_sweep": [
+    {
+      "name": "kill_shrinking_root",
+      "cell": "cellB",
+      "pointwise_in_cell": false,
+      "uniform_format_bounded": false,
+      "positive_radius_margin": false,
+      "failing_chain_function": "a(L,lambda1)=r1-theta*sep",
+      "reason": "the proposed radius tends to -2*theta and is eventually negative; the positive relative replacement (1-theta)*r1 still loses the absolute physical transversality margin as r1 tends to zero",
+      "values": {
+        "n": 8.0,
+        "L": 0.125,
+        "lambda1": -2.0,
+        "sep": 1.8708286933869707,
+        "r1": 0.06458565330651465,
+        "proposed_radius": -0.1692679333668567,
+        "relative_radius": 0.05651244664320032,
+        "quadratic_relation_holds": true
+      }
+    },
+    {
+      "name": "kill_shrinking_root",
+      "cell": "cellB",
+      "pointwise_in_cell": false,
+      "uniform_format_bounded": false,
+      "positive_radius_margin": false,
+      "failing_chain_function": "a(L,lambda1)=r1-theta*sep",
+      "reason": "the proposed radius tends to -2*theta and is eventually negative; the positive relative replacement (1-theta)*r1 still loses the absolute physical transversality margin as r1 tends to zero",
+      "values": {
+        "n": 16.0,
+        "L": 0.0625,
+        "lambda1": -2.0,
+        "sep": 1.9364916731037085,
+        "r1": 0.03175416344814578,
+        "proposed_radius": -0.2103072956898178,
+        "relative_radius": 0.027784893017127558,
+        "quadratic_relation_holds": true
+      }
+    },
+    {
+      "name": "kill_shrinking_root",
+      "cell": "cellB",
+      "pointwise_in_cell": false,
+      "uniform_format_bounded": false,
+      "positive_radius_margin": false,
+      "failing_chain_function": "a(L,lambda1)=r1-theta*sep",
+      "reason": "the proposed radius tends to -2*theta and is eventually negative; the positive relative replacement (1-theta)*r1 still loses the absolute physical transversality margin as r1 tends to zero",
+      "values": {
+        "n": 32.0,
+        "L": 0.03125,
+        "lambda1": -2.0,
+        "sep": 1.9685019685029528,
+        "r1": 0.015749015748523623,
+        "proposed_radius": -0.2303137303143455,
+        "relative_radius": 0.01378038877995817,
+        "quadratic_relation_holds": true
+      }
+    },
+    {
+      "name": "kill_shrinking_root",
+      "cell": "cellB",
+      "pointwise_in_cell": false,
+      "uniform_format_bounded": false,
+      "positive_radius_margin": false,
+      "failing_chain_function": "a(L,lambda1)=r1-theta*sep",
+      "reason": "the proposed radius tends to -2*theta and is eventually negative; the positive relative replacement (1-theta)*r1 still loses the absolute physical transversality margin as r1 tends to zero",
+      "values": {
+        "n": 64.0,
+        "L": 0.015625,
+        "lambda1": -2.0,
+        "sep": 1.984313483298443,
+        "r1": 0.007843258350778528,
+        "proposed_radius": -0.24019592706152684,
+        "relative_radius": 0.006862851056931212,
+        "quadratic_relation_holds": true
+      }
+    }
+  ],
+  "invalid_printed_kill_a": {
+    "epsilon": 0.1,
+    "L": 1.0,
+    "lambda1": -3.0,
+    "sep": 3.720075976020889e-44,
+    "relation_residual": -5.0,
+    "is_quadratic_family_point": false
+  },
+  "admission": {
+    "checks": [
+      {
+        "cell": "cellA",
+        "name": "algebraic_relation_after_substitution",
+        "status": "identically_zero",
+        "enclosure": {
+          "lo": 0.0,
+          "hi": 0.0
+        }
+      },
+      {
+        "cell": "cellA",
+        "name": "positive_coordinate",
+        "status": "nowhere_zero",
+        "enclosure": {
+          "lo": 0.24999999999999992,
+          "hi": 0.5000000000000003
+        }
+      },
+      {
+        "cell": "cellB",
+        "name": "algebraic_relation_after_substitution",
+        "status": "identically_zero",
+        "enclosure": {
+          "lo": 0.0,
+          "hi": 0.0
+        }
+      },
+      {
+        "cell": "cellB",
+        "name": "positive_relative_radius",
+        "status": "nowhere_zero",
+        "enclosure": {
+          "lo": 0.24999999999999992,
+          "hi": 0.5000000000000003
+        }
+      },
+      {
+        "cell": "cellAB",
+        "name": "overlap_coordinate",
+        "status": "nowhere_zero",
+        "enclosure": {
+          "lo": 0.24999999999999992,
+          "hi": 0.5000000000000003
+        }
+      }
+    ],
+    "ambiguous_control": {
+      "cell": "negative_control",
+      "name": "crossing_guard",
+      "status": "unresolved",
+      "enclosure": {
+        "lo": -0.12500000000000014,
+        "hi": 0.1250000000000003
+      }
+    },
+    "finite_compatible": true,
+    "small_label_tube": {
+      "u": 1.0,
+      "tbox": 0.4,
+      "strict": true
+    },
+    "physical_first_hit_complete": false,
+    "reason": "guard compatibility does not prove existence, no earlier hit, or transversality of the singular physical continuation"
+  },
+  "regular_arc": {
+    "certified": true,
+    "replayed": true,
+    "status": "certified",
+    "reason": "unique transverse first positive event; competitors excluded",
+    "physical_singular_tail": false
+  },
+  "overlap": {
+    "coordinate_identity": true,
+    "physical_map_matching": false,
+    "reason": "physical uniqueness applies only after both first-hit continuations exist on the overlap"
+  },
+  "lean_results": {},
+  "g1_passed": false,
+  "full_hilbert16_solved": false,
+  "disclaimer": "All gates certify the finite negative assessment: corrected kill A has an unbounded physical matching quantity and kill B makes the proposed radius negative. Not physical LN membership, G1, or Hilbert XVI."
+}

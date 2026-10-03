@@ -151,8 +151,19 @@ Recall `L = -lambda0` from [the first-root note](HILBERT16-ROOT-SADDLE.md).
 
 **SR2 rematch verdict: fail.** Incoming first-hit at `V = u` is retained.
 Outgoing first-hit of the selected large first-root section is not recovered
-by any existing height theorem along `L_n = 1 / n`, `lambda1 = -2`. The
-joint corner `lambda1 -> 0` and `L -> 0` stays the boundary-reduction
+on `L_n = 1/n`. The two-root I-map of
+`omnibias.dynamics.shrinking_root_leading` is the leading slow-line
+derivative as `r1 -> 0`. The rescaled slow ODE tends to
+`xi' = r2 (1 - xi)`, whose attractor is `xi = 1`. That limiting ODE is
+not outgoing first-hit of the large physical first-root section. The
+[outgoing corridor](HILBERT16-OUTGOING-CORRIDOR.md) bounds the slow time
+from `x = r1(1+theta)` to a compact physical `x_*`. The
+[post-corridor matching](HILBERT16-POST-CORRIDOR.md) restores
+`T_* = Theta(eps^2)` independently of `r1`; it does not restore a
+uniform `a_min` at the colliding root or height-section first-hit.
+
+Lean: [Hilbert16ShrinkingRoot.lean](../../formal/omnibias-analytic/OmnibiasAnalytic/Dynamics/Hilbert16ShrinkingRoot.lean).
+The joint corner `lambda1 -> 0` and `L -> 0` stays the boundary-reduction
 weighted chart. The exact identity `2 r1 + sep + lambda1 = 0` of
 [the next-atlas note](HILBERT16-NEXT-ATLAS.md) shows this axis is disjoint
 from `sep -> 0` at fixed `lambda1 < 0`; a joint `(sep, L)` chart does not

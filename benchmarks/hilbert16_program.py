@@ -72,6 +72,22 @@ FORMAL_MODULES = (
     "Hilbert16Rolle", "Hilbert16Parabola", "Hilbert16Resonance",
     "Hilbert16ReturnMap", "Hilbert16Scale", "Hilbert16ChiScale",
     "Hilbert16SaddleNode", "Hilbert16TwoBlowup", "Hilbert16ScaleDichotomy",
+    "Hilbert16WeightedSection", "Hilbert16QuasihomogeneousDichotomy",
+    "Hilbert16LNFormatBarrier", "Hilbert16AbelianReturnTransfer",
+    "Hilbert16LNCell", "Hilbert16EntryExit", "Hilbert16StageB", "Hilbert16StageA", "Hilbert16ChiB", "Hilbert16DxELeading", "Hilbert16DxEUnif", "Hilbert16StageC", "Hilbert16StageCExit", "Hilbert16StageCTh", "Hilbert16StageCGap", "Hilbert16StageCEnv", "Hilbert16StageCIf", "Hilbert16StageCInt", "Hilbert16StageCLo", "Hilbert16StageCK", "Hilbert16StageCBoot", "Hilbert16StageCRect", "Hilbert16StageCHit", "Hilbert16StageCSec", "Hilbert16StageCOneshot", "Hilbert16StageCOneshotEps", "Hilbert16StageCEpsSpan", "Hilbert16StageCOrigin", "Hilbert16StageCOriginSpan", "Hilbert16StageCOriginIface", "Hilbert16StageCOriginNear", "Hilbert16StageCOriginX32", "Hilbert16StageCCompare", "Hilbert16StageCUniform", "Hilbert16StageCInterface", "Hilbert16SepSpre", "Hilbert16DxEOff", "Hilbert16DxERay", "Hilbert16DxENear", "Hilbert16DxEOpen", "Hilbert16FoldLeading",
+    "Hilbert16ShrinkingRoot", "Hilbert16CanonicalZeta", "Hilbert16FoldZeta",
+    "Hilbert16PhysicalC2", "Hilbert16ZXGap", "Hilbert16ZVBound", "Hilbert16ZSlowV", "Hilbert16FoldZX", "Hilbert16OutgoingCorridor",
+    "Hilbert16PostCorridor", "Hilbert16HeightEnvelope",
+    "Hilbert16QRatioC2", "Hilbert16KZetaRemainder",
+    "Hilbert16KillZeta", "Hilbert16CancelledN", "Hilbert16HeightMix",
+    "Hilbert16OrbitTh", "Hilbert16ThIntegral", "Hilbert16VhOrbit",
+    "Hilbert16EOutSection", "Hilbert16EOutEps", "Hilbert16EOutSpeed",
+    "Hilbert16ESigmaSpeed", "Hilbert16ESigmaIn", "Hilbert16ESigmaHit",
+    "Hilbert16ESigmaFrom0", "Hilbert16ESigmaUnif", "Hilbert16ESigmaWall",
+    "Hilbert16ESigmaBox", "Hilbert16ESigmaSpan", "Hilbert16ESigmaPack",
+    "Hilbert16ESigmaEps", "Hilbert16ESigmaOneshot",
+    "Hilbert16ESigmaOneshotEps", "Hilbert16ESigmaEpsSpan",
+    "Hilbert16ESigmaEpsLo",
 )
 
 
@@ -89,7 +105,7 @@ def _safe(value: Any) -> Any:
         return _safe(asdict(value))
     if isinstance(value, dict):
         return {str(k): _safe(v) for k, v in value.items()}
-    if isinstance(value, (list, tuple)):
+    if isinstance(value, list | tuple):
         return [_safe(v) for v in value]
     return value
 
@@ -217,8 +233,14 @@ def run(*, lean: bool = False) -> dict[str, object]:
         "packages/omnibias-dynamics/src/omnibias/dynamics/hilbert16_identities.py",
         "packages/omnibias-dynamics/src/omnibias/dynamics/chart_cells.py",
         "packages/omnibias-dynamics/src/omnibias/dynamics/scale_dichotomy.py",
+        "packages/omnibias-dynamics/src/omnibias/dynamics/entry_exit_leading.py",
+        "packages/omnibias-dynamics/src/omnibias/dynamics/fold_leading.py",
+        "packages/omnibias-dynamics/src/omnibias/dynamics/shrinking_root_leading.py",
         "benchmarks/hilbert16_two_blowup.py",
         "benchmarks/hilbert16_next_atlas.py",
+        "benchmarks/hilbert16_entry_exit_leading.py",
+        "benchmarks/hilbert16_fold_leading.py",
+        "benchmarks/hilbert16_shrinking_root_leading.py",
         "packages/omnibias-core/src/omnibias/core/verified/asymptotic_jet.py",
         "packages/omnibias-core/src/omnibias/core/verified/ode.py",
         "packages/omnibias-core/src/omnibias/core/verified/interval.py",

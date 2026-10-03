@@ -1,0 +1,1839 @@
+{
+  "schema": "omnibias.benchmarks.twin_prime_bounded_gap.v8",
+  "generated_utc": "2026-09-16T17:55:45Z",
+  "hardware_class": "commodity x86-64 CPU (2 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.11.0",
+    "platform": "Linux-4.18.0-553.34.1.el8_10.x86_64-x86_64-with-glibc2.28",
+    "numpy": "2.4.6",
+    "jax": "0.10.0",
+    "torch": "2.9.0+cu128",
+    "folx": "0.2.20"
+  },
+  "config": {
+    "family": "twin_prime_bounded_gap",
+    "research_status": "BLOCKED",
+    "named_baseline": "OpenAI Improved Short Gaps Between Primes"
+  },
+  "rss_mb_at_start": 630.29,
+  "gates": {
+    "all_passed": true,
+    "entries": [
+      {
+        "name": "g1_reported_h1_186_baseline",
+        "passed": true,
+        "detail": "exact metadata and pure rational input-manifest replay from the pinned evaluator plus a complete 97-component authenticated-split numerical receipt whose exact final arithmetic was replayed"
+      },
+      {
+        "name": "g2_exact_h1_182_target",
+        "passed": true,
+        "detail": "the explicit diameter-182 39-tuple is admissible"
+      },
+      {
+        "name": "g3_k39_parameterization_guards",
+        "passed": true,
+        "detail": "the same exact source schedule is regenerated with outer/face dimensions 39/38; hidden midpoint offset is exact 39/2"
+      },
+      {
+        "name": "g4_exact_signed_convolution_split",
+        "passed": true,
+        "detail": "exact rational interval replay proves P*Q=P_+*Q-P_-*Q for a nonnegative kernel"
+      },
+      {
+        "name": "g5_quadratic_extraction_contract",
+        "passed": true,
+        "detail": "exact descriptor order, interval contraction convention, and two-stage source-rounding reserve are fixed before extraction"
+      },
+      {
+        "name": "g6_candidate_honesty",
+        "passed": true,
+        "finite_k39_crossing_found": false,
+        "source_valid_k39_certificate_found": false,
+        "dhl_39_2_claim": false,
+        "h1_182_claim": false,
+        "detail": "the complete direct k=39 receipt misses 1/50000, so finite_k39_crossing_found stays false"
+      }
+    ]
+  },
+  "baseline": {
+    "name": "OpenAI Improved Short Gaps Between Primes",
+    "target": {
+      "name": "reported_H1_186_DHL_40_2",
+      "k": 40,
+      "shifts": [
+        0,
+        2,
+        6,
+        12,
+        20,
+        26,
+        30,
+        32,
+        36,
+        42,
+        48,
+        50,
+        56,
+        60,
+        68,
+        72,
+        78,
+        86,
+        90,
+        92,
+        98,
+        102,
+        110,
+        116,
+        120,
+        126,
+        132,
+        138,
+        140,
+        146,
+        152,
+        156,
+        158,
+        162,
+        168,
+        170,
+        176,
+        180,
+        182,
+        186
+      ],
+      "gap": 186,
+      "rho_star": [
+        "2624989",
+        "10000000"
+      ],
+      "required_margin": [
+        "1",
+        "50000"
+      ]
+    },
+    "basis_size": 77,
+    "grid_size": 98304,
+    "source_components": 97,
+    "raw_source_forms": 149,
+    "reported_margin": [
+      "230382667",
+      "10000000000000"
+    ],
+    "passed_reported_threshold": true
+  },
+  "baseline_admissibility": {
+    "shifts": [
+      0,
+      2,
+      6,
+      12,
+      20,
+      26,
+      30,
+      32,
+      36,
+      42,
+      48,
+      50,
+      56,
+      60,
+      68,
+      72,
+      78,
+      86,
+      90,
+      92,
+      98,
+      102,
+      110,
+      116,
+      120,
+      126,
+      132,
+      138,
+      140,
+      146,
+      152,
+      156,
+      158,
+      162,
+      168,
+      170,
+      176,
+      180,
+      182,
+      186
+    ],
+    "admissible": true,
+    "missing_residues": {
+      "2": [
+        1
+      ],
+      "3": [
+        1
+      ],
+      "5": [
+        4
+      ],
+      "7": [
+        3
+      ],
+      "11": [
+        7
+      ],
+      "13": [
+        5
+      ],
+      "17": [
+        11
+      ],
+      "19": [
+        8
+      ],
+      "23": [
+        16
+      ],
+      "29": [
+        9,
+        18
+      ],
+      "31": [
+        4,
+        18
+      ],
+      "37": [
+        3,
+        7,
+        17,
+        25,
+        33
+      ]
+    },
+    "obstruction_prime": null
+  },
+  "target": {
+    "name": "target_H1_182_DHL_39_2",
+    "k": 39,
+    "shifts": [
+      0,
+      2,
+      6,
+      12,
+      20,
+      26,
+      30,
+      32,
+      36,
+      42,
+      48,
+      50,
+      56,
+      60,
+      68,
+      72,
+      78,
+      86,
+      90,
+      92,
+      98,
+      102,
+      110,
+      116,
+      120,
+      126,
+      132,
+      138,
+      140,
+      146,
+      152,
+      156,
+      158,
+      162,
+      168,
+      170,
+      176,
+      180,
+      182
+    ],
+    "gap": 182,
+    "rho_star": [
+      "2624989",
+      "10000000"
+    ],
+    "required_margin": [
+      "1",
+      "50000"
+    ]
+  },
+  "target_admissibility": {
+    "shifts": [
+      0,
+      2,
+      6,
+      12,
+      20,
+      26,
+      30,
+      32,
+      36,
+      42,
+      48,
+      50,
+      56,
+      60,
+      68,
+      72,
+      78,
+      86,
+      90,
+      92,
+      98,
+      102,
+      110,
+      116,
+      120,
+      126,
+      132,
+      138,
+      140,
+      146,
+      152,
+      156,
+      158,
+      162,
+      168,
+      170,
+      176,
+      180,
+      182
+    ],
+    "admissible": true,
+    "missing_residues": {
+      "2": [
+        1
+      ],
+      "3": [
+        1
+      ],
+      "5": [
+        4
+      ],
+      "7": [
+        3
+      ],
+      "11": [
+        7
+      ],
+      "13": [
+        5
+      ],
+      "17": [
+        11
+      ],
+      "19": [
+        8
+      ],
+      "23": [
+        16
+      ],
+      "29": [
+        9,
+        18
+      ],
+      "31": [
+        4,
+        18
+      ],
+      "37": [
+        1,
+        3,
+        7,
+        17,
+        25,
+        33
+      ]
+    },
+    "obstruction_prime": null
+  },
+  "parameterization": {
+    "outer_dimension": 39,
+    "face_dimension": 38,
+    "grid_size": 98304,
+    "convolution_length": 98265,
+    "normalization_power": 39,
+    "source_components": 97,
+    "raw_source_forms": 149,
+    "midpoint_offset": [
+      "39",
+      "2"
+    ]
+  },
+  "input_manifests": {
+    "k40": {
+      "schema_version": "1.0",
+      "claim": "prime_gaps_input_manifest_replay",
+      "payload": {
+        "type": "prime_gaps_input_manifest_replay",
+        "dimension": 40,
+        "face_dimension": 39,
+        "intervals": 98304,
+        "convolution_length": 98264,
+        "basis_size": 77,
+        "old_ladder_length": 29,
+        "new_ladder_length": 43,
+        "selected_old_length": 28,
+        "selected_new_length": 39,
+        "source_group_dimensions": [
+          [
+            "outer_h2",
+            40
+          ],
+          [
+            "outer_h25",
+            40
+          ],
+          [
+            "old_inner_h2",
+            39
+          ],
+          [
+            "old_inner_h25",
+            39
+          ],
+          [
+            "new_inner_h2",
+            39
+          ],
+          [
+            "new_inner_h25",
+            39
+          ]
+        ],
+        "task_count": 97,
+        "outer_task_count": 52,
+        "inner_task_count": 45,
+        "raw_form_count": 149,
+        "grid_step": [
+          "2742997",
+          "258046918656"
+        ],
+        "maxima": [
+          [
+            "base",
+            [
+              "245671040311",
+              "258046918656"
+            ]
+          ],
+          [
+            "enlarged",
+            [
+              "246740809141",
+              "258046918656"
+            ]
+          ],
+          [
+            "full",
+            [
+              "134821045547",
+              "129023459328"
+            ]
+          ],
+          [
+            "outer",
+            [
+              "269644834091",
+              "258046918656"
+            ]
+          ]
+        ],
+        "inventory_proved": true,
+        "upstream_commit": "61340d0b74163003b32756bb16e91d9209a5e330",
+        "upstream_source": "https://raw.githubusercontent.com/openai/PrimeGaps186/61340d0b74163003b32756bb16e91d9209a5e330/prime_gap_186_certificate.py",
+        "status": "PROVED"
+      },
+      "honesty": {
+        "unproven_claim": false,
+        "exact_input_manifest_replay": true,
+        "arb_flint_integrals_recomputed": false,
+        "source_loss_enclosures_recomputed": false,
+        "finite_numerical_crossing_proved": false,
+        "bounded_gap_analytic_instantiation_proved": false,
+        "h1_182_claim": false,
+        "twin_prime_conjecture_proof_claim": false
+      },
+      "meta": {
+        "upstream_commit": "61340d0b74163003b32756bb16e91d9209a5e330",
+        "transcend_backend": "mpmath"
+      },
+      "digest": "sha256:4a1523d2a2f734c5bb2441b539ee666dc54cf2e84b3851c9147b32bef08b4488"
+    },
+    "k39": {
+      "schema_version": "1.0",
+      "claim": "prime_gaps_input_manifest_replay",
+      "payload": {
+        "type": "prime_gaps_input_manifest_replay",
+        "dimension": 39,
+        "face_dimension": 38,
+        "intervals": 98304,
+        "convolution_length": 98265,
+        "basis_size": 77,
+        "old_ladder_length": 29,
+        "new_ladder_length": 43,
+        "selected_old_length": 28,
+        "selected_new_length": 39,
+        "source_group_dimensions": [
+          [
+            "outer_h2",
+            39
+          ],
+          [
+            "outer_h25",
+            39
+          ],
+          [
+            "old_inner_h2",
+            38
+          ],
+          [
+            "old_inner_h25",
+            38
+          ],
+          [
+            "new_inner_h2",
+            38
+          ],
+          [
+            "new_inner_h25",
+            38
+          ]
+        ],
+        "task_count": 97,
+        "outer_task_count": 52,
+        "inner_task_count": 45,
+        "raw_form_count": 149,
+        "grid_step": [
+          "2742997",
+          "258046918656"
+        ],
+        "maxima": [
+          [
+            "base",
+            [
+              "245671040311",
+              "258046918656"
+            ]
+          ],
+          [
+            "enlarged",
+            [
+              "246740809141",
+              "258046918656"
+            ]
+          ],
+          [
+            "full",
+            [
+              "134821045547",
+              "129023459328"
+            ]
+          ],
+          [
+            "outer",
+            [
+              "269644834091",
+              "258046918656"
+            ]
+          ]
+        ],
+        "inventory_proved": true,
+        "upstream_commit": "61340d0b74163003b32756bb16e91d9209a5e330",
+        "upstream_source": "https://raw.githubusercontent.com/openai/PrimeGaps186/61340d0b74163003b32756bb16e91d9209a5e330/prime_gap_186_certificate.py",
+        "status": "PROVED"
+      },
+      "honesty": {
+        "unproven_claim": false,
+        "exact_input_manifest_replay": true,
+        "arb_flint_integrals_recomputed": false,
+        "source_loss_enclosures_recomputed": false,
+        "finite_numerical_crossing_proved": false,
+        "bounded_gap_analytic_instantiation_proved": false,
+        "h1_182_claim": false,
+        "twin_prime_conjecture_proof_claim": false
+      },
+      "meta": {
+        "upstream_commit": "61340d0b74163003b32756bb16e91d9209a5e330",
+        "transcend_backend": "mpmath"
+      },
+      "digest": "sha256:6d90c058c9148ab73e205aa17c6b04788e0ca3a57d80d0171c5958a04302fa79"
+    },
+    "task_schedule_identical": true,
+    "physical_maxima_identical": true,
+    "engine_layouts": {
+      "k40": {
+        "dimension": 40,
+        "face_dimension": 39,
+        "intervals": 98304,
+        "convolution_length": 98264,
+        "outer_mask_count": 40,
+        "inner_mask_count": 39,
+        "denominator_moment_count": 40,
+        "face_moment_count": 39,
+        "normalization_multiplier": 40,
+        "normalization_power": 40,
+        "midpoint_offset": [
+          "20",
+          "1"
+        ],
+        "first_radial_point": [
+          "-290234208563",
+          "322558648320"
+        ],
+        "last_radial_point": [
+          "62246245601",
+          "430078197760"
+        ]
+      },
+      "k39": {
+        "dimension": 39,
+        "face_dimension": 38,
+        "intervals": 98304,
+        "convolution_length": 98265,
+        "outer_mask_count": 39,
+        "inner_mask_count": 38,
+        "denominator_moment_count": 39,
+        "face_moment_count": 38,
+        "normalization_multiplier": 39,
+        "normalization_power": 39,
+        "midpoint_offset": [
+          "39",
+          "2"
+        ],
+        "first_radial_point": [
+          "-773962461163",
+          "860156395520"
+        ],
+        "last_radial_point": [
+          "373491188591",
+          "2580469186560"
+        ]
+      }
+    }
+  },
+  "evaluator_rewrite": {
+    "signed_convolution_strategy": "nonnegative_part_split",
+    "checkpoint_resume": {
+      "exact_task_match_required": true,
+      "conflicting_duplicates_rejected": true,
+      "partial_receipt_accepted": false
+    },
+    "exact_identity_certificate": {
+      "signed_length": 3,
+      "nonnegative_length": 2,
+      "direct": [
+        [
+          "-4",
+          "0"
+        ],
+        [
+          "-8",
+          "5"
+        ],
+        [
+          "-3",
+          "19"
+        ],
+        [
+          "2",
+          "15"
+        ]
+      ],
+      "split": [
+        [
+          "-4",
+          "0"
+        ],
+        [
+          "-8",
+          "5"
+        ],
+        [
+          "-3",
+          "19"
+        ],
+        [
+          "2",
+          "15"
+        ]
+      ],
+      "exact_match": true,
+      "status": "PROVED",
+      "honesty": {
+        "finite_exact_interval_identity_proved": true,
+        "arb_implementation_equivalence_proved": false,
+        "k40_numerical_equivalence_proved": false,
+        "h1_182_claim": false
+      }
+    },
+    "corrected_flint_patch_public": false,
+    "runtime_regressions_required": [
+      "nonnegative_fixed_integer_convolution",
+      "positive_arb_split_convolution",
+      "negative_arb_split_convolution"
+    ]
+  },
+  "k40_numerical_baseline": {
+    "claim": "prime_gaps_numerical_receipt_replay",
+    "digest": "sha256:fb65537d187cc8762a324e1f2beca21bc6f592ec039f04a16fce0baf100a4d18",
+    "honesty": {
+      "analytic_distribution_inputs_proved": false,
+      "arb_interval_algorithms_formally_verified": false,
+      "dhl_claim": false,
+      "exact_component_rounding_replayed": true,
+      "exact_task_inventory_replayed": true,
+      "finite_receipt_arithmetic_replayed": true,
+      "twin_prime_claim": false
+    },
+    "meta": {
+      "method": "exact_fraction_receipt_replay",
+      "scope": "finite numerical receipt only",
+      "source_receipt_sha256": "4b51346d5d268313ee92f6c7ed18ac7913b987d7236800f5b8cb636ef271d198",
+      "status": "PROVED",
+      "transcend_backend": "mpmath"
+    },
+    "payload": {
+      "component_count": 97,
+      "dimension": 40,
+      "final_margin": "69162467338708766984467/2960664736250000000000000000",
+      "honesty": {
+        "analytic_distribution_inputs_proved": false,
+        "arb_interval_algorithms_formally_verified": false,
+        "dhl_claim": false,
+        "exact_component_rounding_replayed": true,
+        "exact_task_inventory_replayed": true,
+        "finite_receipt_arithmetic_replayed": true,
+        "twin_prime_claim": false
+      },
+      "published_baseline_floor_met": true,
+      "raw_form_count": 149,
+      "receipt_sha256": "4b51346d5d268313ee92f6c7ed18ac7913b987d7236800f5b8cb636ef271d198",
+      "required_margin": "1/50000",
+      "source_total_relative_units": 696075110,
+      "status": "PROVED"
+    },
+    "schema_version": "1.0"
+  },
+  "quadratic_extraction_contract": {
+    "dimension": 39,
+    "intervals": 98304,
+    "source_sha256": "7f71bdefcfe3bb5ca76a143929b3cb3f4156c21dc483253cda3077420f1e5de4",
+    "arb_precision_bits": 160,
+    "cap_fractional_bits": 224,
+    "source_fractional_bits": 192,
+    "signed_convolution_strategy": "nonnegative_part_split",
+    "variable_count": 77,
+    "upper_triangle_entry_count": 3003,
+    "descriptors": [
+      {
+        "index": 0,
+        "signature": [],
+        "radial_degree": 0
+      },
+      {
+        "index": 1,
+        "signature": [],
+        "radial_degree": 1
+      },
+      {
+        "index": 2,
+        "signature": [],
+        "radial_degree": 2
+      },
+      {
+        "index": 3,
+        "signature": [],
+        "radial_degree": 3
+      },
+      {
+        "index": 4,
+        "signature": [],
+        "radial_degree": 4
+      },
+      {
+        "index": 5,
+        "signature": [],
+        "radial_degree": 5
+      },
+      {
+        "index": 6,
+        "signature": [],
+        "radial_degree": 6
+      },
+      {
+        "index": 7,
+        "signature": [
+          2
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 8,
+        "signature": [
+          2
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 9,
+        "signature": [
+          2
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 10,
+        "signature": [
+          2
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 11,
+        "signature": [
+          2
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 12,
+        "signature": [
+          2
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 13,
+        "signature": [
+          2
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 14,
+        "signature": [
+          3
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 15,
+        "signature": [
+          3
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 16,
+        "signature": [
+          3
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 17,
+        "signature": [
+          3
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 18,
+        "signature": [
+          3
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 19,
+        "signature": [
+          3
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 20,
+        "signature": [
+          3
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 21,
+        "signature": [
+          4
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 22,
+        "signature": [
+          4
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 23,
+        "signature": [
+          4
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 24,
+        "signature": [
+          4
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 25,
+        "signature": [
+          4
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 26,
+        "signature": [
+          4
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 27,
+        "signature": [
+          4
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 28,
+        "signature": [
+          5
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 29,
+        "signature": [
+          5
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 30,
+        "signature": [
+          5
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 31,
+        "signature": [
+          5
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 32,
+        "signature": [
+          5
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 33,
+        "signature": [
+          5
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 34,
+        "signature": [
+          5
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 35,
+        "signature": [
+          6
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 36,
+        "signature": [
+          6
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 37,
+        "signature": [
+          6
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 38,
+        "signature": [
+          6
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 39,
+        "signature": [
+          6
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 40,
+        "signature": [
+          6
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 41,
+        "signature": [
+          6
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 42,
+        "signature": [
+          2,
+          2
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 43,
+        "signature": [
+          2,
+          2
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 44,
+        "signature": [
+          2,
+          2
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 45,
+        "signature": [
+          2,
+          2
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 46,
+        "signature": [
+          2,
+          2
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 47,
+        "signature": [
+          2,
+          2
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 48,
+        "signature": [
+          2,
+          2
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 49,
+        "signature": [
+          2,
+          3
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 50,
+        "signature": [
+          2,
+          3
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 51,
+        "signature": [
+          2,
+          3
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 52,
+        "signature": [
+          2,
+          3
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 53,
+        "signature": [
+          2,
+          3
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 54,
+        "signature": [
+          2,
+          3
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 55,
+        "signature": [
+          2,
+          3
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 56,
+        "signature": [
+          2,
+          4
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 57,
+        "signature": [
+          2,
+          4
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 58,
+        "signature": [
+          2,
+          4
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 59,
+        "signature": [
+          2,
+          4
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 60,
+        "signature": [
+          2,
+          4
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 61,
+        "signature": [
+          2,
+          4
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 62,
+        "signature": [
+          2,
+          4
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 63,
+        "signature": [
+          3,
+          3
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 64,
+        "signature": [
+          3,
+          3
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 65,
+        "signature": [
+          3,
+          3
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 66,
+        "signature": [
+          3,
+          3
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 67,
+        "signature": [
+          3,
+          3
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 68,
+        "signature": [
+          3,
+          3
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 69,
+        "signature": [
+          3,
+          3
+        ],
+        "radial_degree": 6
+      },
+      {
+        "index": 70,
+        "signature": [
+          2,
+          2,
+          2
+        ],
+        "radial_degree": 0
+      },
+      {
+        "index": 71,
+        "signature": [
+          2,
+          2,
+          2
+        ],
+        "radial_degree": 1
+      },
+      {
+        "index": 72,
+        "signature": [
+          2,
+          2,
+          2
+        ],
+        "radial_degree": 2
+      },
+      {
+        "index": 73,
+        "signature": [
+          2,
+          2,
+          2
+        ],
+        "radial_degree": 3
+      },
+      {
+        "index": 74,
+        "signature": [
+          2,
+          2,
+          2
+        ],
+        "radial_degree": 4
+      },
+      {
+        "index": 75,
+        "signature": [
+          2,
+          2,
+          2
+        ],
+        "radial_degree": 5
+      },
+      {
+        "index": 76,
+        "signature": [
+          2,
+          2,
+          2
+        ],
+        "radial_degree": 6
+      }
+    ],
+    "cap_forms": [
+      "denominator",
+      "J0",
+      "Jplus",
+      "Jtail"
+    ],
+    "source_task_count": 97,
+    "raw_source_form_count": 149,
+    "source_task_keys": [
+      [
+        "outer_h2",
+        "low",
+        0
+      ],
+      [
+        "outer_h2",
+        "low",
+        1
+      ],
+      [
+        "outer_h2",
+        "low",
+        2
+      ],
+      [
+        "outer_h2",
+        "low",
+        3
+      ],
+      [
+        "outer_h2",
+        "low",
+        4
+      ],
+      [
+        "outer_h2",
+        "low",
+        5
+      ],
+      [
+        "outer_h2",
+        "low",
+        6
+      ],
+      [
+        "outer_h2",
+        "low",
+        7
+      ],
+      [
+        "outer_h2",
+        "low",
+        8
+      ],
+      [
+        "outer_h2",
+        "low",
+        9
+      ],
+      [
+        "outer_h2",
+        "rank_two",
+        0
+      ],
+      [
+        "outer_h2",
+        "rank_two",
+        1
+      ],
+      [
+        "outer_h2",
+        "rank_two",
+        2
+      ],
+      [
+        "outer_h2",
+        "rank_two",
+        3
+      ],
+      [
+        "outer_h2",
+        "rank_two",
+        4
+      ],
+      [
+        "outer_h2",
+        "rank_two",
+        5
+      ],
+      [
+        "outer_h2",
+        "high",
+        0
+      ],
+      [
+        "outer_h25",
+        "low",
+        0
+      ],
+      [
+        "outer_h25",
+        "low",
+        1
+      ],
+      [
+        "outer_h25",
+        "low",
+        2
+      ],
+      [
+        "outer_h25",
+        "low",
+        3
+      ],
+      [
+        "outer_h25",
+        "low",
+        4
+      ],
+      [
+        "outer_h25",
+        "low",
+        5
+      ],
+      [
+        "outer_h25",
+        "low",
+        6
+      ],
+      [
+        "outer_h25",
+        "low",
+        7
+      ],
+      [
+        "outer_h25",
+        "low",
+        8
+      ],
+      [
+        "outer_h25",
+        "low",
+        9
+      ],
+      [
+        "outer_h25",
+        "low",
+        10
+      ],
+      [
+        "outer_h25",
+        "low",
+        11
+      ],
+      [
+        "outer_h25",
+        "low",
+        12
+      ],
+      [
+        "outer_h25",
+        "low",
+        13
+      ],
+      [
+        "outer_h25",
+        "low",
+        14
+      ],
+      [
+        "outer_h25",
+        "low",
+        15
+      ],
+      [
+        "outer_h25",
+        "low",
+        16
+      ],
+      [
+        "outer_h25",
+        "low",
+        17
+      ],
+      [
+        "outer_h25",
+        "low",
+        18
+      ],
+      [
+        "outer_h25",
+        "low",
+        19
+      ],
+      [
+        "outer_h25",
+        "low",
+        20
+      ],
+      [
+        "outer_h25",
+        "low",
+        21
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        0
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        1
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        2
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        3
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        4
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        5
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        6
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        7
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        8
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        9
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        10
+      ],
+      [
+        "outer_h25",
+        "rank_two",
+        11
+      ],
+      [
+        "outer_h25",
+        "high",
+        0
+      ],
+      [
+        "old_inner_h2",
+        "low",
+        0
+      ],
+      [
+        "old_inner_h2",
+        "low",
+        1
+      ],
+      [
+        "old_inner_h2",
+        "low",
+        2
+      ],
+      [
+        "old_inner_h2",
+        "low",
+        3
+      ],
+      [
+        "old_inner_h2",
+        "low",
+        4
+      ],
+      [
+        "old_inner_h2",
+        "rank_two",
+        0
+      ],
+      [
+        "old_inner_h2",
+        "high",
+        0
+      ],
+      [
+        "old_inner_h25",
+        "low",
+        0
+      ],
+      [
+        "old_inner_h25",
+        "low",
+        1
+      ],
+      [
+        "old_inner_h25",
+        "low",
+        2
+      ],
+      [
+        "old_inner_h25",
+        "low",
+        3
+      ],
+      [
+        "old_inner_h25",
+        "low",
+        4
+      ],
+      [
+        "old_inner_h25",
+        "low",
+        5
+      ],
+      [
+        "old_inner_h25",
+        "low",
+        6
+      ],
+      [
+        "old_inner_h25",
+        "rank_two",
+        0
+      ],
+      [
+        "old_inner_h25",
+        "rank_two",
+        1
+      ],
+      [
+        "old_inner_h25",
+        "high",
+        0
+      ],
+      [
+        "new_inner_h2",
+        "low",
+        0
+      ],
+      [
+        "new_inner_h2",
+        "low",
+        1
+      ],
+      [
+        "new_inner_h2",
+        "low",
+        2
+      ],
+      [
+        "new_inner_h2",
+        "low",
+        3
+      ],
+      [
+        "new_inner_h2",
+        "low",
+        4
+      ],
+      [
+        "new_inner_h2",
+        "low",
+        5
+      ],
+      [
+        "new_inner_h2",
+        "rank_two",
+        0
+      ],
+      [
+        "new_inner_h2",
+        "rank_two",
+        1
+      ],
+      [
+        "new_inner_h2",
+        "rank_two",
+        2
+      ],
+      [
+        "new_inner_h2",
+        "rank_two",
+        3
+      ],
+      [
+        "new_inner_h2",
+        "high",
+        0
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        0
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        1
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        2
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        3
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        4
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        5
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        6
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        7
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        8
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        9
+      ],
+      [
+        "new_inner_h25",
+        "low",
+        10
+      ],
+      [
+        "new_inner_h25",
+        "rank_two",
+        0
+      ],
+      [
+        "new_inner_h25",
+        "rank_two",
+        1
+      ],
+      [
+        "new_inner_h25",
+        "rank_two",
+        2
+      ],
+      [
+        "new_inner_h25",
+        "rank_two",
+        3
+      ],
+      [
+        "new_inner_h25",
+        "rank_two",
+        4
+      ],
+      [
+        "new_inner_h25",
+        "high",
+        0
+      ]
+    ],
+    "rounding_reserve": {
+      "dimension": 39,
+      "outer_task_count": 52,
+      "inner_task_count": 45,
+      "raw_relative_decimal_scale": 1000000000000000000,
+      "component_relative_decimal_scale": 1000000000000,
+      "relative_reserve": "58609757131023290956649509116827161431807143328210485025244143787666098530083736979741011621381453628637447434288888359377349590530892793313369493499400803693319620328482392102613622710368811373593831854110085602249215929606849048692888143156558711470273883153962624183904915466047886707038183903/604165168658610338351574852296701971341918810922184894037603585212682529475754348871193488587624072584345768199405873908402960893633776645265070030467891029675533334375432086238203418260397167304664520802150458858194345947503768687229791708136665475295857078515036580275739615415000000000000000000000000000",
+      "status": "PROVED",
+      "honesty": {
+        "finite_rounding_reserve_proved": true,
+        "quadratic_kernels_extracted": false,
+        "k39_crossing_proved": false,
+        "analytic_distribution_inputs_proved": false,
+        "h1_182_claim": false
+      }
+    }
+  },
+  "quadratic_receipt_consumer": {
+    "schema": "omnibias.prime_gap_quadratic.v1",
+    "matrix_names": [
+      "denominator",
+      "J0",
+      "Jplus",
+      "Jtail",
+      "source_loss"
+    ],
+    "exact_dyadic_endpoints_required": true,
+    "generated_source_digest_required": true,
+    "complete_direct_candidate_receipt_required": true
+  },
+  "blocked": {
+    "k40_equivalence_to_unpublished_corrected_flint_build": false,
+    "quadratic_forms_assembled": true,
+    "outward_source_losses_certified": false,
+    "finite_k39_crossing_found": false,
+    "analytic_instantiation_proved": false
+  },
+  "wall_seconds": 8.065370563417673
+}

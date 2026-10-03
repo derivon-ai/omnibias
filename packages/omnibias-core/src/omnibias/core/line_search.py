@@ -326,6 +326,28 @@ class LineSearchResult:
     wolfe_ok: bool | None = None
     truncation_certified: bool = False
     isolated_root: bool = False
+    consumed_curvature: float | None = None
+
+
+@dataclass(frozen=True)
+class GradientSecant:
+    """Secant plane for a steepest step along ``-gradient``.
+
+    ``previous_gradient`` and ``current_gradient`` are Euclidean gradients.
+    ``previous_step`` is the accepted scalar along ``-previous_gradient``.
+    ``direction`` is the current search direction; the eigenstep is used only
+    when it equals ``-current_gradient``. ``used_curvatures`` are plane-Hessian
+    eigenvalues already annihilated by earlier accepted steps.
+
+    The jet is the founding bias collapse (``delta -> 0``). No temperature
+    collapse appears.
+    """
+
+    previous_gradient: tuple[float, ...]
+    previous_step: float
+    current_gradient: tuple[float, ...]
+    direction: tuple[float, ...]
+    used_curvatures: tuple[float, ...] = ()
 
 
 def polynomial_wolfe(
@@ -530,7 +552,141 @@ def apply_verification(
         wolfe_ok=result.wolfe_ok,
         truncation_certified=result.truncation_certified,
         isolated_root=result.isolated_root and not fell,
+        consumed_curvature=None if fell else result.consumed_curvature,
     )
+
+
+def _dot(left: Sequence[float], right: Sequence[float]) -> float:
+    return sum(float(a) * float(b) for a, b in zip(left, right, strict=True))
+
+
+def _norm(values: Sequence[float]) -> float:
+    return math.sqrt(sum(float(v) * float(v) for v in values))
+
+
+def _direction_is_negative_gradient(
+    direction: Sequence[float],
+    gradient: Sequence[float],
+) -> bool:
+    if len(direction) != len(gradient) or not gradient:
+        return False
+    for raw_d, raw_g in zip(direction, gradient, strict=True):
+        comp = float(raw_d)
+        grad = float(raw_g)
+        if not (math.isfinite(comp) and math.isfinite(grad)):
+            return False
+        if abs(comp + grad) > 1e-8 * (1.0 + abs(grad)):
+            return False
+    return True
+
+
+def _curvature_consumed(curvature: float, used: Sequence[float]) -> bool:
+    scale = max(1.0, abs(curvature))
+    return any(abs(curvature - prev) <= 1e-5 * scale for prev in used)
+
+
+def plane_hessian_eigenvalues(
+    previous_gradient: Sequence[float],
+    previous_step: float,
+    current_gradient: Sequence[float],
+    gradient_curvature: float,
+) -> tuple[float, float] | None:
+    """Eigenvalues of the secant Hessian on ``span(g_prev, g)``.
+
+    For a quadratic, ``H g_prev = (g_prev - g) / s_prev`` when the previous
+    step was along ``-g_prev``. ``gradient_curvature`` is ``g^T H g``, which
+    the order-2 directional jet supplies as ``phi''(0)`` along ``-g``.
+    """
+    if previous_step <= 0.0 or not math.isfinite(previous_step):
+        return None
+    if len(previous_gradient) != len(current_gradient) or len(current_gradient) < 2:
+        return None
+    if not math.isfinite(gradient_curvature):
+        return None
+    prev = [float(v) for v in previous_gradient]
+    curr = [float(v) for v in current_gradient]
+    if any(not math.isfinite(v) for v in prev + curr):
+        return None
+    prev_norm = _norm(prev)
+    curr_norm = _norm(curr)
+    if prev_norm < 1e-18 or curr_norm < 1e-18:
+        return None
+    secant = [(prev[i] - curr[i]) / float(previous_step) for i in range(len(prev))]
+    unit_prev = [v / prev_norm for v in prev]
+    along = _dot(curr, unit_prev)
+    ortho = [curr[i] - along * unit_prev[i] for i in range(len(curr))]
+    ortho_norm = _norm(ortho)
+    if ortho_norm < 1e-12 * max(curr_norm, 1.0):
+        return None
+    unit_ortho = [v / ortho_norm for v in ortho]
+    hessian_prev = [v / prev_norm for v in secant]
+    auu = _dot(unit_prev, hessian_prev)
+    auw = _dot(unit_ortho, hessian_prev)
+    projected = _dot(curr, unit_ortho)
+    if abs(projected) < 1e-18:
+        return None
+    aww = (
+        float(gradient_curvature) - auu * along * along - 2.0 * auw * along * projected
+    ) / (projected * projected)
+    disc = (auu - aww) ** 2 + 4.0 * auw * auw
+    if disc < 0.0 or not math.isfinite(disc):
+        return None
+    root = math.sqrt(disc)
+    first = 0.5 * (auu + aww + root)
+    second = 0.5 * (auu + aww - root)
+    if not (math.isfinite(first) and math.isfinite(second)):
+        return None
+    return first, second
+
+
+def select_secant_eigenstep(
+    derivatives: Sequence[float],
+    secant: GradientSecant,
+    *,
+    radius: float,
+) -> tuple[float, float] | None:
+    """Inverse-eigenvalue step on the secant plane, or ``None``.
+
+    The single-ray minimizer stays :func:`select_model_step`. This schedule
+    is the multi-step partner: after one previous steepest step, unused
+    positive eigenvalues of the plane Hessian become candidate steps
+    ``1/λ`` inside ``(0, radius]``. A candidate is eligible only when the
+    directional Taylor model decreases and the current direction is
+    ``-gradient``. The lowest model value wins. ``phi''(0)`` is the jet
+    curvature ``g^T H g``.
+    """
+    if radius <= 0.0 or not math.isfinite(radius):
+        return None
+    if len(derivatives) < 3:
+        return None
+    if not _direction_is_negative_gradient(secant.direction, secant.current_gradient):
+        return None
+    curvature = float(derivatives[2])
+    spectrum = plane_hessian_eigenvalues(
+        secant.previous_gradient,
+        secant.previous_step,
+        secant.current_gradient,
+        curvature,
+    )
+    if spectrum is None:
+        return None
+    coeffs = taylor_coeffs_from_derivatives(derivatives)
+    base = poly_eval(coeffs, 0.0)
+    best: tuple[float, float, float] | None = None
+    for lam in spectrum:
+        if lam <= 1e-14 or _curvature_consumed(lam, secant.used_curvatures):
+            continue
+        step = 1.0 / lam
+        if not (0.0 < step <= float(radius)) or not math.isfinite(step):
+            continue
+        model = poly_eval(coeffs, step)
+        if not math.isfinite(model) or model >= base - 1e-18:
+            continue
+        if best is None or model < best[0]:
+            best = (model, step, lam)
+    if best is None:
+        return None
+    return best[1], best[2]
 
 
 def run_model_line_search(
@@ -539,8 +695,9 @@ def run_model_line_search(
     config: JetLineSearchConfig | None = None,
     next_derivative_bound: float | None = None,
     actual_fn: Callable[[float], float] | None = None,
+    secant: GradientSecant | None = None,
 ) -> LineSearchResult:
-    """Shared driver: radius -> model step -> optional verification."""
+    """Shared driver: radius -> model step -> optional eigenstep -> verify."""
     cfg = config if config is not None else JetLineSearchConfig()
     if len(derivatives) < cfg.order + 1:
         raise ValueError(
@@ -552,6 +709,23 @@ def run_model_line_search(
         cfg, next_derivative_bound=next_derivative_bound
     )
     result = select_model_step(used, radius=radius, config=cfg)
+    if secant is not None and cfg.order >= 2:
+        picked = select_secant_eigenstep(used, secant, radius=radius)
+        if picked is not None:
+            step, consumed = picked
+            coeffs = taylor_coeffs_from_derivatives(used)
+            result = LineSearchResult(
+                step=step,
+                model_value=poly_eval(coeffs, step),
+                actual_value=None,
+                model_error=None,
+                truncation_radius=float(radius),
+                fell_back=False,
+                wolfe_ok=_wolfe_holds(coeffs, step, c1=cfg.wolfe_c1, c2=cfg.wolfe_c2),
+                truncation_certified=False,
+                isolated_root=False,
+                consumed_curvature=consumed,
+            )
     result = LineSearchResult(
         step=result.step,
         model_value=result.model_value,
@@ -562,6 +736,7 @@ def run_model_line_search(
         wolfe_ok=result.wolfe_ok,
         truncation_certified=certified,
         isolated_root=result.isolated_root,
+        consumed_curvature=result.consumed_curvature,
     )
     if cfg.verify:
         if actual_fn is None:
@@ -577,11 +752,13 @@ def run_model_line_search(
             wolfe_ok=result.wolfe_ok,
             truncation_certified=certified,
             isolated_root=result.isolated_root,
+            consumed_curvature=result.consumed_curvature,
         )
     return result
 
 
 __all__ = [
+    "GradientSecant",
     "JetLineSearchConfig",
     "LineSearchResult",
     "apply_verification",
@@ -591,6 +768,7 @@ __all__ = [
     "interval_poly_eval",
     "isolate_real_roots",
     "lagrange_remainder_bound",
+    "plane_hessian_eigenvalues",
     "poly_derivative",
     "poly_eval",
     "polynomial_wolfe",
@@ -598,5 +776,6 @@ __all__ = [
     "resolve_trust_radius",
     "run_model_line_search",
     "select_model_step",
+    "select_secant_eigenstep",
     "taylor_coeffs_from_derivatives",
 ]

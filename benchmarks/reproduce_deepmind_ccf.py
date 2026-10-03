@@ -89,6 +89,102 @@ def _next_actions(residual: float, *, hilbert: str, hidden: int, mg_steps: int) 
     return actions
 
 
+def _official_free_omega_score(net: Any, cfg: Any) -> dict[str, float]:
+    """Dense Wang residual via ``free_omega_vorticity_residual`` on ``|y|<38``.
+
+    Same window as the signed-hat official path (``y_trunc=40``, mask 38).
+    Does not rescale a profile that hard core-cancel already gauged.
+    """
+    from dataclasses import replace
+
+    import jax
+    import jax.numpy as jnp
+
+    jax.config.update("jax_enable_x64", True)
+    import torch
+    from omnibias.pinn.jax.discovery.ccf_vorticity import free_omega_vorticity_residual
+    from omnibias.pinn.torch.discovery import ccf_vorticity_neural as cvn
+
+    # Pin under the same quadrature free_omega_vorticity_residual uses.
+    cfg = replace(
+        cfg,
+        y_max=40.0,
+        exp_core=False,
+        hard_core_cancel=True,
+        train_hilbert="wholeline_hp",
+        hilbert_n_aux=128,
+        hilbert_n_quad=96,
+        hilbert_n_far=64,
+        hilbert_y_near=2.0,
+    )
+    y_max = 40.0
+    n_val = 1601
+    device = next(net.parameters()).device
+    y_t = torch.linspace(-y_max, y_max, n_val, dtype=torch.float64, device=device)
+    with torch.no_grad():
+        a_cc, b_cc = cvn.core_cancel_coefficients(net, cfg)
+        omega_t, omega_y_t, _, _ = cvn.mix_core_cancel(
+            net,
+            y_t,
+            a_cc,
+            b_cc,
+            lam=float(cfg.lam),
+            node=float(cfg.core_node),
+            family=cfg.core_family,
+            width=float(cfg.core_width),
+        )
+
+        def omega_fn(tt: Any) -> Any:
+            t = torch.tensor(
+                np.array(np.asarray(tt), dtype=np.float64, copy=True),
+                dtype=torch.float64,
+                device=device,
+            )
+            return cvn.mix_core_cancel(
+                net,
+                t,
+                a_cc,
+                b_cc,
+                lam=float(cfg.lam),
+                node=float(cfg.core_node),
+                family=cfg.core_family,
+                width=float(cfg.core_width),
+            )[0].detach().cpu().numpy()
+
+    y_j = jnp.asarray(y_t.detach().cpu().numpy())
+    r, fields = free_omega_vorticity_residual(
+        y_j,
+        jnp.asarray(omega_t.detach().cpu().numpy()),
+        jnp.asarray(omega_y_t.detach().cpu().numpy()),
+        omega_fn,
+        lam=float(cfg.lam),
+        y_trunc=y_max,
+    )
+    mask = jnp.abs(y_j) < 38.0
+    dense = float(jnp.max(jnp.abs(r[mask])))
+    om = np.asarray(fields["omega"])
+    y_np = np.asarray(y_j)
+    g_raw = float(np.interp(float(cfg.gauge_point), y_np, om))
+    omax = float(np.max(np.abs(om)))
+    from omnibias.pinn.torch.discovery.ccf_vorticity_neural import _anti_ghost_residual
+
+    gated = _anti_ghost_residual(
+        dense,
+        omega_gauge_sample=g_raw,
+        omega_max_abs=omax,
+        gauge_value=float(cfg.gauge_value),
+    )
+    h0 = float(np.interp(0.0, y_np, np.asarray(fields["U_y"])))
+    return {
+        "reproduction_dense_max_abs_for_gate": gated,
+        "reproduction_dense_max_abs": dense,
+        "h0": h0,
+        "h0_target": float(cvn.h0_target(cfg.lam)),
+        "omega_gauge_sample": g_raw,
+        "omega_max_abs": omax,
+    }
+
+
 def run_once(
     *,
     smoke: bool = True,
@@ -111,6 +207,22 @@ def run_once(
     origin_fraction: float | None = None,
     n_fourier: int | None = None,
     fourier_scale: float | None = None,
+    hard_core_cancel: bool | None = None,
+    core_node: float | None = None,
+    mg_damping_strategy: str | None = None,
+    hilbert_n_quad: int | None = None,
+    hilbert_n_far: int | None = None,
+    hilbert_n_aux: int | None = None,
+    resample_every: int | None = None,
+    d1_weight: float | None = None,
+    d2_weight: float | None = None,
+    score_collocation: bool | None = None,
+    residual_norm: str | None = None,
+    reject_max_increase: bool | None = None,
+    freeze_velocity: bool | None = None,
+    core_family: str | None = None,
+    core_width: float | None = None,
+    device: str | None = None,
 ) -> dict[str, Any]:
     """One reproduction discovery (+ optional multistage)."""
     import torch
@@ -164,8 +276,45 @@ def run_once(
         n_scales=4 if smoke else 8,
         n_gamma_multiples=2 if smoke else 4,
         d2_weight=0.0 if smoke else 0.01,
-        resample_every=max(2, int(mg_steps) // 4),
+        resample_every=(
+            int(resample_every)
+            if resample_every is not None
+            else max(2, int(mg_steps) // 4)
+        ),
+        device=(
+            device
+            if device is not None
+            else ("cuda" if (not smoke and torch.cuda.is_available()) else "cpu")
+        ),
     )
+    if d1_weight is not None:
+        cfg_kw["d1_weight"] = float(d1_weight)
+    if d2_weight is not None:
+        cfg_kw["d2_weight"] = float(d2_weight)
+    if score_collocation is not None:
+        cfg_kw["score_collocation"] = bool(score_collocation)
+    if residual_norm is not None:
+        cfg_kw["residual_norm"] = residual_norm
+    if reject_max_increase is not None:
+        cfg_kw["reject_max_increase"] = bool(reject_max_increase)
+    if freeze_velocity is not None:
+        cfg_kw["freeze_velocity"] = bool(freeze_velocity)
+    if core_family is not None:
+        cfg_kw["core_family"] = core_family
+    if core_width is not None:
+        cfg_kw["core_width"] = float(core_width)
+    if hard_core_cancel is not None:
+        cfg_kw["hard_core_cancel"] = bool(hard_core_cancel)
+    if core_node is not None:
+        cfg_kw["core_node"] = float(core_node)
+    if mg_damping_strategy is not None:
+        cfg_kw["mg_damping_strategy"] = mg_damping_strategy
+    if hilbert_n_quad is not None:
+        cfg_kw["hilbert_n_quad"] = int(hilbert_n_quad)
+    if hilbert_n_far is not None:
+        cfg_kw["hilbert_n_far"] = int(hilbert_n_far)
+    if hilbert_n_aux is not None:
+        cfg_kw["hilbert_n_aux"] = int(hilbert_n_aux)
     if use_grad_norm is not None:
         cfg_kw["use_grad_norm"] = bool(use_grad_norm)
     if exp_core is not None:
@@ -178,6 +327,9 @@ def run_once(
         cfg_kw["fourier_scale"] = float(fourier_scale)
     cfg = cvn.reproduce_deepmind_config(**cfg_kw)
     disc = cvn.run_ccf_vorticity_neural_discovery(cfg, warm_state_dict=warm_sd)
+    official: dict[str, float] | None = None
+    if cfg.hard_core_cancel and "net" in disc.extra:
+        official = _official_free_omega_score(disc.extra["net"], cfg)
     if save_state_path and "net" in disc.extra:
         Path(save_state_path).parent.mkdir(parents=True, exist_ok=True)
         torch.save(
@@ -185,6 +337,8 @@ def run_once(
             save_state_path,
         )
     residual = float(disc.diagnostics["reproduction_dense_max_abs_for_gate"])
+    if official is not None:
+        residual = float(official["reproduction_dense_max_abs_for_gate"])
     omega = np.asarray(disc.omega, dtype=float)
     y = np.asarray(disc.y, dtype=float)
     omy = np.asarray(disc.omega_y, dtype=float)
@@ -298,14 +452,48 @@ def run_once(
             "y_max": float(cfg.y_max),
             "dense_n_val": int(cfg.dense_n_val),
             "seed": int(seed),
+            "hard_core_cancel": bool(cfg.hard_core_cancel),
+            "core_node": float(cfg.core_node),
+            "exp_core": bool(cfg.exp_core),
+            "use_grad_norm": bool(cfg.use_grad_norm),
+            "mg_damping_strategy": str(cfg.mg_damping_strategy),
+            "device": str(cfg.device),
+            "hilbert_n_quad": int(cfg.hilbert_n_quad),
+            "hilbert_n_aux": int(cfg.hilbert_n_aux),
+            "hilbert_n_far": int(cfg.hilbert_n_far),
+            "d1_weight": float(cfg.d1_weight),
+            "d2_weight": float(cfg.d2_weight),
+            "resample_every": int(cfg.resample_every),
+            "score_collocation": bool(cfg.score_collocation),
+            "residual_norm": str(cfg.residual_norm),
+            "reject_max_increase": bool(cfg.reject_max_increase),
+            "freeze_velocity": bool(cfg.freeze_velocity),
+            "n_fourier": int(cfg.n_fourier),
+            "fourier_scale": float(cfg.fourier_scale),
         },
         "metrics": {
             "reproduction_dense_max_abs_for_gate": residual,
             "reproduction_dense_max_abs": float(
-                disc.diagnostics.get("reproduction_dense_max_abs", residual)
+                (official or {}).get(
+                    "reproduction_dense_max_abs",
+                    disc.diagnostics.get("reproduction_dense_max_abs", residual),
+                )
             ),
-            "omega_gauge_sample": float(disc.diagnostics["omega_gauge_sample"]),
-            "omega_max_abs": float(disc.diagnostics["omega_max_abs"]),
+            "torch_dense_max_abs_for_gate": float(
+                disc.diagnostics["reproduction_dense_max_abs_for_gate"]
+            ),
+            "omega_gauge_sample": float(
+                (official or {}).get(
+                    "omega_gauge_sample", disc.diagnostics["omega_gauge_sample"]
+                )
+            ),
+            "omega_max_abs": float(
+                (official or {}).get("omega_max_abs", disc.diagnostics["omega_max_abs"])
+            ),
+            "h0": float((official or disc.diagnostics).get("h0", float("nan"))),
+            "h0_target": float(
+                (official or disc.diagnostics).get("h0_target", float("nan"))
+            ),
             "collocation_max_abs": float(disc.diagnostics["max_abs_vorticity_residual"]),
             "orders_to_stretch": float(math.log10(max(residual, 1e-300) / STRETCH)),
         },
@@ -330,7 +518,11 @@ def run_once(
             "continuum_claim": False,
             "arm": "reproduce",
             "hardy_cap_deferred_until_stretch": not bool(stretch_gate["passed"]),
-            "metric": "wang_vorticity_dense_neural_matched_hilbert",
+            "metric": (
+                "free_omega_vorticity_residual_|y|<38"
+                if official is not None
+                else "wang_vorticity_dense_neural_matched_hilbert"
+            ),
             "leftover": dict(CCF_STRETCH_LEFTOVER),
         },
     }
@@ -499,63 +691,43 @@ def escalate_loop(
                     f"(floor {src_floor:.6e} < ab {ab_floor:.6e})",
                     flush=True,
                 )
+    # Signed hat + hard HΩ(0)=(2+λ)/2. Positive exp-core cannot cancel r'(0).
+    # Quadrature matches free_omega_vorticity_residual (n_tail=96, y_trunc=40).
+    # Fixed collocation (resample_every=0) so Gauss–Newton sees one residual map.
+    # L∞ stays the gate; d1/d2 finite differences are off for this stage-1.
+    _stage1 = {
+        "adam_warmup_steps": 0,
+        "multistage_rounds": 0,
+        "train_hilbert": "wholeline_hp",
+        "depth": 3,
+        "hidden": 64,
+        "n_fourier": 16,
+        "fourier_scale": 2.0,
+        "mg_solver": "cgls",
+        "y_max": 40.0,
+        "use_grad_norm": False,
+        "exp_core": False,
+        "hard_core_cancel": True,
+        "mg_damping_strategy": "classic",
+        "hilbert_n_quad": 96,
+        "hilbert_n_aux": 128,
+        "hilbert_n_far": 64,
+        "resample_every": 0,
+        "d1_weight": 0.0,
+        "d2_weight": 0.0,
+        "score_collocation": True,
+        "qr_gn_steps": 0,
+        "residual_norm": "l2",
+        "reject_max_increase": True,
+        "n_grid": 1601,
+        "dense_n_val": 1601,
+    }
+    # Continuation of the score-grid Fourier net. Exact-JVP CGLS with a
+    # monotone max-|r| filter stalled near 1.13e-1 (damping ~1e6, 7th-digit
+    # motion). Further rounds record that plateau; they do not retarget 1e-13.
     schedule: list[dict[str, Any]] = [
-        {
-            "hidden": 48,
-            "n_grid": 97,
-            "mg_steps": 300,
-            "adam_warmup_steps": 0,
-            "multistage_rounds": 0,
-            "train_hilbert": "wholeline_hp",
-            "depth": 2,
-            "mg_solver": "qr",
-            "dense_n_val": 1601,
-            "y_max": 60.0,
-            "use_grad_norm": False,
-            "exp_core": True,
-        },
-        {
-            "hidden": 48,
-            "n_grid": 97,
-            "mg_steps": 300,
-            "adam_warmup_steps": 0,
-            "multistage_rounds": 0,
-            "train_hilbert": "wholeline_hp",
-            "depth": 2,
-            "mg_solver": "qr",
-            "dense_n_val": 1601,
-            "y_max": 60.0,
-            "use_grad_norm": True,
-            "exp_core": False,
-        },
-        {
-            "hidden": 48,
-            "n_grid": 97,
-            "mg_steps": 300,
-            "adam_warmup_steps": 0,
-            "multistage_rounds": 0,
-            "train_hilbert": "wholeline_hp",
-            "depth": 2,
-            "mg_solver": "qr",
-            "dense_n_val": 1601,
-            "y_max": 60.0,
-            "use_grad_norm": False,
-            "exp_core": False,
-        },
-        {
-            "hidden": 48,
-            "n_grid": 129,
-            "mg_steps": 600,
-            "adam_warmup_steps": 0,
-            "multistage_rounds": 0,
-            "train_hilbert": "wholeline_hp",
-            "depth": 2,
-            "mg_solver": "qr",
-            "dense_n_val": 2001,
-            "y_max": 60.0,
-            "use_grad_norm": False,
-            "exp_core": True,
-        },
+        {**_stage1, "mg_steps": 20},
+        {**_stage1, "mg_steps": 20},
     ]
     if smoke:
         schedule = [
