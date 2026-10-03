@@ -2,8 +2,9 @@
 # Copyright (C) 2026 Derivon
 """omnibias-sos: certified universal positivity by optimization.
 
-A polynomial ``p(x) >= 0`` for **all** ``x`` iff it has an SOS decomposition
-``p = z(x)^T Q z(x)`` with ``Q`` positive semidefinite.  A floating-point
+An SOS decomposition ``p = z(x)^T Q z(x)`` with positive-semidefinite ``Q``
+certifies ``p(x) >= 0`` for every ``x``. Some nonnegative polynomials are not
+sums of squares. A floating-point
 semidefinite program *proposes* the Gram matrix ``Q``; the *proof* is a rigorous,
 outward-rounded interval ``LDL^T`` positive-definiteness certificate from
 :mod:`omnibias.core.verified` -- the same finite obligation the Mathlib-free Lean
@@ -19,15 +20,6 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError as _PkgNotFound
 from importlib.metadata import version as _pkg_version
 
-from omnibias.sos.auxiliary import (
-    DEFAULT_SLACKS,
-    AuxiliaryBoundCertificate,
-    PolynomialSystem,
-    certify_time_average_bound,
-    energy_conserving_triad_system,
-    energy_observable,
-    seal_auxiliary_bound,
-)
 from omnibias.sos.certify import (
     DEFAULT_DENOMINATORS,
     certify_sos,
@@ -37,12 +29,7 @@ from omnibias.sos.certify import (
     named_adapted_problems,
     rational_gram,
 )
-from omnibias.sos.formal import (
-    drive_sos_obligation,
-    is_theorem_prover_verified,
-    lean_available,
-    lean_check_sos,
-)
+from omnibias.sos.formal import is_theorem_prover_verified, lean_available, lean_check_sos
 from omnibias.sos.honesty import (
     FINITE_DIM_SYSTEM,
     GALERKIN_TRUNCATION,
@@ -73,28 +60,17 @@ from omnibias.sos.problem import (
     RationalPolynomial,
     SOSCertificate,
 )
-from omnibias.sos.proofmachine import (
-    SOS_GLOBAL_NONNEG,
-    SOS_NONNEG_ON_SET,
-    SOS_TIME_AVERAGE_BOUND,
-    build_sos_machine,
-    replay_sos_certificate,
-    sos_certificate_schema_errors,
-    sos_provers,
-)
 
 try:
     __version__ = _pkg_version("omnibias-sos")
 except _PkgNotFound:  # pragma: no cover - bare source checkout
     __version__ = "0.0.0+unknown"
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Limit family exposed as package metadata.
 __lineage__ = "exempt: infrastructure"
 
 __all__ = [
-    "AuxiliaryBoundCertificate",
     "DEFAULT_DENOMINATORS",
-    "DEFAULT_SLACKS",
     "Exponent",
     "FINITE_DIM_SYSTEM",
     "GALERKIN_TRUNCATION",
@@ -102,28 +78,19 @@ __all__ = [
     "MonomialBasis",
     "Polynomial",
     "PolynomialInequalityBackend",
-    "PolynomialSystem",
     "PositivstellensatzCertificate",
     "RationalPolynomial",
     "SOSCertificate",
     "SOSMultiplier",
     "SOSProblem",
     "SOSScope",
-    "SOS_GLOBAL_NONNEG",
-    "SOS_NONNEG_ON_SET",
-    "SOS_TIME_AVERAGE_BOUND",
     "__lineage__",
     "__version__",
     "arrangement_adapted_basis",
-    "build_sos_machine",
     "certify_nonneg_on_set",
     "certify_sos",
     "certify_sos_rational",
-    "certify_time_average_bound",
     "degree_reduction_report",
-    "drive_sos_obligation",
-    "energy_conserving_triad_system",
-    "energy_observable",
     "gram_products",
     "gram_to_poly",
     "honesty_labels",
@@ -135,10 +102,6 @@ __all__ = [
     "monomial_basis",
     "named_adapted_problems",
     "rational_gram",
-    "replay_sos_certificate",
-    "seal_auxiliary_bound",
     "seal_positivstellensatz_certificate",
     "seal_sos_certificate",
-    "sos_certificate_schema_errors",
-    "sos_provers",
 ]

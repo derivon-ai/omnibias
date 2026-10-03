@@ -42,7 +42,7 @@ of a chain would only produce cascading ``NameError``s in the rest -- so any
 
 A missing **third-party** import (matplotlib, pandas, ...) skips the document:
 the snippet was not verified, and the skip says so. A missing **omnibias**
-module is a hard failure, since all 42 distributions are installed in CI -- that
+module is a hard failure, since all primitive distributions are installed in CI -- that
 is exactly the "documented import no longer exists" bug this module exists to
 catch.
 """
@@ -83,9 +83,9 @@ REPO_IMPORT_ROOTS = frozenset({"omnibias", "examples"})
 
 #: Whether a missing ``omnibias.*`` module is a failure rather than a skip.
 #:
-#: The dedicated CI job installs all 42 distributions and sets this, so a
+#: The dedicated CI job installs all primitive distributions and sets this, so a
 #: documented import that no longer exists is caught. A plain ``uv run pytest``
-#: installs only the four workspace members, so there the same import is an
+#: installs the primitive workspace members, so there the same import is an
 #: honest "not verified here" skip instead of a false alarm.
 STRICT_IMPORTS = os.environ.get("OMNIBIAS_DOCS_SNIPPETS_STRICT", "") == "1"
 

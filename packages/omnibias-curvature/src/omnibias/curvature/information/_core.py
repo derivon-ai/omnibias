@@ -320,8 +320,7 @@ def fisher_distance(
 
     Equals the geodesic in one parameter. In several parameters it is
     the length of the linear interpolant (an upper bound on the
-    geodesic). ``as_manifold_spec`` exposes the same ``G`` to
-    ``omnibias.geometry`` when that package is installed.
+    geodesic). The returned matrix can be used directly by downstream geometry code.
     """
     if steps < 1:
         raise ValueError(f"steps must be >= 1, got {steps}")
@@ -554,34 +553,6 @@ def sample_family(
     )
 
 
-def as_manifold_spec(family: PackFamily, *, closed_form: bool = True) -> Any:
-    """Wrap ``G`` as an ``omnibias.geometry`` :class:`ManifoldSpec`.
-
-    ``g_point`` calls the numpy metric, so Christoffel symbols via
-    autodiff of this wrap are not available. Geodesic *length* uses
-    :func:`fisher_distance`. Requires ``omnibias-geometry``.
-    """
-    try:
-        from omnibias.geometry._core.manifold import ManifoldSpec, MetricSpec
-    except ImportError as exc:  # pragma: no cover - optional extra
-        raise ImportError(
-            "as_manifold_spec requires omnibias-geometry; fisher_distance "
-            "does not"
-        ) from exc
-
-    dim = family.n_params
-
-    def g_point(coords: Any) -> Any:
-        import jax.numpy as jnp
-
-        metric = fisher_metric(family, coords, closed_form=closed_form)
-        return jnp.asarray(metric)
-
-    return ManifoldSpec(
-        name=f"pack_fisher_{family.kind}",
-        dim=dim,
-        metric=MetricSpec(g_point=g_point, dim=dim, name="pack_fisher"),
-    )
 
 
 def honesty_payload() -> dict[str, object]:
@@ -919,7 +890,6 @@ __all__ = [
     "PATH_MC",
     "PINV_RCOND_RULE",
     "PackFamily",
-    "as_manifold_spec",
     "collapse_degeneracy",
     "damped_natural_step",
     "distinguishability_samples",

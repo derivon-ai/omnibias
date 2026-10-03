@@ -3,7 +3,7 @@
 """Arrangement graph / Face-Net (theory 02-02, gated).
 
 Sampling is a subgraph. ``beta -> inf`` is temperature collapse, not
-founding ``delta -> 0``. Sound gap, not P vs NP.
+founding ``delta -> 0``. Sound gap.
 """
 
 from __future__ import annotations

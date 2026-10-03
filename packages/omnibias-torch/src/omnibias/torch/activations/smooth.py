@@ -20,7 +20,6 @@ from omnibias.torch.fastpath.eulerian import (
 )
 from omnibias.torch.fastpath.hermite import gaussian_forward, gaussian_nth_derivative
 from omnibias.torch.fastpath.legendre import tanh_nth_derivative, tanh_tower
-from omnibias.torch.transforms import GAUSSIAN_TRANSFORMS, SIGMOID_TRANSFORMS, TANH_TRANSFORMS
 
 import torch
 import torch.nn.functional as F
@@ -45,7 +44,6 @@ def _sigmoid_integral(z: Tensor) -> Tensor:
 SIGMOID = register_activation(
     ActivationSpec(
         name="sigmoid",
-        transforms=SIGMOID_TRANSFORMS,
         forward=_sigmoid,
         derivative=_sigmoid_derivative,
         fastpath=sigmoid_nth_derivative,
@@ -83,7 +81,6 @@ def _tanh_integral(z: Tensor) -> Tensor:
 TANH = register_activation(
     ActivationSpec(
         name="tanh",
-        transforms=TANH_TRANSFORMS,
         forward=_tanh,
         derivative=_tanh_derivative,
         fastpath=tanh_nth_derivative,
@@ -149,7 +146,6 @@ def _gaussian_integral(z: Tensor) -> Tensor:
 GAUSSIAN = register_activation(
     ActivationSpec(
         name="gaussian",
-        transforms=GAUSSIAN_TRANSFORMS,
         forward=_gaussian,
         derivative=_gaussian_derivative,
         fastpath=gaussian_nth_derivative,
@@ -167,4 +163,9 @@ GAUSSIAN = register_activation(
 )
 
 
-__all__ = ["GAUSSIAN", "SIGMOID", "SOFTPLUS", "TANH"]
+__all__ = [
+    "GAUSSIAN",
+    "SIGMOID",
+    "SOFTPLUS",
+    "TANH",
+]

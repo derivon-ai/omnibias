@@ -16,7 +16,7 @@ arithmetic.
 
 The result is a fixed-real-time complex flow enclosure.  It does **not** by
 itself certify a parameter-dependent first-hit time, a holomorphic return map,
-or Log-Noetherian differential-polynomial closure.  Those require a complex
+or differential-polynomial closure. Those require a complex
 implicit-event argument and separate format bounds.
 """
 

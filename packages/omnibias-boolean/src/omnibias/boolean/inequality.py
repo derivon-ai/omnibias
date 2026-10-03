@@ -3,7 +3,7 @@
 r"""Boolean inequality adapter (theory 09-30).
 
 Exact ``solve_system`` on a finite cube. Propose is skipped.
-``budget == 0`` is ``search_incomplete``. ``p_equals_np_claim`` stays false.
+``budget == 0`` is ``search_incomplete``.
 """
 
 from __future__ import annotations
@@ -54,7 +54,6 @@ class BooleanInequalityBackend:
                     "method": "search_incomplete",
                     "honesty": {
                         "complete_solver": False,
-                        "p_equals_np_claim": False,
                     },
                     "detail": "search_incomplete",
                 },
@@ -73,7 +72,6 @@ class BooleanInequalityBackend:
         solution = solve_system(tables)
         honesty = {
             "complete_solver": True,
-            "p_equals_np_claim": False,
             "unsat_proof": not solution.consistent,
         }
         if solution.consistent:

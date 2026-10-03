@@ -14,7 +14,7 @@ in one backend evaluates / certifies identically in the other.
 
 Terminology: the gate hardens as ``beta -> inf`` -- the feasibility / temperature sense of
 "collapse", distinct from the **founding bias collapse** (the multi-bias ``delta -> 0``
-limit to the closed-form derivative ``sigma^(K-1)``; see ``docs/theory.md``).
+limit to the closed-form derivative ``sigma^(K-1)``; see ``docs/derivatives.md``).
 """
 
 from __future__ import annotations

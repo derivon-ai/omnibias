@@ -4,7 +4,7 @@ r"""Exact-``Q`` lift: residual identically zero, or ``None``.
 
 A float residual is not a certificate. :func:`residual_identically_zero` and
 :func:`integer_null_space` adjudicate over :class:`~fractions.Fraction` only.
-This module does not delete the copy in ``omnibias.symbolic.dimensional``.
+Applications use this module for exact rational residual checks.
 """
 
 from __future__ import annotations

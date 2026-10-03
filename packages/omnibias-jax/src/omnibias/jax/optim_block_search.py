@@ -5,7 +5,7 @@ r"""Block / coordinate exact search (theory 08-07), JAX twin.
 A sparse block direction is handed to the 03-12 jet line search
 (``verify=True`` never-worse). Last-layer least squares is exactly
 quadratic. This is a coordinate / block sweep, not a global solver
-and not CCF stretch.
+
 
 ``loss_fn`` must be jit-compatible. Enable x64 before the first array
 when matching the torch twin.

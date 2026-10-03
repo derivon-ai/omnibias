@@ -353,310 +353,90 @@ def tensor_double_dot(a: Array, b: Array) -> Array:
 # ---------------- continuum mechanics / fluids (mechanics.py) --
 
 
-def velocity_from_streamfunction(state: FieldState, psi: str) -> Array:
-    from omnibias.fields.jax.ops.mechanics import velocity_from_streamfunction as _v
-    return _v(state, psi)
 
 
-def vorticity_from_streamfunction(state: FieldState, psi: str) -> Array:
-    from omnibias.fields.jax.ops.mechanics import vorticity_from_streamfunction as _w
-    return _w(state, psi)
 
 
-def newtonian_stress(
-    state: FieldState, velocity: tuple[str, ...], *,
-    viscosity: float = 1.0, pressure: str | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.mechanics import newtonian_stress as _ns
-    return _ns(state, velocity, viscosity=viscosity, pressure=pressure)
 
 
-def linear_elastic_stress(
-    state: FieldState, displacement: tuple[str, ...], *,
-    lam: float = 1.0, mu: float = 1.0,
-) -> Array:
-    from omnibias.fields.jax.ops.mechanics import linear_elastic_stress as _le
-    return _le(state, displacement, lam=lam, mu=mu)
 
 
-def viscous_dissipation(
-    state: FieldState, velocity: tuple[str, ...], *, viscosity: float = 1.0,
-) -> Array:
-    from omnibias.fields.jax.ops.mechanics import viscous_dissipation as _vd
-    return _vd(state, velocity, viscosity=viscosity)
 
 
-def stress_divergence(state: FieldState, sigma_names: Any) -> Array:
-    from omnibias.fields.jax.ops.mechanics import stress_divergence as _sd
-    return _sd(state, sigma_names)
 
 
-def stokes_residual(
-    state: FieldState, *, velocity: tuple[str, ...], pressure: str,
-    viscosity: float = 1.0, body_force: Any = None,
-) -> Array:
-    from omnibias.fields.jax.ops.mechanics import stokes_residual as _sr
-    return _sr(
-        state, velocity=velocity, pressure=pressure,
-        viscosity=viscosity, body_force=body_force,
-    )
 
 
-def navier_cauchy_residual(
-    state: FieldState, *, displacement: tuple[str, ...],
-    lam: float = 1.0, mu: float = 1.0, body_force: Any = None,
-) -> Array:
-    from omnibias.fields.jax.ops.mechanics import navier_cauchy_residual as _nc
-    return _nc(
-        state, displacement=displacement, lam=lam, mu=mu, body_force=body_force,
-    )
 
 
 # ---------------- chemistry / transport (chemistry.py) --------
 
 
-def fickian_flux(state: FieldState, name: str, *, diffusivity: float | str = 1.0) -> Array:
-    from omnibias.fields.jax.ops.chemistry import fickian_flux as _ff
-    return _ff(state, name, diffusivity=diffusivity)
 
 
-def nernst_planck_flux(
-    state: FieldState, concentration: str, potential: str, *,
-    diffusivity: float | str = 1.0, valence: float = 1.0,
-    mobility: float = 1.0, faraday: float = 1.0,
-) -> Array:
-    from omnibias.fields.jax.ops.chemistry import nernst_planck_flux as _np
-    return _np(
-        state, concentration, potential, diffusivity=diffusivity,
-        valence=valence, mobility=mobility, faraday=faraday,
-    )
 
 
-def darcy_flux(
-    state: FieldState, pressure: str, *,
-    permeability: float | str = 1.0, viscosity: float = 1.0,
-) -> Array:
-    from omnibias.fields.jax.ops.chemistry import darcy_flux as _df
-    return _df(state, pressure, permeability=permeability, viscosity=viscosity)
 
 
-def nernst_planck_residual(
-    state: FieldState, *, concentration: str, potential: str,
-    diffusivity: float | str = 1.0, valence: float = 1.0,
-    mobility: float = 1.0, faraday: float = 1.0,
-    source: str | float | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.chemistry import nernst_planck_residual as _npr
-    return _npr(
-        state, concentration=concentration, potential=potential,
-        diffusivity=diffusivity, valence=valence, mobility=mobility,
-        faraday=faraday, source=source,
-    )
 
 
-def reaction_diffusion_residual(
-    state: FieldState, *, scalar: str, diffusivity: float | str = 1.0,
-    reaction: Any = None, source: str | float | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.chemistry import reaction_diffusion_residual as _rd
-    return _rd(
-        state, scalar=scalar, diffusivity=diffusivity, reaction=reaction, source=source,
-    )
 
 
-def poisson_residual(
-    state: FieldState, potential: str, *,
-    source: str | float | None = None, permittivity: float | str = 1.0,
-) -> Array:
-    from omnibias.fields.jax.ops.chemistry import poisson_residual as _pr
-    return _pr(state, potential, source=source, permittivity=permittivity)
 
 
 # ---------------- electromagnetism (electromagnetism.py) ------
 
 
-def faraday_residual(
-    state: FieldState, *, electric: tuple[str, ...], magnetic: tuple[str, ...],
-) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import faraday_residual as _f
-    return _f(state, electric=electric, magnetic=magnetic)
 
 
-def ampere_residual(
-    state: FieldState, *, electric: tuple[str, ...], magnetic: tuple[str, ...],
-    current: tuple[str, ...] | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import ampere_residual as _a
-    return _a(state, electric=electric, magnetic=magnetic, current=current)
 
 
-def gauss_residual(
-    state: FieldState, *, electric: tuple[str, ...], charge: str | float | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import gauss_residual as _g
-    return _g(state, electric=electric, charge=charge)
 
 
-def gauss_magnetic_residual(state: FieldState, *, magnetic: tuple[str, ...]) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import gauss_magnetic_residual as _gm
-    return _gm(state, magnetic=magnetic)
 
 
-def poynting_vector(
-    state: FieldState, *, electric: tuple[str, ...], magnetic: tuple[str, ...],
-) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import poynting_vector as _p
-    return _p(state, electric=electric, magnetic=magnetic)
 
 
-def magnetic_field_from_potential(state: FieldState, *, potential: tuple[str, ...]) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import magnetic_field_from_potential as _m
-    return _m(state, potential=potential)
 
 
-def electric_field_from_potentials(
-    state: FieldState, *, scalar_potential: str,
-    vector_potential: tuple[str, ...] | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import electric_field_from_potentials as _e
-    return _e(state, scalar_potential=scalar_potential, vector_potential=vector_potential)
 
 
-def lorenz_gauge_residual(
-    state: FieldState, *, scalar_potential: str, vector_potential: tuple[str, ...],
-) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import lorenz_gauge_residual as _l
-    return _l(state, scalar_potential=scalar_potential, vector_potential=vector_potential)
 
 
-def vector_dalembertian(
-    state: FieldState, names: tuple[str, ...], *,
-    c: float = 1.0, signature: str = "mostly_plus",
-) -> Array:
-    from omnibias.fields.jax.ops.electromagnetism import vector_dalembertian as _vd
-    return _vd(state, names, c=c, signature=signature)
 
 
 # ---------------- magnetohydrodynamics (mhd.py) ----------------
 
 
-def current_density(state: FieldState, *, magnetic: tuple[str, ...]) -> Array:
-    from omnibias.fields.jax.ops.mhd import current_density as _cd
-    return _cd(state, magnetic=magnetic)
 
 
-def lorentz_force(
-    state: FieldState, *, magnetic: tuple[str, ...],
-    current: tuple[str, ...] | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.mhd import lorentz_force as _lf
-    return _lf(state, magnetic=magnetic, current=current)
 
 
-def magnetic_pressure(state: FieldState, *, magnetic: tuple[str, ...]) -> Array:
-    from omnibias.fields.jax.ops.mhd import magnetic_pressure as _mp
-    return _mp(state, magnetic=magnetic)
 
 
-def maxwell_stress_tensor(
-    state: FieldState, *, magnetic: tuple[str, ...],
-    electric: tuple[str, ...] | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.mhd import maxwell_stress_tensor as _mst
-    return _mst(state, magnetic=magnetic, electric=electric)
 
 
-def magnetic_divergence(state: FieldState, *, magnetic: tuple[str, ...]) -> Array:
-    from omnibias.fields.jax.ops.mhd import magnetic_divergence as _md
-    return _md(state, magnetic=magnetic)
 
 
-def induction_residual(
-    state: FieldState, *, velocity: tuple[str, ...], magnetic: tuple[str, ...],
-    resistivity: float = 0.0,
-) -> Array:
-    from omnibias.fields.jax.ops.mhd import induction_residual as _ir
-    return _ir(state, velocity=velocity, magnetic=magnetic, resistivity=resistivity)
 
 
-def ideal_mhd_momentum_residual(
-    state: FieldState, *, velocity: tuple[str, ...], magnetic: tuple[str, ...],
-    pressure: str, density: float = 1.0, viscosity: float = 0.0,
-    current: tuple[str, ...] | None = None,
-    forcing: tuple[str, ...] | Array | None = None,
-) -> Array:
-    from omnibias.fields.jax.ops.mhd import ideal_mhd_momentum_residual as _mm
-    return _mm(
-        state, velocity=velocity, magnetic=magnetic, pressure=pressure,
-        density=density, viscosity=viscosity, current=current, forcing=forcing,
-    )
 
 
 # ---------------- kinetic theory (kinetic.py) ------------------
 
 
-def vlasov_residual(
-    state: FieldState, name: str, *,
-    position_axes: tuple[str, ...], velocity_axes: tuple[str, ...],
-    force: tuple[str, ...] | Array | None = None, mass: float = 1.0,
-) -> Array:
-    from omnibias.fields.jax.ops.kinetic import vlasov_residual as _vr
-    return _vr(
-        state, name, position_axes=position_axes, velocity_axes=velocity_axes,
-        force=force, mass=mass,
-    )
 
 
-def bgk_collision(
-    state: FieldState, name: str, *, equilibrium: str | Array, tau: float,
-) -> Array:
-    from omnibias.fields.jax.ops.kinetic import bgk_collision as _bc
-    return _bc(state, name, equilibrium=equilibrium, tau=tau)
 
 
-def bgk_vlasov_residual(
-    state: FieldState, name: str, *,
-    position_axes: tuple[str, ...], velocity_axes: tuple[str, ...],
-    equilibrium: str | Array, tau: float,
-    force: tuple[str, ...] | Array | None = None, mass: float = 1.0,
-) -> Array:
-    from omnibias.fields.jax.ops.kinetic import bgk_vlasov_residual as _bvr
-    return _bvr(
-        state, name, position_axes=position_axes, velocity_axes=velocity_axes,
-        equilibrium=equilibrium, tau=tau, force=force, mass=mass,
-    )
 
 
-def maxwellian(
-    state: FieldState, *, velocity_axes: tuple[str, ...],
-    density: float | Array = 1.0,
-    bulk_velocity: tuple[float, ...] | Array | None = None,
-    temperature: float | Array = 1.0, mass: float = 1.0,
-) -> Array:
-    from omnibias.fields.jax.ops.kinetic import maxwellian as _mx
-    return _mx(
-        state, velocity_axes=velocity_axes, density=density,
-        bulk_velocity=bulk_velocity, temperature=temperature, mass=mass,
-    )
 
 
-def number_density(state: FieldState, name: str, *, rule: Any) -> Array:
-    from omnibias.fields.jax.ops.kinetic import number_density as _nd
-    return _nd(state, name, rule=rule)
 
 
-def momentum_density(
-    state: FieldState, name: str, *, rule: Any, velocity_axes: tuple[str, ...],
-) -> Array:
-    from omnibias.fields.jax.ops.kinetic import momentum_density as _md
-    return _md(state, name, rule=rule, velocity_axes=velocity_axes)
 
 
-def kinetic_energy_density(
-    state: FieldState, name: str, *, rule: Any, velocity_axes: tuple[str, ...],
-) -> Array:
-    from omnibias.fields.jax.ops.kinetic import kinetic_energy_density as _ked
-    return _ked(state, name, rule=rule, velocity_axes=velocity_axes)
 
 
 def list_ops() -> tuple[str, ...]:
@@ -670,16 +450,11 @@ def list_ops() -> tuple[str, ...]:
 __all__ = [
     "advection",
     "advection_diffusion_residual",
-    "ampere_residual",
-    "bgk_collision",
-    "bgk_vlasov_residual",
     "biharmonic",
     "conservation_residual",
     "curl",
     "curl_of_curl",
-    "current_density",
     "dalembertian",
-    "darcy_flux",
     "deformation_gradient",
     "derivative",
     "diffusive_flux",
@@ -688,74 +463,42 @@ __all__ = [
     "divergence",
     "dz",
     "dzbar",
-    "electric_field_from_potentials",
-    "faraday_residual",
-    "fickian_flux",
     "flux_divergence",
-    "gauss_magnetic_residual",
-    "gauss_residual",
     "grad_squared_norm",
     "gradient",
     "gradient_of_composition",
     "gradient_of_derivative",
     "gradient_of_divergence",
     "hessian",
-    "ideal_mhd_momentum_residual",
-    "induction_residual",
     "inner_product",
     "integrate",
     "jacobian",
-    "kinetic_energy_density",
     "l2_norm",
     "laplacian",
     "laplacian_of_composition",
     "line_integral",
-    "linear_elastic_stress",
     "list_ops",
-    "lorentz_force",
-    "lorenz_gauge_residual",
-    "magnetic_divergence",
-    "magnetic_field_from_potential",
-    "magnetic_pressure",
     "material_derivative",
-    "maxwell_stress_tensor",
-    "maxwellian",
     "mixed_partial",
-    "momentum_density",
-    "navier_cauchy_residual",
-    "nernst_planck_flux",
-    "nernst_planck_residual",
-    "newtonian_stress",
-    "number_density",
     "p_laplacian",
-    "poisson_residual",
     "polylaplacian",
-    "poynting_vector",
     "rate_of_rotation_tensor",
-    "reaction_diffusion_residual",
     "rot",
     "skew_symmetric_advection",
     "sobolev_norm",
     "spatial_hessian",
     "spatial_jacobian",
     "stack_components",
-    "stokes_residual",
     "strain_rate",
-    "stress_divergence",
     "tensor_divergence",
     "tensor_double_dot",
     "value",
     "variable_coefficient_diffusion",
     "vector_biharmonic",
-    "vector_dalembertian",
     "vector_derivative",
     "vector_hessian",
     "vector_laplacian",
     "vector_polylaplacian",
-    "velocity_from_streamfunction",
-    "viscous_dissipation",
-    "vlasov_residual",
     "vorticity",
-    "vorticity_from_streamfunction",
     "wave_operator",
 ]

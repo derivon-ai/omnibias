@@ -128,12 +128,3 @@ def test_worked_example_and_honesty() -> None:
     assert payload["temperature_collapse"] is False
     assert payload["k_ge_3_fisher"] == "inapplicable_not_a_density"
     assert payload["theorem_prover_verified"] is False
-
-
-def test_as_manifold_spec_optional() -> None:
-    pytest.importorskip("omnibias.geometry")
-    from omnibias.curvature.information import as_manifold_spec
-
-    spec = as_manifold_spec(logistic_location_family())
-    assert spec.dim == 1
-    assert spec.name.startswith("pack_fisher_")

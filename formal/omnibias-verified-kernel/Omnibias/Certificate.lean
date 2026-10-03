@@ -8,7 +8,7 @@ hence kernel-checkable here, sorry-free:
 * **spectral-gap positivity** -- a Birkhoff-Hopf / Perron certificate carries a
   subdominant-ratio upper bound `r = rn/rd < 1`; the spectral gap lower bound is
   `1 - r = (rd - rn)/rd`, whose positivity reduces to the `Int` fact `rn < rd`;
-* **sign of an enclosed quantity** -- a CLM / CCF certificate encloses a scalar
+* **sign of an enclosed quantity** -- a interval certificate encloses a scalar
   (e.g. `H ω₀(0)`, or a closure margin) in a rational interval `[lo, hi]`; the
   blow-up / closure obligation is `0 < lo` (certified) or `hi < 0` (excluded);
 * **a rational equality** -- a special-number identity `p/q = r/s` (a Bernoulli
@@ -55,14 +55,14 @@ theorem spectral_gap_pos {rn rd : Int} (_hrd : 0 < rd) (hlt : rn < rd) :
 /-- The gap, as a `ZInterval` lower-bounded by its certified numerator. -/
 def gapInterval (rn rd : Int) : ZInterval := ⟨gapNumerator rn rd, rd⟩
 
-/-- **CLM / CCF sign obligation (certified).** A quantity enclosed in `I` with a
+/-- **interval sign obligation (certified).** A quantity enclosed in `I` with a
 strictly positive lower endpoint is strictly positive -- the blow-up / closure
 criterion holds for *every* value in the enclosure. -/
 theorem enclosed_quantity_pos {x : Int} {I : ZInterval}
     (hx : ZInterval.Mem x I) (hlo : 0 < I.lo) : 0 < x :=
   ZInterval.pos_of_mem_of_lo_pos hx hlo
 
-/-- **CLM sign obligation (excluded).** A quantity enclosed in `I` with a strictly
+/-- **interval sign obligation (excluded).** A quantity enclosed in `I` with a strictly
 negative upper endpoint is strictly negative -- the criterion fails for *every*
 value in the enclosure, so the property is rigorously ruled out. -/
 theorem enclosed_quantity_neg {x : Int} {I : ZInterval}

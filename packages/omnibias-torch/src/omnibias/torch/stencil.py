@@ -30,7 +30,7 @@ when ``delta`` is updated.
 Terminology: this ``delta -> 0`` limit is *the* **founding bias collapse**
 (``K`` biases collapse onto one value, yielding ``sigma^(K-1)``). Do not confuse
 it with **temperature collapse**, the ``beta -> inf`` penalty in
-:mod:`omnibias.convex` (a feasibility step, not a derivative). See ``docs/theory.md``.
+:mod:`omnibias.convex` (a feasibility step, not a derivative). See ``docs/derivatives.md``.
 """
 
 from __future__ import annotations

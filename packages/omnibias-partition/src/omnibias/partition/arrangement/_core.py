@@ -7,7 +7,7 @@ A depth-``d`` oblique partition is a tree: ``2**d`` regions. An arrangement of
 returns a **lower bound**, never the complete face lattice.
 
 ``beta -> inf`` here is **temperature collapse** (soft indicators hardening),
-not founding ``delta -> 0``. The gap is sound, not P vs NP, not theorem-prover.
+not founding ``delta -> 0``. The gap is sound, not theorem-prover.
 """
 
 from __future__ import annotations

@@ -135,7 +135,7 @@ def polylaplacian_multinomial_terms(
     ``|beta| = k``, so that ``Delta^k f = sum_beta (k! / beta!) D^(2 beta) f``.
     Shared by both ``JetMLPVectorField`` twins (promoted out of the
     previously duplicated private ``_polylaplacian_terms`` in
-    ``omnibias.pinn.{jax,torch}.fields.jet_mlp``) and by
+    field-network adapters) and by
     :func:`polylaplacian_support_terms` below, which further groups these
     terms by support so a deep field never needs the full order-``2k`` jet.
     """

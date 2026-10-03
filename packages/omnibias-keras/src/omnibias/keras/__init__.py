@@ -63,7 +63,7 @@ from omnibias.keras.unit import OperatorMultiBiasUnit
 OMBU = OperatorMultiBiasUnit
 GrowableOMBU = GrowableOperatorMultiBiasUnit
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Limit family exposed as package metadata.
 __lineage__ = "bias collapse"
 
 __all__ = [

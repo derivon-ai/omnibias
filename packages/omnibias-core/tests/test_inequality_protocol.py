@@ -32,7 +32,6 @@ def test_missing_backend_is_blocked() -> None:
     status, payload, honesty = run_inequality_pipeline(system)
     assert status == "BLOCKED"
     assert payload["detail"] == "backend_unavailable"
-    assert honesty["p_equals_np_claim"] is False
     attempt = prove_inequality(
         Conjecture("missing", INEQUALITY_KIND, system.as_dict())
     )
@@ -45,9 +44,6 @@ def test_honesty_defaults_forbid_parent_claims() -> None:
     assert honesty["new_lp_algorithm_claim"] is False
     assert honesty["unsat_from_float_infeasible"] is False
     assert honesty["soft_residual_is_exact_check"] is False
-    assert honesty["jacobian_conjecture_proof_claim"] is False
-    assert honesty["navier_stokes_proof_claim"] is False
-    assert honesty["yang_mills_mass_gap_claim"] is False
 
 
 def test_soft_residual_cannot_become_exact_check() -> None:

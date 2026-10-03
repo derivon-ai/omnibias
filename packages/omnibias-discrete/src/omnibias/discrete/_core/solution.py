@@ -5,7 +5,7 @@ r"""Backend-agnostic result containers for the discrete substrate.
 :class:`DiscreteSolution` is a decoded binary point (an *upper* bound on the minimum
 energy); :class:`GapCertificate` sandwiches the true optimum between a rigorous *lower*
 bound and that decoded energy, so ``lower_bound <= optimum <= energy`` is a **certified
-gap** -- never an exact-optimality (P = NP) claim.
+gap** -- never an exact-optimality  claim.
 """
 
 from __future__ import annotations
@@ -49,7 +49,7 @@ class GapCertificate:
     Combines a rigorous **lower** bound on the minimum energy with the decoded point's
     energy as the **upper** bound, so the true optimum is provably sandwiched
     ``lower_bound <= optimum <= energy``; the gap certifies how close to optimal the
-    point is -- **without** any exact-optimality (P = NP) claim.
+    point is -- **without** any exact-optimality  claim.
 
     Attributes
     ----------

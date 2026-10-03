@@ -17,7 +17,7 @@ picked by the hard gates. The torch / jax twins reproduce this bit-for-bit (floa
 
 Terminology: the gate's ``beta -> inf`` hardening is the feasibility / temperature sense of
 "collapse", distinct from the **founding bias collapse** (the multi-bias ``delta -> 0``
-limit to the closed-form derivative ``sigma^(K-1)``; see ``docs/theory.md``).
+limit to the closed-form derivative ``sigma^(K-1)``; see ``docs/derivatives.md``).
 """
 
 from __future__ import annotations

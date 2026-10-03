@@ -1,38 +1,15 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Reference JAX architectures built on the omnibias closed-form jets.
+"""Reusable PINN architectures over the shared activation derivative tower.
 
-* :class:`~omnibias.jax.architectures.pinn.JetMLP` -- deep, arbitrary-order
-  physics-informed network whose input derivatives come from the multivariate-jet
-  kernel (bit-identical twin of the torch ``JetMLP``).
-* :class:`~omnibias.jax.architectures.pinn.FourierFeatureMLP` -- sin-encoded random
-  Fourier-feature front end for spectral-bias mitigation, still fully closed-form.
-* :func:`~omnibias.jax.architectures.pinn.make_siren` -- SIREN built as a ``sin``
-  :class:`JetMLP` with exact arbitrary-order derivatives.
-* :class:`~omnibias.jax.architectures.multiscale.AdaptiveJetMLP` /
-  :class:`~omnibias.jax.architectures.multiscale.MscaleMLP` -- the two constructions
-  that put the frequency knob *inside* the network: a trainable activation slope
-  ``sigma(n a z)`` (built from the ``tempered`` combinator, so the tower stays
-  exact) and the MscaleDNN band mixture ``u(x) = sum_j f_j(alpha_j x)``.
-* :class:`~omnibias.jax.architectures.hardbc.HardConstraintField` -- wraps a network
-  as ``u = g + b N`` so a boundary/initial condition holds exactly by construction
-  (no boundary loss term), staying closed form via the jet-level Leibniz product.
-* :class:`~omnibias.jax.architectures.attention.AttentionJetMLP` -- the first
-  *non-local* block on the substrate: a softmax mixture over a trainable memory,
-  whose coordinate derivatives stay closed form through ``jet_attention``.
-* gated :mod:`~omnibias.jax.architectures.scannet` / :mod:`~omnibias.jax.architectures.jetkan`
-  -- Scan-Net (on-lattice equivariance, not ``R^D``) and Jet-KAN (model-jet
-  exactness; the Kolmogorov-Arnold theorem does not justify).
-* :mod:`~omnibias.jax.architectures.piratenet` -- jaxpi α-skip
-  (``α=0`` is identity). Not ImageNet / ViT and not CCF stretch.
+Includes multilayer and Fourier-feature fields, multiscale fields, hard boundary
+constraints, attention jets, integral kernels, and residual networks.
 """
 
 from omnibias.jax.architectures.attention import (
     AttentionJetMLP,
     make_attention_jet_mlp,
 )
-from omnibias.jax.architectures.collapse_net import CollapseNetConfig, collapse_net_forward
-from omnibias.jax.architectures.frame_unet import FrameUNetConfig, frame_unet_forward
 from omnibias.jax.architectures.ftc_net import (
     DualFTCConfig,
     FTCNet,
@@ -53,12 +30,6 @@ from omnibias.jax.architectures.integral_kernel import (
     IntegralKernelConfig,
     integral_kernel_apply,
 )
-from omnibias.jax.architectures.jet_hopfield import JetHopfieldConfig, jet_hopfield_retrieve
-from omnibias.jax.architectures.jet_token import (
-    JetTokenConfig,
-    jet_token_forward,
-    worked_compose_jet,
-)
 from omnibias.jax.architectures.jetkan import (
     JetKANConfig,
     JetKANParams,
@@ -70,7 +41,6 @@ from omnibias.jax.architectures.jetkan import (
     jetkan_from_band_plan,
     refine_pack,
 )
-from omnibias.jax.architectures.ladder import apply_operator, hermite_basis, ladder_apply
 from omnibias.jax.architectures.multiscale import (
     AdaptiveActivation,
     AdaptiveJetMLP,
@@ -79,7 +49,6 @@ from omnibias.jax.architectures.multiscale import (
     make_adaptive_jet_mlp,
     make_mscale_mlp,
 )
-from omnibias.jax.architectures.pack_moe import PackMoEConfig, pack_moe_forward
 from omnibias.jax.architectures.pinn import (
     FourierFeatureMLP,
     JetMLP,
@@ -93,16 +62,6 @@ from omnibias.jax.architectures.piratenet import (
     pirate_apply,
     pirate_features,
 )
-from omnibias.jax.architectures.riccati_flow import RiccatiFlowConfig, riccati_flow
-from omnibias.jax.architectures.scannet import (
-    ScanNetConfig,
-    ScanNetParams,
-    init_scan_net,
-    scan_net_apply,
-    scan_net_from_torch_state,
-    scannet_from_band_plan,
-)
-from omnibias.jax.architectures.sliced_jet import SlicedJetConfig, SlicedJetEncoder
 
 __all__ = [
     "AdaptiveActivation",
@@ -111,48 +70,30 @@ __all__ = [
     "AffineLift",
     "AttentionJetMLP",
     "BoundaryMask",
-    "CollapseNetConfig",
     "DualFTCConfig",
     "FTCNet",
     "FTCNetConfig",
     "FourierFeatureMLP",
-    "FrameUNetConfig",
     "HardConstraintField",
     "IntegralKernelConfig",
-    "JetHopfieldConfig",
     "JetKANConfig",
     "JetKANParams",
     "JetMLP",
-    "JetTokenConfig",
     "MscaleMLP",
-    "PackMoEConfig",
     "PirateNetConfig",
-    "RiccatiFlowConfig",
-    "ScanNetConfig",
-    "ScanNetParams",
-    "SlicedJetConfig",
-    "SlicedJetEncoder",
-    "apply_operator",
-    "collapse_net_forward",
     "dirichlet_interval",
     "dual_ftc_loss",
-    "frame_unet_forward",
     "ftc_block",
-    "hermite_basis",
     "homogeneous_box",
     "init_jet_kan",
     "init_pirate_params",
-    "init_scan_net",
     "initial_value",
     "integral_kernel_apply",
-    "jet_hopfield_retrieve",
     "jet_kan_apply",
     "jet_kan_from_torch_state",
     "jet_kan_jet",
     "jet_kan_jet_mv",
-    "jet_token_forward",
     "jetkan_from_band_plan",
-    "ladder_apply",
     "make_adaptive_activation",
     "make_adaptive_jet_mlp",
     "make_attention_jet_mlp",
@@ -160,13 +101,7 @@ __all__ = [
     "make_jet_mlp",
     "make_mscale_mlp",
     "make_siren",
-    "pack_moe_forward",
     "pirate_apply",
     "pirate_features",
     "refine_pack",
-    "riccati_flow",
-    "scan_net_apply",
-    "scan_net_from_torch_state",
-    "scannet_from_band_plan",
-    "worked_compose_jet",
 ]

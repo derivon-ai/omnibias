@@ -13,7 +13,7 @@ Every run emits a :class:`WidthBudget`. The existing
 :func:`~omnibias.core.verified.lohner.lohner_flow` path is
 untouched (G6). Scope is one field, one initial box, one
 finite horizon. This is not a continuum existence theorem,
-not an attractor statement, and not a Navier-Stokes
+not an attractor statement or a global
 regularity result.
 """
 
@@ -55,8 +55,7 @@ from omnibias.core.verified.sigma import sigma_tower_interval
 
 DISCLAIMER = (
     "finite-horizon enclosure of one trajectory from one initial box; "
-    "not a continuum existence theorem, not an attractor statement, "
-    "and not a Navier-Stokes global regularity result"
+    "with bounds local to the specified horizon and box"
 )
 SCHEMA_VERSION = "validated-dynamics-jet-flow-1"
 _EPS = 2.220446049250313e-16
@@ -151,7 +150,6 @@ def honesty_payload() -> dict[str, bool]:
         "unproven_claim": False,
         "continuum_existence_claim": False,
         "attractor_claim": False,
-        "navier_stokes_regularity_claim": False,
         "theorem_prover_verified": False,
     }
 
@@ -161,7 +159,6 @@ def _seal_honesty() -> dict[str, bool]:
         "unproven_claim": False,
         "continuum_existence_claim": False,
         "attractor_claim": False,
-        "navier_stokes_regularity_claim": False,
     }
 
 

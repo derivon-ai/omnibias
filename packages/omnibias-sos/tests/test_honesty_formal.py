@@ -8,7 +8,6 @@ import pytest
 from omnibias.core.proof.certificate import schema_errors_v1, verify_certificate_digest
 from omnibias.sos.certify import certify_sos
 from omnibias.sos.formal import (
-    drive_sos_obligation,
     is_theorem_prover_verified,
     lean_available,
     lean_check_sos,
@@ -74,7 +73,7 @@ def test_no_scope_can_emit_unproven_claim_true() -> None:
 
 def test_invalid_scope_rejected() -> None:
     with pytest.raises(ValueError, match="scope kind"):
-        SOSScope("navier_stokes_regularity")
+        SOSScope("unsupported_scope")
 
 
 def test_cannot_seal_inconclusive() -> None:
@@ -107,12 +106,3 @@ def test_lean_check_degrades_gracefully() -> None:
         assert not is_theorem_prover_verified(sealed)
     else:  # pragma: no cover - only when a Lean toolchain is installed
         assert result.available is True
-
-
-def test_drive_sos_obligation_is_optional() -> None:
-    _cert, sealed = _sealed()
-    report = drive_sos_obligation(sealed)
-    # None when omnibias-formal is not installed; otherwise a DriveReport that
-    # never conflates its Mathlib tier with theorem_prover_verified or an unproven-result claim.
-    if report is not None:  # pragma: no cover - only when omnibias-formal present
-        assert report.tier in (None, "mathlib_verified")

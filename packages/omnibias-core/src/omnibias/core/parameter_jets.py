@@ -10,7 +10,7 @@ do not conflate the two.
 
 Closed form holds **iff** ``μ`` enters a jet trunk / OMBU. A dense
 ``pde_params`` encoder is autodiff and cannot set ``closed_form``.
-Not a ParamPINN package. Not NS. Not CCF stretch.
+Directional parameter derivatives for the supplied finite network.
 ``theorem_prover_verified`` is not asserted.
 """
 
@@ -23,14 +23,14 @@ from typing import Protocol, runtime_checkable
 
 DISCLAIMER = (
     "mixed x-mu jets; closed_form iff mu is on the jet trunk; "
-    "not a ParamPINN package, not NS, not CCF stretch"
+    "directional parameter derivatives for a finite network"
 )
 
 
 def honesty_payload() -> dict[str, bool]:
     return {
         "parampinn_package": False,
-        "ns_claim": False,
+        "global_pde_claim": False,
         "stretch_claim": False,
         "continuum_claim": False,
         "theorem_prover_verified": False,

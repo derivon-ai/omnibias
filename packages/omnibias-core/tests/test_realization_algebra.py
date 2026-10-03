@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 import random
 from dataclasses import replace
 from fractions import Fraction as Q

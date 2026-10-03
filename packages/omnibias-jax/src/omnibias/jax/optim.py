@@ -1,64 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-r"""Second-order optimisation for omnibias PINNs (JAX): Gauss-Newton + adaptive weights.
+"""Optimization primitives for neural fields and residual least squares.
 
-First-order optimisers (Adam/SGD) stall on PINN losses because the differential
-operator squares the condition number of the problem; they typically plateau near
-``1e-3``. omnibias makes a much stronger optimiser practical: the residual map
-``theta |-> r(theta)`` is computed from the *exact* closed-form jets
-(:meth:`omnibias.jax.architectures.JetMLP.value_grad_hessian`, ``partials``, ...), so
-its parameter-Jacobian ``J = d r / d theta`` is a single clean outer autodiff -- no
-nested-autodiff blow-up, no finite-difference noise in ``r`` or ``J``.
-
-This module provides
-
-* :func:`gauss_newton_direction` -- the (Levenberg-Marquardt damped) Gauss-Newton /
-  natural-gradient direction solving ``(J^T J + mu I) delta = -J^T r``, automatically
-  switching to the equivalent *dual* (kernel / NTK) form ``delta = -J^T (J J^T + mu
-  I)^{-1} r`` when there are more parameters than residuals (the push-through identity
-  ``(J^T J + mu I)^{-1} J^T = J^T (J J^T + mu I)^{-1}`` makes them equal, and the dual
-  system is far better conditioned in the over-parameterised regime).
-* :func:`lstsq_gauss_newton_direction` -- QR / SVD least-squares LM on the *augmented*
-  ``J`` (never squares ``kappa(J)``); prefer this on stiff PINN Jacobians.
-* :func:`cgls` / :func:`gauss_newton_direction_cgls` -- matrix-free CGLS twin of the
-  torch solvers (accuracy scales with ``kappa(J)``, not ``kappa(J)^2``).
-* :func:`martens_grosse_combine` / :func:`martens_grosse_gauss_newton_minimize` --
-  damped GN plus Martens–Grosse closed-form LR / momentum via **exact**
-  :func:`jax.jvp` (no finite-difference probes). Default solver is ``"qr"``.
-* :func:`cubic_regularized_gauss_newton_minimize` -- ARC on the PSD Gauss-Newton
-  model (Lanczos cubic subproblem). Twin of
-  :class:`omnibias.torch.optim.CubicRegularizedGaussNewton`.
-* :func:`hvp` / :func:`cubic_regularized_newton_step` -- exact Hessian-vector
-  product and one full-Hessian cubic step (twins of the torch helpers).
-* :func:`sharpness_lambda_max` -- theory 08-06: largest Ritz value from
-  exact HVPs; :func:`sharpness_scheduled_step` sets cubic ``sigma`` or a
-  learning rate from that value. Hutchinson is not the method.
-* :func:`block_exact_search` -- theory 08-07: 03-12 line search on one
-  named or masked block with ``verify=True``.
-* :func:`omnibias.jax.train_local.local_jet_step` -- theory 08-03:
-  depth-causal local Gauss-Newton on a named residual plus a
-  compressed ``k``-direction ``layer_jet``. Not a rewrite of
-  ``omnibias.pinn.train``.
-* :func:`gauss_newton_step` / :func:`gauss_newton_minimize` -- an adaptive-damping LM
-  loop driven by a ``residual_fn``.
-* :func:`grad_norm_weights` -- self-adaptive loss weights that equalise the per-term
-  gradient norms (Wang-Teng-Perdikaris 2021 gradient-pathology balancing).
-* :func:`linf_minimax_step` / :func:`linf_minimax_minimize` -- the **L-infinity**
-  (minimax) sibling of the Gauss-Newton family above: each step proposes a
-  linearized-epigraph / Lawson-IRLS direction from :func:`linearized_linf_direction`
-  inside a shrinking trust-region ``box`` and accepts it only when the *true*
-  (non-linearized) ``max|r|`` does not increase, so the loop is a monotone descent
-  on ``max_i |r_i(theta)|`` rather than on ``0.5 sum r_i(theta)^2``. This is a
-  generic comparison utility for any ``residual_fn`` -- it makes no claim about any
-  specific model, benchmark, or certified result.
-
-For the standard L2 collocation PINN functional, the Gauss-Newton matrix ``J^T J``
-*is* the empirical Sobolev Gram matrix, so :func:`gauss_newton_step` is exactly the
-**empirical energy natural gradient** (Mueller-Zeinhofer 2023) -- the method that takes
-PINNs from ``1e-3`` to near machine precision. L2 Gauss-Newton and L-infinity minimax
-generally disagree on their optimum whenever one residual component is a genuine
-outlier relative to the others (see the cookbook comparison); neither is "the"
-optimizer, they minimise different norms of the same residual vector.
+Includes safeguarded Newton, Gauss–Newton, Krylov, and trust-region methods.
+Model parameter derivatives may use autodiff; coordinate derivative jets use
+the activation tower.
 """
 
 from __future__ import annotations
@@ -82,32 +28,6 @@ from omnibias.jax.optim_block_search import (
     block_exact_sweep,
     last_linear_block,
     ombu_bias_block,
-)
-from omnibias.jax.optim_composed import (
-    ComposedCurvatureConfig,
-    ComposedCurvatureReport,
-    composed_block_hessian,
-    composed_curvature_step,
-)
-from omnibias.jax.optim_homotopy import HomotopyConfig, homotopy_train
-from omnibias.jax.optim_inverse import InverseDesignConfig, invert_input
-from omnibias.jax.optim_kantorovich import (
-    CONTINUUM_PDE_CLAIM_KEY,
-    FINITE_RESIDUAL_CLAIM,
-    KantorovichAccept,
-    approximate_inverse_jacobian,
-    kantorovich_accept_step,
-    kantorovich_gated_gauss_newton_step,
-    polynomial_sqrt2_maps,
-    select_accepted_params,
-)
-from omnibias.jax.optim_sharp_loss import SharpnessLossConfig, sharpness_augmented_loss
-from omnibias.jax.optim_sharpness import (
-    SharpnessReport,
-    SharpnessSchedule,
-    sharpness_lambda_max,
-    sharpness_scheduled_minimize,
-    sharpness_scheduled_step,
 )
 
 import jax
@@ -735,11 +655,7 @@ def linf_minimax_step(
     :func:`linearized_linf_direction` on the live Jacobian ``J = d r / d theta``
     (exact, one :func:`jax.jacfwd`, no finite differences) inside a shrinking
     trust-region ``box``, and accepts the step **only if it does not increase the
-    true (non-linearized) ``max|r|``** -- the same monotone-descent discipline this
-    repo's L-infinity earn path enforces by hand ("reject steps that move the peak
-    to far-field nodes for a sub-``1e-6`` gain", see the
-    ``omnibias-deepmind-campaign`` skill), generalised here into a small,
-    independent, tested primitive. On rejection the box shrinks by ``box_decrease``
+    true (non-linearized) ``max|r|``**. On rejection the box shrinks by ``box_decrease``
     (down to ``min_box``) and the *same* live ``(res, jac)`` linearization is
     reused -- only the trust region shrinks, matching the LM-style backtracking of
     :func:`gauss_newton_step`. On acceptance the box grows by ``box_increase`` (up
@@ -1185,36 +1101,23 @@ def grad_norm_weights(
 
 __all__ = [
     "BlockSpec",
-    "CONTINUUM_PDE_CLAIM_KEY",
-    "ComposedCurvatureConfig",
-    "ComposedCurvatureReport",
     "CubicRegularizedGNConfig",
-    "FINITE_RESIDUAL_CLAIM",
     "GNSolver",
     "GaussNewtonState",
-    "HomotopyConfig",
     "HomotopyGNConfig",
     "HomotopyResidualFn",
-    "InverseDesignConfig",
     "JetLineSearchConfig",
-    "KantorovichAccept",
     "LineSearchResult",
     "LinfMinimaxConfig",
     "MartensGrosseGNConfig",
     "MatVec",
     "ResidualFn",
-    "SharpnessLossConfig",
-    "SharpnessReport",
-    "SharpnessSchedule",
-    "approximate_inverse_jacobian",
     "arrangement_w_block",
     "block_direction",
     "block_exact_search",
     "block_exact_sweep",
     "cgls",
     "champ_barrier_residual",
-    "composed_block_hessian",
-    "composed_curvature_step",
     "cubic_regularized_gauss_newton_minimize",
     "cubic_regularized_newton_step",
     "gauss_newton_direction",
@@ -1224,14 +1127,10 @@ __all__ = [
     "gauss_newton_step",
     "grad_norm_weights",
     "homotopy_gauss_newton_minimize",
-    "homotopy_train",
     "hvp",
     "init_gauss_newton_state",
-    "invert_input",
     "jet_line_search",
     "jet_line_search_on_ray",
-    "kantorovich_accept_step",
-    "kantorovich_gated_gauss_newton_step",
     "lanczos_tridiag",
     "last_linear_block",
     "linearized_linf_direction",
@@ -1245,10 +1144,4 @@ __all__ = [
     "natural_gradient_step",
     "ombu_bias_block",
     "peak_weighted_residual",
-    "polynomial_sqrt2_maps",
-    "select_accepted_params",
-    "sharpness_augmented_loss",
-    "sharpness_lambda_max",
-    "sharpness_scheduled_minimize",
-    "sharpness_scheduled_step",
 ]

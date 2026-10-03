@@ -15,7 +15,7 @@ floats. Tensor HVPs live in ``omnibias.{torch,jax}.optim_composed``.
 
 Jets come from the founding bias collapse (``delta -> 0``). No
 temperature collapse appears. Escape is from a *slice* critical point,
-not a global min of a deep nest, and not CCF stretch.
+not a global min of a deep nest, with explicit local scope.
 """
 
 from __future__ import annotations

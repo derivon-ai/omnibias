@@ -8,9 +8,8 @@ image plus ``sigma`` via the closed-form tower (founding bias collapse
 (``beta -> inf``, feasibility) does not appear. Do not conflate the
 two.
 
-Sound enclosure of a shallow monotone cell. Not a deep-net
-certificate, not ImageNet, not CCF stretch, and not Navier–Stokes
-regularity. ``theorem_prover_verified`` is not asserted.
+Sound enclosure of a shallow monotone cell over the supplied input domain.
+``theorem_prover_verified`` is not asserted.
 """
 
 from __future__ import annotations
@@ -28,7 +27,7 @@ from omnibias.core.verified.sigma import sigma_tower_interval, sigma_value_inter
 from omnibias.core.verified.taylor_model import TaylorModel
 
 DISCLAIMER = (
-    "TM hidden state; sound remainder, not a deep-net certificate, not ImageNet, not CCF stretch"
+    "TM hidden state; sound remainder, not a deep-net certificate, not ImageNet"
 )
 
 

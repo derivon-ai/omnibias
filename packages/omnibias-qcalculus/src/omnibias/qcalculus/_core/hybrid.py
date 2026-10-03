@@ -10,7 +10,7 @@ still use founding bias collapse for ``sigma^(n)``. do not conflate
 the two.
 
 ``q == 1`` is a removable singularity: use :func:`q_ombu_limit`,
-never divide by zero. Not a continuum PDE. Not CCF. Not NS.
+never divide by zero. This is a discrete q-calculus operator.
 """
 
 from __future__ import annotations

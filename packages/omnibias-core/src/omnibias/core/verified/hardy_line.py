@@ -26,7 +26,7 @@ The classical Poisson / conjugate-Poisson pair of
 
     P_{a,1} = a / (a^2 + y^2),    Q_{a,1} = y / (a^2 + y^2).
 
-For CCF self-similar profiles the physical far-field exponent is
+For self-similar profiles the physical far-field exponent is
 ``alpha = 1/(1+lambda)``, so a finite Hardy sum matches the algebraic decay
 that a finite Poisson sum (``|y|^{-2}``) structurally cannot.
 """

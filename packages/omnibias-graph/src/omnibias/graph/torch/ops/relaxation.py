@@ -7,7 +7,7 @@ Each operator carries a temperature ``tau > 0`` that recovers the hard object as
 
 * :func:`sinkhorn_normalize` -- projection onto the Birkhoff polytope
   (doubly-stochastic matrices) by log-domain matrix scaling, mirroring the
-  Sinkhorn iteration in :func:`omnibias.torch.information.sinkhorn_distance`.
+  Sinkhorn matrix scaling.
 * :func:`gumbel_sinkhorn` -- a differentiable relaxation of the assignment /
   matching problem (Mena et al., 2018): Sinkhorn-normalise ``(log_alpha + noise)
   / tau``.

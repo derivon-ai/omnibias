@@ -116,7 +116,6 @@ class ClampedCubicContraction:
             },
             "pde_existence_claim": False,
             "continuum_claim": False,
-            "yang_mills_mass_gap_claim": False,
             "theorem_prover_verified": False,
             "mathlib_verified": False,
         }

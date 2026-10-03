@@ -155,13 +155,13 @@ def test_polylaplacian_estimator_parity_is_statistical() -> None:
     assert abs(torch_grand_mean - exact) < tol
 
 
-def test_tier_a_ulp_divergence_is_in_tensordot_reduction() -> None:
-    """Tier A polynomials and matmul agree; the gap is in ``tensordot``/``sum``.
+def test_small_laplacian_matches_high_precision_within_roundoff() -> None:
+    """Allow exact agreement while bounding both backends against an independent reference.
 
-    At ``(D=1, H=1)`` the backends can agree exactly under float64 x64, but
-    wider hidden layers pick up a 1-2 ULP gap from differing reduction order
-    even when every coefficient matches.
+    Native transcendental kernels and reduction order can vary across platforms.
+    Requiring a nonzero backend difference rejects equally accurate results.
     """
+    mpmath = pytest.importorskip("mpmath")
     from omnibias.jax.laplacian import deep_field_laplacian as jax_lap
     from omnibias.torch.laplacian import deep_field_laplacian as torch_lap
 
@@ -176,5 +176,13 @@ def test_tier_a_ulp_divergence_is_in_tensordot_reduction() -> None:
     j = float(
         jax_lap(jnp.asarray(x_np, dtype=jnp.float64), _to_jax(layers_np))[0]
     )
-    gap = abs(t - j)
-    assert 0 < gap < 1e-15
+    with mpmath.workdps(80):
+        expected = mpmath.mpf(0)
+        for i in range(2):
+            w = mpmath.mpf(float(layers_np[0][0][i, 0]))
+            bias = mpmath.mpf(float(layers_np[0][1][i]))
+            readout = mpmath.mpf(float(layers_np[1][0][0, i]))
+            sigma = mpmath.tanh(w * mpmath.mpf(float(x_np[0])) + bias)
+            expected += readout * (-2 * sigma * (1 - sigma * sigma)) * w * w
+        reference = float(expected)
+    np.testing.assert_array_max_ulp(np.array([t, j]), np.full(2, reference), maxulp=4)

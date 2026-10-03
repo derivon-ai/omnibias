@@ -1,93 +1,23 @@
 ---
 name: omnibias-pinn
-description: Build physics-informed networks with closed-form residual operators, causal marching, SDF cages, DeepONet / FNO operators, and certified weak forms. Use when assembling a PDE residual, inventing a hard BC or operator learner, or when the user mentions PINNs, causal windows, or the four-gap matrix.
+description: Build a PINN residual on omnibias derivative primitives, with explicit coordinates, boundary conditions and differentiable parameter training.
 ---
 
-# Physics-informed networks on the closed-form tower
+1. Start with `docs/pinn.md` and `docs/derivatives.md`; inspect the real API
+   signatures. Put application and solver code in its consumer repository.
+2. Write the coordinate order, PDE residual, derivative orders, domain and
+   boundary/initial conditions explicitly. Choose a manufactured solution as
+   the independent test oracle before training.
+3. Use directional jets for selected directional derivatives and multivariate
+   jets when mixed partials are needed. Convert Taylor coefficients to raw
+   derivatives with `jet_to_tower` or `jet_partials`.
+4. Keep residuals differentiable in parameters; evaluate collocation and
+   boundary losses with the same network. Backpropagate the loss once.
+5. Check derivative values and parameter gradients, then train. Report held-out
+   residual and solution errors separately from optimization loss.
+6. Benchmark time and memory at fixed accuracy, dtype, batch size and derivative
+   order. Exact derivative formulas do not certify training convergence or a
+   continuous-domain residual bound.
 
-`omnibias-pinn` builds PINNs on `omnibias-fields`. Residuals, hard cages, causal
-windows, and operator learners consume exact `sigma^(n)` instead of nested AD.
-
-## Why nested AD fails
-
-Collocation PINNs differentiate a network at thousands of points. Nested AD
-rebuilds a graph per point per order; high-order and polyharmonic residuals
-are the first thing that OOMs. Soft boundary penalties leak. Operator learners
-without an exact trunk jet cannot zero-shot a new coefficient field. Spectral
-bias stays an optimizer accident when the residual operator itself is approximate.
-
-## What only this tower unlocks
-
-Closed-form towers plus hard cages are exact for the quantities they encode
-(Dirichlet on `φ = 0`, conservation identities). Causal marching, SDF geometry,
-conditioned DeepONet / FNO, and multilevel FBPINN are the constructive routes
-that dissolve named PINN gaps. The four-gap suite
-(`docs/benchmarks/pinn_four_gap_matrix.md`) is the absolute gate nested AD
-stacks do not clear at these orders.
-
-## Use
-
-| You want | Import from | Notes |
-| --- | --- | --- |
-| Physics-informed NNs | `omnibias.pinn` | PDE residual layers on the field substrate |
-| Causal time marching | `omnibias.pinn.train` | windowed causal residual weighting + advance gates |
-| Curved hard BCs / SDF | `omnibias.pinn.domain` | negative-inside SDF + `DistanceConstrainedField` |
-| Operator learning | `omnibias.pinn.operator` | DeepONet / FNO with multi-head conditioning |
-| Multilevel FBPINN / NTK | `omnibias.pinn.torch.fields` / `.losses` | spectral-bias arms + diagnostics (JAX twins) |
-| Transmission PINN | `omnibias.pinn.interface` | `Interface` / `MultiInterfaceField`; `alpha -> inf` is sharpening |
-| Tanh-method solitons | `omnibias.pinn.travelling` | `SolitonField` |
-| Layered transfer | `omnibias.pinn.layered` | `TransferStack`; 1-D ABCD |
-| BEM-Net | `omnibias.pinn.bem` | `BEMNet`, `half_plane_dtn` |
-| Linearizing transforms | `omnibias.pinn.transform` | `ColeHopfField`, `darboux_dress` |
-| Characteristic transport | `omnibias.pinn.characteristic` | transport along learned `v` |
-| Certified weak form | `omnibias.pinn.certified.weak_form` | width split + exact-jet Lohner |
-| Inverse / coefficient recovery | `omnibias.pinn.inverse` | locally-seeded `sd ~ alpha^(n-5/2)` |
-| IPM radii / toy CAP | `omnibias.pinn.certified.ipm` | `ipm_banded_toy_radii` |
-
-Examples: `docs/examples/pinn_heat.py`, `pinn_causal_marching.py`,
-`pinn_sdf_geometry.py`. Quantum residuals live in `omnibias-qpinn`.
-
-Request the derivative order the residual needs. Neumann/Robin on CSG
-junctions need smooth normals; non-smooth junctions fail explicitly.
-
-## Extend
-
-General inverse experiments use `omnibias.pinn.inverse.observation.ObservationModel`
-with explicit parameter Jacobians; `observation_information` supports fixed
-correlated noise. Parameter-dependent covariance requires explicit
-`LikelihoodScores`; `information_factor` then supplies the correct score rows
-for nuisance profiling. Optional directional-jet providers power finite-order
-`observation_visibility`; neither first-order rank nor finite visibility proves
-global identification. `inverse.design` provides D/A/E scores and torch/JAX
-gradients; E is differentiable at a simple smallest eigenvalue and its explicit
-gradient refuses multiplicity. Legacy location APIs accept only `model="location"`.
-`select_design` offers deterministic greedy or budgeted exhaustive D/A/E subset
-selection with explicit enumeration status and no automatic approximation factor.
-Use the separate `verify.neuromanifold.scientific` interval consumer for
-whole-box sufficient rank certificates; do not import it into the permissive
-inverse producers. See `docs/api/neuromanifold-science.md` for executable examples.
-
-- Source: `packages/omnibias-pinn`. Substrate stays in `omnibias-fields`.
-- Tests: `python -m pytest packages/omnibias-pinn/tests -q`.
-- Research doctrine: `omnibias-pinn-research`. Compose with `omnibias-fields`,
-  `omnibias-geometry`, `omnibias-qpinn`, `omnibias-symbolic`, `omnibias-verify`.
-- Alpha submodules (`train`, `domain`, `operator`) are the place for aggressive
-  prototypes. New top-level packages still earn independence via `omnibias-new-package`.
-
-## Next invention
-
-A named PDE family whose hard cage, causal window, and closed-form residual
-clear the four-gap absolute gate with a `gates` JSON, then a one-shot operator
-that zero-shots a new coefficient on the same family.
-
-## Bakeoffs
-
-`docs/benchmarks/laplacian_scaling.json`, `polylaplacian_order.json`,
-plus the four-gap suite (`causal_marching`, `geometry_sdf`,
-`operator_zero_shot`, `spectral_bias_fbpinn`).
-
-## Further references
-
-- API: `docs/api/pinn.md`, `docs/api/ipm_radii.md`, `docs/api/interface.md`, `docs/api/travelling.md`,
-  `docs/api/layered.md`, `docs/api/bem.md`, `docs/api/transforms_pde.md`
-- Handbook: `docs/handbook/02-vector-calculus-pde.md`
+For field objects use `omnibias.fields` and its dispatch contract; the existing
+solver consumer is `../omnibias_projects/omnibias-pinn/`.

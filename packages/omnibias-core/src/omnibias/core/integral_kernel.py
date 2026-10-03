@@ -11,7 +11,7 @@ that window recovers a ``sigma`` kernel and is not the default.
 Temperature collapse (``beta -> inf``, feasibility) does not appear.
 do not conflate the two.
 
-Not FNO SOTA. Not CCF stretch. Not NS.
+Accuracy depends on the supplied quadrature rule.
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from omnibias.core.ftc import sigmoid, softplus
 
 DISCLAIMER = (
     "Integral-kernel operator: OMBU integral cell, not BEM-Net, not FNO SOTA, "
-    "and not CCF stretch"
+    "with explicit local scope"
 )
 
 

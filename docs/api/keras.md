@@ -1,81 +1,16 @@
 # omnibias-keras
 
-Keras 3 unified backend for omnibias. The same code runs on TensorFlow,
-JAX, or PyTorch via `keras.ops`; closed-form derivative towers share the
-polynomial coefficients of the torch and JAX backends through
-`omnibias.core.polynomials`, so all backends are bit-identical by
-construction.
+Keras 3 activation and operator layers.
 
-Select the Keras backend with the `KERAS_BACKEND` environment variable
-(`tensorflow` | `jax` | `torch`) *before importing keras*.
+- `omnibias.keras.get_activation`: activation registry access.
+- `omnibias.keras.OperatorBlock`: select identity, derivative, gradient,
+  Laplacian, band or antiderivative-window behavior.
+- `omnibias.keras.cmbDense`, `cmbConv1D`, `cmbConv2D`: trainable layer adapters.
 
-## Top-level API
+Set `KERAS_BACKEND` to `torch`, `jax` or `tensorflow` before importing Keras.
+Activation kernels share core coefficients and use `keras.ops`; tensor dtype
+and device behavior follow the chosen backend. The network jet APIs documented
+here are implemented in the dedicated PyTorch and JAX distributions.
 
-::: omnibias.keras
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Activation registry
-
-::: omnibias.keras.activations.registry
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## OperatorMultiBiasUnit
-
-::: omnibias.keras.unit
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Blocks
-
-::: omnibias.keras.blocks
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Piecewise & tempered activations
-
-The hard almost-everywhere family and the smooth beta-tempered surrogate
-family (see the [activation dictionary](../activations.md)).
-
-::: omnibias.keras.activations.piecewise
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-::: omnibias.keras.activations.tempered
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Learnable-temperature blocks
-
-::: omnibias.keras.tempered_blocks
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Growable units
-
-::: omnibias.keras.growable
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Training utilities
-
-::: omnibias.keras.training.k_scheduler
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Fastpath kernels
-
-::: omnibias.keras.fastpath
-    options:
-      show_root_heading: false
-      heading_level: 3
+Install this distribution with `pip install omnibias-keras`; select its
+backend extras when needed. See [guarantees](../guarantees.md).

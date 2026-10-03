@@ -32,37 +32,37 @@ theorem golden_perron_ratio_below_one : perronRatioNum < perronRatioDen := by
   unfold perronRatioNum perronRatioDen
   decide
 
-/-! ### Golden CLM blow-up sign
+/-! ### Golden positive sign
 
-The certified Hilbert value `H ω₀(0)` is enclosed (scaled to integer units) in
-`[3, 7]`; its strictly positive lower endpoint certifies the CLM criterion. -/
+A certified scalar quantity is enclosed (scaled to integer units) in
+`[3, 7]`; its strictly positive lower endpoint certifies positivity. -/
 
-/-- The certified enclosure of `H ω₀(0)` (scaled to integer units). -/
-def clmHilbertEnclosure : ZInterval := ⟨3, 7⟩
+/-- A certified positive enclosure scaled to integer units. -/
+def positiveEnclosure : ZInterval := ⟨3, 7⟩
 
-theorem golden_clm_blowup_certified
-    (x : Int) (hx : ZInterval.Mem x clmHilbertEnclosure) : 0 < x := by
+theorem golden_positive_sign_certified
+    (x : Int) (hx : ZInterval.Mem x positiveEnclosure) : 0 < x := by
   refine enclosed_quantity_pos hx ?_
-  unfold clmHilbertEnclosure
+  unfold positiveEnclosure
   decide
 
-/-! ### Golden CCF closure margin (excluded sign example)
+/-! ### Golden negative margin (excluded sign example)
 
 A certified closure margin enclosed in `[-9, -2]`; its strictly negative upper
 endpoint rigorously *excludes* the (positive-margin) property. -/
 
-def ccfClosureMargin : ZInterval := ⟨-9, -2⟩
+def negativeClosureMargin : ZInterval := ⟨-9, -2⟩
 
-theorem golden_ccf_margin_excluded
-    (x : Int) (hx : ZInterval.Mem x ccfClosureMargin) : x < 0 := by
+theorem golden_negative_margin_excluded
+    (x : Int) (hx : ZInterval.Mem x negativeClosureMargin) : x < 0 := by
   refine enclosed_quantity_neg hx ?_
-  unfold ccfClosureMargin
+  unfold negativeClosureMargin
   decide
 
 /-! ### Golden binary-surrogate certificates
 
 Concrete instances of the certified surrogate-gradient bounds emitted by
-`omnibias.verify.surrogate_bounds` (see `docs/theory-binary.md`).
+surrogate-bound certificates.
 
 **Mollification margin (Theorem 1).** For the `tanh` surrogate at bandwidth
 `β = 1` and margin `d = 1`, the hard/smooth agreement margin is

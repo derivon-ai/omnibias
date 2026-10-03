@@ -145,16 +145,6 @@ def generate_obligation(cert: Mapping[str, Any]) -> str | None:
     * **stencil poisedness** -- a ``rational_poisedness`` payload yields
       ``allIntGe`` (Polya) and ``ratNez`` (nonzero determinant). Neither
       payload states a collapse or a remainder over a function class.
-    * **LN chain closure** -- an ``ln_chain_closure`` payload carries the
-      coefficient-by-coefficient rational equalities obtained after expanding
-      a finite differential-polynomial chain.  Python first rechecks every
-      equality; Lean independently discharges the resulting ``allRatEq`` list.
-      This proves finite algebra only, not membership of a physical map in the
-      declared chain.
-    * **LN format bound** -- an ``ln_format_bound`` payload carries strict
-      rational format inequalities.  Python first rechecks each inequality;
-      Lean independently discharges the resulting ``allRatLt`` list.  Sup
-      enclosures and holomorphic extension hypotheses remain external.
     * **interval replay trace** -- an ``interval_replay_trace`` payload
       (:meth:`omnibias.core.proof.replay.ReplayTrace.to_payload`) yields
       ``Omnibias.Replay.replayOk [...] = true`` via ``decide``: the Lean
@@ -175,15 +165,6 @@ def generate_obligation(cert: Mapping[str, Any]) -> str | None:
       Python-side truth check before asking Lean to re-derive it); a
       certificate whose leaves have a gap is refused here, before any Lean
       is emitted.
-    * **convergence ledger** -- a ``convergence_ledger`` payload whose
-      Python-side residuals are already strictly negative yields
-      ``allRatLt`` (cross-multiplied ``p/q < 0``) via
-      ``Omnibias.RationalStencil``. Gated on the Python check agreeing,
-      matching poisedness. Algebra only; the analytic classes, the
-      correction construction, and the PDE estimates stay external.
-    * **stress cone** -- a ``stress_cone`` payload whose Cramer weights
-      are already strictly positive yields ``allRatLt`` of ``0 < lambda_i``
-      via ``Omnibias.RationalStencil``. Gated on the Python check.
     """
     if isinstance(cert.get("payload"), Mapping) and cert["payload"].get("type") == "realization_replay":
         from omnibias.core.proof.realization_replay import generate_replay_obligation
@@ -354,30 +335,7 @@ def generate_obligation(cert: Mapping[str, Any]) -> str | None:
         )
         return stencil_header + body + footer
 
-    ln_chain_pairs = _extract_ln_chain_closure(cert)
-    if ln_chain_pairs is not None:
-        lits = ", ".join(
-            f"(({p}), {q}, {r}, {s})" for p, q, r, s in ln_chain_pairs
-        )
-        body = (
-            "/-- Finite LN-chain coefficient identities.  Python and Lean\n"
-            "independently compare exact rational coefficients.  This is\n"
-            "algebra only; no physical Dulac/LN membership is asserted. -/\n"
-            f"theorem obligation : allRatEq [{lits}] = true := by decide\n"
-        )
-        return stencil_header + body + footer
 
-    ln_format_pairs = _extract_ln_format_bound(cert)
-    if ln_format_pairs is not None:
-        lits = ", ".join(
-            f"(({p}), {q}, {r}, {s})" for p, q, r, s in ln_format_pairs
-        )
-        body = (
-            "/-- Finite strict rational LN-format inequalities.  Holomorphic\n"
-            "extension and interval sup bounds are trusted external premises. -/\n"
-            f"theorem obligation : allRatLt [{lits}] = true := by decide\n"
-        )
-        return stencil_header + body + footer
 
     replay_steps = _extract_replay_trace(cert)
     if replay_steps is not None:
@@ -428,31 +386,7 @@ def generate_obligation(cert: Mapping[str, Any]) -> str | None:
         )
         return stencil_header + body + footer
 
-    ledger_pairs = _extract_ledger_residuals(cert)
-    if ledger_pairs is not None:
-        lits = ", ".join(
-            f"(({p}), {q}, {r}, {s})" for p, q, r, s in ledger_pairs
-        )
-        body = (
-            "/-- Finite convergence-ledger residuals: each (p/q) < (r/s) is\n"
-            "the Int cross-multiplication p*s < r*q with positive\n"
-            "denominators. Algebra only; no PDE and no analytic class. -/\n"
-            f"theorem obligation : allRatLt [{lits}] = true := by decide\n"
-        )
-        return stencil_header + body + footer
 
-    cone_pairs = _extract_cone_weights(cert)
-    if cone_pairs is not None:
-        lits = ", ".join(
-            f"(({p}), {q}, {r}, {s})" for p, q, r, s in cone_pairs
-        )
-        body = (
-            "/-- Finite admissible-stress cone weights: each 0 < lambda_i\n"
-            "is the Int cross-multiplication 0*d < n*1 with positive\n"
-            "denominators. Algebra only; no PDE. -/\n"
-            f"theorem obligation : allRatLt [{lits}] = true := by decide\n"
-        )
-        return stencil_header + body + footer
 
     pivots = _extract_pd_pivots(cert)
     if pivots is not None:
@@ -703,68 +637,8 @@ def _normal_rational(raw: Any) -> tuple[int, int] | None:
     return num, den
 
 
-def _extract_ln_chain_closure(
-    cert: Mapping[str, Any],
-) -> list[tuple[int, int, int, int]] | None:
-    """Recheck coefficient equalities from an ``ln_chain_closure`` payload."""
-    payload = cert.get("payload")
-    if not (
-        isinstance(payload, Mapping)
-        and payload.get("type") == "ln_chain_closure"
-    ):
-        return None
-    raw = payload.get("identities")
-    if not (
-        isinstance(raw, Sequence)
-        and not isinstance(raw, str | bytes)
-        and raw
-        and len(raw) <= 100_000
-    ):
-        return None
-    pairs: list[tuple[int, int, int, int]] = []
-    for row in raw:
-        if not isinstance(row, Mapping):
-            return None
-        lhs = _normal_rational(row.get("lhs"))
-        rhs = _normal_rational(row.get("rhs"))
-        if lhs is None or rhs is None:
-            return None
-        if lhs[0] * rhs[1] != rhs[0] * lhs[1]:
-            return None
-        pairs.append((lhs[0], lhs[1], rhs[0], rhs[1]))
-    return pairs
 
 
-def _extract_ln_format_bound(
-    cert: Mapping[str, Any],
-) -> list[tuple[int, int, int, int]] | None:
-    """Recheck strict rational inequalities from an ``ln_format_bound`` payload."""
-    payload = cert.get("payload")
-    if not (
-        isinstance(payload, Mapping)
-        and payload.get("type") == "ln_format_bound"
-    ):
-        return None
-    raw = payload.get("inequalities")
-    if not (
-        isinstance(raw, Sequence)
-        and not isinstance(raw, str | bytes)
-        and raw
-        and len(raw) <= 100_000
-    ):
-        return None
-    pairs: list[tuple[int, int, int, int]] = []
-    for row in raw:
-        if not isinstance(row, Mapping):
-            return None
-        lhs = _normal_rational(row.get("lhs"))
-        rhs = _normal_rational(row.get("rhs"))
-        if lhs is None or rhs is None:
-            return None
-        if lhs[0] * rhs[1] >= rhs[0] * lhs[1]:
-            return None
-        pairs.append((lhs[0], lhs[1], rhs[0], rhs[1]))
-    return pairs
 
 
 def _extract_poisedness(
@@ -799,77 +673,8 @@ def _extract_poisedness(
     return polya, det[0], det[1]
 
 
-def _extract_ledger_residuals(
-    cert: Mapping[str, Any],
-) -> list[tuple[int, int, int, int]] | None:
-    """Pull ``(p, q, 0, 1)`` strict inequalities from a discharged ledger.
-
-    Emitted only when the Python-side ``holds`` flag is already true
-    (matching poisedness / positive-definite gating). Each residual
-    ``n/d`` is normalised to a positive denominator so ``allRatLt``
-    is just ``n < 0``.
-    """
-    payload = cert.get("payload")
-    if not (
-        isinstance(payload, Mapping) and payload.get("type") == "convergence_ledger"
-    ):
-        return None
-    if not bool(payload.get("holds")):
-        return None
-    raw = payload.get("residuals")
-    if not (isinstance(raw, Sequence) and not isinstance(raw, str | bytes) and raw):
-        return None
-    pairs: list[tuple[int, int, int, int]] = []
-    for row in raw:
-        if not isinstance(row, Mapping):
-            return None
-        residual = _int_pair(row.get("residual"))
-        if residual is None:
-            return None
-        num, den = residual
-        if den == 0:
-            return None
-        if den < 0:
-            num, den = -num, -den
-        if num >= 0:
-            return None
-        pairs.append((num, den, 0, 1))
-    return pairs
 
 
-def _extract_cone_weights(
-    cert: Mapping[str, Any],
-) -> list[tuple[int, int, int, int]] | None:
-    """Pull ``0 < lambda_i`` inequalities from a discharged stress cone.
-
-    Emitted only when the Python-side ``holds`` flag is already true.
-    Each weight ``n/d`` is normalised to a positive denominator so
-    ``allRatLt`` is ``0/1 < n/d``.
-    """
-    payload = cert.get("payload")
-    if not (isinstance(payload, Mapping) and payload.get("type") == "stress_cone"):
-        return None
-    if not bool(payload.get("holds")):
-        return None
-    raw = payload.get("lambdas")
-    if not (isinstance(raw, Sequence) and not isinstance(raw, str | bytes) and raw):
-        return None
-    pairs: list[tuple[int, int, int, int]] = []
-    for row in raw:
-        if not isinstance(row, Mapping):
-            return None
-        weight = _int_pair(row.get("lambda"))
-        if weight is None:
-            return None
-        num, den = weight
-        if den == 0:
-            return None
-        if den < 0:
-            num, den = -num, -den
-        if num <= 0:
-            return None
-        pairs.append((0, 1, num, den))
-    return pairs
 
 
 def _extract_integer_matrix_syzygy(

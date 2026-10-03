@@ -6,7 +6,7 @@
 ``log(n)/beta`` from :func:`logsumexp_gap_bound` -- reuse, do not fork.
 
 ``beta -> inf`` is **temperature collapse**, not founding ``delta -> 0``.
-The gap is sound, not P vs NP. Sampling the tie locus is a lower bound.
+The gap is sound. Sampling the tie locus is a lower bound.
 Large ``n, D`` are refused (subdivision is exponential in ``D``).
 """
 

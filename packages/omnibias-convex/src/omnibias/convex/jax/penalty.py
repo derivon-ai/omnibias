@@ -41,7 +41,7 @@ Terminology: the *temperature-collapse* unit here is the ``beta -> inf`` **feasi
 sense of "collapse" (the constraint sigmoid saturates to a 0/1 step); it is
 distinct from omnibias's **founding bias collapse** -- the multi-bias
 ``delta -> 0`` limit ``sum_k s_k sigma(z + b_k) -> sigma^(K-1)`` that yields a
-smooth *derivative* (see ``docs/theory.md`` and :mod:`omnibias.torch.unit`).
+smooth *derivative* (see ``docs/derivatives.md`` and :mod:`omnibias.torch.unit`).
 """
 
 from __future__ import annotations

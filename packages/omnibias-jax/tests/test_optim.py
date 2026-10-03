@@ -491,7 +491,7 @@ def test_linearized_linf_direction_is_exact_on_one_column() -> None:
 # --- L-infinity (minimax) trainer: beside the Gauss-Newton family above ---
 #
 # Generic comparison utility. Nothing below touches, trains, or reproduces the
-# DeepMind-style CCF/IPM campaign, any champion/ghost network, or a stretch /
+# Application-specific networks or external comparisons are outside this test;
 # Rung / whole_line_certified gate; every toy problem is a small synthetic
 # closed-form-verifiable instance.
 
@@ -619,7 +619,7 @@ def test_gn_vs_linf_disagree_on_outlier_heavy_toy_problem() -> None:
     single outlier-heavy residual component, the L-infinity trainer reaches a
     strictly lower true max|r| than the existing Gauss-Newton (L2) trainer,
     under a fixed configuration (no seed search, no tuning against a live
-    run). This is a generic comparison, not a campaign result: the toy
+    run). This is a generic comparison, a toy comparison: the
     residual is a 5-point sigmoid fit, unrelated to any champion network."""
     from omnibias.jax.optim import (
         LinfMinimaxConfig,

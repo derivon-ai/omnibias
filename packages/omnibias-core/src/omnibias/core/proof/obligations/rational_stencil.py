@@ -289,7 +289,6 @@ def honesty_payload() -> dict[str, bool]:
         "taylor_theorem_in_lean": False,
         "function_class_in_lean": False,
         "mathlib_path_used": False,
-        "navier_stokes_proof_claim": False,
     }
 
 

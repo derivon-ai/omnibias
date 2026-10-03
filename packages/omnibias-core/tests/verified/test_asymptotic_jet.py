@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Independent high-precision and exact oracles for confluent scale calculus."""
 
 import math

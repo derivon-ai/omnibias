@@ -18,7 +18,7 @@ gap).
 
 Terminology: the ``beta -> inf`` gate hardening is the feasibility / temperature sense of
 "collapse", distinct from the **founding bias collapse** (the multi-bias ``delta -> 0``
-limit to ``sigma^(K-1)``; see ``docs/theory.md``).
+limit to ``sigma^(K-1)``; see ``docs/derivatives.md``).
 """
 
 from __future__ import annotations

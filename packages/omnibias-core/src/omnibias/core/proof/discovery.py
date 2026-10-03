@@ -663,8 +663,6 @@ class IntegerIntervalFamily:
                 "x": value,
                 "honesty": {
                     "discovered_by_omnibias": ok,
-                    "jacobian_conjecture_proof_claim": False,
-                    "navier_stokes_proof_claim": False,
                 },
             },
         )

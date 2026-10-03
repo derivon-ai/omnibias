@@ -1,51 +1,14 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
-r"""omnibias-discrete: the shared differentiable + certified discrete-optimization substrate.
+"""Differentiable discrete relaxation, decoding, and certified optimality gaps.
 
-Minimizing a pseudo-Boolean energy ``E(x)`` over ``x in {0, 1}^n`` is NP-hard, so no
-poly-time differentiable map yields the *exact* global optimum (that would imply
-P = NP, and the exact argmin's gradient is a.e. zero). The sound object this substrate
-delivers is the ``encode -> relax -> decode -> certify`` pipeline -- **yes, if** you
-accept a certified gap instead of an exactness claim:
+The DiscreteProblem protocol supplies an energy and polynomial representation.
+Annealing uses its closed-form gradient; decoding supplies an upper bound and
+optional SOS certificates supply a lower bound. The supported result is a certified gap; a zero gap requires matching bounds.
 
-1. a **differentiable annealed relaxation** (:mod:`omnibias.discrete.jax` /
-   :mod:`omnibias.discrete.torch`, bit-identical twins): given a closed-form energy
-   gradient, :func:`anneal_descent` descends ``x = sigmoid(beta theta)`` while
-   ``beta -> inf`` collapses it onto a binary vertex, *unrolled* for backprop;
-2. a **heuristic decoder** -- rounding + 1-flip local search (:func:`decode`), an
-   *upper* bound (:func:`brute_force_min` is the exact small-``n`` oracle);
-3. a **rigorous optimality-gap certificate** (:func:`certify_gap`): a Lasserre / SOS
-   bound over the Boolean hypercube (:mod:`omnibias.sos`), seeded by the always-valid
-   :func:`negative_coeff_lower_bound`, is a *lower* bound on the true optimum, so
-   ``lower <= optimum <= energy`` is a certified gap -- never asserted zero.
-
-Anything implementing the :class:`DiscreteProblem` seam (``n`` + ``energy`` +
-``to_polynomial``) plugs into the whole pipeline; ``omnibias-qubo`` and the in-tree
-:mod:`omnibias.discrete.maxsat` front-end are the first two consumers.
-
-Backend-neutral helpers shared by several consumers also live here so they are written
-once: the decision-focused (predict-then-optimize) :func:`spo_plus_subgradient` /
-:func:`mean_normalized_regret` (bound to each consumer's exact oracle in ``omnibias-nphard`` /
-``omnibias-routing``); the :class:`UnionFind` / :func:`is_forest` graph primitive; and the
-representation-neutral matroid independence / rank kernel (:mod:`omnibias.discrete.matroid`)
-that is the single canonical definition of the uniform / partition / graphic families behind
-*both* the polytope lens (``omnibias-combinatorics``) and the greedy-oracle lens
-(``omnibias-submodular``).
-
-Terminology: the relaxation's ``sigmoid(beta z)``, ``beta -> inf`` is the feasibility /
-temperature sense of "collapse" (a soft indicator hardening to a 0/1 step), distinct
-from the **founding bias collapse** (the multi-bias ``delta -> 0`` limit of an ``OMBU``
-to the closed-form derivative ``sigma^(K-1)``; see ``docs/theory.md``).
-
-.. important::
-
-    **Bit-parity with the PyTorch twin requires 64-bit JAX** --
-    ``jax.config.update("jax_enable_x64", True)`` before the first JAX array is
-    created (or ``JAX_ENABLE_X64=1``). JAX otherwise truncates to ``float32``
-    while PyTorch uses ``float64``, so the twins stay internally consistent but
-    agree only to ``float32`` tolerance. Where a value feeds a threshold, a
-    rounding step or an ``argmax``, that is enough to change the decision rather
-    than just the last digits. See :mod:`omnibias.jax.precision`.
+Temperature collapse hardens sigmoid(beta z) for feasibility as beta grows.
+This differs from founding bias collapse, the delta -> 0 derivative limit.
+Use matching dtypes and JAX_ENABLE_X64=1 for float64 comparisons.
 """
 
 from __future__ import annotations
@@ -81,7 +44,7 @@ try:
 except _PkgNotFound:  # pragma: no cover - bare source checkout
     __version__ = "0.0.0+unknown"
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Limit family exposed as package metadata.
 __lineage__ = "temperature collapse"
 
 __all__ = [

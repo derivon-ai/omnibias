@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Derivon
 #
 # Dependency review on pull requests. Requires GitHub Dependency graph.
-# SHA-pinned action (see docs/ci-hardening.md).
+# SHA-pinned action.
 name: dependency-review
 
 on:

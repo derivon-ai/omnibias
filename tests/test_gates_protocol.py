@@ -156,10 +156,6 @@ def test_require_all_seeds_direction_min_passes() -> None:
     assert verdict["passed"] is True
 
 
-def test_threshold_audit_lists_stretch_gate() -> None:
-    script = Path(__file__).resolve().parents[1] / "scripts" / "audit_gate_thresholds.py"
-    out = subprocess.check_output([sys.executable, str(script)], text=True)
-    assert "CCF_STRETCH_RESIDUAL_GATE=" in out
 
 
 def test_require_enclosure_coverage_passes() -> None:

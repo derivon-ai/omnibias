@@ -12,7 +12,7 @@ soft assignment ``x = sigmoid(beta theta) in (0, 1)^n`` and descends
 by unrolled gradient descent along a geometric ``beta`` homotopy; as ``beta`` grows the
 soft assignment collapses onto a binary vertex. One ``jit``-able, ``jax.grad``-friendly
 call, so a model that predicts the problem coefficients can be trained *through* the
-relaxation. Consumers (``omnibias.qubo``, ``omnibias.discrete.maxsat``) supply the
+relaxation. Callers supply the
 gradient and a step ``scale``; the returned soft assignment is decoded with
 :func:`omnibias.discrete.decode` and the gap certified with
 :func:`omnibias.discrete.certify_gap`.
@@ -20,7 +20,7 @@ gradient and a step ``scale``; the returned soft assignment is decoded with
 Terminology: the ``beta -> inf`` hardening of ``sigmoid`` here is the feasibility /
 temperature sense of "collapse" (a soft indicator becoming a 0/1 step), distinct from
 the **founding bias collapse** (the multi-bias ``delta -> 0`` limit to ``sigma^(K-1)``,
-a derivative; see ``docs/theory.md`` and :mod:`omnibias.torch.unit`).
+a derivative; see ``docs/derivatives.md`` and :mod:`omnibias.torch.unit`).
 """
 
 from __future__ import annotations

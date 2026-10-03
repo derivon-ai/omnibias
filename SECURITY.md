@@ -10,7 +10,6 @@ are applied to the latest released minor of each package.
 | `omnibias-core` (0.4.x) | yes |
 | `omnibias-torch` (0.4.x) | yes |
 | `omnibias-jax` (0.4.x) | yes |
-| `omnibias-ferminet` (0.2.x) | yes |
 | `omnibias-pinn` (0.1.x, beta) | yes |
 | `omnibias-qpinn` (0.0.x, alpha) | best-effort |
 | `omnibias-curvature` (0.1.x, alpha) | best-effort |

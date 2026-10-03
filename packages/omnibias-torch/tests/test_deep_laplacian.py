@@ -20,8 +20,8 @@ import pytest
 
 torch = pytest.importorskip("torch")
 from omnibias.core.contraction import (  # noqa: E402
-    support_jet_count,
     polylaplacian_multinomial_terms,
+    support_jet_count,
 )
 from omnibias.core.multi_index import index_position, multi_index_factorial  # noqa: E402
 from omnibias.core.verified.sampled import hoeffding_enclosure  # noqa: E402

@@ -4,7 +4,7 @@
 
 Sampling is a subgraph / lower bound, never a complete face lattice.
 ``beta -> inf`` is temperature collapse, not founding ``delta -> 0``.
-The gap is sound, not P vs NP, not theorem-prover.
+The gap is sound, not theorem-prover.
 """
 
 from __future__ import annotations

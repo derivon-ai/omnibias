@@ -1,10 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-r"""Reusable PirateNet α-skip (torch twin of :mod:`omnibias.jax.architectures.piratenet`).
+"""Identity-initialized residual networks for physics-informed models.
 
-Identity-init residual blocks: ``α=0`` is the embedding. Not ImageNet / ViT,
-not CCF stretch, not a Wave-3 gated invention. Apply is bit-identical to the
-JAX twin given the same weights.
+The zero skip parameter selects the embedding; Fourier features compose with
+the shared field architecture.
 """
 
 from __future__ import annotations

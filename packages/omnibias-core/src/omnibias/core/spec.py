@@ -48,7 +48,7 @@ class TransformKernels(Generic[TensorT]):
     defining integral diverges for that activation). A ``None`` field is a
     deliberate, documented gap -- never a placeholder for an unwritten kernel.
     The half-plane / region of convergence of every shipped kernel is recorded
-    in :mod:`omnibias.core.transforms`.
+    in an optional application module.
 
     Conventions (fixed once here so both backends agree):
 

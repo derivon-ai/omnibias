@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Derivon
 #
 # CodeQL analysis for Python. Least-privilege: contents read + security-events
-# write for SARIF upload. Actions are SHA-pinned (see docs/ci-hardening.md).
+# write for SARIF upload. Actions are SHA-pinned.
 name: codeql
 
 on:

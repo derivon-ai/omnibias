@@ -29,10 +29,6 @@ DOMAINS: tuple[str, ...] = (
     "conservation",
     "fluids",
     "mechanics",
-    "chemistry",
-    "electromagnetism",
-    "magnetohydrodynamics",
-    "kinetic",
     "complex",
     "integral",
 )
@@ -116,52 +112,13 @@ _CATALOG: tuple[OperatorInfo, ...] = (
     _info("advection", "fluids", "(u.grad) u"),
     _info("material_derivative", "fluids", "D/Dt = d_t + (u.grad)"),
     _info("skew_symmetric_advection", "fluids", "0.5[(u.grad)c + div(u c)]"),
-    _info("velocity_from_streamfunction", "fluids", "(d_y psi, -d_x psi)"),
-    _info("vorticity_from_streamfunction", "fluids", "omega = -Delta psi"),
     # --- continuum mechanics -------------------------------------------
-    _info("newtonian_stress", "mechanics", "sigma = -p I + 2 mu eps"),
-    _info("linear_elastic_stress", "mechanics", "sigma = lam tr(eps) I + 2 mu eps"),
-    _info("viscous_dissipation", "mechanics", "Phi = 2 mu eps:eps"),
-    _info("stokes_residual", "mechanics", "mu Delta u - grad p + f"),
-    _info("navier_cauchy_residual", "mechanics", "(lam+mu) grad(div u) + mu Delta u + f"),
-    _info("stress_divergence", "mechanics", "div sigma"),
     _info("tensor_divergence", "mechanics", "(div T)_i = d_j T_ij"),
     _info("tensor_double_dot", "mechanics", "A:B = A_ij B_ij"),
     # --- chemistry / transport -----------------------------------------
-    _info("fickian_flux", "chemistry", "J = -D grad c"),
-    _info("nernst_planck_flux", "chemistry", "J = -D grad c - z mu F c grad phi"),
-    _info("nernst_planck_residual", "chemistry", "d_t c + div J_NP - s"),
-    _info("darcy_flux", "chemistry", "q = -(k/mu) grad p"),
-    _info("reaction_diffusion_residual", "chemistry", "d_t c - div(D grad c) - R(c) - s"),
-    _info("poisson_residual", "chemistry", "div(eps grad phi) + rho"),
     # --- electromagnetism (3-D Maxwell, natural units) -----------------
-    _info("faraday_residual", "electromagnetism", "d_t B + curl E"),
-    _info("ampere_residual", "electromagnetism", "d_t E - curl B + J"),
-    _info("gauss_residual", "electromagnetism", "div E - rho"),
-    _info("gauss_magnetic_residual", "electromagnetism", "div B"),
-    _info("poynting_vector", "electromagnetism", "S = E x B"),
-    _info("magnetic_field_from_potential", "electromagnetism", "B = curl A"),
-    _info("electric_field_from_potentials", "electromagnetism", "E = -grad phi - d_t A"),
-    _info("lorenz_gauge_residual", "electromagnetism", "d_t phi + div A"),
-    _info("vector_dalembertian", "electromagnetism", "(box u_1, ..., box u_C)"),
     # --- magnetohydrodynamics (Alfven units, mu_0 = rho_0 = 1) ---------
-    _info("current_density", "magnetohydrodynamics", "J = curl B"),
-    _info("lorentz_force", "magnetohydrodynamics", "J x B"),
-    _info("magnetic_pressure", "magnetohydrodynamics", "p_B = |B|^2 / 2"),
-    _info("maxwell_stress_tensor", "magnetohydrodynamics",
-          "T_ij = E_i E_j + B_i B_j - 0.5 d_ij (|E|^2 + |B|^2)"),
-    _info("magnetic_divergence", "magnetohydrodynamics", "div B (solenoidal constraint)"),
-    _info("induction_residual", "magnetohydrodynamics", "d_t B - curl(u x B) - eta Delta B"),
-    _info("ideal_mhd_momentum_residual", "magnetohydrodynamics",
-          "rho(d_t u + (u.grad)u) + grad p - J x B - nu Delta u - f"),
     # --- kinetic theory (phase-space transport, natural units) ---------
-    _info("vlasov_residual", "kinetic", "d_t f + v.grad_x f + (F/m).grad_v f"),
-    _info("bgk_collision", "kinetic", "-(f - f_eq)/tau"),
-    _info("bgk_vlasov_residual", "kinetic", "L f + (f - f_eq)/tau"),
-    _info("maxwellian", "kinetic", "f_eq = n (m/2piT)^{d/2} exp(-m|v-u|^2/2T)"),
-    _info("number_density", "kinetic", "n = int f dv"),
-    _info("momentum_density", "kinetic", "int v f dv"),
-    _info("kinetic_energy_density", "kinetic", "int 0.5 |v|^2 f dv"),
     # --- complex / Wirtinger -------------------------------------------
     _info("dz", "complex", "d/dz = 0.5(d_x - i d_y)"),
     _info("dzbar", "complex", "d/dzbar = 0.5(d_x + i d_y)"),
@@ -189,8 +146,8 @@ def list_operators(domain: str | None = None) -> tuple[OperatorInfo, ...]:
     Examples
     --------
     >>> from omnibias.fields import list_operators
-    >>> [op.name for op in list_operators(domain="electromagnetism")][:3]
-    ['ampere_residual', 'electric_field_from_potentials', 'faraday_residual']
+    >>> [op.name for op in list_operators(domain="complex")][:3]
+    ['dz', 'dzbar']
     """
     if domain is not None and domain not in DOMAINS:
         raise ValueError(f"unknown domain {domain!r}; choose from {DOMAINS!r}")

@@ -222,34 +222,6 @@ def _honesty_without_reserved(honesty: Mapping[str, bool] | None) -> dict[str, b
     return dict(honesty)
 
 
-def _parent_claims_from_payload(
-    honesty: Mapping[str, bool],
-    payload: Mapping[str, Any],
-) -> dict[str, bool]:
-    """Derive parent-level flags; refuse a hand-stamped ``True`` that is not earned."""
-    from omnibias.core.proof.obligations.convergence_ledger import (
-        PARENT_CLAIM_KEYS,
-        payload_earns_parent_claim,
-    )
-
-    out = dict(honesty)
-    for key in PARENT_CLAIM_KEYS:
-        earned = payload_earns_parent_claim(payload, key)
-        asserted = bool(out.get(key, False))
-        if asserted and not earned:
-            raise ValueError(
-                f"honesty.{key} is declared true but the payload does not "
-                "earn it; parent flags are derived from a discharged "
-                "convergence ledger with empty external_premises "
-                "(navier_stokes_proof_claim requires parent == NS_PARENT), "
-                "never asserted by hand"
-            )
-        if earned:
-            out[key] = True
-        elif key in out:
-            out[key] = False
-    return out
-
 
 def make_certificate(
     *,
@@ -261,7 +233,7 @@ def make_certificate(
     """Build and seal a v1 certificate around ``payload``.
 
     ``honesty`` defaults to ``{"unproven_claim": False}`` -- the omnibias convention
-    that a certificate makes **no** open-problem claim unless evidence is attached.
+    that unsupported claims are not certified.
 
     Reserved honesty keys (:data:`RESERVED_HONESTY_KEYS`, at minimum
     :data:`THEOREM_PROVER_VERIFIED_KEY`) may **not** be supplied: they are earned
@@ -294,7 +266,6 @@ def make_certificate(
       optional transcendental package.
     """
     honesty_out = _honesty_without_reserved(honesty)
-    honesty_out = _parent_claims_from_payload(honesty_out, payload)
     meta_out = dict(meta) if meta is not None else {}
     # Prefer an explicit caller stamp; otherwise record the rigorous backend
     # that actually fed the payload.  No transcendental invocation is distinct

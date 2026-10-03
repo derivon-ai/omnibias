@@ -155,7 +155,7 @@ def cole_hopf_jet(
 
     Exact (to jet truncation) Cole--Hopf pushforward: heat jets for ``phi``
     and ``phi_x`` become a Burgers jet for ``u`` by Cauchy product only
-    (no CAS). Not a Navier--Stokes claim.
+    (no CAS). The check applies to the supplied finite jet.
     """
     if len(phi) != len(phi_x):
         raise ValueError("phi and phi_x jets must have the same length")
@@ -207,7 +207,6 @@ def verify_cole_hopf_burgers_jet(*, nu: float = 0.1, k: float = -0.5, order: int
         "err0": err0,
         "max_higher_coeff": float(tail),
         "passed": bool(err0 <= 1e-12 and tail <= 1e-12),
-        "navier_stokes_proof_claim": False,
     }
 
 

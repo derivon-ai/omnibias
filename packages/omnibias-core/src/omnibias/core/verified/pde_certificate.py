@@ -489,7 +489,7 @@ def certified_vorticity_transport_residual(
 
     The streamfunction ``\psi`` (an MLP in :data:`Layer` format, scalar output)
     induces ``u = (\psi_y, -\psi_x)`` and vorticity ``\omega = -\Delta\psi``.  The
-    residual of the steady (Navier--)Stokes vorticity equation
+    residual of the steady viscous vorticity-transport equation
 
     .. math::
 

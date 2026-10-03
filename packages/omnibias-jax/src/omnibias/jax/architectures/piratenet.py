@@ -1,11 +1,9 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-r"""Reusable PirateNet α-skip (jaxpi Wang–Li–Chen–Perdikaris).
+"""Identity-initialized residual networks for physics-informed models.
 
-Identity-init residual blocks: ``α=0`` is the embedding. Optional Fourier
-features compose via :class:`~omnibias.jax.architectures.pinn.FourierFeatureMLP`
-— this module does not fork an embed. Not ImageNet / ViT, not CCF stretch,
-not a Wave-3 gated invention.
+The zero skip parameter selects the embedding; Fourier features compose with
+the shared field architecture.
 """
 
 from __future__ import annotations

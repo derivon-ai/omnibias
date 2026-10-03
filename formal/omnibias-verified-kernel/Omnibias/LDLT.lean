@@ -1,7 +1,7 @@
 /-
 Kernel-verified positive-definiteness via the LDLᵀ inertia vector.
 
-The strict-local-minimum certificate (`omnibias.verify.certify_trained_min`) proves a
+A strict-local-minimum certificate requires a
 symmetric interval Hessian is positive definite by an interval LDLᵀ factorisation: it
 is PD exactly when every pivot interval `Dⱼ` of the factorisation is strictly positive
 (`Dⱼ.lo > 0`).  Previously the Python bridge collapsed that whole inertia vector to a

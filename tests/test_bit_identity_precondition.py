@@ -2,12 +2,9 @@
 # Copyright (C) 2026 Derivon
 r"""Every package that promises a bit-identical JAX twin must state the precondition.
 
-The promise is real but conditional: the shared coefficient module makes the two
-backends agree bit for bit **in double precision**, and JAX defaults to
-``float32``. Under the default the twins stay internally consistent and agree
-only to ``float32`` tolerance -- which in the decoders (``discrete``, ``qubo``,
-``struct``) and hardening steps (``partition``, ``tab``) is enough to flip a
-rounded bit and move an answer by a whole unit, not by a rounding error.
+Shared coefficients give the same algebra, while native activation kernels and
+reductions can round differently. Exact parity is conditional on matched input
+values, dtypes and operations; comparisons in float64 require JAX x64 mode.
 
 omnibias deliberately does not enable ``jax_enable_x64`` on import: the flag is
 process-global and irreversible once arrays exist, so a library that set it
@@ -105,15 +102,11 @@ def _sets_x64_at_import(path: Path) -> bool:
 
 def test_the_library_does_not_flip_the_global_flag_on_import() -> None:
     """Importing omnibias must not re-specify a user's JAX numerics behind their back."""
-    # `omnibias.pinn.solver.jax` is the one documented exception: it is a solver
-    # entry point whose results are meaningless in float32, and its docstring says so.
-    allowed = {"omnibias/pinn/solver/jax/__init__.py"}
     offenders = sorted(
         str(path.relative_to(PACKAGES))
         for top in _top_package_dirs()
         for path in top.rglob("__init__.py")
         if _sets_x64_at_import(path)
-        and not any(path.as_posix().endswith(a) for a in allowed)
     )
     assert not offenders, (
         "these modules enable 64-bit JAX at import time, which mutates global state "

@@ -2,9 +2,9 @@
 # Copyright (C) 2026 Derivon
 """Shared helpers for the public ``benchmarks/`` suite.
 
-Every script writes a JSON artifact under ``docs/benchmarks/`` with a common
-provenance header so README numbers stay traceable to a committed file anyone
-can regenerate.
+Each script writes reproducible JSON under ``$OMNIBIAS_SCRATCH`` or the
+repository-relative ``artifacts/`` directory, with configuration and environment
+metadata needed to interpret the measurements.
 """
 
 from __future__ import annotations
@@ -22,7 +22,6 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-OUT_DIR = REPO_ROOT / "docs" / "benchmarks"
 
 
 def enable_x64() -> None:
@@ -86,7 +85,8 @@ def provenance(*, schema: str, config: dict[str, Any]) -> dict[str, Any]:
 
 
 def write_json(name: str, payload: dict[str, Any]) -> Path:
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    path = OUT_DIR / name
+    output_dir = Path(os.environ.get("OMNIBIAS_SCRATCH", REPO_ROOT / "artifacts"))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    path = output_dir / name
     path.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8")
     return path

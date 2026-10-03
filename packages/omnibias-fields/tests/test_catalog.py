@@ -69,8 +69,8 @@ def test_list_operators_rejects_unknown_domain():
 
 
 def test_get_operator_roundtrips_and_raises():
-    info = get_operator("faraday_residual")
-    assert info.domain == "electromagnetism"
+    info = get_operator("gradient")
+    assert info.domain == "calculus"
     assert info.formula
     with pytest.raises(KeyError):
         get_operator("does_not_exist")

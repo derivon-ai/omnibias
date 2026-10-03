@@ -8,7 +8,7 @@
 | You want to… | Go to |
 |---|---|
 | Learn what omnibias does | [Docs](https://omnibias.ai/) · [`README.md`](README.md) |
-| Follow a worked example | [Handbook](https://omnibias.ai/handbook/) · [`docs/examples/`](docs/examples/) |
+| Follow a worked example | [Handbook](https://omnibias.ai/handbook/) · [`docs/pinn.md`](docs/pinn.md) |
 | Know whether a capability exists | [Operator surface](https://omnibias.ai/operator-surface/) — the canonical capability matrix |
 | Understand what is *proved* vs *measured* | [Scope & guarantees](https://omnibias.ai/scope-and-guarantees/) |
 | Ask a question | [GitHub Discussions](https://github.com/derivon-ai/omnibias/discussions) |

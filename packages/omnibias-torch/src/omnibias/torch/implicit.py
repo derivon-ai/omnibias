@@ -10,7 +10,7 @@ backprop through a fixed-point iteration.
 The solver loop is a Python ``while`` (do not wrap in
 ``torch.compile``). JAX uses ``lax.while_loop``; see the twin
 docstring. IFT is the chain rule at a fixed point, not an absence of
-the chain rule. Not a global min and not CCF stretch.
+the chain rule. Not a global min
 """
 
 from __future__ import annotations

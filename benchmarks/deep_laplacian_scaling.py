@@ -1,42 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Deep-network Laplacian fast lane: exactness, ceiling, cost, and honesty.
+"""Deep-network Laplacian accuracy, scaling and cross-backend checks.
 
-Theory spec 09-33 (deep-network Laplacian fast lane).
-
-Local operator benchmark. Not CCF, not Group 09, not ImageNet, not a package
-extract and not a paper. The founding ``delta -> 0`` bias collapse supplies
-``sigma'`` / ``sigma''`` inside ``omnibias.torch.laplacian.deep_field_laplacian``
-/ ``omnibias.jax.laplacian.deep_field_laplacian``; this is not temperature
-collapse.
-
-Five gates:
-
-* G1 exactness -- ``deep_field_laplacian`` (Tier A) against the internal
-  oracle (``omnibias.torch.jet_mv.mlp_jet_mv`` order-2 rows, traced), at
-  small D where the oracle is still affordable.
-* G2 no-ceiling -- the headline fix. ``deep_field_laplacian`` succeeds at
-  D=5000; the same computation through ``mlp_jet_mv`` must raise
-  (``omnibias.core.multi_index.MAX_MULTI_INDICES``).
-* G3 cost parity -- Tier A vs nested ``torch.func.hessian`` trace at a
-  cost-sensitive D, via ``_gates.require_cost_parity``.
-* G4 backend parity -- torch vs JAX. Not ``require_backend_parity`` (bit
-  exact): the ``deep_field_laplacian`` recursion's intermediate tensordot /
-  sum steps disagree with each other at the 1-2 ULP level between backends
-  even at trivial (D=1, H=1) shapes, although the shared pure-Python
-  fastpath polynomial evaluation itself (``omnibias.core.polynomials``) is
-  bit-exact in isolation. This is a measured finding, not a shortfall to
-  paper over -- claiming literal bit-identity here would be false. G4
-  instead gates a tight float64 numerical-parity tolerance and records the
-  measured ULP-scale gap (first divergence at the ``tensordot``/``sum``
-  Laplacian reduction for ``D=1``, ``H=1``; see
-  ``tests/test_deep_laplacian_parity.py``).
-* G5 estimator unbiasedness -- Tier C (mode="estimator") sample mean across
-  >= 5 independent seeds, within a bounded number of standard errors of the
-  Tier B (mode="support") exact value, via ``_gates.require_within_stderr``
-  (using the spread across seeds as the outer stderr, following the same
-  recipe pinned in ``packages/omnibias-jax/tests/test_deep_laplacian.py`` /
-  ``packages/omnibias-torch/tests/test_deep_laplacian.py``).
+Compares the direct Laplacian recursion against a small mixed-jet oracle and
+nested Hessian traces. Tests a dimension beyond the mixed-jet allocation budget,
+float64 torch/JAX numerical parity, and the sampled estimator against the exact
+supported value across independent seeds. The measured backend tolerance is
+numerical agreement, not universal bit identity.
 
 Usage::
 
@@ -47,11 +17,9 @@ Usage::
 from __future__ import annotations
 
 import argparse
-import json
 import os
 import sys
 import time
-from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -71,8 +39,6 @@ from omnibias.torch.laplacian import (  # noqa: E402
     deep_field_laplacian,
     deep_field_polylaplacian,
 )
-
-SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
 torch.set_default_dtype(torch.float64)
 
@@ -366,20 +332,11 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "small_dims": list(SMALL_DIMS),
                 "ceiling_dim": CEILING_DIM,
                 "cost_dim": g3["dim"],
-                "honesty": {
-                    "ccf_showcase": False,
-                    "group_09_vehicle": False,
-                    "package_extract": False,
-                    "paper": False,
-                    "founding_bias_collapse": True,
-                    "temperature_collapse": False,
-                    "theory_number_assigned": True,
-                    "backend_parity_bit_exact": False,
-                    "public_primitive": (
-                        "omnibias.torch.laplacian.deep_field_laplacian / "
-                        "omnibias.jax.laplacian.deep_field_laplacian"
-                    ),
-                },
+                "backend_parity_bit_exact": False,
+                "public_primitive": (
+                    "omnibias.torch.laplacian.deep_field_laplacian / "
+                    "omnibias.jax.laplacian.deep_field_laplacian"
+                ),
             },
         ),
         "baseline": {"name": BASELINE_NAME},
@@ -387,13 +344,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "gates": dict(gates_block(entries)),
         "wall_seconds": time.perf_counter() - t0,
     }
-    if full:
-        dest = SCRATCH / "citation" / "deep_laplacian"
-        dest.mkdir(parents=True, exist_ok=True)
-        path = dest / artifact
-        path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    else:
-        path = write_json(artifact, payload)
+    path = write_json(artifact, payload)
     print(f"wrote {path}")
     return payload
 

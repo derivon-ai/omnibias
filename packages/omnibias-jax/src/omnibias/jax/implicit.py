@@ -11,8 +11,7 @@ The default solver loop is ``lax.while_loop`` (G4). A Python ``while``
 is used only when ``require_contraction=True`` so a bound ``>= 1`` can
 raise instead of silently unrolling. Do not wrap a data-dependent
 Python ``break`` in ``jax.jit``. IFT is the chain rule at a fixed
-point, not an absence of the chain rule. Not a global min and not CCF
-stretch. Enable 64-bit JAX before the first array for torch parity.
+point, not an absence of the chain rule. The fixed point is local. Enable 64-bit JAX before the first array for torch parity.
 """
 
 from __future__ import annotations

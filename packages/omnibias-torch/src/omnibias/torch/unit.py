@@ -32,7 +32,7 @@ Terminology: this ``delta -> 0`` limit is *the* **founding bias collapse**
 from **temperature collapse**, the ``beta -> inf`` feasibility penalty in
 :mod:`omnibias.convex` (and ``omnibias.control`` / ``omnibias.routing``), which
 sharpens one constraint into a 0/1 feasibility step -- an indicator, not a derivative. See
-``docs/theory.md``.
+``docs/derivatives.md``.
 """
 
 from __future__ import annotations

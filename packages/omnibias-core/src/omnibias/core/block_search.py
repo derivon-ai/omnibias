@@ -8,8 +8,7 @@ normal) is a sparse direction. The step along that direction is spec
 ``verify=True`` never-worse. Last-layer least squares is exactly
 quadratic, so order 2 with remainder bound 0 is exact.
 
-This is a coordinate / block sweep, not a global solver and not CCF
-stretch. Bias collapse (``delta -> 0``) supplies the tower. Arrangement
+This is a coordinate / block sweep, not a global solver and with explicit local scope. Bias collapse (``delta -> 0``) supplies the tower. Arrangement
 ``beta`` is caller-owned; this step is at fixed ``beta``.
 """
 

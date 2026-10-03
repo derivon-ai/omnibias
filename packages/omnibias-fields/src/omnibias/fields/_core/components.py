@@ -6,7 +6,7 @@ A :class:`ComponentSpec` is the structural identity of the output side of
 a typed PINN field. It records:
 
 - ``names``: the ordered list of scalar component names (e.g.
-  ``("u", "v", "w", "p")`` for 3D NS primitive variables).
+  ``("u", "v", "w", "p")`` for a three-dimensional vector and scalar field).
 - ``groups``: named subsets of components (e.g.
   ``{"velocity": ("u", "v", "w")}``) used by :class:`VectorView` for
   vector-level operators (curl, div, advect, ...).

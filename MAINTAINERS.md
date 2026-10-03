@@ -5,10 +5,10 @@
 
 | Role | Name | Contact | Scope |
 |---|---|---|---|
-| Founder, Lead Maintainer | Vardan Grigoryants | <vardan@derivon.ai> | all 42 packages |
+| Founder, Lead Maintainer | Vardan Grigoryants | <vardan@derivon.ai> | all primitive packages |
 
 Copyright is held by **Derivon** (<info@derivon.ai>), which is the project
-steward and the counterparty to the [CLA](docs/CLA.md) and to commercial
+steward and the counterparty to the [CLA](CLA.md) and to commercial
 licences.
 
 ## Current state: solo maintainer

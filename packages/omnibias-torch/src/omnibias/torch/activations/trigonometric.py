@@ -47,13 +47,6 @@ from __future__ import annotations
 import math
 
 from omnibias.torch.activations.registry import ActivationSpec, register_activation
-from omnibias.torch.transforms import (
-    COS_TRANSFORMS,
-    COSH_TRANSFORMS,
-    SECH_TRANSFORMS,
-    SIN_TRANSFORMS,
-    SINH_TRANSFORMS,
-)
 
 import torch
 from torch import Tensor
@@ -87,7 +80,6 @@ def _sin_fastpath(z: Tensor, n: int) -> Tensor:
 SIN = register_activation(
     ActivationSpec(
         name="sin",
-        transforms=SIN_TRANSFORMS,
         forward=_sin_forward,
         derivative=_sin_derivative,
         fastpath=_sin_fastpath,
@@ -123,7 +115,6 @@ def _cos_fastpath(z: Tensor, n: int) -> Tensor:
 COS = register_activation(
     ActivationSpec(
         name="cos",
-        transforms=COS_TRANSFORMS,
         forward=_cos_forward,
         derivative=_cos_derivative,
         fastpath=_cos_fastpath,
@@ -159,7 +150,6 @@ def _sinh_fastpath(z: Tensor, n: int) -> Tensor:
 SINH = register_activation(
     ActivationSpec(
         name="sinh",
-        transforms=SINH_TRANSFORMS,
         forward=_sinh_forward,
         derivative=_sinh_derivative,
         fastpath=_sinh_fastpath,
@@ -195,7 +185,6 @@ def _cosh_fastpath(z: Tensor, n: int) -> Tensor:
 COSH = register_activation(
     ActivationSpec(
         name="cosh",
-        transforms=COSH_TRANSFORMS,
         forward=_cosh_forward,
         derivative=_cosh_derivative,
         fastpath=_cosh_fastpath,
@@ -399,7 +388,6 @@ def _sech_fastpath(z: Tensor, n: int) -> Tensor:
 SECH = register_activation(
     ActivationSpec(
         name="sech",
-        transforms=SECH_TRANSFORMS,
         forward=_sech_forward,
         derivative=_sech_derivative,
         fastpath=_sech_fastpath,

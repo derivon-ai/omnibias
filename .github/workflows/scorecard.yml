@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Derivon
 #
 # OpenSSF Scorecard. Publishes SARIF to the code-scanning dashboard.
-# SHA-pinned actions (see docs/ci-hardening.md).
+# SHA-pinned actions.
 name: scorecard
 
 on:

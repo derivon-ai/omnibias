@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Derivon
 #
 # Generate a CycloneDX SBOM on release tags and upload it as a workflow artifact.
-# SHA-pinned actions (see docs/ci-hardening.md).
+# SHA-pinned actions.
 name: sbom
 
 on:
