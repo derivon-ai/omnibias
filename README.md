@@ -6,7 +6,7 @@
 </picture>
 
 [![CI](https://github.com/derivon-ai/omnibias/actions/workflows/ci.yml/badge.svg)](https://github.com/derivon-ai/omnibias/actions/workflows/ci.yml)
-[![Docs](https://img.shields.io/badge/read-the_docs-087f72)](https://omnibias.ai/)
+[![Docs](https://img.shields.io/badge/read-the_docs-087f72)](docs/index.md)
 [![PyPI](https://img.shields.io/pypi/v/omnibias-torch?label=PyPI%20%C2%B7%20torch)](https://pypi.org/project/omnibias-torch/)
 [![Open core](https://img.shields.io/badge/core-Apache--2.0-087f72)](LICENSING.md)
 [![Commercial licensing](https://img.shields.io/badge/advanced_engines-AGPL_or_commercial-5964b4)](COMMERCIAL-LICENSE.md)
