@@ -160,3 +160,30 @@ def test_wheel_readme_preserves_unicode_without_email_charset() -> None:
         ('Name: omnibias-probe\nDescription-Content-Type: text/markdown\n\n' + source).encode('utf-8')
     )
     assert validator.wheel_readme(metadata) == source
+
+
+def test_ecosystem_readme_command_runs_primitives_and_consumers(tmp_path, monkeypatch) -> None:
+    import sys
+
+    spec = importlib.util.spec_from_file_location(
+        'validate_wheels', Path(__file__).resolve().parents[1] / 'scripts/validate_wheels.py'
+    )
+    assert spec and spec.loader
+    validator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(validator)
+    primitive, consumer = tmp_path / 'primitive', tmp_path / 'consumer'
+    wheels = {p.name: (tmp_path / (p.name + '.whl')) for p in [primitive, consumer]}
+    seen = []
+    monkeypatch.setattr(validator, 'discover', lambda _: ([primitive], [consumer]))
+    monkeypatch.setattr(validator, 'project_data', lambda p: {'name': p.name})
+    monkeypatch.setattr(validator, 'wheel_index', lambda _: wheels)
+
+    def validate(project, *args, **kwargs):
+        assert kwargs['readme']
+        seen.append(project.name)
+        return {'name': project.name, 'status': 'passed'}
+
+    monkeypatch.setattr(validator, 'validate', validate)
+    monkeypatch.setattr(sys, 'argv', ['validate_wheels.py', '--readme', '--artifact-only', '--projects-root', str(tmp_path), '--output', str(tmp_path / 'output')])
+    assert validator.main() == 0
+    assert seen == ['primitive', 'consumer']

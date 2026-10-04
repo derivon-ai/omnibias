@@ -299,7 +299,7 @@ def main() -> int:
     constraints.write_text(
         "".join(f"{name} @ {wheel.as_uri()}\n" for name, wheel in sorted(wheels.items()))
     )
-    targets = consumers or primitives
+    targets = projects if args.readme else consumers or primitives
     if args.only:
         targets = [p for p in projects if project_data(p)["name"] in args.only]
     report: dict[str, Any] = {"schema": 1, "wheel_count": len(wheels), "results": []}
