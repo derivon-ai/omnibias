@@ -43,7 +43,7 @@ dev = ["omnibias-discrete[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
 
 [project.urls]
 Homepage = "https://github.com/derivon-ai/omnibias"
-Documentation = "https://omnibias.ai/"
+Documentation = "https://github.com/derivon-ai/omnibias/blob/main/docs/api/discrete.md"
 Source = "https://github.com/derivon-ai/omnibias"
 Issues = "https://github.com/derivon-ai/omnibias/issues"
 Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"

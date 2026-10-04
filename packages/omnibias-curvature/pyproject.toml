@@ -38,7 +38,7 @@ test = ["pytest>=7.0"]
 
 [project.urls]
 Homepage = "https://github.com/derivon-ai/omnibias"
-Documentation = "https://omnibias.ai/"
+Documentation = "https://github.com/derivon-ai/omnibias/blob/main/docs/api/curvature.md"
 Source = "https://github.com/derivon-ai/omnibias"
 Issues = "https://github.com/derivon-ai/omnibias/issues"
 Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"

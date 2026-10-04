@@ -13,7 +13,7 @@ are illustrative unless a training step is explicitly identified; it is not a
 performance comparison.
 
 
-[API reference](https://omnibias.ai/api/keras/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-keras/src/omnibias/keras) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-keras/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+[API reference](https://github.com/derivon-ai/omnibias/blob/main/docs/api/keras.md) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-keras/src/omnibias/keras) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-keras/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
 ## The mathematical connection
 

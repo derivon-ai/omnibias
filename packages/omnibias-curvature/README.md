@@ -13,7 +13,7 @@ are illustrative unless a training step is explicitly identified; it is not a
 performance comparison.
 
 
-[API reference](https://omnibias.ai/api/curvature/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-curvature/src/omnibias/curvature) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-curvature/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+[API reference](https://github.com/derivon-ai/omnibias/blob/main/docs/api/curvature.md) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-curvature/src/omnibias/curvature) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-curvature/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
 ## The mathematical connection
 
