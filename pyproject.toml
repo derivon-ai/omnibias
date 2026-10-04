@@ -59,6 +59,9 @@ filterwarnings = [
     "error",
     "ignore::DeprecationWarning:torch.*",
     "ignore::DeprecationWarning:jax.*",
+    # PyTorch 2.14's forward-AD internals still call their deprecated JIT API.
+    # Limit this exception to the upstream emitter; retain strict user warnings.
+    'ignore:`torch\.jit\.script` is deprecated\..*:FutureWarning:torch\.jit\._script',
     # NumPy 2 copy-keyword warning from Keras' upstream tensor conversion adapter.
     'ignore:.*__array__ implementation.*copy keyword.*:DeprecationWarning:keras\.src\.backend\.(torch|jax|tensorflow)\.core',
 ]
