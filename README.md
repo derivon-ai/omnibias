@@ -133,6 +133,10 @@ explain which path to choose.
 
 Install the prepared **RC/alpha release** explicitly for the examples below:
 
+Use Python **3.11+** with current backend versions for new deployments. Python
+3.10 remains a compatibility target, but resolves older backend releases that
+lack some current security fixes.
+
 ```bash
 python -m pip install --pre "omnibias-torch==0.5.0rc1"
 # The soft-region example also uses the AGPL-or-commercial partition package:
