@@ -28,6 +28,12 @@ stable packages. `scripts/check_prerelease_isolation.py` tests this with the new
 primitive wheels available to the resolver. Avoid `--pre` in existing consumer
 environments unless the whole selected dependency closure has been validated.
 
+**Alpha-only exception:** Keras and first-release alpha projects have no stable
+fallback. Resolvers can select their newest prerelease without `--pre`; Keras's
+explicit dependency minimum can then pull the new core into the same environment.
+The resolver check verifies this exception too. Use the historical constraints
+below for existing installations; `--pre` is not a universal isolation switch.
+
 ## Published-consumer compatibility
 
 The following affected features work with the historical primitives and fail with

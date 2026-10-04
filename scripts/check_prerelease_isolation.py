@@ -57,6 +57,37 @@ def main() -> None:
             "omnibias-fields": "0.1.0",
         }, versions
         print(json.dumps({"ordinary_install": versions, "prerelease_wheels_available": True}))
+        # Alpha-only projects have no stable fallback. Installing one can also
+        # opt dependencies into prereleases through its explicit requirements.
+        subprocess.run(
+            [
+                "uv",
+                "pip",
+                "install",
+                "--python",
+                str(python),
+                "--find-links",
+                str(links),
+                "omnibias-keras",
+            ],
+            cwd=work,
+            env=env,
+            check=True,
+        )
+        probe = 'from importlib.metadata import version; import json; print(json.dumps({n:version(n) for n in ["omnibias-keras","omnibias-core"]}))'
+        alpha_versions = json.loads(
+            subprocess.check_output([str(python), "-I", "-c", probe], cwd=work, env=env, text=True)
+        )
+        expected = {
+            "omnibias-" + name: next(links.glob(f"omnibias_{name}-*.whl")).name.split("-")[1]
+            for name in ("keras", "core")
+        }
+        assert alpha_versions == expected, alpha_versions
+        print(
+            json.dumps(
+                {"alpha_only_exception": alpha_versions, "historical_constraints_required": True}
+            )
+        )
 
 
 if __name__ == "__main__":
