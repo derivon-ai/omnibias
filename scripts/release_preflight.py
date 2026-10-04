@@ -133,7 +133,7 @@ def main() -> None:
     repository = os.getenv("RELEASE_REPOSITORY") or "prepare"
     target = None if repository == "prepare" else repository
     require_prerelease(ROOT, names)
-    validate_closure(ROOT, names, target)
+    validate_closure(ROOT, list(projects(ROOT)) if target is None else names, target)
     if target:
         for name in names:
             project = projects(ROOT)[name]

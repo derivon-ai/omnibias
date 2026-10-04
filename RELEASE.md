@@ -3,7 +3,8 @@
 The release workflow owns the **16 primitive distributions**. Extracted consumers
 and both research distributions are validated locally and retain their own future
 release lifecycle. Repository moves do not rename PyPI projects or revoke existing
-grant terms. Never replace an artifact or reuse an occupied version.
+grant terms. Never replace an artifact. An interrupted upload may resume only from the same
+prepared cohort after verifying every existing artifact hash.
 
 ## Prerelease policy
 
@@ -96,26 +97,52 @@ and [filename reuse](https://pypi.org/help/#file-name-reuse).
    floors together; regenerate the lockfile and inventories. Preserve historical
    release artifacts and required license provenance.
 2. Run the local gates below and CI on the exact candidate commit.
-3. Dispatch `release` with target **prepare** (the default). An empty package input
-   means all 16 primitives. The preparation path builds, executes installed-wheel
-   README profiles, checks metadata and attests artifacts; it never uploads.
-4. Verify every selected dependency, including optional feature closures, is in the
-   selection or already available on the target index. An index error is not evidence
-   of an unused version. Initial preparation should select the complete cohort.
-5. After explicit release approval, dispatch the same reviewed commit with target
-   `testpypi` or `pypi`, then approve the protected environment jobs. These are separate
-   actions from merging a PR. Production artifacts are rebuilt and attested, not
-   promoted byte-for-byte from TestPyPI.
-6. Verify clean index installations and the uploaded artifact hashes/attestations.
+3. Merge the reviewed PR with a merge commit, preserving commit-pinned assets.
+   Wait for checks on `main`, then dispatch `release` with target **prepare**.
+   Preparation always builds all 16 primitives, executes their installed-wheel
+   README profiles, checks metadata, and attests the 32 artifacts plus a manifest.
+   Record this successful preparation run ID and its exact source commit.
+4. Configure pending publishers in batches within the account's simultaneous
+   pending limit. The separate daily registration limit does not increase these
+   slots. A pending publisher becomes ordinary on first use. Publish genuine
+   releases, then register the next batch; never create placeholder releases.
+5. Dispatch `release` on that same `main` commit with target **testpypi**, the
+   `prepared_run_id`, and independent ready package names. Each dependency,
+   including optional extras, must already have both matching cohort artifacts
+   on the target index. Publish core before backends; binary before boolean;
+   difference before fields/qcalculus; curvature before struct; sos and struct
+   before discrete. Self-referencing extras do not add an ordering dependency.
+6. Approve the configured protected environment jobs. The workflow downloads
+   the successful preparation, verifies its repository/workflow/ref/commit,
+   checks all hashes and attestations, and uploads only the selected artifacts.
+   It does not rebuild. Complete all TestPyPI uploads and installation checks
+   before repeating with target **pypi** and the same preparation run ID.
+7. Verify the index artifacts and clean installations using the commands below.
+
+```bash
+python scripts/check_index_release.py --repository testpypi \
+  --prepared artifacts/prepared --output artifacts/testpypi
+python scripts/validate_wheels.py --artifact-only --readme \
+  --python 3.12 --output artifacts/testpypi
+```
+
+`check_index_release.py` downloads only the exact cohort from the selected index
+and compares all 32 artifact hashes. The validator constrains every omnibias
+requirement to those downloaded wheels, while third-party dependencies resolve
+from production PyPI. It does not use a mixed-index fallback. Repeat both commands
+with `pypi` after production publication, then verify the historical constraints.
 
 Independent `omnibias-<package>-v<version>` tags must match package metadata.
-Tag pushes prepare only; they never publish automatically. Aggregate tags are
-unsupported. Partial selections fail when their dependency closure is incomplete.
+Tag pushes prepare the complete cohort only; they never publish automatically.
+A tag preparation cannot be promoted: publication requires a successful
+main-branch dispatch at the exact source commit being released.
 
-Do not use `skip-existing`. If an upload partly succeeds, stop and compare the
-existing filenames, hashes and attestations to the reviewed build. A rerun refuses
-occupied versions. Select only remaining distributions when safe, or prepare a new
-version after review; never silently overwrite a changed build with an old version.
+If an upload partly succeeds, stop and inspect filenames, hashes, and attestations.
+To recover, dispatch the same preparation and package selection with `resume=true`.
+Existing files must match exactly and must not be yanked; matching complete packages
+are skipped, and only missing files are uploaded. Unexpected files, changed hashes,
+wrong preparation runs, and index errors stop publication. There is no blind
+`skip-existing`, version overwrite, or automatic version bump.
 
 ## Installed-wheel gates
 

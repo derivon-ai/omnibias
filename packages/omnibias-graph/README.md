@@ -2,9 +2,9 @@
 
 **From relations to soft assignments.** Spectral operators and matrix relaxations expose graph structure.
 
-![From relations to soft assignments.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-graph/docs/visuals/story.gif)
+![From relations to soft assignments.](https://raw.githubusercontent.com/derivon-ai/omnibias/6fc47b7e10d4739b981dd0eff8849ec5eb19d826/packages/omnibias-graph/docs/visuals/story.gif)
 
-[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-graph/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-graph/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-graph/docs/visuals/scene.py)
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/6fc47b7e10d4739b981dd0eff8849ec5eb19d826/packages/omnibias-graph/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/6fc47b7e10d4739b981dd0eff8849ec5eb19d826/packages/omnibias-graph/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/6fc47b7e10d4739b981dd0eff8849ec5eb19d826/packages/omnibias-graph/docs/visuals/scene.py)
 
 An affinity or cost matrix enters; spectral graph operators, embeddings, soft orderings or assignment matrices leave. Graph-aware models can compose these outputs with trainable features while respecting each relaxation’s constraints.
 
@@ -22,22 +22,19 @@ Temperature-like sharpening controls selected soft assignment and sorting operat
 ## Run this README
 
 The examples use `omnibias-graph[torch]` on Python >=3.10. Their installed-wheel
-profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-graph/wheel-tests.toml); it selects runtime features, not
-an editable workspace. Build the coordinated wheelhouse using the
-[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
-from that main checkout:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-graph[torch]"
-```
-
-After this opt-in prerelease is published, the equivalent index command is:
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
 python -m pip install --pre "omnibias-graph[torch]==0.1.0a2"
 ```
 
-Existing published consumers may need the historical primitive versions; see the
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-graph/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
 [compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists

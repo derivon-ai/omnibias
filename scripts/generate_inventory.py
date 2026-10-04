@@ -116,13 +116,13 @@ def license_label(expression: str) -> str:
 
 
 def package_table(items: list[dict[str, Any]], *, compact: bool = False) -> str:
-    prefix = "docs/" if compact else ""
     columns = ["Distribution", "Version", "License"] if compact else [
         "Distribution", "Version", "Python", "Maturity", "License", "Responsibility"
     ]
     rows = ["| " + " | ".join(columns) + " |", "| " + " | ".join(["---"] * len(columns)) + " |"]
     for item in items:
-        row = [f"[{item['name']}]({prefix}api/{item['stem']}.md)", item["version"]]
+        target = f"packages/{item['name']}/" if compact else f"api/{item['stem']}.md"
+        row = [f"[{item['name']}]({target})", item["version"]]
         if not compact:
             row.extend([item["requires-python"], item["maturity"]])
         row.append(license_label(item["license"]))

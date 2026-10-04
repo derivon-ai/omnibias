@@ -183,6 +183,7 @@ def validate(
             log=log,
             env=env,
         )
+        run(["uv", "pip", "check", "--python", str(python)], cwd=work, log=log, env=env)
         probe = work / "import_smoke.py"
         shutil.copy2(ROOT / "scripts/import_smoke.py", probe)
         command = [str(python), "-I", str(probe), "--distribution", name]

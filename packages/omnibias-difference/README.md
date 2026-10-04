@@ -22,22 +22,19 @@ This package exposes the finite-spacing side of bias collapse. Normalized weight
 ## Run this README
 
 The examples use `omnibias-difference` on Python >=3.10. Their installed-wheel
-profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-difference/wheel-tests.toml); it selects runtime features, not
-an editable workspace. Build the coordinated wheelhouse using the
-[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
-from that main checkout:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-difference"
-```
-
-After this opt-in prerelease is published, the equivalent index command is:
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
 python -m pip install --pre "omnibias-difference==0.1.0a2"
 ```
 
-Existing published consumers may need the historical primitive versions; see the
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-difference/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
 [compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists

@@ -25,6 +25,13 @@ on:
           - prepare
           - testpypi
           - pypi
+      prepared_run_id:
+        description: "Successful main-branch preparation run; required for publication"
+        required: false
+      resume:
+        description: "Recover an interrupted upload after exact artifact hash verification"
+        type: boolean
+        default: false
 
 concurrency:
   group: release-${{ github.ref }}
@@ -35,6 +42,7 @@ permissions:
 
 jobs:
   verify:
+    if: inputs.repository == 'prepare' || github.event_name == 'push'
     uses: ./.github/workflows/ci.yml
 
   build:
@@ -42,8 +50,6 @@ jobs:
     name: build primitive distributions
     runs-on: ubuntu-24.04
     timeout-minutes: 60
-    outputs:
-      matrix: ${{ steps.select.outputs.matrix }}
     permissions:
       contents: read
       # Required by actions/attest-build-provenance to mint the signed
@@ -64,11 +70,13 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
           RELEASE_EVENT: ${{ github.event_name }}
           RELEASE_REPOSITORY: ${{ inputs.repository || 'prepare' }}
-        run: python scripts/release_preflight.py
+        run: |
+          # Validate an independent tag, then prepare the complete dependency cohort.
+          python scripts/release_preflight.py
       - name: Build primitive sdists + wheels
         run: |
-          for name in ${{ steps.select.outputs.pkgs }}; do
-            python -m build "packages/omnibias-$name" --outdir dist/
+          for package in packages/*; do
+            python -m build "$package" --outdir dist/
           done
           ls -1 dist/
       - name: Validate distribution metadata
@@ -77,9 +85,9 @@ jobs:
         run: |
           mkdir -p artifacts/release-wheels/wheels
           cp dist/*.whl artifacts/release-wheels/wheels/
-          selected=""
-          for name in ${{ steps.select.outputs.pkgs }}; do selected="$selected omnibias-$name"; done
-          python scripts/validate_wheels.py --artifact-only --readme --python 3.11 --output artifacts/release-wheels --only $selected
+          python scripts/validate_wheels.py --artifact-only --readme --python 3.11 --output artifacts/release-wheels
+      - name: Seal complete release manifest
+        run: python scripts/release_artifacts.py manifest
       # SLSA build provenance: a signed, verifiable attestation that these exact
       # artifacts were produced by this workflow from this commit. Consumers
       # verify with `gh attestation verify <dist> --repo derivon-ai/omnibias`.
@@ -92,15 +100,49 @@ jobs:
         with:
           name: primitive-dist
           path: dist/
+          retention-days: 90
+
+  promote:
+    if: github.event_name == 'workflow_dispatch' && inputs.repository != 'prepare'
+    name: verify prepared artifacts and publication order
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      actions: read
+      attestations: read
+    outputs:
+      matrix: ${{ steps.promote.outputs.matrix }}
+      pending: ${{ steps.promote.outputs.pending }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: "3.11"
+      - run: python -m pip install packaging
+      - name: Verify preparation and stage missing files
+        id: promote
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREPARED_RUN_ID: ${{ inputs.prepared_run_id }}
+          REQUESTED_PACKAGES: ${{ inputs.packages }}
+          RELEASE_REPOSITORY: ${{ inputs.repository }}
+          RESUME_UPLOAD: ${{ inputs.resume }}
+        run: python scripts/release_artifacts.py promote --directory prepared --output upload
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: steps.promote.outputs.pending == 'true'
+        with:
+          name: verified-upload
+          path: upload/
           retention-days: 7
 
   publish:
     name: publish ${{ matrix.package }} (${{ inputs.repository }})
-    needs: [build]
-    if: github.event_name == 'workflow_dispatch' && inputs.repository != 'prepare'
+    needs: [promote]
+    if: needs.promote.outputs.pending == 'true'
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.promote.outputs.matrix) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: ${{ matrix.environment }}
@@ -108,19 +150,12 @@ jobs:
       id-token: write
       contents: read
     steps:
-      - name: Download prepared distributions
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
-          name: primitive-dist
-          path: all-dist/
-      - name: Select exactly one distribution
-        env:
-          PACKAGE: ${{ matrix.package }}
-        run: |
-          mkdir dist
-          cp all-dist/omnibias_${PACKAGE}-* dist/
-          test "$(find dist -type f | wc -l)" -eq 2
-      - name: Publish to the explicitly selected index
+          name: verified-upload
+          path: upload/
+      - name: Publish verified missing artifacts
         uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
         with:
+          packages-dir: upload/${{ matrix.package }}/
           repository-url: ${{ inputs.repository == 'pypi' && 'https://upload.pypi.org/legacy/' || 'https://test.pypi.org/legacy/' }}

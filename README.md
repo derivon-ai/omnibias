@@ -265,22 +265,22 @@ add fields, partitions or curvature when your model needs them.
 
 | Distribution | Version | License |
 | --- | --- | --- |
-| [omnibias-binary](docs/api/binary.md) | 0.1.0a2 | Apache-2.0 |
-| [omnibias-boolean](docs/api/boolean.md) | 0.1.0a2 | Apache-2.0 |
-| [omnibias-convex](docs/api/convex.md) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-core](docs/api/core.md) | 0.5.0rc1 | Apache-2.0 |
-| [omnibias-curvature](docs/api/curvature.md) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-difference](docs/api/difference.md) | 0.1.0a2 | Apache-2.0 |
-| [omnibias-discrete](docs/api/discrete.md) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-fields](docs/api/fields.md) | 0.2.0rc1 | Apache-2.0 |
-| [omnibias-graph](docs/api/graph.md) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-jax](docs/api/jax.md) | 0.5.0rc1 | Apache-2.0 |
-| [omnibias-keras](docs/api/keras.md) | 0.0.2a1 | Apache-2.0 |
-| [omnibias-partition](docs/api/partition.md) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-qcalculus](docs/api/qcalculus.md) | 0.1.0a2 | Apache-2.0 |
-| [omnibias-sos](docs/api/sos.md) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-struct](docs/api/struct.md) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-torch](docs/api/torch.md) | 0.5.0rc1 | Apache-2.0 |
+| [omnibias-binary](packages/omnibias-binary/) | 0.1.0a2 | Apache-2.0 |
+| [omnibias-boolean](packages/omnibias-boolean/) | 0.1.0a2 | Apache-2.0 |
+| [omnibias-convex](packages/omnibias-convex/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-core](packages/omnibias-core/) | 0.5.0rc1 | Apache-2.0 |
+| [omnibias-curvature](packages/omnibias-curvature/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-difference](packages/omnibias-difference/) | 0.1.0a2 | Apache-2.0 |
+| [omnibias-discrete](packages/omnibias-discrete/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-fields](packages/omnibias-fields/) | 0.2.0rc1 | Apache-2.0 |
+| [omnibias-graph](packages/omnibias-graph/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-jax](packages/omnibias-jax/) | 0.5.0rc1 | Apache-2.0 |
+| [omnibias-keras](packages/omnibias-keras/) | 0.0.2a1 | Apache-2.0 |
+| [omnibias-partition](packages/omnibias-partition/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-qcalculus](packages/omnibias-qcalculus/) | 0.1.0a2 | Apache-2.0 |
+| [omnibias-sos](packages/omnibias-sos/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-struct](packages/omnibias-struct/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-torch](packages/omnibias-torch/) | 0.5.0rc1 | Apache-2.0 |
 
 <!-- END GENERATED PACKAGE INVENTORY -->
 

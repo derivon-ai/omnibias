@@ -38,6 +38,14 @@ def test_package_table_uses_metadata_without_description_truncation() -> None:
     assert inventory.escape(changed["description"]) in table
 
 
+def test_readme_links_open_package_front_pages() -> None:
+    for item in inventory.packages(ROOT):
+        table = inventory.package_table([item], compact=True)
+        assert f"](packages/{item['name']}/)" in table
+        assert (ROOT / "packages" / item["name"] / "README.md").is_file()
+        assert f"](api/{item['stem']}.md)" in inventory.package_table([item])
+
+
 def test_marker_replacement_preserves_authored_text() -> None:
     text = "intro\n<!-- BEGIN GENERATED X -->\nold\n<!-- END GENERATED X -->\noutro\n"
     assert inventory.replace_block(text, "X", "new") == (
