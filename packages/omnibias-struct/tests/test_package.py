@@ -9,7 +9,7 @@ import omnibias.struct as st
 
 
 def test_version() -> None:
-    assert st.__version__ == "0.1.0a1"
+    assert st.__version__ == "0.1.0a2"
 
 
 def test_public_surface() -> None:

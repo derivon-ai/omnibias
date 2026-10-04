@@ -27,7 +27,7 @@ from omnibias.fields._core import (
 
 
 def test_public_surface() -> None:
-    assert fields.__version__ == "0.1.0"
+    assert fields.__version__ == "0.2.0rc1"
     for name in ("FieldState", "ComponentSpec", "CoordinateSpec",
                  "ComponentView", "VectorView", "SigmaCache", "ops_registry"):
         assert hasattr(fields, name)

@@ -12,7 +12,7 @@ import omnibias.difference as D
 
 
 def test_version() -> None:
-    assert D.__version__ == "0.1.0a1"
+    assert D.__version__ == "0.1.0a2"
 
 
 def test_public_surface_present() -> None:
