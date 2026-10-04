@@ -1,188 +1,184 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Iterated Laplacian ``Δᵏ`` cost vs order ``k``.
+"""Runtime-input iterated Laplacians with isolated, resource-bounded baselines.
 
-Compares omnibias closed-form ``neural_field_polylaplacian`` against nested
-``jax.hessian`` (dense) and nested folx. OOM / timeout are recorded as status
-strings rather than silently omitted. Run::
-
-    uv run python benchmarks/polylaplacian_order.py
+Run ``uv run --with folx python benchmarks/polylaplacian_order.py``.
+Each method/order runs in a subprocess. The parent enforces a wall-clock and
+RSS budget; a terminated run is a budget result, not a proof of impossibility.
 """
 
 from __future__ import annotations
 
+import argparse
+import json
+import os
+import signal
+import subprocess
 import sys
+import tempfile
 import time
-import traceback
+from collections.abc import Callable
 from pathlib import Path
+from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from _common import enable_x64, median_time_ms, provenance, write_json  # noqa: E402
+from _common import enable_x64, provenance, source_provenance, write_json  # noqa: E402
 
 enable_x64()
 
-import folx  # noqa: E402
-import jax  # noqa: E402
-import jax.numpy as jnp  # noqa: E402
-import numpy as np  # noqa: E402
-from jax import vmap  # noqa: E402
-from omnibias.jax.laplacian import neural_field_polylaplacian  # noqa: E402
-
-H = 16
-D = 16
-B = 32
+H, D, B = 16, 16, 32
 KS = (1, 2, 3, 4)
-SEED = 0
-TIMEOUT_S = 120.0
-WARMUP = 1
-REPEATS = 3
+SEED, REPEATS = 0, 9
+TIMEOUT_S, RSS_LIMIT_MIB = 120, 3072
 
 
-def _params(key: jax.Array) -> tuple[jnp.ndarray, jnp.ndarray, jnp.ndarray, jnp.ndarray]:
-    k1, k2, k3, k4 = jax.random.split(key, 4)
-    W = jax.random.normal(k1, (H, D), dtype=jnp.float64) * 0.3
+def _worker(method: str, order: int) -> dict[str, Any]:
+    import folx
+    import jax
+    import jax.numpy as jnp
+    import numpy as np
+    from _common import measure
+    from _operator_reference import tanh_field_laplacian_reference
+    from _reference import error_metrics
+    from omnibias.jax.laplacian import neural_field_polylaplacian
+
+    k1, _, k3, k4 = jax.random.split(jax.random.PRNGKey(SEED), 4)
+    w = jax.random.normal(k1, (H, D), dtype=jnp.float64) * 0.3
     beta = jnp.zeros(H, dtype=jnp.float64)
     c = jax.random.normal(k3, (H,), dtype=jnp.float64)
     c = c / jnp.linalg.norm(c)
-    X = jax.random.normal(k4, (B, D), dtype=jnp.float64)
-    return W, beta, c, X
+    x = jax.random.normal(k4, (B, D), dtype=jnp.float64)
+    args = (x, w, beta, c)
+
+    def evaluate(x: Any, w: Any, beta: Any, c: Any) -> Any:
+        if method == "omnibias":
+            return neural_field_polylaplacian(x, w, beta, c, "tanh", k=order)
+        def point(y: Any) -> Any:
+            return jnp.dot(c, jnp.tanh(w @ y + beta))
+
+        function: Callable[[Any], Any] = point
+        for _ in range(order):
+            if method == "dense_nested":
+                hessian = jax.hessian(function)
+
+                def dense_laplacian(y: Any, hessian: Callable[[Any], Any] = hessian) -> Any:
+                    return jnp.trace(hessian(y))
+
+                function = dense_laplacian
+            else:
+                forward = cast(Callable[[Any], Any], folx.forward_laplacian(function))
+
+                def forward_laplacian(y: Any, forward: Callable[[Any], Any] = forward) -> Any:
+                    return forward(y).laplacian
+
+                function = forward_laplacian
+        return jax.vmap(function)(x)
+
+    start = time.perf_counter()
+    compiled = jax.jit(evaluate).lower(*args).compile()
+    compile_ms = (time.perf_counter() - start) * 1000
+    def execute() -> Any:
+        return compiled(*args)
+
+    result = measure(execute, repeats=REPEATS)
+    result.update(status="ok", compile_ms=compile_ms, time_ms=result["median_ms"])
+    indices = np.array([0, B // 2, B - 1])
+    reference = tanh_field_laplacian_reference(
+        np.asarray(x)[indices], np.asarray(w), np.asarray(beta), np.asarray(c), order
+    )
+    values = np.asarray(compiled(*args))[indices]
+    np.testing.assert_allclose(values, reference, rtol=2e-10, atol=1e-9)
+    result["error_vs_mpmath"] = error_metrics(values, reference)
+    result["value_sample"] = float(values[0])
+    return result
 
 
-def _nested_hessian_lap(f, x: jnp.ndarray, k: int) -> jnp.ndarray:
-    """Apply ``trace(hessian(·))`` ``k`` times to a scalar function of ``x``."""
-
-    def lap_once(g):
-        return lambda y: jnp.trace(jax.hessian(g)(y))
-
-    g = f
-    for _ in range(k):
-        g = lap_once(g)
-    return g(x)
-
-
-def _try_time(label: str, build_fn) -> dict[str, object]:
-    """Build + time a callable; catch OOM / timeout / compile blow-ups."""
-    t_compile0 = time.perf_counter()
+def _rss_mib(pid: int) -> float:
+    """Linux RSS, including JAX's threads, without imposing a virtual-address cap."""
     try:
-        fn = build_fn()
-        # force first evaluation (JIT compile)
-        out0 = fn()
-        if hasattr(out0, "block_until_ready"):
-            out0.block_until_ready()
-        compile_s = time.perf_counter() - t_compile0
-        if compile_s > TIMEOUT_S:
-            return {"status": "timeout", "detail": f"compile+first-eval {compile_s:.1f}s > {TIMEOUT_S}s"}
+        for line in Path(f"/proc/{pid}/status").read_text().splitlines():
+            if line.startswith("VmRSS:"):
+                return int(line.split()[1]) / 1024
+    except (FileNotFoundError, ProcessLookupError):
+        pass
+    return 0.0
 
-        def run() -> None:
-            o = fn()
-            if hasattr(o, "block_until_ready"):
-                o.block_until_ready()
 
-        t_ms = median_time_ms(run, warmup=WARMUP, repeats=REPEATS)
-        val = fn()
-        if hasattr(val, "block_until_ready"):
-            val.block_until_ready()
-        arr = np.asarray(val, dtype=np.float64)
-        return {
-            "status": "ok",
-            "time_ms": round(float(t_ms), 4),
-            "value_sample": float(arr.reshape(-1)[0]),
-            "compile_s": round(compile_s, 3),
-        }
-    except MemoryError as exc:
-        return {"status": "oom", "detail": str(exc)[:200]}
-    except Exception as exc:  # noqa: BLE001
-        msg = f"{type(exc).__name__}: {exc}"
-        # Nested autodiff often dies with a resource / tracing error rather than MemoryError.
-        low = msg.lower()
-        status = "oom" if ("memory" in low or "oom" in low or "resource" in low) else "error"
-        return {"status": status, "detail": msg[:300], "traceback": traceback.format_exc()[-400:]}
+def _isolated(method: str, order: int) -> dict[str, Any]:
+    with tempfile.TemporaryDirectory(prefix="omnibias-polylap-") as directory:
+        output = Path(directory) / "result.json"
+        with (Path(directory) / "log.txt").open("w+") as log:
+            start = time.monotonic()
+            process = subprocess.Popen([
+                sys.executable, str(Path(__file__).resolve()), "--worker", method,
+                "--order", str(order), "--output", str(output),
+            ], stdout=log, stderr=log, start_new_session=True)
+            peak, status = 0.0, None
+            while process.poll() is None:
+                peak = max(peak, _rss_mib(process.pid))
+                if peak > RSS_LIMIT_MIB:
+                    status = "memory_budget"
+                elif time.monotonic() - start > TIMEOUT_S:
+                    status = "timeout"
+                if status:
+                    os.killpg(process.pid, signal.SIGKILL)
+                    break
+                time.sleep(0.025)
+            process.wait()
+            result: dict[str, Any]
+            if status:
+                result = {"status": status, "detail": "parent terminated the subprocess at its configured budget"}
+            elif process.returncode != 0:
+                log.seek(0)
+                result = {"status": "error", "detail": log.read()[-1000:]}
+            else:
+                result = json.loads(output.read_text())
+            result["observed_peak_rss_mib"] = peak
+            result["subprocess_wall_s"] = time.monotonic() - start
+            return result
 
 
 def main() -> None:
-    key = jax.random.PRNGKey(SEED)
-    W, beta, c, X = _params(key)
-
-    def f_point(x: jnp.ndarray) -> jnp.ndarray:
-        return jnp.dot(c, jnp.tanh(W @ x + beta))
-
-    rows: list[dict[str, object]] = []
-    for k in KS:
-        print(f"--- k={k} ---", flush=True)
-
-        def build_omni(kk: int = k):
-            @jax.jit
-            def fn() -> jnp.ndarray:
-                return neural_field_polylaplacian(X, W, beta, c, "tanh", k=kk)
-
-            return fn
-
-        omni = _try_time("omnibias", build_omni)
-
-        def build_dense(kk: int = k):
-            @jax.jit
-            def fn() -> jnp.ndarray:
-                return vmap(lambda x: _nested_hessian_lap(f_point, x, kk))(X)
-
-            return fn
-
-        dense = _try_time("dense_nested", build_dense)
-
-        def build_folx(kk: int = k):
-            # Nest forward_laplacian kk times on the scalar field.
-            g = f_point
-            for _ in range(kk):
-                fwd = folx.forward_laplacian(g)
-
-                def g(x, _fwd=fwd):  # noqa: B023
-                    return _fwd(x).laplacian
-
-            @jax.jit
-            def fn() -> jnp.ndarray:
-                return vmap(g)(X)
-
-            return fn
-
-        folx_row = _try_time("folx_nested", build_folx)
-
-        row: dict[str, object] = {"k": k, "omnibias": omni, "folx_nested": folx_row, "dense_nested": dense}
-        if omni.get("status") == "ok" and dense.get("status") == "ok":
-            # Recompute values for an accuracy check (cheap for omnibias; dense already ok).
-            def _dense_k(kk: int = k) -> jnp.ndarray:
-                return vmap(lambda x: _nested_hessian_lap(f_point, x, kk))(X)
-
-            def _omni_k(kk: int = k) -> jnp.ndarray:
-                return neural_field_polylaplacian(X, W, beta, c, "tanh", k=kk)
-
-            ref = np.asarray(jax.jit(_dense_k)())
-            pred = np.asarray(jax.jit(_omni_k)())
-            row["max_abs_diff_omnibias_vs_dense"] = float(np.max(np.abs(pred - ref)))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--worker", choices=["omnibias", "dense_nested", "folx_nested"])
+    parser.add_argument("--order", type=int)
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args()
+    if args.worker:
+        if args.order is None or args.output is None:
+            parser.error("--worker requires --order and --output")
+        args.output.write_text(json.dumps(_worker(args.worker, args.order)))
+        return
+    if not Path("/proc/self/status").exists():
+        parser.error("the bounded benchmark requires Linux /proc RSS monitoring")
+    rows = []
+    for order in KS:
+        row: dict[str, Any] = {"k": order}
+        for method in ("omnibias", "folx_nested", "dense_nested"):
+            row[method] = _isolated(method, order)
+            result = row[method]
+            print(f"k={order} {method}: {result['status']} {result.get('median_ms', '')}", flush=True)
         rows.append(row)
-
-    payload = provenance(
-        schema="omnibias/polylaplacian-order/v1",
-        config={
-            "H": H,
-            "D": D,
-            "B": B,
-            "k": list(KS),
-            "activation": "tanh",
-            "dtype": "float64",
-            "seed": SEED,
-            "timeout_s": TIMEOUT_S,
-        },
-    )
+    payload = provenance(schema="omnibias/polylaplacian-order/v2", config={
+        "H": H, "D": D, "B": B, "k": list(KS), "activation": "tanh",
+        "dtype": "float64", "seed": SEED, "repeats": REPEATS, "warmup": 2,
+        "timeout_s": TIMEOUT_S, "rss_limit_mib": RSS_LIMIT_MIB,
+        "budget_scope": "per subprocess, including imports, compilation and accuracy validation",
+        "execution": "JAX JIT CPU runtime defaults; methods run sequentially in fresh processes",
+        "runtime_arguments": ["X", "W", "beta", "c"],
+        "timing_scope": "iterated Laplacian evaluation only; no parameter backward or training",
+        "reference": "mpmath.diff(tanh), full ridge-field dot products at 80 decimal digits",
+        "reference_points": 3, "relative_error_floor": 1e-3,
+        "accuracy_rtol": 2e-10, "accuracy_atol": 1e-9,
+    })
+    payload.update(source_provenance([
+        "benchmarks/polylaplacian_order.py", "benchmarks/_common.py", "benchmarks/_reference.py", "benchmarks/_operator_reference.py",
+        "packages/omnibias-jax/src/omnibias/jax/laplacian.py",
+        "packages/omnibias-jax/src/omnibias/jax/_fastpath.py",
+        "packages/omnibias-core/src/omnibias/core/polynomials.py",
+    ]))
     payload["rows"] = rows
-    path = write_json("polylaplacian_order.json", payload)
-    print(f"wrote {path}")
-    for r in rows:
-        def _fmt(cell: dict) -> str:
-            if cell.get("status") != "ok":
-                return str(cell.get("status"))
-            return f"{cell['time_ms']:.3f} ms"
-
-        print(f"k={r['k']}: omni={_fmt(r['omnibias'])}  folx={_fmt(r['folx_nested'])}  dense={_fmt(r['dense_nested'])}")
+    print(f"wrote {write_json('polylaplacian_order.json', payload)}")
 
 
 if __name__ == "__main__":

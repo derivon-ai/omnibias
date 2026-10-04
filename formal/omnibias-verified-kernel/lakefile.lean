@@ -8,7 +8,7 @@ A deliberately **Mathlib-free** Lean 4 core library: a sound rational/integer
 interval arithmetic kernel with *proven* soundness lemmas (no `sorry`), plus a
 certificate checker that discharges the **finite, rational** proof obligations
 emitted by the omnibias certificate format v1 -- the Birkhoff-Hopf / Perron
-spectral-gap positivity and the CLM/CCF rational sign obligations.
+spectral-gap positivity and the finite rational sign obligations.
 
 Being Mathlib-free means `lake build` elaborates and *kernel-checks* every proof
 without downloading a Mathlib cache, so it is cheap enough for CI.  Infinite

@@ -1,69 +1,84 @@
 # omnibias-binary
 
-**Status: Alpha (0.1.0a1).**
+**Hard values. A trainable backward path.** Forward representation and backward optimization have separate contracts.
 
-Closed-form, deterministic gradient kernels for binary / ternary / k-bit
-quantized neural-network training. The **forward** pass is a hard quantizer;
-the **backward** pass uses the exact derivative of a smooth `tanh(beta * z)`
-surrogate (which converges to `sign(z)` as `beta -> infinity`) via the Riccati
-identity:
+![Hard values. A trainable backward path.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-binary/docs/visuals/story.gif)
 
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-binary/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-binary/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-binary/docs/visuals/scene.py)
+
+Real-valued tensors enter; hard binary, ternary or quantized values leave in the forward pass. The backward pass follows an explicitly chosen smooth surrogate, allowing optimization through a discrete representation.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
+
+[API reference](https://omnibias.ai/api/binary/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-binary/src/omnibias/binary) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-binary/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+Temperature controls the tanh-based surrogate: higher β concentrates its gradient near the threshold. The hard forward operation remains hard; the surrogate is not its classical derivative. Bias-collapse activation polynomials supply higher derivative formulas for the smooth path. Threshold and tie conventions belong to each quantizer.
+
+## Run this README
+
+The examples use `omnibias-binary[torch]` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
+
+```bash
+python -m pip install --pre "omnibias-binary[torch]==0.1.0a2"
 ```
-tanh'(z) = 1 - tanh(z)^2
-```
 
-Every order is a polynomial in `t = tanh(z)` from
-`omnibias.core.polynomials.tanh_polynomial_coeffs` — no per-backend coefficient
-forks, no straight-through estimator.
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-binary/wheel-tests.toml)
+executes the examples below outside the source checkout.
 
-## Public API
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
-| Function | Forward | Backward surrogate |
-|----------|---------|-------------------|
-| `binarize(z, beta=10)` | `sign(z)` in `{-1, +1}` (`sign(0)=+1`) | `beta * tanh'(beta z)` |
-| `binarize01(z, beta=10)` / `heaviside` | Heaviside step in `{0, 1}` (`H(0)=1`) | `beta * sigmoid'(beta z) = beta * s(1-s)` |
-| `ternarize(z, beta=10, delta=0.5)` | `{-1, 0, +1}` dead-zone | derivative of `0.5(tanh(beta(z-delta))+tanh(beta(z+delta)))` |
-| `kbit_quantize(z, bits=2, lo=-1, hi=1, beta=10)` | uniform `2**bits` levels on `[lo, hi]` | sum of tanh-step Riccati derivatives at internal thresholds |
-| `riccati_tanh_derivative(t, order=1)` | — | evaluates `T_order(t)` (`{-1,+1}` Legendre tower) via Horner |
-| `riccati_sigmoid_derivative(s, order=1)` | — | evaluates `P_order(s)` (`{0,1}` Eulerian tower) via Horner |
+## Why this package exists
 
-`binarize01` is the `{0, 1}` codomain twin of `binarize`, built from the Eulerian
-`sigmoid_polynomial_coeffs` tower. The two are affinely conjugate --
-`binarize01(z, beta) == (binarize(z, beta / 2) + 1) / 2` in both forward and
-backward -- so you can pick the natural codomain for your gates (`{0,1}` for
-AND/OR/Reed-Muller logic, `{-1,+1}` for XOR/Walsh logic) without changing the math.
+A hard quantizer provides the output representation you want but loses an ordinary useful derivative almost everywhere. Binary makes the optimization choice explicit: keep hard forward values and use a temperature-controlled Riccati derivative in the backward path. This gives quantized models a reusable gradient mechanism.
 
-Backends: `omnibias.binary.torch.ops` and `omnibias.binary.jax.ops`.
+## What you can build
 
-## Usage
+- Signed and zero/one binarization, ternary and k-bit quantizers.
+- Torch and JAX surrogate-gradient implementations.
+- Beta schedules and shared activation-polynomial derivatives.
+
+Use binary for quantization-aware experiments, differentiable Boolean realizations and models with hard-valued intermediate states. Compare forward accuracy, surrogate conditioning and deployment behavior separately; a useful training surrogate is a modeling decision that should be evaluated on the target task.
+
+## A working example
 
 ```python
 import torch
-from omnibias.binary.torch.ops import binarize, ternarize, kbit_quantize
+from omnibias.binary.torch.ops import binarize
 
-z = torch.randn(4, 8, dtype=torch.float64, requires_grad=True)
-y = binarize(z, beta=20.0)
-loss = y.pow(2).mean()
-loss.backward()  # z.grad uses the closed-form tanh-beta Riccati surrogate
+z = torch.tensor([-0.8, 0.3, 1.2], requires_grad=True)
+q = binarize(z, beta=2.0)
+q.sum().backward()
+assert torch.all((q == -1) | (q == 1))
+assert z.grad is not None and torch.isfinite(z.grad).all()
 ```
 
-```python
-import jax
-import jax.numpy as jnp
-from omnibias.binary.jax.ops import binarize
+## Choose the right contract
 
-z = jnp.ones((4, 8), dtype=jnp.float64)
-y = binarize(z, beta=20.0)
-grad = jax.grad(lambda zz: jnp.sum(binarize(zz, beta=20.0)))(z)
-```
+The backward formula is not the classical derivative of a discontinuous quantizer. A sharper temperature can produce narrow or saturated gradient regions. Keep the surrogate definition in experiment provenance, and test higher parameter derivatives when an optimizer relies on them.
 
-## Tests
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/binary.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
 
 ```bash
-python -m pytest packages/omnibias-binary/tests -q
+uv run pytest packages/omnibias-binary/tests -q
 ```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-binary/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).

@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""Sound certificate for a soft partition of unity.
 
@@ -16,7 +16,7 @@ the collapse gap, never an exact-optimality claim, and the gap is never asserted
 
 Terminology: the ``beta -> inf`` gate hardening is the feasibility / temperature sense of
 "collapse", distinct from the **founding bias collapse** (the multi-bias ``delta -> 0``
-limit to ``sigma^(K-1)``; see ``docs/theory.md``).
+limit to ``sigma^(K-1)``; see ``docs/derivatives.md``).
 """
 
 from __future__ import annotations

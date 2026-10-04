@@ -574,6 +574,7 @@ def deep_field_value_grad_laplacian(
             # over the batch, so the O(B*D^2) identity is never formed.
             J_u = jnp.broadcast_to(W.T[None, :, :], (B, dim, W.shape[0]))
         else:
+            assert J is not None
             J_u = jnp.tensordot(J, W, axes=([-1], [-1]))  # (B, D, H_out)
         L_u = jnp.matmul(L, W.T)  # (B, H_out)
         if spec is None:

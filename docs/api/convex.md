@@ -1,104 +1,35 @@
 # omnibias-convex
 
-Differentiable + certified convex optimization (LP / QP) on the omnibias stack: a
-closed-form-Hessian log-barrier interior-point solver, an `argmin` that is
-differentiable through the KKT system (OptNet / cvxpylayers style), and an
-optional rigorous optimality certificate from `omnibias.core.verified`.
+Convex optimization and certificate backend.
 
-The problem form is
+- `omnibias.convex.torch` and `.jax`: differentiable LP/QP solvers and layers.
+- `BarrierOptions`, `ConvexSolution`: solver configuration and result objects.
+- `certify_lp_optimum`, `certify_qp_optimum`: verified optimality enclosures.
+- `lp_dual_lower_bound`: a dual objective bound.
 
-\[
-\min_x \; \tfrac12 x^\top Q x + c^\top x \quad\text{s.t.}\quad A x \le b,
-\]
+Use solver status and certificate fields explicitly. A floating-point iterate
+is not automatically feasible or certified. Gradients require the assumptions
+of the selected implicit differentiation path, especially around changing
+active constraints.
 
-with `Q` positive semidefinite (`Q = 0` recovers an LP). The log-barrier
-subproblem has the closed-form Hessian `H = t Q + A^T diag(1/s^2) A`
-(`s = b - A x`), solved with `jnp.linalg.solve` along a short central path -- the
-same closed-form-Hessian Newton pattern as `omnibias.curvature.mse_newton_step`.
+Install this distribution with `pip install omnibias-convex`; select its
+backend extras when needed. See [guarantees](../guarantees.md).
 
-The differentiators are **differentiability, batched/GPU execution, and a
-certificate** -- an LP/QP you can drop into a network and train through, or solve
-by the thousands on-device. For last-digit accuracy on a single program the Newton
-interior point (or a simplex crossover from its almost-exact iterate) is the right
-tool; the two solvers are complementary.
+<!-- BEGIN GENERATED API INVENTORY -->
 
-## Problem & solution containers
+Version **0.1.0a2** · Python **>=3.10** · **3 - Alpha** · AGPL-3.0-or-later **or commercial**
 
-::: omnibias.convex.problem
-    options:
-      show_root_heading: false
-      heading_level: 3
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
 
-## Solver (JAX)
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-convex/src/omnibias/convex). Modules below are relative to `omnibias.convex`; underscored modules are internal.
 
-::: omnibias.convex.jax.solver
-    options:
-      show_root_heading: false
-      heading_level: 3
+`arrangement`, `arrangement.jax`, `arrangement.torch`, `certify`, `inequality`, `jax`, `jax.layer`, `jax.penalty`, `jax.solver`, `problem`, `torch`, `torch.layer`, `torch.penalty`, `torch.solver`, `warm_start`.
 
-## Differentiable layer (JAX)
+Exports from `omnibias.convex`:
 
-::: omnibias.convex.jax.layer
-    options:
-      show_root_heading: false
-      heading_level: 3
+`BarrierOptions`, `Certificate`, `CertificationError`, `ConvexSolution`, `LinearInequalityBackend`, `active_set_warm_start`, `certify_lp_optimum`, `certify_qp_optimum`, `geometry_warm_start`, `lp_dual_lower_bound`, `predicted_vertex`.
 
-## Solver & layer (torch)
+</details>
 
-::: omnibias.convex.torch.solver
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-::: omnibias.convex.torch.layer
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Gradient-descent temperature-collapse penalty solver
-
-A first-order alternative to the Newton interior point: each constraint hyperplane
-becomes a tempered temperature-collapse unit (a softplus), so the LP/QP becomes a smooth
-gradient-descent problem with the closed-form gradient
-`c + Q x + mu A^T sigma(beta (A x - b))`, annealed along a `beta` / `mu` homotopy.
-Bit-identical JAX and torch twins. See the
-[cookbook](../cookbook/differentiable-certified-lp.md#gradient-descent-temperature-collapse-solver).
-
-::: omnibias.convex.jax.penalty
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-::: omnibias.convex.torch.penalty
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Verified optimality certificate
-
-::: omnibias.convex.certify
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Warm starts (temperature-collapse geometry)
-
-::: omnibias.convex.warm_start
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-A worked walkthrough is in the
-[differentiable + certified LP cookbook](../cookbook/differentiable-certified-lp.md).
-
-## Arrangement LP / learned facets (03-02)
-
-See [`docs/api/arrangement_lp.md`](arrangement_lp.md). Soft membership is
-temperature collapse, not founding bias collapse.
-
-::: omnibias.convex.arrangement
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-Status: Alpha (`0.1.0a1`).
+<!-- END GENERATED API INVENTORY -->

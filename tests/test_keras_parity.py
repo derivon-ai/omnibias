@@ -8,9 +8,8 @@ the activation forward / derivative / fast-path kernels must agree.
 
 The Keras backend is selected by ``KERAS_BACKEND`` (tensorflow | jax |
 torch) at import time; CI runs this test once per backend. The
-comparison tolerance adapts to the Keras compute precision: on a float32
-backend (TF / JAX default) we use a looser tolerance, on float64 (torch
-default here) a strict one. Bit-exact coefficient sharing is checked
+comparison requests float64 and selects tolerances from the observed
+transcendental compute dtype; some Keras/JAX versions downcast these ops. Bit-exact coefficient sharing is checked
 separately in :func:`test_polynomial_coeffs_shared`.
 """
 
@@ -87,15 +86,21 @@ _MAX_FASTPATH_ORDER = {
     "soft_step": 6,
 }
 
-# Keras compute precision depends on the active backend; pick tolerances
-# accordingly. (Torch keras runs float64; TF/JAX keras default to float32.)
-_FLOAT32 = keras.config.floatx() == "float32"
-_RTOL = 1e-4 if _FLOAT32 else 1e-6
-_ATOL = 1e-4 if _FLOAT32 else 1e-6
+# Precision is a per-test contract, never a snapshot of mutable global state.
+
+
+@pytest.fixture(autouse=True)
+def _float64_parity():
+    previous = keras.config.floatx()
+    keras.config.set_floatx("float64")
+    try:
+        yield
+    finally:
+        keras.config.set_floatx(previous)
 
 
 def _sample_inputs_for(name: str) -> np.ndarray:
-    rng = np.random.default_rng(7 + abs(hash(name)) % 65536)
+    rng = np.random.default_rng(7 + sum((i + 1) * byte for i, byte in enumerate(name.encode())))
     if name == "tan":
         return rng.uniform(-1.2, 1.2, size=128).astype(np.float64)
     if name == "cot":
@@ -116,13 +121,17 @@ def _keras_np(name: str, z: np.ndarray, n: int) -> np.ndarray:
 
 def _tol_for(name: str, n: int) -> tuple[float, float]:
     """(rtol, atol), loosened where a float32 keras backend costs a few ULPs."""
-    rtol, atol = _RTOL, _ATOL
+    # Keras/JAX may downcast transcendental ops even when floatx and the input
+    # are float64. Probe actual computation rather than trusting global config.
+    probe = kops.tanh(kops.convert_to_tensor(np.array([0.5], dtype=np.float64)))
+    float32 = str(probe.dtype) == "float32"
+    rtol = atol = 1e-4 if float32 else 1e-6
     if name == "gelu":
         rtol = max(rtol, 1e-5)
     # Mish's (t, s) derivative tower has strong term cancellation at high
     # orders; on a float32 backend that drifts a little past the base tol
     # (the float64 jax<->torch parity below still holds it to 1e-6).
-    if _FLOAT32 and name == "mish" and n >= 4:
+    if float32 and name == "mish" and n >= 4:
         rtol, atol = 2e-3, 2e-3
     return rtol, atol
 

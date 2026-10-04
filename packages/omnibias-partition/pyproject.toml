@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-partition"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "A light, certified soft partition-of-unity primitive: oblique / axis-aligned / sparse soft-split gates that route an input into 2**depth regions with weights that are non-negative and sum to one, harden to a crisp partition under temperature collapse (the beta -> inf penalty), carry a SOUND soft->hard membership-gap certificate (outward-rounded Interval + closed-form Gibbs bound), and expose a per-region model registry whose one combine() engine (sum_l w_l * out_l) is shared by every downstream bridge. Bit-identical numpy / torch / jax weights."
 readme = "README.md"
 requires-python = ">=3.10"
-license = "Apache-2.0"
-license-files = ["LICENSE"]
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE", "NOTICE", "COMMERCIAL-LICENSE.md"]
 authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
 maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
 keywords = ["partition-of-unity", "soft-trees", "mixture-of-experts", "differentiable", "certified-machine-learning", "domain-decomposition", "gating"]
@@ -26,7 +26,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
-dependencies = ["omnibias-core>=0.2.0", "numpy>=1.24"]
+dependencies = ["omnibias-core>=0.5.0rc1", "numpy>=1.24"]
 
 [project.optional-dependencies]
 # The bit-identical torch weight twin (autograd-friendly, embeddable in nn modules).

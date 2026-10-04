@@ -17,7 +17,7 @@ This is **one-layer** closed form. A deep nest is still the chain
 rule; this module does not skip it, does not expand ``L(θ)`` as a
 polynomial in every weight, and does not return a full parameter
 Jacobian of hidden activations. The dense loss Hessian is assembled
-only when ``P <= max_params``. Not a global min. Not CCF stretch.
+only when ``P <= max_params``. Not a global min.
 ``theorem_prover_verified`` is not asserted.
 """
 
@@ -39,7 +39,7 @@ _FD_STEP: float = 1e-5
 
 DISCLAIMER = (
     "one-layer closed-form weight-space loss jet; Faà di Bruno is the "
-    "chain rule; not a global min, not a full dh/dθ flood, not CCF stretch"
+    "chain rule; not a global min, not a full dh/dθ flood"
 )
 
 

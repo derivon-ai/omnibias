@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Directed transcendental regressions, including two formerly false enclosures."""
 from __future__ import annotations
 

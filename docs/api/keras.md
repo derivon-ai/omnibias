@@ -1,81 +1,35 @@
 # omnibias-keras
 
-Keras 3 unified backend for omnibias. The same code runs on TensorFlow,
-JAX, or PyTorch via `keras.ops`; closed-form derivative towers share the
-polynomial coefficients of the torch and JAX backends through
-`omnibias.core.polynomials`, so all backends are bit-identical by
-construction.
+Keras 3 activation and operator layers.
 
-Select the Keras backend with the `KERAS_BACKEND` environment variable
-(`tensorflow` | `jax` | `torch`) *before importing keras*.
+- `omnibias.keras.get_activation`: activation registry access.
+- `omnibias.keras.OperatorBlock`: select identity, derivative, gradient,
+  Laplacian, band or antiderivative-window behavior.
+- `omnibias.keras.cmbDense`, `cmbConv1D`, `cmbConv2D`: trainable layer adapters.
 
-## Top-level API
+Set `KERAS_BACKEND` to `torch`, `jax` or `tensorflow` before importing Keras.
+Activation kernels share core coefficients and use `keras.ops`; tensor dtype
+and device behavior follow the chosen backend. The network jet APIs documented
+here are implemented in the dedicated PyTorch and JAX distributions.
 
-::: omnibias.keras
-    options:
-      show_root_heading: false
-      heading_level: 3
+Install this distribution with `pip install omnibias-keras`; select its
+backend extras when needed. See [guarantees](../guarantees.md).
 
-## Activation registry
+<!-- BEGIN GENERATED API INVENTORY -->
 
-::: omnibias.keras.activations.registry
-    options:
-      show_root_heading: false
-      heading_level: 3
+Version **0.0.2a1** · Python **>=3.10** · **3 - Alpha** · Apache-2.0
 
-## OperatorMultiBiasUnit
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
 
-::: omnibias.keras.unit
-    options:
-      show_root_heading: false
-      heading_level: 3
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-keras/src/omnibias/keras). Modules below are relative to `omnibias.keras`; underscored modules are internal.
 
-## Blocks
+`activations`, `activations.classical`, `activations.nqs`, `activations.piecewise`, `activations.proximal`, `activations.registry`, `activations.smooth`, `activations.tempered`, `activations.trigonometric`, `blocks`, `blocks.conv`, `blocks.linear`, `blocks.operator`, `fastpath`, `fastpath.dispatch`, `fastpath.eulerian`, `fastpath.hermite`, `fastpath.legendre`, `growable`, `identity_init`, `stencil`, `tempered_blocks`, `training`, `training.k_scheduler`, `unit`.
 
-::: omnibias.keras.blocks
-    options:
-      show_root_heading: false
-      heading_level: 3
+Exports from `omnibias.keras`:
 
-## Piecewise & tempered activations
+`ActivationSpec`, `AnalyticGaussianConv1D`, `AnalyticGaussianConv2D`, `GrowStrategy`, `GrowableOMBU`, `GrowableOperatorMultiBiasUnit`, `KGrowthScheduler`, `LearnablePReLU`, `OMBU`, `OpName`, `OperatorBlock`, `OperatorMultiBiasUnit`, `TemperedActivation`, `analytic_gaussian_taps`, `cmbConv1D`, `cmbConv2D`, `cmbDense`, `get_activation`, `is_registered`, `list_activations`, `register_activation`.
 
-The hard almost-everywhere family and the smooth beta-tempered surrogate
-family (see the [activation dictionary](../activations.md)).
+</details>
 
-::: omnibias.keras.activations.piecewise
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-::: omnibias.keras.activations.tempered
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Learnable-temperature blocks
-
-::: omnibias.keras.tempered_blocks
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Growable units
-
-::: omnibias.keras.growable
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Training utilities
-
-::: omnibias.keras.training.k_scheduler
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Fastpath kernels
-
-::: omnibias.keras.fastpath
-    options:
-      show_root_heading: false
-      heading_level: 3
+<!-- END GENERATED API INVENTORY -->

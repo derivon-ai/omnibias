@@ -129,78 +129,8 @@ def test_generate_rational_identity_none_when_malformed() -> None:
     assert generate_obligation(bad) is None
 
 
-def test_generate_ln_chain_closure_and_format_obligations() -> None:
-    chain = make_certificate(
-        claim="finite LN chain closure",
-        payload={
-            "type": "ln_chain_closure",
-            "identities": [
-                {"lhs": [2, 3], "rhs": [4, 6]},
-                {"lhs": [-5, 7], "rhs": [5, -7]},
-            ],
-        },
-        honesty={},
-        meta={"transcend_backend": "not_used"},
-    )
-    chain_src = generate_obligation(chain)
-    assert chain_src is not None
-    assert "allRatEq" in chain_src
-    assert "no physical Dulac/LN membership" in chain_src
-
-    fmt = make_certificate(
-        claim="finite LN format bound",
-        payload={
-            "type": "ln_format_bound",
-            "inequalities": [
-                {"lhs": [2, 3], "rhs": [3, 4]},
-                {"lhs": [-1, 2], "rhs": [0, 1]},
-            ],
-        },
-        honesty={},
-        meta={"transcend_backend": "not_used"},
-    )
-    fmt_src = generate_obligation(fmt)
-    assert fmt_src is not None
-    assert "allRatLt" in fmt_src
 
 
-def test_ln_finite_obligations_refuse_false_malformed_and_tampered_data() -> None:
-    false_chain = make_certificate(
-        claim="false closure",
-        payload={
-            "type": "ln_chain_closure",
-            "identities": [{"lhs": [1, 2], "rhs": [2, 3]}],
-        },
-        honesty={},
-    )
-    assert generate_obligation(false_chain) is None
-    malformed_format = make_certificate(
-        claim="malformed format",
-        payload={
-            "type": "ln_format_bound",
-            "inequalities": [{"lhs": [1, 0], "rhs": [2, 1]}],
-        },
-        honesty={},
-    )
-    assert generate_obligation(malformed_format) is None
-
-    valid = make_certificate(
-        claim="finite LN format bound",
-        payload={
-            "type": "ln_format_bound",
-            "inequalities": [{"lhs": [1, 3], "rhs": [1, 2]}],
-        },
-        honesty={},
-    )
-    tampered = dict(valid)
-    tampered["payload"] = {
-        "type": "ln_format_bound",
-        "inequalities": [{"lhs": [2, 3], "rhs": [1, 2]}],
-    }
-    result = check_certificate(tampered)
-    assert result.verified is False
-    assert result.obligation == ""
-    assert "digest" in result.detail
 
 
 def test_generate_integer_matrix_syzygy_obligation() -> None:

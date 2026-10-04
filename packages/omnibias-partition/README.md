@@ -1,64 +1,87 @@
 # omnibias-partition
 
-**Status: Alpha (0.1.0a1).**
+**Learn where each expert applies.** Regions, memberships and expert outputs form one trainable composition.
 
-A light, **certified soft partition-of-unity** primitive -- the keystone shared by four
-downstream bridges (discontinuity-capturing PINNs, region-wise Riemannian atlases,
-per-region symbolic law discovery, and certified decision layers).
+![Learn where each expert applies.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-partition/docs/visuals/story.gif)
 
-A hard partition of `R^d` into regions is a set of indicator functions `1[region l]`.
-omnibias makes it a **soft partition** built from oblique split gates
-`g(x) = sigmoid(beta·(w·x − t))`: `depth` gates route an input into `2**depth` regions with
-weights `w_l(x)` that are
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-partition/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-partition/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-partition/docs/visuals/scene.py)
 
-- **non-negative** and **sum to one** for every `x` (a genuine partition of unity), and
-- **harden** to a crisp `{0,1}` partition as `beta → ∞`.
+Coordinates, oblique gate parameters and regional experts enter; nonnegative region weights and blended outputs leave. Gradients can update splits and expert parameters together, making region choice part of the learned model.
 
-On top of the weights it ships:
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
 
-1. **`partition_weights`** -- the numpy reference plus **bit-identical torch / jax twins**
-   (parity `~1e-9`, float64) and a **keras.ops** twin (`[keras]` extra), so the same
-   partition trains under any backend.
-2. **`hard_assignment` / `hardened_rules`** -- the crisp region index and the exported
-   human-readable `if w·x > t` boundaries (`axis` mode gives single-feature rules).
-3. **A sound certificate** (`certify_partition_gap`): an outward-rounded
-   [`Interval`](https://omnibias.ai/api/core/) enclosure of the soft→hard
-   membership gap, plus the closed-form `log(n_regions)/beta` Gibbs bound -- a well-posed
-   **yes-if** object (bounds hold; the *optimal* hard partition is not claimed).
-4. **`RegionModels`** -- a per-region model registry whose single
-   `combine(X, beta, region_outputs) = Σ_l w_l · out_l` engine is what every bridge calls.
 
-`split_kind ∈ {"oblique", "axis", "sparse"}`: axis-aligned and L1-sparse splits are the
-interpretable / heterogeneous-robust lever, available from day one.
+[API reference](https://omnibias.ai/api/partition/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-partition/src/omnibias/partition) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-partition/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-Gated arrangement geometry (`omnibias.partition.arrangement`) is the many-normal
-generalisation: the binary tree is the special case that agrees with
-`partition_weights`. Cell membership is temperature collapse; sampling is a
-subgraph, never a complete face lattice.
+## The mathematical connection
 
-Terminology: the gate's `beta → ∞` hardening is **temperature collapse**, the
-feasibility sense (a soft indicator becoming a 0/1 step) -- **not** the
-founding bias collapse (the multi-bias `delta → 0` limit to the closed-form derivative
-`sigma^(K-1)`).
+Temperature collapse is the central mechanism: sigmoid gates sharpen as β grows. Away from split boundaries they approach hard routing; on a boundary the sigmoid remains one half, so tie conventions matter. Bias-collapse derivative kernels support the smooth experts and gates. A finite-temperature mixture is differentiable; an exact hard if/else discontinuity is not.
 
-## Install
+## Run this README
+
+The examples use `omnibias-partition` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-pip install -e packages/omnibias-partition            # numpy core + certificate
-pip install -e "packages/omnibias-partition[torch]"   # + torch weight twin
-pip install -e "packages/omnibias-partition[jax]"      # + jax weight twin
-pip install -e "packages/omnibias-partition[keras]"    # + keras.ops weight twin
+python -m pip install --pre "omnibias-partition==0.1.0a2"
 ```
 
-## Scope / honesty
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-partition/wheel-tests.toml)
+executes the examples below outside the source checkout.
 
-- The soft→hard membership gap is **sound** (outward-rounded intervals; a looser bound only
-  widens the certified gap). The partition parameters themselves are trained by the
-  downstream bridges (autodiff); partition only provides the primitive + certificate.
-- Products of sigmoids are differentiated by autodiff in the bridges, **not** the closed-form
-  derivative tower (the "closed-form" brand does not auto-extend to products).
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+Hard routing makes it difficult to learn where one expert should stop and another should begin. A soft partition assigns nonnegative weights that sum to one, so regional outputs can be blended while learning thresholds and features. Increasing inverse temperature sharpens the decision after or during training.
+
+## What you can build
+
+- Oblique, axis and sparse split configurations.
+- NumPy reference weights with Torch, JAX and Keras realizations.
+- Regional composition, hard assignments, readable rules and scoped gap certificates.
+
+Build mixtures of regional physics models, trainable soft trees or piecewise surrogates. This is a routing primitive: stagewise boosting and complete tabular training pipelines live in consumers. The certified add-on supplies integrations for Apache PINN and geometry users who explicitly choose the advanced engines.
+
+## A working example
+
+```python
+import numpy as np
+from omnibias.partition import PartitionConfig, init_params, partition_weights
+
+params = init_params(PartitionConfig(n_features=1, depth=1), rng=0)
+x = np.linspace(-2, 2, 9)[:, None]
+weights = partition_weights(params, x, beta=3.0)
+experts = np.concatenate([x**2, 1 + x], axis=1)
+prediction = (weights * experts).sum(axis=1)
+assert np.allclose(weights.sum(axis=1), 1.0)
+assert prediction.shape == (9,)
+```
+
+## Choose the right contract
+
+Finite-temperature routing is differentiable; exact hard if/else is not made smooth by renaming it. At a split boundary a sigmoid gate stays at one half, and hard assignments need a tie policy. A depth-d binary partition has 2**d regions, so deeper routing has a real representation cost.
+
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/partition.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-partition/tests -q
+```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+AGPL-3.0-or-later **or commercial**. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-partition/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).
+Comply with the AGPL terms or obtain a signed commercial grant; commercial use alone does not require payment. [Commercial terms](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-partition/COMMERCIAL-LICENSE.md) describe the alternative. Previously distributed Apache editions, where applicable, retain their original grants.

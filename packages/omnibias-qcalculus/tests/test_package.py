@@ -11,7 +11,7 @@ import pytest
 
 
 def test_version() -> None:
-    assert qc.__version__ == "0.1.0a1"
+    assert qc.__version__ == "0.1.0a2"
 
 
 def test_all_sorted_and_exported() -> None:

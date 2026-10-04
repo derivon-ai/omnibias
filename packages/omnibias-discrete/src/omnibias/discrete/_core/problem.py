@@ -4,9 +4,7 @@ r"""The :class:`DiscreteProblem` seam and the Boolean-hypercube constraint gener
 
 Any object that implements :class:`DiscreteProblem` plugs into the whole substrate --
 the annealed relaxation (given an energy gradient), the rounding / local-search decoder,
-the brute-force oracle, and the SOS / Lasserre certified lower bound. Consumers such as
-``omnibias.qubo.QUBOProblem`` and ``omnibias.discrete.maxsat.MaxSATProblem`` specialise
-the energy; the substrate is written once against this protocol.
+the brute-force oracle, and the SOS / Lasserre certified lower bound. Consumers specialize the energy; the substrate depends only on this protocol.
 
 :func:`boolean_constraints` builds the semialgebraic description of ``{0, 1}^n`` that
 Putinar's Positivstellensatz uses -- the two inequalities ``x_i - x_i^2 >= 0`` and

@@ -134,6 +134,5 @@ def test_as_dict_carries_honesty() -> None:
     family = _toy()
     payload = run_discovery(family.statement, family, "score_guided", budget=8).as_dict()
     assert payload["kind"] == "finite_discovery"
-    assert payload["honesty"]["jacobian_conjecture_proof_claim"] is False
     assert payload["replay_ok"] is True
     assert payload["characterization"]["note"].startswith("uniqueness is span/box-scoped")

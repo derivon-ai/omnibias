@@ -20,11 +20,11 @@
 - [ ] `ruff check packages tests` is clean.
 - [ ] `mypy --strict` is clean for the T1 packages I touched.
 - [ ] `mkdocs build --strict` is clean (if docs/docstrings changed).
-- [ ] Cross-backend numerics stay bit-identical (parity tests pass).
+- [ ] Existing cross-backend parity tolerances pass.
 - [ ] No GPU-only, cluster-specific, or local-path details leak into tracked files.
 - [ ] `CHANGELOG.md` updated.
-- [ ] I have signed the [CLA](../docs/CLA.md) (the PR bot will confirm).
-- [ ] New source files carry the SPDX dual-license header.
+- [ ] I have signed the [CLA](../CLA.md) (the PR bot will confirm).
+- [ ] New source files carry the SPDX header required by their package license.
 
 ## Notes for reviewers
 

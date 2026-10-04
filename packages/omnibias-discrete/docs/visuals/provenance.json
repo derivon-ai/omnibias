@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.discrete.AnnealSchedule / round_relaxed; exact toy linear bound",
+  "scene_sha256": "2d18eb05f0287e6d66dda883e345816881c3fea3994f919426a600975980394b",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "e157bc00c428f8ee9b3628dbfaec707798cd9c83b3bf2a7359f476b54ceac501",
+    "story-mobile.gif": "70aa46afa48db86ab34c7431a59bf97a91d5f6b2883575312dbdcaaeb7070e29"
+  }
+}

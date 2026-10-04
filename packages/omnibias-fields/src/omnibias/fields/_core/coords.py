@@ -17,7 +17,7 @@ Two conventions worth remembering:
   responsible for the lookup.
 - Time, if present, is the *last* axis. Spatial axes come first. The
   convention is shared with :mod:`omnibias.torch.architectures.pinn` and
-  with the existing 2D NS solver.
+  with two-dimensional time-dependent fields.
 """
 
 from __future__ import annotations

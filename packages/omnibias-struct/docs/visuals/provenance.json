@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.struct.torch.soft_viterbi / soft_viterbi_marginals",
+  "scene_sha256": "f32b8e57edc71891a3a72ea912fe004f81c12d97df6a0b1a139ddcbae4edd6cf",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "852f0ebc7a1e8ff3bd526d2ee3ecc798d66eb7e8135c50160eb654e4b085f357",
+    "story-mobile.gif": "d912b2caaa6c4aaabf11465b54077c3abcbb2a551b1737115dd2cadd3cb4b76b"
+  }
+}

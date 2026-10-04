@@ -1,84 +1,83 @@
 # omnibias-boolean
 
-**Status: Alpha (0.1.0a1).**
+**From truth values to exact algebra.** Representations can change while every Boolean result stays fixed.
 
-Differentiable Boolean algebra on top of the omnibias closed-form derivative
-towers. Two layers:
+![From truth values to exact algebra.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-boolean/docs/visuals/story.gif)
 
-- **Exact pure-Python `_core`** (no torch / jax): truth tables, the
-  algebraic-normal-form / Reed-Muller transform (GF(2) Mobius), the Walsh-Hadamard
-  / Fourier spectrum and influences, Boolean *differential calculus* (the Boolean
-  derivative / difference and its integral with a free "constant" `c`), and
-  **Boolean equation solving** (the eliminant plus Loewenheim-style *reproductive*
-  general solutions with a free parameter).
-- **Verified spectra** (`omnibias.boolean._core.verified`, the `_iv` functions):
-  outward-rounded interval twins of the Walsh / Fourier and real-multilinear
-  transforms, plus certified linear-/differential-bias bounds (linearity,
-  nonlinearity, linear bias, autocorrelation, differential bias, absolute
-  indicator). These give the **real-valued** spectra of a differentiable gate
-  relaxation or a noisy truth table rigorous two-sided bounds despite
-  floating-point round-off.
-- **S-box figure-of-merit analysis** (`omnibias.boolean.cipher`): the
-  difference-distribution and linear-approximation tables, differential
-  uniformity, linearity / nonlinearity, algebraic degree, and the exact
-  higher-order Boolean derivative that bounds resistance to higher-order
-  differential distinguishers. Reproduces the published AES (4 / 112 / 7) and
-  PRESENT (4 / 4 / 3) figures of merit. This scores S-box *design metrics*; it is
-  **not** cryptanalysis and does not break ciphers or recover keys.
-- **Differentiable torch / jax backends**: soft logic gates (the product-t-norm
-  multilinear extension, exact on the cube vertices), a **spectrum engine** that
-  reads the Mobius / ANF coefficients off the *mixed partials* of the multilinear
-  extension via `jet_partials`, a **soft-gate equation/system solver** that anneals
-  `beta -> infinity` (reusing `omnibias.binary.BetaAnnealScheduler`) and then
-  *verifies the exact Boolean system*, and differentiable **design** losses
-  (algebraic degree / influence / target spectrum).
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-boolean/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-boolean/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-boolean/docs/visuals/scene.py)
 
-## What this is and is not
+Truth tables or Boolean polynomials enter; exact ANF, Walsh coefficients, Boolean derivatives or equation solutions leave. Use this package for finite algebraic structure; use binary for tensor quantization.
 
-- The `_core` transforms are **exact** (integer / GF(2)).
-- The backends are **differentiable relaxations**: heuristics with no completeness
-  guarantee. Numerically exact derivatives are **not** logically complete
-  reasoning. The solver is **propose-and-verify** -- it relaxes and optimizes, then
-  checks the exact Boolean system.
-- There is **no SAT/SMT engine, no theorem prover, and no cryptographic attack**
-  here. See the [RSA-limitation cookbook](../../docs/cookbook/rsa-limitation.md)
-  for an honest negative result on why a soft-gate relaxation does **not** shrink
-  the factoring search space.
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
 
-## The bridge
 
-For a Boolean function `f` with multilinear extension `F` on `[0,1]^n`, the
-`{0,1}` Mobius (Reed-Muller-over-reals) coefficient of a monomial `prod_{i in S} x_i`
-equals the mixed partial `d^|S| F / prod_{i in S} d x_i` evaluated at `0`, and its
-reduction mod 2 is the GF(2) ANF coefficient. So a single multivariate jet yields
-the whole Boolean spectrum -- the discrete Boolean difference is the arithmetic
-derivative of the relaxation.
+[API reference](https://omnibias.ai/api/boolean/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-boolean/src/omnibias/boolean) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-boolean/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-## Public API (pure core)
+## The mathematical connection
 
-```python
-from omnibias.boolean import (
-    truth_table_from_callable, anf_from_truth_table, algebraic_degree,
-    walsh_spectrum, influences, boolean_derivative, boolean_integral,
-    eliminant, solve_for, solve_system, multilinear_coeffs,
-    # verified (interval) spectra + certified bias bounds
-    walsh_hadamard_iv, mobius_iv, fourier_coeffs_iv,
-    linearity_iv, nonlinearity_iv, linear_bias_iv, max_linear_bias_iv,
-    autocorrelation_iv, differential_bias_iv, absolute_indicator_iv,
-)
-```
+Exact Boolean algebra needs neither a small bias spacing nor a temperature schedule. Optional differentiable gates connect it to temperature collapse: finite β gives a smooth relaxation and hardening requires a stated tie rule. Bias-collapse kernels can differentiate those smooth gates, but do not turn approximate gate optimization into an exact Boolean proof.
 
-Backends: `omnibias.boolean.torch.ops` and `omnibias.boolean.jax.ops`
-(`soft_and/or/not/xor`, `mobius_spectrum`, `walsh_spectrum`, `influences_diff`,
-`BooleanSystem`, `solve`, `degree_penalty`, `target_spectrum_loss`).
+## Run this README
 
-## Tests
+The examples use `omnibias-boolean` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-python -m pytest packages/omnibias-boolean/tests -q
+python -m pip install --pre "omnibias-boolean==0.1.0a2"
+```
+
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-boolean/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+Boolean functions have algebraic structure that a generic real-valued tensor does not expose. Boolean lets you move between exact finite representations, inspect interactions with discrete derivatives, and solve bounded algebraic systems. Optional tensor realizations connect those structures to learnable soft gates.
+
+## What you can build
+
+- Truth tables and algebraic normal forms over GF(2).
+- Walsh transforms, influences and exact Boolean derivatives.
+- Finite equation solvers, with optional Torch/JAX gate and spectrum operations.
+
+Choose exact mode for truth-table identities, bounded logic tests and reference oracles. Choose a tensor realization when the purpose is optimization through a smooth model. Keeping the two separate lets you compare a learned gate with the exact finite behavior it is intended to approximate.
+
+## A working example
+
+```python
+from omnibias.boolean import truth_table_from_callable, anf_from_truth_table
+from omnibias.boolean import truth_table_from_anf
+
+xor = truth_table_from_callable(lambda a, b: a ^ b, 2)
+polynomial = anf_from_truth_table(xor)
+assert truth_table_from_anf(polynomial) == xor
+print(polynomial)
+```
+
+## Choose the right contract
+
+Truth-table size is exponential in the number of variables. Exact enumeration is a bounded reference tool, not a polynomial-time solver for arbitrary large Boolean systems. A soft gate gradient and a Boolean derivative are different operators with different meanings.
+
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/boolean.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-boolean/tests -q
 ```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-boolean/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).

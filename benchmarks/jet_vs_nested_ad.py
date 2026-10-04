@@ -1,16 +1,12 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Jet vs nested AD + GN vs Adam on 1-D Poisson (theory 06-05 obligation 3).
+"""Directional jets versus nested autodiff on a one-dimensional Poisson problem.
 
-Local PDE only. Not CCF, not Group 09, not ImageNet, not a package extract
-and not a paper. ``delta -> 0`` (founding bias collapse) supplies
-``sigma^(n)`` inside ``mlp_jet``; this is not temperature collapse.
+Checks residual agreement, reports sixth-order derivative cost, and compares
+Gauss-Newton with Adam on the same manufactured problem. Second-order timing
+is reported separately because small networks can favor nested autodiff.
 
-(a) Closed-form ``mlp_jet`` residual vs nested ``autograd``: agreement
-plus wall at a cost-sensitive order (order 6). Order 2 is reported and
-often loses to AD on a small net.
-(b) Exact-J ``GaussNewton`` vs named Adam on the same jet residual,
-multi-seed.
+Usage::
 
     uv run python benchmarks/jet_vs_nested_ad.py
     uv run python benchmarks/jet_vs_nested_ad.py --full
@@ -23,7 +19,6 @@ import math
 import os
 import sys
 import time
-from pathlib import Path
 from typing import Any
 
 import torch
@@ -39,8 +34,6 @@ from _common import (  # type: ignore[import-not-found]  # noqa: E402
 from _gates import gates_block, require_cost_parity  # type: ignore[import-not-found]  # noqa: E402
 from omnibias.torch.jet import jet_to_tower, mlp_jet  # noqa: E402
 from omnibias.torch.optim import GaussNewton, functional_residual_fn  # noqa: E402
-
-SCRATCH = Path(os.environ.get("OMNIBIAS_SCRATCH", "artifacts"))
 
 torch.set_default_dtype(torch.float64)
 
@@ -303,15 +296,8 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
                 "family": "jet_vs_nested_ad",
                 "full": full,
                 "pde": "1d_poisson",
-                "honesty": {
-                    "ccf_showcase": False,
-                    "group_09_vehicle": False,
-                    "package_extract": False,
-                    "paper": False,
-                    "founding_bias_collapse": True,
-                    "temperature_collapse": False,
-                    "public_primitive": "omnibias.torch.jet.mlp_jet",
-                },
+                "derivative_method": "closed-form directional Taylor jets",
+                "public_primitive": "omnibias.torch.jet.mlp_jet",
             },
         ),
         "baseline": {"name": BASELINE_NAME},
@@ -319,13 +305,7 @@ def main(argv: list[str] | None = None) -> dict[str, Any]:
         "gates": dict(gates_block(entries)),
         "wall_seconds": time.perf_counter() - t0,
     }
-    if full:
-        dest = SCRATCH / "citation" / "jet_vs_ad"
-        dest.mkdir(parents=True, exist_ok=True)
-        path = dest / artifact
-        path.write_text(__import__("json").dumps(payload, indent=2) + "\n", encoding="utf-8")
-    else:
-        path = write_json(artifact, payload)
+    path = write_json(artifact, payload)
     print(f"wrote {path}")
     return payload
 

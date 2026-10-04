@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""Natural-gradient (Fisher-scoring) optimisation on the closed-form GLM Fisher.
 
@@ -29,7 +29,11 @@ from __future__ import annotations
 
 import jax
 from jax import Array
-from omnibias.curvature.glm_fisher import _FAMILY_LOG_PARTITION, glm_fisher
+from omnibias.curvature.glm_fisher import (
+    _FAMILY_LOG_PARTITION,
+    _log_partition_derivative,
+    glm_fisher,
+)
 from omnibias.curvature.one_layer import (
     one_layer_param_grad,
     pack_params,
@@ -37,7 +41,6 @@ from omnibias.curvature.one_layer import (
 )
 from omnibias.curvature.regularize import regularized_solve
 from omnibias.jax.activations import get_activation
-from omnibias.jax.information import glm_mean
 
 
 def damped_solve(fisher: Array, grad: Array, *, damping: float = 1e-3) -> Array:
@@ -118,7 +121,7 @@ def glm_loss_gradient(
         return eta, g
 
     etas, gs = jax.vmap(per_sample)(X)  # (B,), (B, P)
-    mu = etas if base is None else glm_mean(etas, base=base)
+    mu = etas if base is None else _log_partition_derivative(etas, base=base, order=1)
     g_loss: Array = (gs.T @ (mu - Y)) / n_batch
     return g_loss
 

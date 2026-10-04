@@ -1,92 +1,86 @@
 # omnibias-convex
 
-**Status: Alpha (0.1.0a1).**
+**Optimize inside explicit constraints.** A barrier path approaches the constrained quadratic optimum.
 
-NN-native convex optimization for omnibias: solve linear and quadratic programs
-*inside* the autodiff graph. Three things set it apart from a classical LP/QP
-solver:
+![Optimize inside explicit constraints.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-convex/docs/visuals/story.gif)
 
-- **Differentiable `argmin`.** The optimum is a differentiable function of
-  `(Q, c, A, b)` -- either through the exact KKT system (OptNet / cvxpylayers
-  style) or as a plain gradient-descent problem via the temperature-collapse penalty --
-  so an LP/QP becomes a first-class *layer* inside a network.
-- **Batched and GPU-native.** The gradient-descent solver is pure matmul plus a
-  closed-form temperature-collapse sigmoid gradient: no pivoting, no factorization, no
-  data-dependent branching, so thousands of programs solve in one batched call on
-  the same device as the rest of the model.
-- **Certifiable.** An optional rigorous interval enclosure of the optimum /
-  duality gap from `omnibias.core.verified`.
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-convex/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-convex/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-convex/docs/visuals/scene.py)
 
-Two solvers behind one API: a closed-form-Hessian **Newton interior point**
-(`solve_lp` / `solve_qp`) for last-digit accuracy on a single program, and a
-first-order **temperature-collapse / hard-hinge gradient-descent** solver (`solve_lp_penalty` /
-`solve_qp_penalty`) for differentiable, batched, moderate-accuracy solving and
-warm starts. Need `1e-12` or an exact vertex for one program? Use the interior
-point (or hand its almost-exact iterate to a simplex crossover). Want an
-optimization *layer* that trains end-to-end and batches on a GPU? Use the
-gradient-descent solver. They are complementary, not competitors.
+Linear or quadratic objectives and explicit constraints enter; primal candidates, dual information, implicit gradients and checked bounds leave. This is an optimization engine and certificate backend, not a generic neural-network layer factory.
 
-## Problem form
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
 
-\[
-\min_x \; \tfrac12 x^\top Q x + c^\top x \quad\text{s.t.}\quad A x \le b
-\]
 
-with `Q` positive semidefinite (`Q = 0` recovers an LP). The log-barrier
-subproblem has the **closed-form Hessian**
+[API reference](https://omnibias.ai/api/convex/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-convex/src/omnibias/convex) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-convex/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-\[
-H = t\,Q + A^\top \operatorname{diag}(1/s^2)\, A, \qquad s = b - A x > 0,
-\]
+## The mathematical connection
 
-solved with `jnp.linalg.solve` along a short central path -- the same
-closed-form-Hessian Newton pattern as `omnibias.curvature.mse_newton_step`.
+The log-barrier continuation follows an interior path toward a constrained solution. It shares the idea of progressively removing a smooth approximation with temperature collapse, but its parameter and feasibility semantics are those of the barrier problem. Bias collapse is not needed for its closed-form quadratic/barrier derivatives. Finite termination tolerances must be checked.
 
-## Public API
+## Run this README
 
-```python
-import jax.numpy as jnp
-from omnibias.convex.jax import solve_lp, solve_qp
-
-c = -jnp.array([1.0, 2.0])                               # maximise x + 2y
-A = jnp.array([[1.0, 1.0], [-1.0, 0.0], [0.0, -1.0]])    # x + y <= 1, x >= 0, y >= 0
-b = jnp.array([1.0, 0.0, 0.0])
-Q = jnp.eye(2)
-
-sol = solve_lp(c, A, b)          # min c^T x s.t. A x <= b  -> the vertex (0, 1)
-sol = solve_qp(Q, c, A, b)       # + 1/2 x^T Q x
-sol.x, sol.dual, sol.slack, sol.gap, sol.converged
-```
-
-Backends: `omnibias.convex.jax` and `omnibias.convex.torch`.
-
-### Gradient-descent (temperature-collapse) solver
-
-`solve_lp_penalty` / `solve_qp_penalty` turn the program into a plain
-gradient-descent problem: each constraint hyperplane becomes a tempered
-temperature-collapse (softplus) unit, so the objective is smooth with the **closed-form**
-gradient `c + Q x + mu A^T sigma(beta (A x - b))`, minimised by accelerated GD along
-a `beta` / `mu` homotopy (`PenaltyOptions`). It is exterior (no feasible start /
-phase-1 needed), fully differentiable, and its dual estimate
-`lambda = mu sigma(beta u) >= 0` feeds `certify_qp_optimum`. First-order *tolerance*
-scope (~`1e-3`–`1e-4`), the complement of the Newton `solve_lp` / `solve_qp`.
-
-```python
-from omnibias.convex.jax import solve_lp_penalty
-sol = solve_lp_penalty(c, A, b)   # -> the LP vertex, by gradient descent
-```
-
-## Tests
+The examples use `omnibias-convex[torch]` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-pip install -e "packages/omnibias-convex[jax,torch,test]"
-python -m pytest packages/omnibias-convex/tests -q
+python -m pip install --pre "omnibias-convex[torch]==0.1.0a2"
+```
+
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-convex/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+Many scientific and decision workflows need a constrained solve inside a larger model. Convex separates problem data, a numerical candidate and its optimality checks. This makes it possible to inspect feasibility and use a differentiable layer where the chosen solve and its regularity assumptions support it.
+
+## What you can build
+
+- Linear and quadratic objectives with explicit inequality constraints.
+- Log-barrier solver configuration and implicit differentiation layers.
+- Dual lower bounds, optimality enclosures and reusable warm starts.
+
+Use convex as a continuous optimization primitive or a bound backend for discrete applications. Start with a small independently solvable problem, check residuals and slacks, then integrate the layer into the surrounding training objective. Named application frontends belong outside this package.
+
+## A working example
+
+```python
+import torch
+from omnibias.convex.torch import solve_qp
+
+# Minimize 0.5*x**2 - 0.5*x over -1 <= x <= 1; optimum is x=0.5.
+solution = solve_qp([[1.]], [-0.5], [[1.], [-1.]], [1., 1.], x0=[0.])
+assert solution.converged
+assert torch.all(solution.slack > 0)
+assert abs(float(solution.x[0]) - 0.5) < 1e-3
+print(solution.gap)
+```
+
+## Choose the right contract
+
+A finite barrier iterate is not automatically an exact optimizer. Inspect converged, gap and slack rather than treating a returned vector as certified. Implicit gradients need appropriate regularity, especially when active constraints change. The solver and certificate functions expose different claims.
+
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/convex.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-convex/tests -q
 ```
 
 ## License
 
-Dual-licensed: AGPL-3.0-or-later OR a commercial licence from Derivon
-(`LicenseRef-omnibias-Commercial`). See [`LICENSE`](LICENSE),
-[`../../LICENSING.md`](../../LICENSING.md), and
-[`../../COMMERCIAL-LICENSE.md`](../../COMMERCIAL-LICENSE.md). Contact
-info@derivon.ai for commercial terms.
+AGPL-3.0-or-later **or commercial**. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-convex/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).
+Comply with the AGPL terms or obtain a signed commercial grant; commercial use alone does not require payment. [Commercial terms](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-convex/COMMERCIAL-LICENSE.md) describe the alternative. Previously distributed Apache editions, where applicable, retain their original grants.

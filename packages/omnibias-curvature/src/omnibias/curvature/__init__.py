@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""Closed-form second-order optimisation for one-layer Riccati fields.
 
@@ -120,7 +120,7 @@ from omnibias.curvature.sharpness import (
     sharpness_aware_loss,
 )
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Limit family exposed as package metadata.
 __lineage__ = "bias collapse"
 
 __all__ = [

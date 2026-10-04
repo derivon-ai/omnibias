@@ -1,81 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-r"""Second-order optimisation for omnibias PINNs (torch): Gauss-Newton + adaptive weights.
+"""Optimization primitives for neural fields and residual least squares.
 
-First-order optimisers (Adam/SGD) stall on PINN losses because the differential
-operator squares the condition number of the problem; they typically plateau near
-``1e-3``. omnibias makes a much stronger optimiser practical: the residual map
-``theta |-> r(theta)`` is computed from the *exact* closed-form jets
-(:meth:`omnibias.torch.architectures.JetMLP.value_grad_hessian`, ``partials``, ...), so
-its parameter-Jacobian ``J = d r / d theta`` is a single clean outer autodiff
-(:func:`torch.func.jacrev`) -- no nested-autodiff blow-up, no finite-difference noise.
-
-This module provides
-
-* :func:`gauss_newton_direction` -- the (Levenberg-Marquardt damped) Gauss-Newton /
-  natural-gradient direction ``(J^T J + mu I) delta = -J^T r``, automatically switching
-  to the equivalent dual (kernel / NTK) form ``delta = -J^T (J J^T + mu I)^{-1} r`` when
-  there are more parameters than residuals (the push-through identity makes them equal,
-  and the dual system is far better conditioned in the over-parameterised regime).
-* :func:`conjugate_gradient` -- a matrix-free SPD conjugate-gradient solver.
-* :func:`gauss_newton_direction_cg` -- the **matrix-free** Gauss-Newton direction: it
-  solves ``(J^T J + mu I) delta = -J^T r`` with conjugate gradient, forming only
-  Jacobian-vector (:func:`torch.func.jvp`) and vector-Jacobian (:func:`torch.func.vjp`)
-  products. The dense ``N x P`` Jacobian is never materialised and no ``P x P`` (or
-  ``N x N``) system is factorised, so a Gauss-Newton step costs ``O(k)`` residual-sized
-  linearisations for ``k`` CG iterations instead of ``O(min(N, P)^3)``. This is what
-  turns the (already large) per-iteration advantage of Gauss-Newton into a wall-clock win.
-* :class:`GaussNewton` -- an adaptive-damping LM optimiser over a flat ``residual_fn``,
-  with ``solver="dense"`` (default) or the matrix-free ``solver="cg"``.
-* :func:`functional_residual_fn` -- bridges an :class:`torch.nn.Module` whose ``forward``
-  returns the residual vector to a flat ``residual_fn`` for :class:`GaussNewton`.
-* :func:`weighted_residual_fn` / :func:`quadrature_loss` -- the **integral (function-space)
-  loss** surface. Scaling a pointwise residual ``r`` sampled at quadrature nodes by
-  ``sqrt(w)`` turns the least-squares objective into the quadrature integral
-  ``||sqrt(w) r||^2 = sum_q w_q r_q^2 ~ integral r^2 dx``, so training minimises a genuine
-  ``L^2`` residual and the Gauss-Newton matrix ``J^T diag(w) J`` becomes the discretised
-  ``L^2`` function-space (energy natural-gradient) metric rather than an empirical average.
-* :class:`CubicRegularizedNewton` -- a matrix-free **cubic-regularised Newton** (ARC)
-  optimiser over a scalar ``loss_fn``. Each step minimises ``g^T s + 0.5 s^T H s +
-  (sigma/3)||s||^3`` with the *exact full* Hessian applied matrix-free (:func:`hvp`, exact
-  because the residual jet is closed form) and the subproblem solved in a small Lanczos
-  subspace (:func:`lanczos_tridiag`). Unlike Gauss-Newton it keeps the curvature term, and
-  unlike Newton it is globally convergent and escapes saddles with no learning-rate / radius.
-* :class:`CubicRegularizedGaussNewton` -- the least-squares sibling: the same ARC cubic model
-  built on the PSD Gauss-Newton curvature ``J^T J`` (matrix-free ``J v`` / ``J^T u`` products),
-  i.e. Levenberg-Marquardt with the ``mu I`` damping replaced by ``(sigma/3)||s||^3`` for
-  automatic step control and global convergence. This is the recommended higher-order PINN
-  optimiser (the GN metric beats the full Hessian on a least-squares objective).
-* :func:`sharpness_lambda_max` / optional ``sharpness=`` on
-  :class:`CubicNewton` and :class:`CubicRegularizedNewton` -- theory 08-06:
-  exact-HVP Lanczos ``lambda_max`` sets cubic ``sigma`` each step. Hutchinson
-  is not the method; sharpness is a step-size signal, not a generalization
-  claim.
-* :func:`block_exact_search` -- theory 08-07: 03-12 line search on one
-  named or masked block (last linear / OMBU bias / arrangement ``W``)
-  with ``verify=True``. A coordinate sweep, not a global solver.
-* :func:`omnibias.torch.train_local.local_jet_step` -- theory 08-03:
-  depth-causal local Gauss-Newton on a named residual plus a
-  compressed ``k``-direction ``layer_jet``. Not a rewrite of
-  ``omnibias.pinn.train``.
-* :func:`omnibias.torch.line_search.jet_line_search` -- theory 03-12: certified
-  truncation radius, Wolfe-as-interval, ``verify=True`` never-worse backstop
-  (re-exported below). :func:`taylor_line_min` remains the order-2/3 autodiff
-  helper without a certified radius.
-* :func:`taylor_line_min` -- an **exact high-order line search**: the along-direction
-  derivatives of ``phi(a)=loss(theta+a d)`` are taken exactly by nested higher-order autodiff,
-  and the truncated Taylor model is minimised in closed form (a near-optimal step in one shot).
-* :class:`JetLBFGS` -- **limited-memory BFGS lifted by the exact jets**: the classic two-loop
-  recursion, but with the Wolfe backtrack replaced by the exact :func:`taylor_line_min` and the
-  scalar initial inverse-Hessian scale replaced by the exact curvature ``<g,g>/<g,Hg>`` (one
-  :func:`hvp`). The honest low-memory quasi-Newton counterpart to the second-order methods.
-* :class:`GradNormBalancer` -- self-adaptive loss weights that equalise the per-term
-  gradient norms (Wang-Teng-Perdikaris 2021 gradient-pathology balancing).
-
-For the standard L2 collocation PINN functional the Gauss-Newton matrix ``J^T J`` *is*
-the empirical Sobolev Gram matrix, so :class:`GaussNewton` is exactly the **empirical
-energy natural gradient** (Mueller-Zeinhofer 2023) -- the method that takes PINNs from
-``1e-3`` to near machine precision.
+Includes safeguarded Newton, Gauss–Newton, Krylov, and trust-region methods.
+Model parameter derivatives may use autodiff; coordinate derivative jets use
+the activation tower.
 """
 
 from __future__ import annotations
@@ -86,7 +15,6 @@ from collections.abc import Callable, Iterable, Sequence
 from dataclasses import dataclass
 from typing import Any, Literal, cast
 
-from omnibias.core.sharpness import SharpnessSchedule, scheduled_value
 from omnibias.core.verified.conditioning import certified_damping, conditioning_certificate
 from omnibias.torch.line_search import (
     JetLineSearchConfig,
@@ -102,31 +30,6 @@ from omnibias.torch.optim_block_search import (
     block_exact_sweep,
     last_linear_block,
     ombu_bias_block,
-)
-from omnibias.torch.optim_composed import (
-    ComposedCurvatureConfig,
-    ComposedCurvatureReport,
-    composed_block_hessian,
-    composed_curvature_step,
-)
-from omnibias.torch.optim_homotopy import HomotopyConfig, homotopy_train
-from omnibias.torch.optim_inverse import InverseDesignConfig, invert_input
-from omnibias.torch.optim_kantorovich import (
-    CONTINUUM_PDE_CLAIM_KEY,
-    FINITE_RESIDUAL_CLAIM,
-    KantorovichAccept,
-    approximate_inverse_jacobian,
-    kantorovich_accept_step,
-    kantorovich_gated_gauss_newton_step,
-    polynomial_sqrt2_maps,
-    select_accepted_params,
-)
-from omnibias.torch.optim_sharp_loss import SharpnessLossConfig, sharpness_augmented_loss
-from omnibias.torch.optim_sharpness import (
-    SharpnessReport,
-    sharpness_lambda_max,
-    sharpness_scheduled_minimize,
-    sharpness_scheduled_step,
 )
 
 import torch
@@ -989,29 +892,6 @@ def lanczos_tridiag(matvec: MatVec, b: Tensor, k: int, *, tol: float = 1e-10) ->
     return q_basis, tri
 
 
-def _schedule_cubic_sigma(
-    matvec: MatVec,
-    g: Tensor,
-    schedule: SharpnessSchedule,
-    *,
-    min_sigma: float,
-    max_sigma: float,
-) -> tuple[float, float]:
-    """Set cubic ``sigma`` from the largest Ritz value of ``matvec`` (theory 08-06)."""
-    probe = g
-    if float(torch.linalg.vector_norm(probe)) == 0.0:
-        probe = torch.zeros_like(g)
-        probe = probe.clone()
-        probe[0] = 1.0
-    _q_basis, tri = lanczos_tridiag(matvec, probe, int(schedule.n_lanczos))
-    ell = float(torch.max(torch.linalg.eigvalsh(tri)))
-    sigma = scheduled_value(ell, schedule)
-    if not math.isfinite(sigma) or sigma <= 0.0:
-        raise ValueError(
-            "sharpness schedule produced a non-finite or non-positive cubic "
-            f"sigma {sigma!r} from ell_k={ell!r}; refusing the step"
-        )
-    return max(float(min_sigma), min(sigma, float(max_sigma))), ell
 
 
 def _solve_cubic_subproblem(tri: Tensor, c: Tensor, sigma: float, *, iters: int = 100) -> Tensor:
@@ -1161,10 +1041,6 @@ class _CubicArcOptimizer:
         Lanczos subspace dimension (number of curvature-vector products per step).
     max_line_search:
         Max ``sigma`` increases attempted within one :meth:`step` before giving up.
-    sharpness:
-        Optional theory 08-06 schedule. When set, each step measures a Ritz
-        ``lambda_max`` with exact HVPs and replaces ``sigma`` before the ARC
-        subproblem. ``target`` must be ``"cubic_sigma"``.
     """
 
     def __init__(
@@ -1179,7 +1055,6 @@ class _CubicArcOptimizer:
         max_sigma: float = 1e16,
         krylov_dim: int = 20,
         max_line_search: int = 12,
-        sharpness: SharpnessSchedule | None = None,
     ) -> None:
         if sigma <= 0.0:
             raise ValueError(f"sigma must be > 0, got {sigma}")
@@ -1195,11 +1070,6 @@ class _CubicArcOptimizer:
             raise ValueError(f"krylov_dim must be >= 1, got {krylov_dim}")
         if max_line_search < 1:
             raise ValueError(f"max_line_search must be >= 1, got {max_line_search}")
-        if sharpness is not None and sharpness.target != "cubic_sigma":
-            raise ValueError(
-                "CubicRegularizedNewton.sharpness.target must be 'cubic_sigma', "
-                f"got {sharpness.target!r}"
-            )
         self.sigma = float(sigma)
         self.eta_accept = float(eta_accept)
         self.eta_success = float(eta_success)
@@ -1209,7 +1079,6 @@ class _CubicArcOptimizer:
         self.max_sigma = float(max_sigma)
         self.krylov_dim = int(krylov_dim)
         self.max_line_search = int(max_line_search)
-        self.sharpness = sharpness
         self.last_ell_k: float | None = None
         self.n_iter = 0
 
@@ -1272,14 +1141,6 @@ class CubicRegularizedNewton(_CubicArcOptimizer):
         def matvec(v: Tensor) -> Tensor:
             return cast(Tensor, jvp(grad_fn, (params,), (v,))[1])
 
-        if self.sharpness is not None:
-            self.sigma, self.last_ell_k = _schedule_cubic_sigma(
-                matvec,
-                g,
-                self.sharpness,
-                min_sigma=self.min_sigma,
-                max_sigma=self.max_sigma,
-            )
 
         f0 = float(fn(params))
         new_params, accepted, self.sigma, rho, loss = self._arc(
@@ -1980,8 +1841,7 @@ class CubicNewton(_CurvatureOptimizer):
     saddle-escaping -- there is no learning rate. Best for general smooth nonconvex objectives;
     for a least-squares / PINN residual prefer :class:`CubicGaussNewton`.
 
-    Pass ``sharpness=SharpnessSchedule(...)`` to set cubic ``sigma`` from exact-HVP
-    Lanczos ``lambda_max`` each step (theory 08-06).
+
 
     Usage (a one-line swap for Adam)::
 
@@ -2005,7 +1865,6 @@ class CubicNewton(_CurvatureOptimizer):
         max_sigma: float = 1e16,
         krylov_dim: int = 20,
         max_line_search: int = 12,
-        sharpness: SharpnessSchedule | None = None,
     ) -> None:
         if sigma <= 0.0:
             raise ValueError(f"sigma must be > 0, got {sigma}")
@@ -2017,11 +1876,6 @@ class CubicNewton(_CurvatureOptimizer):
             raise ValueError(f"krylov_dim must be >= 1, got {krylov_dim}")
         if max_line_search < 1:
             raise ValueError(f"max_line_search must be >= 1, got {max_line_search}")
-        if sharpness is not None and sharpness.target != "cubic_sigma":
-            raise ValueError(
-                "CubicNewton.sharpness.target must be 'cubic_sigma', "
-                f"got {sharpness.target!r}"
-            )
         super().__init__(params, {})
         self._sigma = float(sigma)
         self.eta_accept = float(eta_accept)
@@ -2032,7 +1886,6 @@ class CubicNewton(_CurvatureOptimizer):
         self.max_sigma = float(max_sigma)
         self.krylov_dim = int(krylov_dim)
         self.max_line_search = int(max_line_search)
-        self.sharpness = sharpness
         self.last_ell_k: float | None = None
         self.n_iter = 0
 
@@ -2047,14 +1900,6 @@ class CubicNewton(_CurvatureOptimizer):
         def matvec(v: Tensor) -> Tensor:
             return self._hvp(g_list, v)
 
-        if self.sharpness is not None:
-            self._sigma, self.last_ell_k = _schedule_cubic_sigma(
-                matvec,
-                g,
-                self.sharpness,
-                min_sigma=self.min_sigma,
-                max_sigma=self.max_sigma,
-            )
 
         def eval_f(trial: Tensor) -> float:
             self._write_flat(trial)
@@ -2442,7 +2287,7 @@ class JetSubspaceTensor(_CurvatureOptimizer):
        ``theta + Q a``, accepted / rejected by the usual actual-to-predicted reduction ratio with an
        adaptive radius.
 
-    The thesis (see ``docs/benchmarks.md``): the per-step curvature win of the exact-Hessian methods
+    The thesis (see ``benchmarks/README.md``): the per-step curvature win of the exact-Hessian methods
     only converts to a *wall-clock* win when the inner solve is cheap; a small fixed subspace with an
     exact third-order model needs far fewer steps than a long CG inner loop, at a fixed handful of
     products per step. Set ``order = 2`` to fall back to a pure subspace (Krylov) Newton trust-region
@@ -3851,10 +3696,7 @@ class KFAC(torch.optim.Optimizer):
 
 __all__ = [
     "BlockSpec",
-    "CONTINUUM_PDE_CLAIM_KEY",
     "Closure",
-    "ComposedCurvatureConfig",
-    "ComposedCurvatureReport",
     "ConformalSymplectic",
     "CubicGaussNewton",
     "CubicNewton",
@@ -3862,19 +3704,15 @@ __all__ = [
     "CubicRegularizedGaussNewton",
     "CubicRegularizedNewton",
     "DiagonalCurvature",
-    "FINITE_RESIDUAL_CLAIM",
     "FrugalCurvature",
     "GaussNewton",
     "GaussNewtonInfo",
     "GradNormBalancer",
-    "HomotopyConfig",
-    "InverseDesignConfig",
     "JetLBFGS",
     "JetLBFGSOptimizer",
     "JetLineSearchConfig",
     "JetSubspaceTensor",
     "KFAC",
-    "KantorovichAccept",
     "LBFGSInfo",
     "LineSearchResult",
     "MatVec",
@@ -3882,19 +3720,13 @@ __all__ = [
     "NaturalGradient",
     "ResidualFn",
     "ScalarFn",
-    "SharpnessLossConfig",
-    "SharpnessReport",
-    "SharpnessSchedule",
     "StochasticNewtonCG",
     "TrustRegionNewtonCG",
-    "approximate_inverse_jacobian",
     "arrangement_w_block",
     "block_direction",
     "block_exact_search",
     "block_exact_sweep",
     "cgls",
-    "composed_block_hessian",
-    "composed_curvature_step",
     "conjugate_gradient",
     "cubic_regularized_newton_step",
     "functional_residual_fn",
@@ -3903,13 +3735,9 @@ __all__ = [
     "gauss_newton_direction_cgls",
     "gauss_newton_fisher",
     "gauss_newton_fisher_matvec",
-    "homotopy_train",
     "hvp",
-    "invert_input",
     "jet_line_search",
     "jet_line_search_on_ray",
-    "kantorovich_accept_step",
-    "kantorovich_gated_gauss_newton_step",
     "lanczos_tridiag",
     "last_linear_block",
     "lstsq_gauss_newton_direction",
@@ -3917,13 +3745,7 @@ __all__ = [
     "martens_grosse_gauss_newton_minimize",
     "natural_gradient_direction",
     "ombu_bias_block",
-    "polynomial_sqrt2_maps",
     "quadrature_loss",
-    "select_accepted_params",
-    "sharpness_augmented_loss",
-    "sharpness_lambda_max",
-    "sharpness_scheduled_minimize",
-    "sharpness_scheduled_step",
     "solve_subspace_trust_region",
     "steihaug_cg",
     "taylor_line_min",

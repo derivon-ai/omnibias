@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""Exact higher-order jets of a soft-DP value through the unrolled recursion (jax).
 

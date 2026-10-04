@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 """Pack-parameter Fisher metric (theory 04-01).
 
@@ -17,7 +17,6 @@ from omnibias.curvature.information._core import (
     FisherEvaluation,
     NotADensityError,
     PackFamily,
-    as_manifold_spec,
     collapse_degeneracy,
     damped_natural_step,
     distinguishability_samples,
@@ -58,7 +57,6 @@ __all__ = [
     "PATH_MC",
     "PINV_RCOND_RULE",
     "PackFamily",
-    "as_manifold_spec",
     "collapse_degeneracy",
     "damped_natural_step",
     "distinguishability_samples",

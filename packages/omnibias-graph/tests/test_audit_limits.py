@@ -1,11 +1,6 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
-r"""Enforcement: omnibias-graph ships only differentiable relaxations.
-
-Exact NP-hard combinatorial solving is deliberately out of scope. These tests
-fail if such a surface is silently added, or if the honesty note is deleted --
-mirroring the out-of-thesis enforcement in ``omnibias.geometry.gauge`` / ``omnibias-boolean``
-and the ``rsa-limitation`` audit boundary.
+"""The graph primitive exports matching backend surfaces, without application solvers.
 """
 
 from __future__ import annotations
@@ -61,9 +56,6 @@ def test_backends_export_identical_surface() -> None:
 
 def test_package_docstring_records_scope() -> None:
     doc = (omnibias.graph.__doc__ or "").lower()
-    # yes-if framing: relaxations are supported and certified routing lives elsewhere
     assert "relaxation" in doc
-    assert "routing" in doc
-    # the one honest limit (exactness boundary) is stated, not hidden
-    assert "p = np" in doc
-    assert "exact" in doc
+    assert "spectral" in doc
+    assert "numerical" in doc

@@ -1,90 +1,87 @@
 # omnibias-torch
 
-PyTorch backend for the omnibias closed-form n-th derivative framework.
+**Derivatives that keep training.** Spatial jets forward. Parameter gradients backward.
 
-## Why this is fast
+![Derivatives that keep training.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-torch/docs/visuals/story.gif)
 
-All numbers float64, identical answers to autodiff up to `≤ 10⁻¹⁵`. Full
-derivation in [`docs/complexity.md`](../../docs/complexity.md).
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-torch/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-torch/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-torch/docs/visuals/scene.py)
 
-- Laplacian overhead is **`O(1)` in input dimension `D`** (0.167 → 0.211 ms
-  at `D = 3 → 240` on GPU, `H = 256`, `B = 4096`).
-- At `D = 240`, the closed-form Laplacian is **199× faster than
-  `torch.func.hessian` + trace** and uses **108× less memory**.
-- Iterated Laplacian `Δᵏ` is flat in `k` and `D`: closed-form stays at ~0.1 ms
-  where folx-nested OOMs at `k = 4`.
-- Bit-identical to `omnibias-jax` and `omnibias-keras` (same shared
-  `omnibias.core` polynomial coefficients).
+Torch tensors and supported network layers enter; activation derivatives, directional jets and specialized contractions leave as tensors still connected to model parameters. Use this backend to train a high-order residual without constructing a nested spatial backward graph.
 
-## Install
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
+
+[API reference](https://omnibias.ai/api/torch/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-torch/src/omnibias/torch) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-torch/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+Bias collapse becomes an analytic tensor kernel here: evaluate the shared activation polynomial, then propagate normalized Taylor coefficients through layers. Parameter autograd remains available through that calculation. Temperature collapse is realized by separate soft-gate primitives; this backend provides their trainable arithmetic rather than a tree-learning algorithm.
+
+## Run this README
+
+The examples use `omnibias-torch` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-pip install omnibias-torch
-# or:
-pip install omnibias-torch[examples,test]
+python -m pip install --pre "omnibias-torch==0.5.0rc1"
 ```
 
-`omnibias-torch` depends on `omnibias-core` (pure-Python math) and
-`torch>=2.0`.
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-torch/wheel-tests.toml)
+executes the examples below outside the source checkout.
 
-## Public API
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+A fourth-order residual can require more derivative work than evaluating the network itself. Instead of recursively asking spatial autograd for another gradient, carry Taylor coefficients through supported layers. The result remains a tensor expression, so ordinary parameter autograd can optimize the residual.
+
+## What you can build
+
+- Direct activation derivatives and composable directional Taylor jets.
+- Mixed partials for coupled PDE residuals and direct Laplacian contractions when the full Hessian is unnecessary.
+- Trainable operator layers, reusable architectures and residual-optimizer interfaces.
+
+Use directional jets for a few directions, mixed jets when you need the complete selected order, and specialized Laplacians for trace-like operators. These are different algorithms with different output sizes. Choose the operator your residual consumes before choosing a general Hessian implementation.
+
+## A working example
 
 ```python
 import torch
-from omnibias.torch import (
-    OMBU, OperatorBlock, cmbLinear, cmbConv1d, cmbConv2d,
-    GrowableOMBU, get_activation, list_activations, register_activation,
-    BankSpec, BiasScan, MultiPackUnit,
-)
+from omnibias.torch.jet import mlp_jet, jet_to_tower
 
-# Trainable scalar-operator primitive (drop-in for an activation):
-ombu = OMBU(num_channels=4, K=2, base="tanh")
-out = ombu(torch.zeros(3, 4))
-
-# Operator-typed block. Six roles: identity | grad | laplacian | derivative
-# | band | integral. grad/laplacian/derivative are closed-form sigma^(n);
-# integral is the closed-form antiderivative window S(z+b_hi)-S(z+b_lo), S'=sigma.
-block = OperatorBlock(channels=8, op="grad", base="sigmoid")
-
-# CmbLinear: drop-in for nn.Linear with an inline operator block:
-linear = cmbLinear(in_features=128, out_features=64, op="identity", base="tanh")
-
-# 23 registered activations, every Riccati-class one with closed-form
-# derivatives at every order:
-print(list_activations())
+w = torch.tensor([[0.5], [-0.3]], dtype=torch.float64, requires_grad=True)
+layers = [(w, torch.tensor([0.1, 0.2]), "tanh"),
+          (torch.tensor([[0.6, -0.4]], dtype=torch.float64), None, None)]
+x = torch.tensor([0.3], dtype=torch.float64)
+tower = jet_to_tower(mlp_jet(x, torch.ones_like(x), layers, order=4))
+residual = tower[4] + tower[0]  # an illustrative fourth-order operator
+residual.square().mean().backward()
+assert w.grad is not None and torch.isfinite(w.grad).all()
 ```
 
-Wave-1 primitives: `MultiPackUnit` (heterogeneous Birkhoff
-packs, 01-01, **shipped**) and `BiasScan` / `BankSpec` (transverse scan along `w`, 01-02, **shipped**).
-`BiasScan` templates reuse the six `OperatorBlock` roles; equivariance is an
-interior lattice shift, not a circular wrap. Soft-argmax `gamma` is not
-`delta -> 0`. See [docs/api/multipack.md](../../docs/api/multipack.md) and
-[docs/api/scan.md](../../docs/api/scan.md).
+## Choose the right contract
 
-Shipped Wave-3 architectures: `ScanNet` (on-lattice equivariance, not
-`R^D`; G4 leftover-recorded), `JetKAN` (exactness of the model jet; the
-KA theorem does not justify; G2 leftover-recorded), `EquivariantScan`
-(gaussian-family steering; discrete `C_L`; G5 leftover-recorded), and
-`hierarchical_scan` (1-D offsets; `eta=0` bit-identical to dense), and
-`LadderNet` (Rodrigues reweight required; G4 leftover-recorded).
-See
-[docs/api/scannet.md](../../docs/api/scannet.md),
-[docs/api/jetkan.md](../../docs/api/jetkan.md),
-[docs/api/ladder.md](../../docs/api/ladder.md),
-[docs/api/equivariant_scan.md](../../docs/api/equivariant_scan.md), and
-[docs/api/hierarchy.md](../../docs/api/hierarchy.md).
+Jet row k stores the derivative divided by k!. Convert with jet_to_tower at derivative-facing boundaries. Mixed coefficients use multi-index factorials. Shared algebra gives comparable mathematics, not universal bit identity across devices. Dense mixed jets still grow combinatorially; no fixed dimension ceiling means no hard-coded cap, not constant memory.
 
-See [docs/theory.md](../../docs/theory.md) and the cookbook for end-to-end
-PINN, CmbNet, and CvxLayer examples.
+## Explore and validate
 
-## Activation dictionary
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/torch.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
 
-23 real-valued activations registered, plus 3 complex-valued (NQS).
-See `omnibias.STABILITY.md` (sanitized for the public docs site as
-`docs/stability.md`) for the full table of supported derivative orders
-per activation.
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-torch/tests -q
+```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-torch/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).

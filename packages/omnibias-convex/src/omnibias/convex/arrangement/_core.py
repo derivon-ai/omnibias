@@ -100,7 +100,6 @@ def honesty_payload() -> dict[str, bool]:
     return {
         "new_lp_algorithm": False,
         "uncorrected_float_dual": False,
-        "p_equals_np_claim": False,
         "vertex_enum_is_exponential": True,
         "selection_is_temperature_collapse": True,
         "founding_bias_collapse_in_selection": False,

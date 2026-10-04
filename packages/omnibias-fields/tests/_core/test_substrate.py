@@ -27,7 +27,7 @@ from omnibias.fields._core import (
 
 
 def test_public_surface() -> None:
-    assert fields.__version__ == "0.1.0"
+    assert fields.__version__ == "0.2.0rc1"
     for name in ("FieldState", "ComponentSpec", "CoordinateSpec",
                  "ComponentView", "VectorView", "SigmaCache", "ops_registry"):
         assert hasattr(fields, name)
@@ -72,13 +72,6 @@ def test_ops_registry_roundtrip() -> None:
     assert ops_registry.lookup("definitely_not_registered") is None
 
 
-def test_pinn_shims_are_the_same_objects() -> None:
-    # omnibias-pinn re-exports the moved substrate via transparent shims.
-    from omnibias.pinn._core import FieldState as PinnFieldState
-    from omnibias.pinn._core.ops_registry import register as pinn_register
-
-    assert PinnFieldState is FieldState
-    assert pinn_register is ops_registry.register
 
 
 def test_specs_construct() -> None:

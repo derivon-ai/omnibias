@@ -4,15 +4,15 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-discrete"
-version = "0.1.0a1"
-description = "Shared differentiable + certified discrete-optimization substrate for omnibias: the DiscreteProblem seam, the annealed temperature-collapse (beta -> inf) sigmoid relaxation solved by unrolled descent (torch + jax twins), a rounding + k-flip local-search decoder with a brute-force oracle, and a rigorous optimality-gap certificate (Lasserre / moment-SOS lower bound over the Boolean hypercube). Ships a MaxSAT front-end as its first in-tree consumer."
+version = "0.1.0a2"
+description = "Shared differentiable + certified discrete-optimization substrate for omnibias: the DiscreteProblem seam, the annealed temperature-collapse (beta -> inf) sigmoid relaxation solved by unrolled descent (torch + jax twins), a rounding + k-flip local-search decoder with a brute-force oracle, and a rigorous optimality-gap certificate (Lasserre / moment-SOS lower bound over the Boolean hypercube)."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
-license-files = ["LICENSE"]
+license-files = ["LICENSE", "COMMERCIAL-LICENSE.md"]
 authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
 maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
-keywords = ["discrete-optimization", "pseudo-boolean", "maxsat", "differentiable-optimization", "sum-of-squares", "lasserre", "verified-numerics"]
+keywords = ["discrete-optimization", "pseudo-boolean", "differentiable-optimization", "sum-of-squares", "lasserre", "verified-numerics"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
@@ -26,24 +26,19 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
-dependencies = ["omnibias-core>=0.2.0", "numpy>=1.24"]
+dependencies = ["omnibias-core>=0.5.0rc1", "numpy>=1.24"]
 
 [project.optional-dependencies]
 # the headline SOS / Lasserre certified lower bound (Putinar Positivstellensatz over
 # the Boolean hypercube) reuses omnibias-sos; without it certify_gap degrades to a
 # valid but non-sealed float bound.
-sos = ["omnibias-sos>=0.1.0a1"]
+sos = ["omnibias-sos>=0.1.0a2"]
 # the differentiable annealed relaxation (temperature-collapse penalty,
 # unrolled for backprop) needs a tensor backend.
-torch = ["torch>=2.0", "omnibias-torch>=0.2.0"]
-jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
-# the continuous best-subset certificate (omnibias.discrete.sparse.certify_best_subset_gap)
-# seals a box-QP lower bound with omnibias-convex; absent it degrades to the unsealed
-# OLS-residual floor. omnibias-convex sits below discrete in the DAG (it depends only on
-# omnibias-core), so this optional extra introduces no dependency cycle.
-convex = ["omnibias-convex>=0.1.0a1"]
-all = ["omnibias-discrete[sos,torch,jax,convex]"]
-test = ["pytest>=7.0", "numpy>=1.24", "omnibias-struct>=0.1.0a1"]
+torch = ["torch>=2.0", "omnibias-torch>=0.5.0rc1"]
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.5.0rc1"]
+all = ["omnibias-discrete[sos,torch,jax]"]
+test = ["pytest>=7.0", "numpy>=1.24", "omnibias-struct>=0.1.0a2"]
 dev = ["omnibias-discrete[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
 
 [project.urls]

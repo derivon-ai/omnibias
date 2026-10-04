@@ -192,7 +192,7 @@ def random_csp_degree_certificate(
         wall_seconds=float(elapsed),
         detail=(
             "random 3-XOR instance with a strictly-PD spherical SOS residual "
-            "(1 + sum x_i^2) and a brute-force cube oracle; degree-indexed, not P vs NP"
+            "(1 + sum x_i^2) and a brute-force cube oracle; degree-indexed"
         ),
     )
 

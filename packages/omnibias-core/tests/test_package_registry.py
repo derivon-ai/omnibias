@@ -1,36 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-r"""Filesystem guard for package-registry consistency (the earn-existence rule).
-
-This test is backend-free and runs in the core CI job. It codifies the "package
-earns independent existence" hygiene rule (see AGENTS.md) by pinning the one
-mechanical invariant that a fold / new-package must not break: **every
-``packages/omnibias-*`` distribution is accounted for exactly once** in the root
-``[tool.uv.workspace]`` config -- it is a stable ``member``, or an ``exclude``d
-extension, or the single documented exception (``omnibias-keras``, which ships
-its own pyproject and installs per-backend).
-
-Concretely it catches the two drift modes the consolidation work is prone to:
-
-* a **dangling exclude** -- a ``packages/omnibias-<pkg>`` line left in ``exclude``
-  after the directory was folded away (e.g. the ``pde`` / ``gauge`` / ``flow``
-  folds), and
-* an **unwired package** -- a new ``packages/omnibias-*`` directory added without
-  being registered in the workspace at all.
-
-It deliberately does *not* try to police CI-job / docs presence (those vary in
-shape per package and are covered by ``mkdocs build --strict`` and the CI matrix);
-it guards the single source of truth that every other wiring file keys off.
-
-It additionally pins the **interpreter-support metadata**, which drifted badly
-once (most packages declared ``requires-python = ">=3.10"`` while classifying
-only ``3.10``, understating support to anyone reading PyPI). Every package now
-declares the same floor and the same canonical classifier block, so adding an
-interpreter is a single deliberate edit here plus the CI matrix.
-
-Parsing is done with regexes rather than ``tomllib`` on purpose: this guard must
-run on the declared floor, Python 3.10, where ``tomllib`` does not exist.
-"""
+"""Every retained distribution is a registered workspace member."""
 
 from __future__ import annotations
 
@@ -40,18 +10,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[3]
 ROOT_PYPROJECT = REPO_ROOT / "pyproject.toml"
 
-# The one package directory that is intentionally neither a workspace member nor
-# an ``exclude`` entry: Keras 3 ships its own pyproject and is installed per
-# backend (KERAS_BACKEND=...), so it is not part of the uv workspace at all.
-KNOWN_NON_WORKSPACE = {"omnibias-keras"}
-
-# Distributions that were folded into a home package and must stay gone: their
-# directory must not reappear and no wiring line may reference them.
-FOLDED_AWAY = {
-    "omnibias-pde": "omnibias-pinn (omnibias.pinn.solver)",
-    "omnibias-gauge": "omnibias-geometry (omnibias.geometry.gauge)",
-    "omnibias-flow": "omnibias-score (omnibias.score.flow)",
-}
+KNOWN_NON_WORKSPACE: set[str] = set()
+FOLDED_AWAY: dict[str, str] = {}
 
 
 # The single shared interpreter floor, and the classifier block it implies. Bump

@@ -47,7 +47,7 @@ The blocklist can never go vacuous: :func:`test_every_pattern_catches_its_bait`
 fails on a regex that matches nothing, :func:`test_scan_catches_injected_bait`
 drives the real scanner over each bait string, and
 :func:`test_scan_surface_is_not_vacuous` pins that the file list is large and
-actually reaches ``.github/``, ``notebooks/``, and ``formal/``.
+actually reaches ``.github/``, ``docs/``, and ``formal/``.
 """
 
 from __future__ import annotations
@@ -308,7 +308,7 @@ def test_scan_surface_is_not_vacuous() -> None:
     files = _scanned_files()
     assert len(files) > 500, f"working-tree scan collapsed to {len(files)} files"
     rels = {str(p.relative_to(REPO_ROOT)) for p in files}
-    for required in (".github/", "notebooks/", "formal/", "docs/", "packages/"):
+    for required in (".github/", "formal/", "docs/", "packages/"):
         assert any(r.startswith(required) for r in rels), (
             f"the scan never reaches {required}, so leakage there would go unseen"
         )

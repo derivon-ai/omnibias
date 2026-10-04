@@ -40,11 +40,10 @@ def test_anderson_is_extra() -> None:
 
 def test_honesty_sealed() -> None:
     payload = honesty_payload()
-    assert payload["navier_stokes_proof_claim"] is False
-    assert payload["ccf_stretch_cleared"] is False
+    assert payload["global_convergence_claim"] is False
     assert payload["unrolled_bptt_claim"] is False
-    payload["ccf_stretch_cleared"] = True
-    assert honesty_payload()["ccf_stretch_cleared"] is False
+    payload["global_convergence_claim"] = True
+    assert honesty_payload()["global_convergence_claim"] is False
 
 
 def test_inf_bound() -> None:

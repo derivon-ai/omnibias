@@ -22,8 +22,7 @@ Other approaches you have tried or thought about.
 
 ## Scope
 
-- Which package(s) would this touch (core / torch / jax / ferminet /
-  pinn / qpinn / curvature / keras)?
+- Which primitive package(s) would this touch?
 - Does it need to stay bit-identical across backends?
 
 ## Additional context

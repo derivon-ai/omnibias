@@ -81,7 +81,7 @@ try:
 except _PkgNotFound:  # pragma: no cover - bare source checkout
     __version__ = "0.0.0+unknown"
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Limit family exposed as package metadata.
 __lineage__ = "exempt: q->1 third limit"
 
 __all__ = [

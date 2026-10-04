@@ -1,56 +1,31 @@
 # omnibias-graph
 
-Differentiable **spectral graph operators** and **continuous combinatorial
-relaxations**, bit-identical across the torch and jax backends.
+Differentiable graph primitives.
 
-The spectral layer is exact linear algebra on a weighted adjacency matrix: the
-combinatorial / normalized / random-walk Laplacians, differentiable Laplacian
-eigenmaps (spectral embedding), the graph heat kernel `exp(-t L)`, and the
-Rayleigh-Ritz eigenvector relaxation of the ratio / normalized cut. The
-relaxation layer turns discrete objects into smooth, temperature-controlled
-surrogates: the Sinkhorn projection onto doubly-stochastic matrices,
-Gumbel-Sinkhorn permutation matrices, SoftSort differentiable sorting, and a
-soft top-k operator. Every relaxation recovers its hard combinatorial object as
-the temperature `tau -> 0`.
+- `omnibias.graph.torch.ops` and `omnibias.graph.jax.ops`: graph spectral
+  operators and differentiable combinatorial relaxations.
+- Spectral operations include graph Laplacians, embeddings and heat kernels.
+- Relaxations include Sinkhorn normalization, soft sorting and soft top-k.
 
-!!! warning "Scope: differentiable relaxations, not exact combinatorial solvers"
-    These operators are *continuous relaxations* and *smooth spectral*
-    quantities. Exact NP-hard combinatorial solving — the travelling-salesman
-    tour, exact (weighted) max-cut, exact graph isomorphism, SAT / ILP — is
-    **out of scope** and guarded by an enforcement test. See the
-    [graph-limitation cookbook](../cookbook/graph-limitation.md) and
-    [scope & guarantees](../scope-and-guarantees.md) §6. A relaxed cut value is a
-    *lower bound* on the discrete optimum; the discrete rounding step is the
-    caller's responsibility and is where combinatorial hardness lives.
+These are reusable operators for consumer models. Temperature-based outputs
+are continuous relaxations; a discrete interpretation needs an explicit
+rounding rule. Repeated eigenvalues and ties require care when interpreting
+parameter gradients.
 
-Gated Face-Net (theory 02-02) lives in `omnibias.graph.arrangement`:
-[facenet.md](facenet.md). Sampling is a subgraph; `beta -> inf` is
-temperature collapse; sound gap, not P vs NP.
+Install this distribution with `pip install omnibias-graph`; select its
+backend extras when needed. See [guarantees](../guarantees.md).
 
-## Oracles
+<!-- BEGIN GENERATED API INVENTORY -->
 
-* **Ring graph** `C_n`: the combinatorial-Laplacian spectrum is
-  `lambda_k = 2 - 2 cos(2 pi k / n)`, each eigenpair certified with an
-  `omnibias.core.verified` interval enclosure that brackets a true eigenvalue.
-* **Two-block SBM**: the Fiedler vector (second-smallest eigenvector) separates
-  the planted blocks by sign.
-* **SoftSort / soft top-k**: recover `torch.sort` / the hard top-k mask as
-  `tau -> 0`; the soft top-k weights sum to exactly `k` at any temperature.
+Version **0.1.0a2** · Python **>=3.10** · **3 - Alpha** · AGPL-3.0-or-later **or commercial**
 
-## Ops (torch)
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
 
-::: omnibias.graph.torch.ops
-    options:
-      show_root_heading: false
-      heading_level: 3
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-graph/src/omnibias/graph). Modules below are relative to `omnibias.graph`; underscored modules are internal.
 
-## JAX twin
+`arrangement`, `arrangement.jax`, `arrangement.torch`, `jax`, `jax.ops`, `jax.ops.relaxation`, `jax.ops.spectral`, `torch`, `torch.ops`, `torch.ops.relaxation`, `torch.ops.spectral`.
 
-The JAX backend (`omnibias.graph.jax.ops`) is the bit-identical twin. Laplacians,
-eigenvalues, heat kernels, and every relaxation match the torch backend to
-`rtol=1e-9` in float64 (cross-backend parity tests). Raw eigen*vectors* of a
-degenerate spectrum are only defined up to a rotation within each eigenspace, so
-parity is asserted on the eigenvalues, the heat kernel, and the invariant
-subspace projector rather than on individual eigenvectors.
+</details>
 
-Status: Alpha (`0.1.0a1`).
+<!-- END GENERATED API INVENTORY -->

@@ -136,7 +136,7 @@ theorem nonneg_of_mem_of_lo_nonneg {x : Int} {a : ZInterval} (hx : Mem x a) (h :
   omega
 
 /-- A value drawn from an interval whose upper endpoint is negative is negative
-(the dual obligation used to *exclude* a property, e.g. a CLM non-blow-up). -/
+(the dual obligation used to *exclude* a property, e.g. a nonpositive margin). -/
 theorem neg_of_mem_of_hi_neg {x : Int} {a : ZInterval} (hx : Mem x a) (h : a.hi < 0) :
     x < 0 := by
   simp only [Mem] at hx

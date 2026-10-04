@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""Backend-agnostic configuration for a soft partition of unity.
 
@@ -17,7 +17,7 @@ holds only plain data.
 Terminology: the split gate ``sigmoid(beta * (w.x - t))`` hardens as ``beta -> inf`` -- the
 feasibility / temperature sense of "collapse" (a soft indicator becoming a 0/1 step),
 distinct from the **founding bias collapse** (the multi-bias ``delta -> 0`` limit of an
-``OMBU`` to the closed-form derivative ``sigma^(K-1)``; see ``docs/theory.md``).
+``OMBU`` to the closed-form derivative ``sigma^(K-1)``; see ``docs/derivatives.md``).
 """
 
 from __future__ import annotations

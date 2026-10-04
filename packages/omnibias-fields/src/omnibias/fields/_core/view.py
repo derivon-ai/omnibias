@@ -195,38 +195,9 @@ class ComponentView(Generic[T]):
             self._state, self._name, diffusivity=diffusivity,
         )
 
-    def fickian_flux(self, *, diffusivity: float | str = 1.0) -> T:
-        """Fick's first law ``J = -D grad c`` (chemistry alias of ``diffusive_flux``)."""
-        return self._state.ops.fickian_flux(
-            self._state, self._name, diffusivity=diffusivity,
-        )
 
-    def darcy_flux(self, *, permeability: float | str = 1.0, viscosity: float = 1.0) -> T:
-        """Darcy seepage velocity ``q = -(k/mu) grad p`` (this component is ``p``)."""
-        return self._state.ops.darcy_flux(
-            self._state, self._name, permeability=permeability, viscosity=viscosity,
-        )
 
-    def reaction_diffusion(
-        self,
-        *,
-        diffusivity: float | str = 1.0,
-        reaction: Any = None,
-        source: str | float | None = None,
-    ) -> T:
-        """Reaction-diffusion residual ``d_t c - div(D grad c) - R(c) - s`` (needs a time axis)."""
-        return self._state.ops.reaction_diffusion_residual(
-            self._state, scalar=self._name, diffusivity=diffusivity,
-            reaction=reaction, source=source,
-        )
 
-    def poisson_residual(
-        self, *, source: str | float | None = None, permittivity: float | str = 1.0,
-    ) -> T:
-        """Poisson residual ``div(eps grad phi) + rho`` (this component is ``phi``)."""
-        return self._state.ops.poisson_residual(
-            self._state, self._name, source=source, permittivity=permittivity,
-        )
 
     def d(self, axis: int | str, order: int = 1) -> T:
         """Generic single-axis derivative escape hatch."""
@@ -454,7 +425,7 @@ class VectorView(Generic[T]):
         )
 
     def advect(self) -> T:
-        """Self-advection: ``(u . nabla) u``. The standard NS term."""
+        """Self-advection: ``(u . nabla) u``. """
         return self._state.ops.advection(self._state, velocity=self._names)
 
     def advect_by(self, other: VectorView) -> T:
@@ -472,7 +443,7 @@ class VectorView(Generic[T]):
         )
 
     def material_derivative(self) -> T:
-        """``D/Dt = d/dt + (u . nabla)``; standard NS material derivative."""
+        """``D/Dt = d/dt + (u . nabla)``; material derivative."""
         return self._state.ops.material_derivative(
             self._state, velocity=self._names,
         )
@@ -483,50 +454,15 @@ class VectorView(Generic[T]):
             self._state, velocity=self._names, scalar=scalar,
         )
 
-    def newtonian_stress(self, *, viscosity: float = 1.0, pressure: str | None = None) -> T:
-        """Incompressible-Newtonian Cauchy stress ``-p I + 2 mu eps``."""
-        return self._state.ops.newtonian_stress(
-            self._state, self._names, viscosity=viscosity, pressure=pressure,
-        )
 
-    def elastic_stress(self, *, lam: float = 1.0, mu: float = 1.0) -> T:
-        """Isotropic linear-elastic (Hooke) stress ``lam tr(eps) I + 2 mu eps``."""
-        return self._state.ops.linear_elastic_stress(
-            self._state, self._names, lam=lam, mu=mu,
-        )
 
-    def viscous_dissipation(self, *, viscosity: float = 1.0) -> T:
-        """Viscous dissipation rate ``2 mu eps:eps >= 0``."""
-        return self._state.ops.viscous_dissipation(
-            self._state, self._names, viscosity=viscosity,
-        )
 
-    def stokes_residual(
-        self, *, pressure: str, viscosity: float = 1.0, body_force=None,  # type: ignore[no-untyped-def]
-    ) -> T:
-        """Stokes momentum residual ``mu Delta u - grad p + f``."""
-        return self._state.ops.stokes_residual(
-            self._state, velocity=self._names, pressure=pressure,
-            viscosity=viscosity, body_force=body_force,
-        )
 
-    def navier_cauchy_residual(
-        self, *, lam: float = 1.0, mu: float = 1.0, body_force=None,  # type: ignore[no-untyped-def]
-    ) -> T:
-        """Linear-elastostatics residual ``(lam+mu) grad(div u) + mu Delta u + f``."""
-        return self._state.ops.navier_cauchy_residual(
-            self._state, displacement=self._names, lam=lam, mu=mu, body_force=body_force,
-        )
 
     def polylap(self, k: int) -> T:
         """Vector polylaplacian: ``(Delta^k u_1, ..., Delta^k u_C)``."""
         return self._state.ops.vector_polylaplacian(self._state, self._names, k=k)
 
-    def dalembertian(self, *, c: float = 1.0, signature: str = "mostly_plus") -> T:
-        """Componentwise wave operator ``box u_i`` (e.g. ``box A`` in Lorenz gauge)."""
-        return self._state.ops.vector_dalembertian(
-            self._state, self._names, c=c, signature=signature,
-        )
 
     def __repr__(self) -> str:
         return (
@@ -545,4 +481,8 @@ class VectorView(Generic[T]):
         return hash((id(self._state), self._names))
 
 
-__all__ = ["ComponentView", "VectorView", "did_you_mean"]
+__all__ = [
+    "ComponentView",
+    "VectorView",
+    "did_you_mean",
+]

@@ -1,92 +1,38 @@
 # omnibias-difference
 
-The founding `delta -> 0` register: discrete calculus and analytic combinatorics
-read off the closed-form derivative towers. This is *the* bias collapse the
-library is named for — `K` biases on a difference stencil coalesce as
-`delta -> 0` and the finite difference *becomes* the derivative `sigma^(K-1)`,
-which the closed-form tower evaluates exactly (no `1/delta^(K-1)` cancellation).
+Finite-difference primitives.
 
-- **Certified finite-difference -> derivative** — the rigorous interval-tower
-  enclosure of `sigma^(n)(z)`, the numerical finite-difference estimate, and a
-  *certified* Taylor-remainder bound proving the estimate collapses into the
-  enclosure as `delta -> 0`.
-- **Umbral / Sheffer calculus** (`umbral`) — the forward-difference operator, Newton
-  interpolation, the monomial <-> falling-factorial (Stirling) change of basis, and the
-  full Sheffer surface: `sheffer_sequence` / `associated_sequence` *generation* from a
-  `(g, f)` pair, `appell_sequence`, `umbral_composition`, and the operator layer
-  (`shift_polynomial` `E^a`, `delta_operator_apply` `Q = f(D)`, `pincherle_derivative`
-  `f'(D)`, `umbral_functional`). All exact `Fraction` arithmetic, gathered in the
-  `omnibias.difference.umbral` namespace and flat-re-exported for convenience.
-- **Asymptotic-coefficient reading** — Stirling (off the Bell tower), Bernoulli
-  (off the `tanh` tower) and Euler (off the `sech` tower) numbers, exact as
-  `int` / `Fraction`, plus their leading asymptotics.
-- **Proof-carrying analytic combinatorics** (`generating`) — EGF/OGF algebra,
-  singularity/saddle-point asymptotics, and **certified** asymptotic *enclosures*
-  (`bell_dobinski_enclosure`, `catalan_asymptotic`, certified Bernoulli/Euler
-  enclosures) that close the float-only "no error bars" gap, plus measured
-  exact-vs-asymptotic fallback thresholds.
-- **Singularity analysis / Padé / Sheffer–Riordan** — the Flajolet–Sedgewick
-  `transfer_theorem` mapping an OGF singularity to `[zⁿ]` coefficient asymptotics with a
-  **certified** error term; exact-rational Padé approximants (`pade_approximant`) and
-  Thiele continued fractions (`thiele_interpolation` / `thiele_evaluate`) with certified
-  remainders; and `sheffer_classify` plus the Riordan-array group product / inverse
-  (`riordan_array`) and `connection_constants` (the Fundamental Theorem of Riordan
-  Arrays). Padé / Riordan are `closed-form` (exact rational); the singularity asymptotics
-  are `numerical` (certified). Baselines: raw truncated series (Padé wins) and float
-  coefficient asymptotics (the certified enclosures win).
-- **Lean-checkable special-number identities** (`identities`) — Bernoulli /
-  Euler recurrences and `ζ(1−2m)` regressions emitted as finite *rational*
-  obligations that earn `theorem_prover_verified` **only** on a genuine `lake`
-  pass (see [certificates & the Lean loop](core.md)).
-- **Bit-identical torch / jax twins** for the finite-difference stencil operator.
+`omnibias.difference` supplies finite-difference stencils, Taylor-error
+bounds and exact coefficient algebra.
 
-This package is also the home of an all-tiers **data-driven refinement program**:
-each capability is an instrumented probe (grid + random soundness, an `mpmath`
-oracle, `K ≥ 8` seeds, a named baseline) that surfaces gaps/flaws/bugs and locks
-the fix in with a regression test. The umbrella smoke is
-`docs/examples/difference_validate.py`; the shared probe utilities live in
-`omnibias.difference.validation`.
+- `StencilRequest`, `IrregularStencil`, `solve_irregular_stencil`:
+  construct irregular stencils.
+- `apply_irregular_stencil`: evaluate a stencil on sampled values.
+- `certified_irregular_error`: bound truncation error under derivative bounds.
+- `finite_difference_estimate`: a finite-step derivative estimate.
 
-!!! note "Honest registers, not conflated senses"
-    Extraction is **closed-form** (the towers + exact coefficients); the
-    finite-difference estimate and the mpmath comparison are **numerical**. This
-    is the `delta -> 0` *derivative* collapse — **not** the `beta -> inf`
-    feasibility penalty of `omnibias-convex` / `-control` / `-routing`. Same
-    word, opposite limit; see [`docs/theory.md`](../theory.md).
+Finite steps are approximations. Separate truncation bounds, supplied
+regularity assumptions and floating-point error. Use closed-form activation
+jets when the represented network supports them.
 
-## Public API
+Install this distribution with `pip install omnibias-difference`; select its
+backend extras when needed. See [guarantees](../guarantees.md).
 
-::: omnibias.difference
-    options:
-      show_root_heading: false
-      heading_level: 3
-      members_order: source
+<!-- BEGIN GENERATED API INVENTORY -->
 
-## Irregular / Birkhoff stencils
+Version **0.1.0a2** · Python **>=3.10** · **3 - Alpha** · Apache-2.0
 
-Exact rational weights for arbitrary node and per-node order sets (theory
-01-04, **shipped**). Nodes in `StencilRequest` are dimensionless `c_i` (units of the
-scale `h`). Scale-free weights satisfy `A_{i,p} = a_{i,p} h^{q-p}` (the
-spec's `A = h^q a` only closes if rewritten this way). Order is asymptotic
-in `h`. `is_poised_exact` is the exact-`Q` oracle; `omnibias.core.multipack.is_poised`
-stays the numerical rank test. `IrregularStencil.to_rational_stencil`
-feeds the 01-11 Lean obligation
-([`docs/api/rational_stencil.md`](rational_stencil.md)).
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
 
-::: omnibias.difference._core.irregular
-    options:
-      show_root_heading: false
-      heading_level: 3
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-difference/src/omnibias/difference). Modules below are relative to `omnibias.difference`; underscored modules are internal.
 
-## Refinement-program validation harness
+`jax`, `recurrence`, `singularity`, `torch`, `umbral`, `validation`.
 
-Shared, pure-Python probe utilities (`enclosure_soundness`, an `mpmath` oracle
-adapter, `baseline_compare`, and a `Finding` / `FindingsLedger` JSON writer) used
-by every workstream's probe and by the umbrella smoke.
+Exports from `omnibias.difference`:
 
-::: omnibias.difference.validation
-    options:
-      show_root_heading: false
-      heading_level: 3
+`DerivBound`, `DerivativeEnclosure`, `DerivativeProofVerdict`, `DifferenceEstimate`, `FiniteDifferenceCertificate`, `IrregularStencil`, `RationalIdentityVerdict`, `ShefferClass`, `StencilRequest`, `TransferEstimate`, `accuracy_order`, `appell_sequence`, `apply_irregular_stencil`, `associated_sequence`, `bell_asymptotic_relative_error`, `bell_dobinski_enclosure`, `bell_number`, `bell_number_asymptotic`, `bell_number_asymptotic_refined`, `bernoulli_asymptotic`, `bernoulli_enclosure`, `bernoulli_number`, `bernoulli_polynomial`, `bernoulli_recurrence_identity`, `bernoulli_sign_certificate`, `binomial_coefficient`, `binomial_transform`, `catalan_asymptotic`, `cauchy_product`, `certified_derivative_enclosure`, `certified_fd_error`, `certified_fd_error_general`, `certified_irregular_error`, `check_derivative_certificate`, `check_identity_certificate`, `compose_series`, `compositional_inverse`, `connection_constants`, `delta_operator_apply`, `derivative_sign_certificate`, `dirichlet_beta_odd_enclosure`, `dominant_pole_coefficient_asymptotic`, `euler_asymptotic`, `euler_enclosure`, `euler_number`, `euler_polynomial`, `euler_recurrence_identity`, `eulerian_number`, `exponential_generating_coeffs`, `falling_factorial_coeffs`, `falling_to_monomial`, `finite_difference_estimate`, `forward_difference`, `inverse_binomial_transform`, `is_poised_exact`, `log_bell_number_asymptotic`, `log_bell_number_asymptotic_refined`, `monomial_to_falling`, `newton_forward_coeffs`, `newton_forward_value`, `offsets_exact`, `ordinary_from_exponential`, `pade_approximant`, `pade_certified_remainder`, `pade_evaluate`, `pade_evaluate_interval`, `physical_weights`, `pincherle_derivative`, `polya_screen`, `power_sum_coeffs`, `rational_ogf_coefficients`, `rational_ogf_growth_base`, `rational_series`, `rational_value_identity`, `recommended_bell_fallback_n`, `riordan_array`, `riordan_inverse`, `riordan_product`, `rising_factorial_coeffs`, `series_reciprocal`, `sheffer_classify`, `sheffer_sequence`, `shift_polynomial`, `sigma_deriv_bound`, `signs_exact`, `singular_template_coefficient`, `solve_irregular_stencil`, `stencil_offsets`, `stencil_signs`, `stirling_first_signed`, `stirling_first_signed_row`, `stirling_first_unsigned`, `stirling_second`, `stirling_second_asymptotic`, `stirling_second_row`, `thiele_evaluate`, `thiele_interpolation`, `transfer_theorem`, `umbral_composition`, `umbral_functional`, `zeta_int_enclosure`, `zeta_negative_odd_identity`.
 
-Status: Alpha (`0.1.0a1`).
+</details>
+
+<!-- END GENERATED API INVENTORY -->

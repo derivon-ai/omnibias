@@ -1,107 +1,38 @@
 # omnibias-partition
 
-A light, **certified soft partition-of-unity** primitive -- the keystone shared by four
-downstream bridges (a discontinuity-capturing PINN, a region-wise Riemannian atlas,
-per-region symbolic discovery, and a certified decision layer).
+Soft partitions of unity.
 
-`depth` oblique split gates `g(x) = sigmoid(beta·(w·x − t))` route an input into
-`2**depth` regions with weights `w_l(x)` that are **non-negative**, **sum to one**, and
-**harden** to a crisp `{0,1}` partition as `beta → ∞`. On top of the weights it ships a
-sound soft→hard membership-gap certificate and a per-region model registry whose one
-`combine(X, beta) = Σ_l w_l · out_l` engine every bridge calls.
+`omnibias.partition` routes coordinates into regions using smooth split gates.
 
-\[
-\underbrace{\sum_l |w^{\text{soft}}_l - w^{\text{hard}}_l|}_{\text{measured}} \;\le\;
-\underbrace{2\,\min\!\Big(1, \sum_j e_j\Big)}_{\text{certified sound bound}},
-\qquad e_j = \sigma(-\beta\,|z_j|).
-\]
+- `PartitionConfig`, `PartitionParams`, `init_params`: construct a partition.
+- `partition_weights`: soft region memberships.
+- `hard_assignment`, `hardened_rules`: discrete region choices and rules.
+- `RegionModels`: combine compatible region models.
+- `certify_partition_gap`: a scoped soft-to-hard gap certificate.
 
-Terminology: the gate's `beta → ∞` hardening is the **feasibility / temperature** sense of
-"collapse" (a soft indicator becoming a 0/1 step), distinct from the **founding bias
-collapse** -- the multi-bias `delta → 0` limit to the closed-form derivative `sigma^(K-1)`
-(see [Theory](../theory.md)). The bridges differentiate products of sigmoids by autodiff,
-**not** the closed-form derivative tower.
+PyTorch and JAX adapters live in `omnibias.partition.torch` and `.jax`.
+Increasing inverse temperature sharpens gates. Away from ties, the limit gives
+a hard partition; at a split boundary the soft gate remains one half. This
+limit is distinct from the small-spacing derivative construction.
 
-Gated arrangement geometry (theory 01-03) is documented at
-[arrangement.md](arrangement.md). The binary tree is the special case
-that agrees with `partition_weights`. Cell membership is temperature
-collapse; sampling is a subgraph.
+Install this distribution with `pip install omnibias-partition`; select its
+backend extras when needed. See [guarantees](../guarantees.md).
 
-## Configuration & parameters (numpy)
+<!-- BEGIN GENERATED API INVENTORY -->
 
-::: omnibias.partition._core.config
-    options:
-      show_root_heading: false
-      heading_level: 3
+Version **0.1.0a2** · Python **>=3.10** · **3 - Alpha** · AGPL-3.0-or-later **or commercial**
 
-::: omnibias.partition._core.params
-    options:
-      show_root_heading: false
-      heading_level: 3
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
 
-## Partition-of-unity weights (numpy reference)
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-partition/src/omnibias/partition). Modules below are relative to `omnibias.partition`; underscored modules are internal.
 
-::: omnibias.partition._core.weights
-    options:
-      show_root_heading: false
-      heading_level: 3
+`arrangement`, `arrangement.jax`, `arrangement.torch`, `certify`, `jax`, `jax.weights`, `keras`, `keras.weights`, `registry`, `torch`, `torch.weights`.
 
-## Bit-identical backend twins
+Exports from `omnibias.partition`:
 
-The same weights under torch (autograd-friendly, embeddable), jax (`jit` / `grad` /
-`vmap`), and Keras 3 (`keras.ops`, optional `[keras]` extra), parity `~1e-9` (float64).
+`Arrangement`, `CellGapCertificate`, `PartitionConfig`, `PartitionGapCertificate`, `PartitionParams`, `RegionModels`, `certify_cell_gap`, `certify_partition_gap`, `combine_outputs`, `gate_activations`, `hard_assignment`, `hard_weights`, `hardened_rules`, `init_params`, `max_cells`, `partition_weights`, `region_code_matrix`, `region_rule`, `soft_membership`.
 
-::: omnibias.partition.torch.weights
-    options:
-      show_root_heading: false
-      heading_level: 3
+</details>
 
-::: omnibias.partition.jax.weights
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-::: omnibias.partition.keras.weights
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Certificate
-
-::: omnibias.partition.certify
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-### Sound interval / gap primitives (numpy)
-
-The always-available certificate engine: outward-rounded [`Interval`](core.md) enclosures of
-each region weight over an input box, plus the closed-form soft→hard L1 gap. Imports only
-`omnibias-core`, so it certifies any depth without a backend.
-
-::: omnibias.partition._core.verified
-    options:
-      show_root_heading: false
-      heading_level: 4
-
-## Per-region model registry
-
-::: omnibias.partition.registry
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## Bridges
-
-`omnibias-partition` is the keystone under four submodules of the existing substrates:
-
-- [`omnibias.pinn.partition`](pinn.md) -- discontinuity-capturing PINN (`u = Σ_l w_l u_l`).
-- [`omnibias.geometry.atlas`](geometry.md) -- region-wise Riemannian metric (`g = Σ_l w_l G_l`).
-- [`omnibias.symbolic.piecewise`](symbolic.md) -- per-region symbolic law discovery.
-  The tab-head harden path (SoftTree / Arrangement trained on finite-difference
-  `du`) is **unplanted** for Arrangement (constructor random `W`, no `e_0`);
-  STLSQ still uses the field jet.
-- [`omnibias.struct.decision`](struct.md) + [`omnibias.tab.decision`](tab.md) -- a certified
-  differentiable decision layer.
-
-Status: Alpha (`0.1.0a1`).
+<!-- END GENERATED API INVENTORY -->

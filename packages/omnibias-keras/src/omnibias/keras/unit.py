@@ -195,8 +195,8 @@ class OperatorMultiBiasUnit(layers.Layer):
 
     @property
     def is_identity_nested(self) -> bool:
-        biases = np.asarray(ops.convert_to_numpy(self.biases))
-        signs = np.asarray(ops.convert_to_numpy(self.signs))
+        biases = np.asarray(ops.convert_to_numpy(self.biases.value))
+        signs = np.asarray(ops.convert_to_numpy(self.signs.value))
         tied = bool(np.all(biases.max(axis=-1) - biases.min(axis=-1) == 0))
         sums_to_one = bool(np.all(np.abs(signs.sum(axis=-1) - 1.0) < 1e-6))
         return tied and sums_to_one

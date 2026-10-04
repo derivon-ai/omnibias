@@ -19,7 +19,7 @@ This is a ``delta -> 0`` limit yielding a smooth **derivative** -- it is **not**
 **temperature collapse** -- the ``beta -> inf`` *feasibility penalty* of
 ``omnibias-convex`` / ``-control`` / ``-routing`` (a 0/1 step). Same word, opposite limit: **do not
 conflate** the two (see the ``omnibias-core-concepts`` skill and
-``docs/theory.md``).
+``docs/derivatives.md``).
 
 Honesty labels used throughout: **closed-form** (the sigma / sech / tanh towers
 and the exact integer/rational special-number coefficients) and **numerical**
@@ -157,7 +157,7 @@ try:
 except _PkgNotFound:  # pragma: no cover - bare source checkout
     __version__ = "0.0.0+unknown"
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Limit family exposed as package metadata.
 __lineage__ = "bias collapse"
 
 __all__ = [

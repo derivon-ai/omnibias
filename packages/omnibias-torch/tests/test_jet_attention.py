@@ -192,16 +192,6 @@ def test_attention_matches_autodiff(memory) -> None:
         assert torch.allclose(got[alpha], value, rtol=1e-11, atol=1e-11), alpha
 
 
-def test_attention_value_matches_omnibias_hopfield(memory) -> None:
-    """The block *is* hopfield attention; this module only adds ``d/dx``."""
-    hopfield = pytest.importorskip("omnibias.hopfield.torch.ops")
-    W, b, K, V, x0 = (memory[k] for k in ("W", "b", "K", "V", "x0"))
-    beta = 0.8
-    q = torch.tanh(W @ x0 + b)
-    reference = hopfield.attention(q.unsqueeze(0), K, V, beta=beta).squeeze(0)
-    q_jet = mlp_jet_mv(x0, [(W, b, "tanh")], ORDER)
-    got = jet_attention(q_jet, K, V, DIM, ORDER, beta=beta)[0]
-    assert torch.allclose(got, reference, atol=1e-14)
 
 
 def test_attention_output_lies_in_the_convex_hull_of_the_values(memory) -> None:

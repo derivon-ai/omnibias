@@ -99,7 +99,7 @@ class PenaltyOptions:
     (Terminology: this is the ``beta -> inf`` **feasibility** sense of
     "collapse" -- a 0/1 step; *not* the **founding bias collapse**, the
     multi-bias ``delta -> 0`` limit ``sum_k s_k sigma(z + b_k) -> sigma^(K-1)``
-    that yields a derivative. See ``docs/theory.md`` and
+    that yields a derivative. See ``docs/derivatives.md`` and
     :mod:`omnibias.torch.unit`.)
 
     Attributes

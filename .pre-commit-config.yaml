@@ -30,12 +30,12 @@ repos:
     rev: v1.11.2
     hooks:
       - id: mypy
-        files: '^packages/omnibias-(core|torch|jax|ferminet)/src/.*\.py$'
+        files: '^packages/omnibias-(core|torch|jax)/src/.*\.py$'
         args: ["--strict", "--ignore-missing-imports"]
         additional_dependencies:
           - "numpy>=1.23"
           - "torch>=2.0"
-          # jax / ferminet dependencies are handled via ignore-missing-imports
+          # jax dependencies are handled via ignore-missing-imports
           # at the workspace level; pre-commit env stays small.
 
   - repo: local

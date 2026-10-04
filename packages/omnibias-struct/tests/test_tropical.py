@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 """Tropical-log homotopy G1–G4 (theory 01-08)."""
 
@@ -117,11 +117,15 @@ def test_g4_path_follow_beats_anneal_evals() -> None:
 
 
 def test_anneal_schedule_duck_type() -> None:
-    pytest.importorskip("omnibias.discrete")
-    from omnibias.discrete import AnnealSchedule
+    class Schedule:
+        beta0 = 1.0
+        beta_growth = 2.0
+        stages = 4
+        steps = 6
+        step_safety = 0.9
 
-    wired = as_tropical_schedule(AnnealSchedule.fast())
-    assert wired.betas() == AnnealSchedule.fast().betas()
+    wired = as_tropical_schedule(Schedule())
+    assert wired.betas() == [1.0, 2.0, 4.0, 8.0]
 
 
 def test_g4_parity() -> None:

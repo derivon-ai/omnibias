@@ -15,14 +15,13 @@ from math import comb, factorial
 import pytest
 from omnibias.core.contraction import (
     DEFAULT_SUPPORT_BUDGET,
-    support_jet_count,
-    polylaplacian_support_terms,
     polylaplacian_multinomial_terms,
     polylaplacian_normalizer,
+    polylaplacian_support_terms,
     select_mode,
+    support_jet_count,
 )
 from omnibias.core.multi_index import multi_index_factorial
-
 
 # -- polylaplacian_normalizer ---------------------------------------------- #
 

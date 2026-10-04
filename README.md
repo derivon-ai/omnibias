@@ -1,398 +1,319 @@
 # omnibias
 
+<picture>
+  <source media="(max-width: 600px)" srcset="docs/img/omnibias-hero-mobile.svg">
+  <img src="docs/img/omnibias-hero.svg" width="1280" alt="omnibias. Math that trains. Differentiate deeper. Make decisions differentiable.">
+</picture>
+
 [![CI](https://github.com/derivon-ai/omnibias/actions/workflows/ci.yml/badge.svg)](https://github.com/derivon-ai/omnibias/actions/workflows/ci.yml)
-[![Docs](https://img.shields.io/badge/docs-omnibias.ai-blue)](https://omnibias.ai/)
-[![Website](https://img.shields.io/badge/website-derivon.ai-0b7285)](https://derivon.ai/)
-[![Core license](https://img.shields.io/badge/core-Apache--2.0-success.svg)](LICENSES/Apache-2.0.txt)
-[![Certified tier](https://img.shields.io/badge/certified%20tier-AGPL--3.0%20or%20commercial-blue.svg)](LICENSING.md)
-[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12%20%7C%203.13%20%7C%203.14-blue)](pyproject.toml)
-[![PyPI](https://img.shields.io/badge/PyPI-42%20distributions-orange)](https://pypi.org/search/?q=omnibias)
+[![Docs](https://img.shields.io/badge/read-the_docs-087f72)](https://omnibias.ai/)
+[![PyPI](https://img.shields.io/pypi/v/omnibias-torch?label=PyPI%20%C2%B7%20torch)](https://pypi.org/project/omnibias-torch/)
+[![Open core](https://img.shields.io/badge/core-Apache--2.0-087f72)](LICENSING.md)
+[![Commercial licensing](https://img.shields.io/badge/advanced_engines-AGPL_or_commercial-5964b4)](COMMERCIAL-LICENSE.md)
 
-> **Closed-form n-th derivatives of activations — bit-identical on PyTorch, JAX, and Keras 3.**
+**High-order derivatives without nested spatial autodiff.**
 
-omnibias computes `σ^(n)(z)` — the *n*-th derivative of a base activation — in
-**one forward pass**, for arbitrary `n`, at float64 machine precision. Nested
-autodiff grows exponentially in cost and accumulates round-off; finite
-differences lose roughly *n* digits by the *n*-th derivative. The same
-polynomial coefficients ship from a pure-Python core, so every backend is
-**bit-identical by construction**.
+Train physics-informed networks with derivative towers—and extend them with
+smooth, trainable decisions.
 
-<p align="center">
-  <img src="docs/img/accuracy_cliff.png" alt="Closed-form vs finite-difference n-th derivative accuracy" width="49%">
-  <img src="docs/img/derivative_tower.png" alt="Closed-form derivative tower of tanh" width="49%">
-</p>
+omnibias turns activation identities into derivative towers, trainable fields
+and smooth decisions. It **removes the nested high-order spatial-autodiff
+bottleneck for supported models**: derivatives travel forward through the
+network, without recursively growing backward graphs. Parameter gradients
+remain available for learning. Build high-order physics residuals, regional
+models and soft trees on the same mathematical foundation.
 
-**Left:** finite differences fall off a cliff; the closed form stays at machine
-epsilon. **Right:** the entire derivative tower of `tanh` from a single forward
-pass.
+**[Start with a PINN →](docs/pinn.md)** ·
+**[Choose an API →](docs/derivatives.md)** ·
+**[What this unlocks →](docs/capabilities.md)** ·
+**[Commercial support →](mailto:info@derivon.ai)**
 
----
+## Differentiate deeper
 
-## The idea: bias collapse
+Repeated spatial autodiff can make graph construction, memory and evaluation
+explode as derivative order rises. That growth can make a
+high-order PINN residual impractical before training begins.
 
-Trainable *K* soft decision planes, spaced by a bias gap `δ`. As `δ → 0` they
-coalesce into a **single** hyperplane whose response is exactly
-`σ^(K−1)` — the founding limit of the library. (A different limit,
-`β → ∞` temperature collapse, hardens soft gates to 0/1 decisions; the two
-must never be conflated.)
+omnibias evaluates supported `σ⁽ⁿ⁾(z)` directly, then composes Taylor jets
+through the network. Sigmoid and tanh need **one base activation evaluation
+plus a derivative polynomial**. Specialized operator contractions avoid
+building derivative tensors that the residual never needs. This bypasses the
+nested graph bottleneck. High-order numerical instability is checked separately
+against independent references: direct formulas can still suffer floating-point
+cancellation, and their arithmetic grows with order.
 
-<p align="center">
-  <img src="docs/img/bias_collapse.png" alt="Bias collapse: K parallel soft hyperplanes coalesce into sigma^(K-1)" width="95%">
-</p>
+The founding idea is **bias collapse**. A properly weighted, normalized pack
+of nearby activations converges to a derivative:
 
-That identity is why omnibias can expose six typed `OperatorBlock` roles —
-`identity | grad | laplacian | derivative | band | integral` — with the
-**integral** role the closed-form antiderivative window
-`S(z+b_hi)−S(z+b_lo)` (`S′ = σ`), the slab between two parallel planes.
-See [`docs/theory.md`](docs/theory.md) and
-[`docs/operator-surface.md`](docs/operator-surface.md).
+$$
+\lim_{\delta\to0}\frac{1}{\delta^n}
+\sum_{j=0}^{n}(-1)^{n-j}\binom{n}{j}\sigma(z+j\delta)
+=\sigma^{(n)}(z).
+$$
 
----
+The kernels evaluate the analytic limit, avoiding subtraction of nearly equal
+samples. Shared polynomial recurrences supply the backends; Taylor composition
+supplies the network derivatives. **Forward spatial derivatives. Ordinary
+parameter autodiff.**
 
-## Measured performance (CPU, reproducible)
+<details>
+<summary>Watch bias collapse: nearby activations become a derivative</summary>
 
-Every number in this section comes from a committed JSON artifact under
-[`docs/benchmarks/`](docs/benchmarks/), produced by scripts in
-[`benchmarks/`](benchmarks/). Regenerate on any commodity CPU:
+![Bias collapse, illustrated with tanh](docs/img/explain/bias-collapse.gif)
 
-```bash
-uv run python benchmarks/laplacian_scaling.py
-uv run python benchmarks/polylaplacian_order.py
-uv run python benchmarks/derivative_order.py
-uv run python benchmarks/optimizer_pinn.py
-# PINN four-gap suite (smoke by default; add --full for multi-seed acceptance)
-uv run python benchmarks/causal_marching.py
-uv run python benchmarks/geometry_sdf.py
-uv run python benchmarks/operator_zero_shot.py
-uv run python benchmarks/spectral_bias_fbpinn.py
-uv run python docs/img/generate_figures.py
-```
+[Static image](docs/img/explain/bias-collapse.png). The animation illustrates
+the limit; runtime kernels evaluate its analytic formula directly.
+</details>
 
-### Laplacian vs folx / JAX / PyTorch
+| Build with | What omnibias provides |
+| --- | --- |
+| **High-order physics residuals** | Directional jets, mixed partials, specialized Laplacian and repeated-Laplacian paths |
+| **Field calculus** | Gradients, divergence, curl, Hessians and reusable field state |
+| **Trainable decisions** | Soft partitions, differentiable selection and structured computation |
+| **Curvature-aware learning** | Parameter-curvature primitives and optimizers for supported objectives |
+| **Scoped numerical guarantees** | Outward-rounded intervals, Taylor models and checker-backed certificates |
 
-One-layer field `f(x) = c · tanh(Wx + β)` on a batch of 64 points,
-`H = 32`, float64, CPU. Absolute omnibias time stays ~**0.004 ms** while `D`
-grows; nested dense Hessians do not.
+PyTorch and JAX provide network jets; Keras 3 provides activation and operator
+layers. The [capability map](docs/capabilities.md) connects each mechanism to
+its API and evidence.
 
-| `D` | omnibias | folx | `jax.hessian` | `torch.func.hessian` | max ‖Δ‖ vs `jax.hessian` |
-|---|---:|---:|---:|---:|---:|
-| 3 | 0.004 ms | 2.9× | 5.9× | 298× | 2×10⁻¹⁶ |
-| 12 | 0.006 ms | 2.4× | 7.1× | 336× | 4×10⁻¹⁶ |
-| 30 | 0.004 ms | 23× | 93× | 589× | 1×10⁻¹⁵ |
-| **60** | **0.004 ms** | **6.6×** | **211×** | **923×** | **2×10⁻¹⁵** |
+## Derivative performance, by workload
 
-Source: [`docs/benchmarks/laplacian_scaling.json`](docs/benchmarks/laplacian_scaling.json).
+Activation derivatives, direct Laplacians and general deep-network jets are
+different workloads. These specialized paths exploit activation identities
+and operator contractions. [Full measurements](docs/performance.md) include
+accuracy, compilation, reproduction commands and every baseline.
 
-<p align="center">
-  <img src="docs/img/bench_laplacian_scaling.png" alt="Laplacian cost and speedup vs D" width="95%">
-</p>
+| Workload | omnibias | Baseline | Speedup |
+| --- | ---: | ---: | ---: |
+| Activation derivative · `n = 8` | 0.1405 ms | 30.9908 ms · Torch nested autograd | **220×** |
+| Laplacian · `D = 60` | 0.0227 ms | 0.5544 ms · JAX dense Hessian | **24.4×** |
+| Repeated Laplacian · `Δ³` | 0.0134 ms | 66.4122 ms · JAX dense nested | **4,974×** |
+| Repeated Laplacian · `Δ⁴` | 0.0129 ms | 64.8343 ms · folx nested | **5,036×** |
 
-### Iterated Laplacian `Δᵏ` — where nested autodiff collapses
+![Activation derivatives, Laplacians and repeated Laplacians compared with autodiff baselines on their respective workloads.](docs/img/specialized-derivatives.svg)
 
-Same field, `D = 16`. Omnibias is flat in order `k`; nesting folx or a dense
-Hessian explodes.
+Float64 CPU, nine timed repeats. Activation: 20,000 tanh inputs, Torch eager.
+Laplacian: 64 points, 32 hidden units. Repeated Laplacian: 32 points, 16 hidden
+units, 16 dimensions. Operator comparisons use JAX JIT with **runtime inputs
+and weights**; compilation is recorded separately. All successful methods
+pass independent 80-digit accuracy checks at sampled inputs. Dense `Δ⁴` reached
+the 3 GiB process budget; no speedup is claimed for that unfinished run.
 
-| `k` | omnibias | folx-nested | speedup | dense-nested | speedup |
-|---|---:|---:|---:|---:|---:|
-| 1 | 0.0045 ms | 0.106 ms | 24× | 0.19 ms | 42× |
-| 2 | 0.0045 ms | 0.138 ms | 31× | 0.64 ms | 142× |
-| 3 | 0.0045 ms | 1.11 ms | **246×** | 59 ms | **13,100×** |
-| **4** | **0.024 ms** | **111 ms** | **4,660×** | **4315 ms** | **181,000×** |
+[Activation data](docs/benchmarks/derivative_order.json) ·
+[Laplacian data](docs/benchmarks/laplacian_scaling.json) ·
+[Repeated-Laplacian data](docs/benchmarks/polylaplacian_order.json)
 
-Agreement with the dense nested Hessian: `≤ 4×10⁻¹³` at `k=3`,
-`≤ 8×10⁻¹¹` at `k=4`. Source:
-[`docs/benchmarks/polylaplacian_order.json`](docs/benchmarks/polylaplacian_order.json).
+The independent deep-MLP comparison remains available in the
+[performance guide](docs/performance.md#general-deep-network-jets), including
+JAX Taylor-mode AD and cases where it wins.
 
-<p align="center">
-  <img src="docs/img/bench_polylaplacian.png" alt="Polylaplacian cost vs order k" width="70%">
-</p>
+## High-dimensional physics without a full derivative tensor
 
-### `σ^(n)` cost vs nested autograd
+The one-layer identity is direct:
 
-20k points, tanh, float64. Closed-form stays ~0.1 ms; nested autograd grows
-to **48 ms at order 8** (~350×). Torch and JAX agree to float64 ULP.
-Source: [`docs/benchmarks/derivative_order.json`](docs/benchmarks/derivative_order.json).
+$$
+\Delta^k f(x) = \sum_h c_h\,\sigma^{(2k)}(w_h\cdot x+\beta_h)\,\lVert w_h\rVert^{2k}.
+$$
 
-<p align="center">
-  <img src="docs/img/cost_vs_order.png" alt="Cost of n-th derivative: closed-form vs nested autograd" width="49%">
-  <img src="docs/img/parity_heatmap.png" alt="torch vs jax bit-parity heatmap" width="49%">
-</p>
+No dense Hessian or order-`2k` spatial tensor is needed. Deep MLPs use
+`deep_field_laplacian` to propagate the Laplacian directly, with **no fixed
+input-dimension ceiling** and retained parameter gradients. Both backends
+exercise this path at **5,000 dimensions**, beyond the full mixed-jet budget.
+For fixed layer widths and depth, work and memory grow linearly with dimension.
 
-### Off-band GPU tier (labelled, not required for the claims above)
+In automatic mode, deep repeated Laplacians use exact support enumeration
+while it fits the configured budget, then a reported directional estimator. Full
+mixed jets still have combinatorial output size. The
+[5,000-dimensional training example](docs/derivatives.md#a-deep-laplacian-in-5000-dimensions)
+and [operator guarantees](docs/guarantees.md#laplacians-without-the-mixed-jet-dimension-ceiling)
+explain which path to choose.
 
-On a data-center GPU (`H=256`, `B=4096`, `D=240`) the same Laplacian is
-**68× / 199×** faster than `jax.hessian` / `torch.func.hessian` and uses
-**63× / 108×** less memory; polylaplacian `Δ³` is **518×** faster than
-folx-nested (which OOMs at `Δ⁴`). Full tables:
-[`docs/complexity.md`](docs/complexity.md). These GPU numbers are transcribed
-off-band; the **CPU tables above are the ones you can re-run**.
+## Install, then differentiate
 
----
-
-## Second-order optimizers
-
-`omnibias.torch.optim` ships **exact-curvature** drop-in `torch.optim.Optimizer`
-subclasses — CubicNewton, CubicGaussNewton, TrustRegionNewtonCG,
-JetSubspaceTensor, NaturalGradient, DiagonalCurvature, FrugalCurvature, KFAC,
-JetLBFGS, ConformalSymplectic, StochasticNewtonCG — plus functional
-Gauss–Newton / ARC cores. The residual of a PINN is built from closed-form
-`σ^(n)`, so the Gauss–Newton / Hessian products are autodiff-exact over a
-smooth operator: no nested finite-difference blow-up, no learning rate to
-tune on the ARC methods.
-
-### 1-D Poisson bake-off (this repo, 5 seeds)
-
-| Method | median rel-L2 | median wall |
-|---|---:|---:|
-| Adam (800 steps) | 8.5×10⁻⁴ | 0.38 s |
-| L-BFGS | 2.2×10⁻⁵ | 0.40 s |
-| **Gauss–Newton (QR + Nielsen)** | **4.1×10⁻⁵** | **0.08 s** |
-| Cubic Gauss–Newton | 1.2×10⁻⁴ | 0.71 s |
-| Trust-region Newton-CG | 8.2×10⁻⁴ | 0.19 s |
-
-On this smooth 1-D problem L-BFGS matches Gauss–Newton on accuracy;
-**Gauss–Newton is ~5× faster**. Source:
-[`docs/benchmarks/optimizer_pinn.json`](docs/benchmarks/optimizer_pinn.json).
-
-<p align="center">
-  <img src="docs/img/bench_optimizers.png" alt="Optimizer accuracy vs wall-clock on 1-D Poisson" width="70%">
-</p>
-
-### Where curvature wins harder — and where Adam still wins
-
-On six PDE PINNs (CPU, 5 seeds; see [`docs/benchmarks.md`](docs/benchmarks.md)),
-`cubic_gauss_newton` reaches **1.5×10⁻⁸** rel-L2 on 1-D Poisson vs Adam's
-**1.5×10⁻⁵**, and wins every PDE in that table. Inverse coefficient recovery:
-**0.02%** error vs L-BFGS **17%**.
-
-**Honest negatives** (same page): on data-only FNO Burgers and GPT-2
-iso-wall-clock, a tuned Adam/AdamW still wins. Exact full-Hessian methods are
-for PINNs, operator learning with physics residuals, and small/medium smooth
-objectives — not a universal Adam replacement at LLM scale. That honesty is
-the point.
-
-### PINN four-gap closure (CPU, multi-seed, gated)
-
-Four absolute acceptance gates — causality, SDF geometry, parametric operator
-zero-shot, and spectral bias — all pass on committed `--full` JSON under
-[`docs/benchmarks/`](docs/benchmarks/). Matrix:
-[`docs/benchmarks/pinn_four_gap_matrix.md`](docs/benchmarks/pinn_four_gap_matrix.md).
-
-| Gap | Best-arm headline (`--full`, 5 seeds, float64 CPU) | Artifact |
-|---|---|---|
-| Causality | **heat**: `whole_interval` ≈ 9.4×10⁻³; **reaction** (`rho=12`): `causal_marching` ≈ 8.4×10⁻² beats whole ≈ 0.99 | [`causal_marching.json`](docs/benchmarks/causal_marching.json) |
-| Geometry | Disk hard skill ≈ 0.91; boundary max\|u−g\| ~10⁻¹⁶ by construction | [`geometry_sdf.json`](docs/benchmarks/geometry_sdf.json) |
-| Operators | Conditioned median rel-L2 1.48×10⁻² < unconditioned 1.86×10⁻² and residual PINN 1.85×10⁻² | [`operator_zero_shot.json`](docs/benchmarks/operator_zero_shot.json) |
-| Spectral | One-shot `lstsq` median rel-L2 ≈ 5.2×10⁻⁹ through f=16 | [`spectral_bias_fbpinn.json`](docs/benchmarks/spectral_bias_fbpinn.json) |
-
-Smoke (`*_smoke.json`) is the CI wiring gate; use `--full` before claiming a
-multi-seed result. Shared helpers: [`benchmarks/_gates.py`](benchmarks/_gates.py).
-
----
-
-## Packages (42)
-
-```mermaid
-flowchart TB
-  subgraph tierP ["Tier P — Apache-2.0 (28)"]
-    core[omnibias-core]
-    torch[omnibias-torch]
-    jax[omnibias-jax]
-    keras[omnibias-keras]
-    fields[omnibias-fields]
-    pinn[omnibias-pinn]
-    geom[omnibias-geometry]
-    core --> torch
-    core --> jax
-    core --> keras
-    core --> fields
-    fields --> pinn
-    fields --> geom
-  end
-  subgraph tierC ["Tier C — AGPL-or-Commercial (14)"]
-    verify[omnibias-verify]
-    sos[omnibias-sos]
-    discrete[omnibias-discrete]
-    qubo[omnibias-qubo]
-    verify --> discrete
-    sos --> discrete
-    discrete --> qubo
-  end
-  core -.-> verify
-```
-
-**Invariant, enforced in CI:** no Apache package may depend on an AGPL package.
-A permissive install can never pull copyleft code into your tree.
-
-### Curated public core
-
-| Package | One-liner |
-|---|---|
-| [`omnibias-core`](packages/omnibias-core) | Pure-Python Eulerian / Legendre / Hermite coefficients + `ActivationSpec`. No torch/jax. |
-| [`omnibias-torch`](packages/omnibias-torch) | PyTorch: OMBU, OperatorBlock, jets, exact-curvature optimizers. |
-| [`omnibias-jax`](packages/omnibias-jax) | JAX: closed-form Laplacian / Hessian / polylaplacian, jet kernels. |
-| [`omnibias-ferminet`](packages/omnibias-ferminet) | FermiNet / DeepQMC bridge: folx-compatible local kinetic energy. |
-| [`omnibias-fields`](packages/omnibias-fields) | Field substrate: `FieldState`, grad / div / curl / lap / hess / jacobian. |
-| [`omnibias-pinn`](packages/omnibias-pinn) | Physics-informed NNs: hard-conservation cages, mesh-free `solver`, causal `train`, SDF `domain`, DeepONet/FNO `operator`. |
-| [`omnibias-geometry`](packages/omnibias-geometry) | Riemannian geometry + exterior calculus; gauge theory submodule. |
-| [`omnibias-keras`](packages/omnibias-keras) | Keras 3 unified backend (TF / JAX / torch). |
-
-### Physics, fields & calculus
-
-| Package | One-liner |
-|---|---|
-| [`omnibias-qpinn`](packages/omnibias-qpinn) | Quantum PINNs: Schrödinger / Gross–Pitaevskii / Dirac cages. |
-| [`omnibias-fractional`](packages/omnibias-fractional) | Fractional calculus (GL / RL / Caputo / spectral) — grid-based, not closed form. |
-| [`omnibias-measure`](packages/omnibias-measure) | Autograd-native measure integration and layer-cake primitives. |
-| [`omnibias-score`](packages/omnibias-score) | Score / SDE: score, Itô generator, Fokker–Planck (+ CNF flow submodule). |
-| [`omnibias-variational`](packages/omnibias-variational) | Least-action / Euler–Lagrange / Noether / symplectic integrators. |
-| [`omnibias-difference`](packages/omnibias-difference) | Founding `δ→0` register: certified FD → derivative, umbral calculus. |
-| [`omnibias-qcalculus`](packages/omnibias-qcalculus) | q-calculus; `q→1` recovers the ordinary tower. |
-| [`omnibias-timescale`](packages/omnibias-timescale) | Hilger time-scale calculus unifying continuous and discrete. |
-| [`omnibias-holonomic`](packages/omnibias-holonomic) | D-finite / Ore algebra, Gosper, creative telescoping. |
-| [`omnibias-curvature`](packages/omnibias-curvature) | Closed-form Fisher / Hessian / ExactSAM sharpness-aware training. |
-| [`omnibias-symbolic`](packages/omnibias-symbolic) | Neural-jet equation discovery (library-free SINDy). |
-
-### Differentiable + certified decision layer *(Tier C)*
-
-| Package | One-liner |
-|---|---|
-| [`omnibias-verify`](packages/omnibias-verify) | Certified NN verification: Taylor-model bounds, robustness, Lipschitz. |
-| [`omnibias-dynamics`](packages/omnibias-dynamics) | Validated dynamics: QR-Lohner, Poincaré, certified Lyapunov. |
-| [`omnibias-sos`](packages/omnibias-sos) | Sum-of-Squares / Positivstellensatz with interval LDLᵀ certificates. |
-| [`omnibias-formal`](packages/omnibias-formal) | Mathlib-backed formal checker (`mathlib_verified` tier). |
-| [`omnibias-discrete`](packages/omnibias-discrete) | Discrete-opt substrate: anneal, round, certify gap. |
-| [`omnibias-qubo`](packages/omnibias-qubo) | Differentiable + certified QUBO / Ising / max-cut. |
-| [`omnibias-submodular`](packages/omnibias-submodular) | Multilinear extension, continuous greedy, (1−1/e) certificates. |
-| [`omnibias-combinatorics`](packages/omnibias-combinatorics) | Matching / flow / matroid layers with LP-dual gap certificates. |
-| [`omnibias-nphard`](packages/omnibias-nphard) | Named NP-hard families (QAP / GAP / scheduling) with honest gaps. |
-| [`omnibias-routing`](packages/omnibias-routing) | Certified TSP relaxation + Neumaier–Shcherbina LP gap. |
-| [`omnibias-convex`](packages/omnibias-convex) | Differentiable LP / QP with verified optimality enclosures. |
-| [`omnibias-logic`](packages/omnibias-logic) | Weighted MaxSAT / #SAT with count enclosures. |
-| [`omnibias-control`](packages/omnibias-control) | CBF-QP safety filter + recoverable-set certificate. |
-| [`omnibias-tab`](packages/omnibias-tab) | Soft decision-tree ensembles; certified; vs LightGBM. |
-
-### Learning primitives & tooling
-
-| Package | One-liner |
-|---|---|
-| [`omnibias-binary`](packages/omnibias-binary) | Binary / ternary / k-bit quantization with closed-form tanh-β backward. |
-| [`omnibias-boolean`](packages/omnibias-boolean) | Differentiable Boolean algebra, ANF / Walsh spectra. |
-| [`omnibias-spiking`](packages/omnibias-spiking) | LIF / IF neurons with closed-form surrogate gradients. |
-| [`omnibias-hopfield`](packages/omnibias-hopfield) | Modern Hopfield / attention with closed-form LSE Jacobian / Hessian. |
-| [`omnibias-struct`](packages/omnibias-struct) | Soft Viterbi / CTC / CKY; logsumexp_β differentiated by the softplus tower. |
-| [`omnibias-graph`](packages/omnibias-graph) | Spectral graph ops + Gumbel-Sinkhorn / SoftSort. |
-| [`omnibias-partition`](packages/omnibias-partition) | Soft partition-of-unity keystone (`β→∞` hardens). |
-| [`omnibias-shape`](packages/omnibias-shape) | Soft occupancy / coverage fields. |
-| [`omnibias-skills`](packages/omnibias-skills) | Consumer agent-skill library + installer CLI. |
-
-Full version / maturity matrix: [`docs/packages.md`](docs/packages.md).
-
----
-
-## Install
+Install the prepared **RC/alpha release** explicitly for the examples below:
 
 ```bash
-pip install omnibias-torch                 # most common: PyTorch users
-pip install omnibias-jax                   # JAX-only users
-pip install omnibias-ferminet              # FermiNet bridge (pulls jax + core)
-pip install omnibias-core                  # pure math, no backend
-pip install "omnibias-pinn[torch]"         # PINN extension
-pip install "omnibias-keras[jax]"          # Keras 3 unified backend
+python -m pip install --pre "omnibias-torch==0.5.0rc1"
+# The soft-region example also uses the AGPL-or-commercial partition package:
+python -m pip install --pre "omnibias-partition[torch]==0.1.0a2"
 ```
 
-> **Release-candidate phase.** Distributions are staged on
-> [TestPyPI](https://test.pypi.org/) ahead of the tagged `0.4.0` PyPI upload.
-> Until then:
->
-> ```bash
-> pip install --index-url https://test.pypi.org/simple/ \
->   --extra-index-url https://pypi.org/simple/ omnibias-torch
-> ```
+JAX and Keras users can select `omnibias-jax==0.5.0rc1` or
+`omnibias-keras==0.0.2a1`. Existing published consumer users should keep the
+[tested historical constraints](scripts/constraints-published.txt) until compatible
+successor releases are available. These are prereleases, and alpha-only packages
+may be selected without `--pre`; the [release guide](RELEASE.md) explains resolver
+behavior and the compatibility boundary.
 
-Development checkout:
+For development from source:
 
 ```bash
-git clone https://github.com/derivon-ai/omnibias && cd omnibias
-uv sync --all-extras --dev
+git clone https://github.com/derivon-ai/omnibias.git
+cd omnibias
+uv sync --all-packages --group docs
+# Run the examples with uv run python.
 ```
 
-## 30-second tour
+**A fourth spatial derivative, still trainable.** The jet stores Taylor
+coefficients; `jet_to_tower` restores ordinary derivatives before the loss.
 
 ```python
 import torch
-from omnibias.torch import OMBU, OperatorBlock, cmbLinear
+from omnibias.torch.jet import jet_to_tower, mlp_jet
 
-ombu = OMBU(num_channels=4, K=2, base="tanh")
-out = ombu(torch.zeros(8, 4))
+weight = torch.tensor([[0.7], [-0.4]], requires_grad=True)
+bias = torch.tensor([0.1, 0.2], requires_grad=True)
+readout = torch.tensor([[1.0, -0.5]], requires_grad=True)
+layers = [(weight, bias, "tanh"), (readout, None, None)]
+x = torch.linspace(-1.0, 1.0, 32).reshape(-1, 1)
 
-# Six roles: identity | grad | laplacian | derivative | band | integral
-lap = OperatorBlock(channels=8, op="laplacian", base="gaussian")
-fc = cmbLinear(in_features=128, out_features=64, op="identity", base="tanh")
+tower = jet_to_tower(mlp_jet(x, torch.ones_like(x), layers, order=4))
+u, du, d2u, d3u, d4u = tower.unbind(0)
+loss = (d4u - 24.0).square().mean()
+loss.backward()
+assert weight.grad is not None
 ```
 
+The [PINN guide](docs/pinn.md) adds boundary conditions and an optimizer step;
+the [derivative guide](docs/derivatives.md) covers mixed partials and JAX.
+A derivative demonstration is the starting point for a validated PDE solution.
+
+## Make decisions differentiable
+
+A smooth if/else learns its routing: `g(x) = sigmoid(β(w·x − t))`.
+Two branches become `(1 − g)·f₀(x) + g·f₁(x)`, with gradients into thresholds,
+split directions and branch models. Multiple splits form nonnegative regional
+weights that sum to one. Conditional structure becomes trainable.
+
+**A two-leaf soft tree with trainable regional models:**
+
 ```python
-import jax.numpy as jnp
-from omnibias.jax import get_activation, neural_field_value_grad_hessian
+import torch
+from omnibias.partition.torch import combine, partition_weights_arrays
 
-spec = get_activation("tanh")
-print(spec.fastpath(jnp.array([0.5]), 3))  # 3rd derivative, closed form
+features = torch.tensor([[-0.8], [0.4], [1.2]])
+split = torch.tensor([[1.0]], requires_grad=True)
+threshold = torch.tensor([0.0], requires_grad=True)
+experts = torch.nn.Linear(1, 2)
 
-H, D = 16, 3
-val, grad, hess = neural_field_value_grad_hessian(
-    jnp.zeros(D), jnp.ones((H, D)) * 0.1, jnp.zeros(H), jnp.ones(H) / H, 0.0, "tanh"
+memberships = partition_weights_arrays(
+    split, threshold, features, beta=4.0, depth=1
 )
+prediction = combine(memberships, experts(features))
+prediction.square().mean().backward()
+assert split.grad is not None and experts.weight.grad is not None
 ```
 
-```python
-from omnibias.torch.optim import CubicGaussNewton, TrustRegionNewtonCG, KFAC
-# Drop-in torch.optim.Optimizer subclasses — exact curvature, matrix-free.
-```
+Use the same mechanism for neural feature encoders, mixtures of regional
+models, and soft-tree heads. The external `omnibias-tab` consumer builds
+GBM-style Newton boosting and trainable neural/tree compositions on these
+primitives; those are distinct training paths, not an automatic conversion
+of an existing hard GBM into a differentiable network.
 
-## Notebooks & docs
+**Temperature hardening** (`β → ∞`) approaches a hard partition away from
+ties. It is distinct from bias collapse (`δ → 0`): a smooth branch trains with
+gradients; an exact hard jump stays discontinuous. The
+[partition API](docs/api/partition.md) covers regional models and hardening.
 
-- Runnable gallery: [`notebooks/`](notebooks/) (23 walkthroughs)
-- Docs site: <https://omnibias.ai/>
-- Company & platform: <https://derivon.ai/>
-- Theory primer: [`docs/theory.md`](docs/theory.md)
-- Operator surface (canonical capability matrix): [`docs/operator-surface.md`](docs/operator-surface.md)
-- Scope & guarantees (what is closed-form vs autodiff vs numerical): [`docs/scope-and-guarantees.md`](docs/scope-and-guarantees.md)
-- Complexity derivation: [`docs/complexity.md`](docs/complexity.md)
-- Cookbook: [`docs/cookbook/`](docs/cookbook/)
-- Discovery handbook: [`docs/handbook/`](docs/handbook/)
+<details>
+<summary>Watch temperature collapse: smooth gates become sharper decisions</summary>
 
-Cross-backend parity: **509** tests passed in `tests/` on every release
-(float64 ULP agreement torch ↔ jax ↔ keras).
+![Temperature collapse and a mixture of regional experts](docs/img/explain/temperature-collapse.gif)
 
-## Licensing
+[Static image](docs/img/explain/temperature-collapse.png). Finite temperature
+keeps the route smooth; the hard limit needs an explicit tie policy.
+</details>
 
-**Two tiers** — see [`LICENSING.md`](LICENSING.md):
+## Math that trains
 
-- **Tier P — [Apache-2.0](LICENSES/Apache-2.0.txt) (28 packages).** Derivative
-  tower and its consumers. Use in closed-source or hosted products with **no**
-  copyleft obligation. **You never need a commercial licence for these.**
-- **Tier C — AGPL-3.0-or-later OR commercial (14 packages).** Certified-decision
-  layer (`verify`, `sos`, `discrete`, `qubo`, …). Free under the AGPL (including
-  §13 network use); a [commercial licence](COMMERCIAL-LICENSE.md) removes those
-  obligations — email **<info@derivon.ai>**.
+Derivative-aware residuals also enable **curvature-aware optimization**.
+`omnibias.torch.optim` offers Gauss–Newton, cubic regularization, trust-region
+Newton-CG, natural-gradient and KFAC methods. Parameter curvature is computed
+on the trainable residual; exact Hessian, Gauss–Newton and factorized
+approximations remain distinct choices. The [curvature guide](docs/capabilities.md#curvature-aware-training)
+explains their scope and preserves the historical optimizer evidence.
+
+The external **omnibias-pinn** consumer builds four complementary routes on
+this foundation:
+
+| Training obstacle | Constructive route |
+| --- | --- |
+| Time-dependent residuals compete across an interval | Gated causal marching with window handoff |
+| Curved boundaries are difficult to enforce by penalties | Distance-based hard boundary ansätze |
+| Each physical parameter requires another solve | Conditioned neural operators |
+| Gradient descent underfits high frequencies | Multilevel representations and a one-shot least-squares route |
+
+These routes have [historical acceptance evidence](docs/capabilities.md#four-pinn-integration-routes),
+with explicit workloads and remaining limits. They complement the derivative
+engine; no single derivative formula guarantees that every PDE will train.
+
+## Guarantees with a stated scope
+
+Outward-rounded intervals and Taylor models bound supported quantities on
+stated domains. Certificates carry their assumptions; digests protect
+integrity, and verification flags require a checker to pass. A sampled
+residual alone is not a global solution proof. Read the
+[guarantees](docs/guarantees.md) for precision, operator and certificate scope.
+
+## A small foundation, room for your application
+
+Sixteen distributions keep shared algebra, backends and reusable primitives
+here. Solvers and products live in separate repositories. Start with a backend;
+add fields, partitions or curvature when your model needs them.
+
+<!-- BEGIN GENERATED PACKAGE INVENTORY -->
+
+| Distribution | Version | License |
+| --- | --- | --- |
+| [omnibias-binary](packages/omnibias-binary/) | 0.1.0a2 | Apache-2.0 |
+| [omnibias-boolean](packages/omnibias-boolean/) | 0.1.0a2 | Apache-2.0 |
+| [omnibias-convex](packages/omnibias-convex/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-core](packages/omnibias-core/) | 0.5.0rc1 | Apache-2.0 |
+| [omnibias-curvature](packages/omnibias-curvature/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-difference](packages/omnibias-difference/) | 0.1.0a2 | Apache-2.0 |
+| [omnibias-discrete](packages/omnibias-discrete/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-fields](packages/omnibias-fields/) | 0.2.0rc1 | Apache-2.0 |
+| [omnibias-graph](packages/omnibias-graph/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-jax](packages/omnibias-jax/) | 0.5.0rc1 | Apache-2.0 |
+| [omnibias-keras](packages/omnibias-keras/) | 0.0.2a1 | Apache-2.0 |
+| [omnibias-partition](packages/omnibias-partition/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-qcalculus](packages/omnibias-qcalculus/) | 0.1.0a2 | Apache-2.0 |
+| [omnibias-sos](packages/omnibias-sos/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-struct](packages/omnibias-struct/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
+| [omnibias-torch](packages/omnibias-torch/) | 0.5.0rc1 | Apache-2.0 |
+
+<!-- END GENERATED PACKAGE INVENTORY -->
+
+Generated from package metadata; the [package guide](docs/packages.md) includes
+maturity and dependencies. Shared coefficients support tested backend parity,
+not universal bit identity across devices. Full mixed jets still have
+combinatorial size; request the directional derivative or operator you need.
+
+## Open core. A commercial path when you need one.
+
+The derivative and field packages are **Apache-2.0**, including commercial and
+closed-source use under its terms. The advanced optimization and decision tier offers
+**AGPL-3.0-or-later or a commercial agreement**. Historical Apache grants remain
+intact; see the [transition](docs/license-transition.md). Package boundaries and
+license metadata are checked in CI; see [Licensing](LICENSING.md) for the exact grants.
 
 ## Contact
 
-omnibias is built and maintained by **[Derivon](https://derivon.ai)**, which
-holds the copyright. How decisions get made, and who can make them, is written
-down in [`GOVERNANCE.md`](GOVERNANCE.md) and [`MAINTAINERS.md`](MAINTAINERS.md).
+omnibias is built and maintained by **[Derivon](https://derivon.ai/)**.
+See [Governance](GOVERNANCE.md) and [Maintainers](MAINTAINERS.md) for how
+project decisions are made.
 
 | Topic | Contact |
-|---|---|
-| Commercial licence, support, legal | <info@derivon.ai> |
-| Technical questions, partnerships | <info@derivon.ai> |
-| Security | [`SECURITY.md`](SECURITY.md) |
-| Questions | [GitHub Discussions](https://github.com/derivon-ai/omnibias/discussions) |
-| Bugs | [GitHub Issues](https://github.com/derivon-ai/omnibias/issues) |
+| --- | --- |
+| Commercial licensing, integration and support | [info@derivon.ai](mailto:info@derivon.ai) |
+| Technical questions and partnerships | [info@derivon.ai](mailto:info@derivon.ai) |
+| Bug reports and feature requests | [GitHub Issues](https://github.com/derivon-ai/omnibias/issues) |
+| Security reports | [Security policy](SECURITY.md) |
 
-Contributions welcome under the [CLA](docs/CLA.md) (you keep copyright; Derivon
-gets a perpetual licence to ship under Apache, AGPL, and commercial terms).
-See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT.md).
+Contributions are welcome under the [CLA](CLA.md). Read
+[Contributing](CONTRIBUTING.md), the [Code of Conduct](CODE_OF_CONDUCT.md),
+and the [agent guide](AGENTS.md) before making a change.
 
 ## Citation
 
@@ -401,16 +322,9 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDU
   title   = {omnibias: closed-form n-th derivatives of activations},
   author  = {Grigoryants, Vardan},
   year    = {2026},
-  version = {0.4.0},
+  version = {0.5.0rc1},
   url     = {https://github.com/derivon-ai/omnibias}
 }
 ```
 
-GitHub's "Cite this repository" button reads [`CITATION.cff`](CITATION.cff).
-A Zenodo DOI will be added on the first tagged release.
-
-## Star history
-
-<a href="https://star-history.com/#derivon-ai/omnibias&Date">
-  <img src="https://api.star-history.com/svg?repos=derivon-ai/omnibias&type=Date" alt="Star History Chart" width="70%">
-</a>
+GitHub's “Cite this repository” button reads [CITATION.cff](CITATION.cff).

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-jax"
-version = "0.4.0"
+version = "0.5.0rc1"
 description = "JAX backend for omnibias: closed-form n-th derivative activation kernels (sigmoid via Eulerian polynomials, tanh via Legendre, Gaussian via Hermite), neural-field Laplacian / Hessian primitives, and Born-Oppenheimer derivative tools for variational quantum Monte Carlo."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -38,7 +38,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "omnibias-core>=0.2.0",
+    "omnibias-core>=0.5.0rc1",
     "jax>=0.4.30",
     "jaxlib>=0.4.30",
     "numpy>=1.23",

@@ -37,6 +37,6 @@ def test_g3_closed_form_requires_trunk() -> None:
 def test_g4_honesty() -> None:
     payload = honesty_payload()
     assert payload["parampinn_package"] is False
-    assert payload["ns_claim"] is False
+    assert payload["global_pde_claim"] is False
     assert payload["stretch_claim"] is False
-    assert "not a ParamPINN" in DISCLAIMER
+    assert "finite network" in DISCLAIMER

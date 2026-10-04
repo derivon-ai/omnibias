@@ -1,0 +1,134 @@
+{
+  "schema": "omnibias/precision-sweep/v1",
+  "generated_utc": "2026-10-03T16:08:04Z",
+  "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+  "versions": {
+    "python": "3.12.13",
+    "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
+    "numpy": "2.4.6",
+    "jax": "0.10.2",
+    "torch": "2.12.1+cu130",
+    "folx": "0.2.30",
+    "mpmath": "1.3.0"
+  },
+  "config": {
+    "activation": "tanh",
+    "dtype": "float64",
+    "device": "cpu",
+    "orders": [
+      12,
+      16
+    ],
+    "points": [
+      0.1,
+      3.0
+    ],
+    "reference": "mpmath.diff(mp.tanh), 80 decimal digits, rounded once to float64",
+    "reference_inputs": "exact binary64 inputs, not decimal-rounded replacements",
+    "execution": "eager closed-form fastpaths; JAX experimental.jet Taylor-mode AD",
+    "scope": "pointwise accuracy only; no timings, training, or exhaustive stability claim",
+    "relative_error": "absolute_error / abs(reference); null when reference is zero"
+  },
+  "rss_mb_at_start": 746.08,
+  "source_revision": "8c436214cd79d3d95eb7754c8a9c0f4a8c7e2806",
+  "source_worktree_dirty": true,
+  "source_revision_kind": "base_commit",
+  "source_sha256": {
+    "benchmarks/precision_sweep.py": "59d6ba17c1e5a572f164972c90a2b991d095a482236c9ac9dd24bfedfed7c805",
+    "benchmarks/_common.py": "bbd724fd6e28d6b4dc1798b3c2ed566cccceb7228d0fcd0baf3a1047e5f21c9e",
+    "benchmarks/_reference.py": "f1604d1cc4a98452571b1088c2416d1a28e9afaceced333dde8b24d27b5a6947",
+    "packages/omnibias-core/src/omnibias/core/polynomials.py": "725ef59d0f525dceafe13dc158ddae37e7e09b350f3da9268a1a94a7c62a9fab",
+    "packages/omnibias-torch/src/omnibias/torch/fastpath/legendre.py": "903f8c23f90ab119a9efd6a1319988cc0a6af46da1aa574abe51d2362be492ba",
+    "packages/omnibias-jax/src/omnibias/jax/_fastpath.py": "21013374f503dc00c99c50acd57ae9c1e27fe72248f8ce4f117aa4bc1b37093f"
+  },
+  "results": [
+    {
+      "order": 12,
+      "point": 0.1,
+      "reference": 1936457.727357494,
+      "methods": {
+        "torch_closed_form": {
+          "value": 1936457.727357494,
+          "absolute_error": 0.0,
+          "relative_error": 0.0
+        },
+        "jax_closed_form": {
+          "value": 1936457.7273574942,
+          "absolute_error": 2.3283064365386963e-10,
+          "relative_error": 1.202353350473559e-16
+        },
+        "jax_taylor_ad": {
+          "value": 1936457.7273574925,
+          "absolute_error": 1.3969838619232178e-09,
+          "relative_error": 7.214120102841353e-16
+        }
+      }
+    },
+    {
+      "order": 12,
+      "point": 3.0,
+      "reference": 124.56034077196537,
+      "methods": {
+        "torch_closed_form": {
+          "value": 124.56034046837807,
+          "absolute_error": 3.0358729929957917e-07,
+          "relative_error": 2.4372709436895434e-09
+        },
+        "jax_closed_form": {
+          "value": 124.56034046837807,
+          "absolute_error": 3.0358729929957917e-07,
+          "relative_error": 2.4372709436895434e-09
+        },
+        "jax_taylor_ad": {
+          "value": 124.56034077195508,
+          "absolute_error": 1.028865881380625e-11,
+          "relative_error": 8.25997966129674e-14
+        }
+      }
+    },
+    {
+      "order": 16,
+      "point": 0.1,
+      "reference": 16531527531.829138,
+      "methods": {
+        "torch_closed_form": {
+          "value": 16531527531.82914,
+          "absolute_error": 1.9073486328125e-06,
+          "relative_error": 1.153764302264366e-16
+        },
+        "jax_closed_form": {
+          "value": 16531527531.829138,
+          "absolute_error": 0.0,
+          "relative_error": 0.0
+        },
+        "jax_taylor_ad": {
+          "value": 16531527531.829136,
+          "absolute_error": 1.9073486328125e-06,
+          "relative_error": 1.153764302264366e-16
+        }
+      }
+    },
+    {
+      "order": 16,
+      "point": 3.0,
+      "reference": -14013.496756064033,
+      "methods": {
+        "torch_closed_form": {
+          "value": -14013.486824646623,
+          "absolute_error": 0.009931417409461574,
+          "relative_error": 7.0870372915054e-07
+        },
+        "jax_closed_form": {
+          "value": -14013.486824646623,
+          "absolute_error": 0.009931417409461574,
+          "relative_error": 7.0870372915054e-07
+        },
+        "jax_taylor_ad": {
+          "value": -14013.496756060393,
+          "absolute_error": 3.639797796495259e-09,
+          "relative_error": 2.5973515817315306e-13
+        }
+      }
+    }
+  ]
+}

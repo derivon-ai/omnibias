@@ -1,9 +1,9 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 """Arrangement graph / Face-Net (theory 02-02, gated).
 
 Sampling is a subgraph. ``beta -> inf`` is temperature collapse, not
-founding ``delta -> 0``. Sound gap, not P vs NP.
+founding ``delta -> 0``. Sound gap.
 """
 
 from __future__ import annotations

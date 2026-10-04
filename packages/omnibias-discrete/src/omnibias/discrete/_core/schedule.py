@@ -1,16 +1,9 @@
 # SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
-r"""The temperature homotopy schedule for the annealed relaxation.
+"""Backend-neutral temperature schedule for differentiable annealing.
 
-Shared by every consumer of the differentiable substrate (``omnibias-qubo``,
-``omnibias.discrete.maxsat``, ...). Holds only data (no backend), so the torch and jax
-relaxation twins consume an identical object.
-
-Terminology: the relaxation this schedule drives hardens ``sigmoid(beta z)`` as
-``beta -> inf`` -- the feasibility / temperature sense of "collapse" (a soft indicator
-becoming a 0/1 step), distinct from the **founding bias collapse** (the multi-bias
-``delta -> 0`` limit to the closed-form derivative ``sigma^(K-1)``; see
-``docs/theory.md``).
+The feasibility limit beta -> inf hardens soft assignments. Founding bias
+collapse is the distinct delta -> 0 limit that extracts activation derivatives.
 """
 
 from __future__ import annotations

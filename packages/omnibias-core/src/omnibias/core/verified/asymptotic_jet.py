@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Derivon
 r"""Verified confluent power/root primitives and exact fixed-product calculus.
 
-These are finite analytic calculations, not a Dulac-map closure theorem.
+These are finite analytic calculations on explicit coefficient data.
 ``power_compensator`` uses the entire beta-moment expansion of
 ``log(x) * integral_0^1 exp((b+t*(a-b))*log(x)) dt``. No division by
 ``a-b`` occurs, including when parameter intervals cross the diagonal.

@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Derivon
 #
 # CodeQL analysis for Python. Least-privilege: contents read + security-events
-# write for SARIF upload. Actions are SHA-pinned (see docs/ci-hardening.md).
+# write for SARIF upload. Actions are SHA-pinned.
 name: codeql
 
 on:
@@ -19,7 +19,7 @@ permissions:
 jobs:
   analyze:
     name: CodeQL (Python)
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
       contents: read
@@ -27,7 +27,7 @@ jobs:
       actions: read
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
       - name: Initialize CodeQL
         uses: github/codeql-action/init@fca7ace96b7d713c7035871441bd52efbe39e27e  # v3.28.19
         with:

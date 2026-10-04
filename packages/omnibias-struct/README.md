@@ -1,98 +1,86 @@
 # omnibias-struct
 
-**Status: Alpha (0.1.0a1).**
+**Let paths compete before selecting one.** Dynamic programs expose smooth values and structured marginals.
 
-Certified **differentiable dynamic programming** on the omnibias tower: soft
-**Viterbi**, **shortest-path**, and **CTC** layers, on **PyTorch** and **JAX**
-(bit-identical twins, float64).
+![Let paths compete before selecting one.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-struct/docs/visuals/story.gif)
 
-The whole package rests on keeping two limits apart -- getting this wrong is the
-contagious mistake, so it is stated up front and locked by a test:
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-struct/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-struct/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-struct/docs/visuals/scene.py)
 
-- **`beta -> inf` (temperature / relaxation).** The hard `max` combine of the DP
-  recursion is replaced by the smooth log-sum-exp
-  `lse_beta(a) = beta^-1 log sum_i exp(beta a_i)`. Since `lse_beta >= max` and
-  `lse_beta -> max` as `beta -> inf`, the soft DP anneals to exact hard
-  Viterbi / shortest-path / CTC. This is the *feasibility / temperature* sense of
-  "collapse" (a soft object hardened to a discrete one), **not** bias collapse.
-- **`delta -> 0` (the founding bias-collapse tower): the exact differentiation
-  engine.** The soft combine is differentiated **exactly** by the closed-form
-  derivative tower, never by conflating it with the annealing. Pairwise,
-  `lse_beta(a, b) = a + beta^-1 softplus(beta (b - a))`, and `softplus` is Riccati
-  with the closed-form tower `softplus^(n) = sigma^(n-1)` shipped in
-  `omnibias.core`. Its beta-tempered tower propagated through `compose_jet`
-  (`omnibias.{torch,jax}.jet`) gives the closed-form log-sum-exp / softmax jets;
-  the first-order sensitivity is the softmax marginal, and the soft-DP gradient is
-  the forward-backward path marginal assembled from it.
+Scores on a sequence, graph or grammar enter; soft dynamic-program values, marginals and decoded structures leave. The recurrence exploits structure rather than enumerating all paths as independent neural experts.
 
-## The honest object (yes-if)
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
 
-Exact hard DP is not differentiable (its `argmax` gradient is a.e. zero). The
-sound differentiable object is a **relaxation + a certified gap**, never an
-exactness claim:
 
-| Function | Meaning |
-|----------|---------|
-| `lse_beta >= max` | the soft value is an upper bound on the hard optimum |
-| `lse_beta <= max + log(N) / beta` | closed-form gap (`N` = exact path count) |
+[API reference](https://omnibias.ai/api/struct/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-struct/src/omnibias/struct) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-struct/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-so `V* <= V_beta <= V* + log(N)/beta` is a **certified sandwich** that shrinks as
-`beta` grows, self-checked against the exact brute-force optimum on small
-instances.
+## The mathematical connection
 
-## Quick start
+Temperature collapse replaces a hard max or min with smooth log-sum-exp competition. At high β, values approach the hard recurrence; tied alternatives retain shared soft mass. Bias-collapse jets differentiate supported log-sum-exp compositions at higher order. The resulting derivatives concern the soft program, not a discontinuous argmax path.
+
+## Run this README
+
+The examples use `omnibias-struct[torch]` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
+
+```bash
+python -m pip install --pre "omnibias-struct[torch]==0.1.0a2"
+```
+
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-struct/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+A max-score path selects one discrete explanation. Replacing max with a temperature-scaled log-sum-exp retains information about alternatives, making the structured value differentiable with respect to scores. Struct combines these recurrences with shared semiring representations and derivative machinery.
+
+## What you can build
+
+- Soft Viterbi, alignment, DTW, planning and related structured operators.
+- Semiring/hypergraph representations and selected parsing families.
+- Marginals, higher derivatives, decoding and soft-versus-hard gap bounds.
+
+Use struct when a neural model produces scores for a sequence or structured decision and the final loss should train those scores. The recurrence is the reusable primitive; task-specific tokenization, datasets, supervision and application objectives belong in the consuming project.
+
+## A working example
 
 ```python
 import torch
-from omnibias.struct.torch import soft_viterbi, soft_viterbi_marginals
-from omnibias.struct import ChainTrellis, viterbi, certify_soft_dp, count_paths
+from omnibias.struct.torch import soft_viterbi
 
-emissions = torch.randn(5, 3, dtype=torch.float64)   # (T=5 steps, S=3 states)
-transitions = torch.randn(3, 3, dtype=torch.float64)
-
-soft = soft_viterbi(emissions, transitions, beta=8.0)      # differentiable scalar
-gamma = soft_viterbi_marginals(emissions, transitions, beta=8.0)  # (T, S) marginals
-
-# certify the relaxation against the exact hard optimum
-trellis = ChainTrellis(emissions.numpy(), transitions.numpy())
-hard, _path = viterbi(trellis)
-cert = certify_soft_dp(hard, float(soft), count_paths(trellis), beta=8.0)
-assert cert.is_sound            # V* <= V_beta <= V* + log(N)/beta
+emissions = torch.tensor([[0.3, -0.2], [0.1, 0.5], [0.4, 0.2]], requires_grad=True)
+transitions = torch.zeros((2, 2), requires_grad=True)
+value = soft_viterbi(emissions, transitions, beta=3.0)
+value.backward()
+assert emissions.grad is not None
+assert torch.allclose(emissions.grad.sum(dim=1), torch.ones(3))
 ```
 
-```python
-import jax.numpy as jnp
-from omnibias.struct.jax import soft_viterbi   # bit-identical twin
-soft = soft_viterbi(jnp.asarray(emissions.numpy()), jnp.asarray(transitions.numpy()), beta=8.0)
-```
+## Choose the right contract
 
-## Install
+Temperature bounds depend on the finite alternatives being counted. A bound on the smoothed optimal value is not a proof that every learned decoder is correct. Tensor shapes and semiring conventions matter, and different structured families have different computational costs.
+
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/struct.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
 
 ```bash
-pip install omnibias-struct[torch]   # or [jax], [all]
-```
-
-## Public API
-
-- Backend-agnostic (`omnibias.struct`): `ChainTrellis`, `DAG`, `CTCLattice`,
-  `count_paths`; hard DP `viterbi`, `shortest_path`, `ctc_best` and the
-  brute-force oracles `brute_force_viterbi`, `brute_force_shortest_path`,
-  `brute_force_ctc`; `DPGapCertificate`, `certify_soft_dp`, `logsumexp_gap_bound`.
-- Backends (`omnibias.struct.torch` / `omnibias.struct.jax`): `logsumexp_beta`,
-  `softmax_beta`, `logsumexp_beta_jacobian`, `logsumexp_beta_hessian`,
-  `pairwise_lse`, `pairwise_lse_jet`; `soft_viterbi`, `soft_viterbi_marginals`,
-  `soft_shortest_path`, `soft_shortest_path_marginals`, `soft_ctc`.
-- Gated tropical homotopy (`omnibias.struct._core.tropical`): reuses
-  `logsumexp_gap_bound`; `beta -> inf` is temperature collapse; large
-  `(n, D)` refused.
-
-## Tests
-
-```bash
-python -m pytest packages/omnibias-struct/tests -q
+uv run pytest packages/omnibias-struct/tests -q
 ```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+AGPL-3.0-or-later **or commercial**. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-struct/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).
+Comply with the AGPL terms or obtain a signed commercial grant; commercial use alone does not require payment. [Commercial terms](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-struct/COMMERCIAL-LICENSE.md) describe the alternative. Previously distributed Apache editions, where applicable, retain their original grants.

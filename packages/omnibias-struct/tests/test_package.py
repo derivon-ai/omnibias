@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 """Smoke tests for the omnibias-struct package scaffold and its pure-numpy core."""
 
@@ -9,7 +9,7 @@ import omnibias.struct as st
 
 
 def test_version() -> None:
-    assert st.__version__ == "0.1.0a1"
+    assert st.__version__ == "0.1.0a2"
 
 
 def test_public_surface() -> None:

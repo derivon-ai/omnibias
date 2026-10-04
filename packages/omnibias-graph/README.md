@@ -1,74 +1,87 @@
 # omnibias-graph
 
-> **Differentiable spectral graph operators + continuous combinatorial relaxations, with torch + jax bit-parity.**
+**From relations to soft assignments.** Spectral operators and matrix relaxations expose graph structure.
 
-`omnibias-graph` provides two families of differentiable operators on graphs and
-orderings, each with bit-identical torch and jax backends:
+![From relations to soft assignments.](https://raw.githubusercontent.com/derivon-ai/omnibias/6fc47b7e10d4739b981dd0eff8849ec5eb19d826/packages/omnibias-graph/docs/visuals/story.gif)
 
-- **Spectral graph ops** — the combinatorial `L = D - A`, symmetric normalized
-  `L_sym = I - D^{-1/2} A D^{-1/2}`, and random-walk `L_rw = I - D^{-1} A`
-  Laplacians; Laplacian-eigenmaps `spectral_embedding`; the graph heat kernel
-  `exp(-t L)`; and the Rayleigh-Ritz `spectral_clustering_relaxation` of the
-  ratio / normalized cut.
-- **Differentiable relaxations** — `sinkhorn_normalize` (projection onto
-  doubly-stochastic matrices), `gumbel_sinkhorn` (relaxed permutation /
-  assignment), `soft_sort` (SoftSort), and `soft_top_k`. Each has a temperature
-  `tau` that recovers the exact discrete object as `tau -> 0`.
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/6fc47b7e10d4739b981dd0eff8849ec5eb19d826/packages/omnibias-graph/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/6fc47b7e10d4739b981dd0eff8849ec5eb19d826/packages/omnibias-graph/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/6fc47b7e10d4739b981dd0eff8849ec5eb19d826/packages/omnibias-graph/docs/visuals/scene.py)
 
-## Status
+An affinity or cost matrix enters; spectral graph operators, embeddings, soft orderings or assignment matrices leave. Graph-aware models can compose these outputs with trainable features while respecting each relaxation’s constraints.
 
-**Alpha (0.1.0a1).** API may shift between alpha releases.
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
 
-Shipped Face-Net (`omnibias.graph.arrangement`) message-passes on a **sampled
-subgraph** of an arrangement tope graph. `beta -> inf` is temperature
-collapse, not founding `delta -> 0`. Sound gap, not P vs NP.
 
-## Install
+[API reference](https://omnibias.ai/api/graph/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-graph/src/omnibias/graph) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-graph/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+Temperature-like sharpening controls selected soft assignment and sorting operators. Ties and finite iteration residuals must remain visible when interpreting a hardened result. Spectral Laplacians are a separate graph-calculus operation, not automatically a temperature limit. Bias collapse is consumed only where a differentiated model explicitly uses the shared derivative tower.
+
+## Run this README
+
+The examples use `omnibias-graph[torch]` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-pip install omnibias-graph[torch]   # PyTorch backend
-pip install omnibias-graph[jax]     # JAX backend
-pip install omnibias-graph[all]     # both
+python -m pip install --pre "omnibias-graph[torch]==0.1.0a2"
 ```
 
-## 30-second tour
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-graph/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+Graph Laplacians describe connectivity and diffusion; smooth assignment matrices provide a route from discrete matching choices to trainable scores. Graph puts these reusable operations in one primitive so application packages can focus on their objective and decoding policy.
+
+## What you can build
+
+- Laplacians, spectral embeddings and heat-kernel operations.
+- Sinkhorn normalization, soft sorting and soft top-k.
+- Torch and JAX realizations plus arrangement-related operators.
+
+Use spectral operators for geometry-aware representations and smooth relaxations when a downstream loss must influence assignment scores. Combinatorial applications, routing workflows and shape models live in consumers. A matrix relaxation is a component of those products rather than a complete optimizer.
+
+## A working example
 
 ```python
 import torch
-import omnibias.graph.torch.ops as G
+from omnibias.graph.torch.ops import graph_laplacian, sinkhorn_normalize
 
-# Cycle graph C_8: Laplacian spectrum is 2 - 2 cos(2 pi k / 8).
-n = 8
-A = torch.zeros(n, n, dtype=torch.float64)
-for i in range(n):
-    A[i, (i + 1) % n] = A[i, (i - 1) % n] = 1.0
-
-evals, _ = G.laplacian_spectrum(A)          # exact ring eigenvalues
-H = G.graph_heat_kernel(A, t=0.5)           # exp(-tL), row-sums preserved
-emb = G.spectral_embedding(A, n_components=2)  # Fiedler + next eigenmap
-
-scores = torch.tensor([3.0, 1.0, 2.0, 5.0, 4.0])
-sorted_soft = G.soft_sort(scores, temperature=1e-3)   # -> descending sort
-mask = G.soft_top_k(scores, k=2, temperature=1e-3)    # -> {5, 4} indicator, sum == 2
+adjacency = torch.tensor([[0., 1., 0.], [1., 0., 1.], [0., 1., 0.]])
+L = graph_laplacian(adjacency)
+assert torch.allclose(L.sum(dim=1), torch.zeros(3))
+scores = torch.eye(3, requires_grad=True)
+assignment = sinkhorn_normalize(scores, n_iters=30)
+(assignment * torch.arange(9).reshape(3, 3)).sum().backward()
+assert scores.grad is not None
 ```
 
-The `omnibias.graph.jax.ops` namespace mirrors this surface; `tests/` assert
-cross-backend parity (`rtol=1e-9`, float64).
+## Choose the right contract
 
-## Scope & honesty
+Repeated eigenvalues can make eigenvector gradients ambiguous. Sinkhorn uses a finite iteration budget, so row and column constraints need tolerances. A doubly stochastic matrix is not a permutation until decoded, and a low-temperature choice still needs handling of ties and numerical range.
 
-These are **differentiable relaxations** and **smooth spectral** quantities, not
-exact combinatorial solvers. Exact NP-hard problems (TSP, exact max-cut, exact
-graph isomorphism, SAT / ILP) are **out of scope**, documented in
-[`docs/cookbook/graph-limitation.md`](../../docs/cookbook/graph-limitation.md)
-and guarded by an enforcement test. A relaxed cut value is a lower bound on the
-discrete optimum; rounding the relaxed embedding to a discrete partition is the
-caller's job and is where combinatorial hardness enters.
+## Explore and validate
 
-The rigorous cross-checks reuse `omnibias.core.verified` (interval eigenvalue
-enclosures for the ring-graph oracle).
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/graph.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-graph/tests -q
+```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+AGPL-3.0-or-later **or commercial**. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-graph/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).
+Comply with the AGPL terms or obtain a signed commercial grant; commercial use alone does not require payment. [Commercial terms](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-graph/COMMERCIAL-LICENSE.md) describe the alternative. Previously distributed Apache editions, where applicable, retain their original grants.

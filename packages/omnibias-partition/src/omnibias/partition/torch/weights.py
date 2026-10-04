@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""Torch soft partition-of-unity weights (bit-identical twin of the numpy reference).
 
@@ -11,7 +11,7 @@ evaluates a :class:`~omnibias.partition._core.params.PartitionParams`. Both repr
 Terminology: the split gate ``sigmoid(beta (W.x - t))`` hardens as ``beta -> inf`` -- the
 feasibility / temperature sense of "collapse", distinct from the **founding bias collapse**
 (the multi-bias ``delta -> 0`` limit to the closed-form derivative ``sigma^(K-1)``; see
-``docs/theory.md``).
+``docs/derivatives.md``).
 """
 
 from __future__ import annotations

@@ -1,91 +1,37 @@
 # omnibias-boolean
 
-Differentiable Boolean algebra. The package has two layers:
+Boolean algebra primitives.
 
-- **Exact `_core`** (pure Python, no backend imports): truth tables, the GF(2)
-  Mobius/ANF transform and algebraic degree, the Walsh-Hadamard / Fourier
-  spectrum and influences, Boolean differential calculus (Boolean derivative,
-  set-derivative, and integral with a free "+C" function), the real multilinear
-  extension, and reproductive Boolean equation/unification solving (eliminant +
-  Loewenheim general solution) with a GF(2) Gaussian-elimination fast-path.
-- **Differentiable backends** (`torch` / `jax`): soft logic gates (the multilinear
-  extension -- exact on the cube vertices), a jet-based spectrum/influence engine
-  that reads ANF/Walsh coefficients as the mixed partials of the multilinear
-  extension, a beta-annealed propose-and-verify equation/system solver, and
-  spectral-design losses.
+`omnibias.boolean` provides exact finite Boolean representations and transforms.
 
-!!! note "Honesty guardrails"
-    `_core` transforms are exact (integer / GF(2)); the backends are
-    **differentiable relaxations** with no completeness guarantee. The solver is
-    **propose-and-verify**: it relaxes and optimizes, then checks the exact
-    Boolean system. See the
-    [RSA-limitation study](../cookbook/rsa-limitation.md) for an explicit negative
-    result -- this is not a cryptanalytic tool.
+- `TruthTable`, `all_assignments`: enumerate finite inputs.
+- `anf_from_truth_table`, `anf_monomials`: algebraic normal forms.
+- `boolean_derivative`, `mixed_partial`: Boolean differential operations.
+- `gf2_solve`, `solve_system`: finite algebraic solvers.
 
-See the [Boolean-equations cookbook](../cookbook/boolean-equations.md) for the
-discrete <-> continuous derivative bridge and a worked reproductive solution.
+Optional tensor backends use the binary primitive for smooth gate training.
+Exact discrete algebra and differentiable relaxation are separate modes.
+Truth-table enumeration scales exponentially with the number of variables;
+reserve it for bounded problems and reference checks.
 
-## Core (exact, pure Python)
+Install this distribution with `pip install omnibias-boolean`; select its
+backend extras when needed. See [guarantees](../guarantees.md).
 
-::: omnibias.boolean
-    options:
-      show_root_heading: false
-      heading_level: 3
-      members_order: source
+<!-- BEGIN GENERATED API INVENTORY -->
 
-## Verified spectra (rigorous interval twin)
+Version **0.1.0a2** · Python **>=3.10** · **3 - Alpha** · Apache-2.0
 
-The `_iv` functions are the outward-rounded interval twins of the Walsh / Fourier
-and real-multilinear transforms, plus certified linear- and differential-bias
-figures of merit (linearity, nonlinearity, linear bias, autocorrelation,
-differential bias, absolute indicator). They exist for the **real-valued** spectra
-omnibias unlocks — the coefficients of a differentiable `tanh(beta x)` /
-`sigmoid(beta x)` gate relaxation, a noisy/measured truth table, or any function
-whose values are themselves intervals — and provably *contain* the true spectrum
-despite floating-point round-off. (The exact `{0,1}` integer transforms above are
-already bit-exact and need no enclosure.)
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
 
-::: omnibias.boolean._core.verified
-    options:
-      show_root_heading: false
-      heading_level: 3
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-boolean/src/omnibias/boolean). Modules below are relative to `omnibias.boolean`; underscored modules are internal.
 
-## S-box figure-of-merit analysis
+`inequality`, `jax`, `jax.ops`, `jax.ops.design`, `jax.ops.gates`, `jax.ops.solver`, `jax.ops.spectrum`, `torch`, `torch.ops`, `torch.ops.design`, `torch.ops.gates`, `torch.ops.solver`, `torch.ops.spectrum`.
 
-!!! note "Design metrics, not cryptanalysis"
-    `omnibias.boolean.cipher` scores an S-box's published **figures of merit**; it
-    does **not** break ciphers, recover keys, or mount attacks. See
-    [scope & guarantees](../scope-and-guarantees.md) §6.
+Exports from `omnibias.boolean`:
 
-`omnibias.boolean.cipher` analyses a vector Boolean function (S-box): the
-difference-distribution and linear-approximation tables, the differential
-uniformity, the linearity / nonlinearity, the algebraic degree, and the exact
-higher-order Boolean derivative that bounds an S-box's resistance to higher-order
-differential distinguishers (a function of degree `d` is annihilated by every
-`(d+1)`-th order derivative). The test-suite checks the published figures of merit
-for the AES (differential uniformity 4, nonlinearity 112, degree 7) and PRESENT
-(4 / 4 / 3) S-boxes. Each component `<b, S(x)>` is an ordinary Boolean function, so
-the rigorous interval bias bounds from the verified layer apply to a
-differentiable / noisy S-box.
+`BooleanAntiderivative`, `BooleanInequalityBackend`, `BooleanSolution`, `GF2Solution`, `GeneralSolution`, `TruthTable`, `absolute_indicator_iv`, `algebraic_degree`, `all_assignments`, `anf_from_multilinear_coeffs`, `anf_from_truth_table`, `anf_monomials`, `anf_to_string`, `assignment`, `autocorrelation_iv`, `bit_to_spin`, `boolean_derivative`, `boolean_derivative_reduced`, `boolean_derivative_set`, `boolean_integral`, `check_truth_table`, `constraint_from_predicate`, `constraints_are_linear`, `differential_bias_iv`, `eliminant`, `equation_from_callables`, `fourier_coeffs`, `fourier_coeffs_iv`, `fourier_influences`, `gf2_solve`, `index_of`, `influences`, `is_independent_of`, `is_satisfiable`, `linear_bias_iv`, `linear_system_rows`, `linearity_iv`, `max_linear_bias_iv`, `mixed_partial`, `mobius_iv`, `multilinear_coeffs`, `multilinear_eval`, `multilinear_eval_from_coeffs`, `nonlinearity_iv`, `num_vars`, `parseval_defect`, `parseval_defect_iv`, `pm1_values`, `reduced_index`, `restrict`, `solution_set`, `solve_for`, `solve_system`, `spin_to_bit`, `system_constraint`, `total_influence`, `truth_table_from_anf`, `truth_table_from_callable`, `truth_table_to_callable`, `values_from_multilinear_coeffs`, `verify_assignment`, `walsh_at_iv`, `walsh_hadamard`, `walsh_hadamard_iv`, `walsh_spectrum`, `walsh_spectrum_iv`.
 
-::: omnibias.boolean.cipher
-    options:
-      show_root_heading: false
-      heading_level: 3
+</details>
 
-## Ops (torch)
-
-Soft gates, the jet-based spectrum/influence engine, the annealed solver, and the
-spectral-design losses.
-
-::: omnibias.boolean.torch.ops
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## JAX twin
-
-The JAX backend (`omnibias.boolean.jax.ops`) is the bit-for-bit twin of the torch
-ops; the cross-backend tests assert agreement to `rtol=1e-9` in float64.
-
-Status: Alpha (`0.1.0a1`).
+<!-- END GENERATED API INVENTORY -->

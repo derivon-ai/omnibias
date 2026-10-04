@@ -48,7 +48,6 @@ def test_exact_gate_does_not_discharge_its_external_bounds():
     assert set(payload["external_premises"].values()) == {"UNVERIFIED"}
     assert not payload["pde_existence_claim"]
     assert not payload["theorem_prover_verified"]
-    assert not payload["yang_mills_mass_gap_claim"]
 
 
 def test_false_residual_bound_is_only_a_conditional_gate():

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-fields"
-version = "0.1.0"
+version = "0.2.0rc1"
 description = "Backend-agnostic field substrate for omnibias: the FieldState value object, the attribute-DSL views, the lazy sigma^(n) cache, and the cross-backend (torch + jax) closed-form differential-operator surface (gradient, divergence, curl, laplacian, hessian, jacobian, integration, inner products, Sobolev norms, tensor divergence, Wirtinger)."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -32,13 +32,13 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Mathematics",
     "Typing :: Typed",
 ]
-dependencies = ["omnibias-core>=0.2.0", "numpy>=1.24"]
+dependencies = ["omnibias-core>=0.5.0rc1", "numpy>=1.24"]
 
 [project.optional-dependencies]
-torch = ["omnibias-torch>=0.2.0", "torch>=2.0"]
-jax = ["omnibias-jax>=0.2.0", "jax>=0.4.30", "jaxlib>=0.4.30"]
+torch = ["omnibias-torch>=0.5.0rc1", "torch>=2.0"]
+jax = ["omnibias-jax>=0.5.0rc1", "jax>=0.4.30", "jaxlib>=0.4.30"]
 all = ["omnibias-fields[torch,jax]"]
-difference = ["omnibias-difference>=0.1.0a1"]
+difference = ["omnibias-difference>=0.1.0a2"]
 test = [
     "pytest>=7.0",
     "pytest-cov>=4.0",

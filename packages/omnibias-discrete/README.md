@@ -1,96 +1,86 @@
 # omnibias-discrete
 
-**Status: Alpha (0.1.0a1).**
+**A decision needs more than rounding.** Represent a relaxation, decode a candidate, then measure its gap.
 
-The shared **differentiable + certified discrete-optimization substrate** for omnibias.
-It is the `encode -> relax -> decode -> certify` machinery that was first shipped inside
-`omnibias-qubo` and then extracted so a second consumer (MaxSAT, here; combinatorics /
-logic, later) can reuse it. `omnibias-qubo` now builds on this package via re-export
-shims -- its public API and numerics are unchanged.
+![A decision needs more than rounding.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-discrete/docs/visuals/story.gif)
 
-Minimizing a pseudo-Boolean energy `E(x)` over `x ∈ {0,1}ⁿ` is NP-hard, so there is no
-poly-time differentiable map to the *exact* global optimum (that would imply `P = NP`,
-and the exact argmin's gradient is a.e. zero). Instead of a flat **no-because**, the
-substrate answers the well-posed question with a **yes-if**: you may optimize / learn
-through a discrete problem end to end **if** you accept a *certified optimality gap* in
-place of an exactness claim.
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-discrete/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-discrete/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-discrete/docs/visuals/scene.py)
 
-```
-theta -> x* = relax(problem)  ->  z = decode(problem, x*)     (valid binary point, upper bound)
-                                  lower <= optimum <= E(z)      (certified gap)
-```
+A discrete problem, relaxation schedule and candidate enter a shared optimization interface. Relaxed values, a decoded assignment and an independently justified optimality gap leave. Front-ends supply the objective and feasible-set meaning.
 
-## The seam: `DiscreteProblem`
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
 
-Any object that implements the protocol plugs into the whole pipeline:
 
-<!-- docs-test: signature -->
-```python
-class DiscreteProblem(Protocol):
-    @property
-    def n(self) -> int: ...
-    def energy(self, x) -> float | FloatArray: ...            # point (n,) or batch (m, n)
-    def to_polynomial(self) -> "omnibias.sos.Polynomial": ...  # for the SOS/Lasserre bound
-    # optional fast path: def flip_deltas(self, x) -> FloatArray: ...
-```
+[API reference](https://omnibias.ai/api/discrete/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-discrete/src/omnibias/discrete) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-discrete/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-- **`AnnealSchedule`** -- the temperature homotopy for the relaxation.
-- **`anneal_descent(grad_x_fn, scale, n, schedule)`** (`omnibias.discrete.jax` /
-  `omnibias.discrete.torch`) -- the differentiable annealed relaxation core: descends
-  `x = sigmoid(beta·theta)` on a caller-supplied closed-form energy gradient while
-  `beta -> ∞` collapses the soft assignment onto a binary vertex. Bit-identical twins.
-- **`decode` / `one_flip_descent` / `round_relaxed` / `brute_force_min`** -- rounding +
-  1-flip local search (an *upper* bound), and the exact `O(2ⁿ)` small-`n` oracle.
-- **`certify_gap` / `lasserre_lower_bound` / `negative_coeff_lower_bound`** -- the
-  rigorous *lower* side of the sandwich: a Lasserre / moment-SOS bound over the Boolean
-  hypercube (`omnibias-sos`, hash-sealed / Lean-checkable), seeded by the always-valid
-  sum-of-negative-coefficients bound.
-- **`GapCertificate` / `DiscreteSolution`** -- the result containers.
+## The mathematical connection
 
-## Terminology (the two "collapse" axes)
+Temperature collapse provides a route from continuous relaxation toward discrete candidates. Finite β does not guarantee an integral or globally optimal result; decoding and lower bounds remain separate stages, including at ties. Bias-collapse backends may differentiate a smooth objective, but the problem/anneal/decode/certify contract is the package’s distinctive role.
 
-The relaxation's `sigmoid(beta·)`, `beta -> ∞` is the **feasibility / temperature** sense
-of "collapse" (a soft indicator hardening to a 0/1 step), distinct from the **founding
-bias collapse** -- the multi-bias `delta -> 0` limit of an `OMBU` to the closed-form
-derivative `sigma^(K-1)` (see `docs/theory.md`).
+## Run this README
 
-## MaxSAT front-end (first consumer)
-
-`omnibias.discrete.maxsat` encodes weighted CNF as a pseudo-Boolean `MaxSATProblem`
-(the weighted-violation energy) and reuses the shared relax / decode / certify:
-
-```python
-from omnibias.discrete.maxsat import max_sat
-from omnibias.discrete import decode, certify_gap
-
-# (x1 or ~x2) and (x2 or x3), unit weights; DIMACS-style signed 1-based literals.
-prob = max_sat([[1, -2], [2, 3]])
-assignment, energy = decode(prob)          # a min-violation assignment (upper bound)
-cert = certify_gap(prob, assignment, level=1)
-print(cert.lower_bound, cert.energy, cert.relative_gap, cert.certified)
-```
-
-## Honest scope
-
-- The certificate is a **genuine** rigorous lower bound on the true minimum energy, plus
-  the decoded upper bound. It is **not** an exact-optimality (`P = NP`) claim and never
-  asserts a zero gap; a weaker bound only *widens* the certified gap.
-- `certify_gap` needs the `sos` extra for the sealed Lasserre bound; without it it
-  degrades to the valid, non-sealed float bound (`certified=False`).
-- The relaxation layers need a `jax` / `torch` backend. Extension-tier typing (authored
-  strict-clean; not on the shared strict CI gate).
-
-## Tests
+The examples use `omnibias-discrete` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-pip install -e "packages/omnibias-discrete[sos,jax,torch,test]"
-python -m pytest packages/omnibias-discrete/tests -q
+python -m pip install --pre "omnibias-discrete==0.1.0a2"
+```
+
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-discrete/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+Discrete applications often repeat the same infrastructure: represent an energy, relax binary variables, sharpen a temperature schedule, round a candidate and compare it with a bound. Discrete gives those steps explicit interfaces, so consumers can specialize a problem without copying its optimization plumbing.
+
+## What you can build
+
+- DiscreteProblem and DiscreteSolution interfaces.
+- Annealed Torch/JAX relaxation and reusable proposers.
+- Rounding, local descent, bounded brute-force oracles and optimality-gap certificates.
+
+Use this primitive under QUBO, routing, logic or other discrete frontends. A feasible candidate and a lower bound are independently useful outputs: the candidate supplies an actionable decision, while the bound quantifies what remains unproven about its quality.
+
+## A working example
+
+```python
+import numpy as np
+from omnibias.discrete import AnnealSchedule, round_relaxed
+
+schedule = AnnealSchedule(beta0=0.5, beta_growth=2.0, stages=4)
+assert schedule.betas() == [0.5, 1.0, 2.0, 4.0]
+probabilities = np.array([0.1, 0.8, 0.3])
+candidate = round_relaxed(probabilities)
+assert np.array_equal(candidate, [0., 1., 0.])
+# Rounding creates a candidate; certify_gap needs a separately justified bound.
+```
+
+## Choose the right contract
+
+Temperature hardening does not make a difficult discrete search globally optimal. Keep feasibility, objective value, bound provenance and certificate status separate. Brute-force enumeration is only a small-instance oracle. Optional SOS or convex backends provide specific bounds under their own assumptions.
+
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/discrete.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-discrete/tests -q
 ```
 
 ## License
 
-Dual-licensed: AGPL-3.0-or-later OR a commercial licence from Derivon
-(`LicenseRef-omnibias-Commercial`). See [`LICENSE`](LICENSE),
-[`../../LICENSING.md`](../../LICENSING.md), and
-[`../../COMMERCIAL-LICENSE.md`](../../COMMERCIAL-LICENSE.md). Contact
-info@derivon.ai for commercial terms.
+AGPL-3.0-or-later **or commercial**. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-discrete/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).
+Comply with the AGPL terms or obtain a signed commercial grant; commercial use alone does not require payment. [Commercial terms](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-discrete/COMMERCIAL-LICENSE.md) describe the alternative. Previously distributed Apache editions, where applicable, retain their original grants.

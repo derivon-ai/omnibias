@@ -172,16 +172,6 @@ def test_attention_matches_autodiff(memory) -> None:
         assert _close(got[alpha], value), alpha
 
 
-def test_attention_value_matches_omnibias_hopfield(memory) -> None:
-    """The block *is* hopfield attention; this module only adds ``d/dx``."""
-    hopfield = pytest.importorskip("omnibias.hopfield.jax.ops")
-    W, b, K, V, x0 = (memory[k] for k in ("W", "b", "K", "V", "x0"))
-    beta = 0.8
-    q = jnp.tanh(W @ x0 + b)
-    reference = hopfield.attention(q[None], K, V, beta=beta)[0]
-    q_jet = mlp_jet_mv(x0, [(W, b, "tanh")], ORDER)
-    got = jet_attention(q_jet, K, V, DIM, ORDER, beta=beta)[0]
-    assert _close(got, reference, 1e-14)
 
 
 def test_attention_output_lies_in_the_convex_hull_of_the_values(memory) -> None:

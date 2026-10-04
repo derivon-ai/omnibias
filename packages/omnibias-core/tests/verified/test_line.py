@@ -146,7 +146,7 @@ def test_tail_bound_rejects_bad_input() -> None:
 
 
 # --------------------------------------------------------------------------- #
-# Even-profile layer (CCF-on-the-line representation)                          #
+# Even-profile layer (even-profile representation)                          #
 # --------------------------------------------------------------------------- #
 _COEFFS = (1.2, -0.7, 0.5)
 _SCALES = (0.6, 1.3, 2.1)

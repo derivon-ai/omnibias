@@ -13,7 +13,7 @@ This module is backend-free: config, the contraction raise, and the
 infinity-norm spectral-radius bound. Tensor Newton / Banach iteration
 and the IFT VJP live in ``omnibias.{torch,jax}.implicit``.
 
-No temperature collapse. Not a global min, not CCF stretch, and not a
+No temperature collapse. Not a global min, and not a
 continuum PDE existence claim. IFT is the chain rule at a fixed point,
 not an absence of the chain rule.
 """
@@ -27,8 +27,7 @@ from typing import Literal
 DEQSolver = Literal["newton", "iterate", "anderson"]
 
 HONESTY: dict[str, bool] = {
-    "navier_stokes_proof_claim": False,
-    "ccf_stretch_cleared": False,
+    "global_convergence_claim": False,
     "global_min_claim": False,
     "unrolled_bptt_claim": False,
     "greedy_only_claimed_optimal": False,

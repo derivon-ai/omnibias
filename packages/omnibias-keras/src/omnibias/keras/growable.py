@@ -137,8 +137,8 @@ class GrowableOperatorMultiBiasUnit(layers.Layer):
     ) -> int:
         """Grow ``active_K``. Returns the number of newly-activated columns."""
         K = self._active_K
-        biases_np = np.asarray(ops.convert_to_numpy(self.biases))
-        signs_np = np.asarray(ops.convert_to_numpy(self.signs))
+        biases_np = np.asarray(ops.convert_to_numpy(self.biases.value))
+        signs_np = np.asarray(ops.convert_to_numpy(self.signs.value))
 
         if strategy == "pair":
             if K + 2 > self.K_max:

@@ -1,40 +1,36 @@
 # omnibias-sos
 
-Certified *universal* positivity by optimization. A polynomial `p(x) >= 0` for
-**all** `x` iff it has a Sum-of-Squares decomposition `p(x) = z(x)^T Q z(x)` with
-a positive-semidefinite Gram matrix `Q`. omnibias-sos finds `Q` with a
-floating-point semidefinite program (a *proposer*) and then **proves** the result
-with a rigorous interval LDL^T positive-definiteness certificate built on
-`omnibias.core.verified` -- the same finite obligation the Mathlib-free Lean
-kernel re-checks, so a sealed certificate can earn `theorem_prover_verified`.
+Polynomial positivity certificates.
 
-- **Global SOS positivity** -- a sound proof that a polynomial is nonnegative
-  everywhere.
-- **Positivstellensatz** -- constrained positivity `p >= 0` on `{g_i >= 0}` via
-  certified SOS multipliers (fixed-degree Putinar form). The `sos_onset`
-  condition sort binds when an `Observation` carries `poly_constraints`.
-- **Auxiliary-functional (background) method** -- a certified `for all data`
-  bound on the infinite-time average of an observable for a polynomial ODE /
-  Galerkin-truncated system.
+`omnibias.sos` provides sum-of-squares and constrained positivity certificates.
 
-!!! note "Soundness, not the solver"
-    The SDP solve is a floating-point *proposer* and never touches the proof.
-    The proof is the outward-rounded interval LDL^T certificate; a failed
-    rational rounding or positive-definite margin returns **inconclusive**, never
-    a false positivity claim. The auxiliary-functional bound is a statement about
-    a **finite-dimensional / Galerkin-truncated** system, not a continuum PDE
-    regularity or global-regularity claim (`unproven_claim = False` on every certificate).
+- `Polynomial`, `MonomialBasis`, `SOSProblem`: polynomial problem data.
+- `certify_sos`, `certify_sos_rational`: construct checked decompositions.
+- `certify_nonneg_on_set`: constrained positivity.
+- `lean_check_sos`: check supported finite obligations with the optional Lean kernel.
 
-## Public API
+A valid decomposition proves the stated polynomial claim on its specified
+set. Failure to find a decomposition is inconclusive. Numerical solver output,
+a sealed digest and a successful rigorous/formal check are distinct results.
 
-::: omnibias.sos
-    options:
-      show_root_heading: false
-      heading_level: 3
-      members_order: source
+Install this distribution with `pip install omnibias-sos`; select its
+backend extras when needed. See [guarantees](../guarantees.md).
 
-The NPA moment hierarchy (`omnibias.sos.npa`) and the combinatorial
-degree-indexed clique / 3-XOR certificates (`omnibias.sos.combinatorial`) are
-separate landing pages: [npa.md](npa.md), [combinatorial_sos.md](combinatorial_sos.md).
+<!-- BEGIN GENERATED API INVENTORY -->
 
-Status: Alpha (`0.1.0a1`).
+Version **0.1.0a2** · Python **>=3.10** · **3 - Alpha** · AGPL-3.0-or-later **or commercial**
+
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
+
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-sos/src/omnibias/sos). Modules below are relative to `omnibias.sos`; underscored modules are internal.
+
+`certify`, `combinatorial`, `conditions`, `families`, `formal`, `honesty`, `inequality`, `monomials`, `positivstellensatz`, `problem`, `rounding`, `solve`.
+
+Exports from `omnibias.sos`:
+
+`DEFAULT_DENOMINATORS`, `Exponent`, `FINITE_DIM_SYSTEM`, `GALERKIN_TRUNCATION`, `GLOBAL_POLYNOMIAL`, `MonomialBasis`, `Polynomial`, `PolynomialInequalityBackend`, `PositivstellensatzCertificate`, `RationalPolynomial`, `SOSCertificate`, `SOSMultiplier`, `SOSProblem`, `SOSScope`, `arrangement_adapted_basis`, `certify_nonneg_on_set`, `certify_sos`, `certify_sos_rational`, `degree_reduction_report`, `gram_products`, `gram_to_poly`, `honesty_labels`, `is_nonneg_on_set`, `is_sos`, `is_theorem_prover_verified`, `lean_available`, `lean_check_sos`, `monomial_basis`, `named_adapted_problems`, `rational_gram`, `seal_positivstellensatz_certificate`, `seal_sos_certificate`.
+
+</details>
+
+<!-- END GENERATED API INVENTORY -->

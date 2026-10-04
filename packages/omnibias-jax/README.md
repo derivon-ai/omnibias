@@ -1,81 +1,89 @@
 # omnibias-jax
 
-JAX backend for the omnibias closed-form n-th derivative framework.
+**Trace once. Differentiate a batch.** Functional directional jets compose with jit and vmap.
 
-## Why this is fast
+![Trace once. Differentiate a batch.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-jax/docs/visuals/story.gif)
 
-All numbers float64, identical answers to autodiff up to `≤ 10⁻¹⁵`. Full
-derivation in [`docs/complexity.md`](../../docs/complexity.md).
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-jax/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-jax/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-jax/docs/visuals/scene.py)
 
-- Closed-form Laplacian overhead is **`O(1)` in input dimension `D`** —
-  independent of `D` because the reduction collapses the inner sum once.
-- At `D = 240`, **68× faster than `jax.hessian` + trace** and **63× less
-  memory**.
-- Iterated Laplacian `Δᵏ` is **480× faster than folx-nested at `k = 3`**;
-  folx-nested OOMs at `k = 4` while omnibias finishes in ~0.1 ms.
-- Bit-identical to `omnibias-torch` and `omnibias-keras` for every
-  `(activation, order)` pair.
+A functionally represented network, coordinates and directions enter; traced derivative operators leave. Batch with vmap, compile with jit and keep coordinates and weights as runtime arguments. The traced program can be reused across data of the same abstract shape.
 
-## Install
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
+
+[API reference](https://omnibias.ai/api/jax/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-jax/src/omnibias/jax) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-jax/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+The bias-collapse limit is evaluated by shared polynomial kernels and forward Taylor composition. This bypasses nested high-order spatial reverse-mode graphs on supported paths. JAX also supplies tensor operations to temperature-based consumers, but directional jets are not an annealing procedure. Compilation, steady-state evaluation and numerical error are separate measurements.
+
+## Run this README
+
+The examples use `omnibias-jax` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-pip install omnibias-jax
+python -m pip install --pre "omnibias-jax==0.5.0rc1"
 ```
 
-`omnibias-jax` depends on `omnibias-core` (pure-Python math) and `jax>=0.4.30`.
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-jax/wheel-tests.toml)
+executes the examples below outside the source checkout.
 
-## What is in here
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
-- The same closed-form derivative kernels as `omnibias-torch`, written in
-  JAX (`jax.numpy`) so they JIT-compile cleanly inside FermiNet, vmc_jax,
-  DeepQMC, and similar stacks. Polynomial coefficients are imported from
-  `omnibias-core`, so a JAX `sigma^(n)(z)` is *bit-identical* to the
-  torch `sigma^(n)(z)` for every `n` (this is the contract validated by
-  `tests/test_cross_backend_parity.py`).
-- A backend-specific activation dictionary registered via the same
-  ``ActivationSpec`` protocol as torch (`get_activation`, `list_activations`,
-  `register_activation`).
-- ``neural_field_laplacian`` / ``neural_field_hessian`` / family: closed-form
-  Laplacian and full Hessian for a one-layer scalar field
-  ``f(x) = b + sum_h c_h sigma(W_h . x + b_h)`` on ``R^D``. These are the
-  primitives the FermiNet bridge in `omnibias-ferminet` calls when composing
-  through coordinate transformations.
-- Born-Oppenheimer derivative kernels (`coulomb_potential`,
-  `make_local_energy`, `make_bo_force`, `make_bo_hessian`,
-  `vibrational_frequencies`) used to build analytic nuclear Hessians of
-  neural-VMC energies.
+## Why this package exists
 
-## Public API
+High-order spatial derivatives and parameter gradients are different jobs. JAX omnibias carries the former through an explicit derivative representation, while jax.grad handles learning. This separation makes the computation inspectable and lets you select a contraction rather than materialize every entry of a high-order derivative tensor.
+
+## What you can build
+
+- Functional directional and multivariate jets with the same coefficient convention as Torch.
+- Direct one-layer, repeated and deep Laplacian paths for supported structures.
+- Runtime parameter flow through jit, vmap and gradient transformations.
+
+Build a scalar residual loss whose weights are ordinary function arguments. Batch the operator over points, compile the intended workload, and differentiate with respect to parameters. For small workloads a native JAX transform may win; the benchmark guide includes those cases.
+
+## A working example
 
 ```python
-from omnibias.jax import (
-    JaxActivationSpec, get_activation, list_activations,
-    register_activation, is_registered,
-    neural_field_laplacian, neural_field_value_grad_hessian,
-    coulomb_potential, make_local_energy,
-    make_bo_force, make_bo_hessian, vibrational_frequencies,
-    BankSpec, init_bias_scan, bias_scan, init_multipack, multipack_apply,
-)
+import jax
+import jax.numpy as jnp
+from omnibias.jax.jet import mlp_jet, jet_to_tower
+
+def loss(w):
+    layers = [(w, jnp.array([0.1, 0.2]), "tanh"),
+              (jnp.array([[0.6, -0.4]]), None, None)]
+    tower = jet_to_tower(mlp_jet(jnp.array([0.3]), jnp.ones(1), layers, order=4))
+    return jnp.mean((tower[4] + tower[0]) ** 2)
+
+value, gradient = jax.jit(jax.value_and_grad(loss))(jnp.array([[0.5], [-0.3]]))
+assert gradient.shape == (2, 1)
+assert bool(jnp.all(jnp.isfinite(gradient)))
 ```
 
-The FermiNet bridge (`folx`-compatible API, Tier-2 restricted FermiNet,
-multiblock primitives) lives in the separate `omnibias-ferminet`
-package; importing `omnibias.jax` does **not** trigger a FermiNet import,
-so the JAX core remains useful when FermiNet is absent.
+## Choose the right contract
 
-Wave-1 twins: `init_multipack` / `multipack_apply` (01-01, **shipped**)
-and `init_bias_scan` / `bias_scan` / `BankSpec` (01-02, **shipped**). Same honesty as the
-torch modules: interior shift along `w`, `gamma` is not `delta -> 0`.
+Do not close over benchmark weights or inputs: constant folding can remove the work you intend to time. Synchronize results, separate compilation from execution, and enable x64 before constructing float64 arrays. Full mixed jets enumerate coefficients; the directional and direct-contraction paths have different scaling.
 
-Shipped Wave-3 twins: Scan-Net (`init_scan_net` / `scan_net_apply`;
-on-lattice equivariance; G4 leftover-recorded), Jet-KAN (`init_jet_kan`
-/ `jet_kan_apply`; model-jet exactness, KA theorem does not justify; G2
-leftover-recorded), equivariant scan (gaussian-family steering;
-discrete `C_L`; G5 leftover-recorded), `hierarchical_scan` (1-D
-offsets), and Hermite ladder (`hermite_basis` / `ladder_apply`;
-Rodrigues reweight required; G4 leftover-recorded).
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/jax.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-jax/tests -q
+```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-jax/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).

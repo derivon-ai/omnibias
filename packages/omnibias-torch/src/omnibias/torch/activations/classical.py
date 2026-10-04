@@ -22,7 +22,6 @@ import math
 from omnibias.torch.activations.registry import ActivationSpec, register_activation
 from omnibias.torch.fastpath.eulerian import sigmoid_nth_derivative
 from omnibias.torch.fastpath.hermite import gaussian_nth_derivative
-from omnibias.torch.transforms import EXP_TRANSFORMS, RELU_TRANSFORMS
 
 import torch
 import torch.nn.functional as F
@@ -49,7 +48,6 @@ def _exp_fastpath(z: Tensor, n: int) -> Tensor:
 EXP = register_activation(
     ActivationSpec(
         name="exp",
-        transforms=EXP_TRANSFORMS,
         forward=_exp_forward,
         derivative=_exp_derivative,
         fastpath=_exp_fastpath,
@@ -104,7 +102,6 @@ def _relu_fastpath(z: Tensor, n: int) -> Tensor:
 RELU = register_activation(
     ActivationSpec(
         name="relu",
-        transforms=RELU_TRANSFORMS,
         forward=_relu_forward,
         derivative=_relu_derivative,
         fastpath=_relu_fastpath,
@@ -231,4 +228,9 @@ GELU = register_activation(
 )
 
 
-__all__ = ["EXP", "GELU", "RELU", "SILU"]
+__all__ = [
+    "EXP",
+    "GELU",
+    "RELU",
+    "SILU",
+]

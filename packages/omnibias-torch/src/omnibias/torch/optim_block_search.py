@@ -5,7 +5,7 @@ r"""Block / coordinate exact search (theory 08-07), PyTorch twin.
 A sparse block direction is handed to the 03-12 jet line search
 (``verify=True`` never-worse). Last-layer least squares is exactly
 quadratic. This is a coordinate / block sweep, not a global solver
-and not CCF stretch.
+
 
 Do not wrap the driver in ``torch.compile``.
 """

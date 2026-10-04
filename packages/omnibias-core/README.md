@@ -1,86 +1,83 @@
 # omnibias-core
 
-Backend-agnostic mathematical core of the omnibias framework.
+**One activation. A derivative tower.** Exact coefficient algebra beneath every backend.
 
-This package is the **bottom of the dependency graph**. It ships the pure-Python
-polynomial coefficient generators that power every closed-form `σ^(n)` kernel,
-plus the generic `ActivationSpec` protocol that `omnibias-torch`,
-`omnibias-jax`, and `omnibias-keras` specialise. There is **no** torch / jax /
-numpy / tensorflow dependency — both backends import from here, so the
-Eulerian / Legendre / Hermite recurrences produce **bit-identical** coefficient
-sequences by construction.
+![One activation. A derivative tower.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-core/docs/visuals/story.gif)
 
-## Install
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-core/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-core/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-core/docs/visuals/scene.py)
+
+Activation metadata and an integer order enter; shared polynomial coefficients, derivative values or checked enclosures leave. Backend authors use these exact combinatorics without importing a tensor framework.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
+
+[API reference](https://omnibias.ai/api/core/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-core/src/omnibias/core) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-core/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+Bias collapse starts with normalized nearby shifts of an activation. Their limit is a derivative; the Riccati recurrence evaluates that limit directly instead of subtracting nearly equal samples. One activation evaluation supplies the polynomial argument, while polynomial work still grows with order. Temperature collapse belongs to decision primitives; core supplies algebra and verified arithmetic, not a regional router.
+
+## Run this README
+
+The examples use `omnibias-core` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-pip install omnibias-core
+python -m pip install --pre "omnibias-core==0.5.0rc1"
 ```
 
-## Quick start
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-core/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+A derivative engine should not need three competing implementations of its mathematics. Core gives tensor backends one source for activation polynomials, Taylor composition and mixed-index bookkeeping. Exact integer and rational work stays exact until the numerical boundary, so a new identity can be implemented once and tested independently of a training framework.
+
+## What you can build
+
+- Activation derivative coefficients from Riccati, Eulerian and Hermite recurrences.
+- Bell / Faà di Bruno composition and shared multi-index ordering.
+- Outward-rounded intervals, Taylor models and finite certificate obligations.
+
+Choose core when implementing a backend, inspecting an identity, or building a small numerical checker without importing Torch or JAX. Training tensors and device execution belong in a backend; PDE workflows belong in consumers.
+
+## A working example
 
 ```python
-from omnibias.core.polynomials import (
-    sigmoid_polynomial_coeffs,
-    tanh_polynomial_coeffs,
-    hermite_coeffs,
-)
+from omnibias.core import eval_tanh_derivative, tanh_polynomial_coeffs
+from omnibias.core.verified import Interval
 
-# Coefficients of the degree-(n+1) polynomial P_n such that
-#   sigma^(n)(z) = P_n(sigma(z))   (Riccati class)
-print(sigmoid_polynomial_coeffs(3))  # 3rd derivative of sigmoid
-print(tanh_polynomial_coeffs(4))
-print(hermite_coeffs(5))             # probabilist's Hermite (Gaussian)
+assert tanh_polynomial_coeffs(1) == (1, 0, -1)
+assert eval_tanh_derivative(0.0, 3) == -2.0
+box = Interval(1.0, 2.0)
+print(box * box)  # outward-rounded enclosure of the product
 ```
 
-```python
-# ActivationSpec is a frozen dataclass of shared metadata. Backends pin
-# TensorT to their array type and fill in forward / fastpath callables.
-# Prefer the backend registries rather than constructing one by hand:
-#
-#   from omnibias.torch import get_activation
-#   spec = get_activation("tanh")
-#   spec.fastpath(z, n)   # closed-form sigma^(n)
+## Choose the right contract
+
+A certificate digest checks integrity, not truth. Interval assumptions, floating-point rounding and a successful formal checker are separate concerns. The optional Lean kernel is not needed for ordinary derivative evaluation; a missing checker must never become a verified verdict.
+
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/core.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-core/tests -q
 ```
-
-## Public surface (highlights)
-
-| Module | Role |
-|---|---|
-| `omnibias.core.polynomials` | `sigmoid_polynomial_coeffs`, `tanh_polynomial_coeffs`, `hermite_coeffs` |
-| `omnibias.core.spec` | `ActivationSpec` — shared activation metadata |
-| `omnibias.core.multipack` | `PackSpec` / `MultiPackSpec` — heterogeneous Birkhoff support (theory 01-01, **shipped**) |
-| `omnibias.core.scan` | `BankSpec` — offset / scale bank for the bias scan (theory 01-02, **shipped**) |
-| `omnibias.core.mollifier` | `MollifierSpec` / `tail_bound` — pack-as-mollifier algebra; certified exponential tails, not compact support (theory 01-05, **shipped**) |
-| `omnibias.core.spectral_design` | `BandPlan` / `peak_frequency` — order as a band selector, not Littlewood-Paley completeness (theory 01-07, **shipped**) |
-| `omnibias.core.frames` | `FrameSpec` / `admissibility_constant` — `sigma'` is not admissible (theory 01-06, **shipped**) |
-| `omnibias.core.locus` | `EqualitySystem` — constraint manifold, not a PDE solver (theory 01-09, **shipped**) |
-| `omnibias.core.jets` | `contact_residual` / `is_holonomic` — vocabulary, not a discovery (theory 01-10, **shipped**; G1–G3 earned) |
-| `omnibias.core.conjugate` | line Hilbert permutation of the dictionary (theory 01-12, **shipped**; G5 leftover-recorded, leftover #11) |
-| `omnibias.core.hierarchy` | 1-D pack tree; `eta=0` bit-identical to dense (theory 02-07, **shipped**) |
-| `omnibias.core.tanh_method` | travelling-wave tanh algebra, not a collapse (theory 02-09, **shipped**) |
-| `omnibias.core.ladder` | Hermite raise/lower; Rodrigues reweight required (theory 02-10, **shipped**) |
-| `omnibias.core.transfer` | 1-D ABCD stacks; `continuum_claim=False` (theory 02-11, **shipped**) |
-| `omnibias.core.transforms_pde` | named Cole-Hopf / Miura / Bäcklund / Darboux (theory 02-13, **shipped**) |
-| `omnibias.core.bell` | Bell polynomials / Faà di Bruno combinatorics |
-| `omnibias.core.multi_index` | Multi-index ordering + Cauchy product for multivariate jets |
-| `omnibias.core.verified` | Rigorous numerics: `Interval`, Taylor models, Kantorovich, Lohner, … |
-| `omnibias.core.proof` | Hash-sealed certificate format v1 + Lean bridge |
-
-## Why a separate package?
-
-Forking the coefficients per backend would silently break bit-identity. Keeping
-them in a pure-Python wheel means a JAX-only or torch-only install still shares
-the same numbers, and the Lean / verified substrate never has to import a
-framework.
-
-## Docs
-
-- Theory primer: [`docs/theory.md`](../../docs/theory.md)
-- Operator surface: [`docs/operator-surface.md`](../../docs/operator-surface.md)
-- Stability matrix: [`docs/stability.md`](../../docs/stability.md)
-- Monorepo overview: [`README.md`](../../README.md)
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-core/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).

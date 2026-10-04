@@ -12,7 +12,7 @@ r"""Rigorous optimality-gap certificate for a decoded discrete point.
 * the **decoded point's energy** as the upper bound.
 
 The result is a certified optimality gap ``lower <= optimum <= energy`` -- never an
-exact-optimality (P = NP) claim, and honest about bound strength (a weaker bound only
+exact-optimality  claim, and honest about bound strength (a weaker bound only
 widens the certified gap). Without ``omnibias-sos`` the SOS bound is unavailable and the
 certificate degrades to the trivial floor (``certified=False``), or to ``method="none"``
 when even the polynomial cannot be built.
@@ -105,7 +105,7 @@ class TightenedGap:
     """Best sound Lasserre sandwich among increasing relaxation levels.
 
     ``tight`` is always ``False``. A smaller gap is a better sound floor,
-    never a P = NP claim.
+    without asserting a zero optimality gap.
     """
 
     certificate: GapCertificate

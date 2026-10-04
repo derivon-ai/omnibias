@@ -12,23 +12,19 @@ and runs ``lake build``.
 
 ``theorem_prover_verified`` is earned **only** by a genuine ``lake`` pass; with no
 toolchain present the check degrades gracefully (``available=False``,
-``verified=False``) and never raises.  An optional Mathlib-backed pass via
-``omnibias-formal`` is available when that package is installed.
+``verified=False``) and never raises.
 """
 
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from omnibias.core.proof.lean_check import (
     LeanCheckResult,
     check_certificate,
     lean_check_available,
 )
-
-if TYPE_CHECKING:
-    from omnibias.formal import DriveReport
 
 
 def lean_check_sos(
@@ -55,25 +51,9 @@ def lean_available() -> bool:
     return bool(lean_check_available())
 
 
-def drive_sos_obligation(
-    sealed_certificate: Mapping[str, Any], *, timeout: float = 1800.0
-) -> DriveReport | None:
-    r"""Optionally drive the Mathlib-backed loop over a sealed SOS certificate.
-
-    Requires the optional ``omnibias-formal`` package; returns ``None`` (never
-    raises) when it is not installed.  The Mathlib tier (``mathlib_verified``) it
-    can earn is deliberately **distinct** from the Mathlib-free kernel's
-    ``theorem_prover_verified`` and never implies ``unproven_claim``.
-    """
-    try:
-        from omnibias.formal import drive_obligation
-    except ImportError:
-        return None
-    return drive_obligation(sealed_certificate, timeout=timeout)
 
 
 __all__ = [
-    "drive_sos_obligation",
     "is_theorem_prover_verified",
     "lean_available",
     "lean_check_sos",

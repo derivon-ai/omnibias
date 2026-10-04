@@ -12,6 +12,9 @@ JAX backend that requires enabling x64 *before* keras imports.
 from __future__ import annotations
 
 import os
+from collections.abc import Iterator
+
+import pytest
 
 os.environ.setdefault("KERAS_BACKEND", "torch")
 
@@ -26,3 +29,14 @@ if os.environ["KERAS_BACKEND"] == "jax":
 import keras  # noqa: E402
 
 keras.config.set_floatx("float64")
+
+
+@pytest.fixture(autouse=True)
+def _float64_keras() -> Iterator[None]:
+    """Keep the numerical test contract independent of other suites' precision settings."""
+    previous = keras.config.floatx()
+    keras.config.set_floatx("float64")
+    try:
+        yield
+    finally:
+        keras.config.set_floatx(previous)

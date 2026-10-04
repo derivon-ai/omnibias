@@ -3,7 +3,7 @@
 """Release guard: the open-core licence split is internally consistent.
 
 omnibias is dual-tiered. ``[tool.omnibias.license_tiers]`` in the repository
-root ``pyproject.toml`` records, for each of the 42 distributions, whether it is
+root ``pyproject.toml`` records, for each retained distribution, whether it is
 
 * ``permissive`` -- ``Apache-2.0``; or
 * ``copyleft``   -- ``AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial``.
@@ -38,7 +38,10 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-import tomllib
+try:
+    import tomllib
+except ModuleNotFoundError:  # Python 3.10
+    import tomli as tomllib
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
 PACKAGES = REPO_ROOT / "packages"
@@ -160,8 +163,14 @@ def test_each_pyproject_declares_its_tier_as_a_pep639_expression() -> None:
             offenders[dist] = f"license is {declared!r}, want the SPDX string {wanted!r}"
         elif declared != wanted:
             offenders[dist] = f"{declared!r} != {wanted!r}"
-        elif project.get("license-files") != ["LICENSE"]:
-            offenders[dist] = f"license-files is {project.get('license-files')!r}, want ['LICENSE']"
+        else:
+            files = project.get("license-files", [])
+            if "LICENSE" not in files or any(not list(pkg_dir.glob(pattern)) for pattern in files):
+                offenders[dist] = f"license-files must include LICENSE and resolve: {files!r}"
+            elif "LicenseRef-omnibias-Commercial" in wanted:
+                bundled = {path.name for pattern in files for path in pkg_dir.glob(pattern)}
+                if "COMMERCIAL-LICENSE.md" not in bundled:
+                    offenders[dist] = "commercial alternative must bundle COMMERCIAL-LICENSE.md"
     assert not offenders, f"PEP 639 metadata drift: {offenders}"
 
 
@@ -184,7 +193,7 @@ def test_root_license_stays_agpl_for_the_repository() -> None:
 # ----------------------------------------------------------- README prose
 
 
-_README_LICENSE = re.compile(r"(?ms)^## License\s*\n(?P<body>.*?)(?=^## |\Z)")
+_README_LICENSE = re.compile(r"(?ms)^(?:## License\s*\n|License: ?)(?P<body>.*?)(?=^## |\Z)")
 
 
 def test_package_readme_license_matches_tier() -> None:
@@ -205,7 +214,7 @@ def test_package_readme_license_matches_tier() -> None:
         text = readme.read_text(encoding="utf-8")
         match = _README_LICENSE.search(text)
         if match is None:
-            offenders[dist] = "no ## License section"
+            offenders[dist] = "no license declaration"
             continue
         body = match.group("body")
         tier = tiers[dist]
@@ -241,13 +250,15 @@ def test_every_package_python_file_carries_its_tier_header() -> None:
     checked = 0
     for pkg_dir in _package_dirs():
         wanted = expressions[tiers[_dist_name(pkg_dir)]]
-        for path in _package_py_files(pkg_dir):
+        package_files = _package_py_files(pkg_dir)
+        assert package_files, f"no Python source scanned in {pkg_dir.name}"
+        for path in package_files:
             checked += 1
             head = path.read_text(encoding="utf-8", errors="ignore").splitlines()[:4]
             found = next((m.group("expr") for line in head if (m := _SPDX.match(line))), None)
             if found != wanted:
                 offenders[str(path.relative_to(REPO_ROOT))] = f"{found or '<none>'} (want {wanted})"
-    assert checked > 1000, f"header scan collapsed to {checked} files"
+    assert checked >= len(_package_dirs()), "header scan missed the package tree"
     assert not offenders, (
         "SPDX header drift -- run `python scripts/license_headers.py`: "
         + "; ".join(f"{k}: {v}" for k, v in sorted(offenders.items())[:20])

@@ -1,73 +1,84 @@
 # omnibias-difference
 
-**Status: Alpha (0.1.0a1).**
+**Differentiate the samples you have.** Sample locations and weights determine the discrete operator.
 
-The **founding `delta -> 0` register** of omnibias: discrete calculus and analytic
-combinatorics read off the closed-form derivative towers. This is *the* bias
-collapse the library is named for -- `K` biases on a difference stencil (spread
-`delta`), signs `s_k = (-1)^(K-k) C(K-1, k-1) / delta^(K-1)`, so
+![Differentiate the samples you have.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-difference/docs/visuals/story.gif)
 
-```
-f_K(z) = sum_k s_k * sigma(z + b_k)  ->  sigma^(K-1)(z + b_mean)   as delta -> 0
-```
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-difference/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-difference/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-difference/docs/visuals/scene.py)
 
-The many biases coalesce onto one value and the finite difference *becomes a
-derivative*. The closed-form tower evaluates that limit **exactly**, with no
-`1/delta^(K-1)` catastrophic cancellation.
+Sample locations, values and an extraction order enter; stencil coefficients, derivative estimates and scoped remainder information leave. Use this package when the source is discrete data or an exact recurrence rather than a trainable tensor network.
 
-## Capabilities
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
 
-- **Certified finite-difference -> derivative extraction.** The rigorous
-  interval-tower enclosure of `sigma^(n)(z)` (`omnibias.core.verified`), the
-  numerical finite-difference estimate, and a *certified* truncation-error bound
-  proving the estimate collapses into the enclosure as `delta -> 0`.
-- **Umbral / Sheffer sequence calculus.** The forward-difference operator, Newton
-  forward-difference interpolation, the falling/rising-factorial <-> monomial
-  change of basis (the Stirling transforms), and Appell / Sheffer sequences.
-- **Asymptotic-coefficient reading.** Stirling numbers (both kinds) off the
-  Bell / Faa di Bruno tower, Bernoulli numbers off the `tanh` tower, and Euler
-  (secant) numbers off the `sech` tower -- exact `int` / `Fraction`, each sealed
-  in a tightest outward-rounded interval, with asymptotic formulas.
-- **Bit-identical torch / jax twins** for the finite-difference stencil operator
-  (`omnibias.difference.torch` / `omnibias.difference.jax`).
-- **Exact rational irregular / Birkhoff stencils** (theory 01-04, **gated**):
-  `solve_irregular_stencil` over `Q`, `is_poised_exact`, `certified_irregular_error`.
-  Nodes are dimensionless `c_i` (units of `h`); order is asymptotic in `h`.
-  Scale-free weights use `A = a h^{q-p}`. See [docs/api/difference.md](../../docs/api/difference.md).
 
-## What this is and is not
+[API reference](https://omnibias.ai/api/difference/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-difference/src/omnibias/difference) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-difference/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-- Extraction is **closed-form** (the exact towers + exact integer/rational
-  coefficients). The finite-difference estimate and the mpmath comparison values
-  are **numerical**. Every result says which register it is in.
-- This is the `delta -> 0` **founding bias collapse** (a smooth *derivative*),
-  **not** `beta -> inf` **temperature collapse**, the penalty of `omnibias-convex` /
-  `-control` / `-routing` (a 0/1 feasibility step). Same word, different limit;
-  see `docs/theory.md` and the `omnibias-core-concepts` skill.
-- The pure-Python core depends only on `omnibias-core`; the stencil twins need
-  `omnibias-torch` / `omnibias-jax`.
+## The mathematical connection
 
-## Public API
+This package exposes the finite-spacing side of bias collapse. Normalized weighted shifts approach derivatives as the spacing vanishes; at nonzero spacing, truncation and cancellation must still be assessed. Its umbral and exact recurrence tools also operate algebraically. Temperature collapse does not define this sampling contract.
 
-```python
-from omnibias.difference import (
-    certified_derivative_enclosure, finite_difference_estimate, certified_fd_error,
-    stirling_second, stirling_first_signed, bell_number,
-    bernoulli_number, bernoulli_polynomial,
-    euler_number, eulerian_number,
-    forward_difference, newton_forward_coeffs, monomial_to_falling, falling_to_monomial,
-    bernoulli_asymptotic, euler_asymptotic, bell_number_asymptotic,
-    solve_irregular_stencil, is_poised_exact, certified_irregular_error,
-)
-```
+## Run this README
 
-## Tests
+The examples use `omnibias-difference` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-python -m pytest packages/omnibias-difference/tests -q
+python -m pip install --pre "omnibias-difference==0.1.0a2"
+```
+
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-difference/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+Sampled data and discrete sequences need a different register from an analytic neural activation. Difference makes the step size, stencil and algebra explicit. You can construct irregular derivative estimates, reason about their truncation bounds, or recover exact rational recurrence candidates from a finite sequence.
+
+## What you can build
+
+- Irregular stencil construction and moment identities.
+- Finite-step estimates with separately supplied regularity and remainder information.
+- Umbral algebra, series transforms and one canonical exact recurrence fitter.
+
+Use stencils when you have samples; use activation towers when you have a supported analytic model. Use recurrence fitting to propose compact sequence laws for symbolic or holonomic workflows. Keeping these modes separate prevents a numerical difference estimate from being presented as an exact derivative.
+
+## A working example
+
+```python
+from math import factorial
+from omnibias.difference.recurrence import discover_recurrence
+
+relation = discover_recurrence([factorial(n) for n in range(11)])
+assert relation is not None
+assert relation.order == 1
+assert relation.max_abs_residual([factorial(n) for n in range(16)]) == 0
+print(relation.coefficients)  # exact rational coefficients for a_n - n*a_(n-1)
+```
+
+## Choose the right contract
+
+A finite prefix can fit multiple recurrences. A zero residual on supplied samples is not a proof for all sequence indices; use held-out values and an independent identity argument. Likewise, a truncation certificate depends on its derivative bounds and does not automatically account for every floating-point error.
+
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/difference.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-difference/tests -q
 ```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-difference/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).

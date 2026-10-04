@@ -132,7 +132,6 @@ def test_honesty_keys_never_claim_no_condition() -> None:
     assert honesty["discovered_by_omnibias"] is True
     assert honesty["no_condition_exists_claim"] is False
     assert honesty["unnamed_condition_complete_claim"] is False
-    assert honesty["jacobian_conjecture_proof_claim"] is False
 
 
 def _isolated_sorts() -> dict[str, object]:

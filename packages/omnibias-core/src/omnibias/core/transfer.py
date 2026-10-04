@@ -2,7 +2,7 @@
 # Copyright (C) 2026 Derivon
 """1-D layered transfer matrices (theory 02-11).
 
-Distinct from ``omnibias.geometry.gauge.transfer``. One-dimensional layered
+One-dimensional layered
 propagation only. ``unitarity_residual`` is refused outside lossless
 reciprocal linear media. Certified gaps set ``continuum_claim=False``.
 """

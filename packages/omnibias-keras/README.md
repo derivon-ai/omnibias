@@ -1,75 +1,86 @@
 # omnibias-keras
 
-**Keras 3 unified backend for omnibias.**
+**Make operators part of the layer.** A Keras model can consume analytic derivative outputs.
 
-The same code runs on **TensorFlow, JAX, or PyTorch** because every kernel
-is written against `keras.ops`. The closed-form n-th derivative towers
-(`sigma^(n)(z)`) use the *same* polynomial coefficients as
-`omnibias-torch` and `omnibias-jax` — they are imported from the shared
-pure-Python `omnibias.core.polynomials`, so the closed-form activation /
-derivative math is **bit-identical across backends by construction**.
-End-to-end layer numerics otherwise follow the selected Keras backend.
+![Make operators part of the layer.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-keras/docs/visuals/story.gif)
 
-## Install
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-keras/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-keras/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-keras/docs/visuals/scene.py)
+
+A Keras tensor enters an operator-aware layer; a value or analytic activation derivative leaves with the same channel organization. Model builders can integrate the layer using their selected Keras backend and serialization workflow.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
+
+[API reference](https://omnibias.ai/api/keras/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-keras/src/omnibias/keras) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-keras/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+OMBU encodes bias collapse: a normalized pack of nearby activations converges to an activation derivative, which the analytic path evaluates directly. Its finite-bias and derivative contracts should be chosen explicitly. Temperature collapse is not a property of every Keras layer; smooth decision models need their own gates and schedule.
+
+## Run this README
+
+The examples use `omnibias-keras[torch]` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
 
 ```bash
-pip install omnibias-keras[jax]         # or [tf] / [torch]
+python -m pip install --pre "omnibias-keras[torch]==0.0.2a1"
 ```
 
-Select the Keras backend *before importing keras*:
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-keras/wheel-tests.toml)
+executes the examples below outside the source checkout.
 
-```bash
-export KERAS_BACKEND=jax                 # tensorflow | jax | torch
-```
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
-or in Python:
+## Why this package exists
+
+Keep the Keras model-building workflow while replacing supported activation derivatives with shared analytic formulas. Multi-bias units and operator blocks let an activation carry a selected derivative or other supported operator into a trainable layer. The mathematical coefficients come from core; tensor execution follows the chosen Keras backend.
+
+## What you can build
+
+- A shared activation registry through keras.ops.
+- OperatorMultiBiasUnit / OMBU and operator-typed blocks.
+- Dense and convolutional adapters plus identity-initialized and growable units.
+
+Choose this package for an existing Keras stack that needs activation-level operators. Choose the dedicated Torch or JAX distributions for the network-level directional and mixed jet APIs. A Keras backend choice is an installation and process-start decision, not something to switch after importing the library.
+
+## A working example
 
 ```python
 import os
-os.environ["KERAS_BACKEND"] = "jax"
-import keras  # noqa: E402
+os.environ.setdefault("KERAS_BACKEND", "torch")
+from keras import ops
+from omnibias.keras import OMBU
+
+unit = OMBU(num_channels=2, K=3, base="tanh")
+z = ops.convert_to_tensor([[0.2, -0.3]])
+value = unit(z)
+second = unit.analytic_derivative(z, order=2)
+assert tuple(value.shape) == tuple(second.shape) == (1, 2)
 ```
 
-## Quickstart
+## Choose the right contract
 
-```python
-import keras
-from omnibias.keras import OMBU, OperatorBlock, cmbDense
+Set KERAS_BACKEND before the first Keras import. Dtypes and gradients follow that backend, and serialization should be checked in the environment used for deployment. Activation-level derivative support does not imply that every arbitrary Keras model has an automatic whole-network jet conversion.
 
-# Trainable K-bias scalar operator (drop-in for an activation).
-ombu = OMBU(num_channels=4, K=2, base="tanh")
-y = ombu(keras.ops.zeros((8, 4)))
+## Explore and validate
 
-# Typed operator: closed-form 2nd derivative of the base activation.
-lap = OperatorBlock(channels=4, op="laplacian", base="gaussian")
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/keras.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
 
-# Dense + inline operator, a drop-in for keras.layers.Dense.
-model = keras.Sequential([
-    keras.layers.Input(shape=(4,)),
-    cmbDense(units=64, op="identity", base="tanh"),
-    cmbDense(units=1, op="identity", base="tanh"),
-])
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-keras/tests -q
 ```
-
-## Public API
-
-| Symbol | Role |
-|---|---|
-| `OperatorMultiBiasUnit` (`OMBU`) | trainable K-bias scalar operator |
-| `GrowableOperatorMultiBiasUnit` (`GrowableOMBU`) | OMBU with a growable K |
-| `OperatorBlock` | typed wrapper: `identity / grad / laplacian / derivative / band / integral` |
-| `cmbDense`, `cmbConv1D`, `cmbConv2D` | drop-in `Dense` / `Conv1D` / `Conv2D` with an inline operator |
-| `KGrowthScheduler` | plateau-triggered K-growth controller |
-| `get_activation`, `list_activations`, `register_activation`, `is_registered` | activation registry |
-
-## Activation dictionary
-
-Same names as the other backends: `sigmoid`, `tanh`, `softplus`,
-`gaussian`, `exp`, `relu`, `silu`, `gelu`, `huber`, `arctan`, `log1pu2`,
-`sin`, `cos`, `sinh`, `cosh`, `tan`, `cot`, `coth`, `sech`, `log_cosh`,
-`softabs`, `smooth_sign`, `mish`.
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-keras/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).

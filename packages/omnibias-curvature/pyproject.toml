@@ -4,12 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-curvature"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Closed-form parameter Hessian / Gauss-Newton Fisher / KFAC factors for one-hidden-layer Riccati fields, built on the omnibias closed-form σ' / σ'' primitives."
 readme = "README.md"
 requires-python = ">=3.10"
-license = "Apache-2.0"
-license-files = ["LICENSE"]
+license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+license-files = ["LICENSE", "NOTICE", "COMMERCIAL-LICENSE.md"]
 authors = [{ name = "Vardan Grigoryants", email = "vardan@derivon.ai" }]
 maintainers = [{ name = "Derivon", email = "info@derivon.ai" }]
 keywords = ["second-order-optimization", "fisher-information", "kfac", "riccati", "natural-gradient", "closed-form-hessian"]
@@ -26,14 +26,14 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
 dependencies = [
-    "omnibias-core>=0.2.0",
-    "omnibias-jax>=0.2.0",
+    "omnibias-core>=0.5.0rc1",
+    "omnibias-jax>=0.5.0rc1",
     "jax>=0.4.30",
     "numpy>=1.23",
 ]
 
 [project.optional-dependencies]
-torch = ["omnibias-torch>=0.2.0", "torch>=2.0"]
+torch = ["omnibias-torch>=0.5.0rc1", "torch>=2.0"]
 test = ["pytest>=7.0"]
 
 [project.urls]

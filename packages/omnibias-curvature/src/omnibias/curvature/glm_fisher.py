@@ -1,10 +1,9 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""Multi-parameter Fisher information for one-layer GLM fields (JAX).
 
 Two complementary objects lift the *scalar* Fisher information
-``A''(theta)`` (``omnibias.jax.information.fisher_information``, the exact 1-D
-Fisher-Rao metric) to many parameters:
+``A''(theta)`` (the exact one-dimensional Fisher information) to many parameters:
 
 * :func:`fisher_information_metric` -- the exponential-family **Fisher-Rao
   metric in natural coordinates**: the ``(d, d)`` diagonal matrix
@@ -37,7 +36,6 @@ import jax.numpy as jnp
 from jax import Array
 from omnibias.curvature.one_layer import one_layer_param_grad
 from omnibias.jax.activations import get_activation
-from omnibias.jax.information import glm_variance
 
 #: GLM family -> log-partition activation whose 2nd derivative is the variance
 #: function ``A''``. ``None`` marks the unit-variance Gaussian family.
@@ -46,6 +44,13 @@ _FAMILY_LOG_PARTITION: dict[str, str | None] = {
     "poisson": "exp",
     "gaussian": None,
 }
+
+
+def _log_partition_derivative(eta: Array | float, *, base: str, order: int) -> Array:
+    spec = get_activation(base)
+    if spec.fastpath is None:
+        raise ValueError(f"activation {base!r} has no closed-form derivative tower")
+    return spec.fastpath(jnp.asarray(eta), order)
 
 
 def fisher_information_metric(
@@ -59,7 +64,7 @@ def fisher_information_metric(
     For ``d == 1`` this is the 1-D Fisher information embedded as a ``(1, 1)``
     matrix.
     """
-    v = glm_variance(eta, base=base)
+    v = _log_partition_derivative(eta, base=base, order=2)
     d = v.shape[-1]
     eye = jnp.eye(d, dtype=v.dtype)
     out: Array = v[..., :, None] * eye
@@ -76,7 +81,7 @@ def _glm_weights(eta: Array, family: str) -> Array:
     base = _FAMILY_LOG_PARTITION[family]
     if base is None:
         return jnp.ones_like(eta)
-    return glm_variance(eta, base=base)
+    return _log_partition_derivative(eta, base=base, order=2)
 
 
 def glm_fisher(

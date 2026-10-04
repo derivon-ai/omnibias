@@ -6,7 +6,7 @@ Wraps the existing interior-point solver and the Neumaier-Shcherbina
 bound. Soft membership is temperature collapse (``beta -> inf``,
 feasibility), not the founding bias collapse (``delta -> 0``). Do not conflate
 the two.
-Not a new LP algorithm, not P vs NP.
+Not a new LP algorithm.
 """
 
 from __future__ import annotations

@@ -1,45 +1,82 @@
 # omnibias-qcalculus
 
-**Status: Alpha (0.1.0a1).**
+**Calculus on a geometric grid.** Exact q-polynomial coefficients approach ordinary derivatives.
 
-Quantum / *q*-calculus on top of the omnibias closed-form tower and the founding
-`omnibias-difference` register.
+![Calculus on a geometric grid.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-qcalculus/docs/visuals/story.gif)
 
-## Capabilities
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-qcalculus/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-qcalculus/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-qcalculus/docs/visuals/scene.py)
 
-- **Exact q-combinatorics** (`omnibias.qcalculus`): the q-number `[n]_q`, q-factorial
-  `[n]_q!`, Gaussian / q-binomial `[n choose k]_q`, and the q-Pochhammer `(a; q)_n` --
-  in exact `Fraction` arithmetic at numeric `q`, plus exact **integer-polynomial** forms
-  in `q` (the Gaussian polynomials via the q-Pascal recurrence).
-- **Jackson calculus**: the q-derivative `D_q f = (f(qx) - f(x)) / ((q-1)x)` and the
-  q-integral (Jackson sum), both as exact polynomial operators and as numerical operators
-  on callables.
-- **q-special functions**: the two q-exponentials `e_q`, `E_q` (with the certified
-  `e_q(z) E_q(-z) = 1` identity), and q-deformed Bernoulli / Euler numbers.
-- **Basic hypergeometric series** `_r phi_s(a; b; q, z)` with a **certified** geometric
-  tail enclosure (reusing `omnibias.core.verified`), alongside the plain numerical
-  direct-summation baseline.
-- **Backend twins**: bit-identical PyTorch / JAX Jackson q-derivatives of the activation
-  dictionary.
+A q-parameter and algebraic coefficients enter; q-numbers, Jackson derivatives and q-integrals leave. Multiplicative sampling supports calculations on a geometric grid, distinct from an additive finite-difference stencil.
 
-## The `q -> 1` collapse (honesty)
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
 
-Every q-object reduces to its ordinary-calculus counterpart as `q -> 1`: `[n]_q -> n`,
-`D_q f -> f'`, `e_q -> exp`. This is a **distinct limit** from the `delta -> 0` founding
-bias-collapse of `omnibias-difference` (a finite difference becoming a derivative) and
-from the `beta -> inf` feasibility penalty of `omnibias-convex` -- same spirit, different
-parameter. The three are never conflated.
 
-## Honesty labels
+[API reference](https://omnibias.ai/api/qcalculus/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-qcalculus/src/omnibias/qcalculus) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-qcalculus/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-- **closed-form / exact**: q-numbers, q-factorials, Gaussian binomials, q-Pochhammer,
-  the polynomial q-derivative / q-antiderivative, and q-Bernoulli / q-Euler numbers
-  (exact `Fraction`).
-- **numerical**: the callable Jackson derivative / integral and the direct q-series sums.
-- **numerical (certified)**: the basic-hypergeometric and q-exponential enclosures, whose
-  geometric tails are rigorously bounded.
+## The mathematical connection
+
+The defining limit here is q → 1, which recovers ordinary calculus. It is distinct from both bias collapse (normalized nearby shifts) and temperature collapse (sharpening soft alternatives). Neither founding mechanism should be substituted for the q-calculus operator definition or its domain restrictions.
+
+## Run this README
+
+The examples use `omnibias-qcalculus` on Python >=3.10. Their installed-wheel
+profile selects runtime features, not an editable workspace. Install the prepared
+prerelease from PyPI:
+
+```bash
+python -m pip install --pre "omnibias-qcalculus==0.1.0a2"
+```
+
+For local development before publication, build and test the coordinated wheelhouse
+using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md).
+The package's [wheel profile](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-qcalculus/wheel-tests.toml)
+executes the examples below outside the source checkout.
+
+Existing published consumers may need historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
+
+## Why this package exists
+
+Some discrete and multiplicative-scale problems are expressed more naturally by q-differences than by ordinary shifts. Qcalculus exposes that deformation explicitly and connects it to the ordinary derivative as q approaches one. Exact polynomial operations make the relation easy to inspect without numerical differencing.
+
+## What you can build
+
+- q-brackets, factorials, binomials and polynomial transforms.
+- Jackson derivatives and antiderivatives.
+- q-exponential families, series bounds and optional tensor realizations.
+
+Use qcalculus for multiplicative sampling, q-series experiments and time-scale or symbolic consumers that need this register. Its q→1 limit is a separate mechanism from bias collapse and temperature hardening. Select the register that represents the mathematical problem rather than treating the parameters as interchangeable temperatures.
+
+## A working example
+
+```python
+from fractions import Fraction
+from omnibias.qcalculus import q_derivative_poly
+
+# Coefficients are ordered from constant term upward: f(x) = x**2.
+assert q_derivative_poly([0, 0, 1], Fraction(1, 2)) == (Fraction(0), Fraction(3, 2))
+assert q_derivative_poly([0, 0, 1], Fraction(1)) == (Fraction(0), Fraction(2))
+```
+
+## Choose the right contract
+
+Numeric series require a supported q-domain and truncation/convergence controls. Near q=1, a direct quotient may be poorly conditioned; prefer the explicit limit or polynomial path where available. Exact rational coefficients do not make arbitrary floating-point series evaluations exact.
+
+## Explore and validate
+
+The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/qcalculus.md) contains the generated module/export
+inventory. Use it to find the focused implementation rather than guessing a
+symbol from another package. The [capability map](https://github.com/derivon-ai/omnibias/blob/main/docs/capabilities.md)
+connects the primitives to larger scientific workflows.
+
+From the main repository, run the package’s regression suite:
+
+```bash
+uv run pytest packages/omnibias-qcalculus/tests -q
+```
 
 ## License
 
-Apache-2.0. See [`LICENSE`](LICENSE) and [`../../LICENSING.md`](../../LICENSING.md).
-You never need a commercial licence for this package.
+Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-qcalculus/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).

@@ -5,10 +5,10 @@
 
 | Role | Name | Contact | Scope |
 |---|---|---|---|
-| Founder, Lead Maintainer | Vardan Grigoryants | <vardan@derivon.ai> | all 42 packages |
+| Founder, Lead Maintainer | Vardan Grigoryants | <vardan@derivon.ai> | all primitive packages |
 
 Copyright is held by **Derivon** (<info@derivon.ai>), which is the project
-steward and the counterparty to the [CLA](docs/CLA.md) and to commercial
+steward and the counterparty to the [CLA](CLA.md) and to commercial
 licences.
 
 ## Current state: solo maintainer
@@ -21,7 +21,7 @@ whether to depend on it. The practical consequences:
   time allows; there is no rota and no on-call.
 - **The bus factor is 1.** Mitigations in place: everything runs in public CI,
   every invariant that matters is a test rather than a convention, and the repo
-  is self-describing ([`AGENTS.md`](AGENTS.md), `.cursor/skills/`) so a
+  is self-describing ([`AGENTS.md`](AGENTS.md), `.agents/skills/`) so a
   successor can pick it up. That reduces the risk; it does not eliminate it.
 - **Security reports still get priority.** See [`SECURITY.md`](SECURITY.md) for
   the disclosure process and response targets.

@@ -1,85 +1,68 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 <!-- Copyright (C) 2026 Derivon -->
 
-# omnibias Commercial License (summary)
+# Commercial licensing and supported deployments
 
-> This document is a **plain-language summary** of the commercial license
-> offer. It is **not** the binding contract and is **not legal advice**. The
-> binding terms are in the signed commercial license agreement issued by
-> **Derivon**. To request the agreement, contact **info@derivon.ai**.
+**Build on the open core. Buy the rights, integration and support your product needs.**
+Contact **[info@derivon.ai](mailto:info@derivon.ai)** to discuss a deployment.
 
-## First: check whether you actually need one
+This is a nonbinding offer, not a commercial license grant. Binding rights arise
+only from a signed agreement identifying the covered software and legal parties.
+IP counsel must review those terms before execution.
 
-**Most of omnibias does not require a commercial license, ever.** The 28
-packages in the permissive tier — the derivative tower and everything built
-directly on it, including `omnibias-core`, `omnibias-torch`, `omnibias-jax`,
-`omnibias-keras`, `omnibias-fields`, `omnibias-pinn`, and `omnibias-geometry` —
-are **Apache-2.0**. Ship them in a closed-source product, run them behind a
-hosted API, redistribute them: no copyleft, no §13 disclosure, no conversation
-with us required.
+## Start with the package license
 
-This page is only about the **14 copyleft-tier packages**:
+The nine permissive primitives—including core, torch, jax, keras and fields—are
+Apache-2.0. Commercial use under Apache requires no separate commercial agreement.
+The eight previously published distributions retain that permissive path.
 
-`omnibias-verify`, `omnibias-formal`, `omnibias-sos`, `omnibias-dynamics`,
-`omnibias-convex`, `omnibias-discrete`, `omnibias-qubo`, `omnibias-logic`,
-`omnibias-nphard`, `omnibias-submodular`, `omnibias-combinatorics`,
-`omnibias-routing`, `omnibias-tab`, `omnibias-control`.
+The seven advanced engines are **convex, curvature, discrete, graph, partition,
+sos and struct**. Their expression is
+`AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial`. Extracted consumers identify
+their own terms. See the generated [license inventory](LICENSING.md).
 
-Their SPDX expression is `AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial`.
-See [`LICENSING.md`](LICENSING.md) for the full tier table.
+Customers complying with AGPL do not need a commercial alternative. Internal
+computation does not automatically require payment, and simulation outputs are
+not automatically covered by AGPL. Distribution and remote interaction with
+modified software have distinct source obligations; assess the actual integration
+under [AGPL sections 2 and 13](https://www.gnu.org/licenses/agpl-3.0.en.html).
+Historical Apache grants remain intact, including previously public GitHub code.
 
-Note also that no permissive package depends on a copyleft one, through
-required or optional dependencies — enforced in CI. So installing a Tier-P
-package with any set of extras cannot pull an AGPL package into your tree and
-cannot create an obligation by accident.
+## Three ways to work together
 
-## When you need this
+| Offer | Defined rights and deliverables | Commercial structure |
+| --- | --- | --- |
+| Industrial R&D | A scoped pilot, customer-data validation, internal production deployment, integration and supported releases | Paid pilot followed by an annual deployment/support agreement |
+| OEM embedding | Named-product integration, redistribution and downstream deployment rights for specified packages | Annual minimum and an agreed deployment/distribution metric |
+| Hosted service | Access to a managed scientific product, or hosting rights for a service vendor | Subscription or usage/concurrency bands, with separately scoped private deployments |
 
-You need a commercial license if you use one of the 14 packages above and do
-**not** want to comply with the [GNU AGPL-3.0](LICENSES/AGPL-3.0-or-later.txt)
-— most commonly because you intend to:
+A hosting grant does not automatically include OEM redistribution. An internal
+license identifies permitted affiliates and contractors. OEM terms address
+sublicensing and the continued use of already shipped products when the agreement
+ends. Support can also be purchased for Apache packages without restricting their
+existing rights.
 
-- ship a copyleft-tier package inside a **proprietary / closed-source**
-  application;
-- run a **hosted or SaaS** offering on top of a modified copyleft-tier package
-  without publishing your modified source (the AGPL §13 trigger);
-- redistribute a copyleft-tier package under terms other than the AGPL; or
-- require a **warranty, indemnity, or support commitment**.
+## What an agreement specifies
 
-If you are doing open-source work, internal research, or are happy to comply
-with the AGPL, you do **not** need this — just use the AGPL branch.
+Use a master agreement and an order form selecting internal, OEM or hosting rights.
+Specify covered packages/releases, term, update and maintenance rights, deployment
+scope, fees, service levels and termination. Separate license fees from support.
 
-## What the commercial license grants (typical terms)
+Keep customer data ownership and confidentiality explicit. Identify pre-existing
+background IP, reusable improvements and ownership of customer-specific work.
+Validation criteria cover agreed workloads; derivative microbenchmarks are not
+promises of whole-application speedups or universal scientific accuracy.
 
-Subject to the signed agreement, a commercial license typically grants:
+Warranty, indemnity and liability limits require explicit negotiated terms.
+Nothing here promises those commitments. Neither tier grants the omnibias name
+or logo; [trademark terms](TRADEMARKS.md) continue to apply.
 
-- a non-exclusive, worldwide, royalty-bearing (or paid-up) license to use,
-  modify, and distribute the covered packages **without** the AGPL copyleft /
-  §13 source-disclosure obligations;
-- the right to distribute them in **object/binary** form as part of a larger
-  proprietary work;
-- optional **support, maintenance, and warranty** terms; and
-- optional **patent assurances** and **indemnification**, by negotiation.
+## New industrial products
 
-## What it does not grant
+New domain workflows, integrations, validated solution libraries and deployment
+capabilities may be proprietary products. Existing Apache code remains Apache;
+repackaging it does not create exclusive rights. The commercial value is a
+supported solution to an agreed customer problem.
 
-- Any rights over the permissive tier — those are already Apache-2.0 and a
-  commercial agreement neither adds to nor restricts them.
-- Rights to the **"omnibias" trademark** beyond fair / nominative use
-  (see [`TRADEMARKS.md`](TRADEMARKS.md)).
-- Any ownership of the copyright, which is retained by **Derivon**.
-
-## Pricing & tiers
-
-Pricing is by agreement and typically scales with company size and use case
-(startup / SMB / enterprise / OEM-redistribution). Academic and
-single-developer rates may be available.
-
-## How to obtain a license
-
-1. Email **info@derivon.ai** with your company name, which copyleft-tier
-   packages you need, your intended use (embedded vs hosted), and expected
-   scale.
-2. You will receive the commercial license agreement and a quote.
-3. On signature and payment, you receive a written grant and, if purchased, a
-   support channel.
+For a proposal, email the intended workflow, integration mode, deployment scale,
+validation baseline and support needs. Prices and final scope are set by agreement.

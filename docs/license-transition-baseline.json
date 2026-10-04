@@ -1,0 +1,475 @@
+{
+  "schema": 1,
+  "baseline_commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+  "purpose": "Historical license grants before the prospective open-core transition; existing Apache grants remain available.",
+  "distributions": [
+    {
+      "name": "omnibias-binary",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-binary/pyproject.toml",
+      "manifest_sha256": "7e3d74e6a5dd411be5f9dff2f9766a0f49f515290190c287fce873879a5e4c47"
+    },
+    {
+      "name": "omnibias-boolean",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-boolean/pyproject.toml",
+      "manifest_sha256": "9305147f73391d0b69ae6c0e18bcf63b041c67ecf3581029478cd41d218185c4"
+    },
+    {
+      "name": "omnibias-convex",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-convex/pyproject.toml",
+      "manifest_sha256": "f87d9e0fc935a615938f14768776e5be55a811aa148aeefacae0f2867dbdac11"
+    },
+    {
+      "name": "omnibias-core",
+      "version": "0.4.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-core/pyproject.toml",
+      "manifest_sha256": "7633cb55c7cf0cdda8e11e9c74b20ae45616ec0edc794c0b6ffab61d09dc761a"
+    },
+    {
+      "name": "omnibias-curvature",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-curvature/pyproject.toml",
+      "manifest_sha256": "d4bc072ac0e4c50e2ce08ea85599058050fd0b496654c12268efe373c5303598"
+    },
+    {
+      "name": "omnibias-difference",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-difference/pyproject.toml",
+      "manifest_sha256": "9783f210beb0d35fe8bef1c3016a2c82d272438ce667e650f5d2589f745132f4"
+    },
+    {
+      "name": "omnibias-discrete",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-discrete/pyproject.toml",
+      "manifest_sha256": "a5f1d91479139a3f9f21450f23ac1c5bd39632e5630f0bca5594f5dded65eec6"
+    },
+    {
+      "name": "omnibias-fields",
+      "version": "0.1.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-fields/pyproject.toml",
+      "manifest_sha256": "460bedf5664d6b99077a0a1c8362120a45524d5213fb4e0115005727ec88bc19"
+    },
+    {
+      "name": "omnibias-graph",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-graph/pyproject.toml",
+      "manifest_sha256": "93e44282075d631202885d957bec4ca7e39de4651f1736d18af9906510bafc4e"
+    },
+    {
+      "name": "omnibias-jax",
+      "version": "0.4.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-jax/pyproject.toml",
+      "manifest_sha256": "9a2aef097aa8f1e8c533cd61001d3cb3d6c44fee3cdc40cc1801b18fb8c53a16"
+    },
+    {
+      "name": "omnibias-keras",
+      "version": "0.0.1a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-keras/pyproject.toml",
+      "manifest_sha256": "1b386cf09e39295036cc8c237090775f3f2ee250996b7467c674bf69b2e21fe4"
+    },
+    {
+      "name": "omnibias-partition",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-partition/pyproject.toml",
+      "manifest_sha256": "d5190f09496df46ccf16b42e88005ec17ea02fd5eb07261c04d99d4e137111e7"
+    },
+    {
+      "name": "omnibias-qcalculus",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-qcalculus/pyproject.toml",
+      "manifest_sha256": "24d065f3c1b0bd3623dbe5821d38fe076157ad3b252be0beb95d91a5d7a22d4b"
+    },
+    {
+      "name": "omnibias-sos",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-sos/pyproject.toml",
+      "manifest_sha256": "6d7d7b2ff4a619139f81171d662253a3733f116f5426012e46d3f72675e38b9b"
+    },
+    {
+      "name": "omnibias-struct",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-struct/pyproject.toml",
+      "manifest_sha256": "e2dac989c7519051ac483d0aa17df98d8ce16c0df47f2904fd92f3e5780fe900"
+    },
+    {
+      "name": "omnibias-torch",
+      "version": "0.4.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias",
+      "commit": "115a417d6bee7687137f2f8a36a88dbe7df12c52",
+      "manifest": "packages/omnibias-torch/pyproject.toml",
+      "manifest_sha256": "7c5765312a20bbdcff7a2da0fcaaf69efeedab982f1b5d7c9b410d8b80eacc8c"
+    },
+    {
+      "name": "omnibias-combinatorics",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-combinatorics",
+      "commit": "d41845a252f31f6f6b697471894bda1cc9087b73",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "c1581ee2f08d16edc8209588877972bc6a6b2ee182fabd0cbe0d7a5e7412b41b"
+    },
+    {
+      "name": "omnibias-control",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-control",
+      "commit": "fbe65047cb2d77bddd7697078f0ab9af77ef527f",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "654da547870541e5e67a54c7f932925766496b68443a6b7b813f8b887f52bfaa"
+    },
+    {
+      "name": "omnibias-dynamics",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-dynamics",
+      "commit": "597e3f7ca0d12634bc0a2d2b2f259ac3954870c6",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "408dc8c225aa8dba208212bb38588494233bc556bb601e696213bd5820a902fa"
+    },
+    {
+      "name": "omnibias-ferminet",
+      "version": "0.2.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias-ferminet",
+      "commit": "65fa1fe96e1ab7fa420dff9fc1b1a69b39f8ff6c",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "e012029170b1fd02c38e6929e37df7edf04cd39d114c6b79fc69841428bf4aaa"
+    },
+    {
+      "name": "omnibias-formal",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-formal",
+      "commit": "83e9b00053a5241d262e3b32cfe3bae90d76b372",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "671f714d9c5cafab4eabebc46c36c0d13a7a394df88e0185f6356f4beb0cdd8a"
+    },
+    {
+      "name": "omnibias-fractional",
+      "version": "0.1.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias-fractional",
+      "commit": "16e8e7494094ba0ebfbff1d96010b9b6ac873f1b",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "d20feec9fd07df731b29294f308e0f2faf47ee83020e3ce68737e59d7ec5ce0d"
+    },
+    {
+      "name": "omnibias-geometry",
+      "version": "0.2.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias-geometry",
+      "commit": "63fd62646e9aba8da03a9c2fac36d36bce872b39",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "946f859a84e36487884ee4a4e0c3d86cad9e5227739d0a13b1fa49c8d3e23922"
+    },
+    {
+      "name": "omnibias-holonomic",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-holonomic",
+      "commit": "6303977e06d3b60297857c3c957b51dbb4f0107e",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "ed1f1ebab62c8dd79255834bf98f78c3a2f9a48633f1b1cc700917cea2c6645d"
+    },
+    {
+      "name": "omnibias-hopfield",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-hopfield",
+      "commit": "8c5abd7f8921b19bee05c9450f7433f8bd7559f8",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "4575d83f8ea407e93b17e5c9cdbbc983422a187c976d52eb0e01a4f1241da8b5"
+    },
+    {
+      "name": "omnibias-logic",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-logic",
+      "commit": "ce60e986de50359d7f1a96cd2250eac73153f01f",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "1015567b4e4506307d3a255ecb7e7e8a0784ed5862922baba1f74cc1b97507ad"
+    },
+    {
+      "name": "omnibias-measure",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-measure",
+      "commit": "55b992da473800ec3ba4895e1d28013883c9b0cc",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "3f24c46a18cb63f98b18fee4547d42440cf22c1d4783f2c619989678e668bfcf"
+    },
+    {
+      "name": "omnibias-nphard",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-nphard",
+      "commit": "46e7c756f24cccdf3fabd536c08964f8ec343e95",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "f581268fcd645ca5b9b95ead3eb2dd19bd0a7644ebc7f88734c786cb0ef7a06e"
+    },
+    {
+      "name": "omnibias-pinn",
+      "version": "0.1.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias-pinn",
+      "commit": "7359cbfd01064b4e8c56c24c600fd62519f3db6e",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "dc84b4f4aeb8d8231caf70d901d460445c0c2f89774ee120dda248ed62683865"
+    },
+    {
+      "name": "omnibias-qpinn",
+      "version": "0.0.2a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-qpinn",
+      "commit": "43b2754c8af305d5fa1d6207a1f1f5d6bc9dc2e2",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "99cdf7f2d59f0ac858c36606a5bab8d03b2e1c44e8301b95546dd6ec035ece81"
+    },
+    {
+      "name": "omnibias-qubo",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-qubo",
+      "commit": "092fc58d8e18ff185995ad6a23b167d1bf0be8a7",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "71f9bc8f538252026b18c5756cf2f7ea3aea34d4175421c6e57a92d4ef080b01"
+    },
+    {
+      "name": "omnibias-research",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-research",
+      "commit": "a5814dc7a39868a8a0fb24ad153d62dd7972d48b",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "fa6c127e71c2fc202bbe771e3220959ca270daaecc7f44b3701b4fa6afdcb4a8"
+    },
+    {
+      "name": "omnibias-routing",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-routing",
+      "commit": "5c70b68a21499f528849354b21f83e5d20d9c5a3",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "bc17ea6a6725626d1fd9842988e80f63ccad9d423e1c86d46e8b1c6a0f9da1d0"
+    },
+    {
+      "name": "omnibias-score",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-score",
+      "commit": "8af6828b9d3115ae8b21df02d7953028ea8e3767",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "48713bd0301872f4a7e1e22208cd42c7e6810cdb26f94e1a74804404543021ed"
+    },
+    {
+      "name": "omnibias-shape",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-shape",
+      "commit": "00e266eeda18a5c7d6a45d1b7ad4513025f73b46",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "b6a3e32935c6a34313b99940c938d61c5980884b3ba93dea0a34101396eec72f"
+    },
+    {
+      "name": "omnibias-skills",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-skills",
+      "commit": "3939117fc5f8dd5356d8ad8ad6ad51bfdbb3861b",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "206e8ed23da187b8474aa9252b2aa5de3a41f81d6264aba7763bc27d9e3a5d93"
+    },
+    {
+      "name": "omnibias-spiking",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-spiking",
+      "commit": "5b57e137a0cc054f7c36b184003d94b453f13f29",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "1858b2f25fba7721a25dfe2d9872b8f4165fd32bc532be57ae1f3c9fdf90ada5"
+    },
+    {
+      "name": "omnibias-submodular",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-submodular",
+      "commit": "5cc77dcde3bada60c3f7aaf5e69931a225015921",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "ebe2d911fdc53395b63ecd06b85ab805d571181f44587757cdf1bddac7866b0c"
+    },
+    {
+      "name": "omnibias-symbolic",
+      "version": "0.1.0",
+      "license": "Apache-2.0",
+      "repository": "omnibias-symbolic",
+      "commit": "1e9b58ecc949e4f0bc6baa972c3c3ea97962b470",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "217d2cb8d22f9e7874cacfa37ba64fc7d66dcf9bf32032e7f5d6fd6192623d1d"
+    },
+    {
+      "name": "omnibias-tab",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-tab",
+      "commit": "2de0afab47448c32df67158402f6a52f17357611",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "fc45ea81f45bb0b7949e32b76ede4bc59bf049cf8c6bdfd523c4f923936f6881"
+    },
+    {
+      "name": "omnibias-timescale",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-timescale",
+      "commit": "dd70f3649a546a56515ef65e6b3d6e9356d20638",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "be539fe8622ff49c0d64763e61cab52c0d7b0f1362d2cb782a8ff2aef8ae1825"
+    },
+    {
+      "name": "omnibias-variational",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0",
+      "repository": "omnibias-variational",
+      "commit": "854c5b91c898c2e9a397444b9c0d3b417e53abe6",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "8953a01e1006c139f69b67346c56d44d52f306cf21c6944598bbcad7f28d65d7"
+    },
+    {
+      "name": "omnibias-verify",
+      "version": "0.1.0a1",
+      "license": "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial",
+      "repository": "omnibias-verify",
+      "commit": "80e03470d463af4715ec1a2544c8e45e5481edd8",
+      "manifest": "pyproject.toml",
+      "manifest_sha256": "f211a2d621f58af6dd90d9a854c35e38c8cb70b254116339d18a0045098fb82d"
+    },
+    {
+      "name": "omnibias-research-certified",
+      "version": "0.1.0a1",
+      "license": "Apache-2.0 AND (AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial)",
+      "repository": "omnibias-research",
+      "commit": "a5814dc7a39868a8a0fb24ad153d62dd7972d48b",
+      "manifest": "packages/omnibias-research-certified/pyproject.toml",
+      "manifest_sha256": "e7cb5f2cae39bd86b9e610dd976853ff8f319f80e84ae4698aba8afd52901823"
+    }
+  ],
+  "provenance_review": {
+    "basis": "Maintainer confirmed ownership/control of relevant rights; source attribution and Git authorship inspected. This record does not replace legal review of employer or third-party rights.",
+    "changed_distributions": [
+      {
+        "distribution": "omnibias-curvature",
+        "authors": [
+          "Derivon",
+          "Vardan Grigoryants"
+        ],
+        "source_files": 13,
+        "recorded_copyright": "Copyright (C) 2026 Derivon",
+        "additional_source_attributions_found": false
+      },
+      {
+        "distribution": "omnibias-graph",
+        "authors": [
+          "Derivon",
+          "Vardan Grigoryants"
+        ],
+        "source_files": 13,
+        "recorded_copyright": "Copyright (C) 2026 Derivon",
+        "additional_source_attributions_found": false
+      },
+      {
+        "distribution": "omnibias-partition",
+        "authors": [
+          "Derivon",
+          "Vardan Grigoryants"
+        ],
+        "source_files": 18,
+        "recorded_copyright": "Copyright (C) 2026 Derivon",
+        "additional_source_attributions_found": false
+      },
+      {
+        "distribution": "omnibias-struct",
+        "authors": [
+          "Derivon",
+          "Vardan Grigoryants"
+        ],
+        "source_files": 58,
+        "recorded_copyright": "Copyright (C) 2026 Derivon",
+        "additional_source_attributions_found": false
+      },
+      {
+        "distribution": "omnibias-symbolic",
+        "authors": [
+          "Vardan Grigoryants"
+        ],
+        "source_files": 41,
+        "recorded_copyright": "Copyright (C) 2026 Derivon",
+        "additional_source_attributions_found": false
+      },
+      {
+        "distribution": "omnibias-hopfield",
+        "authors": [
+          "Vardan Grigoryants"
+        ],
+        "source_files": 9,
+        "recorded_copyright": "Copyright (C) 2026 Derivon",
+        "additional_source_attributions_found": false
+      },
+      {
+        "distribution": "omnibias-shape",
+        "authors": [
+          "Vardan Grigoryants"
+        ],
+        "source_files": 19,
+        "recorded_copyright": "Copyright (C) 2026 Derivon",
+        "additional_source_attributions_found": false
+      }
+    ]
+  }
+}

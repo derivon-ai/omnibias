@@ -40,9 +40,10 @@ _DOTTED = re.compile(r"omnibias(?:\.[A-Za-z_][A-Za-z0-9_]*)+")
 #: carries the reason it can never resolve.
 ALLOWLIST: frozenset[str] = frozenset(
     {
-        "omnibias.md",  # the always-apply rule file .cursor/rules/omnibias.md
+        "omnibias.mdc",  # the always-apply Cursor capability rule filename
         "omnibias.ipynb",  # a notebook filename
         "omnibias.ai",  # the documentation domain, https://omnibias.ai/
+        "omnibias.git",  # repository clone URL suffix, not a Python module
         # TOML table paths in the root pyproject, not importable modules.
         "omnibias.license_tiers",
         "omnibias.license_expressions",
@@ -55,6 +56,14 @@ _SCAN_GLOBS = ("docs/**/*.md",)
 _SCAN_FILES = ("llms.txt", "README.md")
 
 _EXEMPT_FILES: frozenset[str] = frozenset()
+
+# This migration page explicitly describes external add-on imports. Their real
+# imports are checked in the certified installed-wheel profile, not this repo.
+_EXTERNAL_MENTIONS = {
+    "docs/license-transition.md": frozenset({
+        "omnibias.pinn.certified", "omnibias.pinn.jax.discovery",
+    }),
+}
 
 
 def _scanned_files() -> list[Path]:
@@ -83,7 +92,7 @@ def _mentions() -> dict[str, list[str]]:
     for path in _scanned_files():
         rel = str(path.relative_to(REPO_ROOT))
         for match in _DOTTED.findall(path.read_text(encoding="utf-8")):
-            if match in ALLOWLIST:
+            if match in ALLOWLIST or match in _EXTERNAL_MENTIONS.get(rel, ()):
                 continue
             where = found.setdefault(match, [])
             if rel not in where:

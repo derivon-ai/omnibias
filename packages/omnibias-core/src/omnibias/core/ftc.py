@@ -10,8 +10,7 @@ founding bias collapse (``delta -> 0``) of the same window is
 (``beta -> inf``, feasibility) does not appear. Do not conflate the
 two.
 
-This is a 1-D FTC identity, not a VPINN / weak form, and not CCF
-stretch.
+This is a 1-D FTC identity, not a VPINN / weak form, and with explicit local scope.
 """
 
 from __future__ import annotations
@@ -24,7 +23,7 @@ import numpy as np
 from numpy.typing import NDArray
 
 DISCLAIMER = (
-    "1-D FTC integral cell; not a VPINN, not a weak form, and not CCF stretch"
+    "1-D FTC integral cell; not a VPINN, not a weak form, with explicit local scope"
 )
 
 
@@ -32,7 +31,7 @@ def honesty_payload() -> dict[str, bool]:
     return {
         "claimed_weak_form": False,
         "claimed_vpinn": False,
-        "ccf_stretch_claim": False,
+        "global_convergence_claim": False,
         "theorem_prover_verified": False,
     }
 

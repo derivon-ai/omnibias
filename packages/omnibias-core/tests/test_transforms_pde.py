@@ -36,7 +36,6 @@ def test_factorial_jet_reciprocal_roundtrip() -> None:
 def test_cole_hopf_jet_burgers_exact() -> None:
     out = verify_cole_hopf_burgers_jet(nu=0.07, k=-1.25, order=10)
     assert out["passed"] is True
-    assert out["navier_stokes_proof_claim"] is False
     # constant field: higher jet coeffs vanish
     phi = [1.0, 0.0, 0.0]
     phi_x = [0.5, 0.0, 0.0]

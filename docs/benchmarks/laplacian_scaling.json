@@ -1,14 +1,14 @@
 {
-  "schema": "omnibias/laplacian-scaling/v1",
-  "generated_utc": "2026-08-05T12:20:10Z",
+  "schema": "omnibias/laplacian-scaling/v2",
+  "generated_utc": "2026-10-03T16:17:31Z",
   "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
   "versions": {
-    "python": "3.14.6",
-    "platform": "Linux-7.0.0-28-generic-x86_64-with-glibc2.43",
+    "python": "3.12.13",
+    "platform": "Linux-7.0.0-31-generic-x86_64-with-glibc2.43",
     "numpy": "2.4.6",
     "jax": "0.10.2",
     "torch": "2.12.1+cu130",
-    "folx": "0.2.22"
+    "folx": "0.2.30"
   },
   "config": {
     "H": 32,
@@ -21,85 +21,409 @@
     ],
     "activation": "tanh",
     "dtype": "float64",
-    "seed": 0
+    "seed": 0,
+    "repeats": 9,
+    "warmup": 2,
+    "torch_threads": 1,
+    "runtime_arguments": [
+      "X",
+      "W",
+      "beta",
+      "c"
+    ],
+    "execution": "JAX JIT CPU defaults; torch.func.hessian eager, one CPU thread",
+    "timing_scope": "Laplacian evaluation only; no parameter backward or training",
+    "reference": "mpmath.diff(tanh), full ridge-field dot products at 80 decimal digits",
+    "reference_points": 3,
+    "relative_error_floor": 0.001,
+    "accuracy_rtol": 2e-10,
+    "accuracy_atol": 1e-09
   },
-  "rss_mb_at_start": 1002.48,
+  "rss_mb_at_start": 975.8,
+  "source_revision": "8c436214cd79d3d95eb7754c8a9c0f4a8c7e2806",
+  "source_worktree_dirty": true,
+  "source_revision_kind": "base_commit",
+  "source_sha256": {
+    "benchmarks/laplacian_scaling.py": "3687090f651180ecb55bb7c0ae49e708bbb366e65637e6d682f2a3db6f67365d",
+    "benchmarks/_common.py": "bbd724fd6e28d6b4dc1798b3c2ed566cccceb7228d0fcd0baf3a1047e5f21c9e",
+    "benchmarks/_reference.py": "f1604d1cc4a98452571b1088c2416d1a28e9afaceced333dde8b24d27b5a6947",
+    "benchmarks/_operator_reference.py": "e652d3b6f281f1dea037b60d56b9ec5dc88e7e97199efd6b870d5b345164286a",
+    "packages/omnibias-jax/src/omnibias/jax/laplacian.py": "c907ab1d80f7c2c7eef0bb4b509aff69c44f05212f9b54cfb29ec09783eb82d9",
+    "packages/omnibias-jax/src/omnibias/jax/_fastpath.py": "21013374f503dc00c99c50acd57ae9c1e27fe72248f8ce4f117aa4bc1b37093f",
+    "packages/omnibias-core/src/omnibias/core/polynomials.py": "725ef59d0f525dceafe13dc158ddae37e7e09b350f3da9268a1a94a7c62a9fab"
+  },
   "rows": [
     {
       "D": 3,
+      "methods": {
+        "omnibias": {
+          "first_execution_ms": 1.4170350041240454,
+          "median_ms": 0.017682003090158105,
+          "samples_ms": [
+            0.01959901419468224,
+            0.015309982700273395,
+            0.02014799974858761,
+            0.0232559978030622,
+            0.018373015336692333,
+            0.0176579924300313,
+            0.017215992556884885,
+            0.017682003090158105,
+            0.017551996279507875
+          ],
+          "compile_ms": 38.615677010966465,
+          "error_vs_mpmath": {
+            "max_abs": 1.1102230246251565e-16,
+            "median_scaled_error": 2.0932370465648982e-16
+          }
+        },
+        "jax_hessian": {
+          "first_execution_ms": 2.277674007927999,
+          "median_ms": 0.02154699177481234,
+          "samples_ms": [
+            0.09389501065015793,
+            0.03998001920990646,
+            0.023984990548342466,
+            0.021705025574192405,
+            0.020991021301597357,
+            0.02065498847514391,
+            0.02154699177481234,
+            0.020750972907990217,
+            0.021198007743805647
+          ],
+          "compile_ms": 94.69085399177857,
+          "error_vs_mpmath": {
+            "max_abs": 8.326672684688674e-17,
+            "median_scaled_error": 6.279711139694695e-16
+          }
+        },
+        "folx": {
+          "first_execution_ms": 1.7075049981940538,
+          "median_ms": 0.021028012270107865,
+          "samples_ms": [
+            0.13669900363311172,
+            0.04686598549596965,
+            0.03474499681033194,
+            0.02447198494337499,
+            0.020682986360043287,
+            0.02026799484156072,
+            0.021028012270107865,
+            0.020350998966023326,
+            0.020089995814487338
+          ],
+          "compile_ms": 57.13137099519372,
+          "error_vs_mpmath": {
+            "max_abs": 8.326672684688674e-17,
+            "median_scaled_error": 6.279711139694695e-16
+          }
+        },
+        "torch_func_hessian": {
+          "first_execution_ms": 886.0635719902348,
+          "median_ms": 1.287243008846417,
+          "samples_ms": [
+            1.4493419730570167,
+            1.287243008846417,
+            1.2607540120370686,
+            1.346494012977928,
+            1.269644999410957,
+            1.3365070044528693,
+            1.2862090079579502,
+            1.3398290029726923,
+            1.2390899937599897
+          ],
+          "compile_ms": null,
+          "error_vs_mpmath": {
+            "max_abs": 5.551115123125783e-17,
+            "median_scaled_error": 1.377053077302559e-16
+          }
+        }
+      },
       "time_ms": {
-        "omnibias": 0.004,
-        "folx": 0.0118,
-        "jax_hessian": 0.0234,
-        "torch_func_hessian": 1.1945
-      },
-      "speedup_vs_omnibias": {
-        "folx": 2.943,
-        "jax_hessian": 5.854,
-        "torch_func_hessian": 298.397
-      },
-      "max_abs_diff_vs_jax_hessian": {
-        "omnibias": 2.220446049250313e-16,
-        "folx": 2.7755575615628914e-16,
-        "torch_func_hessian": 1.3877787807814457e-16
+        "omnibias": 0.017682003090158105,
+        "jax_hessian": 0.02154699177481234,
+        "folx": 0.021028012270107865,
+        "torch_func_hessian": 1.287243008846417
       }
     },
     {
       "D": 12,
+      "methods": {
+        "omnibias": {
+          "first_execution_ms": 1.7822039953898638,
+          "median_ms": 0.015169003745540977,
+          "samples_ms": [
+            0.016546982806175947,
+            0.015444995369762182,
+            0.01506900298409164,
+            0.015788013115525246,
+            0.016681995475664735,
+            0.015169003745540977,
+            0.014627003110945225,
+            0.014644989278167486,
+            0.014793011359870434
+          ],
+          "compile_ms": 36.58785700099543,
+          "error_vs_mpmath": {
+            "max_abs": 5.551115123125783e-16,
+            "median_scaled_error": 2.201496790229998e-15
+          }
+        },
+        "jax_hessian": {
+          "first_execution_ms": 2.4583749764133245,
+          "median_ms": 0.04032999277114868,
+          "samples_ms": [
+            0.04147799336351454,
+            0.04054998862557113,
+            0.04057300975546241,
+            0.03990999539382756,
+            0.04005199298262596,
+            0.0405919854529202,
+            0.04032999277114868,
+            0.04002099740318954,
+            0.04018898471258581
+          ],
+          "compile_ms": 91.82322298875079,
+          "error_vs_mpmath": {
+            "max_abs": 6.661338147750939e-16,
+            "median_scaled_error": 2.6649697986994713e-15
+          }
+        },
+        "folx": {
+          "first_execution_ms": 1.6484750085510314,
+          "median_ms": 0.017557002138346434,
+          "samples_ms": [
+            0.017874001059681177,
+            0.019240978872403502,
+            0.017544982256367803,
+            0.017557002138346434,
+            0.017660000594332814,
+            0.018355000065639615,
+            0.016288977349177003,
+            0.015838013496249914,
+            0.014885008567944169
+          ],
+          "compile_ms": 60.55264998576604,
+          "error_vs_mpmath": {
+            "max_abs": 4.440892098500626e-16,
+            "median_scaled_error": 2.6649697986994713e-15
+          }
+        },
+        "torch_func_hessian": {
+          "first_execution_ms": 2.958529017632827,
+          "median_ms": 2.0020280207972974,
+          "samples_ms": [
+            2.2857800067868084,
+            1.9478579924907535,
+            1.969823002582416,
+            2.0020280207972974,
+            2.0803720108233392,
+            1.953088998561725,
+            1.9590189913287759,
+            2.022278989898041,
+            2.1517260174732655
+          ],
+          "compile_ms": null,
+          "error_vs_mpmath": {
+            "max_abs": 1.1102230246251565e-16,
+            "median_scaled_error": 2.317365042347366e-16
+          }
+        }
+      },
       "time_ms": {
-        "omnibias": 0.0061,
-        "folx": 0.0148,
-        "jax_hessian": 0.0436,
-        "torch_func_hessian": 2.0562
-      },
-      "speedup_vs_omnibias": {
-        "folx": 2.422,
-        "jax_hessian": 7.138,
-        "torch_func_hessian": 336.365
-      },
-      "max_abs_diff_vs_jax_hessian": {
-        "omnibias": 4.440892098500626e-16,
-        "folx": 4.440892098500626e-16,
-        "torch_func_hessian": 3.608224830031759e-16
+        "omnibias": 0.015169003745540977,
+        "jax_hessian": 0.04032999277114868,
+        "folx": 0.017557002138346434,
+        "torch_func_hessian": 2.0020280207972974
       }
     },
     {
       "D": 30,
+      "methods": {
+        "omnibias": {
+          "first_execution_ms": 1.128628005972132,
+          "median_ms": 0.016502977814525366,
+          "samples_ms": [
+            0.01645000884309411,
+            0.016569974832236767,
+            0.01590498141013086,
+            0.01600699033588171,
+            0.01583099947310984,
+            0.02066799788735807,
+            0.016502977814525366,
+            0.03224198007956147,
+            0.021952000679448247
+          ],
+          "compile_ms": 37.011186010204256,
+          "error_vs_mpmath": {
+            "max_abs": 7.771561172376096e-16,
+            "median_scaled_error": 1.456498445115895e-15
+          }
+        },
+        "jax_hessian": {
+          "first_execution_ms": 3.356633009389043,
+          "median_ms": 0.24330199812538922,
+          "samples_ms": [
+            0.3290160093456507,
+            0.241605011979118,
+            0.26383998920209706,
+            0.19428101950325072,
+            0.19412001711316407,
+            0.31673701596446335,
+            0.23296099971048534,
+            0.24330199812538922,
+            0.48328901175409555
+          ],
+          "compile_ms": 105.55083100916818,
+          "error_vs_mpmath": {
+            "max_abs": 8.049116928532385e-16,
+            "median_scaled_error": 1.456498445115895e-15
+          }
+        },
+        "folx": {
+          "first_execution_ms": 1.6693240031599998,
+          "median_ms": 0.019040016923099756,
+          "samples_ms": [
+            0.019040016923099756,
+            0.018367019947618246,
+            0.028358015697449446,
+            0.03546700463630259,
+            0.022365013137459755,
+            0.018135004211217165,
+            0.01789900125004351,
+            0.024720007786527276,
+            0.01759000588208437
+          ],
+          "compile_ms": 60.15342497266829,
+          "error_vs_mpmath": {
+            "max_abs": 9.992007221626409e-16,
+            "median_scaled_error": 1.8726408580061507e-15
+          }
+        },
+        "torch_func_hessian": {
+          "first_execution_ms": 4.081142978975549,
+          "median_ms": 2.6206089823972434,
+          "samples_ms": [
+            2.6812769938260317,
+            2.5820570008363575,
+            2.6620550197549164,
+            2.4919699935708195,
+            2.9003490053582937,
+            2.6206089823972434,
+            2.5872859987430274,
+            2.5798360002227128,
+            2.6769270189106464
+          ],
+          "compile_ms": null,
+          "error_vs_mpmath": {
+            "max_abs": 8.049116928532385e-16,
+            "median_scaled_error": 1.456498445115895e-15
+          }
+        }
+      },
       "time_ms": {
-        "omnibias": 0.0044,
-        "folx": 0.1001,
-        "jax_hessian": 0.4106,
-        "torch_func_hessian": 2.6077
-      },
-      "speedup_vs_omnibias": {
-        "folx": 22.611,
-        "jax_hessian": 92.78,
-        "torch_func_hessian": 589.305
-      },
-      "max_abs_diff_vs_jax_hessian": {
-        "omnibias": 1.1102230246251565e-15,
-        "folx": 8.881784197001252e-16,
-        "torch_func_hessian": 1.4432899320127035e-15
+        "omnibias": 0.016502977814525366,
+        "jax_hessian": 0.24330199812538922,
+        "folx": 0.019040016923099756,
+        "torch_func_hessian": 2.6206089823972434
       }
     },
     {
       "D": 60,
+      "methods": {
+        "omnibias": {
+          "first_execution_ms": 1.3783060130663216,
+          "median_ms": 0.022727996110916138,
+          "samples_ms": [
+            0.02413999754935503,
+            0.023699976736679673,
+            0.022469001123681664,
+            0.022727996110916138,
+            0.022832013200968504,
+            0.023239990696310997,
+            0.022499007172882557,
+            0.02241897163912654,
+            0.02256501466035843
+          ],
+          "compile_ms": 42.938327009323984,
+          "error_vs_mpmath": {
+            "max_abs": 3.552713678800501e-15,
+            "median_scaled_error": 1.2607739644426404e-15
+          }
+        },
+        "jax_hessian": {
+          "first_execution_ms": 4.629783012205735,
+          "median_ms": 0.5544140003621578,
+          "samples_ms": [
+            0.471475999802351,
+            0.6581969792023301,
+            0.5544140003621578,
+            0.6602700159419328,
+            0.8456780051346868,
+            0.42010899051092565,
+            0.7348369981627911,
+            0.4273609956726432,
+            0.4197469970677048
+          ],
+          "compile_ms": 88.19608599878848,
+          "error_vs_mpmath": {
+            "max_abs": 3.1086244689504383e-15,
+            "median_scaled_error": 8.405159762950937e-16
+          }
+        },
+        "folx": {
+          "first_execution_ms": 1.7212980019394308,
+          "median_ms": 0.02672898699529469,
+          "samples_ms": [
+            0.02672898699529469,
+            0.026487017748877406,
+            0.027354981284588575,
+            0.026511988835409284,
+            0.026174995582550764,
+            0.028139009373262525,
+            0.030683004297316074,
+            0.02997199771925807,
+            0.026074994821101427
+          ],
+          "compile_ms": 68.36467998800799,
+          "error_vs_mpmath": {
+            "max_abs": 3.552713678800501e-15,
+            "median_scaled_error": 8.405159762950937e-16
+          }
+        },
+        "torch_func_hessian": {
+          "first_execution_ms": 8.925915986765176,
+          "median_ms": 6.689736008411273,
+          "samples_ms": [
+            6.689736008411273,
+            5.808802001411095,
+            7.2400599892716855,
+            6.136801996035501,
+            6.75079200300388,
+            7.9034070076886564,
+            6.013687001541257,
+            6.060840998543426,
+            7.523498003138229
+          ],
+          "compile_ms": null,
+          "error_vs_mpmath": {
+            "max_abs": 1.3322676295501878e-15,
+            "median_scaled_error": 0.0
+          }
+        }
+      },
       "time_ms": {
-        "omnibias": 0.0037,
-        "folx": 0.0249,
-        "jax_hessian": 0.7889,
-        "torch_func_hessian": 3.4545
-      },
-      "speedup_vs_omnibias": {
-        "folx": 6.649,
-        "jax_hessian": 210.761,
-        "torch_func_hessian": 922.927
-      },
-      "max_abs_diff_vs_jax_hessian": {
-        "omnibias": 1.7763568394002505e-15,
-        "folx": 1.7763568394002505e-15,
-        "torch_func_hessian": 3.1086244689504383e-15
+        "omnibias": 0.022727996110916138,
+        "jax_hessian": 0.5544140003621578,
+        "folx": 0.02672898699529469,
+        "torch_func_hessian": 6.689736008411273
       }
     }
-  ]
+  ],
+  "constant_folding_audit": {
+    "description": "Optimized HLO of the former zero-argument benchmark and the corrected runtime-input benchmark",
+    "zero_argument_entry_hlo": "%main.2 () -> f64[64] {\n  %constant.21 = f64[64]{0} constant({...}), metadata={op_name=\"jit(<lambda>)/dot_general\" stack_frame_id=15}\n  ROOT %copy = f64[64]{0} copy(%constant.21)\n}\n\n",
+    "runtime_argument_entry_hlo": "%main.2 (x.1: f64[64,60], w.1: f64[32,60], beta.1: f64[32], c.1: f64[32]) -> f64[64] {\n  %x.1 = f64[64,60]{1,0} parameter(0), metadata={op_name=\"x\"}\n  %w.1 = f64[32,60]{1,0} parameter(1), metadata={op_name=\"w\"}\n  %beta.1 = f64[32]{0} parameter(2), metadata={op_name=\"beta\"}\n  %c.1 = f64[32]{0} parameter(3), metadata={op_name=\"c\"}\n  %constant.7 = f64[] constant(0)\n  %broadcast_bitcast_fusion = f64[32,1]{1,0} fusion(), kind=kLoop, calls=%fused_computation.1, metadata={op_name=\"jit(omni)/broadcast_in_dim\" stack_frame_id=6}\n  %ynn_fusion = f64[64,32]{1,0} fusion(%x.1, %w.1), kind=kCustom, calls=%fused_computation, metadata={op_name=\"jit(omni)/dot_general\" stack_frame_id=12}, backend_config={\"fusion_config\":{\"kind\":\"__ynn_fusion\"},\"outer_dimension_partitions\":[]}\n  %wrapped_multiply = f64[32,60]{1,0} fusion(%w.1), kind=kLoop, calls=%wrapped_multiply_computation, metadata={op_name=\"jit(omni)/mul\" stack_frame_id=14}\n  %wrapped_reduce-window = f64[32,2]{1,0} fusion(%wrapped_multiply, %constant.7), kind=kLoop, calls=%wrapped_reduce-window_computation\n  %wrapped_reduce = f64[32]{0} fusion(%wrapped_reduce-window, %constant.7), kind=kLoop, calls=%wrapped_reduce_computation, metadata={op_name=\"jit(omni)/reduce_sum\" stack_frame_id=5}\n  %broadcast_multiply_fusion = f64[64,32]{1,0} fusion(%c.1, %wrapped_reduce, %ynn_fusion, %beta.1), kind=kLoop, calls=%fused_computation.2, metadata={op_name=\"jit(omni)/mul\" stack_frame_id=16}\n  %dot = f64[64,1]{1,0} dot(%broadcast_multiply_fusion, %broadcast_bitcast_fusion), lhs_contracting_dims={1}, rhs_contracting_dims={0}\n  ROOT %bitcast.1 = f64[64]{0} bitcast(%dot), metadata={op_name=\"jit(omni)/dot_general\" stack_frame_id=17}\n}\n\n",
+    "zero_argument_tanh_operations": 0,
+    "runtime_argument_tanh_operations": 1,
+    "compiler_version": "0.10.2"
+  }
 }

@@ -1,103 +1,42 @@
 # omnibias-fields
 
-The backend-agnostic **field substrate**: the `FieldState` value object, the
-attribute-DSL views, the lazy `sigma^(n)(z)` cache, the op-extension registry,
-and the cross-backend (PyTorch + JAX) closed-form differential-operator surface
-(plus integration, inner products, Sobolev norms, tensor divergence, and
-Wirtinger calculus).
+Field calculus for PINN integration.
 
-This package was extracted from `omnibias-pinn` so that every field-based
-extension (`omnibias-pinn`, `omnibias-geometry`, `omnibias-score`) builds on one
-shared, bit-identical substrate. `omnibias-pinn` re-exports the moved symbols
-through transparent back-compat shims, so existing `omnibias.pinn._core` and
-`omnibias.pinn.<backend>.ops` imports keep working unchanged.
+- `omnibias.fields.FieldState`: an evaluated field, coordinates and shared cache.
+- `ComponentSpec`, `CoordinateSpec`: named components and coordinate axes.
+- `SigmaCache`: reuse activation derivatives within an evaluation.
+- `omnibias.fields.torch.ops` and `omnibias.fields.jax.ops`: value, derivative,
+  gradient, divergence, curl, Laplacian, Hessian and integration operators.
 
-## Core schemas
+Operations consume a `FieldState`, not an arbitrary tensor and coordinates.
+A consumer field provides parameters and derivative methods through the
+`DISPATCH_ATTR` contract. Rebuild a state after changing coordinates or
+parameters; cached evaluations must remain consistent.
 
-::: omnibias.fields._core
-    options:
-      show_root_heading: false
-      heading_level: 3
+This package supplies shared state and operators. Field model constructors
+and the higher-level solver live in the external `omnibias-pinn` consumer.
+Use [network jets](../derivatives.md) directly for a small self-contained PINN.
+Quadrature results are numerical approximations unless exactness is established
+for the particular integrand and rule.
 
-## Quadrature
+Install this distribution with `pip install omnibias-fields`; select its
+backend extras when needed. See [guarantees](../guarantees.md).
 
-::: omnibias.fields._core.quadrature
-    options:
-      show_root_heading: false
-      heading_level: 3
+<!-- BEGIN GENERATED API INVENTORY -->
 
-## Weak-form VPINN (gated 02-04)
+Version **0.2.0rc1** · Python **>=3.10** · **4 - Beta** · Apache-2.0
 
-Petrov-Galerkin test functions with closed-form antiderivatives. Exact
-integrals hold only for polynomial coefficient data on boxes; the certified
-boundary bound is on by default. Documented in full at [weak.md](weak.md).
+<details markdown="1">
+<summary>Public modules and top-level exports</summary>
 
-## Equality locus (gated 01-09 / 02-12)
+[Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-fields/src/omnibias/fields). Modules below are relative to `omnibias.fields`; underscored modules are internal.
 
-Constraint-manifold Newton / IFT layer. Not a general closed-form PDE
-solver; every return carries `branch` / `condition` / `converged`.
-Documented in full at [locus.md](locus.md).
+`jax`, `jax.ops`, `jax.ops.basic`, `jax.ops.complex`, `jax.ops.conservation`, `jax.ops.high_order`, `jax.ops.integral`, `jax.ops.nonlinear`, `jax.ops.norms`, `jax.ops.registry`, `jax.ops.tensor`, `jax.ops.vector`, `locus`, `locus.jax`, `locus.torch`, `scale`, `singularity`, `torch`, `torch.ops`, `torch.ops.basic`, `torch.ops.complex`, `torch.ops.conservation`, `torch.ops.high_order`, `torch.ops.integral`, `torch.ops.nonlinear`, `torch.ops.norms`, `torch.ops.registry`, `torch.ops.tensor`, `torch.ops.vector`, `weak`, `weak.jax`, `weak.torch`.
 
-## Finite-strain solid mechanics
+Exports from `omnibias.fields`:
 
-Alongside the small-strain fluid / linear-elastic ops, the surface carries
-**finite-deformation** solid mechanics: batched tensor algebra
-(`tensor_determinant`, `tensor_inverse`, `tensor_cofactor`, `tensor_matmul`,
-`tensor_trace`, `tensor_transpose`), kinematics (`deformation_gradient_finite`
-`F = I + ∇u`, `right_cauchy_green`, `green_lagrange_strain`, `jacobian_det`),
-the hyperelastic energies (`st_venant_kirchhoff_energy`, `neo_hookean_energy`,
-`mooney_rivlin_energy`), the stresses (`pk1_stress`/`pk2_stress`/`cauchy_stress`
-as the exact autodiff gradient `∂W/∂F`, plus the validated closed forms
-`st_venant_kirchhoff_pk2` / `neo_hookean_pk2` and the anisotropic
-`hooke_stress_general`), and the balance laws (`finite_strain_residual`,
-`elastodynamic_residual`). The stress divergence combines an autodiff-exact
-constitutive tangent with the closed-form second spatial derivatives of the
-displacement; elasticity/hyperelasticity/elastodynamics are exact, while
-history-dependent plasticity/viscoelasticity is out of the closed-form scope.
+`AffineSet`, `ComponentSpec`, `ComponentView`, `CoordinateSpec`, `DISPATCH_ATTR`, `DOMAINS`, `EqualitySystem`, `FieldBase`, `FieldState`, `NewtonResult`, `OperatorInfo`, `READOUT_INDEPENDENT_ATTR`, `SigmaCache`, `TestFunctionSpace`, `UnitTerm`, `VectorView`, `WeakForm`, `affine_locus`, `boundary_bound`, `certify_locus_point`, `did_you_mean`, `exact_moment`, `get_operator`, `list_operators`, `operator_names`, `ops_registry`.
 
-## Magnetohydrodynamics & kinetic theory
+</details>
 
-Single-fluid **MHD** in Alfven units (`mu_0 = rho_0 = 1`): `current_density`
-(`J = curl B`), `lorentz_force` (`J x B`), `magnetic_pressure`,
-`maxwell_stress_tensor`, `magnetic_divergence`, `induction_residual`
-(`d_t B - curl(u x B) - eta lap B`, with `curl(u x B)` expanded through the exact
-vector identity), and `ideal_mhd_momentum_residual` (Navier-Stokes plus the
-Lorentz force). A finite-amplitude Elsasser/Alfven wave drives both residuals to
-zero; `B = 0` recovers Navier-Stokes and `u = 0` recovers resistive diffusion.
-
-**Kinetic theory** on a phase-space `f(t, x, v)`: `vlasov_residual`
-(`d_t f + v.grad_x f + (F/m).grad_v f`), `bgk_collision` / `bgk_vlasov_residual`,
-the closed-form `maxwellian`, and the velocity moments `number_density`,
-`momentum_density`, `kinetic_energy_density`. Vlasov transport, BGK and the
-Maxwellian are closed-form; the full non-local Boltzmann collision integral is
-numerical (quadrature) and is deliberately not shipped as a closed-form op.
-
-## Line integral & the gradient theorem
-
-`line_integral(state, name, curve, rule)` computes `int_C grad u . dr` for a
-scalar potential `u` along a curve `r`, which by the multivariate Fundamental
-Theorem of Calculus (the gradient theorem) equals `u(curve(t1)) - u(curve(t0))`
-for **any** path. The `curve` is a bare callable mapping a `(1,)` parameter to an
-ambient point — `omnibias-fields` never imports `omnibias-geometry`, so a curve is
-not a `ChartSpec`; `state` must be pre-evaluated at `curve(quadrature_nodes(rule))`
-(the same convention as the geometry surface integrals).
-
-!!! note "Honesty label"
-    The **integrand** is exact — the field gradient `grad u` is the closed-form
-    sigma-tower op and the curve tangent `r'(t)` is exact forward-mode autodiff —
-    but the **integral** is a numerical **Gauss-Legendre quadrature** (exact for
-    polynomials up to the rule degree, convergent otherwise), matching the
-    `integrate` op and the geometry surface integrals.
-
-## Ops (torch)
-
-::: omnibias.fields.torch.ops
-    options:
-      show_root_heading: false
-      heading_level: 3
-
-## JAX twin
-
-The JAX backend has the same module layout under `omnibias.fields.jax`. All
-cross-backend tests assert *bit-identical* results between the two backends
-(typical tolerances: rtol/atol=1e-12 in float64).
+<!-- END GENERATED API INVENTORY -->

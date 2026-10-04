@@ -2,18 +2,20 @@
 # Copyright (C) 2026 Derivon
 """Shared helpers for the public ``benchmarks/`` suite.
 
-Every script writes a JSON artifact under ``docs/benchmarks/`` with a common
-provenance header so README numbers stay traceable to a committed file anyone
-can regenerate.
+Each script writes reproducible JSON under ``$OMNIBIAS_SCRATCH`` or the
+repository-relative ``artifacts/`` directory, with configuration and environment
+metadata needed to interpret the measurements.
 """
 
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import platform
 import resource
 import statistics
+import subprocess
 import sys
 import time
 from collections.abc import Callable
@@ -22,7 +24,6 @@ from pathlib import Path
 from typing import Any
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-OUT_DIR = REPO_ROOT / "docs" / "benchmarks"
 
 
 def enable_x64() -> None:
@@ -86,7 +87,46 @@ def provenance(*, schema: str, config: dict[str, Any]) -> dict[str, Any]:
 
 
 def write_json(name: str, payload: dict[str, Any]) -> Path:
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    path = OUT_DIR / name
+    output_dir = Path(os.environ.get("OMNIBIAS_SCRATCH", REPO_ROOT / "artifacts"))
+    output_dir.mkdir(parents=True, exist_ok=True)
+    path = output_dir / name
     path.write_text(json.dumps(payload, indent=2, sort_keys=False) + "\n", encoding="utf-8")
     return path
+
+
+def measure(function: Callable[[], Any], *, repeats: int = 9, warmup: int = 2) -> dict[str, Any]:
+    """Time synchronous evaluation; preserve individual samples and first-call cost."""
+    def evaluate() -> None:
+        result = function()
+        if hasattr(result, "block_until_ready"):
+            result.block_until_ready()
+
+    start = time.perf_counter()
+    evaluate()
+    first_ms = (time.perf_counter() - start) * 1000
+    for _ in range(warmup):
+        evaluate()
+    samples = []
+    for _ in range(repeats):
+        start = time.perf_counter()
+        evaluate()
+        samples.append((time.perf_counter() - start) * 1000)
+    return {"first_execution_ms": first_ms, "median_ms": statistics.median(samples),
+            "samples_ms": samples}
+
+
+def source_provenance(paths: list[str]) -> dict[str, Any]:
+    """Identify the measured source even when measurements precede their commit."""
+    dirty = bool(subprocess.check_output(
+        ["git", "status", "--porcelain", "--untracked-files=normal"], cwd=REPO_ROOT, text=True
+    ).strip())
+    return {
+        "source_revision": subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=REPO_ROOT, text=True
+        ).strip(),
+        "source_worktree_dirty": dirty,
+        "source_revision_kind": "base_commit" if dirty else "exact_commit",
+        "source_sha256": {
+            path: hashlib.sha256((REPO_ROOT / path).read_bytes()).hexdigest() for path in paths
+        },
+    }

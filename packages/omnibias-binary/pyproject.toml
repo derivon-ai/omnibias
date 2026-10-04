@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-binary"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Closed-form quantization gradients for binary/ternary/k-bit neural-network training via the omnibias tanh-beta Riccati derivative (torch + jax)."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -25,11 +25,11 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
-dependencies = ["omnibias-core>=0.2.0"]
+dependencies = ["omnibias-core>=0.5.0rc1"]
 
 [project.optional-dependencies]
-torch = ["torch>=2.0", "omnibias-torch>=0.2.0"]
-jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
+torch = ["torch>=2.0", "omnibias-torch>=0.5.0rc1"]
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.5.0rc1"]
 all = ["omnibias-binary[torch,jax]"]
 test = ["pytest>=7.0", "numpy>=1.24"]
 dev = ["omnibias-binary[all,test]", "ruff>=0.1.0", "mypy>=1.5"]

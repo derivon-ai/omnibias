@@ -1,10 +1,10 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 """Arrangement graph from sampled cells (theory 02-02).
 
 Sampling is a subgraph / lower bound, never a complete face lattice.
 ``beta -> inf`` is temperature collapse, not founding ``delta -> 0``.
-The gap is sound, not P vs NP, not theorem-prover.
+The gap is sound, not theorem-prover.
 """
 
 from __future__ import annotations

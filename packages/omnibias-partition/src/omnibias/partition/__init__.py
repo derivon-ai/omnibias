@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""omnibias-partition: a light, certified soft partition-of-unity primitive.
 
@@ -25,7 +25,7 @@ layer). It ships:
 Terminology: the gate's ``beta -> inf`` hardening is **temperature collapse** -- the
 feasibility sense (a soft indicator becoming a 0/1 step), distinct from
 the **founding bias collapse** (the multi-bias ``delta -> 0`` limit of an ``OMBU`` to the
-closed-form derivative ``sigma^(K-1)``; see ``docs/theory.md``). The bridges differentiate
+closed-form derivative ``sigma^(K-1)``; see ``docs/derivatives.md``). The bridges differentiate
 products of sigmoids by autodiff -- the closed-form derivative tower does not auto-extend to
 products.
 
@@ -77,7 +77,7 @@ try:
 except _PkgNotFound:  # pragma: no cover - bare source checkout
     __version__ = "0.0.0+unknown"
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Limit family exposed as package metadata.
 __lineage__ = "temperature collapse"
 
 __all__ = [

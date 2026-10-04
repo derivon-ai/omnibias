@@ -8,7 +8,7 @@ it reports which band a channel ``(n, alpha)`` sees. It is not a wavelet
 frame (theory 01-06 stays concept) and it does not claim Littlewood-Paley
 completeness.
 
-Closed-form ``hat_sigma`` is taken from :mod:`omnibias.core.transforms`
+Closed-form ``hat_sigma`` is supplied by the caller
 (gaussian and sech). ``tanh`` is not in ``L^1``, so it is not a supported
 transform base here.
 

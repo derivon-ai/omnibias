@@ -1,107 +1,38 @@
-# Package index
+# Primitive packages
 
-omnibias ships **42 distributions** from a single [uv](https://github.com/astral-sh/uv)
-workspace monorepo. Each package's version is the single source of truth in its
-own `pyproject.toml`, and maturity is the package's own `Development Status`
-classifier. **Track** -- the *curated public core* versus the *extended set* --
-is a separate release decision; see the
-[API-stability contract](stability.md).
+Shared infrastructure belongs here; solver front-ends and application experiments
+live in standalone repositories under `../omnibias_projects/`.
 
-## Curated public core (8)
+<!-- BEGIN GENERATED PACKAGE INVENTORY -->
 
-Published first and held to the [API-stability contract](stability.md).
+| Distribution | Version | Python | Maturity | License | Responsibility |
+| --- | --- | --- | --- | --- | --- |
+| [omnibias-binary](api/binary.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | Apache-2.0 | Closed-form quantization gradients for binary/ternary/k-bit neural-network training via the omnibias tanh-beta Riccati derivative (torch + jax). |
+| [omnibias-boolean](api/boolean.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | Apache-2.0 | Differentiable Boolean algebra: exact ANF/Reed-Muller and Walsh spectra, Boolean differential calculus, reproductive equation solving, and a beta-annealed soft-gate system solver built on the omnibias closed-form derivative towers (torch + jax). |
+| [omnibias-convex](api/convex.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | AGPL-3.0-or-later **or commercial** | Differentiable + certified convex optimization (LP/QP) for omnibias: closed-form-Hessian log-barrier interior-point solver, KKT implicit-function gradients (argmin as a differentiable op), and verified optimality enclosures (jax + torch). |
+| [omnibias-core](api/core.md) | 0.5.0rc1 | >=3.10 | 4 - Beta | Apache-2.0 | Numerically-stable closed-form n-th derivative forward-pass framework: pure-Python core with polynomial coefficient generators (Eulerian / Legendre / Hermite) and the backend-agnostic ActivationSpec protocol. |
+| [omnibias-curvature](api/curvature.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | AGPL-3.0-or-later **or commercial** | Closed-form parameter Hessian / Gauss-Newton Fisher / KFAC factors for one-hidden-layer Riccati fields, built on the omnibias closed-form σ' / σ'' primitives. |
+| [omnibias-difference](api/difference.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | Apache-2.0 | The founding delta->0 (multi-bias collapse) register: certified finite-difference -> derivative extraction, umbral / Sheffer sequence calculus, and asymptotic-coefficient reading (Stirling / Bernoulli / Euler numbers) read straight off the closed-form omnibias towers. Pure-Python core + rigorous interval-tower certificates from omnibias.core.verified, with bit-identical torch/jax twins for the finite-difference stencil operator. |
+| [omnibias-discrete](api/discrete.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | AGPL-3.0-or-later **or commercial** | Shared differentiable + certified discrete-optimization substrate for omnibias: the DiscreteProblem seam, the annealed temperature-collapse (beta -> inf) sigmoid relaxation solved by unrolled descent (torch + jax twins), a rounding + k-flip local-search decoder with a brute-force oracle, and a rigorous optimality-gap certificate (Lasserre / moment-SOS lower bound over the Boolean hypercube). |
+| [omnibias-fields](api/fields.md) | 0.2.0rc1 | >=3.10 | 4 - Beta | Apache-2.0 | Backend-agnostic field substrate for omnibias: the FieldState value object, the attribute-DSL views, the lazy sigma^(n) cache, and the cross-backend (torch + jax) closed-form differential-operator surface (gradient, divergence, curl, laplacian, hessian, jacobian, integration, inner products, Sobolev norms, tensor divergence, Wirtinger). |
+| [omnibias-graph](api/graph.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | AGPL-3.0-or-later **or commercial** | Differentiable spectral graph operators (Laplacians, spectral embedding, heat kernel) and continuous combinatorial relaxations (Gumbel-Sinkhorn, SoftSort, soft top-k) with torch + jax bit-parity. |
+| [omnibias-jax](api/jax.md) | 0.5.0rc1 | >=3.10 | 4 - Beta | Apache-2.0 | JAX backend for omnibias: closed-form n-th derivative activation kernels (sigmoid via Eulerian polynomials, tanh via Legendre, Gaussian via Hermite), neural-field Laplacian / Hessian primitives, and Born-Oppenheimer derivative tools for variational quantum Monte Carlo. |
+| [omnibias-keras](api/keras.md) | 0.0.2a1 | >=3.10 | 3 - Alpha | Apache-2.0 | Keras 3 unified backend for omnibias: closed-form n-th derivative scalar operators (OMBU), operator-typed blocks, and drop-in cmbDense / cmbConv layers that run on TensorFlow, JAX, or PyTorch via keras.ops. |
+| [omnibias-partition](api/partition.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | AGPL-3.0-or-later **or commercial** | A light, certified soft partition-of-unity primitive: oblique / axis-aligned / sparse soft-split gates that route an input into 2**depth regions with weights that are non-negative and sum to one, harden to a crisp partition under temperature collapse (the beta -> inf penalty), carry a SOUND soft->hard membership-gap certificate (outward-rounded Interval + closed-form Gibbs bound), and expose a per-region model registry whose one combine() engine (sum_l w_l * out_l) is shared by every downstream bridge. Bit-identical numpy / torch / jax weights. |
+| [omnibias-qcalculus](api/qcalculus.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | Apache-2.0 | Quantum / q-calculus: exact q-numbers, q-factorials, Gaussian (q-)binomials and q-Pochhammer symbols, the Jackson q-derivative and q-integral, q-exponentials and q-deformed Bernoulli / Euler numbers, and basic hypergeometric series with certified geometric tails. The q -> 1 limit recovers ordinary calculus (a distinct limit, never conflated with the delta -> 0 founding collapse). Built on omnibias-core and omnibias-difference, with bit-identical torch/jax Jackson-derivative twins. |
+| [omnibias-sos](api/sos.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | AGPL-3.0-or-later **or commercial** | Certified universal positivity by optimization: sound Sum-of-Squares / Positivstellensatz decompositions. A floating-point SDP proposes a Gram matrix; the proof is a rigorous interval LDL^T positive-definiteness certificate that reuses omnibias.core.verified and the Mathlib-free Lean kernel obligation, so certificates can earn theorem_prover_verified. |
+| [omnibias-struct](api/struct.md) | 0.1.0a2 | >=3.10 | 3 - Alpha | AGPL-3.0-or-later **or commercial** | Certified differentiable dynamic programming: soft Viterbi / shortest-path / CTC layers whose logsumexp_beta relaxation (the beta->inf temperature axis) is differentiated exactly by the closed-form softplus/sigmoid derivative tower (the delta->0 axis) via omnibias.{torch,jax}.jet, with a closed-form logsumexp_beta >= max gap certificate validated against brute-force hard DP; bit-identical torch + jax twins. |
+| [omnibias-torch](api/torch.md) | 0.5.0rc1 | >=3.10 | 4 - Beta | Apache-2.0 | PyTorch backend for omnibias: trainable scalar operators (OMBU), operator-typed blocks, closed-form activation derivative kernels, and reference PINN / CmbNet / CvxLayer architectures. |
 
-| Package | Version | Status | Scope |
-|---|---|---|---|
-| omnibias-core | 0.4.0 | Beta | Pure-Python closed-form n-th derivative core: Eulerian / Legendre / Hermite coefficient generators, the backend-agnostic `ActivationSpec`, plus gated Wave-1 algebra (`MultiPackSpec`, `BankSpec`) and Wave-3 `MollifierSpec` / `BandPlan` / `FrameSpec` / locus / conjugate Hilbert / ladder / transfer / tanh-method. |
-| omnibias-torch | 0.4.0 | Beta | PyTorch backend: OMBU, operator-typed blocks, closed-form activation-derivative kernels, reference PINN / CmbNet / CvxLayer architectures; gated `MultiPackUnit` / `BiasScan` / `ScanNet` / `JetKAN` / `LadderNet` / `EquivariantScan` / hierarchical scan / `CausalTransverseFilter`. |
-| omnibias-jax | 0.4.0 | Beta | JAX backend: closed-form n-th derivative kernels, neural-field Laplacian / Hessian, Born-Oppenheimer derivative tools for VMC; gated `init_multipack` / `bias_scan` / Scan-Net / Jet-KAN / ladder / equivariant-scan / causal-transverse twins. |
-| omnibias-ferminet | 0.2.0 | Beta | FermiNet bridge: folx-compatible Laplacian, restricted Tier-2 ansatz, analytic nuclear Hessian / Born-Oppenheimer primitives. |
-| omnibias-fields | 0.1.0 | Beta | Backend-agnostic field substrate (`FieldState`, attribute-DSL views, sigma^(n) cache) and the closed-form differential-operator surface (grad / div / curl / laplacian / hessian / jacobian, integration, Sobolev norms); gated weak-form VPINN (`omnibias.fields.weak`) and equality-locus layer (`omnibias.fields.locus`). |
-| omnibias-pinn | 0.1.0 | Beta | Physics-informed neural networks: typed fields, hard-conservation cages, PDE residuals, diagnostics; alpha `train` / `domain` / `operator` / `solver` (four-gap gated); gated `omnibias.pinn.interface` transmission PINN (not XPINN `_core.interface`) plus gated travelling / layered / BEM / linearizing-transform submodules. |
-| omnibias-geometry | 0.2.0 | Beta | Differential geometry: metric, Christoffel, covariant derivative, Laplace-Beltrami, Riemann / Ricci / scalar curvature, geodesics, exterior calculus, learned-chart pullback metric; gated chart scan and Wilson-line holonomy band. |
-| omnibias-keras | 0.0.1a1 | Alpha | Keras 3 unified backend: OMBU, operator blocks, and drop-in `cmbDense` / `cmbConv` layers on TensorFlow / JAX / PyTorch. |
+<!-- END GENERATED PACKAGE INVENTORY -->
 
-## Extended set (34, Alpha)
+For a PINN, start with `omnibias-torch` or `omnibias-jax`. Add `fields` when
+integrating the field-state API, `partition` for region models, and `curvature`
+for supported parameter-curvature operations. Install only what the application
+uses. The existing PINN solver is the external `omnibias-pinn` repository.
 
-Real, tested torch/jax math with a dedicated CI job each, but **not** under the
-API-stability contract -- the public surface may shift between alpha releases.
-
-### Physics, fields & calculus registers
-
-| Package | Version | Status | Scope |
-|---|---|---|---|
-| omnibias-qpinn | 0.0.2a1 | Alpha | Quantum PINN residuals and conservation cages for Schrodinger / Gross-Pitaevskii / Helmholtz / Klein-Gordon / Dirac (torch + jax). |
-| omnibias-fractional | 0.1.0 | Alpha | Fractional calculus in two honest classes: grid/spectral GL / RL / Caputo (non-local, numerical) and a closed-form analytic fractional derivative on analytic functions. |
-| omnibias-measure | 0.1.0a1 | Alpha | Autograd-native measure integration: a `Measure` abstraction (pushforward / product / importance reweighting) and the measure integral `int f dmu`, layer-cake / distribution-function, importance-sampling and simple-function primitives, plus exact 1-D / sliced transport of activation mixtures, with trainable torch / jax layers. |
-| omnibias-score | 0.1.0a1 | Alpha | Score / SDE operators: closed-form score (grad log p), the Ito generator, and the Fokker-Planck adjoint, composed from the fields grad / Hessian primitives. |
-| omnibias-variational | 0.1.0a1 | Alpha | Least-action / variational calculus: action integrals, Euler-Lagrange / Euler-Poisson functional derivatives, Hamiltonian / Noether, symplectic integrators, rigorous action enclosures. |
-| omnibias-difference | 0.1.0a1 | Alpha | The founding delta->0 register: certified finite-difference -> derivative extraction, umbral / Sheffer calculus, asymptotic-coefficient reading (Stirling / Bernoulli / Euler), gated exact-Q irregular Birkhoff stencils (01-04). |
-| omnibias-qcalculus | 0.1.0a1 | Alpha | Quantum / q-calculus: q-numbers, Gaussian q-binomials, the Jackson q-derivative / q-integral, q-exponentials; the q->1 limit recovers ordinary calculus. |
-| omnibias-timescale | 0.1.0a1 | Alpha | Time-scale (Hilger) calculus unifying the continuous and discrete registers via delta / nabla derivatives; graininess mu->0 recovers the derivative tower. |
-| omnibias-holonomic | 0.1.0a1 | Alpha | D-finite / holonomic engine: Ore (skew-polynomial) algebra, Gosper + creative telescoping, and Lean-certified binomial identities. |
-
-### Curvature & second-order optimization
-
-| Package | Version | Status | Scope |
-|---|---|---|---|
-| omnibias-curvature | 0.1.0a1 | Alpha | Closed-form parameter Hessian / Gauss-Newton Fisher / KFAC factors for one-hidden-layer Riccati fields. |
-
-### Differentiable + certified optimization
-
-| Package | Version | Status | Scope |
-|---|---|---|---|
-| omnibias-discrete | 0.1.0a1 | Alpha | Shared discrete-optimization substrate: the DiscreteProblem seam, annealed sigmoid relaxation, rounding + k-flip decoder, and a Lasserre / moment-SOS optimality-gap certificate; ships MaxSAT, soft-population evolution, and finite-domain CSP front-ends. |
-| omnibias-qubo | 0.1.0a1 | Alpha | Differentiable + certified QUBO / Ising: annealed relaxation, 1-flip decoder, brute-force oracle, and a spectral / SOS-Lasserre gap certificate; max-cut / MIS front-ends. |
-| omnibias-submodular | 0.1.0a1 | Alpha | Differentiable + certified submodular optimization: multilinear extension + continuous greedy, pipage / swap rounding, a (1 - 1/e) / curvature guarantee + gap sandwich, and exact P-class minimization. |
-| omnibias-struct | 0.1.0a1 | Alpha | Certified differentiable dynamic programming: soft Viterbi / shortest-path / CTC via logsumexp_beta, differentiated exactly by the softplus / sigmoid tower, with a gap certificate vs hard DP; gated tropical homotopy (`omnibias.struct._core.tropical`). |
-| omnibias-combinatorics | 0.1.0a1 | Alpha | Exact differentiable matching / flow / matroid layers: entropic relaxations onto integral polytopes with a tight LP-dual optimality-gap certificate. |
-| omnibias-nphard | 0.1.0a1 | Alpha | Differentiable certified heuristics for named NP-hard families (QAP / GAP / scheduling) on omnibias-qubo, with an MCTS search track and honest (non-tight) gap certificates. |
-| omnibias-routing | 0.1.0a1 | Alpha | Certified + differentiable routing: a poly-size TSP relaxation + 2-opt decoder + Neumaier-Shcherbina LP gap certificate; decision-focused predict-then-optimize. |
-| omnibias-convex | 0.1.0a1 | Alpha | Differentiable + certified convex LP / QP: a closed-form-Hessian log-barrier interior-point solver, KKT implicit-function gradients, and verified optimality enclosures. |
-| omnibias-sos | 0.1.0a1 | Alpha | Certified positivity: Sum-of-Squares / Positivstellensatz decompositions with a rigorous interval LDL^T PSD certificate that can earn `theorem_prover_verified`. |
-| omnibias-graph | 0.1.0a1 | Alpha | Differentiable spectral graph operators (Laplacians, spectral embedding, heat kernel) and combinatorial relaxations (Gumbel-Sinkhorn, SoftSort, soft top-k); gated Face-Net on a sampled arrangement subgraph. |
-| omnibias-logic | 0.1.0a1 | Alpha | Differentiable + certified Boolean logic: weighted MaxSAT plus (weighted) #SAT / model counting with inclusion-exclusion count enclosures. |
-| omnibias-control | 0.1.0a1 | Alpha | Differentiable control with a model-relative safety certificate: a batched CBF-QP safety filter and a recoverable-set certificate, plus a jet-adjoint policy-optimization stack (exact `dpi/dy` policy gradients, a certified truncation horizon, a sound policy-gradient-bias enclosure, and certified contact smoothing). |
-| omnibias-tab | 0.1.0a1 | Alpha | Differentiable, exactly second-order-trained, certified soft decision-tree ensembles for tabular data; benchmarked against LightGBM. |
-| omnibias-partition | 0.1.0a1 | Alpha | Certified soft partition-of-unity primitive: soft-split gates hardening as beta->inf, a sound membership-gap certificate, a shared region-model registry, and gated arrangement geometry (`omnibias.partition.arrangement`). |
-| omnibias-shape | 0.1.0a1 | Alpha | Differentiable soft shape / occupancy fields, soft-coverage (soft-OR / log-sum-exp union), and gated 03-05 morphology (`logsumexp_beta` dilation / erosion with a composition-aware gap). |
-
-### Learning primitives
-
-| Package | Version | Status | Scope |
-|---|---|---|---|
-| omnibias-binary | 0.1.0a1 | Alpha | Closed-form quantization gradients for binary / ternary / k-bit training via the tanh-beta Riccati derivative. |
-| omnibias-boolean | 0.1.0a1 | Alpha | Differentiable Boolean algebra: exact ANF / Reed-Muller and Walsh spectra, Boolean differential calculus, reproductive equation solving, and a soft-gate solver. |
-| omnibias-spiking | 0.1.0a1 | Alpha | Spiking LIF / IF primitives with exact closed-form surrogate gradients. |
-| omnibias-hopfield | 0.1.0a1 | Alpha | Modern Hopfield networks and attention-as-operator with a closed-form log-sum-exp Jacobian / Hessian. |
-| omnibias-symbolic | 0.1.0 | Alpha | Neural-jet equation discovery (library-free SINDy), AutoML surrogates, PDE operator-coefficient recovery, and Blasius surrogates. |
-
-### Verification, formal & dynamics
-
-| Package | Version | Status | Scope |
-|---|---|---|---|
-| omnibias-verify | 0.1.0a1 | Alpha | Certified neural-network verification: Taylor-model / interval propagation (smooth + ReLU / GELU / max-pool) with branch-and-bound, yielding robustness / Lipschitz / monotonicity / reachable-set certificates. |
-| omnibias-dynamics | 0.1.0a1 | Alpha | Computer-assisted dynamics: validated variational / monodromy flows, Poincare-section enclosures, certified Lyapunov bounds, radii-polynomial periodic-orbit proofs, an instance-level certified cubic Abelian-integral zero count, exact-Q Poincare compactification, finite Dulac-model nonoscillation bounds, a Poincare-Lyapunov focal-value / Bautin engine, resonant normal forms with a derived (not declared) Dulac corner map, sound collar-membership certificates, and a machine-checked Hilbert-16 obligation ledger with derived (never asserted) parent flags (no physical return-map membership, graphic-cyclicity, or Hilbert-16 claim). |
-| omnibias-formal | 0.1.0a1 | Alpha | Mathlib-backed formal checker: drives the `formal/omnibias-analytic` Lean project to discharge a certificate's rational obligations, reporting a `mathlib_verified` tier. |
-
-### Tooling
-
-| Package | Version | Status | Scope |
-|---|---|---|---|
-| omnibias-skills | 0.1.0a1 | Alpha | Agent-skill library for building on omnibias: bundled Cursor / Claude Code Agent Skills (backends, fields/PINN, frontier, geometry, curvature, verify, symbolic) and an idempotent installer CLI. |
-
-## Folded modules (not separate distributions)
-
-Six names are frequently mistaken for standalone packages. They ship *inside*
-their parent distribution and are guarded by
-`packages/omnibias-core/tests/test_package_registry.py`:
-
-
-- `omnibias.score.flow` -- continuous normalizing flows (in `omnibias-score`).
-- `omnibias.pinn.solver` -- the PDE solver (in `omnibias-pinn`).
-- `omnibias.pinn.operator` -- neural operator learning: DeepONet closed-form trunk jet through order 4 (KS residual unchanged) + FNO baseline + multi-head conditioning (in `omnibias-pinn`).
-- `omnibias.pinn.train` -- causal marching drivers + causality / trivial-solution diagnostics + spectral band scheduler + depth-causal residual (08-05) (in `omnibias-pinn`).
-- `omnibias.pinn.domain` -- SDF / R-function geometry + distance-constrained hard BCs (in `omnibias-pinn`).
-- `omnibias.geometry.gauge` -- the non-abelian gauge engine (in `omnibias-geometry`).
-
+Versions, maturity, Python requirements, licenses and summaries above come from
+package metadata. API inventories come from public module paths and explicit
+exports; they do not import optional numerical backends. Regenerate these facts
+with `python scripts/generate_inventory.py`; CI rejects stale output.
+Package-specific requirements and optional extras live in each `pyproject.toml`.

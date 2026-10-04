@@ -1,0 +1,60 @@
+---
+description: What omnibias unlocks and the measured scope of its primitives
+alwaysApply: true
+---
+
+# Differentiate deeper. Make decisions differentiable. Math that trains.
+
+omnibias supplies derivative and optimization infrastructure for PINNs and
+scientific machine learning. It **solves the nested high-order spatial-autodiff
+graph bottleneck on supported paths**: shared activation polynomials, forward
+Taylor composition and direct operator contractions replace repeated backward
+graphs while retaining gradients into model parameters. This makes demonstrated
+high-order residuals practical to train.
+
+Choose the quantity before a general differentiation strategy:
+
+- Activation derivatives use shared Riccati polynomial recurrences and one base
+  activation evaluation; total polynomial arithmetic still grows with order.
+- Directional jets carry selected directions. Mixed jets carry mixed partials;
+  their coefficient count grows combinatorially with dimension and order.
+- Ridge and deep Laplacian contractions avoid materializing a full Hessian.
+  Deep Laplacians have parameter-gradient regressions at D=5,000 and no fixed
+  dimension cap; fixed-width/depth work and memory still grow with dimension.
+- Residual derivatives remain trainable tensor expressions. Parameter-curvature
+  methods support Newton, Gauss–Newton and structured approximations with their
+  distinct assumptions.
+- Soft partition gates route into regional experts and propagate gradients into
+  thresholds, features and experts: **make decisions differentiable**. Neural
+  features and soft trees can train jointly; stagewise GBM-style boosting is a
+  separate consumer procedure. A hard discontinuity itself is not differentiated.
+- Verified intervals and checked certificates bound supported quantities under
+  explicit assumptions. Consumer PINN solvers add boundary, causal, multilevel
+  and conditioned-operator methods; those integrations live outside this repo.
+
+Bias collapse (`δ → 0`) extracts derivatives from normalized weighted shifts.
+Temperature collapse (`β → ∞`) hardens soft decisions. Keep these limits distinct.
+Replacing nested graphs removes their growth mechanism; numerical instability
+must still be measured independently. Direct formulas can suffer cancellation,
+and shared algebra does not imply universal floating-point identity. These
+primitives do not establish convergence for every PDE or solve every training
+and approximation difficulty.
+
+<!-- BEGIN GENERATED CAPABILITY EVIDENCE -->
+
+Measured float64 CPU medians, 9 repeats; derivative evaluation, not training:
+
+- [`σ⁽⁸⁾`](../../docs/benchmarks/derivative_order.json), 20,000 tanh inputs, Torch eager/1 thread: **220×** vs nested autograd.
+- [`Δ`](../../docs/benchmarks/laplacian_scaling.json), D=60/B=64/H=32: **24.4×** vs JAX dense Hessian.
+- [`Δ³` / `Δ⁴`](../../docs/benchmarks/polylaplacian_order.json), D=16/B=32/H=16: **4,974×** / **5,036×** vs dense JAX / nested folx respectively.
+
+Operator timings use JAX JIT, runtime inputs/weights, compilation excluded. Dense `Δ⁴`: `memory_budget` under 3,072 MiB / 120 s process budgets; no speedup for that run.
+[Full protocol, accuracy and baseline wins](../../docs/performance.md).
+
+<!-- END GENERATED CAPABILITY EVIDENCE -->
+
+Before editing a claim, consult [performance evidence](../../docs/performance.md):
+specialized activation/operator workloads and general deep jets are different
+comparisons. Keep baseline wins, compilation costs and resource refusals visible.
+[Capabilities](../../docs/capabilities.md) explains applications;
+[AGENTS.md](../../AGENTS.md) routes maintenance work to the owning skill.

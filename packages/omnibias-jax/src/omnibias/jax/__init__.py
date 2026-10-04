@@ -1,50 +1,10 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""omnibias.jax: JAX backend for omnibias.
+"""JAX activation derivatives and Taylor jets for physics-informed models.
 
-Mirrors :mod:`omnibias.torch` for JAX users. Same closed-form derivative
-kernels (sigmoid via Eulerian polynomials, tanh via Legendre-style
-recursion, Gaussian via probabilist's Hermite polynomials) and same
-activation dictionary, with bit-identical polynomial coefficients
-because both backends import :mod:`omnibias.core.polynomials`.
-
-Public API:
-
-* :class:`JaxActivationSpec` -- alias for
-  :class:`omnibias.core.spec.ActivationSpec` pinned to :class:`jax.Array`.
-* :func:`get_activation`, :func:`list_activations`,
-  :func:`register_activation`, :func:`is_registered` -- registry accessors.
-* :func:`neural_field_laplacian`, :func:`neural_field_hessian`,
-  :func:`neural_field_value`, :func:`neural_field_value_and_laplacian`,
-  :func:`neural_field_value_grad_laplacian`,
-  :func:`neural_field_value_grad_hessian` -- closed-form Laplacian /
-  Hessian primitives for the one-layer neural field
-  ``f(x) = b + sum_h c_h sigma(W_h . x + b_h)`` on ``R^D``.
-* :func:`coulomb_potential`, :func:`make_local_energy`,
-  :func:`make_bo_force`, :func:`make_bo_hessian`,
-  :func:`vibrational_frequencies` -- Born-Oppenheimer derivative kernels
-  used by the nuclear-Hessian work.
-
-* :func:`affine_jet`, :func:`compose_jet`, :func:`layer_jet`, :func:`mlp_jet`,
-  :func:`tower_to_jet`, :func:`jet_to_tower` -- exact multi-layer directional
-  Taylor jets via Faà di Bruno composition of the closed-form activation
-  derivative towers; :func:`compose_jet_riccati` is the opt-in ``O(N^2)``
-  fastpath for the Riccati class (``sigma' = P(sigma)``).
-* :func:`mlp_jet_mv`, :func:`layer_jet_mv`, :func:`compose_jet_mv`,
-  :func:`jet_multiply`, :func:`affine_jet_mv`, :func:`identity_jet`,
-  :func:`jet_partials`, :func:`jet_gradient`, :func:`jet_hessian` -- exact
-  *multivariate* (multi-index) Taylor jets: every mixed partial up to total
-  order ``N`` from a single forward pass.
-* :func:`jet_reciprocal`, :func:`jet_exp`, :func:`jet_softmax`,
-  :func:`jet_attention` -- jet algebra beyond the elementwise layer: rational
-  maps, and the non-local attention block whose *coordinate* derivatives
-  (not merely its score derivatives) stay closed form.
-
-The complex-valued activation dictionary lives in
-:mod:`omnibias.jax.activations_complex` and is imported on demand.
-
-Importing :mod:`omnibias.jax` does **not** import the FermiNet bridge;
-that lives in the separate :mod:`omnibias.ferminet` package.
+Shared polynomial coefficients define the derivative tower. Operator blocks,
+mixed jets, and PINN architectures reuse it without nested coordinate autodiff.
+Architecture and optimization helpers are available in their own modules.
 """
 
 from __future__ import annotations
@@ -71,8 +31,6 @@ from omnibias.jax.bo_derivatives import (
     make_local_energy,
     vibrational_frequencies,
 )
-from omnibias.jax.conjugate import hardy_atoms, hilbert_coeffs
-from omnibias.jax.hierarchy import hierarchical_scan
 from omnibias.jax.implicit import (
     DEQConfig,
     DEQNotContractive,
@@ -81,32 +39,6 @@ from omnibias.jax.implicit import (
     deq_du_dW,
     deq_solve,
     deq_vjp,
-)
-from omnibias.jax.information import (
-    chi_squared_divergence,
-    cross_entropy,
-    entropy,
-    exponential_family_cumulants,
-    f_divergence,
-    fisher_information,
-    fit_natural_parameter,
-    glm_mean,
-    glm_variance,
-    hellinger_distance,
-    js_divergence,
-    kl_divergence,
-    moment_match,
-    mutual_information,
-    renyi_divergence,
-    renyi_entropy,
-    sinkhorn_distance,
-    sliced_wasserstein,
-    total_variation_distance,
-    tsallis_entropy,
-    wasserstein1,
-    wasserstein1_cdf,
-    wasserstein2_gaussian,
-    wassersteinp,
 )
 from omnibias.jax.jet import (
     affine_jet,
@@ -145,15 +77,6 @@ from omnibias.jax.laplacian import (
     neural_field_value_grad_hessian,
     neural_field_value_grad_laplacian,
 )
-from omnibias.jax.lindblad import (
-    apply_lindblad,
-    derivative_tower,
-    evolve,
-    liouvillian,
-    propagator,
-    steady_state,
-    thermal_population,
-)
 from omnibias.jax.line_search import (
     GradientSecant,
     JetLineSearchConfig,
@@ -161,26 +84,11 @@ from omnibias.jax.line_search import (
     jet_line_search,
     jet_line_search_on_ray,
 )
-from omnibias.jax.moments import (
-    delta_method_gaussian,
-    delta_method_moments,
-    gaussian_moment_propagation,
-)
 from omnibias.jax.multipack import (
     BirkhoffOMBU,
     init_multipack,
     multipack_apply,
     multipack_response,
-)
-from omnibias.jax.occupancy import (
-    entropy_per_state,
-    grand_potential_density,
-    occupancy,
-    occupancy_derivative,
-    occupancy_mu_derivative,
-    occupancy_window,
-    reduced_argument,
-    thermal_broadening,
 )
 from omnibias.jax.optim_block_search import (
     BlockSpec,
@@ -191,39 +99,7 @@ from omnibias.jax.optim_block_search import (
     last_linear_block,
     ombu_bias_block,
 )
-from omnibias.jax.optim_composed import (
-    ComposedCurvatureConfig,
-    ComposedCurvatureReport,
-    composed_block_hessian,
-    composed_curvature_step,
-)
-from omnibias.jax.optim_kantorovich import (
-    CONTINUUM_PDE_CLAIM_KEY,
-    FINITE_RESIDUAL_CLAIM,
-    KantorovichAccept,
-    approximate_inverse_jacobian,
-    kantorovich_accept_step,
-    kantorovich_gated_gauss_newton_step,
-    polynomial_sqrt2_maps,
-    select_accepted_params,
-)
-from omnibias.jax.optim_sharpness import (
-    SharpnessReport,
-    SharpnessSchedule,
-    scheduled_value,
-    sharpness_lambda_max,
-    sharpness_scheduled_minimize,
-    sharpness_scheduled_step,
-)
 from omnibias.jax.precision import X64_HINT, require_x64, x64_enabled
-from omnibias.jax.probability import (
-    binned_calibration_error,
-    cdf,
-    empirical_band_mass,
-    ks_statistic,
-    model_band_mass,
-    soft_histogram,
-)
 from omnibias.jax.refine import (
     AdaptivePackBank,
     bank_forward,
@@ -238,33 +114,6 @@ from omnibias.jax.scan import (
     soft_argmax_offset,
 )
 from omnibias.jax.scan_equivariant import equivariant_scan_apply, steerable_basis
-from omnibias.jax.train_local import (
-    LocalJetConfig,
-    LocalJetForbidden,
-    LocalJetReport,
-    LocalLayerState,
-    invert_sigma,
-    local_jet_step,
-    make_input_jet,
-)
-from omnibias.jax.train_stack import (
-    TrainStackConfig,
-    TrainStackReport,
-    recommended_stack_step,
-    stack_minimize,
-)
-from omnibias.jax.transforms import (
-    FourierTransform,
-    LaplaceTransform,
-    MellinTransform,
-    TransformBlock,
-    fermi_dirac_mellin,
-    fourier_transform,
-    has_transform,
-    laplace_transform,
-    mellin_transform,
-    region_of_convergence,
-)
 from omnibias.jax.weight_loss_jet import (
     WeightLossJetSpec,
     one_layer_loss,
@@ -274,7 +123,7 @@ from omnibias.jax.weight_loss_jet import (
     one_layer_newton_direction,
 )
 
-# Founding-idea lineage (see docs/theory.md "Two senses of collapse").
+# Limit family exposed as package metadata.
 __lineage__ = "bias collapse"
 
 __all__ = [
@@ -282,31 +131,14 @@ __all__ = [
     "BankSpec",
     "BirkhoffOMBU",
     "BlockSpec",
-    "CONTINUUM_PDE_CLAIM_KEY",
-    "ComposedCurvatureConfig",
-    "ComposedCurvatureReport",
     "DEQConfig",
     "DEQNotContractive",
     "DEQResult",
     "DEQSolverUnknown",
-    "FINITE_RESIDUAL_CLAIM",
-    "FourierTransform",
     "GradientSecant",
     "JaxActivationSpec",
     "JetLineSearchConfig",
-    "KantorovichAccept",
-    "LaplaceTransform",
     "LineSearchResult",
-    "LocalJetConfig",
-    "LocalJetForbidden",
-    "LocalJetReport",
-    "LocalLayerState",
-    "MellinTransform",
-    "SharpnessReport",
-    "SharpnessSchedule",
-    "TrainStackConfig",
-    "TrainStackReport",
-    "TransformBlock",
     "WeightLossJetSpec",
     "X64_HINT",
     "__lineage__",
@@ -314,57 +146,26 @@ __all__ = [
     "affine_jet",
     "affine_jet_mv",
     "antiderivative_jet",
-    "apply_lindblad",
-    "approximate_inverse_jacobian",
     "arrangement_w_block",
     "bank_forward",
     "bias_scan",
-    "binned_calibration_error",
     "block_direction",
     "block_exact_search",
     "block_exact_sweep",
-    "cdf",
-    "chi_squared_divergence",
     "compose_jet",
     "compose_jet_mv",
     "compose_jet_riccati",
-    "composed_block_hessian",
-    "composed_curvature_step",
     "coulomb_potential",
-    "cross_entropy",
-    "delta_method_gaussian",
-    "delta_method_moments",
     "deq_du_dW",
     "deq_solve",
     "deq_vjp",
     "derivative_jet",
-    "derivative_tower",
-    "empirical_band_mass",
-    "entropy",
-    "entropy_per_state",
     "equivariant_scan_apply",
-    "evolve",
-    "exponential_family_cumulants",
-    "f_divergence",
-    "fermi_dirac_mellin",
-    "fisher_information",
-    "fit_natural_parameter",
-    "fourier_transform",
-    "gaussian_moment_propagation",
     "get_activation",
-    "glm_mean",
-    "glm_variance",
-    "grand_potential_density",
-    "hardy_atoms",
-    "has_transform",
-    "hellinger_distance",
-    "hierarchical_scan",
-    "hilbert_coeffs",
     "identity_jet",
     "init_bias_scan",
     "init_multipack",
     "init_pack_bank",
-    "invert_sigma",
     "is_registered",
     "jet_attention",
     "jet_exp",
@@ -377,81 +178,39 @@ __all__ = [
     "jet_reciprocal",
     "jet_softmax",
     "jet_to_tower",
-    "js_divergence",
-    "kantorovich_accept_step",
-    "kantorovich_gated_gauss_newton_step",
-    "kl_divergence",
-    "ks_statistic",
-    "laplace_transform",
     "last_linear_block",
     "layer_jet",
     "layer_jet_mv",
     "lhopital_ratio",
     "limit_of_ratio",
-    "liouvillian",
     "list_activations",
-    "local_jet_step",
     "make_bo_force",
     "make_bo_hessian",
-    "make_input_jet",
     "make_local_energy",
-    "mellin_transform",
     "mlp_jet",
     "mlp_jet_mv",
-    "model_band_mass",
-    "moment_match",
     "multipack_apply",
     "multipack_response",
-    "mutual_information",
     "neural_field_hessian",
     "neural_field_laplacian",
     "neural_field_value",
     "neural_field_value_and_laplacian",
     "neural_field_value_grad_hessian",
     "neural_field_value_grad_laplacian",
-    "occupancy",
-    "occupancy_derivative",
-    "occupancy_mu_derivative",
-    "occupancy_window",
     "ombu_bias_block",
     "one_layer_loss",
     "one_layer_loss_grad",
     "one_layer_loss_hessian",
     "one_layer_loss_jet",
     "one_layer_newton_direction",
-    "polynomial_sqrt2_maps",
-    "propagator",
-    "recommended_stack_step",
-    "reduced_argument",
     "refine",
-    "region_of_convergence",
     "register_activation",
     "removable_value",
-    "renyi_divergence",
-    "renyi_entropy",
     "require_x64",
     "scan_response",
-    "scheduled_value",
-    "select_accepted_params",
-    "sharpness_lambda_max",
-    "sharpness_scheduled_minimize",
-    "sharpness_scheduled_step",
-    "sinkhorn_distance",
-    "sliced_wasserstein",
     "soft_argmax_offset",
-    "soft_histogram",
-    "stack_minimize",
-    "steady_state",
     "steerable_basis",
-    "thermal_broadening",
-    "thermal_population",
-    "total_variation_distance",
     "tower_to_jet",
-    "tsallis_entropy",
     "vibrational_frequencies",
-    "wasserstein1",
-    "wasserstein1_cdf",
-    "wasserstein2_gaussian",
-    "wassersteinp",
     "x64_enabled",
 ]

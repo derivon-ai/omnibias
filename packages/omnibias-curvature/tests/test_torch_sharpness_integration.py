@@ -1,4 +1,4 @@
-# SPDX-License-Identifier: Apache-2.0
+# SPDX-License-Identifier: AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial
 # Copyright (C) 2026 Derivon
 r"""Integration tests: exact-curvature sharpness on losses that *already contain
 a derivative* -- the PINN residual / CNF divergence structure.
@@ -58,57 +58,3 @@ def test_hvp_exact_through_inner_derivative_loss():
     for p in params:
         assert p.grad is not None and p.grad.shape == p.shape
         assert torch.isfinite(p.grad).all()
-
-
-def test_sharpness_objectives_through_cnf_nll():
-    pytest.importorskip("omnibias.score.flow.torch.ops")
-    from omnibias.score.flow.torch.ops import log_prob
-
-    torch.manual_seed(0)
-    log2pi = math.log(2.0 * math.pi)
-
-    def base_lp(z):
-        return -0.5 * (z.pow(2).sum(-1) + z.shape[-1] * log2pi)
-
-    class Vel(torch.nn.Module):
-        def __init__(self, d=2, h=4):
-            super().__init__()
-            self.net = torch.nn.Sequential(
-                torch.nn.Linear(d + 1, h), torch.nn.Tanh(), torch.nn.Linear(h, d),
-            ).double()
-            with torch.no_grad():  # near-identity, well-conditioned flow
-                for m in self.net:
-                    if isinstance(m, torch.nn.Linear):
-                        m.weight.mul_(0.1)
-                        m.bias.mul_(0.1)
-
-        def forward(self, t, x):
-            tt = torch.full((x.shape[0], 1), float(t), dtype=x.dtype)
-            return self.net(torch.cat([x, tt], dim=-1))
-
-    net = Vel()
-    params = [p for p in net.parameters() if p.requires_grad]
-    x = 0.5 * torch.randn(6, 2, dtype=torch.float64)
-
-    def nll():
-        return -log_prob(net, x, 1.0, 0.0, base_lp, steps=2, method="euler").mean()
-
-    # differentiable frobenius penalty through the exact-divergence NLL
-    obj = S.sharpness_aware_loss(nll(), params, lam=1e-3, measure="frobenius",
-                                 n_samples=1, generator=torch.Generator().manual_seed(1))
-    net.zero_grad()
-    obj.backward()
-    for p in params:
-        assert p.grad is not None and p.grad.shape == p.shape
-        assert torch.isfinite(p.grad).all()
-
-    # exact second-order SAM objective also differentiates end-to-end
-    net.zero_grad()
-    S.sam_objective(nll(), params, rho=0.05, iters=2,
-                    generator=torch.Generator().manual_seed(2)).backward()
-    assert all(p.grad is not None and torch.isfinite(p.grad).all() for p in params)
-
-    # cheap flatness readout of the CNF NLL is finite
-    lam_max = float(S.top_eigenvalue(nll(), params, iters=6,
-                                     generator=torch.Generator().manual_seed(0)))
-    assert math.isfinite(lam_max)

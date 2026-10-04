@@ -13,7 +13,7 @@ conjugate-Poisson pair.  For a scale ``a > 0`` define
 
 These are the ``alpha = 1`` special case of the generalized Cauchy-Hardy pair in
 :mod:`omnibias.core.verified.hardy_line` (``P_{a,1} = p_a``, ``Q_{a,1} = q_a``).
-For CCF self-similar far fields with exponent ``alpha = 1/(1+lambda) != 1``, use
+For self-similar far fields with exponent ``alpha = 1/(1+lambda) != 1``, use
 the Hardy module instead.
 
 With the convention ``H[f](x) = (1/pi) p.v. \int f(t)/(x - t) dt`` the Hilbert
@@ -159,7 +159,7 @@ def poisson_primitive_matrix(x_nodes: Sequence[float],
 
 
 # --------------------------------------------------------------------------- #
-# Even-profile layer (the CCF-on-the-line representation)                      #
+# Even-profile layer (the even-profile representation)                      #
 # --------------------------------------------------------------------------- #
 # A smooth even profile is represented as a finite even Poisson-basis sum
 #   Theta(x) = sum_i c_i p_{a_i}(x)           (even, decays like |x|^{-2}),
@@ -167,7 +167,7 @@ def poisson_primitive_matrix(x_nodes: Sequence[float],
 #   H[Theta](x)  = sum_i c_i q_{a_i}(x)       (odd),
 #   Theta'(x)    = sum_i c_i p_{a_i}'(x)      (odd),
 #   (H Theta)'(x)= H[Theta'](x) = sum_i c_i q_{a_i}'(x)  (even).
-# These four are exactly the quantities the self-similar CCF residual needs:
+# These four are exactly the quantities the self-similar residual needs:
 #   E(Theta, lam) = (1+lam) y Theta' - lam Theta + s (H Theta) Theta'   (transport)
 #                 + s Theta (H Theta)'                                   (flux extra).
 

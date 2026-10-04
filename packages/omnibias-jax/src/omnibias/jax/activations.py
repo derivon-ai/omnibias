@@ -30,18 +30,6 @@ from typing import TypeAlias
 from omnibias.core.polynomials import mish_inner_coeffs
 from omnibias.core.spec import ActivationSpec as _CoreActivationSpec
 from omnibias.jax import _fastpath
-from omnibias.jax.transforms import (
-    COS_TRANSFORMS,
-    COSH_TRANSFORMS,
-    EXP_TRANSFORMS,
-    GAUSSIAN_TRANSFORMS,
-    RELU_TRANSFORMS,
-    SECH_TRANSFORMS,
-    SIGMOID_TRANSFORMS,
-    SIN_TRANSFORMS,
-    SINH_TRANSFORMS,
-    TANH_TRANSFORMS,
-)
 
 import jax.numpy as jnp
 from jax import Array
@@ -123,7 +111,6 @@ def _sigmoid_integral(z: Array) -> Array:
 SIGMOID = register_activation(
     JaxActivationSpec(
         name="sigmoid",
-        transforms=SIGMOID_TRANSFORMS,
         forward=_sigmoid,
         derivative=_sigmoid_derivative,
         fastpath=_fastpath.sigmoid_nth_derivative,
@@ -157,7 +144,6 @@ def _tanh_integral(z: Array) -> Array:
 TANH = register_activation(
     JaxActivationSpec(
         name="tanh",
-        transforms=TANH_TRANSFORMS,
         forward=_tanh,
         derivative=_tanh_derivative,
         fastpath=_fastpath.tanh_nth_derivative,
@@ -214,7 +200,6 @@ def _gaussian_integral(z: Array) -> Array:
 GAUSSIAN = register_activation(
     JaxActivationSpec(
         name="gaussian",
-        transforms=GAUSSIAN_TRANSFORMS,
         forward=_gaussian,
         derivative=_gaussian_derivative,
         fastpath=_fastpath.gaussian_nth_derivative,
@@ -245,7 +230,6 @@ def _exp_fastpath(z: Array, n: int) -> Array:
 EXP = register_activation(
     JaxActivationSpec(
         name="exp",
-        transforms=EXP_TRANSFORMS,
         forward=_exp_forward,
         derivative=_exp_forward,
         fastpath=_exp_fastpath,
@@ -532,7 +516,6 @@ def _relu_fastpath(z: Array, n: int) -> Array:
 RELU = register_activation(
     JaxActivationSpec(
         name="relu",
-        transforms=RELU_TRANSFORMS,
         forward=_relu_forward,
         derivative=_relu_derivative,
         fastpath=_relu_fastpath,
@@ -780,7 +763,6 @@ def _sin_fastpath(z: Array, n: int) -> Array:
 SIN = register_activation(
     JaxActivationSpec(
         name="sin",
-        transforms=SIN_TRANSFORMS,
         forward=_sin_forward,
         derivative=_sin_derivative,
         fastpath=_sin_fastpath,
@@ -815,7 +797,6 @@ def _cos_fastpath(z: Array, n: int) -> Array:
 COS = register_activation(
     JaxActivationSpec(
         name="cos",
-        transforms=COS_TRANSFORMS,
         forward=_cos_forward,
         derivative=_cos_derivative,
         fastpath=_cos_fastpath,
@@ -850,7 +831,6 @@ def _sinh_fastpath(z: Array, n: int) -> Array:
 SINH = register_activation(
     JaxActivationSpec(
         name="sinh",
-        transforms=SINH_TRANSFORMS,
         forward=_sinh_forward,
         derivative=_sinh_derivative,
         fastpath=_sinh_fastpath,
@@ -883,7 +863,6 @@ def _cosh_fastpath(z: Array, n: int) -> Array:
 COSH = register_activation(
     JaxActivationSpec(
         name="cosh",
-        transforms=COSH_TRANSFORMS,
         forward=_cosh_forward,
         derivative=_cosh_derivative,
         fastpath=_cosh_fastpath,
@@ -1060,7 +1039,6 @@ def _sech_fastpath(z: Array, n: int) -> Array:
 SECH = register_activation(
     JaxActivationSpec(
         name="sech",
-        transforms=SECH_TRANSFORMS,
         forward=_sech_forward,
         derivative=_sech_derivative,
         fastpath=_sech_fastpath,

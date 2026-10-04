@@ -14,7 +14,7 @@ otherwise would mislead anyone evaluating it as a dependency.
 | **Founder / Lead Maintainer** | Vardan Grigoryants | technical direction, API and licence-tier changes, releases, who becomes a maintainer |
 | **Steward (copyright holder)** | Derivon | legal matters: licensing, the CLA, trademark, commercial agreements |
 | **Maintainers** | see [`MAINTAINERS.md`](MAINTAINERS.md) | review and merge within their area |
-| **Contributors** | anyone who has signed the [CLA](docs/CLA.md) | propose changes |
+| **Contributors** | anyone who has signed the [CLA](CLA.md) | propose changes |
 
 ## The decision model, stated honestly
 
@@ -62,11 +62,11 @@ disagreement and the reasoning stay on the record.
 
 ## Releases
 
-Each of the 42 distributions is versioned independently. The lead maintainer
+Each of the primitive distributions is versioned independently. The lead maintainer
 cuts releases; publishing runs through PyPI trusted publishing (OIDC) from
 [`.github/workflows/release.yml`](.github/workflows/release.yml), so no
 long-lived credential exists to be shared or leaked. The gate a release must
-pass is recorded in [`docs/release-readiness.md`](docs/release-readiness.md).
+pass is recorded in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ## Licence and relicensing
 

@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.convex.torch.solve_qp",
+  "scene_sha256": "62d7a444aaa775f70e6919cb77c2134ab2bf2dbb97130cbc5b8fe6eeabf9a8a0",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "18364fcbeb9b7068a36a91a76c4f8abacc21287a3e35f9e9ca6c5000be1bf2d3",
+    "story-mobile.gif": "7c53bc536894f244eded606f31a54733b6f72f616bdad15e683dcc9019043ec6"
+  }
+}
