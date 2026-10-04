@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.core.eval_tanh_derivative / tanh_polynomial_coeffs",
+  "scene_sha256": "c39a3280328c93710248fd7ccecbb3e68707306c635da3a54a6039b2015298e9",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "4e0f9f5eba704df2bc7779b1cb6e894c175c7c5c1039bac7f83e074800c888e3",
+    "story-mobile.gif": "88c971bf8d8d264b49951ecbd7a34a17e740fbe9ce5c08b72d6c1a130743245d"
+  }
+}

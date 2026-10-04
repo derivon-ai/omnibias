@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.sos.Polynomial / certify_sos",
+  "scene_sha256": "91be3bd550e906ad341f6e8686befacb2235e0c7da5a2595ecfb29df6eb9838b",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "789b629acb96c05c177bf94db2d6dd031c6fa0f74a5f6e10962c3304708f4c36",
+    "story-mobile.gif": "9db448226063ca5f97f9fe43aa61806b808c0a25051aae1fa4a96bda73bf33d7"
+  }
+}

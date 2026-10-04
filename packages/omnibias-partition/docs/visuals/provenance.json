@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.partition.partition_weights",
+  "scene_sha256": "87eef7eeadc5b1bf580ddcfe7e6505e86ff4f4c2853727d8b8960e92f88b08d5",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "377add806c88a027ade338325aa9656b3a4be249f928d5fa144c9b22532cf6d6",
+    "story-mobile.gif": "8aa9f7bf84404547d0b3fab51f1aa0e23ea546d84964b511e233c9c046c471e3"
+  }
+}

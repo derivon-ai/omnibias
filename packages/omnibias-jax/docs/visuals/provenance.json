@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.jax.jet.mlp_jet through jax.jit(jax.vmap)",
+  "scene_sha256": "2653f554402eb4d055e3dc52346da4fac5bf60ef88772d55df77bb2d0d712a6c",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "9ed90d42db8dd39eb4be0227567b7963c617224f3c47ccb26615cd26e9ef06c5",
+    "story-mobile.gif": "33aee923f2934d2eb448e42349333094c0e9041c8980860c28fc7798b4b26a41"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.qcalculus.q_derivative_poly",
+  "scene_sha256": "6c64952d6a6ff54dcaf7562ab07f92d6e953a95759db58d4ec25359fffefe783",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "4d71846a650f6339bec6d16a818bb0cd84dddef973cb3617b6d3a0f19c289365",
+    "story-mobile.gif": "f33f8774e3e0951f62df789fd4e46b31a1c27f60551a19fe3db7a8280ffbf96f"
+  }
+}

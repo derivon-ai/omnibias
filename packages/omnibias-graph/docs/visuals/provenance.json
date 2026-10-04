@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.graph.torch.ops.graph_laplacian / sinkhorn_normalize",
+  "scene_sha256": "055d49df350aad2a087cad5b99a410ee32e4ecbc242ae74a82587a0a0b3cd949",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "049e04343174b4170a9367610feee622e0d0369ca899a1c33e64fc628ebca2b8",
+    "story-mobile.gif": "ef962836992c62a40ac9e68c1f981d2a22bcf6bb6784527e2902f1274e59acbf"
+  }
+}

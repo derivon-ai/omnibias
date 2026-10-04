@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.keras.OMBU.analytic",
+  "scene_sha256": "0a45c6c755eb14cccf01a8d064af5ff95173f268ba6c4cf3474c4dd5f2cfa977",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "2dfe2aed8d4d155fe02f1ec28f14a02481519c453630e9ac7e45f673ec889e23",
+    "story-mobile.gif": "99f31a52f48f6ddd60715945c99666d90d9f9b9674a93ae12f878cc26dd8f684"
+  }
+}

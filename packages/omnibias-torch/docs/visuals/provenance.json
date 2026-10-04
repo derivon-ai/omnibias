@@ -1,0 +1,14 @@
+{
+  "source": "omnibias.torch.jet.mlp_jet + torch.autograd.grad",
+  "scene_sha256": "012f812b2ff4b00ef7c6b301085e57a802894a1022bfaafca96c19e8bccf0db8",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "9566d7ab79fae08c6adac49b5ee86f29b264a0cbcaa903f6482d3e308c630112",
+    "story-mobile.gif": "75bdf30a0cec8353876bf5293fdf729dacbd25eb98dd06a776ec9676e821e25d"
+  }
+}

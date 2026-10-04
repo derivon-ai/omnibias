@@ -1,0 +1,14 @@
+{
+  "source": "truth_table_from_callable / anf_from_truth_table / truth_table_from_anf",
+  "scene_sha256": "4ebd3832b6fd528dc0736cbe9436b70dbaa11373bcc1ae2f9d1623f75c9f5187",
+  "render_environment": {
+    "numpy": "2.5.3",
+    "matplotlib": "3.10.9",
+    "Pillow": "12.2.0"
+  },
+  "purpose": "computed illustration; not a performance measurement",
+  "sha256": {
+    "story.gif": "483a8d516ef39acd60cbe02695cd7240c7f5ac944997b2953f8febea840365a7",
+    "story-mobile.gif": "dc76db9a253a3edc796f2c3f30096180fe471426a79b1c157ca8612f82575531"
+  }
+}
