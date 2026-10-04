@@ -24,6 +24,7 @@ from __future__ import annotations
 import sys
 import tarfile
 import zipfile
+from email import message_from_bytes, policy
 from pathlib import Path
 
 _CACHE_JUNK = (
@@ -33,6 +34,15 @@ _CACHE_JUNK = (
     ".ruff_cache",
     ".DS_Store",
 )
+
+
+def _metadata_offenders(payload: bytes, filename: str) -> list[str]:
+    metadata = message_from_bytes(payload, policy=policy.default)
+    summary = str(metadata.get("Summary", ""))
+    # Warehouse imposes this additional constraint; twine check does not.
+    if len(summary) > 512:
+        return [f"{filename}: Summary exceeds Warehouse's 512-character limit ({len(summary)})"]
+    return []
 
 
 def _is_cache_junk(name: str) -> bool:
@@ -49,6 +59,8 @@ def _wheel_offenders(whl: Path) -> list[str]:
             if name.endswith("/"):
                 continue
             top = name.split("/", 1)[0]
+            if top.endswith(".dist-info") and name.endswith("/METADATA"):
+                bad.extend(_metadata_offenders(zf.read(name), whl.name))
             if _is_cache_junk(name):
                 bad.append(f"{whl.name}: cache junk -> {name}")
             elif top != "omnibias" and not top.endswith(".dist-info"):
@@ -62,6 +74,10 @@ def _sdist_offenders(sd: Path) -> list[str]:
     with tarfile.open(sd) as tf:
         for name in tf.getnames():
             parts = name.split("/")
+            if len(parts) == 2 and parts[-1] == "PKG-INFO":
+                metadata = tf.extractfile(name)
+                if metadata is not None:
+                    bad.extend(_metadata_offenders(metadata.read(), sd.name))
             if _is_cache_junk(name):
                 bad.append(f"{sd.name}: cache junk -> {name}")
             # A setuptools byproduct sits at ``<root>/build/...`` (build is the
@@ -86,7 +102,7 @@ def main() -> int:
         offenders += _sdist_offenders(sd)
 
     if offenders:
-        print("Packaging junk detected in built distributions:")
+        print("Packaging or metadata errors detected in built distributions:")
         for line in offenders:
             print(f"  {line}")
         return 1

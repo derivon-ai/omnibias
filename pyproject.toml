@@ -21,6 +21,7 @@ members = [
 [tool.uv]
 required-version = "==0.12.1"
 package = false
+environments = ["python_version >= '3.11'"]
 
 [tool.uv.sources]
 omnibias-binary = { workspace = true }
@@ -47,8 +48,8 @@ dev = [
     "mpmath>=1.3", "scipy>=1.10", "build>=1.2", "twine>=5.0",
 ]
 docs = ["mkdocs-material>=9.5", "mkdocstrings[python]>=0.24"]
-benchmarks = ["folx==0.2.30", "mpmath==1.3.0", "numpy==2.5.3", "matplotlib==3.10.9", "pillow==12.2.0"]
-presentation = ["matplotlib==3.10.9", "pillow==12.2.0", "readme-renderer[md]==44.0"]
+benchmarks = ["folx==0.2.30", "mpmath==1.3.0", "numpy==2.5.3", "matplotlib==3.10.9", "pillow==12.3.0"]
+presentation = ["matplotlib==3.10.9", "pillow==12.3.0", "readme-renderer[md]==44.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["packages", "tests"]
@@ -58,6 +59,9 @@ filterwarnings = [
     "error",
     "ignore::DeprecationWarning:torch.*",
     "ignore::DeprecationWarning:jax.*",
+    # PyTorch 2.14's forward-AD internals still call their deprecated JIT API.
+    # Limit this exception to the upstream emitter; retain strict user warnings.
+    'ignore:`torch\.jit\.script` is deprecated\..*:FutureWarning:torch\.jit\._script',
     # NumPy 2 copy-keyword warning from Keras' upstream tensor conversion adapter.
     'ignore:.*__array__ implementation.*copy keyword.*:DeprecationWarning:keras\.src\.backend\.(torch|jax|tensorflow)\.core',
 ]

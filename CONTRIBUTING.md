@@ -4,6 +4,12 @@ Develop reusable primitives here; build solver products and application
 experiments in sibling repositories under `../omnibias_projects/`.
 The package map is in [docs/packages.md](docs/packages.md).
 
+Use Python 3.11 or newer for the shared development environment (CI uses 3.12).
+This keeps the toolchain on maintained backend versions. Individual distributions
+retain their declared Python requirements; Python 3.10 compatibility is tested
+separately from the shared environment. Use a current Python/backend combination
+for applications that process externally supplied models or images.
+
 ```bash
 uv sync --all-packages --group docs
 uv run pytest packages/omnibias-core/tests -q

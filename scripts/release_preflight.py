@@ -78,6 +78,8 @@ def validate_closure(root: Path, names: list[str], repository: str | None = None
     cache = {}
     for name in names:
         project = available[name]
+        if len(project.get("description", "")) > 512:
+            raise ValueError(f"{name}: summary exceeds Warehouse's 512-character limit")
         dependencies = list(project.get("dependencies", []))
         dependencies += [
             r for values in project.get("optional-dependencies", {}).values() for r in values

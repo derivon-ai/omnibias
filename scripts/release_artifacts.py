@@ -10,6 +10,7 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -17,6 +18,7 @@ from packaging.requirements import Requirement
 from packaging.version import Version
 from release_preflight import (
     ROOT,
+    ensure_unpublished,
     index_project,
     projects,
     publisher_environment,
@@ -33,7 +35,7 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def manifest(root: Path, directory: Path, commit: str) -> dict:
+def manifest(root: Path, directory: Path, commit: str, reuse: dict | None = None) -> dict:
     if not re.fullmatch(r"[0-9a-f]{40}", commit):
         raise ValueError("Expected a full source commit")
     cohort = {}
@@ -44,18 +46,80 @@ def manifest(root: Path, directory: Path, commit: str) -> dict:
             "name": project["name"], "version": project["version"],
             "files": {name: digest(directory / name) for name in files},
         }
-    return {"schema": 1, "repository": REPOSITORY, "commit": commit, "packages": cohort}
+    data = {"schema": 1, "repository": REPOSITORY, "commit": commit, "packages": cohort}
+    if reuse is not None:
+        if (set(reuse) != {"run_id", "commit", "packages"}
+                or not isinstance(reuse["run_id"], str) or not reuse["run_id"].isdecimal()
+                or not isinstance(reuse["commit"], str)
+                or not re.fullmatch(r"[0-9a-f]{40}", reuse["commit"])
+                or not isinstance(reuse["packages"], list)
+                or not all(isinstance(short, str) for short in reuse["packages"])
+                or reuse["packages"] != sorted(set(reuse["packages"]))
+                or not set(reuse["packages"]) <= set(cohort)):
+            raise ValueError("Invalid artifact reuse provenance")
+        data["reuse"] = reuse
+    return data
 
 
 def verify_files(root: Path, directory: Path, commit: str) -> dict:
     data = json.loads((directory / MANIFEST).read_text())
-    expected = manifest(root, directory, commit)
+    expected = manifest(root, directory, commit, data.get("reuse"))
     if data != expected:
         raise ValueError("Prepared manifest differs from source metadata or artifact hashes")
     names = {name for p in data["packages"].values() for name in p["files"]} | {MANIFEST}
     if {p.name for p in directory.iterdir()} != names:
         raise ValueError("Unexpected files in prepared artifact bundle")
     return data
+
+
+def repair_plan(root: Path, previous_commit: str, commit: str) -> tuple[list[str], list[str]]:
+    """Reuse only identical package trees from an ancestor; rebuild only unused versions."""
+    subprocess.run(["git", "merge-base", "--is-ancestor", previous_commit, commit],
+                   cwd=root, check=True)
+    reused, rebuilt = [], []
+    for short, project in sorted(projects(root).items()):
+        path = f"packages/{project['name']}"
+        changed = subprocess.check_output(
+            ["git", "diff", "--name-only", previous_commit, commit, "--", path],
+            cwd=root, text=True,
+        ).strip()
+        if changed:
+            for repository in ("testpypi", "pypi"):
+                ensure_unpublished(project["name"], project["version"], repository)
+            rebuilt.append(short)
+        else:
+            reused.append(short)
+    return reused, rebuilt
+
+
+def build_cohort(root: Path, directory: Path, commit: str, reuse_run_id: str = "") -> None:
+    directory.mkdir(parents=True, exist_ok=True)
+    if any(directory.iterdir()):
+        raise ValueError("Build output directory must be empty")
+    available = projects(root)
+    rebuilt = sorted(available)
+    reuse = None
+    if reuse_run_id:
+        if not reuse_run_id.isdecimal():
+            raise ValueError("Reuse requires a numeric preparation run ID")
+        run = json.loads(gh("api", f"repos/{REPOSITORY}/actions/runs/{reuse_run_id}"))
+        previous_commit = run["head_sha"]
+        previous = directory.parent / "artifacts" / "previous-primitive-dist"
+        # fetch_prepared verifies repository/workflow/ref, every hash, and all
+        # attestations. It also rejects changes to cohort names or versions.
+        data = fetch_prepared(reuse_run_id, previous, previous_commit)
+        reused, rebuilt = repair_plan(root, previous_commit, commit)
+        for short in reused:
+            for name in data["packages"][short]["files"]:
+                shutil.copyfile(previous / name, directory / name)
+        reuse = {"run_id": reuse_run_id, "commit": previous_commit, "packages": reused}
+    for short in rebuilt:
+        subprocess.run([sys.executable, "-m", "build", str(root / "packages" / available[short]["name"]),
+                        "--outdir", str(directory.resolve())], cwd=root, check=True)
+    data = manifest(root, directory, commit, reuse)
+    (directory / MANIFEST).write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+    verify_files(root, directory, commit)
+    print(json.dumps({"rebuilt": rebuilt, "reuse": reuse}), flush=True)
 
 
 def verify_run(run: dict, jobs: list[dict], commit: str) -> None:
@@ -153,11 +217,17 @@ def stage(root: Path, directory: Path, output: Path, data: dict, names: list[str
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=["manifest", "promote"])
+    parser.add_argument("mode", choices=["build", "verify", "manifest", "promote"])
     parser.add_argument("--directory", type=Path, default=Path("dist"))
     parser.add_argument("--output", type=Path, default=Path("upload"))
     args = parser.parse_args()
     commit = os.environ["GITHUB_SHA"]
+    if args.mode == "build":
+        build_cohort(ROOT, args.directory, commit, os.environ.get("REUSE_PREPARED_RUN_ID", ""))
+        return
+    if args.mode == "verify":
+        verify_files(ROOT, args.directory, commit)
+        return
     if args.mode == "manifest":
         data = manifest(ROOT, args.directory, commit)
         (args.directory / MANIFEST).write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
