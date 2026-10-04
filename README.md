@@ -131,21 +131,22 @@ explain which path to choose.
 
 ## Install, then differentiate
 
-The backend distributions are independently installable. This source revision
-prepares an **opt-in prerelease**; existing consumer users should keep the
-[tested historical constraints](scripts/constraints-published.txt) until compatible
-successor releases are available. The [release guide](RELEASE.md) explains the
-coordinated wheelhouse and explicit `--pre` installation path.
-
-For the currently published stable backend:
+Install the prepared **RC/alpha release** explicitly for the examples below:
 
 ```bash
-pip install omnibias-torch
-# Alternatives: omnibias-jax or omnibias-keras
+python -m pip install --pre "omnibias-torch==0.5.0rc1"
+# The soft-region example also uses the AGPL-or-commercial partition package:
+python -m pip install --pre "omnibias-partition[torch]==0.1.0a2"
 ```
 
-Published packages can lag this branch. To run both examples against this
-exact checkout, install the primitive workspace:
+JAX and Keras users can select `omnibias-jax==0.5.0rc1` or
+`omnibias-keras==0.0.2a1`. Existing published consumer users should keep the
+[tested historical constraints](scripts/constraints-published.txt) until compatible
+successor releases are available. These are prereleases, and alpha-only packages
+may be selected without `--pre`; the [release guide](RELEASE.md) explains resolver
+behavior and the compatibility boundary.
+
+For development from source:
 
 ```bash
 git clone https://github.com/derivon-ai/omnibias.git
