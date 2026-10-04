@@ -28,6 +28,9 @@ on:
       prepared_run_id:
         description: "Successful main-branch preparation run; required for publication"
         required: false
+      reuse_prepared_run_id:
+        description: "Preparation only: preserve verified bytes of unchanged packages from this prior run"
+        required: false
       resume:
         description: "Recover an interrupted upload after exact artifact hash verification"
         type: boolean
@@ -56,8 +59,11 @@ jobs:
       # attestation and record it in the public transparency log.
       id-token: write
       attestations: write
+      actions: read
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09  # v5
+        with:
+          fetch-depth: 0
       - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1  # v6
         with:
           python-version: "3.11"
@@ -74,20 +80,21 @@ jobs:
           # Validate an independent tag, then prepare the complete dependency cohort.
           python scripts/release_preflight.py
       - name: Build primitive sdists + wheels
-        run: |
-          for package in packages/*; do
-            python -m build "$package" --outdir dist/
-          done
-          ls -1 dist/
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REUSE_PREPARED_RUN_ID: ${{ inputs.reuse_prepared_run_id }}
+        run: python scripts/release_artifacts.py build
       - name: Validate distribution metadata
-        run: twine check dist/*
+        run: |
+          python scripts/check_packaging.py dist
+          twine check dist/*.whl dist/*.tar.gz
       - name: Validate installed README examples from the built wheels
         run: |
           mkdir -p artifacts/release-wheels/wheels
           cp dist/*.whl artifacts/release-wheels/wheels/
           python scripts/validate_wheels.py --artifact-only --readme --python 3.11 --output artifacts/release-wheels
       - name: Seal complete release manifest
-        run: python scripts/release_artifacts.py manifest
+        run: python scripts/release_artifacts.py verify
       # SLSA build provenance: a signed, verifiable attestation that these exact
       # artifacts were produced by this workflow from this commit. Consumers
       # verify with `gh attestation verify <dist> --repo derivon-ai/omnibias`.
@@ -157,5 +164,6 @@ jobs:
       - name: Publish verified missing artifacts
         uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
         with:
+          verbose: true
           packages-dir: upload/${{ matrix.package }}/
           repository-url: ${{ inputs.repository == 'pypi' && 'https://upload.pypi.org/legacy/' || 'https://test.pypi.org/legacy/' }}

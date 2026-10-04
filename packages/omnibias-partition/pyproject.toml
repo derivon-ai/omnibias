@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "omnibias-partition"
 version = "0.1.0a2"
-description = "A light, certified soft partition-of-unity primitive: oblique / axis-aligned / sparse soft-split gates that route an input into 2**depth regions with weights that are non-negative and sum to one, harden to a crisp partition under temperature collapse (the beta -> inf penalty), carry a SOUND soft->hard membership-gap certificate (outward-rounded Interval + closed-form Gibbs bound), and expose a per-region model registry whose one combine() engine (sum_l w_l * out_l) is shared by every downstream bridge. Bit-identical numpy / torch / jax weights."
+description = "Trainable soft partitions of unity: oblique, axis-aligned and sparse gates, regional expert composition, temperature hardening and scoped membership-gap certificates, with NumPy, PyTorch and JAX implementations."
 readme = "README.md"
 requires-python = ">=3.10"
 license = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"

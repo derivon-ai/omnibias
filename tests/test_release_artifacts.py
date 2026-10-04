@@ -121,3 +121,80 @@ def test_index_outage_is_not_an_empty_release(tmp_path, monkeypatch):
     monkeypatch.setattr(release, "index_project", outage)
     with pytest.raises(URLError):
         release.stage(ROOT, tmp_path, tmp_path / "upload", data, ["core"], "pypi", True)
+
+
+def test_repair_reuses_only_identical_package_trees(monkeypatch):
+    monkeypatch.setattr(release, "projects", lambda root: {
+        "core": {"name": "omnibias-core", "version": "0.5.0rc1"},
+        "partition": {"name": "omnibias-partition", "version": "0.1.0a2"},
+    })
+    monkeypatch.setattr(release.subprocess, "run", lambda *a, **kw: None)
+    monkeypatch.setattr(release.subprocess, "check_output", lambda command, **kw:
+                        "packages/omnibias-partition/pyproject.toml\n" if command[-1].endswith("partition") else "")
+    checked = []
+    monkeypatch.setattr(release, "ensure_unpublished", lambda *args: checked.append(args))
+    assert release.repair_plan(ROOT, "b" * 40, SHA) == (["core"], ["partition"])
+    assert checked == [("omnibias-partition", "0.1.0a2", index) for index in ("testpypi", "pypi")]
+
+
+@pytest.mark.parametrize("error", [ValueError("version occupied"), URLError("index unavailable")])
+def test_repair_never_rebuilds_an_occupied_or_unknown_version(monkeypatch, error):
+    monkeypatch.setattr(release, "projects", lambda root: {"core": {"name": "omnibias-core", "version": "0.5.0rc1"}})
+    monkeypatch.setattr(release.subprocess, "run", lambda *a, **kw: None)
+    monkeypatch.setattr(release.subprocess, "check_output", lambda *a, **kw: "changed")
+    def unavailable(*args):
+        raise error
+    monkeypatch.setattr(release, "ensure_unpublished", unavailable)
+    with pytest.raises(type(error)):
+        release.repair_plan(ROOT, "b" * 40, SHA)
+
+
+def test_repair_rejects_unrelated_history(monkeypatch):
+    def unrelated(*args, **kwargs):
+        raise release.subprocess.CalledProcessError(1, "git merge-base")
+    monkeypatch.setattr(release.subprocess, "run", unrelated)
+    with pytest.raises(release.subprocess.CalledProcessError):
+        release.repair_plan(ROOT, "b" * 40, SHA)
+
+
+def test_repair_keeps_original_bytes_and_records_origin(tmp_path, monkeypatch):
+    available = {"core": {"name": "omnibias-core", "version": "0.5.0rc1"},
+                 "partition": {"name": "omnibias-partition", "version": "0.1.0a2"}}
+    monkeypatch.setattr(release, "projects", lambda root: available)
+    monkeypatch.setattr(release, "gh", lambda *args: json.dumps({"head_sha": "b" * 40}))
+    def write_artifacts(directory, project, payload):
+        directory.mkdir(parents=True, exist_ok=True)
+        for suffix in ("-py3-none-any.whl", ".tar.gz"):
+            name = project["name"].replace("-", "_") + "-" + project["version"] + suffix
+            (directory / name).write_bytes(payload)
+    verified = []
+    def fetch(run_id, directory, commit):
+        verified.append((run_id, commit))
+        for project in available.values():
+            write_artifacts(directory, project, b"original signed bytes")
+        return release.manifest(tmp_path, directory, commit)
+    monkeypatch.setattr(release, "fetch_prepared", fetch)
+    monkeypatch.setattr(release, "repair_plan", lambda *args: (["core"], ["partition"]))
+    built = []
+    def build(command, **kwargs):
+        built.append(command[3])
+        write_artifacts(Path(command[-1]), available["partition"], b"corrected metadata")
+    monkeypatch.setattr(release.subprocess, "run", build)
+    directory = tmp_path / "dist"
+    release.build_cohort(tmp_path, directory, SHA, "123")
+    data = release.verify_files(tmp_path, directory, SHA)
+    assert verified == [("123", "b" * 40)]
+    assert built == [str(tmp_path / "packages/omnibias-partition")]
+    assert data["reuse"] == {"run_id": "123", "commit": "b" * 40, "packages": ["core"]}
+    assert next(directory.glob("omnibias_core-*.whl")).read_bytes() == b"original signed bytes"
+    assert next(directory.glob("omnibias_partition-*.whl")).read_bytes() == b"corrected metadata"
+
+
+def test_repair_requires_verified_previous_artifacts(tmp_path, monkeypatch):
+    monkeypatch.setattr(release, "gh", lambda *args: json.dumps({"head_sha": "b" * 40}))
+    def unverified(*args):
+        raise ValueError("Invalid signature")
+    monkeypatch.setattr(release, "fetch_prepared", unverified)
+    with pytest.raises(ValueError, match="signature"):
+        release.build_cohort(ROOT, tmp_path / "dist", SHA, "123")
+    assert not list((tmp_path / "dist").iterdir())

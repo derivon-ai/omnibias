@@ -6,6 +6,18 @@ release lifecycle. Repository moves do not rename PyPI projects or revoke existi
 grant terms. Never replace an artifact. An interrupted upload may resume only from the same
 prepared cohort after verifying every existing artifact hash.
 
+If the rehearsal rejects a package before accepting any files, fix its source
+metadata and merge the correction. Run preparation with `reuse_prepared_run_id`
+set to the earlier successful preparation. This verifies the earlier run and
+attestations, requires its commit to be an ancestor, and preserves exact bytes for
+unchanged package trees. Changed packages may rebuild only when their versions
+are absent from **both** indexes; index errors stop preparation. Package names
+and versions must still match the prior cohort. The new signed manifest records
+the earlier run, source commit and reused packages. Finish the rehearsal and
+promote this repaired cohort; never replace accepted files or use blind
+`skip-existing`. The artifact guard checks Warehouse's 512-character Summary
+limit in wheels and sdists, in addition to Twine's rendering checks.
+
 ## Prerelease policy
 
 This migration prepares an **opt-in prerelease**, not a stable consumer upgrade:
