@@ -1,20 +1,44 @@
 # omnibias-torch
 
-## Differentiate deeper. Keep training.
+**Derivatives that keep training.** Spatial jets forward. Parameter gradients backward.
 
-**PyTorch activation towers, directional and mixed jets, and direct Laplacian paths with gradients into model parameters.**
+![Derivatives that keep training.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-torch/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-torch/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-torch/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-torch/docs/visuals/scene.py)
+
+Torch tensors and supported network layers enter; activation derivatives, directional jets and specialized contractions leave as tensors still connected to model parameters. Use this backend to train a high-order residual without constructing a nested spatial backward graph.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/torch/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-torch/src/omnibias/torch) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-torch/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-![Differentiate deeper. Keep training.](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/bias-collapse.svg)
+## The mathematical connection
 
-<details>
-<summary>Watch the mechanism change continuously</summary>
+Bias collapse becomes an analytic tensor kernel here: evaluate the shared activation polynomial, then propagate normalized Taylor coefficients through layers. Parameter autograd remains available through that calculation. Temperature collapse is realized by separate soft-gate primitives; this backend provides their trainable arithmetic rather than a tree-learning algorithm.
 
-![Animated mathematical explanation](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/bias-collapse.gif)
+## Run this README
 
-The animation illustrates the mechanism; it is not a speed benchmark.
-</details>
+The examples use `omnibias-torch` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-torch/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-torch"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-torch==0.5.0rc1"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -27,22 +51,6 @@ A fourth-order residual can require more derivative work than evaluating the net
 - Trainable operator layers, reusable architectures and residual-optimizer interfaces.
 
 Use directional jets for a few directions, mixed jets when you need the complete selected order, and specialized Laplacians for trace-like operators. These are different algorithms with different output sizes. Choose the operator your residual consumes before choosing a general Hessian implementation.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-torch"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-torch/pyproject.toml).
 
 ## A working example
 
@@ -64,14 +72,6 @@ assert w.grad is not None and torch.isfinite(w.grad).all()
 
 Jet row k stores the derivative divided by k!. Convert with jet_to_tower at derivative-facing boundaries. Mixed coefficients use multi-index factorials. Shared algebra gives comparable mathematics, not universal bit identity across devices. Dense mixed jets still grow combinatorially; no fixed dimension ceiling means no hard-coded cap, not constant memory.
 
-## Evidence, not a universal speed claim
-
-The [performance guide](https://github.com/derivon-ai/omnibias/blob/main/docs/performance.md) separates activation derivatives,
-specialized contractions and general deep-network jets. Its artifacts record
-workloads, precision, compilation and independent accuracy checks, including
-baseline wins. The reported speedups do not automatically transfer to an entire
-training loop, another activation, a different device or this package’s every API.
-
 ## Explore and validate
 
 The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/torch.md) contains the generated module/export
@@ -84,10 +84,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-torch/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

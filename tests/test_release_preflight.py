@@ -17,7 +17,7 @@ spec.loader.exec_module(release)
 
 
 def test_matching_package_tag() -> None:
-    assert release.select(ROOT, '', 'omnibias-core-v0.4.0', 'push') == ['core']
+    assert release.select(ROOT, '', 'omnibias-core-v0.5.0rc1', 'push') == ['core']
 
 
 @pytest.mark.parametrize('tag', ['omnibias-core-v9.9.9', 'v0.4.0', 'omnibias-pinn-v0.1.0'])
@@ -53,3 +53,46 @@ def test_existing_release_is_rejected(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(release, 'urlopen', lambda *a, **kw: nullcontext())
     with pytest.raises(ValueError, match='already exists'):
         release.ensure_unpublished('omnibias-core', '0.4.0', 'pypi')
+
+
+def test_default_selects_all_primitives() -> None:
+    names = release.select(ROOT, '', '', 'workflow_dispatch')
+    assert len(names) == 16
+    release.validate_closure(ROOT, names)
+    release.require_prerelease(ROOT, names)
+
+
+def test_incomplete_preparation_is_rejected() -> None:
+    with pytest.raises(ValueError, match='must be selected'):
+        release.validate_closure(ROOT, ['torch'])
+
+
+def test_published_closure_excludes_yanked_versions(monkeypatch) -> None:
+    monkeypatch.setattr(release, 'index_project', lambda *a: {'releases': {'0.5.0rc1': [{'yanked': True}]}})
+    with pytest.raises(ValueError, match='must be selected'):
+        release.validate_closure(ROOT, ['torch'], 'pypi')
+    monkeypatch.setattr(release, 'index_project', lambda *a: {'releases': {'0.5.0rc1': [{'yanked': False}]}})
+    release.validate_closure(ROOT, ['torch'], 'pypi')
+
+
+def test_stable_promotion_remains_blocked(monkeypatch) -> None:
+    monkeypatch.setattr(release, 'projects', lambda root: {'core': {'version': '0.5.0'}})
+    with pytest.raises(ValueError, match='Stable promotion'):
+        release.require_prerelease(ROOT, ['core'])
+
+
+def test_publisher_identities_are_explicit_and_distinct() -> None:
+    names = release.select(ROOT, '', '', 'workflow_dispatch')
+    assert release.publisher_environment('core', 'pypi') == 'pypi'
+    assert release.publisher_environment('binary', 'pypi') == 'pypi'
+    initial = [n for n in names if n not in {'core', 'torch', 'jax', 'keras', 'fields'}]
+    assert len({release.publisher_environment(n, 'pypi') for n in initial}) == 11
+    assert len({release.publisher_environment(n, 'testpypi') for n in names}) == 16
+
+
+def test_partial_upload_is_not_silently_skipped(monkeypatch) -> None:
+    from contextlib import nullcontext
+    # Even one accepted artifact occupies the version; recovery needs review.
+    monkeypatch.setattr(release, 'urlopen', lambda *a, **kw: nullcontext({'urls': [{'filename': 'one.whl'}]}))
+    with pytest.raises(ValueError, match='partial upload'):
+        release.ensure_unpublished('omnibias-core', '0.5.0rc1', 'pypi')

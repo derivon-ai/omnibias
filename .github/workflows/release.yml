@@ -1,15 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
 #
-# Publish the curated-core release set to TestPyPI and/or production PyPI.
-#
-# The curated-core packages ship first under an API-stability contract:
-#   core, torch, jax, keras, fields
-#
-# Auth: Trusted Publishing (OIDC) only -- no long-lived API tokens in secrets.
-# Before the first publish, configure a PyPI / TestPyPI *trusted publisher* for
-# each project pointing at this workflow and the matching GitHub Environment
-# (`testpypi` or `pypi`). See https://docs.pypi.org/trusted-publishers/
+# Prepare all primitive artifacts by default. Publication is an explicit choice.
+# Trusted Publishing only; each project maps to this workflow and its environment.
 name: release
 
 on:
@@ -20,15 +13,16 @@ on:
   workflow_dispatch:
     inputs:
       packages:
-        description: "Retained package short-names to publish (space-separated)"
+        description: "Primitive short-names (empty means all 16)"
         required: false
-        default: "core torch jax keras fields"
+        default: ""
       repository:
-        description: "Publish target"
+        description: "Prepare artifacts, or explicitly select an upload target"
         required: true
         type: choice
-        default: testpypi
+        default: prepare
         options:
+          - prepare
           - testpypi
           - pypi
 
@@ -45,9 +39,11 @@ jobs:
 
   build:
     needs: [verify]
-    name: build curated-core distributions
+    name: build primitive distributions
     runs-on: ubuntu-24.04
     timeout-minutes: 60
+    outputs:
+      matrix: ${{ steps.select.outputs.matrix }}
     permissions:
       contents: read
       # Required by actions/attest-build-provenance to mint the signed
@@ -60,16 +56,16 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install build tooling
-        run: python -m pip install --upgrade pip build twine
+        run: python -m pip install --upgrade pip build twine packaging uv readme-renderer[md]
       - name: Resolve retained package list
         id: select
         env:
           REQUESTED_PACKAGES: ${{ github.event.inputs.packages }}
           RELEASE_TAG: ${{ github.ref_name }}
           RELEASE_EVENT: ${{ github.event_name }}
-          RELEASE_REPOSITORY: ${{ inputs.repository || 'testpypi' }}
+          RELEASE_REPOSITORY: ${{ inputs.repository || 'prepare' }}
         run: python scripts/release_preflight.py
-      - name: Build curated-core sdists + wheels
+      - name: Build primitive sdists + wheels
         run: |
           for name in ${{ steps.select.outputs.pkgs }}; do
             python -m build "packages/omnibias-$name" --outdir dist/
@@ -77,6 +73,13 @@ jobs:
           ls -1 dist/
       - name: Validate distribution metadata
         run: twine check dist/*
+      - name: Validate installed README examples from the built wheels
+        run: |
+          mkdir -p artifacts/release-wheels/wheels
+          cp dist/*.whl artifacts/release-wheels/wheels/
+          selected=""
+          for name in ${{ steps.select.outputs.pkgs }}; do selected="$selected omnibias-$name"; done
+          python scripts/validate_wheels.py --artifact-only --readme --python 3.11 --output artifacts/release-wheels --only $selected
       # SLSA build provenance: a signed, verifiable attestation that these exact
       # artifacts were produced by this workflow from this commit. Consumers
       # verify with `gh attestation verify <dist> --repo derivon-ai/omnibias`.
@@ -87,54 +90,37 @@ jobs:
       - name: Upload built distributions
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
         with:
-          name: curated-core-dist
+          name: primitive-dist
           path: dist/
           retention-days: 7
 
-  # Default path for tag pushes: TestPyPI via OIDC trusted publishing.
-  # Configure the GitHub Environment `testpypi` + TestPyPI trusted publishers
-  # before the first use.
-  testpypi:
-    name: publish curated-core to TestPyPI (OIDC)
+  publish:
+    name: publish ${{ matrix.package }} (${{ inputs.repository }})
     needs: [build]
-    if: >
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && inputs.repository == 'testpypi')
+    if: github.event_name == 'workflow_dispatch' && inputs.repository != 'prepare'
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.build.outputs.matrix) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 30
-    environment: testpypi
+    environment: ${{ matrix.environment }}
     permissions:
       id-token: write
       contents: read
     steps:
-      - name: Download built distributions
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+      - name: Download prepared distributions
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
         with:
-          name: curated-core-dist
-          path: dist/
-      - name: Publish to TestPyPI
-        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc  # v1.12.4
+          name: primitive-dist
+          path: all-dist/
+      - name: Select exactly one distribution
+        env:
+          PACKAGE: ${{ matrix.package }}
+        run: |
+          mkdir dist
+          cp all-dist/omnibias_${PACKAGE}-* dist/
+          test "$(find dist -type f | wc -l)" -eq 2
+      - name: Publish to the explicitly selected index
+        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc
         with:
-          repository-url: https://test.pypi.org/legacy/
-
-  # Production PyPI: OIDC trusted publishing only. Manual workflow_dispatch with
-  # repository=pypi, or extend the `if:` once the pypi environment + publishers
-  # are configured. No long-lived token is used.
-  pypi:
-    name: publish curated-core to PyPI (OIDC)
-    needs: [build]
-    if: github.event_name == 'workflow_dispatch' && inputs.repository == 'pypi'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
-    environment: pypi
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Download built distributions
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
-        with:
-          name: curated-core-dist
-          path: dist/
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@76f52bc884231f62b9a034ebfe128415bbaabdfc  # v1.12.4
+          repository-url: ${{ inputs.repository == 'pypi' && 'https://upload.pypi.org/legacy/' || 'https://test.pypi.org/legacy/' }}

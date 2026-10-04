@@ -1,10 +1,44 @@
 # omnibias-boolean
 
-## Exact logic, inspectable structure.
+**From truth values to exact algebra.** Representations can change while every Boolean result stays fixed.
 
-**Truth tables, algebraic normal forms, Walsh spectra and Boolean differential calculus.**
+![From truth values to exact algebra.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-boolean/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-boolean/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-boolean/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-boolean/docs/visuals/scene.py)
+
+Truth tables or Boolean polynomials enter; exact ANF, Walsh coefficients, Boolean derivatives or equation solutions leave. Use this package for finite algebraic structure; use binary for tensor quantization.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/boolean/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-boolean/src/omnibias/boolean) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-boolean/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+Exact Boolean algebra needs neither a small bias spacing nor a temperature schedule. Optional differentiable gates connect it to temperature collapse: finite β gives a smooth relaxation and hardening requires a stated tie rule. Bias-collapse kernels can differentiate those smooth gates, but do not turn approximate gate optimization into an exact Boolean proof.
+
+## Run this README
+
+The examples use `omnibias-boolean` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-boolean/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-boolean"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-boolean==0.1.0a2"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -17,22 +51,6 @@ Boolean functions have algebraic structure that a generic real-valued tensor doe
 - Finite equation solvers, with optional Torch/JAX gate and spectrum operations.
 
 Choose exact mode for truth-table identities, bounded logic tests and reference oracles. Choose a tensor realization when the purpose is optimization through a smooth model. Keeping the two separate lets you compare a learned gate with the exact finite behavior it is intended to approximate.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-boolean"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-boolean/pyproject.toml).
 
 ## A working example
 
@@ -62,10 +80,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-boolean/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

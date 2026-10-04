@@ -1,10 +1,44 @@
 # omnibias-sos
 
-## Turn positivity into checkable algebra.
+**Turn positivity into a checkable witness.** A decomposition earns a scoped certificate through explicit checks.
 
-**Sum-of-squares proposals, rational reconstruction and scoped polynomial certificates.**
+![Turn positivity into a checkable witness.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-sos/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-sos/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-sos/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-sos/docs/visuals/scene.py)
+
+A polynomial positivity problem enters; a proposed Gram decomposition and rigorously checked certificate data leave. The useful distinction is between finding a numerical candidate and earning a positivity verdict.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/sos/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-sos/src/omnibias/sos) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-sos/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+SOS is certificate infrastructure and directly implements neither bias collapse nor temperature collapse. A smooth or discrete consumer can use its lower bounds, but annealing success does not imply polynomial positivity. The checker’s domain, rounding and PSD obligations determine what is certified; a proposal alone is insufficient.
+
+## Run this README
+
+The examples use `omnibias-sos` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-sos/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-sos"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-sos==0.1.0a2"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -17,22 +51,6 @@ A plot that looks positive is not a proof. An SOS certificate represents a polyn
 - Rational reconstruction, interval pivot checks and optional formal obligations.
 
 Use SOS to justify polynomial nonnegativity, construct lower bounds or support another package’s certificate. Small examples are useful for learning the workflow; higher degree and dimension increase basis and semidefinite costs. A carefully chosen basis can matter as much as the numerical proposer.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-sos"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-sos/pyproject.toml).
 
 ## A working example
 
@@ -63,10 +81,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-sos/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

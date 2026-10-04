@@ -1,20 +1,44 @@
 # omnibias-binary
 
-## Discrete forward values. Trainable surrogate gradients.
+**Hard values. A trainable backward path.** Forward representation and backward optimization have separate contracts.
 
-**Binary, ternary and k-bit quantizers with an explicit smooth backward model.**
+![Hard values. A trainable backward path.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-binary/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-binary/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-binary/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-binary/docs/visuals/scene.py)
+
+Real-valued tensors enter; hard binary, ternary or quantized values leave in the forward pass. The backward pass follows an explicitly chosen smooth surrogate, allowing optimization through a discrete representation.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/binary/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-binary/src/omnibias/binary) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-binary/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-![Discrete forward values. Trainable surrogate gradients.](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/temperature-collapse.svg)
+## The mathematical connection
 
-<details>
-<summary>Watch the mechanism change continuously</summary>
+Temperature controls the tanh-based surrogate: higher β concentrates its gradient near the threshold. The hard forward operation remains hard; the surrogate is not its classical derivative. Bias-collapse activation polynomials supply higher derivative formulas for the smooth path. Threshold and tie conventions belong to each quantizer.
 
-![Animated mathematical explanation](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/temperature-collapse.gif)
+## Run this README
 
-The animation illustrates the mechanism; it is not a speed benchmark.
-</details>
+The examples use `omnibias-binary[torch]` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-binary/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-binary[torch]"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-binary[torch]==0.1.0a2"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -27,22 +51,6 @@ A hard quantizer provides the output representation you want but loses an ordina
 - Beta schedules and shared activation-polynomial derivatives.
 
 Use binary for quantization-aware experiments, differentiable Boolean realizations and models with hard-valued intermediate states. Compare forward accuracy, surrogate conditioning and deployment behavior separately; a useful training surrogate is a modeling decision that should be evaluated on the target task.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-binary[torch]"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-binary/pyproject.toml).
 
 ## A working example
 
@@ -73,10 +81,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-binary/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

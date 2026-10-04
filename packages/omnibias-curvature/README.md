@@ -1,10 +1,44 @@
 # omnibias-curvature
 
-## See how the loss bends.
+**Let curvature shape the optimization step.** A loss landscape, its local quadratic model and a damped update.
 
-**Parameter Hessians, Fisher constructions, matrix-free operators and structured curvature approximations.**
+![Let curvature shape the optimization step.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-curvature/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-curvature/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-curvature/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-curvature/docs/visuals/scene.py)
+
+Network parameters and a stated curvature quantity enter; a Hessian, Gauss–Newton object or structured factor leaves. Optimizer builders use these operators to choose a parameter-space step without confusing an approximation with an exact loss Hessian.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/curvature/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-curvature/src/omnibias/curvature) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-curvature/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+Bias-collapse activation derivatives provide analytic ingredients for parameter curvature. A signed Hessian describes local behavior and can be indefinite. Temperature collapse may appear in a consuming soft-decision model, but is not the definition of Hessian, Fisher or KFAC. Damping and step acceptance remain optimizer responsibilities.
+
+## Run this README
+
+The examples use `omnibias-curvature` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-curvature/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-curvature"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-curvature==0.1.0a2"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -17,22 +51,6 @@ A gradient gives a local direction; curvature describes how that direction chang
 - Damped solves, matrix-free curvature and sharpness-oriented utilities.
 
 Use curvature when a training method, uncertainty calculation or neural-VMC optimizer needs more than first-order information. Start from the objective and parameterization that the formula supports. Dense Hessians are useful small-model references; operator and factorized forms address different memory budgets.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-curvature"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-curvature/pyproject.toml).
 
 ## A working example
 
@@ -63,10 +81,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-curvature/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

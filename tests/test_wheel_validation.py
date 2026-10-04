@@ -1,6 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
 """Installed-wheel checks must fail when an editable/source path leaks in."""
+
 from __future__ import annotations
 
 import importlib.util
@@ -104,8 +105,11 @@ def test_archive_build_excludes_stale_setuptools_modules(tmp_path: Path) -> None
     old_manifest.write_text("src/wheel_build_probe/deleted_bridge.py\n")
     wheelhouse = tmp_path / "wheels"
     wheelhouse.mkdir()
-    env = {key: value for key, value in os.environ.items()
-           if key not in {"PYTHONPATH", "VIRTUAL_ENV", "PYTHONHOME"}}
+    env = {
+        key: value
+        for key, value in os.environ.items()
+        if key not in {"PYTHONPATH", "VIRTUAL_ENV", "PYTHONHOME"}
+    }
     validator.build_wheel(project, wheelhouse, log=tmp_path / "build.log", env=env)
     wheels = list(wheelhouse.glob("*.whl"))
     assert len(wheels) == 1
@@ -114,3 +118,45 @@ def test_archive_build_excludes_stale_setuptools_modules(tmp_path: Path) -> None
         assert not any("deleted_bridge" in name for name in archive.namelist())
     # Validation did not need to delete the user's existing build directory.
     assert stale.read_text() == "REMOVED = True\n"
+
+
+def test_artifact_metadata_cannot_masquerade_as_current_source(tmp_path: Path) -> None:
+    import zipfile
+
+    spec = importlib.util.spec_from_file_location(
+        "validate_wheels", Path(__file__).resolve().parents[1] / "scripts/validate_wheels.py"
+    )
+    assert spec and spec.loader
+    validator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(validator)
+    wheel = tmp_path / "old.whl"
+    with zipfile.ZipFile(wheel, "w") as archive:
+        archive.writestr(
+            "omnibias_probe.dist-info/METADATA",
+            "Name: omnibias-probe\nVersion: 0.1\nLicense-Expression: Apache-2.0\n\nWheel example",
+        )
+    expected = {"name": "omnibias-probe", "version": "0.2", "license": "Apache-2.0"}
+    with pytest.raises(ValueError, match="Version differs"):
+        validator.checked_wheel_metadata(wheel, expected)
+    expected["version"] = "0.1"
+    expected["license"] = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
+    with pytest.raises(ValueError, match="License-Expression differs"):
+        validator.checked_wheel_metadata(wheel, expected)
+    expected["license"] = "Apache-2.0"
+    assert validator.checked_wheel_metadata(wheel, expected).get_payload() == "Wheel example"
+
+
+def test_wheel_readme_preserves_unicode_without_email_charset() -> None:
+    from email.parser import BytesParser
+
+    spec = importlib.util.spec_from_file_location(
+        'validate_wheels', Path(__file__).resolve().parents[1] / 'scripts/validate_wheels.py'
+    )
+    assert spec and spec.loader
+    validator = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(validator)
+    source = '# A derivative σ⁽ⁿ⁾\n\n```python\nα = 2\nassert α ** 2 == 4\n```\n'
+    metadata = BytesParser().parsebytes(
+        ('Name: omnibias-probe\nDescription-Content-Type: text/markdown\n\n' + source).encode('utf-8')
+    )
+    assert validator.wheel_readme(metadata) == source

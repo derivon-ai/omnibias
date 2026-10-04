@@ -1,20 +1,44 @@
 # omnibias-struct
 
-## Dynamic programs that participate in training.
+**Let paths compete before selecting one.** Dynamic programs expose smooth values and structured marginals.
 
-**Smooth structured computation on sequences, paths and hypergraphs, with explicit hard-limit comparisons.**
+![Let paths compete before selecting one.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-struct/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-struct/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-struct/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-struct/docs/visuals/scene.py)
+
+Scores on a sequence, graph or grammar enter; soft dynamic-program values, marginals and decoded structures leave. The recurrence exploits structure rather than enumerating all paths as independent neural experts.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/struct/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-struct/src/omnibias/struct) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-struct/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-![Dynamic programs that participate in training.](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/temperature-collapse.svg)
+## The mathematical connection
 
-<details>
-<summary>Watch the mechanism change continuously</summary>
+Temperature collapse replaces a hard max or min with smooth log-sum-exp competition. At high β, values approach the hard recurrence; tied alternatives retain shared soft mass. Bias-collapse jets differentiate supported log-sum-exp compositions at higher order. The resulting derivatives concern the soft program, not a discontinuous argmax path.
 
-![Animated mathematical explanation](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/temperature-collapse.gif)
+## Run this README
 
-The animation illustrates the mechanism; it is not a speed benchmark.
-</details>
+The examples use `omnibias-struct[torch]` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-struct/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-struct[torch]"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-struct[torch]==0.1.0a2"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -27,22 +51,6 @@ A max-score path selects one discrete explanation. Replacing max with a temperat
 - Marginals, higher derivatives, decoding and soft-versus-hard gap bounds.
 
 Use struct when a neural model produces scores for a sequence or structured decision and the final loss should train those scores. The recurrence is the reusable primitive; task-specific tokenization, datasets, supervision and application objectives belong in the consuming project.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-struct[torch]"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-struct/pyproject.toml).
 
 ## A working example
 
@@ -74,10 +82,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-struct/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

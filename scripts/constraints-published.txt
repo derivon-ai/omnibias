@@ -1,0 +1,7 @@
+# Historical primitive set for the currently published FermiNet/PINN/geometry releases.
+# Validate with scripts/check_published_compatibility.py before changing these pins.
+omnibias-core==0.4.0
+omnibias-torch==0.4.0
+omnibias-jax==0.4.0
+omnibias-fields==0.1.0
+omnibias-keras==0.0.1a1

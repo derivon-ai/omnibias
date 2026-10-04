@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-convex"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Differentiable + certified convex optimization (LP/QP) for omnibias: closed-form-Hessian log-barrier interior-point solver, KKT implicit-function gradients (argmin as a differentiable op), and verified optimality enclosures (jax + torch)."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -26,11 +26,11 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
-dependencies = ["omnibias-core>=0.2.0", "numpy>=1.24"]
+dependencies = ["omnibias-core>=0.5.0rc1", "numpy>=1.24"]
 
 [project.optional-dependencies]
-torch = ["torch>=2.0", "omnibias-torch>=0.2.0"]
-jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.2.0"]
+torch = ["torch>=2.0", "omnibias-torch>=0.5.0rc1"]
+jax = ["jax>=0.4.30", "jaxlib>=0.4.30", "omnibias-jax>=0.5.0rc1"]
 all = ["omnibias-convex[torch,jax]"]
 test = ["pytest>=7.0", "numpy>=1.24", "scipy>=1.10"]
 dev = ["omnibias-convex[all,test]", "ruff>=0.1.0", "mypy>=1.5"]

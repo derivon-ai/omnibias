@@ -221,3 +221,12 @@ def test_fitted_predict_places_input_on_model_device(monkeypatch) -> None:  # ty
     pred = fitted.predict(np.zeros((5, 3), dtype=np.float32))
     assert captured["device"] == model_device
     assert pred.shape == (5,)
+
+
+def test_sample_weight_normalization_preserves_float32_contract() -> None:
+    from omnibias.torch.architectures.joint_operator import _prepare_sample_weight
+
+    for weights in (None, np.array([1, 2, 3], dtype=np.float64)):
+        result = _prepare_sample_weight(weights, 3, 'weights')
+        assert result.dtype == np.float32
+        np.testing.assert_allclose(result.mean(), 1.0)

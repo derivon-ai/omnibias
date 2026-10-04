@@ -493,7 +493,8 @@ def _prepare_sample_weight(
     mean = float(out.mean())
     if mean <= 1e-12:
         raise ValueError(f"{name} must have positive mean")
-    return out / mean
+    # Keep the advertised input-buffer dtype across NumPy scalar-promotion rules.
+    return np.asarray(out / mean, dtype=np.float32)
 
 
 def _polish_linear_readout(

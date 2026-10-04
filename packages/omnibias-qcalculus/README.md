@@ -1,10 +1,44 @@
 # omnibias-qcalculus
 
-## A calculus with a scale parameter.
+**Calculus on a geometric grid.** Exact q-polynomial coefficients approach ordinary derivatives.
 
-**q-numbers, Jackson operators and q-deformed polynomial and series algebra.**
+![Calculus on a geometric grid.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-qcalculus/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-qcalculus/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-qcalculus/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-qcalculus/docs/visuals/scene.py)
+
+A q-parameter and algebraic coefficients enter; q-numbers, Jackson derivatives and q-integrals leave. Multiplicative sampling supports calculations on a geometric grid, distinct from an additive finite-difference stencil.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/qcalculus/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-qcalculus/src/omnibias/qcalculus) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-qcalculus/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+The defining limit here is q → 1, which recovers ordinary calculus. It is distinct from both bias collapse (normalized nearby shifts) and temperature collapse (sharpening soft alternatives). Neither founding mechanism should be substituted for the q-calculus operator definition or its domain restrictions.
+
+## Run this README
+
+The examples use `omnibias-qcalculus` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-qcalculus/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-qcalculus"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-qcalculus==0.1.0a2"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -17,22 +51,6 @@ Some discrete and multiplicative-scale problems are expressed more naturally by 
 - q-exponential families, series bounds and optional tensor realizations.
 
 Use qcalculus for multiplicative sampling, q-series experiments and time-scale or symbolic consumers that need this register. Its q→1 limit is a separate mechanism from bias collapse and temperature hardening. Select the register that represents the mathematical problem rather than treating the parameters as interchangeable temperatures.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-qcalculus"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-qcalculus/pyproject.toml).
 
 ## A working example
 
@@ -61,10 +79,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-qcalculus/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

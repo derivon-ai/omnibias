@@ -17,7 +17,7 @@ backend extras when needed. See [guarantees](../guarantees.md).
 
 <!-- BEGIN GENERATED API INVENTORY -->
 
-Version **0.1.0a1** · Python **>=3.10** · **3 - Alpha** · AGPL-3.0-or-later **or commercial**
+Version **0.1.0a2** · Python **>=3.10** · **3 - Alpha** · AGPL-3.0-or-later **or commercial**
 
 <details markdown="1">
 <summary>Public modules and top-level exports</summary>

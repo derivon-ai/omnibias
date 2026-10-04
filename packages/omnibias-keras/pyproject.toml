@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-keras"
-version = "0.0.1a1"
+version = "0.0.2a1"
 description = "Keras 3 unified backend for omnibias: closed-form n-th derivative scalar operators (OMBU), operator-typed blocks, and drop-in cmbDense / cmbConv layers that run on TensorFlow, JAX, or PyTorch via keras.ops."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -37,7 +37,7 @@ classifiers = [
     "Typing :: Typed",
 ]
 dependencies = [
-    "omnibias-core>=0.2.0",
+    "omnibias-core>=0.5.0rc1",
     "keras>=3.0",
     "numpy>=1.23",
 ]

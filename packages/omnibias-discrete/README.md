@@ -1,20 +1,44 @@
 # omnibias-discrete
 
-## Relax. Decode. Measure the gap.
+**A decision needs more than rounding.** Represent a relaxation, decode a candidate, then measure its gap.
 
-**A shared contract for differentiable optimization over binary decisions.**
+![A decision needs more than rounding.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-discrete/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-discrete/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-discrete/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-discrete/docs/visuals/scene.py)
+
+A discrete problem, relaxation schedule and candidate enter a shared optimization interface. Relaxed values, a decoded assignment and an independently justified optimality gap leave. Front-ends supply the objective and feasible-set meaning.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/discrete/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-discrete/src/omnibias/discrete) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-discrete/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-![Relax. Decode. Measure the gap.](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/temperature-collapse.svg)
+## The mathematical connection
 
-<details>
-<summary>Watch the mechanism change continuously</summary>
+Temperature collapse provides a route from continuous relaxation toward discrete candidates. Finite β does not guarantee an integral or globally optimal result; decoding and lower bounds remain separate stages, including at ties. Bias-collapse backends may differentiate a smooth objective, but the problem/anneal/decode/certify contract is the package’s distinctive role.
 
-![Animated mathematical explanation](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/temperature-collapse.gif)
+## Run this README
 
-The animation illustrates the mechanism; it is not a speed benchmark.
-</details>
+The examples use `omnibias-discrete` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-discrete/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-discrete"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-discrete==0.1.0a2"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -27,22 +51,6 @@ Discrete applications often repeat the same infrastructure: represent an energy,
 - Rounding, local descent, bounded brute-force oracles and optimality-gap certificates.
 
 Use this primitive under QUBO, routing, logic or other discrete frontends. A feasible candidate and a lower bound are independently useful outputs: the candidate supplies an actionable decision, while the bound quantifies what remains unproven about its quality.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-discrete"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-discrete/pyproject.toml).
 
 ## A working example
 
@@ -74,10 +82,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-discrete/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

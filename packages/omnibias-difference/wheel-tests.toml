@@ -1,0 +1,3 @@
+
+# Features required by the executable README, without test/development extras.
+readme_extras = []

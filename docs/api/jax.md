@@ -17,7 +17,7 @@ backend extras when needed. See [guarantees](../guarantees.md).
 
 <!-- BEGIN GENERATED API INVENTORY -->
 
-Version **0.4.0** · Python **>=3.10** · **4 - Beta** · Apache-2.0
+Version **0.5.0rc1** · Python **>=3.10** · **4 - Beta** · Apache-2.0
 
 <details markdown="1">
 <summary>Public modules and top-level exports</summary>

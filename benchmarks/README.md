@@ -68,3 +68,21 @@ uv run --no-project --with matplotlib python benchmarks/render_specialized_bench
 
 The [performance guide](../docs/performance.md) explains workload differences,
 execution policies, compilation costs and the scope of the published claims.
+
+## Clean environment and CI smoke
+
+The locked `benchmarks` dependency group supplies folx, mpmath, NumPy and plotting
+requirements. From a clean checkout, use Python 3.12 and CPU execution:
+
+```bash
+uv sync --locked --all-packages --group benchmarks --python 3.12
+JAX_PLATFORMS=cpu OMP_NUM_THREADS=2 uv run --no-sync python benchmarks/smoke.py
+```
+
+The smoke command reuses the activation, deep-jet and Laplacian comparison
+implementations at bounded sizes. It covers Torch nested AD, JAX nested AD,
+JAX Taylor mode and folx, and retains the independent high-precision checks.
+Its outputs go to `artifacts/benchmark-smoke/`; they never update reviewed charts.
+A full comparison is explicitly invoked with the commands above. Hardware,
+compiler and dependency changes can alter both timing and rankings. Reproducing
+an experiment does not promise an identical speedup ratio on another machine.

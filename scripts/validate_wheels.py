@@ -7,12 +7,14 @@ Run with --projects-root pointing at the extracted project inventory. Source
 checkout paths are used only to build wheels and copy test inputs, never to
 resolve imports in the validation subprocesses.
 """
+
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -40,7 +42,9 @@ def discover(projects_root: Path | None) -> tuple[list[Path], list[Path]]:
     consumers = []
     if projects_root:
         inventory = json.loads((projects_root / "migration.json").read_text())
-        consumers = [(projects_root / row["destination"]).resolve() for row in inventory["consumers"]]
+        consumers = [
+            (projects_root / row["destination"]).resolve() for row in inventory["consumers"]
+        ]
         support = projects_root / "omnibias-research"
         consumers.append(support)
         consumers.extend(p.parent for p in sorted((support / "packages").glob("*/pyproject.toml")))
@@ -62,9 +66,32 @@ def wheel_index(wheelhouse: Path) -> dict[str, Path]:
                 if member.endswith("/") or ".dist-info/" in member:
                     continue
                 if member in owners:
-                    raise ValueError(f"Overlapping wheel file {member}: {owners[member]} and {name}")
+                    raise ValueError(
+                        f"Overlapping wheel file {member}: {owners[member]} and {name}"
+                    )
                 owners[member] = name
     return index
+
+
+def checked_wheel_metadata(wheel: Path, expected: dict[str, Any]) -> Any:
+    """Reject artifacts built from different version or license metadata."""
+    with zipfile.ZipFile(wheel) as archive:
+        paths = [n for n in archive.namelist() if n.endswith(".dist-info/METADATA")]
+        if len(paths) != 1:
+            raise ValueError(f"{wheel}: expected exactly one distribution metadata record")
+        metadata = BytesParser().parsebytes(archive.read(paths[0]))
+    for field, key in [("Name", "name"), ("Version", "version"), ("License-Expression", "license")]:
+        if metadata[field] != expected[key]:
+            raise ValueError(f"{wheel}: {field} differs from declared project metadata")
+    return metadata
+
+
+def wheel_readme(metadata: Any) -> str:
+    """Core metadata is UTF-8 even without an email Content-Type charset."""
+    payload = metadata.get_payload(decode=True)
+    if not isinstance(payload, bytes) or not payload:
+        raise ValueError("Missing wheel long description")
+    return payload.decode("utf-8")
 
 
 def run(command: list[str], *, cwd: Path, log: Path, env: dict[str, str]) -> None:
@@ -80,22 +107,52 @@ def build_wheel(project: Path, wheelhouse: Path, *, log: Path, env: dict[str, st
     """Build from a source archive so deleted modules cannot survive in build/lib."""
     with tempfile.TemporaryDirectory(prefix="omnibias-sdist-") as scratch:
         source = Path(scratch)
-        run(["uv", "build", "--sdist", "--no-sources", str(project), "--out-dir", str(source)],
-            cwd=source, log=log, env=env)
+        run(
+            ["uv", "build", "--sdist", "--no-sources", str(project), "--out-dir", str(source)],
+            cwd=source,
+            log=log,
+            env=env,
+        )
         archives = list(source.glob("*.tar.gz"))
         if len(archives) != 1:
             raise ValueError(f"Expected one source archive for {project.name}, got {len(archives)}")
-        run(["uv", "build", "--wheel", "--no-sources", str(archives[0]),
-             "--out-dir", str(wheelhouse)], cwd=source, log=log, env=env)
+        run(
+            [
+                "uv",
+                "build",
+                "--wheel",
+                "--no-sources",
+                str(archives[0]),
+                "--out-dir",
+                str(wheelhouse),
+            ],
+            cwd=source,
+            log=log,
+            env=env,
+        )
 
 
-def validate(project: Path, wheel: Path, constraints: Path, output: Path,
-             env: dict[str, str], *, numerical: bool) -> dict[str, Any]:
+def validate(
+    project: Path,
+    wheel: Path,
+    constraints: Path,
+    output: Path,
+    env: dict[str, str],
+    *,
+    numerical: bool,
+    readme: bool = False,
+    python_version: str = "3.12",
+) -> dict[str, Any]:
     data = project_data(project)
     name = data["name"]
+    artifact_metadata = checked_wheel_metadata(wheel, data)
     profile_path = project / "wheel-tests.toml"
     profile = tomllib.loads(profile_path.read_text()) if profile_path.exists() else {}
-    extras = profile.get("extras" if numerical else "base_extras", [])
+    extras = profile.get(
+        "readme_extras" if readme else "extras" if numerical else "base_extras", []
+    )
+    if readme and "readme_extras" not in profile:
+        raise ValueError(f"{name}: missing explicit README profile")
     modules = profile.get("modules" if numerical else "base_modules", []) or [
         "omnibias." + name.removeprefix("omnibias-").replace("-", "_")
     ]
@@ -104,10 +161,28 @@ def validate(project: Path, wheel: Path, constraints: Path, output: Path,
     with tempfile.TemporaryDirectory(prefix="omnibias-wheel-") as scratch:
         work = Path(scratch)
         python = work / "env/bin/python"
-        run(["uv", "venv", "--python", "3.12", str(work / "env")], cwd=work, log=log, env=env)
+        run(
+            ["uv", "venv", "--python", python_version, str(work / "env")],
+            cwd=work,
+            log=log,
+            env=env,
+        )
         requested = name + ("[" + ",".join(extras) + "]" if extras else "") + " @ " + wheel.as_uri()
-        run(["uv", "pip", "install", "--python", str(python), "--constraint", str(constraints),
-             requested], cwd=work, log=log, env=env)
+        run(
+            [
+                "uv",
+                "pip",
+                "install",
+                "--python",
+                str(python),
+                "--constraint",
+                str(constraints),
+                requested,
+            ],
+            cwd=work,
+            log=log,
+            env=env,
+        )
         probe = work / "import_smoke.py"
         shutil.copy2(ROOT / "scripts/import_smoke.py", probe)
         command = [str(python), "-I", str(probe), "--distribution", name]
@@ -116,9 +191,26 @@ def validate(project: Path, wheel: Path, constraints: Path, output: Path,
         if data["license"] == "Apache-2.0":
             command.append("--permissive")
         run(command, cwd=work, log=log, env=env)
+        if readme:
+            source = wheel_readme(artifact_metadata)
+            blocks = re.findall(r"^```python[^\n]*\n(.*?)^```", source, re.MULTILINE | re.DOTALL)
+            runner = work / "readme_example.py"
+            runner.write_text(
+                "\n".join(blocks) + "\nimport sys, import_smoke\n"
+                "for name, module in tuple(sys.modules.items()):\n"
+                "    if name == 'omnibias' or name.startswith('omnibias.'):\n"
+                "        import_smoke.check_module(module, import_smoke.installed_roots())\n"
+            )
+            run([str(python), str(runner)], cwd=work, log=log, env=env)
+            for command in profile.get("readme_commands", []):
+                run([str(python), *command], cwd=work, log=log, env=env)
         tests = profile.get("tests", []) if numerical else []
         if tests:
-            shutil.copytree(project / "tests", work / "tests", ignore=shutil.ignore_patterns("__pycache__", "*.pyc"))
+            shutil.copytree(
+                project / "tests",
+                work / "tests",
+                ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+            )
             # Keep only test helper paths, never inherit project/source pytest settings.
             (work / "pytest.ini").write_text(
                 "[pytest]\naddopts = --import-mode=importlib -m 'not slow'\n"
@@ -136,12 +228,24 @@ def validate(project: Path, wheel: Path, constraints: Path, output: Path,
                 "            import_smoke.check_module(module, import_smoke.installed_roots())\n"
             )
             runner = work / "run_tests.py"
-            runner.write_text("import pytest, wheel_guard\nraise SystemExit(pytest.main("
-                              + repr(["-c", "pytest.ini", "-q", *tests]) + ", plugins=[wheel_guard]))\n")
+            runner.write_text(
+                "import pytest, wheel_guard\nraise SystemExit(pytest.main("
+                + repr(["-c", "pytest.ini", "-q", *tests])
+                + ", plugins=[wheel_guard]))\n"
+            )
             run([str(python), str(runner)], cwd=work, log=log, env=env)
-        return {"name": name, "version": data["version"], "extras": extras,
-                "modules": modules, "test_paths": tests, "status": "passed",
-                "wheel_sha256": hashlib.sha256(wheel.read_bytes()).hexdigest()}
+        return {
+            "name": name,
+            "version": data["version"],
+            "extras": extras,
+            "modules": modules,
+            "test_paths": tests,
+            "status": "passed",
+            "readme_blocks": len(blocks) if readme else None,
+            "readme_commands": profile.get("readme_commands", []) if readme else [],
+            "python": python_version,
+            "wheel_sha256": hashlib.sha256(wheel.read_bytes()).hexdigest(),
+        }
 
 
 def main() -> int:
@@ -151,6 +255,17 @@ def main() -> int:
     parser.add_argument("--only", nargs="+")
     parser.add_argument("--no-build", action="store_true")
     parser.add_argument("--numerical", action="store_true")
+    parser.add_argument(
+        "--readme",
+        action="store_true",
+        help="Execute README code using its declared feature profile",
+    )
+    parser.add_argument("--python", default="3.12", dest="python_version")
+    parser.add_argument(
+        "--artifact-only",
+        action="store_true",
+        help="Validate existing wheels without rebuilding or resolving source overrides",
+    )
     args = parser.parse_args()
     output = args.output.resolve()
     output.mkdir(parents=True, exist_ok=True)
@@ -161,19 +276,29 @@ def main() -> int:
     names = {project_data(p)["name"] for p in projects}
     if args.only and not set(args.only) <= names:
         parser.error("--only must name discovered distributions")
-    env = {k: v for k, v in os.environ.items() if k not in {"PYTHONPATH", "VIRTUAL_ENV", "PYTHONHOME"}}
-    env.update(KERAS_BACKEND="torch", JAX_PLATFORMS="cpu", JAX_ENABLE_X64="true",
-               OMP_NUM_THREADS="2", UV_TORCH_BACKEND="cpu")
-    if not args.no_build:
+    env = {
+        k: v for k, v in os.environ.items() if k not in {"PYTHONPATH", "VIRTUAL_ENV", "PYTHONHOME"}
+    }
+    env.update(
+        KERAS_BACKEND="torch",
+        JAX_PLATFORMS="cpu",
+        JAX_ENABLE_X64="true",
+        OMP_NUM_THREADS="2",
+        UV_TORCH_BACKEND="cpu",
+    )
+    if not (args.no_build or args.artifact_only):
         for project in projects:
             name = project_data(project)["name"]
             print("build", name, flush=True)
             build_wheel(project, wheelhouse, log=output / "build.log", env=env)
     wheels = wheel_index(wheelhouse)
-    if set(wheels) != names:
-        raise ValueError(f"Wheelhouse coverage differs: {set(wheels) ^ names}")
+    expected = set(args.only) if args.artifact_only and args.only else names
+    if not expected <= set(wheels) or not set(wheels) <= names:
+        raise ValueError(f"Wheelhouse coverage differs: {set(wheels) ^ expected}")
     constraints = output / "constraints.txt"
-    constraints.write_text("".join(f"{name} @ {wheel.as_uri()}\n" for name, wheel in sorted(wheels.items())))
+    constraints.write_text(
+        "".join(f"{name} @ {wheel.as_uri()}\n" for name, wheel in sorted(wheels.items()))
+    )
     targets = consumers or primitives
     if args.only:
         targets = [p for p in projects if project_data(p)["name"] in args.only]
@@ -182,7 +307,16 @@ def main() -> int:
         name = project_data(project)["name"]
         print("validate", name, flush=True)
         try:
-            result = validate(project, wheels[name], constraints, output, env, numerical=args.numerical)
+            result = validate(
+                project,
+                wheels[name],
+                constraints,
+                output,
+                env,
+                numerical=args.numerical,
+                readme=args.readme,
+                python_version=args.python_version,
+            )
         except Exception as error:
             result = {"name": name, "status": "failed", "error": str(error)}
         report["results"].append(result)

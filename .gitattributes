@@ -69,6 +69,9 @@ scripts/*               text eol=lf
 # ---------------------------------------------------------------------------
 uv.lock                 linguist-generated=true -diff
 *.lock                  linguist-generated=true -diff
+packages/*/docs/visuals/*.svg linguist-generated=true
+packages/*/docs/visuals/*.png linguist-generated=true
+packages/*/docs/visuals/*.gif linguist-generated=true
 
 # Notebooks are documentation here (outputs are stripped); without this the 23
 # notebooks would dominate GitHub's language bar over 1,700 Python modules.

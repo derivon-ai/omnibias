@@ -3,3 +3,6 @@ base_extras = ["torch"]
 extras = ["torch", "test"]
 base_modules = ["omnibias.keras"]
 modules = ["omnibias.keras"]
+
+# Features required by the executable README, without test/development extras.
+readme_extras = ["torch"]

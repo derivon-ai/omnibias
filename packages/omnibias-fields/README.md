@@ -1,10 +1,44 @@
 # omnibias-fields
 
-## Write the physics in field operations.
+**One field. Several operators.** Coordinate-aware state shares derivative work across views.
 
-**Named coordinates, components and reusable differential operators for models built on omnibias.**
+![One field. Several operators.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-fields/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-fields/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-fields/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-fields/docs/visuals/scene.py)
+
+Coordinates, named components and derivative providers enter a FieldState. Gradient, divergence, Hessian and Laplacian views leave through one dispatch and caching contract. This is infrastructure for PDE and geometry libraries, not a PDE solver.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/fields/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-fields/src/omnibias/fields) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-fields/tests) · [Talk to Derivon](mailto:info@derivon.ai)
+
+## The mathematical connection
+
+Bias-collapse backends can provide the cached derivative tower; field operators contract and compose those derivatives without requiring concrete consumer classes. Other providers must declare their own derivative semantics. Temperature collapse is not built into a FieldState: regional gates are an explicit higher-level integration.
+
+## Run this README
+
+The examples use `omnibias-fields` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-fields/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-fields"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-fields==0.2.0rc1"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -17,22 +51,6 @@ A PDE residual is easier to maintain when coordinates, field components and deri
 - Torch and JAX operators cover scalar, vector, tensor, complex and weak-form compositions.
 
 Use fields as the integration seam between a model and physical operators. The external PINN package owns concrete solver workflows; fields owns the reusable state and operator contracts. A component name is part of the model interface, not a guess about a tensor axis.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-fields"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-fields/pyproject.toml).
 
 ## A working example
 
@@ -52,14 +70,6 @@ assert cache.get_or_compute(2, lambda n: 999.0) == u_xx
 
 Operators consume a FieldState with a compatible provider; they are not generic functions accepting any tensor. Rebuild state after coordinates or parameters change. Cached values must stay attached to the current computation. Numerical quadrature is an approximation unless the selected rule is exact for the integrand.
 
-## Evidence, not a universal speed claim
-
-The [performance guide](https://github.com/derivon-ai/omnibias/blob/main/docs/performance.md) separates activation derivatives,
-specialized contractions and general deep-network jets. Its artifacts record
-workloads, precision, compilation and independent accuracy checks, including
-baseline wins. The reported speedups do not automatically transfer to an entire
-training loop, another activation, a different device or this package’s every API.
-
 ## Explore and validate
 
 The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/fields.md) contains the generated module/export
@@ -72,10 +82,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-fields/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 

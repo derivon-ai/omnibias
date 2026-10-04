@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-sos"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Certified universal positivity by optimization: sound Sum-of-Squares / Positivstellensatz decompositions. A floating-point SDP proposes a Gram matrix; the proof is a rigorous interval LDL^T positive-definiteness certificate that reuses omnibias.core.verified and the Mathlib-free Lean kernel obligation, so certificates can earn theorem_prover_verified."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -31,7 +31,7 @@ classifiers = [
     "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
-dependencies = ["omnibias-core>=0.2.0", "numpy>=1.24"]
+dependencies = ["omnibias-core>=0.5.0rc1", "numpy>=1.24"]
 
 [project.optional-dependencies]
 test = ["pytest>=7.0"]

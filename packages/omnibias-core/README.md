@@ -1,20 +1,44 @@
 # omnibias-core
 
-## One algebra. Every backend.
+**One activation. A derivative tower.** Exact coefficient algebra beneath every backend.
 
-**The framework-independent mathematics behind high-order neural derivatives and checked numerical enclosures.**
+![One activation. A derivative tower.](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-core/docs/visuals/story.gif)
+
+[Static poster](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-core/docs/visuals/poster.png) · [Narrow-screen animation](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-core/docs/visuals/story-mobile.gif) · [How this visual is computed](https://raw.githubusercontent.com/derivon-ai/omnibias/62200950132cb8fc53cc627f4614b5380058be82/packages/omnibias-core/docs/visuals/scene.py)
+
+Activation metadata and an integer order enter; shared polynomial coefficients, derivative values or checked enclosures leave. Backend authors use these exact combinatorics without importing a tensor framework.
+
+The animation uses computed outputs to explain this package. Frame transitions
+are illustrative unless a training step is explicitly identified; it is not a
+performance comparison.
+
 
 [API reference](https://omnibias.ai/api/core/) · [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-core/src/omnibias/core) · [Tests](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-core/tests) · [Talk to Derivon](mailto:info@derivon.ai)
 
-![One algebra. Every backend.](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/bias-collapse.svg)
+## The mathematical connection
 
-<details>
-<summary>Watch the mechanism change continuously</summary>
+Bias collapse starts with normalized nearby shifts of an activation. Their limit is a derivative; the Riccati recurrence evaluates that limit directly instead of subtracting nearly equal samples. One activation evaluation supplies the polynomial argument, while polynomial work still grows with order. Temperature collapse belongs to decision primitives; core supplies algebra and verified arithmetic, not a regional router.
 
-![Animated mathematical explanation](https://raw.githubusercontent.com/derivon-ai/omnibias/62c9646964ea58b00cc3de5b80bcc2134b45f511/docs/img/explain/bias-collapse.gif)
+## Run this README
 
-The animation illustrates the mechanism; it is not a speed benchmark.
-</details>
+The examples use `omnibias-core` on Python >=3.10. Their installed-wheel
+profile is [wheel-tests.toml](https://github.com/derivon-ai/omnibias/blob/codex/pinn-substrate-split/packages/omnibias-core/wheel-tests.toml); it selects runtime features, not
+an editable workspace. Build the coordinated wheelhouse using the
+[release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md), then run
+from that main checkout:
+
+```bash
+python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-core"
+```
+
+After this opt-in prerelease is published, the equivalent index command is:
+
+```bash
+python -m pip install --pre "omnibias-core==0.5.0rc1"
+```
+
+Existing published consumers may need the historical primitive versions; see the
+[compatibility policy](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md#published-consumer-compatibility).
 
 ## Why this package exists
 
@@ -27,22 +51,6 @@ A derivative engine should not need three competing implementations of its mathe
 - Outward-rounded intervals, Taylor models and finite certificate obligations.
 
 Choose core when implementing a backend, inspecting an identity, or building a small numerical checker without importing Torch or JAX. Training tensors and device execution belong in a backend; PDE workflows belong in consumers.
-
-## Install the source edition
-
-This README describes the current source tree. Published artifacts can lag this
-branch, and this migration does not overwrite existing package versions. Build
-the coordinated local wheelhouse using the [release guide](https://github.com/derivon-ai/omnibias/blob/main/RELEASE.md),
-then install only this package and its selected dependencies:
-
-```bash
-python -m pip install --constraint artifacts/wheel-validation/constraints.txt "omnibias-core"
-```
-
-Run that command from the repository containing the generated wheelhouse.
-The constraint file selects the built distributions rather than silently mixing
-an older published dependency with the current source. Supported Python versions,
-optional features and runtime dependencies are declared in [pyproject.toml](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-core/pyproject.toml).
 
 ## A working example
 
@@ -60,14 +68,6 @@ print(box * box)  # outward-rounded enclosure of the product
 
 A certificate digest checks integrity, not truth. Interval assumptions, floating-point rounding and a successful formal checker are separate concerns. The optional Lean kernel is not needed for ordinary derivative evaluation; a missing checker must never become a verified verdict.
 
-## Evidence, not a universal speed claim
-
-The [performance guide](https://github.com/derivon-ai/omnibias/blob/main/docs/performance.md) separates activation derivatives,
-specialized contractions and general deep-network jets. Its artifacts record
-workloads, precision, compilation and independent accuracy checks, including
-baseline wins. The reported speedups do not automatically transfer to an entire
-training loop, another activation, a different device or this package’s every API.
-
 ## Explore and validate
 
 The [API guide](https://github.com/derivon-ai/omnibias/blob/main/docs/api/core.md) contains the generated module/export
@@ -80,10 +80,6 @@ From the main repository, run the package’s regression suite:
 ```bash
 uv run pytest packages/omnibias-core/tests -q
 ```
-
-Examples above are executable smoke checks, not a substitute for application
-validation. For a production integration, measure the intended objective,
-precision, parameter gradients, memory and wall time on representative inputs.
 
 ## License
 
