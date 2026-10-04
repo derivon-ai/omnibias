@@ -30,6 +30,8 @@ def build_scene():
                     "title": "Weighted node relationships",
                     "nodes": nodes,
                     "edges": [[0, 1], [1, 2, True], [2, 3], [3, 0]],
+                    "edge_weights": [float(A[i, j]) for i, j in [(0, 1), (1, 2), (2, 3), (3, 0)]],
+                    "edge_labels": [f"{float(A[i, j]):.2f}" for i, j in [(0, 1), (1, 2), (2, 3), (3, 0)]],
                 },
                 {
                     "kind": "heatmap",

@@ -89,14 +89,26 @@ def panel(ax: Any, data: dict[str, Any], mobile: bool) -> None:
                 )
     elif kind == "graph":
         nodes = np.asarray(data["nodes"])
-        for edge in data.get("edges", []):
+        for index, edge in enumerate(data.get("edges", [])):
             i, j = edge[:2]
+            weight = data.get("edge_weights", [])[index] if "edge_weights" in data else None
+            if weight is not None and (not np.isfinite(weight) or weight < 0):
+                raise ValueError("Graph illustration weights must be finite and nonnegative")
             ax.plot(
                 nodes[[i, j], 0],
                 nodes[[i, j], 1],
                 color=COLORS[0] if len(edge) > 2 and edge[2] else "#b7c2c3",
-                lw=3 if len(edge) > 2 and edge[2] else 1.3,
+                lw=1 + 1.5 * weight if weight is not None else (
+                    3 if len(edge) > 2 and edge[2] else 1.3
+                ),
             )
+            if "edge_labels" in data:
+                midpoint = nodes[[i, j]].mean(axis=0)
+                ax.annotate(
+                    data["edge_labels"][index], midpoint, xytext=(0, 8),
+                    textcoords="offset points", ha="center", fontsize=size,
+                    color=INK, bbox={"facecolor": BG, "edgecolor": "none", "pad": 1},
+                )
         ax.scatter(nodes[:, 0], nodes[:, 1], s=180, c=data.get("colors", COLORS[0]), zorder=5)
         for i, point in enumerate(nodes):
             ax.annotate(
