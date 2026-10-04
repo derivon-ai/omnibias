@@ -321,7 +321,7 @@ and the [agent guide](AGENTS.md) before making a change.
   title   = {omnibias: closed-form n-th derivatives of activations},
   author  = {Grigoryants, Vardan},
   year    = {2026},
-  version = {0.4.0},
+  version = {0.5.0rc1},
   url     = {https://github.com/derivon-ai/omnibias}
 }
 ```

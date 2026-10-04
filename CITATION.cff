@@ -17,10 +17,10 @@ authors:
     affiliation: "Derivon"
     email: "vardan@derivon.ai"
     # orcid: "https://orcid.org/0000-0000-0000-0000"   # add if/when you have one
-version: "0.4.0"
-date-released: "2026-07-29"
+version: "0.5.0rc1"
+# Prerelease source version; set date-released only when publication occurs.
 # doi: "10.5281/zenodo.XXXXXXX"   # fill after the first Zenodo release (a GitHub Release mints it)
-# This checkout retains 13 Apache-2.0 distributions and three certified
+# This checkout retains nine Apache-2.0 distributions and seven certified
 # optimization distributions offered under AGPL-3.0-or-later or commercial
 # terms. This citation records the license of omnibias-core; LICENSING.md
 # identifies each distribution's license.

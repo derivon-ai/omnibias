@@ -117,6 +117,10 @@ Build a coordinated wheelhouse from fresh source archives. The validator checks
 44 distributions when the extracted ecosystem is present, with disjoint namespace
 ownership, correct metadata and no editable/source-checkout leakage:
 
+Use the uv version pinned by `[tool.uv].required-version`; CI reads the same pin.
+If temporary storage has a small quota, set `TMPDIR` to a larger scratch directory
+outside all source checkouts. Sequential profiles reuse the download cache.
+
 ```bash
 uv run --no-sync python scripts/validate_wheels.py --projects-root ../omnibias_projects --readme
 uv run --no-sync python scripts/validate_wheels.py --projects-root ../omnibias_projects \
