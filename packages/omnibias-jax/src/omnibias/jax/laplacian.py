@@ -15,22 +15,24 @@ Computing this with standard JAX would call ``jax.hessian`` or
 Hessian matrix and traces it. That is ``O(B * D * H)`` per backward
 pass and produces ``O(B * D^2)`` intermediate memory.
 
-The omnibias kernel here is ``O(B * H)`` and ``O(1)`` in ``D`` for
-the *Laplacian* (the ``||W_h||^2`` term is a per-row scalar reduction,
-computed once per parameter update).
+After pre-activations and row norms are available, the Laplacian contraction
+costs ``O(B * H)`` independently of ``D``. The public functions compute both
+``x @ W.T`` and ``||W_h||^2`` at each call, so their total work remains
+``O(B * H * D + H * D + B * H)``. Norm reuse across calls requires an explicit
+cache tied to the current parameters; it is not implicit in this API.
 
 This module is the JAX-side workhorse a FermiNet/DeepQMC-style code
 would call to assemble the kinetic-energy term of a neural
 wavefunction without nesting two ``jax.jacrev`` calls.
 
-The :func:`neural_field_value_and_laplacian` function additionally
-returns the gradient, which most VMC loops need anyway.
+The :func:`neural_field_value_grad_laplacian` function additionally returns
+the gradient, which most VMC loops need anyway.
 """
 
 from __future__ import annotations
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 from omnibias.core.contraction import (
     DEFAULT_SUPPORT_BUDGET,
@@ -329,16 +331,15 @@ def neural_field_value_grad_hessian(
 # k times (i.e., taking Delta^k = trace_{1,2} trace_{3,4} ... ) yields
 # the formula above.
 #
-# Cost: O(B * H), *independent of k*.  This is the structural
-# advantage over forward-Laplacian libraries like folx, which compute
-# the trace at O(B * D * H) and require nesting for k >= 2 (giving
-# O(B * D^{k-1} * H)).  For k=2 (the relativistic mass-velocity
-# correction <p^4> = <Delta^2 psi>) on a D=30 (10-electron) molecule
-# the omnibias / folx cost ratio is already ~30x; for k=3 it is ~900x.
+# The final contraction is O(B * H). Pre-activation and row-norm work still
+# depend on D, and the degree of the tanh/sigmoid derivative polynomial grows
+# with 2k. Thus warmed polynomial arithmetic is O(B * H * k), in addition to
+# O(B * H * D + H * D) affine/norm work. Avoiding nested traces is a structural
+# advantage, not constant total work or a universal speedup over folx.
 #
 # Pre-requisite: the activation's fastpath kernel must support order
-# 2k.  All Riccati-class activations (sigmoid, tanh, softplus,
-# gaussian, exp) support arbitrary order via their Eulerian / Legendre
+# 2k. Supported activation families (sigmoid, tanh, softplus,
+# gaussian, exp) provide higher orders via their Eulerian / Legendre
 # / Hermite / Stirling polynomial recursions in omnibias/fastpath/.
 # ---------------------------------------------------------------------------
 
@@ -379,9 +380,10 @@ def neural_field_polylaplacian(
 
     Notes
     -----
-    Memory cost: ``O(B * H)``, *independent of k*.  Time cost: one
-    forward pass through ``sigma^{(2k)}`` plus one ``(B,H)`` reduction.
-    Compare to folx-nested ``Delta^k`` which is ``O(B * D^{k-1} * H)``.
+    Inference working arrays have shape ``(B,H)`` in addition to inputs and
+    parameters. One activation-derivative evaluation and one reduction follow
+    the affine/norm work; derivative polynomial work grows with ``k``. A
+    retained parameter-backward graph has a separate memory cost.
     """
     if k < 1:
         raise ValueError(f"polylaplacian order k must be >= 1, got {k}")
@@ -494,7 +496,7 @@ def neural_field_local_p4_over_psi(
 #     is never materialised and the O(B*D^2) it would cost is never paid).
 #     Every sigma', sigma'' comes from the closed-form fastpath tower -- no
 #     autodiff through the activation at all, unlike folx.  Cost O(B*H*D),
-#     the same order as the forward pass itself, with *no* combinatorial term.
+#     linear in D at fixed width/depth, with no mixed-jet combinatorial term.
 #
 #   Tier B (k>=2, mode="support"): Delta^k f = k! * sum_{|a|=k} D^(2a) f / a!
 #     (the multinomial expansion of (sum_i d_i^2)^k). Every surviving `a` has
@@ -513,11 +515,11 @@ def neural_field_local_p4_over_psi(
 #     -- unbiased in expectation, and its jet size never depends on D.
 #
 # Honest scope: Tier A is exact and ceiling-free, full stop. Tier B is exact
-# while it fits its budget. Tier C is exact *in expectation*, with a reported
-# standard error and a probabilistic (Hoeffding) enclosure -- never a
-# omnibias.core.verified-grade sound one. The claim is "exact and ceiling-free
-# for the Laplacian; exact-or-enclosed at any dimension for Delta^k", never
-# "O(1) at arbitrary order" (see docs/honesty.md).
+# while it fits its budget. Tier C is exact *in expectation*. Its report has
+# no concentration enclosure by default; a Hoeffding report is conditional
+# on an explicitly supplied bound on every normalized directional draw.
+# Sample extrema do not establish that premise. None of these paths claims
+# constant total cost at arbitrary dimension or order.
 # ---------------------------------------------------------------------------
 
 
@@ -533,8 +535,9 @@ def deep_field_value_grad_laplacian(
     running activation w.r.t. the *original* input and the scalar Laplacian
     ``L`` of each unit through every layer, using the closed-form
     ``sigma'``/``sigma''`` fastpath (no autodiff through the activation).
-    Memory is ``O(B * H * D)`` -- the same order as the forward pass -- with
-    no ``comb(D + 2k, D)`` combinatorial term at any ``D``.
+    For fixed width and depth, Jacobian-state memory is ``O(B * H * D)``;
+    ordinary value-only MLP evaluation does not carry this Jacobian. There
+    is no ``comb(D + 2k, D)`` mixed-jet combinatorial term.
 
     Parameters
     ----------
@@ -617,10 +620,16 @@ def deep_field_laplacian(
 ) -> Array:
     r"""``nabla_x^2 f(x)`` for a deep MLP, no ceiling at any ``D`` (Tier A).
 
-    Thin wrapper over :func:`deep_field_value_grad_laplacian` discarding the
-    value and gradient. See that function for the recursion and the
-    depth-1 collapse onto :func:`neural_field_laplacian`.
+    Uses :func:`deep_field_value_grad_laplacian` for the hidden recursion.
+    An affine readout propagates only its Laplacian; its discarded value
+    and Jacobian are not formed. See that function for the recursion and
+    the depth-1 collapse onto :func:`neural_field_laplacian`.
     """
+    if len(layers) > 1 and layers[-1][2] is None:
+        _, _, lap = deep_field_value_grad_laplacian(
+            x, layers[:-1], allow_almost_everywhere=allow_almost_everywhere
+        )
+        return jnp.matmul(lap, jnp.asarray(layers[-1][0]).T)
     _, _, lap = deep_field_value_grad_laplacian(
         x, layers, allow_almost_everywhere=allow_almost_everywhere
     )
@@ -719,14 +728,58 @@ def _resolve_polylaplacian_mode(
     return mode, resolved_budget  # type: ignore[return-value]
 
 
-def _tier_c_concentration(scaled_samples: Array) -> ConcentrationReport:
-    """Build a Hoeffding report from the first batch point, first output."""
-    flat = [float(x) for x in scaled_samples[0, :, 0]]
-    lo = min(flat)
-    hi = max(flat)
-    if lo == hi:
-        hi = lo + 1.0
-    return hoeffding_enclosure(flat, value_range=(lo, hi))
+def _tier_c_concentration(
+    scaled_samples: Array, *, value_range: tuple[float, float], delta: float
+) -> ConcentrationReport:
+    """Host report for the first point/output, conditional on a declared range.
+
+    The range must bound every possible normalized directional draw. Sample
+    extrema cannot establish that premise. Only diagnostics leave the graph.
+    """
+    flat = jax.device_get(scaled_samples[0, :, 0]).tolist()
+    return hoeffding_enclosure(flat, value_range=value_range, delta=delta)
+
+
+def _evaluate_polylaplacian(
+    x: Array, layers: Sequence[LayerSpec], k: int, *, mode: str,
+    n_directions: int, budget: int | None, seed: int,
+    key: Array | None = None,
+    return_samples: bool = False,
+) -> tuple[Array, Array | None, Mode, int]:
+    """Shared tensor evaluation without host conversion or report construction."""
+    if k < 1:
+        raise ValueError(f"polylaplacian order k must be >= 1, got {k}")
+    x = jnp.asarray(x)
+    batched = x.ndim > 1
+    x2 = x if batched else x[None, :]
+    resolved_mode, resolved_budget = _resolve_polylaplacian_mode(x2.shape[-1], k, mode, budget)
+    scaled = None
+    if k == 1:
+        out = deep_field_laplacian(x2, layers)
+    elif resolved_mode == "forward":
+        raise ValueError(
+            "mode='forward' only applies to k=1 (the Laplacian); use "
+            "'support' or 'estimator' for k >= 2"
+        )
+    elif resolved_mode == "support":
+        out = _polylaplacian_support(x2, layers, k)
+    elif resolved_mode == "estimator":
+        if n_directions < 1:
+            raise ValueError("n_directions must be >= 1 for estimator mode")
+        if return_samples:
+            out, scaled = _polylaplacian_estimator(
+                x2, layers, k, n_directions=n_directions, seed=seed,
+                key=key,
+                return_samples=True,
+            )
+        else:
+            out = cast(Array, _polylaplacian_estimator(
+                x2, layers, k, n_directions=n_directions, seed=seed,
+                key=key,
+            ))
+    else:
+        raise ValueError(f"unknown mode {resolved_mode!r}")
+    return (out if batched else out[0]), scaled, resolved_mode, resolved_budget
 
 
 def deep_field_polylaplacian(
@@ -740,56 +793,21 @@ def deep_field_polylaplacian(
     seed: int = 0,
     key: Array | None = None,
 ) -> Array:
-    r"""``Delta^k f(x)`` for a deep MLP at any input dimension ``D``.
+    r"""``Delta^k f(x)`` with a live parameter graph and no host diagnostics.
 
-    ``k=1`` always routes to :func:`deep_field_laplacian` (Tier A: exact, no
-    ceiling). For ``k >= 2``, ``mode="auto"`` (the default) picks Tier B
-    (``"support"``, exact) while :func:`omnibias.core.contraction.select_mode`
-    finds the number of support sets within ``budget``
-    (:data:`omnibias.core.contraction.DEFAULT_SUPPORT_BUDGET` when
-    ``budget`` is ``None``), else Tier C (``"estimator"``, exact in
-    expectation over ``n_directions`` sampled unit directions).
+    ``k=1`` uses the exact forward Laplacian. At higher order, ``auto`` selects
+    exact support enumeration while its support count fits ``budget``;
+    otherwise it samples normalized directional derivatives. The sampled
+    result is exact only in expectation, and its work still depends on input
+    dimension, network size, derivative order, and ``n_directions``.
 
-    Parameters
-    ----------
-    x : Array of shape ``(D,)`` or ``(B, D)``.
-    layers : sequence of ``(W, b, spec)``, as for :func:`deep_field_laplacian`.
-    k : int >= 1
-        Poly-Laplacian order.
-    mode : {"auto", "support", "estimator"}
-        Force a tier for ``k >= 2`` instead of the budget-driven choice.
-    n_directions : int
-        Sample count for Tier C (ignored otherwise).
-    budget : int, optional
-        Override :data:`omnibias.core.contraction.DEFAULT_SUPPORT_BUDGET`
-        for the Tier B/C decision.
-    seed : int
-        PRNG seed for Tier C direction sampling when ``key`` is ``None``.
-    key : Array, optional
-        JAX PRNG key for Tier C; when supplied, ``seed`` is ignored and the
-        caller can vary the key per step without forcing a ``jit`` retrace on
-        ``seed``.
-
-    Returns
-    -------
-    Array of shape ``(C,)`` or ``(B, C)``.
-
-    Notes
-    -----
-    Tier B is exact to floating-point round-off; Tier C is exact only *in
-    expectation*. Use :func:`deep_field_polylaplacian_with_report` for the
-    resolved tier, sample standard error, and a probabilistic enclosure.
-    Never claim "O(1) at arbitrary order" for Tier C: its cost is
-    ``O(n_directions)`` regardless of ``D``, but it is a Monte Carlo
-    estimator, not a closed form.
+    Batched ``x`` of shape ``(B,D)`` returns ``(B,C)``; ``(D,)`` returns ``(C,)``.
+    The value-only path is suitable for differentiation and tracing. Use
+    :func:`deep_field_polylaplacian_with_report` outside transformed code when
+    host diagnostics are wanted. A supplied key is a runtime value; a fixed key reproduces directions.
     """
-    out, _ = deep_field_polylaplacian_with_report(
-        x,
-        layers,
-        k,
-        mode=mode,
-        n_directions=n_directions,
-        budget=budget,
+    out, _, _, _ = _evaluate_polylaplacian(
+        x, layers, k, mode=mode, n_directions=n_directions, budget=budget,
         seed=seed,
         key=key,
     )
@@ -806,54 +824,41 @@ def deep_field_polylaplacian_with_report(
     budget: int | None = None,
     seed: int = 0,
     key: Array | None = None,
+    value_range: tuple[float, float] | None = None,
+    delta: float = 1e-9,
 ) -> tuple[Array, PolylaplacianReport]:
-    r"""``Delta^k f(x)`` plus metadata about which tier ran.
+    r"""Point estimate and host metadata, with an optional conditional bound.
 
-    Returns the same point estimate as :func:`deep_field_polylaplacian` and a
-    :class:`~omnibias.core.contraction.PolylaplacianReport` carrying the
-    resolved mode, ``D``, ``k``, the budget, and for Tier C the direction
-    count, sample standard error, and a :class:`~omnibias.core.verified.sampled.ConcentrationReport`
-    from :func:`~omnibias.core.verified.sampled.hoeffding_enclosure`.
+    ``concentration`` is ``None`` unless estimator mode runs and an explicit
+    ``value_range=(lo,hi)`` is supplied. This range must bound every possible
+    normalized directional integrand for the first batch point and output,
+    including unseen directions. It is never inferred from observations.
+    ``delta`` is the failure probability conditional on that premise. The
+    core range/sample/delta checks apply; an observed violation raises.
+    These two options are ignored by exact modes.
+
+    When a bound is requested this host-report API belongs outside JIT/gradient
+    transforms. Host conversion affects only diagnostics, not the returned
+    estimate's parameter graph. The bound is not an interval-arithmetic or
+    theorem-prover certificate and does not cover other batch/output entries.
     """
-    if k < 1:
-        raise ValueError(f"polylaplacian order k must be >= 1, got {k}")
-    x = jnp.asarray(x)
-    batched = x.ndim > 1
-    x2 = x if batched else x[None, :]
-    dim = x2.shape[-1]
-    resolved_mode, resolved_budget = _resolve_polylaplacian_mode(dim, k, mode, budget)
+    out, scaled, resolved_mode, resolved_budget = _evaluate_polylaplacian(
+        x, layers, k, mode=mode, n_directions=n_directions, budget=budget,
+        seed=seed,
+        key=key,
+        return_samples=value_range is not None,
+    )
     concentration = None
-    if k == 1:
-        out = deep_field_laplacian(x2, layers)
-    elif resolved_mode == "forward":
-        raise ValueError(
-            "mode='forward' only applies to k=1 (the Laplacian); use "
-            "'support' or 'estimator' for k >= 2"
+    if scaled is not None and value_range is not None:
+        concentration = _tier_c_concentration(
+            scaled, value_range=value_range, delta=delta
         )
-    elif resolved_mode == "support":
-        out = _polylaplacian_support(x2, layers, k)
-    elif resolved_mode == "estimator":
-        out, scaled = _polylaplacian_estimator(
-            x2,
-            layers,
-            k,
-            n_directions=n_directions,
-            seed=seed,
-            key=key,
-            return_samples=True,
-        )
-        concentration = _tier_c_concentration(scaled)
-    else:
-        raise ValueError(f"unknown mode {resolved_mode!r}")
     report = PolylaplacianReport(
-        mode=resolved_mode,
-        dim=dim,
-        k=k,
-        budget=resolved_budget,
+        mode=resolved_mode, dim=jnp.asarray(x).shape[-1], k=k, budget=resolved_budget,
         n_directions=n_directions if resolved_mode == "estimator" else None,
         concentration=concentration,
     )
-    return (out if batched else out[0]), report
+    return out, report
 
 
 __all__ = [

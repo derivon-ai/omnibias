@@ -1,0 +1,3315 @@
+{
+  "accuracy_report": "<workspace>/artifacts/operator-release/operator_accuracy.json",
+  "aggregation_scope": "Each input is independent; revisions are never pooled.",
+  "attachments": [
+    {
+      "archive_path": "attachments/000-keras_precision.py",
+      "original": "<workspace>/artifacts/operator-evidence/keras_precision.py",
+      "sha256": "e50c60601a9c0ffb153753ef8eccdc576d06c1370ace5e9ce7dc1ad589563535",
+      "size_bytes": 2372
+    },
+    {
+      "archive_path": "attachments/001-keras_precision.json",
+      "original": "<workspace>/artifacts/operator-evidence/keras_precision.json",
+      "sha256": "5d0cb474e46825678701e530ec6c3a6c90672218a16effc167f7b964187cfe2e",
+      "size_bytes": 2712
+    },
+    {
+      "archive_path": "attachments/002-hardware.json",
+      "original": "<workspace>/artifacts/operator-evidence/hardware.json",
+      "sha256": "3bc7a3163775b204de662344a081688b0e1ea8d0ca486f2a0940c5650c6cec36",
+      "size_bytes": 469
+    },
+    {
+      "archive_path": "attachments/003-validation.json",
+      "original": "<workspace>/artifacts/operator-evidence/validation.json",
+      "sha256": "fb9af0ee006b7dcbcf916bae911df0cb277ef483c304314344a561e6f63bc6be",
+      "size_bytes": 1979
+    },
+    {
+      "archive_path": "attachments/004-core_torch_tests.log",
+      "original": "<workspace>/artifacts/operator-evidence/core_torch_tests.log",
+      "sha256": "1889ad1b2a798e40a722776fe4de86d28ca587fb8e5b1e4906db7c9a03cbe7f4",
+      "size_bytes": 4367
+    },
+    {
+      "archive_path": "attachments/005-keras_torch_tests.log",
+      "original": "<workspace>/artifacts/operator-evidence/keras_torch_tests.log",
+      "sha256": "1c5b0fc45e1c4ec838ad469907a2f59ab98ecff386ded9b014816bddd393eb0f",
+      "size_bytes": 192
+    },
+    {
+      "archive_path": "attachments/006-keras_jax_tests.log",
+      "original": "<workspace>/artifacts/operator-evidence/keras_jax_tests.log",
+      "sha256": "843c56b520c2f45db3a8cbb9a1a12b1aea87a119967979d24ecefd81ea29626e",
+      "size_bytes": 192
+    },
+    {
+      "archive_path": "attachments/007-keras_tensorflow_tests.log",
+      "original": "<workspace>/artifacts/operator-evidence/keras_tensorflow_tests.log",
+      "sha256": "c0ddc91f0f1bd6100253d7630132b6d72f08324f9888374bfd1d387d40423c21",
+      "size_bytes": 192
+    },
+    {
+      "archive_path": "attachments/008-docs_protocol_tests.log",
+      "original": "<workspace>/artifacts/operator-evidence/docs_protocol_tests.log",
+      "sha256": "69f1302eae64964eeec5d4d00395f8f9700152a8c2e0a385fdcf557625ebb89b",
+      "size_bytes": 100
+    },
+    {
+      "archive_path": "attachments/009-known_export_order_failure.log",
+      "original": "<workspace>/artifacts/operator-evidence/known_export_order_failure.log",
+      "sha256": "9b0b415d310c0d3a401d0e725880129fc593088be20cffab4d97b9f812c50988",
+      "size_bytes": 2177
+    },
+    {
+      "archive_path": "attachments/010-ruff.log",
+      "original": "<workspace>/artifacts/operator-evidence/ruff.log",
+      "sha256": "82b3e6a6c090a57601d22943bd23fca9218d1031dbe5a7b754092f9a156b4f18",
+      "size_bytes": 19
+    },
+    {
+      "archive_path": "attachments/011-mypy.log",
+      "original": "<workspace>/artifacts/operator-evidence/mypy.log",
+      "sha256": "cbb4d59ac8d399777ef0a1e1260eddd4b81f582ebb38df0e966e5935bca13669",
+      "size_bytes": 45
+    },
+    {
+      "archive_path": "attachments/012-build.json",
+      "original": "<workspace>/artifacts/operator-wheels/build.json",
+      "sha256": "0a6986270ad8b64fd1e9ae4497842e4d48bc575af59e0418c16d208692c5242e",
+      "size_bytes": 41763
+    },
+    {
+      "archive_path": "attachments/013-probe.json",
+      "original": "<workspace>/artifacts/operator-wheels/probe.json",
+      "sha256": "c2d4524d7e0ac8dbc633d300c53882bd1be783c6e54961e97e829cf7384e805c",
+      "size_bytes": 12233
+    },
+    {
+      "archive_path": "attachments/014-rebuild.py",
+      "original": "<workspace>/artifacts/operator-wheels/rebuild.py",
+      "sha256": "4e1c71863687d44b04eb586ad1262d05586ee0119aa6862915106938159285b8",
+      "size_bytes": 12662
+    },
+    {
+      "archive_path": "attachments/015-operator-compiler.md",
+      "original": "<workspace>/docs/operator-compiler.md",
+      "sha256": "88c4a8f3ba15e87d654bf069a864c1f48d481162a4dea19123e15257aaf7e490",
+      "size_bytes": 11684
+    },
+    {
+      "archive_path": "attachments/016-operator-compiler-results.md",
+      "original": "<workspace>/docs/operator-compiler-results.md",
+      "sha256": "187be1a5bbb66c81366316a4292050964cc7f98912eca32fdd6d560acebe4045",
+      "size_bytes": 12632
+    }
+  ],
+  "reports": [
+    {
+      "archive_path": "reports/000-ridge.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "folx": 0.23153816764984628,
+            "jax-manual": 0.22545463031617793,
+            "jax-nested": 0.37645726669269597,
+            "manual": 0.742115954172381,
+            "torch-jet": 0.7925844119801555
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 0.22545463031617793,
+          "fastest_measured_baseline": "jax-manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.10413400013931096,
+            "folx": 0.024110995582304895,
+            "jax-manual": 0.023477492504753172,
+            "jax-nested": 0.039202001062221825,
+            "manual": 0.0772795028751716,
+            "torch-jet": 0.0825349852675572
+          },
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": false
+        },
+        {
+          "baseline_over_compiler": {
+            "folx": 0.48449111580750476,
+            "jax-manual": 0.281009417463475,
+            "jax-nested": 9.343373120990247,
+            "manual": 0.7440391541515821,
+            "torch-jet": 2.5618943048671965
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 0.281009417463475,
+          "fastest_measured_baseline": "jax-manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.10411748371552676,
+            "folx": 0.050443995860405266,
+            "jax-manual": 0.029257993446663022,
+            "jax-nested": 0.9728084987727925,
+            "manual": 0.07746748451609164,
+            "torch-jet": 0.2667379885679111
+          },
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": false
+        },
+        {
+          "baseline_over_compiler": {
+            "folx": 8.812324884190412,
+            "jax-manual": 0.2796009248422981,
+            "jax-nested": 1676.38140669563,
+            "manual": 0.8138226561703632
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 0.2796009248422981,
+          "fastest_measured_baseline": "jax-manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.10150000161956996,
+            "folx": 0.8944509900175035,
+            "jax-manual": 0.028379494324326515,
+            "jax-nested": 170.1527154946234,
+            "manual": 0.08260300091933459
+          },
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": false
+        },
+        {
+          "baseline_over_compiler": {
+            "folx": 1759.0025867813351,
+            "jax-manual": 0.2771118937002064,
+            "manual": 0.7549259817706863
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 0.2771118937002064,
+          "fastest_measured_baseline": "jax-manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.11310049740131944,
+            "folx": 198.94406749517657,
+            "jax-manual": 0.0313414930133149,
+            "manual": 0.08538250403944403
+          },
+          "order": 8,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": false
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "ridge"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual",
+          "folx",
+          "jax-nested",
+          "jax-manual",
+          "torch-jet"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "output": "ridge.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:07:18Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "rss_mb_at_start": 611.38,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [
+        {
+          "family": "ridge",
+          "method": "torch-jet",
+          "order": 8,
+          "reason": "public torch-jet baseline covers directional jets and exact Laplacian/biharmonic",
+          "replicate": 0,
+          "row_index": 5,
+          "status": "refused"
+        },
+        {
+          "family": "ridge",
+          "method": "jax-nested",
+          "order": 8,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 0,
+          "row_index": 8,
+          "status": "memory_budget"
+        },
+        {
+          "family": "ridge",
+          "method": "torch-jet",
+          "order": 8,
+          "reason": "public torch-jet baseline covers directional jets and exact Laplacian/biharmonic",
+          "replicate": 1,
+          "row_index": 12,
+          "status": "refused"
+        },
+        {
+          "family": "ridge",
+          "method": "torch-jet",
+          "order": 6,
+          "reason": "public torch-jet baseline covers directional jets and exact Laplacian/biharmonic",
+          "replicate": 0,
+          "row_index": 23,
+          "status": "refused"
+        },
+        {
+          "family": "ridge",
+          "method": "torch-jet",
+          "order": 8,
+          "reason": "public torch-jet baseline covers directional jets and exact Laplacian/biharmonic",
+          "replicate": 2,
+          "row_index": 30,
+          "status": "refused"
+        },
+        {
+          "family": "ridge",
+          "method": "jax-nested",
+          "order": 8,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 2,
+          "row_index": 33,
+          "status": "memory_budget"
+        },
+        {
+          "family": "ridge",
+          "method": "jax-nested",
+          "order": 8,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 1,
+          "row_index": 41,
+          "status": "memory_budget"
+        },
+        {
+          "family": "ridge",
+          "method": "torch-jet",
+          "order": 6,
+          "reason": "public torch-jet baseline covers directional jets and exact Laplacian/biharmonic",
+          "replicate": 2,
+          "row_index": 43,
+          "status": "refused"
+        },
+        {
+          "family": "ridge",
+          "method": "torch-jet",
+          "order": 6,
+          "reason": "public torch-jet baseline covers directional jets and exact Laplacian/biharmonic",
+          "replicate": 1,
+          "row_index": 71,
+          "status": "refused"
+        }
+      ],
+      "input": "<workspace>/artifacts/operator-evidence/ridge.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14742501662112772,
+            "capture_ms": 1310.3957069979515,
+            "compile_and_first_execution_ms": 1660.5342119873967,
+            "evaluation_median_ms": 0.10413400013931096,
+            "training_step_median_ms": 0.3846160107059404
+          },
+          "method": "compiler",
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 34.334066993324086,
+            "compilation_ms": 3.278210002463311,
+            "evaluation_median_ms": 0.024110995582304895,
+            "first_execution_ms": 1.4827330014668405,
+            "training_step_median_ms": 0.04389298555906862
+          },
+          "method": "folx",
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 16.34010998532176,
+            "compilation_ms": 3.1928530079312623,
+            "evaluation_median_ms": 0.023477492504753172,
+            "first_execution_ms": 1.295613998081535,
+            "training_step_median_ms": 0.048145491746254265
+          },
+          "method": "jax-manual",
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 37.632828985806555,
+            "compilation_ms": 3.360916016390547,
+            "evaluation_median_ms": 0.039202001062221825,
+            "first_execution_ms": 2.2533579904120415,
+            "training_step_median_ms": 0.1496674958616495
+          },
+          "method": "jax-nested",
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14579399430658668,
+            "capture_ms": 0.03215699689462781,
+            "compile_and_first_execution_ms": 1620.5283059971407,
+            "evaluation_median_ms": 0.0772795028751716,
+            "training_step_median_ms": 0.3286030114395544
+          },
+          "method": "manual",
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14872249448671937,
+            "capture_ms": 1024.848546978319,
+            "compile_and_first_execution_ms": 1526.7453659907915,
+            "evaluation_median_ms": 0.0825349852675572,
+            "training_step_median_ms": 0.3463614993961528
+          },
+          "method": "torch-jet",
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15997349692042917,
+            "capture_ms": 1144.4126759888604,
+            "compile_and_first_execution_ms": 1738.995320018148,
+            "evaluation_median_ms": 0.10411748371552676,
+            "training_step_median_ms": 0.3798720135819167
+          },
+          "method": "compiler",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 146.78091899259016,
+            "compilation_ms": 7.29472900275141,
+            "evaluation_median_ms": 0.050443995860405266,
+            "first_execution_ms": 3.4971550048794597,
+            "training_step_median_ms": 0.1328670041402802
+          },
+          "method": "folx",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 19.66741299838759,
+            "compilation_ms": 4.164209996815771,
+            "evaluation_median_ms": 0.029257993446663022,
+            "first_execution_ms": 1.2796110240742564,
+            "training_step_median_ms": 0.051740018534474075
+          },
+          "method": "jax-manual",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 122.34741300926544,
+            "compilation_ms": 10.210510023171082,
+            "evaluation_median_ms": 0.9728084987727925,
+            "first_execution_ms": 23.741240991512313,
+            "training_step_median_ms": 6.488683487987146
+          },
+          "method": "jax-nested",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14786400424782187,
+            "capture_ms": 0.040996994357556105,
+            "compile_and_first_execution_ms": 1663.2497149985284,
+            "evaluation_median_ms": 0.07746748451609164,
+            "training_step_median_ms": 0.3281059907749295
+          },
+          "method": "manual",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.5369455029722303,
+            "capture_ms": 1533.9286430098582,
+            "compile_and_first_execution_ms": 1708.463037997717,
+            "evaluation_median_ms": 0.2667379885679111,
+            "training_step_median_ms": 0.928411478525959
+          },
+          "method": "torch-jet",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14604399621021003,
+            "capture_ms": 1141.4336150046438,
+            "compile_and_first_execution_ms": 1575.8014530001674,
+            "evaluation_median_ms": 0.10150000161956996,
+            "training_step_median_ms": 0.3461419983068481
+          },
+          "method": "compiler",
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 1029.011728009209,
+            "compilation_ms": 22.5624919985421,
+            "evaluation_median_ms": 0.8944509900175035,
+            "first_execution_ms": 15.582674997858703,
+            "training_step_median_ms": 3.808476496487856
+          },
+          "method": "folx",
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 21.404538012575358,
+            "compilation_ms": 4.0161070064641535,
+            "evaluation_median_ms": 0.028379494324326515,
+            "first_execution_ms": 1.125216978834942,
+            "training_step_median_ms": 0.04767750215250999
+          },
+          "method": "jax-manual",
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 415.8369090000633,
+            "compilation_ms": 50.46856601256877,
+            "evaluation_median_ms": 170.1527154946234,
+            "first_execution_ms": 306.8426040117629,
+            "training_step_median_ms": 864.2608484951779
+          },
+          "method": "jax-nested",
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14562249998562038,
+            "capture_ms": 0.06417700205929577,
+            "compile_and_first_execution_ms": 1715.2373629796784,
+            "evaluation_median_ms": 0.08260300091933459,
+            "training_step_median_ms": 0.3321140102343634
+          },
+          "method": "manual",
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "ridge",
+          "method": "torch-jet",
+          "order": 6,
+          "query_configuration_sha256": "1d2329df5ca573e0cf612a6d8dd424a73ffbb368bdd45af0fb5aa8119f9ca271",
+          "status_counts": {
+            "refused": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.17854048928711563,
+            "capture_ms": 1169.2232089990284,
+            "compile_and_first_execution_ms": 1838.4095020010136,
+            "evaluation_median_ms": 0.11310049740131944,
+            "training_step_median_ms": 0.4180959949735552
+          },
+          "method": "compiler",
+          "order": 8,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 10502.72410499747,
+            "compilation_ms": 126.14839800517075,
+            "evaluation_median_ms": 198.94406749517657,
+            "first_execution_ms": 248.20224900031462,
+            "training_step_median_ms": 426.17223648994695
+          },
+          "method": "folx",
+          "order": 8,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "capture_ms": 26.573234994430095,
+            "compilation_ms": 7.359809009358287,
+            "evaluation_median_ms": 0.0313414930133149,
+            "first_execution_ms": 1.125822978792712,
+            "training_step_median_ms": 0.05479049286805093
+          },
+          "method": "jax-manual",
+          "order": 8,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "ridge",
+          "method": "jax-nested",
+          "order": 8,
+          "query_configuration_sha256": "2a8a698c24984b54b306f378b3097086b634cc1ff6e954dbe5ce1bd4fbd8d274",
+          "status_counts": {
+            "memory_budget": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.1524840045021847,
+            "capture_ms": 0.07349898805841804,
+            "compile_and_first_execution_ms": 1792.1089690062217,
+            "evaluation_median_ms": 0.08538250403944403,
+            "training_step_median_ms": 0.3445574839133769
+          },
+          "method": "manual",
+          "order": 8,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "ridge",
+          "method": "torch-jet",
+          "order": 8,
+          "query_configuration_sha256": "1d2329df5ca573e0cf612a6d8dd424a73ffbb368bdd45af0fb5aa8119f9ca271",
+          "status_counts": {
+            "refused": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "memory_budget": 3,
+        "ok": 63,
+        "refused": 6
+      }
+    },
+    {
+      "archive_path": "reports/001-mixed.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "manual": 0.7750862775166094,
+            "reference": 1.859186591197534
+          },
+          "compiled_method": "compiler",
+          "family": "separable",
+          "fastest_baseline_over_compiler": 0.7750862775166094,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.06435798422899097,
+            "manual": 0.04988299042452127,
+            "reference": 0.11965350131504238
+          },
+          "order": 4,
+          "query_configuration_sha256": "9c1a29c26aa4f3f97da9be3ca8a06f43c66dc9beaee96ab99019fdb2f1db322f"
+        },
+        {
+          "baseline_over_compiler": {
+            "manual": 0.7842324340223853
+          },
+          "compiled_method": "compiler",
+          "family": "separable",
+          "fastest_baseline_over_compiler": 0.7842324340223853,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.06574900180567056,
+            "manual": 0.05156249972060323
+          },
+          "order": 8,
+          "query_configuration_sha256": "174ddfd974a7aa81aa386a7e38d8edf5354f742b3fe03f81c9b870d09fe03fcb"
+        },
+        {
+          "baseline_over_compiler": {
+            "manual": 0.7786445734979649
+          },
+          "compiled_method": "compiler",
+          "family": "separable",
+          "fastest_baseline_over_compiler": 0.7786445734979649,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.069725007051602,
+            "manual": 0.05429099837783724
+          },
+          "order": 24,
+          "query_configuration_sha256": "286c00cde447b9c58c1a3d13f7a89a9bfb6415c2537363f65875b9311289d08f"
+        },
+        {
+          "baseline_over_compiler": {
+            "manual": 0.7778256461052454
+          },
+          "compiled_method": "compiler",
+          "family": "separable",
+          "fastest_baseline_over_compiler": 0.7778256461052454,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.07451348938047886,
+            "manual": 0.05795850302092731
+          },
+          "order": 32,
+          "query_configuration_sha256": "7ba160ff404dd6d12928b924c6d592b6d65a4a5b1e102ecb291ca446601a5f7a"
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "separable"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual",
+          "reference"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          4,
+          8,
+          24,
+          32
+        ],
+        "output": "mixed.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T22:53:39Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "rss_mb_at_start": 606.71,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 8,
+          "reason": "JetCompileError: jet compilation failed at tanh (aten.tanh.default): operator graph node budget 10000 exceeded during emission; lower derivative order or simplify the model\n  File \"<workspace>/.venv/lib/python3.12/site-packages/torch/_dynamo/functional_export.py\", line 243, in forward\n    res = self._export_root(*args, **kwargs)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/benchmarks/_operator_models.py\", line 48, in forward\n    return torch.sin(torch.tanh(x * self.operands[0] + self.operands[1]).sum(-1, keepdim=True))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+          "replicate": 0,
+          "row_index": 3,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 8,
+          "reason": "JetCompileError: jet compilation failed at tanh (aten.tanh.default): operator graph node budget 10000 exceeded during emission; lower derivative order or simplify the model\n  File \"<workspace>/.venv/lib/python3.12/site-packages/torch/_dynamo/functional_export.py\", line 243, in forward\n    res = self._export_root(*args, **kwargs)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/benchmarks/_operator_models.py\", line 48, in forward\n    return torch.sin(torch.tanh(x * self.operands[0] + self.operands[1]).sum(-1, keepdim=True))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+          "replicate": 2,
+          "row_index": 4,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 24,
+          "reason": "ValueError: jet needs 16777216 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 0,
+          "row_index": 6,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 32,
+          "reason": "ValueError: jet needs 4294967296 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 1,
+          "row_index": 7,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 32,
+          "reason": "ValueError: jet needs 4294967296 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 2,
+          "row_index": 19,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 32,
+          "reason": "ValueError: jet needs 4294967296 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 0,
+          "row_index": 27,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 24,
+          "reason": "ValueError: jet needs 16777216 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 2,
+          "row_index": 28,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 8,
+          "reason": "JetCompileError: jet compilation failed at tanh (aten.tanh.default): operator graph node budget 10000 exceeded during emission; lower derivative order or simplify the model\n  File \"<workspace>/.venv/lib/python3.12/site-packages/torch/_dynamo/functional_export.py\", line 243, in forward\n    res = self._export_root(*args, **kwargs)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/benchmarks/_operator_models.py\", line 48, in forward\n    return torch.sin(torch.tanh(x * self.operands[0] + self.operands[1]).sum(-1, keepdim=True))\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n",
+          "replicate": 1,
+          "row_index": 29,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 24,
+          "reason": "ValueError: jet needs 16777216 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 1,
+          "row_index": 35,
+          "status": "refused"
+        }
+      ],
+      "input": "<workspace>/artifacts/operator-evidence/mixed.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15072949463501573,
+            "capture_ms": 1257.5374399893917,
+            "compile_and_first_execution_ms": 1652.6309670007322,
+            "evaluation_median_ms": 0.06435798422899097,
+            "training_step_median_ms": 0.3254735056543723
+          },
+          "method": "compiler",
+          "order": 4,
+          "query_configuration_sha256": "9c1a29c26aa4f3f97da9be3ca8a06f43c66dc9beaee96ab99019fdb2f1db322f",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.1439454936189577,
+            "capture_ms": 0.001801992766559124,
+            "compile_and_first_execution_ms": 1750.3883200115524,
+            "evaluation_median_ms": 0.04988299042452127,
+            "training_step_median_ms": 0.3048430080525577
+          },
+          "method": "manual",
+          "order": 4,
+          "query_configuration_sha256": "9c1a29c26aa4f3f97da9be3ca8a06f43c66dc9beaee96ab99019fdb2f1db322f",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.22134350729174912,
+            "capture_ms": 1448.438346007606,
+            "compile_and_first_execution_ms": 2467.9792130191345,
+            "evaluation_median_ms": 0.11965350131504238,
+            "training_step_median_ms": 0.4835119907511398
+          },
+          "method": "reference",
+          "order": 4,
+          "query_configuration_sha256": "9c1a29c26aa4f3f97da9be3ca8a06f43c66dc9beaee96ab99019fdb2f1db322f",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14473700139205903,
+            "capture_ms": 1311.1999300017487,
+            "compile_and_first_execution_ms": 1720.53252600017,
+            "evaluation_median_ms": 0.06574900180567056,
+            "training_step_median_ms": 0.3103480121353641
+          },
+          "method": "compiler",
+          "order": 8,
+          "query_configuration_sha256": "174ddfd974a7aa81aa386a7e38d8edf5354f742b3fe03f81c9b870d09fe03fcb",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.13996550114825368,
+            "capture_ms": 0.002015003701671958,
+            "compile_and_first_execution_ms": 1726.3203250186052,
+            "evaluation_median_ms": 0.05156249972060323,
+            "training_step_median_ms": 0.2911180054070428
+          },
+          "method": "manual",
+          "order": 8,
+          "query_configuration_sha256": "174ddfd974a7aa81aa386a7e38d8edf5354f742b3fe03f81c9b870d09fe03fcb",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "separable",
+          "method": "reference",
+          "order": 8,
+          "query_configuration_sha256": "174ddfd974a7aa81aa386a7e38d8edf5354f742b3fe03f81c9b870d09fe03fcb",
+          "status_counts": {
+            "refused": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15092951070982963,
+            "capture_ms": 1278.3593279891647,
+            "compile_and_first_execution_ms": 1711.8477259937208,
+            "evaluation_median_ms": 0.069725007051602,
+            "training_step_median_ms": 0.33484950836282223
+          },
+          "method": "compiler",
+          "order": 24,
+          "query_configuration_sha256": "286c00cde447b9c58c1a3d13f7a89a9bfb6415c2537363f65875b9311289d08f",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.1457679900340736,
+            "capture_ms": 0.0016260019037872553,
+            "compile_and_first_execution_ms": 1706.4291519927792,
+            "evaluation_median_ms": 0.05429099837783724,
+            "training_step_median_ms": 0.2923440042650327
+          },
+          "method": "manual",
+          "order": 24,
+          "query_configuration_sha256": "286c00cde447b9c58c1a3d13f7a89a9bfb6415c2537363f65875b9311289d08f",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "separable",
+          "method": "reference",
+          "order": 24,
+          "query_configuration_sha256": "286c00cde447b9c58c1a3d13f7a89a9bfb6415c2537363f65875b9311289d08f",
+          "status_counts": {
+            "refused": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15829499170649797,
+            "capture_ms": 1307.2539950080682,
+            "compile_and_first_execution_ms": 1688.8427819940262,
+            "evaluation_median_ms": 0.07451348938047886,
+            "training_step_median_ms": 0.3402250004000962
+          },
+          "method": "compiler",
+          "order": 32,
+          "query_configuration_sha256": "7ba160ff404dd6d12928b924c6d592b6d65a4a5b1e102ecb291ca446601a5f7a",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.1503890089225024,
+            "capture_ms": 0.0017530110199004412,
+            "compile_and_first_execution_ms": 1699.6633219823707,
+            "evaluation_median_ms": 0.05795850302092731,
+            "training_step_median_ms": 0.31967900577001274
+          },
+          "method": "manual",
+          "order": 32,
+          "query_configuration_sha256": "7ba160ff404dd6d12928b924c6d592b6d65a4a5b1e102ecb291ca446601a5f7a",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "separable",
+          "method": "reference",
+          "order": 32,
+          "query_configuration_sha256": "7ba160ff404dd6d12928b924c6d592b6d65a4a5b1e102ecb291ca446601a5f7a",
+          "status_counts": {
+            "refused": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 27,
+        "refused": 9
+      }
+    },
+    {
+      "archive_path": "reports/002-bottleneck.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "folx": 0.26802626650144584,
+            "manual": 0.8568455588737005,
+            "reference": 9.03240492782822,
+            "torch-jet": 0.8680086858358892
+          },
+          "compiled_method": "compiler",
+          "family": "bottleneck",
+          "fastest_baseline_over_compiler": 0.26802626650144584,
+          "fastest_measured_baseline": "folx",
+          "median_of_process_medians_ms": {
+            "compiler": 0.17100750119425356,
+            "folx": 0.045834502088837326,
+            "manual": 0.1465270179323852,
+            "reference": 1.544608996482566,
+            "torch-jet": 0.14843599637970328
+          },
+          "order": 2,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32"
+        },
+        {
+          "baseline_over_compiler": {
+            "folx": 4.541459703927535,
+            "manual": 0.9800649984099256,
+            "torch-jet": 45.9832537073259
+          },
+          "compiled_method": "compiler",
+          "family": "bottleneck",
+          "fastest_baseline_over_compiler": 0.9800649984099256,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.2141959994332865,
+            "folx": 0.9727625001687557,
+            "manual": 0.20992600184399635,
+            "torch-jet": 9.849428985035047
+          },
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32"
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 32,
+        "execution": "compiled",
+        "families": [
+          "bottleneck"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual",
+          "reference",
+          "folx",
+          "torch-jet"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          2,
+          4
+        ],
+        "output": "bottleneck.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:00:52Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "rss_mb_at_start": 606.62,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [
+        {
+          "family": "bottleneck",
+          "method": "reference",
+          "order": 4,
+          "reason": "JetCompileError: jet compilation failed at tanh (aten.tanh.default): operator graph node budget 10000 exceeded during emission; lower derivative order or simplify the model\n  File \"<workspace>/.venv/lib/python3.12/site-packages/torch/_dynamo/functional_export.py\", line 243, in forward\n    res = self._export_root(*args, **kwargs)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/benchmarks/_operator_models.py\", line 52, in forward\n    x = torch.tanh(x)\n        ^^^^^^^^^^^^^\n",
+          "replicate": 0,
+          "row_index": 4,
+          "status": "refused"
+        },
+        {
+          "family": "bottleneck",
+          "method": "reference",
+          "order": 4,
+          "reason": "JetCompileError: jet compilation failed at tanh (aten.tanh.default): operator graph node budget 10000 exceeded during emission; lower derivative order or simplify the model\n  File \"<workspace>/.venv/lib/python3.12/site-packages/torch/_dynamo/functional_export.py\", line 243, in forward\n    res = self._export_root(*args, **kwargs)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/benchmarks/_operator_models.py\", line 52, in forward\n    x = torch.tanh(x)\n        ^^^^^^^^^^^^^\n",
+          "replicate": 2,
+          "row_index": 10,
+          "status": "refused"
+        },
+        {
+          "family": "bottleneck",
+          "method": "reference",
+          "order": 4,
+          "reason": "JetCompileError: jet compilation failed at tanh (aten.tanh.default): operator graph node budget 10000 exceeded during emission; lower derivative order or simplify the model\n  File \"<workspace>/.venv/lib/python3.12/site-packages/torch/_dynamo/functional_export.py\", line 243, in forward\n    res = self._export_root(*args, **kwargs)\n          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"<workspace>/benchmarks/_operator_models.py\", line 52, in forward\n    x = torch.tanh(x)\n        ^^^^^^^^^^^^^\n",
+          "replicate": 1,
+          "row_index": 23,
+          "status": "refused"
+        }
+      ],
+      "input": "<workspace>/artifacts/operator-evidence/bottleneck.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.250532990321517,
+            "capture_ms": 1403.8967269880231,
+            "compile_and_first_execution_ms": 1912.2796849987935,
+            "evaluation_median_ms": 0.17100750119425356,
+            "training_step_median_ms": 0.5154904938535765
+          },
+          "method": "compiler",
+          "order": 2,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "capture_ms": 51.10992700792849,
+            "compilation_ms": 5.23565401090309,
+            "evaluation_median_ms": 0.045834502088837326,
+            "first_execution_ms": 4.755747009767219,
+            "training_step_median_ms": 0.1338285073870793
+          },
+          "method": "folx",
+          "order": 2,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.24797649530228227,
+            "capture_ms": 0.5656230205204338,
+            "compile_and_first_execution_ms": 2078.1937290157657,
+            "evaluation_median_ms": 0.1465270179323852,
+            "training_step_median_ms": 0.5032979970565066
+          },
+          "method": "manual",
+          "order": 2,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 1.3686269958270714,
+            "capture_ms": 1970.194244000595,
+            "compile_and_first_execution_ms": 5631.434552982682,
+            "evaluation_median_ms": 1.544608996482566,
+            "training_step_median_ms": 3.118689506663941
+          },
+          "method": "reference",
+          "order": 2,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.2457684895489365,
+            "capture_ms": 1226.1288389854599,
+            "compile_and_first_execution_ms": 1801.4966689806897,
+            "evaluation_median_ms": 0.14843599637970328,
+            "training_step_median_ms": 0.4756995040224865
+          },
+          "method": "torch-jet",
+          "order": 2,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.32073850161395967,
+            "capture_ms": 1331.323196995072,
+            "compile_and_first_execution_ms": 2106.6367359890137,
+            "evaluation_median_ms": 0.2141959994332865,
+            "training_step_median_ms": 0.6367885071085766
+          },
+          "method": "compiler",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "capture_ms": 335.6437049806118,
+            "compilation_ms": 16.301108000334352,
+            "evaluation_median_ms": 0.9727625001687557,
+            "first_execution_ms": 18.636166991200298,
+            "training_step_median_ms": 6.435856994357891
+          },
+          "method": "folx",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.3128680109512061,
+            "capture_ms": 0.5949790065642446,
+            "compile_and_first_execution_ms": 2353.540267009521,
+            "evaluation_median_ms": 0.20992600184399635,
+            "training_step_median_ms": 0.627977991825901
+          },
+          "method": "manual",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "bottleneck",
+          "method": "reference",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "refused": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 9.359606992802583,
+            "capture_ms": 2021.9406500109471,
+            "compile_and_first_execution_ms": 2106.825690018013,
+            "evaluation_median_ms": 9.849428985035047,
+            "training_step_median_ms": 14.15712499874644
+          },
+          "method": "torch-jet",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 27,
+        "refused": 3
+      }
+    },
+    {
+      "archive_path": "reports/003-coupled.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "jax-jet": 0.37492719883396586,
+            "manual": 1.1589825533316924,
+            "reference": 0.9174584901316708,
+            "torch-jet": 1.0020730878127122
+          },
+          "compiled_method": "compiler",
+          "family": "coupled",
+          "fastest_baseline_over_compiler": 0.37492719883396586,
+          "fastest_measured_baseline": "jax-jet",
+          "median_of_process_medians_ms": {
+            "compiler": 0.10056751489173621,
+            "jax-jet": 0.037705496652051806,
+            "manual": 0.11655599519144744,
+            "reference": 0.09226652036886662,
+            "torch-jet": 0.10077600018121302
+          },
+          "order": 4,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692"
+        },
+        {
+          "baseline_over_compiler": {
+            "jax-jet": 1.5364381318827725,
+            "manual": 1.0497892418360864,
+            "reference": 0.996363706073375
+          },
+          "compiled_method": "compiler",
+          "family": "coupled",
+          "fastest_baseline_over_compiler": 0.996363706073375,
+          "fastest_measured_baseline": "reference",
+          "median_of_process_medians_ms": {
+            "compiler": 0.16624099225737154,
+            "jax-jet": 0.25541899958625436,
+            "manual": 0.17451800522394478,
+            "reference": 0.16563649114686996
+          },
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692"
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "coupled"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual",
+          "reference",
+          "jax-jet",
+          "torch-jet"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          4,
+          16,
+          32
+        ],
+        "output": "coupled.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:23:23Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "rss_mb_at_start": 607.17,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [
+        {
+          "family": "coupled",
+          "method": "torch-jet",
+          "order": 32,
+          "reason": "ValueError: Multiplicity should be an integer, but got 253.00000000000003.\n\nWhile executing %tanh : [num_users=1] = call_function[target=torch.ops.aten.tanh.default](args = (%addmm,), kwargs = {})\nOriginal traceback:\nNone\nUse tlparse to see full graph. (https://github.com/pytorch/tlparse?tab=readme-ov-file#tlparse-parse-structured-pt2-logs)",
+          "replicate": 0,
+          "row_index": 2,
+          "status": "error"
+        },
+        {
+          "family": "coupled",
+          "method": "compiler",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 0,
+          "row_index": 4,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "jax-jet",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 2,
+          "row_index": 5,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "manual",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 0,
+          "row_index": 6,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "torch-jet",
+          "order": 16,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 1,
+          "row_index": 8,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "reference",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 2,
+          "row_index": 9,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "manual",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 1,
+          "row_index": 12,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "torch-jet",
+          "order": 32,
+          "reason": "ValueError: Multiplicity should be an integer, but got 253.00000000000003.\n\nWhile executing %tanh : [num_users=1] = call_function[target=torch.ops.aten.tanh.default](args = (%addmm,), kwargs = {})\nOriginal traceback:\nNone\nUse tlparse to see full graph. (https://github.com/pytorch/tlparse?tab=readme-ov-file#tlparse-parse-structured-pt2-logs)",
+          "replicate": 2,
+          "row_index": 15,
+          "status": "error"
+        },
+        {
+          "family": "coupled",
+          "method": "reference",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 0,
+          "row_index": 17,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "reference",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 1,
+          "row_index": 20,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "torch-jet",
+          "order": 32,
+          "reason": "ValueError: Multiplicity should be an integer, but got 253.00000000000003.\n\nWhile executing %tanh : [num_users=1] = call_function[target=torch.ops.aten.tanh.default](args = (%addmm,), kwargs = {})\nOriginal traceback:\nNone\nUse tlparse to see full graph. (https://github.com/pytorch/tlparse?tab=readme-ov-file#tlparse-parse-structured-pt2-logs)",
+          "replicate": 1,
+          "row_index": 24,
+          "status": "error"
+        },
+        {
+          "family": "coupled",
+          "method": "jax-jet",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 1,
+          "row_index": 26,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "jax-jet",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 0,
+          "row_index": 33,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "compiler",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 2,
+          "row_index": 35,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "manual",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 2,
+          "row_index": 41,
+          "status": "timeout"
+        },
+        {
+          "family": "coupled",
+          "method": "compiler",
+          "order": 32,
+          "reason": "parent terminated worker at configured resource budget",
+          "replicate": 1,
+          "row_index": 42,
+          "status": "timeout"
+        }
+      ],
+      "input": "<workspace>/artifacts/operator-evidence/coupled.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.1704845199128613,
+            "capture_ms": 1467.0881479978561,
+            "compile_and_first_execution_ms": 1589.306673995452,
+            "evaluation_median_ms": 0.10056751489173621,
+            "training_step_median_ms": 0.38721699093002826
+          },
+          "method": "compiler",
+          "order": 4,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "capture_ms": 26.76017300109379,
+            "compilation_ms": 9.383516997331753,
+            "evaluation_median_ms": 0.037705496652051806,
+            "first_execution_ms": 5.521938990568742,
+            "training_step_median_ms": 0.0982710043899715
+          },
+          "method": "jax-jet",
+          "order": 4,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.19269999756943434,
+            "capture_ms": 0.0035349803511053324,
+            "compile_and_first_execution_ms": 1993.8768529973458,
+            "evaluation_median_ms": 0.11655599519144744,
+            "training_step_median_ms": 0.43108349200338125
+          },
+          "method": "manual",
+          "order": 4,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15527500363532454,
+            "capture_ms": 1135.917317995336,
+            "compile_and_first_execution_ms": 1418.7921789998654,
+            "evaluation_median_ms": 0.09226652036886662,
+            "training_step_median_ms": 0.3485660126898438
+          },
+          "method": "reference",
+          "order": 4,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.1700415014056489,
+            "capture_ms": 981.8252889963333,
+            "compile_and_first_execution_ms": 1399.1226189828012,
+            "evaluation_median_ms": 0.10077600018121302,
+            "training_step_median_ms": 0.36043500585947186
+          },
+          "method": "torch-jet",
+          "order": 4,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.3607760008890182,
+            "capture_ms": 1378.2855619792826,
+            "compile_and_first_execution_ms": 2195.5416180135217,
+            "evaluation_median_ms": 0.16624099225737154,
+            "training_step_median_ms": 0.6408015033230186
+          },
+          "method": "compiler",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "capture_ms": 133.9660989760887,
+            "compilation_ms": 135.45149998390116,
+            "evaluation_median_ms": 0.25541899958625436,
+            "first_execution_ms": 13.415416004136205,
+            "training_step_median_ms": 0.5988010088913143
+          },
+          "method": "jax-jet",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.5606515042018145,
+            "capture_ms": 0.00280898530036211,
+            "compile_and_first_execution_ms": 2335.0865170068573,
+            "evaluation_median_ms": 0.17451800522394478,
+            "training_step_median_ms": 0.8412905008299276
+          },
+          "method": "manual",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.3626135003287345,
+            "capture_ms": 1209.8141869937535,
+            "compile_and_first_execution_ms": 2291.803418978816,
+            "evaluation_median_ms": 0.16563649114686996,
+            "training_step_median_ms": 0.6361819978337735
+          },
+          "method": "reference",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 1,
+          "eligible": false,
+          "family": "coupled",
+          "method": "torch-jet",
+          "order": 16,
+          "query_configuration_sha256": "2a8a698c24984b54b306f378b3097086b634cc1ff6e954dbe5ce1bd4fbd8d274",
+          "status_counts": {
+            "timeout": 1
+          }
+        },
+        {
+          "cells": 2,
+          "eligible": false,
+          "family": "coupled",
+          "method": "torch-jet",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 2
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "coupled",
+          "method": "compiler",
+          "order": 32,
+          "query_configuration_sha256": "2a8a698c24984b54b306f378b3097086b634cc1ff6e954dbe5ce1bd4fbd8d274",
+          "status_counts": {
+            "timeout": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "coupled",
+          "method": "jax-jet",
+          "order": 32,
+          "query_configuration_sha256": "2a8a698c24984b54b306f378b3097086b634cc1ff6e954dbe5ce1bd4fbd8d274",
+          "status_counts": {
+            "timeout": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "coupled",
+          "method": "manual",
+          "order": 32,
+          "query_configuration_sha256": "2a8a698c24984b54b306f378b3097086b634cc1ff6e954dbe5ce1bd4fbd8d274",
+          "status_counts": {
+            "timeout": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "coupled",
+          "method": "reference",
+          "order": 32,
+          "query_configuration_sha256": "2a8a698c24984b54b306f378b3097086b634cc1ff6e954dbe5ce1bd4fbd8d274",
+          "status_counts": {
+            "timeout": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "coupled",
+          "method": "torch-jet",
+          "order": 32,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "error": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "error": 3,
+        "ok": 29,
+        "timeout": 13
+      }
+    },
+    {
+      "archive_path": "reports/004-coupled_eager32.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "manual": 0.7826983449802173,
+            "reference": 1.0656763320813019
+          },
+          "compiled_method": "compiler",
+          "family": "coupled",
+          "fastest_baseline_over_compiler": 0.7826983449802173,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 21.61162100674119,
+            "manual": 16.915379994316027,
+            "reference": 23.030993004795164
+          },
+          "order": 32,
+          "query_configuration_sha256": "6404a308c5b422e38e14470f5dcf1696797351f43178b8077542e6f87431e382"
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "eager",
+        "families": [
+          "coupled"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "reference",
+          "manual"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          32
+        ],
+        "output": "coupled_eager32.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:03:42Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "rss_mb_at_start": 603.27,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [],
+      "input": "<workspace>/artifacts/operator-evidence/coupled_eager32.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 42.20205650199205,
+            "capture_ms": 1938.7269230210222,
+            "compile_and_first_execution_ms": 21.53778399224393,
+            "evaluation_median_ms": 21.61162100674119,
+            "training_step_median_ms": 61.97505598538555
+          },
+          "method": "compiler",
+          "order": 32,
+          "query_configuration_sha256": "6404a308c5b422e38e14470f5dcf1696797351f43178b8077542e6f87431e382",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 40.632857009768486,
+            "capture_ms": 0.003381021087989211,
+            "compile_and_first_execution_ms": 18.610647006426007,
+            "evaluation_median_ms": 16.915379994316027,
+            "training_step_median_ms": 56.48386549728457
+          },
+          "method": "manual",
+          "order": 32,
+          "query_configuration_sha256": "6404a308c5b422e38e14470f5dcf1696797351f43178b8077542e6f87431e382",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 43.82428148528561,
+            "capture_ms": 2087.3816150124185,
+            "compile_and_first_execution_ms": 21.189666993450373,
+            "evaluation_median_ms": 23.030993004795164,
+            "training_step_median_ms": 64.5454010082176
+          },
+          "method": "reference",
+          "order": 32,
+          "query_configuration_sha256": "6404a308c5b422e38e14470f5dcf1696797351f43178b8077542e6f87431e382",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 9
+      }
+    },
+    {
+      "archive_path": "reports/005-ridge_gate_2.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "manual": 1.1529905302775565
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 1.1529905302775565,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.07357000140473247,
+            "manual": 0.08482551493216306
+          },
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": true
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "ridge"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          2
+        ],
+        "output": "ridge_gate_2.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:34:06Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "host_hardware": {
+          "cpu_model": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+          "installed_memory_bytes": 32822591488,
+          "logical_cpus": 16,
+          "parent_cpu_affinity": [
+            0
+          ],
+          "platform": "linux"
+        },
+        "rss_mb_at_start": 602.94,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [],
+      "input": "<workspace>/artifacts/operator-evidence/ridge_gate_2.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.12929999502375722,
+            "capture_ms": 1279.4196199974976,
+            "compile_and_first_execution_ms": 1725.150507001672,
+            "evaluation_median_ms": 0.07357000140473247,
+            "training_step_median_ms": 0.3036099806195125
+          },
+          "method": "compiler",
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.13886651140637696,
+            "capture_ms": 0.03592198481783271,
+            "compile_and_first_execution_ms": 1782.9725769988727,
+            "evaluation_median_ms": 0.08482551493216306,
+            "training_step_median_ms": 0.35266249324195087
+          },
+          "method": "manual",
+          "order": 2,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 6
+      }
+    },
+    {
+      "archive_path": "reports/006-ridge_gate_4.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "manual": 1.0376317403719664
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 1.0376317403719664,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.08846250420901924,
+            "manual": 0.09179150220006704
+          },
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": true
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "ridge"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          4
+        ],
+        "output": "ridge_gate_4.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:34:08Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "host_hardware": {
+          "cpu_model": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+          "installed_memory_bytes": 32822591488,
+          "logical_cpus": 16,
+          "parent_cpu_affinity": [
+            2
+          ],
+          "platform": "linux"
+        },
+        "rss_mb_at_start": 602.73,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [],
+      "input": "<workspace>/artifacts/operator-evidence/ridge_gate_4.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.13686949387192726,
+            "capture_ms": 1265.6029969803058,
+            "compile_and_first_execution_ms": 1744.2012859974056,
+            "evaluation_median_ms": 0.08846250420901924,
+            "training_step_median_ms": 0.3020945005118847
+          },
+          "method": "compiler",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15413099026773125,
+            "capture_ms": 0.05815899930894375,
+            "compile_and_first_execution_ms": 2181.86352099292,
+            "evaluation_median_ms": 0.09179150220006704,
+            "training_step_median_ms": 0.34752851934172213
+          },
+          "method": "manual",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 6
+      }
+    },
+    {
+      "archive_path": "reports/007-ridge_gate_6.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "manual": 1.057950798955373
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 1.057950798955373,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.07766949420329183,
+            "manual": 0.0821705034468323
+          },
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": true
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "ridge"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          6
+        ],
+        "output": "ridge_gate_6.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:34:13Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "host_hardware": {
+          "cpu_model": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+          "installed_memory_bytes": 32822591488,
+          "logical_cpus": 16,
+          "parent_cpu_affinity": [
+            4
+          ],
+          "platform": "linux"
+        },
+        "rss_mb_at_start": 602.8,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [],
+      "input": "<workspace>/artifacts/operator-evidence/ridge_gate_6.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.1495194883318618,
+            "capture_ms": 1250.6545899959747,
+            "compile_and_first_execution_ms": 2081.398320005974,
+            "evaluation_median_ms": 0.07766949420329183,
+            "training_step_median_ms": 0.3234559844713658
+          },
+          "method": "compiler",
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14224249753169715,
+            "capture_ms": 0.05743198562413454,
+            "compile_and_first_execution_ms": 2012.2718700149562,
+            "evaluation_median_ms": 0.0821705034468323,
+            "training_step_median_ms": 0.3639244969235733
+          },
+          "method": "manual",
+          "order": 6,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 6
+      }
+    },
+    {
+      "archive_path": "reports/008-ridge_gate_8.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "manual": 1.0147795277053895
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 1.0147795277053895,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.0806505122454837,
+            "manual": 0.08184248872566968
+          },
+          "order": 8,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": true
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "ridge"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          8
+        ],
+        "output": "ridge_gate_8.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:34:19Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "host_hardware": {
+          "cpu_model": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+          "installed_memory_bytes": 32822591488,
+          "logical_cpus": 16,
+          "parent_cpu_affinity": [
+            6
+          ],
+          "platform": "linux"
+        },
+        "rss_mb_at_start": 602.76,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [],
+      "input": "<workspace>/artifacts/operator-evidence/ridge_gate_8.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.1448909897590056,
+            "capture_ms": 1279.5811720134225,
+            "compile_and_first_execution_ms": 1790.1309370063245,
+            "evaluation_median_ms": 0.0806505122454837,
+            "training_step_median_ms": 0.3128855023533106
+          },
+          "method": "compiler",
+          "order": 8,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.14847450074739754,
+            "capture_ms": 0.08135000825859606,
+            "compile_and_first_execution_ms": 2022.4305900046602,
+            "evaluation_median_ms": 0.08184248872566968,
+            "training_step_median_ms": 0.34112451248802245
+          },
+          "method": "manual",
+          "order": 8,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 6
+      }
+    },
+    {
+      "archive_path": "reports/009-ridge_cold4.json",
+      "cache_policy": "cold",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "manual": 1.1372275840762458
+          },
+          "compiled_method": "compiler",
+          "family": "ridge",
+          "fastest_baseline_over_compiler": 1.1372275840762458,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.06876900442875922,
+            "manual": 0.07820600876584649
+          },
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "ridge_release_gate_pass": true
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "cold",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "ridge"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          4
+        ],
+        "output": "ridge_cold4.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:35:13Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "host_hardware": {
+          "cpu_model": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+          "installed_memory_bytes": 32822591488,
+          "logical_cpus": 16,
+          "parent_cpu_affinity": [
+            5
+          ],
+          "platform": "linux"
+        },
+        "rss_mb_at_start": 602.84,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [],
+      "input": "<workspace>/artifacts/operator-evidence/ridge_cold4.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.12217249604873359,
+            "capture_ms": 1342.9115840117447,
+            "compile_and_first_execution_ms": 9274.875036004232,
+            "evaluation_median_ms": 0.06876900442875922,
+            "training_step_median_ms": 0.2851934841601178
+          },
+          "method": "compiler",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "ridge",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.12247450649738312,
+            "capture_ms": 0.042670988477766514,
+            "compile_and_first_execution_ms": 9028.50973198656,
+            "evaluation_median_ms": 0.07820600876584649,
+            "training_step_median_ms": 0.2900139952544123
+          },
+          "method": "manual",
+          "order": 4,
+          "query_configuration_sha256": "b79cc2cf8a16fcb8c28131678c8853e7ae284ac1804764d161381c7153639405",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 6
+      }
+    },
+    {
+      "archive_path": "reports/010-bottleneck_final4.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "folx": 5.482145847895746,
+            "manual": 1.0862377800693153,
+            "torch-jet": 54.135567274693045
+          },
+          "compiled_method": "compiler",
+          "family": "bottleneck",
+          "fastest_baseline_over_compiler": 1.0862377800693153,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.18923848983831704,
+            "folx": 1.037433001329191,
+            "manual": 0.20555799710564315,
+            "torch-jet": 10.244532997603528
+          },
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32"
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 32,
+        "execution": "compiled",
+        "families": [
+          "bottleneck"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual",
+          "folx",
+          "torch-jet"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          4
+        ],
+        "output": "bottleneck_final4.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:37:18Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "host_hardware": {
+          "cpu_model": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+          "installed_memory_bytes": 32822591488,
+          "logical_cpus": 16,
+          "parent_cpu_affinity": [
+            0
+          ],
+          "platform": "linux"
+        },
+        "rss_mb_at_start": 603.93,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [],
+      "input": "<workspace>/artifacts/operator-evidence/bottleneck_final4.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.3267360007157549,
+            "capture_ms": 1392.3980159743223,
+            "compile_and_first_execution_ms": 2021.002557972679,
+            "evaluation_median_ms": 0.18923848983831704,
+            "training_step_median_ms": 0.6857214902993292
+          },
+          "method": "compiler",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "capture_ms": 330.0207029969897,
+            "compilation_ms": 15.302950982004404,
+            "evaluation_median_ms": 1.037433001329191,
+            "first_execution_ms": 18.615423003211617,
+            "training_step_median_ms": 6.731686502462253
+          },
+          "method": "folx",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.33756600168999285,
+            "capture_ms": 0.591605989029631,
+            "compile_and_first_execution_ms": 2393.8945260015316,
+            "evaluation_median_ms": 0.20555799710564315,
+            "training_step_median_ms": 0.6347940070554614
+          },
+          "method": "manual",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "bottleneck",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 9.493072997429408,
+            "capture_ms": 2018.6276070016902,
+            "compile_and_first_execution_ms": 2124.5572670013644,
+            "evaluation_median_ms": 10.244532997603528,
+            "training_step_median_ms": 14.66100849211216
+          },
+          "method": "torch-jet",
+          "order": 4,
+          "query_configuration_sha256": "390696e8604fa56397990ae472e5bbeb7c10a487b029aa76abb89f112e255d32",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 12
+      }
+    },
+    {
+      "archive_path": "reports/011-mixed_final.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "manual": 0.8834096192487159
+          },
+          "compiled_method": "compiler",
+          "family": "separable",
+          "fastest_baseline_over_compiler": 0.8834096192487159,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.06607751129195094,
+            "manual": 0.058373509091325104
+          },
+          "order": 24,
+          "query_configuration_sha256": "286c00cde447b9c58c1a3d13f7a89a9bfb6415c2537363f65875b9311289d08f"
+        },
+        {
+          "baseline_over_compiler": {
+            "manual": 0.9300523117247694
+          },
+          "compiled_method": "compiler",
+          "family": "separable",
+          "fastest_baseline_over_compiler": 0.9300523117247694,
+          "fastest_measured_baseline": "manual",
+          "median_of_process_medians_ms": {
+            "compiler": 0.06597800529561937,
+            "manual": 0.06136299634817988
+          },
+          "order": 32,
+          "query_configuration_sha256": "7ba160ff404dd6d12928b924c6d592b6d65a4a5b1e102ecb291ca446601a5f7a"
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "separable"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual",
+          "reference"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          24,
+          32
+        ],
+        "output": "mixed_final.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:37:23Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "host_hardware": {
+          "cpu_model": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+          "installed_memory_bytes": 32822591488,
+          "logical_cpus": 16,
+          "parent_cpu_affinity": [
+            2
+          ],
+          "platform": "linux"
+        },
+        "rss_mb_at_start": 604.63,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 24,
+          "reason": "ValueError: jet needs 16777216 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 2,
+          "row_index": 0,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 24,
+          "reason": "ValueError: jet needs 16777216 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 0,
+          "row_index": 1,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 32,
+          "reason": "ValueError: jet needs 4294967296 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 1,
+          "row_index": 6,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 32,
+          "reason": "ValueError: jet needs 4294967296 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 0,
+          "row_index": 9,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 24,
+          "reason": "ValueError: jet needs 16777216 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 1,
+          "row_index": 11,
+          "status": "refused"
+        },
+        {
+          "family": "separable",
+          "method": "reference",
+          "order": 32,
+          "reason": "ValueError: jet needs 4294967296 coefficients; budget is 200000; reduce derivative order or request fewer mixed targets",
+          "replicate": 2,
+          "row_index": 14,
+          "status": "refused"
+        }
+      ],
+      "input": "<workspace>/artifacts/operator-evidence/mixed_final.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15762148541398346,
+            "capture_ms": 1351.5533380268607,
+            "compile_and_first_execution_ms": 1714.2907879897393,
+            "evaluation_median_ms": 0.06607751129195094,
+            "training_step_median_ms": 0.3243240062147379
+          },
+          "method": "compiler",
+          "order": 24,
+          "query_configuration_sha256": "286c00cde447b9c58c1a3d13f7a89a9bfb6415c2537363f65875b9311289d08f",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15236249601002783,
+            "capture_ms": 0.0020900042727589607,
+            "compile_and_first_execution_ms": 1761.6944870096631,
+            "evaluation_median_ms": 0.058373509091325104,
+            "training_step_median_ms": 0.3077884903177619
+          },
+          "method": "manual",
+          "order": 24,
+          "query_configuration_sha256": "286c00cde447b9c58c1a3d13f7a89a9bfb6415c2537363f65875b9311289d08f",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "separable",
+          "method": "reference",
+          "order": 24,
+          "query_configuration_sha256": "286c00cde447b9c58c1a3d13f7a89a9bfb6415c2537363f65875b9311289d08f",
+          "status_counts": {
+            "refused": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.16107450937852263,
+            "capture_ms": 1337.8445120179094,
+            "compile_and_first_execution_ms": 1719.422096008202,
+            "evaluation_median_ms": 0.06597800529561937,
+            "training_step_median_ms": 0.32558348902966827
+          },
+          "method": "compiler",
+          "order": 32,
+          "query_configuration_sha256": "7ba160ff404dd6d12928b924c6d592b6d65a4a5b1e102ecb291ca446601a5f7a",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "separable",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.15553348930552602,
+            "capture_ms": 0.0019299914129078388,
+            "compile_and_first_execution_ms": 1749.1745529987384,
+            "evaluation_median_ms": 0.06136299634817988,
+            "training_step_median_ms": 0.30663699726574123
+          },
+          "method": "manual",
+          "order": 32,
+          "query_configuration_sha256": "7ba160ff404dd6d12928b924c6d592b6d65a4a5b1e102ecb291ca446601a5f7a",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": false,
+          "family": "separable",
+          "method": "reference",
+          "order": 32,
+          "query_configuration_sha256": "7ba160ff404dd6d12928b924c6d592b6d65a4a5b1e102ecb291ca446601a5f7a",
+          "status_counts": {
+            "refused": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 12,
+        "refused": 6
+      }
+    },
+    {
+      "archive_path": "reports/012-coupled_final16.json",
+      "cache_policy": "persistent",
+      "comparisons": [
+        {
+          "baseline_over_compiler": {
+            "jax-jet": 1.519742159742855,
+            "manual": 1.1346164698786314,
+            "reference": 1.0272319636801808
+          },
+          "compiled_method": "compiler",
+          "family": "coupled",
+          "fastest_baseline_over_compiler": 1.0272319636801808,
+          "fastest_measured_baseline": "reference",
+          "median_of_process_medians_ms": {
+            "compiler": 0.1933939929585904,
+            "jax-jet": 0.29390900454018265,
+            "manual": 0.21942800958640873,
+            "reference": 0.19866049115080386
+          },
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692"
+        }
+      ],
+      "config": {
+        "activation_method": "recurrence",
+        "batch": 32,
+        "cache": "persistent",
+        "dim": 16,
+        "execution": "compiled",
+        "families": [
+          "coupled"
+        ],
+        "family": null,
+        "forward_only": false,
+        "hidden": 16,
+        "latent": 2,
+        "methods": [
+          "compiler",
+          "manual",
+          "reference",
+          "jax-jet"
+        ],
+        "nested_max_order": 8,
+        "order": null,
+        "orders": [
+          16
+        ],
+        "output": "coupled_final16.json",
+        "repeats": 20,
+        "replicates": 3,
+        "rss_limit_mib": 3072,
+        "seed": 7,
+        "threads": 1,
+        "timeout": 120.0,
+        "warmup": 3,
+        "worker": null
+      },
+      "environment": {
+        "config": {},
+        "generated_utc": "2026-10-07T23:37:35Z",
+        "hardware_class": "commodity x86-64 CPU (16 logical cores; float64; JAX_PLATFORMS=cpu)",
+        "host_hardware": {
+          "cpu_model": "11th Gen Intel(R) Core(TM) i7-11850H @ 2.50GHz",
+          "installed_memory_bytes": 32822591488,
+          "logical_cpus": 16,
+          "parent_cpu_affinity": [
+            4
+          ],
+          "platform": "linux"
+        },
+        "rss_mb_at_start": 603.76,
+        "schema": "omnibias/operator-compiler/v1",
+        "versions": {
+          "folx": "0.2.30",
+          "jax": "0.10.2",
+          "numpy": "2.5.3",
+          "platform": "Linux-7.0.0-38-generic-x86_64-with-glibc2.43",
+          "python": "3.12.13",
+          "torch": "2.14.1+cu130"
+        }
+      },
+      "failures": [],
+      "input": "<workspace>/artifacts/operator-evidence/coupled_final16.json",
+      "method_groups": [
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.4747380007756874,
+            "capture_ms": 1795.0930939987302,
+            "compile_and_first_execution_ms": 2961.1670979938935,
+            "evaluation_median_ms": 0.1933939929585904,
+            "training_step_median_ms": 0.8658584847580642
+          },
+          "method": "compiler",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "capture_ms": 161.92816899274476,
+            "compilation_ms": 159.64573400560766,
+            "evaluation_median_ms": 0.29390900454018265,
+            "first_execution_ms": 16.400133987190202,
+            "training_step_median_ms": 0.7409860118059441
+          },
+          "method": "jax-jet",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.7329999934881926,
+            "capture_ms": 0.003028020728379488,
+            "compile_and_first_execution_ms": 3024.67489297851,
+            "evaluation_median_ms": 0.21942800958640873,
+            "training_step_median_ms": 1.1581339786062017
+          },
+          "method": "manual",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        },
+        {
+          "cells": 3,
+          "eligible": true,
+          "family": "coupled",
+          "median_of_process_stage_medians": {
+            "backward_median_ms": 0.40552949940320104,
+            "capture_ms": 1541.6404040006455,
+            "compile_and_first_execution_ms": 2909.5788889972027,
+            "evaluation_median_ms": 0.19866049115080386,
+            "training_step_median_ms": 0.7345899939537048
+          },
+          "method": "reference",
+          "order": 16,
+          "query_configuration_sha256": "5427a49c6368412d980ffd325ab0b3e73733bfcb340393960baac8a0512b1692",
+          "status_counts": {
+            "ok": 3
+          }
+        }
+      ],
+      "resource_budget_scope": "worker wall time/RSS including imports, compilation and oracle; RSS excludes compiler children",
+      "schema": "omnibias/operator-compiler/v1",
+      "scope": "float64 CPU; derivative-only forward, backward and SGD; runtime coordinates/parameters",
+      "status_counts": {
+        "ok": 12
+      }
+    }
+  ],
+  "schema": "omnibias/operator-evidence/v1"
+}

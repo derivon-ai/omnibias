@@ -27,6 +27,10 @@ nav:
   - Capabilities and mechanisms: capabilities.md
   - PINN integration: pinn.md
   - Derivative APIs: derivatives.md
+  - Experimental jet compiler: jet-compiler.md
+  - Structural operator compiler: operator-compiler.md
+  - Compiler execution and precision results: operator-compiler-v2-results.md
+  - Historical operator compiler measurements: operator-compiler-results.md
   - Performance: performance.md
   - Guarantees and limits: guarantees.md
   - Package map: packages.md

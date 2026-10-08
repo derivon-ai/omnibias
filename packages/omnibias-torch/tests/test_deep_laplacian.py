@@ -191,8 +191,8 @@ def test_polylaplacian_support_matches_mlp_jet_mv(k) -> None:
 
 def test_polylaplacian_estimator_is_unbiased_over_five_seeds() -> None:
     """Tier C's sample mean must sit within a few stderrs of the Tier B exact
-    value across independent seeds, and a Hoeffding enclosure around a pooled
-    sample must cover that exact value."""
+    value across independent seeds. This is a numerical smoke check, not
+    a proof of unbiasedness or a concentration-coverage guarantee."""
     dim, k = 4, 2
     layers = _make_layers(dim, 5, depth=2, activation="tanh", seed=15)
     x = torch.as_tensor(
@@ -211,11 +211,7 @@ def test_polylaplacian_estimator_is_unbiased_over_five_seeds() -> None:
     grand_mean = means_arr.mean()
     assert abs(grand_mean - float(exact)) < 0.15 * (abs(float(exact)) + 1.0)
 
-    spread = float(np.std(means_arr)) + 1e-6
-    lo = float(means_arr.min()) - 5 * spread
-    hi = float(means_arr.max()) + 5 * spread
-    report = hoeffding_enclosure(means, value_range=(lo, hi), delta=1e-3)
-    assert report.interval.lo <= float(exact) <= report.interval.hi
+
 
 
 def test_select_mode_auto_matches_budget_driven_choice() -> None:

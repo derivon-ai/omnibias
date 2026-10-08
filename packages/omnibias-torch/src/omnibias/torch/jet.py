@@ -354,9 +354,37 @@ def mlp_jet(
 
     ``riccati=True`` forwards to the :func:`compose_jet_riccati` fastpath in
     every activation layer and requires all of them to be Riccati-class.
+
+    On the default general path, an activated first layer uses the affine
+    input identity ``jet[n] = sigma^(n)(W x0 + b) * (W v)^n / n!``. This
+    avoids propagating structurally zero higher input coefficients and
+    composing their zero products. Later layers retain general composition;
+    the full deep-network kernel is still cubic in order.
     """
-    jet = _path_jet(x0, v, order)
-    for W, b, spec in layers:
+    if order < 0:
+        raise ValueError(f"order must be >= 0, got {order}")
+    remaining = layers
+    if order >= 2 and not riccati and layers and layers[0][2] is not None:
+        W, b, spec = layers[0]
+        assert spec is not None
+        W = torch.as_tensor(W)
+        u0 = torch.matmul(torch.as_tensor(x0), W.t())
+        if b is not None:
+            u0 = u0 + torch.as_tensor(b)
+        u1 = torch.matmul(torch.as_tensor(v), W.t())
+        tower = _sigma_tower(get_activation(spec), u0, order)
+        rows = [tower[0]]
+        power = torch.ones_like(u1)
+        fact = 1.0
+        for n in range(1, order + 1):
+            power = power * u1
+            fact *= n
+            rows.append((tower[n] / fact) * power)
+        jet = torch.stack(rows, dim=0)
+        remaining = layers[1:]
+    else:
+        jet = _path_jet(x0, v, order)
+    for W, b, spec in remaining:
         if spec is None:
             jet = affine_jet(jet, W, b)
         else:

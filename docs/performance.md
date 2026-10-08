@@ -98,7 +98,9 @@ uv run --all-packages --with folx python benchmarks/polylaplacian_order.py
 
 Outputs go to `artifacts/`, or `$OMNIBIAS_SCRATCH`. See each JSON configuration
 for versions, seeds, dtypes, shapes and source hashes. Dirty working trees
-record a base commit plus hashes of the actual measured files.
+record a base commit plus hashes of the actual measured files. When later
+maintenance changes a measured file, its exact historical version is retained
+in [content-addressed source snapshots](benchmarks/sources/README.md).
 
 ## Precision is measured separately from speed
 

@@ -81,7 +81,9 @@ class PolylaplacianReport:
     n_directions : int | None
         Sample count when ``mode == "estimator"``, else ``None``.
     concentration : ConcentrationReport | None
-        Hoeffding enclosure around the Tier C sample mean, when applicable.
+        Conditional Hoeffding enclosure for the first batch point/output only,
+        when estimator mode is used with an explicitly declared population
+        range. None without that range; sample extrema never establish it.
     """
 
     mode: Mode

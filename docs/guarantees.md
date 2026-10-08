@@ -19,6 +19,11 @@ Directional jets contain `order + 1` coefficient rows. Full mixed jets in
 size remains even when the derivatives are computed without nested autodiff.
 The Riccati directional composition path is quadratic in order; the general
 composition path is cubic. Benchmark the actual model and requested orders.
+For a straight input path and an activated first layer, the default general
+MLP jet uses `sigma^(n)(W x + b) (W v)^n / n!` directly at that layer. This
+omits zero higher input coefficients; later nonlinear layers still require
+composition. The explicit Riccati path and arbitrary curved input jets keep
+their existing recurrences.
 
 ## Laplacians without the mixed-jet dimension ceiling
 
@@ -49,10 +54,15 @@ Deep repeated Laplacians have three explicit modes:
 `auto` selects support enumeration or sampling according to the budget;
 explicitly forcing `support` bypasses that budget. Use
 `deep_field_polylaplacian_with_report` to inspect the selected method. Its
-current concentration report uses the observed range from the first batch
-element and output. Treat that report as a diagnostic, not a validated
-confidence bound for unseen draws or other outputs. Sampling is not an exact
-finite-sample value or an interval-arithmetic proof. Full Hessians,
+`concentration` is `None` by default. To request a conditional Hoeffding bound,
+pass `value_range=(lo, hi)` bounding every possible normalized directional
+integrand for the first batch element and output, and optionally `delta`.
+Observed sample extrema do not establish this population bound. The bound
+also assumes independent draws for a field and point fixed independently of
+those draws; an adaptively fitted field needs fresh independent report samples.
+The report is constructed on the host; use `deep_field_polylaplacian` inside JIT or
+gradient transforms. Sampling is not an exact finite-sample value or an
+interval-arithmetic proof. Full Hessians,
 full mixed jets and other architectures do not inherit the contraction path's
 dimension behavior.
 
