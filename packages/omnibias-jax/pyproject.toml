@@ -49,8 +49,9 @@ test = ["pytest>=7.0"]
 examples = ["matplotlib>=3.6", "scipy>=1.10"]
 
 [project.urls]
-Homepage = "https://github.com/derivon-ai/omnibias"
-Documentation = "https://github.com/derivon-ai/omnibias/blob/main/docs/api/jax.md"
+Funding = "https://derivon.ai/sponsor/"
+Homepage = "https://omnibias.ai/"
+Documentation = "https://omnibias.ai/docs/api/jax/"
 Source = "https://github.com/derivon-ai/omnibias"
 Issues = "https://github.com/derivon-ai/omnibias/issues"
 Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"

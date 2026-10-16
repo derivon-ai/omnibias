@@ -84,3 +84,7 @@ uv run pytest packages/omnibias-struct/tests -q
 
 AGPL-3.0-or-later **or commercial**. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-struct/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).
 Comply with the AGPL terms or obtain a signed commercial grant; commercial use alone does not require payment. [Commercial terms](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-struct/COMMERCIAL-LICENSE.md) describe the alternative. Previously distributed Apache editions, where applicable, retain their original grants.
+
+## Support the project
+
+If omnibias helps your work, consider [starring the repository](https://github.com/derivon-ai/omnibias). [Organizational sponsorship through Derivon](https://derivon.ai/sponsor/) supports maintenance, testing, and new scientific examples.

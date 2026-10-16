@@ -42,8 +42,9 @@ test = ["pytest>=7.0", "numpy>=1.24", "omnibias-struct>=0.1.0a2"]
 dev = ["omnibias-discrete[all,test]", "ruff>=0.1.0", "mypy>=1.5"]
 
 [project.urls]
-Homepage = "https://github.com/derivon-ai/omnibias"
-Documentation = "https://github.com/derivon-ai/omnibias/blob/main/docs/api/discrete.md"
+Funding = "https://derivon.ai/sponsor/"
+Homepage = "https://omnibias.ai/"
+Documentation = "https://omnibias.ai/docs/api/discrete/"
 Source = "https://github.com/derivon-ai/omnibias"
 Issues = "https://github.com/derivon-ai/omnibias/issues"
 Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"

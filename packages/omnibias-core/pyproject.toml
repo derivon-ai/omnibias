@@ -42,8 +42,9 @@ test = ["mpmath>=1.3", "pytest>=7.0", "pytest-cov>=4.0", "tomli>=2; python_versi
 verified = ["mpmath>=1.3"]
 
 [project.urls]
-Homepage = "https://github.com/derivon-ai/omnibias"
-Documentation = "https://github.com/derivon-ai/omnibias/blob/main/docs/api/core.md"
+Funding = "https://derivon.ai/sponsor/"
+Homepage = "https://omnibias.ai/"
+Documentation = "https://omnibias.ai/docs/api/core/"
 Source = "https://github.com/derivon-ai/omnibias"
 Issues = "https://github.com/derivon-ai/omnibias/issues"
 Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"
