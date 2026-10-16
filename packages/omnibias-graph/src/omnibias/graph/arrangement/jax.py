@@ -6,7 +6,8 @@ from __future__ import annotations
 
 import jax.numpy as jnp
 from jax import Array
-from omnibias.graph.arrangement._core import ArrangementGraph, node_features
+from jax.ops import segment_sum
+from omnibias.graph.arrangement._core import ArrangementGraph, _message_topology, node_features
 from omnibias.partition.arrangement import Arrangement
 
 
@@ -23,27 +24,25 @@ def facenet_apply(
     rounds: int,
     beta: float,
 ) -> Array:
+    """Apply trainable weights to a static arrangement and graph.
+
+    Capture ``graph`` and ``arr`` when using :func:`jax.jit`; feature discovery
+    remains host preprocessing. Message arithmetic is batched on the device.
+    """
     feats = jnp.asarray(node_features(arr, graph, beta=beta), dtype=lift_w.dtype)
     h = jnp.tanh(feats @ lift_w.T + lift_b)
     n = h.shape[0]
-    adj = jnp.zeros((n, n), dtype=h.dtype)
-    crossed = jnp.zeros((n, n), dtype=h.dtype)
-    for u, v, k in graph.edges:
-        adj = adj.at[u, v].set(1.0).at[v, u].set(1.0)
-        crossed = crossed.at[u, v].set(float(k)).at[v, u].set(float(k))
-    for _ in range(int(rounds)):
-        msgs = []
-        for i in range(n):
-            acc = jnp.zeros_like(h[i])
-            deg = 0.0
-            for j in range(n):
-                if float(adj[i, j]) <= 0.0:
-                    continue
-                cat = jnp.concatenate([h[j], crossed[i, j].reshape(1)])
-                acc = acc + jnp.tanh(cat @ msg_w.T + msg_b)
-                deg += 1.0
-            msgs.append(acc / max(deg, 1.0))
-        h = h + jnp.stack(msgs)
+    receivers, senders, labels, degrees = _message_topology(graph, n)
+    if receivers:
+        dst = jnp.asarray(receivers, dtype=jnp.int32)
+        src = jnp.asarray(senders, dtype=jnp.int32)
+        crossed = jnp.asarray(labels, dtype=h.dtype).reshape(-1, 1)
+        degree = jnp.asarray(degrees, dtype=h.dtype).reshape(-1, 1)
+        for _ in range(int(rounds)):
+            cat = jnp.concatenate([h[src], crossed], axis=-1)
+            messages = jnp.tanh(cat @ msg_w.T + msg_b)
+            aggregated = segment_sum(messages, dst, num_segments=n, indices_are_sorted=True)
+            h = h + aggregated / degree
     return (h @ out_w.T + out_b).reshape(-1)
 
 

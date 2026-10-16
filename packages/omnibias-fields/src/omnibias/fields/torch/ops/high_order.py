@@ -16,6 +16,7 @@ from omnibias.fields.torch.ops.basic import (
     _sigma_of_order,
     derivative,
     gradient,
+    mixed_partial,
 )
 from torch import Tensor
 
@@ -47,9 +48,12 @@ def biharmonic(state: FieldState, name: str) -> Tensor:
 def polylaplacian(state: FieldState, name: str, *, k: int) -> Tensor:
     """``Delta^k f_name`` of shape ``(B,)``.
 
-    Memory and time both ``O(B * H)``, *independent of* ``k``, because
-    the omnibias closed-form expresses ``Delta^k`` as one ``sigma^{(2k)}``
-    fast-path call plus a per-mode reduction.
+    For a one-layer field, the contraction after evaluating
+    ``sigma^{(2k)}`` costs ``O(B * H)``. Activation evaluation may depend on
+    ``k``: the tanh polynomial takes ``O(k * B * H)`` work. Its forward
+    scratch can stay ``O(B * H)``, excluding cached derivative orders,
+    polynomial metadata and the backward graph. Other field types have
+    their own operator costs.
     """
     if k < 1:
         raise ValueError(f"polylaplacian k must be >= 1, got {k}")
@@ -103,12 +107,15 @@ def hessian(
             return full
         idx = list(axis_idx)
         return full[..., idx, :][..., :, idx]
-    # Generic fallback: build by taking first-derivative-of-gradient.
+    # Generic fallback: request only the selected Hessian entries.
     rows = []
     for i in axis_idx:
-        # d/dx_i grad f -> the i-th column is grad of (d f / dx_i).
-        gi = gradient_of_derivative(state, name, axis=i)
-        rows.append(gi[..., list(axis_idx)])
+        cols = [
+            derivative(state, name, axis=i, order=2)
+            if i == j else mixed_partial(state, name, (i, j), (1, 1))
+            for j in axis_idx
+        ]
+        rows.append(torch.stack(cols, dim=-1))
     return torch.stack(rows, dim=-2)  # (B, D, D); rows index outer axis
 
 

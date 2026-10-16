@@ -24,7 +24,7 @@ Version **0.5.0rc1** · Python **>=3.10** · **4 - Beta** · Apache-2.0
 
 [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-jax/src/omnibias/jax). Modules below are relative to `omnibias.jax`; underscored modules are internal.
 
-`activations`, `activations_complex`, `architectures`, `architectures.attention`, `architectures.ftc_net`, `architectures.hardbc`, `architectures.integral_kernel`, `architectures.jetkan`, `architectures.multiscale`, `architectures.pinn`, `architectures.piratenet`, `bo_derivatives`, `confluence`, `confluent_bank`, `implicit`, `jet`, `jet_mv`, `laplacian`, `line_search`, `multipack`, `optim`, `optim_block_search`, `precision`, `realization`, `refine`, `scan`, `scan_equivariant`, `weight_loss_jet`.
+`activations`, `activations_complex`, `architectures`, `architectures.attention`, `architectures.ftc_net`, `architectures.hardbc`, `architectures.integral_kernel`, `architectures.jetkan`, `architectures.multiscale`, `architectures.pinn`, `architectures.piratenet`, `bo_derivatives`, `confluence`, `confluent_bank`, `gaussian_aging`, `gaussian_chebyshev`, `gaussian_constrained`, `gaussian_constrained_aging`, `gaussian_constrained_approximation`, `gaussian_heat`, `gaussian_jet`, `gaussian_predictor`, `implicit`, `jet`, `jet_mv`, `laplacian`, `line_search`, `multipack`, `optim`, `optim_block_search`, `precision`, `profile_system`, `realization`, `refine`, `ridge_system`, `scan`, `scan_equivariant`, `weight_loss_jet`.
 
 Exports from `omnibias.jax`:
 

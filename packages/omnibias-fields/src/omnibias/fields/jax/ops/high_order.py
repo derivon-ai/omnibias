@@ -17,6 +17,7 @@ from omnibias.fields.jax.ops.basic import (
     _sigma_of_order,
     derivative,
     gradient,
+    mixed_partial,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -85,10 +86,15 @@ def hessian(
         idx = jnp.array(list(axis_idx))
         return full[..., idx, :][..., :, idx]
     rows = []
-    idx = jnp.array(list(axis_idx))
     for i in axis_idx:
-        gi = gradient_of_derivative(state, name, axis=i)
-        rows.append(gi[..., idx])
+        # Request only the selected entries; a full gradient would compute
+        # every coordinate even when the caller needs a small Hessian block.
+        cols = [
+            derivative(state, name, axis=i, order=2)
+            if i == j else mixed_partial(state, name, (i, j), (1, 1))
+            for j in axis_idx
+        ]
+        rows.append(jnp.stack(cols, axis=-1))
     return jnp.stack(rows, axis=-2)
 
 

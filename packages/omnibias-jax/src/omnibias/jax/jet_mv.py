@@ -101,6 +101,13 @@ def compose_jet_mv(
     -------
     Array
         Jet of ``sigma(u)`` of shape ``(M, ...)``.
+
+    Only structurally possible terms of each shifted power are formed:
+    ``(u-u0)^k`` has no coefficient below total degree ``k``. Remaining
+    Cauchy products retain their accumulation order. With finite intermediates,
+    eager results agree with the dense recurrence up to signed zero. Compiler
+    transformations may round differently. Nonfinite higher tower entries no
+    longer contaminate lower orders through multiplication by structural zeros.
     """
     u_jet = jnp.asarray(u_jet)
     sigma_tower = jnp.asarray(sigma_tower)
@@ -117,23 +124,28 @@ def compose_jet_mv(
         )
 
     table = multiply_table(dim, order)
+    degrees = tuple(map(sum, multi_indices(dim, order)))
     zero = jnp.zeros_like(u_jet[0])
     # w = u - u0 has no constant term (row 0 is zero).
     w = [zero] + [u_jet[g] for g in range(1, m)]
-    # p holds the coefficients of w^k; start at w^0 = 1 (only the constant row).
-    p = [jnp.ones_like(u_jet[0])] + [zero for _ in range(m - 1)]
-    result = [sigma_tower[0] * p[0]] + [zero for _ in range(m - 1)]
+    # w^1 is known directly; avoid multiplying by the constant series 1.
+    p = w
+    result = [sigma_tower[0] * jnp.ones_like(u_jet[0])] + [zero for _ in range(m - 1)]
     fact = 1.0
     for k in range(1, order + 1):
         fact *= k
-        # p <- truncated multivariate product (p * w) via the Cauchy table.
-        acc = [zero for _ in range(m)]
-        for g, a, b in table:
-            acc[g] = acc[g] + p[a] * w[b]
-        p = acc
+        if k > 1:
+            # p has valuation k-1 and w has no constant coefficient. These
+            # are structural facts, independent of runtime parameter values.
+            acc = [zero for _ in range(m)]
+            for g, a, b in table:
+                if b != 0 and degrees[a] >= k - 1:
+                    acc[g] = acc[g] + p[a] * w[b]
+            p = acc
         dk = sigma_tower[k] / fact
         for g in range(m):
-            result[g] = result[g] + dk * p[g]
+            if degrees[g] >= k:
+                result[g] = result[g] + dk * p[g]
     return jnp.stack(result, axis=0)
 
 

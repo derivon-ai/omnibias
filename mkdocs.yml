@@ -27,6 +27,38 @@ nav:
   - Capabilities and mechanisms: capabilities.md
   - PINN integration: pinn.md
   - Derivative APIs: derivatives.md
+  - Bias collapse and PDE solution families: bias-collapse-pde.md
+  - Profile algebra and PDE identification: profile-pde.md
+  - Exact nonlinear PDE identities: nonlinear-pde-identities.md
+  - Certified inverse PDE maps: inverse-pde-map.md
+  - Gaussian heat inverse maps: gaussian-heat-inverse.md
+  - Gaussian inverse Taylor jets: gaussian-inverse-jets.md
+  - Certified inverse approximations: gaussian-inverse-approximation.md
+  - Certified inverse evolution: gaussian-inverse-evolution.md
+  - Gaussian affine constraints: gaussian-affine-constraints.md
+  - Gaussian polyhedral constraints: gaussian-polyhedral-constraints.md
+  - Gaussian switching derivatives: gaussian-polyhedral-directional.md
+  - Gaussian grouped switching derivatives: gaussian-grouped-directional.md
+  - Gaussian projected equilibria: gaussian-projected-equilibrium.md
+  - Gaussian joint bias and target derivatives: gaussian-joint-directional.md
+  - Gaussian higher-order constraint paths: gaussian-polyhedral-path.md
+  - Gaussian certified path intervals: gaussian-polyhedral-radius.md
+  - Gaussian critical inverse charts: gaussian-critical-inverse.md
+  - Gaussian nonconvex two-center minima: gaussian-two-center-minimum.md
+  - Gaussian polyhedral scalar reduction: gaussian-polyhedral-reduction.md
+  - Gaussian collinear mixture reduction: gaussian-collinear-reduction.md
+  - Gaussian global projection search: gaussian-projection-global.md
+  - Gaussian entropy global search: gaussian-entropy-global.md
+  - Gaussian entropy uniqueness: gaussian-entropy-uniqueness.md
+  - Gaussian certified projected iteration: gaussian-entropy-solver.md
+  - Gaussian stable-face target derivatives: gaussian-entropy-sensitivity.md
+  - Gaussian global bias derivatives: gaussian-entropy-bias.md
+  - Gaussian finite bias regions: gaussian-entropy-bias-region.md
+  - Gaussian finite target and bias regions: gaussian-entropy-joint-region.md
+  - Gaussian global uniqueness and sensitivity: gaussian-polyhedral-sensitivity.md
+  - Periodic Burgers initial-value enclosures: periodic-burgers.md
+  - Deep collapse and the chain rule: deep-bias-collapse.md
+  - Global minimum enclosures: global-optimization.md
   - Experimental jet compiler: jet-compiler.md
   - Structural operator compiler: operator-compiler.md
   - Compiler execution and precision results: operator-compiler-v2-results.md

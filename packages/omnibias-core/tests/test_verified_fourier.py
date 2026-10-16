@@ -331,3 +331,129 @@ def test_error_handling() -> None:
         a.riesz(5)
     with pytest.raises(ValueError):
         a.apply_multiplier(lambda k: ComplexInterval.one(), -1.0)
+
+
+# Exterior frequencies may return to low modes under convolution. A separate
+# global error is needed before applying a multiplier with a smaller tail norm.
+def test_two_exterior_modes_can_produce_an_uncertain_constant() -> None:
+    # Representatives of exp(2ix) and exp(-2ix), both outside truncation1.
+    a = VFS.from_coeffs({}, 1, 1, 1.0, tail=1.0)
+    product = a * a
+    assert product.tail == Interval.point(0.0)
+    assert product.global_remainder.hi >= 1.0
+    assert product.get((0,)).contains(1.0)
+    assert product.norm().contains(1.0)
+
+    # Projection onto the mean has exterior factor zero but global factor one.
+    def mean_symbol(k):
+        return ComplexInterval.from_value(float(k == (0,)))
+
+    with pytest.raises(ValueError, match="global_factor"):
+        product.apply_multiplier(mean_symbol, 0.0)
+    mean = product.apply_multiplier(mean_symbol, 0.0, global_factor=1.0)
+    assert mean.get((0,)).contains(1.0)
+    assert mean.global_remainder.hi >= 1.0
+
+
+def test_finite_overflow_reenters_the_kept_block_in_a_repeated_product() -> None:
+    positive = VFS.from_coeffs({(1,): 1.0}, 1, 1, 1.0)
+    negative = VFS.from_coeffs({(-1,): 1.0}, 1, 1, 1.0)
+    squared = positive * positive
+    assert squared.global_remainder == Interval.point(0.0)
+    assert squared.get((2,)).contains(1.0)
+    cubed = squared * negative
+    assert cubed.get((1,)).contains(1.0)
+    assert cubed.global_remainder.hi >= 1.0
+    with pytest.raises(ValueError, match="global remainder"):
+        cubed.derivative(0)
+
+
+def test_get_accounts_for_exterior_and_global_weighted_errors() -> None:
+    series = VFS.from_coeffs({(0, 0): 2.0}, 2, 1, (2.0, 3.0), tail=36.0, global_remainder=12.0)
+    assert series.get((0, 0)).contains(-10.0 + 12.0j)
+    assert series.get((1, 1)).contains(2.0j)  # weight6, global radius12
+    assert series.get((2, 1)).contains(4.0j)  # weight12, total radius48
+    assert series.get((1, 1)).re.hi < 2.00001  # exterior radius is not added inside
+    assert series.norm().contains(0.0)  # the global error may cancel the representative
+    with pytest.raises(ValueError, match="dimension"):
+        series.get((0,))
+    with pytest.raises(TypeError, match="integer"):
+        series.get((0, True))
+
+
+@pytest.mark.parametrize("seed", [101, 103, 107])
+def test_truncated_true_series_convolution_contains_all_low_coefficients(seed: int) -> None:
+    rng = random.Random(seed)
+    dim, trunc, nu = 2, 1, 1.0
+    complete_a = _rand_coeffs(rng, dim, 3, density=0.25)
+    complete_b = _rand_coeffs(rng, dim, 3, density=0.25)
+
+    def enclosure(complete):
+        kept = {k: value for k, value in complete.items() if max(map(abs, k)) <= trunc}
+        # Inflate an independently computed finite exterior l1 sum.
+        tail = sum(abs(value) for k, value in complete.items() if max(map(abs, k)) > trunc) * (1 + 1e-12)
+        return VFS.from_coeffs(kept, dim, trunc, nu, tail=tail)
+
+    product = enclosure(complete_a) * enclosure(complete_b)
+    exact = _brute_convolution(complete_a, complete_b, dim)
+    for k, value in exact.items():
+        assert product.get(k).contains(value), (k, value, product.get(k))
+    assert product.norm().hi >= sum(abs(value) for value in exact.values())
+
+
+def test_global_remainder_survives_add_negate_scale_and_bounded_helpers() -> None:
+    series = VFS.from_coeffs({}, 2, 1, 1.0, global_remainder=2.0)
+    transformed = -(series + series).scale(1j)
+    assert transformed.global_remainder.hi >= 4.0
+    assert transformed.get((0, 0)).contains(-4j)
+    assert series.hilbert().get((1, 0)).contains(-2j)
+    assert series.riesz(0).get((1, 0)).contains(2j)
+    assert series.leray(0, 0).get((0, 1)).contains(2.0)
+    assert series.scale(0.0).global_remainder.hi < 1e-300
+
+
+def test_global_multiplier_does_not_enumerate_a_dense_cube() -> None:
+    dimension = 20
+    zero = (0,) * dimension
+    series = VFS.from_coeffs({zero: 1.0}, dimension, 10**6, 1.0, global_remainder=2.0)
+    calls = []
+
+    def symbol(k):
+        calls.append(k)
+        return ComplexInterval.from_value(3.0)
+
+    result = series.apply_multiplier(symbol, 3.0, global_factor=3.0)
+    assert calls == [zero]
+    assert result.get(zero).contains(9.0)
+
+
+def test_zero_remainder_does_not_require_new_multiplier_argument() -> None:
+    finite = VFS.from_coeffs({(1,): 2.0}, 1, 1, 1.0)
+    product = finite * VFS.constant(3.0, 1, 1, 1.0)
+    assert product.global_remainder == Interval.point(0.0)
+    result = product.apply_multiplier(lambda k: ComplexInterval.one(), 1.0)
+    assert result.get((1,)).contains(6.0)
+
+
+@pytest.mark.parametrize("value", [-1.0, float("nan"), float("inf")])
+def test_invalid_global_multiplier_bound_is_refused(value: float) -> None:
+    series = VFS.from_coeffs({}, 1, 1, 1.0, global_remainder=1.0)
+    with pytest.raises(ValueError, match="global_factor"):
+        series.apply_multiplier(lambda k: ComplexInterval.one(), 1.0, global_factor=value)
+
+
+def test_negative_global_remainder_is_refused() -> None:
+    with pytest.raises(ValueError, match="non-negative"):
+        VFS.from_coeffs({}, 1, 1, 1.0, global_remainder=-1.0)
+
+
+def test_norm_lower_endpoint_does_not_treat_radius_or_upper_magnitude_as_actual_norm() -> None:
+    exterior = VFS.from_coeffs({}, 1, 1, 1.0, tail=1.0)
+    assert exterior.norm().contains(0.0)
+    rectangle = ComplexInterval(Interval(-2.0, 3.0), Interval(-4.0, 1.0))
+    uncertain = VFS.from_coeffs({(0,): rectangle}, 1, 1, 1.0)
+    assert uncertain.low_norm().contains(0.0)
+    assert uncertain.norm().contains(0.0)
+    separated = VFS.from_coeffs({(0,): ComplexInterval(Interval(3.0, 4.0), Interval(4.0, 5.0))}, 1, 1, 1.0)
+    assert separated.norm().contains(5.0)
+    assert separated.norm().lo > 4.999999999

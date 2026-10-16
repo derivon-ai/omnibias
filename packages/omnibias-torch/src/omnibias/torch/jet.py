@@ -16,6 +16,9 @@ the omnibias activation fast paths.
 
 Truncation-order cost (no ``O(N^2)`` claim for the general kernel) is discussed
 in :mod:`omnibias.jax.jet`; the two modules run the same recurrences.
+The cubic cost belongs to this schoolbook implementation, not a lower bound
+on general power-series composition. Faster algebraic algorithms need their
+own floating-point validation and measured crossover.
 """
 
 from __future__ import annotations
@@ -457,10 +460,10 @@ def limit_of_ratio(num_jet: Tensor, den_jet: Tensor, *, atol: float = 1e-12) -> 
     num_ord = _leading_order_scalar(num_jet, atol)
     dtype = torch.result_type(num_jet, den_jet)
     if num_ord is None or num_ord > den_ord:
-        return torch.zeros((), dtype=dtype)
+        return torch.zeros((), dtype=dtype, device=num_jet.device)
     if num_ord < den_ord:
         sign = float(torch.sign(num_jet[num_ord]) * torch.sign(den_jet[den_ord]))
-        return torch.tensor(sign * math.inf, dtype=dtype)
+        return torch.tensor(sign * math.inf, dtype=dtype, device=num_jet.device)
     return (num_jet[den_ord] / den_jet[den_ord]).to(dtype)
 
 

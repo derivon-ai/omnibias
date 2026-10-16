@@ -12,6 +12,9 @@ installed. The two Laplacian comparison scripts also require `folx`.
 | `uv run python benchmarks/jet_vs_nested_ad.py` | Directional-jet residuals and parameter optimization on a manufactured Poisson problem. |
 | `uv run python benchmarks/deep_laplacian_scaling.py` | Deep Laplacian accuracy, dimension limits, cost and backend parity. |
 | `uv run python benchmarks/operator_compiler.py` | Automatic ridge, disjoint-branch and affine-bottleneck lowering, with accuracy-gated Taylor/operator baselines and derivative-only training. |
+| `uv run python benchmarks/gaussian_inverse_jets.py` | Gaussian inverse Taylor jets versus recursively differentiating the same implicit inverse, orders 1, 2, 4, 6, 8; exact rational accuracy gates, one CPU thread, fresh subprocess wall/RSS limits, first execution and nine raw samples. Use `--check-only --orders 1,2` for an untimed correctness smoke. |
+| `uv run python benchmarks/gaussian_inverse_approximation.py` | Certified Chebyshev enclosures versus fresh certified Gaussian inverse solves at 17 rational queries, both gated at coordinate half-width ≤1e−6 and independent 80-digit roots. Records construction separately, nine raw samples and conditional break-even query count. Pure core, bounded subprocess; use `--check-only` without performance sampling. |
+| `uv run python benchmarks/gaussian_inverse_predictor.py` | One-pass moment predictors versus fresh certified Gaussian inverse solves at 17 targets, with a common ≤1e−6 physical half-width requirement. Both return fresh certificates; model construction is excluded equally. Includes a smaller-age accuracy failure, independent 80-digit roots and nine raw samples. Use `--check-only` for untimed validation. |
 
 `jet_vs_nested_ad.py` and `deep_laplacian_scaling.py` accept `--full`;
 their default runs write `*_smoke.json`. The operator comparison has its own

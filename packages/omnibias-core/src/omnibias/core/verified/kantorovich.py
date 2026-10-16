@@ -224,11 +224,18 @@ def krawczyk_certificate(
     x_bar: Sequence[float],
     a_inv: Sequence[Sequence[float]],
     r: float,
+    *,
+    certificate_meta: Mapping[str, Any] | None = None,
 ) -> KrawczykCertificate | None:
     r"""Krawczyk unique-zero test on the box ``B(x_bar, r)`` (rigorous).
 
     Returns a certificate iff ``K(x_bar, X) subset int(X)`` and
     ``||I - A DF(X)||_inf < 1`` -- a unique zero of ``F`` then lies in ``X``.
+
+    Optional ``certificate_meta`` is forwarded to ``make_certificate``. A
+    producer supplying explicit backend provenance is responsible for proving
+    that it describes the actual callback enclosures; this does not change
+    callback validation, interval arithmetic, or the caller's backend state.
     """
     n = len(x_bar)
     if r <= 0.0:
@@ -257,6 +264,7 @@ def krawczyk_certificate(
                 "center": list(x_bar),
                 "enclosure": [[lo, hi] for lo, hi in enclosure],
             },
+            meta=certificate_meta,
         )
         return KrawczykCertificate(r, kappa, tuple(x_bar), enclosure, cert)
     return None

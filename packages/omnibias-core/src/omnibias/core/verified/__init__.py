@@ -136,6 +136,10 @@ from omnibias.core.verified.euler_maclaurin import (
     euler_maclaurin_sum,
     log_gamma_iv,
 )
+from omnibias.core.verified.exp_polynomial import (
+    evaluate_exp_polynomial,
+    evaluate_rational_field,
+)
 from omnibias.core.verified.fourier import (
     NuLike,
     Symbol,
@@ -149,6 +153,214 @@ from omnibias.core.verified.ftc import (
     certified_ftc_residual,
     ftc_certificate,
 )
+from omnibias.core.verified.gaussian_affine import (
+    GaussianAffineRestriction,
+    InconsistentAffineConstraints,
+    restrict_gaussian_heat,
+)
+from omnibias.core.verified.gaussian_affine_adjoint import (
+    GaussianAffineAdjointGeometry,
+    compile_gaussian_affine_adjoint,
+)
+from omnibias.core.verified.gaussian_affine_aging import (
+    GaussianAffineAging,
+    certify_gaussian_affine_aging,
+    certify_gaussian_affine_predictor,
+)
+from omnibias.core.verified.gaussian_affine_approximation import (
+    GaussianAffineApproximation,
+    certify_gaussian_affine_approximation,
+)
+from omnibias.core.verified.gaussian_affine_evolution import (
+    GaussianAffineEvolution,
+    certify_gaussian_affine_evolution,
+)
+from omnibias.core.verified.gaussian_affine_parameters import (
+    GaussianAffineParameterVJP,
+    certify_gaussian_affine_parameter_vjp,
+)
+from omnibias.core.verified.gaussian_affine_sensitivity import (
+    GaussianAffineTargetVJPCertificate,
+    certify_gaussian_affine_target_vjp,
+)
+from omnibias.core.verified.gaussian_affine_stationarity import (
+    GaussianAffineStationarity,
+    certify_gaussian_affine_stationarity,
+)
+from omnibias.core.verified.gaussian_aging import (
+    GaussianInverseAging,
+    certify_gaussian_inverse_aging,
+)
+from omnibias.core.verified.gaussian_aging_derivative import (
+    GaussianAgingDerivative,
+    certify_gaussian_aging_derivative,
+)
+from omnibias.core.verified.gaussian_analytic import (
+    GaussianSeriesCertificate,
+    certify_gaussian_inverse_series,
+)
+from omnibias.core.verified.gaussian_bias_analytic import (
+    GaussianBiasSeriesCertificate,
+    certify_gaussian_bias_inverse_series,
+)
+from omnibias.core.verified.gaussian_chebyshev import (
+    GaussianInverseApproximation,
+    approximate_gaussian_inverse,
+)
+from omnibias.core.verified.gaussian_chebyshev_derivative import (
+    GaussianInverseDerivative,
+    certify_gaussian_inverse_derivative,
+)
+from omnibias.core.verified.gaussian_collinear_minimum import (
+    GaussianCollinearMinimum,
+    certify_gaussian_collinear_minimum,
+)
+from omnibias.core.verified.gaussian_collinear_reduction import (
+    GaussianCollinearPiece,
+    GaussianCollinearReduction,
+    compile_gaussian_collinear_reduction,
+)
+from omnibias.core.verified.gaussian_critical import (
+    GaussianCriticalChart,
+    certify_gaussian_critical_chart,
+)
+from omnibias.core.verified.gaussian_entropy_bias import (
+    GaussianEntropyBias,
+    certify_gaussian_entropy_bias,
+)
+from omnibias.core.verified.gaussian_entropy_bias_face import (
+    GaussianEntropyBiasFace,
+    certify_gaussian_entropy_bias_face,
+)
+from omnibias.core.verified.gaussian_entropy_bias_region import (
+    GaussianEntropyBiasRegion,
+    certify_gaussian_entropy_bias_region,
+)
+from omnibias.core.verified.gaussian_entropy_face import (
+    GaussianEntropyFace,
+    certify_gaussian_entropy_face,
+)
+from omnibias.core.verified.gaussian_entropy_joint_face import (
+    GaussianEntropyJointFace,
+    certify_gaussian_entropy_joint_face,
+)
+from omnibias.core.verified.gaussian_entropy_joint_region import (
+    GaussianEntropyJointRegion,
+    certify_gaussian_entropy_joint_region,
+)
+from omnibias.core.verified.gaussian_entropy_minimum import (
+    GaussianEntropyMinimum,
+    certify_gaussian_entropy_minimum,
+)
+from omnibias.core.verified.gaussian_entropy_residual import (
+    GaussianEntropyResidual,
+    certify_gaussian_entropy_residual,
+)
+from omnibias.core.verified.gaussian_entropy_sensitivity import (
+    GaussianEntropySensitivity,
+    certify_gaussian_entropy_sensitivity,
+)
+from omnibias.core.verified.gaussian_entropy_solver import (
+    GaussianEntropySolve,
+    solve_gaussian_entropy,
+)
+from omnibias.core.verified.gaussian_entropy_unique import (
+    GaussianEntropyUnique,
+    certify_gaussian_entropy_unique,
+)
+from omnibias.core.verified.gaussian_evolution import (
+    GaussianInverseEvolution,
+    certify_gaussian_inverse_evolution,
+)
+from omnibias.core.verified.gaussian_grouped_directional import (
+    GaussianGroupedCriticalFace,
+    GaussianGroupedDirectional,
+    certify_gaussian_grouped_directional,
+    compile_gaussian_grouped_critical_face,
+)
+from omnibias.core.verified.gaussian_grouped_equilibrium import (
+    GaussianGroupedEquilibrium,
+    certify_gaussian_grouped_equilibrium,
+)
+from omnibias.core.verified.gaussian_heat import GaussianHeatMap
+from omnibias.core.verified.gaussian_joint_directional import (
+    GaussianJointDirectional,
+    certify_gaussian_joint_directional,
+)
+from omnibias.core.verified.gaussian_polyhedral import (
+    GaussianPolyhedralFace,
+    GaussianPolyhedralMinimum,
+    GaussianPolyhedralParameterVJP,
+    certify_gaussian_polyhedral_minimum,
+    certify_gaussian_polyhedral_parameter_vjp,
+    compile_gaussian_polyhedral_face,
+)
+from omnibias.core.verified.gaussian_polyhedral_directional import (
+    GaussianCriticalFace,
+    GaussianPolyhedralDirectional,
+    certify_gaussian_polyhedral_directional,
+    compile_gaussian_critical_face,
+)
+from omnibias.core.verified.gaussian_polyhedral_equilibrium import (
+    GaussianPolyhedralEquilibrium,
+    certify_gaussian_polyhedral_equilibrium,
+)
+from omnibias.core.verified.gaussian_polyhedral_path import (
+    GaussianPathSign,
+    GaussianPolyhedralPath,
+    compile_gaussian_polyhedral_path,
+)
+from omnibias.core.verified.gaussian_polyhedral_radius import (
+    GaussianPathSignBound,
+    GaussianPolyhedralPathRadius,
+    certify_gaussian_polyhedral_path_radius,
+)
+from omnibias.core.verified.gaussian_polyhedral_reduced_minimum import (
+    GaussianPolyhedralReducedMinimum,
+    certify_gaussian_polyhedral_reduced_minimum,
+)
+from omnibias.core.verified.gaussian_polyhedral_reduced_sensitivity import (
+    GaussianPolyhedralReducedSensitivity,
+    certify_gaussian_polyhedral_reduced_sensitivity,
+)
+from omnibias.core.verified.gaussian_polyhedral_reduction import (
+    GaussianPolyhedralPiece,
+    GaussianPolyhedralReduction,
+    compile_gaussian_polyhedral_reduction,
+)
+from omnibias.core.verified.gaussian_polyhedral_unique import (
+    GaussianPolyhedralUnique,
+    certify_gaussian_polyhedral_unique,
+)
+from omnibias.core.verified.gaussian_posterior_domain import (
+    GaussianPosteriorDomain,
+    certify_gaussian_posterior_domain,
+)
+from omnibias.core.verified.gaussian_predictor import (
+    GaussianInversePredictor,
+    certify_gaussian_inverse_predictor,
+)
+from omnibias.core.verified.gaussian_projected_equilibrium import (
+    GaussianProjectedEquilibrium,
+    certify_gaussian_projected_equilibrium,
+)
+from omnibias.core.verified.gaussian_projection_minimum import (
+    GaussianProjectionMinimum,
+    certify_gaussian_projection_minimum,
+)
+from omnibias.core.verified.gaussian_sensitivity import (
+    GaussianTargetVJPCertificate,
+    certify_gaussian_target_vjp,
+)
+from omnibias.core.verified.gaussian_tube import (
+    GaussianInverseTubeCertificate,
+    certify_gaussian_inverse_tube,
+)
+from omnibias.core.verified.gaussian_two_center import (
+    GaussianTwoCenterMinimum,
+    certify_gaussian_two_center_minimum,
+)
+from omnibias.core.verified.global_min import BoxMinimum, minimize_box
 from omnibias.core.verified.hardy_line import (
     hardy_angle,
     hardy_even,
@@ -200,6 +412,24 @@ from omnibias.core.verified.interval_array import (
 from omnibias.core.verified.invariant_subspace import (
     InvariantSubspaceCertificate,
     certified_invariant_subspace,
+)
+from omnibias.core.verified.inverse_gaussian_affine import (
+    GaussianAffineInverseCertificate,
+    GaussianAffineInverseResult,
+    certify_gaussian_affine_inverse,
+    inverse_gaussian_affine,
+)
+from omnibias.core.verified.inverse_gaussian_heat import (
+    GaussianInverseCertificate,
+    GaussianInverseResult,
+    certify_gaussian_inverse,
+    inverse_gaussian_heat,
+)
+from omnibias.core.verified.inverse_mean_map import (
+    MeanInverseCertificate,
+    MeanInverseResult,
+    certify_mean_inverse,
+    inverse_mean_map,
 )
 from omnibias.core.verified.jet import (
     affine_jet,
@@ -300,6 +530,8 @@ from omnibias.core.verified.lohner import (
     naive_interval_flow,
     qr_gram_schmidt,
 )
+from omnibias.core.verified.mean_map import MeanEvaluation, MeanMap
+from omnibias.core.verified.mlp_objective import IntervalMLP
 from omnibias.core.verified.ode import TaylorSeries, VectorField, integrate_ivp
 from omnibias.core.verified.pde_certificate import (
     BoundaryFace,
@@ -316,6 +548,17 @@ from omnibias.core.verified.pde_certificate import (
     radii_polynomial_residual_certificate,
     screened_poisson,
     spectral_residual_norm,
+)
+from omnibias.core.verified.periodic_heat import (
+    BurgersJet,
+    HeatEnclosure,
+    enclose_burgers_jet,
+    enclose_heat_derivative,
+)
+from omnibias.core.verified.polyhedral_projection import (
+    PolyhedralProjection,
+    PolyhedralProjector,
+    compile_polyhedral_projector,
 )
 from omnibias.core.verified.quadrature import (
     GAUSS_LEGENDRE_MAX_N,
@@ -446,6 +689,8 @@ __all__ = [
     'Bilinear',
     'BlockOperatorGapCertificate',
     'BoundaryFace',
+    'BoxMinimum',
+    'BurgersJet',
     'CONTINUUM_PDE_CLAIM_KEY',
     'CRAMER_UNIFORM_BOUND',
     'ClampedCubicContraction',
@@ -464,7 +709,70 @@ __all__ = [
     'EigenvalueLowerBound',
     'FINITE_RESIDUAL_CLAIM',
     'GAUSS_LEGENDRE_MAX_N',
+    'GaussianAffineAdjointGeometry',
+    'GaussianAffineAging',
+    'GaussianAffineApproximation',
+    'GaussianAffineEvolution',
+    'GaussianAffineInverseCertificate',
+    'GaussianAffineInverseResult',
+    'GaussianAffineParameterVJP',
+    'GaussianAffineRestriction',
+    'GaussianAffineStationarity',
+    'GaussianAffineTargetVJPCertificate',
+    'GaussianAgingDerivative',
+    'GaussianBiasSeriesCertificate',
+    'GaussianCollinearMinimum',
+    'GaussianCollinearPiece',
+    'GaussianCollinearReduction',
+    'GaussianCriticalChart',
+    'GaussianCriticalFace',
+    'GaussianEntropyBias',
+    'GaussianEntropyBiasFace',
+    'GaussianEntropyBiasRegion',
+    'GaussianEntropyFace',
+    'GaussianEntropyJointFace',
+    'GaussianEntropyJointRegion',
+    'GaussianEntropyMinimum',
+    'GaussianEntropyResidual',
+    'GaussianEntropySensitivity',
+    'GaussianEntropySolve',
+    'GaussianEntropyUnique',
+    'GaussianGroupedCriticalFace',
+    'GaussianGroupedDirectional',
+    'GaussianGroupedEquilibrium',
+    'GaussianHeatMap',
+    'GaussianInverseAging',
+    'GaussianInverseApproximation',
+    'GaussianInverseCertificate',
+    'GaussianInverseDerivative',
+    'GaussianInverseEvolution',
+    'GaussianInversePredictor',
+    'GaussianInverseResult',
+    'GaussianInverseTubeCertificate',
+    'GaussianJointDirectional',
+    'GaussianPathSign',
+    'GaussianPathSignBound',
+    'GaussianPolyhedralDirectional',
+    'GaussianPolyhedralEquilibrium',
+    'GaussianPolyhedralFace',
+    'GaussianPolyhedralMinimum',
+    'GaussianPolyhedralParameterVJP',
+    'GaussianPolyhedralPath',
+    'GaussianPolyhedralPathRadius',
+    'GaussianPolyhedralPiece',
+    'GaussianPolyhedralReducedMinimum',
+    'GaussianPolyhedralReducedSensitivity',
+    'GaussianPolyhedralReduction',
+    'GaussianPolyhedralUnique',
+    'GaussianPosteriorDomain',
+    'GaussianProjectedEquilibrium',
+    'GaussianProjectionMinimum',
+    'GaussianSeriesCertificate',
+    'GaussianTargetVJPCertificate',
+    'GaussianTwoCenterMinimum',
+    'HeatEnclosure',
     'HermiteExpansion',
+    'InconsistentAffineConstraints',
     'Inertia',
     'Interval',
     'IntervalArray',
@@ -472,6 +780,7 @@ __all__ = [
     'IntervalFn',
     'IntervalLDLT',
     'IntervalLike',
+    'IntervalMLP',
     'InvariantSubspaceCertificate',
     'JacobianEnclosure',
     'KantorovichAccept',
@@ -481,11 +790,17 @@ __all__ = [
     'LinearPDE',
     'LohnerSet',
     'MVJet',
+    'MeanEvaluation',
+    'MeanInverseCertificate',
+    'MeanInverseResult',
+    'MeanMap',
     'NKBounds',
     'NuLike',
     'PINNErrorCertificate',
     'PI_IV',
     'PerronGapCertificate',
+    'PolyhedralProjection',
+    'PolyhedralProjector',
     'QuadEstimate',
     'RadiiCertificate',
     'RecommendedAction',
@@ -510,6 +825,7 @@ __all__ = [
     'affine_jet',
     'antiderivative_jet',
     'aposteriori_error_certificate',
+    'approximate_gaussian_inverse',
     'atan_iv',
     'atan_point',
     'backend_name',
@@ -544,6 +860,52 @@ __all__ = [
     'certified_sign_change',
     'certified_spectral_gap',
     'certified_symmetric_spectral_gap',
+    'certify_gaussian_affine_aging',
+    'certify_gaussian_affine_approximation',
+    'certify_gaussian_affine_evolution',
+    'certify_gaussian_affine_inverse',
+    'certify_gaussian_affine_parameter_vjp',
+    'certify_gaussian_affine_predictor',
+    'certify_gaussian_affine_stationarity',
+    'certify_gaussian_affine_target_vjp',
+    'certify_gaussian_aging_derivative',
+    'certify_gaussian_bias_inverse_series',
+    'certify_gaussian_collinear_minimum',
+    'certify_gaussian_critical_chart',
+    'certify_gaussian_entropy_bias',
+    'certify_gaussian_entropy_bias_face',
+    'certify_gaussian_entropy_bias_region',
+    'certify_gaussian_entropy_face',
+    'certify_gaussian_entropy_joint_face',
+    'certify_gaussian_entropy_joint_region',
+    'certify_gaussian_entropy_minimum',
+    'certify_gaussian_entropy_residual',
+    'certify_gaussian_entropy_sensitivity',
+    'certify_gaussian_entropy_unique',
+    'certify_gaussian_grouped_directional',
+    'certify_gaussian_grouped_equilibrium',
+    'certify_gaussian_inverse',
+    'certify_gaussian_inverse_aging',
+    'certify_gaussian_inverse_derivative',
+    'certify_gaussian_inverse_evolution',
+    'certify_gaussian_inverse_predictor',
+    'certify_gaussian_inverse_series',
+    'certify_gaussian_inverse_tube',
+    'certify_gaussian_joint_directional',
+    'certify_gaussian_polyhedral_directional',
+    'certify_gaussian_polyhedral_equilibrium',
+    'certify_gaussian_polyhedral_minimum',
+    'certify_gaussian_polyhedral_parameter_vjp',
+    'certify_gaussian_polyhedral_path_radius',
+    'certify_gaussian_polyhedral_reduced_minimum',
+    'certify_gaussian_polyhedral_reduced_sensitivity',
+    'certify_gaussian_polyhedral_unique',
+    'certify_gaussian_posterior_domain',
+    'certify_gaussian_projected_equilibrium',
+    'certify_gaussian_projection_minimum',
+    'certify_gaussian_target_vjp',
+    'certify_gaussian_two_center_minimum',
+    'certify_mean_inverse',
     'certify_zero_radii',
     'clamped_biharmonic_green_kernel',
     'clamped_biharmonic_inverse_norm',
@@ -552,6 +914,14 @@ __all__ = [
     'clenshaw_curtis_integral',
     'collatz_wielandt_perron_bounds',
     'companion_matrix',
+    'compile_gaussian_affine_adjoint',
+    'compile_gaussian_collinear_reduction',
+    'compile_gaussian_critical_face',
+    'compile_gaussian_grouped_critical_face',
+    'compile_gaussian_polyhedral_face',
+    'compile_gaussian_polyhedral_path',
+    'compile_gaussian_polyhedral_reduction',
+    'compile_polyhedral_projector',
     'compose_jet',
     'compose_jet_mv',
     'conditioning_certificate',
@@ -576,12 +946,16 @@ __all__ = [
     'digamma_iv',
     'dot',
     'ell1_nu_norm',
+    'enclose_burgers_jet',
+    'enclose_heat_derivative',
     'erf_iv',
     'erf_point',
     'euler_maclaurin_quadrature',
     'euler_maclaurin_sum',
     'euler_number_exact',
     'evaluate_complex_polynomial',
+    'evaluate_exp_polynomial',
+    'evaluate_rational_field',
     'evaluate_residual',
     'evaluate_series_residual',
     'even_profile',
@@ -662,6 +1036,9 @@ __all__ = [
     'interval_newton',
     'interval_solve',
     'interval_triangular_solve',
+    'inverse_gaussian_affine',
+    'inverse_gaussian_heat',
+    'inverse_mean_map',
     'is_positive_definite',
     'is_positive_definite_array',
     'jet_gradient',
@@ -700,6 +1077,7 @@ __all__ = [
     'measured_mean_value_width',
     'measured_taylor_remainder',
     'midpoint_integral',
+    'minimize_box',
     'mlp_jet',
     'mlp_jet_mv',
     'naive_interval_flow',
@@ -731,6 +1109,7 @@ __all__ = [
     'rayleigh_quotient',
     'realify_complex_matrix',
     'require_rigorous_backend',
+    'restrict_gaussian_heat',
     'riesz_double_blob',
     'riesz_symbol',
     'riesz_tail_bound',
@@ -754,6 +1133,7 @@ __all__ = [
     'sin_point',
     'sinh_iv',
     'softplus_iv',
+    'solve_gaussian_entropy',
     'sparse_matvec',
     'spectral_residual_norm',
     'sqg_blob',

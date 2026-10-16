@@ -8,7 +8,7 @@ These are point-for-point mirrors of the PyTorch fast paths in
 :mod:`omnibias.fastpath.hermite`, with the polynomial coefficients
 shared via :mod:`omnibias.fastpath.polynomials`.
 
-All functions are pure JAX (``jax.numpy`` only). They are
+All numerical kernels are pure JAX. They are
 trace-friendly, ``jit``-friendly, ``vmap``-friendly, and produce no
 side effects.
 
@@ -33,6 +33,11 @@ native kernels, so we document rather than unify.
 
 from __future__ import annotations
 
+from collections.abc import Callable
+from functools import partial
+from inspect import signature
+from typing import Any, cast
+
 from omnibias.core.polynomials import (
     hermite_coeffs,
     sigmoid_polynomial_coeffs,
@@ -41,6 +46,9 @@ from omnibias.core.polynomials import (
 
 import jax.numpy as jnp
 from jax import Array
+from jax.experimental import jet as jet_module
+from jax.extend import core as jax_core
+from jax.interpreters import ad, batching, mlir
 
 
 def _horner(coeffs: tuple[float, ...], x: Array) -> Array:
@@ -104,13 +112,65 @@ def jax_sigmoid(z: Array) -> Array:
 # ---------------------------------------------------------------------------
 
 
+def _tanh_polynomial_impl(t: Array, *, n: int) -> Array:
+    """Keep the dense-Horner primal while shortening its differentiated graph."""
+    return _horner(tanh_polynomial_coeffs(n), t)
+
+
+def _tanh_polynomial_jvp(dt: Array, t: Array, *, n: int) -> Array:
+    coeffs = tanh_polynomial_coeffs(n)
+    derivative_coeffs = tuple(k * coeffs[k] for k in range(1, len(coeffs)))
+    # Differentiate the *same* polynomial, not an independently rounded P_(n+1).
+    # Native tanh AD remains outside this helper, including its saturation rule.
+    return _horner(derivative_coeffs, t) * dt
+
+
+# A private primitive gives ordinary AD the short polynomial derivative and
+# Taylor AD the original arithmetic. A custom_jvp wrapper cannot currently
+# provide both: jet(custom_jvp(...)) fails on JAX 0.10.2, even for x*x.
+# Register only our own primitive; never replace a JAX rule or inspect tracers.
+_tanh_polynomial_p: Any = jax_core.Primitive("omnibias_tanh_polynomial")
+_tanh_polynomial_p.def_impl(_tanh_polynomial_impl)
+_tanh_polynomial_p.def_abstract_eval(lambda aval, *, n: aval)
+mlir.register_lowering(
+    _tanh_polynomial_p, mlir.lower_fun(_tanh_polynomial_impl, multiple_results=False)
+)
+ad.defjvp(_tanh_polynomial_p, _tanh_polynomial_jvp)  # type: ignore[no-untyped-call]
+batching.defvectorized(_tanh_polynomial_p)  # type: ignore[no-untyped-call]
+
+# Old JAX jet rules used physical derivatives internally. Newer releases use
+# normalized coefficients and expose factorial_scaled=False for that convention.
+_jet_has_factorial_scaling = "factorial_scaled" in signature(jet_module.jet).parameters
+_jet: Callable[..., Any] = jet_module.jet
+
+
+def _tanh_polynomial_jet(primals_in: Any, series_in: Any, **params: Any) -> Any:
+    primal = partial(_tanh_polynomial_impl, **params)
+    if _jet_has_factorial_scaling:
+        return _jet(primal, primals_in, series_in, factorial_scaled=False)
+    return _jet(primal, primals_in, series_in)
+
+
+jet_module.jet_rules[_tanh_polynomial_p] = _tanh_polynomial_jet
+
+
 def tanh_nth_derivative(z: Array, n: int) -> Array:
-    """``tanh^(n)(z)`` via the Legendre-style recursion."""
+    """``tanh^(n)(z)`` via the Legendre-style recursion.
+
+    Float32/float64 orders 4--8 use an explicit polynomial JVP to avoid retaining
+    the primal Horner intermediates during reverse AD. Forward accumulation is unchanged;
+    gradient rounding can differ within tested dtype tolerances. Other orders
+    retain ordinary AD, including the existing high-order conditioning limits.
+    """
     if n < 0:
         raise ValueError(f"order n must be >= 0, got {n}")
     t = jnp.tanh(z)
     if n == 0:
         return t
+    # P'_n coefficients fit exactly in binary32 through n=8. In float16,
+    # P'_7 would already overflow although P_7's coefficients still fit.
+    if 4 <= n <= 8 and t.dtype in (jnp.float32, jnp.float64):
+        return cast(Array, _tanh_polynomial_p.bind(t, n=n))
     return _horner(tanh_polynomial_coeffs(n), t)
 
 

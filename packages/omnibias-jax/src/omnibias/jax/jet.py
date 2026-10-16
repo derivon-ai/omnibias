@@ -33,9 +33,10 @@ Truncation-order cost
 :func:`compose_jet` takes an **arbitrary** derivative tower, so what it has to
 evaluate is the truncated composition of the polynomial
 ``D(x) = sum_k sigma^(k)(u_0) x^k / k!`` with the valuation-1 series
-``v = u - u_0``. The kernel knows nothing about ``D`` beyond its coefficients,
-and every output coefficient ``b_n`` really does depend on all ``sigma^(k)(u_0)``
-and ``u_j`` with ``k, j <= n``, which already forces ``Omega(N^2)`` work.
+``v = u - u_0``. The kernel knows nothing about ``D`` beyond its coefficients.
+An output coefficient can depend on many input coefficients, but this does
+not establish a quadratic lower bound: shared arithmetic and alternative
+representations can reduce the work.
 
 * Because ``v^k`` has valuation ``k``, all coefficients of ``v^k`` below order
   ``k`` vanish identically. Restricting the recurrence to the triangle
@@ -44,17 +45,16 @@ and ``u_j`` with ``k, j <= n``, which already forces ``Omega(N^2)`` work.
   bit-for-bit in eager execution (see :func:`compose_jet`). The exponent is
   unchanged -- this is a constant factor, measured at 3.3x fewer multiplies at
   ``N = 16`` in ``benchmarks/jet_compose_cost.py``.
-* Sub-cubic composition is not ruled out in theory: baby-step / giant-step
+* Sub-cubic composition is available in theory: baby-step / giant-step
   (Brent-Kung) reaches ``O(N^{5/2})`` when truncated multiplication is
   schoolbook, and near-linear composition exists in the ring-operation model.
-  Both buy the exponent by transforming or reordering the coefficient axis
-  (FFT / Karatsuba style multiplication), which is *not* exact in floating
-  point -- the Taylor coefficients here span many magnitudes, so a transform
-  would trade the kernel's exactness (and the pinned cross-backend goldens) for
-  the exponent. At the truncation orders this API is used at (``N`` of order
-  ten) ``N^{5/2}`` with its larger constant is not even a win. So **no
-  ``O(N^2)`` claim is made for** :func:`compose_jet`; it is cubic in ``N``,
-  with a smaller constant than the dense form.
+  Their arithmetic graphs differ from this schoolbook implementation. All
+  binary floating-point variants, including this one, incur rounding; an
+  alternative requires numerical validation and a measured crossover before
+  replacing the current accumulation order. **No ``O(N^2)`` claim is made
+  for** :func:`compose_jet`; this implementation is cubic in ``N``, with a
+  smaller constant than the dense form. This is an implementation cost,
+  not a lower bound on general series composition.
 * ``O(N^2)`` *is* available when the outer map is not arbitrary. An activation
   in the Riccati class satisfies ``sigma' = P(sigma)`` for a polynomial ``P``
   (recorded as :attr:`omnibias.core.spec.ActivationSpec.riccati_polynomial`),
@@ -67,9 +67,10 @@ and ``u_j`` with ``k, j <= n``, which already forces ``Omega(N^2)`` work.
 
     **Bit-parity requires 64-bit JAX.** The "bit-identical twin" guarantee
     against :mod:`omnibias.torch.jet` holds in double precision. PyTorch defaults
-    to ``float64`` for Python floats, whereas JAX silently truncates arrays to
-    ``float32`` unless 64-bit mode is enabled. Enable it *before* the first JAX
-    import::
+    to ``float32`` unless its default dtype is changed, and JAX truncates
+    requested ``float64`` arrays unless 64-bit mode is enabled. Use explicit
+    ``float64`` tensors in both backends and enable JAX 64-bit mode before
+    constructing arrays::
 
         import jax
         jax.config.update("jax_enable_x64", True)

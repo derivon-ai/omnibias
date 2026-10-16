@@ -19,6 +19,13 @@ weighted norm of everything truncated away,
     \|a\|_\nu = \sum_{k} |a_k|\,\nu^{\|k\|_1},
     \qquad \text{tail} \ge \sum_{\|k\|_\infty > N} |a_k|\,\nu^{\|k\|_1}.
 
+A separate ``global_remainder`` bounds a weighted-l1 error supported anywhere.
+The represented sequence is ``finite coefficients + exterior error + global
+error``. This distinction is essential: two exterior wavevectors can cancel
+into a low mode under convolution. Raw ``coeffs`` store the finite
+representative; :meth:`ValidatedFourierSeries.get` encloses the complete
+coefficient, including both applicable error radii.
+
 With ``nu >= 1`` the weight is sub-multiplicative
 (``nu^{\|i+j\|_1} \le nu^{\|i\|_1}\nu^{\|j\|_1}``), so convolution is a bounded
 bilinear operation and :math:`\ell^1_\nu` is a Banach *algebra* -- the property
@@ -141,7 +148,7 @@ Unbounded multipliers
 Differentiation ``\partial_j`` (symbol ``i k_j``) and the fractional Laplacian
 ``(-\Delta)^s`` (symbol ``|k|^{2s}``) are **unbounded**: they do not map
 ``\ell^1_\nu`` into itself, so there is no finite tail factor.  They are provided
-only on a *finite* series (:meth:`derivative` requires a zero tail) or through
+only on a *finite* series (:meth:`derivative` requires both remainders zero) or through
 :meth:`apply_multiplier` with a caller-supplied, separately-justified
 ``tail_factor``.
 """
@@ -149,7 +156,8 @@ only on a *finite* series (:meth:`derivative` requires a zero tail) or through
 from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from math import isfinite
 
 from omnibias.core.verified.complex_interval import ComplexInterval, ComplexLike
 from omnibias.core.verified.interval import Interval
@@ -183,9 +191,9 @@ def _normalize_nu(nu: NuLike, dim: int) -> tuple[float, ...]:
         if len(axes) != dim:
             raise ValueError(f"nu has {len(axes)} axis weight(s) but dim={dim}")
     for v in axes:
-        if v < 1.0:
+        if not isfinite(v) or v < 1.0:
             raise ValueError(
-                "every axis weight of nu must be >= 1 for the weighted l1 "
+                "every axis weight of nu must be finite and >= 1 for the weighted l1 "
                 "convolution algebra to be sound (see module docstring)"
             )
     return axes
@@ -201,6 +209,27 @@ def _nonneg(iv: Interval) -> Interval:
     return Interval(max(iv.lo, 0.0), max(iv.hi, 0.0))
 
 
+def _radius_add(left: Interval, right: Interval) -> Interval:
+    """Add nonnegative radii without manufacturing uncertainty from two zeros."""
+    if not left.hi:
+        return right
+    if not right.hi:
+        return left
+    return _nonneg(left + right)
+
+
+def _radius_product(left: Interval, right: Interval) -> Interval:
+    if not left.hi or not right.hi:
+        return Interval.point(0.0)
+    return _nonneg(left * right)
+
+
+def _multiplier_bound(value: float, label: str) -> Interval:
+    if not isfinite(value) or value < 0.0:
+        raise ValueError(f"{label} must be finite and non-negative")
+    return Interval.from_value(value)
+
+
 @dataclass
 class ValidatedFourierSeries:
     r"""A rigorous element of the weighted :math:`\ell^1_\nu` Fourier algebra over ``Z^d``.
@@ -210,7 +239,13 @@ class ValidatedFourierSeries:
     weights ``(nu_1, ..., nu_dim)`` (the weight ``\prod_d nu_d^{|k_d|}``); see
     the module docstring for the derivation of what each regime means and why
     every axis weight must be ``>= 1``. Passing a scalar is a strict
-    behavioural subset: it runs the exact pre-existing isotropic formula.
+    behavioural subset: it runs the exact pre-existing isotropic weight formula.
+
+    ``tail`` bounds only the error outside the truncation cube;
+    ``global_remainder`` bounds an independent error anywhere. Both are upper
+    bounds on weighted-l1 norms, not lower bounds on the actual errors. The
+    finite representative ``coeffs`` excludes these errors; use :meth:`get`
+    to enclose an actual coefficient. No dense cube is stored or enumerated.
     """
 
     dim: int
@@ -218,6 +253,7 @@ class ValidatedFourierSeries:
     nu: NuLike
     coeffs: dict[Wavevector, ComplexInterval]
     tail: Interval
+    global_remainder: Interval = field(default_factory=lambda: Interval.point(0.0))
 
     def __post_init__(self) -> None:
         if self.dim < 1:
@@ -230,8 +266,8 @@ class ValidatedFourierSeries:
         # `_check`/`__repr__`/equality compare like-with-like regardless of the
         # container type the caller happened to pass.
         self.nu = float(self.nu) if isinstance(self.nu, int | float) else self._nu_axes
-        if self.tail.lo < 0.0:
-            raise ValueError("tail radius must be non-negative")
+        if self.tail.lo < 0.0 or self.global_remainder.lo < 0.0:
+            raise ValueError("tail and global remainder radii must be non-negative")
         for k in self.coeffs:
             if len(k) != self.dim:
                 raise ValueError(f"wavevector {k} has wrong length for dim={self.dim}")
@@ -260,15 +296,35 @@ class ValidatedFourierSeries:
         nu: NuLike,
         *,
         tail: float = 0.0,
+        global_remainder: float = 0.0,
     ) -> ValidatedFourierSeries:
         out: dict[Wavevector, ComplexInterval] = {
             tuple(k): ComplexInterval.from_value(v) for k, v in coeffs.items()
         }
-        return cls(dim, trunc, nu, out, Interval.from_value(tail))
+        return cls(dim, trunc, nu, out, Interval.from_value(tail), Interval.from_value(global_remainder))
 
     # ----- queries ------------------------------------------------------- #
     def get(self, k: Wavevector) -> ComplexInterval:
-        return self.coeffs.get(tuple(k), ComplexInterval.zero())
+        """Enclose a complete coefficient, including applicable remainder errors.
+
+        A weighted-l1 radius ``R`` implies ``|error_k| <= R / weight(k)``.
+        Its complex disk is enclosed by a rectangle; independent calls need
+        not describe independently achievable errors. This query is sparse.
+        """
+        if len(k) != self.dim:
+            raise ValueError("wavevector dimension must match the series")
+        if any(isinstance(kd, bool) or not isinstance(kd, int) for kd in k):
+            raise TypeError("wavevector entries must be integers, excluding bool")
+        k = tuple(k)
+        result = self.coeffs.get(k, ComplexInterval.zero())
+        radius = self.global_remainder
+        if any(abs(kd) > self.trunc for kd in k):
+            radius = _radius_add(radius, self.tail)
+        if not radius.hi:
+            return result
+        error = (Interval.point(radius.hi) / self._weight(k)).hi
+        box = Interval(-error, error)
+        return result + ComplexInterval(box, box)
 
     @property
     def nu_axes(self) -> tuple[float, ...]:
@@ -289,12 +345,25 @@ class ValidatedFourierSeries:
         """Weighted norm of the finite (kept) block only."""
         acc = Interval.point(0.0)
         for k, c in self.coeffs.items():
-            acc = acc + Interval.point(c.mag) * self._weight(k)
-        return acc
+            real_min = 0.0 if c.re.contains_zero() else min(abs(c.re.lo), abs(c.re.hi))
+            imag_min = 0.0 if c.im.contains_zero() else min(abs(c.im.lo), abs(c.im.hi))
+            squared = Interval.point(real_min).pow_int(2) + Interval.point(imag_min).pow_int(2)
+            minimum = max(0.0, _nonneg(squared).sqrt().lo)
+            acc = acc + Interval(minimum, c.mag) * self._weight(k)
+        return _nonneg(acc)
 
     def norm(self) -> Interval:
-        r"""Rigorous total weighted norm ``\|a\|_\nu`` (kept block + tail)."""
-        return self.low_norm() + self.tail
+        r"""Weighted norm bound including both remainders (use ``.hi``).
+
+        A global error can cancel the finite representative, so its presence
+        forces a conservative zero lower endpoint.
+        """
+        low = self.low_norm()
+        bound = low + self.tail
+        if self.global_remainder.hi:
+            return Interval(0.0, (bound + self.global_remainder).hi)
+        # The exterior radius is only an upper bound and may represent zero.
+        return Interval(low.lo, bound.hi)
 
     def _check(self, other: ValidatedFourierSeries) -> None:
         if self.dim != other.dim or self.trunc != other.trunc or self.nu != other.nu:
@@ -307,12 +376,13 @@ class ValidatedFourierSeries:
         for k, v in other.coeffs.items():
             coeffs[k] = coeffs.get(k, ComplexInterval.zero()) + v
         return ValidatedFourierSeries(
-            self.dim, self.trunc, self.nu, coeffs, _nonneg(self.tail + other.tail)
+            self.dim, self.trunc, self.nu, coeffs, _radius_add(self.tail, other.tail),
+            _radius_add(self.global_remainder, other.global_remainder)
         )
 
     def __neg__(self) -> ValidatedFourierSeries:
         coeffs = {k: -v for k, v in self.coeffs.items()}
-        return ValidatedFourierSeries(self.dim, self.trunc, self.nu, coeffs, self.tail)
+        return ValidatedFourierSeries(self.dim, self.trunc, self.nu, coeffs, self.tail, self.global_remainder)
 
     def __sub__(self, other: ValidatedFourierSeries) -> ValidatedFourierSeries:
         return self.__add__(-other)
@@ -320,22 +390,25 @@ class ValidatedFourierSeries:
     def scale(self, factor: ComplexLike) -> ValidatedFourierSeries:
         """Multiply by a (complex) scalar rigorously."""
         c = ComplexInterval.from_value(factor)
+        if c == ComplexInterval.zero():
+            return ValidatedFourierSeries.zero(self.dim, self.trunc, self.nu)
         coeffs = {k: v * c for k, v in self.coeffs.items()}
         return ValidatedFourierSeries(
             self.dim,
             self.trunc,
             self.nu,
             coeffs,
-            _nonneg(self.tail * Interval.point(c.mag)),
+            _radius_product(self.tail, Interval.point(c.mag)),
+            _radius_product(self.global_remainder, Interval.point(c.mag)),
         )
 
     def __mul__(self, other: ValidatedFourierSeries) -> ValidatedFourierSeries:
         r"""Banach-algebra product (truncated convolution) ``(a b)_k = \sum_{i+j=k} a_i b_j``.
 
-        Coefficients with ``\|k\|_\infty \le N`` are kept *exactly* (so genuine
-        cancellation in the convolution is captured); products landing outside the
-        box are folded into the tail by their weighted magnitude, and the
-        kept/tail and tail/tail cross terms are bounded sub-multiplicatively.
+        Products of finite representatives are retained in the finite block
+        or exterior tail. Every term involving either remainder is bounded
+        submultiplicatively in ``global_remainder``: exterior frequencies can
+        cancel into the finite block, so these terms are not exterior tails.
         """
         self._check(other)
         n = self.trunc
@@ -349,13 +422,15 @@ class ValidatedFourierSeries:
                     kept[k] = kept.get(k, ComplexInterval.zero()) + prod
                 else:
                     overflow = overflow + Interval.point(prod.mag) * self._weight(k)
-        cross = (
-            self.low_norm() * other.tail
-            + self.tail * other.low_norm()
-            + self.tail * other.tail
+        left_error = _radius_add(self.tail, self.global_remainder)
+        right_error = _radius_add(other.tail, other.global_remainder)
+        cross = _radius_add(
+            _radius_add(_radius_product(self.low_norm(), right_error),
+                        _radius_product(left_error, other.low_norm())),
+            _radius_product(left_error, right_error),
         )
         return ValidatedFourierSeries(
-            self.dim, n, self.nu, kept, _nonneg(overflow + cross)
+            self.dim, n, self.nu, kept, _nonneg(overflow), cross
         )
 
     def banach_algebra_bound(self, other: ValidatedFourierSeries) -> Interval:
@@ -365,7 +440,7 @@ class ValidatedFourierSeries:
 
     # ----- Fourier multipliers ------------------------------------------ #
     def apply_multiplier(
-        self, symbol: Symbol, tail_factor: float
+        self, symbol: Symbol, tail_factor: float, *, global_factor: float | None = None
     ) -> ValidatedFourierSeries:
         r"""Apply a Fourier multiplier ``m`` coefficient-wise to the kept block.
 
@@ -373,24 +448,31 @@ class ValidatedFourierSeries:
         rigorous upper bound on ``sup_{\|k\|_\infty > N} |m(k)|`` so the truncated
         tail scales soundly (this is the caller's proof obligation -- the bounded
         helpers :meth:`hilbert`, :meth:`riesz`, and :meth:`leray` discharge it
-        with factor ``1``).
+        with factor ``1``). When ``global_remainder`` is nonzero, an explicit
+        ``global_factor >= sup_k |m(k)|`` is also required. An exterior bound
+        cannot control the low modes. This refusal avoids enumerating a dense
+        truncation cube merely to infer a global bound; the built-in bounded
+        multipliers supply their analytic bound automatically.
         """
-        if tail_factor < 0.0:
-            raise ValueError("tail_factor must be non-negative")
+        exterior_bound = _multiplier_bound(tail_factor, "tail_factor")
+        global_bound = None if global_factor is None else _multiplier_bound(global_factor, "global_factor")
+        if self.global_remainder.hi and global_bound is None:
+            raise ValueError("a nonzero global remainder requires a global_factor bound over all modes")
         coeffs = {k: symbol(k) * v for k, v in self.coeffs.items()}
         return ValidatedFourierSeries(
             self.dim,
             self.trunc,
             self.nu,
             coeffs,
-            _nonneg(self.tail * Interval.point(float(tail_factor))),
+            _radius_product(self.tail, exterior_bound),
+            Interval.point(0.0) if global_bound is None else _radius_product(self.global_remainder, global_bound),
         )
 
     def riesz(self, j: int) -> ValidatedFourierSeries:
         r"""Riesz transform ``R_j = \partial_j(-\Delta)^{-1/2}`` (bounded, symbol ``i k_j/|k|``)."""
         if not 0 <= j < self.dim:
             raise ValueError(f"axis j={j} out of range for dim {self.dim}")
-        return self.apply_multiplier(riesz_symbol(self.dim, j), 1.0)
+        return self.apply_multiplier(riesz_symbol(self.dim, j), 1.0, global_factor=1.0)
 
     def hilbert(self, axis: int = 0) -> ValidatedFourierSeries:
         r"""Coordinate Hilbert transform (bounded, symbol ``-i sign(k_axis)``).
@@ -401,27 +483,27 @@ class ValidatedFourierSeries:
         """
         if not 0 <= axis < self.dim:
             raise ValueError(f"axis={axis} out of range for dim {self.dim}")
-        return self.apply_multiplier(hilbert_symbol(self.dim, axis), 1.0)
+        return self.apply_multiplier(hilbert_symbol(self.dim, axis), 1.0, global_factor=1.0)
 
     def leray(self, a: int, b: int) -> ValidatedFourierSeries:
         r"""Leray-projection entry ``P_{ab} = \delta_{ab} - k_a k_b/|k|^2`` (bounded by ``1``)."""
         if not (0 <= a < self.dim and 0 <= b < self.dim):
             raise ValueError("Leray indices out of range")
-        return self.apply_multiplier(leray_symbol(self.dim, a, b), 1.0)
+        return self.apply_multiplier(leray_symbol(self.dim, a, b), 1.0, global_factor=1.0)
 
     def derivative(self, axis: int) -> ValidatedFourierSeries:
         r"""Exact partial derivative ``\partial_{axis}`` (symbol ``i k_{axis}``).
 
         This is an *unbounded* multiplier, so it is only sound on a finite series
-        (zero tail).  Use it to differentiate a band-limited spectral ansatz
+        (zero exterior tail and global remainder). Use it to differentiate a band-limited spectral ansatz
         exactly; for a series with a non-zero tail the derivative is not an
         ``\ell^1_\nu`` element and a :class:`ValueError` is raised.
         """
         if not 0 <= axis < self.dim:
             raise ValueError(f"axis {axis} out of range for dim {self.dim}")
-        if not (self.tail.lo == 0.0 and self.tail.hi == 0.0):
+        if self.tail.hi or self.global_remainder.hi:
             raise ValueError(
-                "derivative is an unbounded multiplier; it requires a zero tail "
+                "derivative is an unbounded multiplier; it requires a zero tail and global remainder "
                 "(a finite trigonometric polynomial)"
             )
 
@@ -436,7 +518,8 @@ class ValidatedFourierSeries:
     def __repr__(self) -> str:
         return (
             f"ValidatedFourierSeries(dim={self.dim}, trunc={self.trunc}, "
-            f"nu={self.nu!r}, modes={len(self.coeffs)}, tail={self.tail!r})"
+            f"nu={self.nu!r}, modes={len(self.coeffs)}, tail={self.tail!r}, "
+            f"global_remainder={self.global_remainder!r})"
         )
 
 

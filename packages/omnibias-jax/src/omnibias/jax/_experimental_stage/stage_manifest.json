@@ -1,0 +1,175 @@
+{
+  "workspace": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013",
+  "package": "/home/vardan/dev/projects/omnibias/packages/omnibias-jax/src/omnibias/jax/_experimental_stage",
+  "files": {
+    "bounds.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/bounds.py",
+      "source_sha256": "ae46096cc05bba2fd66fdecbf29b624c958841c563ff43cb971c4683669e7463",
+      "package_sha256": "dd5c3f177863efe87065c00ac6f4b7731d57cbcebf896564b01f9d76be531f8f",
+      "import_conversion": "AST relative imports only"
+    },
+    "providers.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/providers.py",
+      "source_sha256": "533fdf470630493879dbc8ba55bfa5d03ca72945a135442d0fa6225243a81845",
+      "package_sha256": "1b63bb9aa9d71be4a6ae04f209ad30d27aa5190ab996797f0476f4a95d3f4f3c",
+      "import_conversion": "AST relative imports only"
+    },
+    "bundles.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/bundles.py",
+      "source_sha256": "cc683eb37823d4c8715b6685884d3af076bee8fa27f63c4a8d61dae4f83bcfe0",
+      "package_sha256": "2de148cd8a8e0972124ea28f75e8d6bafb62b650c160804749348ba138fa7987",
+      "import_conversion": "AST relative imports only"
+    },
+    "reuse.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/reuse.py",
+      "source_sha256": "d517ab8333dc9506b01f3c48ba41b51e8a4b65839bc237bcf06d32d340d6ed04",
+      "package_sha256": "c2804b8a115e42db53c865527318ab6e4b1d8b86e24143afc3cd64b9064f993d",
+      "import_conversion": "AST relative imports only"
+    },
+    "certificates.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/certificates.py",
+      "source_sha256": "e6afd684eaaaafec273d65a7c69d63e0773621a8dc75981e965f90f6815af577",
+      "package_sha256": "8641c3ac365afabb0d81a3c973643ffaa066578ce96085853e94faa63b6c44ca",
+      "import_conversion": "AST relative imports only"
+    },
+    "planner.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/planner.py",
+      "source_sha256": "c6e49a46351ebfc12f39745bab9f8e22cf62451f383451577ba6ebbe686098c6",
+      "package_sha256": "8621268128e519cda31ac7517bc5caa0eb37dc08fe9c9a34c81e2cfc6fc9eb6e",
+      "import_conversion": "AST relative imports only"
+    },
+    "cache_manager.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/cache_manager.py",
+      "source_sha256": "946aafa3f4a9138e58e195833b1ed56734174086f111fa6b481c108c8996f2fc",
+      "package_sha256": "ac24048bfc7ba19cc9a1ab4e220a6eab21dce9502ddca979ace79765dee04900",
+      "import_conversion": "AST relative imports only"
+    },
+    "streaming.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/streaming.py",
+      "source_sha256": "0799b8931576bcc366f375f9ca4617ce6fc7e7e825f290c245c79b1f5142541e",
+      "package_sha256": "70c8b0bd1c54b8f399a64136efa04e55ed3553d3a864bdc459f7a9b10ac20996",
+      "import_conversion": "AST relative imports only"
+    },
+    "device_training.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/device_training.py",
+      "source_sha256": "bcee046430a7ae463cc94b7f433cafd8b554805b96a101bd4419e876bc0abb00",
+      "package_sha256": "39f5a78c974177c3b95a0d66c764004213bd443ffb1fac93c7189bbc86858bed",
+      "import_conversion": "AST relative imports only"
+    },
+    "prefetch.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/prefetch.py",
+      "source_sha256": "63212563bfb56c6dc7607983d8de168d5a488f17006725487507ec93d5da1a33",
+      "package_sha256": "c5079f8968f0b508df0f03e8c0b087f468ca21f8a2b45889cfc36289c90582f6",
+      "import_conversion": "AST relative imports only"
+    },
+    "reduction.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/reduction.py",
+      "source_sha256": "c41afc9a2a033d85c904b7bc938d967100a8626de9bb313eeec493418054f9c0",
+      "package_sha256": "b5da9f5faaaf40b2901acadb317af869cdf3c2ed7d3c15e52d7f614c78a6dc95",
+      "import_conversion": "AST relative imports only"
+    },
+    "variable_projection.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/variable_projection.py",
+      "source_sha256": "caf95b0a0d1b97c75b26300dabd90f46751d12b52ee22d253b741911d251d766",
+      "package_sha256": "ae7178ae00897b0f1bf5f70b228199f5618ade2c11b1b6e68508060bfa9f4db0",
+      "import_conversion": "AST relative imports only"
+    },
+    "feature_models.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/feature_models.py",
+      "source_sha256": "8a80d912cfa6da7334310f6652559292bbb04b2eb30b7e2529d8db47c2bcf51d",
+      "package_sha256": "53a088b7249cdcb6b22e52a47bd1a3a55cf354a3f7f60e7bfcc9b173700a6ee8",
+      "import_conversion": "AST relative imports only"
+    },
+    "explicit_fft.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/explicit_fft.py",
+      "source_sha256": "eb25e3acaaa8a28cdb51da74dcbf1820d7dc84a744e8a66b3cb900bccdb74c99",
+      "package_sha256": "1112969c096730d342707de559660addc2a930a44ea473b5977e3b080681c076",
+      "import_conversion": "AST relative imports only"
+    },
+    "low_rank_operators.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/low_rank_operators.py",
+      "source_sha256": "fc0c8d16db11e05ea3ae9dbc92ddacc9671b81bee50fe7c33e2ceafaccfc1ec5",
+      "package_sha256": "55d0aa81c69ad00a53308a15fb399885a3829d60763e69187beea4b43b2a8d1a",
+      "import_conversion": "AST relative imports only"
+    },
+    "shared_models.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/shared_models.py",
+      "source_sha256": "89f75b26506de5d6e2023976fa86f246d71adc159f696f5273477268959368ce",
+      "package_sha256": "7077af916835ada34b35522a5725940baeb7a4dfce0fc649feb1683579008fc1",
+      "import_conversion": "AST relative imports only"
+    },
+    "qualification_session.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/qualification_session.py",
+      "source_sha256": "47dd27b23e9535d5b5397e5cf96e4eee5eb2df20407db6c5315eda78ac55fcf4",
+      "package_sha256": "c6e0b33547dd9a208dfa9edf7004b40153f2a7bbae597e5fcdf794e34546839b",
+      "import_conversion": "AST relative imports only"
+    },
+    "solve_certificate.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/solve_certificate.py",
+      "source_sha256": "d1c258fa20563a4f0f43b32cc02633187f12c843d128463789b5bbebb5ce5ded",
+      "package_sha256": "bc62d8145b243ff5c09fb1baf16e655b698feb81d041df2c830600f661e90c68",
+      "import_conversion": "AST relative imports only"
+    },
+    "frozen_previous.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/frozen_previous.py",
+      "source_sha256": "9d0b89265caf93676cf7ef0d892530fc01521ba66bbfc5af59e981f4eb19f0b4",
+      "package_sha256": "0b709d680224b659919ecbf72c3c81fcc2792a3ac3fc960fb643b3422bd99c0d",
+      "import_conversion": "AST relative imports only"
+    },
+    "legacy.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/legacy.py",
+      "source_sha256": "a6b39289fc76ce37168de8a33c9d36f001b25327f27c24690f8947571099c3b5",
+      "package_sha256": "0cf5568338394431edfb8e9f93b3c44628db88f7f458e1b803424bce1a431ff3",
+      "import_conversion": "AST relative imports only"
+    },
+    "operators.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/operators.py",
+      "source_sha256": "0f5efac3fd671147cb402796908a4fe7fc8ce76fbcfa67dc02f5239fd381e0d4",
+      "package_sha256": "f340713ec9af13e255b8873ed3817d0ba52397ab0507df8858d30f43438d7e4a",
+      "import_conversion": "AST relative imports only"
+    },
+    "kernels.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/kernels.py",
+      "source_sha256": "314ce9ca82748826f9ba3a3a99bca00a43ebc5f4b583ff196e2f219b3c097749",
+      "package_sha256": "821cdbda1e5201c6c729e7cf9cfc972c5e1df8d250ba1429b1f70c91f38a27b4",
+      "import_conversion": "AST relative imports only"
+    },
+    "generic_programs.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/generic_programs.py",
+      "source_sha256": "7be091ef560ef9e396667e7cf4c5a8664989046a8a111fba9d1a04a528922970",
+      "package_sha256": "f2584d281fc4b78992c5f12423a3759895fb07478cd9fb358bdf72ef0fc0403f",
+      "import_conversion": "AST relative imports only"
+    },
+    "series_fourier.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/series_fourier.py",
+      "source_sha256": "8e75bcd8541b735eb649eb4d91f6dc64902130d38e749cbbb87f3453a1fc7666",
+      "package_sha256": "77667139c9fc8449208a0dbce7a9f29223ab6b85f218851fbe1ddb9751671133",
+      "import_conversion": "AST relative imports only"
+    },
+    "pde_math.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/pde_math.py",
+      "source_sha256": "94b15c5010fa959975a73b760b1533d3069efc5dae26772165ec58ad9d1299b3",
+      "package_sha256": "1ef4ca5a4c36e1df960de135dd4274f4eb4d0ab6453f55e16205894ed7aa5d46",
+      "import_conversion": "AST relative imports only"
+    },
+    "execution_measurements.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/execution_measurements.py",
+      "source_sha256": "1a85c0a2a0a1ddf2b174e09be9c3fba8d7d1469d7044153d7c9c37a48d8467e5",
+      "package_sha256": "8eead4fa4925659d8f6e5dbb4b898b65db54309a0871de5f332e4c5b95d5622f",
+      "import_conversion": "AST relative imports only"
+    },
+    "frozen_batch.py": {
+      "source": "/home/vardan/.codex/visualizations/2026/10/08/01a11c12-7b2c-71e1-a9c6-fb86aacb27f2/bias-collapse-research/completion_execution_20261013/frozen_batch.py",
+      "source_sha256": "987182276fb92a2dfeb5ea169c9d6a359809e125e1f22ea1b4492a9aa8fac3bf",
+      "package_sha256": "846c4ad56843b7c45acf926d2519abfc6d812722e2aaf51cce42c7d20d019538",
+      "import_conversion": "AST relative imports only"
+    },
+    "__init__.py": {
+      "source": null,
+      "source_sha256": null,
+      "package_sha256": "dea464634242bde3ea18771411c179ebc39ada273938fec68eb4c3916416f568"
+    }
+  },
+  "public_exports": [],
+  "gate": "requires final-package numerical and matched performance evidence"
+}

@@ -12,6 +12,7 @@ from __future__ import annotations
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass
+from operator import index as integer_index
 
 import numpy as np
 from numpy.typing import NDArray
@@ -36,6 +37,37 @@ class ArrangementGraph:
         object.__setattr__(
             self, "representatives", np.asarray(self.representatives, dtype=np.float64)
         )
+
+
+def _message_topology(
+    graph: ArrangementGraph, n: int,
+) -> tuple[tuple[int, ...], tuple[int, ...], tuple[float, ...], tuple[int, ...]]:
+    """Canonical directed messages for the static undirected topology.
+
+    Dense adjacency assignment historically kept the last crossing label for
+    repeated/reversed edges and counted a self-edge once. Sorting by receiver
+    then sender preserves the old neighbor traversal without an N-by-N table.
+    """
+    labels: dict[tuple[int, int], float] = {}
+    for u, v, crossed in graph.edges:
+        u, v = integer_index(u), integer_index(v)
+        # Match the previous valid negative array-index convention as well.
+        u = u + n if u < 0 else u
+        v = v + n if v < 0 else v
+        if not 0 <= u < n or not 0 <= v < n:
+            raise IndexError("arrangement graph edge endpoint is outside the node range")
+        labels[u, v] = float(crossed)
+        labels[v, u] = float(crossed)
+    pairs = sorted(labels)
+    degrees = [0] * n
+    for receiver, _ in pairs:
+        degrees[receiver] += 1
+    return (
+        tuple(receiver for receiver, _ in pairs),
+        tuple(sender for _, sender in pairs),
+        tuple(labels[pair] for pair in pairs),
+        tuple(max(degree, 1) for degree in degrees),
+    )
 
 
 def build_arrangement_graph(

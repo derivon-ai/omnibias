@@ -60,6 +60,10 @@ MAX_BELL_ORDER: int = 64
 #: than enumerating partitions and so tolerates a far higher order.
 MAX_BELL_NUMBER_ORDER: int = 4096
 
+#: Ceiling for the non-partition-enumerating Stirling row. Its integer outputs
+#: and quadratic work still grow with order; no unbounded table is cached.
+MAX_STIRLING_ORDER: int = 512
+
 #: Bound on each memo: unbounded memoisation keyed on a caller-supplied order
 #: lets one hostile or mistyped call pin arbitrarily much memory for the life of
 #: the process.
@@ -212,9 +216,32 @@ def faa_di_bruno_terms(n: int) -> list[tuple[int, ExpKey, int]]:
     return list(_faa_di_bruno_pairs(n))
 
 
+def stirling_second_row(n: int) -> tuple[int, ...]:
+    r"""Return exact second-kind Stirling numbers ``(S(n,0),...,S(n,n))``.
+
+    They convert powers to falling factorials:
+    ``j**n = sum(S(n,k) * j*(j-1)*...*(j-k+1), k=0..n)``.
+    In particular ``S(0,0)=1`` and their row sum is ``bell_number(n)``.
+    A single rolling row uses ``O(n**2)`` integer arithmetic and ``O(n)``
+    integer storage without enumerating partitions. Orders above
+    :data:`MAX_STIRLING_ORDER` are refused; results are not cached.
+    """
+    if isinstance(n, bool) or not isinstance(n, int):
+        raise TypeError("Stirling order must be an integer")
+    if not 0 <= n <= MAX_STIRLING_ORDER:
+        raise ValueError(f"Stirling order must be between 0 and {MAX_STIRLING_ORDER}")
+    row = [1] + [0] * n
+    for order in range(1, n + 1):
+        for k in range(order, 0, -1):
+            row[k] = k * row[k] + row[k - 1]
+        row[0] = 0
+    return tuple(row)
+
+
 __all__ = [
     "bell_complete",
     "bell_number",
     "bell_partial",
     "faa_di_bruno_terms",
+    "stirling_second_row",
 ]

@@ -44,6 +44,13 @@ def compose_jet_mv(
     ``u_jet`` has shape ``(M, ...)`` with ``M = num_multi_indices(dim, order)``;
     ``sigma_tower[k] = sigma^(k)(u_jet[0])`` for ``k = 0..order``. Returns the
     jet of ``sigma(u)``.
+
+    Only structurally possible terms of each shifted power are formed:
+    ``(u-u0)^k`` has no coefficient below total degree ``k``. Remaining
+    Cauchy products retain their accumulation order. With finite intermediates,
+    eager results agree with the dense recurrence up to signed zero. Compiler
+    transformations may round differently. Nonfinite higher tower entries no
+    longer contaminate lower orders through multiplication by structural zeros.
     """
     u_jet = torch.as_tensor(u_jet)
     sigma_tower = torch.as_tensor(sigma_tower)
@@ -60,20 +67,26 @@ def compose_jet_mv(
         )
 
     table = multiply_table(dim, order)
+    degrees = tuple(map(sum, multi_indices(dim, order)))
     zero = torch.zeros_like(u_jet[0])
     w = [zero] + [u_jet[g] for g in range(1, m)]
-    p = [torch.ones_like(u_jet[0])] + [zero for _ in range(m - 1)]
-    result = [sigma_tower[0] * p[0]] + [zero for _ in range(m - 1)]
+    # w^1 is known directly; avoid multiplying by the constant series 1.
+    p = w
+    result = [sigma_tower[0] * torch.ones_like(u_jet[0])] + [zero for _ in range(m - 1)]
     fact = 1.0
     for k in range(1, order + 1):
         fact *= k
-        acc = [zero for _ in range(m)]
-        for g, a, b in table:
-            acc[g] = acc[g] + p[a] * w[b]
-        p = acc
+        if k > 1:
+            # Keep original summation order while omitting structural zeros.
+            acc = [zero for _ in range(m)]
+            for g, a, b in table:
+                if b != 0 and degrees[a] >= k - 1:
+                    acc[g] = acc[g] + p[a] * w[b]
+            p = acc
         dk = sigma_tower[k] / fact
         for g in range(m):
-            result[g] = result[g] + dk * p[g]
+            if degrees[g] >= k:
+                result[g] = result[g] + dk * p[g]
     return torch.stack(result, dim=0)
 
 

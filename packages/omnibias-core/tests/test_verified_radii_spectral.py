@@ -383,3 +383,61 @@ def test_banded_manufactured_solution_proved() -> None:
     assert result.proved
     assert result.y0 < 1e-10
     assert result.radius is not None and result.radius > 0.0
+
+
+@pytest.mark.parametrize("kind", ["tail", "global_remainder"])
+def test_finite_linear_helpers_refuse_uncertainty_instead_of_dropping_it(kind: str) -> None:
+    from omnibias.core.verified.radii_spectral import (
+        _apply_finite_banded,
+        constant_coefficient_band,
+    )
+
+    uncertain = ValidatedFourierSeries.from_coeffs({}, 1, 2, 1.0, **{kind: 1.0})
+    symbol = laplacian_symbol(1.0, 1.0)
+    with pytest.raises(ValueError, match="zero tail and global remainder"):
+        _apply_finite_symbol(uncertain, symbol)
+    banded = constant_coefficient_band(symbol, {(1,): 0.25})
+    with pytest.raises(ValueError, match="zero tail and global remainder"):
+        _apply_finite_banded(uncertain, banded, 1.0)
+
+
+def test_split_inverse_bounds_global_uncertainty_by_finite_block_too() -> None:
+    from omnibias.core.verified.radii_spectral import _SplitInverse
+
+    modes = [(-1,), (0,), (1,)]
+    matrix = [[ComplexInterval.from_value(5.0 if row == col else 0.0) for col in range(3)]
+              for row in range(3)]
+    inverse = _SplitInverse(matrix, modes, laplacian_symbol(10.0, 1.0), 0.1, 1, 2, 1.0, 1)
+    uncertain = ValidatedFourierSeries.from_coeffs({}, 1, 2, 1.0, global_remainder=1.0)
+    applied = inverse.apply(uncertain)
+    assert applied.get((0,)).contains(5.0)
+    assert applied.global_remainder.hi >= 5.0  # multiplying only by mu would give0.1
+    assert applied.norm().hi >= 5.0
+
+
+def test_banded_inverse_shell_uncertainty_is_global_at_work_truncation() -> None:
+    from omnibias.core.verified.interval import Interval
+    from omnibias.core.verified.radii_spectral import _SplitInverse, constant_coefficient_band
+
+    modes = [(-1,), (0,), (1,)]
+    identity = [[ComplexInterval.from_value(float(row == col)) for col in range(3)] for row in range(3)]
+    # An empty coupling map is still dispatched as a BandedLinearPart; its
+    # exact tail inverse is the identity. Shell mode2 lies inside work_trunc2.
+    banded = constant_coefficient_band(laplacian_symbol(1.0, 0.0), {})
+    inverse = _SplitInverse(identity, modes, banded, 1.0, 1, 2, 1.0, 1)
+    shell = ValidatedFourierSeries.from_coeffs({(2,): 1.0}, 1, 2, 1.0)
+    applied = inverse.apply(shell)
+    assert applied.tail == Interval.point(0.0)
+    assert applied.global_remainder.hi >= 1.0
+    assert applied.get((2,)).contains(1.0)
+
+
+def test_finite_jacobian_refuses_input_global_error() -> None:
+    problem, a_star = _scalar_problem(trunc=1, a_star={(0,): 0.1})
+    assembled = _assemble(problem, a_star)
+    uncertain = ValidatedFourierSeries.from_coeffs({}, 1, 2, problem.nu, global_remainder=1.0)
+    with pytest.raises(ValueError, match="zero tail and global remainder"):
+        assembled.df_apply(uncertain)
+    outside = ValidatedFourierSeries.from_coeffs({(2,): 1.0}, 1, 2, problem.nu)
+    with pytest.raises(ValueError, match="finite block"):
+        assembled.df_apply(outside)
