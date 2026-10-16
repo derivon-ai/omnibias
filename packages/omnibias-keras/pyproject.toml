@@ -49,8 +49,9 @@ torch = ["torch>=2.0"]
 test = ["pytest>=7.0", "pytest-cov>=4.0", "numpy>=1.24"]
 
 [project.urls]
-Homepage = "https://github.com/derivon-ai/omnibias"
-Documentation = "https://github.com/derivon-ai/omnibias/blob/main/docs/api/keras.md"
+Funding = "https://derivon.ai/sponsor/"
+Homepage = "https://omnibias.ai/"
+Documentation = "https://omnibias.ai/docs/api/keras/"
 Source = "https://github.com/derivon-ai/omnibias"
 Issues = "https://github.com/derivon-ai/omnibias/issues"
 Changelog = "https://github.com/derivon-ai/omnibias/blob/main/CHANGELOG.md"

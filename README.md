@@ -332,3 +332,7 @@ and the [agent guide](AGENTS.md) before making a change.
 ```
 
 GitHub's “Cite this repository” button reads [CITATION.cff](CITATION.cff).
+
+## Support the project
+
+If omnibias helps your work, consider [starring the repository](https://github.com/derivon-ai/omnibias). [Organizational sponsorship through Derivon](https://derivon.ai/sponsor/) supports maintenance, testing, and new scientific examples.

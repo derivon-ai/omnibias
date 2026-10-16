@@ -84,3 +84,7 @@ uv run pytest packages/omnibias-keras/tests -q
 ## License
 
 Apache-2.0. See [LICENSE](https://github.com/derivon-ai/omnibias/blob/main/packages/omnibias-keras/LICENSE) and the [licensing policy](https://github.com/derivon-ai/omnibias/blob/main/LICENSING.md).
+
+## Support the project
+
+If omnibias helps your work, consider [starring the repository](https://github.com/derivon-ai/omnibias). [Organizational sponsorship through Derivon](https://derivon.ai/sponsor/) supports maintenance, testing, and new scientific examples.
