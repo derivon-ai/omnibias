@@ -123,6 +123,26 @@ Reproduce the four-point/order cases with
 accuracy answer different questions; choose an algorithm that satisfies both
 your cost and error requirements.
 
+The separate [float32/float64 activation study](benchmarks/activation_precision_study.json)
+checks 141 inputs through order 16, including parameter gradients. Existing
+stable Taylor providers improve saturated-tail behavior; the shipped dense
+polynomial fastpaths are not universally more accurate. In JAX 0.10.2,
+`jet` drops `tanh`'s highest-accuracy setting. A tested local patch restores
+that opt-in path, while highest-accuracy ordinary JAX AD already provides a
+stable alternative. The [research record](bias-collapse-pde.md#float32-accuracy-and-an-opt-in-jax-taylor-rule-repair)
+includes the patch, application checks and remaining intermediate-underflow
+limits. This study makes no speed or general PINN-accuracy claim.
+
+The separate [verified-enclosure comparison](benchmarks/verified_tanh_study.json)
+uses 54 point cases and 20 boxes, including scaled tails. A controlled
+recurrence/log-scaled implementation meets every point error budget, but its
+geometric speed ratio against the fastest eligible classical interval control
+is **0.5353x**. The strongest multiprecision monomial control also meets all
+point budgets. The [replayed research record](bias-collapse-pde.md#verified-activation-bounds-tighter-enclosures-no-matched-control-speedup)
+keeps this negative result, source provenance, refusals and the serialization
+correction used by its separate replay checker. These are CPU primitive costs,
+not PDE-training or certification-workflow timings.
+
 ## General deep-network jets
 
 ![Derivative evaluation time versus order for PyTorch eager and JAX compiled execution, including nested autodiff and JAX Taylor-mode baselines.](img/derivative-benchmark.svg)

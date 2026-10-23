@@ -1,0 +1,19 @@
+dataset,seed,method,absolute_cosine_to_true_raw_input_projection,metric_scope
+binary,7211,fixed,0.6241931011863846,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+binary,7211,refined,0.4089692601430784,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+binary,7211,smooth_compile,0.12757979281224088,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+binary,7219,fixed,0.11015770436838197,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+binary,7219,refined,0.11199568983030297,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+binary,7219,smooth_compile,0.2579320643170999,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7201,fixed,0.8984151900491787,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7201,refined,0.9165461520012594,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7201,smooth_compile,0.9997214625918613,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7211,fixed,0.9247133962900865,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7211,refined,0.9702101308850405,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7211,smooth_compile,0.9998153961168754,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7219,fixed,0.83486303652187,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7219,refined,0.8640680031762137,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+multiclass,7219,smooth_compile,0.9993754264571966,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+count,7219,fixed,0.8408034757041869,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+count,7219,refined,0.8444287391005907,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection
+count,7219,smooth_compile,0.9999443775905679,post-hoc direction diagnostic; known generator used for evaluation only; no new recipe selection

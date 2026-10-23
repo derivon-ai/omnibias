@@ -19,8 +19,16 @@ markdown_extensions:
   - md_in_html
   - tables
   - fenced_code
+  - pymdownx.arithmatex:
+      generic: true
+      inline_syntax: [round]
+      block_syntax: [square]
   - toc:
       permalink: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js
 
 nav:
   - Home: index.md
@@ -28,6 +36,21 @@ nav:
   - PINN integration: pinn.md
   - Derivative APIs: derivatives.md
   - Bias collapse and PDE solution families: bias-collapse-pde.md
+  - Affine equality geometry: affine-geometry.md
+  - Calculus–geometry pilot: calculus-geometry-pilot.md
+  - Calculus–geometry results: calculus-geometry-results.md
+  - Calculus and geometry opportunities: calculus-geometry-opportunities.md
+  - Calculus and geometry campaign: calculus-geometry-campaign.md
+  - Verified physical calibration: verified-physical-calibration.md
+  - Unification research audit: unification-research-audit.md
+  - Two-bias bell experiment: two-bias-bell-experiment.md
+  - Multi-bias capacity and architecture: multi-bias-capacity-and-architecture.md
+  - Activation profile compression: activation-profile-compression.md
+  - Multi-bias learning and margins: multi-bias-learning-and-margin.md
+  - Multi-bias frontier study: multibias-frontier-study.md
+  - Multi-bias follow-up audit: multibias-followup-audit.md
+  - Multi-bias research synthesis: multi-bias-research-synthesis.md
+  - Complete session findings and theory: session-research-findings.md
   - Profile algebra and PDE identification: profile-pde.md
   - Exact nonlinear PDE identities: nonlinear-pde-identities.md
   - Certified inverse PDE maps: inverse-pde-map.md

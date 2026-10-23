@@ -1,0 +1,5 @@
+method,parameters,phantom_PSNR_mean,phantom_PSNR_std,pattern_PSNR_mean,pattern_PSNR_std
+ReLU_MLP,12737,35.1,1.05,17.87,1.7
+multibias_K3,14037,42.4,1.58,28.27,1.6
+SIREN,12737,86.2,30.9,120.0,5.0
+RandomFourierFeatures,28993,81.77,28.7,93.04,19.4

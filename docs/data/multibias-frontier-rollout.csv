@@ -1,0 +1,13 @@
+model,seed,method,status,accepted_blocks,accuracy,test_NLL,array_artifact_bytes,metadata_bytes,total_exported_bytes,caution
+resnet18,7201,rank,COMPLETE,0,0.781656050955414,0.7891384848948019,46830690,334,46831024,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet18,7201,svd,COMPLETE,0,0.781656050955414,0.7891384848948019,46830690,334,46831024,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet18,7211,rank,COMPLETE,0,0.781656050955414,0.7891384848948019,46830690,334,46831024,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet18,7211,svd,COMPLETE,0,0.781656050955414,0.7891384848948019,46830690,334,46831024,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet18,7219,rank,COMPLETE,1,0.8932484076433121,0.754331470251083,37388540,443,37388983,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet18,7219,svd,COMPLETE,0,0.781656050955414,0.7891384848948019,46830690,334,46831024,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet50,7201,rank,COMPLETE,3,0.8670063694267516,1.1643399686451092,100287652,657,100288309,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet50,7201,weighted_svd,COMPLETE,3,0.8662420382165605,1.1184522533558274,93891480,680,93892160,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet50,7211,rank,COMPLETE,5,0.8555414012738853,1.191267615454846,98472920,868,98473788,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet50,7211,weighted_svd,COMPLETE,3,0.8710828025477707,1.1112129824621635,93891480,680,93892160,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet50,7219,rank,COMPLETE,5,0.8547770700636943,1.1947372781601995,98472920,868,98473788,original R18 SVD control budget infeasible; see matched-rollout repair
+resnet50,7219,weighted_svd,COMPLETE,4,0.849171974522293,1.19096011542358,99857454,793,99858247,original R18 SVD control budget infeasible; see matched-rollout repair

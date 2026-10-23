@@ -1,0 +1,5 @@
+model,validation_accuracy,test_accuracy,test_log_loss,total_export_bytes,scope,file_reduction_vs_teacher_percent
+teacher,0.787,0.781656050955414,0.7891384848948019,46831024.0,"retrospective, one seed, fixed factor2, three independently reconstructed blocks",0.0
+raw_shared,0.589,0.5946496815286624,1.917547977710607,44238930.0,"retrospective, one seed, fixed factor2, three independently reconstructed blocks",5.534993213046125
+scale_aware_shared,0.603,0.6089171974522293,1.8506098137147842,44238930.0,"retrospective, one seed, fixed factor2, three independently reconstructed blocks",5.534993213046125
+prune,0.777,0.7778343949044586,0.8495880888392409,44215391.0,"retrospective, one seed, fixed factor2, three independently reconstructed blocks",5.585256901493329

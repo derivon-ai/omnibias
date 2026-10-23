@@ -1,14 +1,16 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""PyTorch Newton projection on an equality locus (theory 01-09).
+"""Host Gauss-Newton root landing and first-order isolated-root sensitivities.
 
-``newton_project`` is Gauss-Newton in the forward pass. Its gradient uses the
-implicit function theorem (``dx* / d theta = - DF^+ dF/d theta``), not the
-unrolled iteration, so memory does not scale with iteration count.
+The iteration does not generally compute a nearest point. Implicit derivatives
+are supported only at converged, regular square roots. Underdetermined roots
+need a solution-selection rule; use an affine projection or differentiate the
+explicit iteration when that is the intended map.
 """
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Literal, cast
@@ -20,7 +22,7 @@ from omnibias.core.locus import (
     NewtonResult,
     UnitTerm,
     dF_d_weights,
-    pseudoinverse,
+    smallest_singular,
 )
 from omnibias.core.locus import (
     jacobian as jacobian_core,
@@ -33,6 +35,7 @@ from omnibias.core.locus import (
 )
 from omnibias.core.tanh_method import PDESpec, TravellingWaveAnsatz, verify_exact
 from torch import Tensor
+from torch.autograd.function import once_differentiable
 
 
 def _as_tuple(x: Tensor) -> tuple[float, ...]:
@@ -49,8 +52,37 @@ def _with_weights(sys: EqualitySystem, weights: Sequence[float]) -> EqualitySyst
     return EqualitySystem(terms, sys.base)
 
 
+def _check_inputs(sys: EqualitySystem, x0: Tensor, weights: Tensor, max_iter: int, tol: float) -> None:
+    if x0.ndim != 1 or x0.numel() != sys.dim:
+        raise ValueError("x0 must be a vector with system.dim entries")
+    if weights.ndim != 1 or weights.numel() != sys.n_terms:
+        raise ValueError("weights must be a vector with system.n_terms entries")
+    if not x0.is_floating_point() or not weights.is_floating_point():
+        raise ValueError("x0 and weights must be real floating-point tensors")
+    if not bool(torch.isfinite(x0).all()) or not bool(torch.isfinite(weights).all()):
+        raise ValueError("x0 and weights must be finite")
+    if max_iter < 1 or not math.isfinite(tol) or tol <= 0:
+        raise ValueError("max_iter must be positive and tol must be finite and positive")
+
+
+def _require_isolated_root(sys: EqualitySystem, result: NewtonResult, tol: float) -> None:
+    if sys.codimension != sys.dim:
+        raise ValueError(
+            "implicit differentiation requires a regular isolated square root; "
+            "an underdetermined locus needs a solution-selection rule"
+        )
+    if not result.converged or any(not math.isfinite(v) for v in result.point):
+        raise ValueError("implicit differentiation requires a converged root")
+    f = residual_core(sys, result.point)
+    if any(not math.isfinite(v) for v in f) or math.hypot(*f) > tol:
+        raise ValueError("implicit differentiation requires a converged root")
+    sigma_min = smallest_singular(jacobian_core(sys, result.point))
+    if not math.isfinite(sigma_min) or sigma_min <= 1e-10:
+        raise ValueError("implicit differentiation requires a regular root (Jacobian rank lost)")
+
+
 class _NewtonIFT(torch.autograd.Function):
-    """Forward: Gauss-Newton. Backward: IFT on the landing point."""
+    """Forward: host root landing. Backward: first-order square-root IFT."""
 
     @staticmethod
     def forward(
@@ -63,33 +95,29 @@ class _NewtonIFT(torch.autograd.Function):
     ) -> Tensor:
         sys_w = _with_weights(sys, _as_tuple(weights))
         result = newton_project_core(sys_w, _as_tuple(x0), max_iter=max_iter, tol=tol)
+        _require_isolated_root(sys_w, result, tol)
         x_star = torch.tensor(result.point, dtype=x0.dtype, device=x0.device)
         ctx.sys = sys
         ctx.save_for_backward(x_star, weights)
         return x_star
 
     @staticmethod
+    @once_differentiable
     def backward(ctx: Any, grad_output: Tensor) -> tuple[Tensor | None, Tensor | None, None, None, None]:
         x_star, weights = ctx.saved_tensors
         sys_w = _with_weights(ctx.sys, _as_tuple(weights))
         xs = _as_tuple(x_star)
         df = jacobian_core(sys_w, xs)
-        pinv = pseudoinverse(df)  # D x m
         dfdc = dF_d_weights(sys_w, xs)  # m x n_c
-        g = _as_tuple(grad_output)
-        # dL/dc = - (dF/dc)^T (DF^+)^T g
-        # (DF^+)^T g is m-vector: pinv^T g
-        m = len(df)
-        n_c = sys_w.n_terms
-        pinv_t_g = tuple(sum(pinv[k][j] * g[k] for k in range(sys_w.dim)) for j in range(m))
-        grad_w = torch.zeros(n_c, dtype=weights.dtype, device=weights.device)
-        for j in range(n_c):
-            acc = 0.0
-            for i in range(m):
-                acc -= dfdc[i][j] * pinv_t_g[i]
-            grad_w[j] = acc
-        # x0 is a seed; IFT treats the landing point as independent of x0
-        # once the iteration has converged (projection onto the manifold).
+        # Solve the square adjoint directly; forming the normal-equation Gram
+        # matrix would unnecessarily square its condition number.
+        solve_dtype = torch.float64 if torch.float64 in (x_star.dtype, weights.dtype) else torch.float32
+        jac = torch.tensor(df, dtype=solve_dtype, device=x_star.device)
+        parameter_jac = torch.tensor(dfdc, dtype=solve_dtype, device=x_star.device)
+        adjoint = torch.linalg.solve(jac.T, grad_output.to(dtype=solve_dtype))
+        grad_w = (-(parameter_jac.T @ adjoint)).to(dtype=weights.dtype, device=weights.device)
+        # A regular isolated root is locally independent of its initial seed
+        # within the same attraction basin. This is not true for a manifold.
         grad_x0 = torch.zeros_like(x_star)
         return grad_x0, grad_w, None, None, None
 
@@ -102,7 +130,13 @@ def newton_project(
     max_iter: int = 20,
     tol: float = 1e-12,
 ) -> Tensor:
-    """Gauss-Newton projection. Differentiable through the IFT, not the loop."""
+    """Land on a root from ``x0`` using host Gauss-Newton.
+
+    Gradient-enabled calls require a converged, regular square root and provide
+    first-order implicit sensitivities. The seed derivative is then locally
+    zero within its attraction basin. Forward-only calls also accept
+    underdetermined systems. There is no nearest-point or branch guarantee.
+    """
     if weights is None:
         w = torch.tensor(
             [t.weight for t in sys.terms],
@@ -111,6 +145,11 @@ def newton_project(
         )
     else:
         w = weights
+    _check_inputs(sys, x0, w, max_iter, tol)
+    if not torch.is_grad_enabled() or not (x0.requires_grad or w.requires_grad):
+        sys_w = _with_weights(sys, _as_tuple(w))
+        result = newton_project_core(sys_w, _as_tuple(x0), max_iter=max_iter, tol=tol)
+        return torch.tensor(result.point, dtype=x0.dtype, device=x0.device)
     return cast(Tensor, _NewtonIFT.apply(x0, w, sys, max_iter, tol))
 
 
@@ -122,13 +161,15 @@ def newton_project_unrolled(
     max_iter: int = 20,
     tol: float = 1e-12,
 ) -> Tensor:
-    """Unrolled Gauss-Newton kept on the autodiff graph (G5 comparison only).
+    """Differentiate the executed codimension-one Gauss-Newton iteration.
 
-    Implemented for codimension 1 (the IFT-vs-unrolled gate). Higher
-    codimension should use :func:`newton_project`.
+    This is the iteration map, including its seed dependence, rather than an
+    implicit root derivative or a nearest-point projection. The stopping
+    decision is discrete and its derivative is not included.
     """
     if sys.codimension != 1:
         raise ValueError("newton_project_unrolled is the G5 probe for m=1")
+    _check_inputs(sys, x0, weights, max_iter, tol)
     from omnibias.torch.activations import get_activation
 
     act = get_activation(sys.base)
@@ -149,6 +190,8 @@ def newton_project_unrolled(
             return x
         df = weights[0] * sigmas_p[0] * normals[0] - weights[1] * sigmas_p[1] * normals[1]
         gram = (df * df).sum()
+        if not bool(torch.isfinite(gram).detach()) or float(gram.detach()) <= 1e-20:
+            raise ValueError("Gauss-Newton iteration requires a regular Jacobian")
         x = x - df * (f / gram)
     return x
 
@@ -173,6 +216,9 @@ def locus_tangent_tensor(sys: EqualitySystem, x: Tensor) -> Tensor:
 def newton_result(
     sys: EqualitySystem, x0: Tensor, *, max_iter: int = 20, tol: float = 1e-12
 ) -> NewtonResult:
+    """Host root-landing diagnostics, without an attached derivative."""
+    weights = x0.new_tensor([term.weight for term in sys.terms])
+    _check_inputs(sys, x0, weights, max_iter, tol)
     return newton_project_core(sys, _as_tuple(x0), max_iter=max_iter, tol=tol)
 
 
@@ -187,19 +233,25 @@ class LocusOutput:
 
 
 class EqualityLocusLayer(nn.Module):
-    """Gauss-Newton projection with IFT backward. Always returns branch / condition."""
+    """Seed-selected root landing with diagnostics and restricted IFT backward.
+
+    ``branch`` diagnostics describe the returned root; they do not establish
+    branch completeness or nearest-point selection.
+    """
 
     def __init__(
         self,
         system: EqualitySystem,
         *,
-        branch: int | Literal["nearest", "all"] = "nearest",
+        branch: Literal["seed"] = "seed",
         max_iter: int = 20,
         tol: float = 1e-12,
         require_transversal: bool = True,
         dtype: torch.dtype | None = None,
     ) -> None:
         super().__init__()
+        if branch != "seed":
+            raise ValueError("only branch='seed' is implemented; nearest/all/numbered guarantees are unsupported")
         self.system = system
         self.branch_mode = branch
         self.max_iter = int(max_iter)

@@ -1,0 +1,5 @@
+OOD,method,in_accuracy_percent,AUROC_Mahalanobis,AUROC_MSP,AUROC_firing
+SVHN,ReLU,90.34,0.6272,0.898,0.9651
+SVHN,mbK3,89.15,0.9029,0.8557,0.8502
+Textures,ReLU,90.38,0.7327,0.8351,0.7773
+Textures,mbK3,89.27,0.8793,0.8132,0.8121

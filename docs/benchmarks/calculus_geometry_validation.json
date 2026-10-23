@@ -1,0 +1,83 @@
+{
+  "scope": "Per-command validation records; passing suites are reported separately from two existing repository-policy failures.",
+  "cpu_environment": {
+    "CUDA_VISIBLE_DEVICES": "",
+    "JAX_PLATFORMS": "cpu",
+    "JAX_ENABLE_X64": "1",
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "runs": [
+    {
+      "name": "core_and_fields",
+      "passed": 5914,
+      "skipped": 1,
+      "deselected": 2,
+      "command": "python -m pytest packages/omnibias-core/tests packages/omnibias-fields/tests --deselect packages/omnibias-core/tests/test_license_consistency.py::test_every_package_python_file_carries_its_tier_header --deselect packages/omnibias-core/tests/test_no_leakage.py::test_no_leakage_in_tracked_files -q"
+    },
+    {
+      "name": "torch_package",
+      "passed": 1628,
+      "skipped": 14,
+      "deselected": 9,
+      "command": "python -m pytest packages/omnibias-torch/tests -x -q"
+    },
+    {
+      "name": "jax_package",
+      "passed": 983,
+      "skipped": 0,
+      "deselected": 0,
+      "command": "python -m pytest packages/omnibias-jax/tests -x -q"
+    },
+    {
+      "name": "additional_native_compilation_case",
+      "passed": 1,
+      "command": "python -m pytest packages/omnibias-torch/tests/test_affine_geometry.py::test_compiled_affine_projection_preserves_parameter_gradients -q"
+    },
+    {
+      "name": "laboratory_pilot_tests",
+      "passed": 34,
+      "command": "python -m pytest tests/test_calculus_geometry_science.py tests/test_calculus_geometry_tabular.py tests/test_calculus_geometry_optimization.py tests/test_calculus_geometry_audit.py -q"
+    },
+    {
+      "name": "continuous_bias_tests",
+      "passed": 16,
+      "command": "python -m pytest calculus_geometry_continuous_bias/test_pricing.py calculus_geometry_continuous_bias/test_replay.py -q"
+    },
+    {
+      "name": "final_polynomial_jet_checks",
+      "passed": 25,
+      "command": "python -m pytest packages/omnibias-core/tests/test_jet_geometry.py -q"
+    },
+    {
+      "name": "selected_executable_documentation",
+      "passed": 4,
+      "deselected": 54,
+      "command": "python -m pytest tests/test_docs_snippets.py -k 'affine or calculus' -q"
+    },
+    {
+      "name": "final_geometry_regressions",
+      "passed": 51,
+      "command": "python -m pytest packages/omnibias-torch/tests/test_affine_geometry.py packages/omnibias-jax/tests/test_affine_geometry.py tests/test_affine_geometry_parity.py packages/omnibias-core/tests/test_jet_geometry.py -q"
+    }
+  ],
+  "static_checks": {
+    "ruff": "passed for new/changed owned implementation and pilot sources",
+    "strict_mypy": "passed for four new reusable source modules",
+    "generated_inventory": "passed",
+    "mkdocs_strict": "passed",
+    "whitespace": "passed"
+  },
+  "existing_policy_failures": [
+    {
+      "test": "packages/omnibias-core/tests/test_license_consistency.py::test_every_package_python_file_carries_its_tier_header",
+      "reason": "Older local experimental Python files lack required SPDX headers."
+    },
+    {
+      "test": "packages/omnibias-core/tests/test_no_leakage.py::test_no_leakage_in_tracked_files",
+      "reason": "Earlier research/handoff artifacts contain local paths and scheduler-specific wording."
+    }
+  ],
+  "environment_diagnosis": "An initial unrestricted backend run encountered GPU-driver discovery warnings. Explicit CPU selection made the complete Torch and JAX package runs pass."
+}

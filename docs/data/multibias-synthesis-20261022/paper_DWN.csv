@@ -1,0 +1,4 @@
+dataset,config,multibias_final_hard_accuracy_percent,std_pp,seeds,published_DWN_accuracy_percent,reported_bits,caveat
+MNIST,"n2,2x6000LUT2",98.22,0.06,8,98.27,5.9KiB,acc_discretizedfullydiscretizedexportabout1pplower;final_acc_hardnotfullydiscretizeddeploymentmetric
+MNIST,"n6,2000→1000",98.07,0.02,,98.31,,
+MNIST,"n6,1000→500",97.41,0.07,,97.8,,

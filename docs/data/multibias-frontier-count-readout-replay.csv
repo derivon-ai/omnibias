@@ -1,0 +1,7 @@
+seed,method,status,complete_assignments,disagreements,array_bytes,metadata_bytes,total_bytes
+7201,moment,PASSED,4096,0,547,377,924
+7201,exhaustive,PASSED,4096,0,547,377,924
+7211,moment,PASSED,4096,0,547,377,924
+7211,exhaustive,PASSED,4096,0,547,377,924
+7219,moment,PASSED,4096,0,547,377,924
+7219,exhaustive,PASSED,4096,0,547,377,924

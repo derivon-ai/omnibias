@@ -1,0 +1,104 @@
+{
+  "schema": "omnibias-session-checkpoint-validation-v1",
+  "date": "2026-10-23",
+  "lab_commit": "10ac0799c925c80a9ea20e5128bc2692e7ff10f6",
+  "root_base_commit": "72ef81d1ae9f8ae8792b21e6bc89ccc2e850959c",
+  "publication_ready": false,
+  "checks": {
+    "focused_primitive_regression_parity": {
+      "passed": 251,
+      "seconds": 28.55,
+      "device": "CPU",
+      "jax_float64": true
+    },
+    "lab_selected_regressions": {
+      "passed": 134,
+      "seconds": 5.08,
+      "interpreter": "/tmp/omnibias-frontier-env-20261021/bin/python",
+      "targets": [
+        "tests/projection_profile_research",
+        "tests/test_activation_compression.py",
+        "tests/test_multibias_frontier_band_contract.py",
+        "tests/test_multibias_frontier_lifecycle.py",
+        "tests/test_multibias_frontier_evidence_contract.py"
+      ]
+    },
+    "docs_snippets": {
+      "passed": 58,
+      "seconds": 42.57
+    },
+    "compendium_regressions": {
+      "passed": 10,
+      "seconds": 0.14
+    },
+    "api_inventory": "PASSED",
+    "changed_python_ruff": "PASSED",
+    "changed_python_spdx": "PASSED",
+    "strict_mkdocs": "PASSED",
+    "curated_lab_archive_committed_blob_hashes": {
+      "passed": 116,
+      "failures": 0
+    },
+    "source_note_hashes": {
+      "passed": 102,
+      "failures": 0
+    },
+    "global_ruff": {
+      "issues": 464,
+      "classification": "unchanged experimental JAX baseline"
+    },
+    "global_mypy": {
+      "errors": 1363,
+      "files": 27,
+      "classification": "unchanged experimental JAX baseline"
+    },
+    "global_license_headers": {
+      "missing": 28,
+      "classification": "unchanged experimental JAX baseline"
+    },
+    "full_affected_packages": {
+      "passed": 8663,
+      "failed": 13,
+      "skipped": 15,
+      "deselected": 9,
+      "seconds": 890.52,
+      "baseline_reproduced_failures": 12,
+      "session_expanded_hygiene_failures": 1,
+      "log_sha256": "db34f9aae3f47e3b89851e29217277d7151de7cbfb6079067ce2dae86a1b1187",
+      "raw_log_retained_locally": "/tmp/omnibias-session-full-package-tests-20261023.log"
+    }
+  },
+  "failure_classification": [
+    {
+      "count": 11,
+      "cause": "Unchanged experimental bounds module sets global strict-transcendental state at import; certificate/provenance tests become collection-order dependent.",
+      "baseline_evidence": "11 nodes pass isolated on current and HEAD; importing HEAD bounds changes strict_backend False to True and reproduces the same 11 failures."
+    },
+    {
+      "count": 1,
+      "cause": "Missing tier license headers in unchanged experimental JAX files.",
+      "baseline_evidence": "Same failure reproduced against clean HEAD snapshot."
+    },
+    {
+      "count": 1,
+      "cause": "No-leakage guard detects workstation paths/scheduler references in tracked documents.",
+      "classification": "Existing findings plus intentional new research-provenance paths; expanded by session and left open, not claimed as an entirely baseline failure."
+    }
+  ],
+  "preservation": {
+    "frozen_artifacts_rewritten": false,
+    "guard_weakened": false,
+    "new_model_training": false,
+    "large_artifacts_and_environments": "retained locally, excluded from Git",
+    "archival_whitespace": "retained in frozen patches/plots/CSV and historical source"
+  },
+  "commands": {
+    "full_suite": "CUDA_VISIBLE_DEVICES='' JAX_PLATFORMS=cpu JAX_ENABLE_X64=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest packages/omnibias-core/tests packages/omnibias-fields/tests packages/omnibias-torch/tests packages/omnibias-jax/tests packages/omnibias-convex/tests tests/test_affine_geometry_parity.py tests/test_ridge_distribution_parity.py tests/test_normalized_band.py -q",
+    "docs_snippets": "CUDA_VISIBLE_DEVICES='' JAX_PLATFORMS=cpu JAX_ENABLE_X64=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest tests/test_docs_snippets.py -q -p no:cacheprovider",
+    "compile": ".venv/bin/python scripts/compile_session_findings.py",
+    "compendium_regressions": ".venv/bin/python -m pytest tests/test_session_compendium.py -q -p no:cacheprovider",
+    "docs": ".venv/bin/python -m mkdocs build --strict",
+    "archive_integrity": "python3 reports/projection_profile_20261023/verify_archive.py"
+  },
+  "full_suite_detailed_record": "package-suite.json"
+}

@@ -1,0 +1,1542 @@
+{
+  "schema": "multibias-forensic-followup-v1",
+  "status": "COMPLETED_WITH_SCOPED_FINDINGS",
+  "started_utc": "2026-10-22T14:44:37+00:00",
+  "finished_utc": "2026-10-22T15:11:39.009123+00:00",
+  "artifact_root": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/multibias_followup_20261022_1444",
+  "scripts_root": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_followup_20261022",
+  "prior_campaign_index_sha256": "a5749b01fc2c86f74aae99f4a0fbfa6b8c952f08ff27237317d3016f1307d930",
+  "registered_sources": [
+    "compression/registration.json",
+    "filtering/registration.json",
+    "filtering_long/registration.json"
+  ],
+  "decisions": {
+    "bands": "Reported numbers verified; architecture clarified: learn scalar coordinate, discard soft head, exact refitted hard bands. Same-init and PPR controls remain missing.",
+    "compression": "Mapping checks pass. ReLU scale compensation fixes a collinear construction and modestly improves one retrospective model, but does not close quality gap. No general impossibility or full R50/GPT2 rerun claim.",
+    "filtering": "Training-derived initialization stabilizes the matched Gaussian one-index fixture across five fresh seeds; joint/native controls also succeed. Fixed-rate final iterates may oscillate; global convergence and real-image gains unproved."
+  },
+  "limitations": [
+    "The 123-case matrix includes five fresh cases per fixed method/target after discovery-validation freeze; 20 longer fits use already inspected seeds and are diagnostics.",
+    "Native band has a favorable known response-family initialization and basis-dependent ridge scaling.",
+    "New compression is one previously evaluated seed and fixed factor2/three blocks, not fresh confirmation or full ImageNet.",
+    "Current clipping/fixed-stage checkpoints are not global-optimum or stationarity certificates.",
+    "Prior and new artifacts remain separate; unchanged paper/stable APIs are verified."
+  ],
+  "costs": {
+    "compression_study_seconds": 116.39411164191552,
+    "compression_gpu_validation_replay": "not separately instrumented; no runtime superiority claim",
+    "filtering_fit_seconds": 36.41143878351431,
+    "filtering_internal_seconds_before_replay": 37.2652207139181,
+    "filtering_separate_process_replay_seconds": 3.47,
+    "longer_fit_seconds": 33.29895840410609,
+    "new_download_bytes": 0,
+    "environment_modifications": 0
+  },
+  "verification": {
+    "unchanged_research_substrate": "e04ee01482c66bb93dce461e7e6b87c441ab3cffbab90a284b42f05de4a2ce7b",
+    "previous_campaign_retained_hashes": {
+      "public": 37,
+      "scripts": 91,
+      "metadata": 1621
+    },
+    "open_paper_preserved": "625c9952f7ae46afc20ea5e5e5b44d5801f467ab7a9eaadc07aecbe6ee2cc5c1",
+    "compression": {
+      "fits": 9,
+      "all_updates": 200,
+      "primary_block_error_deltas": 0,
+      "export_hashes_checked": 4,
+      "validation_replay": "PASSED",
+      "test_scope": "retrospective"
+    },
+    "filtering": {
+      "cases": 123,
+      "replay": "PASSED",
+      "source_hash_matches_registration": true
+    },
+    "filtering_long": {
+      "cases": 20,
+      "replay": "PASSED",
+      "source_hash_matches_registration": true
+    },
+    "longer_prefix": {
+      "checkpoints": 140,
+      "scalar_checks": 560,
+      "max_abs_error": 0
+    },
+    "export_equations": {
+      "step_equivalence": "PASSED",
+      "soft_region_probabilities": "PASSED",
+      "examples": 2004,
+      "scope": "numerical illustration plus supplied telescoping/monotonicity argument"
+    },
+    "strict_documentation_build": {
+      "exit_code": 0,
+      "log": "documentation_build.log"
+    },
+    "tables_and_figure": {
+      "tables": 6,
+      "hashes": "PASSED",
+      "figure_visually_reviewed": true
+    }
+  },
+  "artifact_files": {
+    "compression/data_protocol.npz": {
+      "bytes": 17090,
+      "sha256": "5f78bc0154caa609846d8495510d64c60a18c0b1bc17fd3345b3c6172e1f2362"
+    },
+    "compression/evaluation_progress.json": {
+      "bytes": 2515,
+      "sha256": "ff72a4b99453f2bb0f8605e0be8514b3fe04759cb98f5136ea0c778092a46521"
+    },
+    "compression/progress.json": {
+      "bytes": 9908,
+      "sha256": "f36398d37b087cc56d1062419b430647f12175033f502a8c5d5e0a8f080378e1"
+    },
+    "compression/prune.json": {
+      "bytes": 585,
+      "sha256": "74796d9b9ac7ae2b8134bc27333e1c27b33f0a58f31b3f50c27fc50c12d266a1"
+    },
+    "compression/prune.npz": {
+      "bytes": 44214806,
+      "sha256": "1f480337d5c6f3892e87c9fb243cd2cd3edb3cf49420704cceef775843a7290e"
+    },
+    "compression/prune_test.npz": {
+      "bytes": 15731910,
+      "sha256": "0f656289144595b81f5cebe41173cd4e6e7bc092a9d0ac4c34e0c6de192cf54b"
+    },
+    "compression/prune_validation.npz": {
+      "bytes": 4008510,
+      "sha256": "b12641775adacd83f76cfaa68e56e1609ce1f4a423569543b1af5cdf123056aa"
+    },
+    "compression/raw_shared.json": {
+      "bytes": 588,
+      "sha256": "93c2a5e3a51de328491ff7c131ec388a2dcd0475fb8b3cf516c82103dbc07446"
+    },
+    "compression/raw_shared.npz": {
+      "bytes": 44238342,
+      "sha256": "ee9db646e0c14ce10fea7dbc7da4cd127cc041e3faaac8ca10a3b3e3c28d0a80"
+    },
+    "compression/raw_shared_test.npz": {
+      "bytes": 15731910,
+      "sha256": "c6612ccd4fba895e620f8318de7634a113fd5a138493ea93936e1583c9d35cf1"
+    },
+    "compression/raw_shared_validation.npz": {
+      "bytes": 4008510,
+      "sha256": "0e82cf32a2f02142484c10a047c71ce70bbd80738a9f841c973e28c35b59dddd"
+    },
+    "compression/registration.json": {
+      "bytes": 1247,
+      "sha256": "63287dfbefb1db2dc3c654ae84bf026a12ed3b1b61b845b48066ee7f01c6c049"
+    },
+    "compression/replay.json": {
+      "bytes": 1222,
+      "sha256": "c792f518b7b5b307fea72e6581910e9bf7bb283f09ba5379ba0abcba51ddafa9"
+    },
+    "compression/result.json": {
+      "bytes": 13412,
+      "sha256": "0c80e9caeba00c312e9481cc7f964ce1e90270e77cbf50a1f3e1545bccf4823f"
+    },
+    "compression/scale_aware_shared.json": {
+      "bytes": 588,
+      "sha256": "ea246de293d761b15c58af99b05414ba26cd676dcdd9292bd0c533a5278242c3"
+    },
+    "compression/scale_aware_shared.npz": {
+      "bytes": 44238342,
+      "sha256": "5674acf0f7af8d39e62f8e1faf70f486962ca1b4661421f54d0c9711020ef7a4"
+    },
+    "compression/scale_aware_shared_test.npz": {
+      "bytes": 15731910,
+      "sha256": "a057c650c4c461e0a086bcab00c88948e21d42e1a61cc772467b528f116f2716"
+    },
+    "compression/scale_aware_shared_validation.npz": {
+      "bytes": 4008510,
+      "sha256": "c00335bb7c89ddbba066d7e96da9bc250eb9fbc8b10d94eb5753c46e6509b7d3"
+    },
+    "compression/selection_freeze.json": {
+      "bytes": 10220,
+      "sha256": "8ac8f2f038b0b9090277717f6c5df12f412d0599cdcd59827c3cbf24086dfef0"
+    },
+    "compression/teacher.json": {
+      "bytes": 334,
+      "sha256": "ba986003d0dcda064e6d018df53abebab4a30a60d97df3c93040e93d5a626604"
+    },
+    "compression/teacher.npz": {
+      "bytes": 46830690,
+      "sha256": "4d611c92a6e0e46f48303329c613a0f60f9705ff23cb9fb08a1f5b3b776cfa31"
+    },
+    "compression/teacher_test.npz": {
+      "bytes": 15731910,
+      "sha256": "c1d12590ae8028892bc4bee5ea1fb3eafbed37ac3c65d5e256971316de0c686c"
+    },
+    "compression/teacher_validation.npz": {
+      "bytes": 4008510,
+      "sha256": "cb0539d58e089f3c16ed969d7634a9be71cad75ce58f7526830cec95d4e3d16a"
+    },
+    "documentation_build.log": {
+      "bytes": 1165,
+      "sha256": "5544c6ef85c8e02f0728c25126cdca8d9b61ef4c442d2c905a8d25440a088d18"
+    },
+    "filtering/cases/confirmation_amplitude_band_7541_legacy_initialization_joint.json": {
+      "bytes": 4931,
+      "sha256": "9c274a79048d16df0ebba223aac73a6db545757528d00abff77ac056d2b717e9"
+    },
+    "filtering/cases/confirmation_amplitude_band_7541_moment_native_band.json": {
+      "bytes": 5253,
+      "sha256": "690f7fd8c9948a59ca3665c0443143102342c324374768142c5331e8415ed1e4"
+    },
+    "filtering/cases/confirmation_amplitude_band_7541_moment_quantile_joint.json": {
+      "bytes": 5345,
+      "sha256": "acc82927db9d649b8ce6a4e1279aa4daa67010fb4b3ce12782148153b284e4f0"
+    },
+    "filtering/cases/confirmation_amplitude_band_7541_moment_quantile_varpro.json": {
+      "bytes": 5336,
+      "sha256": "c9aec4db972f18db904c020f6b05844c7ab08e624843a50f5da0ca58e44215b7"
+    },
+    "filtering/cases/confirmation_amplitude_band_7547_legacy_initialization_joint.json": {
+      "bytes": 4926,
+      "sha256": "7848b72dc29409cefe38299ef5bcf2e54c7e2aed6b3e64ae35fec80097381615"
+    },
+    "filtering/cases/confirmation_amplitude_band_7547_moment_native_band.json": {
+      "bytes": 5229,
+      "sha256": "36018aed3e85a4598096331f51434607d474409629a9a05fa60a2cbad1bc8c2c"
+    },
+    "filtering/cases/confirmation_amplitude_band_7547_moment_quantile_joint.json": {
+      "bytes": 5321,
+      "sha256": "fb20f83405a297aed58ae7977e8ac69f4eb55a297fc9071de60833753b9438f8"
+    },
+    "filtering/cases/confirmation_amplitude_band_7547_moment_quantile_varpro.json": {
+      "bytes": 5326,
+      "sha256": "29b96451aaccb4ce28467fd131cd6b3899307efefa61eaa9627764c616c4403c"
+    },
+    "filtering/cases/confirmation_amplitude_band_7549_legacy_initialization_joint.json": {
+      "bytes": 4929,
+      "sha256": "ba30b8fbeb74f2ca9ac3f35a9426d330c12e88deecfc5155ad710d9fabe727f9"
+    },
+    "filtering/cases/confirmation_amplitude_band_7549_moment_native_band.json": {
+      "bytes": 5235,
+      "sha256": "23a32a97e5ca73d1e4fd5572914b26920b73dfae6523fc4c3662d93415f0020d"
+    },
+    "filtering/cases/confirmation_amplitude_band_7549_moment_quantile_joint.json": {
+      "bytes": 5332,
+      "sha256": "c370e5e7eb49774162cb6ba7db5f979ac15259c67c129b66746921dea91988ed"
+    },
+    "filtering/cases/confirmation_amplitude_band_7549_moment_quantile_varpro.json": {
+      "bytes": 5320,
+      "sha256": "69d1f119d8cd63ac0fce2fbad24252dba4132415c3de346f1c4cffe5e778fcfd"
+    },
+    "filtering/cases/confirmation_amplitude_band_7559_legacy_initialization_joint.json": {
+      "bytes": 4914,
+      "sha256": "00cafdaf092755536f4a3a1568a0af0fe644fb73c72c0e3d11227c8cd031dbee"
+    },
+    "filtering/cases/confirmation_amplitude_band_7559_moment_native_band.json": {
+      "bytes": 5273,
+      "sha256": "0978629586cbe4358cb79df23a5fb56358f60f621a98834d7c18d0ab2f320311"
+    },
+    "filtering/cases/confirmation_amplitude_band_7559_moment_quantile_joint.json": {
+      "bytes": 5363,
+      "sha256": "11ecf4c00524b37f5e895eef3582d1b8a9a7df99d55902833982b65ed2f65647"
+    },
+    "filtering/cases/confirmation_amplitude_band_7559_moment_quantile_varpro.json": {
+      "bytes": 5372,
+      "sha256": "0d4c398b22eb3c7eccfccbf2db8c54cfa70c5ce8b25415eb96dd2d0e7ac4c113"
+    },
+    "filtering/cases/confirmation_amplitude_band_7561_legacy_initialization_joint.json": {
+      "bytes": 4904,
+      "sha256": "80f0c36f649ba9b3102a97630ad8bc3e4731221414242d15e5ac6c5f3c22a995"
+    },
+    "filtering/cases/confirmation_amplitude_band_7561_moment_native_band.json": {
+      "bytes": 5232,
+      "sha256": "c356c9cbfbbc94517fb36ef83f1780e896c6b8fdc71315cb6f73f0948eaa1b46"
+    },
+    "filtering/cases/confirmation_amplitude_band_7561_moment_quantile_joint.json": {
+      "bytes": 5338,
+      "sha256": "4a2f71aea0e08488dae31312b48c150c3ef99ecea02990703c41fc30cdc15c7a"
+    },
+    "filtering/cases/confirmation_amplitude_band_7561_moment_quantile_varpro.json": {
+      "bytes": 5323,
+      "sha256": "24c574ccc8f27e7f1932630baaeee5d6aa37b119f80d12fa058f8a95f7c883b9"
+    },
+    "filtering/cases/confirmation_dog_linear_7541_legacy_initialization_joint.json": {
+      "bytes": 5020,
+      "sha256": "bd089a37c863a0f8ab93ecb556a907a0c8db7f84aeacddf3c1a88bf9f704d6af"
+    },
+    "filtering/cases/confirmation_dog_linear_7541_moment_native_band.json": {
+      "bytes": 5292,
+      "sha256": "9815b3dd94c713d659028b027ba7417114e716752ea0efb48adb563b2fbf8f39"
+    },
+    "filtering/cases/confirmation_dog_linear_7541_moment_quantile_joint.json": {
+      "bytes": 5361,
+      "sha256": "d15b44970d78d962482e727cc9dc2fd52354d619af25dc0a602030ed11e0b419"
+    },
+    "filtering/cases/confirmation_dog_linear_7541_moment_quantile_varpro.json": {
+      "bytes": 5376,
+      "sha256": "da3cbec08c5e5fd95858c9bde6817fb7a0f866ef7572a58b56254e51116b6f1f"
+    },
+    "filtering/cases/confirmation_dog_linear_7547_legacy_initialization_joint.json": {
+      "bytes": 5014,
+      "sha256": "498c5c851a713d716eeb7d5c0152e07cc2bedd52da9d5b15bb1cd68675a68a45"
+    },
+    "filtering/cases/confirmation_dog_linear_7547_moment_native_band.json": {
+      "bytes": 5309,
+      "sha256": "9cee7281c4b4ebb026f2b7ce681b1741e7ef0b24ba6fb087fd3bf29c8c588b7f"
+    },
+    "filtering/cases/confirmation_dog_linear_7547_moment_quantile_joint.json": {
+      "bytes": 5390,
+      "sha256": "b76c0c9e162fa5a729f3ad360d854800929fea65cac2e76dc0604683b7a0a6e1"
+    },
+    "filtering/cases/confirmation_dog_linear_7547_moment_quantile_varpro.json": {
+      "bytes": 5379,
+      "sha256": "8587d26bee06e84900e0f49ce2f0a457ae59082c3e5d240e0b70285b402a129a"
+    },
+    "filtering/cases/confirmation_dog_linear_7549_legacy_initialization_joint.json": {
+      "bytes": 5014,
+      "sha256": "a1f0eeb2c282526474e126f55b9a07f7b1d7d94b77fc400172c54acd1f0cdfed"
+    },
+    "filtering/cases/confirmation_dog_linear_7549_moment_native_band.json": {
+      "bytes": 5301,
+      "sha256": "01197e4695a9217d5a62422c55ea25fc2d4d8106ca917c4772233d8a12db85e3"
+    },
+    "filtering/cases/confirmation_dog_linear_7549_moment_quantile_joint.json": {
+      "bytes": 5388,
+      "sha256": "6b547faec622784acb0fad3652c677ef5c440c227d16725e89b070ac7b70eb03"
+    },
+    "filtering/cases/confirmation_dog_linear_7549_moment_quantile_varpro.json": {
+      "bytes": 5393,
+      "sha256": "42b4ff26088d4f1fdb0c3b2deaf9e35888d3aa052a269585e2ec9d8814d458b3"
+    },
+    "filtering/cases/confirmation_dog_linear_7559_legacy_initialization_joint.json": {
+      "bytes": 5022,
+      "sha256": "51437863f2fecf4233202005899e7451d56be18d6a780590cb9c253739897c38"
+    },
+    "filtering/cases/confirmation_dog_linear_7559_moment_native_band.json": {
+      "bytes": 5287,
+      "sha256": "a88a32737143a13145793b29342878082cf40a6b816b21dafdfe7d9cbf6ab840"
+    },
+    "filtering/cases/confirmation_dog_linear_7559_moment_quantile_joint.json": {
+      "bytes": 5375,
+      "sha256": "86584caf48258a7b84f3d4a9a3caf6449b1240f3890cc154443a4f2b35702f92"
+    },
+    "filtering/cases/confirmation_dog_linear_7559_moment_quantile_varpro.json": {
+      "bytes": 5371,
+      "sha256": "399d0c0ac3759886c941d96023a6bb9f264b75011587f0d46a28df0c5466c7cc"
+    },
+    "filtering/cases/confirmation_dog_linear_7561_legacy_initialization_joint.json": {
+      "bytes": 5023,
+      "sha256": "e0a31014a93258768bef099bbcb183fb49f89c90ec83c4c4457209ad6bd54b88"
+    },
+    "filtering/cases/confirmation_dog_linear_7561_moment_native_band.json": {
+      "bytes": 5283,
+      "sha256": "37c18c18e26915f59fc4f7330bb9d413de0c89d6cb6597370c88a81d479457bd"
+    },
+    "filtering/cases/confirmation_dog_linear_7561_moment_quantile_joint.json": {
+      "bytes": 5388,
+      "sha256": "a842c92ce5078398db478380dbc85382f39b052a52994215f493730e4e2eef97"
+    },
+    "filtering/cases/confirmation_dog_linear_7561_moment_quantile_varpro.json": {
+      "bytes": 5359,
+      "sha256": "ac79bcc74ce38943bc827d5250b7bfe57ae2707f7db0392da9f55eb81c951b2f"
+    },
+    "filtering/cases/confirmation_independent_patterns_7541_legacy_initialization_joint.json": {
+      "bytes": 4949,
+      "sha256": "02fd721df4287e2bfd05e15a8f6113cec1a8179f9b4c4fa0b20854471d5307ba"
+    },
+    "filtering/cases/confirmation_independent_patterns_7541_moment_native_band.json": {
+      "bytes": 5216,
+      "sha256": "93720b65b6be2370409f745bc22df18591f1dfdc57a7fe0187952d4ca38ab1ee"
+    },
+    "filtering/cases/confirmation_independent_patterns_7541_moment_quantile_joint.json": {
+      "bytes": 5288,
+      "sha256": "7f93343220c52a748f8daa5c9dda76b26e2a114753f90115cdad8f494bf5ab8e"
+    },
+    "filtering/cases/confirmation_independent_patterns_7541_moment_quantile_varpro.json": {
+      "bytes": 5283,
+      "sha256": "60be35522cc1493878011498e4cd02b2bdb43b779b7f1817b0b0e4f2a7b73aa7"
+    },
+    "filtering/cases/confirmation_independent_patterns_7547_legacy_initialization_joint.json": {
+      "bytes": 4959,
+      "sha256": "f615ddb4d79822d1282d74778d139b77d3b5ff102778cbc111a7cf31e15867cd"
+    },
+    "filtering/cases/confirmation_independent_patterns_7547_moment_native_band.json": {
+      "bytes": 5218,
+      "sha256": "b2e406355fbd806369329c0c57359f98bd77bffab6134a18ba817770f4fa7a1b"
+    },
+    "filtering/cases/confirmation_independent_patterns_7547_moment_quantile_joint.json": {
+      "bytes": 5307,
+      "sha256": "f2c6bbae363ca7629f50cdee2bcc06b127b21aefb4799d99582973586d053b75"
+    },
+    "filtering/cases/confirmation_independent_patterns_7547_moment_quantile_varpro.json": {
+      "bytes": 5294,
+      "sha256": "55d851315afee32135f83cb3ca50366476cfe0b2252176426017894ad06d4dbd"
+    },
+    "filtering/cases/confirmation_independent_patterns_7549_legacy_initialization_joint.json": {
+      "bytes": 4939,
+      "sha256": "68c54d3d53f868de034ada0516486b97ecd1f62e6cb5fe9c9f6dc82ec14927ed"
+    },
+    "filtering/cases/confirmation_independent_patterns_7549_moment_native_band.json": {
+      "bytes": 5205,
+      "sha256": "eeed720ce2814587ec1697bb64de56daa0795fdf22ac962aa6e4d7eb026e491f"
+    },
+    "filtering/cases/confirmation_independent_patterns_7549_moment_quantile_joint.json": {
+      "bytes": 5281,
+      "sha256": "95f14f306115d757f6731d1f95fa593f5d5ab5d8ea6b5ea3be1e9f117839dd08"
+    },
+    "filtering/cases/confirmation_independent_patterns_7549_moment_quantile_varpro.json": {
+      "bytes": 5289,
+      "sha256": "500147e783381b4f246faf5b4f9e1ae71c29a17dc383c8e273c551ee896ef12b"
+    },
+    "filtering/cases/confirmation_independent_patterns_7559_legacy_initialization_joint.json": {
+      "bytes": 4950,
+      "sha256": "6b10b54554924d1a81bc91dc65444776190039d51eff70164a1e4e2ae31215e3"
+    },
+    "filtering/cases/confirmation_independent_patterns_7559_moment_native_band.json": {
+      "bytes": 5213,
+      "sha256": "354d46c7ee89f4a2f420df938c471b1a4a6c22fce250ad3313e0b24d1ccccbe8"
+    },
+    "filtering/cases/confirmation_independent_patterns_7559_moment_quantile_joint.json": {
+      "bytes": 5295,
+      "sha256": "15e0d2a0ab40707b46f6bd30318d7b0ca4c247dee909ed398684990b0f999393"
+    },
+    "filtering/cases/confirmation_independent_patterns_7559_moment_quantile_varpro.json": {
+      "bytes": 5293,
+      "sha256": "69752d0df64c1dc920bc9dfe1c340d29e9c293bef8723d923c2c274ecd40eb89"
+    },
+    "filtering/cases/confirmation_independent_patterns_7561_legacy_initialization_joint.json": {
+      "bytes": 4935,
+      "sha256": "71ef6837f508850a57f478dd5c00d3d6413302687904aac94f157b441f33f9b9"
+    },
+    "filtering/cases/confirmation_independent_patterns_7561_moment_native_band.json": {
+      "bytes": 5207,
+      "sha256": "42351264ca7b2c4c00ae160371d785f6ef2836bd31867b3e2726d9589f71b064"
+    },
+    "filtering/cases/confirmation_independent_patterns_7561_moment_quantile_joint.json": {
+      "bytes": 5280,
+      "sha256": "db7974360deca0824cf0e5b61f06e2a9f7f5d87f37f04c3e5b42da0f1b3242e6"
+    },
+    "filtering/cases/confirmation_independent_patterns_7561_moment_quantile_varpro.json": {
+      "bytes": 5290,
+      "sha256": "c32659f9ea0da18b2dc3dd9c5a0dfe9bce3216038fbf942411e17e64478dc9a6"
+    },
+    "filtering/cases/discovery_amplitude_band_7517_legacy_features_ls_joint.json": {
+      "bytes": 4901,
+      "sha256": "63f79828e2de345db3fe0c36b06a99fc1135577e1caea556bd1c8534a5771615"
+    },
+    "filtering/cases/discovery_amplitude_band_7517_legacy_initialization_joint.json": {
+      "bytes": 4914,
+      "sha256": "ca386648c49297edca89456be21b0f8e838f2ad1078d337990c24ac437a97f45"
+    },
+    "filtering/cases/discovery_amplitude_band_7517_moment_native_band.json": {
+      "bytes": 5227,
+      "sha256": "8e0fdf3c28e9691f43ca44a0b36d1bbaca975f07095e4945d2787bbc93d75f00"
+    },
+    "filtering/cases/discovery_amplitude_band_7517_moment_quantile_joint.json": {
+      "bytes": 5324,
+      "sha256": "c4c0034cb032a879375ee4f0df81248b3c63d731efa5e800b4658f47d156a8fd"
+    },
+    "filtering/cases/discovery_amplitude_band_7517_moment_quantile_varpro.json": {
+      "bytes": 5336,
+      "sha256": "b5eb8cf20518ac23cf95ae617f9b00b877b9815670075f4a7452b505c6b93aec"
+    },
+    "filtering/cases/discovery_amplitude_band_7517_unit_quantile_ls_joint.json": {
+      "bytes": 4919,
+      "sha256": "c835e06b90f1d7f1030256c103d5b69bc3a3a7da35f29154ce476ab78bbbda88"
+    },
+    "filtering/cases/discovery_amplitude_band_7517_unit_quantile_varpro.json": {
+      "bytes": 4918,
+      "sha256": "4f2e5ce7d829faeeb6553e827c8f31ee20f70fd03779d69f59f8e0664a94ed79"
+    },
+    "filtering/cases/discovery_amplitude_band_7523_legacy_features_ls_joint.json": {
+      "bytes": 5036,
+      "sha256": "e67f4aa77a6d38e5d5f39f7c22b62bf4edf6299fe1af789dc569b8ec42acca1e"
+    },
+    "filtering/cases/discovery_amplitude_band_7523_legacy_initialization_joint.json": {
+      "bytes": 4912,
+      "sha256": "cebc552ef20c68762e95ee9be1a73fa79577a24dcb9fca298780ab2b0eafd29a"
+    },
+    "filtering/cases/discovery_amplitude_band_7523_moment_native_band.json": {
+      "bytes": 5231,
+      "sha256": "fb21b6bb011002ddef4796a27a57fa56f48b28f1cf30daae5e909b5d05ce5a9b"
+    },
+    "filtering/cases/discovery_amplitude_band_7523_moment_quantile_joint.json": {
+      "bytes": 5317,
+      "sha256": "8179e483dc9c521f7dc4d19d426e6e8eb34ffe9cf7da14d885e3d33e60f2bbd2"
+    },
+    "filtering/cases/discovery_amplitude_band_7523_moment_quantile_varpro.json": {
+      "bytes": 5331,
+      "sha256": "3d4c6fc9f9f3492738b3315cf374649cc7a2cf49d6ca79207b91c6e7c0644a1b"
+    },
+    "filtering/cases/discovery_amplitude_band_7523_unit_quantile_ls_joint.json": {
+      "bytes": 4903,
+      "sha256": "acaf6572140012d2cead11f355a2053bd85f36df534baa8f3fe891db123268ac"
+    },
+    "filtering/cases/discovery_amplitude_band_7523_unit_quantile_varpro.json": {
+      "bytes": 4912,
+      "sha256": "73a8053e0ca40f2420257a91eccecd6a448f51ecebe7a7103300aa8662ce567d"
+    },
+    "filtering/cases/discovery_amplitude_band_7529_legacy_features_ls_joint.json": {
+      "bytes": 5032,
+      "sha256": "7046e3b781fc94e287418f213bcad392ae92f8b249c7047a5a5921fa99905c25"
+    },
+    "filtering/cases/discovery_amplitude_band_7529_legacy_initialization_joint.json": {
+      "bytes": 4909,
+      "sha256": "c98743c682be3eca96548c99685ab6e59efec15504c9a6f91436ac27c96c248b"
+    },
+    "filtering/cases/discovery_amplitude_band_7529_moment_native_band.json": {
+      "bytes": 5268,
+      "sha256": "cf7fb3f0d216a53cb6d3462097b518dacd2d4445755ff0adebfc3aa93f11782a"
+    },
+    "filtering/cases/discovery_amplitude_band_7529_moment_quantile_joint.json": {
+      "bytes": 5384,
+      "sha256": "72cc04d117adce69342d2489daa17554105dffe580bb2ba64bf7888d93e5cbd2"
+    },
+    "filtering/cases/discovery_amplitude_band_7529_moment_quantile_varpro.json": {
+      "bytes": 5359,
+      "sha256": "c113195cdd2d8a32a94bec50fb3fefcbf2caf1d40451d9c2067151ea205a4fbe"
+    },
+    "filtering/cases/discovery_amplitude_band_7529_unit_quantile_ls_joint.json": {
+      "bytes": 4992,
+      "sha256": "2b087603c2fd108667c9a7a91f597314361ba84107e04c8354adaf5916fbe7b8"
+    },
+    "filtering/cases/discovery_amplitude_band_7529_unit_quantile_varpro.json": {
+      "bytes": 4989,
+      "sha256": "8090c289442ea1478981cee20fd4ff213340abbabcfb078c88084726367ec977"
+    },
+    "filtering/cases/discovery_dog_linear_7517_legacy_features_ls_joint.json": {
+      "bytes": 5046,
+      "sha256": "985489a1d8069f084ec46b9981decda3974eb8db8404f57df0afb915b291e7dd"
+    },
+    "filtering/cases/discovery_dog_linear_7517_legacy_initialization_joint.json": {
+      "bytes": 5017,
+      "sha256": "5102feda6f066bb2ff9b7146e85ba951d0e64a6f431c9f1175fa6ae93232d9d0"
+    },
+    "filtering/cases/discovery_dog_linear_7517_moment_native_band.json": {
+      "bytes": 5295,
+      "sha256": "1c6d5bdf4b062a1088955d800ee07ec4309d4c26edc2ade7c1c40fad787d6925"
+    },
+    "filtering/cases/discovery_dog_linear_7517_moment_quantile_joint.json": {
+      "bytes": 5354,
+      "sha256": "0f7d9a4c73b4c8b9c12eef0bdfa9fc8cd41820ee4f9a35b24c7fb04da2bea355"
+    },
+    "filtering/cases/discovery_dog_linear_7517_moment_quantile_varpro.json": {
+      "bytes": 5379,
+      "sha256": "45ee93ec0037ce207605d02f534de0203e23ac0510f73d5b0a31d6f7e6b8be0e"
+    },
+    "filtering/cases/discovery_dog_linear_7517_unit_quantile_ls_joint.json": {
+      "bytes": 5029,
+      "sha256": "fcc88203bbc683d020b0f38be5535b528bc8da9f2f094cdca5e384564fa21e34"
+    },
+    "filtering/cases/discovery_dog_linear_7517_unit_quantile_varpro.json": {
+      "bytes": 5025,
+      "sha256": "8c2050be0076647484799710bbb2052c1409f86a812492176241bfb72ee73585"
+    },
+    "filtering/cases/discovery_dog_linear_7523_legacy_features_ls_joint.json": {
+      "bytes": 5008,
+      "sha256": "aa52876fbfba0dbf67068648e70b4fd96483dfdf4c826811a6f34f7f45937dc9"
+    },
+    "filtering/cases/discovery_dog_linear_7523_legacy_initialization_joint.json": {
+      "bytes": 5013,
+      "sha256": "6945faf6dbd1e6cc3799b57c57f0c7becdf2b53711ab93e31291514e7f7208b6"
+    },
+    "filtering/cases/discovery_dog_linear_7523_moment_native_band.json": {
+      "bytes": 5284,
+      "sha256": "92f0aef43a91d67922f34f1ad18ede7a4dcf8fc6e32cadf50122ebcb9150ab98"
+    },
+    "filtering/cases/discovery_dog_linear_7523_moment_quantile_joint.json": {
+      "bytes": 5375,
+      "sha256": "9d649498336f93aace8d710f5226f6c5f038bf2bfa08156cc589fe1f683f2b66"
+    },
+    "filtering/cases/discovery_dog_linear_7523_moment_quantile_varpro.json": {
+      "bytes": 5361,
+      "sha256": "0db05938b4a21d2377ddaf5a2df231af6ca7644495dccb3d7dde493e1bce90d7"
+    },
+    "filtering/cases/discovery_dog_linear_7523_unit_quantile_ls_joint.json": {
+      "bytes": 4998,
+      "sha256": "dc34bb094aa2618d14858792ae8f84e899956a46e216cbb1c1c9086ebd534f1d"
+    },
+    "filtering/cases/discovery_dog_linear_7523_unit_quantile_varpro.json": {
+      "bytes": 4981,
+      "sha256": "cbc3e64cbeeb1b9d230768a0ecdee8cd68e2a16fdbf91c2d03cf149a72019f5e"
+    },
+    "filtering/cases/discovery_dog_linear_7529_legacy_features_ls_joint.json": {
+      "bytes": 5028,
+      "sha256": "676e911cfe59e9ed05d88d15ba553810455573105a2fc2342b58dfdd2aa5a576"
+    },
+    "filtering/cases/discovery_dog_linear_7529_legacy_initialization_joint.json": {
+      "bytes": 5024,
+      "sha256": "6f2077aba0fdba9f31837aaf5e6a6145af973feeb4168018365d44cb1347326a"
+    },
+    "filtering/cases/discovery_dog_linear_7529_moment_native_band.json": {
+      "bytes": 5288,
+      "sha256": "696de163a6f1a9dae04628a4ab8fab59544920ce40fcda8d875a7ae90ae1d767"
+    },
+    "filtering/cases/discovery_dog_linear_7529_moment_quantile_joint.json": {
+      "bytes": 5376,
+      "sha256": "3c4c82122275b0aabf412ff699d6a666969ddeb1a00170aec6a67d6e644b0697"
+    },
+    "filtering/cases/discovery_dog_linear_7529_moment_quantile_varpro.json": {
+      "bytes": 5377,
+      "sha256": "a793c0efe3489f4cc8f2c752dce4698ede51d3fb7d33088ebb6bf90f0d037c0a"
+    },
+    "filtering/cases/discovery_dog_linear_7529_unit_quantile_ls_joint.json": {
+      "bytes": 5006,
+      "sha256": "b63539732c56303cc91b5cedf944a140b6365ec808c572d16b5fc646a8514f71"
+    },
+    "filtering/cases/discovery_dog_linear_7529_unit_quantile_varpro.json": {
+      "bytes": 5009,
+      "sha256": "2cf213f3e956bc0a45baa3539c10dba51d46d6963c2c627be24ed0a093d36414"
+    },
+    "filtering/cases/discovery_independent_patterns_7517_legacy_features_ls_joint.json": {
+      "bytes": 4959,
+      "sha256": "afdd7bef66d99aba304e490590469bca0f3720f0f8c1dfb257d0006073b1917b"
+    },
+    "filtering/cases/discovery_independent_patterns_7517_legacy_initialization_joint.json": {
+      "bytes": 4949,
+      "sha256": "516b0a306382ef3ccc99a9307f545c73fad676522c3fee0d64c45c7c5bdf2d84"
+    },
+    "filtering/cases/discovery_independent_patterns_7517_moment_native_band.json": {
+      "bytes": 5203,
+      "sha256": "d222ab5dd775a995714de7d346f10acc6fd95f35adb1f2f0ed436d76ab386d04"
+    },
+    "filtering/cases/discovery_independent_patterns_7517_moment_quantile_joint.json": {
+      "bytes": 5285,
+      "sha256": "ad6c74eaac1cec058c1bc20c6d9a4cc147cbd413b604f5d5899d7ee1c0077cde"
+    },
+    "filtering/cases/discovery_independent_patterns_7517_moment_quantile_varpro.json": {
+      "bytes": 5289,
+      "sha256": "4ae0bd5205fed2f05d13bdb50a5676dfdcee06194633fd7c9e3995dea154d4bd"
+    },
+    "filtering/cases/discovery_independent_patterns_7517_unit_quantile_ls_joint.json": {
+      "bytes": 4951,
+      "sha256": "5fed7090ccd99ea5b0e99ceaafd4a250ab7c3faed4523987e1a39f23cf86dcfb"
+    },
+    "filtering/cases/discovery_independent_patterns_7517_unit_quantile_varpro.json": {
+      "bytes": 4949,
+      "sha256": "93db02f7a5146995ab5c0e502f8be077a09619aa5ec6cc929ca29518c69539f8"
+    },
+    "filtering/cases/discovery_independent_patterns_7523_legacy_features_ls_joint.json": {
+      "bytes": 4975,
+      "sha256": "df7bf2a422b3bd1e8f1d01415661e09c67ef6aa039643e4c5c98ae295c64473c"
+    },
+    "filtering/cases/discovery_independent_patterns_7523_legacy_initialization_joint.json": {
+      "bytes": 4946,
+      "sha256": "3d03f9643bd5e636f39ff59bdb6a4607dd9b4360795e53b5c034ab33f237f76a"
+    },
+    "filtering/cases/discovery_independent_patterns_7523_moment_native_band.json": {
+      "bytes": 5196,
+      "sha256": "76ca1c280c44e94869441ac32fe9477c42dd23dc41f71af69d3487fd8fe574a4"
+    },
+    "filtering/cases/discovery_independent_patterns_7523_moment_quantile_joint.json": {
+      "bytes": 5280,
+      "sha256": "b4d43d4aa1d0876ecebf6323c67a445551f685f04101f13b22000b5f489a5846"
+    },
+    "filtering/cases/discovery_independent_patterns_7523_moment_quantile_varpro.json": {
+      "bytes": 5282,
+      "sha256": "fc147c6f91c49fe0da43a81af62d79b3d0ba4e85aff95eb8c5a828c4121703c7"
+    },
+    "filtering/cases/discovery_independent_patterns_7523_unit_quantile_ls_joint.json": {
+      "bytes": 4934,
+      "sha256": "2ad00e60f228e7c9832f2d52159f9c77a7a7b4b113ad4ec116d165989fcfef89"
+    },
+    "filtering/cases/discovery_independent_patterns_7523_unit_quantile_varpro.json": {
+      "bytes": 4920,
+      "sha256": "3eb933afa75548b045e5771001ac01e3132c8ed1bbe570579fc34372327789f0"
+    },
+    "filtering/cases/discovery_independent_patterns_7529_legacy_features_ls_joint.json": {
+      "bytes": 4952,
+      "sha256": "39c1f270d627ff6ddd2d8082bdee7d5fbc0d4e02588802c5ecb1fa1fd8296d79"
+    },
+    "filtering/cases/discovery_independent_patterns_7529_legacy_initialization_joint.json": {
+      "bytes": 4937,
+      "sha256": "84a44717ec28e76093ac8eac16feb0e172762b55f4f0936fe0493f5465cccde5"
+    },
+    "filtering/cases/discovery_independent_patterns_7529_moment_native_band.json": {
+      "bytes": 5190,
+      "sha256": "3bb0fa3529a3823164db6fca1d64cf950889de17df38d4086d3532a4d2257712"
+    },
+    "filtering/cases/discovery_independent_patterns_7529_moment_quantile_joint.json": {
+      "bytes": 5268,
+      "sha256": "4e6b5589e35ef949d0e83a6165f1b5932dfab1c6f46711cb0e3fa6c8cd73c20e"
+    },
+    "filtering/cases/discovery_independent_patterns_7529_moment_quantile_varpro.json": {
+      "bytes": 5283,
+      "sha256": "6327c8ae0b9133d1116a192930555e2284283847ae144887f3d54bcf9020289d"
+    },
+    "filtering/cases/discovery_independent_patterns_7529_unit_quantile_ls_joint.json": {
+      "bytes": 4936,
+      "sha256": "91967e3ac4c73d81c93ee25e64adeb0e481ff3e92b4a43622a89f279d2d0705a"
+    },
+    "filtering/cases/discovery_independent_patterns_7529_unit_quantile_varpro.json": {
+      "bytes": 4948,
+      "sha256": "b42b6c763b08f43000cc9145ec4126c5913782e1075c4156d52b6f0f35f16846"
+    },
+    "filtering/checks.json": {
+      "bytes": 445,
+      "sha256": "69db1b1999e06b7b09732c7e970f48c4e361b1fad782e09dd45e0534b7196683"
+    },
+    "filtering/data/seed_7517.npz": {
+      "bytes": 2134472,
+      "sha256": "0370a77331fba90811a721fb3e8c25bc0b957fc2a5aa40ce51d85fdd6e9ee765"
+    },
+    "filtering/data/seed_7523.npz": {
+      "bytes": 2134472,
+      "sha256": "d68e12fb4689f7be62e6d81be975f9b0da741cba1e5b35964058b8b67f00d2e6"
+    },
+    "filtering/data/seed_7529.npz": {
+      "bytes": 2134472,
+      "sha256": "ef37531470ef1be47b86fc3688d236049047ca19050404c210558f9b98837e86"
+    },
+    "filtering/data/seed_7541.npz": {
+      "bytes": 2134472,
+      "sha256": "2e1fae5c7603aadd6f7d81b4c4fc5672acc7a828daf82a51aa7a62cc38254ecd"
+    },
+    "filtering/data/seed_7547.npz": {
+      "bytes": 2134472,
+      "sha256": "65e889cf2f24cffda4e998050aeb6bdcc15850fdf2282b1a76eb224d2225c9d0"
+    },
+    "filtering/data/seed_7549.npz": {
+      "bytes": 2134472,
+      "sha256": "ecb61704861764c534f9f1365878f97ae6c00eefb9613670673b5f11fe1cdc1a"
+    },
+    "filtering/data/seed_7559.npz": {
+      "bytes": 2134472,
+      "sha256": "fd9c14064deafe104736240fa02e8be2f45867c037e97ba207711f8d30868e29"
+    },
+    "filtering/data/seed_7561.npz": {
+      "bytes": 2134472,
+      "sha256": "9364691c999766e65351979cfb86c05e474cd1556265f2778724fda2824ee3cc"
+    },
+    "filtering/frozen_recipe.json": {
+      "bytes": 683,
+      "sha256": "1ac00bb0a5a7c68a39521fac313524be837c6ce932aca607042a0890ad2c979d"
+    },
+    "filtering/progress/confirmation_amplitude_band_7541_legacy_initialization_joint.json": {
+      "bytes": 3423,
+      "sha256": "69f6c447e5faeaea661036b050e39c4335d329080f87524aea731b83cdb0da58"
+    },
+    "filtering/progress/confirmation_amplitude_band_7541_moment_native_band.json": {
+      "bytes": 3411,
+      "sha256": "bf461a9fe89904a77ba922aae5a2b0e305b9558215b1c139e298f4614061b8ef"
+    },
+    "filtering/progress/confirmation_amplitude_band_7541_moment_quantile_joint.json": {
+      "bytes": 3485,
+      "sha256": "40684b8dbb6e93342ea8569fedd18a7d3191d73a7e56ca2e5578a952fedb2096"
+    },
+    "filtering/progress/confirmation_amplitude_band_7541_moment_quantile_varpro.json": {
+      "bytes": 3479,
+      "sha256": "bb47b698ed2dc7120a700ea53631a5b8b10c6b4d4e630eb9c6204dd0b34f34a0"
+    },
+    "filtering/progress/confirmation_amplitude_band_7547_legacy_initialization_joint.json": {
+      "bytes": 3422,
+      "sha256": "ea7852155eb412094079f219e39368798b995cf362ef82fb50dfd843a8f83dff"
+    },
+    "filtering/progress/confirmation_amplitude_band_7547_moment_native_band.json": {
+      "bytes": 3400,
+      "sha256": "e24ba1cb1af5bd7cf8617999c0da8b4b31d99bfc0871d3dba0af65393f32bac8"
+    },
+    "filtering/progress/confirmation_amplitude_band_7547_moment_quantile_joint.json": {
+      "bytes": 3491,
+      "sha256": "760613cf78cc637db3ae422a34596b6509d67a8bad7ffc638c5471479a8b44ed"
+    },
+    "filtering/progress/confirmation_amplitude_band_7547_moment_quantile_varpro.json": {
+      "bytes": 3483,
+      "sha256": "d66910be834126ddeff5836601ca113da9760ab4beadfbc3b135a2dd5690fba1"
+    },
+    "filtering/progress/confirmation_amplitude_band_7549_legacy_initialization_joint.json": {
+      "bytes": 3422,
+      "sha256": "c2d0dc2f211f444a0c2c455413c60b6ec4471f7f8bc614bf72f8b3d41a7841dd"
+    },
+    "filtering/progress/confirmation_amplitude_band_7549_moment_native_band.json": {
+      "bytes": 3410,
+      "sha256": "0680e4a5aeee48f1b928dd2c4770b83f1cc5a9ae2e0e7565e6151cbcbaa8b36f"
+    },
+    "filtering/progress/confirmation_amplitude_band_7549_moment_quantile_joint.json": {
+      "bytes": 3478,
+      "sha256": "af281d5a24c2bb0352f9db85e6fdd5c11660e4ac69c03702e66f0fd70dbf797a"
+    },
+    "filtering/progress/confirmation_amplitude_band_7549_moment_quantile_varpro.json": {
+      "bytes": 3481,
+      "sha256": "800451b486cce1fcb1b6d6cab66e22ce996f6a68f812ab3bbfc1c3f79fee32b0"
+    },
+    "filtering/progress/confirmation_amplitude_band_7559_legacy_initialization_joint.json": {
+      "bytes": 3418,
+      "sha256": "34ff785db3b6540f0c0d24e2d0d613896bda87eb87fd30829189dff4f6551da2"
+    },
+    "filtering/progress/confirmation_amplitude_band_7559_moment_native_band.json": {
+      "bytes": 3436,
+      "sha256": "feea3d7988c7d1d547ab32f50fd7e7d15e266b08d68610722911a12a9bb62809"
+    },
+    "filtering/progress/confirmation_amplitude_band_7559_moment_quantile_joint.json": {
+      "bytes": 3517,
+      "sha256": "b0555b2c1326375188eb49cb57aafad8e839f2832649daa26af6b4f7f3dabbfd"
+    },
+    "filtering/progress/confirmation_amplitude_band_7559_moment_quantile_varpro.json": {
+      "bytes": 3516,
+      "sha256": "9901365d4c611efb0d8fb97faa6514379dffca3815b2f2d54c3dfd74dd507ff2"
+    },
+    "filtering/progress/confirmation_amplitude_band_7561_legacy_initialization_joint.json": {
+      "bytes": 3412,
+      "sha256": "d1e5467853a121765067c401ad4b153e2cf0609ac5a141f3767f49413dc48016"
+    },
+    "filtering/progress/confirmation_amplitude_band_7561_moment_native_band.json": {
+      "bytes": 3402,
+      "sha256": "51f601dd693e4184609a99035a4b4a1b952bf73702bf70c8a17950e44c1a8dcb"
+    },
+    "filtering/progress/confirmation_amplitude_band_7561_moment_quantile_joint.json": {
+      "bytes": 3481,
+      "sha256": "faed41a46e28bfe89e38a930070fe3e97a0462702ef04e005cec835e58019693"
+    },
+    "filtering/progress/confirmation_amplitude_band_7561_moment_quantile_varpro.json": {
+      "bytes": 3481,
+      "sha256": "8c01e85cc4141d0f08f0f5d03143fb61d951f76ca61af944b210c3bfd7aa5e0b"
+    },
+    "filtering/progress/confirmation_dog_linear_7541_legacy_initialization_joint.json": {
+      "bytes": 3525,
+      "sha256": "4d79b1efbd1441d8e86d88804e61d656ad5d843ad76aeb903aa465b40b388faa"
+    },
+    "filtering/progress/confirmation_dog_linear_7541_moment_native_band.json": {
+      "bytes": 3460,
+      "sha256": "214d47cd2076c8e64c64b9baa21fdad75ed78226d9a17f9e7a47c5f00d844dec"
+    },
+    "filtering/progress/confirmation_dog_linear_7541_moment_quantile_joint.json": {
+      "bytes": 3531,
+      "sha256": "c3c1a8b96216d9e35cfb339573fd19f672fb5ad3de39de1385a29e3fa06f8ba6"
+    },
+    "filtering/progress/confirmation_dog_linear_7541_moment_quantile_varpro.json": {
+      "bytes": 3534,
+      "sha256": "7e563bed027309b70a1e8f0ab0f5382ada19d2317d4f5f6c2766e75b3d32d76b"
+    },
+    "filtering/progress/confirmation_dog_linear_7547_legacy_initialization_joint.json": {
+      "bytes": 3523,
+      "sha256": "c3e2d7be8e047de2bd44dcc510b13d522480d254da1cfaf3eafb090885ae20d4"
+    },
+    "filtering/progress/confirmation_dog_linear_7547_moment_native_band.json": {
+      "bytes": 3461,
+      "sha256": "f6c615f5e39e0d4b0215e6b98754a28addc5eea3ba29dd9b68486231ac3bb798"
+    },
+    "filtering/progress/confirmation_dog_linear_7547_moment_quantile_joint.json": {
+      "bytes": 3531,
+      "sha256": "9b41cf4e8910fb82b3c3312881ed07e5fb8580c468b23458e861ee630a69629b"
+    },
+    "filtering/progress/confirmation_dog_linear_7547_moment_quantile_varpro.json": {
+      "bytes": 3525,
+      "sha256": "8d6e50ab33c95ee18895e105b1168e880827dc9fc8778ab9d25fd9a76532b6b1"
+    },
+    "filtering/progress/confirmation_dog_linear_7549_legacy_initialization_joint.json": {
+      "bytes": 3520,
+      "sha256": "d34e17ef8070fa13abe4f47cf8985b74ce091df364505dfd0bb22a526fe53f65"
+    },
+    "filtering/progress/confirmation_dog_linear_7549_moment_native_band.json": {
+      "bytes": 3458,
+      "sha256": "39b35ed519c929e434a0a30c0ac62f259eddfe93e1e09d65bde08bb1d50a3dfa"
+    },
+    "filtering/progress/confirmation_dog_linear_7549_moment_quantile_joint.json": {
+      "bytes": 3527,
+      "sha256": "fb1424b9b37ae905cd0bb9042e086787202f6acf7953baf52bc97a9bd0db5471"
+    },
+    "filtering/progress/confirmation_dog_linear_7549_moment_quantile_varpro.json": {
+      "bytes": 3524,
+      "sha256": "98f92ba3a72256bf9f1fc82568e62ab432bd4e105139117759bbbff20e3e379f"
+    },
+    "filtering/progress/confirmation_dog_linear_7559_legacy_initialization_joint.json": {
+      "bytes": 3525,
+      "sha256": "2c5df1b1339e5abe7bf7334c959acae01f3a74d49b0605aec1f5282bbfaf4813"
+    },
+    "filtering/progress/confirmation_dog_linear_7559_moment_native_band.json": {
+      "bytes": 3455,
+      "sha256": "3e549009cf9c496bce11ebbe4e4b06b994eb72f94ac4e2b1a59e31a5b35d585f"
+    },
+    "filtering/progress/confirmation_dog_linear_7559_moment_quantile_joint.json": {
+      "bytes": 3529,
+      "sha256": "2714361258d2f5dafa2a2d68a011dc67158004d3e8509bb6bfdbbc12bd0ac4e9"
+    },
+    "filtering/progress/confirmation_dog_linear_7559_moment_quantile_varpro.json": {
+      "bytes": 3530,
+      "sha256": "3abd31f1628058a1df4e5929df2998c412255e385499f5c77aaf2c323bdc1b62"
+    },
+    "filtering/progress/confirmation_dog_linear_7561_legacy_initialization_joint.json": {
+      "bytes": 3523,
+      "sha256": "abe59a4bc38cf3eff7d1a8608f8c4e85b64b5e198aad4ceac823772ac61b0271"
+    },
+    "filtering/progress/confirmation_dog_linear_7561_moment_native_band.json": {
+      "bytes": 3454,
+      "sha256": "7051b1a7342f565665b4e3aac47f27632ca3a2ec0e8ff798b160d1cd9a5a0740"
+    },
+    "filtering/progress/confirmation_dog_linear_7561_moment_quantile_joint.json": {
+      "bytes": 3533,
+      "sha256": "59d98e7db2f338a0c446402188a219474ec2f439928b8e060b844ea9f32d952b"
+    },
+    "filtering/progress/confirmation_dog_linear_7561_moment_quantile_varpro.json": {
+      "bytes": 3520,
+      "sha256": "63f133ad3900a82ee3cea5a43cee15e0451977c42d33c41fdef1e95693751a53"
+    },
+    "filtering/progress/confirmation_independent_patterns_7541_legacy_initialization_joint.json": {
+      "bytes": 3463,
+      "sha256": "fc4b218a01a92daec597a80508c22b02b1ebd7a2fde2ac3233cce61cf77bdc39"
+    },
+    "filtering/progress/confirmation_independent_patterns_7541_moment_native_band.json": {
+      "bytes": 3385,
+      "sha256": "5a457771042be351f783fda7c3997668a957e8ba61c445d93f212ac6759ccfd2"
+    },
+    "filtering/progress/confirmation_independent_patterns_7541_moment_quantile_joint.json": {
+      "bytes": 3452,
+      "sha256": "da6cf1200a09351e0c3d4a3b9076a8a2d9e5dd610af2bdeaeddad9d8d9c89461"
+    },
+    "filtering/progress/confirmation_independent_patterns_7541_moment_quantile_varpro.json": {
+      "bytes": 3439,
+      "sha256": "adacabf40191b14e1989465615489d88775b1c6e0f7f61cc92ed5a8d9879bd2e"
+    },
+    "filtering/progress/confirmation_independent_patterns_7547_legacy_initialization_joint.json": {
+      "bytes": 3451,
+      "sha256": "41a02be15a0d380d2af66e595e20751d47b2a5a13c7a2e31ceae6d5a4e7ebdae"
+    },
+    "filtering/progress/confirmation_independent_patterns_7547_moment_native_band.json": {
+      "bytes": 3383,
+      "sha256": "1c0a279f67a2991f89c2d404164c447567deaa0539feeaa8b73d155cab282393"
+    },
+    "filtering/progress/confirmation_independent_patterns_7547_moment_quantile_joint.json": {
+      "bytes": 3455,
+      "sha256": "dac31cd3c51e69331049fb6525d18e375d7a48b3ab4afd2705b85885ea25db66"
+    },
+    "filtering/progress/confirmation_independent_patterns_7547_moment_quantile_varpro.json": {
+      "bytes": 3449,
+      "sha256": "125ab338bde301d2650685873afaa357428a153d04f63bbece956886abf5ad4e"
+    },
+    "filtering/progress/confirmation_independent_patterns_7549_legacy_initialization_joint.json": {
+      "bytes": 3455,
+      "sha256": "e34f66c0e823c366217306b552d36ad9d623aac0ac5167775de6b683ef3ab2b7"
+    },
+    "filtering/progress/confirmation_independent_patterns_7549_moment_native_band.json": {
+      "bytes": 3389,
+      "sha256": "4b373ebbd548eb593cdb06de15afe4fa0d7406968eec5ce717c679e550c9aec8"
+    },
+    "filtering/progress/confirmation_independent_patterns_7549_moment_quantile_joint.json": {
+      "bytes": 3451,
+      "sha256": "4f564e0ad8f1eead6dcf745ce9f329a33461376c14e5778190ba3b4794d5baf8"
+    },
+    "filtering/progress/confirmation_independent_patterns_7549_moment_quantile_varpro.json": {
+      "bytes": 3450,
+      "sha256": "9f51c31c90b3a89c8b861670ffece6bfa2f25dd1d4c3a4762dcdfced1375a633"
+    },
+    "filtering/progress/confirmation_independent_patterns_7559_legacy_initialization_joint.json": {
+      "bytes": 3459,
+      "sha256": "39e6329cded951439205f1506b34a3da3d48c3720aac9da812ab492df3407aff"
+    },
+    "filtering/progress/confirmation_independent_patterns_7559_moment_native_band.json": {
+      "bytes": 3378,
+      "sha256": "9fb6cbeeebb1d96cf5c2781603e3b1d4887577c3c455ce94e36407dcc3b406b8"
+    },
+    "filtering/progress/confirmation_independent_patterns_7559_moment_quantile_joint.json": {
+      "bytes": 3449,
+      "sha256": "376cdbe319974fdf7b8a1c98fec4add994f582eaad307e499b4f6f9408f10f0c"
+    },
+    "filtering/progress/confirmation_independent_patterns_7559_moment_quantile_varpro.json": {
+      "bytes": 3439,
+      "sha256": "5f92db7c9d9bb7083bd7ab61d0216a81ba360d7bc5d593a87acb0f558c938166"
+    },
+    "filtering/progress/confirmation_independent_patterns_7561_legacy_initialization_joint.json": {
+      "bytes": 3453,
+      "sha256": "26fb1931f8206a6ba61357604bbcf51756a288aec48f12ebaad5836858364d78"
+    },
+    "filtering/progress/confirmation_independent_patterns_7561_moment_native_band.json": {
+      "bytes": 3388,
+      "sha256": "4b555ff353f2d46c8381f6eb611963ccc7701ee255b9a8ccc8648d9d358714ae"
+    },
+    "filtering/progress/confirmation_independent_patterns_7561_moment_quantile_joint.json": {
+      "bytes": 3452,
+      "sha256": "e30a3b2777cfd825ab8d9557ef4d4ef558620cdc5d77757ad0f0d8a7a709fff2"
+    },
+    "filtering/progress/confirmation_independent_patterns_7561_moment_quantile_varpro.json": {
+      "bytes": 3455,
+      "sha256": "756eda42d46edacaeb6d755a6a142022fb110a97e84bbd46379322db688f1dfc"
+    },
+    "filtering/progress/discovery_amplitude_band_7517_legacy_features_ls_joint.json": {
+      "bytes": 3426,
+      "sha256": "f9ddaedd2dd794e2b3be270bd7345c9266cf4108c83061708778b316c853056a"
+    },
+    "filtering/progress/discovery_amplitude_band_7517_legacy_initialization_joint.json": {
+      "bytes": 3413,
+      "sha256": "4badfbad2054b3de340c706c18ee83c19f8fedc5c97a0cc228c2552b928aaf5c"
+    },
+    "filtering/progress/discovery_amplitude_band_7517_moment_native_band.json": {
+      "bytes": 3404,
+      "sha256": "0346381c56682f912c82ae736aadfab51c9c7bd98724b29a45c1f3370a72b51c"
+    },
+    "filtering/progress/discovery_amplitude_band_7517_moment_quantile_joint.json": {
+      "bytes": 3486,
+      "sha256": "c5ad7642708968417a06e1621ae6fdd6e6a304b36e46fdc82b5b2c7ea3ccd8ec"
+    },
+    "filtering/progress/discovery_amplitude_band_7517_moment_quantile_varpro.json": {
+      "bytes": 3490,
+      "sha256": "cfd673a849475ae2a3e02cff809a54926ddb133cf6d44d5bd07ce2c532e7f8bb"
+    },
+    "filtering/progress/discovery_amplitude_band_7517_unit_quantile_ls_joint.json": {
+      "bytes": 3388,
+      "sha256": "b3a2ebd3547e0fe8ec69e864700832309c54e65eae4b909f1b2b19eb843e5653"
+    },
+    "filtering/progress/discovery_amplitude_band_7517_unit_quantile_varpro.json": {
+      "bytes": 3389,
+      "sha256": "7a1c00445d8e4d6707d3177a2958d4685022c6aa464362d859e7801ffd2bd052"
+    },
+    "filtering/progress/discovery_amplitude_band_7523_legacy_features_ls_joint.json": {
+      "bytes": 3527,
+      "sha256": "77c277911118ae5a398f795ed23ce1b94fab27179c87c7576ad59092cd54d968"
+    },
+    "filtering/progress/discovery_amplitude_band_7523_legacy_initialization_joint.json": {
+      "bytes": 3415,
+      "sha256": "e52bd1104c388c34fd8c4881a963f9080f601e5752e3e32ac1dda8f5a0e50971"
+    },
+    "filtering/progress/discovery_amplitude_band_7523_moment_native_band.json": {
+      "bytes": 3404,
+      "sha256": "96bfa902770d7aebcc637ce0193956cda8f5ffb7a74e7f2491d3d86ec3d56beb"
+    },
+    "filtering/progress/discovery_amplitude_band_7523_moment_quantile_joint.json": {
+      "bytes": 3477,
+      "sha256": "8034a77cebb80addc7c3ae5a0ce1b9c26a9905d37251dca09a9fccbec12190bc"
+    },
+    "filtering/progress/discovery_amplitude_band_7523_moment_quantile_varpro.json": {
+      "bytes": 3483,
+      "sha256": "6a49b3adf551e37be3b4e99f57a4b8c56ef9b01a23d0ff4ede5450433d75beb5"
+    },
+    "filtering/progress/discovery_amplitude_band_7523_unit_quantile_ls_joint.json": {
+      "bytes": 3402,
+      "sha256": "f95cdc502319391ad291741d0dfc1accb46f9d1d0c13bf2ab2b530b2195b0cfd"
+    },
+    "filtering/progress/discovery_amplitude_band_7523_unit_quantile_varpro.json": {
+      "bytes": 3391,
+      "sha256": "c097ef1e79ae3fab3d12902052da0ca2591e22cb28c9baef3d911a410cd3c57c"
+    },
+    "filtering/progress/discovery_amplitude_band_7529_legacy_features_ls_joint.json": {
+      "bytes": 3522,
+      "sha256": "2d1551faf63e7f331d56232f7e4605195e98dbb98a259052d78f50d625e9ac78"
+    },
+    "filtering/progress/discovery_amplitude_band_7529_legacy_initialization_joint.json": {
+      "bytes": 3421,
+      "sha256": "d2cea0864129667fcd60845c04045c637a22890679e4c5410242bd419d87ef37"
+    },
+    "filtering/progress/discovery_amplitude_band_7529_moment_native_band.json": {
+      "bytes": 3431,
+      "sha256": "fb5921cb1f133b89a7f7e5ac27978b4e8374b850dc59ad0631950ba8bcf73503"
+    },
+    "filtering/progress/discovery_amplitude_band_7529_moment_quantile_joint.json": {
+      "bytes": 3519,
+      "sha256": "aa2195d28c6ec5f8e83446445fc423b244cf53fa5326fc1150193d7077b9489b"
+    },
+    "filtering/progress/discovery_amplitude_band_7529_moment_quantile_varpro.json": {
+      "bytes": 3499,
+      "sha256": "e615778ecd376b21b7e2e637d76227bb35283468b32c31fa15c5607fc2d8a353"
+    },
+    "filtering/progress/discovery_amplitude_band_7529_unit_quantile_ls_joint.json": {
+      "bytes": 3476,
+      "sha256": "68279fc4b9ebbb238ef46817efd16d5bee757d753395994e5743936480d10c86"
+    },
+    "filtering/progress/discovery_amplitude_band_7529_unit_quantile_varpro.json": {
+      "bytes": 3479,
+      "sha256": "bb54e62e557db4b649257202d3237a36d7825282e2e67aaa54ffaa817b9faabf"
+    },
+    "filtering/progress/discovery_dog_linear_7517_legacy_features_ls_joint.json": {
+      "bytes": 3540,
+      "sha256": "531cff2f9044672246a992a202ac8140869b70ca76b12f32d13973eeb3ea844b"
+    },
+    "filtering/progress/discovery_dog_linear_7517_legacy_initialization_joint.json": {
+      "bytes": 3526,
+      "sha256": "b1c427c7ea58a1b57ef180e998ec443172fc7e9c7f2c567712ce64bbe7f741c6"
+    },
+    "filtering/progress/discovery_dog_linear_7517_moment_native_band.json": {
+      "bytes": 3464,
+      "sha256": "7e6301548e7fb9404737f4e08d67714859b1faaee0044703585a6bf103676c0b"
+    },
+    "filtering/progress/discovery_dog_linear_7517_moment_quantile_joint.json": {
+      "bytes": 3525,
+      "sha256": "69c829edeea26e07d02bf2beac914c6e6ccf06c74f0d4671c5e6baf78c8a20c4"
+    },
+    "filtering/progress/discovery_dog_linear_7517_moment_quantile_varpro.json": {
+      "bytes": 3539,
+      "sha256": "7a0c11c27bc71ee87575f8eb90c45c92f2826c4226c146852cfe7bca63eba753"
+    },
+    "filtering/progress/discovery_dog_linear_7517_unit_quantile_ls_joint.json": {
+      "bytes": 3518,
+      "sha256": "4854d476e928c7eb7334490016efd7794a7494d2d30ac0b241ec410f92bf5c32"
+    },
+    "filtering/progress/discovery_dog_linear_7517_unit_quantile_varpro.json": {
+      "bytes": 3516,
+      "sha256": "d03b94d5c959370e1ff57fea3e3a4aa86785eb47d9c04331f5b2aaf0afb49a15"
+    },
+    "filtering/progress/discovery_dog_linear_7523_legacy_features_ls_joint.json": {
+      "bytes": 3508,
+      "sha256": "1e75aa22a1166f827b83cfee12d9d317f3e44ef948853f196e70f2e8af31aecc"
+    },
+    "filtering/progress/discovery_dog_linear_7523_legacy_initialization_joint.json": {
+      "bytes": 3524,
+      "sha256": "2b1ddde6e88531482973ff2ee0c87e93d392f88b3fa46883b0d0aca20bcdba1c"
+    },
+    "filtering/progress/discovery_dog_linear_7523_moment_native_band.json": {
+      "bytes": 3460,
+      "sha256": "fb675901c432fa6aebcf38bb915d344f40b59827fc4069bd23f4c051668ebb69"
+    },
+    "filtering/progress/discovery_dog_linear_7523_moment_quantile_joint.json": {
+      "bytes": 3531,
+      "sha256": "3e0681105cdf96a16b274469d730c6908f229fc0752bb4b482db485867d34456"
+    },
+    "filtering/progress/discovery_dog_linear_7523_moment_quantile_varpro.json": {
+      "bytes": 3526,
+      "sha256": "b345eb603db006332db1625996f9d02ffb5a3403e25911004f6012539a5e67d1"
+    },
+    "filtering/progress/discovery_dog_linear_7523_unit_quantile_ls_joint.json": {
+      "bytes": 3483,
+      "sha256": "dee3e7a44ceba5eec4bcd00f9f37478c70fe5cedb9a2acd5401261f5ad08d835"
+    },
+    "filtering/progress/discovery_dog_linear_7523_unit_quantile_varpro.json": {
+      "bytes": 3483,
+      "sha256": "0915a9ec6168fea01be807104ab0f7c49d3cc2aed0567e4d4e2e91fccbebefa3"
+    },
+    "filtering/progress/discovery_dog_linear_7529_legacy_features_ls_joint.json": {
+      "bytes": 3526,
+      "sha256": "bf7bcf248f26baa62f672dfca3e93f2b80082c593cb37dba362c747d5d2e1aec"
+    },
+    "filtering/progress/discovery_dog_linear_7529_legacy_initialization_joint.json": {
+      "bytes": 3526,
+      "sha256": "19ed869e438cecf381938d2a8aa092d8920650df48d2c0f72c571c7b3da4d6c8"
+    },
+    "filtering/progress/discovery_dog_linear_7529_moment_native_band.json": {
+      "bytes": 3462,
+      "sha256": "55b76f6ebc1e7b1c234029b24f05b4da63f999c845fc1096ac5e135826352240"
+    },
+    "filtering/progress/discovery_dog_linear_7529_moment_quantile_joint.json": {
+      "bytes": 3530,
+      "sha256": "d0c10a51ec326df13aac7163d1daf19a63dbcaa88cff7bdb1708cbea34c14530"
+    },
+    "filtering/progress/discovery_dog_linear_7529_moment_quantile_varpro.json": {
+      "bytes": 3533,
+      "sha256": "e1fa7924423a1f144dcd73038c6d2d17b81076e4a01fe2519322a023499109cc"
+    },
+    "filtering/progress/discovery_dog_linear_7529_unit_quantile_ls_joint.json": {
+      "bytes": 3497,
+      "sha256": "3cde20ae823357979ebdcd60299d353b71f7f1a23c1903337a366b636b254ada"
+    },
+    "filtering/progress/discovery_dog_linear_7529_unit_quantile_varpro.json": {
+      "bytes": 3500,
+      "sha256": "b6ac4bc2160e66f77b269e287e1f6642089c02ebc873e0a32b908f62162a5697"
+    },
+    "filtering/progress/discovery_independent_patterns_7517_legacy_features_ls_joint.json": {
+      "bytes": 3462,
+      "sha256": "6302964495382c509f46bef45af0a3d452580c0a76913253b1ac0cf63ee5ec9a"
+    },
+    "filtering/progress/discovery_independent_patterns_7517_legacy_initialization_joint.json": {
+      "bytes": 3465,
+      "sha256": "9f27277c3fcd31728bae8b0ec82eb80492963aa804cb2b2f18df74ec9feb3c1c"
+    },
+    "filtering/progress/discovery_independent_patterns_7517_moment_native_band.json": {
+      "bytes": 3389,
+      "sha256": "44489267fb1f251eb1ad1a1ce779a9b3bd249f5811272566f90f1250b0ddb0d9"
+    },
+    "filtering/progress/discovery_independent_patterns_7517_moment_quantile_joint.json": {
+      "bytes": 3450,
+      "sha256": "7a41eb6ffe601b21e68d0e2f960be1851855ebb875fd5c8014c628f9a6b16ae0"
+    },
+    "filtering/progress/discovery_independent_patterns_7517_moment_quantile_varpro.json": {
+      "bytes": 3453,
+      "sha256": "6de4cfdafe792f158459f207c72e17f217d74461f6d315c2cbf919a09bf3cceb"
+    },
+    "filtering/progress/discovery_independent_patterns_7517_unit_quantile_ls_joint.json": {
+      "bytes": 3434,
+      "sha256": "0da986e5b551c50b9823daa917f614189e15cbcc9089a88fce4c9e40b93a9b80"
+    },
+    "filtering/progress/discovery_independent_patterns_7517_unit_quantile_varpro.json": {
+      "bytes": 3443,
+      "sha256": "c6afc27ae963f18ef823a3e06bc45fa0a64c4d3942e9c684e55bd4ecb5e5b5c3"
+    },
+    "filtering/progress/discovery_independent_patterns_7523_legacy_features_ls_joint.json": {
+      "bytes": 3472,
+      "sha256": "3cd85a764f1622f17510f1751f154f242061ed353c591d4bf6269754f13b1463"
+    },
+    "filtering/progress/discovery_independent_patterns_7523_legacy_initialization_joint.json": {
+      "bytes": 3459,
+      "sha256": "dec2300040ec2ea6aeeb1c2c1432c7ea1a117de26d7ce2a536e0d744681449b4"
+    },
+    "filtering/progress/discovery_independent_patterns_7523_moment_native_band.json": {
+      "bytes": 3385,
+      "sha256": "96f67d4628e451c442045d9ccd3386711937c088ad66b0dbf689019aa26981fb"
+    },
+    "filtering/progress/discovery_independent_patterns_7523_moment_quantile_joint.json": {
+      "bytes": 3441,
+      "sha256": "b863b7ab42e689573558def689488a6932d0ac7e1916ae1d7c79dc8cc2b94067"
+    },
+    "filtering/progress/discovery_independent_patterns_7523_moment_quantile_varpro.json": {
+      "bytes": 3447,
+      "sha256": "d7fd53371a0fda94382f0b1fadb72ec9059ec652c5655be606922a50d85c20d4"
+    },
+    "filtering/progress/discovery_independent_patterns_7523_unit_quantile_ls_joint.json": {
+      "bytes": 3439,
+      "sha256": "b592a03517154ab58c1533789472ddcb5e88eb8a416afd1861e3da1c0fe913e8"
+    },
+    "filtering/progress/discovery_independent_patterns_7523_unit_quantile_varpro.json": {
+      "bytes": 3442,
+      "sha256": "328536facb67374cc796458f0b0e27f952f42fa9670afac9b0ab493752471d4c"
+    },
+    "filtering/progress/discovery_independent_patterns_7529_legacy_features_ls_joint.json": {
+      "bytes": 3455,
+      "sha256": "8247b0d9cfa081f5b4b72094dd86622d2a96b8dd806700aec9c9b64e990d9bd0"
+    },
+    "filtering/progress/discovery_independent_patterns_7529_legacy_initialization_joint.json": {
+      "bytes": 3451,
+      "sha256": "6dc2623c97e6e93b04c38bc9b95f61661f94f5569e0736e230e33028edaa79c6"
+    },
+    "filtering/progress/discovery_independent_patterns_7529_moment_native_band.json": {
+      "bytes": 3377,
+      "sha256": "0764a4fcc16fe2f2ab62989cc10642ab7c08c2f588dcd262c61b45b6790b4e4a"
+    },
+    "filtering/progress/discovery_independent_patterns_7529_moment_quantile_joint.json": {
+      "bytes": 3438,
+      "sha256": "4823197ed85babde1083db5fdf6e22663c1734f801389cc1f73efa3b629b44d7"
+    },
+    "filtering/progress/discovery_independent_patterns_7529_moment_quantile_varpro.json": {
+      "bytes": 3441,
+      "sha256": "50c85b3787d2e4acca81502d5df87fcb214f4e3b589cb103baefc627e941a146"
+    },
+    "filtering/progress/discovery_independent_patterns_7529_unit_quantile_ls_joint.json": {
+      "bytes": 3432,
+      "sha256": "fc90fe08c9224c7388a563a05489b760dd80502726bde3755a8ea968b66c1046"
+    },
+    "filtering/progress/discovery_independent_patterns_7529_unit_quantile_varpro.json": {
+      "bytes": 3431,
+      "sha256": "cb48e4715dd6e7603ff8d319fb578fe30b0c2064dfa386df79b4b08ea9546295"
+    },
+    "filtering/registration.json": {
+      "bytes": 2363,
+      "sha256": "45174629bdb42804a5f40bbb4915aaa1d10ccb3dde1113eaa3c6853a576a7049"
+    },
+    "filtering/replay.json": {
+      "bytes": 622,
+      "sha256": "1ba29f4bf015a34abb159df75f8a152034e72d627f5f29c185fed3e8a4f0367e"
+    },
+    "filtering/replay_fresh_process.log": {
+      "bytes": 570,
+      "sha256": "a98276b6257ed59264968d9622159cba5dbfd1f19cce1a2c1a84fab17e480b05"
+    },
+    "filtering/replay_wall_seconds.txt": {
+      "bytes": 5,
+      "sha256": "66ab92a5faf390e91c78a082eb63ca74980e366ac22d8aad4dc27c1ec493e4ba"
+    },
+    "filtering/results.json": {
+      "bytes": 13254,
+      "sha256": "4a30dfe23e7edaa504decebfc10a1e8ada135e7619045b782b68ea577703e565"
+    },
+    "filtering.log": {
+      "bytes": 37813,
+      "sha256": "356e1b0a3afa23f110f65d0af56de0299ea79d849d92a342d0842d04da9f9057"
+    },
+    "filtering_long/cases/7541_legacy_initialization_joint.json": {
+      "bytes": 62110,
+      "sha256": "3928a6f7a35e9b8917e35a73253d8ebe8046e4856d38b1dc731b25ef0ab9938d"
+    },
+    "filtering_long/cases/7541_moment_native_band.json": {
+      "bytes": 37475,
+      "sha256": "0732d2ecd765735b24df48ce78e141048b223c9757797bd7c5bcfd869409ad79"
+    },
+    "filtering_long/cases/7541_moment_quantile_joint.json": {
+      "bytes": 38656,
+      "sha256": "304529d0399937c5caafcc98f556da3e673ad1315affc46beef4c3fd55108bdf"
+    },
+    "filtering_long/cases/7541_moment_quantile_varpro.json": {
+      "bytes": 25583,
+      "sha256": "b13958f1f554f2e898a37c6c1516d18a840381e5f10823d4946fb83479c08951"
+    },
+    "filtering_long/cases/7547_legacy_initialization_joint.json": {
+      "bytes": 62101,
+      "sha256": "d2bd8907cf376127742142826327363daa7f570840336c78f60f819a21c942a5"
+    },
+    "filtering_long/cases/7547_moment_native_band.json": {
+      "bytes": 33547,
+      "sha256": "28221db56c66304e549b6bf6840a0c89908323293fc00a810cba6ec131da46a0"
+    },
+    "filtering_long/cases/7547_moment_quantile_joint.json": {
+      "bytes": 35888,
+      "sha256": "b67e3af144b211c28df7d69153eb0f953dcd2875c7b642ddd3b418416d812e91"
+    },
+    "filtering_long/cases/7547_moment_quantile_varpro.json": {
+      "bytes": 33651,
+      "sha256": "1a379da625003e44ed71d5b8471e6c6d2c65c92c8b4e771fadb53e64116343a3"
+    },
+    "filtering_long/cases/7549_legacy_initialization_joint.json": {
+      "bytes": 62806,
+      "sha256": "0c93d914bc58acba487b18517a12dd336d1a63391ff057f7a36992b2e84f9be1"
+    },
+    "filtering_long/cases/7549_moment_native_band.json": {
+      "bytes": 34537,
+      "sha256": "0da303eb02cd2382218404c7cfbdef10b36dbe310c3ec4802e1b47e9f0216d02"
+    },
+    "filtering_long/cases/7549_moment_quantile_joint.json": {
+      "bytes": 35872,
+      "sha256": "91b1e745d410799a10515574c4c551441b24e8718725a6e9a15d07737993ffc5"
+    },
+    "filtering_long/cases/7549_moment_quantile_varpro.json": {
+      "bytes": 24698,
+      "sha256": "c6f9af56cf0da4008c4006a27df17aad0d1f06587a21db9b4b198b5987b3bdcd"
+    },
+    "filtering_long/cases/7559_legacy_initialization_joint.json": {
+      "bytes": 61881,
+      "sha256": "b3088896f33e63fd98bcf89875154e17495e2509905305d35790ba837c12402b"
+    },
+    "filtering_long/cases/7559_moment_native_band.json": {
+      "bytes": 30657,
+      "sha256": "c9b7d87cdb40624ca7fe8a5a9ced933b397b13237c49f658cb6f05492bad0256"
+    },
+    "filtering_long/cases/7559_moment_quantile_joint.json": {
+      "bytes": 32228,
+      "sha256": "d2bc12ee45f300867f4ebb28f7f352192bebd143673114cc100de84e44dddefb"
+    },
+    "filtering_long/cases/7559_moment_quantile_varpro.json": {
+      "bytes": 25666,
+      "sha256": "676f7b8cb789663bb91cbf29d1c47e183bf5b1b90d4819a37dec84caeb075d8d"
+    },
+    "filtering_long/cases/7561_legacy_initialization_joint.json": {
+      "bytes": 61582,
+      "sha256": "bae35304188a5da3c2b28ea148a9025076693f8864489440e5ee1971212ffcb8"
+    },
+    "filtering_long/cases/7561_moment_native_band.json": {
+      "bytes": 33562,
+      "sha256": "9c94ce7fa1a8f1e43d2098ebbab7f1014cd7e25cb4f94d4ac544f6c23945735d"
+    },
+    "filtering_long/cases/7561_moment_quantile_joint.json": {
+      "bytes": 37722,
+      "sha256": "ca28612ddb4b95baf5c50ed6092ceaecb7bdc8738763d1633335ec8acba21d92"
+    },
+    "filtering_long/cases/7561_moment_quantile_varpro.json": {
+      "bytes": 24698,
+      "sha256": "a1c48d1f2b6a4695300b0a72ae1d559fb7d048371b5801e50ae349f1683e762f"
+    },
+    "filtering_long/checks.json": {
+      "bytes": 445,
+      "sha256": "2d77779db95abc34a142f6d94151818762a46f485969e231cf84623ccdcd57e0"
+    },
+    "filtering_long/cohort_complete_before_test.json": {
+      "bytes": 169,
+      "sha256": "37d6bb6b10058aba4134ea290316aa422cf0aeff5693e450cc10f1688d30b858"
+    },
+    "filtering_long/data/seed_7541.npz": {
+      "bytes": 2134472,
+      "sha256": "2e1fae5c7603aadd6f7d81b4c4fc5672acc7a828daf82a51aa7a62cc38254ecd"
+    },
+    "filtering_long/data/seed_7547.npz": {
+      "bytes": 2134472,
+      "sha256": "65e889cf2f24cffda4e998050aeb6bdcc15850fdf2282b1a76eb224d2225c9d0"
+    },
+    "filtering_long/data/seed_7549.npz": {
+      "bytes": 2134472,
+      "sha256": "ecb61704861764c534f9f1365878f97ae6c00eefb9613670673b5f11fe1cdc1a"
+    },
+    "filtering_long/data/seed_7559.npz": {
+      "bytes": 2134472,
+      "sha256": "fd9c14064deafe104736240fa02e8be2f45867c037e97ba207711f8d30868e29"
+    },
+    "filtering_long/data/seed_7561.npz": {
+      "bytes": 2134472,
+      "sha256": "9364691c999766e65351979cfb86c05e474cd1556265f2778724fda2824ee3cc"
+    },
+    "filtering_long/progress/7541_legacy_initialization_joint.json": {
+      "bytes": 59676,
+      "sha256": "3f4c889418d3c9aa1667296059449f2a5a9276e0174243534181efad6c13cee6"
+    },
+    "filtering_long/progress/7541_moment_native_band.json": {
+      "bytes": 34882,
+      "sha256": "2471a9e3fa32a1647f1b6e26be9477cfd328d7bf9f43a867337a3606b2c2d1b0"
+    },
+    "filtering_long/progress/7541_moment_quantile_joint.json": {
+      "bytes": 36151,
+      "sha256": "b5da1916a3c0ca8f87a6f12f3de063d64f860e3f771f0eb2c46263c4fc5286ea"
+    },
+    "filtering_long/progress/7541_moment_quantile_varpro.json": {
+      "bytes": 23163,
+      "sha256": "b9e85d848b34ae61988bf6b8197be67ca91fa917b31550bd55dac34acf0af8b9"
+    },
+    "filtering_long/progress/7547_legacy_initialization_joint.json": {
+      "bytes": 59664,
+      "sha256": "a5433fff6dbe6e64918611c604b8ae92081e833ae3dee94fc55d457ba49803c8"
+    },
+    "filtering_long/progress/7547_moment_native_band.json": {
+      "bytes": 30948,
+      "sha256": "1562b22a19766dd810a639928a1a8694af9aedf4da4a79d56ecdc65ea33669a1"
+    },
+    "filtering_long/progress/7547_moment_quantile_joint.json": {
+      "bytes": 33397,
+      "sha256": "0491a0269b4b1281d385bb66d3e05f9cbfb134b900ae0c1fb1f6f51d618fc5ea"
+    },
+    "filtering_long/progress/7547_moment_quantile_varpro.json": {
+      "bytes": 31221,
+      "sha256": "4bd5bb6c5dc501125bbbfe5b6ff663cbb45cb4d7dd647de62e71de6f0e3c258a"
+    },
+    "filtering_long/progress/7549_legacy_initialization_joint.json": {
+      "bytes": 60306,
+      "sha256": "67fc0df12260dc18020829d1b13c56e757df2ad045808f7699dff68584cb1305"
+    },
+    "filtering_long/progress/7549_moment_native_band.json": {
+      "bytes": 31936,
+      "sha256": "cd1c9e1b677331813eeae37f664222869d2f8d02049ea1388ce255888796015b"
+    },
+    "filtering_long/progress/7549_moment_quantile_joint.json": {
+      "bytes": 33351,
+      "sha256": "ca42ca68c08e89303ba7b250a4b0ff61a80e1f20beb978159796afb091ee9aab"
+    },
+    "filtering_long/progress/7549_moment_quantile_varpro.json": {
+      "bytes": 22261,
+      "sha256": "62a9e3f397f486cda7f6d4f6422848e5662ad088246e3f83b99903c629de6a58"
+    },
+    "filtering_long/progress/7559_legacy_initialization_joint.json": {
+      "bytes": 59450,
+      "sha256": "851e964b1ed3cf1248eea17a296af72f3a6c17154bad9f27b4afbb9e368f78c7"
+    },
+    "filtering_long/progress/7559_moment_native_band.json": {
+      "bytes": 28054,
+      "sha256": "92d55a3d8285e476aea00763246246704d86bd6e10ad7bfb6c74713087bd6f32"
+    },
+    "filtering_long/progress/7559_moment_quantile_joint.json": {
+      "bytes": 29716,
+      "sha256": "499ed6eb988fad82e04cfe4ebf500cf2a6f3bf096890143eed95a3f4c609ab1c"
+    },
+    "filtering_long/progress/7559_moment_quantile_varpro.json": {
+      "bytes": 23219,
+      "sha256": "87cacb27ee34e2235c78e9f107245526a2f68b0a21c1fc75e4aeef09bd0f201f"
+    },
+    "filtering_long/progress/7561_legacy_initialization_joint.json": {
+      "bytes": 59153,
+      "sha256": "8f78383cccbc00ece855c51d2918fddce2b3a569985a9cdb7530b62bf38bf970"
+    },
+    "filtering_long/progress/7561_moment_native_band.json": {
+      "bytes": 30959,
+      "sha256": "dcdd2441315b02f70bc7e741e371635f9771362ab40ce31d16be23ebb181c808"
+    },
+    "filtering_long/progress/7561_moment_quantile_joint.json": {
+      "bytes": 35217,
+      "sha256": "fa3a5a0411c83ee9c54714355dafb11b963770d11c6dd37ecef4b95b038e638c"
+    },
+    "filtering_long/progress/7561_moment_quantile_varpro.json": {
+      "bytes": 22268,
+      "sha256": "fa49506a49ed2e26c0468b7e6e135b0a98ac6e2d1df00ab4dd986d567e9e102d"
+    },
+    "filtering_long/registration.json": {
+      "bytes": 2367,
+      "sha256": "88a5e85d77faf3174dab95947b5220be38d71fd6bfbdcd7985b7bab9439ab756"
+    },
+    "filtering_long/replay.json": {
+      "bytes": 56,
+      "sha256": "7d664b3cb27621f8c670acf9618bd30cc3ab776bcdcafe6e9a1ca973652badff"
+    },
+    "filtering_long/results.json": {
+      "bytes": 2153,
+      "sha256": "4c0504d9ee8cda26ebe7ab5619fc99dcf49a7b15ba4125b80af97af4cf65c541"
+    },
+    "final_checks.json": {
+      "bytes": 1373,
+      "sha256": "577680ec18f02cf0266888dbfd55f60014fa6d63bb260acb2439634ab4f00192"
+    },
+    "publication_tables.json": {
+      "bytes": 1661,
+      "sha256": "bd25ff203bc1bb66bae4069f49a905ff307e55abc858da0e8917e317cc97f5ea"
+    },
+    "source_dependency_snapshot.json": {
+      "bytes": 19223,
+      "sha256": "caf1afa35bfd879016a2d4659b4a708edf29b5c6a0bf6ba05c708b13aa7ae83a"
+    }
+  },
+  "script_files": {
+    "reports/multibias_followup_20261022/frontier_band_explanation_audit.json": {
+      "bytes": 28248,
+      "sha256": "15bb7f6784bacb97866d826822a643ba54eee916f194eeed4353d5f10e7cc16e"
+    },
+    "reports/multibias_followup_20261022/frontier_compression_forensic_audit.json": {
+      "bytes": 12731,
+      "sha256": "43d0d173406ffcc6735cea1a7c91ac64533241eb083929db9e28edd0c5fe5699"
+    },
+    "reports/multibias_followup_20261022/frontier_compression_forensic_fixtures.json": {
+      "bytes": 4800,
+      "sha256": "107d55092ab700f43c5a0b5f9c160c07dc8aee7711b7191239505214cf9691d2"
+    },
+    "reports/multibias_followup_20261022/frontier_compression_forensic_fixtures.py": {
+      "bytes": 4447,
+      "sha256": "9e636067b853499c8ca20702a9f206c5ffc3e5db81878d5065e648d00bc26520"
+    },
+    "reports/multibias_followup_20261022/frontier_filter_long_analysis.json": {
+      "bytes": 34751,
+      "sha256": "37f49aa66d0f11f5a838d03bfe4a0d09e99ebaebd7ae33a31a36fcc44a4bc5de"
+    },
+    "reports/multibias_followup_20261022/frontier_filter_long_analyze.py": {
+      "bytes": 5957,
+      "sha256": "ac4b5750dd528436a1c53e87362709ff736d9754c7abda8d1d67ed6834f69d38"
+    },
+    "reports/multibias_followup_20261022/frontier_filter_long_diagnosis.py": {
+      "bytes": 12436,
+      "sha256": "6a80c2866ea70a8a696b664a6e6895360f73e54127ad2fa05d973f4396a7c837"
+    },
+    "reports/multibias_followup_20261022/frontier_filter_protocol_review.json": {
+      "bytes": 8062,
+      "sha256": "9e8490f3ae80c04b66b7f72e894184272c495369bb1d60c5ac32996735761f28"
+    },
+    "reports/multibias_followup_20261022/frontier_filter_stability_analysis.json": {
+      "bytes": 96646,
+      "sha256": "8036ed2b81eb1dd167e3b31423d7c11f59071e11dba5c1d5c569bb22e12a68a8"
+    },
+    "reports/multibias_followup_20261022/frontier_filter_stability_analyze.py": {
+      "bytes": 5840,
+      "sha256": "a775a0b36db253b6e92da2f1df0a59e4713180e479a76ac8cf01c11986f37990"
+    },
+    "reports/multibias_followup_20261022/frontier_filter_stability_followup.py": {
+      "bytes": 17982,
+      "sha256": "aeb0a5e02044306d8df16204dea500bc8d50d2141e03786e114438fc5bf0758e"
+    },
+    "reports/multibias_followup_20261022/frontier_followup_closeout.py": {
+      "bytes": 10859,
+      "sha256": "f2a8363063d100262a6002b4eaf9b8734c4e32622ab1d1f4fdad55704392b53c"
+    },
+    "reports/multibias_followup_20261022/frontier_followup_publication.py": {
+      "bytes": 33629,
+      "sha256": "bf914e2e86889f5cbf1d0ed718ee55668d51e4c951ab0017c3208e35be17a4ba"
+    },
+    "reports/multibias_followup_20261022/frontier_new_compression_review.json": {
+      "bytes": 4028,
+      "sha256": "768f5bad794d451e1e29af2c90e96d8a7690ae2bec12396e5ac670cf4a12ffb8"
+    },
+    "reports/multibias_followup_20261022/frontier_relu_scale_aware.py": {
+      "bytes": 1909,
+      "sha256": "e9e8b9c9635564bf148771ed5f9d313cc34914dd632c4dfce56a7d31ee7546df"
+    },
+    "reports/multibias_followup_20261022/frontier_scale_aware_followup.py": {
+      "bytes": 10240,
+      "sha256": "d067428dae062698b1de58fa6047171dbb84cc354a12c55d3ef29430c58c3ce7"
+    }
+  },
+  "public_files": {
+    "docs/data/multibias-followup-20261022-bands.csv": {
+      "bytes": 676,
+      "sha256": "1acd0199d0d3228bf77c0bfacb920b7dc50512e470344a5f3885354c047710ed"
+    },
+    "docs/data/multibias-followup-20261022-block-reconstruction.csv": {
+      "bytes": 954,
+      "sha256": "f2e28bf217663585b079699ada9bf52f1120781302ae050820e002fd7d0c832e"
+    },
+    "docs/data/multibias-followup-20261022-compression.csv": {
+      "bytes": 670,
+      "sha256": "fb7a2faa42e016e36aeb1bde98f85a6131d0f0b8327ed918ff35c118693c6d2b"
+    },
+    "docs/data/multibias-followup-20261022-filtering-curves.csv": {
+      "bytes": 124765,
+      "sha256": "493a6662fd77e2c94c4d06ce0a56a30450f02114f65bbd0954d0670c88134b1c"
+    },
+    "docs/data/multibias-followup-20261022-filtering-long.csv": {
+      "bytes": 5127,
+      "sha256": "e20d3c91ffd251e1bc94957e57a1893c324189bb4330b5cd681a92d2543327f2"
+    },
+    "docs/data/multibias-followup-20261022-filtering.csv": {
+      "bytes": 28775,
+      "sha256": "13ca31f29454d1d5d5bc9d52c710f5c919bb233dbf3cfd041522461f131420f1"
+    },
+    "docs/multibias-followup-audit.md": {
+      "bytes": 23374,
+      "sha256": "7dd80c1b354e1bb8134552953385a07860d3fcfc8f345defeecbed52320aa4db"
+    },
+    "docs/img/research/multibias-followup-20261022.png": {
+      "bytes": 238971,
+      "sha256": "e638810e4a78cdf7ffee1f4ff649f4a0c23f5f06ae2d2a8380fbd80c88320560"
+    }
+  },
+  "self_reference": "This manifest excludes its own digest; public and lab copies are byte-identical. All listed digests were actually recomputed; prior expensive dataset hashes remain referenced by preserved registration records."
+}

@@ -1,0 +1,5543 @@
+{
+  "provenance": {
+    "protocol": {
+      "version": 1,
+      "seeds": [
+        17,
+        29,
+        43
+      ],
+      "trials": 3,
+      "epochs": 180,
+      "checkpoint_every": 5,
+      "patience_checks": 10,
+      "threads": 1,
+      "split": [
+        0.6,
+        0.2,
+        0.2
+      ],
+      "selection": "validation_log_loss",
+      "threshold": 0.5,
+      "neural_training": "full_batch_adamw",
+      "limitations": [
+        "small pilot, no significance claim",
+        "equal trial count, unequal compute",
+        "small CPU TabM: k=8,d_block=64,n_blocks=2,embeddings=4",
+        "no categorical datasets",
+        "no post-test hyperparameter changes"
+      ]
+    },
+    "dependencies": {
+      "torch": "2.14.1",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "scikit-learn": "1.9.1",
+      "catboost": "1.2.10",
+      "lightgbm": "4.7.0",
+      "tabm": "0.0.3",
+      "rtdl-num-embeddings": "0.0.12"
+    },
+    "python": "3.12.13",
+    "source_sha256": {
+      "omnibias-lab/tabular/band_pilot.py": "40d3129a5934a13a96b848c0fc43510ebea0118abdb3d54ac483d1713825602a",
+      "packages/omnibias-torch/src/omnibias/torch/confluence.py": "a21ef818744526f8c97315e388381555a2aaa7b581e3211b30eacb1fad0b9b36",
+      "omnibias-lab/tabular/requirements.lock": "16e0fd202cd551d2184f9118dcdd72b9098b3c84dd4605d14e5a8e6040a9e1f6"
+    },
+    "datasets": [
+      "oblique_band",
+      "xor_bands",
+      "axis_tree",
+      "breast_cancer",
+      "banknote",
+      "spambase"
+    ],
+    "models": [
+      "band",
+      "gaussian",
+      "mlp",
+      "tabm",
+      "qda",
+      "lightgbm",
+      "catboost"
+    ]
+  },
+  "rows": [
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.5415740049871517,
+          "trial": 0,
+          "fit_seconds": 1.1942077649873681
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.34674351449792395,
+          "trial": 1,
+          "fit_seconds": 0.32397271099034697
+        },
+        {
+          "best_epoch": 70,
+          "epochs_run": 120,
+          "parameters": 1633,
+          "validation_log_loss": 0.39241009847242025,
+          "trial": 2,
+          "fit_seconds": 0.19705292402068153
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.320038577143457,
+        "auc": 0.9464836003051106,
+        "accuracy": 0.8975609756097561,
+        "f1": 0.8820224719101124
+      },
+      "dataset": "oblique_band",
+      "seed": 17,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.5572839348900196,
+          "trial": 0,
+          "fit_seconds": 0.28649887297069654
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.3023410117476238,
+          "trial": 1,
+          "fit_seconds": 0.26298420096281916
+        },
+        {
+          "best_epoch": 75,
+          "epochs_run": 125,
+          "parameters": 1665,
+          "validation_log_loss": 0.2895367301333125,
+          "trial": 2,
+          "fit_seconds": 0.1777146509848535
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.2957439860149321,
+        "auc": 0.9581083142639207,
+        "accuracy": 0.9243902439024391,
+        "f1": 0.9114285714285715
+      },
+      "dataset": "oblique_band",
+      "seed": 17,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.298015063100443,
+          "trial": 0,
+          "fit_seconds": 0.23039954900741577
+        },
+        {
+          "best_epoch": 95,
+          "epochs_run": 145,
+          "parameters": 2689,
+          "validation_log_loss": 0.2964313192582314,
+          "trial": 1,
+          "fit_seconds": 0.17436089599505067
+        },
+        {
+          "best_epoch": 75,
+          "epochs_run": 125,
+          "parameters": 2689,
+          "validation_log_loss": 0.3080302271611083,
+          "trial": 2,
+          "fit_seconds": 0.14952954498585314
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.29547612824892855,
+        "auc": 0.9584073226544623,
+        "accuracy": 0.9207317073170732,
+        "f1": 0.9072753209700428
+      },
+      "dataset": "oblique_band",
+      "seed": 17,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.2847504698665359,
+          "trial": 0,
+          "fit_seconds": 10.318341699952725
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.23648359095615193,
+          "trial": 1,
+          "fit_seconds": 10.34975688304985
+        },
+        {
+          "best_epoch": 160,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.22502443161268537,
+          "trial": 2,
+          "fit_seconds": 10.77082304598298
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.2452072658657696,
+        "auc": 0.9592311212814646,
+        "accuracy": 0.9365853658536586,
+        "f1": 0.924198250728863
+      },
+      "dataset": "oblique_band",
+      "seed": 17,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.4026325156950723,
+          "trial": 0,
+          "fit_seconds": 0.002651383983902633
+        },
+        {
+          "validation_log_loss": 0.431391340941997,
+          "trial": 1,
+          "fit_seconds": 0.002120379009284079
+        },
+        {
+          "validation_log_loss": 0.5610189440953672,
+          "trial": 2,
+          "fit_seconds": 0.0020724930218420923
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.3952620032287601,
+        "auc": 0.9610373760488177,
+        "accuracy": 0.926829268292683,
+        "f1": 0.9107142857142857
+      },
+      "dataset": "oblique_band",
+      "seed": 17,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.40983610504292284,
+          "trial": 0,
+          "fit_seconds": 0.16214077599579468
+        },
+        {
+          "validation_log_loss": 0.4026075746140284,
+          "trial": 1,
+          "fit_seconds": 0.1474608350545168
+        },
+        {
+          "validation_log_loss": 0.4025442152530195,
+          "trial": 2,
+          "fit_seconds": 0.18625651102047414
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.43549618942319646,
+        "auc": 0.8805430968726164,
+        "accuracy": 0.802439024390244,
+        "f1": 0.7786885245901639
+      },
+      "dataset": "oblique_band",
+      "seed": 17,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.4074862310985824,
+          "trial": 0,
+          "fit_seconds": 0.43022587400628254
+        },
+        {
+          "validation_log_loss": 0.38285031003001446,
+          "trial": 1,
+          "fit_seconds": 0.7248604969936423
+        },
+        {
+          "validation_log_loss": 0.37251425016820916,
+          "trial": 2,
+          "fit_seconds": 1.385209628031589
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.37660584565992455,
+        "auc": 0.9171319603356217,
+        "accuracy": 0.8475609756097561,
+        "f1": 0.8294679399727148
+      },
+      "dataset": "oblique_band",
+      "seed": 17,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.43620840693824264,
+          "trial": 0,
+          "fit_seconds": 0.33188996196258813
+        },
+        {
+          "best_epoch": 155,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.2525154902167972,
+          "trial": 1,
+          "fit_seconds": 0.33594573597656563
+        },
+        {
+          "best_epoch": 70,
+          "epochs_run": 120,
+          "parameters": 1633,
+          "validation_log_loss": 0.3203291834519126,
+          "trial": 2,
+          "fit_seconds": 0.21013237204169855
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.26138602461505744,
+        "auc": 0.9577421815408085,
+        "accuracy": 0.9085365853658537,
+        "f1": 0.8927038626609443
+      },
+      "dataset": "oblique_band",
+      "seed": 29,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.47146501081576503,
+          "trial": 0,
+          "fit_seconds": 0.2869461239897646
+        },
+        {
+          "best_epoch": 155,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.25340478961096075,
+          "trial": 1,
+          "fit_seconds": 0.26927007699850947
+        },
+        {
+          "best_epoch": 120,
+          "epochs_run": 170,
+          "parameters": 1665,
+          "validation_log_loss": 0.2434504939906481,
+          "trial": 2,
+          "fit_seconds": 0.2574724510195665
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.24775672553366537,
+        "auc": 0.962233409610984,
+        "accuracy": 0.9207317073170732,
+        "f1": 0.9062049062049062
+      },
+      "dataset": "oblique_band",
+      "seed": 29,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.25346010920337947,
+          "trial": 0,
+          "fit_seconds": 0.23718145996099338
+        },
+        {
+          "best_epoch": 135,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.23630760096863324,
+          "trial": 1,
+          "fit_seconds": 0.2504384109633975
+        },
+        {
+          "best_epoch": 75,
+          "epochs_run": 125,
+          "parameters": 2689,
+          "validation_log_loss": 0.2196017059636806,
+          "trial": 2,
+          "fit_seconds": 0.17365510103991255
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.23276626517302557,
+        "auc": 0.9629717772692602,
+        "accuracy": 0.925609756097561,
+        "f1": 0.9117221418234442
+      },
+      "dataset": "oblique_band",
+      "seed": 29,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.30147202840968584,
+          "trial": 0,
+          "fit_seconds": 10.972378203994595
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.20404906349935,
+          "trial": 1,
+          "fit_seconds": 11.33396407199325
+        },
+        {
+          "best_epoch": 145,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.1890495873732879,
+          "trial": 2,
+          "fit_seconds": 11.579464394017123
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.22597731757171366,
+        "auc": 0.9611289092295958,
+        "accuracy": 0.9317073170731708,
+        "f1": 0.9188405797101449
+      },
+      "dataset": "oblique_band",
+      "seed": 29,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.36597374749245715,
+          "trial": 0,
+          "fit_seconds": 0.0029392149881459773
+        },
+        {
+          "validation_log_loss": 0.41037634955016283,
+          "trial": 1,
+          "fit_seconds": 0.0033578830189071596
+        },
+        {
+          "validation_log_loss": 0.5508361173985454,
+          "trial": 2,
+          "fit_seconds": 0.0034975390299223363
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.37408990162056505,
+        "auc": 0.9603844393592678,
+        "accuracy": 0.9109756097560976,
+        "f1": 0.8918518518518519
+      },
+      "dataset": "oblique_band",
+      "seed": 29,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.38180784278027274,
+          "trial": 0,
+          "fit_seconds": 0.18045428796904162
+        },
+        {
+          "validation_log_loss": 0.3658793367474967,
+          "trial": 1,
+          "fit_seconds": 0.1988460459979251
+        },
+        {
+          "validation_log_loss": 0.36604137008195764,
+          "trial": 2,
+          "fit_seconds": 0.23772612703032792
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.39229364555019874,
+        "auc": 0.9055621662852784,
+        "accuracy": 0.8341463414634146,
+        "f1": 0.8095238095238095
+      },
+      "dataset": "oblique_band",
+      "seed": 29,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.37246856497930037,
+          "trial": 0,
+          "fit_seconds": 0.41415484598837793
+        },
+        {
+          "validation_log_loss": 0.3393431086883727,
+          "trial": 1,
+          "fit_seconds": 0.8355415379628539
+        },
+        {
+          "validation_log_loss": 0.3158183672331305,
+          "trial": 2,
+          "fit_seconds": 1.8764530969783664
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.33917507276179126,
+        "auc": 0.9347673531655224,
+        "accuracy": 0.8731707317073171,
+        "f1": 0.8535211267605634
+      },
+      "dataset": "oblique_band",
+      "seed": 29,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.4500323053660115,
+          "trial": 0,
+          "fit_seconds": 0.3613353839609772
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.2960571787648621,
+          "trial": 1,
+          "fit_seconds": 0.36902378499507904
+        },
+        {
+          "best_epoch": 60,
+          "epochs_run": 110,
+          "parameters": 1633,
+          "validation_log_loss": 0.35019552093205364,
+          "trial": 2,
+          "fit_seconds": 0.20922511903336272
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.3281966460663802,
+        "auc": 0.9449824561403508,
+        "accuracy": 0.8878048780487805,
+        "f1": 0.8693181818181818
+      },
+      "dataset": "oblique_band",
+      "seed": 43,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.47852994699144674,
+          "trial": 0,
+          "fit_seconds": 0.31084716599434614
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.27059914129819407,
+          "trial": 1,
+          "fit_seconds": 0.2959342619869858
+        },
+        {
+          "best_epoch": 115,
+          "epochs_run": 165,
+          "parameters": 1665,
+          "validation_log_loss": 0.21879049018133043,
+          "trial": 2,
+          "fit_seconds": 0.26973553601419553
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.24124979607256156,
+        "auc": 0.9627581998474447,
+        "accuracy": 0.9207317073170732,
+        "f1": 0.9051094890510949
+      },
+      "dataset": "oblique_band",
+      "seed": 43,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.2541202979293151,
+          "trial": 0,
+          "fit_seconds": 0.26509441097732633
+        },
+        {
+          "best_epoch": 145,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.23122544067511122,
+          "trial": 1,
+          "fit_seconds": 0.2524816840304993
+        },
+        {
+          "best_epoch": 55,
+          "epochs_run": 105,
+          "parameters": 2689,
+          "validation_log_loss": 0.23395147184677992,
+          "trial": 2,
+          "fit_seconds": 0.16928559500956908
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.2746869569951595,
+        "auc": 0.9612021357742182,
+        "accuracy": 0.9280487804878049,
+        "f1": 0.9151079136690647
+      },
+      "dataset": "oblique_band",
+      "seed": 43,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.27037065275668326,
+          "trial": 0,
+          "fit_seconds": 11.30314825696405
+        },
+        {
+          "best_epoch": 170,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.20413557053715542,
+          "trial": 1,
+          "fit_seconds": 11.005808050977066
+        },
+        {
+          "best_epoch": 170,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.17692770950811598,
+          "trial": 2,
+          "fit_seconds": 10.908171746006701
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.18042084095207586,
+        "auc": 0.9687383676582761,
+        "accuracy": 0.9512195121951219,
+        "f1": 0.9416909620991254
+      },
+      "dataset": "oblique_band",
+      "seed": 43,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.34864371310368736,
+          "trial": 0,
+          "fit_seconds": 0.0022444900241680443
+        },
+        {
+          "validation_log_loss": 0.3955565149060522,
+          "trial": 1,
+          "fit_seconds": 0.002088512002956122
+        },
+        {
+          "validation_log_loss": 0.5446642289414717,
+          "trial": 2,
+          "fit_seconds": 0.0021137470030225813
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.4001417243369759,
+        "auc": 0.9635636918382914,
+        "accuracy": 0.9329268292682927,
+        "f1": 0.9187592319054653
+      },
+      "dataset": "oblique_band",
+      "seed": 43,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.370634490596861,
+          "trial": 0,
+          "fit_seconds": 0.18682198994792998
+        },
+        {
+          "validation_log_loss": 0.3623023046853527,
+          "trial": 1,
+          "fit_seconds": 0.24343056103680283
+        },
+        {
+          "validation_log_loss": 0.35494090494018987,
+          "trial": 2,
+          "fit_seconds": 0.23073514498537406
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.35830769337752916,
+        "auc": 0.9194385964912282,
+        "accuracy": 0.8365853658536585,
+        "f1": 0.8117977528089888
+      },
+      "dataset": "oblique_band",
+      "seed": 43,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.3724689715122153,
+          "trial": 0,
+          "fit_seconds": 0.3834124509594403
+        },
+        {
+          "validation_log_loss": 0.3320944550313912,
+          "trial": 1,
+          "fit_seconds": 0.7517441739910282
+        },
+        {
+          "validation_log_loss": 0.32641935461711685,
+          "trial": 2,
+          "fit_seconds": 1.7851626300252974
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.33917972280842235,
+        "auc": 0.9343218916857362,
+        "accuracy": 0.8658536585365854,
+        "f1": 0.84593837535014
+      },
+      "dataset": "oblique_band",
+      "seed": 43,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 40,
+          "epochs_run": 90,
+          "parameters": 1665,
+          "validation_log_loss": 0.6916559983431974,
+          "trial": 0,
+          "fit_seconds": 0.18064717401284724
+        },
+        {
+          "best_epoch": 15,
+          "epochs_run": 65,
+          "parameters": 1665,
+          "validation_log_loss": 0.6919858164142958,
+          "trial": 1,
+          "fit_seconds": 0.1293770709889941
+        },
+        {
+          "best_epoch": 5,
+          "epochs_run": 55,
+          "parameters": 1633,
+          "validation_log_loss": 0.6910416731397029,
+          "trial": 2,
+          "fit_seconds": 0.10040324699366465
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6923225472695197,
+        "auc": 0.5279180720884717,
+        "accuracy": 0.525609756097561,
+        "f1": 0.49282920469361147
+      },
+      "dataset": "xor_bands",
+      "seed": 17,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 40,
+          "epochs_run": 90,
+          "parameters": 1665,
+          "validation_log_loss": 0.6912407766416667,
+          "trial": 0,
+          "fit_seconds": 0.1469558920362033
+        },
+        {
+          "best_epoch": 15,
+          "epochs_run": 65,
+          "parameters": 1665,
+          "validation_log_loss": 0.6921927955385032,
+          "trial": 1,
+          "fit_seconds": 0.09887231199536473
+        },
+        {
+          "best_epoch": 105,
+          "epochs_run": 155,
+          "parameters": 1665,
+          "validation_log_loss": 0.3294343416003315,
+          "trial": 2,
+          "fit_seconds": 0.23772979999193922
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.29539833510151003,
+        "auc": 0.9543602281988589,
+        "accuracy": 0.9048780487804878,
+        "f1": 0.9051094890510949
+      },
+      "dataset": "xor_bands",
+      "seed": 17,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 30,
+          "epochs_run": 80,
+          "parameters": 2689,
+          "validation_log_loss": 0.6928724253825255,
+          "trial": 0,
+          "fit_seconds": 0.10676504397997633
+        },
+        {
+          "best_epoch": 130,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.3416481347165389,
+          "trial": 1,
+          "fit_seconds": 0.2373704289784655
+        },
+        {
+          "best_epoch": 60,
+          "epochs_run": 110,
+          "parameters": 2689,
+          "validation_log_loss": 0.3241942682471867,
+          "trial": 2,
+          "fit_seconds": 0.1437196339829825
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.3190350071692963,
+        "auc": 0.9535273856477433,
+        "accuracy": 0.8926829268292683,
+        "f1": 0.8947368421052632
+      },
+      "dataset": "xor_bands",
+      "seed": 17,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.6312634878492944,
+          "trial": 0,
+          "fit_seconds": 10.921960923995357
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.49355394609834574,
+          "trial": 1,
+          "fit_seconds": 11.040879886015318
+        },
+        {
+          "best_epoch": 170,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.3635001670222846,
+          "trial": 2,
+          "fit_seconds": 9.142983683967032
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.3622698336105322,
+        "auc": 0.9318615815680046,
+        "accuracy": 0.8439024390243902,
+        "f1": 0.8461538461538461
+      },
+      "dataset": "xor_bands",
+      "seed": 17,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.7104092623867453,
+          "trial": 0,
+          "fit_seconds": 0.0024219410261139274
+        },
+        {
+          "validation_log_loss": 0.7071046590996972,
+          "trial": 1,
+          "fit_seconds": 0.00210325897205621
+        },
+        {
+          "validation_log_loss": 0.6973373109082398,
+          "trial": 2,
+          "fit_seconds": 0.002086188003886491
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6936386167071499,
+        "auc": 0.5323589075485279,
+        "accuracy": 0.5219512195121951,
+        "f1": 0.5462962962962963
+      },
+      "dataset": "xor_bands",
+      "seed": 17,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.6704430832648463,
+          "trial": 0,
+          "fit_seconds": 0.03638173302169889
+        },
+        {
+          "validation_log_loss": 0.6528838078621296,
+          "trial": 1,
+          "fit_seconds": 0.05849176901392639
+        },
+        {
+          "validation_log_loss": 0.6405184743824164,
+          "trial": 2,
+          "fit_seconds": 0.10956782498396933
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6298878139573445,
+        "auc": 0.7027406468807071,
+        "accuracy": 0.6439024390243903,
+        "f1": 0.6395061728395062
+      },
+      "dataset": "xor_bands",
+      "seed": 17,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.6604668468759195,
+          "trial": 0,
+          "fit_seconds": 0.2666209900053218
+        },
+        {
+          "validation_log_loss": 0.6419615260116528,
+          "trial": 1,
+          "fit_seconds": 0.5050650340272114
+        },
+        {
+          "validation_log_loss": 0.6154902173372582,
+          "trial": 2,
+          "fit_seconds": 1.5402899680193514
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.5799120838859138,
+        "auc": 0.7659890897625805,
+        "accuracy": 0.698780487804878,
+        "f1": 0.6998784933171325
+      },
+      "dataset": "xor_bands",
+      "seed": 17,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.5958642820924094,
+          "trial": 0,
+          "fit_seconds": 0.355422438995447
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.378524439100917,
+          "trial": 1,
+          "fit_seconds": 0.3509776759892702
+        },
+        {
+          "best_epoch": 70,
+          "epochs_run": 120,
+          "parameters": 1633,
+          "validation_log_loss": 0.5373316822758801,
+          "trial": 2,
+          "fit_seconds": 0.21693422796670347
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.38161863556029435,
+        "auc": 0.9159185955895037,
+        "accuracy": 0.8292682926829268,
+        "f1": 0.8284313725490197
+      },
+      "dataset": "xor_bands",
+      "seed": 29,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.6269315948821343,
+          "trial": 0,
+          "fit_seconds": 0.29644843499409035
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.3364016797689624,
+          "trial": 1,
+          "fit_seconds": 0.2799111570348032
+        },
+        {
+          "best_epoch": 100,
+          "epochs_run": 150,
+          "parameters": 1665,
+          "validation_log_loss": 0.3171724631619523,
+          "trial": 2,
+          "fit_seconds": 0.22859003097983077
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.3156402865847982,
+        "auc": 0.9452822443916977,
+        "accuracy": 0.8829268292682927,
+        "f1": 0.8848920863309353
+      },
+      "dataset": "xor_bands",
+      "seed": 29,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.511336556400048,
+          "trial": 0,
+          "fit_seconds": 0.26175950100878254
+        },
+        {
+          "best_epoch": 135,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.3675845233643702,
+          "trial": 1,
+          "fit_seconds": 0.2640504559967667
+        },
+        {
+          "best_epoch": 65,
+          "epochs_run": 115,
+          "parameters": 2689,
+          "validation_log_loss": 0.36757965659273345,
+          "trial": 2,
+          "fit_seconds": 0.15563086996553466
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.35004805812999645,
+        "auc": 0.9325040601074368,
+        "accuracy": 0.8695121951219512,
+        "f1": 0.8721624850657109
+      },
+      "dataset": "xor_bands",
+      "seed": 29,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.6526426015050061,
+          "trial": 0,
+          "fit_seconds": 10.88957279198803
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.4637551624355851,
+          "trial": 1,
+          "fit_seconds": 10.827104679017793
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.39136580031446183,
+          "trial": 2,
+          "fit_seconds": 10.795108701044228
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.38839321037242824,
+        "auc": 0.9144670700004164,
+        "accuracy": 0.8378048780487805,
+        "f1": 0.8422301304863582
+      },
+      "dataset": "xor_bands",
+      "seed": 29,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.6979645043159095,
+          "trial": 0,
+          "fit_seconds": 0.002303781977389008
+        },
+        {
+          "validation_log_loss": 0.6958498927384632,
+          "trial": 1,
+          "fit_seconds": 0.0022377760033123195
+        },
+        {
+          "validation_log_loss": 0.6903726145905107,
+          "trial": 2,
+          "fit_seconds": 0.0021009219926781952
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6968721622472971,
+        "auc": 0.5103837619498034,
+        "accuracy": 0.5182926829268293,
+        "f1": 0.5188794153471377
+      },
+      "dataset": "xor_bands",
+      "seed": 29,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.676966820735943,
+          "trial": 0,
+          "fit_seconds": 0.055488061043433845
+        },
+        {
+          "validation_log_loss": 0.6599814488189666,
+          "trial": 1,
+          "fit_seconds": 0.09312477399362251
+        },
+        {
+          "validation_log_loss": 0.6566997218066717,
+          "trial": 2,
+          "fit_seconds": 0.08556599402800202
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6532159696476976,
+        "auc": 0.6682312208876912,
+        "accuracy": 0.6317073170731707,
+        "f1": 0.6370192307692307
+      },
+      "dataset": "xor_bands",
+      "seed": 29,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.6550038616712479,
+          "trial": 0,
+          "fit_seconds": 0.2507539290236309
+        },
+        {
+          "validation_log_loss": 0.626781247871832,
+          "trial": 1,
+          "fit_seconds": 0.7322954160044901
+        },
+        {
+          "validation_log_loss": 0.6047090791292405,
+          "trial": 2,
+          "fit_seconds": 1.7107576269772835
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6154155093208095,
+        "auc": 0.729397557391775,
+        "accuracy": 0.6853658536585366,
+        "f1": 0.6884057971014492
+      },
+      "dataset": "xor_bands",
+      "seed": 29,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.6516045599514205,
+          "trial": 0,
+          "fit_seconds": 0.35026958998059854
+        },
+        {
+          "best_epoch": 165,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.4558164247144826,
+          "trial": 1,
+          "fit_seconds": 0.3608587729977444
+        },
+        {
+          "best_epoch": 65,
+          "epochs_run": 115,
+          "parameters": 1633,
+          "validation_log_loss": 0.6154258986436346,
+          "trial": 2,
+          "fit_seconds": 0.21628651401260868
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.45301043393898976,
+        "auc": 0.8801361102683537,
+        "accuracy": 0.8036585365853659,
+        "f1": 0.8034188034188035
+      },
+      "dataset": "xor_bands",
+      "seed": 43,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 45,
+          "epochs_run": 95,
+          "parameters": 1665,
+          "validation_log_loss": 0.6942956103513617,
+          "trial": 0,
+          "fit_seconds": 0.1590697529609315
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.38392700256579404,
+          "trial": 1,
+          "fit_seconds": 0.29165924299741164
+        },
+        {
+          "best_epoch": 105,
+          "epochs_run": 155,
+          "parameters": 1665,
+          "validation_log_loss": 0.3392391349032994,
+          "trial": 2,
+          "fit_seconds": 0.244529525982216
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.32545813073943825,
+        "auc": 0.944711152356647,
+        "accuracy": 0.9,
+        "f1": 0.8987654320987655
+      },
+      "dataset": "xor_bands",
+      "seed": 43,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.4619392078809366,
+          "trial": 0,
+          "fit_seconds": 0.2561478989664465
+        },
+        {
+          "best_epoch": 130,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.35196535041839344,
+          "trial": 1,
+          "fit_seconds": 0.24806539597921073
+        },
+        {
+          "best_epoch": 65,
+          "epochs_run": 115,
+          "parameters": 2689,
+          "validation_log_loss": 0.3548883392675479,
+          "trial": 2,
+          "fit_seconds": 0.15759692498249933
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.3711664528604545,
+        "auc": 0.9297616285641199,
+        "accuracy": 0.8707317073170732,
+        "f1": 0.8691358024691358
+      },
+      "dataset": "xor_bands",
+      "seed": 43,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.6048554113670511,
+          "trial": 0,
+          "fit_seconds": 11.11232618498616
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.42342484325777335,
+          "trial": 1,
+          "fit_seconds": 10.905423703952692
+        },
+        {
+          "best_epoch": 175,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.3519668561473831,
+          "trial": 2,
+          "fit_seconds": 10.989253098028712
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.33408654558339423,
+        "auc": 0.9405826328532589,
+        "accuracy": 0.8707317073170732,
+        "f1": 0.8744075829383886
+      },
+      "dataset": "xor_bands",
+      "seed": 43,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.6915040185219229,
+          "trial": 0,
+          "fit_seconds": 0.002364646003115922
+        },
+        {
+          "validation_log_loss": 0.6909168624925746,
+          "trial": 1,
+          "fit_seconds": 0.0022200740058906376
+        },
+        {
+          "validation_log_loss": 0.6900105429336342,
+          "trial": 2,
+          "fit_seconds": 0.002087778993882239
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6916015205698316,
+        "auc": 0.5292297991064789,
+        "accuracy": 0.5158536585365854,
+        "f1": 0.5056039850560399
+      },
+      "dataset": "xor_bands",
+      "seed": 43,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.6590113248596992,
+          "trial": 0,
+          "fit_seconds": 0.08776174299418926
+        },
+        {
+          "validation_log_loss": 0.6563381916337292,
+          "trial": 1,
+          "fit_seconds": 0.08161548402858898
+        },
+        {
+          "validation_log_loss": 0.6435611854072577,
+          "trial": 2,
+          "fit_seconds": 0.1286097220145166
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6304908135367998,
+        "auc": 0.7010154730248246,
+        "accuracy": 0.6402439024390244,
+        "f1": 0.6362515413070283
+      },
+      "dataset": "xor_bands",
+      "seed": 43,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.6539191424118417,
+          "trial": 0,
+          "fit_seconds": 0.3004407440312207
+        },
+        {
+          "validation_log_loss": 0.6207078413578392,
+          "trial": 1,
+          "fit_seconds": 0.5747305850381963
+        },
+        {
+          "validation_log_loss": 0.5956998589976693,
+          "trial": 2,
+          "fit_seconds": 1.3019683659658767
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6010866920587815,
+        "auc": 0.7425743163254986,
+        "accuracy": 0.6853658536585366,
+        "f1": 0.683046683046683
+      },
+      "dataset": "xor_bands",
+      "seed": 43,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.3625863105234546,
+          "trial": 0,
+          "fit_seconds": 0.33492361899698153
+        },
+        {
+          "best_epoch": 140,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.2831368075221068,
+          "trial": 1,
+          "fit_seconds": 0.34270768897840753
+        },
+        {
+          "best_epoch": 35,
+          "epochs_run": 85,
+          "parameters": 1633,
+          "validation_log_loss": 0.39604907430988545,
+          "trial": 2,
+          "fit_seconds": 0.14558312902227044
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.30529086565528984,
+        "auc": 0.9420394812280098,
+        "accuracy": 0.8780487804878049,
+        "f1": 0.8614958448753463
+      },
+      "dataset": "axis_tree",
+      "seed": 17,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.38547102363282254,
+          "trial": 0,
+          "fit_seconds": 0.28060118900611997
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.27390412849469575,
+          "trial": 1,
+          "fit_seconds": 0.2764722380088642
+        },
+        {
+          "best_epoch": 90,
+          "epochs_run": 140,
+          "parameters": 1665,
+          "validation_log_loss": 0.2439737561360178,
+          "trial": 2,
+          "fit_seconds": 0.20520191098330542
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.24118615064791532,
+        "auc": 0.9628482972136223,
+        "accuracy": 0.9146341463414634,
+        "f1": 0.9008498583569405
+      },
+      "dataset": "axis_tree",
+      "seed": 17,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.26438968864300977,
+          "trial": 0,
+          "fit_seconds": 0.22794266801793128
+        },
+        {
+          "best_epoch": 170,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.2284156615558039,
+          "trial": 1,
+          "fit_seconds": 0.22617086401442066
+        },
+        {
+          "best_epoch": 65,
+          "epochs_run": 115,
+          "parameters": 2689,
+          "validation_log_loss": 0.22070811903175389,
+          "trial": 2,
+          "fit_seconds": 0.14357838401338086
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.2246983842672719,
+        "auc": 0.9680142909733914,
+        "accuracy": 0.9365853658536586,
+        "f1": 0.9263456090651558
+      },
+      "dataset": "axis_tree",
+      "seed": 17,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.14621764184667374,
+          "trial": 0,
+          "fit_seconds": 10.530666177975945
+        },
+        {
+          "best_epoch": 150,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.12466898014404315,
+          "trial": 1,
+          "fit_seconds": 10.671501991979312
+        },
+        {
+          "best_epoch": 90,
+          "epochs_run": 140,
+          "parameters": 10056,
+          "validation_log_loss": 0.12167134343826269,
+          "trial": 2,
+          "fit_seconds": 8.307357505022082
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.1384230900105337,
+        "auc": 0.9731682146542828,
+        "accuracy": 0.9682926829268292,
+        "f1": 0.9637883008356546
+      },
+      "dataset": "axis_tree",
+      "seed": 17,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.35323724689383007,
+          "trial": 0,
+          "fit_seconds": 0.002389842993579805
+        },
+        {
+          "validation_log_loss": 0.36272882025372516,
+          "trial": 1,
+          "fit_seconds": 0.0020302989869378507
+        },
+        {
+          "validation_log_loss": 0.4068410268016059,
+          "trial": 2,
+          "fit_seconds": 0.0020135919912718236
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.35717855532806503,
+        "auc": 0.936396719352561,
+        "accuracy": 0.8670731707317073,
+        "f1": 0.8445078459343794
+      },
+      "dataset": "axis_tree",
+      "seed": 17,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.11324395197614687,
+          "trial": 0,
+          "fit_seconds": 0.06253034400288016
+        },
+        {
+          "validation_log_loss": 0.1134935595227559,
+          "trial": 1,
+          "fit_seconds": 0.10830806900048628
+        },
+        {
+          "validation_log_loss": 0.1129777537135894,
+          "trial": 2,
+          "fit_seconds": 0.1750197209767066
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.13470477397270222,
+        "auc": 0.9723595193694592,
+        "accuracy": 0.973170731707317,
+        "f1": 0.9694444444444444
+      },
+      "dataset": "axis_tree",
+      "seed": 17,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.11412899014324794,
+          "trial": 0,
+          "fit_seconds": 0.15047086495906115
+        },
+        {
+          "validation_log_loss": 0.11061634921543682,
+          "trial": 1,
+          "fit_seconds": 0.6086748569505289
+        },
+        {
+          "validation_log_loss": 0.10541918255173491,
+          "trial": 2,
+          "fit_seconds": 1.4316000540275127
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.1311566031796445,
+        "auc": 0.9752563383001707,
+        "accuracy": 0.9707317073170731,
+        "f1": 0.9665738161559888
+      },
+      "dataset": "axis_tree",
+      "seed": 17,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.4027214931673354,
+          "trial": 0,
+          "fit_seconds": 0.3277528459439054
+        },
+        {
+          "best_epoch": 155,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.34848070070884585,
+          "trial": 1,
+          "fit_seconds": 0.3307094410411082
+        },
+        {
+          "best_epoch": 60,
+          "epochs_run": 110,
+          "parameters": 1633,
+          "validation_log_loss": 0.4447639412579419,
+          "trial": 2,
+          "fit_seconds": 0.18524718197295442
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.28592816049386777,
+        "auc": 0.9514722478711398,
+        "accuracy": 0.8914634146341464,
+        "f1": 0.8741159830268741
+      },
+      "dataset": "axis_tree",
+      "seed": 29,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.4318733217611669,
+          "trial": 0,
+          "fit_seconds": 0.27613417798420414
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.3113979310511122,
+          "trial": 1,
+          "fit_seconds": 0.2659901640145108
+        },
+        {
+          "best_epoch": 125,
+          "epochs_run": 175,
+          "parameters": 1665,
+          "validation_log_loss": 0.2839141911808799,
+          "trial": 2,
+          "fit_seconds": 0.2551483149873093
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.26571647019991024,
+        "auc": 0.9569460286422972,
+        "accuracy": 0.9219512195121952,
+        "f1": 0.9090909090909091
+      },
+      "dataset": "axis_tree",
+      "seed": 29,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.30442077244622845,
+          "trial": 0,
+          "fit_seconds": 0.22502293600700796
+        },
+        {
+          "best_epoch": 165,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.2634697070707032,
+          "trial": 1,
+          "fit_seconds": 0.22305083298124373
+        },
+        {
+          "best_epoch": 65,
+          "epochs_run": 115,
+          "parameters": 2689,
+          "validation_log_loss": 0.2664705096061724,
+          "trial": 2,
+          "fit_seconds": 0.14703890297096223
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.22252385671921232,
+        "auc": 0.9659804826824543,
+        "accuracy": 0.9341463414634147,
+        "f1": 0.9241573033707865
+      },
+      "dataset": "axis_tree",
+      "seed": 29,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.1988309646832044,
+          "trial": 0,
+          "fit_seconds": 10.513705254998058
+        },
+        {
+          "best_epoch": 120,
+          "epochs_run": 170,
+          "parameters": 10056,
+          "validation_log_loss": 0.18589724097740093,
+          "trial": 1,
+          "fit_seconds": 9.93297695601359
+        },
+        {
+          "best_epoch": 65,
+          "epochs_run": 115,
+          "parameters": 10056,
+          "validation_log_loss": 0.18042139228507165,
+          "trial": 2,
+          "fit_seconds": 6.748899043013807
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.1398926948191253,
+        "auc": 0.9726009209470183,
+        "accuracy": 0.9646341463414634,
+        "f1": 0.9593267882187938
+      },
+      "dataset": "axis_tree",
+      "seed": 29,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.38150257076292354,
+          "trial": 0,
+          "fit_seconds": 0.0021735900081694126
+        },
+        {
+          "validation_log_loss": 0.3894265041888527,
+          "trial": 1,
+          "fit_seconds": 0.0021109969820827246
+        },
+        {
+          "validation_log_loss": 0.4280362658963019,
+          "trial": 2,
+          "fit_seconds": 0.001998516032472253
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.35860243536439845,
+        "auc": 0.9322627173368577,
+        "accuracy": 0.875609756097561,
+        "f1": 0.8538681948424068
+      },
+      "dataset": "axis_tree",
+      "seed": 29,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.15923475115890703,
+          "trial": 0,
+          "fit_seconds": 0.05037427501520142
+        },
+        {
+          "validation_log_loss": 0.16283352014123414,
+          "trial": 1,
+          "fit_seconds": 0.08585670398315415
+        },
+        {
+          "validation_log_loss": 0.1663857772370415,
+          "trial": 2,
+          "fit_seconds": 0.1263107669656165
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.1305839941807978,
+        "auc": 0.9697584173712575,
+        "accuracy": 0.974390243902439,
+        "f1": 0.9704641350210971
+      },
+      "dataset": "axis_tree",
+      "seed": 29,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.1543401776398273,
+          "trial": 0,
+          "fit_seconds": 0.15607396396808326
+        },
+        {
+          "validation_log_loss": 0.15568189424742943,
+          "trial": 1,
+          "fit_seconds": 0.21623223199276254
+        },
+        {
+          "validation_log_loss": 0.15748013027842261,
+          "trial": 2,
+          "fit_seconds": 0.5003700969973579
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.13052548436532885,
+        "auc": 0.9677004689225644,
+        "accuracy": 0.974390243902439,
+        "f1": 0.9704641350210971
+      },
+      "dataset": "axis_tree",
+      "seed": 29,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.37435277133665135,
+          "trial": 0,
+          "fit_seconds": 0.3310682070441544
+        },
+        {
+          "best_epoch": 150,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.30872702439911126,
+          "trial": 1,
+          "fit_seconds": 0.3347828059922904
+        },
+        {
+          "best_epoch": 75,
+          "epochs_run": 125,
+          "parameters": 1633,
+          "validation_log_loss": 0.371213461412857,
+          "trial": 2,
+          "fit_seconds": 0.21655486500822008
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.2719369196599303,
+        "auc": 0.9557993711488906,
+        "accuracy": 0.9073170731707317,
+        "f1": 0.8953168044077136
+      },
+      "dataset": "axis_tree",
+      "seed": 43,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.4011533928643832,
+          "trial": 0,
+          "fit_seconds": 0.2816356969997287
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1665,
+          "validation_log_loss": 0.28930231975305915,
+          "trial": 1,
+          "fit_seconds": 0.2716997759998776
+        },
+        {
+          "best_epoch": 100,
+          "epochs_run": 150,
+          "parameters": 1665,
+          "validation_log_loss": 0.26917591728070683,
+          "trial": 2,
+          "fit_seconds": 0.22470399498706684
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.25567135494998966,
+        "auc": 0.9617861302723614,
+        "accuracy": 0.9219512195121952,
+        "f1": 0.9116022099447514
+      },
+      "dataset": "axis_tree",
+      "seed": 43,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.30713257393968857,
+          "trial": 0,
+          "fit_seconds": 0.23141882102936506
+        },
+        {
+          "best_epoch": 155,
+          "epochs_run": 180,
+          "parameters": 2689,
+          "validation_log_loss": 0.2592385738912719,
+          "trial": 1,
+          "fit_seconds": 0.23019819101318717
+        },
+        {
+          "best_epoch": 80,
+          "epochs_run": 130,
+          "parameters": 2689,
+          "validation_log_loss": 0.24900459088232652,
+          "trial": 2,
+          "fit_seconds": 0.16449827002361417
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.2218743606488166,
+        "auc": 0.9689316169681168,
+        "accuracy": 0.9317073170731708,
+        "f1": 0.9243243243243243
+      },
+      "dataset": "axis_tree",
+      "seed": 43,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.195067446345367,
+          "trial": 0,
+          "fit_seconds": 10.642209840996657
+        },
+        {
+          "best_epoch": 130,
+          "epochs_run": 180,
+          "parameters": 10056,
+          "validation_log_loss": 0.16377795691501476,
+          "trial": 1,
+          "fit_seconds": 8.065226877981331
+        },
+        {
+          "best_epoch": 70,
+          "epochs_run": 120,
+          "parameters": 10056,
+          "validation_log_loss": 0.1615246909615961,
+          "trial": 2,
+          "fit_seconds": 7.051854068995453
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.13185432140583445,
+        "auc": 0.9781048769153706,
+        "accuracy": 0.9719512195121951,
+        "f1": 0.9685362517099864
+      },
+      "dataset": "axis_tree",
+      "seed": 43,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.3746525933084035,
+          "trial": 0,
+          "fit_seconds": 0.0022186069982126355
+        },
+        {
+          "validation_log_loss": 0.38227271678487423,
+          "trial": 1,
+          "fit_seconds": 0.002066088025458157
+        },
+        {
+          "validation_log_loss": 0.41990643515490106,
+          "trial": 2,
+          "fit_seconds": 0.0019990219734609127
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.348207029616285,
+        "auc": 0.9449966505531113,
+        "accuracy": 0.8829268292682927,
+        "f1": 0.8677685950413223
+      },
+      "dataset": "axis_tree",
+      "seed": 43,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.14490876124428684,
+          "trial": 0,
+          "fit_seconds": 0.06011889997171238
+        },
+        {
+          "validation_log_loss": 0.14535511214365132,
+          "trial": 1,
+          "fit_seconds": 0.09153868799330667
+        },
+        {
+          "validation_log_loss": 0.1484573399224961,
+          "trial": 2,
+          "fit_seconds": 0.1417653170065023
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.12279459906348385,
+        "auc": 0.9758507896849106,
+        "accuracy": 0.974390243902439,
+        "f1": 0.9711141678129298
+      },
+      "dataset": "axis_tree",
+      "seed": 43,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.14490598101262267,
+          "trial": 0,
+          "fit_seconds": 0.08536937896860763
+        },
+        {
+          "validation_log_loss": 0.14759945966619253,
+          "trial": 1,
+          "fit_seconds": 0.16601465502753854
+        },
+        {
+          "validation_log_loss": 0.14556552724747635,
+          "trial": 2,
+          "fit_seconds": 0.4771209940081462
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.12700106281848886,
+        "auc": 0.9760529635061166,
+        "accuracy": 0.975609756097561,
+        "f1": 0.9725274725274725
+      },
+      "dataset": "axis_tree",
+      "seed": 43,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 3073,
+          "validation_log_loss": 0.0544106231677225,
+          "trial": 0,
+          "fit_seconds": 0.2061504070297815
+        },
+        {
+          "best_epoch": 90,
+          "epochs_run": 140,
+          "parameters": 3073,
+          "validation_log_loss": 0.044553705337873645,
+          "trial": 1,
+          "fit_seconds": 0.15919176599709317
+        },
+        {
+          "best_epoch": 130,
+          "epochs_run": 180,
+          "parameters": 3041,
+          "validation_log_loss": 0.015385684071127783,
+          "trial": 2,
+          "fit_seconds": 0.1942538009607233
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.14123854086778456,
+        "auc": 0.992063492063492,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9795918367346939
+      },
+      "dataset": "breast_cancer",
+      "seed": 17,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 3073,
+          "validation_log_loss": 0.05357525540438907,
+          "trial": 0,
+          "fit_seconds": 0.19568425399484113
+        },
+        {
+          "best_epoch": 100,
+          "epochs_run": 150,
+          "parameters": 3073,
+          "validation_log_loss": 0.0438086548475746,
+          "trial": 1,
+          "fit_seconds": 0.15580402803607285
+        },
+        {
+          "best_epoch": 60,
+          "epochs_run": 110,
+          "parameters": 3073,
+          "validation_log_loss": 0.0403065429148694,
+          "trial": 2,
+          "fit_seconds": 0.11398925201501697
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.11214862087257196,
+        "auc": 0.9887566137566137,
+        "accuracy": 0.9824561403508771,
+        "f1": 0.9863013698630136
+      },
+      "dataset": "breast_cancer",
+      "seed": 17,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 4097,
+          "validation_log_loss": 0.03985781071590561,
+          "trial": 0,
+          "fit_seconds": 0.1502400769968517
+        },
+        {
+          "best_epoch": 75,
+          "epochs_run": 125,
+          "parameters": 4097,
+          "validation_log_loss": 0.03419445483185665,
+          "trial": 1,
+          "fit_seconds": 0.10332056297920644
+        },
+        {
+          "best_epoch": 30,
+          "epochs_run": 80,
+          "parameters": 4097,
+          "validation_log_loss": 0.027028193326369573,
+          "trial": 2,
+          "fit_seconds": 0.06617187400115654
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.19684415805500755,
+        "auc": 0.9828042328042328,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9793103448275862
+      },
+      "dataset": "breast_cancer",
+      "seed": 17,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 17976,
+          "validation_log_loss": 0.03801797895637081,
+          "trial": 0,
+          "fit_seconds": 1.9962722350028343
+        },
+        {
+          "best_epoch": 130,
+          "epochs_run": 180,
+          "parameters": 17976,
+          "validation_log_loss": 0.03161768657474743,
+          "trial": 1,
+          "fit_seconds": 1.4869590339949355
+        },
+        {
+          "best_epoch": 55,
+          "epochs_run": 105,
+          "parameters": 17976,
+          "validation_log_loss": 0.032799529930030234,
+          "trial": 2,
+          "fit_seconds": 1.1387777529889718
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.12756061028835436,
+        "auc": 0.9930555555555556,
+        "accuracy": 0.9824561403508771,
+        "f1": 0.9863013698630136
+      },
+      "dataset": "breast_cancer",
+      "seed": 17,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "trial": 0,
+          "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+        },
+        {
+          "validation_log_loss": 0.0902711018110294,
+          "trial": 1,
+          "fit_seconds": 0.0024156110011972487
+        },
+        {
+          "validation_log_loss": 0.07926544716475432,
+          "trial": 2,
+          "fit_seconds": 0.002107379026710987
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.2127895658263308,
+        "auc": 0.9672619047619047,
+        "accuracy": 0.9385964912280702,
+        "f1": 0.9536423841059603
+      },
+      "dataset": "breast_cancer",
+      "seed": 17,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.11531708395795442,
+          "trial": 0,
+          "fit_seconds": 0.06690326699754223
+        },
+        {
+          "validation_log_loss": 0.11488091893313004,
+          "trial": 1,
+          "fit_seconds": 0.07693301601102576
+        },
+        {
+          "validation_log_loss": 0.11488091893313004,
+          "trial": 2,
+          "fit_seconds": 0.082400023995433
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.09336268682574962,
+        "auc": 0.9937169312169313,
+        "accuracy": 0.9649122807017544,
+        "f1": 0.972972972972973
+      },
+      "dataset": "breast_cancer",
+      "seed": 17,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.09704415790487281,
+          "trial": 0,
+          "fit_seconds": 0.3219532709917985
+        },
+        {
+          "validation_log_loss": 0.09138229921618322,
+          "trial": 1,
+          "fit_seconds": 0.5506739289849065
+        },
+        {
+          "validation_log_loss": 0.090655719858407,
+          "trial": 2,
+          "fit_seconds": 2.489773819979746
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.11098419307290604,
+        "auc": 0.9874338624338624,
+        "accuracy": 0.9649122807017544,
+        "f1": 0.9726027397260274
+      },
+      "dataset": "breast_cancer",
+      "seed": 17,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 3073,
+          "validation_log_loss": 0.07654878087702,
+          "trial": 0,
+          "fit_seconds": 0.20094998501008376
+        },
+        {
+          "best_epoch": 70,
+          "epochs_run": 120,
+          "parameters": 3073,
+          "validation_log_loss": 0.06836738214623105,
+          "trial": 1,
+          "fit_seconds": 0.13358145399251953
+        },
+        {
+          "best_epoch": 30,
+          "epochs_run": 80,
+          "parameters": 3041,
+          "validation_log_loss": 0.04823623526137574,
+          "trial": 2,
+          "fit_seconds": 0.08307294902624562
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.04629025391462537,
+        "auc": 0.9996693121693121,
+        "accuracy": 0.9912280701754386,
+        "f1": 0.993006993006993
+      },
+      "dataset": "breast_cancer",
+      "seed": 29,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 3073,
+          "validation_log_loss": 0.08259595212464901,
+          "trial": 0,
+          "fit_seconds": 0.19135391898453236
+        },
+        {
+          "best_epoch": 75,
+          "epochs_run": 125,
+          "parameters": 3073,
+          "validation_log_loss": 0.06384371730749372,
+          "trial": 1,
+          "fit_seconds": 0.12636327900690958
+        },
+        {
+          "best_epoch": 30,
+          "epochs_run": 80,
+          "parameters": 3073,
+          "validation_log_loss": 0.04231095353603602,
+          "trial": 2,
+          "fit_seconds": 0.08044133096700534
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.052948102147997146,
+        "auc": 0.9990079365079364,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9790209790209791
+      },
+      "dataset": "breast_cancer",
+      "seed": 29,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 4097,
+          "validation_log_loss": 0.04936923489637779,
+          "trial": 0,
+          "fit_seconds": 0.14623104396741837
+        },
+        {
+          "best_epoch": 45,
+          "epochs_run": 95,
+          "parameters": 4097,
+          "validation_log_loss": 0.04760239174299135,
+          "trial": 1,
+          "fit_seconds": 0.07479211798636243
+        },
+        {
+          "best_epoch": 15,
+          "epochs_run": 65,
+          "parameters": 4097,
+          "validation_log_loss": 0.034873335811241135,
+          "trial": 2,
+          "fit_seconds": 0.05174180801259354
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.05643342325343371,
+        "auc": 0.9973544973544974,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9793103448275862
+      },
+      "dataset": "breast_cancer",
+      "seed": 29,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 175,
+          "epochs_run": 180,
+          "parameters": 17976,
+          "validation_log_loss": 0.043066269959337974,
+          "trial": 0,
+          "fit_seconds": 1.8349791649961844
+        },
+        {
+          "best_epoch": 160,
+          "epochs_run": 180,
+          "parameters": 17976,
+          "validation_log_loss": 0.02636508914189388,
+          "trial": 1,
+          "fit_seconds": 1.5604242919944227
+        },
+        {
+          "best_epoch": 135,
+          "epochs_run": 180,
+          "parameters": 17976,
+          "validation_log_loss": 0.02839694699965906,
+          "trial": 2,
+          "fit_seconds": 1.593346630979795
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.02259023215065979,
+        "auc": 1.0,
+        "accuracy": 0.9912280701754386,
+        "f1": 0.993006993006993
+      },
+      "dataset": "breast_cancer",
+      "seed": 29,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "trial": 0,
+          "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+        },
+        {
+          "validation_log_loss": 0.12412411365106121,
+          "trial": 1,
+          "fit_seconds": 0.002020138024818152
+        },
+        {
+          "validation_log_loss": 0.08682954047310934,
+          "trial": 2,
+          "fit_seconds": 0.001955637999344617
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.07751963701647056,
+        "auc": 0.9950396825396824,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9793103448275862
+      },
+      "dataset": "breast_cancer",
+      "seed": 29,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.09715738973909539,
+          "trial": 0,
+          "fit_seconds": 0.07391823100624606
+        },
+        {
+          "validation_log_loss": 0.09611029274257799,
+          "trial": 1,
+          "fit_seconds": 0.09095286298543215
+        },
+        {
+          "validation_log_loss": 0.09611029274257799,
+          "trial": 2,
+          "fit_seconds": 0.0915157690178603
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.052019955517491584,
+        "auc": 0.9980158730158729,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9793103448275862
+      },
+      "dataset": "breast_cancer",
+      "seed": 29,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.07630471859299194,
+          "trial": 0,
+          "fit_seconds": 0.7065367709728889
+        },
+        {
+          "validation_log_loss": 0.06922522440547445,
+          "trial": 1,
+          "fit_seconds": 1.2489872729638591
+        },
+        {
+          "validation_log_loss": 0.07502496775741709,
+          "trial": 2,
+          "fit_seconds": 6.803663316997699
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.08108686574370959,
+        "auc": 0.9966931216931216,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9790209790209791
+      },
+      "dataset": "breast_cancer",
+      "seed": 29,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 3073,
+          "validation_log_loss": 0.09599940246186343,
+          "trial": 0,
+          "fit_seconds": 0.2070211639511399
+        },
+        {
+          "best_epoch": 110,
+          "epochs_run": 160,
+          "parameters": 3073,
+          "validation_log_loss": 0.0784975907219105,
+          "trial": 1,
+          "fit_seconds": 0.18234358099289238
+        },
+        {
+          "best_epoch": 30,
+          "epochs_run": 80,
+          "parameters": 3041,
+          "validation_log_loss": 0.11108627359621921,
+          "trial": 2,
+          "fit_seconds": 0.0859835270093754
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.09486014894712752,
+        "auc": 0.9849328529315428,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9790209790209791
+      },
+      "dataset": "breast_cancer",
+      "seed": 43,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 3073,
+          "validation_log_loss": 0.10789505056577499,
+          "trial": 0,
+          "fit_seconds": 0.19664907199330628
+        },
+        {
+          "best_epoch": 135,
+          "epochs_run": 180,
+          "parameters": 3073,
+          "validation_log_loss": 0.07645823557866946,
+          "trial": 1,
+          "fit_seconds": 0.18713782000122592
+        },
+        {
+          "best_epoch": 55,
+          "epochs_run": 105,
+          "parameters": 3073,
+          "validation_log_loss": 0.07988111560333373,
+          "trial": 2,
+          "fit_seconds": 0.10788343503372744
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.10893408646682076,
+        "auc": 0.982640026203734,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9790209790209791
+      },
+      "dataset": "breast_cancer",
+      "seed": 43,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 160,
+          "epochs_run": 180,
+          "parameters": 4097,
+          "validation_log_loss": 0.07899261695545433,
+          "trial": 0,
+          "fit_seconds": 0.15057822701055557
+        },
+        {
+          "best_epoch": 60,
+          "epochs_run": 110,
+          "parameters": 4097,
+          "validation_log_loss": 0.08725568959194809,
+          "trial": 1,
+          "fit_seconds": 0.08953030599514022
+        },
+        {
+          "best_epoch": 15,
+          "epochs_run": 65,
+          "parameters": 4097,
+          "validation_log_loss": 0.10201921895511959,
+          "trial": 2,
+          "fit_seconds": 0.054266944993287325
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.09863147017594412,
+        "auc": 0.9872256796593515,
+        "accuracy": 0.9824561403508771,
+        "f1": 0.9861111111111112
+      },
+      "dataset": "breast_cancer",
+      "seed": 43,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 165,
+          "epochs_run": 180,
+          "parameters": 17976,
+          "validation_log_loss": 0.08189138844911348,
+          "trial": 0,
+          "fit_seconds": 1.404095668985974
+        },
+        {
+          "best_epoch": 135,
+          "epochs_run": 180,
+          "parameters": 17976,
+          "validation_log_loss": 0.0803845576277521,
+          "trial": 1,
+          "fit_seconds": 1.3974998380290344
+        },
+        {
+          "best_epoch": 100,
+          "epochs_run": 150,
+          "parameters": 17976,
+          "validation_log_loss": 0.09851989502865599,
+          "trial": 2,
+          "fit_seconds": 1.1650844390387647
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.14758038537867824,
+        "auc": 0.9885358663609565,
+        "accuracy": 0.9736842105263158,
+        "f1": 0.9790209790209791
+      },
+      "dataset": "breast_cancer",
+      "seed": 43,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "trial": 0,
+          "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+        },
+        {
+          "validation_log_loss": 0.11502235137228072,
+          "trial": 1,
+          "fit_seconds": 0.0026003160164691508
+        },
+        {
+          "validation_log_loss": 0.12722942275124655,
+          "trial": 2,
+          "fit_seconds": 0.0019423449994064867
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.1715138169424286,
+        "auc": 0.9793645594497216,
+        "accuracy": 0.9649122807017544,
+        "f1": 0.971830985915493
+      },
+      "dataset": "breast_cancer",
+      "seed": 43,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.14197865740346513,
+          "trial": 0,
+          "fit_seconds": 0.057954335992690176
+        },
+        {
+          "validation_log_loss": 0.14202412287195793,
+          "trial": 1,
+          "fit_seconds": 0.0657718789880164
+        },
+        {
+          "validation_log_loss": 0.14202412287195793,
+          "trial": 2,
+          "fit_seconds": 0.06620298099005595
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.1666304797026816,
+        "auc": 0.9819849328529315,
+        "accuracy": 0.956140350877193,
+        "f1": 0.9645390070921985
+      },
+      "dataset": "breast_cancer",
+      "seed": 43,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.1315879684431749,
+          "trial": 0,
+          "fit_seconds": 0.3079148690449074
+        },
+        {
+          "validation_log_loss": 0.11841726992249928,
+          "trial": 1,
+          "fit_seconds": 0.7120586480014026
+        },
+        {
+          "validation_log_loss": 0.14000750603624046,
+          "trial": 2,
+          "fit_seconds": 2.4865125520154834
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.14022691616010202,
+        "auc": 0.9810022928267279,
+        "accuracy": 0.956140350877193,
+        "f1": 0.9645390070921985
+      },
+      "dataset": "breast_cancer",
+      "seed": 43,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.046791963128929075,
+          "trial": 0,
+          "fit_seconds": 0.2371204509981908
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.004008481700898339,
+          "trial": 1,
+          "fit_seconds": 0.2656885890173726
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1377,
+          "validation_log_loss": 0.007943536789314587,
+          "trial": 2,
+          "fit_seconds": 0.23420279996935278
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.0019943221121099747,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 17,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.0586614561636859,
+          "trial": 0,
+          "fit_seconds": 0.21985845803283155
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.005458236478692544,
+          "trial": 1,
+          "fit_seconds": 0.21307977702235803
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.0007525038786287942,
+          "trial": 2,
+          "fit_seconds": 0.21282877901103348
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.0006028378939580745,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 17,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 0.03494330844079209,
+          "trial": 0,
+          "fit_seconds": 0.18224223802099004
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 0.0029493834855267454,
+          "trial": 1,
+          "fit_seconds": 0.17592233000323176
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 0.00021046456283463106,
+          "trial": 2,
+          "fit_seconds": 0.17600621294695884
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.0001445197711682834,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 17,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.030776931099329715,
+          "trial": 0,
+          "fit_seconds": 2.6103111100383103
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.0013666573092584236,
+          "trial": 1,
+          "fit_seconds": 3.244504289003089
+        },
+        {
+          "best_epoch": 175,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.0005840250448728966,
+          "trial": 2,
+          "fit_seconds": 3.381637768005021
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.0010691824695158066,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 17,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.019561116071460587,
+          "trial": 0,
+          "fit_seconds": 0.0018378429813310504
+        },
+        {
+          "validation_log_loss": 0.05877193066910749,
+          "trial": 1,
+          "fit_seconds": 0.0016514489543624222
+        },
+        {
+          "validation_log_loss": 0.27095970620760923,
+          "trial": 2,
+          "fit_seconds": 0.0016365019837394357
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.022082217456290833,
+        "auc": 1.0,
+        "accuracy": 0.9854545454545455,
+        "f1": 0.9838709677419355
+      },
+      "dataset": "banknote",
+      "seed": 17,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.05388497480931616,
+          "trial": 0,
+          "fit_seconds": 0.03536045295186341
+        },
+        {
+          "validation_log_loss": 0.049477924761976884,
+          "trial": 1,
+          "fit_seconds": 0.05556083598639816
+        },
+        {
+          "validation_log_loss": 0.049478022455520076,
+          "trial": 2,
+          "fit_seconds": 0.06035645701922476
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.019068364453815562,
+        "auc": 0.9998928533161898,
+        "accuracy": 0.9963636363636363,
+        "f1": 0.9959183673469387
+      },
+      "dataset": "banknote",
+      "seed": 17,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.01544400182643604,
+          "trial": 0,
+          "fit_seconds": 0.11509411002043635
+        },
+        {
+          "validation_log_loss": 0.018194169143172408,
+          "trial": 1,
+          "fit_seconds": 0.15680929098743945
+        },
+        {
+          "validation_log_loss": 0.01365979489007495,
+          "trial": 2,
+          "fit_seconds": 0.5589159370283596
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.013642995540129243,
+        "auc": 1.0,
+        "accuracy": 0.9927272727272727,
+        "f1": 0.991869918699187
+      },
+      "dataset": "banknote",
+      "seed": 17,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.04707439169406297,
+          "trial": 0,
+          "fit_seconds": 0.23650000296765938
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.002302730440700603,
+          "trial": 1,
+          "fit_seconds": 0.237167730985675
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1377,
+          "validation_log_loss": 0.006800550001753114,
+          "trial": 2,
+          "fit_seconds": 0.21759077702881768
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.0030479293482353295,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 29,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.047152169089451794,
+          "trial": 0,
+          "fit_seconds": 0.2169826040044427
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.0033371247016562976,
+          "trial": 1,
+          "fit_seconds": 0.20451406697975472
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 3.734486600454995e-05,
+          "trial": 2,
+          "fit_seconds": 0.20431968302000314
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 1.652439935242898e-05,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 29,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 0.021938132373047488,
+          "trial": 0,
+          "fit_seconds": 0.1689919840428047
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 0.0014545947037921231,
+          "trial": 1,
+          "fit_seconds": 0.16813293000450358
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 8.164670235432352e-05,
+          "trial": 2,
+          "fit_seconds": 0.1668771550175734
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.0001982491317389369,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 29,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.029467111506137098,
+          "trial": 0,
+          "fit_seconds": 3.291766367969103
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.0018645859299081453,
+          "trial": 1,
+          "fit_seconds": 3.008459030010272
+        },
+        {
+          "best_epoch": 135,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.001824779513318448,
+          "trial": 2,
+          "fit_seconds": 3.1572573910234496
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.0033585013252417878,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 29,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.027485013227335917,
+          "trial": 0,
+          "fit_seconds": 0.0019269040203653276
+        },
+        {
+          "validation_log_loss": 0.041050980115463695,
+          "trial": 1,
+          "fit_seconds": 0.0016649480094201863
+        },
+        {
+          "validation_log_loss": 0.22433703855062911,
+          "trial": 2,
+          "fit_seconds": 0.00151584402192384
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.048492362603296146,
+        "auc": 0.9998392799742848,
+        "accuracy": 0.9745454545454545,
+        "f1": 0.9721115537848606
+      },
+      "dataset": "banknote",
+      "seed": 29,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.002380088251532584,
+          "trial": 0,
+          "fit_seconds": 0.059762344986665994
+        },
+        {
+          "validation_log_loss": 0.0026934115792969712,
+          "trial": 1,
+          "fit_seconds": 0.07649973197840154
+        },
+        {
+          "validation_log_loss": 0.0026934330882986404,
+          "trial": 2,
+          "fit_seconds": 0.08418391802115366
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.05255840718579327,
+        "auc": 0.9996249866066645,
+        "accuracy": 0.9890909090909091,
+        "f1": 0.9875518672199171
+      },
+      "dataset": "banknote",
+      "seed": 29,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.005011061906995008,
+          "trial": 0,
+          "fit_seconds": 0.17996381199918687
+        },
+        {
+          "validation_log_loss": 0.004475993764500674,
+          "trial": 1,
+          "fit_seconds": 0.3751755990087986
+        },
+        {
+          "validation_log_loss": 0.0052649910721281785,
+          "trial": 2,
+          "fit_seconds": 1.0314521079999395
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.003069377421478506,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 29,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.05120219707854871,
+          "trial": 0,
+          "fit_seconds": 0.2301236249622889
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.0029674742950316843,
+          "trial": 1,
+          "fit_seconds": 0.23738525301450863
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1377,
+          "validation_log_loss": 0.0012605843052646483,
+          "trial": 2,
+          "fit_seconds": 0.22006894397782162
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.00142609921747161,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 43,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.05394757306755617,
+          "trial": 0,
+          "fit_seconds": 0.21333087905077264
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.003155452416189524,
+          "trial": 1,
+          "fit_seconds": 0.2047158349887468
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 1409,
+          "validation_log_loss": 0.0008550027038418901,
+          "trial": 2,
+          "fit_seconds": 0.2049671200220473
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.0007516892807187593,
+        "auc": 0.9999999999999999,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 43,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 0.024399766406498945,
+          "trial": 0,
+          "fit_seconds": 0.16736144601600245
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 0.002337103918698166,
+          "trial": 1,
+          "fit_seconds": 0.16907898598583415
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 2433,
+          "validation_log_loss": 0.00023801036463035578,
+          "trial": 2,
+          "fit_seconds": 0.18257335596717894
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.00021118579230566033,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 43,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.027851038851281425,
+          "trial": 0,
+          "fit_seconds": 3.012918187014293
+        },
+        {
+          "best_epoch": 165,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.002268767275650551,
+          "trial": 1,
+          "fit_seconds": 3.0947541940258816
+        },
+        {
+          "best_epoch": 130,
+          "epochs_run": 180,
+          "parameters": 8616,
+          "validation_log_loss": 0.0017121614013175751,
+          "trial": 2,
+          "fit_seconds": 3.462329594010953
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.0005456799939186576,
+        "auc": 1.0,
+        "accuracy": 1.0,
+        "f1": 1.0
+      },
+      "dataset": "banknote",
+      "seed": 43,
+      "model": "tabm",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.027210837047452485,
+          "trial": 0,
+          "fit_seconds": 0.0021276019979268312
+        },
+        {
+          "validation_log_loss": 0.04953437324493508,
+          "trial": 1,
+          "fit_seconds": 0.0017529779579490423
+        },
+        {
+          "validation_log_loss": 0.22784285445591962,
+          "trial": 2,
+          "fit_seconds": 0.0016692379722371697
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.03160839605085761,
+        "auc": 1.0,
+        "accuracy": 0.9854545454545455,
+        "f1": 0.9838709677419355
+      },
+      "dataset": "banknote",
+      "seed": 43,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.01207650159590128,
+          "trial": 0,
+          "fit_seconds": 0.038206539989914745
+        },
+        {
+          "validation_log_loss": 0.009399291273372813,
+          "trial": 1,
+          "fit_seconds": 0.06537659600144252
+        },
+        {
+          "validation_log_loss": 0.009399246511363504,
+          "trial": 2,
+          "fit_seconds": 0.07468578999396414
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.01719267741878211,
+        "auc": 0.999946426658095,
+        "accuracy": 0.9963636363636363,
+        "f1": 0.9959183673469387
+      },
+      "dataset": "banknote",
+      "seed": 43,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.00620287247465038,
+          "trial": 0,
+          "fit_seconds": 0.19210658204974607
+        },
+        {
+          "validation_log_loss": 0.006113994966725032,
+          "trial": 1,
+          "fit_seconds": 0.3740137330023572
+        },
+        {
+          "validation_log_loss": 0.0043547808954366475,
+          "trial": 2,
+          "fit_seconds": 0.8045551530085504
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.013481198482864162,
+        "auc": 0.9998928533161898,
+        "accuracy": 0.9963636363636363,
+        "f1": 0.9959183673469387
+      },
+      "dataset": "banknote",
+      "seed": 43,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 4801,
+          "validation_log_loss": 0.2168407653000243,
+          "trial": 0,
+          "fit_seconds": 0.45432804099982604
+        },
+        {
+          "best_epoch": 100,
+          "epochs_run": 150,
+          "parameters": 4801,
+          "validation_log_loss": 0.20759486243640848,
+          "trial": 1,
+          "fit_seconds": 0.3816770930425264
+        },
+        {
+          "best_epoch": 40,
+          "epochs_run": 90,
+          "parameters": 4769,
+          "validation_log_loss": 0.22921761622515896,
+          "trial": 2,
+          "fit_seconds": 0.21906187298009172
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.20719115657043333,
+        "auc": 0.9735922272579165,
+        "accuracy": 0.9239956568946797,
+        "f1": 0.9033149171270718
+      },
+      "dataset": "spambase",
+      "seed": 17,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 4801,
+          "validation_log_loss": 0.21923093777230246,
+          "trial": 0,
+          "fit_seconds": 0.41708891198504716
+        },
+        {
+          "best_epoch": 110,
+          "epochs_run": 160,
+          "parameters": 4801,
+          "validation_log_loss": 0.199301627995811,
+          "trial": 1,
+          "fit_seconds": 0.3337919290061109
+        },
+        {
+          "best_epoch": 95,
+          "epochs_run": 145,
+          "parameters": 4801,
+          "validation_log_loss": 0.17531722521449933,
+          "trial": 2,
+          "fit_seconds": 0.3029306880198419
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.20346236160191358,
+        "auc": 0.9784156323745767,
+        "accuracy": 0.9391965255157437,
+        "f1": 0.9228650137741047
+      },
+      "dataset": "spambase",
+      "seed": 17,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 5825,
+          "validation_log_loss": 0.1913885058420226,
+          "trial": 0,
+          "fit_seconds": 0.30263439001282677
+        },
+        {
+          "best_epoch": 115,
+          "epochs_run": 165,
+          "parameters": 5825,
+          "validation_log_loss": 0.17878349234394617,
+          "trial": 1,
+          "fit_seconds": 0.27281211997615173
+        },
+        {
+          "best_epoch": 45,
+          "epochs_run": 95,
+          "parameters": 5825,
+          "validation_log_loss": 0.1886683485103078,
+          "trial": 2,
+          "fit_seconds": 0.1623695109738037
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.19858647322517667,
+        "auc": 0.9773640609417735,
+        "accuracy": 0.9413680781758957,
+        "f1": 0.925414364640884
+      },
+      "dataset": "spambase",
+      "seed": 17,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 27696,
+          "validation_log_loss": 0.1695439309150951,
+          "trial": 0,
+          "fit_seconds": 18.524729836033657
+        },
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 27696,
+          "validation_log_loss": 0.15340007893664867,
+          "trial": 1,
+          "fit_seconds": 17.28409539698623
+        },
+        {
+          "best_epoch": 85,
+          "epochs_run": 135,
+          "parameters": 27696,
+          "validation_log_loss": 0.15835982837364448,
+          "trial": 2,
+          "fit_seconds": 14.07883019396104
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.1638818592718168,
+        "auc": 0.9831600462098995,
+        "accuracy": 0.9424538545059717,
+        "f1": 0.9274965800273598
+      },
+      "dataset": "spambase",
+      "seed": 17,
+      "model": "tabm",
+      "warnings": [
+        "The 21-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 3-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 31-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 33-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 37-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 40-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 46-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 47-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler"
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "trial": 0,
+          "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+        },
+        {
+          "validation_log_loss": 2.453510279373558,
+          "trial": 1,
+          "fit_seconds": 0.006958562997169793
+        },
+        {
+          "validation_log_loss": 0.956809073992334,
+          "trial": 2,
+          "fit_seconds": 0.007192710996605456
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 1.106165464236472,
+        "auc": 0.9289275946167442,
+        "accuracy": 0.8458197611292074,
+        "f1": 0.8246913580246914
+      },
+      "dataset": "spambase",
+      "seed": 17,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.13350142005742682,
+          "trial": 0,
+          "fit_seconds": 0.26037944795098156
+        },
+        {
+          "validation_log_loss": 0.13249261073126167,
+          "trial": 1,
+          "fit_seconds": 0.28859032300533727
+        },
+        {
+          "validation_log_loss": 0.13725280072779708,
+          "trial": 2,
+          "fit_seconds": 0.37667231197701767
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.14334406153844065,
+        "auc": 0.9834488580822892,
+        "accuracy": 0.9543973941368078,
+        "f1": 0.9424657534246575
+      },
+      "dataset": "spambase",
+      "seed": 17,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.1341710664380073,
+          "trial": 0,
+          "fit_seconds": 1.256782790995203
+        },
+        {
+          "validation_log_loss": 0.13049528516446243,
+          "trial": 1,
+          "fit_seconds": 2.8368567540310323
+        },
+        {
+          "validation_log_loss": 0.12072331233668487,
+          "trial": 2,
+          "fit_seconds": 9.045844122010749
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.13803816327906804,
+        "auc": 0.9848139261628999,
+        "accuracy": 0.9576547231270358,
+        "f1": 0.9463548830811555
+      },
+      "dataset": "spambase",
+      "seed": 17,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 4801,
+          "validation_log_loss": 0.21038792374480628,
+          "trial": 0,
+          "fit_seconds": 0.4469613599940203
+        },
+        {
+          "best_epoch": 110,
+          "epochs_run": 160,
+          "parameters": 4801,
+          "validation_log_loss": 0.1905379098693455,
+          "trial": 1,
+          "fit_seconds": 0.39826281397836283
+        },
+        {
+          "best_epoch": 40,
+          "epochs_run": 90,
+          "parameters": 4769,
+          "validation_log_loss": 0.2046024943497782,
+          "trial": 2,
+          "fit_seconds": 0.217552695015911
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.1708825584107399,
+        "auc": 0.9804768111219724,
+        "accuracy": 0.9348534201954397,
+        "f1": 0.9162011173184358
+      },
+      "dataset": "spambase",
+      "seed": 29,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 4801,
+          "validation_log_loss": 0.212666983765531,
+          "trial": 0,
+          "fit_seconds": 0.41028438799548894
+        },
+        {
+          "best_epoch": 120,
+          "epochs_run": 170,
+          "parameters": 4801,
+          "validation_log_loss": 0.19016122697760116,
+          "trial": 1,
+          "fit_seconds": 0.3481969240237959
+        },
+        {
+          "best_epoch": 50,
+          "epochs_run": 100,
+          "parameters": 4801,
+          "validation_log_loss": 0.1993982710088449,
+          "trial": 2,
+          "fit_seconds": 0.2027706060325727
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.171194077841466,
+        "auc": 0.9805212437177246,
+        "accuracy": 0.9359391965255157,
+        "f1": 0.9174825174825175
+      },
+      "dataset": "spambase",
+      "seed": 29,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 170,
+          "epochs_run": 180,
+          "parameters": 5825,
+          "validation_log_loss": 0.186906426871597,
+          "trial": 0,
+          "fit_seconds": 0.3002786149736494
+        },
+        {
+          "best_epoch": 80,
+          "epochs_run": 130,
+          "parameters": 5825,
+          "validation_log_loss": 0.1919916246437836,
+          "trial": 1,
+          "fit_seconds": 0.21425396198173985
+        },
+        {
+          "best_epoch": 35,
+          "epochs_run": 85,
+          "parameters": 5825,
+          "validation_log_loss": 0.19329814821379535,
+          "trial": 2,
+          "fit_seconds": 0.14661732595413923
+        }
+      ],
+      "selected_trial": 0,
+      "test": {
+        "log_loss": 0.16723970842914246,
+        "auc": 0.9806446675948143,
+        "accuracy": 0.9424538545059717,
+        "f1": 0.92524682651622
+      },
+      "dataset": "spambase",
+      "seed": 29,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 27696,
+          "validation_log_loss": 0.1670697788211839,
+          "trial": 0,
+          "fit_seconds": 17.92076496296795
+        },
+        {
+          "best_epoch": 130,
+          "epochs_run": 180,
+          "parameters": 27696,
+          "validation_log_loss": 0.16351379969831656,
+          "trial": 1,
+          "fit_seconds": 18.03901729104109
+        },
+        {
+          "best_epoch": 70,
+          "epochs_run": 120,
+          "parameters": 27696,
+          "validation_log_loss": 0.16284573406591793,
+          "trial": 2,
+          "fit_seconds": 12.057669516012538
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.14672151188397478,
+        "auc": 0.9861444355579253,
+        "accuracy": 0.9554831704668838,
+        "f1": 0.9434482758620689
+      },
+      "dataset": "spambase",
+      "seed": 29,
+      "model": "tabm",
+      "warnings": [
+        "The 21-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 3-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 31-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 33-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 37-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 40-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 46-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 47-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler"
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "trial": 0,
+          "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+        },
+        {
+          "validation_log_loss": 2.42599753285383,
+          "trial": 1,
+          "fit_seconds": 0.006769875006284565
+        },
+        {
+          "validation_log_loss": 0.8997974118633477,
+          "trial": 2,
+          "fit_seconds": 0.00658205000218004
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.8074269595281374,
+        "auc": 0.9417463984912665,
+        "accuracy": 0.8089033659066233,
+        "f1": 0.7958236658932715
+      },
+      "dataset": "spambase",
+      "seed": 29,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.13981513331796197,
+          "trial": 0,
+          "fit_seconds": 0.2385876089683734
+        },
+        {
+          "validation_log_loss": 0.1445425169293106,
+          "trial": 1,
+          "fit_seconds": 0.2566175760002807
+        },
+        {
+          "validation_log_loss": 0.13517288822462747,
+          "trial": 2,
+          "fit_seconds": 0.35246303997701034
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.1211742517136478,
+        "auc": 0.9883265697048689,
+        "accuracy": 0.9576547231270358,
+        "f1": 0.9459084604715673
+      },
+      "dataset": "spambase",
+      "seed": 29,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.14102068812811244,
+          "trial": 0,
+          "fit_seconds": 1.1921585039817728
+        },
+        {
+          "validation_log_loss": 0.13309088532273333,
+          "trial": 1,
+          "fit_seconds": 2.9066189259756356
+        },
+        {
+          "validation_log_loss": 0.13464558561737278,
+          "trial": 2,
+          "fit_seconds": 8.865175690036267
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.11863748698079842,
+        "auc": 0.988869634764063,
+        "accuracy": 0.9576547231270358,
+        "f1": 0.9456066945606695
+      },
+      "dataset": "spambase",
+      "seed": 29,
+      "model": "catboost",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 4801,
+          "validation_log_loss": 0.20285697110526105,
+          "trial": 0,
+          "fit_seconds": 0.5027837620000355
+        },
+        {
+          "best_epoch": 85,
+          "epochs_run": 135,
+          "parameters": 4801,
+          "validation_log_loss": 0.19899262562607128,
+          "trial": 1,
+          "fit_seconds": 0.3930119889555499
+        },
+        {
+          "best_epoch": 35,
+          "epochs_run": 85,
+          "parameters": 4769,
+          "validation_log_loss": 0.1991881100826381,
+          "trial": 2,
+          "fit_seconds": 0.23550648300442845
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.1824256439912852,
+        "auc": 0.9793487168853737,
+        "accuracy": 0.9239956568946797,
+        "f1": 0.9022346368715084
+      },
+      "dataset": "spambase",
+      "seed": 43,
+      "model": "band",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 4801,
+          "validation_log_loss": 0.20228551475894457,
+          "trial": 0,
+          "fit_seconds": 0.46508915297454223
+        },
+        {
+          "best_epoch": 90,
+          "epochs_run": 140,
+          "parameters": 4801,
+          "validation_log_loss": 0.1948703843054966,
+          "trial": 1,
+          "fit_seconds": 0.32772601500619203
+        },
+        {
+          "best_epoch": 45,
+          "epochs_run": 95,
+          "parameters": 4801,
+          "validation_log_loss": 0.19319034744441113,
+          "trial": 2,
+          "fit_seconds": 0.21651186799863353
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.1955467491961201,
+        "auc": 0.9757200548989405,
+        "accuracy": 0.9196525515743756,
+        "f1": 0.895774647887324
+      },
+      "dataset": "spambase",
+      "seed": 43,
+      "model": "gaussian",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 140,
+          "epochs_run": 180,
+          "parameters": 5825,
+          "validation_log_loss": 0.18928397865045862,
+          "trial": 0,
+          "fit_seconds": 0.33862497797235847
+        },
+        {
+          "best_epoch": 55,
+          "epochs_run": 105,
+          "parameters": 5825,
+          "validation_log_loss": 0.18840408387916524,
+          "trial": 1,
+          "fit_seconds": 0.19760025199502707
+        },
+        {
+          "best_epoch": 25,
+          "epochs_run": 75,
+          "parameters": 5825,
+          "validation_log_loss": 0.18688234648665353,
+          "trial": 2,
+          "fit_seconds": 0.14213786099571735
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.21220039527620319,
+        "auc": 0.971893914709164,
+        "accuracy": 0.9229098805646037,
+        "f1": 0.8984263233190272
+      },
+      "dataset": "spambase",
+      "seed": 43,
+      "model": "mlp",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "best_epoch": 180,
+          "epochs_run": 180,
+          "parameters": 27696,
+          "validation_log_loss": 0.15952202384146008,
+          "trial": 0,
+          "fit_seconds": 19.992861006991006
+        },
+        {
+          "best_epoch": 170,
+          "epochs_run": 180,
+          "parameters": 27696,
+          "validation_log_loss": 0.14472083100152192,
+          "trial": 1,
+          "fit_seconds": 19.500119783973787
+        },
+        {
+          "best_epoch": 65,
+          "epochs_run": 115,
+          "parameters": 27696,
+          "validation_log_loss": 0.15073557657822714,
+          "trial": 2,
+          "fit_seconds": 12.149828183988575
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.14920215269863615,
+        "auc": 0.9848287370281505,
+        "accuracy": 0.9435396308360477,
+        "f1": 0.9279778393351801
+      },
+      "dataset": "spambase",
+      "seed": 43,
+      "model": "tabm",
+      "warnings": [
+        "The 21-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 3-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 31-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 33-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 37-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 40-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 46-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler",
+        "The 47-th feature has just two bin edges, which means only one bin. Strictly speaking, using a single bin for the piecewise-linear encoding should not break anything, but it is the same as using sklearn.preprocessing.MinMaxScaler"
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "trial": 0,
+          "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+        },
+        {
+          "validation_log_loss": 2.150189330724326,
+          "trial": 1,
+          "fit_seconds": 0.007166900031734258
+        },
+        {
+          "validation_log_loss": 0.8961524713475758,
+          "trial": 2,
+          "fit_seconds": 0.00718220800627023
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.6709790096469842,
+        "auc": 0.9424597885008442,
+        "accuracy": 0.8425624321389794,
+        "f1": 0.8229548229548229
+      },
+      "dataset": "spambase",
+      "seed": 43,
+      "model": "qda",
+      "warnings": []
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.14147221512973246,
+          "trial": 0,
+          "fit_seconds": 0.2303112189983949
+        },
+        {
+          "validation_log_loss": 0.13773523681087252,
+          "trial": 1,
+          "fit_seconds": 0.31504876498365775
+        },
+        {
+          "validation_log_loss": 0.1416111068971228,
+          "trial": 2,
+          "fit_seconds": 0.38796160998754203
+        }
+      ],
+      "selected_trial": 1,
+      "test": {
+        "log_loss": 0.11587390298004319,
+        "auc": 0.9909332819890004,
+        "accuracy": 0.9565689467969598,
+        "f1": 0.9447513812154696
+      },
+      "dataset": "spambase",
+      "seed": 43,
+      "model": "lightgbm",
+      "warnings": [
+        "The argument 'eval_set' is deprecated, use 'eval_X' and 'eval_y' instead."
+      ]
+    },
+    {
+      "status": "ok",
+      "trials": [
+        {
+          "validation_log_loss": 0.14012645210422206,
+          "trial": 0,
+          "fit_seconds": 1.1988188729737885
+        },
+        {
+          "validation_log_loss": 0.13492199193697982,
+          "trial": 1,
+          "fit_seconds": 2.8034964819671586
+        },
+        {
+          "validation_log_loss": 0.13204395168361857,
+          "trial": 2,
+          "fit_seconds": 8.992881001962814
+        }
+      ],
+      "selected_trial": 2,
+      "test": {
+        "log_loss": 0.12128092637568129,
+        "auc": 0.9894990965372198,
+        "accuracy": 0.9554831704668838,
+        "f1": 0.9429763560500696
+      },
+      "dataset": "spambase",
+      "seed": 43,
+      "model": "catboost",
+      "warnings": []
+    }
+  ],
+  "data": {
+    "oblique_band": {
+      "shape": [
+        4096,
+        8
+      ],
+      "sha256": "a1febca46e2d3a0a016c530538c678000ac81c4428d43577001bc7f40b6fb580"
+    },
+    "xor_bands": {
+      "shape": [
+        4096,
+        8
+      ],
+      "sha256": "20e4628db0224dce4ff61289a7be694f3a9826d6209f16a07368841642230143"
+    },
+    "axis_tree": {
+      "shape": [
+        4096,
+        8
+      ],
+      "sha256": "0dd480886641de37a0324dd6793cf39e993f1ff885fd8fbe6096100bcec09402"
+    },
+    "breast_cancer": {
+      "shape": [
+        569,
+        30
+      ],
+      "sha256": "25e2eb7b7a8745b1bde5ba18bc4969983d2e2f403291ecd5bde4a29ef30c3859"
+    },
+    "banknote": {
+      "shape": [
+        1372,
+        4
+      ],
+      "sha256": "47752e4641c1a26173ece4a5741b3a26870e6d1668baeea6a1bc71ad3e93a840"
+    },
+    "spambase": {
+      "shape": [
+        4601,
+        57
+      ],
+      "sha256": "ac5f1044ec0e8fcde656ad01b11dcb23b294c852a64c1a0ca68be767a5e1e790"
+    }
+  },
+  "reviewed_snapshot": {
+    "raw_artifact": "omnibias-lab/artifacts/tabular_band_pilot.json",
+    "timing_note": "An existing confluence regression suite overlapped initial synthetic runs. Fit times are exploratory and are not used as comparative performance evidence.",
+    "scope": "Three overlapping stratified splits per dataset; no statistical significance or general superiority claim."
+  },
+  "summary": {
+    "datasets": {
+      "oblique_band": {
+        "band": {
+          "log_loss": {
+            "mean": 0.3032070826082982,
+            "sample_sd": 0.03644707383169872
+          },
+          "accuracy": {
+            "mean": 0.8979674796747967,
+            "sample_sd": 0.010371829936726085
+          },
+          "auc": {
+            "mean": 0.9497360793287566,
+            "sample_sd": 0.0069739954777167925
+          },
+          "f1": {
+            "mean": 0.8813481721297461,
+            "sample_sd": 0.011707413346475754
+          }
+        },
+        "gaussian": {
+          "log_loss": {
+            "mean": 0.26158350254038637,
+            "sample_sd": 0.02976220768296568
+          },
+          "accuracy": {
+            "mean": 0.9219512195121952,
+            "sample_sd": 0.002112257082401072
+          },
+          "auc": {
+            "mean": 0.9610333079074498,
+            "sample_sd": 0.0025466727428323584
+          },
+          "f1": {
+            "mean": 0.9075809888948575,
+            "sample_sd": 0.0033768185027509955
+          }
+        },
+        "mlp": {
+          "log_loss": {
+            "mean": 0.2676431168057045,
+            "sample_sd": 0.0319428160187946
+          },
+          "accuracy": {
+            "mean": 0.9247967479674797,
+            "sample_sd": 0.0037256712967120684
+          },
+          "auc": {
+            "mean": 0.9608604118993136,
+            "sample_sd": 0.0023013350229046216
+          },
+          "f1": {
+            "mean": 0.9113684588208506,
+            "sample_sd": 0.003928256082148365
+          }
+        },
+        "tabm": {
+          "log_loss": {
+            "mean": 0.21720180812985304,
+            "sample_sd": 0.03327277246860499
+          },
+          "accuracy": {
+            "mean": 0.9398373983739837,
+            "sample_sd": 0.010154468290078643
+          },
+          "auc": {
+            "mean": 0.9630327993897788,
+            "sample_sd": 0.005031454235494985
+          },
+          "f1": {
+            "mean": 0.9282432641793777,
+            "sample_sd": 0.011950171303868069
+          }
+        },
+        "qda": {
+          "log_loss": {
+            "mean": 0.389831209728767,
+            "sample_sd": 0.01384898932202277
+          },
+          "accuracy": {
+            "mean": 0.9235772357723577,
+            "sample_sd": 0.011331186881923874
+          },
+          "auc": {
+            "mean": 0.9616618357487923,
+            "sample_sd": 0.0016790991689038899
+          },
+          "f1": {
+            "mean": 0.9071084564905343,
+            "sample_sd": 0.013811346010818152
+          }
+        },
+        "lightgbm": {
+          "log_loss": {
+            "mean": 0.39536584278364145,
+            "sample_sd": 0.03868584724843026
+          },
+          "accuracy": {
+            "mean": 0.824390243902439,
+            "sample_sd": 0.019049389453430817
+          },
+          "auc": {
+            "mean": 0.9018479532163743,
+            "sample_sd": 0.01971196354213018
+          },
+          "f1": {
+            "mean": 0.8000033623076541,
+            "sample_sd": 0.018494172993358184
+          }
+        },
+        "catboost": {
+          "log_loss": {
+            "mean": 0.3516535470767127,
+            "sample_sd": 0.021609324580954627
+          },
+          "accuracy": {
+            "mean": 0.8621951219512195,
+            "sample_sd": 0.013191041251697533
+          },
+          "auc": {
+            "mean": 0.9287404017289601,
+            "sample_sd": 0.010055672163979014
+          },
+          "f1": {
+            "mean": 0.8429758140278061,
+            "sample_sd": 0.012297216183113333
+          }
+        }
+      },
+      "xor_bands": {
+        "band": {
+          "log_loss": {
+            "mean": 0.508983872256268,
+            "sample_sd": 0.16273905350482756
+          },
+          "accuracy": {
+            "mean": 0.7195121951219512,
+            "sample_sd": 0.1684119407778132
+          },
+          "auc": {
+            "mean": 0.7746575926487764,
+            "sample_sd": 0.21443038455099206
+          },
+          "f1": {
+            "mean": 0.7082264602204782,
+            "sample_sd": 0.18695825849639058
+          }
+        },
+        "gaussian": {
+          "log_loss": {
+            "mean": 0.3121655841419155,
+            "sample_sd": 0.015328176546753149
+          },
+          "accuracy": {
+            "mean": 0.8959349593495936,
+            "sample_sd": 0.011526379576225885
+          },
+          "auc": {
+            "mean": 0.9481178749824012,
+            "sample_sd": 0.0054135724607129124
+          },
+          "f1": {
+            "mean": 0.8962556691602652,
+            "sample_sd": 0.010339730445852116
+          }
+        },
+        "mlp": {
+          "log_loss": {
+            "mean": 0.34674983938658244,
+            "sample_sd": 0.02622175800021999
+          },
+          "accuracy": {
+            "mean": 0.8776422764227643,
+            "sample_sd": 0.01303984953849224
+          },
+          "auc": {
+            "mean": 0.9385976914397667,
+            "sample_sd": 0.01300200213621783
+          },
+          "f1": {
+            "mean": 0.8786783765467033,
+            "sample_sd": 0.013989136462151365
+          }
+        },
+        "tabm": {
+          "log_loss": {
+            "mean": 0.36158319652211823,
+            "sample_sd": 0.02715984283819617
+          },
+          "accuracy": {
+            "mean": 0.8508130081300813,
+            "sample_sd": 0.01751744831415875
+          },
+          "auc": {
+            "mean": 0.92897042814056,
+            "sample_sd": 0.013295665906074845
+          },
+          "f1": {
+            "mean": 0.8542638531928644,
+            "sample_sd": 0.01755495007698292
+          }
+        },
+        "qda": {
+          "log_loss": {
+            "mean": 0.6940374331747595,
+            "sample_sd": 0.002657857568453686
+          },
+          "accuracy": {
+            "mean": 0.5186991869918699,
+            "sample_sd": 0.003069038388321446
+          },
+          "auc": {
+            "mean": 0.52399082286827,
+            "sample_sd": 0.01188746861361463
+          },
+          "f1": {
+            "mean": 0.5235932322331579,
+            "sample_sd": 0.02075165296415377
+          }
+        },
+        "lightgbm": {
+          "log_loss": {
+            "mean": 0.6378648657139473,
+            "sample_sd": 0.013297864344014351
+          },
+          "accuracy": {
+            "mean": 0.6386178861788618,
+            "sample_sd": 0.00625805053591084
+          },
+          "auc": {
+            "mean": 0.6906624469310743,
+            "sample_sd": 0.01944515318955517
+          },
+          "f1": {
+            "mean": 0.6375923149719217,
+            "sample_sd": 0.0017013158820690152
+          }
+        },
+        "catboost": {
+          "log_loss": {
+            "mean": 0.5988047617551683,
+            "sample_sd": 0.017861374774515854
+          },
+          "accuracy": {
+            "mean": 0.6898373983739837,
+            "sample_sd": 0.007744942635470532
+          },
+          "auc": {
+            "mean": 0.7459869878266181,
+            "sample_sd": 0.018532938390655725
+          },
+          "f1": {
+            "mean": 0.6904436578217549,
+            "sample_sd": 0.008598960197699804
+          }
+        }
+      },
+      "axis_tree": {
+        "band": {
+          "log_loss": {
+            "mean": 0.2877186486030293,
+            "sample_sd": 0.016748904863217992
+          },
+          "accuracy": {
+            "mean": 0.8922764227642277,
+            "sample_sd": 0.014651074220276518
+          },
+          "auc": {
+            "mean": 0.9497703667493468,
+            "sample_sd": 0.00703604591892531
+          },
+          "f1": {
+            "mean": 0.876976210769978,
+            "sample_sd": 0.017090933356002605
+          }
+        },
+        "gaussian": {
+          "log_loss": {
+            "mean": 0.2541913252659384,
+            "sample_sd": 0.012331950787689703
+          },
+          "accuracy": {
+            "mean": 0.9195121951219513,
+            "sample_sd": 0.004224514164802144
+          },
+          "auc": {
+            "mean": 0.9605268187094269,
+            "sample_sd": 0.0031462029148512324
+          },
+          "f1": {
+            "mean": 0.9071809924642004,
+            "sample_sd": 0.005624864647945626
+          }
+        },
+        "mlp": {
+          "log_loss": {
+            "mean": 0.22303220054510028,
+            "sample_sd": 0.001479049503359214
+          },
+          "accuracy": {
+            "mean": 0.9341463414634147,
+            "sample_sd": 0.0024390243902439046
+          },
+          "auc": {
+            "mean": 0.9676421302079875,
+            "sample_sd": 0.0015103562889208371
+          },
+          "f1": {
+            "mean": 0.9249424122534222,
+            "sample_sd": 0.0012180701823272411
+          }
+        },
+        "tabm": {
+          "log_loss": {
+            "mean": 0.1367233687451645,
+            "sample_sd": 0.004280262967136086
+          },
+          "accuracy": {
+            "mean": 0.9682926829268292,
+            "sample_sd": 0.003658536585365857
+          },
+          "auc": {
+            "mean": 0.9746246708388906,
+            "sample_sd": 0.0030272646545440765
+          },
+          "f1": {
+            "mean": 0.9638837802548116,
+            "sample_sd": 0.004605474100297827
+          }
+        },
+        "qda": {
+          "log_loss": {
+            "mean": 0.3546626734362495,
+            "sample_sd": 0.005635899345903135
+          },
+          "accuracy": {
+            "mean": 0.8752032520325204,
+            "sample_sd": 0.007934642803228923
+          },
+          "auc": {
+            "mean": 0.9378853624141766,
+            "sample_sd": 0.00649617636865519
+          },
+          "f1": {
+            "mean": 0.8553815452727028,
+            "sample_sd": 0.011703985833795841
+          }
+        },
+        "lightgbm": {
+          "log_loss": {
+            "mean": 0.12936112240566128,
+            "sample_sd": 0.006048522805269307
+          },
+          "accuracy": {
+            "mean": 0.9739837398373984,
+            "sample_sd": 0.0007040856941336905
+          },
+          "auc": {
+            "mean": 0.9726562421418757,
+            "sample_sd": 0.003057005627210175
+          },
+          "f1": {
+            "mean": 0.9703409157594904,
+            "sample_sd": 0.0008416538906460847
+          }
+        },
+        "catboost": {
+          "log_loss": {
+            "mean": 0.12956105012115407,
+            "sample_sd": 0.002239359056024989
+          },
+          "accuracy": {
+            "mean": 0.9735772357723577,
+            "sample_sd": 0.0025386170725196764
+          },
+          "auc": {
+            "mean": 0.9730032569096172,
+            "sample_sd": 0.004609590356681448
+          },
+          "f1": {
+            "mean": 0.9698551412348528,
+            "sample_sd": 0.003023187245472936
+          }
+        }
+      },
+      "breast_cancer": {
+        "band": {
+          "log_loss": {
+            "mean": 0.09412964790984582,
+            "sample_sd": 0.047478358466347244
+          },
+          "accuracy": {
+            "mean": 0.97953216374269,
+            "sample_sd": 0.010128952091046034
+          },
+          "auc": {
+            "mean": 0.992221885721449,
+            "sample_sd": 0.007369506369477542
+          },
+          "f1": {
+            "mean": 0.9838732695875553,
+            "sample_sd": 0.007915184600463565
+          }
+        },
+        "gaussian": {
+          "log_loss": {
+            "mean": 0.09134360316246329,
+            "sample_sd": 0.033290301612862304
+          },
+          "accuracy": {
+            "mean": 0.9766081871345029,
+            "sample_sd": 0.005064476045522985
+          },
+          "auc": {
+            "mean": 0.9901348588227614,
+            "sample_sd": 0.008270537559818818
+          },
+          "f1": {
+            "mean": 0.9814477759683239,
+            "sample_sd": 0.00420333561245435
+          }
+        },
+        "mlp": {
+          "log_loss": {
+            "mean": 0.1173030171614618,
+            "sample_sd": 0.07204348417451623
+          },
+          "accuracy": {
+            "mean": 0.9766081871345029,
+            "sample_sd": 0.005064476045522985
+          },
+          "auc": {
+            "mean": 0.9891281366060273,
+            "sample_sd": 0.00745936032419256
+          },
+          "f1": {
+            "mean": 0.9815772669220945,
+            "sample_sd": 0.003926424244488887
+          }
+        },
+        "tabm": {
+          "log_loss": {
+            "mean": 0.09924374260589747,
+            "sample_sd": 0.067134330617801
+          },
+          "accuracy": {
+            "mean": 0.9824561403508771,
+            "sample_sd": 0.008771929824561375
+          },
+          "auc": {
+            "mean": 0.993863807305504,
+            "sample_sd": 0.005774646585890203
+          },
+          "f1": {
+            "mean": 0.9861097806303286,
+            "sample_sd": 0.006994975098583636
+          }
+        },
+        "qda": {
+          "log_loss": {
+            "mean": 0.15394100659507665,
+            "sample_sd": 0.06932597750976299
+          },
+          "accuracy": {
+            "mean": 0.9590643274853802,
+            "sample_sd": 0.018260228065492386
+          },
+          "auc": {
+            "mean": 0.9805553822504363,
+            "sample_sd": 0.013927123851496684
+          },
+          "f1": {
+            "mean": 0.9682612382830131,
+            "sample_sd": 0.013201074786600877
+          }
+        },
+        "lightgbm": {
+          "log_loss": {
+            "mean": 0.1040043740153076,
+            "sample_sd": 0.058041598816549744
+          },
+          "accuracy": {
+            "mean": 0.9649122807017544,
+            "sample_sd": 0.00877192982456143
+          },
+          "auc": {
+            "mean": 0.9912392456952452,
+            "sample_sd": 0.008297707803076171
+          },
+          "f1": {
+            "mean": 0.9722741082975859,
+            "sample_sd": 0.007410425999839661
+          }
+        },
+        "catboost": {
+          "log_loss": {
+            "mean": 0.11076599165890588,
+            "sample_sd": 0.029570629004236
+          },
+          "accuracy": {
+            "mean": 0.9649122807017544,
+            "sample_sd": 0.00877192982456143
+          },
+          "auc": {
+            "mean": 0.9883764256512373,
+            "sample_sd": 0.007887765633731439
+          },
+          "f1": {
+            "mean": 0.9720542419464017,
+            "sample_sd": 0.007256549806704811
+          }
+        }
+      },
+      "banknote": {
+        "band": {
+          "log_loss": {
+            "mean": 0.0021561168926056383,
+            "sample_sd": 0.0008229315928496096
+          },
+          "accuracy": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          },
+          "auc": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          },
+          "f1": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          }
+        },
+        "gaussian": {
+          "log_loss": {
+            "mean": 0.0004570171913430876,
+            "sample_sd": 0.00038867030846456355
+          },
+          "accuracy": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          },
+          "auc": {
+            "mean": 1.0,
+            "sample_sd": 6.409875621278546e-17
+          },
+          "f1": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          }
+        },
+        "mlp": {
+          "log_loss": {
+            "mean": 0.00018465156507096022,
+            "sample_sd": 3.535194419038152e-05
+          },
+          "accuracy": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          },
+          "auc": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          },
+          "f1": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          }
+        },
+        "tabm": {
+          "log_loss": {
+            "mean": 0.0016577879295587507,
+            "sample_sd": 0.0014959389196022947
+          },
+          "accuracy": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          },
+          "auc": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          },
+          "f1": {
+            "mean": 1.0,
+            "sample_sd": 0.0
+          }
+        },
+        "qda": {
+          "log_loss": {
+            "mean": 0.03406099203681486,
+            "sample_sd": 0.013374803249925672
+          },
+          "accuracy": {
+            "mean": 0.9818181818181818,
+            "sample_sd": 0.006298366572977776
+          },
+          "auc": {
+            "mean": 0.999946426658095,
+            "sample_sd": 9.279175011084055e-05
+          },
+          "f1": {
+            "mean": 0.9799511630895772,
+            "sample_sd": 0.006789300813629445
+          }
+        },
+        "lightgbm": {
+          "log_loss": {
+            "mean": 0.02960648301946365,
+            "sample_sd": 0.01989906197955214
+          },
+          "accuracy": {
+            "mean": 0.9939393939393939,
+            "sample_sd": 0.004198911048651787
+          },
+          "auc": {
+            "mean": 0.9998214221936498,
+            "sample_sd": 0.00017221419981057357
+          },
+          "f1": {
+            "mean": 0.9931295339712648,
+            "sample_sd": 0.0048304011005109995
+          }
+        },
+        "catboost": {
+          "log_loss": {
+            "mean": 0.010064523814823971,
+            "sample_sd": 0.006058514617477246
+          },
+          "accuracy": {
+            "mean": 0.9963636363636363,
+            "sample_sd": 0.0036363636363636598
+          },
+          "auc": {
+            "mean": 0.99996428443873,
+            "sample_sd": 6.186116674058173e-05
+          },
+          "f1": {
+            "mean": 0.9959294286820419,
+            "sample_sd": 0.004065051937467492
+          }
+        }
+      },
+      "spambase": {
+        "band": {
+          "log_loss": {
+            "mean": 0.18683311965748614,
+            "sample_sd": 0.01855122519920553
+          },
+          "accuracy": {
+            "mean": 0.9276149113282663,
+            "sample_sd": 0.006268732564491054
+          },
+          "auc": {
+            "mean": 0.9778059184217542,
+            "sample_sd": 0.003692498350685445
+          },
+          "f1": {
+            "mean": 0.9072502237723387,
+            "sample_sd": 0.007770496947609749
+          }
+        },
+        "gaussian": {
+          "log_loss": {
+            "mean": 0.1900677295464999,
+            "sample_sd": 0.016817409921027805
+          },
+          "accuracy": {
+            "mean": 0.9315960912052117,
+            "sample_sd": 0.010470847731805602
+          },
+          "auc": {
+            "mean": 0.9782189769970806,
+            "sample_sd": 0.0024066280397119916
+          },
+          "f1": {
+            "mean": 0.9120407263813154,
+            "sample_sd": 0.014341610745022855
+          }
+        },
+        "mlp": {
+          "log_loss": {
+            "mean": 0.19267552564350743,
+            "sample_sd": 0.02305580873499769
+          },
+          "accuracy": {
+            "mean": 0.935577271082157,
+            "sample_sd": 0.010983706771982283
+          },
+          "auc": {
+            "mean": 0.9766342144152506,
+            "sample_sd": 0.004420794722743578
+          },
+          "f1": {
+            "mean": 0.9163625048253771,
+            "sample_sd": 0.015533414709179376
+          }
+        },
+        "tabm": {
+          "log_loss": {
+            "mean": 0.15326850795147592,
+            "sample_sd": 0.009274740664815234
+          },
+          "accuracy": {
+            "mean": 0.9471588852696344,
+            "sample_sd": 0.007229455068924425
+          },
+          "auc": {
+            "mean": 0.9847110729319918,
+            "sample_sd": 0.0014956699417973602
+          },
+          "f1": {
+            "mean": 0.9329742317415363,
+            "sample_sd": 0.009073979436250086
+          }
+        },
+        "qda": {
+          "log_loss": {
+            "mean": 0.8615238111371979,
+            "sample_sd": 0.22257956909844986
+          },
+          "accuracy": {
+            "mean": 0.8324285197249367,
+            "sample_sd": 0.020438375538900478
+          },
+          "auc": {
+            "mean": 0.937711260536285,
+            "sample_sd": 0.007615236146438114
+          },
+          "f1": {
+            "mean": 0.8144899489575953,
+            "sample_sd": 0.01618877639262204
+          }
+        },
+        "lightgbm": {
+          "log_loss": {
+            "mean": 0.12679740541071055,
+            "sample_sd": 0.014572827314267713
+          },
+          "accuracy": {
+            "mean": 0.9562070213536011,
+            "sample_sd": 0.0016585507401215497
+          },
+          "auc": {
+            "mean": 0.9875695699253861,
+            "sample_sd": 0.0037992021272156957
+          },
+          "f1": {
+            "mean": 0.9443751983705648,
+            "sample_sd": 0.001751911271243784
+          }
+        },
+        "catboost": {
+          "log_loss": {
+            "mean": 0.12598552554518258,
+            "sample_sd": 0.010521240431470728
+          },
+          "accuracy": {
+            "mean": 0.9569308722403185,
+            "sample_sd": 0.0012537465128982107
+          },
+          "auc": {
+            "mean": 0.9877275524880609,
+            "sample_sd": 0.0025428270296994006
+          },
+          "f1": {
+            "mean": 0.9449793112306315,
+            "sample_sd": 0.0017744910839594668
+          }
+        }
+      }
+    },
+    "trial_failures": [
+      {
+        "dataset": "breast_cancer",
+        "seed": 17,
+        "model": "qda",
+        "trial": 0,
+        "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+      },
+      {
+        "dataset": "breast_cancer",
+        "seed": 29,
+        "model": "qda",
+        "trial": 0,
+        "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+      },
+      {
+        "dataset": "breast_cancer",
+        "seed": 43,
+        "model": "qda",
+        "trial": 0,
+        "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+      },
+      {
+        "dataset": "spambase",
+        "seed": 17,
+        "model": "qda",
+        "trial": 0,
+        "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+      },
+      {
+        "dataset": "spambase",
+        "seed": 29,
+        "model": "qda",
+        "trial": 0,
+        "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+      },
+      {
+        "dataset": "spambase",
+        "seed": 43,
+        "model": "qda",
+        "trial": 0,
+        "failure": "LinAlgError: The covariance matrix of class 1 is not full rank. Increase the value of `reg_param` to reduce the collinearity."
+      }
+    ]
+  }
+}

@@ -1,0 +1,556 @@
+{
+  "scope": "three-seed CPU pilot; timings observational; no general novelty or superiority established",
+  "artifact_sha256": {
+    "science.json": "8b2fe4d3e494cb8e245358f35426dcabb67fd4251f911f2a0bfd2de57ce77a04",
+    "tabular.json": "c0bf67f960aae83f0edee06c138e9b35887b641ae582be07b1e6901892760650",
+    "optimization.json": "c80f9cff4e79a208cb14fd67083f46032f0296ad6ded7767ad74c1fc8faae049",
+    "validation.json": "067500c9b71dbedafb38b9348beecca615a8521478d372af6fb009228ae4ce87"
+  },
+  "stage_elapsed_seconds": {
+    "science": 1.296756250958424,
+    "tabular": 13.203672726987861,
+    "optimization": 2.166374757012818
+  },
+  "source_files_fingerprinted": 282,
+  "science": {
+    "cases": 6,
+    "methods": {
+      "direct_characteristic_ls": {
+        "mean_u_rmse": 0.004845836322657869,
+        "max_pde_residual": 1.6683074401566843e-15,
+        "max_coefficient_residual": 0.0,
+        "mean_setup_plus_solve_seconds": 0.00016232000780291855
+      },
+      "svd_nullspace_ls": {
+        "mean_u_rmse": 0.004845836322657909,
+        "max_pde_residual": 8.247983166681406e-14,
+        "max_coefficient_residual": 3.670674875166924e-15,
+        "mean_setup_plus_solve_seconds": 0.00518563713800783
+      },
+      "omnibias_projected_ls": {
+        "mean_u_rmse": 0.004845836322657885,
+        "max_pde_residual": 4.79007299530291e-14,
+        "max_coefficient_residual": 1.388646142519434e-15,
+        "mean_setup_plus_solve_seconds": 0.0026393696510543427
+      },
+      "ordinary_qr_projected_ls": {
+        "mean_u_rmse": 0.004845836322657909,
+        "max_pde_residual": 8.303278293256785e-14,
+        "max_coefficient_residual": 1.7616116898544476e-15,
+        "mean_setup_plus_solve_seconds": 0.0006552020010227958
+      },
+      "matched_sine_network_adam": {
+        "mean_u_rmse": 0.00492675037026553,
+        "max_pde_residual": 1.374252274977901e-15,
+        "max_coefficient_residual": 0.0,
+        "mean_setup_plus_solve_seconds": 0.15616311083431356
+      }
+    },
+    "max_observation_sensitivity_error": 1.0097012115295456e-10,
+    "polynomial_realizability": {
+      "valid_wave_jet": true,
+      "global_identities_checked": 9,
+      "fingerprint_scope": "section and residual checks; original obligations supplied by replay function",
+      "wave_fingerprint": "184025a36b2055257f096acbacd5627dbb6bdde676967a3701c1a44ff5ebd207",
+      "fake_pde_relation_passes": true,
+      "fake_jet_rejected": true,
+      "fake_failure_witnesses": [
+        {
+          "nvars": 1,
+          "terms": [
+            [
+              [
+                0
+              ],
+              [
+                1,
+                1
+              ]
+            ],
+            [
+              [
+                1
+              ],
+              [
+                -1,
+                1
+              ]
+            ]
+          ]
+        }
+      ],
+      "scope": "finite exact polynomial identities, not a general nonlinear PDE existence theorem"
+    },
+    "pointwise_jet_counterexample": {
+      "projected_jet": [
+        0.3,
+        0.4999999999999999,
+        0.5000000000000001
+      ],
+      "algebraic_pde_residual": -2.220446049250313e-16,
+      "contact_defect": [
+        0.4999999999999999,
+        -0.4999999999999999
+      ],
+      "interpretation": "pointwise PDE feasibility does not imply a derivative-compatible field"
+    }
+  },
+  "tabular": {
+    "cases": 6,
+    "datasets": {
+      "breast_cancer": {
+        "omnibias_projection": {
+          "mean_test_log_loss": 0.07966957072528856,
+          "mean_test_accuracy": 0.9736842105263158,
+          "mean_fit_seconds": 0.34168171902031946
+        },
+        "ordinary_qr_projection": {
+          "mean_test_log_loss": 0.07966957072528856,
+          "mean_test_accuracy": 0.9736842105263158,
+          "mean_fit_seconds": 0.18416123165904233
+        },
+        "absorbed_projection_head": {
+          "mean_test_log_loss": 0.07966957072528856,
+          "mean_test_accuracy": 0.9736842105263158,
+          "mean_fit_seconds": 0.15633158500228697
+        },
+        "unconstrained_mlp": {
+          "mean_test_log_loss": 0.08376703456611502,
+          "mean_test_accuracy": 0.9707602339181287,
+          "mean_fit_seconds": 0.15132966600746536
+        },
+        "catboost": {
+          "mean_test_log_loss": 0.08223322856794343,
+          "mean_test_accuracy": 0.9824561403508771,
+          "mean_fit_seconds": 1.3630231093072023
+        }
+      },
+      "noisy_oblique_geometry": {
+        "omnibias_projection": {
+          "mean_test_log_loss": 0.4450983757979376,
+          "mean_test_accuracy": 0.8211382113821138,
+          "mean_fit_seconds": 0.5418220266971426
+        },
+        "ordinary_qr_projection": {
+          "mean_test_log_loss": 0.44509837579793765,
+          "mean_test_accuracy": 0.8211382113821138,
+          "mean_fit_seconds": 0.27305740063699585
+        },
+        "absorbed_projection_head": {
+          "mean_test_log_loss": 0.44509837579793765,
+          "mean_test_accuracy": 0.8211382113821138,
+          "mean_fit_seconds": 0.2306203400172914
+        },
+        "unconstrained_mlp": {
+          "mean_test_log_loss": 0.45236475650240277,
+          "mean_test_accuracy": 0.8146341463414634,
+          "mean_fit_seconds": 0.22761828634732714
+        },
+        "catboost": {
+          "mean_test_log_loss": 0.4453393808449306,
+          "mean_test_accuracy": 0.8195121951219512,
+          "mean_fit_seconds": 0.5274307663397243
+        }
+      }
+    },
+    "exact_detector": {
+      "training_positive_count": 5,
+      "test_positive_count": 58,
+      "test_negative_count": 58,
+      "recovered_normal": [
+        "1/15",
+        "2/15",
+        "-1/15",
+        "-1/5"
+      ],
+      "noiseless_accuracy": 1.0,
+      "perturbed_positive_recall": 0.0,
+      "perturbation": "exact rational 1/1000 along first coordinate",
+      "control": "ordinary exact affine-nullspace recovery gives the identical detector",
+      "interpretation": "exact membership preserved; no tolerance or smooth detector substituted"
+    },
+    "same_algebra_training": {
+      "updates": 20,
+      "max_logit_error": 4.440892098500626e-16,
+      "max_gradient_error": 3.165870343657673e-17,
+      "max_parameter_error": 7.771561172376096e-16
+    },
+    "equivalent_prediction_max_error": 2.3869795029440866e-15
+  },
+  "optimization": {
+    "lp_cases": 9,
+    "qp_cases": 36,
+    "reference_checks": 275,
+    "reference_checks_passed": true,
+    "candidate_failures": [],
+    "candidates": {
+      "lp": {
+        "omnibias_solver": {
+          "evaluations": 9,
+          "max_x_error": 1.8474011209690389e-09,
+          "max_stationarity": 4.145385786413769e-06,
+          "max_grad_c_error": 0.0,
+          "max_grad_c_relative_error": 0.0,
+          "max_grad_b_error": 0.0
+        },
+        "omnibias_layer": {
+          "evaluations": 9,
+          "max_x_error": 1.8474011209690389e-09,
+          "max_stationarity": 0.0,
+          "max_grad_c_error": 5.574812367876974e-09,
+          "max_grad_c_relative_error": 0.0,
+          "max_grad_b_error": 3.219646771412954e-15
+        }
+      },
+      "qp": {
+        "omnibias_solver": {
+          "evaluations": 36,
+          "max_x_error": 6.986174089659847e-06,
+          "max_stationarity": 3.652618445648681e-06,
+          "max_grad_c_error": 0.0,
+          "max_grad_c_relative_error": 0.0,
+          "max_grad_b_error": 0.0
+        },
+        "omnibias_layer": {
+          "evaluations": 36,
+          "max_x_error": 6.986174089659847e-06,
+          "max_stationarity": 0.0,
+          "max_grad_c_error": 0.6279950644166092,
+          "max_grad_c_relative_error": 4.045073967182626e-05,
+          "max_grad_b_error": 4.4584906769617365e-05
+        }
+      }
+    },
+    "max_native_active_rhs_gradient_error": 2.6645352591003757e-15,
+    "unavailable_comparators": {
+      "available": false,
+      "executed": false,
+      "reason": "not installed in the locked pilot environments"
+    }
+  },
+  "continuous_bias": {
+    "replay": {
+      "verified": true,
+      "case_count": 7,
+      "checked_rows": 25,
+      "scope": "exact retained witnesses, source/dependency fingerprints; no solver rerun or retiming"
+    },
+    "cases": [
+      {
+        "name": "strict_interior_grid_failure",
+        "exchange_iterations": 2,
+        "last_lower": [
+          1,
+          1
+        ],
+        "last_upper": [
+          1,
+          1
+        ],
+        "last_gap": [
+          0,
+          1
+        ],
+        "last_upper_source": "exactly_reconstructed_grid_solution",
+        "dense_controls": [
+          {
+            "grid_size": 21,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          },
+          {
+            "grid_size": 101,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          }
+        ]
+      },
+      {
+        "name": "signed_atoms_with_knots",
+        "exchange_iterations": 4,
+        "last_lower": [
+          1468,
+          1513
+        ],
+        "last_upper": [
+          367,
+          378
+        ],
+        "last_gap": [
+          367,
+          571914
+        ],
+        "last_upper_source": "exactly_reconstructed_grid_solution",
+        "dense_controls": [
+          {
+            "grid_size": 21,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          },
+          {
+            "grid_size": 101,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          }
+        ]
+      },
+      {
+        "name": "infeasible_initial_dictionary",
+        "exchange_iterations": 1,
+        "last_lower": null,
+        "last_upper": [
+          1,
+          1
+        ],
+        "last_gap": null,
+        "last_upper_source": "known_target_generator_fallback_not_recovered",
+        "dense_controls": [
+          {
+            "grid_size": 21,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          },
+          {
+            "grid_size": 101,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          }
+        ]
+      },
+      {
+        "name": "zero_target",
+        "exchange_iterations": 1,
+        "last_lower": [
+          0,
+          1
+        ],
+        "last_upper": [
+          0,
+          1
+        ],
+        "last_gap": [
+          0,
+          1
+        ],
+        "last_upper_source": "exactly_reconstructed_grid_solution",
+        "dense_controls": [
+          {
+            "grid_size": 21,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          },
+          {
+            "grid_size": 101,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          }
+        ]
+      },
+      {
+        "name": "fresh_seed_101",
+        "exchange_iterations": 1,
+        "last_lower": null,
+        "last_upper": [
+          4,
+          3
+        ],
+        "last_gap": null,
+        "last_upper_source": "known_target_generator_fallback_not_recovered",
+        "dense_controls": [
+          {
+            "grid_size": 21,
+            "gap": [
+              11725,
+              258264
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          },
+          {
+            "grid_size": 101,
+            "gap": [
+              8486875,
+              4929231384
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          }
+        ]
+      },
+      {
+        "name": "fresh_seed_211",
+        "exchange_iterations": 1,
+        "last_lower": null,
+        "last_upper": [
+          1,
+          1
+        ],
+        "last_gap": null,
+        "last_upper_source": "known_target_generator_fallback_not_recovered",
+        "dense_controls": [
+          {
+            "grid_size": 21,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          },
+          {
+            "grid_size": 101,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          }
+        ]
+      },
+      {
+        "name": "fresh_seed_307",
+        "exchange_iterations": 1,
+        "last_lower": null,
+        "last_upper": [
+          5,
+          3
+        ],
+        "last_gap": null,
+        "last_upper_source": "known_target_generator_fallback_not_recovered",
+        "dense_controls": [
+          {
+            "grid_size": 21,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          },
+          {
+            "grid_size": 101,
+            "gap": [
+              0,
+              1
+            ],
+            "upper_source": "exactly_reconstructed_grid_solution"
+          }
+        ]
+      }
+    ],
+    "rational_encoding": "numerator/denominator integer pairs; null means no dual certificate",
+    "artifact_sha256": "334053a07486ce92a3c83c445a12dadb9c8ae6cf511435bae45f30dd0a2fbb46",
+    "source_sha256": {
+      "pricing.py": "8859097d3e1739913e332cda3e05bf6778c04a3c71d85641059591d9f41d84c0",
+      "run.py": "8c1ce6b49f418cab8e712faa864ac94505be75d84b4541828aba9403f9483800",
+      "test_pricing.py": "7f43afcbb317b3bcea3c7b59e4e76bba878b3fbe8167f1769011425d1b32fc63",
+      "replay.py": "2e12ec14f9f4a40221add94f257efbeb24167f13de92f8b7b44d04c546a71a6e",
+      "test_replay.py": "91ce55198bd1f5e58fec3f1ccfc86824ae2b1deeb810ac74834ff369b9cea406",
+      "README.md": "619e0388293c717e376114ed904cd7ca530bc6190bad6e6ff3b3e5d5fb89cdb2"
+    }
+  },
+  "validation": {
+    "scope": "Per-command validation records; passing suites are reported separately from two existing repository-policy failures.",
+    "cpu_environment": {
+      "CUDA_VISIBLE_DEVICES": "",
+      "JAX_PLATFORMS": "cpu",
+      "JAX_ENABLE_X64": "1",
+      "OMP_NUM_THREADS": "1",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    },
+    "runs": [
+      {
+        "name": "core_and_fields",
+        "passed": 5914,
+        "skipped": 1,
+        "deselected": 2,
+        "command": "python -m pytest packages/omnibias-core/tests packages/omnibias-fields/tests --deselect packages/omnibias-core/tests/test_license_consistency.py::test_every_package_python_file_carries_its_tier_header --deselect packages/omnibias-core/tests/test_no_leakage.py::test_no_leakage_in_tracked_files -q"
+      },
+      {
+        "name": "torch_package",
+        "passed": 1628,
+        "skipped": 14,
+        "deselected": 9,
+        "command": "python -m pytest packages/omnibias-torch/tests -x -q"
+      },
+      {
+        "name": "jax_package",
+        "passed": 983,
+        "skipped": 0,
+        "deselected": 0,
+        "command": "python -m pytest packages/omnibias-jax/tests -x -q"
+      },
+      {
+        "name": "additional_native_compilation_case",
+        "passed": 1,
+        "command": "python -m pytest packages/omnibias-torch/tests/test_affine_geometry.py::test_compiled_affine_projection_preserves_parameter_gradients -q"
+      },
+      {
+        "name": "laboratory_pilot_tests",
+        "passed": 34,
+        "command": "python -m pytest tests/test_calculus_geometry_science.py tests/test_calculus_geometry_tabular.py tests/test_calculus_geometry_optimization.py tests/test_calculus_geometry_audit.py -q"
+      },
+      {
+        "name": "continuous_bias_tests",
+        "passed": 16,
+        "command": "python -m pytest calculus_geometry_continuous_bias/test_pricing.py calculus_geometry_continuous_bias/test_replay.py -q"
+      },
+      {
+        "name": "final_polynomial_jet_checks",
+        "passed": 25,
+        "command": "python -m pytest packages/omnibias-core/tests/test_jet_geometry.py -q"
+      },
+      {
+        "name": "selected_executable_documentation",
+        "passed": 4,
+        "deselected": 54,
+        "command": "python -m pytest tests/test_docs_snippets.py -k 'affine or calculus' -q"
+      },
+      {
+        "name": "final_geometry_regressions",
+        "passed": 51,
+        "command": "python -m pytest packages/omnibias-torch/tests/test_affine_geometry.py packages/omnibias-jax/tests/test_affine_geometry.py tests/test_affine_geometry_parity.py packages/omnibias-core/tests/test_jet_geometry.py -q"
+      }
+    ],
+    "static_checks": {
+      "ruff": "passed for new/changed owned implementation and pilot sources",
+      "strict_mypy": "passed for four new reusable source modules",
+      "generated_inventory": "passed",
+      "mkdocs_strict": "passed",
+      "whitespace": "passed"
+    },
+    "existing_policy_failures": [
+      {
+        "test": "packages/omnibias-core/tests/test_license_consistency.py::test_every_package_python_file_carries_its_tier_header",
+        "reason": "Older local experimental Python files lack required SPDX headers."
+      },
+      {
+        "test": "packages/omnibias-core/tests/test_no_leakage.py::test_no_leakage_in_tracked_files",
+        "reason": "Earlier research/handoff artifacts contain local paths and scheduler-specific wording."
+      }
+    ],
+    "environment_diagnosis": "An initial unrestricted backend run encountered GPU-driver discovery warnings. Explicit CPU selection made the complete Torch and JAX package runs pass."
+  },
+  "report_source_sha256": "b3b6450b9e0a0b07d36671066ad3cb648cd05eae38b09a9c07247f3efbdf32a7"
+}

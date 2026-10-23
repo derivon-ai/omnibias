@@ -16,6 +16,7 @@ from typing import NamedTuple
 from omnibias.torch.activations import get_activation
 
 import torch
+import torch.nn.functional as F
 from torch import Tensor
 
 
@@ -139,4 +140,32 @@ def polynomial_pair(z: Tensor, rho: Tensor, eta: Tensor, coefficients: Tensor) -
                 a = a+term*p**(power//2)*eta**power
     return CenteredPair(a,b)
 
-__all__ = ["CenteredPair", "centered_pair", "collision_atom", "moment_atom", "polynomial_pair", "retract_spread"]
+def normalized_sigmoid_band(
+    z: Tensor, half_width: float | Tensor, temperature: float | Tensor = 1.0,
+) -> Tensor:
+    r"""Peak-one smooth slab, including the attained zero-spacing limit.
+
+    For v=temperature*z and u=temperature*half_width, this equals
+    ``(sigmoid(v+u)-sigmoid(v-u))/tanh(u/2)`` when u!=0. At u=0 its
+    analytic extension is ``4*sigmoid(v)*sigmoid(-v)``. Both signed spacings
+    and signed temperatures give the same values by symmetry. At zero
+    temperature the response is one everywhere.
+
+    The log-sigmoid identity avoids subtraction/division of vanishing shifts
+    and overflow in log-add-exp's higher backward derivatives. It preserves derivatives into z,
+    width and temperature, including second width derivatives at zero. Inputs
+    broadcast and use z's real floating dtype/device. Products must remain
+    representable; extreme tails may underflow. Mathematical range [0,1] is
+    not an outward-rounded enclosure. No hard equality predicate is evaluated.
+    """
+    if not isinstance(z, Tensor) or not z.is_floating_point():
+        raise TypeError("z must be a real floating tensor")
+    width = torch.as_tensor(half_width, dtype=z.dtype, device=z.device)
+    beta = torch.as_tensor(temperature, dtype=z.dtype, device=z.device)
+    u, v = beta*width, beta*z
+
+    return torch.exp(F.logsigmoid(u+v)+F.logsigmoid(u-v)-2*F.logsigmoid(u))
+
+
+__all__ = ["CenteredPair", "centered_pair", "collision_atom", "moment_atom",
+           "normalized_sigmoid_band", "polynomial_pair", "retract_spread"]

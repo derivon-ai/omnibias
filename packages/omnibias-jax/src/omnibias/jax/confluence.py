@@ -140,4 +140,29 @@ def polynomial_pair(z: Array, rho: Array, eta: Array, coefficients: Array) -> Ce
                 a = a+term*p**(power//2)*eta**power
     return CenteredPair(a,b)
 
-__all__ = ["CenteredPair", "centered_pair", "collision_atom", "moment_atom", "polynomial_pair", "retract_spread"]
+def normalized_sigmoid_band(
+    z: Array, half_width: float | Array, temperature: float | Array = 1.0,
+) -> Array:
+    r"""JIT/vmap-compatible peak-one sigmoid slab with live zero width.
+
+    Equals ``(sigmoid(v+u)-sigmoid(v-u))/tanh(u/2)`` with v=beta*z,
+    u=beta*half_width. The analytic u=0 extension is
+    ``4*sigmoid(v)*sigmoid(-v)``. Signed widths/temperatures are symmetric;
+    beta=0 produces one. Inputs broadcast with z's floating dtype.
+
+    Log-sigmoid avoids cancellation and division by width; z, width and beta
+    retain parameter gradients and higher derivatives at zero spacing.
+    Extreme products can overflow and tails can underflow. This is a smooth
+    slab, not differentiation of a hard equality or a rigorous enclosure.
+    """
+    if not jnp.issubdtype(z.dtype, jnp.floating):
+        raise TypeError("z must have a real floating dtype")
+    width = jnp.asarray(half_width, dtype=z.dtype)
+    beta = jnp.asarray(temperature, dtype=z.dtype)
+    u, v = beta*width, beta*z
+
+    return jnp.exp(jax.nn.log_sigmoid(u+v)+jax.nn.log_sigmoid(u-v)-2*jax.nn.log_sigmoid(u))
+
+
+__all__ = ["CenteredPair", "centered_pair", "collision_atom", "moment_atom",
+           "normalized_sigmoid_band", "polynomial_pair", "retract_spread"]

@@ -1,0 +1,5 @@
+method,trainable_params_approx,accuracy_percent,std_pp
+Li2016_expandedchannels_one_site,1975000,74.14,0.25
+ours_mbK3_all_sites,279000,82.31,0.1
+MaxoutK3,354000,81.66,0.06
+APLK3,428000,82.48,0.21

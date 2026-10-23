@@ -1,0 +1,19 @@
+seed,phase,method,accuracy,balanced_accuracy,macro_F1,artifact_bytes,provenance
+7201,discovery,smooth_compile,0.938232421875,0.9381950390811751,0.9383779058321529,1482,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7201,discovery,linear_svm,0.561767578125,0.5444580396898915,0.4707148384741699,1608,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7201,discovery,rbf_svm,0.80126953125,0.7962900374914881,0.7960748274230253,17720,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7201,discovery,cart,0.42822265625,0.4235435754048163,0.41862242540919725,3736,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7201,discovery,privileged_oracle,0.948974609375,0.9490211431821397,0.9490681143274315,,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7201,discovery,mlp,0.90380859375,0.9046801024893055,0.9037197531639013,2247,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7211,discovery,smooth_compile,0.945556640625,0.9457405678482047,0.9456134949883843,1482,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7211,discovery,linear_svm,0.62841796875,0.6162476729503247,0.5001031096966466,1608,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7211,discovery,rbf_svm,0.75634765625,0.752946031498511,0.7503657502569115,18120,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7211,discovery,cart,0.54443359375,0.5430073869105289,0.541909451473433,3736,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7211,discovery,privileged_oracle,0.9541015625,0.9541998225215681,0.9540767688458311,,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7211,discovery,mlp,0.917236328125,0.9168855208726298,0.917069412246278,2247,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7219,discovery,smooth_compile,0.92529296875,0.9251896057585335,0.9253808533678839,1482,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7219,discovery,linear_svm,0.555908203125,0.5528320796096143,0.45989557615205673,1608,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7219,discovery,rbf_svm,0.74609375,0.7453674503360864,0.7424111311633993,17080,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7219,discovery,cart,0.51416015625,0.5140601443562786,0.5038031964966759,2728,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7219,discovery,privileged_oracle,0.950439453125,0.9503855869661851,0.9504182393445667,,post-discovery exploratory single-index control follow-up; not primary LP confirmation
+7219,discovery,mlp,0.880615234375,0.8803472998892401,0.8806246985764509,3399,post-discovery exploratory single-index control follow-up; not primary LP confirmation

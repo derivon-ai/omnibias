@@ -1,0 +1,4 @@
+method,test_RMSE,std,parameters
+STEHeaviside5steps,0.244,0.001,
+MBK5decomposition,0.102,0.001,
+ReLUMLPmatchedwidth,0.109,0.002,

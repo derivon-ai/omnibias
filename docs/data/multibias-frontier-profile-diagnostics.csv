@@ -1,0 +1,6 @@
+arm,seeds,active_pairs,near_zero_width_pairs,zero_width_outward_gradient_pairs,median_gap,target_gap,below_target_pairs,max_analytic_width_gradient_error,scope
+residual,3,336,0,0,0.3886011391878128,,,7.450580596923828e-09,selected checkpoint; inactive coordinates excluded; not all optimization steps
+gap03,3,336,0,0,0.3879140466451645,0.3,114,7.450580596923828e-09,selected checkpoint; inactive coordinates excluded; not all optimization steps
+gap10,3,336,0,0,0.41422809660434723,1.0,336,1.1175870895385742e-08,selected checkpoint; inactive coordinates excluded; not all optimization steps
+residual_lr10,3,336,0,0,1.6239446997642517,,,5.587935447692871e-09,selected checkpoint; inactive coordinates excluded; not all optimization steps
+adaptive,3,147,0,0,0.20276837050914764,,,7.450580596923828e-09,selected checkpoint; inactive coordinates excluded; not all optimization steps

@@ -1,0 +1,4 @@
+dataset,metric,MB,MB_std,ReLU,ReLU_std,XGBoost,XGBoost_std
+Adult,accuracy_percent,82.02,0.16,82.93,0.41,87.07,0.11
+Winequality,RMSE,0.888,0.025,0.854,0.027,0.718,0.007
+Covertype,accuracy_percent,83.3,0.26,82.24,0.2,82.74,0.3

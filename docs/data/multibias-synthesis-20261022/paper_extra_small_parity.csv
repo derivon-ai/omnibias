@@ -1,0 +1,4 @@
+method,H,reported_parameters,N,accuracy_percent
+MBK3,4,40,"[3, 4]",100
+ReLU,4,25,[3],96
+ReLU,4,,[5],86

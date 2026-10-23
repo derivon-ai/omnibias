@@ -1,0 +1,7 @@
+dataset,architecture,K,binary_weights,accuracy_percent,std_pp,seeds,actual_export_bytes
+MNIST,"MLP[1024,1024]",1,1851904,98.17,0.04,3,
+MNIST,"MLP[512,512]",2,663552,98.12,0.03,3,
+MNIST,MLP[256]depth1,2,200704,97.7,0.11,3,
+MNIST,MLP[256]depth4,1,397312,97.41,0.09,3,
+CIFAR10,ConvNetc128,1,1032192,69.39,0.37,3,
+CIFAR10,ConvNetc64,2,258048,68.8,0.67,3,

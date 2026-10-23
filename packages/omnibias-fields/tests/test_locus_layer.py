@@ -71,3 +71,18 @@ def test_g6_torch_jax_parity() -> None:
     out_t = EqualityLocusLayer(sys, dtype=torch.float64)(x0)
     out_j = equality_locus_apply(sys, jnp.asarray([0.4, -0.1], dtype=jnp.float64))
     assert out_t.point.detach().cpu().numpy() == pytest.approx(out_j.point.tolist(), rel=0, abs=0)
+
+
+@pytest.mark.parametrize("branch", ["nearest", "all", 1, -1])
+def test_unsupported_branch_guarantees_are_not_silently_ignored(branch: object) -> None:
+    with pytest.raises(ValueError, match="only branch='seed'"):
+        EqualityLocusLayer(_matched(), branch=branch)  # type: ignore[arg-type]
+
+
+def test_jax_unsupported_branch_guarantee_refused() -> None:
+    pytest.importorskip("jax")
+    import jax.numpy as jnp
+    from omnibias.fields.locus.jax import equality_locus_apply
+
+    with pytest.raises(ValueError, match="only branch='seed'"):
+        equality_locus_apply(_matched(), jnp.asarray([0.4, -0.1]), branch="nearest")  # type: ignore[arg-type]

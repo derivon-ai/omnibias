@@ -1,0 +1,260 @@
+{
+  "schema_version": 1,
+  "recorded_at": "2026-10-23T06:12:58.487792+00:00",
+  "scope": "Commit-readiness validation of affected core,fields,torch,jax,convex package suites plus new cross-backend root tests; no source edits, stage operations or commits by the auditor.",
+  "head_baseline": "72ef81d1ae9f8ae8792b21e6bc89ccc2e850959c",
+  "full_suite": {
+    "command": "CUDA_VISIBLE_DEVICES='' JAX_PLATFORMS=cpu JAX_ENABLE_X64=1 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 .venv/bin/python -m pytest packages/omnibias-core/tests packages/omnibias-fields/tests packages/omnibias-torch/tests packages/omnibias-jax/tests packages/omnibias-convex/tests tests/test_affine_geometry_parity.py tests/test_ridge_distribution_parity.py tests/test_normalized_band.py -q",
+    "exit_code": 1,
+    "passed": 8663,
+    "failed": 13,
+    "skipped": 15,
+    "deselected": 9,
+    "seconds": 890.52,
+    "raw_log_path": "/tmp/omnibias-session-full-package-tests-20261023.log",
+    "raw_log_sha256": "db34f9aae3f47e3b89851e29217277d7151de7cbfb6079067ce2dae86a1b1187"
+  },
+  "focused_suite": {
+    "passed": 251,
+    "failed": 0,
+    "seconds": 28.55,
+    "scope": "All new numerical primitive and affected contract/parity tests",
+    "environment_note": "The initial CPU compilation check hit sandbox NVML probing; setting CUDA_VISIBLE_DEVICES empty avoided unsupported GPU probing and the full focused suite passed without source changes."
+  },
+  "baseline_reproductions": [
+    {
+      "scenario": "current_isolated",
+      "returncode": 0,
+      "log": "/tmp/omnibias-session-current_isolated.log",
+      "summary": [
+        "IMPORT_PROVENANCE {\"core\": \"/home/vardan/dev/projects/omnibias/packages/omnibias-core/src/omnibias/core/__init__.py\", \"certificate\": \"/home/vardan/dev/projects/omnibias/packages/omnibias-core/src/omnibias/core/proof/certificate.py\", \"transcend\": \"/home/vardan/dev/projects/omnibias/packages/omnibias-core/src/omnibias/core/verified/transcend.py\", \"strict_before\": false}",
+        "11 passed in 0.16s"
+      ]
+    },
+    {
+      "scenario": "head_isolated",
+      "returncode": 0,
+      "log": "/tmp/omnibias-session-head_isolated.log",
+      "summary": [
+        "IMPORT_PROVENANCE {\"core\": \"/tmp/omnibias-session-head-baseline-20261023/packages/omnibias-core/src/omnibias/core/__init__.py\", \"certificate\": \"/tmp/omnibias-session-head-baseline-20261023/packages/omnibias-core/src/omnibias/core/proof/certificate.py\", \"transcend\": \"/tmp/omnibias-session-head-baseline-20261023/packages/omnibias-core/src/omnibias/core/verified/transcend.py\", \"strict_before\": false}",
+        "11 passed in 0.19s"
+      ]
+    },
+    {
+      "scenario": "head_with_bounds_import",
+      "returncode": 1,
+      "log": "/tmp/omnibias-session-head_with_bounds_import.log",
+      "summary": [
+        "IMPORT_PROVENANCE {\"core\": \"/tmp/omnibias-session-head-baseline-20261023/packages/omnibias-core/src/omnibias/core/__init__.py\", \"certificate\": \"/tmp/omnibias-session-head-baseline-20261023/packages/omnibias-core/src/omnibias/core/proof/certificate.py\", \"transcend\": \"/tmp/omnibias-session-head-baseline-20261023/packages/omnibias-core/src/omnibias/core/verified/transcend.py\", \"strict_before\": false}",
+        "BOUNDS_IMPORT {\"path\": \"/tmp/omnibias-session-head-baseline-20261023/packages/omnibias-jax/src/omnibias/jax/_experimental_stage/bounds.py\", \"strict_after\": true}",
+        "11 failed in 0.34s"
+      ]
+    }
+  ],
+  "header_baseline_reproduction": {
+    "snapshot": "/tmp/omnibias-session-head-baseline-20261023",
+    "nodeid": "packages/omnibias-core/tests/test_license_consistency.py::test_every_package_python_file_carries_its_tier_header",
+    "exit_code": 1,
+    "failed": 1,
+    "seconds": 0.19,
+    "raw_log_path": "/tmp/omnibias-session-head-header.log"
+  },
+  "failure_classification_counts": {
+    "preexisting_import_side_effect_reproduced": 11,
+    "preexisting_header_failure_reproduced": 1,
+    "session_expanded_open_publication_hygiene_failure": 1
+  },
+  "failures": [
+    {
+      "nodeid": "packages/omnibias-core/tests/test_certificate.py::test_unconditional_claim_is_refused_at_seal_time_on_conditional_backend",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_certificate.py::test_certificate_cannot_silently_use_libm_fallback",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_certificate.py::test_pure_rational_interval_does_not_acquire_a_libm_stamp",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_certificate_audit_regressions.py::test_strict_mode_refuses_libm_fallback",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_certificate_audit_regressions.py::test_certificate_mode_requires_mpmath",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_gaussian_aging_derivative.py::test_affine_derivatives_are_exact_without_backend[0]",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_gaussian_aging_derivative.py::test_affine_derivatives_are_exact_without_backend[1]",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_gaussian_aging_derivative.py::test_affine_derivatives_are_exact_without_backend[2]",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_gaussian_aging_derivative.py::test_affine_derivatives_are_exact_without_backend[12]",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_gaussian_aging_derivative.py::test_derivative_uses_only_source_provenance_and_snapshots_dependency",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_gaussian_chebyshev.py::test_fresh_rigorous_provenance_preserves_ambient_sticky_state",
+      "classification": "PREEXISTING_IMPORT_STATE_CONTAMINATION_REPRODUCED",
+      "short_cause": "Importing unchanged JAX _experimental_stage.bounds at collection calls set_strict_backend(True), contaminating the ambient core transcendental mode. Tests that simulate no mpmath or conditional provenance then fail. All11 nodes pass in isolation on both current and HEAD; importing HEAD bounds first reproduces exactly11 failures with verified snapshot imports.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-current_isolated.log",
+        "/tmp/omnibias-session-head_isolated.log",
+        "/tmp/omnibias-session-head_with_bounds_import.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_license_consistency.py::test_every_package_python_file_carries_its_tier_header",
+      "classification": "PREEXISTING_BASELINE_REPRODUCED",
+      "short_cause": "28 unchanged JAX _experimental_stage Python sources lack required Apache SPDX headers. The same header guard fails against the HEAD source snapshot.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-head-header.log"
+      ]
+    },
+    {
+      "nodeid": "packages/omnibias-core/tests/test_no_leakage.py::test_no_leakage_in_tracked_files",
+      "classification": "SESSION_EXPANDED_OPEN_PUBLICATION_HYGIENE_FAILURE",
+      "short_cause": "The unchanged guard rejects developer workstation paths in new research docs/evidence. HEAD already had some path/scheduler findings; this session substantially expands local-path findings. No credential-family matches were found by the guard. User-authorized local commit is not a publication/release pass.",
+      "test_unchanged_from_head": true,
+      "evidence": [
+        "/tmp/omnibias-session-leakage-comparison.json",
+        "/tmp/omnibias-session-full-package-tests-20261023.log"
+      ]
+    }
+  ],
+  "cause_source_provenance": [
+    {
+      "path": "packages/omnibias-core/src/omnibias/core/proof/certificate.py",
+      "head_sha256": "5f4ceeb4ec45b8344b823c4d68e178aa72b15d6e7a4a6c28e5fb29e9727b30d4",
+      "current_sha256": "5f4ceeb4ec45b8344b823c4d68e178aa72b15d6e7a4a6c28e5fb29e9727b30d4",
+      "identical_to_head": true
+    },
+    {
+      "path": "packages/omnibias-core/src/omnibias/core/verified/transcend.py",
+      "head_sha256": "4f6eff8864c7fa0881e61d4401e43c1de54824ed09a62c529e775cdfc1e616da",
+      "current_sha256": "4f6eff8864c7fa0881e61d4401e43c1de54824ed09a62c529e775cdfc1e616da",
+      "identical_to_head": true
+    },
+    {
+      "path": "packages/omnibias-jax/src/omnibias/jax/_experimental_stage/bounds.py",
+      "head_sha256": "dd5c3f177863efe87065c00ac6f4b7731d57cbcebf896564b01f9d76be531f8f",
+      "current_sha256": "dd5c3f177863efe87065c00ac6f4b7731d57cbcebf896564b01f9d76be531f8f",
+      "identical_to_head": true
+    },
+    {
+      "path": "packages/omnibias-core/tests/test_no_leakage.py",
+      "head_sha256": "8f331c1389ae9d5c27e1f9b60d59009527de0d6fe8fe7fd4f4172b7331a99792",
+      "current_sha256": "8f331c1389ae9d5c27e1f9b60d59009527de0d6fe8fe7fd4f4172b7331a99792",
+      "identical_to_head": true
+    },
+    {
+      "path": "packages/omnibias-core/tests/test_license_consistency.py",
+      "head_sha256": "afcb33b51c1afbee954a15a315f7ec21cbeaa1adccabbdfe28528be92e2d59e7",
+      "current_sha256": "afcb33b51c1afbee954a15a315f7ec21cbeaa1adccabbdfe28528be92e2d59e7",
+      "identical_to_head": true
+    }
+  ],
+  "leakage_guard_comparison": {
+    "baseline_head": "72ef81d1ae9f8ae8792b21e6bc89ccc2e850959c",
+    "baseline_files_scanned": 1566,
+    "baseline_match_counts": {
+      "scheduler": 7,
+      "local_path": 37
+    },
+    "current_match_counts": {
+      "local_path": 1505,
+      "scheduler": 7
+    },
+    "credential_family_matches": 0,
+    "timing_note": "The current-tree direct scan was performed after the full suite; research documentation was being compiled concurrently, so its counts describe the later scan snapshot, not necessarily the exact earlier pytest scan.",
+    "raw_comparison_path": "/tmp/omnibias-session-leakage-comparison.json",
+    "frozen_evidence_rewritten": false,
+    "guard_weakened": false
+  },
+  "formal_generated_module_restored": true,
+  "release_readiness": "NOT_RELEASE_READY: global baseline quality debt and session-expanded path-publication hygiene remain open; local commit evidence must retain these failures."
+}

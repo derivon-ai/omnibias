@@ -79,6 +79,12 @@ packages/*/docs/visuals/*.gif linguist-generated=true
 notebooks/**            linguist-documentation
 docs/**                 linguist-documentation
 
+# Frozen research evidence is hashed as an original byte stream. In particular,
+# csv.writer's CRLF records must survive checkout without invalidating manifests.
+docs/data/**            -text
+docs/benchmarks/**      -text
+docs/img/research/**    -text
+
 # The Lean projects are real source, not vendored; label them explicitly so the
 # formal kernel shows up as Lean rather than as an unknown extension.
 formal/**/*.lean        linguist-language=Lean linguist-detectable=true
