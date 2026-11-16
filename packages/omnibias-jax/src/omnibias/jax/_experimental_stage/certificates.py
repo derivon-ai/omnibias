@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Relational certificates for frozen designs and exact low-rank operators.
 
 Saved arrays represent rounded computations, not exact ideal precomputations.

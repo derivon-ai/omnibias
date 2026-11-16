@@ -32,10 +32,12 @@ Rules
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+import threading
+import weakref
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from itertools import product
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from numpy.typing import NDArray
@@ -299,6 +301,33 @@ def tensor_product(*rules_1d: QuadratureSpec) -> QuadratureSpec:
     per_axis = [(r.nodes[:, 0], r.weights) for r in rules_1d]
     nodes, weights = _tensor(per_axis)
     return QuadratureSpec("tensor_product", nodes, weights, None)
+
+
+_CONVERTED: weakref.WeakKeyDictionary[QuadratureSpec, dict[tuple[Any, ...], Any]] = weakref.WeakKeyDictionary()
+_CONVERTED_LOCK = threading.Lock()
+
+
+def _converted(
+    rule: QuadratureSpec,
+    key: tuple[Any, ...],
+    make: Callable[[], Any],
+    keep: Callable[[Any], bool] | None = None,
+) -> Any:
+    """``make()``, remembered for as long as ``rule`` lives (the nodes and weights of a rule are never modified).
+
+    ``key`` names what is converted and to what (array, dtype, device): a conversion to a device array costs a host
+    transfer on every call otherwise.  ``keep(value)`` may refuse to remember a value (a traced value must not outlive
+    its trace).
+    """
+    with _CONVERTED_LOCK:
+        hit = _CONVERTED.get(rule, {}).get(key)
+    if hit is not None:
+        return hit
+    value = make()
+    if keep is None or keep(value):
+        with _CONVERTED_LOCK:
+            _CONVERTED.setdefault(rule, {})[key] = value
+    return value
 
 
 __all__ = [

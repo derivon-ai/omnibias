@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Device-side transactional Adam steps; host authority handles qualification.
 
 Runtime box thresholds may change without recompiling a fixed-shape step. No

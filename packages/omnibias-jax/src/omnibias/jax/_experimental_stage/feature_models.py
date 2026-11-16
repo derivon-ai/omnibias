@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Explicit linear-readout feature families for operator residuals.
 
 All hidden arrays remain live arguments.  The separable bank is an explicit

@@ -1,0 +1,5169 @@
+{
+ "schema": "omnibias-benchmark/residual-ntk-diagonal-a100/v1",
+ "what": "float64 exact diagonal of the empirical neural tangent kernel of PDE residual rows, diag_b = |dr_b / d theta|^2 over every weight, bias and readout parameter of deep tanh MLPs u(z) = wo . tanh(W_L ... tanh(W_1 z + b_1) ...) + bo (per-row gradient norms; block sums give the NTK loss-balancing weights), regime diag = (r, diag). Candidate = omnibias.jax.experimental.residual_gram.deep_residual_ntk_diagonal: with the cotangents Q_b and the input streams P_b of one reverse pass, |dr_b / dW|^2 = sum_(t,s) (P_b^T P_b)_ts (Q_b^T Q_b)_ts per layer (identity) or explicit rows per layer by a rule on T (in + R out) against R in out, at O(N) memory and without the N x N matrix. Every control forms per-row gradients: explicitly from the same stream cotangents, one point at a time by vmap(grad) through forward-Laplacian engines, Taylor mode or nested autodiff, or through the full Gram matrix and its diagonal where N <= 24,576. All eight cells have D <= H; the projected variant for D > H was calibrated separately and is not part of this run",
+ "hardware": "one NVIDIA A100-SXM4-80GB (exclusive), JAX 0.10.2 with jaxlib 0.10.2 CUDA 12 plugins, CPython 3.12",
+ "protocol": {
+  "precision": "float64",
+  "repetitions": "3 fresh processes (paired by repetition, rotating method order)",
+  "warmups": 3,
+  "samples": 51,
+  "statistic": "ratio = strongest-control median / candidate median per tier; lower95 = exp(mean(log r) - 2.920 sd(log r)/sqrt(3)); strongest control = smallest mean log median among qualified tier members",
+  "qualification": "every method's diag program on a reduced instance (width 4, D_q = min(D, 5), B = 4 interior points (+ 1 boundary point), same depth and operator, seed + 1) vs a 50-digit oracle (Taylor series per coordinate direction, J by central differences in every parameter, diag = row norms): r and diag 1e-12 + 1e-10 max |ref|; the candidate and the independent reproduction pass both under the rule and with the identity forced on every layer; full-size outputs finite and digest-checked",
+  "status": {
+   "significant_2x": "lower95 >= 2",
+   "lower95_ge_1": "1 <= lower95 < 2",
+   "parity": "lower95 < 1 <= ratio or ratio < 1 <= upper bound",
+   "loss": "candidate slower with confidence",
+   "partial": "an applicable tier member failed (e.g. out of memory) or did not qualify; never promoted",
+   "suppressed": "no applicable tier member ran"
+  },
+  "fairness": "identical data, initialisation, loss and float64 inputs for every method; compilation excluded (value-and-gradient steady state)",
+  "worker_timeout_s": 1200
+ },
+ "tiers": {
+  "gram_then_diagonal": "the A26 module's full K = J J^T, then its diagonal; N x N memory, cells with N <= 24576",
+  "explicit_rows_from_shared_streams": "the full J from one reverse pass of the summed residual, row norms; full-seed streams_J",
+  "per_row_forward_laplacian": "vmap(grad) through one-point forward-Laplacian engines: rg_lib stream recursion, omnibias.jax.laplacian.deep_field_value_grad_laplacian, folx.forward_laplacian; row norms",
+  "taylor_mode": "vmap(grad) through jax.experimental.jet, row norms",
+  "nested_autodiff": "vmap(grad) through jax.grad and jax.hessian, row norms"
+ },
+ "roles": {
+  "held_out": "cells, operators and seed not used for any tuning"
+ },
+ "aggregates": [
+  {
+   "role": "held_out",
+   "family": "deep_mlp_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "deep_residual_ntk_diagonal",
+   "tier": "explicit_rows_from_shared_streams",
+   "cells": 24,
+   "input_dims": [
+    2,
+    3,
+    4,
+    5,
+    8,
+    12,
+    30
+   ],
+   "lower95_ge_1": 3,
+   "significant_2x": 15,
+   "suppressed": 6,
+   "geomean_ratio_complete_tiers": 3.440924036842726,
+   "ratio_range_complete_tiers": [
+    1.158692004195916,
+    8.389035014351363
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "deep_residual_ntk_diagonal",
+   "tier": "gram_then_diagonal",
+   "cells": 21,
+   "input_dims": [
+    2,
+    3,
+    5,
+    8,
+    12,
+    30
+   ],
+   "significant_2x": 12,
+   "suppressed": 9,
+   "geomean_ratio_complete_tiers": 37.78147264213506,
+   "ratio_range_complete_tiers": [
+    25.123810352866432,
+    77.34065978360142
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "deep_residual_ntk_diagonal",
+   "tier": "nested_autodiff",
+   "cells": 24,
+   "input_dims": [
+    2,
+    3,
+    4,
+    5,
+    8,
+    12,
+    30
+   ],
+   "significant_2x": 18,
+   "suppressed": 6,
+   "geomean_ratio_complete_tiers": 6.026037676250456,
+   "ratio_range_complete_tiers": [
+    2.8544924406741194,
+    10.776117472287542
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "deep_residual_ntk_diagonal",
+   "tier": "per_row_forward_laplacian",
+   "cells": 24,
+   "input_dims": [
+    2,
+    3,
+    4,
+    5,
+    8,
+    12,
+    30
+   ],
+   "lower95_ge_1": 2,
+   "parity": 1,
+   "significant_2x": 21,
+   "geomean_ratio_complete_tiers": 2.9586854779809975,
+   "ratio_range_complete_tiers": [
+    1.0007633059987,
+    7.408691597011728
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "deep_residual_ntk_diagonal",
+   "tier": "taylor_mode",
+   "cells": 24,
+   "input_dims": [
+    2,
+    3,
+    4,
+    5,
+    8,
+    12,
+    30
+   ],
+   "significant_2x": 18,
+   "suppressed": 6,
+   "geomean_ratio_complete_tiers": 5.456301078221104,
+   "ratio_range_complete_tiers": [
+    2.6493295855012247,
+    9.409493642770416
+   ]
+  }
+ ],
+ "reproduction": [
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 1.061999401075033
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384
+   },
+   "package_over_benchmark_program_time": 1.05110218782649
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768
+   },
+   "package_over_benchmark_program_time": 1.0848063343520327
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 1.0357176644922201
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288
+   },
+   "package_over_benchmark_program_time": 1.107019583557182
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096
+   },
+   "package_over_benchmark_program_time": 1.0612825356658337
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768
+   },
+   "package_over_benchmark_program_time": 1.0911186604313503
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384
+   },
+   "package_over_benchmark_program_time": 1.1520249472795665
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 0.964082519898159
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096
+   },
+   "package_over_benchmark_program_time": 1.0608902303044576
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384
+   },
+   "package_over_benchmark_program_time": 1.0574363101287012
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 1.0526442216036909
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384
+   },
+   "package_over_benchmark_program_time": 0.9993499019932146
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 0.9915557320839172
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 1.0885587080081767
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288
+   },
+   "package_over_benchmark_program_time": 1.0792973298676332
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768
+   },
+   "package_over_benchmark_program_time": 1.038262110669784
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384
+   },
+   "package_over_benchmark_program_time": 1.075330582758508
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384
+   },
+   "package_over_benchmark_program_time": 1.1649933171698061
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 0.9748230280982362
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 0.9953706711714638
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096
+   },
+   "package_over_benchmark_program_time": 1.0673489866388575
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192
+   },
+   "package_over_benchmark_program_time": 1.1223877675165639
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288
+   },
+   "package_over_benchmark_program_time": 1.078093614581576
+  }
+ ],
+ "rows": [
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.458121,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 289.081282,
+   "speed_ratio": 30.616692097718044,
+   "lower95": 29.90375317482281
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.874349,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 63.53GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.502946,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 284.706371,
+   "speed_ratio": 43.49013095231837,
+   "lower95": 42.74304437531178
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.980208,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 925.306849,
+   "speed_ratio": 77.34065978360142,
+   "lower95": 75.84353176477673
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.461152,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 475.991094,
+   "speed_ratio": 41.42026379177388,
+   "lower95": 40.20142590352862
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.458121,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 10.938392,
+   "speed_ratio": 1.158692004195916,
+   "lower95": 1.128453163965216
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.874349,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 17.309408,
+   "speed_ratio": 4.465899541844396,
+   "lower95": 4.418113589113931
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.652904,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 29.260706,
+   "speed_ratio": 3.011570233858751,
+   "lower95": 2.938016828823627
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.502946,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 35.541835,
+   "speed_ratio": 5.432729433856134,
+   "lower95": 5.358194681132035
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.980208,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "streams_J": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.20GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.461152,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 47.344662,
+   "speed_ratio": 4.1185056888946585,
+   "lower95": 3.9811296266750715
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.458121,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 9.413072,
+   "speed_ratio": 1.0007633059987,
+   "lower95": 0.9686061541420754
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.874349,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 14.908843,
+   "speed_ratio": 3.840077329260275,
+   "lower95": 3.779069390724965
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.652904,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 24.067902,
+   "speed_ratio": 2.476621617488078,
+   "lower95": 2.4133880339583724
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.502946,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 29.571577,
+   "speed_ratio": 4.528945795806203,
+   "lower95": 4.485937623658533
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.980208,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 43.14051,
+   "speed_ratio": 3.6075398821375417,
+   "lower95": 3.565868079387703
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.461152,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 31.021183,
+   "speed_ratio": 2.7014384130997158,
+   "lower95": 2.6340566694650462
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.458121,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 25.033522,
+   "speed_ratio": 2.6493295855012247,
+   "lower95": 2.572818602968909
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.874349,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 28.004699,
+   "speed_ratio": 7.204078468707612,
+   "lower95": 7.077552366823714
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.652904,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 46.859188,
+   "speed_ratio": 4.827891800764279,
+   "lower95": 4.693564299195763
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.502946,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 57.477281,
+   "speed_ratio": 8.793461727127092,
+   "lower95": 8.62605127508258
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.980208,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.20GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.461152,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 65.162993,
+   "speed_ratio": 5.670583622133707,
+   "lower95": 5.518276526862013
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.458121,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 27.020004,
+   "speed_ratio": 2.8544924406741194,
+   "lower95": 2.7696405588214663
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.874349,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 29.786396,
+   "speed_ratio": 7.675495932792372,
+   "lower95": 7.562528721057106
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.652904,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 50.720755,
+   "speed_ratio": 5.22893731274662,
+   "lower95": 5.088689330125309
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.502946,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 62.682943,
+   "speed_ratio": 9.590040718873414,
+   "lower95": 9.40291685740499
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.980208,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "nested": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.62GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.461152,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 70.554708,
+   "speed_ratio": 6.137702260191346,
+   "lower95": 5.968438648867307
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.69606,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 79.88GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.021107,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 281.529071,
+   "speed_ratio": 46.08957062327339,
+   "lower95": 43.39671895848638
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 12.324975,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 472.67118,
+   "speed_ratio": 38.32493911962197,
+   "lower95": 37.91333364759554
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.600338,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 52.03GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.214849,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 282.569419,
+   "speed_ratio": 27.650399754990346,
+   "lower95": 27.489452206751675
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.032289,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 26.814344,
+   "speed_ratio": 2.9661687574400952,
+   "lower95": 2.9536444925141203
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.69606,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 50.953317,
+   "speed_ratio": 4.357512210096726,
+   "lower95": 4.286700125605236
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.021107,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 39.478385,
+   "speed_ratio": 6.467556758439862,
+   "lower95": 6.056161436909455
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 12.324975,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 49.705702,
+   "speed_ratio": 4.035799782009154,
+   "lower95": 3.969559403394379
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.600338,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 16.017146,
+   "speed_ratio": 4.63684916634039,
+   "lower95": 4.0576446827447965
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.214849,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "streams_J": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.97GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.032289,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 23.300258,
+   "speed_ratio": 2.5823561227702703,
+   "lower95": 2.5545952839511474
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.69606,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 31.729324,
+   "speed_ratio": 2.708281781653198,
+   "lower95": 2.678893203860971
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.021107,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 28.476629,
+   "speed_ratio": 4.656341490682643,
+   "lower95": 4.384990261173006
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 12.324975,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 30.996879,
+   "speed_ratio": 2.5153253961355224,
+   "lower95": 2.477290794577415
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.600338,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 14.344409,
+   "speed_ratio": 4.154446041676965,
+   "lower95": 3.626235416121211
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.214849,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 72.793507,
+   "speed_ratio": 7.123124668725051,
+   "lower95": 7.084113639441871
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.032289,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 45.954796,
+   "speed_ratio": 5.072761462529408,
+   "lower95": 5.011152803198178
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.69606,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 64.170987,
+   "speed_ratio": 5.5020580022866055,
+   "lower95": 5.404210987645297
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.021107,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 57.505741,
+   "speed_ratio": 9.409493642770416,
+   "lower95": 8.846021905045676
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 12.324975,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 65.377494,
+   "speed_ratio": 5.294615678355666,
+   "lower95": 5.242969033402143
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.600338,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 27.215261,
+   "speed_ratio": 7.880988962051989,
+   "lower95": 6.901525228674903
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.214849,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.90GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.032289,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 52.582509,
+   "speed_ratio": 5.797266259286585,
+   "lower95": 5.750920875810564
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.69606,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 67.916335,
+   "speed_ratio": 5.810594013569502,
+   "lower95": 5.719274431594506
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.021107,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 65.826902,
+   "speed_ratio": 10.776117472287542,
+   "lower95": 10.117579421696181
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 12.324975,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 69.035104,
+   "speed_ratio": 5.594998977501572,
+   "lower95": 5.538577713586402
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.600338,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 30.21051,
+   "speed_ratio": 8.751188342274782,
+   "lower95": 7.6745904414973625
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.214849,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "nested": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.78GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.655532,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 52.03GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.406564,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 235.867014,
+   "speed_ratio": 25.123810352866432,
+   "lower95": 24.93835409514606
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.571898,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 343.020793,
+   "speed_ratio": 39.941298838759515,
+   "lower95": 39.553371004385504
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.994463,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.43GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.354421,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 54.03GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.655532,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 16.681603,
+   "speed_ratio": 4.5685836091368595,
+   "lower95": 4.5280069733143335
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.406564,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "streams_J": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.74GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.571898,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 10.141429,
+   "speed_ratio": 1.1832326705476777,
+   "lower95": 1.1808350926782825
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.994463,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "streams_J": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.29GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.951462,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 28.169829,
+   "speed_ratio": 2.8305029702156985,
+   "lower95": 2.823723905427738
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.354421,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 40.304859,
+   "speed_ratio": 3.5213372551274387,
+   "lower95": 3.436283441750881
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.655532,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 7.496352,
+   "speed_ratio": 2.0506321316520504,
+   "lower95": 2.036279013560682
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.406564,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 69.59752,
+   "speed_ratio": 7.408691597011728,
+   "lower95": 7.373134206554542
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.571898,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 9.277568,
+   "speed_ratio": 1.0756531039724895,
+   "lower95": 1.0467771118474873
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.994463,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 45.191247,
+   "speed_ratio": 4.120131675914994,
+   "lower95": 4.069202129522452
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.951462,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 22.985554,
+   "speed_ratio": 2.3093022993752457,
+   "lower95": 2.3040085344524424
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.354421,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 31.060117,
+   "speed_ratio": 2.714435070992519,
+   "lower95": 2.6486820138983425
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.655532,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 27.149317,
+   "speed_ratio": 7.419426694703491,
+   "lower95": 7.3859938745313
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.406564,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.41GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.571898,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 24.233815,
+   "speed_ratio": 2.8275230027283094,
+   "lower95": 2.815473664678971
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.994463,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.20GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.951462,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 45.439635,
+   "speed_ratio": 4.565815871118607,
+   "lower95": 4.554968891914951
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.354421,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 63.033681,
+   "speed_ratio": 5.508794238801734,
+   "lower95": 5.3830015452663975
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 192,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.655532,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 30.452503,
+   "speed_ratio": 8.318658637988724,
+   "lower95": 8.290920694697778
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.406564,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "nested": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.02GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.571898,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 28.54606,
+   "speed_ratio": 3.3294046682822938,
+   "lower95": 3.3235568182023774
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.994463,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "nested": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.34GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4,
+    "H": 96,
+    "depth": 6,
+    "B": 32768,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.951462,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 52.579155,
+   "speed_ratio": 5.286334056799947,
+   "lower95": 5.257309842189742
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.354421,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 69.839299,
+   "speed_ratio": 6.104319955665037,
+   "lower95": 5.952846586446359
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 13.449277,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 54.04GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.043623,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 312.106278,
+   "speed_ratio": 49.739920335684545,
+   "lower95": 42.78896602897786
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.865919,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 251.032929,
+   "speed_ratio": 25.455492641503294,
+   "lower95": 25.0765106327797
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.650444,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 55.20GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.863797,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "gram_diag",
+   "strongest_control_median_ms": 283.122298,
+   "speed_ratio": 31.9592835171896,
+   "lower95": 31.630832691433156
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "gram_then_diagonal",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.710804,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "gram_diag": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 38.29GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 13.449277,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 49.302026,
+   "speed_ratio": 3.6293673824446433,
+   "lower95": 3.5057956702543445
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.043623,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 52.573166,
+   "speed_ratio": 8.389035014351363,
+   "lower95": 7.229966521473433
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.865919,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "streams_J": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.74GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.650444,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 51.332077,
+   "speed_ratio": 4.407879168575157,
+   "lower95": 4.3965841819117255
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.863797,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 10.2808,
+   "speed_ratio": 1.1593136358614327,
+   "lower95": 1.151352565261724
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.710804,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "streams_J": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.20GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 13.449277,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 30.88033,
+   "speed_ratio": 2.2703367991511247,
+   "lower95": 2.198160332014951
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.043623,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 30.587904,
+   "speed_ratio": 4.878515843660362,
+   "lower95": 4.215336564226958
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.865919,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 36.585563,
+   "speed_ratio": 3.6968847973428347,
+   "lower95": 3.637262351075091
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.650444,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 31.339913,
+   "speed_ratio": 2.6877680203534644,
+   "lower95": 2.673286694268254
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.863797,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 9.318032,
+   "speed_ratio": 1.0497451376622375,
+   "lower95": 1.0402552454732574
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.710804,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "folx",
+   "strongest_control_median_ms": 43.9156,
+   "speed_ratio": 4.0779489456967575,
+   "lower95": 3.98982767223287
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 13.449277,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 63.598768,
+   "speed_ratio": 4.67666629497557,
+   "lower95": 4.525702201273267
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.043623,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 58.587407,
+   "speed_ratio": 9.343672526721278,
+   "lower95": 8.058511901693883
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.865919,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.41GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.650444,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 65.891718,
+   "speed_ratio": 5.658665863334113,
+   "lower95": 5.620756299564141
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.863797,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 24.803015,
+   "speed_ratio": 2.7966607711847375,
+   "lower95": 2.790894885723203
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.710804,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.20GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8,
+    "H": 256,
+    "depth": 3,
+    "B": 16384,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 13.449277,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 70.384093,
+   "speed_ratio": 5.171454881183291,
+   "lower95": 4.9822819975508095
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3,
+    "H": 320,
+    "depth": 4,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.043623,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 60.698907,
+   "speed_ratio": 9.680941550770061,
+   "lower95": 8.351764595877107
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2,
+    "H": 640,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 9.865919,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "nested": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.09GiB. [tf-"
+   }
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12,
+    "H": 512,
+    "depth": 3,
+    "B": 4096,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 11.650444,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 68.677009,
+   "speed_ratio": 5.895677488651134,
+   "lower95": 5.878267439456504
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 30,
+    "H": 128,
+    "depth": 3,
+    "B": 8192,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.863797,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 30.838202,
+   "speed_ratio": 3.4725551038320934,
+   "lower95": 3.4511988115491996
+  },
+  {
+   "config": {
+    "model": "deep_mlp_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5,
+    "H": 384,
+    "depth": 3,
+    "B": 12288,
+    "claim_regime": true
+   },
+   "tier": "nested_autodiff",
+   "candidate": "deep_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 10.710804,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "nested": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 28.55GiB. [tf-"
+   }
+  }
+ ],
+ "full_size_accuracy": {
+  "what": "max over repetitions of per-field relative deviations (norms and sampled entries scaled by the largest sampled reference magnitude) between methods at full size; floor = two controls",
+  "candidate": "pkg",
+  "floor": "streams_J_vs_fl_vmap",
+  "summary": {
+   "pkg_vs_rg_diag": {
+    "max_residual_rel": 1.192047111890684e-15,
+    "max_diag_rel": 3.156544415910681e-16,
+    "cells": 24
+   },
+   "pkg_vs_gram_diag": {
+    "max_residual_rel": 0.0,
+    "max_diag_rel": 3.994169482126204e-15,
+    "cells": 13
+   },
+   "pkg_vs_streams_J": {
+    "max_residual_rel": 1.192047111890684e-15,
+    "max_diag_rel": 5.380658515053375e-16,
+    "cells": 18
+   },
+   "pkg_vs_fl_vmap": {
+    "max_residual_rel": 1.192047111890684e-15,
+    "max_diag_rel": 8.874415472078146e-16,
+    "cells": 24
+   },
+   "pkg_vs_omnibias_a": {
+    "max_residual_rel": 9.36608445056966e-16,
+    "max_diag_rel": 1.364916782076865e-15,
+    "cells": 24
+   },
+   "pkg_vs_folx": {
+    "max_residual_rel": 1.0827610958120963e-15,
+    "max_diag_rel": 1.436468590378252e-15,
+    "cells": 24
+   },
+   "pkg_vs_jet": {
+    "max_residual_rel": 3.235556446560427e-15,
+    "max_diag_rel": 5.7841916317633356e-15,
+    "cells": 18
+   },
+   "pkg_vs_nested": {
+    "max_residual_rel": 1.2118032635952546e-15,
+    "max_diag_rel": 4.094750346230608e-15,
+    "cells": 18
+   },
+   "streams_J_vs_fl_vmap": {
+    "max_residual_rel": 4.502354556865831e-16,
+    "max_diag_rel": 3.15654441591068e-16,
+    "cells": 18
+   }
+  },
+  "rows": [
+   {
+    "D": 30,
+    "width": 128,
+    "depth": 3,
+    "B": 8192,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 2.521274573068381e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 3.1515932163354762e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 2.5212745730683807e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.5212745730683807e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.4665145981779197e-16,
+     "diag": 2.5212745730683807e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 5.86605839271168e-16,
+     "diag": 2.521274573068381e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 1.7598175178135057e-15,
+     "diag": 5.364734917604016e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 5.499429743167198e-16,
+     "diag": 2.521274573068381e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.5212745730683807e-16
+    }
+   },
+   {
+    "D": 2,
+    "width": 192,
+    "depth": 3,
+    "B": 16384,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 6.374172231458861e-16,
+     "diag": 1.6337214116883325e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 3.267442823376664e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.6337214116883323e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 6.374172231458861e-16,
+     "diag": 1.6337214116883323e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 9.03007732790005e-16,
+     "diag": 1.6337214116883323e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 2.8683775041564915e-15,
+     "diag": 5.091908529166879e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 9.561258347188296e-16,
+     "diag": 3.267442823376664e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.6337214116883323e-16
+    }
+   },
+   {
+    "D": 4,
+    "width": 96,
+    "depth": 6,
+    "B": 32768,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 1.192047111890684e-15,
+     "diag": 2.412465625937097e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.192047111890684e-15,
+     "diag": 2.4124656259370973e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.192047111890684e-15,
+     "diag": 3.6186984389056454e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 9.36608445056966e-16,
+     "diag": 3.618698438905646e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 5.960235559453417e-16,
+     "diag": 3.0155820324213706e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 3.235556446560427e-15,
+     "diag": 5.133904383770404e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 6.811697782232477e-16,
+     "diag": 3.0155820324213716e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.4124656259370973e-16
+    }
+   },
+   {
+    "D": 3,
+    "width": 320,
+    "depth": 4,
+    "B": 8192,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 7.357861459835179e-17,
+     "diag": 2.172814440210069e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 2.172814440210069e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 2.172814440210068e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.8394653649587946e-17,
+     "diag": 1.0864072201050342e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 7.357861459835179e-17,
+     "diag": 4.345628880420135e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.9431445839340714e-16,
+     "diag": 9.777664980945317e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 5.886289167868142e-16,
+     "diag": 1.0095552443246178e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 5.886289167868144e-16,
+     "diag": 2.0098533571943143e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 1.8394653649587946e-17,
+     "diag": 2.1728144402100684e-16
+    }
+   },
+   {
+    "D": 5,
+    "width": 384,
+    "depth": 3,
+    "B": 12288,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 2.0180130337901793e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 2.018013033790179e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 4.036026067580357e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.8034806267083903e-16,
+     "diag": 4.036026067580357e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 9.508701566770978e-16,
+     "diag": 4.036026067580357e-16
+    }
+   },
+   {
+    "D": 12,
+    "width": 512,
+    "depth": 3,
+    "B": 4096,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 7.208804034735921e-17,
+     "diag": 1.1826614949024397e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 2.3653229898048795e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 7.208804034735921e-17,
+     "diag": 2.3653229898048795e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.9566537372560997e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.4417608069471842e-16,
+     "diag": 3.5479844847073195e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.4417608069471844e-16,
+     "diag": 7.095968969414637e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 3.60440201736796e-16,
+     "diag": 1.1826614949024407e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 3.60440201736796e-16,
+     "diag": 1.6557260928634153e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 7.208804034735921e-17,
+     "diag": 1.1826614949024397e-16
+    }
+   },
+   {
+    "D": 4,
+    "width": 96,
+    "depth": 6,
+    "B": 32768,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 9.449014846794813e-17,
+     "diag": 1.7911577800668813e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 9.449014846794813e-17,
+     "diag": 1.7911577800668813e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 9.449014846794813e-17,
+     "diag": 1.7911577800668813e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.8898029693589625e-16,
+     "diag": 3.585281455474407e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.8898029693589625e-16,
+     "diag": 4.1828283647201415e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 7.55921187743585e-16,
+     "diag": 1.9121501095863463e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 4.724507423397405e-16,
+     "diag": 1.1353391275668952e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.1950938184914686e-16
+    }
+   },
+   {
+    "D": 8,
+    "width": 256,
+    "depth": 3,
+    "B": 16384,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 6.063438647657422e-16,
+     "diag": 2.410564557764631e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 6.063438647657422e-16,
+     "diag": 4.821129115529264e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 6.063438647657422e-16,
+     "diag": 6.026411394411578e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 6.063438647657421e-16,
+     "diag": 4.821129115529263e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 4.850750918125936e-16,
+     "diag": 4.821129115529263e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 2.3041066861098244e-15,
+     "diag": 5.544298482858681e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 7.276126377188905e-16,
+     "diag": 6.026411394411578e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.4105645577646313e-16
+    }
+   },
+   {
+    "D": 3,
+    "width": 320,
+    "depth": 4,
+    "B": 8192,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 1.2456448337113932e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 1.245644833711393e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 2.4912896674227855e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.4912896674227855e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.7885890807034817e-16,
+     "diag": 2.4912896674227855e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 4.471472701758704e-16,
+     "diag": 2.4912896674227855e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 1.2072976294748517e-15,
+     "diag": 4.9169848841965235e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 8.048650863165666e-16,
+     "diag": 3.7369345011341787e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.8684672505670893e-16
+    }
+   },
+   {
+    "D": 12,
+    "width": 512,
+    "depth": 3,
+    "B": 4096,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 1.7935528383511238e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 2.690329257526686e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 5.380658515053375e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 5.380658515053374e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.3930232013481607e-16,
+     "diag": 5.380658515053374e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 5.572092805392642e-16,
+     "diag": 5.380658515053374e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 1.880581321820018e-15,
+     "diag": 5.325211635682508e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 9.054650808763038e-16,
+     "diag": 4.932270305465592e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.7935528383511245e-16
+    }
+   },
+   {
+    "D": 2,
+    "width": 192,
+    "depth": 3,
+    "B": 16384,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 1.7061459775960797e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 3.412291955192158e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 3.4122919551921584e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.6920050125514246e-16,
+     "diag": 1.364916782076865e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 2.326506892258209e-16,
+     "diag": 1.1943021843172562e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 6.7680200502056985e-16,
+     "diag": 4.435979541749814e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 7.614022556481409e-16,
+     "diag": 4.094750346230608e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.7061459775960792e-16
+    }
+   },
+   {
+    "D": 2,
+    "width": 640,
+    "depth": 3,
+    "B": 8192,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 7.218407305413976e-16,
+     "diag": 2.1148412814602564e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 4.2296825629205133e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 3.1722619221903844e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 6.015339421178313e-16,
+     "diag": 3.1722619221903844e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.0827610958120963e-15,
+     "diag": 4.229682562920512e-16
+    }
+   },
+   {
+    "D": 2,
+    "width": 192,
+    "depth": 3,
+    "B": 16384,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 1.6362226456696967e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 3.272445291339393e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 4.90866793700909e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 2.3554184853708495e-16,
+     "diag": 4.90866793700909e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 5.103406718303507e-16,
+     "diag": 4.90866793700909e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 9.421673941483404e-16,
+     "diag": 4.854101981037119e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 6.67368570855074e-16,
+     "diag": 4.90866793700909e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.6362226456696967e-16
+    }
+   },
+   {
+    "D": 2,
+    "width": 640,
+    "depth": 3,
+    "B": 8192,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 1.4785264780644484e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 3.9176416101225095e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 5.223522146830013e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.3241636027243332e-16,
+     "diag": 1.0447044293660031e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 5.075960477109944e-16,
+     "diag": 1.436468590378252e-15
+    }
+   },
+   {
+    "D": 30,
+    "width": 128,
+    "depth": 3,
+    "B": 8192,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 3.7791952043140074e-16,
+     "diag": 3.156544415910681e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 3.630026078297276e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 3.7791952043140074e-16,
+     "diag": 3.156544415910681e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 3.15654441591068e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.7791952043140074e-16,
+     "diag": 3.15654441591068e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 6.298658673856678e-16,
+     "diag": 4.73481662386602e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 1.7636244286798729e-15,
+     "diag": 5.062786010531417e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 6.928524541242347e-16,
+     "diag": 3.15654441591068e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 3.7791952043140074e-16,
+     "diag": 3.15654441591068e-16
+    }
+   },
+   {
+    "D": 5,
+    "width": 384,
+    "depth": 3,
+    "B": 12288,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 4.892996528141582e-16,
+     "diag": 2.685284850091633e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 4.892996528141582e-16,
+     "diag": 3.3566060626145407e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 6.523995370855447e-16,
+     "diag": 2.685284850091633e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 7.135619936873143e-16,
+     "diag": 2.685284850091633e-16
+    }
+   },
+   {
+    "D": 4,
+    "width": 96,
+    "depth": 6,
+    "B": 32768,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 1.4805470241947182e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 1.974062698926291e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.9740626989262912e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.306520087611677e-16,
+     "diag": 1.9740626989262912e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 4.133150109514596e-16,
+     "diag": 2.961094048389437e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 1.4052710372349621e-15,
+     "diag": 4.925774399824205e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 7.026355186174812e-16,
+     "diag": 2.961094048389437e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.9740626989262912e-16
+    }
+   },
+   {
+    "D": 8,
+    "width": 256,
+    "depth": 3,
+    "B": 16384,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 6.485330208077309e-17,
+     "diag": 8.974237738166563e-17
+    },
+    "pkg_vs_streams_J": {
+     "residual": 6.485330208077309e-17,
+     "diag": 1.7948475476333127e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 6.485330208077309e-17,
+     "diag": 1.794847547633313e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.297066041615462e-16,
+     "diag": 2.6922713214499693e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.91839859363479e-16,
+     "diag": 4.487118869083283e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 3.8911981248463855e-16,
+     "diag": 7.179390190533252e-16
+    },
+    "pkg_vs_nested": {
+     "residual": 5.188264166461847e-16,
+     "diag": 1.0769085285799865e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.794847547633313e-16
+    }
+   },
+   {
+    "D": 8,
+    "width": 256,
+    "depth": 3,
+    "B": 16384,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 8.468433891427837e-17
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 2.540530167428352e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 3.3873735565711363e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 2.651261183810425e-16,
+     "diag": 3.3873735565711353e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 5.30252236762085e-16,
+     "diag": 2.540530167428352e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 2.2535720062388647e-15,
+     "diag": 3.842208413138212e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 6.62815295952606e-16,
+     "diag": 2.540530167428352e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.6936867782855682e-16
+    }
+   },
+   {
+    "D": 3,
+    "width": 320,
+    "depth": 4,
+    "B": 8192,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 6.059016317976277e-16,
+     "diag": 3.1265900712234065e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 1.563295035611703e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 0.0,
+     "diag": 4.689885106835111e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 4.689885106835111e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 4.847213054381023e-16,
+     "diag": 3.9082375890292593e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 9.694426108762041e-16,
+     "diag": 6.253180142446814e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 2.5447868535500353e-15,
+     "diag": 5.7841916317633356e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 1.2118032635952546e-15,
+     "diag": 6.253180142446815e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.3449425534175556e-16
+    }
+   },
+   {
+    "D": 2,
+    "width": 640,
+    "depth": 3,
+    "B": 8192,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 0.0,
+     "diag": 1.4790692453463585e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 4.437207736039073e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 8.874415472078146e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.454837691224851e-16,
+     "diag": 8.874415472078147e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 6.525804527869165e-16,
+     "diag": 8.874415472078146e-16
+    }
+   },
+   {
+    "D": 12,
+    "width": 512,
+    "depth": 3,
+    "B": 4096,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 7.316326154906978e-16,
+     "diag": 3.054999056341825e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 4.502354556865832e-16,
+     "diag": 4.582498584512738e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 4.582498584512738e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 5.627943196082289e-16,
+     "diag": 4.582498584512738e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 5.627943196082287e-16,
+     "diag": 5.346248348598193e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 1.3507063670597502e-15,
+     "diag": 5.1934983957811285e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 9.004709113731659e-16,
+     "diag": 5.346248348598192e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 4.502354556865831e-16,
+     "diag": 1.5274995281709127e-16
+    }
+   },
+   {
+    "D": 30,
+    "width": 128,
+    "depth": 3,
+    "B": 8192,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 1.455302091748585e-16,
+     "diag": 1.5976677928504833e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 3.994169482126204e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 9.216340282706362e-17,
+     "diag": 3.195335585700967e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 9.216340282706362e-17,
+     "diag": 3.195335585700967e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 9.216340282706362e-17,
+     "diag": 3.195335585700967e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.8432680565412725e-16,
+     "diag": 6.390671171401934e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 3.6865361130825454e-16,
+     "diag": 1.5976677928504846e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 2.764902084811909e-16,
+     "diag": 6.390671171401935e-16
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 9.216340282706362e-17,
+     "diag": 1.5976677928504835e-16
+    }
+   },
+   {
+    "D": 5,
+    "width": 384,
+    "depth": 3,
+    "B": 12288,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_rg_diag": {
+     "residual": 9.39924201130077e-17,
+     "diag": 1.2002768696714529e-16
+    },
+    "pkg_vs_gram_diag": {
+     "residual": 0.0,
+     "diag": 3.449315975336217e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 9.39924201130077e-17,
+     "diag": 1.7246579876681088e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.2479779971155415e-16,
+     "diag": 1.7246579876681096e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.8798484022601535e-16,
+     "diag": 6.898631950672441e-16
+    }
+   }
+  ]
+ },
+ "cold_cost": {
+  "what": "per cell, medians over repetitions: cold = lowering + compilation ms (excluded from the speed ratios), steady = steady-state median ms, for the candidate and the steady-state-fastest member of every tier; break_even_calls = extra cold ms / steady saving per call (only when the candidate compiles slower and runs faster)",
+  "rows": [
+   {
+    "cfg": {
+     "D": 30,
+     "width": 128,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 3838.2377922534943,
+     "steady": 9.458121
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 16200.732842087746,
+     "steady": 289.081282,
+     "extra_compile_ms": -12362.495049834251,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 470453.34254577756,
+     "steady": 10.938392,
+     "extra_compile_ms": -466615.10475352407,
+     "break_even_calls": null
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 7598.587479442358,
+     "steady": 9.413072,
+     "extra_compile_ms": -3760.3496871888638,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9247.094824910164,
+     "steady": 25.033522,
+     "extra_compile_ms": -5408.85703265667,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 8644.693728536367,
+     "steady": 27.020004,
+     "extra_compile_ms": -4806.455936282873,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2,
+     "width": 192,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 5740.280468016863,
+     "steady": 3.874349
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3286.431271582842,
+     "steady": 17.309408,
+     "extra_compile_ms": 2453.849196434021,
+     "break_even_calls": 182.6452117876089
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4587.505780160427,
+     "steady": 14.908843,
+     "extra_compile_ms": 1152.7746878564358,
+     "break_even_calls": 104.47009965807548
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9247.360363602638,
+     "steady": 28.004699,
+     "extra_compile_ms": -3507.0798955857754,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 9189.829502254725,
+     "steady": 29.786396,
+     "extra_compile_ms": -3449.5490342378616,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4,
+     "width": 96,
+     "depth": 6,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 5428.42997983098,
+     "steady": 9.652904
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3866.888139396906,
+     "steady": 29.260706,
+     "extra_compile_ms": 1561.5418404340744,
+     "break_even_calls": 79.63880094434218
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 6511.278506368399,
+     "steady": 24.067902,
+     "extra_compile_ms": -1082.8485265374184,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 11247.799329459667,
+     "steady": 46.859188,
+     "extra_compile_ms": -5819.369349628687,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 9492.160178720951,
+     "steady": 50.720755,
+     "extra_compile_ms": -4063.730198889971,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3,
+     "width": 320,
+     "depth": 4,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 4186.348840594292,
+     "steady": 6.502946
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 10897.316940128803,
+     "steady": 284.706371,
+     "extra_compile_ms": -6710.968099534512,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3605.6986898183823,
+     "steady": 35.541835,
+     "extra_compile_ms": 580.6501507759094,
+     "break_even_calls": 19.995604886120454
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 2984.50243473053,
+     "steady": 29.571577,
+     "extra_compile_ms": 1201.846405863762,
+     "break_even_calls": 52.09873121052401
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9607.913699001074,
+     "steady": 57.477281,
+     "extra_compile_ms": -5421.564858406782,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 9748.895216733217,
+     "steady": 62.682943,
+     "extra_compile_ms": -5562.546376138926,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 5,
+     "width": 384,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 4195.2447183430195,
+     "steady": 11.980208
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 18238.31109702587,
+     "steady": 925.306849,
+     "extra_compile_ms": -14043.066378682852,
+     "break_even_calls": null
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 2563.5582208633423,
+     "steady": 43.14051,
+     "extra_compile_ms": 1631.6864974796772,
+     "break_even_calls": 52.364270971432724
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12,
+     "width": 512,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 3971.587646752596,
+     "steady": 11.461152
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 16748.38710203767,
+     "steady": 475.991094,
+     "extra_compile_ms": -12776.799455285072,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2928.5294599831104,
+     "steady": 47.344662,
+     "extra_compile_ms": 1043.0581867694855,
+     "break_even_calls": 29.06789739268777
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 4939.241357147694,
+     "steady": 31.021183,
+     "extra_compile_ms": -967.6537103950977,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7836.161319166422,
+     "steady": 65.162993,
+     "extra_compile_ms": -3864.573672413826,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 10238.070704042912,
+     "steady": 70.554708,
+     "extra_compile_ms": -6266.483057290316,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4,
+     "width": 96,
+     "depth": 6,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 4033.173466101289,
+     "steady": 9.032289
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2359.469815157354,
+     "steady": 26.814344,
+     "extra_compile_ms": 1673.703650943935,
+     "break_even_calls": 94.12318491557556
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 4620.273341424763,
+     "steady": 23.300258,
+     "extra_compile_ms": -587.0998753234744,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7433.673933148384,
+     "steady": 45.954796,
+     "extra_compile_ms": -3400.5004670470953,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 8936.704036779702,
+     "steady": 52.582509,
+     "extra_compile_ms": -4903.530570678413,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 8,
+     "width": 256,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 4003.5331579856575,
+     "steady": 11.69606
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2814.1830870881677,
+     "steady": 50.953317,
+     "extra_compile_ms": 1189.3500708974898,
+     "break_even_calls": 30.296311097270245
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 33417.11811814457,
+     "steady": 31.690204,
+     "extra_compile_ms": -29413.584960158914,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 35848.492240998894,
+     "steady": 64.170987,
+     "extra_compile_ms": -31844.959083013237,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 33493.137465789914,
+     "steady": 67.916335,
+     "extra_compile_ms": -29489.604307804257,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3,
+     "width": 320,
+     "depth": 4,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 4107.035075314343,
+     "steady": 6.021107
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 9964.050677604973,
+     "steady": 281.529071,
+     "extra_compile_ms": -5857.01560229063,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2681.9117278791964,
+     "steady": 39.478385,
+     "extra_compile_ms": 1425.1233474351466,
+     "break_even_calls": 42.59531655370011
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 2642.097664065659,
+     "steady": 28.476629,
+     "extra_compile_ms": 1464.937411248684,
+     "break_even_calls": 65.23729046462087
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7891.402418725193,
+     "steady": 57.505741,
+     "extra_compile_ms": -3784.3673434108496,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 7218.774524051696,
+     "steady": 65.826902,
+     "extra_compile_ms": -3111.739448737353,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12,
+     "width": 512,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 3649.291048757732,
+     "steady": 12.324975
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 17087.599257472903,
+     "steady": 472.67118,
+     "extra_compile_ms": -13438.30820871517,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2537.0185701176524,
+     "steady": 49.705702,
+     "extra_compile_ms": 1112.2724786400795,
+     "break_even_calls": 29.755239341387863
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 2644.672288093716,
+     "steady": 30.966786,
+     "extra_compile_ms": 1004.618760664016,
+     "break_even_calls": 53.890620426524876
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 6926.276822108775,
+     "steady": 65.377494,
+     "extra_compile_ms": -3276.9857733510435,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 8468.953654170036,
+     "steady": 69.035104,
+     "extra_compile_ms": -4819.662605412304,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2,
+     "width": 192,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 4026.603267993778,
+     "steady": 3.600338
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2760.001221206039,
+     "steady": 16.017146,
+     "extra_compile_ms": 1266.6020467877388,
+     "break_even_calls": 102.0070574327749
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 2815.5627748928964,
+     "steady": 14.344409,
+     "extra_compile_ms": 1211.0404931008816,
+     "break_even_calls": 112.7170970017679
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 6653.006620705128,
+     "steady": 27.215261,
+     "extra_compile_ms": -2626.4033527113497,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 9436.732687987387,
+     "steady": 30.21051,
+     "extra_compile_ms": -5410.129419993609,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2,
+     "width": 640,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 4762.887388002127,
+     "steady": 10.214849
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 12938.648656010628,
+     "steady": 282.569419,
+     "extra_compile_ms": -8175.7612680085,
+     "break_even_calls": null
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 6300.7550607435405,
+     "steady": 72.793507,
+     "extra_compile_ms": -1537.8676727414131,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2,
+     "width": 192,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 3910.0806675851345,
+     "steady": 3.655532
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2502.447199076414,
+     "steady": 16.681603,
+     "extra_compile_ms": 1407.6334685087204,
+     "break_even_calls": 108.06278182490489
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 5939.887819811702,
+     "steady": 7.496352,
+     "extra_compile_ms": -2029.8071522265673,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 6547.987686470151,
+     "steady": 27.149317,
+     "extra_compile_ms": -2637.9070188850164,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 7624.298667535186,
+     "steady": 30.452503,
+     "extra_compile_ms": -3714.2179999500513,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2,
+     "width": 640,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 4458.055766299367,
+     "steady": 9.406564
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 11120.712228119373,
+     "steady": 235.867014,
+     "extra_compile_ms": -6662.656461820006,
+     "break_even_calls": null
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 4553.150096908212,
+     "steady": 69.59752,
+     "extra_compile_ms": -95.09433060884476,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 30,
+     "width": 128,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 6220.03060951829,
+     "steady": 8.571898
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 19128.54289636016,
+     "steady": 343.020793,
+     "extra_compile_ms": -12908.51228684187,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3206.8418618291616,
+     "steady": 10.141429,
+     "extra_compile_ms": 3013.188747689128,
+     "break_even_calls": 1919.8019967041907
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 5323.137102648616,
+     "steady": 9.277568,
+     "extra_compile_ms": 896.8935068696737,
+     "break_even_calls": 1270.9814883297745
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7660.597290843725,
+     "steady": 24.233815,
+     "extra_compile_ms": -1440.5666813254356,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 7763.960396870971,
+     "steady": 28.54606,
+     "extra_compile_ms": -1543.9297873526812,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 5,
+     "width": 384,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 5422.001296654344,
+     "steady": 10.994463
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 6040.53988493979,
+     "steady": 45.191247,
+     "extra_compile_ms": -618.5385882854462,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4,
+     "width": 96,
+     "depth": 6,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 3598.43030013144,
+     "steady": 9.951462
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2411.1517276614904,
+     "steady": 28.169829,
+     "extra_compile_ms": 1187.2785724699497,
+     "break_even_calls": 65.16931909813594
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 2568.4329979121685,
+     "steady": 22.985554,
+     "extra_compile_ms": 1029.9973022192717,
+     "break_even_calls": 79.02332607589939
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7631.148606538773,
+     "steady": 45.439635,
+     "extra_compile_ms": -4032.7183064073324,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 7324.452422559261,
+     "steady": 52.579155,
+     "extra_compile_ms": -3726.022122427821,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 8,
+     "width": 256,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 3557.112665846944,
+     "steady": 11.354421
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2326.920308172703,
+     "steady": 40.304859,
+     "extra_compile_ms": 1230.192357674241,
+     "break_even_calls": 42.49304821136872
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 5923.923602327704,
+     "steady": 31.060117,
+     "extra_compile_ms": -2366.8109364807606,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7061.032019555569,
+     "steady": 63.033681,
+     "extra_compile_ms": -3503.919353708625,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 7429.221164435148,
+     "steady": 69.839299,
+     "extra_compile_ms": -3872.1084985882044,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 8,
+     "width": 256,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 5001.279152929783,
+     "steady": 13.449277
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2558.067463338375,
+     "steady": 49.302026,
+     "extra_compile_ms": 2443.211689591408,
+     "break_even_calls": 68.14572822829871
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 2641.2046030163765,
+     "steady": 30.88033,
+     "extra_compile_ms": 2360.0745499134064,
+     "break_even_calls": 135.39483529270473
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8632.781602442265,
+     "steady": 63.598768,
+     "extra_compile_ms": -3631.5024495124817,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 8200.776044279337,
+     "steady": 70.384093,
+     "extra_compile_ms": -3199.496891349554,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3,
+     "width": 320,
+     "depth": 4,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 5292.182356119156,
+     "steady": 6.043623
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 15189.34502825141,
+     "steady": 312.106278,
+     "extra_compile_ms": -9897.162672132254,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3688.6193566024303,
+     "steady": 52.573166,
+     "extra_compile_ms": 1603.5629995167255,
+     "break_even_calls": 34.46333009367243
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4501.856848597527,
+     "steady": 30.587904,
+     "extra_compile_ms": 790.3255075216293,
+     "break_even_calls": 32.199986119847196
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 10223.798990249634,
+     "steady": 58.587407,
+     "extra_compile_ms": -4931.616634130478,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 8143.6370350420475,
+     "steady": 60.698907,
+     "extra_compile_ms": -2851.4546789228916,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2,
+     "width": 640,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 3622.37498909235,
+     "steady": 9.865919
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 11663.593847304583,
+     "steady": 251.032929,
+     "extra_compile_ms": -8041.218858212233,
+     "break_even_calls": null
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 3380.9298798441887,
+     "steady": 36.585563,
+     "extra_compile_ms": 241.44510924816132,
+     "break_even_calls": 9.036239751104517
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12,
+     "width": 512,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 6246.522031724453,
+     "steady": 11.650444
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3639.9929262697697,
+     "steady": 51.332077,
+     "extra_compile_ms": 2606.5291054546833,
+     "break_even_calls": 65.68603427824362
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 249523.88475462794,
+     "steady": 31.339913,
+     "extra_compile_ms": -243277.3627229035,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 230550.99318549037,
+     "steady": 65.891718,
+     "extra_compile_ms": -224304.47115376592,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 242294.57959905267,
+     "steady": 68.677009,
+     "extra_compile_ms": -236048.05756732821,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 30,
+     "width": 128,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 4425.489779561758,
+     "steady": 8.863797
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 15619.972735643387,
+     "steady": 283.122298,
+     "extra_compile_ms": -11194.482956081629,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2737.494222819805,
+     "steady": 10.2808,
+     "extra_compile_ms": 1687.995556741953,
+     "break_even_calls": 1191.2434601351963
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 5632.332943379879,
+     "steady": 9.318032,
+     "extra_compile_ms": -1206.843163818121,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7895.956818014383,
+     "steady": 24.803015,
+     "extra_compile_ms": -3470.4670384526253,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 11822.36022874713,
+     "steady": 30.838202,
+     "extra_compile_ms": -7396.870449185371,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 5,
+     "width": 384,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 4552.569944411516,
+     "steady": 10.710804
+    },
+    "gram_then_diagonal": {
+     "member": "gram_diag",
+     "cold": 18136.582259088755,
+     "steady": 910.4848,
+     "extra_compile_ms": -13584.012314677238,
+     "break_even_calls": null
+    },
+    "per_row_forward_laplacian": {
+     "member": "folx",
+     "cold": 5191.017471253872,
+     "steady": 43.9156,
+     "extra_compile_ms": -638.4475268423557,
+     "break_even_calls": null
+    },
+    "run": 1
+   }
+  ]
+ }
+}

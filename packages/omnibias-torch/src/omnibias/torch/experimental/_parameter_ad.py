@@ -32,20 +32,29 @@ class _FunctionalProgram:
         self.parameter_names = tuple(name for name, _ in self.canonical.named_parameters())
         missing = set(self.parameter_names) - dict(program.named_parameters()).keys()
         if missing:
-            raise ValueError(f"canonical parameter names differ from the program: {sorted(missing)}")
+            raise ValueError(
+                f"canonical parameter names differ from the program: {sorted(missing)}"
+            )
 
     def state(self, program: nn.Module) -> tuple[dict[str, Tensor], dict[str, Tensor]]:
         parameters: dict[str, Tensor] = dict(program.named_parameters())
         live_buffers = dict(program.named_buffers())
-        buffers = {name: live_buffers.get(name, value)
-                   for name, value in self.canonical.named_buffers()}
+        buffers = {
+            name: live_buffers.get(name, value) for name, value in self.canonical.named_buffers()
+        }
         return parameters, buffers
 
-    def __call__(self, parameters: dict[str, Tensor], buffers: dict[str, Tensor],
-                 args: tuple[Any, ...], kwargs: dict[str, Any]) -> Any:
+    def __call__(
+        self,
+        parameters: dict[str, Tensor],
+        buffers: dict[str, Tensor],
+        args: tuple[Any, ...],
+        kwargs: dict[str, Any],
+    ) -> Any:
         selected = {name: parameters[name] for name in self.parameter_names}
-        return torch.func.functional_call(self.canonical, (selected, buffers), args, kwargs,
-                                          tie_weights=True, strict=True)
+        return torch.func.functional_call(
+            self.canonical, (selected, buffers), args, kwargs, tie_weights=True, strict=True
+        )
 
 
 @dataclass
@@ -61,8 +70,12 @@ class _Invocation:
 
     def unpack(self, tensors: tuple[Tensor, ...]) -> Any:
         return _pytree.tree_unflatten(
-            [tensors[self.slots[i]] if i in self.slots else leaf
-             for i, leaf in enumerate(self.leaves)], self.structure)
+            [
+                tensors[self.slots[i]] if i in self.slots else leaf
+                for i, leaf in enumerate(self.leaves)
+            ],
+            self.structure,
+        )
 
 
 class _HybridBridge(torch.autograd.Function):
@@ -76,10 +89,13 @@ class _HybridBridge(torch.autograd.Function):
         # nonleaf arguments. Originals remain saved for the native pullback.
         forward_values = tuple(t.detach() for t in tensors)
         output = invocation.compiled(*invocation.unpack(forward_values))
-        invocation.output_leaves, invocation.output_structure = _pytree.tree_flatten(output)
-        invocation.output_slots = [i for i, leaf in enumerate(invocation.output_leaves)
-                                   if isinstance(leaf, Tensor)]
-        result = tuple(invocation.output_leaves[i] for i in invocation.output_slots)
+        leaves, invocation.output_structure = _pytree.tree_flatten(output)
+        invocation.output_slots = [i for i, leaf in enumerate(leaves) if isinstance(leaf, Tensor)]
+        result = tuple(leaves[i] for i in invocation.output_slots)
+        # The outputs reference this node through their grad_fn and the node references the invocation, so the
+        # invocation must not reference the output tensors back (a cycle only the garbage collector could free, holding
+        # device memory until it runs). Their positions are in ``output_slots``; the caller supplies the tensors.
+        invocation.output_leaves = [None if isinstance(leaf, Tensor) else leaf for leaf in leaves]
         ctx.mark_non_differentiable(*(x for x in result if not x.is_floating_point()))
         return result
 
@@ -90,24 +106,34 @@ class _HybridBridge(torch.autograd.Function):
         saved = ctx.saved_tensors  # Includes the usual tensor version checks.
         with torch.enable_grad():
             # Distinct formal arguments may depend on each other. Cloning each
-            # unique input isolates their partials without detaching higher AD.
-            clones = tuple(t.clone() for t in saved)
+            # unique input that needs a gradient isolates their partials without
+            # detaching higher AD; an input without one has no partial to isolate.
+            clones = tuple(t.clone() if t.requires_grad else t for t in saved)
             active = [i for i, t in enumerate(clones) if t.requires_grad]
             output = invocation.native(*invocation.unpack(clones))
             leaves, structure = _pytree.tree_flatten(output)
             if structure != invocation.output_structure:
                 raise RuntimeError("hybrid recomputation changed the output structure")
-            selected = [(leaves[i], bar) for i, bar in zip(invocation.output_slots, cotangents, strict=True)
-                        if bar is not None and leaves[i].requires_grad]
+            selected = [
+                (leaves[i], bar)
+                for i, bar in zip(invocation.output_slots, cotangents, strict=True)
+                if bar is not None and leaves[i].requires_grad
+            ]
             gradients: dict[int, Tensor | None] = {}
             if selected and active:
                 values, bars = zip(*selected, strict=True)
-                computed = torch.autograd.grad(values, [clones[i] for i in active], bars,
-                                               create_graph=higher, allow_unused=True)
+                computed = torch.autograd.grad(
+                    values,
+                    [clones[i] for i in active],
+                    bars,
+                    create_graph=higher,
+                    allow_unused=True,
+                )
                 gradients = dict(zip(active, computed, strict=True))
             # Connected zeros allow further gradients through constant partials.
-            result = [gradients.get(i) if gradients.get(i) is not None else saved[i] * 0
-                      for i in active]
+            result = [
+                gradients.get(i) if gradients.get(i) is not None else saved[i] * 0 for i in active
+            ]
             by_slot = dict(zip(active, result, strict=True))
         return (None, *(by_slot.get(i) for i in range(len(saved))))
 
@@ -144,23 +170,34 @@ class HybridProgram(nn.Module):
         return _pytree.tree_unflatten(result, invocation.output_structure)
 
     def explain(self) -> dict[str, Any]:
-        return {**self.program.explain(), "execution": "hybrid",  # type: ignore[operator]
-                "outer_fullgraph": False, "backward": "native differentiable recomputation",
-                "parameter_higher_gradients": True}
+        return {
+            **self.program.explain(),
+            "execution": "hybrid",  # type: ignore[operator]
+            "outer_fullgraph": False,
+            "backward": "native differentiable recomputation",
+            "parameter_higher_gradients": True,
+        }
 
 
 class ParameterHVP(nn.Module):
     """Compile a parameter Hessian-vector product before backend lowering."""
 
-    def __init__(self, program: nn.Module, loss_fn: Callable[..., Tensor], **compile_options: Any) -> None:
+    def __init__(
+        self, program: nn.Module, loss_fn: Callable[..., Tensor], **compile_options: Any
+    ) -> None:
         super().__init__()
         if not callable(loss_fn):
             raise TypeError("loss_fn must be callable and return a scalar tensor")
         self.program = program
         self._native = _FunctionalProgram(program)
 
-        def loss(parameters: dict[str, Tensor], buffers: dict[str, Tensor],
-                 args: tuple[Any, ...], kwargs: dict[str, Any], loss_args: tuple[Any, ...]) -> Tensor:
+        def loss(
+            parameters: dict[str, Tensor],
+            buffers: dict[str, Tensor],
+            args: tuple[Any, ...],
+            kwargs: dict[str, Any],
+            loss_args: tuple[Any, ...],
+        ) -> Tensor:
             value = loss_fn(self._native(parameters, buffers, args, kwargs), *loss_args)
             if not isinstance(value, Tensor) or value.ndim != 0:
                 raise ValueError("loss_fn must return a scalar tensor")
@@ -168,27 +205,45 @@ class ParameterHVP(nn.Module):
 
         gradient = torch.func.grad(loss)
 
-        def evaluate(parameters: dict[str, Tensor], buffers: dict[str, Tensor],
-                     args: tuple[Any, ...], kwargs: dict[str, Any], loss_args: tuple[Any, ...],
-                     tangents: dict[str, Tensor]) -> dict[str, Tensor]:
+        def evaluate(
+            parameters: dict[str, Tensor],
+            buffers: dict[str, Tensor],
+            args: tuple[Any, ...],
+            kwargs: dict[str, Any],
+            loss_args: tuple[Any, ...],
+            tangents: dict[str, Tensor],
+        ) -> dict[str, Tensor]:
             def g(p: dict[str, Tensor]) -> dict[str, Tensor]:
                 return cast(dict[str, Tensor], gradient(p, buffers, args, kwargs, loss_args))
+
             return cast(dict[str, Tensor], torch.func.jvp(g, (parameters,), (tangents,))[1])
 
         compile_options.setdefault("fullgraph", True)
         self._compiled = torch.compile(evaluate, **compile_options)
 
-    def forward(self, tangents: Mapping[str, Tensor], *args: Any,
-                loss_args: tuple[Any, ...] = (), **kwargs: Any) -> dict[str, Tensor]:
+    def forward(
+        self,
+        tangents: Mapping[str, Tensor],
+        *args: Any,
+        loss_args: tuple[Any, ...] = (),
+        **kwargs: Any,
+    ) -> dict[str, Tensor]:
         parameters, buffers = self._native.state(self.program)
         if not isinstance(tangents, Mapping) or tangents.keys() != parameters.keys():
-            raise ValueError("HVP tangents must have exactly the program's unique named parameter keys")
+            raise ValueError(
+                "HVP tangents must have exactly the program's unique named parameter keys"
+            )
         ordered = {}
         for name, parameter in parameters.items():
             tangent = tangents[name]
-            if not isinstance(tangent, Tensor) or (tangent.shape, tangent.dtype, tangent.device) != (
-                    parameter.shape, parameter.dtype, parameter.device):
-                raise ValueError(f"HVP tangent {name!r} must match its parameter shape, dtype and device")
+            if not isinstance(tangent, Tensor) or (
+                tangent.shape,
+                tangent.dtype,
+                tangent.device,
+            ) != (parameter.shape, parameter.dtype, parameter.device):
+                raise ValueError(
+                    f"HVP tangent {name!r} must match its parameter shape, dtype and device"
+                )
             ordered[name] = tangent
         if not isinstance(loss_args, tuple):
             raise TypeError("loss_args must be a tuple")
@@ -197,6 +252,10 @@ class ParameterHVP(nn.Module):
         return self._compiled(parameters, buffers, args, kwargs, loss_args, ordered)
 
     def explain(self) -> dict[str, Any]:
-        return {**self.program.explain(), "execution": "compiled-parameter-hvp",  # type: ignore[operator]
-                "canonical_lowering": "inline-native", "parameter_hessian": "inputs and buffers fixed",
-                "parameter_keys": tuple(dict(self.program.named_parameters()))}
+        return {
+            **self.program.explain(),
+            "execution": "compiled-parameter-hvp",  # type: ignore[operator]
+            "canonical_lowering": "inline-native",
+            "parameter_hessian": "inputs and buffers fixed",
+            "parameter_keys": tuple(dict(self.program.named_parameters())),
+        }

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Immutable environment fingerprints and bounded, distinct research caches."""
 from collections import OrderedDict
 from dataclasses import dataclass

@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Equivalent derivative representations; research-only analytic first JVPs."""
 import functools
 import math

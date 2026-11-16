@@ -43,16 +43,29 @@ a 5,000-dimensional regression beyond the full mixed-jet allocation budget.
 There is no fixed input-dimension cap on this path; available memory and
 compute still bound a practical run. Parameter gradients are retained.
 
-Deep repeated Laplacians have three explicit modes:
+Deep repeated Laplacians have four explicit modes:
 
 | Requested operator | Method | Meaning of the result |
 | --- | --- | --- |
 | `k = 1` | Forward Laplacian | Exact differentiation, subject to floating-point rounding |
 | `k >= 2`, `support` | Jets over coordinate supports of size at most `k` | Exact differentiation; work grows with the number of supports |
 | `k >= 2`, `estimator` | Sampled directional derivatives | Unbiased in expectation; a finite run is an estimate |
+| `k` in `{2, 3}`, `structured` (JAX and PyTorch) | Projected program over the first-layer factor | Exact differentiation, subject to floating-point rounding; refuses activations it cannot differentiate faithfully |
 
-`auto` selects support enumeration or sampling according to the budget;
-explicitly forcing `support` bypasses that budget. Use
+`auto` selects support enumeration while the support count fits the budget,
+except that from a measured input dimension it runs the exact `structured`
+program in its place wherever that applies (`k` in `{2, 3}`, a supported smooth
+activation, an affine readout): `STRUCTURED_MIN_DIM` on CPU (`k = 2` from `D = 2`;
+`k = 3` from `D = 4` on JAX and `D = 6` on PyTorch) and `STRUCTURED_MIN_DIM_CUDA`
+on an accelerator (`k = 3` from `D = 3`), where it measured faster; both are
+module constants of `omnibias.jax.laplacian` and `omnibias.torch.laplacian`.
+Both backends return the same exact value either way, within rounding, and the
+PyTorch result stays connected to the readout bias, which `Delta^k` (`k >= 2`)
+does not depend on, so its gradient is an exact zero as under support
+enumeration (`torch.autograd.grad` without `allow_unused` does not start to raise).
+Past the budget, the JAX backend uses the exact `structured` program when it
+applies and samples only otherwise; the PyTorch backend samples. Explicitly forcing
+`support` bypasses the budget. Use
 `deep_field_polylaplacian_with_report` to inspect the selected method. Its
 `concentration` is `None` by default. To request a conditional Hoeffding bound,
 pass `value_range=(lo, hi)` bounding every possible normalized directional

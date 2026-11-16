@@ -37,6 +37,7 @@ def test_read_once_repeated_mixed_derivatives_and_scalar_outer_cut(alpha):
     def formula(x):
         s = torch.sin(x[0]) + torch.exp(x[1])
         return torch.sin(s) * torch.exp(s)
+
     x = torch.tensor([0.13, -0.2], dtype=torch.float64)
     model = Function(formula)
     program = compile_operator(model, (x,), operator=OperatorSpec.mixed(alpha))
@@ -65,8 +66,12 @@ def test_square_free_separable_operator_avoids_exponential_layout(order):
     with mp.workdps(80):
         w = [mp.mpf(float(v)) for v in model.weight.detach()]
         points = [mp.mpf(float(v)) for v in x]
-        s = sum(mp.tanh(a*b) for a, b in zip(w, points, strict=True)) + mp.mpf(float(model.offset.detach()))
-        expected = mp.diff(mp.sin, s, order) * mp.fprod(a / mp.cosh(a*b)**2 for a, b in zip(w, points, strict=True))
+        s = sum(mp.tanh(a * b) for a, b in zip(w, points, strict=True)) + mp.mpf(
+            float(model.offset.detach())
+        )
+        expected = mp.diff(mp.sin, s, order) * mp.fprod(
+            a / mp.cosh(a * b) ** 2 for a, b in zip(w, points, strict=True)
+        )
     assert float(actual.detach()) == pytest.approx(float(expected), rel=3e-12, abs=1e-30)
     actual.backward()
     assert model.weight.grad is not None and torch.isfinite(model.weight.grad).all()
@@ -124,15 +129,21 @@ def test_batched_ridge_direction_and_parameter_graph_compiles():
 @pytest.mark.parametrize("power", [1, 2, 3])
 def test_affine_bottleneck_weighted_operator_transport(power):
     torch.manual_seed(3)
-    model = nn.Sequential(nn.Linear(4, 2), nn.Tanh(), nn.Linear(2, 3), nn.Sigmoid(), nn.Linear(3, 1)).double()
+    model = nn.Sequential(
+        nn.Linear(4, 2), nn.Tanh(), nn.Linear(2, 3), nn.Sigmoid(), nn.Linear(3, 1)
+    ).double()
     x = torch.linspace(-0.2, 0.2, 4, dtype=torch.float64)
-    request = OperatorSpec.laplacian(power, planning_budget=OperatorPlanningBudget(max_graph_nodes=50_000))
+    request = OperatorSpec.laplacian(
+        power, planning_budget=OperatorPlanningBudget(max_graph_nodes=50_000)
+    )
     program = compile_operator(model, (x,), operator=request)
     reference = compile_operator(model, (x,), operator=request, strategy="reference")
     torch.testing.assert_close(program(x), reference(x), rtol=5e-10, atol=2e-12)
     assert any("bottleneck" in pattern for pattern in program.explain()["matched_patterns"])
     got = torch.autograd.grad(program(x).square().sum() + model(x).sum(), tuple(model.parameters()))
-    want = torch.autograd.grad(reference(x).square().sum() + model(x).sum(), tuple(model.parameters()))
+    want = torch.autograd.grad(
+        reference(x).square().sum() + model(x).sum(), tuple(model.parameters())
+    )
     for a, b in zip(got, want, strict=True):
         torch.testing.assert_close(a, b, rtol=2e-9, atol=1e-11)
 
@@ -147,12 +158,14 @@ def test_factorized_ridge_metric_and_dynamic_weights():
     with torch.no_grad():
         model[0].weight.add_(0.1)
     assert not torch.equal(value, program(x))
+
     # Independent nested Hessians include the changed, live parameters.
     def scalar(v):
         return model(v).sum()
 
     def lap(v):
         return torch.func.hessian(scalar)(v).trace()
+
     expected = torch.func.hessian(lap)(x).trace()
     torch.testing.assert_close(program(x).squeeze(), expected, rtol=2e-11, atol=1e-12)
 
@@ -162,13 +175,21 @@ def test_factorized_ridge_metric_and_dynamic_weights():
 def test_batch_coupling_is_hard_rejected(function, strategy):
     x = torch.ones(2, 3, dtype=torch.float64)
     with pytest.raises(JetCompileError, match="batch"):
-        compile_operator(Function(function), (x,), operator=OperatorSpec.mixed((1, 0, 0)), batch_ndim=1, strategy=strategy)
+        compile_operator(
+            Function(function),
+            (x,),
+            operator=OperatorSpec.mixed((1, 0, 0)),
+            batch_ndim=1,
+            strategy=strategy,
+        )
 
 
 @pytest.mark.parametrize("function", [lambda x: 2 + x, lambda x: 2 * x])
 def test_constant_left_arithmetic_preserves_batch(function):
     x = torch.ones(2, 3, dtype=torch.float64)
-    program = compile_operator(Function(function), (x,), operator=OperatorSpec.mixed((1, 0, 0)), batch_ndim=1)
+    program = compile_operator(
+        Function(function), (x,), operator=OperatorSpec.mixed((1, 0, 0)), batch_ndim=1
+    )
     expected = torch.zeros_like(x)
     expected[:, 0] = 1 if function(x)[0, 0] == 3 else 2
     torch.testing.assert_close(program(x), expected)
@@ -224,7 +245,12 @@ def test_coupled_operator_selects_apolar_with_live_parameter_gradients(power, st
 
     actual, expected = program(x), reference(x)
     torch.testing.assert_close(actual, expected, rtol=2e-11, atol=2e-12)
-    torch.testing.assert_close(torch.autograd.grad(actual, model.scale)[0], torch.autograd.grad(expected, model.scale)[0], rtol=2e-10, atol=2e-12)
+    torch.testing.assert_close(
+        torch.autograd.grad(actual, model.scale)[0],
+        torch.autograd.grad(expected, model.scale)[0],
+        rtol=2e-10,
+        atol=2e-12,
+    )
     assert program.explain()["selected_strategy"] == "apolar"
     assert program.explain()["coefficient_count"] == states
 
@@ -232,7 +258,13 @@ def test_coupled_operator_selects_apolar_with_live_parameter_gradients(power, st
 @pytest.mark.parametrize("point", [-0.2, 1.5])
 def test_bottleneck_softplus_source_options_match_nested_derivatives(point):
     torch.manual_seed(5)
-    model = nn.Sequential(nn.Linear(3, 1), nn.Softplus(beta=2, threshold=1), nn.Linear(1, 2), nn.Tanh(), nn.Linear(2, 1)).double()
+    model = nn.Sequential(
+        nn.Linear(3, 1),
+        nn.Softplus(beta=2, threshold=1),
+        nn.Linear(1, 2),
+        nn.Tanh(),
+        nn.Linear(2, 1),
+    ).double()
     with torch.no_grad():
         model[0].weight.fill_(1 / 3)
         model[0].bias.zero_()
@@ -248,11 +280,24 @@ def test_bottleneck_softplus_source_options_match_nested_derivatives(point):
 
 
 @pytest.mark.parametrize("strategy", ["auto", "reference"])
-@pytest.mark.parametrize("function", [lambda x: torch.cat((x, x), dim=0), lambda x: torch.stack((x, x), dim=0), lambda x: x.unbind(0)[0]])
+@pytest.mark.parametrize(
+    "function",
+    [
+        lambda x: torch.cat((x, x), dim=0),
+        lambda x: torch.stack((x, x), dim=0),
+        lambda x: x.unbind(0)[0],
+    ],
+)
 def test_batch_sequence_operations_are_hard_rejected(function, strategy):
     x = torch.ones(2, 3, dtype=torch.float64)
     with pytest.raises(JetCompileError, match="batch"):
-        compile_operator(Function(function), (x,), operator=OperatorSpec.mixed((1, 0, 0)), batch_ndim=1, strategy=strategy)
+        compile_operator(
+            Function(function),
+            (x,),
+            operator=OperatorSpec.mixed((1, 0, 0)),
+            batch_ndim=1,
+            strategy=strategy,
+        )
 
 
 def test_dynamic_batch_ridge_guards_and_output_shape():
@@ -266,8 +311,13 @@ def test_dynamic_batch_ridge_guards_and_output_shape():
 
     model = Ridge()
     x = torch.zeros(2, 3, dtype=torch.float64)
-    program = compile_operator(model, (x,), operator=OperatorSpec.mixed((1, 1, 0)), batch_ndim=1,
-                               dynamic_shapes=({0: torch.export.Dim("batch", min=1, max=8)},))
+    program = compile_operator(
+        model,
+        (x,),
+        operator=OperatorSpec.mixed((1, 1, 0)),
+        batch_ndim=1,
+        dynamic_shapes=({0: torch.export.Dim("batch", min=1, max=8)},),
+    )
     larger = torch.linspace(-0.2, 0.2, 15, dtype=torch.float64).reshape(5, 3)
     expected = torch.stack([mixed(model, row, (1, 1, 0)) for row in larger])
     torch.testing.assert_close(program(larger), expected)
@@ -279,7 +329,9 @@ def test_dynamic_batch_ridge_guards_and_output_shape():
 def test_polynomial_provider_opt_in_is_explicit_and_semantics_match_low_order():
     model = nn.Sequential(nn.Linear(2, 3), nn.Tanh(), nn.Linear(3, 1)).double()
     x = torch.tensor([0.1, -0.2], dtype=torch.float64)
-    program = compile_operator(model, (x,), operator=OperatorSpec.mixed((2, 1)), activation_method="polynomial")
+    program = compile_operator(
+        model, (x,), operator=OperatorSpec.mixed((2, 1)), activation_method="polynomial"
+    )
     torch.testing.assert_close(program(x).squeeze(), mixed(model, x, (2, 1)))
     assert program.explain()["polynomial_accuracy_note"]
 
@@ -289,7 +341,13 @@ def test_tracked_broadcast_cannot_shift_example_axis_into_coordinates(strategy):
     # B == D makes this legal broadcasting while nevertheless coupling rows.
     x = torch.ones(3, 3, dtype=torch.float64)
     with pytest.raises(JetCompileError, match="batch"):
-        compile_operator(Function(lambda v: v + v.sum(-1)), (x,), operator=OperatorSpec.mixed((1, 0, 0)), batch_ndim=1, strategy=strategy)
+        compile_operator(
+            Function(lambda v: v + v.sum(-1)),
+            (x,),
+            operator=OperatorSpec.mixed((1, 0, 0)),
+            batch_ndim=1,
+            strategy=strategy,
+        )
 
 
 @pytest.mark.parametrize("strategy", ["auto", "reference"])
@@ -297,7 +355,9 @@ def test_graph_emission_stops_at_resource_limit(strategy):
     model = nn.Sequential(nn.Linear(2, 3), nn.Tanh(), nn.Linear(3, 1)).double()
     request = OperatorSpec.mixed((8, 0), planning_budget=OperatorPlanningBudget(max_graph_nodes=50))
     with pytest.raises(JetCompileError, match="node budget.*during emission"):
-        compile_operator(model, (torch.ones(2, dtype=torch.float64),), operator=request, strategy=strategy)
+        compile_operator(
+            model, (torch.ones(2, dtype=torch.float64),), operator=request, strategy=strategy
+        )
 
 
 def test_polynomial_large_exact_weight_crosses_backend_boundary_as_float():
@@ -325,7 +385,9 @@ def test_zero_order_ridge_term_preserves_captured_gelu_primal():
 def test_unrepresentable_static_operator_weights_refuse(coefficient):
     request = OperatorSpec.polynomial({(1,): coefficient})
     with pytest.raises(JetCompileError, match="not representable.*binary64"):
-        compile_operator(Function(torch.sin), (torch.tensor([0.1], dtype=torch.float64),), operator=request)
+        compile_operator(
+            Function(torch.sin), (torch.tensor([0.1], dtype=torch.float64),), operator=request
+        )
 
 
 @pytest.mark.parametrize("reduction", ["sum", "mean"])
@@ -340,7 +402,11 @@ def test_tensorized_separable_subset_duplicate_branches_and_shared_parameters(re
         def forward(self, x):
             u = x * self.weight + self.bias
             branches = torch.tanh(u) + torch.sin(u) * torch.cos(x)
-            cut = branches.sum(-1, keepdim=True) if reduction == "sum" else branches.mean(-1, keepdim=True)
+            cut = (
+                branches.sum(-1, keepdim=True)
+                if reduction == "sum"
+                else branches.mean(-1, keepdim=True)
+            )
             return torch.sin(cut * self.weight) * torch.exp(cut) + self.bias
 
     model = Separable()
@@ -367,7 +433,20 @@ def test_separable_vector_fastpath_refuses_spatial_bypass():
 _OutputPair = namedtuple("OperatorOutputPair", ["first", "second"])
 
 
-@pytest.mark.parametrize("kind", ["ordered", "default", "named"])
+@pytest.mark.parametrize(
+    "kind",
+    [
+        "ordered",
+        pytest.param(
+            "default",
+            marks=pytest.mark.skipif(
+                tuple(int(v) for v in torch.__version__.split("+")[0].split(".")[:2]) < (2, 10),
+                reason="Dynamo before PyTorch 2.10 graph-breaks on defaultdict outputs (capture, not omnibias, refuses)",
+            ),
+        ),
+        "named",
+    ],
+)
 def test_reference_preserves_keyed_output_container_types(kind):
     def formula(x):
         first, second = torch.softmax(x, dim=-1), torch.sin(x)
@@ -379,11 +458,15 @@ def test_reference_preserves_keyed_output_container_types(kind):
 
     model = Function(formula)
     x = torch.tensor([0.1, -0.2], dtype=torch.float64)
-    program = compile_operator(model, (x,), operator=OperatorSpec.mixed((1, 1)), strategy="reference")
+    program = compile_operator(
+        model, (x,), operator=OperatorSpec.mixed((1, 1)), strategy="reference"
+    )
     result = program(x)
     expected = torch.func.jacfwd(torch.func.jacrev(lambda v: torch.softmax(v, dim=-1)))(x)[:, 0, 1]
     assert type(result) is type(model(x))
-    first, second = (result.first, result.second) if kind == "named" else (result["first"], result["second"])
+    first, second = (
+        (result.first, result.second) if kind == "named" else (result["first"], result["second"])
+    )
     torch.testing.assert_close(first, expected)
     torch.testing.assert_close(second, torch.zeros_like(x))
     if kind == "default":
@@ -392,7 +475,9 @@ def test_reference_preserves_keyed_output_container_types(kind):
 
 def test_flat_guard_fastpath_retains_argument_dtype_rank_and_dimension_checks():
     x = torch.ones(2, 3, dtype=torch.float64)
-    program = compile_operator(Function(torch.sin), (x,), operator=OperatorSpec.mixed((1, 0, 0)), batch_ndim=1)
+    program = compile_operator(
+        Function(torch.sin), (x,), operator=OperatorSpec.mixed((1, 0, 0)), batch_ndim=1
+    )
     with pytest.raises(JetCompileError, match="tree"):
         program({"value": x})
     with pytest.raises(JetCompileError, match="tree"):
@@ -413,8 +498,13 @@ def test_flat_guard_fastpath_retains_shared_dynamic_batch_constraints():
     x = torch.ones(2, 3, dtype=torch.float64)
     scale = torch.ones(2, 1, dtype=torch.float64)
     batch = torch.export.Dim("shared_batch", min=1, max=6)
-    program = compile_operator(Scaled(), (x, scale), operator=OperatorSpec.mixed((1, 0, 0)), batch_ndim=1,
-                               dynamic_shapes=({0: batch}, {0: batch}))
+    program = compile_operator(
+        Scaled(),
+        (x, scale),
+        operator=OperatorSpec.mixed((1, 0, 0)),
+        batch_ndim=1,
+        dynamic_shapes=({0: batch}, {0: batch}),
+    )
     larger = torch.ones(3, 3, dtype=torch.float64)
     result = program(larger, torch.ones(3, 1, dtype=torch.float64))
     expected = torch.zeros_like(larger)
@@ -440,7 +530,10 @@ def test_ridge_terminal_shape_replay_drops_unused_primal_readout_bias():
     program = compile_operator(model, (x,), operator=OperatorSpec.mixed((1, 1)), batch_ndim=1)
     expected = torch.stack([mixed(model, row, (1, 1)) for row in x]).unsqueeze(-1)
     torch.testing.assert_close(program(x), expected)
-    assert not any(node.op == "get_attr" and str(node.target).endswith("layers.2.bias") for node in program.graph_module.graph.nodes)
+    assert not any(
+        node.op == "get_attr" and str(node.target).endswith("layers.2.bias")
+        for node in program.graph_module.graph.nodes
+    )
     assert tuple(program.parameters())[-1] is model.layers[-1].bias
 
 
@@ -452,7 +545,9 @@ def test_operator_call_preserves_original_parameter_and_module_backward_hooks():
     expected = torch.autograd.grad(program(x).sum(), weight)[0]
     backward_events = []
     parameter_hook = weight.register_hook(lambda gradient: gradient * 2)
-    module_hook = program.register_full_backward_hook(lambda module, inputs, outputs: backward_events.append((inputs, outputs)))
+    module_hook = program.register_full_backward_hook(
+        lambda module, inputs, outputs: backward_events.append((inputs, outputs))
+    )
     try:
         program(x).sum().backward()
     finally:

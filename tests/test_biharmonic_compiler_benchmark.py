@@ -40,7 +40,8 @@ def test_independent_ridge_reference_matches_closed_fourth_derivative():
 
 
 def test_timeout_preserves_completed_forward_checkpoint(monkeypatch):
-    args = benchmark.parser().parse_args(["--timeout", "0.1"])
+    # The worker prints at once and then sleeps 5 s; the budget must exceed interpreter start-up on a loaded host.
+    args = benchmark.parser().parse_args(["--timeout", "2.5"])
     script = "import time; print('BIHARMONIC_PROGRESS={\"evaluation\":{\"median_ms\":1.25}}', flush=True); time.sleep(5)"
     monkeypatch.setattr(benchmark, "worker_command", lambda *args: [sys.executable, "-c", script])
     result = benchmark.run_case(args, "packed", 2)

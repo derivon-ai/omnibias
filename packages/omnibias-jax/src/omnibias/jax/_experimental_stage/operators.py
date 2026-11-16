@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Bounded supplied constant-coefficient operators for the captured factories."""
 import math
 from fractions import Fraction

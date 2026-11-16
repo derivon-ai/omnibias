@@ -68,7 +68,8 @@ def test_ratios_require_all_accuracy_gated_fresh_processes_and_samples():
 
 
 def test_timeout_retains_completed_stage_without_success(monkeypatch):
-    args = benchmark.parser().parse_args(["--timeout", "0.2"])
+    # The worker prints at once and then sleeps 5 s; the budget must exceed interpreter start-up on a loaded host.
+    args = benchmark.parser().parse_args(["--timeout", "2.5"])
     row = {"family": "ridge", "order": 2, "method": "compiler", "completed_stage": "forward_accuracy"}
     script = "import time; print(" + repr(benchmark.PROGRESS+json.dumps(row)) + ", flush=True); time.sleep(5)"
     monkeypatch.setattr(benchmark, "worker_command", lambda *args: [sys.executable, "-c", script])

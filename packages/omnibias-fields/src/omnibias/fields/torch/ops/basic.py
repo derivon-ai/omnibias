@@ -17,6 +17,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import torch
+from omnibias.fields.torch.ops._planned import routed as _routed
 from torch import Tensor
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -241,6 +242,10 @@ def divergence(state: FieldState, names: tuple[str, ...]) -> Tensor:
             f"divergence: number of components {len(names)} must equal "
             f"number of spatial axes {len(sa)} ({sa!r})"
         )
+    if _is_jet_mlp(state):
+        planned = _routed(state, tuple(names), "divergence")
+        if planned is not None:
+            return planned
     out = None
     for n, a in zip(names, sa, strict=False):
         d = derivative(state, n, axis=a, order=1)
@@ -269,6 +274,9 @@ def laplacian(
         sigma_pp = _sigma_of_order(state, 2)
         return state.field.laplacian(sigma_pp, name)
     if axes is None and _is_jet_mlp(state):
+        planned = _routed(state, (name,), "laplacian")
+        if planned is not None:  # the field opted in to the planner (see fields._core.planned)
+            return planned
         # Fast-path: the spatial trace of the Hessian block of a single jet.
         return state.field.laplacian(state, name)  # type: ignore[attr-defined]
     # Fallback: sum of pure 2nd partials along the requested axes.

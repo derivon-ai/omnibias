@@ -27,6 +27,8 @@ jobs:
       - run: uv run --no-sync python scripts/license_headers.py --check
       - run: uv run --no-sync python scripts/generate_inventory.py --check
       - run: uv run --no-sync python scripts/generate_capability_evidence.py --check
+      - run: uv run --no-sync python scripts/build_full_scope.py --check
+      - run: uv run --no-sync python scripts/build_regime_guide.py --check
       - run: uv run --no-sync python scripts/check_agent_context.py
       - run: uv run --no-sync python scripts/check_package_presentation.py
       - name: Bounded benchmark pipeline (independent numerical references)

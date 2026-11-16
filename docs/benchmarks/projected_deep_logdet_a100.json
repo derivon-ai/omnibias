@@ -1,0 +1,6321 @@
+{
+ "schema": "omnibias-benchmark/projected-deep-logdet-a100/v1",
+ "what": "float64 exact Jacobian log-determinants of residual blocks x + s(x), s(x) = W_L tanh(W_n ... tanh(W_1 x + b_1) ...) + b_L with every weight rescaled to spectral norm 0.9 (identical rescaling for every method), at B points: forward = objective values; vg = objective and its gradient w.r.t. every weight and bias. Candidate = omnibias.jax.experimental.projected_logdet.projected_deep_logdet: det(I_D + W_L A W_1) = det(I_H + A C) (Sylvester), with A C carried as H_n columns through the hidden layers and one H_n x H_n LU per point instead of the D x D Jacobian and its LU. The cell with D < H is a control where the candidate forms the D x D Jacobian; full-input methods are run where B D^2 <= 2e9 and B D^3 <= 4e12",
+ "hardware": "one NVIDIA A100-SXM4-80GB (exclusive), JAX 0.10.2 with jaxlib 0.10.2 CUDA 12 plugins, CPython 3.12",
+ "protocol": {
+  "precision": "float64",
+  "repetitions": "3 fresh processes (paired by repetition, rotating method order)",
+  "warmups": 3,
+  "samples": 51,
+  "statistic": "ratio = strongest-control median / candidate median per tier; lower95 = exp(mean(log r) - 2.920 sd(log r)/sqrt(3)); strongest control = smallest mean log median among qualified tier members",
+  "qualification": "every method's forward and vg programs on a reduced instance (width 4, B = 2, D_q = min(D, 12) > 4 so the projection is active, seed + 1) vs a 50-digit oracle (the full D x D Jacobian as a product of matrices and its determinant, no projection; objective derivatives along two fixed random parameter directions by central differences in 50 digits): values and objective 1e-9 / 2e-10, directional derivatives 1e-8 / 2e-9 (scaled); full-size outputs finite and digest-checked",
+  "status": {
+   "significant_2x": "lower95 >= 2",
+   "lower95_ge_1": "1 <= lower95 < 2",
+   "parity": "lower95 < 1 <= ratio or ratio < 1 <= upper bound",
+   "loss": "candidate slower with confidence",
+   "partial": "an applicable tier member failed (e.g. out of memory) or did not qualify; never promoted",
+   "suppressed": "no applicable tier member ran"
+  },
+  "fairness": "identical data, initialisation, loss and float64 inputs for every method; compilation excluded (value-and-gradient steady state)",
+  "worker_timeout_s": 1200
+ },
+ "tiers": {
+  "projected_generic": "the same Sylvester identity through jax.jvp: H_n JVPs of z_1 -> a_n along the columns of C = W_1 W_L per point, then slogdet(I + A C); isolates the closed-form recursion from the identity",
+  "full_input_recursion": "the D x D Jacobian by the forward recursion seeded with the D columns of W_1, then slogdet(I_D + J): the strongest full-input exact program; B D^2 <= 2e9 and B D^3 <= 4e12",
+  "autodiff_jacobian": "jax.jacfwd or jax.jacrev of s per point, vmapped, then slogdet(I_D + J); same limits"
+ },
+ "roles": {
+  "held_out": "cells, operators and seed not used for any tuning"
+ },
+ "aggregates": [
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_gt_H_forward",
+   "candidate": "projected_deep_logdet",
+   "tier": "autodiff_jacobian",
+   "cells": 14,
+   "input_dims": [
+    160,
+    384,
+    768,
+    1536,
+    2048,
+    3072,
+    6144
+   ],
+   "significant_2x": 14,
+   "geomean_ratio_complete_tiers": 68.10782920515295,
+   "ratio_range_complete_tiers": [
+    3.4069592467241665,
+    1229.3760692205653
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_gt_H_forward",
+   "candidate": "projected_deep_logdet",
+   "tier": "full_input_recursion",
+   "cells": 14,
+   "input_dims": [
+    160,
+    384,
+    768,
+    1536,
+    2048,
+    3072,
+    6144
+   ],
+   "significant_2x": 14,
+   "geomean_ratio_complete_tiers": 68.24944499300632,
+   "ratio_range_complete_tiers": [
+    3.4141185100578024,
+    1236.552899523415
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_gt_H_forward",
+   "candidate": "projected_deep_logdet",
+   "tier": "projected_generic",
+   "cells": 22,
+   "input_dims": [
+    160,
+    384,
+    768,
+    1536,
+    2048,
+    3072,
+    6144,
+    12288,
+    24576,
+    49152,
+    98304
+   ],
+   "loss": 9,
+   "lower95_ge_1": 5,
+   "parity": 8,
+   "geomean_ratio_complete_tiers": 1.0038864995035415,
+   "ratio_range_complete_tiers": [
+    0.9042960666927061,
+    1.0451395473305891
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_gt_H_vg",
+   "candidate": "projected_deep_logdet",
+   "tier": "autodiff_jacobian",
+   "cells": 14,
+   "input_dims": [
+    160,
+    384,
+    768,
+    1536,
+    2048,
+    3072,
+    6144
+   ],
+   "significant_2x": 14,
+   "geomean_ratio_complete_tiers": 63.1311307411815,
+   "ratio_range_complete_tiers": [
+    4.184046333624683,
+    752.6390593206718
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_gt_H_vg",
+   "candidate": "projected_deep_logdet",
+   "tier": "full_input_recursion",
+   "cells": 14,
+   "input_dims": [
+    160,
+    384,
+    768,
+    1536,
+    2048,
+    3072,
+    6144
+   ],
+   "significant_2x": 14,
+   "geomean_ratio_complete_tiers": 63.099102493108134,
+   "ratio_range_complete_tiers": [
+    4.219211391354558,
+    755.7439613834601
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_gt_H_vg",
+   "candidate": "projected_deep_logdet",
+   "tier": "projected_generic",
+   "cells": 22,
+   "input_dims": [
+    160,
+    384,
+    768,
+    1536,
+    2048,
+    3072,
+    6144,
+    12288,
+    24576,
+    49152,
+    98304
+   ],
+   "loss": 6,
+   "lower95_ge_1": 6,
+   "parity": 10,
+   "geomean_ratio_complete_tiers": 1.02172129765984,
+   "ratio_range_complete_tiers": [
+    0.9367825858494941,
+    1.0840670797780185
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_le_H_control_forward",
+   "candidate": "projected_deep_logdet",
+   "tier": "autodiff_jacobian",
+   "cells": 2,
+   "input_dims": [
+    48
+   ],
+   "parity": 2,
+   "geomean_ratio_complete_tiers": 1.009793092115774,
+   "ratio_range_complete_tiers": [
+    1.0093283100212433,
+    1.0102580882362002
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_le_H_control_forward",
+   "candidate": "projected_deep_logdet",
+   "tier": "full_input_recursion",
+   "cells": 2,
+   "input_dims": [
+    48
+   ],
+   "parity": 2,
+   "geomean_ratio_complete_tiers": 1.0659089955020042,
+   "ratio_range_complete_tiers": [
+    1.038500637573831,
+    1.0940407213869598
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_le_H_control_forward",
+   "candidate": "projected_deep_logdet",
+   "tier": "projected_generic",
+   "cells": 2,
+   "input_dims": [
+    48
+   ],
+   "lower95_ge_1": 2,
+   "geomean_ratio_complete_tiers": 2.0585251246130007,
+   "ratio_range_complete_tiers": [
+    1.9752602840073157,
+    2.145299899447214
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_le_H_control_vg",
+   "candidate": "projected_deep_logdet",
+   "tier": "autodiff_jacobian",
+   "cells": 2,
+   "input_dims": [
+    48
+   ],
+   "parity": 2,
+   "geomean_ratio_complete_tiers": 1.0387697109994096,
+   "ratio_range_complete_tiers": [
+    1.0302770428059123,
+    1.0473323850360428
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_le_H_control_vg",
+   "candidate": "projected_deep_logdet",
+   "tier": "full_input_recursion",
+   "cells": 2,
+   "input_dims": [
+    48
+   ],
+   "loss": 1,
+   "lower95_ge_1": 1,
+   "geomean_ratio_complete_tiers": 0.9755115831593038,
+   "ratio_range_complete_tiers": [
+    0.9367734336523279,
+    1.0158516613432853
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "residual_mlp_block_D_le_H_control_vg",
+   "candidate": "projected_deep_logdet",
+   "tier": "projected_generic",
+   "cells": 2,
+   "input_dims": [
+    48
+   ],
+   "lower95_ge_1": 1,
+   "significant_2x": 1,
+   "geomean_ratio_complete_tiers": 2.23903146791842,
+   "ratio_range_complete_tiers": [
+    2.1853529143275057,
+    2.294028521188137
+   ]
+  }
+ ],
+ "reproduction": [
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 12288,
+    "H": 64,
+    "depth": 2,
+    "B": 16
+   },
+   "package_over_benchmark_program_time": 0.9600245861409391
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 12288,
+    "H": 64,
+    "depth": 2,
+    "B": 16
+   },
+   "package_over_benchmark_program_time": 1.0083251641633701
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 12288,
+    "H": 64,
+    "depth": 2,
+    "B": 16
+   },
+   "package_over_benchmark_program_time": 0.9927499532453209
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 12288,
+    "H": 64,
+    "depth": 2,
+    "B": 16
+   },
+   "package_over_benchmark_program_time": 0.9546316841409916
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64
+   },
+   "package_over_benchmark_program_time": 1.0009905281801035
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64
+   },
+   "package_over_benchmark_program_time": 0.9767249591114145
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64
+   },
+   "package_over_benchmark_program_time": 1.0152127890839295
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64
+   },
+   "package_over_benchmark_program_time": 0.9755181075306442
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024
+   },
+   "package_over_benchmark_program_time": 0.9966982661791498
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024
+   },
+   "package_over_benchmark_program_time": 1.0029938569362835
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024
+   },
+   "package_over_benchmark_program_time": 0.992703882476165
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024
+   },
+   "package_over_benchmark_program_time": 1.0139448043245372
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32
+   },
+   "package_over_benchmark_program_time": 0.9966610929773106
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32
+   },
+   "package_over_benchmark_program_time": 0.9885898517960002
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32
+   },
+   "package_over_benchmark_program_time": 0.9909297040279844
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32
+   },
+   "package_over_benchmark_program_time": 0.999667819639681
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 24576,
+    "H": 96,
+    "depth": 4,
+    "B": 16
+   },
+   "package_over_benchmark_program_time": 1.0077385442776143
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 24576,
+    "H": 96,
+    "depth": 4,
+    "B": 16
+   },
+   "package_over_benchmark_program_time": 0.9857259633462487
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 24576,
+    "H": 96,
+    "depth": 4,
+    "B": 16
+   },
+   "package_over_benchmark_program_time": 0.9464422653084638
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 24576,
+    "H": 96,
+    "depth": 4,
+    "B": 16
+   },
+   "package_over_benchmark_program_time": 0.9546509353786853
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32
+   },
+   "package_over_benchmark_program_time": 0.9440430084369172
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32
+   },
+   "package_over_benchmark_program_time": 0.9531142191142192
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32
+   },
+   "package_over_benchmark_program_time": 1.0137246405941607
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32
+   },
+   "package_over_benchmark_program_time": 1.019355898178357
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 1.0018830890206905
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.9813219589043686
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.9995406133220579
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 1.0043659849266684
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048
+   },
+   "package_over_benchmark_program_time": 0.9931802682427825
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048
+   },
+   "package_over_benchmark_program_time": 1.1303558521429065
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048
+   },
+   "package_over_benchmark_program_time": 0.9047595380662161
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048
+   },
+   "package_over_benchmark_program_time": 0.966786375350934
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 49152,
+    "H": 128,
+    "depth": 1,
+    "B": 8
+   },
+   "package_over_benchmark_program_time": 0.9468162464522547
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 49152,
+    "H": 128,
+    "depth": 1,
+    "B": 8
+   },
+   "package_over_benchmark_program_time": 1.0135178778238303
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 49152,
+    "H": 128,
+    "depth": 1,
+    "B": 8
+   },
+   "package_over_benchmark_program_time": 0.9886603238301795
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 49152,
+    "H": 128,
+    "depth": 1,
+    "B": 8
+   },
+   "package_over_benchmark_program_time": 0.9690145972671544
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8
+   },
+   "package_over_benchmark_program_time": 0.9993359458807761
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8
+   },
+   "package_over_benchmark_program_time": 0.9669446820903945
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8
+   },
+   "package_over_benchmark_program_time": 0.9532752484015031
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8
+   },
+   "package_over_benchmark_program_time": 1.00068608007957
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256
+   },
+   "package_over_benchmark_program_time": 1.0103640405673997
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256
+   },
+   "package_over_benchmark_program_time": 0.9625822216045952
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256
+   },
+   "package_over_benchmark_program_time": 1.0071292212957648
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256
+   },
+   "package_over_benchmark_program_time": 0.9515606761851576
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 98304,
+    "H": 160,
+    "depth": 3,
+    "B": 4
+   },
+   "package_over_benchmark_program_time": 1.012251862272965
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 98304,
+    "H": 160,
+    "depth": 3,
+    "B": 4
+   },
+   "package_over_benchmark_program_time": 0.9820544527864189
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 98304,
+    "H": 160,
+    "depth": 3,
+    "B": 4
+   },
+   "package_over_benchmark_program_time": 0.9490298650274915
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 98304,
+    "H": 160,
+    "depth": 3,
+    "B": 4
+   },
+   "package_over_benchmark_program_time": 0.9396235141087992
+  }
+ ],
+ "rows": [
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 12288,
+    "H": 64,
+    "depth": 2,
+    "B": 16,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.418588,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.419498,
+   "speed_ratio": 0.9915924577121084,
+   "lower95": 0.9454174615044052
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 12288,
+    "H": 64,
+    "depth": 2,
+    "B": 16,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.409378,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.407219,
+   "speed_ratio": 0.9988197199500727,
+   "lower95": 0.991566700086176
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 12288,
+    "H": 64,
+    "depth": 2,
+    "B": 16,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.727236,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.736937,
+   "speed_ratio": 1.062884860045843,
+   "lower95": 0.9273075116180551
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 12288,
+    "H": 64,
+    "depth": 2,
+    "B": 16,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.789047,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.815836,
+   "speed_ratio": 1.0401197235178188,
+   "lower95": 1.0011456091479742
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.182358,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 120.118315,
+   "speed_ratio": 101.73898546878183,
+   "lower95": 101.3738473175572
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.195568,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 121.210187,
+   "speed_ratio": 101.61909875973627,
+   "lower95": 99.9081764692245
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.517146,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 187.10215,
+   "speed_ratio": 74.21277029269523,
+   "lower95": 73.51717946730186
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.542646,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 187.33238,
+   "speed_ratio": 73.68275027119566,
+   "lower95": 73.22087109848098
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.182358,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 120.057335,
+   "speed_ratio": 101.57117540457364,
+   "lower95": 101.36865241098256
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.195568,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 119.929395,
+   "speed_ratio": 100.49046067857951,
+   "lower95": 99.1635249092894
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.517146,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 187.55331,
+   "speed_ratio": 74.49229129047288,
+   "lower95": 73.69048932339913
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.542646,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 187.70539,
+   "speed_ratio": 73.88073417829344,
+   "lower95": 73.35255560560896
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.182358,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.170658,
+   "speed_ratio": 0.9925496359331079,
+   "lower95": 0.9835265066203809
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.195568,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.193419,
+   "speed_ratio": 0.9999280597977396,
+   "lower95": 0.9821856553364254
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.517146,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 2.503023,
+   "speed_ratio": 0.9367825858494941,
+   "lower95": 0.7906874296713722
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 1536,
+    "H": 160,
+    "depth": 3,
+    "B": 64,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.542646,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 2.558015,
+   "speed_ratio": 1.009818723692903,
+   "lower95": 0.9936412906765483
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.580494,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 15.443587,
+   "speed_ratio": 4.410429495803042,
+   "lower95": 4.109820591570051
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.304919,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 7.966267,
+   "speed_ratio": 3.4187390928945516,
+   "lower95": 3.3605852187305665
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.698225,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 15.554828,
+   "speed_ratio": 4.219211391354558,
+   "lower95": 4.164329972044148
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.307493,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 7.883602,
+   "speed_ratio": 3.4141185100578024,
+   "lower95": 3.3941195325427103
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.580494,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 15.327741,
+   "speed_ratio": 4.365146936644697,
+   "lower95": 4.044340967462737
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.304919,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 7.892097,
+   "speed_ratio": 3.4069592467241665,
+   "lower95": 3.3393082070825852
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.698225,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 15.420066,
+   "speed_ratio": 4.184046333624683,
+   "lower95": 4.140297824573694
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.307493,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 7.93096,
+   "speed_ratio": 3.4706153082178077,
+   "lower95": 3.367553236310593
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.580494,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 3.725466,
+   "speed_ratio": 1.0644413578022134,
+   "lower95": 0.9926530584040777
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.304919,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 2.322488,
+   "speed_ratio": 0.9986484861783281,
+   "lower95": 0.9667924706605557
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.698225,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 3.742138,
+   "speed_ratio": 1.0127741779246529,
+   "lower95": 1.0075373972272657
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 160,
+    "H": 64,
+    "depth": 2,
+    "B": 1024,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.307493,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 2.27343,
+   "speed_ratio": 0.9898805820457068,
+   "lower95": 0.9692675898765585
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.878157,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 234.111911,
+   "speed_ratio": 128.3441692725863,
+   "lower95": 116.1451212350028
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.207027,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 304.168551,
+   "speed_ratio": 94.72457451146794,
+   "lower95": 94.3782193861575
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.892319,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 233.311001,
+   "speed_ratio": 123.35404075661566,
+   "lower95": 123.0278301128826
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.156874,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 303.152134,
+   "speed_ratio": 95.81243118528111,
+   "lower95": 94.59705517354489
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.878157,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 232.54982,
+   "speed_ratio": 127.45427102312865,
+   "lower95": 115.21251005478626
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.207027,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 301.983184,
+   "speed_ratio": 94.06121213613513,
+   "lower95": 93.67551306508541
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.892319,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 233.399444,
+   "speed_ratio": 123.38638159964734,
+   "lower95": 123.08752367976938
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.156874,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 303.771013,
+   "speed_ratio": 96.01747637479191,
+   "lower95": 94.82528698749452
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.878157,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.864256,
+   "speed_ratio": 1.0251364576872426,
+   "lower95": 0.9319905141052214
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.207027,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 3.247167,
+   "speed_ratio": 1.010876461736953,
+   "lower95": 1.0071877892305854
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.892319,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.893519,
+   "speed_ratio": 1.0006140996753086,
+   "lower95": 0.9927521183145929
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 2048,
+    "H": 256,
+    "depth": 2,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.156874,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 3.202761,
+   "speed_ratio": 1.012841058378081,
+   "lower95": 0.9954436662608195
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 24576,
+    "H": 96,
+    "depth": 4,
+    "B": 16,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.200919,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.213832,
+   "speed_ratio": 1.0048306650734,
+   "lower95": 0.9810077944231353
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 24576,
+    "H": 96,
+    "depth": 4,
+    "B": 16,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.602939,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.624521,
+   "speed_ratio": 1.0255359754946025,
+   "lower95": 0.9960392825474477
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 24576,
+    "H": 96,
+    "depth": 4,
+    "B": 16,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.626965,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.645678,
+   "speed_ratio": 1.0189896001216776,
+   "lower95": 0.9199321832083885
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 24576,
+    "H": 96,
+    "depth": 4,
+    "B": 16,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.342349,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.363582,
+   "speed_ratio": 0.9935698119980524,
+   "lower95": 0.8998127146879252
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.279959,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 930.737956,
+   "speed_ratio": 731.8833964948291,
+   "lower95": 712.0776925316762
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.613329,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 753.385842,
+   "speed_ratio": 1229.2059418921392,
+   "lower95": 1225.5501690510218
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.230609,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 930.082484,
+   "speed_ratio": 755.7439613834601,
+   "lower95": 740.6416552770647
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.60832,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 753.486876,
+   "speed_ratio": 1236.552899523415,
+   "lower95": 1208.9716013815753
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.279959,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 922.356691,
+   "speed_ratio": 725.3737535200984,
+   "lower95": 705.6153567354648
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.613329,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 746.219599,
+   "speed_ratio": 1217.6091270402326,
+   "lower95": 1215.0479882275633
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.230609,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 923.233918,
+   "speed_ratio": 752.6390593206718,
+   "lower95": 730.7797017940483
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.60832,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 746.899431,
+   "speed_ratio": 1229.3760692205653,
+   "lower95": 1211.2445153007873
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.279959,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.341169,
+   "speed_ratio": 0.9839085332717585,
+   "lower95": 0.8199487613898627
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.613329,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.633339,
+   "speed_ratio": 1.0377578755173928,
+   "lower95": 1.022555519380837
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.230609,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.222659,
+   "speed_ratio": 0.9997781366690276,
+   "lower95": 0.9686807996490168
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 3072,
+    "H": 96,
+    "depth": 5,
+    "B": 32,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.60832,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.629519,
+   "speed_ratio": 1.0344525354812366,
+   "lower95": 1.0336430858909813
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.938417,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 43.978585,
+   "speed_ratio": 9.154850706310574,
+   "lower95": 8.430836113333749
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.930294,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 44.19226,
+   "speed_ratio": 9.436033179357464,
+   "lower95": 8.084192919316239
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.569638,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 20.358601,
+   "speed_ratio": 7.949329133939881,
+   "lower95": 7.854217200825847
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.571195,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 20.36591,
+   "speed_ratio": 7.933604868560943,
+   "lower95": 7.792467551184274
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.938417,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 44.710138,
+   "speed_ratio": 9.30820520966195,
+   "lower95": 8.593725847228868
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.930294,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 44.567599,
+   "speed_ratio": 9.491602733835759,
+   "lower95": 8.18347322285085
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.569638,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 20.216373,
+   "speed_ratio": 7.896682830208369,
+   "lower95": 7.830337186394164
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.571195,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 20.264293,
+   "speed_ratio": 7.905171613583321,
+   "lower95": 7.714276809433765
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.938417,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 4.902719,
+   "speed_ratio": 1.022965064051427,
+   "lower95": 0.9444661702866044
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.930294,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 5.055269,
+   "speed_ratio": 1.0763733810713065,
+   "lower95": 0.9302521926843769
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.569638,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 2.505855,
+   "speed_ratio": 0.9780115262011986,
+   "lower95": 0.9612078516211873
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 384,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.571195,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 2.470698,
+   "speed_ratio": 0.9042960666927061,
+   "lower95": 0.7595742424473184
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.06317,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 4.059361,
+   "speed_ratio": 1.038500637573831,
+   "lower95": 0.8284177875650068
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 6.794959,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 6.054034,
+   "speed_ratio": 0.9367734336523279,
+   "lower95": 0.7649614616074801
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.659043,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 4.049873,
+   "speed_ratio": 1.0940407213869598,
+   "lower95": 0.9411689172480697
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 6.113114,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 6.249436,
+   "speed_ratio": 1.0158516613432853,
+   "lower95": 1.0040915303949822
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.06317,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 3.970909,
+   "speed_ratio": 1.0093283100212433,
+   "lower95": 0.8035571781976891
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 6.794959,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 6.774078,
+   "speed_ratio": 1.0302770428059123,
+   "lower95": 0.8983495301465011
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.659043,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 3.973187,
+   "speed_ratio": 1.0102580882362002,
+   "lower95": 0.9092371298613325
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 6.113114,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 6.4012,
+   "speed_ratio": 1.0473323850360428,
+   "lower95": 0.8170167446420534
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 4.06317,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 8.759181,
+   "speed_ratio": 2.145299899447214,
+   "lower95": 1.5732303582568485
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 6.794959,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 14.487235,
+   "speed_ratio": 2.1853529143275057,
+   "lower95": 1.9635637237800967
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.659043,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 7.296921,
+   "speed_ratio": 1.9752602840073157,
+   "lower95": 1.6755538114346726
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 48,
+    "H": 96,
+    "depth": 3,
+    "B": 2048,
+    "projection_applies": false
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 6.113114,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 14.673734,
+   "speed_ratio": 2.294028521188137,
+   "lower95": 2.007636742270693
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 49152,
+    "H": 128,
+    "depth": 1,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.854137,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.933129,
+   "speed_ratio": 1.0505845894019743,
+   "lower95": 0.8631430424943211
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 49152,
+    "H": 128,
+    "depth": 1,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.660121,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.651681,
+   "speed_ratio": 0.9951241894799768,
+   "lower95": 0.9779853093270094
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 49152,
+    "H": 128,
+    "depth": 1,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.949978,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.925392,
+   "speed_ratio": 0.9747357312104161,
+   "lower95": 0.9152160351141987
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 49152,
+    "H": 128,
+    "depth": 1,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.889005,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.904092,
+   "speed_ratio": 1.0084574906056454,
+   "lower95": 0.9955680414408786
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.105357,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 584.154002,
+   "speed_ratio": 294.37794677027716,
+   "lower95": 246.38201746114905
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.328026,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 302.620862,
+   "speed_ratio": 226.5249022613184,
+   "lower95": 221.3838942133385
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.161646,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 583.867081,
+   "speed_ratio": 268.3779740679121,
+   "lower95": 259.38042965522453
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.319993,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 302.810842,
+   "speed_ratio": 229.79397244244242,
+   "lower95": 228.18726510647778
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.105357,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 586.630685,
+   "speed_ratio": 295.5927361336446,
+   "lower95": 247.33336302661667
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.328026,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 302.582129,
+   "speed_ratio": 226.5565487777024,
+   "lower95": 222.32488428688515
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.161646,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 586.357108,
+   "speed_ratio": 269.05988441386904,
+   "lower95": 260.07501169586226
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.319993,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 303.842671,
+   "speed_ratio": 230.61076102349617,
+   "lower95": 228.99234039079624
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.105357,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 2.147486,
+   "speed_ratio": 1.0840670797780185,
+   "lower95": 0.9075876608009917
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.328026,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.343601,
+   "speed_ratio": 1.010217773113391,
+   "lower95": 1.0023883021173543
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.161646,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 2.19336,
+   "speed_ratio": 1.0179814720238483,
+   "lower95": 1.0111405923171366
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 6144,
+    "H": 192,
+    "depth": 3,
+    "B": 8,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.319993,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.355542,
+   "speed_ratio": 1.0250191262013864,
+   "lower95": 1.0164333802481949
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.832153,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 58.254835,
+   "speed_ratio": 69.81792297083715,
+   "lower95": 69.47738312671665
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.831209,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 58.155771,
+   "speed_ratio": 71.48106508330163,
+   "lower95": 66.78046276527132
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.573723,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 106.821032,
+   "speed_ratio": 67.74312936426766,
+   "lower95": 66.42282907693449
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "full_input_recursion",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.588052,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "seed_full",
+   "strongest_control_median_ms": 107.175076,
+   "speed_ratio": 67.15968967267253,
+   "lower95": 65.27788287637881
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.832153,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 58.285557,
+   "speed_ratio": 69.86670046772768,
+   "lower95": 69.47753104309433
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.831209,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacrev",
+   "strongest_control_median_ms": 58.146239,
+   "speed_ratio": 71.38272316189614,
+   "lower95": 66.5838654649524
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.573723,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 107.066109,
+   "speed_ratio": 67.89789272776156,
+   "lower95": 66.70416443029791
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "autodiff_jacobian",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.588052,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jacfwd",
+   "strongest_control_median_ms": 107.85049,
+   "speed_ratio": 67.55509510503997,
+   "lower95": 65.55640032225551
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.832153,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.842591,
+   "speed_ratio": 1.011021833824545,
+   "lower95": 0.9696267944138344
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 0.831209,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 0.848793,
+   "speed_ratio": 1.0451395473305891,
+   "lower95": 0.9769293493954039
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.573723,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.595755,
+   "speed_ratio": 1.0215803413316051,
+   "lower95": 0.9677734348615867
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 768,
+    "H": 64,
+    "depth": 4,
+    "B": 256,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.588052,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.608951,
+   "speed_ratio": 0.9808350628935979,
+   "lower95": 0.9049844276287847
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "forward",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 98304,
+    "H": 160,
+    "depth": 3,
+    "B": 4,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.403057,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.404107,
+   "speed_ratio": 1.0058066157390133,
+   "lower95": 0.979506690929924
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "ld",
+    "regime": "vg",
+    "operator_definition": "values log|det(I + J_s)|; vg 0.5 mean (ld - f)^2",
+    "D": 98304,
+    "H": 160,
+    "depth": 3,
+    "B": 4,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 2.970973,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 3.112456,
+   "speed_ratio": 1.045994835889155,
+   "lower95": 1.0416532605403872
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "forward",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 98304,
+    "H": 160,
+    "depth": 3,
+    "B": 4,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 1.477835,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 1.505218,
+   "speed_ratio": 1.0180141313003646,
+   "lower95": 1.0107256018818025
+  },
+  {
+   "config": {
+    "model": "residual_mlp_block",
+    "activation": "tanh",
+    "operator": "nll",
+    "regime": "vg",
+    "operator_definition": "values 0.5 |x + s(x)|^2 - log|det(I + J_s)| (flow negative log-likelihood under N(0, I), constants dropped); vg their mean",
+    "D": 98304,
+    "H": 160,
+    "depth": 3,
+    "B": 4,
+    "projection_applies": true
+   },
+   "tier": "projected_generic",
+   "candidate": "projected_deep_logdet",
+   "role": "held_out",
+   "candidate_median_ms": 3.490489,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_jvp",
+   "strongest_control_median_ms": 3.756919,
+   "speed_ratio": 1.062949236861466,
+   "lower95": 1.0051880664069766
+  }
+ ],
+ "full_size_accuracy": {
+  "what": "max over repetitions of per-field relative deviations (norms and sampled entries scaled by the largest sampled reference magnitude) between methods at full size; floor = two controls",
+  "candidate": "pkg",
+  "floor": "ring_vs_proj_jvp",
+  "summary": {
+   "pkg_vs_ring": {
+    "max_values_rel": 3.141105614486299e-14,
+    "max_loss_rel": 2.8883788025042687e-16,
+    "max_grad_rel": 2.3014711951919532e-15,
+    "cells": 48
+   },
+   "pkg_vs_proj_jvp": {
+    "max_values_rel": 1.2457163291929793e-13,
+    "max_loss_rel": 3.1420719061744123e-16,
+    "max_grad_rel": 9.205884780767855e-15,
+    "cells": 48
+   },
+   "pkg_vs_seed_full": {
+    "max_values_rel": 8.10391905381462e-12,
+    "max_loss_rel": 1.2721596783211443e-14,
+    "max_grad_rel": 2.7821673273574207e-14,
+    "cells": 32
+   },
+   "pkg_vs_jacfwd": {
+    "max_values_rel": 8.103919053815198e-12,
+    "max_loss_rel": 1.2721596783211443e-14,
+    "max_grad_rel": 2.652428954579092e-14,
+    "cells": 32
+   },
+   "pkg_vs_jacrev": {
+    "max_values_rel": 8.103919053814909e-12,
+    "max_loss_rel": 1.2562576823421303e-14,
+    "max_grad_rel": 2.6201486354446216e-14,
+    "cells": 32
+   },
+   "ring_vs_proj_jvp": {
+    "max_values_rel": 1.2457163291929793e-13,
+    "max_loss_rel": 2.8883788025042687e-16,
+    "max_grad_rel": 9.49356868016685e-15,
+    "cells": 48
+   }
+  },
+  "rows": [
+   {
+    "D": 12288,
+    "width": 64,
+    "depth": 2,
+    "B": 16,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 2.2482278743685273e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 2.2482278743685273e-16
+    },
+    "ring_vs_proj_jvp": {
+     "values": 0.0
+    }
+   },
+   {
+    "D": 12288,
+    "width": 64,
+    "depth": 2,
+    "B": 16,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 2.1696892430677005e-14
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 2.1696892430677005e-14
+    },
+    "ring_vs_proj_jvp": {
+     "values": 2.1696892430677005e-14
+    }
+   },
+   {
+    "D": 12288,
+    "width": 64,
+    "depth": 2,
+    "B": 16,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 2.8883788025042687e-16,
+     "grad": 4.148370624280111e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 2.8883788025042687e-16,
+     "grad": 2.7655804161867416e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 2.8883788025042687e-16,
+     "grad": 3.042138457805416e-15
+    }
+   },
+   {
+    "D": 12288,
+    "width": 64,
+    "depth": 2,
+    "B": 16,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 4.826778765239234e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 4.041523381839373e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 3.6200840739294253e-16
+    }
+   },
+   {
+    "D": 1536,
+    "width": 160,
+    "depth": 3,
+    "B": 64,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 1.7104425716653386e-14
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 4.262949178612111e-14
+    },
+    "pkg_vs_seed_full": {
+     "values": 3.3153639939144185e-12
+    },
+    "pkg_vs_jacfwd": {
+     "values": 3.323521489256303e-12
+    },
+    "pkg_vs_jacrev": {
+     "values": 3.3658878360314344e-12
+    },
+    "ring_vs_proj_jvp": {
+     "values": 4.210320176407023e-14
+    }
+   },
+   {
+    "D": 1536,
+    "width": 160,
+    "depth": 3,
+    "B": 64,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 2.0495312660352531e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 4.0990625320705063e-16
+    },
+    "pkg_vs_seed_full": {
+     "values": 4.918875038484609e-15
+    },
+    "pkg_vs_jacfwd": {
+     "values": 4.91887503848461e-15
+    },
+    "pkg_vs_jacrev": {
+     "values": 5.1238281650881345e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 2.0495312660352531e-16
+    }
+   },
+   {
+    "D": 1536,
+    "width": 160,
+    "depth": 3,
+    "B": 64,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 5.080719011977218e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.5751843298795768e-16,
+     "grad": 1.9447128761001094e-15
+    },
+    "pkg_vs_seed_full": {
+     "loss": 0.0,
+     "grad": 5.461772937875531e-15
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 0.0,
+     "grad": 5.715808888474396e-15
+    },
+    "pkg_vs_jacrev": {
+     "loss": 1.5751843298795763e-16,
+     "grad": 6.261203344284445e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.5751843298795768e-16,
+     "grad": 1.666896750942951e-15
+    }
+   },
+   {
+    "D": 1536,
+    "width": 160,
+    "depth": 3,
+    "B": 64,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 4.902077367406272e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 4.902077367406273e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 2.103854567142124e-16,
+     "grad": 1.1261231622773709e-15
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 0.0,
+     "grad": 1.1797480747667694e-15
+    },
+    "pkg_vs_jacrev": {
+     "loss": 2.103854567142124e-16,
+     "grad": 9.839262235396783e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 2.7331283987213283e-16
+    }
+   },
+   {
+    "D": 160,
+    "width": 64,
+    "depth": 2,
+    "B": 1024,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 2.0302573900101053e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 2.1951121833539294e-16,
+     "grad": 9.73900419968671e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 2.1951121833539294e-16,
+     "grad": 4.2199283091937315e-15
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 2.1951121833539294e-16,
+     "grad": 4.6035581554840724e-15
+    },
+    "pkg_vs_jacrev": {
+     "loss": 2.1951121833539294e-16,
+     "grad": 3.729189198309643e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 2.1951121833539294e-16,
+     "grad": 9.73900419968671e-16
+    }
+   },
+   {
+    "D": 160,
+    "width": 64,
+    "depth": 2,
+    "B": 1024,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 0.0
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 3.178089029371347e-16
+    },
+    "pkg_vs_seed_full": {
+     "values": 4.8730698450360795e-15
+    },
+    "pkg_vs_jacfwd": {
+     "values": 4.87306984503608e-15
+    },
+    "pkg_vs_jacrev": {
+     "values": 5.0849424469941714e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 3.178089029371347e-16
+    }
+   },
+   {
+    "D": 160,
+    "width": 64,
+    "depth": 2,
+    "B": 1024,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 3.721131714091511e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 2.790351995197674e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 0.0,
+     "grad": 5.580703990395346e-16
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 0.0,
+     "grad": 5.580703990395346e-16
+    },
+    "pkg_vs_jacrev": {
+     "loss": 0.0,
+     "grad": 4.639192690118293e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 2.790351995197674e-16
+    }
+   },
+   {
+    "D": 160,
+    "width": 64,
+    "depth": 2,
+    "B": 1024,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 8.930281061988145e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 1.8195447663800845e-14
+    },
+    "pkg_vs_seed_full": {
+     "values": 3.2818782902806973e-13
+    },
+    "pkg_vs_jacfwd": {
+     "values": 3.286343430811668e-13
+    },
+    "pkg_vs_jacrev": {
+     "values": 3.429227927803492e-13
+    },
+    "ring_vs_proj_jvp": {
+     "values": 1.7525676584151735e-14
+    }
+   },
+   {
+    "D": 2048,
+    "width": 256,
+    "depth": 2,
+    "B": 32,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 4.631655278619456e-15
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 1.0604052874733976e-14
+    },
+    "pkg_vs_seed_full": {
+     "values": 6.200323790088554e-13
+    },
+    "pkg_vs_jacfwd": {
+     "values": 6.161320377216018e-13
+    },
+    "pkg_vs_jacrev": {
+     "values": 6.02480843216188e-13
+    },
+    "ring_vs_proj_jvp": {
+     "values": 9.750853218146185e-15
+    }
+   },
+   {
+    "D": 2048,
+    "width": 256,
+    "depth": 2,
+    "B": 32,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 3.555676559634258e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 4.148289319573301e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 1.554743079282124e-16,
+     "grad": 9.48180415902469e-16
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 1.554743079282124e-16,
+     "grad": 1.0667029678902777e-15
+    },
+    "pkg_vs_jacrev": {
+     "loss": 1.554743079282124e-16,
+     "grad": 3.674199111622057e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 3.555676559634258e-16
+    }
+   },
+   {
+    "D": 2048,
+    "width": 256,
+    "depth": 2,
+    "B": 32,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 3.043595135233387e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 3.043595135233387e-16
+    },
+    "pkg_vs_seed_full": {
+     "values": 3.1957748919950578e-15
+    },
+    "pkg_vs_jacfwd": {
+     "values": 3.195774891995057e-15
+    },
+    "pkg_vs_jacrev": {
+     "values": 3.1957748919950578e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 1.5217975676166934e-16
+    }
+   },
+   {
+    "D": 2048,
+    "width": 256,
+    "depth": 2,
+    "B": 32,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 2.7329224382473233e-16,
+     "grad": 1.3510309625529846e-15
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 2.7329224382473233e-16,
+     "grad": 2.671356675957042e-15
+    },
+    "pkg_vs_seed_full": {
+     "loss": 9.291936290040813e-15,
+     "grad": 1.525671005388132e-14
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 9.018644046216085e-15,
+     "grad": 1.5475445571061635e-14
+    },
+    "pkg_vs_jacrev": {
+     "loss": 8.745351802391359e-15,
+     "grad": 1.7194939523401837e-14
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.3664612191236614e-16,
+     "grad": 2.7634724234038365e-15
+    }
+   },
+   {
+    "D": 24576,
+    "width": 96,
+    "depth": 4,
+    "B": 16,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 4.399225643505594e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 1.6427903634142947e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 1.5861424198482844e-15
+    }
+   },
+   {
+    "D": 24576,
+    "width": 96,
+    "depth": 4,
+    "B": 16,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 1.4162669263770139e-14
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 2.8325338527540277e-14
+    },
+    "ring_vs_proj_jvp": {
+     "values": 2.8325338527540277e-14
+    }
+   },
+   {
+    "D": 24576,
+    "width": 96,
+    "depth": 4,
+    "B": 16,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 1.1497318005931173e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 1.1497318005931173e-16
+    },
+    "ring_vs_proj_jvp": {
+     "values": 1.1497318005931173e-16
+    }
+   },
+   {
+    "D": 24576,
+    "width": 96,
+    "depth": 4,
+    "B": 16,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 1.1510291739347824e-16,
+     "grad": 5.353791158401503e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.1510291739347824e-16,
+     "grad": 5.4045484406375715e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.1510291739347827e-16,
+     "grad": 5.4045484406375715e-16
+    }
+   },
+   {
+    "D": 3072,
+    "width": 96,
+    "depth": 5,
+    "B": 32,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 4.354077594774533e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 6.474730564059341e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 2.1783955342614574e-16,
+     "grad": 8.705503773201102e-16
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 2.1783955342614574e-16,
+     "grad": 1.0288322641055848e-15
+    },
+    "pkg_vs_jacrev": {
+     "loss": 2.1783955342614574e-16,
+     "grad": 1.800542375302624e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 4.046706602537088e-16
+    }
+   },
+   {
+    "D": 3072,
+    "width": 96,
+    "depth": 5,
+    "B": 32,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 2.1516546564220696e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 2.1516546564220696e-16
+    },
+    "pkg_vs_seed_full": {
+     "values": 3.012316518990892e-15
+    },
+    "pkg_vs_jacfwd": {
+     "values": 3.012316518990892e-15
+    },
+    "pkg_vs_jacrev": {
+     "values": 3.012316518990892e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 2.1516546564220696e-16
+    }
+   },
+   {
+    "D": 3072,
+    "width": 96,
+    "depth": 5,
+    "B": 32,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 3.4883739925937083e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.508172015717525e-16,
+     "grad": 9.593028479632697e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 1.100965571473805e-14,
+     "grad": 1.9892541691356673e-14
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 1.100965571473805e-14,
+     "grad": 1.9892541691356676e-14
+    },
+    "pkg_vs_jacrev": {
+     "loss": 1.0858838513166295e-14,
+     "grad": 1.8560522425582064e-14
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.508172015717525e-16,
+     "grad": 9.71274992289682e-16
+    }
+   },
+   {
+    "D": 3072,
+    "width": 96,
+    "depth": 5,
+    "B": 32,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 1.7835310159603924e-14
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 3.567062031920912e-14
+    },
+    "pkg_vs_seed_full": {
+     "values": 8.10391905381462e-12
+    },
+    "pkg_vs_jacfwd": {
+     "values": 8.103919053815198e-12
+    },
+    "pkg_vs_jacrev": {
+     "values": 8.103919053814909e-12
+    },
+    "ring_vs_proj_jvp": {
+     "values": 3.567062031920912e-14
+    }
+   },
+   {
+    "D": 384,
+    "width": 96,
+    "depth": 3,
+    "B": 512,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 7.902817061172015e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 2.290811316466275e-16,
+     "grad": 2.9635563979395145e-15
+    },
+    "pkg_vs_seed_full": {
+     "loss": 2.290811316466275e-16,
+     "grad": 1.6379077394057272e-14
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 2.290811316466275e-16,
+     "grad": 1.6189630219812998e-14
+    },
+    "pkg_vs_jacrev": {
+     "loss": 2.290811316466275e-16,
+     "grad": 1.5998168617451297e-14
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 2.290811316466275e-16,
+     "grad": 2.9635563979395145e-15
+    }
+   },
+   {
+    "D": 384,
+    "width": 96,
+    "depth": 3,
+    "B": 512,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 1.571035953087206e-16,
+     "grad": 2.5231891263307336e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 3.1420719061744123e-16,
+     "grad": 2.830126216783935e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 0.0,
+     "grad": 4.919872679562276e-16
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 0.0,
+     "grad": 5.903847215474732e-16
+    },
+    "pkg_vs_jacrev": {
+     "loss": 0.0,
+     "grad": 4.919872679562276e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.5710359530872061e-16,
+     "grad": 2.523189126330733e-16
+    }
+   },
+   {
+    "D": 384,
+    "width": 96,
+    "depth": 3,
+    "B": 512,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 2.846467112203768e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 2.846467112203768e-16
+    },
+    "pkg_vs_seed_full": {
+     "values": 5.265964157576977e-15
+    },
+    "pkg_vs_jacfwd": {
+     "values": 5.2659641575769776e-15
+    },
+    "pkg_vs_jacrev": {
+     "values": 5.265964157576977e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 1.4232335561018842e-16
+    }
+   },
+   {
+    "D": 384,
+    "width": 96,
+    "depth": 3,
+    "B": 512,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 5.94771181088567e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 1.2886708923585452e-14
+    },
+    "pkg_vs_seed_full": {
+     "values": 4.776012584140451e-13
+    },
+    "pkg_vs_jacfwd": {
+     "values": 4.77601258414042e-13
+    },
+    "pkg_vs_jacrev": {
+     "values": 4.776012584140419e-13
+    },
+    "ring_vs_proj_jvp": {
+     "values": 1.2886708923585493e-14
+    }
+   },
+   {
+    "D": 48,
+    "width": 96,
+    "depth": 3,
+    "B": 2048,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 2.1437161327646748e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 7.824563884591053e-15
+    },
+    "pkg_vs_seed_full": {
+     "values": 2.1437161327646748e-16
+    },
+    "pkg_vs_jacfwd": {
+     "values": 5.359290331911689e-16
+    },
+    "pkg_vs_jacrev": {
+     "values": 4.2874322655293496e-16
+    },
+    "ring_vs_proj_jvp": {
+     "values": 7.824563884591053e-15
+    }
+   },
+   {
+    "D": 48,
+    "width": 96,
+    "depth": 3,
+    "B": 2048,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 1.774907032611823e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 2.1687256291814008e-16,
+     "grad": 1.1163737315098022e-15
+    },
+    "pkg_vs_seed_full": {
+     "loss": 0.0,
+     "grad": 2.4099063510264686e-16
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 2.1687256291814008e-16,
+     "grad": 2.9936782104468935e-16
+    },
+    "pkg_vs_jacrev": {
+     "loss": 2.1687256291814018e-16,
+     "grad": 7.442491543398685e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 2.1687256291814008e-16,
+     "grad": 1.1163737315098022e-15
+    }
+   },
+   {
+    "D": 48,
+    "width": 96,
+    "depth": 3,
+    "B": 2048,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 0.0
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 8.397473480013382e-14
+    },
+    "pkg_vs_seed_full": {
+     "values": 0.0
+    },
+    "pkg_vs_jacfwd": {
+     "values": 5.875365404104818e-15
+    },
+    "pkg_vs_jacrev": {
+     "values": 4.585651047106195e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 8.397473480013382e-14
+    }
+   },
+   {
+    "D": 48,
+    "width": 96,
+    "depth": 3,
+    "B": 2048,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 1.5837190510638428e-16,
+     "grad": 2.722739791662192e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.5837190510638428e-16,
+     "grad": 4.680199447043441e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 1.5837190510638428e-16,
+     "grad": 2.722739791662192e-16
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 0.0,
+     "grad": 2.9251246544021514e-16
+    },
+    "pkg_vs_jacrev": {
+     "loss": 1.5837190510638428e-16,
+     "grad": 3.802980322225608e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.5837190510638428e-16,
+     "grad": 4.680199447043441e-16
+    }
+   },
+   {
+    "D": 49152,
+    "width": 128,
+    "depth": 1,
+    "B": 8,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 2.290632381194015e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.1540523532934083e-16,
+     "grad": 2.290632381194015e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.1540523532934083e-16,
+     "grad": 2.2855928898801205e-16
+    }
+   },
+   {
+    "D": 49152,
+    "width": 128,
+    "depth": 1,
+    "B": 8,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 2.3014711951919532e-15
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.2905105867004668e-16,
+     "grad": 9.205884780767855e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.2905105867004668e-16,
+     "grad": 9.49356868016685e-15
+    }
+   },
+   {
+    "D": 49152,
+    "width": 128,
+    "depth": 1,
+    "B": 8,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 1.1532718056087488e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 1.1532718056087488e-16
+    },
+    "ring_vs_proj_jvp": {
+     "values": 0.0
+    }
+   },
+   {
+    "D": 49152,
+    "width": 128,
+    "depth": 1,
+    "B": 8,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 3.6766837966225853e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 5.882694074596139e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 5.882694074596139e-15
+    }
+   },
+   {
+    "D": 6144,
+    "width": 192,
+    "depth": 3,
+    "B": 8,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 7.348555846022201e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.5901995979014508e-16,
+     "grad": 1.9460755916748273e-15
+    },
+    "pkg_vs_seed_full": {
+     "loss": 1.2721596783211443e-14,
+     "grad": 2.7821673273574207e-14
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 1.2721596783211443e-14,
+     "grad": 2.652428954579092e-14
+    },
+    "pkg_vs_jacrev": {
+     "loss": 1.2562576823421303e-14,
+     "grad": 2.6201486354446216e-14
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.5901995979014508e-16,
+     "grad": 2.0041515943696884e-15
+    }
+   },
+   {
+    "D": 6144,
+    "width": 192,
+    "depth": 3,
+    "B": 8,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 0.0
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 2.182553942487084e-16
+    },
+    "pkg_vs_seed_full": {
+     "values": 8.73021576994833e-16
+    },
+    "pkg_vs_jacfwd": {
+     "values": 1.0912769712435412e-15
+    },
+    "pkg_vs_jacrev": {
+     "values": 1.0912769712435412e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 2.182553942487084e-16
+    }
+   },
+   {
+    "D": 6144,
+    "width": 192,
+    "depth": 3,
+    "B": 8,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 7.471444043173902e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 7.471444043173902e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 0.0,
+     "grad": 1.9873247427674783e-15
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 0.0,
+     "grad": 1.8066588570613443e-15
+    },
+    "pkg_vs_jacrev": {
+     "loss": 0.0,
+     "grad": 3.8843165426818926e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 0.0,
+     "grad": 5.419976571184042e-16
+    }
+   },
+   {
+    "D": 6144,
+    "width": 192,
+    "depth": 3,
+    "B": 8,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 3.141105614486299e-14
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 3.1534236757195316e-14
+    },
+    "pkg_vs_seed_full": {
+     "values": 3.830670682337564e-12
+    },
+    "pkg_vs_jacfwd": {
+     "values": 3.909752635455473e-12
+    },
+    "pkg_vs_jacrev": {
+     "values": 3.893000072177667e-12
+    },
+    "ring_vs_proj_jvp": {
+     "values": 3.1534236757195316e-14
+    }
+   },
+   {
+    "D": 768,
+    "width": 64,
+    "depth": 4,
+    "B": 256,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 1.3386822269259436e-14
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 1.3526268334564221e-14
+    },
+    "pkg_vs_seed_full": {
+     "values": 7.545426593643266e-13
+    },
+    "pkg_vs_jacfwd": {
+     "values": 7.456181111848155e-13
+    },
+    "pkg_vs_jacrev": {
+     "values": 7.545426593643232e-13
+    },
+    "ring_vs_proj_jvp": {
+     "values": 1.3386822269259436e-14
+    }
+   },
+   {
+    "D": 768,
+    "width": 64,
+    "depth": 4,
+    "B": 256,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 2.154214923925871e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 2.154214923925871e-16
+    },
+    "pkg_vs_seed_full": {
+     "values": 4.523851340244334e-15
+    },
+    "pkg_vs_jacfwd": {
+     "values": 4.523851340244334e-15
+    },
+    "pkg_vs_jacrev": {
+     "values": 4.523851340244333e-15
+    },
+    "ring_vs_proj_jvp": {
+     "values": 3.2313223858888066e-16
+    }
+   },
+   {
+    "D": 768,
+    "width": 64,
+    "depth": 4,
+    "B": 256,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 2.1167795093291848e-15
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.266947143435645e-16,
+     "grad": 4.2629845073374174e-15
+    },
+    "pkg_vs_seed_full": {
+     "loss": 2.5338942868712894e-16,
+     "grad": 7.106331209890842e-15
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 2.5338942868712894e-16,
+     "grad": 7.908535325719472e-15
+    },
+    "pkg_vs_jacrev": {
+     "loss": 2.5338942868712894e-16,
+     "grad": 9.980525694689734e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.266947143435645e-16,
+     "grad": 4.04993542889665e-15
+    }
+   },
+   {
+    "D": 768,
+    "width": 64,
+    "depth": 4,
+    "B": 256,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 1.1163991530459136e-16,
+     "grad": 3.386285483461652e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.1163991530459136e-16,
+     "grad": 3.9465546589270243e-16
+    },
+    "pkg_vs_seed_full": {
+     "loss": 1.1163991530459134e-16,
+     "grad": 5.547627013002046e-16
+    },
+    "pkg_vs_jacfwd": {
+     "loss": 1.1163991530459134e-16,
+     "grad": 5.547627013002047e-16
+    },
+    "pkg_vs_jacrev": {
+     "loss": 1.1163991530459134e-16,
+     "grad": 6.777974416615539e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.1163991530459136e-16,
+     "grad": 2.711189766646215e-16
+    }
+   },
+   {
+    "D": 98304,
+    "width": 160,
+    "depth": 3,
+    "B": 4,
+    "op": "ld",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 0.0
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 1.2457163291929793e-13
+    },
+    "ring_vs_proj_jvp": {
+     "values": 1.2457163291929793e-13
+    }
+   },
+   {
+    "D": 98304,
+    "width": 160,
+    "depth": 3,
+    "B": 4,
+    "op": "ld",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 3.01594480829558e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.430680442410186e-16,
+     "grad": 1.5440574864787694e-15
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.430680442410186e-16,
+     "grad": 1.5440574864787694e-15
+    }
+   },
+   {
+    "D": 98304,
+    "width": 160,
+    "depth": 3,
+    "B": 4,
+    "op": "nll",
+    "regime": "forward",
+    "pkg_vs_ring": {
+     "values": 2.300292884965693e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "values": 2.300292884965693e-16
+    },
+    "ring_vs_proj_jvp": {
+     "values": 0.0
+    }
+   },
+   {
+    "D": 98304,
+    "width": 160,
+    "depth": 3,
+    "B": 4,
+    "op": "nll",
+    "regime": "vg",
+    "pkg_vs_ring": {
+     "loss": 0.0,
+     "grad": 6.653559798108174e-16
+    },
+    "pkg_vs_proj_jvp": {
+     "loss": 1.150730982001018e-16,
+     "grad": 7.762486431126203e-16
+    },
+    "ring_vs_proj_jvp": {
+     "loss": 1.150730982001018e-16,
+     "grad": 3.6991548869210375e-16
+    }
+   }
+  ]
+ },
+ "cold_cost": {
+  "what": "per cell, medians over repetitions: cold = lowering + compilation ms (excluded from the speed ratios), steady = steady-state median ms, for the candidate and the steady-state-fastest member of every tier; break_even_calls = extra cold ms / steady saving per call (only when the candidate compiles slower and runs faster)",
+  "rows": [
+   {
+    "cfg": {
+     "D": 12288,
+     "width": 64,
+     "depth": 2,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 2629.852991551161,
+     "steady": 0.418588
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 2133.4588453173637,
+     "steady": 0.419498,
+     "extra_compile_ms": 496.3941462337971,
+     "break_even_calls": 545488.0727844125
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12288,
+     "width": 64,
+     "depth": 2,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 2683.3153516054153,
+     "steady": 0.409378
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 1994.0053708851337,
+     "steady": 0.407219,
+     "extra_compile_ms": 689.3099807202816,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12288,
+     "width": 64,
+     "depth": 2,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 4982.444463297725,
+     "steady": 0.727236
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 4632.11571611464,
+     "steady": 0.736937,
+     "extra_compile_ms": 350.3287471830845,
+     "break_even_calls": 36112.64273611854
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12288,
+     "width": 64,
+     "depth": 2,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 5927.706450223923,
+     "steady": 0.789047
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 5687.239056453109,
+     "steady": 0.815836,
+     "extra_compile_ms": 240.46739377081394,
+     "break_even_calls": 8976.348268722773
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1536,
+     "width": 160,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 3578.4170432016253,
+     "steady": 1.182358
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 2523.7613329663873,
+     "steady": 120.118315,
+     "extra_compile_ms": 1054.655710235238,
+     "break_even_calls": 8.867425266820177
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 3352.5803592056036,
+     "steady": 120.057335,
+     "extra_compile_ms": 225.83668399602175,
+     "break_even_calls": 1.8997831982421476
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3292.038267478347,
+     "steady": 1.170658,
+     "extra_compile_ms": 286.3787757232785,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1536,
+     "width": 160,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 3861.1077750101686,
+     "steady": 1.195568
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 4365.718089975417,
+     "steady": 121.210187,
+     "extra_compile_ms": -504.6103149652481,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 3239.088900387287,
+     "steady": 119.929395,
+     "extra_compile_ms": 622.0188746228814,
+     "break_even_calls": 5.2387671680361265
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3870.8704253658652,
+     "steady": 1.193419,
+     "extra_compile_ms": -9.762650355696678,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1536,
+     "width": 160,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 8628.432978875935,
+     "steady": 2.517146
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 9509.187737479806,
+     "steady": 187.10215,
+     "extra_compile_ms": -880.7547586038709,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 7737.537629902363,
+     "steady": 187.55331,
+     "extra_compile_ms": 890.8953489735723,
+     "break_even_calls": 4.814709350403374
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 9076.591012068093,
+     "steady": 2.503023,
+     "extra_compile_ms": -448.15803319215775,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1536,
+     "width": 160,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 9142.414763569832,
+     "steady": 2.542646
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 13088.165675289929,
+     "steady": 187.33238,
+     "extra_compile_ms": -3945.750911720097,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 8093.115947209299,
+     "steady": 187.70539,
+     "extra_compile_ms": 1049.2988163605332,
+     "break_even_calls": 5.6669003369302695
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 10340.804711915553,
+     "steady": 2.558015,
+     "extra_compile_ms": -1198.3899483457208,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 160,
+     "width": 64,
+     "depth": 2,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 4985.63852859661,
+     "steady": 3.580494
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 4804.449343122542,
+     "steady": 15.443587,
+     "extra_compile_ms": 181.18918547406793,
+     "break_even_calls": 15.273351180342926
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 6066.413100343198,
+     "steady": 15.327741,
+     "extra_compile_ms": -1080.7745717465878,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 4632.303044665605,
+     "steady": 3.725466,
+     "extra_compile_ms": 353.335483931005,
+     "break_even_calls": 2437.267085582076
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 160,
+     "width": 64,
+     "depth": 2,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 2615.5525599606335,
+     "steady": 2.304919
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 2963.5297497734427,
+     "steady": 7.966267,
+     "extra_compile_ms": -347.97718981280923,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 2310.46897592023,
+     "steady": 7.892097,
+     "extra_compile_ms": 305.08358404040337,
+     "break_even_calls": 54.60423563387516
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 2082.2697719559073,
+     "steady": 2.322488,
+     "extra_compile_ms": 533.2827880047262,
+     "break_even_calls": 30353.62217569172
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 160,
+     "width": 64,
+     "depth": 2,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 6249.453986994922,
+     "steady": 3.698225
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 7678.832914214581,
+     "steady": 15.554828,
+     "extra_compile_ms": -1429.378927219659,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 7500.52748573944,
+     "steady": 15.420066,
+     "extra_compile_ms": -1251.0734987445176,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 6358.738926239312,
+     "steady": 3.742138,
+     "extra_compile_ms": -109.28493924438953,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 160,
+     "width": 64,
+     "depth": 2,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 2562.1691741980612,
+     "steady": 2.307493
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 1902.7472147718072,
+     "steady": 7.883602,
+     "extra_compile_ms": 659.421959426254,
+     "break_even_calls": 118.258441401747
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 2045.7991901785135,
+     "steady": 7.93096,
+     "extra_compile_ms": 516.3699840195477,
+     "break_even_calls": 91.82413340729975
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 1950.1885608769953,
+     "steady": 2.27343,
+     "extra_compile_ms": 611.9806133210659,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2048,
+     "width": 256,
+     "depth": 2,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 2614.1830757260323,
+     "steady": 1.878157
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 1914.7784188389778,
+     "steady": 234.111911,
+     "extra_compile_ms": 699.4046568870544,
+     "break_even_calls": 3.0116408353242847
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 3156.0433134436607,
+     "steady": 232.54982,
+     "extra_compile_ms": -541.8602377176285,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 2424.5836194604635,
+     "steady": 1.864256,
+     "extra_compile_ms": 189.59945626556873,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2048,
+     "width": 256,
+     "depth": 2,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 6473.636807873845,
+     "steady": 3.207027
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 9212.886068969965,
+     "steady": 304.168551,
+     "extra_compile_ms": -2739.24926109612,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 7591.444244608283,
+     "steady": 301.983184,
+     "extra_compile_ms": -1117.807436734438,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 6279.546992853284,
+     "steady": 3.247167,
+     "extra_compile_ms": 194.08981502056122,
+     "break_even_calls": 4835.321749391153
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2048,
+     "width": 256,
+     "depth": 2,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 3057.948425412178,
+     "steady": 1.892319
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 3471.1442347615957,
+     "steady": 233.311001,
+     "extra_compile_ms": -413.1958093494177,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 3075.879354029894,
+     "steady": 233.399444,
+     "extra_compile_ms": -17.930928617715836,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3034.482588991523,
+     "steady": 1.893519,
+     "extra_compile_ms": 23.46583642065525,
+     "break_even_calls": 19554.86368388153
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2048,
+     "width": 256,
+     "depth": 2,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 5248.582147061825,
+     "steady": 3.156874
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 5259.625116363168,
+     "steady": 303.152134,
+     "extra_compile_ms": -11.042969301342964,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 6293.459549546242,
+     "steady": 303.771013,
+     "extra_compile_ms": -1044.877402484417,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 5155.771970748901,
+     "steady": 3.202761,
+     "extra_compile_ms": 92.81017631292343,
+     "break_even_calls": 2022.5810428427094
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 24576,
+     "width": 96,
+     "depth": 4,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 5912.713974714279,
+     "steady": 1.200919
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 6446.873405948281,
+     "steady": 1.213832,
+     "extra_compile_ms": -534.1594312340021,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 24576,
+     "width": 96,
+     "depth": 4,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 3034.9210556596518,
+     "steady": 0.602939
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 2835.489846765995,
+     "steady": 0.624521,
+     "extra_compile_ms": 199.43120889365673,
+     "break_even_calls": 9240.626860052675
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 24576,
+     "width": 96,
+     "depth": 4,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 3020.8272486925125,
+     "steady": 0.626965
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3309.919888153672,
+     "steady": 0.645678,
+     "extra_compile_ms": -289.0926394611597,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 24576,
+     "width": 96,
+     "depth": 4,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 7036.888582631946,
+     "steady": 1.342349
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 7962.7869091928005,
+     "steady": 1.363582,
+     "extra_compile_ms": -925.8983265608549,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3072,
+     "width": 96,
+     "depth": 5,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 7261.933963745832,
+     "steady": 1.279959
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 9245.188327040523,
+     "steady": 930.737956,
+     "extra_compile_ms": -1983.2543632946908,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 7543.422924820334,
+     "steady": 922.356691,
+     "extra_compile_ms": -281.4889610745013,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 8768.78459425643,
+     "steady": 1.341169,
+     "extra_compile_ms": -1506.8506305105984,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3072,
+     "width": 96,
+     "depth": 5,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 3293.248611036688,
+     "steady": 0.613329
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 2942.9802340455353,
+     "steady": 753.385842,
+     "extra_compile_ms": 350.26837699115276,
+     "break_even_calls": 0.4653044192530882
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 2907.899382058531,
+     "steady": 746.219599,
+     "extra_compile_ms": 385.34922897815704,
+     "break_even_calls": 0.5168267012804989
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3714.331939816475,
+     "steady": 0.633339,
+     "extra_compile_ms": -421.0833287797868,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3072,
+     "width": 96,
+     "depth": 5,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 6027.527377009392,
+     "steady": 1.230609
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 7804.078194778413,
+     "steady": 930.082484,
+     "extra_compile_ms": -1776.5508177690208,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 7893.116374034435,
+     "steady": 923.233918,
+     "extra_compile_ms": -1865.5889970250428,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 6378.745464142412,
+     "steady": 1.222659,
+     "extra_compile_ms": -351.21808713302016,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3072,
+     "width": 96,
+     "depth": 5,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 3568.3736936189234,
+     "steady": 0.60832
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 1890.9576241858304,
+     "steady": 753.486876,
+     "extra_compile_ms": 1677.416069433093,
+     "break_even_calls": 2.228003515394444
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 2896.1950126104057,
+     "steady": 746.899431,
+     "extra_compile_ms": 672.1786810085177,
+     "break_even_calls": 0.9006923318540206
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3240.277197211981,
+     "steady": 0.629519,
+     "extra_compile_ms": 328.0964964069426,
+     "break_even_calls": 15476.979876736705
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 384,
+     "width": 96,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 7032.603060826659,
+     "steady": 4.938417
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 8271.437247749418,
+     "steady": 43.978585,
+     "extra_compile_ms": -1238.8341869227588,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 8051.012521144003,
+     "steady": 44.710138,
+     "extra_compile_ms": -1018.4094603173435,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 7224.652593955398,
+     "steady": 4.902719,
+     "extra_compile_ms": -192.0495331287384,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 384,
+     "width": 96,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 9562.32666503638,
+     "steady": 4.930294
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 11952.281210105866,
+     "steady": 44.19226,
+     "extra_compile_ms": -2389.954545069486,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 8441.664790268987,
+     "steady": 44.567599,
+     "extra_compile_ms": 1120.6618747673929,
+     "break_even_calls": 28.272907927705806
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 9067.962310276926,
+     "steady": 5.055269,
+     "extra_compile_ms": 494.3643547594547,
+     "break_even_calls": 3955.7059792714904
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 384,
+     "width": 96,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 4339.954105205834,
+     "steady": 2.569638
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 3864.5491148345172,
+     "steady": 20.358601,
+     "extra_compile_ms": 475.40499037131667,
+     "break_even_calls": 26.72471635200527
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 3912.897165864706,
+     "steady": 20.216373,
+     "extra_compile_ms": 427.0569393411279,
+     "break_even_calls": 24.200337305520137
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3398.1326264329255,
+     "steady": 2.505855,
+     "extra_compile_ms": 941.8214787729084,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 384,
+     "width": 96,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 3633.8733192533255,
+     "steady": 2.571195
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 2566.6974098421633,
+     "steady": 20.36591,
+     "extra_compile_ms": 1067.1759094111621,
+     "break_even_calls": 59.971508923360794
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 3199.849545955658,
+     "steady": 20.264293,
+     "extra_compile_ms": 434.0237732976675,
+     "break_even_calls": 24.53068271580633
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3084.750876761973,
+     "steady": 2.470698,
+     "extra_compile_ms": 549.1224424913526,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 48,
+     "width": 96,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 3143.9794674515724,
+     "steady": 4.06317
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 3564.2707347869873,
+     "steady": 4.059361,
+     "extra_compile_ms": -420.2912673354149,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 3203.916508704424,
+     "steady": 3.970909,
+     "extra_compile_ms": -59.937041252851486,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3182.567674666643,
+     "steady": 8.759181,
+     "extra_compile_ms": -38.588207215070724,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 48,
+     "width": 96,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 8157.8819416463375,
+     "steady": 6.794959
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 8249.961491674185,
+     "steady": 6.054034,
+     "extra_compile_ms": -92.07955002784729,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 8458.366982638836,
+     "steady": 6.774078,
+     "extra_compile_ms": -300.4850409924984,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 8332.283969968557,
+     "steady": 14.487235,
+     "extra_compile_ms": -174.40202832221985,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 48,
+     "width": 96,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 3177.7270175516605,
+     "steady": 3.659043
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 2221.5033210814,
+     "steady": 4.049873,
+     "extra_compile_ms": 956.2236964702606,
+     "break_even_calls": 2446.648661746184
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 2724.196095019579,
+     "steady": 3.973187,
+     "extra_compile_ms": 453.5309225320816,
+     "break_even_calls": 1443.7039145490028
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 2977.797541767359,
+     "steady": 7.296921,
+     "extra_compile_ms": 199.92947578430176,
+     "break_even_calls": 54.95771869873089
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 48,
+     "width": 96,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 9943.692069500685,
+     "steady": 6.113114
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 13620.09895592928,
+     "steady": 6.249436,
+     "extra_compile_ms": -3676.4068864285946,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 8935.991670936346,
+     "steady": 6.4012,
+     "extra_compile_ms": 1007.7003985643387,
+     "break_even_calls": 3497.915200892578
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 9447.08563759923,
+     "steady": 14.673734,
+     "extra_compile_ms": 496.6064319014549,
+     "break_even_calls": 58.01056838189932
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 49152,
+     "width": 128,
+     "depth": 1,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 5296.5356931090355,
+     "steady": 1.854137
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 4337.409734725952,
+     "steady": 1.933129,
+     "extra_compile_ms": 959.1259583830833,
+     "break_even_calls": 12142.064492392663
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 49152,
+     "width": 128,
+     "depth": 1,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 3750.8572414517403,
+     "steady": 1.660121
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3526.44881606102,
+     "steady": 1.651681,
+     "extra_compile_ms": 224.40842539072037,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 49152,
+     "width": 128,
+     "depth": 1,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 2342.0544303953648,
+     "steady": 0.949978
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 2035.817563533783,
+     "steady": 0.925392,
+     "extra_compile_ms": 306.2368668615818,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 49152,
+     "width": 128,
+     "depth": 1,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 1986.9973957538605,
+     "steady": 0.889005
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 1756.9546923041344,
+     "steady": 0.904092,
+     "extra_compile_ms": 230.0427034497261,
+     "break_even_calls": 15247.743318733128
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 6144,
+     "width": 192,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 7338.694047182798,
+     "steady": 2.105357
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 6549.810860306025,
+     "steady": 584.154002,
+     "extra_compile_ms": 788.8831868767738,
+     "break_even_calls": 1.3553561092419928
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 7798.133857548237,
+     "steady": 586.630685,
+     "extra_compile_ms": -459.43981036543846,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 7751.6378574073315,
+     "steady": 2.147486,
+     "extra_compile_ms": -412.9438102245331,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 6144,
+     "width": 192,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 3453.419879078865,
+     "steady": 1.328026
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 3872.942265123129,
+     "steady": 302.620862,
+     "extra_compile_ms": -419.52238604426384,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 3981.044340878725,
+     "steady": 302.582129,
+     "extra_compile_ms": -527.62446179986,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3759.459689259529,
+     "steady": 1.343601,
+     "extra_compile_ms": -306.03981018066406,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 6144,
+     "width": 192,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 7559.85789000988,
+     "steady": 2.161646
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 8833.961702883244,
+     "steady": 583.867081,
+     "extra_compile_ms": -1274.1038128733635,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 9446.355935186148,
+     "steady": 586.357108,
+     "extra_compile_ms": -1886.4980451762676,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 8429.594717919827,
+     "steady": 2.19336,
+     "extra_compile_ms": -869.7368279099464,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 6144,
+     "width": 192,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 3246.592003852129,
+     "steady": 1.319993
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 2269.4881968200207,
+     "steady": 302.810842,
+     "extra_compile_ms": 977.1038070321083,
+     "break_even_calls": 3.240907013506431
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 3044.0353378653526,
+     "steady": 303.842671,
+     "extra_compile_ms": 202.55666598677635,
+     "break_even_calls": 0.6695586173105884
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3298.2030659914017,
+     "steady": 1.355542,
+     "extra_compile_ms": -51.61106213927269,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 768,
+     "width": 64,
+     "depth": 4,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 3491.518784314394,
+     "steady": 0.832153
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 1984.254825860262,
+     "steady": 58.254835,
+     "extra_compile_ms": 1507.263958454132,
+     "break_even_calls": 26.248581674644385
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 2810.276687145233,
+     "steady": 58.285557,
+     "extra_compile_ms": 681.2420971691608,
+     "break_even_calls": 11.857297387795523
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 2907.7667742967606,
+     "steady": 0.842591,
+     "extra_compile_ms": 583.7520100176334,
+     "break_even_calls": 55925.657215715306
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 768,
+     "width": 64,
+     "depth": 4,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 3267.667654901743,
+     "steady": 0.831209
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 3242.513317614794,
+     "steady": 58.155771,
+     "extra_compile_ms": 25.154337286949158,
+     "break_even_calls": 0.4388055732017483
+    },
+    "autodiff_jacobian": {
+     "member": "jacrev",
+     "cold": 2920.378554612398,
+     "steady": 58.146239,
+     "extra_compile_ms": 347.2891002893448,
+     "break_even_calls": 6.059302425373323
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3036.8382781744003,
+     "steady": 0.848793,
+     "extra_compile_ms": 230.8293767273426,
+     "break_even_calls": 13127.239349826094
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 768,
+     "width": 64,
+     "depth": 4,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 6390.394393354654,
+     "steady": 1.573723
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 7878.1546875834465,
+     "steady": 106.821032,
+     "extra_compile_ms": -1487.7602942287922,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 7101.539954543114,
+     "steady": 107.066109,
+     "extra_compile_ms": -711.1455611884594,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 6011.145081371069,
+     "steady": 1.595755,
+     "extra_compile_ms": 379.24931198358536,
+     "break_even_calls": 17213.567174273077
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 768,
+     "width": 64,
+     "depth": 4,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 7993.887890130281,
+     "steady": 1.588052
+    },
+    "full_input_recursion": {
+     "member": "seed_full",
+     "cold": 10230.14671728015,
+     "steady": 107.175076,
+     "extra_compile_ms": -2236.258827149868,
+     "break_even_calls": null
+    },
+    "autodiff_jacobian": {
+     "member": "jacfwd",
+     "cold": 8365.352217108011,
+     "steady": 107.85049,
+     "extra_compile_ms": -371.4643269777298,
+     "break_even_calls": null
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 7909.326087683439,
+     "steady": 1.608951,
+     "extra_compile_ms": 84.5618024468422,
+     "break_even_calls": 4046.212854530944
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 98304,
+     "width": 160,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 2987.3794689774513,
+     "steady": 1.403057
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 2973.582111299038,
+     "steady": 1.404107,
+     "extra_compile_ms": 13.797357678413391,
+     "break_even_calls": 13140.340646108049
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 98304,
+     "width": 160,
+     "depth": 3,
+     "op": "ld"
+    },
+    "candidate": {
+     "cold": 6797.966912388802,
+     "steady": 2.970973
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 7305.883459746838,
+     "steady": 3.112456,
+     "extra_compile_ms": -507.91654735803604,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 98304,
+     "width": 160,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 3764.2289251089096,
+     "steady": 1.477835
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 3161.2717285752296,
+     "steady": 1.505218,
+     "extra_compile_ms": 602.95719653368,
+     "break_even_calls": 22019.398770539436
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 98304,
+     "width": 160,
+     "depth": 3,
+     "op": "nll"
+    },
+    "candidate": {
+     "cold": 7900.419346988201,
+     "steady": 3.490489
+    },
+    "projected_generic": {
+     "member": "proj_jvp",
+     "cold": 8591.502357274294,
+     "steady": 3.756919,
+     "extra_compile_ms": -691.0830102860928,
+     "break_even_calls": null
+    },
+    "run": 1
+   }
+  ]
+ }
+}

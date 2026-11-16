@@ -1,0 +1,1453 @@
+{
+ "backend": "torch",
+ "environment": {
+  "machine": "x86_64",
+  "python": "3.12.13",
+  "tolerance": 1e-08,
+  "torch": "2.9.0+cu128"
+ },
+ "format": 1,
+ "seconds": 103.1,
+ "sections": {
+  "activations": {
+   "abs": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['abs'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['abs'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "arctan": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 1.2579214742491708e-16,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 1.4606805949366243e-16,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 1.4606805949366243e-16,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 1.4606805949366243e-16,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 5.346537960309983e-16,
+     "status": "structured"
+    }
+   },
+   "celu": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 7.210604652915172e-17,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.8896225029599635e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.8896225029599635e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.8896225029599635e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "cos": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.8916530030216438e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 1.187839916505897e-16,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 1.187839916505897e-16,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 1.187839916505897e-16,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 2.635009913062205e-16,
+     "status": "structured"
+    }
+   },
+   "cosh": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.386726047331013e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.247650830792196e-16,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.247650830792196e-16,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.247650830792196e-16,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.7742502948453522e-16,
+     "status": "structured"
+    }
+   },
+   "cot": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 2.327198369853321e-16,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 5.419941644147993e-14,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 5.419941644147993e-14,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 5.419941644147993e-14,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.5715393339002912e-13,
+     "status": "structured"
+    }
+   },
+   "coth": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 4.45688158157893e-16,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 2.090185957417135e-16,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 2.090185957417135e-16,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 2.090185957417135e-16,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.341127972345013e-26,
+     "status": "structured"
+    }
+   },
+   "elu": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 7.210604652915172e-17,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.8896225029599635e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.8896225029599635e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.8896225029599635e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "exp": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.1029499893855065e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 8.061471754842402e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 8.061471754842402e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 8.061471754842402e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 2.0890766965164243e-16,
+     "status": "structured"
+    }
+   },
+   "gaussian": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 2.651190186345653e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 1.0455855168582301e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 1.0455855168582301e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 1.0455855168582301e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.0412877889596443e-16,
+     "status": "structured"
+    }
+   },
+   "gelu": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.2317732751947113e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 2.3422189193277318e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 2.3422189193277318e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 2.3422189193277318e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.074992397942054e-16,
+     "status": "structured"
+    }
+   },
+   "hardshrink": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['hardshrink'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['hardshrink'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "hardsigmoid": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['hardsigmoid'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['hardsigmoid'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "hardswish": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 3.444944897130602e-18,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 1.9679486321695016e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 1.9679486321695016e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 1.9679486321695016e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 3.7092071208132753e-17,
+     "status": "fallback"
+    }
+   },
+   "hardtanh": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['hardtanh'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['hardtanh'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "huber": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.7045186419167736e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.7045186419167736e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.7045186419167736e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 1.0910571005124598e-16,
+     "status": "fallback"
+    }
+   },
+   "leaky_relu": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['leaky_relu'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['leaky_relu'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "log1pu2": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 1.4794776584486177e-16,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 1.1652380670606502e-16,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 1.1652380670606502e-16,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 1.1652380670606502e-16,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 2.4482906554286444e-16,
+     "status": "structured"
+    }
+   },
+   "log_cosh": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 9.517651816125486e-17,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 2.5670201686405905e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 2.5670201686405905e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 2.5670201686405905e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 2.393039737895007e-16,
+     "status": "structured"
+    }
+   },
+   "mish": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.184981869824957e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 9.352515880304715e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 9.352515880304715e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 9.352515880304715e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.6443136075003657e-16,
+     "status": "structured"
+    }
+   },
+   "prelu": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['prelu'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['prelu'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "relu": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['relu'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['relu'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "relu6": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['relu6'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['relu6'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "sech": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 1.3752405474306135e-16,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 5.79980879956536e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 5.79980879956536e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 5.79980879956536e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 2.466593056453532e-16,
+     "status": "structured"
+    }
+   },
+   "selu": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 4.588873322686154e-17,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 9.1548371233588e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 9.1548371233588e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 9.1548371233588e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "sigmoid": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.0197198818511873e-17,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.4408880843766653e-18,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.4408880843766653e-18,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.4408880843766653e-18,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 7.285327152968435e-17,
+     "status": "structured"
+    }
+   },
+   "sign": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['sign'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['sign'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "silu": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 6.942743643714715e-17,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.794932718616293e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.794932718616293e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.794932718616293e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.4108411278480442e-16,
+     "status": "structured"
+    }
+   },
+   "sin": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.459389965794504e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 9.900677448256668e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 9.900677448256668e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 9.900677448256668e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 3.1760477708784986e-16,
+     "status": "structured"
+    }
+   },
+   "sinh": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 6.091388012880865e-17,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 1.0147489898191863e-16,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 1.0147489898191863e-16,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 1.0147489898191863e-16,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.6608506587882934e-16,
+     "status": "structured"
+    }
+   },
+   "smooth_sign": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.869806899558755e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.540075319123725e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.540075319123725e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.540075319123725e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.496416261437398e-16,
+     "status": "structured"
+    }
+   },
+   "soft_relu": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.17942172905918e-17,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 1.8498724831279662e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 1.8498724831279662e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 1.8498724831279662e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 5.991195568436676e-17,
+     "status": "structured"
+    }
+   },
+   "soft_step": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.0197198818511873e-17,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.4408880843766653e-18,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.4408880843766653e-18,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.4408880843766653e-18,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 7.285327152968435e-17,
+     "status": "structured"
+    }
+   },
+   "softabs": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 3.115881694907405e-14,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 2.280478443201515e-16,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 2.280478443201515e-16,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 2.280478443201515e-16,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.5958243021935315e-15,
+     "status": "structured"
+    }
+   },
+   "softplus": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.17942172905918e-17,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 1.8498724831279662e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 1.8498724831279662e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 1.8498724831279662e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 5.991195568436676e-17,
+     "status": "structured"
+    }
+   },
+   "softshrink": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['softshrink'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['softshrink'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "softsign": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 1.4670928388610343e-16,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 4.135802253228476e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 4.135802253228476e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 4.135802253228476e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 1.8540802981387527e-16,
+     "status": "fallback"
+    }
+   },
+   "step": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['step'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['step'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   },
+   "tan": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 3.7547918376441243e-16,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 4.3879240216577673e-16,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 4.3879240216577673e-16,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 4.3879240216577673e-16,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 3.8088198024776733e-16,
+     "status": "structured"
+    }
+   },
+   "tanh": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.869806899558755e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.540075319123725e-17,
+     "status": "structured"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 3.540075319123725e-17,
+     "status": "structured"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 3.540075319123725e-17,
+     "status": "structured"
+    },
+    "residual_gram": {
+     "algorithm": "full_streams",
+     "error": 1.496416261437398e-16,
+     "status": "structured"
+    }
+   },
+   "threshold": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "laplacian_forward": {
+     "algorithm": "forward_laplacian",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'forward_laplacian': activation(s) ['threshold'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "laplacian_projected": {
+     "algorithm": "projected",
+     "error": 0.0,
+     "note": "opt-in: allow_almost_everywhere; cannot force 'projected': activation(s) ['threshold'] have an a.e.-zero second derivative; pass allow_almost_everywhere=True to opt in",
+     "status": "refused"
+    },
+    "residual_gram": {
+     "algorithm": "autodiff_rows",
+     "error": 0.0,
+     "status": "fallback"
+    }
+   }
+  },
+  "architectures": {
+   "attention": {
+    "biharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 3.4473025856425105e-18,
+     "status": "reduced"
+    },
+    "laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 5.147810014050385e-18,
+     "status": "reduced"
+    },
+    "triharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 5.166525725982693e-18,
+     "status": "reduced"
+    },
+    "weighted_laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 2.5592649252269914e-18,
+     "status": "reduced"
+    }
+   },
+   "fourier_features": {
+    "biharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 3.9364847436808955e-16,
+     "status": "reduced"
+    },
+    "laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 1.2478454781437845e-16,
+     "status": "reduced"
+    },
+    "triharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 1.3019775235829003e-15,
+     "status": "reduced"
+    },
+    "weighted_laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 1.1756573819573216e-16,
+     "status": "reduced"
+    }
+   },
+   "gated_pirate": {
+    "biharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 7.075215324019902e-16,
+     "status": "reduced"
+    },
+    "laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 3.367264222643425e-16,
+     "status": "reduced"
+    },
+    "triharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 1.0632497546169255e-15,
+     "status": "reduced"
+    },
+    "weighted_laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 4.0452062559991057e-16,
+     "status": "reduced"
+    }
+   },
+   "hard_boundary_mask": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 5.84721074549844e-17,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "taylor_jet",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "triharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 2.1631041276007135e-16,
+     "status": "fallback"
+    },
+    "weighted_laplacian": {
+     "algorithm": "taylor_jet",
+     "error": 2.1042925472601294e-16,
+     "status": "fallback"
+    }
+   },
+   "kan_edges": {
+    "biharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 1.6299885408317173e-16,
+     "status": "fallback"
+    },
+    "laplacian": {
+     "algorithm": "taylor_jet",
+     "error": 1.2410130276847776e-16,
+     "status": "fallback"
+    },
+    "triharmonic": {
+     "algorithm": "nested_autodiff",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "weighted_laplacian": {
+     "algorithm": "taylor_jet",
+     "error": 2.5586272703768455e-16,
+     "status": "fallback"
+    }
+   },
+   "mlp_tanh": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.1598331637617372e-16,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 3.143770054059566e-17,
+     "status": "structured"
+    },
+    "triharmonic": {
+     "algorithm": "projected",
+     "error": 7.355429773816067e-17,
+     "status": "structured"
+    },
+    "weighted_laplacian": {
+     "algorithm": "projected",
+     "error": 2.514545874255204e-17,
+     "status": "structured"
+    }
+   },
+   "residual_mlp": {
+    "biharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 2.6383166826817254e-17,
+     "status": "reduced"
+    },
+    "laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 6.797233509326332e-18,
+     "status": "reduced"
+    },
+    "triharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 1.2945286368271117e-16,
+     "status": "reduced"
+    },
+    "weighted_laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 5.109679398485674e-18,
+     "status": "reduced"
+    }
+   },
+   "siren_folded_layers": {
+    "biharmonic": {
+     "algorithm": "projected",
+     "error": 1.344765045340636e-15,
+     "status": "structured"
+    },
+    "laplacian": {
+     "algorithm": "projected",
+     "error": 2.6952434146394514e-16,
+     "status": "structured"
+    },
+    "triharmonic": {
+     "algorithm": "projected",
+     "error": 2.673635087401649e-15,
+     "status": "structured"
+    },
+    "weighted_laplacian": {
+     "algorithm": "projected",
+     "error": 2.1088047048706028e-16,
+     "status": "structured"
+    }
+   },
+   "siren_scaled": {
+    "biharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 4.396955288365921e-16,
+     "status": "reduced"
+    },
+    "laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 1.6309384276225637e-16,
+     "status": "reduced"
+    },
+    "triharmonic": {
+     "algorithm": "subspace_nested",
+     "error": 7.994080956618544e-16,
+     "status": "reduced"
+    },
+    "weighted_laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 3.0579500892611356e-16,
+     "status": "reduced"
+    }
+   }
+  },
+  "derivatives": {
+   "curl": {
+    "note": "see vector_fields",
+    "status": "not_provided"
+   },
+   "mixed_derivative": {
+    "algorithm": "projected+projected",
+    "error": 6.799387251188704e-18,
+    "status": "composed"
+   },
+   "space_subset_laplacian": {
+    "algorithm": "projected",
+    "error": 2.5525941152802768e-17,
+    "status": "structured"
+   },
+   "time_derivative": {
+    "algorithm": "projected",
+    "error": 1.3253704017439211e-17,
+    "status": "structured"
+   }
+  },
+  "residuals": {
+   "allen_cahn_nonlinear": {
+    "algorithm": "full_streams",
+    "error": 1.643003013071759e-16,
+    "status": "structured"
+   },
+   "boundary_normal_derivative": {
+    "algorithm": "full_streams",
+    "error": 4.898307105092063e-17,
+    "status": "structured"
+   },
+   "burgers_time_space": {
+    "algorithm": "full_streams",
+    "error": 1.052026314120404e-16,
+    "status": "structured"
+   },
+   "gradient_norm_nonlinearity": {
+    "algorithm": "full_streams",
+    "error": 1.7106764799859053e-16,
+    "status": "structured"
+   },
+   "variable_coefficient_biharmonic": {
+    "algorithm": "autodiff_rows",
+    "error": 5.771406674068835e-17,
+    "status": "fallback"
+   },
+   "variable_coefficient_poisson": {
+    "algorithm": "full_streams",
+    "error": 6.378325676034246e-17,
+    "status": "structured"
+   }
+  },
+  "vector_fields": {
+   "mlp_tanh": {
+    "curl": {
+     "note": "first-order: torch.func.jacrev(model) gives the antisymmetric part in D reverse passes",
+     "status": "not_provided"
+    },
+    "divergence": {
+     "algorithm": "projected",
+     "error": 4.692510520360604e-17,
+     "status": "structured"
+    },
+    "logdet": {
+     "algorithm": "projected",
+     "error": 9.337778480387786e-17,
+     "status": "structured"
+    },
+    "solve": {
+     "algorithm": "woodbury",
+     "error": 9.739389126692737e-17,
+     "status": "structured"
+    },
+    "vector_laplacian": {
+     "algorithm": "projected",
+     "error": 3.72149636387486e-17,
+     "status": "structured"
+    }
+   },
+   "residual_mlp": {
+    "curl": {
+     "note": "first-order: torch.func.jacrev(model) gives the antisymmetric part in D reverse passes",
+     "status": "not_provided"
+    },
+    "divergence": {
+     "algorithm": "jacobian_trace",
+     "error": 2.443734313097639e-17,
+     "status": "fallback"
+    },
+    "logdet": {
+     "algorithm": "dense_jacobian",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "solve": {
+     "algorithm": "dense_jacobian",
+     "error": 0.0,
+     "status": "fallback"
+    },
+    "vector_laplacian": {
+     "algorithm": "subspace_jet",
+     "error": 6.681296021806699e-17,
+     "status": "reduced"
+    }
+   }
+  }
+ }
+}

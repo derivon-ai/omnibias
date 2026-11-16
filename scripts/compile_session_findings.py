@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Compile the session overview and complete research notes without altering sources."""
 
 from __future__ import annotations

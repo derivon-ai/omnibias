@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "omnibias-core"
-version = "0.5.0rc1"
+version = "0.5.0"
 description = "Numerically-stable closed-form n-th derivative forward-pass framework: pure-Python core with polynomial coefficient generators (Eulerian / Legendre / Hermite) and the backend-agnostic ActivationSpec protocol."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -53,5 +53,5 @@ where = ["src"]
 include = ["omnibias.*"]
 
 [tool.setuptools.package-data]
-"omnibias.core" = ["py.typed"]
+"omnibias.core" = ["py.typed", "calibration/*.json", "fixtures/*.json"]
 "omnibias.core.verified" = ["py.typed"]

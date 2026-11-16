@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Conditional binary64 forward-error interpreter for actual JAX operation DAGs.
 
 No empirical error is used as a proof bound. Transcendental real intervals use
@@ -490,7 +492,7 @@ def interpret(closed, inputs, max_equations=100000, constant_bounds=None, max_st
             p = eq.params
             vs = [read(v) for v in eq.invars]
             projected = sum((math.prod(v.aval.shape) * 24 for v in eq.outvars if hasattr(v.aval, 'shape')))
-            views = {'reshape', 'transpose', 'broadcast_in_dim', 'slice', 'squeeze', 'stop_gradient', 'copy', 'split', 'unstack', 'rev', 'optimization_barrier'}
+            views = {'reshape', 'transpose', 'broadcast_in_dim', 'slice', 'squeeze', 'stop_gradient', 'copy', 'split', 'unstack', 'rev', 'optimization_barrier', 'device_put'}
             nested = {'jit', 'pjit', 'custom_jvp_call', 'custom_vjp_call', 'closed_call', 'remat2', 'cond'}
             if name in views or name in nested:
                 projected = 0
@@ -503,8 +505,8 @@ def interpret(closed, inputs, max_equations=100000, constant_bounds=None, max_st
             if name in ('jit', 'pjit', 'custom_jvp_call', 'custom_vjp_call', 'closed_call', 'remat2'):
                 sub = p.get('jaxpr', p.get('call_jaxpr'))
                 out = walk(getattr(sub, 'jaxpr', sub), getattr(sub, 'consts', ()), vs, path + (f'{equation_index}:{name}',))
-            elif name == 'optimization_barrier':
-                out = vs
+            elif name in ('optimization_barrier', 'device_put'):
+                out = vs  # identity on every operand (device_put binds several operands at once)
             elif name == 'scan':
                 sub = p['jaxpr']
                 nc = p['num_consts']

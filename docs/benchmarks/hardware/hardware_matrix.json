@@ -1,0 +1,340 @@
+{
+ "protocol": "omnibias_experiments/hardware_20261022/README.md",
+ "ship_rule": {
+  "median": 1.1,
+  "worst": 1.5
+ },
+ "problems_per_device": 40,
+ "devices": {
+  "a100_80": {
+   "device": "NVIDIA A100-SXM4-80GB",
+   "jax": "0.10.2",
+   "probe": {
+    "gemm_f64_flops": 17514465841654.701,
+    "gemm_f32_highest_flops": 18690633871832.836,
+    "gemm_f32_tf32_flops": 123867449371390.25,
+    "bandwidth_bytes_per_s": 1638779978013.3345,
+    "launch_latency_s": 4.9261250533163546e-05,
+    "tanh_f64_elems_per_s": 104319060448.59601,
+    "memory_bytes": 63822626816
+   },
+   "n_problems": 40,
+   "n_cells_lost": 0,
+   "n_cells_truncated": 4,
+   "winners": {
+    "jacobian_trace": 2,
+    "projected": 21,
+    "full_streams": 6,
+    "forward_laplacian": 7,
+    "nested_autodiff": 2,
+    "forward_polylaplacian": 1,
+    "dense_jacobian": 1
+   },
+   "generic": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": 1.1449242042440637,
+    "p90": 1.582111372089371,
+    "worst": 3.031597218518172,
+    "hit_rate": 0.575
+   },
+   "a100_transfer": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": Infinity,
+    "p90": 1.582111372089371,
+    "worst": Infinity,
+    "hit_rate": 0.575
+   },
+   "own_cv": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": Infinity,
+    "p90": 1.995354192909849,
+    "worst": Infinity,
+    "hit_rate": 0.55
+   },
+   "own_cv_unscored": {
+    "worst_finite": 3.031597218518172,
+    "n_infinite": 1,
+    "infinite": [
+     {
+      "group": "lap2/0",
+      "chosen": "projected",
+      "why": "unmeasured"
+     }
+    ]
+   },
+   "class_transfer": null,
+   "ship": false
+  },
+  "a100_40": {
+   "device": "NVIDIA A100-SXM4-40GB",
+   "jax": "0.10.2",
+   "probe": {
+    "gemm_f64_flops": 17758505070391.695,
+    "gemm_f32_highest_flops": 18724187379684.605,
+    "gemm_f32_tf32_flops": 123117683562136.62,
+    "bandwidth_bytes_per_s": 1328181157299.3335,
+    "launch_latency_s": 5.296551063656807e-05,
+    "tanh_f64_elems_per_s": 83519316766.17773,
+    "memory_bytes": 31805407232
+   },
+   "n_problems": 40,
+   "n_cells_lost": 0,
+   "n_cells_truncated": 5,
+   "winners": {
+    "jacobian_trace": 2,
+    "projected": 17,
+    "projected_streams": 3,
+    "full_streams": 3,
+    "nested_autodiff": 2,
+    "taylor_jet": 3,
+    "forward_laplacian": 5,
+    "forward_polylaplacian": 1,
+    "dense_jacobian": 4
+   },
+   "generic": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": 1.4224634052342933,
+    "p90": 2.5650039832493285,
+    "worst": 41.73720672534546,
+    "hit_rate": 0.525
+   },
+   "a100_transfer": {
+    "n": 40.0,
+    "median": 1.0003534651777044,
+    "mean": Infinity,
+    "p90": 2.107709177141192,
+    "worst": Infinity,
+    "hit_rate": 0.475
+   },
+   "own_cv": {
+    "n": 40.0,
+    "median": 1.0001302529719358,
+    "mean": Infinity,
+    "p90": 2.6200842075087962,
+    "worst": Infinity,
+    "hit_rate": 0.5
+   },
+   "own_cv_unscored": {
+    "worst_finite": 15.634836028008145,
+    "n_infinite": 1,
+    "infinite": [
+     {
+      "group": "lap2/0",
+      "chosen": "projected",
+      "why": "unmeasured"
+     }
+    ]
+   },
+   "class_transfer": {
+    "n": 40.0,
+    "median": 1.0179450412350324,
+    "mean": Infinity,
+    "p90": 3.457209634955704,
+    "worst": Infinity,
+    "hit_rate": 0.425
+   },
+   "ship": false
+  },
+  "h100_sxm": {
+   "device": "NVIDIA H100 80GB HBM3",
+   "jax": "0.10.2",
+   "probe": {
+    "gemm_f64_flops": 55273282457751.7,
+    "gemm_f32_highest_flops": 51607263800194.734,
+    "gemm_f32_tf32_flops": 365418649061416.44,
+    "bandwidth_bytes_per_s": 2949771070512.59,
+    "launch_latency_s": 2.742484211921692e-05,
+    "tanh_f64_elems_per_s": 186508076865.72256,
+    "memory_bytes": 63763906560
+   },
+   "n_problems": 40,
+   "n_cells_lost": 0,
+   "n_cells_truncated": 4,
+   "winners": {
+    "jacobian_trace": 3,
+    "projected": 16,
+    "full_streams": 6,
+    "forward_laplacian": 4,
+    "nested_autodiff": 3,
+    "taylor_jet": 3,
+    "forward_polylaplacian": 1,
+    "dense_jacobian": 4
+   },
+   "generic": {
+    "n": 40.0,
+    "median": 1.0167217630564223,
+    "mean": 1.2138289258628632,
+    "p90": 2.022450793377564,
+    "worst": 3.900567084920975,
+    "hit_rate": 0.425
+   },
+   "a100_transfer": {
+    "n": 40.0,
+    "median": 1.0167217630564223,
+    "mean": Infinity,
+    "p90": 2.022450793377564,
+    "worst": Infinity,
+    "hit_rate": 0.45
+   },
+   "own_cv": {
+    "n": 40.0,
+    "median": 1.0167217630564223,
+    "mean": Infinity,
+    "p90": 2.022450793377564,
+    "worst": Infinity,
+    "hit_rate": 0.45
+   },
+   "own_cv_unscored": {
+    "worst_finite": 3.2050018936175344,
+    "n_infinite": 1,
+    "infinite": [
+     {
+      "group": "lap2/0",
+      "chosen": "projected",
+      "why": "unmeasured"
+     }
+    ]
+   },
+   "class_transfer": null,
+   "ship": false
+  },
+  "a30": {
+   "device": "NVIDIA A30",
+   "jax": "0.10.2",
+   "probe": {
+    "gemm_f64_flops": 7624334893044.995,
+    "gemm_f32_highest_flops": 9644506233045.977,
+    "gemm_f32_tf32_flops": 54558773271862.45,
+    "bandwidth_bytes_per_s": 801136160372.3907,
+    "launch_latency_s": 2.7326827868819236e-05,
+    "tanh_f64_elems_per_s": 50229684734.86352,
+    "memory_bytes": 19004391424
+   },
+   "n_problems": 40,
+   "n_cells_lost": 0,
+   "n_cells_truncated": 4,
+   "winners": {
+    "projected": 24,
+    "jacobian_trace": 1,
+    "full_streams": 5,
+    "projected_streams": 1,
+    "forward_laplacian": 4,
+    "forward_polylaplacian": 1,
+    "dense_jacobian": 4
+   },
+   "generic": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": 1.13335490841054,
+    "p90": 1.5282662002976417,
+    "worst": 2.636913131074814,
+    "hit_rate": 0.625
+   },
+   "a100_transfer": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": Infinity,
+    "p90": 1.9318919671417478,
+    "worst": Infinity,
+    "hit_rate": 0.575
+   },
+   "own_cv": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": Infinity,
+    "p90": 2.2404236109334574,
+    "worst": Infinity,
+    "hit_rate": 0.55
+   },
+   "own_cv_unscored": {
+    "worst_finite": 2.636913131074814,
+    "n_infinite": 1,
+    "infinite": [
+     {
+      "group": "lap2/0",
+      "chosen": "projected",
+      "why": "unmeasured"
+     }
+    ]
+   },
+   "class_transfer": null,
+   "ship": false
+  },
+  "cpu": {
+   "device": "cpu",
+   "jax": "0.10.2",
+   "probe": {
+    "gemm_f64_flops": 76739438397.25507,
+    "gemm_f32_highest_flops": 219775613190.3258,
+    "gemm_f32_tf32_flops": 213298228543.40082,
+    "bandwidth_bytes_per_s": 16501145807.183863,
+    "launch_latency_s": 1.003311574459076e-05,
+    "tanh_f64_elems_per_s": 753405872.4995619,
+    "memory_bytes": null
+   },
+   "n_problems": 40,
+   "n_cells_lost": 0,
+   "n_cells_truncated": 5,
+   "winners": {
+    "projected": 25,
+    "jacobian_trace": 1,
+    "projected_streams": 5,
+    "full_streams": 1,
+    "forward_laplacian": 4,
+    "forward_polylaplacian": 1,
+    "dense_jacobian": 3
+   },
+   "generic": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": 1.0328117050256804,
+    "p90": 1.0733320671613638,
+    "worst": 1.4455548210574993,
+    "hit_rate": 0.75
+   },
+   "a100_transfer": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": Infinity,
+    "p90": 1.4669015064426343,
+    "worst": Infinity,
+    "hit_rate": 0.7
+   },
+   "own_cv": {
+    "n": 40.0,
+    "median": 1.0,
+    "mean": Infinity,
+    "p90": 1.4419873868415498,
+    "worst": Infinity,
+    "hit_rate": 0.725
+   },
+   "own_cv_unscored": {
+    "worst_finite": 3.119178734544408,
+    "n_infinite": 1,
+    "infinite": [
+     {
+      "group": "lap2/0",
+      "chosen": "projected",
+      "why": "unmeasured"
+     }
+    ]
+   },
+   "class_transfer": null,
+   "ship": false
+  }
+ },
+ "not_measured": {
+  "h100_pcie": "requested 22 Oct 10:07 PDT; the job was still pending 15.5 hours later (23 Oct 01:36 PDT) and was cancelled without running",
+  "h200": "requested 22 Oct 10:07 PDT; the job was still pending 15.5 hours later (23 Oct 01:36 PDT) and was cancelled without running",
+  "l40": "requested 22 Oct 10:07 PDT; the job was still pending 15.5 hours later (23 Oct 01:36 PDT) and was cancelled without running",
+  "v100_sxm2": "requested 22 Oct 10:07 PDT; the job was still pending 15.5 hours later (23 Oct 01:36 PDT) and was cancelled without running",
+  "v100_pcie": "requested 22 Oct 10:07 PDT; the job was still pending 15.5 hours later (23 Oct 01:36 PDT) and was cancelled without running",
+  "tpu": "no access",
+  "amd_gpu": "not attempted"
+ },
+ "calibration_files_shipped": []
+}

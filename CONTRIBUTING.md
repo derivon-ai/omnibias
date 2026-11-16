@@ -29,6 +29,12 @@ Use shared core polynomial coefficients, preserve parameter gradients, and
 state numerical and approximation limits. Do not change versions unless the
 release task asks for it.
 
+A name promoted out of an `experimental` module follows the schedule in
+[docs/stability.md](docs/stability.md): register an `Alias` (silent for one release, a
+`DeprecationWarning` for at least one more, then removal), keep it resolving to the same object,
+and never remove an alias before its `remove_in` release. A change to the plan format needs a
+`PLAN_FORMAT` bump and a migration.
+
 [AGENTS.md](AGENTS.md) routes repository maintenance; the
 [numerical contracts](docs/development/numerical-contracts.md) cover shared math invariants.
 Review [LICENSING.md](LICENSING.md) before adding cross-package dependencies.

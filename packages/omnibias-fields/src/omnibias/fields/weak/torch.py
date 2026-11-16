@@ -9,7 +9,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 import torch
-from omnibias.fields._core.quadrature import QuadratureSpec
+from omnibias.fields._core.quadrature import QuadratureSpec, _converted
 from omnibias.fields.weak._core import (
     TestFunctionSpace,
     WeakForm,
@@ -33,8 +33,12 @@ class ResidualTerm:
 
 
 def _quad_nodes(spec: QuadratureSpec, dtype: torch.dtype, device: torch.device) -> tuple[Tensor, Tensor]:
-    x = torch.as_tensor(spec.nodes[:, 0], dtype=dtype, device=device)
-    w = torch.as_tensor(spec.weights, dtype=dtype, device=device)
+    x = _converted(
+        spec, ("axis0", dtype, device), lambda: torch.as_tensor(spec.nodes[:, 0], dtype=dtype, device=device)
+    )
+    w = _converted(
+        spec, ("weights", dtype, device), lambda: torch.as_tensor(spec.weights, dtype=dtype, device=device)
+    )
     return x, w
 
 

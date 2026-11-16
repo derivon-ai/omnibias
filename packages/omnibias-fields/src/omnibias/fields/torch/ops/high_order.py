@@ -7,6 +7,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import torch
+from omnibias.fields.torch.ops._planned import routed as _routed
 from omnibias.fields.torch.ops.basic import (
     _is_chebyshev,
     _is_jet_mlp,
@@ -38,6 +39,9 @@ def biharmonic(state: FieldState, name: str) -> Tensor:
     if _is_chebyshev(state):
         return state.field.biharmonic(state, name)  # type: ignore[attr-defined]
     if _is_jet_mlp(state):
+        planned = _routed(state, (name,), "laplacian", power=2)
+        if planned is not None:
+            return planned
         return state.field.biharmonic(state, name)  # type: ignore[attr-defined]
     # Generic fallback: chain through laplacian-of-laplacian.
     raise NotImplementedError(
@@ -69,6 +73,9 @@ def polylaplacian(state: FieldState, name: str, *, k: int) -> Tensor:
         # Composition fallback: Delta^k = Delta(Delta^{k-1}).
         return state.field.polylaplacian(state, name, k=k)  # type: ignore[attr-defined]
     if _is_jet_mlp(state):
+        planned = _routed(state, (name,), "laplacian", power=k)
+        if planned is not None:
+            return planned
         # Multinomial expansion of (sum_i d_i^2)^k over one order-2k jet.
         return state.field.polylaplacian(state, name, k=k)  # type: ignore[attr-defined]
     raise NotImplementedError(
@@ -107,15 +114,17 @@ def hessian(
             return full
         idx = list(axis_idx)
         return full[..., idx, :][..., :, idx]
-    # Generic fallback: request only the selected Hessian entries.
-    rows = []
-    for i in axis_idx:
-        cols = [
-            derivative(state, name, axis=i, order=2)
-            if i == j else mixed_partial(state, name, (i, j), (1, 1))
-            for j in axis_idx
-        ]
-        rows.append(torch.stack(cols, dim=-1))
+    # Generic fallback: request only the selected Hessian entries -- the upper triangle, mirrored (mixed partials commute).
+    n = len(axis_idx)
+    upper: dict[tuple[int, int], Tensor] = {}
+    for p in range(n):
+        for q in range(p, n):
+            i, j = axis_idx[p], axis_idx[q]
+            upper[(p, q)] = (
+                derivative(state, name, axis=i, order=2)
+                if i == j else mixed_partial(state, name, (i, j), (1, 1))
+            )
+    rows = [torch.stack([upper[(min(p, q), max(p, q))] for q in range(n)], dim=-1) for p in range(n)]
     return torch.stack(rows, dim=-2)  # (B, D, D); rows index outer axis
 
 
@@ -173,21 +182,44 @@ def vector_hessian(
     return torch.stack(rows, dim=-3)
 
 
+def _routed_vector(state: FieldState, names: tuple[str, ...], power: int) -> Tensor | None:
+    """The ``power``-th Laplacian of every component of ``names`` in one planner call, or ``None``.
+
+    ``None`` when there is one component, the field is not a deep field or does not opt in to the planner: the
+    components are then evaluated one by one as before.  The planner serves a vector-valued chain with one program, so the
+    first layers are evaluated once for all components instead of once per component.
+    """
+    if len(names) < 2 or not _is_jet_mlp(state):
+        return None
+    return _routed(state, tuple(names), "laplacian", power=power)
+
+
 def vector_laplacian(state: FieldState, names: tuple[str, ...]) -> Tensor:
     """Laplacian applied per component, shape ``(B, len(names))``."""
     from omnibias.fields.torch.ops.basic import laplacian
+    planned = _routed_vector(state, names, 1)
+    if planned is not None:
+        return planned
     cols = [laplacian(state, n) for n in names]
     return torch.stack(cols, dim=-1)
 
 
 def vector_biharmonic(state: FieldState, names: tuple[str, ...]) -> Tensor:
     """Biharmonic per component, shape ``(B, len(names))``."""
+    planned = _routed_vector(state, names, 2)
+    if planned is not None:
+        return planned
     cols = [biharmonic(state, n) for n in names]
     return torch.stack(cols, dim=-1)
 
 
 def vector_polylaplacian(state: FieldState, names: tuple[str, ...], *, k: int) -> Tensor:
     """Polylaplacian applied per component, shape ``(B, len(names))``."""
+    if k < 1:
+        raise ValueError(f"polylaplacian k must be >= 1, got {k}")
+    planned = _routed_vector(state, names, k)
+    if planned is not None:
+        return planned
     cols = [polylaplacian(state, n, k=k) for n in names]
     return torch.stack(cols, dim=-1)
 

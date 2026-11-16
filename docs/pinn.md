@@ -72,7 +72,10 @@ Newton-CG and structured curvature methods. Distinguish residual-based
 Gauss–Newton from a full loss Hessian, and follow the chosen optimizer's
 closure contract. Compare held-out solution error and wall time, not step
 count alone. The [capability guide](capabilities.md#curvature-aware-training)
-maps the families and preserves historical optimizer results.
+maps the families and preserves historical optimizer results. For the derivative
+programs, [regimes](regimes.md) lists where each family is faster, level or slower
+than the baselines by operator, dimension, width, device and precision, and
+[the planner](operator-planner.md#planning-for-training) times the candidates on your shape.
 
 For application-level difficulties, the external **omnibias-pinn** consumer
 provides the following module families; these are not part of this workspace:

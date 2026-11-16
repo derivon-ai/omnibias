@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Supplemental operator composition over a frozen-base factorization.
 
 Research only; no promotion is implied by the geometry benchmark. The callable

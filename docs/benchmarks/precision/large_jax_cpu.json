@@ -1,0 +1,183 @@
+{
+ "backend": "jax",
+ "device": "cpu",
+ "records": [
+  {
+   "backend": "jax",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "float32",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 9.263915206059181e-07,
+   "scale": 1.2418122976671992,
+   "rel_error": 7.459996348451265e-07,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "float32_tf32",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 9.263915206059181e-07,
+   "scale": 1.2418122976671992,
+   "rel_error": 7.459996348451265e-07,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "bfloat16_allowed",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 0.012651674683235914,
+   "scale": 1.2418122976671992,
+   "rel_error": 0.010188073275649355,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "float32",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 3.795659371252924e-06,
+   "scale": 7.882992534508335,
+   "rel_error": 4.814998053895354e-07,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "float32_tf32",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 3.795659371252924e-06,
+   "scale": 7.882992534508335,
+   "rel_error": 4.814998053895354e-07,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "bfloat16_allowed",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 0.2427433971439088,
+   "scale": 7.882992534508335,
+   "rel_error": 0.030793305471403545,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "float32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 2.9909909865510897e-06,
+   "scale": 0.9110738283501367,
+   "rel_error": 3.282929323046711e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "float32_tf32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 2.9909909865510897e-06,
+   "scale": 0.9110738283501367,
+   "rel_error": 3.282929323046711e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "bfloat16_allowed",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 0.007462217519787928,
+   "scale": 0.9110738283501367,
+   "rel_error": 0.008190573900362449,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "float32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 1.932362516998687e-06,
+   "scale": 1.144692336710481,
+   "rel_error": 1.6881064501154475e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "float32_tf32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 1.932362516998687e-06,
+   "scale": 1.144692336710481,
+   "rel_error": 1.6881064501154475e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "bfloat16_allowed",
+   "reference_program": "projected",
+   "status": "error",
+   "reason": "NotImplementedError: (KeyError(<class 'ml_dtypes.bfloat16'>), 'Unsupported dtype bfloat16.')"
+  },
+  {
+   "backend": "jax",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "float32",
+   "reference_program": "projected_streams",
+   "status": "ok",
+   "abs_error": 5.623677486710221e-05,
+   "scale": 224.00509056190782,
+   "rel_error": 2.510513253338775e-07,
+   "ran": "projected_streams"
+  },
+  {
+   "backend": "jax",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "float32_tf32",
+   "reference_program": "projected_streams",
+   "status": "ok",
+   "abs_error": 5.623677486710221e-05,
+   "scale": 224.00509056190782,
+   "rel_error": 2.510513253338775e-07,
+   "ran": "projected_streams"
+  },
+  {
+   "backend": "jax",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "bfloat16_allowed",
+   "reference_program": "projected_streams",
+   "status": "ok",
+   "abs_error": 1.3233526687259314,
+   "scale": 224.00509056190782,
+   "rel_error": 0.005907690157426129,
+   "ran": "projected_streams"
+  }
+ ]
+}

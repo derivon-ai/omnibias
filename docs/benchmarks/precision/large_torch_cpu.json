@@ -1,0 +1,183 @@
+{
+ "backend": "torch",
+ "device": "cpu",
+ "records": [
+  {
+   "backend": "torch",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "float32",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 9.238719940185547e-07,
+   "scale": 1.2418123483657837,
+   "rel_error": 7.439706935064414e-07,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "torch",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "float32_tf32",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 9.238719940185547e-07,
+   "scale": 1.2418123483657837,
+   "rel_error": 7.439706935064414e-07,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "torch",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "bfloat16_allowed",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 0.013917148113250732,
+   "scale": 1.2418123483657837,
+   "rel_error": 0.011207126528871774,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "torch",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "float32",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 4.76837158203125e-06,
+   "scale": 7.882992744445801,
+   "rel_error": 6.048935647430285e-07,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "torch",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "float32_tf32",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 4.76837158203125e-06,
+   "scale": 7.882992744445801,
+   "rel_error": 6.048935647430285e-07,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "torch",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "bfloat16_allowed",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 0.24274349212646484,
+   "scale": 7.882992744445801,
+   "rel_error": 0.03079331670037335,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "torch",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "float32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 2.7418136596679688e-06,
+   "scale": 0.9110738039016724,
+   "rel_error": 3.009430902223459e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "torch",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "float32_tf32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 2.7418136596679688e-06,
+   "scale": 0.9110738039016724,
+   "rel_error": 3.009430902223459e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "torch",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "bfloat16_allowed",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 0.007462203502655029,
+   "scale": 0.9110738039016724,
+   "rel_error": 0.00819055873486665,
+   "ran": "projected"
+  },
+  {
+   "backend": "torch",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "float32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 1.6093254089355469e-06,
+   "scale": 1.144692301750183,
+   "rel_error": 1.4059021856571942e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "torch",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "float32_tf32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 1.6093254089355469e-06,
+   "scale": 1.144692301750183,
+   "rel_error": 1.4059021856571942e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "torch",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "bfloat16_allowed",
+   "reference_program": "projected",
+   "status": "error",
+   "reason": "ValueError: no executor could run this model: projected: executor could not run this model: RuntimeError: linalg.slogdet: Low precision dtypes not supported. Got BFloat16; dense_jacobian: executor cou"
+  },
+  {
+   "backend": "torch",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "float32",
+   "reference_program": "full_streams",
+   "status": "ok",
+   "abs_error": 4.57763671875e-05,
+   "scale": 224.00509643554688,
+   "rel_error": 2.0435413263318882e-07,
+   "ran": "full_streams"
+  },
+  {
+   "backend": "torch",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "float32_tf32",
+   "reference_program": "full_streams",
+   "status": "ok",
+   "abs_error": 4.57763671875e-05,
+   "scale": 224.00509643554688,
+   "rel_error": 2.0435413263318882e-07,
+   "ran": "full_streams"
+  },
+  {
+   "backend": "torch",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "bfloat16_allowed",
+   "reference_program": "full_streams",
+   "status": "ok",
+   "abs_error": 1.30645751953125,
+   "scale": 224.00509643554688,
+   "rel_error": 0.005832266945351209,
+   "ran": "full_streams"
+  }
+ ]
+}

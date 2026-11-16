@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Exact rational operator-span reduction with bounded symbolic expansion.
 
 Current numerical parameter rank/zeros never enter this reduction. Dependencies

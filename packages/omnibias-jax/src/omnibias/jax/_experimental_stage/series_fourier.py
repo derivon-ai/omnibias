@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Opt-in finite Fourier models and normalized power-series algorithms."""
 from dataclasses import dataclass
 import math

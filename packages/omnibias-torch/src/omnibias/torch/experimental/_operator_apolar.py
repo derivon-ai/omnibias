@@ -50,7 +50,8 @@ def select_apolar(request: OperatorSpec, dimension: int) -> ApolarAlgebra:
     lower_bound = max(largest_box, len(closure))
     try:
         algebra = apolar_algebra(
-            dict(terms), max_monomials=min(512, request.planning_budget.max_planning_work),
+            dict(terms),
+            max_monomials=min(512, request.planning_budget.max_planning_work),
             max_basis=min(128, request.budget.max_coefficients),
             max_products=request.budget.max_multiplication_terms,
             max_order=min(32, request.planning_budget.max_order),
@@ -64,8 +65,12 @@ def select_apolar(request: OperatorSpec, dimension: int) -> ApolarAlgebra:
     return algebra
 
 
-def apolar_derivative(expr: Expr, algebra: ApolarAlgebra, lowering: Lowering,
-                      memo: dict[Expr, list[Any]] | None = None) -> Any:
+def apolar_derivative(
+    expr: Expr,
+    algebra: ApolarAlgebra,
+    lowering: Lowering,
+    memo: dict[Expr, list[Any]] | None = None,
+) -> Any:
     """Emit a live-parameter quotient program and its raw differential readout."""
     cache = {} if memo is None else memo
     budget = lowering.operator.budget
@@ -81,8 +86,11 @@ def apolar_derivative(expr: Expr, algebra: ApolarAlgebra, lowering: Lowering,
             result = quotient_seed(node.value, node.coordinate, algebra, budget=budget)
         elif node.kind in {"add", "multiply"}:
             a, b = (lift(child) for child in node.children)
-            result = ([x + y for x, y in zip(a, b, strict=True)]
-                      if node.kind == "add" else quotient_multiply(a, b, algebra, budget=budget))
+            result = (
+                [x + y for x, y in zip(a, b, strict=True)]
+                if node.kind == "add"
+                else quotient_multiply(a, b, algebra, budget=budget)
+            )
         elif node.kind == "unary":
             rows = lift(node.children[0])
             tower = lowering.tower(rows[0], algebra.order, node.name or "", node.options)

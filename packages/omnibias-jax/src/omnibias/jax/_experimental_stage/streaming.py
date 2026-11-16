@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Objective-only streaming with explicit row-local sufficient statistics.
 
 This research implementation makes no performance or numerical-certificate claim.

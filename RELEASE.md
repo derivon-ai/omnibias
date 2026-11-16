@@ -18,28 +18,29 @@ promote this repaired cohort; never replace accepted files or use blind
 `skip-existing`. The artifact guard checks Warehouse's 512-character Summary
 limit in wheels and sdists, in addition to Twine's rendering checks.
 
-## Prerelease policy
+## Release versions and compatibility policy
 
-This migration prepares an **opt-in prerelease**, not a stable consumer upgrade:
-`core`, `torch`, `jax` are `0.5.0rc1`; `fields` is `0.2.0rc1`; `keras` is
-`0.0.2a1`; the other eleven primitives are `0.1.0a2`. Metadata and dependency
-minimums are coordinated. Recheck index availability immediately before upload.
+The compatibility promotion selects `core`, `torch` and `jax` `0.5.0`, plus
+`fields` `0.2.0`. `keras` remains `0.0.2a1`; the other eleven primitives remain
+`0.1.0a2`. Stable dependency floors are coordinated for all packages that depend
+on the promoted distributions. Recheck version availability on both indexes
+immediately before upload.
 
-`[tool.omnibias.release].prerelease-only` blocks stable artifacts. Remove this guard
-only after published-consumer feature profiles pass against the new primitives,
-or validated successor consumer releases are available with correct constraints.
-Microbenchmark wins are not a substitute for consumer compatibility.
+Stable promotion is gated on the published FermiNet `0.2.0`, PINN `0.1.0` and
+Geometry `0.2.0` feature profiles passing against the prepared wheels. The
+historical constraints remain useful for reproducing the previously published
+consumer environments. Microbenchmark results do not replace this compatibility
+gate.
 
-After publication, select the migration explicitly:
+Install a promoted distribution without prerelease selection:
 
 ```bash
-python -m pip install --pre 'omnibias-torch==0.5.0rc1'
+python -m pip install 'omnibias-torch==0.5.0'
 ```
 
-Ordinary installation without prerelease selection retains compatible published
-stable packages. `scripts/check_prerelease_isolation.py` tests this with the new
-primitive wheels available to the resolver. Avoid `--pre` in existing consumer
-environments unless the whole selected dependency closure has been validated.
+Packages that remain prereleases still need `--pre` when selected explicitly.
+`scripts/check_prerelease_isolation.py` tests resolver behavior with the prepared
+primitive wheels available.
 
 **Alpha-only exception:** Keras and first-release alpha projects have no stable
 fallback. Resolvers can select their newest prerelease without `--pre`; Keras's
@@ -49,8 +50,9 @@ below for existing installations; `--pre` is not a universal isolation switch.
 
 ## Published-consumer compatibility
 
-The following affected features work with the historical primitives and fail with
-the reduced primitive surface. This is the reason stable promotion remains blocked.
+These published features failed with the reduced primitive surface. The restored
+compatibility APIs make all six historical and prepared-wheel probes pass; rerun
+the prepared-wheel profiles before any future promotion.
 
 | Published consumer | Affected feature | Removed dependency surface |
 | --- | --- | --- |

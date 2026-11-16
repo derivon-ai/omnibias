@@ -106,7 +106,9 @@ the 3 GiB process budget; no speedup is claimed for that unfinished run.
 
 The independent deep-MLP comparison remains available in the
 [performance guide](docs/performance.md#general-deep-network-jets), including
-JAX Taylor-mode AD and cases where it wins.
+JAX Taylor-mode AD and cases where it wins. [Full-scope matrix](docs/performance.md#full-scope-matrix)
+gives the verdict of every measured cell against independent baselines, against generic engines fed omnibias's projection,
+and against omnibias's own variants.
 
 ## High-dimensional physics without a full derivative tensor
 
@@ -131,24 +133,23 @@ explain which path to choose.
 
 ## Install, then differentiate
 
-Install the prepared **RC/alpha release** explicitly for the examples below:
+Install the stable release explicitly for the examples below:
 
 Use Python **3.11+** with current backend versions for new deployments. Python
 3.10 remains a compatibility target, but resolves older backend releases that
 lack some current security fixes.
 
 ```bash
-python -m pip install --pre "omnibias-torch==0.5.0rc1"
+python -m pip install "omnibias-torch==0.5.0"
 # The soft-region example also uses the AGPL-or-commercial partition package:
 python -m pip install --pre "omnibias-partition[torch]==0.1.0a2"
 ```
 
-JAX and Keras users can select `omnibias-jax==0.5.0rc1` or
-`omnibias-keras==0.0.2a1`. Existing published consumer users should keep the
-[tested historical constraints](scripts/constraints-published.txt) until compatible
-successor releases are available. These are prereleases, and alpha-only packages
-may be selected without `--pre`; the [release guide](RELEASE.md) explains resolver
-behavior and the compatibility boundary.
+JAX users can install `omnibias-jax==0.5.0`; Keras remains at
+`omnibias-keras==0.0.2a1` and requires prerelease selection. The stable core,
+JAX and Torch releases preserve the feature probes for published FermiNet, PINN
+and Geometry consumers. See the [release guide](RELEASE.md) for the tested
+compatibility boundary and installation checks.
 
 For development from source:
 
@@ -273,19 +274,19 @@ add fields, partitions or curvature when your model needs them.
 | [omnibias-binary](packages/omnibias-binary/) | 0.1.0a2 | Apache-2.0 |
 | [omnibias-boolean](packages/omnibias-boolean/) | 0.1.0a2 | Apache-2.0 |
 | [omnibias-convex](packages/omnibias-convex/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-core](packages/omnibias-core/) | 0.5.0rc1 | Apache-2.0 |
+| [omnibias-core](packages/omnibias-core/) | 0.5.0 | Apache-2.0 |
 | [omnibias-curvature](packages/omnibias-curvature/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-difference](packages/omnibias-difference/) | 0.1.0a2 | Apache-2.0 |
 | [omnibias-discrete](packages/omnibias-discrete/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-fields](packages/omnibias-fields/) | 0.2.0rc1 | Apache-2.0 |
+| [omnibias-fields](packages/omnibias-fields/) | 0.2.0 | Apache-2.0 |
 | [omnibias-graph](packages/omnibias-graph/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-jax](packages/omnibias-jax/) | 0.5.0rc1 | Apache-2.0 |
+| [omnibias-jax](packages/omnibias-jax/) | 0.5.0 | Apache-2.0 |
 | [omnibias-keras](packages/omnibias-keras/) | 0.0.2a1 | Apache-2.0 |
 | [omnibias-partition](packages/omnibias-partition/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-qcalculus](packages/omnibias-qcalculus/) | 0.1.0a2 | Apache-2.0 |
 | [omnibias-sos](packages/omnibias-sos/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
 | [omnibias-struct](packages/omnibias-struct/) | 0.1.0a2 | AGPL-3.0-or-later **or commercial** |
-| [omnibias-torch](packages/omnibias-torch/) | 0.5.0rc1 | Apache-2.0 |
+| [omnibias-torch](packages/omnibias-torch/) | 0.5.0 | Apache-2.0 |
 
 <!-- END GENERATED PACKAGE INVENTORY -->
 
@@ -326,7 +327,7 @@ and the [agent guide](AGENTS.md) before making a change.
   title   = {omnibias: closed-form n-th derivatives of activations},
   author  = {Grigoryants, Vardan},
   year    = {2026},
-  version = {0.5.0rc1},
+  version = {0.5.0},
   url     = {https://github.com/derivon-ai/omnibias}
 }
 ```

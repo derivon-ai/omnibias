@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Bounded per-program certificate reuse with frozen transformable graphs.
 
 This owns a separate maximum-16 LRU, reported independently of planner CACHES.

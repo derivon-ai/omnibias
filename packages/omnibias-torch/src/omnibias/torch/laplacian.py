@@ -22,14 +22,18 @@ are pinned against in the test suite.
 
 from __future__ import annotations
 
+import functools
+import math
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
+import numpy as np
 from omnibias.core.contraction import (
     DEFAULT_SUPPORT_BUDGET,
     Mode,
     PolylaplacianReport,
     polylaplacian_normalizer,
+    polylaplacian_support_batches,
     polylaplacian_support_terms,
     select_mode,
 )
@@ -52,6 +56,7 @@ _PIECEWISE_AE_SECOND_ORDER_ZERO = frozenset(
     {
         "relu",
         "leaky_relu",
+        "prelu",
         "relu6",
         "hardtanh",
         "hardsigmoid",
@@ -368,59 +373,13 @@ def deep_field_value_grad_laplacian(
     """
     if not layers:
         raise ValueError("layers must be non-empty")
-    x = torch.as_tensor(x)
-    batched = x.ndim > 1
-    a = x if batched else x.unsqueeze(0)
-    B, dim = a.shape
-    L = torch.zeros_like(a)  # (B, D); Laplacian of the identity map is 0.
-    J: Tensor | None = None  # sentinel for the identity Jacobian (never materialised)
-    for W, b, spec in layers:
-        W = torch.as_tensor(W)
-        u = torch.matmul(a, W.t())
-        if b is not None:
-            b_t = torch.as_tensor(b)
-            u = u + (b_t if b_t.ndim == 1 else b_t)
-        first_layer = J is None
-        if first_layer:
-            # First layer: (identity Jacobian) @ W.T collapses to W.T broadcast
-            # over the batch, so the O(B*D^2) identity is never formed.
-            J_u = W.t().unsqueeze(0).expand(B, dim, W.shape[0])
-        else:
-            J_u = torch.tensordot(J, W, dims=([-1], [-1]))  # (B, D, H_out)
-        L_u = torch.matmul(L, W.t())  # (B, H_out)
-        if spec is None:
-            a, J, L = u, J_u, L_u
-            continue
-        resolved = get_activation(spec)
-        if resolved.fastpath is None:
-            raise ValueError(
-                f"activation {resolved.name!r} has no fast-path kernel, cannot "
-                "use the deep-field Laplacian"
-            )
-        _check_piecewise_second_order(
-            resolved.name, allow_almost_everywhere=allow_almost_everywhere
-        )
-        try:
-            sigma_p = resolved.fastpath(u, 1)
-            sigma_pp = resolved.fastpath(u, 2)
-        except NotImplementedError as exc:
-            raise ValueError(
-                f"activation {resolved.name!r} fastpath does not support order "
-                "2, required for the deep-field Laplacian"
-            ) from exc
-        a = resolved.forward(u)
-        J = sigma_p.unsqueeze(1) * J_u
-        if first_layer:
-            row_norm_sq = torch.sum(W * W, dim=-1)  # (H,) == ||W_h||^2
-            lap_contrib = sigma_pp * row_norm_sq
-        else:
-            lap_contrib = sigma_pp * torch.sum(J_u * J_u, dim=1)
-        L = lap_contrib + sigma_p * L_u
-    assert J is not None  # every loop iteration above assigns J; layers is non-empty
-    value = a if batched else a[0]
-    grad = J if batched else J[0]
-    lap = L if batched else L[0]
-    return value, grad, lap
+    from omnibias.torch.experimental.streams import second_order_streams
+
+    # One stacked stream tensor per layer (value, the D Jacobian tangents, the Laplacian stream), one matmul and one
+    # elementwise update each; the first layer's identity Jacobian is W1^T expanded over the batch.
+    r = second_order_streams(x, layers, full_jacobian=True, allow_almost_everywhere=allow_almost_everywhere)
+    assert r.jacobian is not None
+    return r.value, r.jacobian, r.laplacian
 
 
 def deep_field_laplacian(
@@ -428,20 +387,15 @@ def deep_field_laplacian(
 ) -> Tensor:
     r"""``nabla_x^2 f(x)`` for a deep MLP, no ceiling at any ``D`` (Tier A).
 
-    Uses :func:`deep_field_value_grad_laplacian` for the hidden recursion.
-    An affine readout propagates only its Laplacian; its discarded value
-    and Jacobian are not formed. See that function for the recursion and
-    the depth-1 collapse onto :func:`neural_field_laplacian`.
+    Runs the stacked stream engine (:func:`omnibias.torch.experimental.streams.second_order_streams`) with the identity
+    metric; for ``D`` above twice the hidden width the first-layer metric enters through its ``H x H`` Gram matrix, so the
+    hidden recursion carries ``O(H)`` stream channels independent of ``D``.
     """
-    if len(layers) > 1 and layers[-1][2] is None:
-        _, _, lap = deep_field_value_grad_laplacian(
-            x, layers[:-1], allow_almost_everywhere=allow_almost_everywhere
-        )
-        return torch.matmul(lap, torch.as_tensor(layers[-1][0]).t())
-    _, _, lap = deep_field_value_grad_laplacian(
-        x, layers, allow_almost_everywhere=allow_almost_everywhere
-    )
-    return lap
+    if not layers:
+        raise ValueError("layers must be non-empty")
+    from omnibias.torch.experimental.streams import second_order_streams
+
+    return second_order_streams(x, layers, allow_almost_everywhere=allow_almost_everywhere).laplacian
 
 
 def restrict_first_layer(
@@ -466,8 +420,53 @@ def restrict_first_layer(
     return [(W_local, b_local, spec0), *layers[1:]]
 
 
-def _polylaplacian_support(x: Tensor, layers: Sequence[LayerSpec], k: int) -> Tensor:
-    """Tier B: exact ``Delta^k`` via the support-grouped local multivariate jet."""
+_SUPPORT_JET_FLOATS = 1 << 25  # floats the jets of one chunk of supports may hold (about 256 MB in float64)
+
+
+@functools.lru_cache(maxsize=64)
+def _support_groups(dim: int, k: int) -> tuple[tuple[int, np.ndarray, tuple[tuple[int, int], ...]], ...]:
+    """Supports of one size share their terms: ``(size, supports (n, size), ((jet position, weight), ...))`` per size."""
+    return tuple(
+        (size, np.asarray(supports, dtype=np.int64), readout)
+        for size, supports, readout in polylaplacian_support_batches(dim, k)
+    )
+
+
+def _support_value(
+    layers: Sequence[LayerSpec], xi: Tensor, cols: Tensor, size: int, readout: Sequence[tuple[int, int]], k: int
+) -> Tensor:
+    local_jet = mlp_jet_mv(
+        torch.zeros(size, dtype=xi.dtype, device=xi.device), restrict_first_layer(layers, xi, cols), 2 * k
+    )
+    total: Tensor | None = None
+    for position, weight in readout:
+        term = local_jet[position] * weight
+        total = term if total is None else total + term
+    assert total is not None
+    return total
+
+
+def _support_chunk(count: int, size: int, k: int, layers: Sequence[LayerSpec], batch: int) -> int:
+    """Supports evaluated together: as many as keep their jets (``C(size+2k, size)`` coefficients per unit) in budget."""
+    width = max(int(W.shape[0]) for W, _, _ in layers)
+    per_support = max(batch, 1) * math.comb(size + 2 * k, size) * width * 8
+    return max(1, min(count, _SUPPORT_JET_FLOATS // per_support))
+
+
+#: The largest total number of order-``2k`` jet coefficients (``sum C(size + 2k, size)`` over the supports) for which the support
+#: enumeration is traced one support at a time, as in every release before the batched program. The default ``0`` evaluates the
+#: supports of one size as a batch everywhere: in the A/B audit (same job, CPU and an exclusive A100) it took 0.003 to 0.34 of the
+#: per-support loop's time in the forward and gradient passes of the support cells, while the forward-only transient peak of three
+#: cells is a few MiB higher (one chunk of per-support jets is live instead of one support). Raise the value to keep the per-support
+#: loop where that transient matters more than the speed; ``_polylaplacian_support(..., batched=False)`` forces the loop for one call.
+SUPPORT_UNROLL_MAX_COEFFS = 0
+
+
+def _support_jet_coefficients(dim: int, k: int) -> int:
+    return sum(len(supports) * math.comb(size + 2 * k, size) for size, supports, _ in _support_groups(dim, k))
+
+
+def _polylaplacian_support_unrolled(x: Tensor, layers: Sequence[LayerSpec], k: int) -> Tensor:
     dim = x.shape[-1]
     terms = polylaplacian_support_terms(dim, k)
 
@@ -476,9 +475,7 @@ def _polylaplacian_support(x: Tensor, layers: Sequence[LayerSpec], k: int) -> Te
         for support, local_terms in terms:
             local_layers = restrict_first_layer(layers, xi, support)
             s = len(support)
-            local_jet = mlp_jet_mv(
-                torch.zeros(s, dtype=xi.dtype, device=xi.device), local_layers, 2 * k
-            )
+            local_jet = mlp_jet_mv(torch.zeros(s, dtype=xi.dtype, device=xi.device), local_layers, 2 * k)
             pos = index_position(s, 2 * k)
             for a_local, coeff in local_terms:
                 alpha = tuple(2 * v for v in a_local)
@@ -488,6 +485,53 @@ def _polylaplacian_support(x: Tensor, layers: Sequence[LayerSpec], k: int) -> Te
         return total
 
     return vmap(one_point)(x)
+
+
+def _polylaplacian_support_batched(x: Tensor, layers: Sequence[LayerSpec], k: int) -> Tensor:
+    dim = x.shape[-1]
+    groups = _support_groups(dim, k)
+    batch = x.shape[0]
+    device = x.device
+
+    def one_point(xi: Tensor) -> Tensor:
+        total: Tensor | None = None
+        for size, cols, readout in groups:
+            count = cols.shape[0]
+            if count == 1:
+                part = _support_value(layers, xi, torch.as_tensor(cols[0], device=device), size, readout, k)
+            else:
+                chunk = _support_chunk(count, size, k, layers, batch)
+
+                def value(c: Tensor, size: int = size, readout: Any = readout) -> Tensor:
+                    return _support_value(layers, xi, c, size, readout, k)
+
+                parts = [
+                    vmap(value)(torch.as_tensor(cols[i : i + chunk], device=device)).sum(dim=0)
+                    for i in range(0, count, chunk)
+                ]
+                part = parts[0]
+                for extra in parts[1:]:
+                    part = part + extra
+            total = part if total is None else total + part
+        assert total is not None
+        return total
+
+    return vmap(one_point)(x)
+
+
+def _polylaplacian_support(
+    x: Tensor, layers: Sequence[LayerSpec], k: int, *, batched: bool | None = None
+) -> Tensor:
+    """Tier B: exact ``Delta^k`` via the support-grouped local multivariate jet.
+
+    The supports of one size are evaluated as a batch (``vmap`` over chunks that fit the jet budget), so the program has one
+    traced jet per support size and chunk rather than one per support, unless their total coefficient count is at most
+    ``SUPPORT_UNROLL_MAX_COEFFS`` (default ``0``), where one local jet is traced per support as before. ``batched`` forces
+    either form.
+    """
+    if batched is None:
+        batched = _support_jet_coefficients(x.shape[-1], k) > SUPPORT_UNROLL_MAX_COEFFS
+    return (_polylaplacian_support_batched if batched else _polylaplacian_support_unrolled)(x, layers, k)
 
 
 def _polylaplacian_estimator(
@@ -532,7 +576,7 @@ def _resolve_polylaplacian_mode(
         return "forward", resolved_budget
     if mode == "auto":
         return select_mode(dim, k, budget=resolved_budget), resolved_budget
-    if mode not in ("forward", "support", "estimator"):
+    if mode not in ("forward", "support", "estimator", "structured"):
         raise ValueError(f"unknown mode {mode!r}")
     return mode, resolved_budget  # type: ignore[return-value]
 
@@ -549,6 +593,48 @@ def _tier_c_concentration(
     return hoeffding_enclosure(flat, value_range=value_range, delta=delta)
 
 
+#: Smallest input dimension from which ``mode="auto"`` runs the exact projected program rather than the support
+#: enumeration, by order ``k``. Measured on CPU (float64, batch 16, two hidden layers, widths 16 to 256): the
+#: projected program is faster at every ``D >= 2`` for ``k = 2`` (4x to 60x) and from ``D = 6`` for ``k = 3``
+#: (``D = 4`` is a tie, ``D <= 3`` a loss); see ``docs/performance.md``. Past the support budget ``auto`` still samples.
+STRUCTURED_MIN_DIM: dict[int, int] = {2: 2, 3: 6}
+#: The same on an accelerator (exclusive A100, float64, batch 16, widths 16 to 64): there the support enumeration pays one
+#: launch chain per support, so the projected program wins from ``D = 3`` for ``k = 3`` (80 ms against 141 ms); ``D = 2``
+#: is still a loss.
+STRUCTURED_MIN_DIM_CUDA: dict[int, int] = {2: 2, 3: 3}
+
+
+def _structured_min_dim(k: int, device: torch.device) -> int:
+    table = STRUCTURED_MIN_DIM if device.type == "cpu" else STRUCTURED_MIN_DIM_CUDA
+    return table[k]
+
+
+def _structured_polylaplacian(x2: Tensor, layers: Sequence[LayerSpec], k: int) -> Tensor:
+    """Exact ``Delta^k f`` (``k`` in ``{2, 3}``) by the projected programs; raises ``ValueError`` if they do not apply.
+
+    The programs refuse what they cannot differentiate faithfully (an activation without a closed-form kernel or whose
+    derivatives jump, a non-affine readout, no hidden layer), so a caller can fall back to another mode.
+    """
+    from omnibias.torch.experimental.projected_polylaplacian import (
+        projected_deep_bilaplacian,
+        projected_deep_trilaplacian,
+    )
+
+    if k == 2:
+        out = projected_deep_bilaplacian(x2, layers)[3]
+    elif k == 3:
+        out = projected_deep_trilaplacian(x2, layers)[4]
+    else:
+        raise ValueError(f"the structured program serves k in (2, 3), not {k}")
+    # ``Delta^k`` (``k >= 2``) does not depend on the readout bias and the programs never read it; the support enumeration
+    # carries it through the graph, so its gradient is an exact zero there.  Keep that: ``torch.autograd.grad`` without
+    # ``allow_unused`` must not start to raise for a network whose operator was routed here.
+    bias = layers[-1][1]
+    if torch.is_tensor(bias) and bias.requires_grad:
+        out = out + 0.0 * bias.sum()
+    return out
+
+
 def _evaluate_polylaplacian(
     x: Tensor, layers: Sequence[LayerSpec], k: int, *, mode: str,
     n_directions: int, budget: int | None, seed: int,
@@ -562,7 +648,17 @@ def _evaluate_polylaplacian(
     x2 = x if batched else x.unsqueeze(0)
     resolved_mode, resolved_budget = _resolve_polylaplacian_mode(x2.shape[-1], k, mode, budget)
     scaled = None
-    if k == 1:
+    structured: Tensor | None = None
+    if mode == "auto" and resolved_mode == "support" and k in (2, 3) and x2.shape[-1] >= _structured_min_dim(k, x2.device):
+        # the support enumeration is slower than the exact projected program from STRUCTURED_MIN_DIM on
+        try:
+            structured = _structured_polylaplacian(x2, layers, k)
+            resolved_mode = "structured"
+        except ValueError:
+            structured = None
+    if structured is not None:
+        out = structured
+    elif k == 1:
         out = deep_field_laplacian(x2, layers)
     elif resolved_mode == "forward":
         raise ValueError(
@@ -571,6 +667,8 @@ def _evaluate_polylaplacian(
         )
     elif resolved_mode == "support":
         out = _polylaplacian_support(x2, layers, k)
+    elif resolved_mode == "structured":
+        out = _structured_polylaplacian(x2, layers, k)
     elif resolved_mode == "estimator":
         if n_directions < 1:
             raise ValueError("n_directions must be >= 1 for estimator mode")
@@ -601,7 +699,9 @@ def deep_field_polylaplacian(
     r"""``Delta^k f(x)`` with a live parameter graph and no host diagnostics.
 
     ``k=1`` uses the exact forward Laplacian. At higher order, ``auto`` selects
-    exact support enumeration while its support count fits ``budget``;
+    exact support enumeration while its support count fits ``budget`` (the exact projected program instead, for ``k`` in
+    ``{2, 3}`` from ``STRUCTURED_MIN_DIM[k]`` on (``STRUCTURED_MIN_DIM_CUDA`` on an accelerator), where it is measured faster and
+    applies to the network);
     otherwise it samples normalized directional derivatives. The sampled
     result is exact only in expectation, and its work still depends on input
     dimension, network size, derivative order, and ``n_directions``.

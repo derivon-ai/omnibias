@@ -10,4 +10,6 @@ The one-layer and repeated-Laplacian measurements reference the archived
 `omnibias.jax.laplacian` source. The general directional-jet measurement also
 retains both backend `jet.py` versions from its measured run. Later reporting
 fixes and kernel optimizations do not retroactively change those measurements.
+The activation-derivative measurement (`derivative_order.json`, `precision_sweep.json`) references the
+archived torch `fastpath/legendre.py`; its current Horner evaluation launches fewer kernels and returns the same bits.
 Consult current package source for current API behavior.

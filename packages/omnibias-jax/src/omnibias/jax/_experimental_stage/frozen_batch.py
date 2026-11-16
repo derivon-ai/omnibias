@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Next-batch projection using only an explicitly frozen low-rank base.
 
 The host producer computes X@A0.T while the consumer may evaluate the current

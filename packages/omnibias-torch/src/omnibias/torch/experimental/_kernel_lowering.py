@@ -52,21 +52,33 @@ def estimate_inline_nodes(spec: JetSpec, name: str, derivative: bool = False) ->
     if name == "reciprocal":
         return 2 * (pairs - count) + 3 * count + 5 + (product if derivative else 0)
     if name == "silu":
-        return estimate_inline_nodes(spec, "sigmoid", derivative) + product + count + (
-            estimate_inline_nodes(spec, "sigmoid") if derivative else 0)
+        return (
+            estimate_inline_nodes(spec, "sigmoid", derivative)
+            + product
+            + count
+            + (estimate_inline_nodes(spec, "sigmoid") if derivative else 0)
+        )
     if name == "gelu_approx":
-        return (5 if derivative else 3) * product + 8 * count + estimate_inline_nodes(spec, "tanh", derivative) + (
-            estimate_inline_nodes(spec, "tanh") if derivative else 0)
+        return (
+            (5 if derivative else 3) * product
+            + 8 * count
+            + estimate_inline_nodes(spec, "tanh", derivative)
+            + (estimate_inline_nodes(spec, "tanh") if derivative else 0)
+        )
     system = _DERIVATIVE_SYSTEMS[name] if derivative else SYSTEMS[name]
     nodes, polynomials = (_DERIVATIVE_PLANS if derivative else _BUILTIN_PLANS)[name]
-    return (3 * len(system.states) * (pairs - count) + 2 * len(nodes) * pairs
-            + count * (2 * sum(map(len, polynomials)) + len(system.states) + 3) + 32)
+    return (
+        3 * len(system.states) * (pairs - count)
+        + 2 * len(nodes) * pairs
+        + count * (2 * sum(map(len, polynomials)) + len(system.states) + 3)
+        + 32
+    )
 
 
 def _product_at(a: Any, b: Any, spec: JetSpec, position: int, *, positive: bool = False) -> Any:
     if spec.mode == "directional":
         start = int(positive)
-        return (a[start:position + 1] * b[:position + 1 - start].flip(0)).sum(0)
+        return (a[start : position + 1] * b[: position + 1 - start].flip(0)).sum(0)
     pairs = spec.pairs[position]
     left = [i for i, _ in pairs if i or not positive]
     right = [j for i, j in pairs if i or not positive]
@@ -86,7 +98,9 @@ def _identity(a: Any) -> Any:
     return torch.cat((torch.ones_like(a[:1]), torch.zeros_like(a[1:])), dim=0)
 
 
-def packed_activation(a: Any, spec: JetSpec, name: str, ops: Any, *, derivative: bool = False) -> Any:
+def packed_activation(
+    a: Any, spec: JetSpec, name: str, ops: Any, *, derivative: bool = False
+) -> Any:
     """Evaluate shared differential systems using per-coefficient reductions."""
     name = _ALIASES.get(name, name)
     if name in {"identity", "linear"}:
@@ -99,7 +113,9 @@ def packed_activation(a: Any, spec: JetSpec, name: str, ops: Any, *, derivative:
     if name == "silu":
         sig = packed_activation(a, spec, "sigmoid", ops)
         if derivative:
-            return sig + packed_product(a, packed_activation(a, spec, "sigmoid", ops, derivative=True), spec)
+            return sig + packed_product(
+                a, packed_activation(a, spec, "sigmoid", ops, derivative=True), spec
+            )
         return packed_product(a, sig, spec)
     if name == "gelu_approx":
         square = packed_product(a, a, spec)
@@ -109,8 +125,15 @@ def packed_activation(a: Any, spec: JetSpec, name: str, ops: Any, *, derivative:
         blend = packed_activation(2 * inner, spec, "sigmoid", ops)
         if derivative:
             inner_prime = (_identity(a) + square * (3 * 0.044715)) * (2 * sqrt(2 / pi))
-            correction = packed_product(a, packed_product(
-                packed_activation(2 * inner, spec, "sigmoid", ops, derivative=True), inner_prime, spec), spec)
+            correction = packed_product(
+                a,
+                packed_product(
+                    packed_activation(2 * inner, spec, "sigmoid", ops, derivative=True),
+                    inner_prime,
+                    spec,
+                ),
+                spec,
+            )
             return blend + correction
         return packed_product(a, blend, spec)
     system = (_DERIVATIVE_SYSTEMS if derivative else SYSTEMS)[name]
@@ -150,8 +173,15 @@ def packed_activation(a: Any, spec: JetSpec, name: str, ops: Any, *, derivative:
     return torch.stack(output)
 
 
-def activation_graph(spec: JetSpec, name: str, ops: Any, *, derivative: bool = False,
-                     packed: bool = False, graph_factory: Callable[[], Graph] = Graph) -> GraphModule:
+def activation_graph(
+    spec: JetSpec,
+    name: str,
+    ops: Any,
+    *,
+    derivative: bool = False,
+    packed: bool = False,
+    graph_factory: Callable[[], Graph] = Graph,
+) -> GraphModule:
     graph = graph_factory()
     tracer = GraphAppendingTracer(graph)
     value: Any = Proxy(graph.placeholder("packed"), tracer)
@@ -161,7 +191,9 @@ def activation_graph(spec: JetSpec, name: str, ops: Any, *, derivative: bool = F
         function = activation_derivative if derivative else activation
         result = torch.stack(function([value[k] for k in range(spec.size)], spec, name, ops))
     graph.output(result.node)
-    return GraphModule(nn.Module(), graph, "PackedJetActivation" if packed else "JetActivationRegion")
+    return GraphModule(
+        nn.Module(), graph, "PackedJetActivation" if packed else "JetActivationRegion"
+    )
 
 
 class _RegionalActivation(nn.Module):
@@ -181,8 +213,14 @@ class _RegionalActivation(nn.Module):
 class KernelLowering:
     """One compiler invocation's reusable, budgeted activation kernels."""
 
-    def __init__(self, mode: str, ops: Any, tracer: GraphAppendingTracer, holder: nn.Module,
-                 graph_factory: Callable[[], Graph] = Graph) -> None:
+    def __init__(
+        self,
+        mode: str,
+        ops: Any,
+        tracer: GraphAppendingTracer,
+        holder: nn.Module,
+        graph_factory: Callable[[], Graph] = Graph,
+    ) -> None:
         validate_lowering(mode)
         self.mode, self.ops, self.tracer, self.holder = mode, ops, tracer, holder
         self.graph_factory = graph_factory
@@ -198,20 +236,35 @@ class KernelLowering:
                 return "inline"
             return "regional" if available else "packed"
         if self.mode == "regional" and not available:
-            raise ValueError("regional kernel lowering requires torch.compiler.nested_compile_region; use packed or auto")
+            raise ValueError(
+                "regional kernel lowering requires torch.compiler.nested_compile_region; use packed or auto"
+            )
         return self.mode
 
     def module(self, spec: JetSpec, name: str, derivative: bool = False) -> nn.Module:
         key = spec, name, derivative
         if key not in self.modules:
             selected = self.select(spec, name, derivative)
-            graph = activation_graph(spec, name, self.ops, derivative=derivative,
-                                     packed=selected == "packed", graph_factory=self.graph_factory)
+            graph = activation_graph(
+                spec,
+                name,
+                self.ops,
+                derivative=derivative,
+                packed=selected == "packed",
+                graph_factory=self.graph_factory,
+            )
             self.modules[key] = _RegionalActivation(graph) if selected == "regional" else graph
-            self.records.append({"activation": name, "derivative": derivative,
-                                 "layout": spec.mode, "coefficients": spec.size,
-                                 "selected": selected, "estimated_inline_nodes": estimate_inline_nodes(spec, name, derivative),
-                                 "graph_nodes": len(list(graph.graph.nodes))})
+            self.records.append(
+                {
+                    "activation": name,
+                    "derivative": derivative,
+                    "layout": spec.mode,
+                    "coefficients": spec.size,
+                    "selected": selected,
+                    "estimated_inline_nodes": estimate_inline_nodes(spec, name, derivative),
+                    "graph_nodes": len(list(graph.graph.nodes)),
+                }
+            )
         return self.modules[key]
 
     def activate(self, rows: list[Any], spec: JetSpec, name: str) -> list[Any]:
@@ -222,10 +275,15 @@ class KernelLowering:
         if key not in self.names:
             self.names[key] = f"jet_kernel_{len(self.holder._modules)}"
             self.holder.add_module(self.names[key], module)
-        result: Any = self.tracer.create_proxy("call_module", self.names[key], (torch.stack(rows),), {})
+        result: Any = self.tracer.create_proxy(
+            "call_module", self.names[key], (torch.stack(rows),), {}
+        )
         return [result[k] for k in range(spec.size)]
 
     def explain(self) -> dict[str, Any]:
-        return {"requested": self.mode, "regional_threshold_nodes": REGION_THRESHOLD,
-                "regions": tuple(dict(row) for row in self.records),
-                "packed_scope": "one coefficient reduction; no all-pairs feature tensor"}
+        return {
+            "requested": self.mode,
+            "regional_threshold_nodes": REGION_THRESHOLD,
+            "regions": tuple(dict(row) for row in self.records),
+            "packed_scope": "one coefficient reduction; no all-pairs feature tensor",
+        }

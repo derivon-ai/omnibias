@@ -15,7 +15,7 @@ from dataclasses import dataclass
 from typing import cast
 
 from omnibias.core.multi_index import (
-    index_position,
+    index_position_view,
     multi_indices,
     multiply_table,
     num_multi_indices,
@@ -293,7 +293,7 @@ def observe(
         directions = torch.zeros((theta.shape[0], spec.input_dim), dtype=theta.dtype, device=theta.device)
         ibasis = torch.eye(spec.input_dim, dtype=theta.dtype, device=theta.device)
         jet = parameter_jet(coords, theta, spec, directions, order, input_basis=ibasis)
-        positions = index_position(spec.input_dim, order)
+        positions = index_position_view(spec.input_dim, order)
         return torch.stack([jet[positions[a]] * math.prod(math.factorial(i) for i in a) for a in indices], dim=0).reshape(-1)
     values = evaluate(coords, theta, spec)
     if observation.kind == "integrals":

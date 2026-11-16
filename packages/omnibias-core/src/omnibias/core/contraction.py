@@ -46,7 +46,7 @@ from functools import lru_cache
 from math import comb, factorial
 from typing import TYPE_CHECKING, Literal
 
-from omnibias.core.multi_index import multi_index_factorial, multi_indices
+from omnibias.core.multi_index import index_position_view, multi_index_factorial, multi_indices
 
 if TYPE_CHECKING:
     from omnibias.core.verified.sampled import ConcentrationReport
@@ -59,7 +59,9 @@ if TYPE_CHECKING:
 #: work.
 DEFAULT_SUPPORT_BUDGET: int = 20_000
 
-Mode = Literal["forward", "support", "estimator"]
+#: ``"structured"`` is the exact projected program of a backend that has one (``omnibias.jax.experimental``): it
+#: replaces sampling when the support count exceeds the budget, for ``k`` in ``{2, 3}`` and supported activations.
+Mode = Literal["forward", "support", "estimator", "structured"]
 
 _CACHE_SIZE: int = 256
 
@@ -71,7 +73,8 @@ class PolylaplacianReport:
     Attributes
     ----------
     mode : Mode
-        Resolved tier after ``select_mode`` (or an explicit ``mode`` override).
+        Resolved tier after ``select_mode`` (or an explicit ``mode`` override); ``"structured"`` when a backend
+        replaced the sampling tier by its exact projected program.
     dim : int
         Ambient input dimension ``D``.
     k : int
@@ -128,6 +131,7 @@ def polylaplacian_normalizer(dim: int, k: int) -> float:
     return float(2**k * factorial(k) * rising) / factorial(2 * k)
 
 
+@lru_cache(maxsize=_CACHE_SIZE)
 def polylaplacian_multinomial_terms(
     n_spatial: int, k: int
 ) -> tuple[tuple[tuple[int, ...], int], ...]:
@@ -228,13 +232,44 @@ def polylaplacian_support_terms(
     s_max = min(k, dim)
     groups: list[tuple[tuple[int, ...], tuple[tuple[tuple[int, ...], int], ...]]] = []
     for s in range(1, s_max + 1):
+        # the terms depend on the support size only: one tuple, shared by every support of that size
+        terms = tuple(
+            (a_local, k_fact // multi_index_factorial(a_local))
+            for a_local in _positive_compositions(k, s)
+        )
         for support in combinations(range(dim), s):
-            terms = tuple(
-                (a_local, k_fact // multi_index_factorial(a_local))
-                for a_local in _positive_compositions(k, s)
-            )
             groups.append((support, terms))
     return tuple(groups)
+
+
+@lru_cache(maxsize=_CACHE_SIZE)
+def polylaplacian_support_batches(
+    dim: int, k: int
+) -> tuple[tuple[int, tuple[tuple[int, ...], ...], tuple[tuple[int, int], ...]], ...]:
+    r"""The support grouping of :func:`polylaplacian_support_terms`, batched by support size.
+
+    Supports of one size share their terms, so one local jet program serves all of them. Returns, per size ``s``,
+    ``(s, supports, readout)``: ``supports`` lists the increasing axis tuples of that size, and ``readout`` lists
+    ``(position, weight)`` pairs -- the flat position of the multi-index ``2 * a_local`` in the order-``2k`` jet of
+    dimension ``s`` (:func:`omnibias.core.multi_index.index_position_view`) and its weight ``(2a)! * k! / a!``. Summing
+    ``jet[position] * weight`` over the readout, in order, and over the supports gives ``Delta^k`` exactly as the
+    per-support loop does.
+    """
+    batches: list[list[object]] = []
+    for support, local_terms in polylaplacian_support_terms(dim, k):
+        if batches and batches[-1][2] is local_terms:
+            batches[-1][1].append(support)  # type: ignore[attr-defined]
+        else:
+            batches.append([len(support), [support], local_terms])
+    out = []
+    for size, supports, local_terms in batches:
+        pos = index_position_view(size, 2 * k)  # type: ignore[arg-type]
+        readout = []
+        for a_local, coeff in local_terms:  # type: ignore[attr-defined]
+            alpha = tuple(2 * v for v in a_local)
+            readout.append((pos[alpha], multi_index_factorial(alpha) * coeff))
+        out.append((size, tuple(supports), tuple(readout)))  # type: ignore[call-overload]
+    return tuple(out)
 
 
 def select_mode(
@@ -269,6 +304,7 @@ __all__ = [
     "PolylaplacianReport",
     "polylaplacian_multinomial_terms",
     "polylaplacian_normalizer",
+    "polylaplacian_support_batches",
     "polylaplacian_support_terms",
     "select_mode",
     "support_jet_count",

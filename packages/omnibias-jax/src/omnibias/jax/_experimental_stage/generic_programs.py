@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Research adapter: same Python expression, native JAX or public core jet rules.
 This is not an Omnibias arbitrary-callable JAX transformation API.
 """

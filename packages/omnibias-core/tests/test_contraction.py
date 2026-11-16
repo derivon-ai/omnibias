@@ -218,3 +218,35 @@ def test_select_mode_rejects_bad_inputs() -> None:
         select_mode(3, 0)
     with pytest.raises(ValueError, match="budget must be"):
         select_mode(3, 2, budget=0)
+
+
+def test_support_terms_are_shared_per_support_size_and_multinomial_terms_are_memoized() -> None:
+    from omnibias.core.contraction import (
+        polylaplacian_multinomial_terms,
+        polylaplacian_support_terms,
+    )
+
+    groups = polylaplacian_support_terms(7, 3)
+    by_size: dict[int, object] = {}
+    for support, terms in groups:
+        assert by_size.setdefault(len(support), terms) is terms  # one tuple per size, shared by every support
+    assert polylaplacian_multinomial_terms(5, 3) is polylaplacian_multinomial_terms(5, 3)
+
+
+@pytest.mark.parametrize(("dim", "k"), [(1, 2), (2, 2), (4, 2), (5, 3), (7, 3), (3, 4)])
+def test_support_batches_are_the_per_support_loop_regrouped(dim, k):
+    from omnibias.core.contraction import polylaplacian_support_batches
+    from omnibias.core.multi_index import index_position_view
+
+    batches = polylaplacian_support_batches(dim, k)
+    assert polylaplacian_support_batches(dim, k) is batches
+    flat = [support for _, supports, _ in batches for support in supports]
+    assert flat == [support for support, _ in polylaplacian_support_terms(dim, k)]
+    readout = {size: r for size, _, r in batches}
+    for support, terms in polylaplacian_support_terms(dim, k):
+        pos = index_position_view(len(support), 2 * k)
+        alphas = [tuple(2 * v for v in a) for a, _ in terms]
+        expected = tuple(
+            (pos[alpha], multi_index_factorial(alpha) * c) for alpha, (_, c) in zip(alphas, terms, strict=True)
+        )
+        assert readout[len(support)] == expected

@@ -61,7 +61,7 @@ from fractions import Fraction
 
 from omnibias.core.multi_index import (
     MultiIndex,
-    index_position,
+    index_position_view,
     multi_index_factorial,
     multi_indices,
     multiply_table,
@@ -236,7 +236,7 @@ def identity_jet(box: BoxLike, order: int) -> MVJet:
     dim = len(x0)
     if dim < 1:
         raise ValueError("box must have at least one axis")
-    pos = index_position(dim, order)
+    pos = index_position_view(dim, order)
     m = num_multi_indices(dim, order)
     rows: MVJet = [[_zero() for _ in range(dim)] for _ in range(m)]
     zero_idx = (0,) * dim
@@ -302,7 +302,7 @@ def jet_gradient(
     """Gradient enclosure ``d u / d x_i``, shape ``(D, C)``. Needs ``order >= 1``."""
     if order < 1:
         raise ValueError(f"gradient needs order >= 1, got {order}")
-    pos = index_position(dim, order)
+    pos = index_position_view(dim, order)
     rows: list[list[Interval]] = []
     for i in range(dim):
         e = tuple(1 if j == i else 0 for j in range(dim))
@@ -316,7 +316,7 @@ def jet_hessian(
     """Hessian enclosure ``d^2 u / d x_i d x_j``, shape ``(D, D, C)``. Needs ``order >= 2``."""
     if order < 2:
         raise ValueError(f"hessian needs order >= 2, got {order}")
-    pos = index_position(dim, order)
+    pos = index_position_view(dim, order)
     out: list[list[list[Interval]]] = []
     for i in range(dim):
         row: list[list[Interval]] = []
@@ -343,7 +343,7 @@ def jet_laplacian(
     """
     if order < 2:
         raise ValueError(f"laplacian needs order >= 2, got {order}")
-    pos = index_position(dim, order)
+    pos = index_position_view(dim, order)
     width = len(jet[0])
     two = Interval.point(2.0)
     acc = [_zero() for _ in range(width)]

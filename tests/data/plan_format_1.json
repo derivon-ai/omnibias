@@ -1,0 +1,56 @@
+{
+ "algorithm": "projected",
+ "candidates": [
+  {
+   "compile_seconds": 2.4,
+   "generic": false,
+   "name": "projected",
+   "peak_bytes": 7168.0,
+   "seconds": 0.000100011664
+  },
+  {
+   "compile_seconds": 2.4,
+   "generic": false,
+   "name": "forward_laplacian",
+   "peak_bytes": 7168.0,
+   "seconds": 0.000100011664
+  },
+  {
+   "compile_seconds": 4.0,
+   "generic": true,
+   "name": "nested_autodiff",
+   "peak_bytes": 6144.0,
+   "seconds": 0.000300005376
+  },
+  {
+   "compile_seconds": 4.8,
+   "generic": true,
+   "name": "taylor_jet",
+   "peak_bytes": 10368.0,
+   "seconds": 0.00040001944
+  }
+ ],
+ "descriptor": "7ec64eb7c6534629e626",
+ "device": "cpu",
+ "expected_uses": 1,
+ "format": 1,
+ "measured": {},
+ "memory_budget": null,
+ "mode": "heuristic",
+ "operator": "laplacian",
+ "refusals": [
+  {
+   "algorithm": "forward_polylaplacian",
+   "reason": "serves Laplace powers (2, 3), not 1"
+  },
+  {
+   "algorithm": "hutchinson",
+   "reason": "stochastic estimator; the request asks for an exact result"
+  }
+ ],
+ "versions": {
+  "jax": "0.10.2",
+  "omnibias-core": "0.5.0rc1",
+  "omnibias-jax": "0.5.0rc1"
+ }
+}

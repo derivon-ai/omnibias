@@ -93,10 +93,6 @@ omnibias-torch = "permissive"
 permissive = "Apache-2.0"
 copyleft = "AGPL-3.0-or-later OR LicenseRef-omnibias-Commercial"
 
-[tool.omnibias.release]
-# Remove only after published-consumer feature profiles pass or successors ship.
-prerelease-only = true
-
 [tool.uv.dependency-groups]
 benchmarks = { requires-python = ">=3.12" }
 presentation = { requires-python = ">=3.12" }

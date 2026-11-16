@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Frozen readouts and exact frozen-base adapters. Real binary64 research API."""
 from dataclasses import dataclass
 import hashlib

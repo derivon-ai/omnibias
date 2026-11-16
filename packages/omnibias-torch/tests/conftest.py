@@ -17,8 +17,22 @@ Collection order cannot determine the precision contract.
 
 from __future__ import annotations
 
+import os
+
 import pytest
 import torch
+
+# Triton decides at decoration time whether a kernel runs on a GPU or in its interpreter, so the choice has to be made
+# before any module defining a kernel is imported: without a GPU the fused-kernel tests use the interpreter.
+if not torch.cuda.is_available():
+    os.environ.setdefault("TRITON_INTERPRET", "1")
+
+
+@pytest.fixture(autouse=True)
+def _reset_dynamo() -> object:
+    """Every test compiles its own models; Dynamo's per-code-object recompile limit is a per-process counter."""
+    yield
+    torch._dynamo.reset()
 
 
 @pytest.fixture(autouse=True)

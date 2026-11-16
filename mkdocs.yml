@@ -84,8 +84,16 @@ nav:
   - Global minimum enclosures: global-optimization.md
   - Experimental jet compiler: jet-compiler.md
   - Structural operator compiler: operator-compiler.md
+  - Operator planner: operator-planner.md
+  - Stability and deprecation: stability.md
+  - Interop (folx, DeepXDE, PINA, engines): interop.md
+  - Operator coverage matrix: operator-coverage.md
+  - Precision policy and error tables: precision.md
+  - Distributed residual programs and scaling: distributed.md
+  - Hardware matrix and what is unmeasured: hardware.md
   - Compiler execution and precision results: operator-compiler-v2-results.md
   - Historical operator compiler measurements: operator-compiler-results.md
+  - Regimes, from the full-scope matrix: regimes.md
   - Performance: performance.md
   - Guarantees and limits: guarantees.md
   - Package map: packages.md

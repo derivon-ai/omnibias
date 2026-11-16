@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Bounded, conditional numerical qualification and amortized hardware planning."""
 from collections import OrderedDict
 from dataclasses import asdict, dataclass

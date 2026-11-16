@@ -30,6 +30,7 @@ from omnibias.torch.jet_mv import mlp_jet_mv  # noqa: E402
 from omnibias.torch.laplacian import (  # noqa: E402
     deep_field_laplacian,
     deep_field_polylaplacian,
+    deep_field_polylaplacian_with_report,
     deep_field_value_grad_laplacian,
     neural_field_laplacian,
     restrict_first_layer,
@@ -280,8 +281,9 @@ def test_arctan_k1_laplacian_still_works() -> None:
     assert bool(torch.all(torch.isfinite(lap)))
 
 
-def test_relu_laplacian_refuses_without_opt_in() -> None:
-    layers = _make_layers(3, 4, depth=1, activation="relu", seed=29)
+@pytest.mark.parametrize("activation", ["relu", "prelu"])
+def test_relu_laplacian_refuses_without_opt_in(activation: str) -> None:
+    layers = _make_layers(3, 4, depth=1, activation=activation, seed=29)
     x = torch.as_tensor(np.random.default_rng(30).normal(size=(3,)), dtype=torch.float64)
     with pytest.raises(ValueError, match="a.e.-zero second derivative"):
         deep_field_laplacian(x, layers)
@@ -301,3 +303,151 @@ def test_sech_fastpath_order_3() -> None:
     z = torch.randn(3, dtype=torch.float64)
     out = spec.fastpath(z, 3)
     assert out.shape == z.shape
+
+
+@pytest.mark.parametrize("k", (2, 3))
+def test_polylaplacian_support_chunks_agree_with_one_batch_and_the_dense_hessian(k, monkeypatch) -> None:
+    from omnibias.torch import laplacian as lap
+
+    dim = 5
+    layers = _make_layers(dim, 6, depth=2, activation="tanh", seed=21)
+    x = torch.as_tensor(np.random.default_rng(22).normal(scale=0.3, size=(3, dim)), dtype=torch.float64)
+    whole = deep_field_polylaplacian(x, layers, k, mode="support")
+    monkeypatch.setattr(lap, "_SUPPORT_JET_FLOATS", 1)  # a chunk of one support: the chunking path with no batching
+    one = deep_field_polylaplacian(x, layers, k, mode="support")
+    monkeypatch.setattr(lap, "_SUPPORT_JET_FLOATS", 3 * 3 * 6 * 8 * 28 * 2)  # a few supports per chunk
+    few = deep_field_polylaplacian(x, layers, k, mode="support")
+    torch.testing.assert_close(one, whole, rtol=1e-11, atol=1e-12)
+    torch.testing.assert_close(few, whole, rtol=1e-11, atol=1e-12)
+
+    def forward(z):
+        a = z
+        for W, b, s in layers:
+            a = a @ W.T + (0 if b is None else b)
+            if s is not None:
+                a = torch.tanh(a)
+        return a[0]
+
+    def power(fn, n):
+        for _ in range(n):
+            fn = (lambda g: lambda z: torch.trace(torch.func.hessian(g)(z)))(fn)
+        return fn
+
+    dense = torch.stack([power(forward, k)(xi).reshape(-1) for xi in x])
+    torch.testing.assert_close(whole, dense, rtol=1e-8, atol=1e-10)
+
+
+def test_support_enumeration_is_batched_by_default_and_the_unrolled_loop_is_selectable(monkeypatch) -> None:
+    from omnibias.torch import laplacian as lap
+
+    assert lap.SUPPORT_UNROLL_MAX_COEFFS == 0  # the batched program everywhere
+    assert lap._support_jet_coefficients(16, 2) == 1880 and lap._support_jet_coefficients(4, 3) == 532
+    layers = _make_layers(3, 4, depth=2, activation="tanh", seed=51)
+    params = [t.requires_grad_() for W, b, _ in layers for t in (W, b) if t is not None]
+    x = torch.as_tensor(np.random.default_rng(52).normal(scale=0.3, size=(2, 3)), dtype=torch.float64)
+    forced = {flag: lap._polylaplacian_support(x, layers, 2, batched=flag) for flag in (True, False)}
+    torch.testing.assert_close(forced[True], forced[False], rtol=1e-11, atol=1e-12)
+    torch.testing.assert_close(lap._polylaplacian_support(x, layers, 2), forced[True], rtol=0, atol=0)
+    grads = {
+        flag: torch.autograd.grad(lap._polylaplacian_support(x, layers, 2, batched=flag).sum(), params, allow_unused=True)
+        for flag in (True, False)
+    }
+    for g_batched, g_loop in zip(grads[True], grads[False], strict=True):
+        if g_batched is None or g_loop is None:
+            assert g_batched is None and g_loop is None
+        else:
+            torch.testing.assert_close(g_batched, g_loop, rtol=1e-10, atol=1e-12)
+    # a positive limit above the size of the cell selects the per-support loop through the public mode
+    monkeypatch.setattr(lap, "SUPPORT_UNROLL_MAX_COEFFS", lap._support_jet_coefficients(3, 2))
+    torch.testing.assert_close(lap._polylaplacian_support(x, layers, 2), forced[False], rtol=0, atol=0)
+    monkeypatch.setattr(lap, "SUPPORT_UNROLL_MAX_COEFFS", lap._support_jet_coefficients(3, 2) - 1)
+    torch.testing.assert_close(lap._polylaplacian_support(x, layers, 2), forced[True], rtol=0, atol=0)
+
+
+def test_polylaplacian_support_gradients_match_the_dense_hessian() -> None:
+    dim, k = 4, 2
+    layers = _make_layers(dim, 5, depth=2, activation="tanh", seed=23)
+    params = [t.requires_grad_() for W, b, _ in layers for t in (W, b) if t is not None]
+    x = torch.as_tensor(np.random.default_rng(24).normal(scale=0.3, size=(2, dim)), dtype=torch.float64)
+    got = torch.autograd.grad(
+        (deep_field_polylaplacian(x, layers, k, mode="support") ** 2).sum(), params, allow_unused=True
+    )
+
+    def forward(z):
+        a = z
+        for W, b, s in layers:
+            a = a @ W.T + (0 if b is None else b)
+            if s is not None:
+                a = torch.tanh(a)
+        return a[0]
+
+    def lap(z):
+        return torch.trace(torch.func.hessian(forward)(z))
+
+    def bilap(z):
+        return torch.trace(torch.func.hessian(lap)(z))
+
+    dense = torch.stack([bilap(xi).reshape(-1) for xi in x])
+    want = torch.autograd.grad((dense**2).sum(), params, allow_unused=True)
+    for p, g, w in zip(params, got, want, strict=True):  # the readout bias has no derivative: None in both
+        zero = torch.zeros_like(p)
+        torch.testing.assert_close(zero if g is None else g, zero if w is None else w, rtol=1e-7, atol=1e-9)
+
+
+@pytest.mark.parametrize(("k", "dim", "mode"), [(2, 1, "support"), (2, 2, "structured"), (3, 4, "support"), (3, 6, "structured")])
+def test_auto_routes_to_the_projected_program_from_the_measured_dimension(k, dim, mode) -> None:
+    layers = _make_layers(dim, 5, depth=2, activation="tanh", seed=31)
+    x = torch.as_tensor(np.random.default_rng(32).normal(scale=0.3, size=(3, dim)), dtype=torch.float64)
+    out, report = deep_field_polylaplacian_with_report(x, layers, k, mode="auto")
+    assert report.mode == mode and report.n_directions is None
+    torch.testing.assert_close(out, deep_field_polylaplacian(x, layers, k, mode="support"), rtol=1e-9, atol=1e-10)
+
+
+def test_structured_mode_is_explicit_exact_and_refused_where_it_does_not_apply() -> None:
+    layers = _make_layers(4, 5, depth=2, activation="tanh", seed=37)
+    x = torch.as_tensor(np.random.default_rng(38).normal(scale=0.3, size=(2, 4)), dtype=torch.float64)
+    for k in (2, 3):
+        torch.testing.assert_close(
+            deep_field_polylaplacian(x, layers, k, mode="structured"),
+            deep_field_polylaplacian(x, layers, k, mode="support"),
+            rtol=1e-9,
+            atol=1e-10,
+        )
+    with pytest.raises(ValueError, match="serves k in"):
+        deep_field_polylaplacian(x, layers, 4, mode="structured")
+    relu = _make_layers(4, 5, depth=2, activation="relu", seed=39)
+    with pytest.raises(ValueError):
+        deep_field_polylaplacian(x, relu, 2, mode="structured")
+    _, report = deep_field_polylaplacian_with_report(x, relu, 2, mode="auto")
+    assert report.mode == "support"
+
+
+@pytest.mark.parametrize("k", [2, 3])
+def test_structured_and_support_have_the_same_gradient_leaves(k) -> None:
+    """Routing must not change which parameters the graph reaches: ``autograd.grad`` without ``allow_unused`` keeps working."""
+    layers = _make_layers(6, 5, depth=2, activation="tanh", seed=43)
+    params = [t.requires_grad_() for W, b, _ in layers for t in (W, b) if t is not None]
+    x = torch.as_tensor(np.random.default_rng(44).normal(scale=0.3, size=(2, 6)), dtype=torch.float64)
+    grads = {
+        mode: torch.autograd.grad((deep_field_polylaplacian(x, layers, k, mode=mode) ** 2).sum(), params)
+        for mode in ("auto", "structured", "support")
+    }
+    for mode in ("auto", "structured"):
+        for got, want in zip(grads[mode], grads["support"], strict=True):
+            torch.testing.assert_close(got, want, rtol=1e-7, atol=1e-9)
+    assert float(grads["structured"][-1].abs().max()) == 0.0  # the readout bias: an exact zero, not "unused"
+
+
+def test_auto_past_the_budget_still_samples_in_torch() -> None:
+    layers = _make_layers(4, 5, depth=2, activation="tanh", seed=40)
+    x = torch.as_tensor(np.random.default_rng(41).normal(scale=0.3, size=(2, 4)), dtype=torch.float64)
+    _, report = deep_field_polylaplacian_with_report(x, layers, 2, mode="auto", budget=1, n_directions=8)
+    assert report.mode == "estimator" and report.n_directions == 8
+
+
+def test_accelerators_route_to_the_projected_program_from_a_lower_dimension() -> None:
+    from omnibias.torch import laplacian as lap
+
+    cpu, cuda = torch.device("cpu"), torch.device("cuda")
+    assert [lap._structured_min_dim(3, d) for d in (cpu, cuda)] == [6, 3]
+    assert [lap._structured_min_dim(2, d) for d in (cpu, cuda)] == [2, 2]

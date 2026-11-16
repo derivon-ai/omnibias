@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """A posteriori unique least-squares solve certificates from small statistics.
 
 QR/SVD computes the candidate. Gram statistics are used only to check it.

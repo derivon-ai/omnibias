@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Fixed Fourier models, exact heat, Cole--Hopf and dealiased ETDRK4.
 
 All methods are classical scientific controls. These are architecture/solver

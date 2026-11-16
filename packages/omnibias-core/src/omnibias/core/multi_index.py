@@ -38,9 +38,11 @@ Everything is pure integer combinatorics (no numpy / torch / jax) and cached on
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from functools import lru_cache
-from itertools import product
+from itertools import combinations_with_replacement, product
 from math import comb, factorial
+from types import MappingProxyType
 
 MultiIndex = tuple[int, ...]
 
@@ -107,29 +109,29 @@ def _check_shape(dim: int, order: int) -> None:
 
 
 def _generate(dim: int, order: int) -> list[MultiIndex]:
-    """All multi-indices in ``N^dim`` with total degree ``<= order``.
+    """All multi-indices in ``N^dim`` with total degree ``<= order``, in the canonical order.
 
-    Built up one coordinate at a time rather than by recursion on ``dim``, so a
-    wide, low-order request (thousands of variables at order 1) costs memory
-    proportional to its output instead of blowing the interpreter stack.
+    Degree by degree: the multi-indices of degree ``d`` are the multisets of ``d`` axes. ``combinations_with_replacement``
+    lists them in ascending order of the sorted axis tuple, and the exponent vectors of that listing are in *descending*
+    lexicographic order (the first axis at which two multisets differ is the smaller one in the one that comes first, which
+    then holds more copies of it), so reversing a degree gives the canonical ``(degree, lexicographic)`` order with no sort.
+    Each multi-index is built once, ``O(dim)``, where growing the product one coordinate at a time rebuilt every prefix.
+    A wide, low-order request (thousands of variables at order 1) costs memory proportional to its output.
     """
-    partial: list[MultiIndex] = [()]
-    for _ in range(dim):
-        grown: list[MultiIndex] = []
-        for head in partial:
-            remaining = order - sum(head)
-            for value in range(remaining + 1):
-                grown.append((*head, value))
-        partial = grown
-    return partial
+    out: list[MultiIndex] = [(0,) * dim]
+    for degree in range(1, order + 1):
+        for axes in reversed(list(combinations_with_replacement(range(dim), degree))):
+            alpha = [0] * dim
+            for axis in axes:
+                alpha[axis] += 1
+            out.append(tuple(alpha))
+    return out
 
 
 @lru_cache(maxsize=_CACHE_SIZE)
 def _multi_indices(dim: int, order: int) -> tuple[MultiIndex, ...]:
     _check_shape(dim, order)
-    indices = _generate(dim, order)
-    indices.sort(key=lambda a: (sum(a), a))
-    return tuple(indices)
+    return tuple(_generate(dim, order))
 
 
 @lru_cache(maxsize=_CACHE_SIZE)
@@ -167,8 +169,8 @@ def multi_indices(dim: int, order: int) -> list[MultiIndex]:
 
     Indices are sorted by total degree ``|alpha|`` and then lexicographically,
     so element ``0`` is always the zero multi-index ``(0, ..., 0)`` and the next
-    ``dim`` entries are the unit vectors ``e_0, ..., e_{dim-1}`` (the gradient
-    block). The ordering is deterministic, so dense jets share row indexing
+    ``dim`` entries are the unit vectors (the gradient block), last axis first:
+    ``e_{dim-1}, ..., e_0``, since ``(0, 1) < (1, 0)`` lexicographically. The ordering is deterministic, so dense jets share row indexing
     across backends.
     """
     return list(_multi_indices(dim, order))
@@ -177,6 +179,11 @@ def multi_indices(dim: int, order: int) -> list[MultiIndex]:
 def index_position(dim: int, order: int) -> dict[MultiIndex, int]:
     """Map each multi-index to its row in :func:`multi_indices`."""
     return dict(_index_position(dim, order))
+
+
+def index_position_view(dim: int, order: int) -> Mapping[MultiIndex, int]:
+    """Read-only view of :func:`index_position` without the copy: use it to look entries up, not to modify them."""
+    return MappingProxyType(_index_position(dim, order))
 
 
 def multiply_table(dim: int, order: int) -> list[tuple[int, int, int]]:
@@ -206,6 +213,7 @@ __all__ = [
     "MultiIndex",
     "get_multi_index_budget",
     "index_position",
+    "index_position_view",
     "multi_index_factorial",
     "multi_indices",
     "multiply_table",

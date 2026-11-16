@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Research-only cost/error selection. Existing distribution APIs are untouched."""
 import os
 import functools

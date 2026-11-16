@@ -122,7 +122,9 @@ def test_exact_modes_do_not_construct_concentration(backend):
         assert report.n_directions is None
     _, report = module.deep_field_polylaplacian_with_report(
         x, layers(params), 2, mode="auto", budget=1, n_directions=4)
-    assert report.mode == "estimator"
+    # Past the support budget the JAX backend uses its exact projected program; Torch still samples.
+    assert report.mode == ("structured" if backend == "jax" else "estimator")
+    assert report.n_directions is None if backend == "jax" else report.n_directions == 4
 
 
 def test_jax_estimator_jit_vmap_and_all_parameter_gradients():

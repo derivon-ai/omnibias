@@ -1,4 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Keep source mathematics intact when compiling the research record."""
 
 from pathlib import Path

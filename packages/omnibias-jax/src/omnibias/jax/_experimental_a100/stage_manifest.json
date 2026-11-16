@@ -1,0 +1,443 @@
+{
+  "base_commit": "72ef81d1ae9f8ae8792b21e6bc89ccc2e850959c",
+  "candidate_sources": 37,
+  "copy": "verbatim bytes; package_sha256 == source_sha256",
+  "core": {
+    "all_match": true,
+    "declared": 181,
+    "mismatches": []
+  },
+  "experiment": "omnibias-a100-20261016",
+  "files": {
+    "__init__.py": {
+      "bytes": 83,
+      "package_sha256": "dea464634242bde3ea18771411c179ebc39ada273938fec68eb4c3916416f568",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/__init__.py",
+      "source_sha256": "dea464634242bde3ea18771411c179ebc39ada273938fec68eb4c3916416f568"
+    },
+    "_adam_bias_schedule_math.py": {
+      "bytes": 7675,
+      "package_sha256": "d89edb6a4c6e84c749b0a4beb43bc09032fff5debda18f27b0ffd6639e58f9d3",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_adam_schedule/math_construction.py",
+      "source_sha256": "d89edb6a4c6e84c749b0a4beb43bc09032fff5debda18f27b0ffd6639e58f9d3"
+    },
+    "_bound_carry_authority.py": {
+      "bytes": 14614,
+      "package_sha256": "d8db0f3507ea0dc314c8aa474f1a2e8280727f8e740804a1317e83b150abc426",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_bound_carry_authority/revision_v2/_bound_carry_authority.py",
+      "source_sha256": "d8db0f3507ea0dc314c8aa474f1a2e8280727f8e740804a1317e83b150abc426"
+    },
+    "_bound_sign_facts.py": {
+      "bytes": 23088,
+      "package_sha256": "18f2331ddf92ccd8cc566e9384c86fbf88648329dcb0a97b438b27967fa86f14",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_bound_carry_authority/_bound_sign_facts.py",
+      "source_sha256": "18f2331ddf92ccd8cc566e9384c86fbf88648329dcb0a97b438b27967fa86f14"
+    },
+    "bounded_optimizer.py": {
+      "bytes": 19749,
+      "package_sha256": "3524a6436fb93a18bd6e4e2466708dc1a857f4a337482995cb8cbcf9444972e1",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_bounded_optimizer/revision_v2/bounded_optimizer.py",
+      "source_sha256": "3524a6436fb93a18bd6e4e2466708dc1a857f4a337482995cb8cbcf9444972e1"
+    },
+    "bounds.py": {
+      "bytes": 66681,
+      "package_sha256": "e4d9263502985f81c09f5138b5f73681966413e117e0d1de19df0f888b74b370",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_bound_carry_authority/bounds.py",
+      "source_sha256": "e4d9263502985f81c09f5138b5f73681966413e117e0d1de19df0f888b74b370"
+    },
+    "bundles.py": {
+      "bytes": 9002,
+      "package_sha256": "2de148cd8a8e0972124ea28f75e8d6bafb62b650c160804749348ba138fa7987",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/bundles.py",
+      "source_sha256": "2de148cd8a8e0972124ea28f75e8d6bafb62b650c160804749348ba138fa7987"
+    },
+    "cache_manager.py": {
+      "bytes": 29812,
+      "package_sha256": "92fd66fac26d127a9419977a5c7c917ece80885f1f1c74bc3f7fd5e79c92b315",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_amortized_runtime_identity/cache_manager.py",
+      "source_sha256": "92fd66fac26d127a9419977a5c7c917ece80885f1f1c74bc3f7fd5e79c92b315"
+    },
+    "certificates.py": {
+      "bytes": 7373,
+      "package_sha256": "8641c3ac365afabb0d81a3c973643ffaa066578ce96085853e94faa63b6c44ca",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/certificates.py",
+      "source_sha256": "8641c3ac365afabb0d81a3c973643ffaa066578ce96085853e94faa63b6c44ca"
+    },
+    "device_training.py": {
+      "bytes": 10456,
+      "package_sha256": "39f5a78c974177c3b95a0d66c764004213bd443ffb1fac93c7189bbc86858bed",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/device_training.py",
+      "source_sha256": "39f5a78c974177c3b95a0d66c764004213bd443ffb1fac93c7189bbc86858bed"
+    },
+    "execution_measurements.py": {
+      "bytes": 9193,
+      "package_sha256": "8eead4fa4925659d8f6e5dbb4b898b65db54309a0871de5f332e4c5b95d5622f",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/execution_measurements.py",
+      "source_sha256": "8eead4fa4925659d8f6e5dbb4b898b65db54309a0871de5f332e4c5b95d5622f"
+    },
+    "explicit_fft.py": {
+      "bytes": 6450,
+      "package_sha256": "1c1a65e910efbe238f2dc992198954e7654490df130e83d8c6d9920d23abb133",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_contract_hardening/revised_sources/explicit_fft.py",
+      "source_sha256": "1c1a65e910efbe238f2dc992198954e7654490df130e83d8c6d9920d23abb133"
+    },
+    "feature_models.py": {
+      "bytes": 17184,
+      "package_sha256": "53a088b7249cdcb6b22e52a47bd1a3a55cf354a3f7f60e7bfcc9b173700a6ee8",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/feature_models.py",
+      "source_sha256": "53a088b7249cdcb6b22e52a47bd1a3a55cf354a3f7f60e7bfcc9b173700a6ee8"
+    },
+    "frozen_batch.py": {
+      "bytes": 9133,
+      "package_sha256": "846c4ad56843b7c45acf926d2519abfc6d812722e2aaf51cce42c7d20d019538",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/frozen_batch.py",
+      "source_sha256": "846c4ad56843b7c45acf926d2519abfc6d812722e2aaf51cce42c7d20d019538"
+    },
+    "frozen_previous.py": {
+      "bytes": 7951,
+      "package_sha256": "0b709d680224b659919ecbf72c3c81fcc2792a3ac3fc960fb643b3422bd99c0d",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/frozen_previous.py",
+      "source_sha256": "0b709d680224b659919ecbf72c3c81fcc2792a3ac3fc960fb643b3422bd99c0d"
+    },
+    "generic_programs.py": {
+      "bytes": 4400,
+      "package_sha256": "cf47c3857aec9fbd8bbe9a0609ffae9145b23cec5ca26a6b299da98a66d4510b",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_contract_hardening/revised_sources/generic_programs.py",
+      "source_sha256": "cf47c3857aec9fbd8bbe9a0609ffae9145b23cec5ca26a6b299da98a66d4510b"
+    },
+    "kernels.py": {
+      "bytes": 7315,
+      "package_sha256": "821cdbda1e5201c6c729e7cf9cfc972c5e1df8d250ba1429b1f70c91f38a27b4",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/kernels.py",
+      "source_sha256": "821cdbda1e5201c6c729e7cf9cfc972c5e1df8d250ba1429b1f70c91f38a27b4"
+    },
+    "legacy.py": {
+      "bytes": 23163,
+      "package_sha256": "ea8c9e32d357a5b3c2cf22b83725264ee71f25f3c500101e4798298d340d65f9",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_contract_hardening/revised_sources/legacy.py",
+      "source_sha256": "ea8c9e32d357a5b3c2cf22b83725264ee71f25f3c500101e4798298d340d65f9"
+    },
+    "low_rank_operators.py": {
+      "bytes": 3213,
+      "package_sha256": "55d0aa81c69ad00a53308a15fb399885a3829d60763e69187beea4b43b2a8d1a",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/low_rank_operators.py",
+      "source_sha256": "55d0aa81c69ad00a53308a15fb399885a3829d60763e69187beea4b43b2a8d1a"
+    },
+    "operators.py": {
+      "bytes": 6637,
+      "package_sha256": "f340713ec9af13e255b8873ed3817d0ba52397ab0507df8858d30f43438d7e4a",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/operators.py",
+      "source_sha256": "f340713ec9af13e255b8873ed3817d0ba52397ab0507df8858d30f43438d7e4a"
+    },
+    "pde_math.py": {
+      "bytes": 13001,
+      "package_sha256": "1ef4ca5a4c36e1df960de135dd4274f4eb4d0ab6453f55e16205894ed7aa5d46",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/pde_math.py",
+      "source_sha256": "1ef4ca5a4c36e1df960de135dd4274f4eb4d0ab6453f55e16205894ed7aa5d46"
+    },
+    "planner.py": {
+      "bytes": 41795,
+      "package_sha256": "f1e173a679fcca295d44fd4b833b1f49156934c4c6e180d826559daa2d18dd21",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_contract_hardening/revised_sources/planner.py",
+      "source_sha256": "f1e173a679fcca295d44fd4b833b1f49156934c4c6e180d826559daa2d18dd21"
+    },
+    "prefetch.py": {
+      "bytes": 12115,
+      "package_sha256": "97c7332506a3508cf188171fa63857d7ee146516cf4803db3772b814516d25b0",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_contract_hardening/revised_sources/prefetch.py",
+      "source_sha256": "97c7332506a3508cf188171fa63857d7ee146516cf4803db3772b814516d25b0"
+    },
+    "providers.py": {
+      "bytes": 4580,
+      "package_sha256": "1b63bb9aa9d71be4a6ae04f209ad30d27aa5190ab996797f0476f4a95d3f4f3c",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/providers.py",
+      "source_sha256": "1b63bb9aa9d71be4a6ae04f209ad30d27aa5190ab996797f0476f4a95d3f4f3c"
+    },
+    "qualification_session.py": {
+      "bytes": 7976,
+      "package_sha256": "918add8364fba250428ba0f9e635a1689a0015fb0f245e61005b5d611f205436",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_contract_hardening/revised_sources/qualification_session.py",
+      "source_sha256": "918add8364fba250428ba0f9e635a1689a0015fb0f245e61005b5d611f205436"
+    },
+    "reduction.py": {
+      "bytes": 7928,
+      "package_sha256": "b5da9f5faaaf40b2901acadb317af869cdf3c2ed7d3c15e52d7f614c78a6dc95",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/reduction.py",
+      "source_sha256": "b5da9f5faaaf40b2901acadb317af869cdf3c2ed7d3c15e52d7f614c78a6dc95"
+    },
+    "reuse.py": {
+      "bytes": 6450,
+      "package_sha256": "c2804b8a115e42db53c865527318ab6e4b1d8b86e24143afc3cd64b9064f993d",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/reuse.py",
+      "source_sha256": "c2804b8a115e42db53c865527318ab6e4b1d8b86e24143afc3cd64b9064f993d"
+    },
+    "ridge_diagonal_geometry.py": {
+      "bytes": 26365,
+      "package_sha256": "6e33538afe1fe4601927859955f92957e742c163586b0b2b0f92b78d71c408c1",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_ridge_diagonal_geometry/revision_v2/ridge_diagonal_geometry.py",
+      "source_sha256": "6e33538afe1fe4601927859955f92957e742c163586b0b2b0f92b78d71c408c1"
+    },
+    "runtime_block.py": {
+      "bytes": 69891,
+      "package_sha256": "791a739f939a70923b96f865be6f31fcb2a85d4a5c0db0b90e5addf8dfebe9fe",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_bound_carry_authority/revision_v2/runtime_block.py",
+      "source_sha256": "791a739f939a70923b96f865be6f31fcb2a85d4a5c0db0b90e5addf8dfebe9fe"
+    },
+    "runtime_block_domain_reuse.py": {
+      "bytes": 70287,
+      "package_sha256": "088a738eb27e747c6045562824177400b76888192f728f16f00dfd95f3e33c9a",
+      "role": "wholeblock_consumer",
+      "source": "bundle:completion_execution_20261013/pending_identity_wholeblock_domain_reuse/revision_v1/runtime_block_domain_reuse.py",
+      "source_sha256": "088a738eb27e747c6045562824177400b76888192f728f16f00dfd95f3e33c9a"
+    },
+    "runtime_prepared.py": {
+      "bytes": 94997,
+      "package_sha256": "1938c213049b83685d2309058cef3ce19d18b04faa19aea7117fd246e60dcd82",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_amortized_runtime_identity/runtime_prepared.py",
+      "source_sha256": "1938c213049b83685d2309058cef3ce19d18b04faa19aea7117fd246e60dcd82"
+    },
+    "scheduled_optimizer.py": {
+      "bytes": 19194,
+      "package_sha256": "ec3c7580491f08dac166f753974aab95a1a5123148a4c7dd7477931fae5b4cd1",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_adam_schedule_integration/scheduled_optimizer.py",
+      "source_sha256": "ec3c7580491f08dac166f753974aab95a1a5123148a4c7dd7477931fae5b4cd1"
+    },
+    "series_fourier.py": {
+      "bytes": 2887,
+      "package_sha256": "77667139c9fc8449208a0dbce7a9f29223ab6b85f218851fbe1ddb9751671133",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/series_fourier.py",
+      "source_sha256": "77667139c9fc8449208a0dbce7a9f29223ab6b85f218851fbe1ddb9751671133"
+    },
+    "shared_models.py": {
+      "bytes": 1764,
+      "package_sha256": "7077af916835ada34b35522a5725940baeb7a4dfce0fc649feb1683579008fc1",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/shared_models.py",
+      "source_sha256": "7077af916835ada34b35522a5725940baeb7a4dfce0fc649feb1683579008fc1"
+    },
+    "solve_certificate.py": {
+      "bytes": 8429,
+      "package_sha256": "bc62d8145b243ff5c09fb1baf16e655b698feb81d041df2c830600f661e90c68",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/solve_certificate.py",
+      "source_sha256": "bc62d8145b243ff5c09fb1baf16e655b698feb81d041df2c830600f661e90c68"
+    },
+    "streaming.py": {
+      "bytes": 8884,
+      "package_sha256": "70c8b0bd1c54b8f399a64136efa04e55ed3553d3a864bdc459f7a9b10ac20996",
+      "role": "candidate37",
+      "source": "repo:packages/omnibias-jax/src/omnibias/jax/_experimental_stage/streaming.py",
+      "source_sha256": "70c8b0bd1c54b8f399a64136efa04e55ed3553d3a864bdc459f7a9b10ac20996"
+    },
+    "streaming_objective.py": {
+      "bytes": 22684,
+      "package_sha256": "4407c2696b13105dba23529ef96797a937c3e512cc4f7207b964dfad6ff6ca30",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_streaming_runtime/revision_v1/streaming_objective.py",
+      "source_sha256": "4407c2696b13105dba23529ef96797a937c3e512cc4f7207b964dfad6ff6ca30"
+    },
+    "variable_projection.py": {
+      "bytes": 29235,
+      "package_sha256": "67b6a00af57ac173f84883ab678fedcf152805f09e6acc6e0a202edec6de3bb7",
+      "role": "candidate37",
+      "source": "bundle:completion_execution_20261013/pending_contract_hardening/revised_sources/variable_projection.py",
+      "source_sha256": "67b6a00af57ac173f84883ab678fedcf152805f09e6acc6e0a202edec6de3bb7"
+    }
+  },
+  "gate": "private; numerical, resource and matched-performance evidence required before any public export",
+  "package": "omnibias.jax._experimental_a100",
+  "public_exports": [],
+  "schema": "omnibias-a100-stage/v1",
+  "staged_modules": 38,
+  "static_checks": {
+    "absolute_omnibias_imports": {
+      "omnibias.core": true,
+      "omnibias.core.jet_algebra": true,
+      "omnibias.core.jet_series": true,
+      "omnibias.core.operator_spec": true,
+      "omnibias.core.polynomials": true,
+      "omnibias.core.verified.coeffs": true,
+      "omnibias.core.verified.interval": true,
+      "omnibias.core.verified.transcend": true,
+      "omnibias.keras.experimental": "resolves_in_repo_package_omnibias-keras_NOT_installed_in_experiment_env(lazy_legacy_only)",
+      "omnibias.keras.experimental.operator": "resolves_in_repo_package_omnibias-keras_NOT_installed_in_experiment_env(lazy_legacy_only)"
+    },
+    "problems": [],
+    "relative_import_graph": {
+      "__init__.py": [],
+      "_adam_bias_schedule_math.py": [],
+      "_bound_carry_authority.py": [
+        "bounds",
+        "runtime_block"
+      ],
+      "_bound_sign_facts.py": [],
+      "bounded_optimizer.py": [
+        "bounds",
+        "device_training",
+        "planner"
+      ],
+      "bounds.py": [
+        "_bound_carry_authority",
+        "_bound_sign_facts"
+      ],
+      "bundles.py": [
+        "bounds",
+        "providers"
+      ],
+      "cache_manager.py": [
+        "bounds"
+      ],
+      "certificates.py": [
+        "bounds",
+        "bundles",
+        "low_rank_operators",
+        "planner"
+      ],
+      "device_training.py": [],
+      "execution_measurements.py": [
+        "prefetch"
+      ],
+      "explicit_fft.py": [
+        "bounds"
+      ],
+      "feature_models.py": [
+        "bundles",
+        "providers",
+        "variable_projection"
+      ],
+      "frozen_batch.py": [
+        "bounds",
+        "certificates",
+        "prefetch",
+        "reuse"
+      ],
+      "frozen_previous.py": [
+        "providers"
+      ],
+      "generic_programs.py": [],
+      "kernels.py": [
+        "legacy",
+        "operators",
+        "providers"
+      ],
+      "legacy.py": [
+        "bounds"
+      ],
+      "low_rank_operators.py": [
+        "providers"
+      ],
+      "operators.py": [
+        "kernels",
+        "legacy",
+        "providers"
+      ],
+      "pde_math.py": [],
+      "planner.py": [
+        "bounds",
+        "bundles",
+        "cache_manager",
+        "reduction",
+        "shared_models",
+        "streaming"
+      ],
+      "prefetch.py": [],
+      "providers.py": [],
+      "qualification_session.py": [
+        "bounds",
+        "cache_manager",
+        "planner"
+      ],
+      "reduction.py": [
+        "bounds",
+        "bundles",
+        "shared_models",
+        "streaming"
+      ],
+      "reuse.py": [
+        "solve_certificate"
+      ],
+      "ridge_diagonal_geometry.py": [
+        "bounds",
+        "certificates",
+        "planner",
+        "prefetch",
+        "providers"
+      ],
+      "runtime_block.py": [
+        "_bound_carry_authority",
+        "bounded_optimizer",
+        "bounds",
+        "device_training",
+        "planner",
+        "runtime_prepared",
+        "scheduled_optimizer"
+      ],
+      "runtime_block_domain_reuse.py": [],
+      "runtime_prepared.py": [
+        "bounds",
+        "cache_manager",
+        "certificates",
+        "device_training",
+        "planner",
+        "prefetch",
+        "providers",
+        "ridge_diagonal_geometry",
+        "streaming_objective"
+      ],
+      "scheduled_optimizer.py": [
+        "_adam_bias_schedule_math",
+        "bounded_optimizer",
+        "bounds",
+        "device_training"
+      ],
+      "series_fourier.py": [],
+      "shared_models.py": [
+        "bundles"
+      ],
+      "solve_certificate.py": [
+        "bounds"
+      ],
+      "streaming.py": [
+        "bundles",
+        "shared_models"
+      ],
+      "streaming_objective.py": [],
+      "variable_projection.py": [
+        "bounds",
+        "feature_models"
+      ]
+    }
+  }
+}

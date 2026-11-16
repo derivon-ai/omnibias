@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Conditional first-order variable projection for explicit linear residuals.
 
 QR/SVD are opaque numerical solvers: their answers are accepted only through

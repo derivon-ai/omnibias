@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (C) 2026 Derivon
-"""Selected generic Hessians must not evaluate discarded coordinate entries."""
+"""Selected generic Hessians must not evaluate discarded coordinate entries, nor an entry whose transpose was evaluated."""
 from __future__ import annotations
 
 import importlib
@@ -62,7 +62,10 @@ def test_selected_hessian_values_and_only_requested_calls(backend, axes, indices
                 (2 if a == 0 else 6) * x[:, 2] if a == b else 2 * x[:, 0]
             )
     np.testing.assert_allclose(np.asarray(result), expected, rtol=1e-14, atol=1e-14)
-    assert calls == [(a, b) for a in indices for b in indices]
+    # mixed partials commute: the upper triangle of the selected block is evaluated and mirrored
+    n = len(indices)
+    assert calls == [(indices[p], indices[q]) for p in range(n) for q in range(p, n)]
+    np.testing.assert_array_equal(np.asarray(result), np.swapaxes(np.asarray(result), -1, -2))
 
 
 @pytest.mark.parametrize("backend", ["jax", "torch"])

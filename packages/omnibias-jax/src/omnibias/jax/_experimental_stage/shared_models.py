@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Explicit role bindings for genuinely shared runtime parameter leaves."""
 from dataclasses import dataclass
 from .bundles import Model, build

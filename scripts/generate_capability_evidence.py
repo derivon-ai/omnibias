@@ -15,6 +15,8 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 TARGETS = (".cursor/rules/omnibias.mdc",)
 ARTIFACTS = ("derivative_order", "laplacian_scaling", "polylaplacian_order")
+FULL_SCOPE = "full_scope"
+VERDICTS = ("big_win", "win", "parity", "loss", "incomplete")
 BEGIN = "<!-- BEGIN GENERATED CAPABILITY EVIDENCE -->"
 END = "<!-- END GENERATED CAPABILITY EVIDENCE -->"
 
@@ -22,8 +24,44 @@ END = "<!-- END GENERATED CAPABILITY EVIDENCE -->"
 def read_artifacts(root: Path) -> dict[str, Any]:
     return {
         name: json.loads((root / "docs/benchmarks" / f"{name}.json").read_text())
-        for name in ARTIFACTS
+        for name in (*ARTIFACTS, FULL_SCOPE)
     }
+
+
+def full_scope_lines(matrix: dict[str, Any], prefix: str) -> list[str]:
+    """Counts per verdict of the full-scope matrix, recomputed from its rows (the stored summary is not trusted)."""
+    rows = matrix["rows"]
+    if not rows or any(row["verdict"] not in VERDICTS for row in rows):
+        raise ValueError("Full-scope rows need a known verdict")
+
+    def counts(selection: list[dict[str, Any]]) -> list[int]:
+        return [sum(row["verdict"] == verdict for row in selection) for verdict in VERDICTS]
+
+    external = [row for row in rows if row["baseline_kind"] == "external"]
+    projected = [row for row in rows if row["baseline_kind"] == "engine_on_omnibias_projection"]
+    own = [row for row in rows if row["baseline_kind"] in {"omnibias_variant", "hand_written"}]
+    if len(external) + len(projected) + len(own) != len(rows):
+        raise ValueError("Every full-scope row needs a known baseline kind")
+    families = {
+        name: dict(zip(VERDICTS, counts([row for row in external if row["family"] == name]), strict=True))
+        for name in sorted({row["family"] for row in external})
+    }
+    lines = [
+        f"Full scope ([`full_scope.json`]({prefix}docs/benchmarks/full_scope.json), {len(rows):,} cells; verdict from each cell's "
+        "95 % interval of baseline time / omnibias time: big win lower bound ≥ 2, win > 1, parity contains 1, loss upper bound < 1):",
+        "",
+        "| Baseline | Cells | Big win | Win | Parity | Loss | Incomplete |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ]
+    for label, selection in (("independent (Taylor mode, folx, jet, nested autodiff, dense, DeepXDE, GMRES)", external),
+                             ("generic engine on omnibias's own projection", projected),
+                             ("omnibias's own variants and hand-written closed forms", own)):
+        c = counts(selection)
+        lines.append(f"| {label} | {len(selection):,} | " + " | ".join(f"{n:,}" for n in c) + " |")
+    lines += ["", "Independent baselines by family: " + "; ".join(
+        f"{name} {entry['big_win']:,}/{entry['win']:,}/{entry['parity']:,}/{entry['loss']:,}"
+        for name, entry in families.items()) + " (big win/win/parity/loss; incomplete cells omitted).", ""]
+    return lines
 
 
 def row_at(payload: dict[str, Any], key: str, value: int) -> dict[str, Any]:
@@ -67,6 +105,7 @@ def comparison(fast: dict[str, Any], slow: dict[str, Any], repeats: int) -> str:
 def evidence(data: dict[str, Any], prefix: str) -> str:
     """Render ratios from successful medians; failed baselines never yield claims."""
     activation, laplacian, repeated = (data[name] for name in ARTIFACTS)
+    matrix = data[FULL_SCOPE]
     a, lap, poly = (item["config"] for item in (activation, laplacian, repeated))
     if any(item["dtype"] != a["dtype"] or item["repeats"] != a["repeats"]
            for item in (lap, poly)):
@@ -109,7 +148,9 @@ def evidence(data: dict[str, Any], prefix: str) -> str:
         "vs dense JAX / nested folx respectively.",
         "",
         "Operator timings use JAX JIT, runtime inputs/weights, compilation excluded. " + dense_note,
-        f"[Full protocol, accuracy and baseline wins]({prefix}docs/performance.md).",
+        "",
+        *full_scope_lines(matrix, prefix),
+        f"[Full matrix, protocol, accuracy and every baseline win and loss]({prefix}docs/performance.md#full-scope-matrix).",
     ])
 
 

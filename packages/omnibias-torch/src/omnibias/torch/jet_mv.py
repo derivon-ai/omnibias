@@ -19,7 +19,7 @@ from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from omnibias.core.multi_index import (
-    index_position,
+    index_position_view,
     multi_index_factorial,
     multi_indices,
     multiply_table,
@@ -307,7 +307,7 @@ def identity_jet(x0: Tensor, order: int) -> Tensor:
     dim = int(x0.shape[0])
     if order < 0:
         raise ValueError(f"order must be >= 0, got {order}")
-    pos = index_position(dim, order)
+    pos = index_position_view(dim, order)
     m = num_multi_indices(dim, order)
     rows = [torch.zeros((dim,), dtype=x0.dtype, device=x0.device) for _ in range(m)]
     rows[pos[(0,) * dim]] = x0
@@ -363,7 +363,7 @@ def jet_gradient(jet: Tensor, dim: int, order: int) -> Tensor:
     if order < 1:
         raise ValueError(f"gradient needs order >= 1, got {order}")
     jet = torch.as_tensor(jet)
-    pos = index_position(dim, order)
+    pos = index_position_view(dim, order)
     rows = []
     for i in range(dim):
         e = tuple(1 if j == i else 0 for j in range(dim))
@@ -380,7 +380,7 @@ def jet_hessian(jet: Tensor, dim: int, order: int) -> Tensor:
     if order < 2:
         raise ValueError(f"hessian needs order >= 2, got {order}")
     jet = torch.as_tensor(jet)
-    pos = index_position(dim, order)
+    pos = index_position_view(dim, order)
     rows = []
     for i in range(dim):
         row = []

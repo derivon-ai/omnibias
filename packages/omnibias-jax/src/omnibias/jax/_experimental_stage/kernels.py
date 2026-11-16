@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Operator demand reductions and contracted metric adjoints."""
 import functools
 import jax

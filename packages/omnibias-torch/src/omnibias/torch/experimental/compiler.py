@@ -40,14 +40,25 @@ class _CapturedGraph:
 
     @classmethod
     def from_export(cls, exported: Any) -> _CapturedGraph:
-        return cls(exported.graph_module, exported.graph_signature, exported.call_spec,
-                   exported.range_constraints, exported.constants)
+        return cls(
+            exported.graph_module,
+            exported.graph_signature,
+            exported.call_spec,
+            exported.range_constraints,
+            exported.constants,
+        )
 
 
 def _metadata_examples(args: tuple[Any, ...]) -> tuple[Any, ...]:
-    return cast(tuple[Any, ...], _pytree.tree_map(
-        lambda value: torch.empty_like(value, device="meta", requires_grad=False) if isinstance(value, Tensor) else value,
-        args))
+    return cast(
+        tuple[Any, ...],
+        _pytree.tree_map(
+            lambda value: torch.empty_like(value, device="meta", requires_grad=False)
+            if isinstance(value, Tensor)
+            else value,
+            args,
+        ),
+    )
 
 
 def _reject_capture_state_aliases(model: nn.Module, args: tuple[Any, ...]) -> None:
@@ -55,30 +66,47 @@ def _reject_capture_state_aliases(model: nn.Module, args: tuple[Any, ...]) -> No
     seen: set[int] = set()
     for value in _pytree.tree_leaves(args):
         if isinstance(value, Tensor) and id(value) in state:
-            raise JetCompileError(f"capture example tensor aliases model state {state[id(value)]!r}; "
-                                  "use an independent example tensor to keep input and parameter roles distinct")
+            raise JetCompileError(
+                f"capture example tensor aliases model state {state[id(value)]!r}; "
+                "use an independent example tensor to keep input and parameter roles distinct"
+            )
         if isinstance(value, Tensor):
             if id(value) in seen:
-                raise JetCompileError("duplicate capture example tensor; distinct example tensors identify independent "
-                                      "argument roles; runtime aliases are supported")
+                raise JetCompileError(
+                    "duplicate capture example tensor; distinct example tensors identify independent "
+                    "argument roles; runtime aliases are supported"
+                )
             seen.add(id(value))
 
 
 _OPS = SimpleNamespace(
-    exp=torch.exp, log=torch.log, sqrt=torch.sqrt, tanh=torch.tanh,
-    sigmoid=torch.sigmoid, sin=torch.sin, cos=torch.cos, erf=torch.erf,
-    erfc=torch.erfc, zeros_like=torch.zeros_like, ones_like=torch.ones_like,
-    logaddexp=torch.logaddexp, softplus=F.softplus,
+    exp=torch.exp,
+    log=torch.log,
+    sqrt=torch.sqrt,
+    tanh=torch.tanh,
+    sigmoid=torch.sigmoid,
+    sin=torch.sin,
+    cos=torch.cos,
+    erf=torch.erf,
+    erfc=torch.erfc,
+    zeros_like=torch.zeros_like,
+    ones_like=torch.ones_like,
+    logaddexp=torch.logaddexp,
+    softplus=F.softplus,
 )
 
 
 def _validate_tensor(x: Tensor) -> None:
     if x.dtype not in (torch.float32, torch.float64):
-        raise JetCompileError("jet inputs require float32 or float64 (half, complex and integer jets are unsupported)")
+        raise JetCompileError(
+            "jet inputs require float32 or float64 (half, complex and integer jets are unsupported)"
+        )
 
 
 def seed_jet(
-    value: Tensor, spec: JetSpec, coefficients: dict[tuple[int, ...], Tensor] | None = None,
+    value: Tensor,
+    spec: JetSpec,
+    coefficients: dict[tuple[int, ...], Tensor] | None = None,
 ) -> Tensor:
     """Pack a primal and optional Taylor coefficients without detaching either.
 
@@ -93,9 +121,15 @@ def seed_jet(
         if not any(alpha):
             raise ValueError("the constant coefficient is supplied as value")
         coefficient = supplied[alpha]
-        if coefficient.shape != value.shape or coefficient.dtype != value.dtype or coefficient.device != value.device:
+        if (
+            coefficient.shape != value.shape
+            or coefficient.dtype != value.dtype
+            or coefficient.device != value.device
+        ):
             raise ValueError("every seed coefficient must match the primal shape, dtype and device")
-    return torch.stack([value if not any(a) else supplied.get(a, torch.zeros_like(value)) for a in spec.indices])
+    return torch.stack(
+        [value if not any(a) else supplied.get(a, torch.zeros_like(value)) for a in spec.indices]
+    )
 
 
 def directional_seed(value: Tensor, direction: Tensor, spec: JetSpec | int) -> Tensor:
@@ -138,7 +172,9 @@ def _add(a: Sequence[Any], b: Sequence[Any]) -> list[Any]:
 
 class _ActivationVJP(torch.autograd.Function):
     @staticmethod
-    def forward(packed: Tensor, forward_graph: nn.Module, slope_graph: nn.Module, pairs: Any) -> Tensor:
+    def forward(
+        packed: Tensor, forward_graph: nn.Module, slope_graph: nn.Module, pairs: Any
+    ) -> Tensor:
         return cast(Tensor, forward_graph(packed))
 
     @staticmethod
@@ -186,14 +222,22 @@ class _AnalyticActivation(nn.Module):
     def __init__(self, spec: JetSpec, name: str, kernels: KernelLowering | None = None) -> None:
         super().__init__()
         self.pairs = spec.pairs
-        self.forward_graph = _activation_graph(spec, name, False) if kernels is None else kernels.module(spec, name)
-        self.slope_graph = _activation_graph(spec, name, True) if kernels is None else kernels.module(spec, name, True)
+        self.forward_graph = (
+            _activation_graph(spec, name, False) if kernels is None else kernels.module(spec, name)
+        )
+        self.slope_graph = (
+            _activation_graph(spec, name, True)
+            if kernels is None
+            else kernels.module(spec, name, True)
+        )
 
     def forward(self, packed: Tensor) -> Tensor:
         # Both variants use the same analytic correlation backward. The eager
         # variant additionally exposes JVP/vmap, which Dynamo does not trace.
         function = _ActivationVJP if torch.compiler.is_compiling() else _TransformActivationVJP
-        return cast(Tensor, function.apply(packed, self.forward_graph, self.slope_graph, self.pairs))
+        return cast(
+            Tensor, function.apply(packed, self.forward_graph, self.slope_graph, self.pairs)
+        )
 
 
 @dataclass
@@ -228,10 +272,41 @@ def _map(value: Any, fn: Callable[[Any], Any]) -> Any:
     return fn(value)
 
 
+def _spec_children(spec: Any) -> list[Any]:
+    """The child specs of a pytree ``TreeSpec`` (a method in recent PyTorch, ``children_specs`` in 2.9)."""
+    children = getattr(spec, "children", None)
+    return list(children()) if callable(children) else list(spec.children_specs)
+
+
+_DYNAMO_LIMITS = (
+    "recompile_limit",
+    "cache_size_limit",
+    "accumulated_recompile_limit",
+    "accumulated_cache_size_limit",
+)
+
+
+def _strict_export(model: Any, example_args: Any, dynamic_shapes: Any) -> Any:
+    """``torch.export.export(strict=True)`` that survives many captures in one process.
+
+    Strict export traces ``model.forward`` with Dynamo, which counts every capture of the same code object against
+    ``recompile_limit`` (8 by default): the ninth model compiled in a process fails with "recompile_limit reached".  Each
+    capture here is a fresh trace of a fresh model, so the limits are raised for the call only.
+    """
+    config = torch._dynamo.config
+    limits = {name: 1 << 20 for name in _DYNAMO_LIMITS if hasattr(config, name)}
+    with config.patch(**limits):
+        return torch.export.export(model, example_args, dynamic_shapes=dynamic_shapes, strict=True)
+
+
 def _emit_output(graph: Graph, leaves: list[Any], output_spec: Any) -> None:
     """Keep registered output containers intact in the generated FX function."""
+
     def needs_pytree_codegen(spec: Any) -> bool:
-        return not spec.is_leaf() and (spec.type not in {tuple, list, dict} or any(needs_pytree_codegen(child) for child in spec.children()))
+        return not spec.is_leaf() and (
+            spec.type not in {tuple, list, dict}
+            or any(needs_pytree_codegen(child) for child in _spec_children(spec))
+        )
 
     if needs_pytree_codegen(output_spec):
         names = [str(node.target) for node in graph.nodes if node.op == "placeholder"]
@@ -258,27 +333,77 @@ def _zero(value: Any) -> Any:
 
 
 def _rows(value: Any, spec: JetSpec) -> list[Any]:
-    return value.rows if isinstance(value, _Series) else [value] + [_zero(value) for _ in range(spec.size - 1)]
+    return (
+        value.rows
+        if isinstance(value, _Series)
+        else [value] + [_zero(value) for _ in range(spec.size - 1)]
+    )
 
 
 _ACTIVATIONS = {
-    "tanh": "tanh", "sigmoid": "sigmoid", "sin": "sin", "cos": "cos",
-    "exp": "exp", "log": "log", "sqrt": "sqrt", "reciprocal": "reciprocal",
-    "erf": "erf", "erfc": "erfc", "silu": "silu",
+    "tanh": "tanh",
+    "sigmoid": "sigmoid",
+    "sin": "sin",
+    "cos": "cos",
+    "exp": "exp",
+    "log": "log",
+    "sqrt": "sqrt",
+    "reciprocal": "reciprocal",
+    "erf": "erf",
+    "erfc": "erfc",
+    "silu": "silu",
 }
 _LINEAR = {
-    "view", "reshape", "_unsafe_view", "flatten", "squeeze", "unsqueeze",
-    "permute", "transpose", "t", "numpy_T", "select", "slice", "expand", "expand_as",
-    "clone", "contiguous", "alias", "sum", "mean", "neg", "constant_pad_nd", "pad",
-    "repeat", "tile", "flip", "roll", "split", "split_with_sizes", "unbind",
+    "view",
+    "reshape",
+    "_unsafe_view",
+    "flatten",
+    "squeeze",
+    "unsqueeze",
+    "permute",
+    "transpose",
+    "t",
+    "numpy_T",
+    "select",
+    "slice",
+    "expand",
+    "expand_as",
+    "clone",
+    "contiguous",
+    "alias",
+    "sum",
+    "mean",
+    "neg",
+    "constant_pad_nd",
+    "pad",
+    "repeat",
+    "tile",
+    "flip",
+    "roll",
+    "split",
+    "split_with_sizes",
+    "unbind",
 }
 _SHAPE = {"sym_size", "sym_numel", "sym_stride", "size", "numel"}
 _CREATION = {"zeros", "ones", "full", "arange", "scalar_tensor", "lift_fresh_copy"}
 
 
-def _rule(target: Any, args: tuple[Any, ...], kwargs: dict[str, Any], spec: JetSpec, backward: str, tracer: GraphAppendingTracer | None = None, holder: nn.Module | None = None, kernels: KernelLowering | None = None) -> Any:
+def _rule(
+    target: Any,
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+    spec: JetSpec,
+    backward: str,
+    tracer: GraphAppendingTracer | None = None,
+    holder: nn.Module | None = None,
+    kernels: KernelLowering | None = None,
+) -> Any:
     def compose(rows: list[Any], name: str) -> list[Any]:
-        return activation(rows, spec, name, _OPS) if kernels is None else kernels.activate(rows, spec, name)
+        return (
+            activation(rows, spec, name, _OPS)
+            if kernels is None
+            else kernels.activate(rows, spec, name)
+        )
 
     if target is operator.getitem:
         obj, key = args
@@ -287,35 +412,75 @@ def _rule(target: Any, args: tuple[Any, ...], kwargs: dict[str, Any], spec: JetS
         return obj[key]
     if target in (operator.add, operator.sub, operator.mul, operator.floordiv, operator.mod):
         if _tracked(args):
-            raise JetCompileError("Python arithmetic on tracked values must be exported as tensor operations")
+            raise JetCompileError(
+                "Python arithmetic on tracked values must be exported as tensor operations"
+            )
         return target(*args, **kwargs)
     if target in _CUSTOM_RULES:
+
         def unpack(v: Any) -> Any:
             return v.rows if isinstance(v, _Series) else v
+
         result = _CUSTOM_RULES[target](_map(args, unpack), _map(kwargs, unpack), spec, _OPS)
         return _Series(result) if isinstance(result, list) else tuple(_Series(r) for r in result)
     qualified = str(target).split(".")
     if len(qualified) < 2 or qualified[0] != "aten":
         raise JetCompileError(f"unsupported graph operation {target}")
     op = qualified[1]
-    supported = _LINEAR | _SHAPE | _CREATION | set(_ACTIVATIONS) | {
-        "add", "sub", "mul", "div", "true_divide", "pow", "square", "linear",
-        "mm", "matmul", "bmm", "addmm", "conv1d", "conv2d", "convolution",
-        "cat", "stack", "gelu", "softplus", "softmax", "_softmax",
-        "zeros_like", "ones_like", "full_like", "detach", "_to_copy",
-    }
+    supported = (
+        _LINEAR
+        | _SHAPE
+        | _CREATION
+        | set(_ACTIVATIONS)
+        | {
+            "add",
+            "sub",
+            "mul",
+            "div",
+            "true_divide",
+            "pow",
+            "square",
+            "linear",
+            "mm",
+            "matmul",
+            "bmm",
+            "addmm",
+            "conv1d",
+            "conv2d",
+            "convolution",
+            "cat",
+            "stack",
+            "gelu",
+            "softplus",
+            "softmax",
+            "_softmax",
+            "zeros_like",
+            "ones_like",
+            "full_like",
+            "detach",
+            "_to_copy",
+        }
+    )
     if op not in supported:
         raise JetCompileError(f"unsupported primitive {target}; register an explicit jet rule")
     if not _tracked((args, kwargs)):
-        return tracer.create_proxy("call_function", target, args, kwargs) if tracer is not None else target(*args, **kwargs)
+        return (
+            tracer.create_proxy("call_function", target, args, kwargs)
+            if tracer is not None
+            else target(*args, **kwargs)
+        )
     if op in _SHAPE:
         return target(*_primal(args), **_primal(kwargs))
     if op == "detach":
-        raise JetCompileError("detach of a differentiated value would discard its derivative contract")
+        raise JetCompileError(
+            "detach of a differentiated value would discard its derivative contract"
+        )
     if op == "_to_copy":
         dtype = kwargs.get("dtype")
         if dtype is not None and dtype not in (torch.float32, torch.float64):
-            raise JetCompileError("casting a tracked jet to a non-float32/float64 dtype is unsupported")
+            raise JetCompileError(
+                "casting a tracked jet to a non-float32/float64 dtype is unsupported"
+            )
         return _Series([target(row, **kwargs) for row in _rows(args[0], spec)])
     if op in {"zeros_like", "ones_like", "full_like"}:
         primal = target(*_primal(args), **kwargs)
@@ -326,16 +491,31 @@ def _rule(target: Any, args: tuple[Any, ...], kwargs: dict[str, Any], spec: JetS
         if op == "constant_pad_nd":
             pad = args[1]
             value = args[2] if len(args) > 2 else kwargs.get("value", 0)
-            return _Series([target(row, pad, value if i == 0 else 0) for i, row in enumerate(_rows(args[0], spec))])
+            return _Series(
+                [
+                    target(row, pad, value if i == 0 else 0)
+                    for i, row in enumerate(_rows(args[0], spec))
+                ]
+            )
         if op == "pad":
             pad = args[1]
             mode = args[2] if len(args) > 2 else kwargs.get("mode", "constant")
             value = args[3] if len(args) > 3 else kwargs.get("value")
-            return _Series([target(row, pad, mode, value if i == 0 or mode != "constant" else 0) for i, row in enumerate(_rows(args[0], spec))])
+            return _Series(
+                [
+                    target(row, pad, mode, value if i == 0 or mode != "constant" else 0)
+                    for i, row in enumerate(_rows(args[0], spec))
+                ]
+            )
         rows = [target(row, *args[1:], **kwargs) for row in _rows(args[0], spec)]
         return _Series(rows)
     if op in {"cat", "stack"}:
-        return _Series([target([_rows(a, spec)[i] for a in args[0]], *args[1:], **kwargs) for i in range(spec.size)])
+        return _Series(
+            [
+                target([_rows(a, spec)[i] for a in args[0]], *args[1:], **kwargs)
+                for i in range(spec.size)
+            ]
+        )
     if op in {"add", "sub"}:
         a, b = (_rows(v, spec) for v in args[:2])
         return _Series([target(x, y, *args[2:], **kwargs) for x, y in zip(a, b, strict=True)])
@@ -350,7 +530,9 @@ def _rule(target: Any, args: tuple[Any, ...], kwargs: dict[str, Any], spec: JetS
             raise JetCompileError("integer/rounded division is not differentiable")
         if not isinstance(args[1], _Series):
             return _Series([r / args[1] for r in _rows(args[0], spec)])
-        return _Series(multiply(_rows(args[0], spec), reciprocal(args[1].rows, spec, _OPS), spec, _OPS))
+        return _Series(
+            multiply(_rows(args[0], spec), reciprocal(args[1].rows, spec, _OPS), spec, _OPS)
+        )
     if op in {"pow", "square"}:
         exponent = 2 if op == "square" else args[1]
         if isinstance(exponent, float) and exponent.is_integer():
@@ -378,7 +560,9 @@ def _rule(target: Any, args: tuple[Any, ...], kwargs: dict[str, Any], spec: JetS
         if not isinstance(args[1], _Series):
             return _Series([target(r, args[1], **kwargs) for r in args[0].rows])
         a, b = (_rows(v, spec) for v in args[:2])
-        return _Series([sum((target(a[i], b[j], **kwargs) for i, j in pairs)) for pairs in spec.pairs])
+        return _Series(
+            [sum((target(a[i], b[j], **kwargs) for i, j in pairs)) for pairs in spec.pairs]
+        )
     if op in {"linear", "conv1d", "conv2d", "convolution"}:
         a, b = (_rows(v, spec) for v in args[:2])
         bias = args[2] if len(args) > 2 else kwargs.get("bias")
@@ -408,14 +592,24 @@ def _rule(target: Any, args: tuple[Any, ...], kwargs: dict[str, Any], spec: JetS
             else:
                 rank = 1 if op == "conv1d" else 2
                 if isinstance(bias, _Series):
-                    out = [v + z.reshape((1, -1) + (1,) * rank) for v, z in zip(out, bias_rows, strict=True)]
+                    out = [
+                        v + z.reshape((1, -1) + (1,) * rank)
+                        for v, z in zip(out, bias_rows, strict=True)
+                    ]
                 else:
                     out[0] = out[0] + bias.reshape((1, -1) + (1,) * rank)
         return _Series(out)
     if op == "addmm":
         bias, a, b = args[:3]
-        product = _rule(torch.ops.aten.mm.default, (a, b), {}, spec, backward, tracer, holder, kernels)
-        return _Series(_add(_scale(_rows(bias, spec), kwargs.get("beta", 1)), _scale(product.rows, kwargs.get("alpha", 1))))
+        product = _rule(
+            torch.ops.aten.mm.default, (a, b), {}, spec, backward, tracer, holder, kernels
+        )
+        return _Series(
+            _add(
+                _scale(_rows(bias, spec), kwargs.get("beta", 1)),
+                _scale(product.rows, kwargs.get("alpha", 1)),
+            )
+        )
     if op in {"softmax", "_softmax"}:
         if op == "_softmax" and len(args) > 2 and args[2]:
             raise JetCompileError("half-to-float softmax is outside float32/float64 jet semantics")
@@ -435,7 +629,12 @@ def _rule(target: Any, args: tuple[Any, ...], kwargs: dict[str, Any], spec: JetS
         threshold = args[2] if len(args) > 2 else kwargs.get("threshold", 20)
         a = _rows(args[0], spec)
         nonlinear = compose(_scale(a, beta), "softplus")
-        return _Series([torch.where(a[0] * beta > threshold, x, y / beta) for x, y in zip(a, nonlinear, strict=True)])
+        return _Series(
+            [
+                torch.where(a[0] * beta > threshold, x, y / beta)
+                for x, y in zip(a, nonlinear, strict=True)
+            ]
+        )
     name = _ACTIVATIONS.get(op)
     if op == "gelu":
         approximation = kwargs.get("approximate", args[1] if len(args) > 1 else "none")
@@ -446,7 +645,9 @@ def _rule(target: Any, args: tuple[Any, ...], kwargs: dict[str, Any], spec: JetS
             assert holder is not None and tracer is not None
             module_name = f"jet_activation_{len(holder._modules)}"
             holder.add_module(module_name, _AnalyticActivation(spec, name, kernels))
-            analytic_proxy: Any = tracer.create_proxy("call_module", module_name, (torch.stack(a),), {})
+            analytic_proxy: Any = tracer.create_proxy(
+                "call_module", module_name, (torch.stack(a),), {}
+            )
             return _Series([analytic_proxy[i] for i in range(spec.size)])
         return _Series(compose(a, name))
     raise JetCompileError(f"no coefficient implementation for {target}")
@@ -460,14 +661,26 @@ class JetProgram(nn.Module):
     generated once and can be inspected or compiled with ``torch.compile``.
     """
 
-    def __init__(self, graph_module: GraphModule, spec: JetSpec, argnums: tuple[int, ...], guards: list[Any], report: dict[str, Any], input_structure: Any) -> None:
+    def __init__(
+        self,
+        graph_module: GraphModule,
+        spec: JetSpec,
+        argnums: tuple[int, ...],
+        guards: list[Any],
+        report: dict[str, Any],
+        input_structure: Any,
+    ) -> None:
         super().__init__()
         self.graph_module = graph_module
         self.spec, self.argnums = spec, argnums
         self._guards, self._report = guards, report
         self._input_structure = input_structure
-        children = list(input_structure.children())
-        self._flat_input_arity = len(children) if input_structure.type is tuple and all(child.is_leaf() for child in children) else None
+        children = _spec_children(input_structure)
+        self._flat_input_arity = (
+            len(children)
+            if input_structure.type is tuple and all(child.is_leaf() for child in children)
+            else None
+        )
 
     def forward(self, *args: Any) -> Any:
         leaves: Sequence[Any]
@@ -487,13 +700,18 @@ class JetProgram(nn.Module):
                     raise JetCompileError("a specialized non-tensor export argument changed")
                 continue
             if not isinstance(value, Tensor):
-                raise JetCompileError("runtime tensor argument differs from the exported argument tree")
+                raise JetCompileError(
+                    "runtime tensor argument differs from the exported argument tree"
+                )
             if value.dtype != dtype:
                 raise JetCompileError("runtime dtype differs from the exported example")
             offset = int(selected)
             if selected:
                 torch._assert(value.shape[0] == self.spec.size, "jet coefficient count mismatch")
-                torch._assert(value.numel() * value.element_size() <= self.spec.budget.max_tensor_bytes, "runtime jet exceeds tensor byte budget")
+                torch._assert(
+                    value.numel() * value.element_size() <= self.spec.budget.max_tensor_bytes,
+                    "runtime jet exceeds tensor byte budget",
+                )
             torch._assert(value.ndim == len(shape) + offset, "runtime rank differs from export")
             for axis, (key, lower, upper) in enumerate(shape):
                 length = value.shape[axis + offset]
@@ -501,7 +719,9 @@ class JetProgram(nn.Module):
                     torch._assert(length == key, "static export dimension changed")
                 else:
                     if key in symbols:
-                        torch._assert(length == symbols[key], "shared dynamic export dimension differs")
+                        torch._assert(
+                            length == symbols[key], "shared dynamic export dimension differs"
+                        )
                     symbols[key] = length
                     if lower is not None:
                         torch._assert(length >= lower, "dynamic dimension below exported bound")
@@ -511,12 +731,15 @@ class JetProgram(nn.Module):
 
     def explain(self) -> dict[str, Any]:
         """Return the captured rule and resource plan without evaluating tensors."""
-        return {**self._report, "parameter_ad": {
-            "eager_higher_gradients": True,
-            "compiled_forward": "first backward; use compiled HVP or hybrid for higher gradients",
-            "compiled_parameter_hvp": True,
-            "hybrid_higher_gradients": True,
-        }}
+        return {
+            **self._report,
+            "parameter_ad": {
+                "eager_higher_gradients": True,
+                "compiled_forward": "first backward; use compiled HVP or hybrid for higher gradients",
+                "compiled_parameter_hvp": True,
+                "hybrid_higher_gradients": True,
+            },
+        }
 
     def hybrid(self, **compile_options: Any) -> Any:
         """Compile forward and recompute native backward for higher gradients.
@@ -551,21 +774,30 @@ def _check_tensor_bound(value: Tensor, spec: JetSpec, ranges: dict[Any, Any]) ->
         for symbol in expr.free_symbols:
             bound = ranges.get(symbol)
             if bound is None or str(bound.upper) in {"oo", "int_oo"}:
-                raise JetCompileError("dynamic jet dimensions require finite upper bounds for resource checks")
+                raise JetCompileError(
+                    "dynamic jet dimensions require finite upper bounds for resource checks"
+                )
             derivative = expr.diff(symbol)
             if derivative.is_nonnegative:
                 substitutions[symbol] = int(bound.upper)
             elif derivative.is_nonpositive and str(bound.lower) not in {"-oo", "-int_oo"}:
                 substitutions[symbol] = int(bound.lower)
             else:
-                raise JetCompileError("cannot prove a resource bound for this dynamic shape expression")
+                raise JetCompileError(
+                    "cannot prove a resource bound for this dynamic shape expression"
+                )
         shape.append(int(expr.subs(substitutions)))
     return spec.check_tensor(shape, value.element_size())
 
 
 def compile_jet(
-    model: nn.Module, example_args: tuple[Any, ...], *, spec: JetSpec,
-    argnums: tuple[int, ...] = (0,), dynamic_shapes: Any = None, backward: str = "native",
+    model: nn.Module,
+    example_args: tuple[Any, ...],
+    *,
+    spec: JetSpec,
+    argnums: tuple[int, ...] = (0,),
+    dynamic_shapes: Any = None,
+    backward: str = "native",
     kernel_lowering: str = "auto",
     _graph_factory: Callable[[], Graph] = Graph,
     _exported: _CapturedGraph | None = None,
@@ -601,7 +833,9 @@ def compile_jet(
     if _exported is None:
         _reject_capture_state_aliases(model, example_args)
         try:
-            exported = _CapturedGraph.from_export(torch.export.export(model, example_args, dynamic_shapes=dynamic_shapes, strict=True))
+            exported = _CapturedGraph.from_export(
+                _strict_export(model, example_args, dynamic_shapes)
+            )
         except Exception as exc:
             raise JetCompileError(f"torch.export capture failed: {exc}") from exc
     else:
@@ -646,11 +880,23 @@ def compile_jet(
                             dims.append((dim, None, None))
                         else:
                             if not dim.node.expr.is_Symbol:
-                                raise JetCompileError("derived symbolic input dimensions are unsupported; use independent bounded dimensions")
+                                raise JetCompileError(
+                                    "derived symbolic input dimensions are unsupported; use independent bounded dimensions"
+                                )
                             key = str(dim)
                             bound = exported.range_constraints.get(dim.node.expr)
-                            lower = int(bound.lower) if bound is not None and str(bound.lower) not in {"-oo", "oo", "-int_oo", "int_oo"} else None
-                            upper = int(bound.upper) if bound is not None and str(bound.upper) not in {"-oo", "oo", "-int_oo", "int_oo"} else None
+                            lower = (
+                                int(bound.lower)
+                                if bound is not None
+                                and str(bound.lower) not in {"-oo", "oo", "-int_oo", "int_oo"}
+                                else None
+                            )
+                            upper = (
+                                int(bound.upper)
+                                if bound is not None
+                                and str(bound.upper) not in {"-oo", "oo", "-int_oo", "int_oo"}
+                                else None
+                            )
                             dims.append((key, lower, upper))
                     guards.append((user_index, selected, value.dtype, dims))
                 else:
@@ -666,12 +912,21 @@ def compile_jet(
                     value = node.meta.get("val")
                     if isinstance(value, Tensor):
                         if value.dtype not in (torch.float32, torch.float64):
-                            raise JetCompileError("a tracked operation produced a non-float32/float64 tensor")
-                        estimated_peak = max(estimated_peak, _check_tensor_bound(value, spec, exported.range_constraints))
-                env[node] = _rule(node.target, args, kwargs, spec, backward, tracer, holder, kernels)
+                            raise JetCompileError(
+                                "a tracked operation produced a non-float32/float64 tensor"
+                            )
+                        estimated_peak = max(
+                            estimated_peak,
+                            _check_tensor_bound(value, spec, exported.range_constraints),
+                        )
+                env[node] = _rule(
+                    node.target, args, kwargs, spec, backward, tracer, holder, kernels
+                )
             except Exception as exc:
                 source = node.meta.get("stack_trace", "source unavailable")
-                raise JetCompileError(f"jet compilation failed at {node.name} ({node.target}): {exc}\n{source}") from exc
+                raise JetCompileError(
+                    f"jet compilation failed at {node.name} ({node.target}): {exc}\n{source}"
+                ) from exc
             rules.append(str(node.target))
         elif node.op == "output":
             raw = _map(node.args[0], lambda n: env[n] if isinstance(n, Node) else n)
@@ -679,7 +934,10 @@ def compile_jet(
             for original, result in zip(node.args[0], raw, strict=True):
                 tensor_output = original.meta.get("val") if isinstance(original, Node) else None
                 if isinstance(tensor_output, Tensor):
-                    estimated_peak = max(estimated_peak, _check_tensor_bound(tensor_output, spec, exported.range_constraints))
+                    estimated_peak = max(
+                        estimated_peak,
+                        _check_tensor_bound(tensor_output, spec, exported.range_constraints),
+                    )
                 if isinstance(result, _Series):
                     leaves.append(torch.stack(result.rows))
                 elif isinstance(result, Proxy) and isinstance(tensor_output, Tensor):
@@ -695,16 +953,36 @@ def compile_jet(
     gm = GraphModule(holder, graph, "OmnibiasJetGraph")
     gm.graph.eliminate_dead_code()
     gm.recompile()
-    report = {"backend": "torch.export+fx", "backend_version": torch.__version__,
-              "backward": backward, "spec": spec.to_config(), "algebra": spec.explain(),
-              "coefficient_axis": 0, "rules": tuple(rules),
-              "graph_nodes": sum(len(list(child.graph.nodes)) for child in gm.modules() if isinstance(child, GraphModule)),
-              "kernel_lowering": kernels.explain(), "selected_arguments": argnums,
-              "peak_single_jet_bytes_bound": estimated_peak,
-              "budget_scope": "one packed tensor; excludes auxiliaries, backend workspaces and backward tape"}
+    report = {
+        "backend": "torch.export+fx",
+        "backend_version": torch.__version__,
+        "backward": backward,
+        "spec": spec.to_config(),
+        "algebra": spec.explain(),
+        "coefficient_axis": 0,
+        "rules": tuple(rules),
+        "graph_nodes": sum(
+            len(list(child.graph.nodes)) for child in gm.modules() if isinstance(child, GraphModule)
+        ),
+        "kernel_lowering": kernels.explain(),
+        "selected_arguments": argnums,
+        "peak_single_jet_bytes_bound": estimated_peak,
+        "budget_scope": "one packed tensor; excludes auxiliaries, backend workspaces and backward tape",
+    }
     program = JetProgram(gm, spec, argnums, guards, report, _pytree.tree_flatten(example_args)[1])
     metadata_args = _metadata_examples(example_args)
-    object.__setattr__(program, "_canonical_factory", lambda: compile_jet(
-        model, metadata_args, spec=spec, argnums=argnums, dynamic_shapes=dynamic_shapes,
-        backward="native", kernel_lowering="inline", _exported=exported))
+    object.__setattr__(
+        program,
+        "_canonical_factory",
+        lambda: compile_jet(
+            model,
+            metadata_args,
+            spec=spec,
+            argnums=argnums,
+            dynamic_shapes=dynamic_shapes,
+            backward="native",
+            kernel_lowering="inline",
+            _exported=exported,
+        ),
+    )
     return program

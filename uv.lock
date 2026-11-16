@@ -2576,7 +2576,7 @@ provides-extras = ["torch", "jax", "all", "test", "dev"]
 
 [[package]]
 name = "omnibias-core"
-version = "0.5.0rc1"
+version = "0.5.0"
 source = { editable = "packages/omnibias-core" }
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -2759,7 +2759,7 @@ provides-extras = ["sos", "torch", "jax", "all", "test", "dev"]
 
 [[package]]
 name = "omnibias-fields"
-version = "0.2.0rc1"
+version = "0.2.0"
 source = { editable = "packages/omnibias-fields" }
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },
@@ -2881,7 +2881,7 @@ provides-extras = ["torch", "jax", "all", "test", "dev"]
 
 [[package]]
 name = "omnibias-jax"
-version = "0.5.0rc1"
+version = "0.5.0"
 source = { editable = "packages/omnibias-jax" }
 dependencies = [
     { name = "jax" },
@@ -3165,7 +3165,7 @@ provides-extras = ["torch", "jax", "all", "test", "dev"]
 
 [[package]]
 name = "omnibias-torch"
-version = "0.5.0rc1"
+version = "0.5.0"
 source = { editable = "packages/omnibias-torch" }
 dependencies = [
     { name = "numpy", version = "2.4.6", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.12'" },

@@ -1,0 +1,6302 @@
+{
+ "schema": "omnibias-benchmark/projected-residual-gram-a100/v1",
+ "what": "float64 Gram matrix K = J J^T of PDE residual gradients over every weight, bias and readout parameter of deep tanh MLPs with D > H, u(z) = wo . tanh(W_L ... tanh(W_1 z + b_1) ...) + bo, W_1 of shape (H, D), and the damped Gauss-Newton step: gram = (r, K); gn = (0.5 |r|^2, step). Candidate = omnibias.jax.experimental.projected_gram: the residual depends on the first layer through W_1 A W_1^T and the drift tangents only, so the streams carry k = min(rank, H) projected tangent columns and the first-layer gradient of row b is q_b x_b^T + Q^F_b Omega + Q^V_b V^T from the projected cotangents; its block of K is formed from inner products of q, Q^F, Q^V and x without the H x D rows; hidden layers by the per-layer rule of the residual-Gram module. The claim regime D / H >= 16 was set on separate calibration cells; the two cells with D / H of 5-6 are controls where the first layer is a minor part of the cost. The tier 'projected without identity' feeds the same projected streams and cotangents to explicit first-layer rows (the module's own ablation) and to vmap(grad) through the projected Laplacian; the other tiers use the full-seed streams of the residual-Gram module or generic one-point engines",
+ "hardware": "one NVIDIA A100-SXM4-80GB (exclusive), JAX 0.10.2 with jaxlib 0.10.2 CUDA 12 plugins, CPython 3.12",
+ "protocol": {
+  "precision": "float64",
+  "repetitions": "3 fresh processes (paired by repetition, rotating method order)",
+  "warmups": 3,
+  "samples": 51,
+  "statistic": "ratio = strongest-control median / candidate median per tier; lower95 = exp(mean(log r) - 2.920 sd(log r)/sqrt(3)); strongest control = smallest mean log median among qualified tier members",
+  "qualification": "every method's gram and gn programs on a reduced instance (width 4, D_q = min(D, 5) > 4 so the projection is active, B = 4 interior points (+ 1 boundary point), same depth and operator, seed + 1) vs a 50-digit oracle (Taylor series per coordinate direction through the network, no projection, J by central differences in every parameter, step by an LU solve in 50 digits): r and K 1e-12 + 1e-10 max |ref|, loss 1e-12 + 1e-10 |ref|, step 1e-12 + 1e-8 max |ref|; the candidate and its explicit-first-layer ablation pass both under the rule and with the identity forced on every hidden layer; full-size outputs finite and digest-checked",
+  "status": {
+   "significant_2x": "lower95 >= 2",
+   "lower95_ge_1": "1 <= lower95 < 2",
+   "parity": "lower95 < 1 <= ratio or ratio < 1 <= upper bound",
+   "loss": "candidate slower with confidence",
+   "partial": "an applicable tier member failed (e.g. out of memory) or did not qualify; never promoted",
+   "suppressed": "no applicable tier member ran"
+  },
+  "fairness": "identical data, initialisation, loss and float64 inputs for every method; compilation excluded (value-and-gradient steady state)",
+  "worker_timeout_s": 1200
+ },
+ "tiers": {
+  "projected_without_identity": "the same projected streams and cotangents with the first-layer rows formed explicitly, proj_explicit; and vmap(grad) through projected_deep_laplacian, proj_vmap",
+  "explicit_jacobian_full_seed": "the full J from the full-seed stream cotangents, rg_lib.explicit_J; K = J J^T",
+  "a26_stream_module": "omnibias.jax.experimental.residual_gram: full-seed streams, per-layer rule, explicit first layer",
+  "per_row_forward_laplacian": "vmap(grad) through full-seed one-point forward-Laplacian engines: rg_lib stream recursion, omnibias.jax.laplacian.deep_field_value_grad_laplacian, folx.forward_laplacian",
+  "taylor_mode": "vmap(grad) through jax.experimental.jet along every input direction",
+  "nested_autodiff": "vmap(grad) through jax.grad and jax.hessian; D <= 1024 only"
+ },
+ "roles": {
+  "held_out": "cells, operators and seed not used for any tuning"
+ },
+ "aggregates": [
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "a26_stream_module",
+   "cells": 6,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 6,
+   "geomean_ratio_complete_tiers": 9.025661268102036,
+   "ratio_range_complete_tiers": [
+    6.330658624218297,
+    16.078246730628784
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "explicit_jacobian_full_seed",
+   "cells": 6,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 6,
+   "geomean_ratio_complete_tiers": 6.648720979322447,
+   "ratio_range_complete_tiers": [
+    4.326385015758146,
+    12.553440590308258
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "per_row_forward_laplacian",
+   "cells": 6,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 6,
+   "geomean_ratio_complete_tiers": 7.65463870099128,
+   "ratio_range_complete_tiers": [
+    4.950494337943283,
+    14.668975677943402
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "projected_without_identity",
+   "cells": 6,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "lower95_ge_1": 2,
+   "significant_2x": 4,
+   "geomean_ratio_complete_tiers": 2.405410985368862,
+   "ratio_range_complete_tiers": [
+    1.4504346623183564,
+    4.252542398728359
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "taylor_mode",
+   "cells": 6,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 6,
+   "geomean_ratio_complete_tiers": 15.014169739533523,
+   "ratio_range_complete_tiers": [
+    10.148686921972287,
+    27.942443923616253
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "a26_stream_module",
+   "cells": 2,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "significant_2x": 2,
+   "geomean_ratio_complete_tiers": 2.746751133190417,
+   "ratio_range_complete_tiers": [
+    2.6584254481604384,
+    2.838011422476992
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "explicit_jacobian_full_seed",
+   "cells": 2,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "significant_2x": 2,
+   "geomean_ratio_complete_tiers": 2.2657923187437543,
+   "ratio_range_complete_tiers": [
+    2.201536037206278,
+    2.331924049807037
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "nested_autodiff",
+   "cells": 2,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "significant_2x": 2,
+   "geomean_ratio_complete_tiers": 6.682399810733275,
+   "ratio_range_complete_tiers": [
+    6.369264447693448,
+    7.0109300056867925
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "per_row_forward_laplacian",
+   "cells": 2,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "significant_2x": 2,
+   "geomean_ratio_complete_tiers": 2.487493399872408,
+   "ratio_range_complete_tiers": [
+    2.4386562475430673,
+    2.5373085774769555
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "projected_without_identity",
+   "cells": 2,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "lower95_ge_1": 2,
+   "geomean_ratio_complete_tiers": 1.3535472005542493,
+   "ratio_range_complete_tiers": [
+    1.339531762568783,
+    1.367709281200542
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gn_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "taylor_mode",
+   "cells": 2,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "significant_2x": 2,
+   "geomean_ratio_complete_tiers": 4.538557708972058,
+   "ratio_range_complete_tiers": [
+    4.34600711222319,
+    4.739639293211504
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "a26_stream_module",
+   "cells": 12,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 9.422722681382108,
+   "ratio_range_complete_tiers": [
+    7.099226824897989,
+    17.135134360474026
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "explicit_jacobian_full_seed",
+   "cells": 12,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 9.015603629312954,
+   "ratio_range_complete_tiers": [
+    6.599328059523106,
+    16.05586801304338
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "per_row_forward_laplacian",
+   "cells": 12,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 9.412105645152788,
+   "ratio_range_complete_tiers": [
+    6.592005475774055,
+    18.119680845096152
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "projected_without_identity",
+   "cells": 12,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 3.2717140970053773,
+   "ratio_range_complete_tiers": [
+    2.231527091026269,
+    6.616130737501428
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_claim_regime",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "taylor_mode",
+   "cells": 12,
+   "input_dims": [
+    2560,
+    3000,
+    4096,
+    6000,
+    8192,
+    12000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 19.093234890077007,
+   "ratio_range_complete_tiers": [
+    13.735031048922302,
+    34.918199011625994
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "a26_stream_module",
+   "cells": 4,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "lower95_ge_1": 2,
+   "significant_2x": 2,
+   "geomean_ratio_complete_tiers": 2.3888453934879266,
+   "ratio_range_complete_tiers": [
+    2.2248137221787694,
+    2.5910594507623568
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "explicit_jacobian_full_seed",
+   "cells": 4,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "lower95_ge_1": 2,
+   "significant_2x": 2,
+   "geomean_ratio_complete_tiers": 2.3226009025769376,
+   "ratio_range_complete_tiers": [
+    2.1977200399338,
+    2.438430916550668
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "nested_autodiff",
+   "cells": 4,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "significant_2x": 4,
+   "geomean_ratio_complete_tiers": 6.742116849632793,
+   "ratio_range_complete_tiers": [
+    6.262301143542417,
+    7.549225580501206
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "per_row_forward_laplacian",
+   "cells": 4,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "lower95_ge_1": 2,
+   "significant_2x": 2,
+   "geomean_ratio_complete_tiers": 2.4127755238171753,
+   "ratio_range_complete_tiers": [
+    2.294664248056604,
+    2.61814384137329
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "projected_without_identity",
+   "cells": 4,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "lower95_ge_1": 4,
+   "geomean_ratio_complete_tiers": 1.3947423836779764,
+   "ratio_range_complete_tiers": [
+    1.2993662079925294,
+    1.5538247872246564
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_gram_gram_control",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "tier": "taylor_mode",
+   "cells": 4,
+   "input_dims": [
+    768,
+    1024
+   ],
+   "significant_2x": 4,
+   "geomean_ratio_complete_tiers": 4.637065006744291,
+   "ratio_range_complete_tiers": [
+    4.264188795921821,
+    5.279927657287715
+   ]
+  }
+ ],
+ "reproduction": [
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.737238142956382
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256
+   },
+   "package_over_benchmark_program_time": 0.4238813104667918
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.23462657065346143
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.2764500075823458
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128
+   },
+   "package_over_benchmark_program_time": 0.2803184659287593
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768
+   },
+   "package_over_benchmark_program_time": 0.38957370147625753
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192
+   },
+   "package_over_benchmark_program_time": 0.27482820896630333
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256
+   },
+   "package_over_benchmark_program_time": 0.43783187433479204
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.41846735888344155
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128
+   },
+   "package_over_benchmark_program_time": 0.3236097422883919
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768
+   },
+   "package_over_benchmark_program_time": 0.385073643854782
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.6417471622346156
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128
+   },
+   "package_over_benchmark_program_time": 0.6310879884745206
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.4381998779432104
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.14415222062543176
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.7718457594323261
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192
+   },
+   "package_over_benchmark_program_time": 0.3193172933176405
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.7579916735497922
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256
+   },
+   "package_over_benchmark_program_time": 0.328239926177364
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.7269717879624331
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.7262906847374615
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192
+   },
+   "package_over_benchmark_program_time": 0.47339713995442184
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.19844388937048602
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768
+   },
+   "package_over_benchmark_program_time": 0.30621188375353786
+  }
+ ],
+ "rows": [
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.302607,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 9.905357,
+   "speed_ratio": 1.339531762568783,
+   "lower95": 1.2519380648696308
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.1939,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 21.689798,
+   "speed_ratio": 2.3575044671006,
+   "lower95": 2.3237387317577896
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.956945,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 21.126955,
+   "speed_ratio": 4.252542398728359,
+   "lower95": 4.197375690412498
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.28766,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 15.509712,
+   "speed_ratio": 3.6154046491714467,
+   "lower95": 3.580755242724441
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.146094,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 13.484493,
+   "speed_ratio": 3.315646285243969,
+   "lower95": 3.1351374270033263
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.579438,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 39.99099,
+   "speed_ratio": 2.5692367688834508,
+   "lower95": 2.5613148947806694
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.302607,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 16.274563,
+   "speed_ratio": 2.201536037206278,
+   "lower95": 2.0632259752140816
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.1939,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 61.38823,
+   "speed_ratio": 6.675856307941855,
+   "lower95": 6.607009210774185
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.956945,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 62.396382,
+   "speed_ratio": 12.553440590308258,
+   "lower95": 12.368601966741158
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.28766,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 35.954679,
+   "speed_ratio": 8.379404174591393,
+   "lower95": 8.324485818080825
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.146094,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 41.738691,
+   "speed_ratio": 10.319352027514705,
+   "lower95": 9.560410176661723
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.579438,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 109.827316,
+   "speed_ratio": 7.043475509728991,
+   "lower95": 7.0197563147534705
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.302607,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 19.640187,
+   "speed_ratio": 2.6584254481604384,
+   "lower95": 2.486486571924912
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.1939,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 66.367663,
+   "speed_ratio": 7.203607878418388,
+   "lower95": 7.10359418224372
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.956945,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 79.850625,
+   "speed_ratio": 16.078246730628784,
+   "lower95": 15.857146974358562
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.28766,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 37.3084,
+   "speed_ratio": 8.700195385290542,
+   "lower95": 8.612119907394927
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.146094,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 44.097357,
+   "speed_ratio": 10.85760270158427,
+   "lower95": 9.994588445361222
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.579438,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 110.580618,
+   "speed_ratio": 7.099226824897989,
+   "lower95": 7.081587564273584
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.302607,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 18.046252,
+   "speed_ratio": 2.4386562475430673,
+   "lower95": 2.287834729824764
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.1939,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 61.387741,
+   "speed_ratio": 6.670744058081388,
+   "lower95": 6.58160484430956
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.956945,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 72.902038,
+   "speed_ratio": 14.668975677943402,
+   "lower95": 14.479136128110248
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.28766,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 38.18944,
+   "speed_ratio": 8.897929676127337,
+   "lower95": 8.834026368115467
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.146094,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "omnibias_a",
+   "strongest_control_median_ms": 44.444115,
+   "speed_ratio": 10.988092643964144,
+   "lower95": 10.179600948205268
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.579438,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 109.770589,
+   "speed_ratio": 7.063075582994076,
+   "lower95": 6.987775073558447
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.302607,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 32.105073,
+   "speed_ratio": 4.34600711222319,
+   "lower95": 4.0639776104987515
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.1939,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 140.3477,
+   "speed_ratio": 15.25351206842639,
+   "lower95": 15.052053826710868
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.956945,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 138.813653,
+   "speed_ratio": 27.942443923616253,
+   "lower95": 27.59233908322627
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.28766,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 70.63467,
+   "speed_ratio": 16.466081603066765,
+   "lower95": 16.32061468451199
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.146094,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 88.341795,
+   "speed_ratio": 21.843184948633414,
+   "lower95": 20.252723371595266
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.579438,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 217.667574,
+   "speed_ratio": 13.974131148147421,
+   "lower95": 13.94075218255697
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "nested_autodiff",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.302607,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 47.109465,
+   "speed_ratio": 6.369264447693448,
+   "lower95": 5.9490035305696765
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.849603,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 21.248198,
+   "speed_ratio": 3.847365228920001,
+   "lower95": 3.2172274196017443
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.675774,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 22.099291,
+   "speed_ratio": 2.280900222367357,
+   "lower95": 2.263216810682776
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.970585,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 11.878071,
+   "speed_ratio": 2.5226930267513707,
+   "lower95": 2.169815978302674
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.556564,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 10.195663,
+   "speed_ratio": 2.231527091026269,
+   "lower95": 2.222719508897494
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.976687,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 41.489952,
+   "speed_ratio": 2.5972403256117005,
+   "lower95": 2.5620004579151323
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.185597,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 23.662897,
+   "speed_ratio": 1.5538247872246564,
+   "lower95": 1.5253723482437773
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.849603,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 56.794755,
+   "speed_ratio": 10.29569772924187,
+   "lower95": 8.616494374905207
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.675774,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 59.851529,
+   "speed_ratio": 6.1754672844296135,
+   "lower95": 6.13377757666607
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.970585,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 31.16966,
+   "speed_ratio": 6.599328059523106,
+   "lower95": 5.6557530988237
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.556564,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 37.688911,
+   "speed_ratio": 8.252698965631334,
+   "lower95": 8.139919983188182
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.976687,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 108.422154,
+   "speed_ratio": 6.7499771553698364,
+   "lower95": 6.673338295386169
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.185597,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 37.085302,
+   "speed_ratio": 2.438430916550668,
+   "lower95": 2.402280041729728
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.849603,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 61.764868,
+   "speed_ratio": 11.219488805443445,
+   "lower95": 9.425998694349662
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.675774,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 80.233841,
+   "speed_ratio": 8.279434608862934,
+   "lower95": 8.220257193316588
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.970585,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 33.675256,
+   "speed_ratio": 7.155433747177654,
+   "lower95": 6.161382662807368
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.556564,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 40.093256,
+   "speed_ratio": 8.808836588207399,
+   "lower95": 8.737103796293656
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.976687,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 129.235901,
+   "speed_ratio": 8.069111140266353,
+   "lower95": 7.984020180019151
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.185597,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 39.456949,
+   "speed_ratio": 2.5910594507623568,
+   "lower95": 2.553358812149465
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.849603,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "omnibias_a",
+   "strongest_control_median_ms": 59.958579,
+   "speed_ratio": 10.878553295829958,
+   "lower95": 9.135698334015668
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.675774,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 69.930834,
+   "speed_ratio": 7.15785767215443,
+   "lower95": 6.994764973201991
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.970585,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 31.131317,
+   "speed_ratio": 6.592005475774055,
+   "lower95": 5.6194258912447
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.556564,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 37.769798,
+   "speed_ratio": 8.240458331728284,
+   "lower95": 8.079850607214654
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.976687,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 123.898265,
+   "speed_ratio": 7.755793420194496,
+   "lower95": 7.630078862008074
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.185597,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "omnibias_a",
+   "strongest_control_median_ms": 39.823599,
+   "speed_ratio": 2.61814384137329,
+   "lower95": 2.588321175070078
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.849603,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 119.641634,
+   "speed_ratio": 21.632831203250813,
+   "lower95": 18.297674122732758
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 9.675774,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 141.25791,
+   "speed_ratio": 14.616857340121923,
+   "lower95": 14.396493181449218
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.970585,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 64.825047,
+   "speed_ratio": 13.735031048922302,
+   "lower95": 11.77631780671619
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.556564,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 83.346103,
+   "speed_ratio": 18.29912546797314,
+   "lower95": 18.226414289111325
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.976687,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 223.971436,
+   "speed_ratio": 13.998573795203686,
+   "lower95": 13.905283283353747
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.185597,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 80.410773,
+   "speed_ratio": 5.279927657287715,
+   "lower95": 5.202188287111456
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "nested_autodiff",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.185597,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 114.154984,
+   "speed_ratio": 7.549225580501206,
+   "lower95": 7.331483718104034
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.186226,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 12.132967,
+   "speed_ratio": 1.4504346623183564,
+   "lower95": 1.402834378705138
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.284673,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 12.05996,
+   "speed_ratio": 2.384787085519561,
+   "lower95": 2.0617200451031694
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 3.772443,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 26.169857,
+   "speed_ratio": 6.616130737501428,
+   "lower95": 5.767740648930246
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.02707,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 20.764602,
+   "speed_ratio": 1.2993662079925294,
+   "lower95": 1.2844057506485678
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.667319,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 17.481746,
+   "speed_ratio": 2.9098409981427524,
+   "lower95": 2.4501559925176193
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.000449,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 10.554798,
+   "speed_ratio": 1.3897998636704068,
+   "lower95": 1.1796096193140253
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.186226,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 35.728135,
+   "speed_ratio": 4.326385015758146,
+   "lower95": 4.09261001796087
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.284673,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 29.754017,
+   "speed_ratio": 5.896995641498216,
+   "lower95": 5.080274132053151
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 3.772443,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 62.84624,
+   "speed_ratio": 15.769551228317363,
+   "lower95": 13.389102378898256
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.02707,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 37.913266,
+   "speed_ratio": 2.376940476395618,
+   "lower95": 2.353357063130626
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.667319,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 51.066872,
+   "speed_ratio": 8.549238966640457,
+   "lower95": 7.331586036253665
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.000449,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 16.678891,
+   "speed_ratio": 2.1977200399338,
+   "lower95": 1.8698526236570987
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.186226,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 52.325092,
+   "speed_ratio": 6.330658624218297,
+   "lower95": 5.955602023202808
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.284673,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 42.736065,
+   "speed_ratio": 8.452410070154608,
+   "lower95": 7.349974751798635
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 3.772443,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 68.261427,
+   "speed_ratio": 17.135134360474026,
+   "lower95": 14.542699939771293
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.02707,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 39.055943,
+   "speed_ratio": 2.4460135363247937,
+   "lower95": 2.420880239824631
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.667319,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 54.871328,
+   "speed_ratio": 9.159694051868998,
+   "lower95": 7.763372711204779
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.000449,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 16.879209,
+   "speed_ratio": 2.2248137221787694,
+   "lower95": 1.8858841694299406
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.186226,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 40.325014,
+   "speed_ratio": 4.950494337943283,
+   "lower95": 4.846669796285924
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.284673,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 34.098857,
+   "speed_ratio": 6.742148610159757,
+   "lower95": 5.842490965945185
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 3.772443,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 72.251368,
+   "speed_ratio": 18.119680845096152,
+   "lower95": 15.360656138245682
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.02707,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 37.920165,
+   "speed_ratio": 2.373056041949094,
+   "lower95": 2.3458955698663306
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.667319,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 51.096509,
+   "speed_ratio": 8.558919405242474,
+   "lower95": 7.215484376991979
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.000449,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 18.254165,
+   "speed_ratio": 2.377097675240642,
+   "lower95": 1.9491536653381016
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 12000,
+    "H": 96,
+    "depth": 3,
+    "B": 128,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.186226,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 83.705883,
+   "speed_ratio": 10.148686921972287,
+   "lower95": 9.616683236269703
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 3000,
+    "H": 96,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.284673,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 66.111731,
+   "speed_ratio": 13.065996134290213,
+   "lower95": 11.299318353992243
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 3.772443,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 139.127381,
+   "speed_ratio": 34.918199011625994,
+   "lower95": 29.741933187512938
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.02707,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 75.633357,
+   "speed_ratio": 4.733846712989939,
+   "lower95": 4.6934537167405095
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 5.667319,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 111.808989,
+   "speed_ratio": 18.731558234948853,
+   "lower95": 15.78395892701186
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.000449,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 33.03992,
+   "speed_ratio": 4.338045965217339,
+   "lower95": 3.654767259939508
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "nested_autodiff",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.02707,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 111.147805,
+   "speed_ratio": 6.95256474046442,
+   "lower95": 6.896202092228351
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "nested_autodiff",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.000449,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 47.67966,
+   "speed_ratio": 6.286424555019579,
+   "lower95": 5.351528737369865
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.550118,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 26.048379,
+   "speed_ratio": 3.0198175627563972,
+   "lower95": 2.915810474354002
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.043232,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 9.688453,
+   "speed_ratio": 1.348621615039906,
+   "lower95": 1.0850029864936026
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.167235,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 22.260006,
+   "speed_ratio": 1.367709281200542,
+   "lower95": 1.3340491748824301
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.892497,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 16.672042,
+   "speed_ratio": 2.2229048940175464,
+   "lower95": 1.8505757720273825
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.169984,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 21.013416,
+   "speed_ratio": 5.033263412380932,
+   "lower95": 4.975530551003333
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_without_identity",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.28298,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_explicit",
+   "strongest_control_median_ms": 49.90982,
+   "speed_ratio": 3.2688026048298613,
+   "lower95": 3.244926868182183
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.550118,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 61.26084,
+   "speed_ratio": 7.094153559539497,
+   "lower95": 6.888859450021766
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.043232,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 16.553379,
+   "speed_ratio": 2.2845319242284,
+   "lower95": 1.8782269101496671
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.167235,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 37.239803,
+   "speed_ratio": 2.331924049807037,
+   "lower95": 2.2025212229934708
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.892497,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 48.397291,
+   "speed_ratio": 6.470498989743795,
+   "lower95": 5.418207808176408
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.169984,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 67.109454,
+   "speed_ratio": 16.05586801304338,
+   "lower95": 15.93659050248696
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_jacobian_full_seed",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.28298,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 125.59946,
+   "speed_ratio": 8.236552862113713,
+   "lower95": 8.126940592276481
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.550118,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 65.416228,
+   "speed_ratio": 7.580466604423708,
+   "lower95": 7.37827391708955
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.043232,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 17.048279,
+   "speed_ratio": 2.3095229580447274,
+   "lower95": 1.9655078153151904
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.167235,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 46.054833,
+   "speed_ratio": 2.838011422476992,
+   "lower95": 2.8102880597034856
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.892497,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 70.427377,
+   "speed_ratio": 9.405451803633259,
+   "lower95": 7.847404445579644
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.169984,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 69.838834,
+   "speed_ratio": 16.721402650750722,
+   "lower95": 16.577980567942568
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "a26_stream_module",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.28298,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "rg26",
+   "strongest_control_median_ms": 109.969423,
+   "speed_ratio": 7.2082216669360015,
+   "lower95": 7.176799078030946
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.550118,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "omnibias_a",
+   "strongest_control_median_ms": 66.852162,
+   "speed_ratio": 7.7416908243747535,
+   "lower95": 7.50250330457999
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.043232,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 16.674,
+   "speed_ratio": 2.294664248056604,
+   "lower95": 1.8693395250582123
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.167235,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 41.16723,
+   "speed_ratio": 2.5373085774769555,
+   "lower95": 2.4970822838332927
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.892497,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 55.387659,
+   "speed_ratio": 7.401030804386088,
+   "lower95": 6.172672683471217
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.169984,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 67.167702,
+   "speed_ratio": 16.072643777688448,
+   "lower95": 15.943405772636417
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.28298,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 140.316912,
+   "speed_ratio": 9.200880946031685,
+   "lower95": 9.152256021658818
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 192,
+    "depth": 3,
+    "B": 256,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 8.550118,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 141.842719,
+   "speed_ratio": 16.428769651215326,
+   "lower95": 15.968406920062298
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.043232,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 31.322543,
+   "speed_ratio": 4.264188795921821,
+   "lower95": 3.6374521446569736
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.167235,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 76.960087,
+   "speed_ratio": 4.739639293211504,
+   "lower95": 4.665324828513945
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 8192,
+    "H": 128,
+    "depth": 3,
+    "B": 192,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.892497,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 112.774009,
+   "speed_ratio": 15.109613676619452,
+   "lower95": 12.669027493602565
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 6000,
+    "H": 64,
+    "depth": 4,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 4.169984,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 137.072321,
+   "speed_ratio": 32.82353411847593,
+   "lower95": 32.580282947767394
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "gram",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2560,
+    "H": 128,
+    "depth": 4,
+    "B": 768,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 15.28298,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 243.567222,
+   "speed_ratio": 15.964812734732066,
+   "lower95": 15.879616832305677
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "gram",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 768,
+    "H": 128,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "nested_autodiff",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 7.043232,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 45.955036,
+   "speed_ratio": 6.262301143542417,
+   "lower95": 5.323149854934082
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_gram",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "gn",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1024,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "nested_autodiff",
+   "candidate": "projected_residual_gram / projected_residual_gauss_newton",
+   "role": "held_out",
+   "candidate_median_ms": 16.167235,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "nested",
+   "strongest_control_median_ms": 113.661604,
+   "speed_ratio": 7.0109300056867925,
+   "lower95": 6.898415315619879
+  }
+ ],
+ "full_size_accuracy": {
+  "what": "max over repetitions of per-field relative deviations (norms and sampled entries scaled by the largest sampled reference magnitude) between methods at full size; floor = two controls",
+  "candidate": "pkg",
+  "floor": "streams_J_vs_fl_vmap",
+  "summary": {
+   "pkg_vs_proj_explicit": {
+    "max_loss_rel": 3.6232766478273005e-16,
+    "max_step_rel": 1.433724790424397e-14,
+    "max_residual_rel": 2.1752555890805284e-15,
+    "max_gram_rel": 8.566575984254487e-15,
+    "cells": 24
+   },
+   "pkg_vs_rg26": {
+    "max_loss_rel": 3.6232766478273005e-16,
+    "max_step_rel": 1.9754113969441802e-14,
+    "max_residual_rel": 1.8723095020386615e-15,
+    "max_gram_rel": 1.0148097704424531e-14,
+    "cells": 24
+   },
+   "pkg_vs_streams_J": {
+    "max_loss_rel": 1.9693983472608692e-16,
+    "max_step_rel": 2.1282056486415434e-14,
+    "max_residual_rel": 2.0595404522425275e-15,
+    "max_gram_rel": 1.0476575707522826e-14,
+    "cells": 24
+   },
+   "pkg_vs_fl_vmap": {
+    "max_loss_rel": 1.9693983472608692e-16,
+    "max_step_rel": 2.3464831510663253e-14,
+    "max_residual_rel": 2.0595404522425275e-15,
+    "max_gram_rel": 1.0476575707522826e-14,
+    "cells": 24
+   },
+   "pkg_vs_proj_vmap": {
+    "max_loss_rel": 1.9693983472608692e-16,
+    "max_step_rel": 2.635700841779148e-14,
+    "max_residual_rel": 1.9097556920794343e-15,
+    "max_gram_rel": 1.0304828564776549e-14,
+    "cells": 24
+   },
+   "pkg_vs_omnibias_a": {
+    "max_loss_rel": 3.6232766478273005e-16,
+    "max_step_rel": 2.1839678358064255e-14,
+    "max_residual_rel": 2.0969866422833007e-15,
+    "max_gram_rel": 1.0476575707522826e-14,
+    "cells": 24
+   },
+   "pkg_vs_folx": {
+    "max_loss_rel": 1.9693983472608692e-16,
+    "max_step_rel": 1.9485214891953257e-14,
+    "max_residual_rel": 5.5370142267504355e-15,
+    "max_gram_rel": 1.0476575707522826e-14,
+    "cells": 24
+   },
+   "pkg_vs_jet": {
+    "max_loss_rel": 1.9693983472608692e-16,
+    "max_step_rel": 2.3028276505813477e-14,
+    "max_residual_rel": 3.2958418016371704e-15,
+    "max_gram_rel": 1.4942001418926067e-14,
+    "cells": 24
+   },
+   "pkg_vs_nested": {
+    "max_loss_rel": 1.9693983472608692e-16,
+    "max_step_rel": 2.4065094642331363e-14,
+    "max_residual_rel": 9.937947917002398e-16,
+    "max_gram_rel": 2.4656344888253397e-15,
+    "cells": 6
+   },
+   "streams_J_vs_fl_vmap": {
+    "max_loss_rel": 0.0,
+    "max_step_rel": 6.048535456043827e-15,
+    "max_residual_rel": 6.298966723321999e-16,
+    "max_gram_rel": 3.434942854925517e-16,
+    "cells": 24
+   }
+  },
+  "rows": [
+   {
+    "D": 768,
+    "width": 128,
+    "depth": 3,
+    "B": 512,
+    "op": "eik_visc",
+    "regime": "gn",
+    "pkg_vs_proj_explicit": {
+     "loss": 1.7214029567663385e-16,
+     "step": 1.433724790424397e-14
+    },
+    "pkg_vs_rg26": {
+     "loss": 0.0,
+     "step": 1.2409550707034651e-14
+    },
+    "pkg_vs_streams_J": {
+     "loss": 0.0,
+     "step": 2.018058003328469e-14
+    },
+    "pkg_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 2.05030502777527e-14
+    },
+    "pkg_vs_proj_vmap": {
+     "loss": 1.7214029567663385e-16,
+     "step": 1.7066569157752724e-14
+    },
+    "pkg_vs_omnibias_a": {
+     "loss": 0.0,
+     "step": 2.1839678358064255e-14
+    },
+    "pkg_vs_folx": {
+     "loss": 1.7214029567663385e-16,
+     "step": 1.9485214891953257e-14
+    },
+    "pkg_vs_jet": {
+     "loss": 0.0,
+     "step": 1.8429765751972423e-14
+    },
+    "pkg_vs_nested": {
+     "loss": 1.7214029567663385e-16,
+     "step": 1.8348577356589296e-14
+    },
+    "streams_J_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 6.048535456043827e-15
+    }
+   },
+   {
+    "D": 4096,
+    "width": 192,
+    "depth": 3,
+    "B": 256,
+    "op": "heat_ac",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.499933294302175e-15,
+     "gram": 5.793065528038641e-16
+    },
+    "pkg_vs_rg26": {
+     "residual": 7.231821240385486e-16,
+     "gram": 6.519326183945906e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 6.428285547009321e-16,
+     "gram": 3.86204368535909e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 6.428285547009321e-16,
+     "gram": 3.86204368535909e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 8.838892627137817e-16,
+     "gram": 3.86204368535909e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 7.231821240385486e-16,
+     "gram": 3.86204368535909e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.392795201852017e-15,
+     "gram": 3.86204368535909e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 2.1427618490031104e-15,
+     "gram": 5.650082692753154e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "gram": 0.0
+    }
+   },
+   {
+    "D": 6000,
+    "width": 64,
+    "depth": 4,
+    "B": 512,
+    "op": "eik_visc",
+    "regime": "gn",
+    "pkg_vs_proj_explicit": {
+     "loss": 0.0,
+     "step": 9.12403664325442e-15
+    },
+    "pkg_vs_rg26": {
+     "loss": 0.0,
+     "step": 9.776946085754984e-15
+    },
+    "pkg_vs_streams_J": {
+     "loss": 0.0,
+     "step": 7.910733898140814e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 7.910733898140814e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "loss": 0.0,
+     "step": 7.522477019704461e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "loss": 0.0,
+     "step": 7.231284360877187e-15
+    },
+    "pkg_vs_folx": {
+     "loss": 0.0,
+     "step": 7.0545681275960435e-15
+    },
+    "pkg_vs_jet": {
+     "loss": 0.0,
+     "step": 8.007798117749898e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 8.11926318540204e-16
+    }
+   },
+   {
+    "D": 3000,
+    "width": 96,
+    "depth": 3,
+    "B": 384,
+    "op": "poisson_bc",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.0015876167321076e-15,
+     "gram": 3.1918878149700023e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.1052001288078429e-15,
+     "gram": 3.1918878149700023e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.1052001288078429e-15,
+     "gram": 4.506194562310597e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.0706626247825979e-15,
+     "gram": 4.506194562310597e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.1052001288078429e-15,
+     "gram": 4.506194562310597e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 9.670501127068624e-16,
+     "gram": 4.69395266907354e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 1.1742751368583326e-15,
+     "gram": 5.6327432028882536e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.5887251851612747e-15,
+     "gram": 9.012389124621235e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 3.4537504025245093e-16,
+     "gram": 8.801161254512885e-18
+    }
+   },
+   {
+    "D": 12000,
+    "width": 96,
+    "depth": 3,
+    "B": 128,
+    "op": "poisson_bc",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.2019413424782473e-15,
+     "gram": 8.330340174524668e-16
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.1235538636209707e-15,
+     "gram": 5.553560116349781e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.0451663847636934e-15,
+     "gram": 1.527229031996188e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.1235538636209705e-15,
+     "gram": 1.527229031996188e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 5.22583192381847e-16,
+     "gram": 1.8049070378136765e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.1496830232400634e-15,
+     "gram": 1.9437460407224203e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 4.18066553905478e-15,
+     "gram": 2.0825850436311724e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.1948494080037613e-15,
+     "gram": 4.8376173806071645e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 3.1354991542910804e-16,
+     "gram": 2.7767800581748874e-16
+    }
+   },
+   {
+    "D": 2560,
+    "width": 128,
+    "depth": 4,
+    "B": 768,
+    "op": "heat_ac",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.6871257953903592e-15,
+     "gram": 8.566575984254487e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.5337507230821444e-15,
+     "gram": 1.0148097704424531e-14
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.6104382592362518e-15,
+     "gram": 7.775815124169465e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.6104382592362518e-15,
+     "gram": 7.775815124169465e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.5337507230821448e-15,
+     "gram": 7.907608600850302e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.5337507230821444e-15,
+     "gram": 7.907608600850302e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 1.6104382592362518e-15,
+     "gram": 7.775815124169465e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.070563476160895e-15,
+     "gram": 5.802831451150846e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "gram": 0.0
+    }
+   },
+   {
+    "D": 8192,
+    "width": 128,
+    "depth": 3,
+    "B": 192,
+    "op": "poisson_bc",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.9846480721609815e-15,
+     "gram": 1.0334600203699492e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.8723095020386615e-15,
+     "gram": 1.3287343119042201e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 2.0595404522425275e-15,
+     "gram": 1.9192828949727687e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 2.0595404522425275e-15,
+     "gram": 1.7716457492056323e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.9097556920794343e-15,
+     "gram": 2.066920040739905e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 2.0969866422833007e-15,
+     "gram": 1.9192828949727687e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 2.8833566331395372e-15,
+     "gram": 3.460245603917244e-17
+    },
+    "pkg_vs_jet": {
+     "residual": 2.6212333028541275e-15,
+     "gram": 6.348397267986878e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 3.7446190040773225e-16,
+     "gram": 1.47637145767136e-16
+    }
+   },
+   {
+    "D": 4096,
+    "width": 192,
+    "depth": 3,
+    "B": 256,
+    "op": "eik_visc",
+    "regime": "gn",
+    "pkg_vs_proj_explicit": {
+     "loss": 3.6232766478273005e-16,
+     "step": 3.899075416433511e-15
+    },
+    "pkg_vs_rg26": {
+     "loss": 3.6232766478273005e-16,
+     "step": 7.664871020318565e-15
+    },
+    "pkg_vs_streams_J": {
+     "loss": 1.8116383239136507e-16,
+     "step": 6.369530964072181e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "loss": 1.8116383239136507e-16,
+     "step": 6.369530964072181e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "loss": 1.8116383239136507e-16,
+     "step": 4.0073830668899824e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "loss": 3.6232766478273005e-16,
+     "step": 4.187895817650799e-15
+    },
+    "pkg_vs_folx": {
+     "loss": 1.811638323913651e-16,
+     "step": 5.036915241923683e-15
+    },
+    "pkg_vs_jet": {
+     "loss": 1.811638323913651e-16,
+     "step": 7.36492023104102e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 8.019193659803103e-16
+    }
+   },
+   {
+    "D": 3000,
+    "width": 96,
+    "depth": 3,
+    "B": 384,
+    "op": "heat_ac",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 9.123698516585648e-16,
+     "gram": 2.0575796946457646e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 9.12369851658565e-16,
+     "gram": 1.6166697600788142e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 9.12369851658565e-16,
+     "gram": 1.3227298037008476e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 9.12369851658565e-16,
+     "gram": 1.3227298037008476e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.0427084018955028e-15,
+     "gram": 1.1757598255118645e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 9.12369851658565e-16,
+     "gram": 1.469699781889831e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 1.3522624587082306e-15,
+     "gram": 1.469699781889829e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 2.0854168037910084e-15,
+     "gram": 7.936378822205138e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "gram": 0.0
+    }
+   },
+   {
+    "D": 12000,
+    "width": 96,
+    "depth": 3,
+    "B": 128,
+    "op": "heat_ac",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 2.1752555890805284e-15,
+     "gram": 1.2949839172081182e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.186503048589379e-15,
+     "gram": 8.633226114720792e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.1205862125566353e-15,
+     "gram": 4.3166130573603977e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.1205862125566353e-15,
+     "gram": 4.3166130573603977e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.1205862125566355e-15,
+     "gram": 4.3166130573603977e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.1865030485893785e-15,
+     "gram": 4.3166130573603977e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 5.5370142267504355e-15,
+     "gram": 3.4532904458883316e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 3.2958418016371704e-15,
+     "gram": 5.611596974568551e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "gram": 0.0
+    }
+   },
+   {
+    "D": 2560,
+    "width": 128,
+    "depth": 4,
+    "B": 768,
+    "op": "eik_visc",
+    "regime": "gn",
+    "pkg_vs_proj_explicit": {
+     "loss": 0.0,
+     "step": 6.5702199270590206e-15
+    },
+    "pkg_vs_rg26": {
+     "loss": 0.0,
+     "step": 1.442188089287177e-14
+    },
+    "pkg_vs_streams_J": {
+     "loss": 0.0,
+     "step": 1.548206400810475e-14
+    },
+    "pkg_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 1.5276549884103363e-14
+    },
+    "pkg_vs_proj_vmap": {
+     "loss": 0.0,
+     "step": 1.4180474556095945e-14
+    },
+    "pkg_vs_omnibias_a": {
+     "loss": 0.0,
+     "step": 1.4248123291752986e-14
+    },
+    "pkg_vs_folx": {
+     "loss": 0.0,
+     "step": 1.1931355276833806e-14
+    },
+    "pkg_vs_jet": {
+     "loss": 0.0,
+     "step": 1.2973900883547402e-14
+    },
+    "streams_J_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 2.729168277393742e-15
+    }
+   },
+   {
+    "D": 1024,
+    "width": 192,
+    "depth": 3,
+    "B": 512,
+    "op": "poisson_bc",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 9.201803626854068e-16,
+     "gram": 8.170305121605692e-16
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.0306020062076558e-15,
+     "gram": 9.337491567549364e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.1410236497299048e-15,
+     "gram": 2.334372891887333e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 9.937947917002395e-16,
+     "gram": 2.334372891887333e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 9.569875771928233e-16,
+     "gram": 2.8012474702647985e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.2514452932521531e-15,
+     "gram": 2.6845288256704324e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 1.067409220715072e-15,
+     "gram": 2.334372891887333e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.20843287044498e-15,
+     "gram": 5.156636172064228e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 9.937947917002398e-16,
+     "gram": 2.334372891887333e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 5.889154321186604e-16,
+     "gram": 3.647457643573958e-17
+    }
+   },
+   {
+    "D": 12000,
+    "width": 96,
+    "depth": 3,
+    "B": 128,
+    "op": "eik_visc",
+    "regime": "gn",
+    "pkg_vs_proj_explicit": {
+     "loss": 1.3247941672142766e-16,
+     "step": 2.1196095295001125e-15
+    },
+    "pkg_vs_rg26": {
+     "loss": 0.0,
+     "step": 2.8084826265876506e-15
+    },
+    "pkg_vs_streams_J": {
+     "loss": 0.0,
+     "step": 4.545524660482614e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 4.6364351536922676e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "loss": 0.0,
+     "step": 1.1657852412250622e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "loss": 0.0,
+     "step": 2.4375509589251306e-15
+    },
+    "pkg_vs_folx": {
+     "loss": 1.324794167214276e-16,
+     "step": 5.246033585512782e-15
+    },
+    "pkg_vs_jet": {
+     "loss": 1.3247941672142766e-16,
+     "step": 4.378737444386134e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 9.09104932096523e-16
+    }
+   },
+   {
+    "D": 3000,
+    "width": 96,
+    "depth": 3,
+    "B": 384,
+    "op": "eik_visc",
+    "regime": "gn",
+    "pkg_vs_proj_explicit": {
+     "loss": 1.2534872812274823e-16,
+     "step": 5.546414162619436e-15
+    },
+    "pkg_vs_rg26": {
+     "loss": 1.2534872812274823e-16,
+     "step": 3.890768143927072e-15
+    },
+    "pkg_vs_streams_J": {
+     "loss": 1.2534872812274823e-16,
+     "step": 7.002132132832608e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "loss": 1.2534872812274823e-16,
+     "step": 6.764771721550147e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "loss": 1.2534872812274823e-16,
+     "step": 6.52741131026769e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "loss": 1.2534872812274823e-16,
+     "step": 6.76477172155015e-15
+    },
+    "pkg_vs_folx": {
+     "loss": 1.2534872812274823e-16,
+     "step": 4.509847814366757e-15
+    },
+    "pkg_vs_jet": {
+     "loss": 1.2534872812274823e-16,
+     "step": 8.188934189244903e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 1.186802056412307e-15
+    }
+   },
+   {
+    "D": 6000,
+    "width": 64,
+    "depth": 4,
+    "B": 512,
+    "op": "poisson_bc",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.7912220559952884e-15,
+     "gram": 4.940250060495133e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.6283836872684439e-15,
+     "gram": 4.785867246104661e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.5198247747838813e-15,
+     "gram": 1.0806797007333145e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.5198247747838813e-15,
+     "gram": 1.0806797007333145e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.5198247747838815e-15,
+     "gram": 1.0806797007333141e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.519824774783881e-15,
+     "gram": 1.389445329514261e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 1.8455015122375675e-15,
+     "gram": 2.3157422158570998e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.388296074660389e-15,
+     "gram": 4.877067701425732e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 2.7139728121140738e-16,
+     "gram": 9.045868030691808e-19
+    }
+   },
+   {
+    "D": 1024,
+    "width": 192,
+    "depth": 3,
+    "B": 512,
+    "op": "heat_ac",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.1403435232503125e-15,
+     "gram": 1.0567004952108636e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.5501544769183935e-15,
+     "gram": 8.805837460090529e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.4967008742660352e-15,
+     "gram": 2.6417512380271494e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.4967008742660352e-15,
+     "gram": 2.6417512380271494e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.4254294040628907e-15,
+     "gram": 2.4656344888253397e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.5501544769183935e-15,
+     "gram": 2.6417512380271494e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 7.483504371330175e-16,
+     "gram": 2.6417512380271494e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.1381441060943383e-15,
+     "gram": 5.222242915640438e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 8.552576424377344e-16,
+     "gram": 2.4656344888253397e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "gram": 0.0
+    }
+   },
+   {
+    "D": 8192,
+    "width": 128,
+    "depth": 3,
+    "B": 192,
+    "op": "heat_ac",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.9456031866980248e-15,
+     "gram": 2.734744647127254e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.5132469229873534e-15,
+     "gram": 1.783529117691689e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.297068791132017e-15,
+     "gram": 6.987240215529089e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.297068791132017e-15,
+     "gram": 6.987240215529089e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.657365677557577e-15,
+     "gram": 5.240430161646818e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.585306300272465e-15,
+     "gram": 6.987240215529089e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.486048516336366e-15,
+     "gram": 1.5457252353327976e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.7382563368342593e-15,
+     "gram": 6.1829009413312384e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 2.882375091404482e-16,
+     "gram": 1.1890194117944612e-16
+    }
+   },
+   {
+    "D": 768,
+    "width": 128,
+    "depth": 3,
+    "B": 512,
+    "op": "poisson_bc",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 7.424917573017926e-16,
+     "gram": 8.5222329049754825e-16
+    },
+    "pkg_vs_rg26": {
+     "residual": 6.8061744419331e-16,
+     "gram": 6.817786323980387e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 6.806174441933099e-16,
+     "gram": 1.3635572647960766e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 6.806174441933099e-16,
+     "gram": 1.3635572647960766e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 7.424917573017926e-16,
+     "gram": 1.3635572647960766e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 7.115546007475515e-16,
+     "gram": 1.1931126066965672e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 3.712458786508964e-16,
+     "gram": 1.5340019228955859e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.1037266456884166e-15,
+     "gram": 5.188227221954031e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 5.568688179763446e-16,
+     "gram": 1.3635572647960766e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 2.4749725243393086e-16,
+     "gram": 1.8529382935550015e-16
+    }
+   },
+   {
+    "D": 4096,
+    "width": 192,
+    "depth": 3,
+    "B": 256,
+    "op": "poisson_bc",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 7.563535447056847e-16,
+     "gram": 1.167701217725892e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 9.454419308821057e-16,
+     "gram": 1.0379566379785708e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.0805050638652642e-15,
+     "gram": 6.487228987366079e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.0805050638652642e-15,
+     "gram": 6.487228987366079e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 8.10378797898948e-16,
+     "gram": 6.487228987366079e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 9.994671840753694e-16,
+     "gram": 5.189783189892862e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.2425808234450526e-15,
+     "gram": 1.4271903772205383e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.377111140503586e-15,
+     "gram": 5.579016929134855e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 2.70126265966316e-16,
+     "gram": 1.2163554351311397e-17
+    }
+   },
+   {
+    "D": 768,
+    "width": 128,
+    "depth": 3,
+    "B": 512,
+    "op": "heat_ac",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 9.673030339683362e-16,
+     "gram": 2.0933445733557285e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 8.463901547222941e-16,
+     "gram": 1.6447707362080732e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.0277594735913572e-15,
+     "gram": 8.97147674295315e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.0277594735913572e-15,
+     "gram": 8.97147674295315e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 9.673030339683362e-16,
+     "gram": 1.0466722866778676e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 8.463901547222941e-16,
+     "gram": 8.97147674295315e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 8.46390154722294e-16,
+     "gram": 1.1961968990604203e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.0555189471827135e-15,
+     "gram": 7.02765678198001e-15
+    },
+    "pkg_vs_nested": {
+     "residual": 9.67303033968336e-16,
+     "gram": 1.4952461238255258e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "gram": 0.0
+    }
+   },
+   {
+    "D": 1024,
+    "width": 192,
+    "depth": 3,
+    "B": 512,
+    "op": "eik_visc",
+    "regime": "gn",
+    "pkg_vs_proj_explicit": {
+     "loss": 1.9693983472608692e-16,
+     "step": 7.150095085528295e-15
+    },
+    "pkg_vs_rg26": {
+     "loss": 1.9693983472608692e-16,
+     "step": 1.9754113969441802e-14
+    },
+    "pkg_vs_streams_J": {
+     "loss": 1.9693983472608692e-16,
+     "step": 2.1282056486415434e-14
+    },
+    "pkg_vs_fl_vmap": {
+     "loss": 1.9693983472608692e-16,
+     "step": 2.3464831510663253e-14
+    },
+    "pkg_vs_proj_vmap": {
+     "loss": 1.9693983472608692e-16,
+     "step": 2.635700841779148e-14
+    },
+    "pkg_vs_omnibias_a": {
+     "loss": 1.9693983472608692e-16,
+     "step": 2.166404211565885e-14
+    },
+    "pkg_vs_folx": {
+     "loss": 1.9693983472608692e-16,
+     "step": 1.838987957928724e-14
+    },
+    "pkg_vs_jet": {
+     "loss": 1.9693983472608692e-16,
+     "step": 2.3028276505813477e-14
+    },
+    "pkg_vs_nested": {
+     "loss": 1.9693983472608692e-16,
+     "step": 2.4065094642331363e-14
+    },
+    "streams_J_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 3.492440038796391e-15
+    }
+   },
+   {
+    "D": 8192,
+    "width": 128,
+    "depth": 3,
+    "B": 192,
+    "op": "eik_visc",
+    "regime": "gn",
+    "pkg_vs_proj_explicit": {
+     "loss": 0.0,
+     "step": 2.7542098228017246e-15
+    },
+    "pkg_vs_rg26": {
+     "loss": 0.0,
+     "step": 3.177215456129797e-15
+    },
+    "pkg_vs_streams_J": {
+     "loss": 0.0,
+     "step": 4.236287274839731e-15
+    },
+    "pkg_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 4.5010552295172154e-15
+    },
+    "pkg_vs_proj_vmap": {
+     "loss": 0.0,
+     "step": 2.9786394901216833e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "loss": 0.0,
+     "step": 3.1968411863761105e-15
+    },
+    "pkg_vs_folx": {
+     "loss": 0.0,
+     "step": 5.0305911388721925e-15
+    },
+    "pkg_vs_jet": {
+     "loss": 0.0,
+     "step": 4.850379731053388e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "loss": 0.0,
+     "step": 8.818872238278933e-16
+    }
+   },
+   {
+    "D": 6000,
+    "width": 64,
+    "depth": 4,
+    "B": 512,
+    "op": "heat_ac",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.6601736822174585e-15,
+     "gram": 4.8013994865776015e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.0854981768344926e-15,
+     "gram": 2.1824543120807336e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.0854981768344926e-15,
+     "gram": 6.099195440624036e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.0854981768344926e-15,
+     "gram": 6.099195440624036e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.404762346491696e-15,
+     "gram": 4.574396580468025e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.2132038446973738e-15,
+     "gram": 6.547362936242211e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.7878793500803406e-15,
+     "gram": 9.148793160936057e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 1.9155850179432236e-15,
+     "gram": 6.3291175050341816e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 3.192641696572036e-16,
+     "gram": 2.1824543120807375e-16
+    }
+   },
+   {
+    "D": 2560,
+    "width": 128,
+    "depth": 4,
+    "B": 768,
+    "op": "poisson_bc",
+    "regime": "gram",
+    "pkg_vs_proj_explicit": {
+     "residual": 1.4172675127474494e-15,
+     "gram": 1.889218570209011e-15
+    },
+    "pkg_vs_rg26": {
+     "residual": 1.2204248026436373e-15,
+     "gram": 2.576207141194104e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.181056260622875e-15,
+     "gram": 1.0476575707522826e-14
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.4960045967889746e-15,
+     "gram": 1.0476575707522826e-14
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.2597933446644e-15,
+     "gram": 1.0304828564776549e-14
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.2597933446644001e-15,
+     "gram": 1.0476575707522826e-14
+    },
+    "pkg_vs_folx": {
+     "residual": 5.511595882906747e-16,
+     "gram": 1.0476575707522826e-14
+    },
+    "pkg_vs_jet": {
+     "residual": 1.8896900169966004e-15,
+     "gram": 1.4942001418926067e-14
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 6.298966723321999e-16,
+     "gram": 3.434942854925517e-16
+    }
+   }
+  ]
+ },
+ "cold_cost": {
+  "what": "per cell, medians over repetitions: cold = lowering + compilation ms (excluded from the speed ratios), steady = steady-state median ms, for the candidate and the steady-state-fastest member of every tier; break_even_calls = extra cold ms / steady saving per call (only when the candidate compiles slower and runs faster)",
+  "rows": [
+   {
+    "cfg": {
+     "D": 768,
+     "width": 128,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 12239.873284474015,
+     "steady": 7.302607
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 10523.20115081966,
+     "steady": 9.905357,
+     "extra_compile_ms": 1716.672133654356,
+     "break_even_calls": 659.5609004531191
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 4117.490248754621,
+     "steady": 16.274563,
+     "extra_compile_ms": 8122.383035719395,
+     "break_even_calls": 905.3079435208325
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 8301.395924761891,
+     "steady": 19.640187,
+     "extra_compile_ms": 3938.477359712124,
+     "break_even_calls": 319.22608483285404
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3686.6116039454937,
+     "steady": 18.046252,
+     "extra_compile_ms": 8553.261680528522,
+     "break_even_calls": 796.1228875794502
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9260.84128767252,
+     "steady": 32.105073,
+     "extra_compile_ms": 2979.0319968014956,
+     "break_even_calls": 120.11031470828328
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 15230.212168768048,
+     "steady": 47.109465,
+     "extra_compile_ms": -2990.338884294033,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4096,
+     "width": 192,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 9741.487501189113,
+     "steady": 9.1939
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 7830.646149814129,
+     "steady": 21.689798,
+     "extra_compile_ms": 1910.8413513749838,
+     "break_even_calls": 152.9174895133574
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 5248.149128630757,
+     "steady": 61.38823,
+     "extra_compile_ms": 4493.338372558355,
+     "break_even_calls": 86.08863017416557
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 6359.863832592964,
+     "steady": 66.367663,
+     "extra_compile_ms": 3381.6236685961485,
+     "break_even_calls": 59.14642470876281
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5206.325864419341,
+     "steady": 61.387741,
+     "extra_compile_ms": 4535.161636769772,
+     "break_even_calls": 86.89074323481523
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8643.80630850792,
+     "steady": 140.3477,
+     "extra_compile_ms": 1097.6811926811934,
+     "break_even_calls": 8.369419663640652
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 6000,
+     "width": 64,
+     "depth": 4,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 12911.467380821705,
+     "steady": 4.956945
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 10319.81897726655,
+     "steady": 21.126955,
+     "extra_compile_ms": 2591.648403555155,
+     "break_even_calls": 160.27500314193716
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 4644.691307097673,
+     "steady": 62.396382,
+     "extra_compile_ms": 8266.776073724031,
+     "break_even_calls": 143.9216069218093
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 7590.011656284332,
+     "steady": 79.850625,
+     "extra_compile_ms": 5321.455724537373,
+     "break_even_calls": 71.05346839062219
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4637.224702164531,
+     "steady": 72.902038,
+     "extra_compile_ms": 8274.242678657174,
+     "break_even_calls": 121.77837005326012
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8607.137680053711,
+     "steady": 138.813653,
+     "extra_compile_ms": 4304.329700767994,
+     "break_even_calls": 32.15624950800369
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3000,
+     "width": 96,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 12154.926298186183,
+     "steady": 4.28766
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 9864.13007415831,
+     "steady": 15.509712,
+     "extra_compile_ms": 2290.796224027872,
+     "break_even_calls": 204.13345295743343
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 4158.832618966699,
+     "steady": 35.954679,
+     "extra_compile_ms": 7996.093679219484,
+     "break_even_calls": 252.50541199408394
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 8662.006376311183,
+     "steady": 37.3084,
+     "extra_compile_ms": 3492.919921875,
+     "break_even_calls": 105.77957737697581
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5068.717692047358,
+     "steady": 38.18944,
+     "extra_compile_ms": 7086.208606138825,
+     "break_even_calls": 209.02172706385406
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8777.135020121932,
+     "steady": 70.63467,
+     "extra_compile_ms": 3377.791278064251,
+     "break_even_calls": 50.91097968189148
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12000,
+     "width": 96,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 12834.117630496621,
+     "steady": 4.146094
+    },
+    "projected_without_identity": {
+     "member": "proj_vmap",
+     "cold": 12675.096787512302,
+     "steady": 13.484493,
+     "extra_compile_ms": 159.02084298431873,
+     "break_even_calls": 17.0287051328947
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 4247.450424358249,
+     "steady": 41.738691,
+     "extra_compile_ms": 8586.667206138372,
+     "break_even_calls": 228.4137806743804
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 9086.315898224711,
+     "steady": 44.097357,
+     "extra_compile_ms": 3747.8017322719097,
+     "break_even_calls": 93.80934295548828
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 9112.39916458726,
+     "steady": 44.444115,
+     "extra_compile_ms": 3721.718465909362,
+     "break_even_calls": 92.354869384513
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9234.697222709656,
+     "steady": 88.341795,
+     "extra_compile_ms": 3599.4204077869654,
+     "break_even_calls": 42.75064361999867
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2560,
+     "width": 128,
+     "depth": 4,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 8815.378699451685,
+     "steady": 15.579438
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 8172.712666913867,
+     "steady": 39.99099,
+     "extra_compile_ms": 642.666032537818,
+     "break_even_calls": 26.326307829089195
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 5769.691683351994,
+     "steady": 109.827316,
+     "extra_compile_ms": 3045.6870160996914,
+     "break_even_calls": 32.3157091780856
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 6078.975817188621,
+     "steady": 110.580618,
+     "extra_compile_ms": 2736.4028822630644,
+     "break_even_calls": 28.80388309137912
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 6692.580642178655,
+     "steady": 109.770589,
+     "extra_compile_ms": 2122.7980572730303,
+     "break_even_calls": 22.53712832613151
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 10885.561414062977,
+     "steady": 217.667574,
+     "extra_compile_ms": -2070.182714611292,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 8192,
+     "width": 128,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 12242.919258773327,
+     "steady": 5.849603
+    },
+    "projected_without_identity": {
+     "member": "proj_vmap",
+     "cold": 12799.950882792473,
+     "steady": 21.248198,
+     "extra_compile_ms": -557.031624019146,
+     "break_even_calls": null
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 4432.597689330578,
+     "steady": 56.794755,
+     "extra_compile_ms": 7810.321569442749,
+     "break_even_calls": 153.3084358928353
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 10697.487741708755,
+     "steady": 61.764868,
+     "extra_compile_ms": 1545.4315170645714,
+     "break_even_calls": 27.638812354096352
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 8236.27758398652,
+     "steady": 59.958579,
+     "extra_compile_ms": 4006.641674786806,
+     "break_even_calls": 74.04763444029705
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9608.66006091237,
+     "steady": 119.641634,
+     "extra_compile_ms": 2634.259197860956,
+     "break_even_calls": 23.14976870270429
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4096,
+     "width": 192,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 11227.884080260992,
+     "steady": 9.675774
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 10311.12216040492,
+     "steady": 22.099291,
+     "extra_compile_ms": 916.7619198560715,
+     "break_even_calls": 73.79246310493811
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 5166.031442582607,
+     "steady": 59.851529,
+     "extra_compile_ms": 6061.852637678385,
+     "break_even_calls": 120.81238513856712
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 9070.053156465292,
+     "steady": 80.233841,
+     "extra_compile_ms": 2157.8309237957,
+     "break_even_calls": 30.582341829116437
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 8993.996169418097,
+     "steady": 68.965161,
+     "extra_compile_ms": 2233.8879108428955,
+     "break_even_calls": 37.67770293936242
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9629.344925284386,
+     "steady": 141.25791,
+     "extra_compile_ms": 1598.5391549766064,
+     "break_even_calls": 12.148603173432344
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3000,
+     "width": 96,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 9433.925107121468,
+     "steady": 4.970585
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 7582.416355609894,
+     "steady": 11.878071,
+     "extra_compile_ms": 1851.5087515115738,
+     "break_even_calls": 268.0437935757776
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 6737.80132830143,
+     "steady": 31.16966,
+     "extra_compile_ms": 2696.123778820038,
+     "break_even_calls": 102.90912098308958
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 6821.129873394966,
+     "steady": 33.675256,
+     "extra_compile_ms": 2612.7952337265015,
+     "break_even_calls": 91.02334716626788
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 6005.636494606733,
+     "steady": 31.131317,
+     "extra_compile_ms": 3428.2886125147343,
+     "break_even_calls": 131.0471210253113
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8688.022319227457,
+     "steady": 64.825047,
+     "extra_compile_ms": 745.9027878940105,
+     "break_even_calls": 12.461941231616292
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12000,
+     "width": 96,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 9217.919934540987,
+     "steady": 4.556564
+    },
+    "projected_without_identity": {
+     "member": "proj_vmap",
+     "cold": 13154.311306774616,
+     "steady": 10.195663,
+     "extra_compile_ms": -3936.391372233629,
+     "break_even_calls": null
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 6021.819319576025,
+     "steady": 37.688911,
+     "extra_compile_ms": 3196.100614964962,
+     "break_even_calls": 96.46466080308052
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 7711.0959477722645,
+     "steady": 40.093256,
+     "extra_compile_ms": 1506.8239867687225,
+     "break_even_calls": 42.40192043673403
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 6466.656666249037,
+     "steady": 37.769798,
+     "extra_compile_ms": 2751.26326829195,
+     "break_even_calls": 82.83635578191362
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8964.63955938816,
+     "steady": 83.346103,
+     "extra_compile_ms": 253.2803751528263,
+     "break_even_calls": 3.2146447151166386
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2560,
+     "width": 128,
+     "depth": 4,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 12106.187533587217,
+     "steady": 15.976687
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 10849.012404680252,
+     "steady": 41.489952,
+     "extra_compile_ms": 1257.1751289069653,
+     "break_even_calls": 49.275352602145006
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 5317.870479077101,
+     "steady": 108.422154,
+     "extra_compile_ms": 6788.317054510117,
+     "break_even_calls": 73.43050205490461
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 8629.421517252922,
+     "steady": 129.235901,
+     "extra_compile_ms": 3476.7660163342953,
+     "break_even_calls": 30.697423137108252
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4754.6110935509205,
+     "steady": 123.898265,
+     "extra_compile_ms": 7351.576440036297,
+     "break_even_calls": 68.11961589401794
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 11986.338432878256,
+     "steady": 223.971436,
+     "extra_compile_ms": 119.84910070896149,
+     "break_even_calls": 0.5762121461487544
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1024,
+     "width": 192,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 14098.405685275793,
+     "steady": 15.185597
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 12861.75625026226,
+     "steady": 23.662897,
+     "extra_compile_ms": 1236.6494350135326,
+     "break_even_calls": 145.87774822331787
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 6024.240393191576,
+     "steady": 37.085302,
+     "extra_compile_ms": 8074.165292084217,
+     "break_even_calls": 368.6883130199342
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 12290.491182357073,
+     "steady": 39.456949,
+     "extra_compile_ms": 1807.9145029187202,
+     "break_even_calls": 74.48758943954668
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 9695.984054356813,
+     "steady": 39.823599,
+     "extra_compile_ms": 4402.42163091898,
+     "break_even_calls": 178.68419813095963
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 10992.59676784277,
+     "steady": 80.410773,
+     "extra_compile_ms": 3105.8089174330235,
+     "break_even_calls": 47.616719615030604
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 13411.788418889046,
+     "steady": 114.154984,
+     "extra_compile_ms": 686.6172663867474,
+     "break_even_calls": 6.937673226032484
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 12000,
+     "width": 96,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 12463.758756406605,
+     "steady": 8.186226
+    },
+    "projected_without_identity": {
+     "member": "proj_vmap",
+     "cold": 12053.5574904643,
+     "steady": 12.132967,
+     "extra_compile_ms": 410.2012659423053,
+     "break_even_calls": 103.93417402923203
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 3977.8642314486206,
+     "steady": 35.728135,
+     "extra_compile_ms": 8485.894524957985,
+     "break_even_calls": 308.10843667219956
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 8250.589696224779,
+     "steady": 52.325092,
+     "extra_compile_ms": 4213.169060181826,
+     "break_even_calls": 95.4525895654371
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4222.397237550467,
+     "steady": 40.325014,
+     "extra_compile_ms": 8241.361518856138,
+     "break_even_calls": 256.4303768659894
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8614.774147979915,
+     "steady": 83.705883,
+     "extra_compile_ms": 3848.98460842669,
+     "break_even_calls": 50.9666590305977
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 3000,
+     "width": 96,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 12387.068551033735,
+     "steady": 5.284673
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 10261.897872202098,
+     "steady": 12.05996,
+     "extra_compile_ms": 2125.170678831637,
+     "break_even_calls": 313.66504161840476
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 3920.2466760762036,
+     "steady": 29.754017,
+     "extra_compile_ms": 8466.821874957532,
+     "break_even_calls": 346.0175260504545
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 7396.070583257824,
+     "steady": 42.736065,
+     "extra_compile_ms": 4990.997967775911,
+     "break_even_calls": 133.26602033312702
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4339.447159320116,
+     "steady": 34.098857,
+     "extra_compile_ms": 8047.621391713619,
+     "break_even_calls": 279.29374615340896
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9222.843810450286,
+     "steady": 66.111731,
+     "extra_compile_ms": 3164.2247405834496,
+     "break_even_calls": 52.02001945554311
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 6000,
+     "width": 64,
+     "depth": 4,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 12025.15067672357,
+     "steady": 3.772443
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 12439.92649205029,
+     "steady": 26.169857,
+     "extra_compile_ms": -414.7758153267205,
+     "break_even_calls": null
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 5764.442604966462,
+     "steady": 62.84624,
+     "extra_compile_ms": 6260.708071757108,
+     "break_even_calls": 105.98113528671787
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 10911.607881542295,
+     "steady": 68.261427,
+     "extra_compile_ms": 1113.5427951812744,
+     "break_even_calls": 17.267178456110805
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5732.100914232433,
+     "steady": 72.251368,
+     "extra_compile_ms": 6293.049762491137,
+     "break_even_calls": 91.89761320714565
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9381.554396357387,
+     "steady": 139.127381,
+     "extra_compile_ms": 2643.5962803661823,
+     "break_even_calls": 19.530844751051358
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1024,
+     "width": 192,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 8813.09371162206,
+     "steady": 16.02707
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 7071.381276473403,
+     "steady": 20.764602,
+     "extra_compile_ms": 1741.7124351486564,
+     "break_even_calls": 367.64130250701334
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 9780.82829900086,
+     "steady": 37.913266,
+     "extra_compile_ms": -967.7345873787999,
+     "break_even_calls": null
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 6757.156493142247,
+     "steady": 39.055943,
+     "extra_compile_ms": 2055.937218479812,
+     "break_even_calls": 89.27650165424127
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 10002.531020902097,
+     "steady": 37.920165,
+     "extra_compile_ms": -1189.4373092800379,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9762.181315105408,
+     "steady": 75.633357,
+     "extra_compile_ms": -949.0876034833491,
+     "break_even_calls": null
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 12787.94969804585,
+     "steady": 111.147805,
+     "extra_compile_ms": -3974.8559864237905,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 8192,
+     "width": 128,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 9714.284369722009,
+     "steady": 5.667319
+    },
+    "projected_without_identity": {
+     "member": "proj_vmap",
+     "cold": 10226.84746561572,
+     "steady": 17.481746,
+     "extra_compile_ms": -512.5630958937109,
+     "break_even_calls": null
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 4233.038403093815,
+     "steady": 51.066872,
+     "extra_compile_ms": 5481.245966628194,
+     "break_even_calls": 120.73347873333013
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 5889.7897666320205,
+     "steady": 54.871328,
+     "extra_compile_ms": 3824.4946030899882,
+     "break_even_calls": 77.72729663328832
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4214.4869402982295,
+     "steady": 51.096509,
+     "extra_compile_ms": 5499.797429423779,
+     "break_even_calls": 121.06307485173694
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8325.03744121641,
+     "steady": 111.808989,
+     "extra_compile_ms": 1389.2469285055995,
+     "break_even_calls": 13.08861004830242
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 768,
+     "width": 128,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 12707.378803752363,
+     "steady": 8.000449
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 11524.309965316206,
+     "steady": 10.554798,
+     "extra_compile_ms": 1183.0688384361565,
+     "break_even_calls": 463.15865155315754
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 4696.2206261232495,
+     "steady": 16.678891,
+     "extra_compile_ms": 8011.158177629113,
+     "break_even_calls": 923.1101824070626
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 10718.739971984178,
+     "steady": 16.879209,
+     "extra_compile_ms": 1988.638831768185,
+     "break_even_calls": 223.9770904685097
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5125.128685031086,
+     "steady": 18.254165,
+     "extra_compile_ms": 7582.2501187212765,
+     "break_even_calls": 739.4636362779382
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9471.078103873879,
+     "steady": 33.03992,
+     "extra_compile_ms": 3236.300699878484,
+     "break_even_calls": 129.24796613628473
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 11564.801778178662,
+     "steady": 47.67966,
+     "extra_compile_ms": 1142.5770255737007,
+     "break_even_calls": 28.795356479585767
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4096,
+     "width": 192,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 15631.870329380035,
+     "steady": 8.550118
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 14537.6284904778,
+     "steady": 26.048379,
+     "extra_compile_ms": 1094.241838902235,
+     "break_even_calls": 62.534319204761836
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 5683.591797947884,
+     "steady": 61.26084,
+     "extra_compile_ms": 9948.278531432152,
+     "break_even_calls": 188.7334901508682
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 13259.444057941437,
+     "steady": 65.416228,
+     "extra_compile_ms": 2372.4262714385986,
+     "break_even_calls": 41.719510468336914
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 10614.575814455748,
+     "steady": 66.852162,
+     "extra_compile_ms": 5017.294514924288,
+     "break_even_calls": 86.05692306301108
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 11381.99533522129,
+     "steady": 141.842719,
+     "extra_compile_ms": 4249.874994158745,
+     "break_even_calls": 31.88380271879266
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 768,
+     "width": 128,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 9966.09315648675,
+     "steady": 7.043232
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 9396.741047501564,
+     "steady": 9.688453,
+     "extra_compile_ms": 569.3521089851856,
+     "break_even_calls": 215.2380118656193
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 6139.952290803194,
+     "steady": 16.553379,
+     "extra_compile_ms": 3826.1408656835556,
+     "break_even_calls": 402.3219478819366
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 6867.221098393202,
+     "steady": 17.048279,
+     "extra_compile_ms": 3098.872058093548,
+     "break_even_calls": 309.73088463188105
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5527.253985404968,
+     "steady": 16.674,
+     "extra_compile_ms": 4438.839171081781,
+     "break_even_calls": 460.90188976432427
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9556.590363383293,
+     "steady": 31.322543,
+     "extra_compile_ms": 409.5027931034565,
+     "break_even_calls": 16.8663267711121
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 12907.341305166483,
+     "steady": 45.955036,
+     "extra_compile_ms": -2941.2481486797333,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1024,
+     "width": 192,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 12516.454715281725,
+     "steady": 16.167235
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 11004.009280353785,
+     "steady": 22.260006,
+     "extra_compile_ms": 1512.4454349279404,
+     "break_even_calls": 248.23605465032915
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 4813.2527731359005,
+     "steady": 37.239803,
+     "extra_compile_ms": 7703.201942145824,
+     "break_even_calls": 365.5559181085962
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 8757.491569966078,
+     "steady": 46.054833,
+     "extra_compile_ms": 3758.963145315647,
+     "break_even_calls": 125.76999815494196
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5586.706228554249,
+     "steady": 41.16723,
+     "extra_compile_ms": 6929.748486727476,
+     "break_even_calls": 277.189994907098
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 10293.405644595623,
+     "steady": 76.960087,
+     "extra_compile_ms": 2223.049070686102,
+     "break_even_calls": 36.56760618314308
+    },
+    "nested_autodiff": {
+     "member": "nested",
+     "cold": 18092.781089246273,
+     "steady": 113.661604,
+     "extra_compile_ms": -5576.326373964548,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 8192,
+     "width": 128,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 14317.19284132123,
+     "steady": 7.892497
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 11845.26290744543,
+     "steady": 16.672042,
+     "extra_compile_ms": 2471.929933875799,
+     "break_even_calls": 281.5555856113043
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 5169.283337891102,
+     "steady": 48.397291,
+     "extra_compile_ms": 9147.909503430128,
+     "break_even_calls": 225.84757506556204
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 7814.978923648596,
+     "steady": 70.427377,
+     "extra_compile_ms": 6502.213917672634,
+     "break_even_calls": 103.97739497817271
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5239.84669521451,
+     "steady": 55.387659,
+     "extra_compile_ms": 9077.34614610672,
+     "break_even_calls": 191.1214903553065
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 10645.824428647757,
+     "steady": 112.774009,
+     "extra_compile_ms": 3671.3684126734734,
+     "break_even_calls": 35.00491500040039
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 6000,
+     "width": 64,
+     "depth": 4,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 10141.918942332268,
+     "steady": 4.169984
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 9015.383441001177,
+     "steady": 21.013416,
+     "extra_compile_ms": 1126.535501331091,
+     "break_even_calls": 66.88277670079891
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 78369.59774792194,
+     "steady": 67.109454,
+     "extra_compile_ms": -68227.67880558968,
+     "break_even_calls": null
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 8641.852915287018,
+     "steady": 69.838834,
+     "extra_compile_ms": 1500.06602704525,
+     "break_even_calls": 22.842885584950093
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 77757.50009343028,
+     "steady": 67.167702,
+     "extra_compile_ms": -67615.58115109801,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 10157.49754011631,
+     "steady": 137.072321,
+     "extra_compile_ms": -15.578597784042358,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2560,
+     "width": 128,
+     "depth": 4,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 14647.000089287758,
+     "steady": 15.28298
+    },
+    "projected_without_identity": {
+     "member": "proj_explicit",
+     "cold": 13239.960048347712,
+     "steady": 49.90982,
+     "extra_compile_ms": 1407.0400409400463,
+     "break_even_calls": 40.634376135392266
+    },
+    "explicit_jacobian_full_seed": {
+     "member": "streams_J",
+     "cold": 8398.586448282003,
+     "steady": 125.59946,
+     "extra_compile_ms": 6248.4136410057545,
+     "break_even_calls": 56.640799643042946
+    },
+    "a26_stream_module": {
+     "member": "rg26",
+     "cold": 12196.730975061655,
+     "steady": 109.969423,
+     "extra_compile_ms": 2450.269114226103,
+     "break_even_calls": 25.87771846309722
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 8630.267586559057,
+     "steady": 140.316912,
+     "extra_compile_ms": 6016.732502728701,
+     "break_even_calls": 48.12079734266615
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 14949.451230466366,
+     "steady": 243.567222,
+     "extra_compile_ms": -302.45114117860794,
+     "break_even_calls": null
+    },
+    "run": 1
+   }
+  ]
+ }
+}

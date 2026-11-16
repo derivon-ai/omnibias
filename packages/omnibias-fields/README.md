@@ -22,11 +22,11 @@ Bias-collapse backends can provide the cached derivative tower; field operators 
 ## Run this README
 
 The examples use `omnibias-fields` on Python >=3.10. Their installed-wheel
-profile selects runtime features, not an editable workspace. Install the prepared
-prerelease from PyPI:
+profile selects runtime features, not an editable workspace. Install the stable
+release from PyPI:
 
 ```bash
-python -m pip install --pre "omnibias-fields==0.2.0rc1"
+python -m pip install "omnibias-fields==0.2.0"
 ```
 
 For local development before publication, build and test the coordinated wheelhouse

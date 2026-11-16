@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Research radix-2 FFT arithmetic emitted entirely as real binary64 operations.
 
 Unlike a native FFT primitive, each butterfly and each saved twiddle has an

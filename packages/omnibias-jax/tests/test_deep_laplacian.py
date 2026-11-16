@@ -28,6 +28,7 @@ from omnibias.jax.jet_mv import mlp_jet_mv  # noqa: E402
 from omnibias.jax.laplacian import (  # noqa: E402
     deep_field_laplacian,
     deep_field_polylaplacian,
+    deep_field_polylaplacian_with_report,
     deep_field_value_grad_laplacian,
     neural_field_laplacian,
     restrict_first_layer,
@@ -233,6 +234,35 @@ def test_select_mode_auto_matches_budget_driven_choice() -> None:
     assert abs(est_mean - float(support)) < 0.3 * (abs(float(support)) + 1.0)
 
 
+@pytest.mark.parametrize("k", [2, 3])
+def test_auto_prefers_the_exact_structured_program_to_sampling(k) -> None:
+    dim = 4
+    layers = _make_layers(dim, 5, depth=2, activation="tanh", seed=17)
+    x = jnp.asarray(np.random.default_rng(18).normal(scale=0.2, size=(3, dim)))
+    support = deep_field_polylaplacian(x, layers, k, mode="support")
+    auto_out, report = deep_field_polylaplacian_with_report(x, layers, k, mode="auto", budget=1, n_directions=4)
+    assert report.mode == "structured" and report.n_directions is None
+    np.testing.assert_allclose(np.asarray(auto_out), np.asarray(support), rtol=1e-9, atol=1e-10)
+    explicit = deep_field_polylaplacian(x, layers, k, mode="structured")
+    np.testing.assert_allclose(np.asarray(explicit), np.asarray(support), rtol=1e-9, atol=1e-10)
+
+
+def test_auto_still_samples_where_no_structured_program_applies() -> None:
+    layers = _make_layers(4, 5, depth=2, activation="relu", seed=17)
+    x = jnp.asarray(np.random.default_rng(18).normal(scale=0.2, size=(4,)))
+    _, report = deep_field_polylaplacian_with_report(x, layers, 2, mode="auto", budget=1, n_directions=8)
+    assert report.mode == "estimator" and report.n_directions == 8
+    with pytest.raises(ValueError):
+        deep_field_polylaplacian(x, layers, 2, mode="structured")
+
+
+def test_structured_mode_serves_orders_two_and_three_only() -> None:
+    layers = _make_layers(3, 4, depth=1, activation="tanh", seed=19)
+    x = jnp.asarray(np.random.default_rng(20).normal(size=(3,)))
+    with pytest.raises(ValueError, match="serves k in"):
+        deep_field_polylaplacian(x, layers, 4, mode="structured")
+
+
 def test_polylaplacian_forward_mode_rejected_for_k_ge_2() -> None:
     layers = _make_layers(3, 4, depth=1, activation="tanh", seed=19)
     x = jnp.asarray(np.random.default_rng(20).normal(size=(3,)))
@@ -272,3 +302,91 @@ def test_arctan_k1_laplacian_still_works() -> None:
     x = jnp.asarray(np.random.default_rng(28).normal(size=(3,)))
     lap = deep_field_laplacian(x, layers)
     assert bool(jnp.all(jnp.isfinite(lap)))
+
+
+@pytest.mark.parametrize("k", (2, 3))
+def test_polylaplacian_support_chunks_agree_with_one_batch_and_the_dense_hessian(k, monkeypatch) -> None:
+    from omnibias.jax import laplacian as lap
+
+    dim = 5
+    layers = _make_layers(dim, 6, depth=2, activation="tanh", seed=21)
+    x = jnp.asarray(np.random.default_rng(22).normal(scale=0.3, size=(3, dim)))
+    unrolled = deep_field_polylaplacian(x, layers, k, mode="support")  # small: one traced jet per support, as before
+    monkeypatch.setattr(lap, "SUPPORT_UNROLL_MAX_COEFFS", 0)  # the batched program from here on
+    whole = deep_field_polylaplacian(x, layers, k, mode="support")
+    np.testing.assert_allclose(whole, unrolled, rtol=1e-11, atol=1e-12)
+    monkeypatch.setattr(lap, "_SUPPORT_JET_FLOATS", 1)  # chunks of one support: the lax.map path with no batching
+    one = deep_field_polylaplacian(x, layers, k, mode="support")
+    monkeypatch.setattr(lap, "_SUPPORT_JET_FLOATS", 3 * 3 * 6 * 8 * 28 * 2)  # a few supports per chunk
+    few = deep_field_polylaplacian(x, layers, k, mode="support")
+    np.testing.assert_allclose(one, whole, rtol=1e-11, atol=1e-12)
+    np.testing.assert_allclose(few, whole, rtol=1e-11, atol=1e-12)
+
+    def forward(z):
+        a = z
+        for W, b, s in layers:
+            a = a @ W.T + (0 if b is None else b)
+            if s is not None:
+                a = jnp.tanh(a)
+        return a[0]
+
+    def power(fn, n):
+        for _ in range(n):
+            fn = (lambda g: lambda z: jnp.trace(jax.hessian(g)(z)))(fn)
+        return fn
+
+    dense = jnp.stack([power(forward, k)(xi).reshape(-1) for xi in x])
+    np.testing.assert_allclose(whole, dense, rtol=1e-8, atol=1e-10)
+
+
+@pytest.mark.parametrize(("k", "dim", "mode"), [(2, 1, "support"), (2, 2, "structured"), (3, 3, "support"), (3, 4, "structured")])
+def test_auto_routes_to_the_projected_program_from_the_measured_dimension(k, dim, mode) -> None:
+    layers = _make_layers(dim, 5, depth=2, activation="tanh", seed=31)
+    x = jnp.asarray(np.random.default_rng(32).normal(scale=0.3, size=(3, dim)))
+    out, report = deep_field_polylaplacian_with_report(x, layers, k, mode="auto")
+    assert report.mode == mode and report.n_directions is None
+    np.testing.assert_allclose(out, deep_field_polylaplacian(x, layers, k, mode="support"), rtol=1e-9, atol=1e-10)
+
+
+def test_auto_keeps_the_support_enumeration_where_the_projected_program_refuses() -> None:
+    layers = _make_layers(6, 5, depth=2, activation="relu", seed=33)
+    x = jnp.asarray(np.random.default_rng(34).normal(scale=0.3, size=(2, 6)))
+    _, report = deep_field_polylaplacian_with_report(x, layers, 2, mode="auto")
+    assert report.mode == "support"
+
+
+def test_the_routing_threshold_is_a_module_setting(monkeypatch) -> None:
+    from omnibias.jax import laplacian as lap
+
+    layers = _make_layers(4, 5, depth=2, activation="tanh", seed=35)
+    x = jnp.asarray(np.random.default_rng(36).normal(scale=0.3, size=(2, 4)))
+    monkeypatch.setitem(lap.STRUCTURED_MIN_DIM, 2, 99)
+    assert deep_field_polylaplacian_with_report(x, layers, 2, mode="auto")[1].mode == "support"
+
+
+def test_accelerators_route_to_the_projected_program_one_dimension_earlier(monkeypatch) -> None:
+    import jax
+    from omnibias.jax import laplacian as lap
+
+    assert not lap._prefers_structured(3, 3, "support") and lap._prefers_structured(4, 3, "support")
+    monkeypatch.setattr(jax, "default_backend", lambda: "gpu")
+    assert lap._prefers_structured(3, 3, "support") and not lap._prefers_structured(2, 3, "support")
+    assert not lap._prefers_structured(8, 3, "forward")  # only the support regime is rerouted
+    assert lap._prefers_structured(1, 3, "estimator")  # past the budget the projected program is tried first
+
+
+def test_support_enumeration_is_unrolled_where_it_always_was_and_batched_above_the_measured_size() -> None:
+    from omnibias.jax import laplacian as lap
+
+    # the audit's cells: D = 16 at k = 2 (1,880 coefficients) compiled unrolled; D = 6 at k = 3 (2,142) did not in 35 GB
+    assert lap._support_jet_coefficients(16, 2) == 1880 and lap._support_jet_coefficients(4, 3) == 532
+    assert lap._support_jet_coefficients(6, 3) == 2142
+    limit = lap.SUPPORT_UNROLL_MAX_COEFFS
+    assert lap._support_jet_coefficients(16, 2) <= limit < lap._support_jet_coefficients(6, 3)
+    layers = _make_layers(3, 4, depth=2, activation="tanh", seed=51)
+    x = jnp.asarray(np.random.default_rng(52).normal(scale=0.3, size=(2, 3)))
+    forced = {
+        flag: lap._polylaplacian_support(x, layers, 2, batched=flag) for flag in (True, False)
+    }
+    np.testing.assert_allclose(forced[True], forced[False], rtol=1e-11, atol=1e-12)
+    np.testing.assert_array_equal(lap._polylaplacian_support(x, layers, 2), forced[False])  # small: the unrolled program

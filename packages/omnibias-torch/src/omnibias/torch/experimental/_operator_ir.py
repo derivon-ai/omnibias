@@ -38,7 +38,13 @@ def constant(value: Any) -> Expr:
 
 
 def variable(value: Any, coordinate: int) -> Expr:
-    return Expr("variable", value, support=frozenset({coordinate}), affine={coordinate: 1}, coordinate=coordinate)
+    return Expr(
+        "variable",
+        value,
+        support=frozenset({coordinate}),
+        affine={coordinate: 1},
+        coordinate=coordinate,
+    )
 
 
 def add(left: Expr, right: Expr, value: Any = None) -> Expr:
@@ -47,8 +53,13 @@ def add(left: Expr, right: Expr, value: Any = None) -> Expr:
         affine = dict(left.affine)
         for axis, coefficient in right.affine.items():
             affine[axis] = affine.get(axis, 0) + coefficient
-    return Expr("add", left.value + right.value if value is None else value, (left, right),
-                left.support | right.support, affine=affine)
+    return Expr(
+        "add",
+        left.value + right.value if value is None else value,
+        (left, right),
+        left.support | right.support,
+        affine=affine,
+    )
 
 
 def multiply(left: Expr, right: Expr, value: Any = None) -> Expr:
@@ -57,8 +68,13 @@ def multiply(left: Expr, right: Expr, value: Any = None) -> Expr:
         affine = {axis: left.value * c for axis, c in right.affine.items()}
     elif not right.support and left.affine is not None:
         affine = {axis: right.value * c for axis, c in left.affine.items()}
-    return Expr("multiply", left.value * right.value if value is None else value, (left, right),
-                left.support | right.support, affine=affine)
+    return Expr(
+        "multiply",
+        left.value * right.value if value is None else value,
+        (left, right),
+        left.support | right.support,
+        affine=affine,
+    )
 
 
 def unary(child: Expr, value: Any, name: str, options: dict[str, Any] | None = None) -> Expr:
@@ -90,10 +106,16 @@ def at(value: TensorExpr | Any, index: tuple[int, ...]) -> Expr:
         return constant(value)
     if value.expressions is None:
         count = min(len(value.shape), len(index))
-        key = tuple(0 if value.shape[-count + i] == 1 else axis for i, axis in enumerate(index[-count:])) if count else ()
+        key = (
+            tuple(
+                0 if value.shape[-count + i] == 1 else axis for i, axis in enumerate(index[-count:])
+            )
+            if count
+            else ()
+        )
         return constant(select(value.value, key))
     assert value.features is not None
-    key = index[-len(value.features):] if value.features else ()
+    key = index[-len(value.features) :] if value.features else ()
     key = tuple(0 if size == 1 else i for i, size in zip(key, value.features, strict=True))
     offset = 0
     for axis, size in zip(key, value.features, strict=True):
@@ -108,8 +130,17 @@ def feature_shape(shape: tuple[Any, ...], batch_ndim: int) -> tuple[int, ...]:
     return tuple(features)
 
 
-def build_tensor_rule(op: str, args: tuple[Any, ...], kwargs: dict[str, Any], value: Any,
-                      shape: tuple[Any, ...], batch_ndim: int, activation_name: Callable[[str, tuple[Any, ...], dict[str, Any]], tuple[str, dict[str, Any]] | None]) -> TensorExpr:
+def build_tensor_rule(
+    op: str,
+    args: tuple[Any, ...],
+    kwargs: dict[str, Any],
+    value: Any,
+    shape: tuple[Any, ...],
+    batch_ndim: int,
+    activation_name: Callable[
+        [str, tuple[Any, ...], dict[str, Any]], tuple[str, dict[str, Any]] | None
+    ],
+) -> TensorExpr:
     """Conservative feature scalarization; batch axes are never scalarized."""
     features = feature_shape(shape, batch_ndim)
     indices = coordinates(features)
@@ -130,15 +161,22 @@ def build_tensor_rule(op: str, args: tuple[Any, ...], kwargs: dict[str, Any], va
             elif op == "mul":
                 result.append(multiply(a, b, select(value, index)))
             else:
-                inverse = unary(b, 1 / b.value, "reciprocal") if b.support else constant(1 / b.value)
+                inverse = (
+                    unary(b, 1 / b.value, "reciprocal") if b.support else constant(1 / b.value)
+                )
                 result.append(multiply(a, inverse, select(value, index)))
     elif op == "neg":
-        result = [multiply(constant(-1), at(first, index), select(value, index)) for index in indices]
+        result = [
+            multiply(constant(-1), at(first, index), select(value, index)) for index in indices
+        ]
     elif op in {"square", "pow"}:
         exponent = 2 if op == "square" else args[1]
         if not isinstance(exponent, (int, float)):
             raise NotStructured("tensor exponent needs general rules")
-        result = [unary(at(first, index), select(value, index), "power", {"exponent": exponent}) for index in indices]
+        result = [
+            unary(at(first, index), select(value, index), "power", {"exponent": exponent})
+            for index in indices
+        ]
     elif op == "linear":
         if not isinstance(first, TensorExpr) or first.features is None or len(first.features) != 1:
             raise NotStructured("linear source must have one feature axis")
@@ -159,7 +197,11 @@ def build_tensor_rule(op: str, args: tuple[Any, ...], kwargs: dict[str, Any], va
         if not isinstance(first, TensorExpr) or first.features is None:
             raise NotStructured("reduction input is unstructured")
         dim = args[1] if len(args) > 1 else kwargs.get("dim")
-        dims = tuple(range(len(first.shape))) if dim is None else ((dim,) if isinstance(dim, int) else tuple(dim))
+        dims = (
+            tuple(range(len(first.shape)))
+            if dim is None
+            else ((dim,) if isinstance(dim, int) else tuple(dim))
+        )
         dims = tuple(d % len(first.shape) for d in dims)
         if any(d < batch_ndim for d in dims):
             raise NotStructured("a reduction mixes independent examples")
@@ -169,15 +211,33 @@ def build_tensor_rule(op: str, args: tuple[Any, ...], kwargs: dict[str, Any], va
         for index in indices:
             term = constant(0)
             for original in coordinates(first.features):
-                projected = tuple(0 if axis in reduced else item for axis, item in enumerate(original)) if keepdim else tuple(item for axis, item in enumerate(original) if axis not in reduced)
+                projected = (
+                    tuple(0 if axis in reduced else item for axis, item in enumerate(original))
+                    if keepdim
+                    else tuple(item for axis, item in enumerate(original) if axis not in reduced)
+                )
                 if projected == index:
                     term = add(term, at(first, original))
             if op == "mean":
                 term = multiply(term, constant(1 / prod(first.features[d] for d in reduced)))
             term.value = select(value, index)
             result.append(term)
-    elif op in {"view", "reshape", "_unsafe_view", "flatten", "squeeze", "unsqueeze", "clone", "contiguous", "alias"}:
-        if not isinstance(first, TensorExpr) or first.expressions is None or len(first.expressions) != prod(features):
+    elif op in {
+        "view",
+        "reshape",
+        "_unsafe_view",
+        "flatten",
+        "squeeze",
+        "unsqueeze",
+        "clone",
+        "contiguous",
+        "alias",
+    }:
+        if (
+            not isinstance(first, TensorExpr)
+            or first.expressions is None
+            or len(first.expressions) != prod(features)
+        ):
             raise NotStructured("shape operation changes spatial feature count")
         result = list(first.expressions)
     elif op in {"select", "slice"}:
@@ -194,7 +254,7 @@ def build_tensor_rule(op: str, args: tuple[Any, ...], kwargs: dict[str, Any], va
             else:
                 start = int(args[2] or 0)
                 step = int(args[4]) if len(args) > 4 else 1
-                key = (*index[:axis], start + index[axis] * step, *index[axis + 1:])
+                key = (*index[:axis], start + index[axis] * step, *index[axis + 1 :])
             result.append(at(first, key))
     elif op in {"cat", "stack"}:
         sources = args[0]
@@ -205,13 +265,13 @@ def build_tensor_rule(op: str, args: tuple[Any, ...], kwargs: dict[str, Any], va
         result = []
         for index in indices:
             if op == "stack":
-                result.append(at(sources[index[axis]], (*index[:axis], *index[axis + 1:])))
+                result.append(at(sources[index[axis]], (*index[:axis], *index[axis + 1 :])))
             else:
                 offset = index[axis]
                 for source in sources:
                     size = source.shape[batch_ndim + axis]
                     if offset < size:
-                        result.append(at(source, (*index[:axis], offset, *index[axis + 1:])))
+                        result.append(at(source, (*index[:axis], offset, *index[axis + 1 :])))
                         break
                     offset -= size
     else:

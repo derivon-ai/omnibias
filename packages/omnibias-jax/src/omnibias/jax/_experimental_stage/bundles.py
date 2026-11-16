@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Explicit supported formulas, shared operator demands, and complete-step AD."""
 from dataclasses import dataclass
 from fractions import Fraction

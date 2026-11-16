@@ -1,0 +1,617 @@
+{
+ "device": "cuda:0",
+ "rows": [
+  {
+   "dtype": "float32",
+   "D": 2,
+   "H": 32,
+   "L": 2,
+   "BB": 16,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 0.9152319803833961
+   },
+   "bwd": {
+    "ok": true,
+    "s": 2.142328961752355
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 2,
+   "H": 32,
+   "L": 2,
+   "BB": 32,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 0.9610149851068854
+   },
+   "bwd": {
+    "ok": true,
+    "s": 3.6283571422100067
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 2,
+   "H": 64,
+   "L": 2,
+   "BB": 16,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 2.2671965057961643
+   },
+   "bwd": {
+    "ok": true,
+    "s": 5.938898940104991
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 2,
+   "H": 64,
+   "L": 2,
+   "BB": 32,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 1.714884485118091
+   },
+   "bwd": {
+    "ok": true,
+    "s": 6.190350424963981
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 2,
+   "H": 128,
+   "L": 2,
+   "BB": 16,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 4.657780966255814
+   },
+   "bwd": {
+    "ok": true,
+    "s": 61.32281412323937
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 2,
+   "H": 128,
+   "L": 2,
+   "BB": 32,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 9.718102247919887
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 212992,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 212992, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 6,
+   "H": 32,
+   "L": 2,
+   "BB": 16,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 0.9158002734184265
+   },
+   "bwd": {
+    "ok": true,
+    "s": 2.996294522192329
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 6,
+   "H": 32,
+   "L": 2,
+   "BB": 32,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 1.1319396700710058
+   },
+   "bwd": {
+    "ok": true,
+    "s": 5.529143630992621
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 6,
+   "H": 64,
+   "L": 2,
+   "BB": 16,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 2.4494655639864504
+   },
+   "bwd": {
+    "ok": true,
+    "s": 8.47160125290975
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 6,
+   "H": 64,
+   "L": 2,
+   "BB": 32,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 3.4894844591617584
+   },
+   "bwd": {
+    "ok": true,
+    "s": 17.53166408604011
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 6,
+   "H": 128,
+   "L": 2,
+   "BB": 16,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 26.213105697650462
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 204800,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 204800, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 6,
+   "H": 128,
+   "L": 2,
+   "BB": 32,
+   "S": 8,
+   "fwd": {
+    "ok": false,
+    "requested": 196608,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 196608, available: 166912, context: []"
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 344064,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 344064, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 12,
+   "H": 32,
+   "L": 2,
+   "BB": 16,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 1.571530300192535
+   },
+   "bwd": {
+    "ok": true,
+    "s": 6.344644722994417
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 12,
+   "H": 32,
+   "L": 2,
+   "BB": 32,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 2.2208612873218954
+   },
+   "bwd": {
+    "ok": true,
+    "s": 14.462420656811446
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 12,
+   "H": 64,
+   "L": 2,
+   "BB": 16,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 4.899377167224884
+   },
+   "bwd": {
+    "ok": true,
+    "s": 23.684775198809803
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 12,
+   "H": 64,
+   "L": 2,
+   "BB": 32,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 7.574899003840983
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 262144,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 262144, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 12,
+   "H": 128,
+   "L": 2,
+   "BB": 16,
+   "S": 14,
+   "fwd": {
+    "ok": false,
+    "requested": 180224,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 180224, available: 166912, context: []"
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 303104,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 303104, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float32",
+   "D": 12,
+   "H": 128,
+   "L": 2,
+   "BB": 32,
+   "S": 14,
+   "fwd": {
+    "ok": false,
+    "requested": 294912,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 294912, available: 166912, context: []"
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 540672,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 540672, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 2,
+   "H": 32,
+   "L": 2,
+   "BB": 16,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 0.43355253897607327
+   },
+   "bwd": {
+    "ok": true,
+    "s": 0.9063605768606067
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 2,
+   "H": 32,
+   "L": 2,
+   "BB": 32,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 0.32449376909062266
+   },
+   "bwd": {
+    "ok": true,
+    "s": 1.5520289419218898
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 2,
+   "H": 64,
+   "L": 2,
+   "BB": 16,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 0.8162881168536842
+   },
+   "bwd": {
+    "ok": true,
+    "s": 1.610595622099936
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 2,
+   "H": 64,
+   "L": 2,
+   "BB": 32,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 0.6829762798734009
+   },
+   "bwd": {
+    "ok": true,
+    "s": 3.0535573731176555
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 2,
+   "H": 128,
+   "L": 2,
+   "BB": 16,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 3.4902865532785654
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 212992,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 212992, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 2,
+   "H": 128,
+   "L": 2,
+   "BB": 32,
+   "S": 4,
+   "fwd": {
+    "ok": true,
+    "s": 3.28006359282881
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 294912,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 294912, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 6,
+   "H": 32,
+   "L": 2,
+   "BB": 16,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 0.86733418982476
+   },
+   "bwd": {
+    "ok": true,
+    "s": 1.8707081219181418
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 6,
+   "H": 32,
+   "L": 2,
+   "BB": 32,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 0.6330534196458757
+   },
+   "bwd": {
+    "ok": true,
+    "s": 3.8234820649959147
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 6,
+   "H": 64,
+   "L": 2,
+   "BB": 16,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 1.7758270958438516
+   },
+   "bwd": {
+    "ok": true,
+    "s": 3.6659664981998503
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 6,
+   "H": 64,
+   "L": 2,
+   "BB": 32,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 1.7656459910795093
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 180224,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 180224, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 6,
+   "H": 128,
+   "L": 2,
+   "BB": 16,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 12.701665231958032
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 278528,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 278528, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 6,
+   "H": 128,
+   "L": 2,
+   "BB": 32,
+   "S": 8,
+   "fwd": {
+    "ok": true,
+    "s": 12.869229153729975
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 425984,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 425984, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 12,
+   "H": 32,
+   "L": 2,
+   "BB": 16,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 1.2708891076035798
+   },
+   "bwd": {
+    "ok": true,
+    "s": 3.976871221791953
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 12,
+   "H": 32,
+   "L": 2,
+   "BB": 32,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 1.1552398027852178
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 180224,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 180224, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 12,
+   "H": 64,
+   "L": 2,
+   "BB": 16,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 3.965592690743506
+   },
+   "bwd": {
+    "ok": true,
+    "s": 8.462297541089356
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 12,
+   "H": 64,
+   "L": 2,
+   "BB": 32,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 3.9586479533463717
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 278528,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 278528, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 12,
+   "H": 128,
+   "L": 2,
+   "BB": 16,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 59.28039698768407
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 376832,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 376832, available: 166912, context: []"
+   }
+  },
+  {
+   "dtype": "float64",
+   "D": 12,
+   "H": 128,
+   "L": 2,
+   "BB": 32,
+   "S": 14,
+   "fwd": {
+    "ok": true,
+    "s": 61.426567108836025
+   },
+   "bwd": {
+    "ok": false,
+    "requested": 622592,
+    "available": 166912,
+    "msg": "JaxRuntimeError: RESOURCE_EXHAUSTED: Shared memory size limit exceeded: requested 622592, available: 166912, context: []"
+   }
+  }
+ ]
+}

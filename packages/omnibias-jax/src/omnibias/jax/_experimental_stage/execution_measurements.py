@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Deterministic training input pipelines and separate profiler diagnostics.
 
 The synchronous and prefetched paths execute identical numerical preparation,

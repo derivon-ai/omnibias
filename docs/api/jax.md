@@ -17,14 +17,14 @@ backend extras when needed. See [guarantees](../guarantees.md).
 
 <!-- BEGIN GENERATED API INVENTORY -->
 
-Version **0.5.0rc1** · Python **>=3.10** · **4 - Beta** · Apache-2.0
+Version **0.5.0** · Python **>=3.10** · **4 - Beta** · Apache-2.0
 
 <details markdown="1">
 <summary>Public modules and top-level exports</summary>
 
 [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-jax/src/omnibias/jax). Modules below are relative to `omnibias.jax`; underscored modules are internal.
 
-`activations`, `activations_complex`, `affine_geometry`, `architectures`, `architectures.attention`, `architectures.ftc_net`, `architectures.hardbc`, `architectures.integral_kernel`, `architectures.jetkan`, `architectures.multiscale`, `architectures.pinn`, `architectures.piratenet`, `bo_derivatives`, `confluence`, `confluent_bank`, `gaussian_aging`, `gaussian_chebyshev`, `gaussian_constrained`, `gaussian_constrained_aging`, `gaussian_constrained_approximation`, `gaussian_heat`, `gaussian_jet`, `gaussian_predictor`, `implicit`, `jet`, `jet_mv`, `laplacian`, `line_search`, `multipack`, `optim`, `optim_block_search`, `precision`, `profile_system`, `realization`, `refine`, `ridge_distribution`, `ridge_system`, `scan`, `scan_equivariant`, `weight_loss_jet`.
+`activations`, `activations_complex`, `affine_geometry`, `architectures`, `architectures.attention`, `architectures.ftc_net`, `architectures.hardbc`, `architectures.integral_kernel`, `architectures.jetkan`, `architectures.multiscale`, `architectures.pinn`, `architectures.piratenet`, `bo_derivatives`, `confluence`, `confluent_bank`, `experimental`, `experimental.chain`, `experimental.closed_ridge`, `experimental.coldcost`, `experimental.compensated`, `experimental.compiler`, `experimental.conditioning`, `experimental.demand`, `experimental.distributed`, `experimental.fused_closed_ridge`, `experimental.fused_streams`, `experimental.grid_gauss_newton`, `experimental.grid_ridge`, `experimental.projected_bilaplacian`, `experimental.projected_divergence`, `experimental.projected_gram`, `experimental.projected_laplacian`, `experimental.projected_logdet`, `experimental.projected_polylaplacian`, `experimental.residual_compiler`, `experimental.residual_gram`, `experimental.residual_woodbury`, `experimental.separable_grid`, `experimental.streams`, `experimental.tanh_ridge`, `experimental.training_step`, `folx_compat`, `gaussian_aging`, `gaussian_chebyshev`, `gaussian_constrained`, `gaussian_constrained_aging`, `gaussian_constrained_approximation`, `gaussian_heat`, `gaussian_jet`, `gaussian_predictor`, `implicit`, `jet`, `jet_mv`, `laplacian`, `line_search`, `multipack`, `operators`, `optim`, `optim_block_search`, `optim_pinn`, `precision`, `profile_system`, `realization`, `refine`, `ridge_distribution`, `ridge_system`, `scan`, `scan_equivariant`, `train_local`, `weight_loss_jet`.
 
 Exports from `omnibias.jax`:
 

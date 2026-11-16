@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2026 Derivon
 """Bounded next-batch preparation for explicitly immutable dependencies.
 
 Only input/frozen-data work belongs here. Parameter-dependent projections must

@@ -27,7 +27,16 @@ def test_committed_guidance_matches_artifacts_and_links_resolve() -> None:
         assert path.read_text() == content, f"Regenerate {path.relative_to(ROOT)}"
         generated = content.split(generator.BEGIN)[1].split(generator.END)[0]
         for link in re.findall(r"\]\(([^)]+)\)", generated):
-            assert (path.parent / link).is_file(), (path, link)
+            target, _, anchor = link.partition("#")
+            resolved = path.parent / target
+            assert resolved.is_file(), (path, link)
+            if anchor:
+                headings = {
+                    re.sub(r"[^a-z0-9 -]", "", line.lstrip("#").strip().lower()).replace(" ", "-")
+                    for line in resolved.read_text().splitlines()
+                    if line.startswith("#")
+                }
+                assert anchor in headings, (path, link)
 
 
 def test_ratios_use_raw_medians_and_follow_changed_workload_metadata() -> None:

@@ -4,6 +4,8 @@ Read the [capability rule](.cursor/rules/omnibias.mdc) once, unless already load
 For maintenance, load only `.agents/skills/omnibias-<package>/SKILL.md` for the
 affected primitive. Each skill owns its package's implementation context.
 Consumer repositories own their own skills under `../omnibias_projects/`.
+To advise a user on which program, API or optimizer fits their problem, load
+`.agents/skills/omnibias-advisor/SKILL.md` instead; it is for using omnibias, not maintaining it.
 
 [CONTRIBUTING.md](CONTRIBUTING.md) owns development commands and contribution
 policy. [Package metadata](docs/packages.md) and [API pages](docs/api/core.md)
