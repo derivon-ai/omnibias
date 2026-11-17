@@ -364,3 +364,18 @@ def test_spectral_feeds_radii_bridge() -> None:
     cert = radii_polynomial_residual_certificate(res.hi, 0.1, 0.0, 0.5)
     assert cert is not None
     assert math.isfinite(cert.radius)
+
+
+def test_spectral_residual_requires_global_symbol_bound_for_global_error() -> None:
+    # Two exterior modes may cancel into the mean. The mean projection has
+    # tail norm0 but whole-space norm1, so an exterior-only bound is unsafe.
+    a = VFS.from_coeffs({}, 1, 1, 1.0, tail=1.0)
+    product = a * a
+
+    def mean_symbol(k):
+        return ComplexInterval.from_value(float(k == (0,)))
+
+    with pytest.raises(ValueError, match="global_factor"):
+        spectral_residual_norm(product, mean_symbol, 0.0)
+    bound = spectral_residual_norm(product, mean_symbol, 0.0, linear_global_factor=1.0)
+    assert bound.contains(1.0)

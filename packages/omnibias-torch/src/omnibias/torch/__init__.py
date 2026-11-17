@@ -24,6 +24,12 @@ from omnibias.torch.activations import (
     list_activations,
     register_activation,
 )
+from omnibias.torch.affine_geometry import (
+    AffineProjection,
+    LinearizedEqualityStep,
+    affine_project,
+    linearized_equality_step,
+)
 from omnibias.torch.blocks import (
     AnalyticGaussianConv1d,
     AnalyticGaussianConv2d,
@@ -112,6 +118,7 @@ __lineage__ = "bias collapse"
 __all__ = [
     "ActivationSpec",
     "AdaptivePackBank",
+    "AffineProjection",
     "AnalyticGaussianConv1d",
     "AnalyticGaussianConv2d",
     "BankSpec",
@@ -130,6 +137,7 @@ __all__ = [
     "JetLineSearchConfig",
     "LearnablePReLU",
     "LineSearchResult",
+    "LinearizedEqualityStep",
     "MultiPackUnit",
     "OMBU",
     "OperatorBlock",
@@ -140,6 +148,7 @@ __all__ = [
     "__version__",
     "affine_jet",
     "affine_jet_mv",
+    "affine_project",
     "analytic_gaussian_taps",
     "antiderivative_jet",
     "arrangement_w_block",
@@ -176,6 +185,7 @@ __all__ = [
     "layer_jet_mv",
     "lhopital_ratio",
     "limit_of_ratio",
+    "linearized_equality_step",
     "list_activations",
     "mlp_jet",
     "mlp_jet_mv",

@@ -1,0 +1,5847 @@
+{
+ "schema": "omnibias-benchmark/projected-residual-ntk-diagonal-a100/v1",
+ "what": "float64 exact diagonal of the empirical neural tangent kernel of PDE residual rows, diag_b = |dr_b / d theta|^2 over every weight, bias and readout parameter of deep tanh MLPs with D > H, regime diag = (r, diag). Candidate = omnibias.jax.experimental.projected_gram.projected_residual_ntk_diagonal: the first-layer part |dr_b / dW_1|^2 from the projected cotangents (q_b x_b^T + Q^F_b Omega + Q^V_b V^T) without forming the H x D row, hidden layers by the per-layer rule of the full-seed module. The claim regime D / H >= 64 was fixed on separate calibration cells (an earlier calibration at D / H = 5-32 had given 1.2-1.9x over the explicit first-layer rows); the three controls have D / H = 8, 21 and 32. The ablation 'projected streams with explicit first-layer rows' is the strongest control by construction in the claim regime; the other tiers are the full-seed stream identity without the projection, vmap(grad) through the projected Laplacian, explicit rows from the shared streams, and per-row forward-Laplacian and Taylor-mode engines",
+ "hardware": "one NVIDIA A100-SXM4-80GB (exclusive), JAX 0.10.2 with jaxlib 0.10.2 CUDA 12 plugins, CPython 3.12",
+ "protocol": {
+  "precision": "float64",
+  "repetitions": "3 fresh processes (paired by repetition, rotating method order)",
+  "warmups": 3,
+  "samples": 51,
+  "statistic": "ratio = strongest-control median / candidate median per tier; lower95 = exp(mean(log r) - 2.920 sd(log r)/sqrt(3)); strongest control = smallest mean log median among qualified tier members",
+  "qualification": "every method's diag program on a reduced instance (width 4, D_q = min(D, 5) > 4 so the projection is active, B = 4 interior points (+ 1 boundary point), same depth and operator, seed + 1) vs a 50-digit oracle (Taylor series per coordinate direction, no projection, J by central differences in every parameter, diag = row norms): r and diag 1e-12 + 1e-10 max |ref|; the candidate and its explicit-first-layer ablation pass both under the rule and with the identity forced on every hidden layer; full-size outputs finite and digest-checked",
+  "status": {
+   "significant_2x": "lower95 >= 2",
+   "lower95_ge_1": "1 <= lower95 < 2",
+   "parity": "lower95 < 1 <= ratio or ratio < 1 <= upper bound",
+   "loss": "candidate slower with confidence",
+   "partial": "an applicable tier member failed (e.g. out of memory) or did not qualify; never promoted",
+   "suppressed": "no applicable tier member ran"
+  },
+  "fairness": "identical data, initialisation, loss and float64 inputs for every method; compilation excluded (value-and-gradient steady state)",
+  "worker_timeout_s": 1200
+ },
+ "tiers": {
+  "projected_streams_explicit_first_layer_rows": "the same projected streams and cotangents, the first-layer rows formed explicitly at H D per row; the module's own ablation",
+  "full_seed_stream_identity": "deep_residual_ntk_diagonal on the full-seed streams, no projection",
+  "projected_per_row": "vmap(grad) through projected_deep_laplacian, row norms",
+  "explicit_rows_from_shared_streams": "the full J from one reverse pass of the summed residual, row norms; full-seed streams_J",
+  "per_row_forward_laplacian": "vmap(grad) through one-point forward-Laplacian engines: rg_lib stream recursion, omnibias.jax.laplacian.deep_field_value_grad_laplacian, folx.forward_laplacian; row norms",
+  "taylor_mode": "vmap(grad) through jax.experimental.jet, row norms"
+ },
+ "roles": {
+  "held_out": "cells, operators and seed not used for any tuning"
+ },
+ "aggregates": [
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "explicit_rows_from_shared_streams",
+   "cells": 12,
+   "input_dims": [
+    5000,
+    7000,
+    10000,
+    14000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 13.942085539694668,
+   "ratio_range_complete_tiers": [
+    9.849583166786852,
+    19.19156140954877
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "full_seed_stream_identity",
+   "cells": 12,
+   "input_dims": [
+    5000,
+    7000,
+    10000,
+    14000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 16.193410160101532,
+   "ratio_range_complete_tiers": [
+    11.120906493846558,
+    21.37397077037558
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "per_row_forward_laplacian",
+   "cells": 12,
+   "input_dims": [
+    5000,
+    7000,
+    10000,
+    14000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 14.6938139600501,
+   "ratio_range_complete_tiers": [
+    10.962713429068708,
+    20.377551671922316
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "projected_per_row",
+   "cells": 12,
+   "input_dims": [
+    5000,
+    7000,
+    10000,
+    14000
+   ],
+   "lower95_ge_1": 5,
+   "significant_2x": 7,
+   "geomean_ratio_complete_tiers": 2.52411466215631,
+   "ratio_range_complete_tiers": [
+    1.962260537442514,
+    3.3761731460193896
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "cells": 12,
+   "input_dims": [
+    5000,
+    7000,
+    10000,
+    14000
+   ],
+   "lower95_ge_1": 2,
+   "significant_2x": 10,
+   "geomean_ratio_complete_tiers": 2.530335624132843,
+   "ratio_range_complete_tiers": [
+    2.1996070041022437,
+    3.23590045964972
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_claim_regime",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "taylor_mode",
+   "cells": 12,
+   "input_dims": [
+    5000,
+    7000,
+    10000,
+    14000
+   ],
+   "significant_2x": 12,
+   "geomean_ratio_complete_tiers": 34.12390400146375,
+   "ratio_range_complete_tiers": [
+    24.854364190527246,
+    44.20699409502562
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_control",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "explicit_rows_from_shared_streams",
+   "cells": 9,
+   "input_dims": [
+    1536,
+    2048,
+    4096
+   ],
+   "significant_2x": 9,
+   "geomean_ratio_complete_tiers": 6.37312298701696,
+   "ratio_range_complete_tiers": [
+    4.30905532064142,
+    9.69584229070428
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_control",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "full_seed_stream_identity",
+   "cells": 9,
+   "input_dims": [
+    1536,
+    2048,
+    4096
+   ],
+   "significant_2x": 9,
+   "geomean_ratio_complete_tiers": 7.549910664685596,
+   "ratio_range_complete_tiers": [
+    4.9123751922958,
+    11.312710440684018
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_control",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "per_row_forward_laplacian",
+   "cells": 9,
+   "input_dims": [
+    1536,
+    2048,
+    4096
+   ],
+   "significant_2x": 9,
+   "geomean_ratio_complete_tiers": 6.751421011318512,
+   "ratio_range_complete_tiers": [
+    4.491547532511571,
+    10.184041488325013
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_control",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "projected_per_row",
+   "cells": 9,
+   "input_dims": [
+    1536,
+    2048,
+    4096
+   ],
+   "lower95_ge_1": 1,
+   "significant_2x": 8,
+   "geomean_ratio_complete_tiers": 2.3859014411157493,
+   "ratio_range_complete_tiers": [
+    2.084884024940031,
+    2.6244753082235577
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_control",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "cells": 9,
+   "input_dims": [
+    1536,
+    2048,
+    4096
+   ],
+   "lower95_ge_1": 9,
+   "geomean_ratio_complete_tiers": 1.5964006469024867,
+   "ratio_range_complete_tiers": [
+    1.385639242691115,
+    1.8743020953467728
+   ]
+  },
+  {
+   "role": "held_out",
+   "family": "deep_mlp_projected_residual_ntk_diagonal_diag_control",
+   "candidate": "projected_residual_ntk_diagonal",
+   "tier": "taylor_mode",
+   "cells": 9,
+   "input_dims": [
+    1536,
+    2048,
+    4096
+   ],
+   "significant_2x": 9,
+   "geomean_ratio_complete_tiers": 16.069031993620396,
+   "ratio_range_complete_tiers": [
+    11.389115446615582,
+    23.181446588336332
+   ]
+  }
+ ],
+ "reproduction": [
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160
+   },
+   "package_over_benchmark_program_time": 0.431413091095723
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.5728900716612102
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.5873883525183111
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320
+   },
+   "package_over_benchmark_program_time": 0.4104483645080638
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.3777122618043517
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.46070841736754775
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.695282742014239
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.42580228825671174
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160
+   },
+   "package_over_benchmark_program_time": 0.4161641178962809
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.7096684033472681
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.4407802538561126
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.5799679448659386
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.5534461230570726
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320
+   },
+   "package_over_benchmark_program_time": 0.3964773454805896
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.424017570076359
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160
+   },
+   "package_over_benchmark_program_time": 0.29248088127068295
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.604817222052466
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512
+   },
+   "package_over_benchmark_program_time": 0.7186547987433486
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.591352115460723
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384
+   },
+   "package_over_benchmark_program_time": 0.37843914226042114
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320
+   },
+   "package_over_benchmark_program_time": 0.3056885690147686
+  }
+ ],
+ "rows": [
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.371527,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 14.76897,
+   "speed_ratio": 2.44979681075741,
+   "lower95": 2.069751720627032
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.864287,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 8.490786,
+   "speed_ratio": 1.8278315283575435,
+   "lower95": 1.6237274803745376
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.024408,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 5.148907,
+   "speed_ratio": 1.6202110316682947,
+   "lower95": 1.412992008017084
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.564256,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 11.120171,
+   "speed_ratio": 2.4401710626291075,
+   "lower95": 2.394636416195492
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.917119,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 5.075607,
+   "speed_ratio": 2.4482944219087814,
+   "lower95": 1.8052958083636934
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.061379,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 4.474368,
+   "speed_ratio": 2.3487192593519954,
+   "lower95": 2.0658098203472344
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 7.851593,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 11.292662,
+   "speed_ratio": 1.385639242691115,
+   "lower95": 1.237776061658838
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.371527,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 73.547347,
+   "speed_ratio": 12.248128632989832,
+   "lower95": 10.428953721977763
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.864287,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 52.667589,
+   "speed_ratio": 11.312710440684018,
+   "lower95": 9.827037404691293
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.024408,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 22.601485,
+   "speed_ratio": 7.447343183057192,
+   "lower95": 7.358465366145598
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.564256,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 80.392044,
+   "speed_ratio": 17.634483599854512,
+   "lower95": 17.302743755272218
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.917119,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 29.863427,
+   "speed_ratio": 15.082151293874713,
+   "lower95": 12.785713610948207
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.061379,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 41.474692,
+   "speed_ratio": 21.37397077037558,
+   "lower95": 17.670514817670046
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 7.851593,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 40.042443,
+   "speed_ratio": 4.9123751922958,
+   "lower95": 4.375573052016673
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.371527,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 11.874641,
+   "speed_ratio": 1.969977556686439,
+   "lower95": 1.6757591731718513
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.864287,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 10.899954,
+   "speed_ratio": 2.3540778760893817,
+   "lower95": 2.020612261881561
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.024408,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 6.657626,
+   "speed_ratio": 2.2441550059644255,
+   "lower95": 2.0581658097663507
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.564256,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 11.419082,
+   "speed_ratio": 2.51055060356772,
+   "lower95": 2.490657994379903
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.917119,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 6.964444,
+   "speed_ratio": 3.3761731460193896,
+   "lower95": 2.997510359915342
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.061379,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 4.857247,
+   "speed_ratio": 2.4964958351858306,
+   "lower95": 2.05452617538887
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 7.851593,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 20.765145,
+   "speed_ratio": 2.5505844202290526,
+   "lower95": 2.2677780515779924
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.371527,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 66.232747,
+   "speed_ratio": 11.03083574470787,
+   "lower95": 9.404693120324795
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.864287,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 44.831157,
+   "speed_ratio": 9.69584229070428,
+   "lower95": 8.522942367250781
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.024408,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 18.517157,
+   "speed_ratio": 6.097342405822983,
+   "lower95": 6.031258524474901
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.564256,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 70.239032,
+   "speed_ratio": 15.411393886958733,
+   "lower95": 15.139158517706607
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.917119,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 24.799623,
+   "speed_ratio": 12.454815037083742,
+   "lower95": 10.337642497978594
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.061379,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 37.226793,
+   "speed_ratio": 19.19156140954877,
+   "lower95": 15.874186529686241
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 7.851593,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 34.734057,
+   "speed_ratio": 4.30905532064142,
+   "lower95": 3.7682203596083106
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.371527,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 68.954985,
+   "speed_ratio": 11.430696286548281,
+   "lower95": 9.673739790696109
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.864287,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "omnibias_a",
+   "strongest_control_median_ms": 45.631945,
+   "speed_ratio": 9.842471481384326,
+   "lower95": 8.609214156252339
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.024408,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 20.505187,
+   "speed_ratio": 6.765097014329168,
+   "lower95": 6.6566324904173
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.564256,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "omnibias_a",
+   "strongest_control_median_ms": 71.32876,
+   "speed_ratio": 15.643127424828114,
+   "lower95": 15.40207607135427
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.917119,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 26.344509,
+   "speed_ratio": 13.398801737672416,
+   "lower95": 11.297210541735897
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.061379,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 39.525682,
+   "speed_ratio": 20.377551671922316,
+   "lower95": 16.86058772659472
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 7.851593,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "omnibias_a",
+   "strongest_control_median_ms": 38.255282,
+   "speed_ratio": 4.701958469368722,
+   "lower95": 4.1751685287212945
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.371527,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 149.455445,
+   "speed_ratio": 24.854364190527246,
+   "lower95": 20.817880917930573
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.864287,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 103.892141,
+   "speed_ratio": 22.386962593377216,
+   "lower95": 19.625985004055256
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.024408,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 51.006865,
+   "speed_ratio": 16.79694002000891,
+   "lower95": 16.57281471427447
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.564256,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 166.39092,
+   "speed_ratio": 36.473092502075765,
+   "lower95": 35.87885528758121
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.917119,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 67.596943,
+   "speed_ratio": 34.30423818949805,
+   "lower95": 28.83979879146381
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.061379,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 85.787415,
+   "speed_ratio": 44.20699409502562,
+   "lower95": 36.59297835174164
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "poisson_bc",
+    "regime": "diag",
+    "operator_definition": "rows Delta u - f at B interior points z ~ U(-1, 1)^D and u - g at B / 4 boundary points on the unit sphere",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 7.851593,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 93.361662,
+   "speed_ratio": 11.456016783458542,
+   "lower95": 10.190418584516838
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.99137,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 4.676748,
+   "speed_ratio": 2.377928427107918,
+   "lower95": 1.892953997535518
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.164704,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 14.813156,
+   "speed_ratio": 2.4638024868293873,
+   "lower95": 2.167312320857764
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.320625,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 11.724666,
+   "speed_ratio": 1.4129079745595117,
+   "lower95": 1.4016516653356483
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.179661,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 4.945006,
+   "speed_ratio": 2.1996070041022437,
+   "lower95": 2.0566104928009334
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.016074,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 5.200415,
+   "speed_ratio": 1.6636935836800544,
+   "lower95": 1.4717609133020721
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.57073,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 8.258672,
+   "speed_ratio": 1.8743020953467728,
+   "lower95": 1.5675785909561106
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.351639,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 10.975757,
+   "speed_ratio": 2.6554100156201903,
+   "lower95": 2.225045347611792
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.99137,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 35.897605,
+   "speed_ratio": 18.75252738547586,
+   "lower95": 16.05649800585297
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.164704,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 66.383724,
+   "speed_ratio": 11.120906493846558,
+   "lower95": 9.491216776815513
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.320625,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 42.283723,
+   "speed_ratio": 5.127729076552282,
+   "lower95": 4.989527427842434
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.179661,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 32.431575,
+   "speed_ratio": 14.861488304140499,
+   "lower95": 14.348357317755468
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.016074,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 24.649258,
+   "speed_ratio": 8.193011646753256,
+   "lower95": 8.08365705388762
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.57073,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 48.057654,
+   "speed_ratio": 10.877424732928816,
+   "lower95": 9.19134149867407
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.351639,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 72.464208,
+   "speed_ratio": 17.59226890581593,
+   "lower95": 14.917982675652027
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.99137,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 4.543354,
+   "speed_ratio": 2.2826764935929043,
+   "lower95": 1.7939849368701881
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.164704,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 11.858543,
+   "speed_ratio": 1.962260537442514,
+   "lower95": 1.8147630972508262
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.320625,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 21.669149,
+   "speed_ratio": 2.6244753082235577,
+   "lower95": 2.54491126869442
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.179661,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 7.263302,
+   "speed_ratio": 3.21241505890731,
+   "lower95": 2.824161862753064
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.016074,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 8.083233,
+   "speed_ratio": 2.6158883168132725,
+   "lower95": 2.405333512795115
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.57073,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 11.684574,
+   "speed_ratio": 2.6198855022444207,
+   "lower95": 2.2556927317168056
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.351639,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 11.514161,
+   "speed_ratio": 2.829376010578509,
+   "lower95": 2.4319697143666406
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.99137,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 31.622446,
+   "speed_ratio": 16.511334007090113,
+   "lower95": 14.17971382485285
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.164704,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 58.774577,
+   "speed_ratio": 9.849583166786852,
+   "lower95": 8.403387553269447
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.320625,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 36.854176,
+   "speed_ratio": 4.466976793488233,
+   "lower95": 4.338491516910614
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.179661,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 26.658656,
+   "speed_ratio": 12.15177119380209,
+   "lower95": 11.921348065404965
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.016074,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 20.2224,
+   "speed_ratio": 6.735290314611303,
+   "lower95": 6.618370231339177
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.57073,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 40.343879,
+   "speed_ratio": 9.176081031017244,
+   "lower95": 7.534551406020816
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.351639,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 62.36977,
+   "speed_ratio": 15.115486068587744,
+   "lower95": 12.666216265449137
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.99137,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 37.140899,
+   "speed_ratio": 19.386846102459042,
+   "lower95": 16.673102785510114
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.164704,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 66.119726,
+   "speed_ratio": 10.962713429068708,
+   "lower95": 9.668046242124598
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.320625,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 41.614209,
+   "speed_ratio": 5.045558026244057,
+   "lower95": 4.904774920311681
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.179661,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 29.668506,
+   "speed_ratio": 13.536297982713847,
+   "lower95": 13.344672790135345
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.016074,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 22.879377,
+   "speed_ratio": 7.610753133099869,
+   "lower95": 7.464192401308085
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.57073,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 45.041999,
+   "speed_ratio": 10.184041488325013,
+   "lower95": 8.516362060454451
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.351639,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 70.293999,
+   "speed_ratio": 17.013772631622768,
+   "lower95": 14.38224546622195
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.99137,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 83.953325,
+   "speed_ratio": 43.86804930583379,
+   "lower95": 37.578098510004914
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 6.164704,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 151.694309,
+   "speed_ratio": 25.313439268757104,
+   "lower95": 21.889303820051026
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.320625,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 95.30335,
+   "speed_ratio": 11.55546460694037,
+   "lower95": 11.225528045731798
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.179661,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 68.358485,
+   "speed_ratio": 31.240785947830975,
+   "lower95": 30.76250651891031
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.016074,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 52.481236,
+   "speed_ratio": 17.364530385496376,
+   "lower95": 17.181773557299284
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.57073,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 102.305955,
+   "speed_ratio": 23.181446588336332,
+   "lower95": 19.46332685221063
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "eik_visc",
+    "regime": "diag",
+    "operator_definition": "rows |grad u|^2 - 0.1 Delta u - f (viscous eikonal / HJB), z ~ U(-1, 1)^D",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.351639,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 162.77576,
+   "speed_ratio": 39.40679037663736,
+   "lower95": 33.23445939068097
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.252665,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 5.312669,
+   "speed_ratio": 2.2627791736986302,
+   "lower95": 2.0365108822433418
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.38196,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 18.401066,
+   "speed_ratio": 3.23590045964972,
+   "lower95": 2.730977818881729
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.420343,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 5.655168,
+   "speed_ratio": 1.5851659914898,
+   "lower95": 1.3667069575848627
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.83327,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 12.291395,
+   "speed_ratio": 1.3884013300876692,
+   "lower95": 1.3753987348625585
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.27012,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 8.911983,
+   "speed_ratio": 1.6923982057736262,
+   "lower95": 1.6789349029514427
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.997177,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 5.277406,
+   "speed_ratio": 2.52277168362563,
+   "lower95": 2.1917004762728753
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_streams_explicit_first_layer_rows",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.043133,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_rows",
+   "strongest_control_median_ms": 13.226314,
+   "speed_ratio": 3.1702670277655267,
+   "lower95": 2.779797370656835
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.252665,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 36.801285,
+   "speed_ratio": 16.369566693979944,
+   "lower95": 15.939911684587837
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.38196,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 73.653003,
+   "speed_ratio": 13.055841914346647,
+   "lower95": 11.013765548291813
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.420343,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 27.029673,
+   "speed_ratio": 7.887395217629383,
+   "lower95": 7.761392721634759
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.83327,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 46.792706,
+   "speed_ratio": 5.285612129626466,
+   "lower95": 5.239223665059253
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.27012,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 53.099112,
+   "speed_ratio": 10.108649167473008,
+   "lower95": 9.899192391553221
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.997177,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 41.377875,
+   "speed_ratio": 20.704049598423182,
+   "lower95": 20.64380325487449
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "full_seed_stream_identity",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.043133,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "full_diag",
+   "strongest_control_median_ms": 80.76411,
+   "speed_ratio": 19.355183031094214,
+   "lower95": 16.99076662989524
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.252665,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 6.616188,
+   "speed_ratio": 3.0252391397662,
+   "lower95": 2.612512121538184
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.38196,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 12.977495,
+   "speed_ratio": 2.2861639660068493,
+   "lower95": 1.9389111933126129
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.420343,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 7.484688,
+   "speed_ratio": 2.0879474809719736,
+   "lower95": 1.8236581096637117
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.83327,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 20.963427,
+   "speed_ratio": 2.374726743739432,
+   "lower95": 2.332535519839858
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.27012,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 11.00735,
+   "speed_ratio": 2.084884024940031,
+   "lower95": 2.0694857077290596
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.997177,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 4.132052,
+   "speed_ratio": 2.0713539058224466,
+   "lower95": 1.9327609360259708
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "projected_per_row",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.043133,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "proj_vmap",
+   "strongest_control_median_ms": 11.448069,
+   "speed_ratio": 2.7509227182733045,
+   "lower95": 2.334511014564305
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.252665,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 30.28036,
+   "speed_ratio": 13.416000501717287,
+   "lower95": 13.178515451185843
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.38196,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 64.070455,
+   "speed_ratio": 11.291442585988912,
+   "lower95": 9.609269385084726
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.420343,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 22.279868,
+   "speed_ratio": 6.498891002326814,
+   "lower95": 6.423528017116787
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.83327,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 40.075507,
+   "speed_ratio": 4.522650915386165,
+   "lower95": 4.477045559000016
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.27012,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 43.955682,
+   "speed_ratio": 8.39079134178051,
+   "lower95": 8.198387738221333
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.997177,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 35.647986,
+   "speed_ratio": 17.85702973921483,
+   "lower95": 17.793185472196118
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "explicit_rows_from_shared_streams",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.043133,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "streams_J",
+   "strongest_control_median_ms": 68.631731,
+   "speed_ratio": 16.428259389258788,
+   "lower95": 14.500628446604297
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.252665,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 30.094806,
+   "speed_ratio": 13.332991925471257,
+   "lower95": 13.006898039674871
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.38196,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 62.379435,
+   "speed_ratio": 10.997344462639619,
+   "lower95": 9.3500801514319
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.420343,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 22.051719,
+   "speed_ratio": 6.440787757766796,
+   "lower95": 6.28565473762281
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.83327,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 39.745139,
+   "speed_ratio": 4.491547532511571,
+   "lower95": 4.44279417342449
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.27012,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 43.415351,
+   "speed_ratio": 8.228255097041398,
+   "lower95": 7.947646659401791
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.997177,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 35.425965,
+   "speed_ratio": 17.729116971397467,
+   "lower95": 17.61657176753952
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "per_row_forward_laplacian",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.043133,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "fl_vmap",
+   "strongest_control_median_ms": 67.965146,
+   "speed_ratio": 16.306918663037724,
+   "lower95": 14.28868355257806
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 5000,
+    "H": 64,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 2.252665,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 68.582404,
+   "speed_ratio": 30.481644926673106,
+   "lower95": 30.389190041471686
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 14000,
+    "H": 128,
+    "depth": 3,
+    "B": 160,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.38196,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 151.98488,
+   "speed_ratio": 26.788426983330623,
+   "lower95": 22.77696180994568
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 2048,
+    "H": 96,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 3.420343,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 55.567045,
+   "speed_ratio": 16.181960949764772,
+   "lower95": 15.905210180787654
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 1536,
+    "H": 192,
+    "depth": 3,
+    "B": 512,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 8.83327,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 100.890381,
+   "speed_ratio": 11.389115446615582,
+   "lower95": 11.28914912228971
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 4096,
+    "H": 128,
+    "depth": 3,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": false
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 5.27012,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 101.316108,
+   "speed_ratio": 19.343556251888586,
+   "lower95": 18.890256678632547
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 7000,
+    "H": 48,
+    "depth": 4,
+    "B": 384,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 1.997177,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 82.774444,
+   "speed_ratio": 41.447422697680885,
+   "lower95": 41.27985346937744
+  },
+  {
+   "config": {
+    "model": "deep_mlp_projected_residual_ntk_diagonal",
+    "activation": "tanh",
+    "operator": "heat_ac",
+    "regime": "diag",
+    "operator_definition": "rows u_t - Delta_x u + u^3 - u - f (Allen-Cahn), z = (t, x), t ~ U(0, 1), x ~ U(-1, 1)^(D-1)",
+    "D": 10000,
+    "H": 96,
+    "depth": 3,
+    "B": 320,
+    "projection_applies": true,
+    "claim_regime": true
+   },
+   "tier": "taylor_mode",
+   "candidate": "projected_residual_ntk_diagonal",
+   "role": "held_out",
+   "candidate_median_ms": 4.043133,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "jet",
+   "strongest_control_median_ms": 163.079347,
+   "speed_ratio": 39.19357613498776,
+   "lower95": 34.22350275104598
+  }
+ ],
+ "full_size_accuracy": {
+  "what": "max over repetitions of per-field relative deviations (norms and sampled entries scaled by the largest sampled reference magnitude) between methods at full size; floor = two controls",
+  "candidate": "pkg",
+  "floor": "streams_J_vs_fl_vmap",
+  "summary": {
+   "pkg_vs_proj_rows": {
+    "max_residual_rel": 1.3240595105899533e-15,
+    "max_diag_rel": 1.5905759940426134e-15,
+    "cells": 21
+   },
+   "pkg_vs_full_diag": {
+    "max_residual_rel": 7.106356736273366e-16,
+    "max_diag_rel": 7.019796623022953e-16,
+    "cells": 21
+   },
+   "pkg_vs_proj_vmap": {
+    "max_residual_rel": 7.956082589552596e-16,
+    "max_diag_rel": 1.539613357722568e-15,
+    "cells": 21
+   },
+   "pkg_vs_streams_J": {
+    "max_residual_rel": 8.52762808352804e-16,
+    "max_diag_rel": 9.44101198072981e-16,
+    "cells": 21
+   },
+   "pkg_vs_fl_vmap": {
+    "max_residual_rel": 7.736598938653791e-16,
+    "max_diag_rel": 1.0621138478321037e-15,
+    "cells": 21
+   },
+   "pkg_vs_omnibias_a": {
+    "max_residual_rel": 8.17102538255901e-16,
+    "max_diag_rel": 1.1721061395880041e-15,
+    "cells": 21
+   },
+   "pkg_vs_folx": {
+    "max_residual_rel": 4.82489137288616e-15,
+    "max_diag_rel": 6.171198358882518e-15,
+    "cells": 21
+   },
+   "pkg_vs_jet": {
+    "max_residual_rel": 2.4757116603692128e-15,
+    "max_diag_rel": 6.185573310165748e-15,
+    "cells": 21
+   },
+   "streams_J_vs_fl_vmap": {
+    "max_residual_rel": 5.415619257057653e-16,
+    "max_diag_rel": 5.358913510645736e-16,
+    "cells": 21
+   }
+  },
+  "rows": [
+   {
+    "D": 14000,
+    "width": 128,
+    "depth": 3,
+    "B": 160,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 3.94463294330435e-16,
+     "diag": 3.516318418764013e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 4.508151935204971e-16,
+     "diag": 4.688424558352015e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 5.635189919006213e-16,
+     "diag": 4.688424558352016e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 5.071670927105592e-16,
+     "diag": 4.688424558352016e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 4.50815193520497e-16,
+     "diag": 4.688424558352016e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 8.17102538255901e-16,
+     "diag": 1.1721061395880041e-15
+    },
+    "pkg_vs_folx": {
+     "residual": 2.70489116112298e-15,
+     "diag": 1.9925804372996073e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.6905569757018649e-15,
+     "diag": 5.3269760184440866e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 3.3811139514037275e-16,
+     "diag": 3.5163184187640123e-16
+    }
+   },
+   {
+    "D": 4096,
+    "width": 128,
+    "depth": 3,
+    "B": 384,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 5.190613156393643e-16,
+     "diag": 4.108902707240833e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 5.19061315639364e-16,
+     "diag": 6.163354060861249e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 7.137093090041257e-16,
+     "diag": 6.163354060861249e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 5.190613156393641e-16,
+     "diag": 6.163354060861249e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 5.190613156393642e-16,
+     "diag": 8.217805414481663e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 5.190613156393641e-16,
+     "diag": 8.217805414481663e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.1411279270123768e-15,
+     "diag": 1.5408385152153108e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.2060105914672994e-15,
+     "diag": 4.927166538927987e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 3.892959867295231e-16,
+     "diag": 3.0816770304306235e-16
+    }
+   },
+   {
+    "D": 2048,
+    "width": 96,
+    "depth": 3,
+    "B": 512,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 0.0,
+     "diag": 4.522973734634705e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 4.675680706518705e-16,
+     "diag": 4.522973734634705e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 5.844600883148377e-16,
+     "diag": 6.030631646179608e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 3.506760529889028e-16,
+     "diag": 6.030631646179607e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 4.675680706518704e-16,
+     "diag": 4.522973734634705e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 4.675680706518703e-16,
+     "diag": 6.030631646179607e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 9.278303901998045e-16,
+     "diag": 1.3568921203904117e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.870272282607483e-15,
+     "diag": 5.578334272716165e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 4.675680706518704e-16,
+     "diag": 3.0153158230898034e-16
+    }
+   },
+   {
+    "D": 10000,
+    "width": 96,
+    "depth": 3,
+    "B": 320,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 2.319225562869415e-16,
+     "diag": 2.652336974129425e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 5.370838145592331e-16,
+     "diag": 5.304673948258851e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 5.126709138974496e-16,
+     "diag": 3.978505461194137e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 3.906064105885332e-16,
+     "diag": 3.978505461194138e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 3.906064105885332e-16,
+     "diag": 2.6523369741294254e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.906064105885331e-16,
+     "diag": 3.9785054611941374e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.3436384635311992e-15,
+     "diag": 2.387103276716482e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.8553804502955346e-15,
+     "diag": 5.256028457357161e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 2.929548079413999e-16,
+     "diag": 2.6523369741294254e-16
+    }
+   },
+   {
+    "D": 5000,
+    "width": 64,
+    "depth": 3,
+    "B": 512,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 6.189279150923032e-16,
+     "diag": 5.849830519185793e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 6.189279150923032e-16,
+     "diag": 7.019796623022953e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 5.415619257057654e-16,
+     "diag": 9.35972883069727e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 7.736598938653791e-16,
+     "diag": 7.019796623022952e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 7.736598938653791e-16,
+     "diag": 8.18976272686011e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 6.189279150923032e-16,
+     "diag": 8.189762726860108e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.4757116603692163e-15,
+     "diag": 3.860888142662622e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.4757116603692128e-15,
+     "diag": 5.615837298418387e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 5.415619257057653e-16,
+     "diag": 3.509898311511476e-16
+    }
+   },
+   {
+    "D": 7000,
+    "width": 48,
+    "depth": 4,
+    "B": 384,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 2.8761195256742887e-16,
+     "diag": 2.5971182482876044e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 2.8761195256742887e-16,
+     "diag": 3.2463978103595056e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 4.314179288511432e-16,
+     "diag": 5.843516058647111e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 3.595149407092861e-16,
+     "diag": 3.895677372431408e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 4.3141792885114335e-16,
+     "diag": 3.895677372431408e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.59514940709286e-16,
+     "diag": 3.895677372431408e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.5818657391208565e-15,
+     "diag": 5.2591644527824095e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.7256717154045764e-15,
+     "diag": 6.1032278834759025e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 2.8761195256742887e-16,
+     "diag": 2.5971182482876053e-16
+    }
+   },
+   {
+    "D": 1536,
+    "width": 192,
+    "depth": 3,
+    "B": 512,
+    "op": "poisson_bc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 1.7765891840683417e-17,
+     "diag": 2.553629988062139e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 7.106356736273366e-16,
+     "diag": 2.553629988062139e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 7.106356736273364e-16,
+     "diag": 3.404839984082853e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 8.52762808352804e-16,
+     "diag": 2.5536299880621396e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 7.106356736273367e-16,
+     "diag": 2.553629988062139e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 7.106356736273366e-16,
+     "diag": 3.404839984082853e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 9.948899430782706e-16,
+     "diag": 5.107259976124278e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 2.131907020882011e-15,
+     "diag": 5.6179859737367374e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 4.974449715391357e-16,
+     "diag": 2.553629988062139e-16
+    }
+   },
+   {
+    "D": 7000,
+    "width": 48,
+    "depth": 4,
+    "B": 384,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 1.5993865132054513e-16,
+     "diag": 5.142665299068754e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 1.599386513205451e-16,
+     "diag": 5.142665299068753e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.599386513205451e-16,
+     "diag": 8.571108831781254e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.599386513205451e-16,
+     "diag": 4.285554415890627e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.599386513205451e-16,
+     "diag": 6.856887065425002e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.599386513205451e-16,
+     "diag": 5.999776182246878e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 3.198773026410903e-16,
+     "diag": 6.171198358882518e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.399079769808177e-16,
+     "diag": 3.0855991794412597e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 7.996932566027255e-17,
+     "diag": 3.428443532712501e-16
+    }
+   },
+   {
+    "D": 14000,
+    "width": 128,
+    "depth": 3,
+    "B": 160,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 0.0,
+     "diag": 3.5529539024366934e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 1.5744568202832995e-16,
+     "diag": 3.5529539024366934e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.5744568202832995e-16,
+     "diag": 1.539613357722568e-15
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.5744568202832995e-16,
+     "diag": 4.145112886176143e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.5744568202832995e-16,
+     "diag": 3.5529539024366934e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.5744568202832995e-16,
+     "diag": 3.5529539024366934e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 4.723370460849897e-16,
+     "diag": 2.723931325201462e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.3616852304249493e-16,
+     "diag": 3.5088741481229814e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 7.872284101416497e-17,
+     "diag": 2.368635934957796e-16
+    }
+   },
+   {
+    "D": 1536,
+    "width": 192,
+    "depth": 3,
+    "B": 512,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 0.0,
+     "diag": 2.8218805472787495e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 8.298806035748361e-17,
+     "diag": 2.8218805472787505e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.6597612071496722e-16,
+     "diag": 4.232820820918126e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.6597612071496722e-16,
+     "diag": 2.82188054727875e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.6597612071496722e-16,
+     "diag": 2.8218805472787495e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.6597612071496722e-16,
+     "diag": 2.8218805472787495e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.9045821125119263e-16,
+     "diag": 9.876581915475624e-16
+    },
+    "pkg_vs_jet": {
+     "residual": 3.3195224142993443e-16,
+     "diag": 3.0688021830208502e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.4109402736393747e-16
+    }
+   },
+   {
+    "D": 5000,
+    "width": 64,
+    "depth": 3,
+    "B": 512,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 1.188498288091803e-16,
+     "diag": 7.080758985547355e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 1.188498288091803e-16,
+     "diag": 5.900632487956128e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.188498288091803e-16,
+     "diag": 7.080758985547355e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.188498288091803e-16,
+     "diag": 9.44101198072981e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.188498288091803e-16,
+     "diag": 1.0621138478321037e-15
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.188498288091803e-16,
+     "diag": 4.720505990364903e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.376996576183606e-16,
+     "diag": 4.012430091810181e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.3769965761836065e-16,
+     "diag": 3.4223668430145643e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.0031643745286785e-16
+    }
+   },
+   {
+    "D": 2048,
+    "width": 96,
+    "depth": 3,
+    "B": 512,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 1.3937792289944932e-16,
+     "diag": 5.942705004505392e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 1.3483321151534298e-16,
+     "diag": 5.942705004505392e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.3937792289944932e-16,
+     "diag": 9.508328007208627e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.3937792289944932e-16,
+     "diag": 8.319787006307548e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.3937792289944932e-16,
+     "diag": 8.319787006307548e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.3937792289944932e-16,
+     "diag": 4.754164003604313e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.696664230306859e-16,
+     "diag": 1.66395740126151e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.0224981727301444e-16,
+     "diag": 3.3279148025230265e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 1.3937792289944932e-16,
+     "diag": 2.3770820018021567e-16
+    }
+   },
+   {
+    "D": 4096,
+    "width": 128,
+    "depth": 3,
+    "B": 384,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 7.612316594686803e-17,
+     "diag": 2.679911079468495e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 1.1418474892030205e-16,
+     "diag": 4.019866619202744e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.522463318937361e-16,
+     "diag": 4.019866619202744e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 7.612316594686803e-17,
+     "diag": 4.0198666192027436e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.522463318937361e-16,
+     "diag": 4.0198666192027446e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 7.612316594686803e-17,
+     "diag": 4.019866619202744e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.2836949784060415e-16,
+     "diag": 1.87593775562795e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.2836949784060415e-16,
+     "diag": 3.0456651232450307e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 1.522463318937361e-16,
+     "diag": 4.0198666192027446e-16
+    }
+   },
+   {
+    "D": 10000,
+    "width": 96,
+    "depth": 3,
+    "B": 320,
+    "op": "eik_visc",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 1.5841824816316594e-16,
+     "diag": 3.099997346250936e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 1.5841824816316594e-16,
+     "diag": 3.045014363096872e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 1.5841824816316594e-16,
+     "diag": 3.719996815501126e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 1.5841824816316594e-16,
+     "diag": 3.045014363096872e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 1.5841824816316594e-16,
+     "diag": 3.045014363096872e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 1.5841824816316594e-16,
+     "diag": 3.7199968155011246e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 7.898611623433406e-16,
+     "diag": 2.107998195450638e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 3.7697919111841244e-16,
+     "diag": 2.479997877000756e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 1.4361112042606188e-16,
+     "diag": 1.2399989385003749e-16
+    }
+   },
+   {
+    "D": 5000,
+    "width": 64,
+    "depth": 3,
+    "B": 512,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 8.38694148882172e-16,
+     "diag": 1.4053592588682595e-15
+    },
+    "pkg_vs_full_diag": {
+     "residual": 6.099593810052163e-16,
+     "diag": 4.3241823349792606e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 5.337144583795643e-16,
+     "diag": 6.486273502468888e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 6.099593810052163e-16,
+     "diag": 5.405227918724074e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 6.099593810052163e-16,
+     "diag": 6.486273502468888e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 5.337144583795641e-16,
+     "diag": 4.3241823349792586e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.7536332203899989e-15,
+     "diag": 1.2972547004937767e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.6773882977643462e-15,
+     "diag": 5.033080449526811e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 1.5248984525130408e-16,
+     "diag": 4.3241823349792586e-16
+    }
+   },
+   {
+    "D": 14000,
+    "width": 128,
+    "depth": 3,
+    "B": 160,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 7.147987219090596e-16,
+     "diag": 4.019185132984302e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 4.467492011931622e-16,
+     "diag": 4.0191851329843023e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 6.254488816704271e-16,
+     "diag": 5.358913510645737e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 5.360990414317946e-16,
+     "diag": 8.038370265968601e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 5.360990414317946e-16,
+     "diag": 5.358913510645736e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 5.360990414317946e-16,
+     "diag": 4.68904932181502e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 4.82489137288616e-15,
+     "diag": 2.1435654042582927e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.3230958462044452e-15,
+     "diag": 5.496125564334422e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 4.467492011931622e-16,
+     "diag": 5.358913510645736e-16
+    }
+   },
+   {
+    "D": 2048,
+    "width": 96,
+    "depth": 3,
+    "B": 512,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 8.593273397866856e-16,
+     "diag": 9.68839070038598e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 6.940720821353999e-16,
+     "diag": 6.458927133590659e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 5.288168244841142e-16,
+     "diag": 8.073658916988323e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 3.9661261836308564e-16,
+     "diag": 6.458927133590656e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 3.9661261836308564e-16,
+     "diag": 8.073658916988319e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 4.296636698933429e-16,
+     "diag": 9.688390700385985e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.0576336489682284e-15,
+     "diag": 1.291785426718131e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.983063091815431e-15,
+     "diag": 5.490088063552086e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.6147317833976638e-16
+    }
+   },
+   {
+    "D": 1536,
+    "width": 192,
+    "depth": 3,
+    "B": 512,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 5.03024579424696e-16,
+     "diag": 6.84479262884543e-16
+    },
+    "pkg_vs_full_diag": {
+     "residual": 3.3534971961646403e-16,
+     "diag": 2.737917051538172e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 5.030245794246961e-16,
+     "diag": 8.213751154614516e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 3.35349719616464e-16,
+     "diag": 2.7379170515381727e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 3.35349719616464e-16,
+     "diag": 2.737917051538173e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.3534971961646403e-16,
+     "diag": 2.737917051538172e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.1178323987215468e-15,
+     "diag": 1.2320626731921794e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.012098317698786e-15,
+     "diag": 4.7669217369608016e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.737917051538173e-16
+    }
+   },
+   {
+    "D": 4096,
+    "width": 128,
+    "depth": 3,
+    "B": 384,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 8.353886719030229e-16,
+     "diag": 1.067685392705948e-15
+    },
+    "pkg_vs_full_diag": {
+     "residual": 3.18243303582104e-16,
+     "diag": 4.575794540168351e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 7.956082589552596e-16,
+     "diag": 7.626324233613916e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 6.36486607164208e-16,
+     "diag": 7.626324233613916e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 6.36486607164208e-16,
+     "diag": 7.626324233613916e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.18243303582104e-16,
+     "diag": 7.626324233613916e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.386824776865779e-15,
+     "diag": 1.067685392705948e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 2.068581473283678e-15,
+     "diag": 5.47430950040332e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.610091029530379e-16
+    }
+   },
+   {
+    "D": 7000,
+    "width": 48,
+    "depth": 4,
+    "B": 384,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 8.961146774263756e-16,
+     "diag": 1.5905759940426134e-15
+    },
+    "pkg_vs_full_diag": {
+     "residual": 2.88036860601335e-16,
+     "diag": 5.301919980142047e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 2.829442238068309e-16,
+     "diag": 7.069226640189394e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 3.2004095622370554e-16,
+     "diag": 7.952879970213068e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 3.2004095622370554e-16,
+     "diag": 7.069226640189394e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 3.2004095622370554e-16,
+     "diag": 7.069226640189396e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 1.3441720161395634e-15,
+     "diag": 4.1531706511112576e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.920245737342237e-15,
+     "diag": 6.185573310165748e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 2.650959990071023e-16
+    }
+   },
+   {
+    "D": 10000,
+    "width": 96,
+    "depth": 3,
+    "B": 320,
+    "op": "heat_ac",
+    "regime": "diag",
+    "pkg_vs_proj_rows": {
+     "residual": 1.3240595105899533e-15,
+     "diag": 1.2388440164192407e-15
+    },
+    "pkg_vs_full_diag": {
+     "residual": 3.5906698592269893e-16,
+     "diag": 3.716532049257728e-16
+    },
+    "pkg_vs_proj_vmap": {
+     "residual": 4.0395035916303615e-16,
+     "diag": 4.955376065676967e-16
+    },
+    "pkg_vs_streams_J": {
+     "residual": 4.039503591630363e-16,
+     "diag": 1.8582660246288636e-16
+    },
+    "pkg_vs_fl_vmap": {
+     "residual": 4.039503591630363e-16,
+     "diag": 2.477688032838485e-16
+    },
+    "pkg_vs_omnibias_a": {
+     "residual": 4.937171056437111e-16,
+     "diag": 4.955376065676967e-16
+    },
+    "pkg_vs_folx": {
+     "residual": 2.154401915536193e-15,
+     "diag": 1.3007862172402037e-15
+    },
+    "pkg_vs_jet": {
+     "residual": 1.7953349296134974e-15,
+     "diag": 4.480805205996432e-15
+    },
+    "streams_J_vs_fl_vmap": {
+     "residual": 0.0,
+     "diag": 1.2388440164192424e-16
+    }
+   }
+  ]
+ },
+ "cold_cost": {
+  "what": "per cell, medians over repetitions: cold = lowering + compilation ms (excluded from the speed ratios), steady = steady-state median ms, for the candidate and the steady-state-fastest member of every tier; break_even_calls = extra cold ms / steady saving per call (only when the candidate compiles slower and runs faster)",
+  "rows": [
+   {
+    "cfg": {
+     "D": 14000,
+     "width": 128,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 6031.859379261732,
+     "steady": 6.371527
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 6139.147746376693,
+     "steady": 14.76897,
+     "extra_compile_ms": -107.28836711496115,
+     "break_even_calls": null
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5112.120224162936,
+     "steady": 73.547347,
+     "extra_compile_ms": 919.7391550987959,
+     "break_even_calls": 13.691521072594215
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 8966.661982238293,
+     "steady": 11.874641,
+     "extra_compile_ms": -2934.8026029765606,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3279.8941573128104,
+     "steady": 66.232747,
+     "extra_compile_ms": 2751.9652219489217,
+     "break_even_calls": 45.97242124281666
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4176.070421934128,
+     "steady": 68.954985,
+     "extra_compile_ms": 1855.7889573276043,
+     "break_even_calls": 29.65302680027052
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7736.993839964271,
+     "steady": 149.455445,
+     "extra_compile_ms": -1705.1344607025385,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4096,
+     "width": 128,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 6270.301644690335,
+     "steady": 4.864287
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5877.982197329402,
+     "steady": 8.490786,
+     "extra_compile_ms": 392.3194473609328,
+     "break_even_calls": 108.18131960354404
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 4595.202135853469,
+     "steady": 52.667589,
+     "extra_compile_ms": 1675.0995088368654,
+     "break_even_calls": 35.04150212964086
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 10165.060554631054,
+     "steady": 10.899954,
+     "extra_compile_ms": -3894.7589099407196,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3115.777070634067,
+     "steady": 44.831157,
+     "extra_compile_ms": 3154.5245740562677,
+     "break_even_calls": 78.92848687065731
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 7240.600509569049,
+     "steady": 45.631945,
+     "extra_compile_ms": -970.2988648787141,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8095.256225205958,
+     "steady": 103.892141,
+     "extra_compile_ms": -1824.954580515623,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2048,
+     "width": 96,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 7198.345581069589,
+     "steady": 3.024408
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 6101.44186206162,
+     "steady": 5.148907,
+     "extra_compile_ms": 1096.903719007969,
+     "break_even_calls": 516.3117134947904
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 4994.444211013615,
+     "steady": 22.601485,
+     "extra_compile_ms": 2203.9013700559735,
+     "break_even_calls": 112.57560922174304
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 10816.150857135653,
+     "steady": 6.657626,
+     "extra_compile_ms": -3617.805276066065,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3864.485119469464,
+     "steady": 18.517157,
+     "extra_compile_ms": 3333.860461600125,
+     "break_even_calls": 215.1884382558657
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4454.947943799198,
+     "steady": 20.505187,
+     "extra_compile_ms": 2743.397637270391,
+     "break_even_calls": 156.9379509500344
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8708.924613893032,
+     "steady": 51.006865,
+     "extra_compile_ms": -1510.5790328234434,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 10000,
+     "width": 96,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 5992.3095582053065,
+     "steady": 4.564256
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5665.524315088987,
+     "steady": 11.120171,
+     "extra_compile_ms": 326.7852431163192,
+     "break_even_calls": 49.84586333354219
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 4696.815738454461,
+     "steady": 80.392044,
+     "extra_compile_ms": 1295.4938197508454,
+     "break_even_calls": 17.084684307959048
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 9215.211880393326,
+     "steady": 11.419082,
+     "extra_compile_ms": -3222.9023221880198,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3360.506823286414,
+     "steady": 70.239032,
+     "extra_compile_ms": 2631.8027349188924,
+     "break_even_calls": 40.0732654941814
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 7512.764543294907,
+     "steady": 71.32876,
+     "extra_compile_ms": -1520.4549850896,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8474.49092194438,
+     "steady": 166.39092,
+     "extra_compile_ms": -2482.1813637390733,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 5000,
+     "width": 64,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 5869.569688104093,
+     "steady": 1.917119
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 6463.085665367544,
+     "steady": 5.075607,
+     "extra_compile_ms": -593.5159772634506,
+     "break_even_calls": null
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5183.865087106824,
+     "steady": 29.863427,
+     "extra_compile_ms": 685.7046009972692,
+     "break_even_calls": 24.536500527986348
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 8068.017833866179,
+     "steady": 6.964444,
+     "extra_compile_ms": -2198.448145762086,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3259.659589268267,
+     "steady": 24.799623,
+     "extra_compile_ms": 2609.910098835826,
+     "break_even_calls": 114.05701486322589
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4009.568389505148,
+     "steady": 26.344509,
+     "extra_compile_ms": 1860.0012985989451,
+     "break_even_calls": 76.14408656016649
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 6749.198514036834,
+     "steady": 67.596943,
+     "extra_compile_ms": -879.6288259327412,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 7000,
+     "width": 48,
+     "depth": 4,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 5333.671424537897,
+     "steady": 2.061379
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5039.500631392002,
+     "steady": 4.474368,
+     "extra_compile_ms": 294.170793145895,
+     "break_even_calls": 121.91136932074494
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 4103.677268140018,
+     "steady": 41.474692,
+     "extra_compile_ms": 1229.9941563978791,
+     "break_even_calls": 31.20758096123204
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 6372.555440291762,
+     "steady": 4.857247,
+     "extra_compile_ms": -1038.8840157538652,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 2818.726046010852,
+     "steady": 37.226793,
+     "extra_compile_ms": 2514.9453785270452,
+     "break_even_calls": 71.517581977765
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3885.0255142897367,
+     "steady": 39.525682,
+     "extra_compile_ms": 1448.6459102481604,
+     "break_even_calls": 38.66736584551327
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 6923.620231449604,
+     "steady": 85.787415,
+     "extra_compile_ms": -1589.948806911707,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1536,
+     "width": 192,
+     "depth": 3,
+     "op": "poisson_bc"
+    },
+    "candidate": {
+     "cold": 7180.378004908562,
+     "steady": 7.851593
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 6746.20296806097,
+     "steady": 11.292662,
+     "extra_compile_ms": 434.1750368475914,
+     "break_even_calls": 126.17446405392958
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5333.49959179759,
+     "steady": 40.042443,
+     "extra_compile_ms": 1846.8784131109715,
+     "break_even_calls": 57.37277559029884
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 11364.944349043071,
+     "steady": 20.765145,
+     "extra_compile_ms": -4184.56634413451,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 4195.820849388838,
+     "steady": 34.734057,
+     "extra_compile_ms": 2984.557155519724,
+     "break_even_calls": 111.0224552154045
+    },
+    "per_row_forward_laplacian": {
+     "member": "omnibias_a",
+     "cold": 8893.465138040483,
+     "steady": 38.255282,
+     "extra_compile_ms": -1713.0871331319213,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9569.381054490805,
+     "steady": 93.361662,
+     "extra_compile_ms": -2389.003049582243,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 7000,
+     "width": 48,
+     "depth": 4,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 6124.754976481199,
+     "steady": 1.99137
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5430.354744195938,
+     "steady": 4.676748,
+     "extra_compile_ms": 694.4002322852612,
+     "break_even_calls": 258.5856562038049
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5443.348485976458,
+     "steady": 35.897605,
+     "extra_compile_ms": 681.4064905047417,
+     "break_even_calls": 20.09679017752168
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 7582.14258775115,
+     "steady": 4.543354,
+     "extra_compile_ms": -1457.3876112699509,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3352.797143161297,
+     "steady": 31.622446,
+     "extra_compile_ms": 2771.9578333199024,
+     "break_even_calls": 93.5490102796099
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3286.425579339266,
+     "steady": 37.140899,
+     "extra_compile_ms": 2838.3293971419334,
+     "break_even_calls": 80.75014026907542
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8425.757732242346,
+     "steady": 83.953325,
+     "extra_compile_ms": -2301.0027557611465,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 14000,
+     "width": 128,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 7272.054336965084,
+     "steady": 6.164704
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 7350.566815584898,
+     "steady": 14.813156,
+     "extra_compile_ms": -78.51247861981392,
+     "break_even_calls": null
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5373.116247355938,
+     "steady": 66.383724,
+     "extra_compile_ms": 1898.9380896091461,
+     "break_even_calls": 31.53385906328509
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 9555.827494710684,
+     "steady": 11.858543,
+     "extra_compile_ms": -2283.7731577455997,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3673.2729747891426,
+     "steady": 58.774577,
+     "extra_compile_ms": 3598.7813621759415,
+     "break_even_calls": 68.40505701612207
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4332.959048449993,
+     "steady": 66.119726,
+     "extra_compile_ms": 2939.095288515091,
+     "break_even_calls": 49.02166975295399
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8110.342398285866,
+     "steady": 151.694309,
+     "extra_compile_ms": -838.2880613207817,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1536,
+     "width": 192,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 6118.645701557398,
+     "steady": 8.320625
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 6913.417808711529,
+     "steady": 11.724666,
+     "extra_compile_ms": -794.7721071541309,
+     "break_even_calls": null
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 4844.053380191326,
+     "steady": 42.283723,
+     "extra_compile_ms": 1274.5923213660717,
+     "break_even_calls": 37.52874138178065
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 11090.789619833231,
+     "steady": 21.669149,
+     "extra_compile_ms": -4972.143918275833,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3454.53267544508,
+     "steady": 36.854176,
+     "extra_compile_ms": 2664.113026112318,
+     "break_even_calls": 93.36773492063142
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3996.3976852595806,
+     "steady": 41.614209,
+     "extra_compile_ms": 2122.2480162978172,
+     "break_even_calls": 63.743453282104355
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 9464.69471603632,
+     "steady": 95.30335,
+     "extra_compile_ms": -3346.049014478922,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 5000,
+     "width": 64,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 6041.773393750191,
+     "steady": 2.179661
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 7112.705461680889,
+     "steady": 4.945006,
+     "extra_compile_ms": -1070.9320679306984,
+     "break_even_calls": null
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 4876.893065869808,
+     "steady": 32.431575,
+     "extra_compile_ms": 1164.8803278803825,
+     "break_even_calls": 38.506004211184205
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 7546.785157173872,
+     "steady": 7.263302,
+     "extra_compile_ms": -1505.0117634236813,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3137.9485204815865,
+     "steady": 26.658656,
+     "extra_compile_ms": 2903.8248732686043,
+     "break_even_calls": 118.62516713895339
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3594.563566148281,
+     "steady": 29.668506,
+     "extra_compile_ms": 2447.2098276019096,
+     "break_even_calls": 89.02556028097614
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7359.008546918631,
+     "steady": 68.358485,
+     "extra_compile_ms": -1317.2351531684399,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2048,
+     "width": 96,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 7249.223209917545,
+     "steady": 3.016074
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 6370.803441852331,
+     "steady": 5.200415,
+     "extra_compile_ms": 878.4197680652142,
+     "break_even_calls": 402.1440645326048
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 4447.1317529678345,
+     "steady": 24.649258,
+     "extra_compile_ms": 2802.091456949711,
+     "break_even_calls": 129.52746377739453
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 11563.546366989613,
+     "steady": 8.083233,
+     "extra_compile_ms": -4314.323157072067,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3874.532777816057,
+     "steady": 20.2224,
+     "extra_compile_ms": 3374.690432101488,
+     "break_even_calls": 196.13079701625367
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3863.065842539072,
+     "steady": 22.879377,
+     "extra_compile_ms": 3386.1573673784733,
+     "break_even_calls": 170.47302593020268
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8084.550283849239,
+     "steady": 52.481236,
+     "extra_compile_ms": -835.327073931694,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4096,
+     "width": 128,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 6100.288666784763,
+     "steady": 4.57073
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 6044.350385665894,
+     "steady": 8.258672,
+     "extra_compile_ms": 55.93828111886978,
+     "break_even_calls": 15.167885264700415
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5120.518386363983,
+     "steady": 48.057654,
+     "extra_compile_ms": 979.7702804207802,
+     "break_even_calls": 22.530227256836564
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 10817.220408469439,
+     "steady": 11.684574,
+     "extra_compile_ms": -4716.931741684675,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3772.9138284921646,
+     "steady": 40.343879,
+     "extra_compile_ms": 2327.3748382925987,
+     "break_even_calls": 65.05926661062459
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3977.8548888862133,
+     "steady": 45.041999,
+     "extra_compile_ms": 2122.43377789855,
+     "break_even_calls": 52.44297572924017
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8183.505550026894,
+     "steady": 102.305955,
+     "extra_compile_ms": -2083.2168832421303,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 10000,
+     "width": 96,
+     "depth": 3,
+     "op": "eik_visc"
+    },
+    "candidate": {
+     "cold": 7053.54493483901,
+     "steady": 4.351639
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5892.894707620144,
+     "steady": 10.975757,
+     "extra_compile_ms": 1160.6502272188663,
+     "break_even_calls": 175.21581397234564
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 4785.495359450579,
+     "steady": 72.464208,
+     "extra_compile_ms": 2268.0495753884315,
+     "break_even_calls": 33.298546930279954
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 10915.875867009163,
+     "steady": 11.514161,
+     "extra_compile_ms": -3862.3309321701527,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3575.5539052188396,
+     "steady": 62.36977,
+     "extra_compile_ms": 3477.9910296201706,
+     "break_even_calls": 59.94662305857751
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3897.39266037941,
+     "steady": 70.293999,
+     "extra_compile_ms": 3156.1522744596004,
+     "break_even_calls": 47.862288739129156
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7978.078443557024,
+     "steady": 162.77576,
+     "extra_compile_ms": -924.5335087180138,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 5000,
+     "width": 64,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 5043.30487921834,
+     "steady": 2.252665
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 6575.354455038905,
+     "steady": 5.312669,
+     "extra_compile_ms": -1532.0495758205652,
+     "break_even_calls": null
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 3930.6143638677895,
+     "steady": 36.801285,
+     "extra_compile_ms": 1112.6905153505504,
+     "break_even_calls": 32.20651115299397
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 7616.600268986076,
+     "steady": 6.616188,
+     "extra_compile_ms": -2573.295389767736,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 38065.46246493235,
+     "steady": 30.28036,
+     "extra_compile_ms": -33022.15758571401,
+     "break_even_calls": null
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 36063.020448200405,
+     "steady": 30.094806,
+     "extra_compile_ms": -31019.715568982065,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 6357.5318972580135,
+     "steady": 68.582404,
+     "extra_compile_ms": -1314.2270180396736,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 14000,
+     "width": 128,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 7166.1304431036115,
+     "steady": 5.38196
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5631.5703499130905,
+     "steady": 18.401066,
+     "extra_compile_ms": 1534.560093190521,
+     "break_even_calls": 117.86985167725963
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5064.451708458364,
+     "steady": 73.653003,
+     "extra_compile_ms": 2101.6787346452475,
+     "break_even_calls": 30.784336115170348
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 9021.138851065189,
+     "steady": 12.977495,
+     "extra_compile_ms": -1855.0084079615772,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 3484.275348018855,
+     "steady": 64.070455,
+     "extra_compile_ms": 3681.8550950847566,
+     "break_even_calls": 62.735551407218004
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3715.8577158115804,
+     "steady": 62.379435,
+     "extra_compile_ms": 3450.272727292031,
+     "break_even_calls": 60.53378201915139
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8611.730015836656,
+     "steady": 151.98488,
+     "extra_compile_ms": -1445.5995727330446,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 2048,
+     "width": 96,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 6225.081038661301,
+     "steady": 3.420343
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5253.301196731627,
+     "steady": 5.655168,
+     "extra_compile_ms": 971.7798419296741,
+     "break_even_calls": 434.83487160277616
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5060.073990840465,
+     "steady": 27.029673,
+     "extra_compile_ms": 1165.0070478208363,
+     "break_even_calls": 49.34519733600387
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 11032.015747856349,
+     "steady": 7.484688,
+     "extra_compile_ms": -4806.934709195048,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 5119.447589386255,
+     "steady": 22.279868,
+     "extra_compile_ms": 1105.6334492750466,
+     "break_even_calls": 58.62467104951193
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5139.68313485384,
+     "steady": 22.051719,
+     "extra_compile_ms": 1085.3979038074613,
+     "break_even_calls": 58.2564542633599
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8176.89487664029,
+     "steady": 55.567045,
+     "extra_compile_ms": -1951.8138379789889,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 1536,
+     "width": 192,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 6048.825527541339,
+     "steady": 8.83327
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5441.714416258037,
+     "steady": 12.291395,
+     "extra_compile_ms": 607.1111112833023,
+     "break_even_calls": 175.56077680341298
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5400.958751793951,
+     "steady": 46.792706,
+     "extra_compile_ms": 647.8667757473886,
+     "break_even_calls": 17.06734461880278
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 9790.532607585192,
+     "steady": 20.963427,
+     "extra_compile_ms": -3741.7070800438523,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 9045.522862579674,
+     "steady": 40.075507,
+     "extra_compile_ms": -2996.697335038334,
+     "break_even_calls": null
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 10375.122902914882,
+     "steady": 39.745139,
+     "extra_compile_ms": -4326.297375373542,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 8336.122498847544,
+     "steady": 100.890381,
+     "extra_compile_ms": -2287.296971306205,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 4096,
+     "width": 128,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 5659.977657720447,
+     "steady": 5.27012
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5931.600482668728,
+     "steady": 8.911983,
+     "extra_compile_ms": -271.62282494828105,
+     "break_even_calls": null
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 3708.5053022019565,
+     "steady": 53.099112,
+     "extra_compile_ms": 1951.47235551849,
+     "break_even_calls": 40.801034559091065
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 9609.389711171389,
+     "steady": 11.00735,
+     "extra_compile_ms": -3949.412053450942,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 4242.466596886516,
+     "steady": 43.955682,
+     "extra_compile_ms": 1417.511060833931,
+     "break_even_calls": 36.64186294705841
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 4575.421184767038,
+     "steady": 43.415351,
+     "extra_compile_ms": 1084.556472953409,
+     "break_even_calls": 28.432295322930642
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7449.93466231972,
+     "steady": 101.316108,
+     "extra_compile_ms": -1789.9570045992732,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 7000,
+     "width": 48,
+     "depth": 4,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 5723.663113079965,
+     "steady": 1.997177
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5272.434486076236,
+     "steady": 5.277406,
+     "extra_compile_ms": 451.22862700372934,
+     "break_even_calls": 137.56009931127653
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 3565.126738511026,
+     "steady": 41.377875,
+     "extra_compile_ms": 2158.536374568939,
+     "break_even_calls": 54.8120395064846
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 7662.402410525829,
+     "steady": 4.132052,
+     "extra_compile_ms": -1938.7392974458635,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 5234.118464868516,
+     "steady": 35.647986,
+     "extra_compile_ms": 489.5446482114494,
+     "break_even_calls": 14.547782438497967
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 5946.986955124885,
+     "steady": 35.425965,
+     "extra_compile_ms": -223.32384204491973,
+     "break_even_calls": null
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 6313.617288600653,
+     "steady": 82.774444,
+     "extra_compile_ms": -589.9541755206883,
+     "break_even_calls": null
+    },
+    "run": 1
+   },
+   {
+    "cfg": {
+     "D": 10000,
+     "width": 96,
+     "depth": 3,
+     "op": "heat_ac"
+    },
+    "candidate": {
+     "cold": 6916.323019191623,
+     "steady": 4.043133
+    },
+    "projected_streams_explicit_first_layer_rows": {
+     "member": "proj_rows",
+     "cold": 5274.441722780466,
+     "steady": 13.226314,
+     "extra_compile_ms": 1641.8812964111567,
+     "break_even_calls": 178.79221768700373
+    },
+    "full_seed_stream_identity": {
+     "member": "full_diag",
+     "cold": 5208.481573499739,
+     "steady": 80.76411,
+     "extra_compile_ms": 1707.8414456918836,
+     "break_even_calls": 22.26042358261266
+    },
+    "projected_per_row": {
+     "member": "proj_vmap",
+     "cold": 9167.702519334853,
+     "steady": 11.448069,
+     "extra_compile_ms": -2251.37950014323,
+     "break_even_calls": null
+    },
+    "explicit_rows_from_shared_streams": {
+     "member": "streams_J",
+     "cold": 4189.001699443907,
+     "steady": 68.631731,
+     "extra_compile_ms": 2727.321319747716,
+     "break_even_calls": 42.22604924398136
+    },
+    "per_row_forward_laplacian": {
+     "member": "fl_vmap",
+     "cold": 3880.1186783239245,
+     "steady": 67.965146,
+     "extra_compile_ms": 3036.204340867698,
+     "break_even_calls": 47.498572062611636
+    },
+    "taylor_mode": {
+     "member": "jet",
+     "cold": 7754.244066774845,
+     "steady": 163.079347,
+     "extra_compile_ms": -837.9210475832224,
+     "break_even_calls": null
+    },
+    "run": 1
+   }
+  ]
+ }
+}

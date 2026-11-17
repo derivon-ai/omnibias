@@ -1,0 +1,10 @@
+task,method,trainable_parameters_approx,IoU_percent,IoU_std_pp,accIoUhalf_percent,accIoU07_percent,seeds
+segmentation,headonly,4000,82.64,,,,3
+segmentation,BitFit,57000,93.91,0.03,,,3
+segmentation,mbK3,72000,94.99,0.06,,,3
+bbox,headonly,8000,45.03,0.07,43.64,13.62,3
+bbox,BitFit,61000,66.04,0.13,84.2,50.32,3
+bbox,Adapter,211000,69.09,1.28,89.15,56.4,3
+bbox,mbK1,33000,75.95,0.3,95.82,75.61,3
+bbox,mbK3,82000,77.91,0.79,96.96,80.47,3
+bbox,LoRA_layer4,78000,81.11,0.28,97.77,88.74,3

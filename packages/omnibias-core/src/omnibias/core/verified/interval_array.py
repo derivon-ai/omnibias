@@ -381,18 +381,29 @@ def sparse_matvec(
 
     lower = np.zeros(n_rows, dtype=np.float64)
     upper = np.zeros(n_rows, dtype=np.float64)
-    for row, column, entry_lo, entry_hi in zip(
-        row_indices, column_indices, entries.lo, entries.hi, strict=True
-    ):
+    nnz = int(row_indices.shape[0])
+    if nnz:
         product_lo, product_hi = _mul_bounds(
-            np.asarray(entry_lo, dtype=np.float64),
-            np.asarray(entry_hi, dtype=np.float64),
-            np.asarray(values.lo[column], dtype=np.float64),
-            np.asarray(values.hi[column], dtype=np.float64),
+            np.asarray(entries.lo, dtype=np.float64),
+            np.asarray(entries.hi, dtype=np.float64),
+            np.asarray(values.lo[column_indices], dtype=np.float64),
+            np.asarray(values.hi[column_indices], dtype=np.float64),
         )
-        row_index = int(row)
-        lower[row_index] = np.nextafter(lower[row_index] + product_lo.item(), -np.inf)
-        upper[row_index] = np.nextafter(upper[row_index] + product_hi.item(), np.inf)
+        # Each row accumulates its entries one at a time in COO order, rounding outward after every addition. The entries
+        # that come k-th in their rows touch distinct rows, so all of them are added in one vector operation: the sequence
+        # of IEEE operations of every row, and therefore every bit of the result, is that of the entry-by-entry loop.
+        by_row = np.argsort(row_indices, kind="stable")
+        sorted_rows = row_indices[by_row]
+        first = np.flatnonzero(np.concatenate(([True], sorted_rows[1:] != sorted_rows[:-1])))
+        group = np.repeat(np.arange(first.shape[0]), np.diff(np.concatenate((first, [nnz]))))
+        rank = np.arange(nnz) - first[group]
+        by_rank = by_row[np.argsort(rank, kind="stable")]
+        bounds = np.concatenate(([0], np.cumsum(np.bincount(rank))))
+        for k in range(bounds.shape[0] - 1):
+            entry = by_rank[bounds[k] : bounds[k + 1]]
+            at = row_indices[entry]
+            lower[at] = np.nextafter(lower[at] + product_lo[entry], -np.inf)
+            upper[at] = np.nextafter(upper[at] + product_hi[entry], np.inf)
     return IntervalArray(lower, upper)
 
 

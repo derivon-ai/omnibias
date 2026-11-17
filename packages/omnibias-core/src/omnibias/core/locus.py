@@ -2,9 +2,9 @@
 # Copyright (C) 2026 Derivon
 """Equality-locus geometry (theory 01-09).
 
-Forcing collapsed units to agree, ``f_i(x) = f_j(x)``, cuts out a
-codimension-``m`` constraint manifold whose Jacobian and Hessian the
-derivative tower supplies in closed form. Newton projection needs no
+Forcing collapsed units to agree, ``f_i(x) = f_j(x)``, defines a constraint
+set, which is a codimension-``m`` manifold at full-row-rank points. Its
+Jacobian and Hessian come from the derivative tower. Newton projection needs no
 autodiff; existence on a box is the Krawczyk test already in
 :mod:`omnibias.core.verified.kantorovich`.
 
@@ -246,15 +246,17 @@ def _smallest_eig_sym(gram: list[list[float]]) -> float:
 
 
 def branch_signature(sys: EqualitySystem, x: Sequence[float]) -> tuple[int, ...]:
-    """Which even/odd branch each consecutive pair sits on.
+    """Nearest symmetry label for each consecutive pair (a diagnostic).
 
-    For odd order (even ``sigma^(n)``) ``+1`` is the identity ``z_i = z_j``
-    and ``-1`` is the mirror ``z_i = -z_j``.
+    For even profiles ``+1`` labels ``z_i = z_j`` and ``-1`` labels
+    ``z_i = -z_j``. Higher derivatives can have additional equal-value
+    branches; these labels neither enumerate nor certify a complete locus.
     """
     signs: list[int] = []
     for a, b in zip(sys.terms, sys.terms[1:], strict=False):
         z1, z2 = _z(a, x), _z(b, x)
-        if a.order == b.order and a.order % 2 == 1:
+        even_profile = a.order % 2 == (0 if sys.base == "gaussian" else 1)
+        if a.order == b.order and even_profile:
             signs.append(1 if abs(z1 - z2) <= abs(z1 + z2) else -1)
         else:
             signs.append(1 if z1 >= z2 else -1)
@@ -262,13 +264,25 @@ def branch_signature(sys: EqualitySystem, x: Sequence[float]) -> tuple[int, ...]
 
 
 def affine_locus(sys: EqualitySystem) -> tuple[AffineSet, ...] | None:
-    """Exact hyperplanes when every consecutive pair is order-matched with equal ``c``.
+    """Complete affine branches for a supported two-unit equality.
 
-    Returns ``None`` when any pair is order-mismatched (the curved case).
+    Equal nonzero weights are required. Sigmoid/tanh values are injective,
+    their first derivatives are injective in ``abs(z)``, and a Gaussian
+    value is injective in ``abs(z)``. These cases give identity and, for
+    even profiles, mirror branches. Higher derivatives need not be
+    injective even on a half-line, so matching their orders is insufficient.
+
+    ``None`` means the complete affine representation is not established;
+    it does not mean the locus is empty or necessarily curved. Systems
+    with more than two units are refused because a flat list would lose
+    the intersection-of-unions structure of their pairwise branches.
     """
+    if len(sys.terms) != 2:
+        return None
     planes: list[AffineSet] = []
     for a, b in zip(sys.terms, sys.terms[1:], strict=False):
-        if a.order != b.order or a.weight != b.weight:
+        supported = a.order == 0 if sys.base == "gaussian" else a.order in (0, 1)
+        if a.order != b.order or a.weight != b.weight or a.weight == 0 or not supported:
             return None
         ident = AffineSet(
             tuple(wi - wj for wi, wj in zip(a.normal, b.normal, strict=True)),
@@ -276,8 +290,8 @@ def affine_locus(sys: EqualitySystem) -> tuple[AffineSet, ...] | None:
             1,
         )
         planes.append(ident)
-        if a.order % 2 == 1:
-            # even sigma^(n): also the mirror z_i = -z_j
+        if sys.base == "gaussian" or a.order == 1:
+            # The supported even profiles are injective in abs(z).
             planes.append(
                 AffineSet(
                     tuple(wi + wj for wi, wj in zip(a.normal, b.normal, strict=True)),
@@ -335,11 +349,12 @@ def newton_project(
     max_iter: int = 20,
     tol: float = 1e-12,
 ) -> NewtonResult:
-    """Gauss-Newton projection ``x <- x - DF^+ F``. Minimum-norm correction.
+    """Gauss-Newton root landing ``x <- x - DF^+ F``.
 
-    Differentiating this iterate is **not** the IFT path; tensor twins in
-    ``omnibias.fields.locus`` attach the implicit-function theorem on the
-    landing point so memory does not scale with ``max_iter``.
+    Each step is a minimum-norm linearized correction. On a curved locus the
+    landing point need not be nearest to the seed. Implicit sensitivities in
+    ``omnibias.fields.locus`` require a converged regular isolated square root;
+    an underdetermined locus additionally needs a solution-selection rule.
     """
     x = tuple(float(v) for v in x0)
     last_f = residual(sys, x)
@@ -365,7 +380,12 @@ def newton_project(
             f = residual(sys, x)
             last_f = f
             break
+    # Diagnostics describe the returned point, including when the last allowed
+    # Newton step reaches tolerance. The pre-step residual can be much larger.
+    last_f = residual(sys, x)
     nrm = _residual_norm(last_f)
+    cond = smallest_singular(jacobian(sys, x))
+    transversal = cond > 1e-10
     return NewtonResult(
         point=x,
         residual_norm=nrm,

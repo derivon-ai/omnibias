@@ -1,0 +1,23 @@
+--- a/jax/experimental/jet.py
++++ b/jax/experimental/jet.py
+@@ -556,9 +556,19 @@
+ jet_rules[lax.logistic_p] = _logistic_taylor
+ 
+ 
+-def _tanh_taylor(primals_in, series_in, **_):
++def _tanh_taylor(primals_in, series_in, *, accuracy=None, **_):
+   x, = primals_in
+   series, = series_in
++  if accuracy == lax.AccuracyMode.HIGHEST:
++    # Preserve the requested primal and avoid cancellation in 1 - sigmoid(2x).
++    # Internally jet carries factorial-normalized Taylor coefficients.
++    u = [x] + series
++    v = [lax.tanh(x, accuracy=accuracy)]
++    slope = [4 * lax.logistic(2*x) * lax.logistic(-2*x)]
++    for k in range(1, len(u)):
++      v.append(sum(j * slope[k-j] * u[j] for j in range(1, k+1)) / k)
++      slope.append(-sum(v[j] * v[k-j] for j in range(k+1)))
++    return v[0], v[1:]
+   u = [2*x] + [2 * series_ for series_ in series]
+   primals_in, *series_in = u
+   primal_out, series_out = _logistic_taylor((primals_in, ), (series_in, ))

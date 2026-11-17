@@ -29,12 +29,21 @@ from omnibias.core.proof import Conjecture, ProofMachine
 from omnibias.core.proof.certificate import interval_certificate, verify_certificate_digest
 from omnibias.core.proof.lean_check import generate_obligation
 from omnibias.core.verified.interval import Interval
+from omnibias.core.operator_spec import OperatorSpec
+from omnibias.core.ridge_system import RidgeSystem
+from omnibias.core.ridge_distribution import RidgeDistribution, collapse_dirac_cluster
+from omnibias.core.poisson_sources import PositivePoissonSources, compress_poisson_sources
 
 assert sigmoid_polynomial_coeffs(2) == (0, 1, -3, 2)
 certificate = interval_certificate("positive margin", Interval(1.0, 2.0))
 assert verify_certificate_digest(certificate)
 assert "enclosed_quantity_pos" in generate_obligation(certificate)
 assert ProofMachine().evaluate(Conjecture("unknown", "unregistered")).status == "BLOCKED"
+field = RidgeDistribution((1,), ((1, (1,)),))
+laplace = RidgeSystem.from_operators(((OperatorSpec.laplacian(),),), (1,))
+assert field.apply(laplace).terms == ((-1, (1,)),)
+assert collapse_dirac_cluster((1,), (0,), (1,), min_probe_std=1).weak_error_bound == 0
+assert compress_poisson_sources(PositivePoissonSources((), ()), 0).verify()
 '''
     result = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True)
     assert result.returncode == 0, result.stdout + result.stderr

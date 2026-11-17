@@ -24,6 +24,12 @@ from omnibias.jax.activations import (
     list_activations,
     register_activation,
 )
+from omnibias.jax.affine_geometry import (
+    AffineProjection,
+    LinearizedEqualityStep,
+    affine_project,
+    linearized_equality_step,
+)
 from omnibias.jax.bo_derivatives import (
     coulomb_potential,
     make_bo_force,
@@ -128,6 +134,7 @@ __lineage__ = "bias collapse"
 
 __all__ = [
     "AdaptivePackBank",
+    "AffineProjection",
     "BankSpec",
     "BirkhoffOMBU",
     "BlockSpec",
@@ -139,12 +146,14 @@ __all__ = [
     "JaxActivationSpec",
     "JetLineSearchConfig",
     "LineSearchResult",
+    "LinearizedEqualityStep",
     "WeightLossJetSpec",
     "X64_HINT",
     "__lineage__",
     "__version__",
     "affine_jet",
     "affine_jet_mv",
+    "affine_project",
     "antiderivative_jet",
     "arrangement_w_block",
     "bank_forward",
@@ -183,6 +192,7 @@ __all__ = [
     "layer_jet_mv",
     "lhopital_ratio",
     "limit_of_ratio",
+    "linearized_equality_step",
     "list_activations",
     "make_bo_force",
     "make_bo_hessian",

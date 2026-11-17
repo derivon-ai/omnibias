@@ -41,7 +41,27 @@ def fixture_repository(root: Path) -> Path:
 def test_real_main_context_is_consistent() -> None:
     errors, report = context.check(ROOT)
     assert errors == []
-    assert report['skill_count'] == len(list((ROOT / 'packages').glob('*/pyproject.toml')))
+    packages = len(list((ROOT / 'packages').glob('*/pyproject.toml')))
+    assert report['skill_count'] == packages + len(context.USER_SKILLS)
+    assert all((ROOT / context.SKILLS / name / 'SKILL.md').is_file() for name in context.USER_SKILLS)
+
+
+def test_a_user_skill_is_accepted_beside_the_package_skills_and_nothing_else_is(tmp_path: Path) -> None:
+    root = tmp_path / 'main'
+    fixture_repository(root)
+    name = sorted(context.USER_SKILLS)[0]
+    advisor = root / context.SKILLS / name / 'SKILL.md'
+    advisor.parent.mkdir(parents=True)
+    advisor.write_text(f'---\nname: {name}\ndescription: Advise a user on choosing a program.\n---\n\nAsk what is read.\n')
+    errors, report = context.check(root)
+    assert errors == [] and report['skill_count'] == 2
+    stray = root / context.SKILLS / 'omnibias-unlisted/SKILL.md'
+    stray.parent.mkdir(parents=True)
+    stray.write_text('---\nname: omnibias-unlisted\ndescription: Not a package and not a user skill.\n---\n\nBody.\n')
+    assert any("extra=['omnibias-unlisted']" in error for error in context.check(root)[0])
+    stray.unlink()
+    advisor.write_text(advisor.read_text().replace(f'name: {name}', 'name: another-name'))  # held to the metadata check
+    assert any('invalid name/description' in error for error in context.check(root)[0])
 
 
 def test_archived_guidance_is_not_discovered_as_active(tmp_path: Path) -> None:

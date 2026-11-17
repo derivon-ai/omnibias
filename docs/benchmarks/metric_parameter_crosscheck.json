@@ -1,0 +1,3857 @@
+{
+  "schema": 1,
+  "study_sha256": "f0e5ad6f304a32cf4750535865fc8aa1995dafe7bac80a986d3ae7bcb2eed710",
+  "source_sha256": "02c613ec5b200cfa6a5e9eddaf11b0f31f8fd348d0ae4a7081b5773c023089e0",
+  "study_provenance": {
+    "protocol": {
+      "version": 1,
+      "cases": [
+        "gaussian_weak_128",
+        "gaussian_strong_128",
+        "gaussian_weak_512",
+        "gaussian_strong_512",
+        "banknote_128",
+        "spambase_128"
+      ],
+      "seeds": [
+        13001,
+        13007,
+        13009
+      ],
+      "betas": [
+        1,
+        16,
+        256
+      ],
+      "modes": [
+        "folded",
+        "legendre",
+        "controlled"
+      ],
+      "lambda": 0.01,
+      "model": "linear logit on training-standardized features with unpenalized last-column intercept",
+      "initialization": "common BCE(lambda=.01), unscaled weights for every fixed beta; NOT an annealing trajectory",
+      "temperature_limit": "beta changes effective regularization/initial predictions; no across-beta learning-quality claim",
+      "value_tolerance": [
+        "1",
+        "1000000000000"
+      ],
+      "parameter_gradient_tolerance": [
+        "1",
+        "1000000000"
+      ],
+      "guard": "beta>=16 only; exact beta*maxabs(X)*weighted coupling budget; exact endpoint shortcut in every mode",
+      "optimizer": {
+        "name": "L-BFGS-B",
+        "maxiter": 200,
+        "maxfun": 1000,
+        "maxls": 30,
+        "ftol": 1e-12,
+        "gtol": 1e-07,
+        "per_fit_seconds": 15
+      },
+      "timing": "single thread, cyclic mode order; cold rule caches per fit; setup, proof, fallback and trace capture included",
+      "primary_cost": "common BCE initialization + oracle training + validation threshold/metric selection",
+      "secondary_cost": "oracle setup + optimization only; test reporting/replay excluded",
+      "fidelity_gate": {
+        "regularized_objective_gap_to_folded": 1e-06,
+        "validation_threshold_test_decision_agreement": 0.999,
+        "all_three_modes_numerically_converged": true
+      },
+      "primary_gate": "complete matrix, numerical checks, all convergence/fidelity gates, and primary pooled geometric speed ratio>=2 vs faster full-control workflow",
+      "numerical_reference_allowance": {
+        "value": 1e-10,
+        "parameter_gradient": 1e-08
+      },
+      "limits": [
+        "ordinary expected-utility training, no collapse-specific invention or predictive-SOTA claim",
+        "proof conditional on actual binary64 probabilities and design; no upstream or regularizer FP enclosure",
+        "small bounded pilot with one timing per fit, no confidence/significance claim",
+        "query error budgets do not imply identical nonconvex optimizer trajectories",
+        "case-control real-data seeds share source examples; not independent datasets"
+      ],
+      "smoke": {
+        "seed": 13999,
+        "cases": [
+          "gaussian_weak_128",
+          "gaussian_strong_512"
+        ],
+        "betas": [
+          16
+        ]
+      }
+    },
+    "smoke": false,
+    "command": [
+      "/home/vardan/.local/share/uv/python/cpython-3.12.13-linux-x86_64-gnu/bin/python3.12",
+      "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/metric_parameter_training.py",
+      "--data-dir",
+      "/tmp/omnibias_band_pilot/data",
+      "--output",
+      "/tmp/omnibias_parameter_training/study.json"
+    ],
+    "dependencies": {
+      "python": "3.12.13",
+      "numpy": "2.5.4",
+      "scipy": "1.18.1",
+      "torch": "2.14.1",
+      "scikit-learn": "1.9.1",
+      "threadpoolctl": "3.7.0"
+    },
+    "source_sha256": {
+      "tabular/metric_learning_study.py": "a56c4ccf384efd52e22ffdcd325183621da58f1bb91bb275803894d23154eaa4",
+      "tabular/metric_learning.py": "f08ab2773f2de2dded8f4994d52d234e33f82e57b681477bbde33180302e393e",
+      "tabular/metric_expectation.py": "845a0143aefa1975f886dfcff7cc81a187b0f9634e9844a687e08084315e73c5",
+      "tabular/metric_jacobi.py": "e08960cc0f54ffa9b104d7b87034d53b57f0e74b83013dfaaa7163d5957ae7ee",
+      "tabular/metric_hard_guard.py": "283936d35a98c30e72499070e5b3fdbd3a06fb6ce369e7c7e20d2d700fbce63b",
+      "tabular/metric_parameter_oracle.py": "cb059509a39573deb33f091ef37e1a6ab3d5396fa7b132074d155b8cf9b05116",
+      "tabular/metric_parameter_training.py": "8272cb5f0b09e8780c24a5963a32997789999b9c906855ef300a8afe528b14f7",
+      "tests/test_metric_parameter_oracle.py": "b3e22a0e3539522f00d87ea33cfc01c785005a3bd29ff9411d8365294ff43552",
+      "tests/test_metric_parameter_training.py": "0c4eaedc8932d1f04fa9afce5d78691a9ca6b3c4c4272bd3b64bc11e828beded",
+      "tabular/requirements.lock": "16e0fd202cd551d2184f9118dcdd72b9098b3c84dd4605d14e5a8e6040a9e1f6"
+    },
+    "data_sha256": {
+      "banknote": "dcdf61956ebe2b2f75360164144262f438af782485d0355d2e4fafe12149896d",
+      "spambase": "767070483621479de01e1f2ff7d4fd4f73f4e96b522b50a8686e45ec99a00d72"
+    }
+  },
+  "scope": "post-study formula diagnostic; no optimization reruns or new success gate",
+  "limits": "ordinary binary64 numerical comparisons, not outward enclosures or global-optimality proofs",
+  "summary": {
+    "problems": 54,
+    "distinct_queries": 11410,
+    "independent_count_checks": 66,
+    "max_full_value_difference": 5.684341886080801e-13,
+    "max_full_gradient_difference": 1.8893331343861064e-11,
+    "max_count_value_difference": 3.980149543281186e-13,
+    "max_count_gradient_difference": 1.8967938331115874e-11
+  },
+  "rows": [
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13001,
+      "beta": 1,
+      "distinct_queries": 43,
+      "full_controls_max_value_difference": 1.865174681370263e-14,
+      "full_controls_max_gradient_difference": 7.223388553967425e-15,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.9965030752082322,
+            -0.5312311883920332,
+            0.7635698446475374,
+            -0.698200545556798,
+            -1.5100924163414118,
+            0.03722272754224519,
+            1.8846511052006425,
+            0.293695384323398,
+            -3.5158208684169607
+          ],
+          "count_objective": -0.1751397542412516,
+          "count_gradient": [
+            0.023097264660867402,
+            -0.00036081806865506227,
+            0.007383763267096952,
+            -0.015423723012498185,
+            -0.03035046879881264,
+            -0.00405049188191974,
+            0.028464607235178123,
+            0.000802525396520903,
+            0.04626708113549537
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 3.3306690738754696e-16,
+              "parameter_gradient_error": 1.457167719820518e-16
+            },
+            "legendre": {
+              "value_error": 1.8318679906315083e-14,
+              "parameter_gradient_error": 4.166805789296291e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13001,
+      "beta": 16,
+      "distinct_queries": 3,
+      "full_controls_max_value_difference": 0.0,
+      "full_controls_max_gradient_difference": 1.1890721305449773e-24,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.7704197190166762,
+            -0.373704701526838,
+            0.2249922063425524,
+            -0.14386632514893558,
+            -0.5273472691819195,
+            -0.11697306052874787,
+            0.7771788755504191,
+            0.04083019788709482,
+            -4.098424773549751
+          ],
+          "count_objective": 0.008509863536951302,
+          "count_gradient": [
+            0.007704197101867109,
+            -0.00373704700748122,
+            0.0022499219899463924,
+            -0.001438663293452347,
+            -0.005273472479870656,
+            -0.0011697306010056967,
+            0.007771788661731155,
+            0.000408302054900945,
+            -1.0351112108006018e-10
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 3.877409121342317e-26
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 1.2278462217584005e-24
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13001,
+      "beta": 256,
+      "distinct_queries": 3,
+      "full_controls_max_value_difference": 0.0,
+      "full_controls_max_gradient_difference": 2.620037695138252e-185,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.7704197190166762,
+            -0.373704701526838,
+            0.2249922063425524,
+            -0.14386632514893558,
+            -0.5273472691819195,
+            -0.11697306052874787,
+            0.7771788755504191,
+            0.04083019788709482,
+            -4.098424773549751
+          ],
+          "count_objective": 0.008509863543420747,
+          "count_gradient": [
+            0.007704197190166762,
+            -0.00373704701526838,
+            0.002249922063425524,
+            -0.0014386632514893558,
+            -0.005273472691819195,
+            -0.0011697306052874787,
+            0.007771788755504191,
+            0.0004083019788709482,
+            -2.2431703161511815e-171
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 0.0
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 2.620037695138252e-185
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13007,
+      "beta": 1,
+      "distinct_queries": 47,
+      "full_controls_max_value_difference": 1.3489209749195652e-14,
+      "full_controls_max_gradient_difference": 4.309053114326389e-15,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.3921881410526158,
+            -0.4979241103793929,
+            -1.4091127022681948,
+            0.5472158215105848,
+            -1.086937144020744,
+            0.5802992723693535,
+            1.5699686572490892,
+            -0.8428373480711606,
+            -4.134932413493692
+          ],
+          "count_objective": -0.17884364118384927,
+          "count_gradient": [
+            0.048493642370816686,
+            -0.036505741425505334,
+            -0.028493801049647376,
+            0.0071390801016156325,
+            -0.03741825957850908,
+            0.013053014186038766,
+            0.05040620479184657,
+            -0.00575962793405743,
+            0.07798682795833517
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 4.440892098500626e-16,
+              "parameter_gradient_error": 1.457167719820518e-16
+            },
+            "legendre": {
+              "value_error": 1.304512053934559e-14,
+              "parameter_gradient_error": 1.5265566588595902e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13007,
+      "beta": 16,
+      "distinct_queries": 5,
+      "full_controls_max_value_difference": 8.631998540240873e-43,
+      "full_controls_max_gradient_difference": 7.51248017260074e-26,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.7735923761706693,
+            -0.2121008935206617,
+            -0.1951276833292203,
+            0.33085923214400986,
+            0.030968618188836693,
+            -0.1294621096794101,
+            0.4093322137148227,
+            -0.802136821159147,
+            -4.078352324077102
+          ],
+          "count_objective": 0.008098352159582729,
+          "count_gradient": [
+            0.007735923753583563,
+            -0.002121008927075758,
+            -0.0019512768291252978,
+            0.003308592331014016,
+            0.0003096861919036508,
+            -0.0012946210985854318,
+            0.0040933221277112365,
+            -0.008021368203874783,
+            -6.448021198149224e-12
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 2.4233807008389483e-27
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 7.754818242684634e-26
+            }
+          }
+        },
+        {
+          "name": "final_legendre",
+          "weights": [
+            -2.214874672556988e-10,
+            2.2169820840245436e-10,
+            1.1361595692038762e-10,
+            2.610450744455761e-10,
+            2.730794713620699e-10,
+            -4.884292623130726e-11,
+            -2.57311519313852e-10,
+            2.1040522102389048e-10,
+            -4.078352323608098
+          ],
+          "count_objective": 1.8334874989838655e-21,
+          "count_gradient": [
+            -2.2148746725569892e-12,
+            2.216982084024544e-12,
+            1.1361595692038764e-12,
+            2.610450744455761e-12,
+            2.730794713620699e-12,
+            -4.884292623130723e-13,
+            -2.57311519313852e-12,
+            2.1040522102389056e-12,
+            -1.172048036956352e-27
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 8.96831017167883e-43
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 1.3990563867818974e-41
+            }
+          }
+        },
+        {
+          "name": "final_controlled",
+          "weights": [
+            -1.1102230246251565e-16,
+            2.0816681711721685e-17,
+            1.3877787807814457e-17,
+            -4.163336342344337e-17,
+            -2.6020852139652106e-18,
+            3.469446951953614e-18,
+            -5.551115123125783e-17,
+            8.326672684688674e-17,
+            -4.078352324077102
+          ],
+          "count_objective": -7.325287868706204e-29,
+          "count_gradient": [
+            -1.1102230256379552e-18,
+            2.081668174191482e-19,
+            1.3877787818707023e-19,
+            -4.163336346133218e-19,
+            -2.6020852164186882e-20,
+            3.4694469775462115e-20,
+            -5.551115127929521e-19,
+            8.326672694771484e-19,
+            -1.1720480365017483e-27
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1210387714598537e-44,
+              "parameter_gradient_error": 8.96831017167883e-43
+            },
+            "legendre": {
+              "value_error": 8.744102417386859e-43,
+              "parameter_gradient_error": 1.3811197664385397e-41
+            }
+          }
+        },
+        {
+          "name": "final_folded",
+          "weights": [
+            -2.214874672556988e-10,
+            2.2169820840245436e-10,
+            1.1361595692038762e-10,
+            2.610450744455761e-10,
+            2.730794713620699e-10,
+            -4.884292623130726e-11,
+            -2.57311519313852e-10,
+            2.1040522102389048e-10,
+            -4.078352323608098
+          ],
+          "count_objective": 1.8334874989838655e-21,
+          "count_gradient": [
+            -2.2148746725569892e-12,
+            2.216982084024544e-12,
+            1.1361595692038764e-12,
+            2.610450744455761e-12,
+            2.730794713620699e-12,
+            -4.884292623130723e-13,
+            -2.57311519313852e-12,
+            2.1040522102389056e-12,
+            -1.172048036956352e-27
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 8.96831017167883e-43
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 1.3990563867818974e-41
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13007,
+      "beta": 256,
+      "distinct_queries": 3,
+      "full_controls_max_value_difference": 0.0,
+      "full_controls_max_gradient_difference": 1.3704893057759155e-204,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.7735923761706693,
+            -0.2121008935206617,
+            -0.1951276833292203,
+            0.33085923214400986,
+            0.030968618188836693,
+            -0.1294621096794101,
+            0.4093322137148227,
+            -0.802136821159147,
+            -4.078352324077102
+          ],
+          "count_objective": 0.00809835215998573,
+          "count_gradient": [
+            0.007735923761706694,
+            -0.002121008935206617,
+            -0.0019512768332922029,
+            0.003308592321440099,
+            0.00030968618188836693,
+            -0.001294621096794101,
+            0.004093322137148227,
+            -0.00802136821159147,
+            -1.1526750331427541e-190
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 0.0
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 1.3704893057759155e-204
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13009,
+      "beta": 1,
+      "distinct_queries": 57,
+      "full_controls_max_value_difference": 1.3100631690576847e-14,
+      "full_controls_max_gradient_difference": 5.6066262743570405e-15,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.503920274720219,
+            0.2569685153044612,
+            0.8031151586624165,
+            1.1094404612314281,
+            0.12938909388456712,
+            -0.9494145678684809,
+            -0.45107472361687084,
+            -0.3441540207093949,
+            -4.337129054440818
+          ],
+          "count_objective": -0.2673253953211905,
+          "count_gradient": [
+            0.04087517689146499,
+            -0.004608551275973449,
+            -0.004444361462479535,
+            0.035503620960453675,
+            0.0023446231859051967,
+            -0.022113767912464513,
+            -0.012132785133033744,
+            -0.002865624423866969,
+            0.05312408582252545
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 4.440892098500626e-16,
+              "parameter_gradient_error": 4.85722573273506e-17
+            },
+            "legendre": {
+              "value_error": 1.2656542480726785e-14,
+              "parameter_gradient_error": 4.045375145977914e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13009,
+      "beta": 16,
+      "distinct_queries": 183,
+      "full_controls_max_value_difference": 2.842170943040401e-14,
+      "full_controls_max_gradient_difference": 4.39648317751562e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.2555107914690039,
+            -0.029384378052836422,
+            0.09127047888565451,
+            0.1993794626692229,
+            0.09937528416254149,
+            -0.2014307110464461,
+            -0.25755865658042787,
+            -0.0030468742974499767,
+            -1.012574269144741
+          ],
+          "count_objective": -0.4639680471304987,
+          "count_gradient": [
+            -0.2863316251827455,
+            0.9159608073500234,
+            -0.9703870754474697,
+            -0.2914499548630901,
+            -1.679785307372272,
+            -0.1930527456793846,
+            -0.2003993247662871,
+            1.164974613486,
+            -0.2653812796149661
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 3.885780586188048e-16,
+              "parameter_gradient_error": 2.4980018054066022e-15
+            },
+            "legendre": {
+              "value_error": 8.049116928532385e-15,
+              "parameter_gradient_error": 4.3520742565306136e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_128",
+      "seed": 13009,
+      "beta": 256,
+      "distinct_queries": 501,
+      "full_controls_max_value_difference": 2.881028748902281e-14,
+      "full_controls_max_gradient_difference": 9.592326932761353e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.026192321144909134,
+            -0.041355481123788576,
+            0.011115339810048166,
+            0.016107304891472787,
+            0.055785363427211535,
+            -0.013618778256428696,
+            0.002194669188507258,
+            -0.009304111155682372,
+            -0.16137750580093546
+          ],
+          "count_objective": -0.38190187100978934,
+          "count_gradient": [
+            -29.104562777735595,
+            -1.8635848527947827,
+            -8.308701195088629,
+            -32.450867076997945,
+            -2.7993720623546716,
+            18.98861467163832,
+            27.035791639624815,
+            2.540150516871048,
+            -10.320986975138714
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 2.220446049250313e-16,
+              "parameter_gradient_error": 1.199040866595169e-14
+            },
+            "legendre": {
+              "value_error": 9.048317650695026e-15,
+              "parameter_gradient_error": 9.592326932761353e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13001,
+      "beta": 1,
+      "distinct_queries": 45,
+      "full_controls_max_value_difference": 2.453592884421596e-14,
+      "full_controls_max_gradient_difference": 1.27675647831893e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.5105258069091914,
+            0.22859089489388154,
+            0.014547287818089172,
+            -0.3575906393092738,
+            0.7555157146905462,
+            1.0620700062268709,
+            0.14457558475880655,
+            -0.7561760395985546,
+            -5.212496356603531
+          ],
+          "count_objective": -0.5293331034094318,
+          "count_gradient": [
+            0.11613188978575677,
+            -0.019469287369297615,
+            0.019869625938575122,
+            -0.01653969553477246,
+            0.03076934231280979,
+            0.08908597664879113,
+            -0.011391121298222437,
+            -0.0214917938375948,
+            0.12050599027854621
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 5.551115123125783e-16,
+              "parameter_gradient_error": 1.6653345369377348e-16
+            },
+            "legendre": {
+              "value_error": 2.398081733190338e-14,
+              "parameter_gradient_error": 5.329070518200751e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13001,
+      "beta": 16,
+      "distinct_queries": 223,
+      "full_controls_max_value_difference": 2.881028748902281e-14,
+      "full_controls_max_gradient_difference": 7.116529587847253e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.8984624772360323,
+            -0.2629757066927647,
+            0.201180345358642,
+            0.763040018670077,
+            -1.453249305676062,
+            0.3063464337122586,
+            0.6283441548366255,
+            -0.03251290385918554,
+            -1.7908643199752081
+          ],
+          "count_objective": -0.13535609600598397,
+          "count_gradient": [
+            -0.5537019434538147,
+            0.25997404672893404,
+            -0.35638231915359636,
+            0.20117730486134083,
+            -0.2333910891680617,
+            -0.39216774092885065,
+            -0.03704058264802573,
+            -0.18330269075602434,
+            -0.18440641543410077
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1102230246251565e-16,
+              "parameter_gradient_error": 8.326672684688674e-16
+            },
+            "legendre": {
+              "value_error": 1.7208456881689926e-14,
+              "parameter_gradient_error": 7.09432512735475e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13001,
+      "beta": 256,
+      "distinct_queries": 447,
+      "full_controls_max_value_difference": 2.881028748902281e-14,
+      "full_controls_max_gradient_difference": 1.0444978215673473e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.5506051145233701,
+            0.10373765537562943,
+            0.05606911198352235,
+            -0.15665629890563054,
+            0.3704158454025538,
+            0.6579156532249786,
+            0.134901669138293,
+            -0.47476111392593956,
+            -5.220541308400802
+          ],
+          "count_objective": -0.7383569890316459,
+          "count_gradient": [
+            -30.946809928058055,
+            14.836282316170514,
+            -18.333641397912974,
+            9.636061668609122,
+            -10.77892311006252,
+            -22.041931776408187,
+            -4.299575887517606,
+            -9.757251886287449,
+            -12.156882092378062
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1102230246251565e-16,
+              "parameter_gradient_error": 1.4210854715202004e-14
+            },
+            "legendre": {
+              "value_error": 1.3322676295501878e-14,
+              "parameter_gradient_error": 1.0302869668521453e-12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13007,
+      "beta": 1,
+      "distinct_queries": 61,
+      "full_controls_max_value_difference": 2.1094237467877974e-14,
+      "full_controls_max_gradient_difference": 1.2712053631958042e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.713185598671517,
+            -0.3508877863326773,
+            -0.20909087291340156,
+            -0.34406370820176,
+            -0.06613489293524273,
+            0.12807980572665992,
+            0.0935563713424628,
+            0.5003036115537637,
+            -4.774909352481751
+          ],
+          "count_objective": -0.4074900007289024,
+          "count_gradient": [
+            0.09101319138387443,
+            0.006236119260479641,
+            -0.014874159380819403,
+            0.028074837232236572,
+            -0.005168352495885814,
+            0.006391460531921567,
+            -0.007603099424708844,
+            0.03042435325548343,
+            0.09099364464654075
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 4.440892098500626e-16,
+              "parameter_gradient_error": 9.020562075079397e-17
+            },
+            "legendre": {
+              "value_error": 2.0650148258027912e-14,
+              "parameter_gradient_error": 6.467049118441537e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13007,
+      "beta": 16,
+      "distinct_queries": 159,
+      "full_controls_max_value_difference": 2.864375403532904e-14,
+      "full_controls_max_gradient_difference": 5.395683899678261e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.3175126528450074,
+            0.25465494613947015,
+            -0.3589925325691793,
+            0.2873841775028383,
+            -0.12223040872768998,
+            0.29502213876735517,
+            0.2980613970863354,
+            0.4864632883009901,
+            -3.752543269415062
+          ],
+          "count_objective": -0.7043584973960457,
+          "count_gradient": [
+            -1.607935153228468,
+            0.352540093184428,
+            0.4320470044714508,
+            0.3841378437129597,
+            -0.13001562117703452,
+            -0.5409122001945595,
+            0.4897941736362732,
+            -0.1962051946587338,
+            -0.5935004060283363
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 8.881784197001252e-16
+            },
+            "legendre": {
+              "value_error": 1.2323475573339238e-14,
+              "parameter_gradient_error": 5.484501741648273e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13007,
+      "beta": 256,
+      "distinct_queries": 441,
+      "full_controls_max_value_difference": 2.858824288409778e-14,
+      "full_controls_max_gradient_difference": 2.1600499167107046e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.0778853362394523,
+            0.00040808573259692896,
+            0.01239971445121349,
+            -0.01466125776966359,
+            -0.024108086850079882,
+            0.01911481621131988,
+            0.011515522479826765,
+            0.01806327114110468,
+            -0.22063147166916314
+          ],
+          "count_objective": -0.6605979906312441,
+          "count_gradient": [
+            -86.35116792644683,
+            5.669306402096386,
+            24.88026939227176,
+            4.470109633911409,
+            19.618792071766407,
+            -1.0326578330196763,
+            0.40381352421719613,
+            -16.797814990743717,
+            -32.628381654938465
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1102230246251565e-16,
+              "parameter_gradient_error": 7.105427357601002e-15
+            },
+            "legendre": {
+              "value_error": 1.1102230246251565e-14,
+              "parameter_gradient_error": 2.1600499167107046e-12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13009,
+      "beta": 1,
+      "distinct_queries": 57,
+      "full_controls_max_value_difference": 2.5979218776228663e-14,
+      "full_controls_max_gradient_difference": 1.2823075934420558e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.4540698291171394,
+            -0.1084674455448712,
+            1.0956305226417846,
+            -0.9589464557589609,
+            -0.5120439249595646,
+            -0.3384710679707611,
+            -0.8893182572283551,
+            -0.2913798805306127,
+            -5.175733622335526
+          ],
+          "count_objective": -0.5133462266425521,
+          "count_gradient": [
+            0.1057130098438224,
+            0.001670913283086876,
+            0.06895675641807059,
+            -0.04373067548492557,
+            -0.009965314492449657,
+            -0.02583235813500683,
+            -0.0522723601578646,
+            -0.03206805060723812,
+            0.12927570419226836
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 7.771561172376096e-16,
+              "parameter_gradient_error": 3.0531133177191805e-16
+            },
+            "legendre": {
+              "value_error": 2.5202062658991053e-14,
+              "parameter_gradient_error": 3.83026943495679e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13009,
+      "beta": 16,
+      "distinct_queries": 129,
+      "full_controls_max_value_difference": 2.5979218776228663e-14,
+      "full_controls_max_gradient_difference": 5.950795411990839e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.6980304700571338,
+            -0.08135520265849504,
+            0.7462747372604975,
+            -0.6706561323326734,
+            -0.3754629839740705,
+            -0.22145647831604218,
+            -0.5576785000521483,
+            -0.15102114128928407,
+            -5.421653053498138
+          ],
+          "count_objective": -0.6504536495230347,
+          "count_gradient": [
+            -2.270724429756083,
+            -0.20618122215380325,
+            -1.3212667722542601,
+            0.10967199760920968,
+            -0.02994625201848216,
+            0.29912963477140864,
+            0.16572768149101957,
+            -0.05074140222032297,
+            -0.9403786713322317
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 3.3306690738754696e-16,
+              "parameter_gradient_error": 4.440892098500626e-16
+            },
+            "legendre": {
+              "value_error": 1.0880185641326534e-14,
+              "parameter_gradient_error": 5.995204332975845e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_128",
+      "seed": 13009,
+      "beta": 256,
+      "distinct_queries": 615,
+      "full_controls_max_value_difference": 2.856048730848215e-14,
+      "full_controls_max_gradient_difference": 2.0818902157770935e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.12027157558666945,
+            -0.02634498265553431,
+            0.007297228875092723,
+            -0.06018263319698067,
+            -0.040373268025921505,
+            -0.013981092489270569,
+            -0.004805422157494368,
+            -0.012893828205828267,
+            -0.2920132943104816
+          ],
+          "count_objective": -0.8939715450262821,
+          "count_gradient": [
+            -50.08392699548597,
+            -6.764945244035199,
+            -33.9618446014835,
+            -12.27390982408866,
+            1.9146086833629954,
+            5.045234125475256,
+            -5.08836416098149,
+            -9.928588378731392,
+            -18.1441020772911
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 5.551115123125783e-16,
+              "parameter_gradient_error": 1.4210854715202004e-14
+            },
+            "legendre": {
+              "value_error": 1.887379141862766e-14,
+              "parameter_gradient_error": 2.0961010704922955e-12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13001,
+      "beta": 1,
+      "distinct_queries": 35,
+      "full_controls_max_value_difference": 1.9878543255913428e-13,
+      "full_controls_max_gradient_difference": 1.1091128016005314e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.813730126851083,
+            0.22963728035032066,
+            0.20815493161378054,
+            0.2553954770489717,
+            0.6450567984070606,
+            0.2881763289294228,
+            0.2927649633463967,
+            0.5893239169455957,
+            -3.8700648435388
+          ],
+          "count_objective": -0.19077558053153282,
+          "count_gradient": [
+            0.008371752682103713,
+            0.01287707745781571,
+            -0.011119798757199711,
+            0.015904006699996524,
+            0.014361983372853255,
+            -0.006306269959077121,
+            0.014168029014824451,
+            -0.004861143962119225,
+            0.025961602164519308
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 9.992007221626409e-16,
+              "parameter_gradient_error": 3.920475055707584e-16
+            },
+            "legendre": {
+              "value_error": 1.9778623183697164e-13,
+              "parameter_gradient_error": 9.48477407725079e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13001,
+      "beta": 16,
+      "distinct_queries": 240,
+      "full_controls_max_value_difference": 5.387634782749728e-13,
+      "full_controls_max_gradient_difference": 9.633405184672483e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.23788510800254423,
+            -0.09101639722705085,
+            -0.11038857238191817,
+            0.1175367369035851,
+            0.0807786535153776,
+            0.06925589549306835,
+            0.11593217609898765,
+            0.11913825651870391,
+            -0.5824286650920711
+          ],
+          "count_objective": -0.19846159809959826,
+          "count_gradient": [
+            -0.4997406041815571,
+            -0.2496901138522163,
+            -0.5040622787848782,
+            0.30285617117496283,
+            0.0004543664556936693,
+            -0.1720856430467966,
+            0.19730562304048335,
+            -0.04893096558303262,
+            0.07193197786408362
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 9.159339953157541e-16,
+              "parameter_gradient_error": 5.551115123125783e-15
+            },
+            "legendre": {
+              "value_error": 1.5487611193520934e-13,
+              "parameter_gradient_error": 9.577894033441225e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13001,
+      "beta": 256,
+      "distinct_queries": 462,
+      "full_controls_max_value_difference": 5.684341886080801e-13,
+      "full_controls_max_gradient_difference": 1.8893331343861064e-11,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.010260950392404327,
+            0.002029823781919606,
+            0.005079484333937215,
+            -0.0020256567349486738,
+            0.00574135074861321,
+            0.006802374059282804,
+            -0.00045856237674090413,
+            -0.0006348854620610873,
+            -0.033799235612936025
+          ],
+          "count_objective": -0.16469090644587814,
+          "count_gradient": [
+            -31.90726150405371,
+            1.4935469730785231,
+            4.508497754332583,
+            -7.978581888879088,
+            -10.046870677090327,
+            -3.23467084884856,
+            -6.360820476343552,
+            -14.949513555622925,
+            -10.484910098169852
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 2.220446049250313e-16,
+              "parameter_gradient_error": 7.460698725481052e-14
+            },
+            "legendre": {
+              "value_error": 6.919465000976288e-14,
+              "parameter_gradient_error": 1.8967938331115874e-11
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13007,
+      "beta": 1,
+      "distinct_queries": 27,
+      "full_controls_max_value_difference": 2.0988766280538584e-13,
+      "full_controls_max_gradient_difference": 1.073689748221085e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.0624543796286376,
+            0.2726099196709206,
+            0.38710720942495336,
+            -0.29252795832390915,
+            -0.8538014664867605,
+            -0.8816404192516422,
+            0.5386070613892252,
+            -0.4825203556367058,
+            -4.16705027573736
+          ],
+          "count_objective": -0.17968074567261216,
+          "count_gradient": [
+            -4.868919937111443e-05,
+            -0.0013192504586036738,
+            0.009319032578613504,
+            -0.004800618659089912,
+            -0.0067236578015029,
+            -0.0053344259179104155,
+            -0.003759860515449065,
+            0.0010256106575099802,
+            0.013884155579618173
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 9.71445146547012e-16,
+              "parameter_gradient_error": 2.706168622523819e-16
+            },
+            "legendre": {
+              "value_error": 2.0891621765883883e-13,
+              "parameter_gradient_error": 1.0413198081593578e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13007,
+      "beta": 16,
+      "distinct_queries": 7,
+      "full_controls_max_value_difference": 0.0,
+      "full_controls_max_gradient_difference": 5.204170427930421e-18,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.9614482582145193,
+            0.10252142147607637,
+            0.10919443254497728,
+            -0.03878181613856385,
+            -0.3276342989018643,
+            -0.4205591856393043,
+            0.22564168817520366,
+            -0.018351999974605036,
+            -3.98555553907536
+          ],
+          "count_objective": 0.0064185113160162175,
+          "count_gradient": [
+            0.009595347210510814,
+            0.001016224242920816,
+            0.0010964022338857654,
+            -0.00039911889591754307,
+            -0.0032866189180145314,
+            -0.004195913308665973,
+            0.002245740728115116,
+            -0.00018580708443714328,
+            -6.7051786867236395e-06
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 2.0328790734103208e-20
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 5.204170427930421e-18
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13007,
+      "beta": 256,
+      "distinct_queries": 3,
+      "full_controls_max_value_difference": 0.0,
+      "full_controls_max_gradient_difference": 5.011285343653224e-99,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.9614482582145193,
+            0.10252142147607637,
+            0.10919443254497728,
+            -0.03878181613856385,
+            -0.3276342989018643,
+            -0.4205591856393043,
+            0.22564168817520366,
+            -0.018351999974605036,
+            -3.98555553907536
+          ],
+          "count_objective": 0.0064189303911758415,
+          "count_gradient": [
+            0.009614482582145194,
+            0.0010252142147607638,
+            0.0010919443254497729,
+            -0.00038781816138563853,
+            -0.003276342989018643,
+            -0.004205591856393043,
+            0.0022564168817520366,
+            -0.00018351999974605037,
+            -2.010332155106177e-86
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 2.1431013586542656e-101
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 4.989854330066682e-99
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13009,
+      "beta": 1,
+      "distinct_queries": 37,
+      "full_controls_max_value_difference": 2.1452284393319587e-13,
+      "full_controls_max_gradient_difference": 1.1914774722399102e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.6080246132288054,
+            0.6851681208345628,
+            -0.41499676227805365,
+            -0.20271648793994165,
+            0.20312367756920696,
+            1.1562060039303121,
+            -0.5570561629107906,
+            0.12542086332852131,
+            -4.875757305961022
+          ],
+          "count_objective": -0.1780575356987938,
+          "count_gradient": [
+            -0.005059982545890053,
+            0.009921487826140267,
+            -0.019948397917931553,
+            0.017968210075508983,
+            0.011041778764916415,
+            0.02684116545979976,
+            -0.021893712443055033,
+            0.005077351800761487,
+            0.010056529532867993
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1934897514720433e-15,
+              "parameter_gradient_error": 1.8041124150158794e-16
+            },
+            "legendre": {
+              "value_error": 2.1332935418172383e-13,
+              "parameter_gradient_error": 1.1497400254079082e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13009,
+      "beta": 16,
+      "distinct_queries": 6,
+      "full_controls_max_value_difference": 6.887662211849341e-41,
+      "full_controls_max_gradient_difference": 4.336808689942018e-19,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.9619689951756468,
+            0.0824794898180404,
+            0.12197439610021964,
+            -0.1218363242857848,
+            0.06379579709518074,
+            0.1441875536524981,
+            0.19731799827335272,
+            0.3977794133986924,
+            -4.001037898919262
+          ],
+          "count_objective": 0.00591963508320784,
+          "count_gradient": [
+            0.009618524517076663,
+            0.0008250225367515096,
+            0.0012195009797292575,
+            -0.0012181609044411516,
+            0.0006378504565192823,
+            0.0014418263492879447,
+            0.0019722941678482543,
+            0.003978213089354792,
+            -3.87921481315353e-07
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 1.1117307432712692e-21
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 4.336808689942018e-19
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_weak_512",
+      "seed": 13009,
+      "beta": 256,
+      "distinct_queries": 3,
+      "full_controls_max_value_difference": 0.0,
+      "full_controls_max_gradient_difference": 7.822635667995623e-119,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.9619689951756468,
+            0.0824794898180404,
+            0.12197439610021964,
+            -0.1218363242857848,
+            0.06379579709518074,
+            0.1441875536524981,
+            0.19731799827335272,
+            0.3977794133986924,
+            -4.001037898919262
+          ],
+          "count_objective": 0.005919659328305421,
+          "count_gradient": [
+            0.009619689951756468,
+            0.0008247948981804041,
+            0.0012197439610021964,
+            -0.001218363242857848,
+            0.0006379579709518074,
+            0.0014418755365249811,
+            0.001973179982733527,
+            0.003977794133986924,
+            -3.1613382830571413e-106
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 2.420369946780824e-121
+            },
+            "legendre": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 7.846839367463431e-119
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13001,
+      "beta": 1,
+      "distinct_queries": 45,
+      "full_controls_max_value_difference": 3.781419621873283e-13,
+      "full_controls_max_gradient_difference": 2.145505995088115e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.5701383883236426,
+            0.265283641982886,
+            -0.3874978332180459,
+            0.10543074094050606,
+            -0.4566312554167267,
+            0.24348705258778253,
+            0.05915598196225871,
+            0.4198211019841305,
+            -4.699022689699124
+          ],
+          "count_objective": -0.4029365345268894,
+          "count_gradient": [
+            0.08340482669950221,
+            -0.004484321355857572,
+            -0.02915112502487758,
+            0.02581304561622758,
+            -0.005716991880691229,
+            -0.0021889318526461784,
+            0.018725858666032498,
+            -0.0038622994712052385,
+            0.09246433692345125
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 2.6645352591003757e-15,
+              "parameter_gradient_error": 1.1102230246251565e-16
+            },
+            "legendre": {
+              "value_error": 3.7547742692822794e-13,
+              "parameter_gradient_error": 1.0565159858089146e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13001,
+      "beta": 16,
+      "distinct_queries": 179,
+      "full_controls_max_value_difference": 4.0334402484631937e-13,
+      "full_controls_max_gradient_difference": 7.55284723652494e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.496165471992663,
+            0.2852565305603248,
+            -0.5342280441779544,
+            0.1720847645114458,
+            -0.38765852477229423,
+            0.4844344993534746,
+            0.10770278522833068,
+            0.15503506162035,
+            -3.959176687920683
+          ],
+          "count_objective": -0.7309459692420637,
+          "count_gradient": [
+            -0.535323351381872,
+            -0.06690366490960638,
+            -0.23918353903911815,
+            -0.3364362981847991,
+            0.178657463908031,
+            0.036799335591409195,
+            -0.3116368193156382,
+            -0.24672988986558744,
+            -0.21201251199155063
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1102230246251565e-16,
+              "parameter_gradient_error": 1.4432899320127035e-15
+            },
+            "legendre": {
+              "value_error": 3.0475622025960547e-13,
+              "parameter_gradient_error": 7.559508574672691e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13001,
+      "beta": 256,
+      "distinct_queries": 730,
+      "full_controls_max_value_difference": 5.264677582772492e-13,
+      "full_controls_max_gradient_difference": 1.2512657576735364e-11,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.22023549481485527,
+            -0.037960642295772395,
+            -0.1290135275386326,
+            0.022139918977378922,
+            -0.06036488647628886,
+            0.055977051887830774,
+            0.07262293355885555,
+            0.03512415942772478,
+            -0.7024293489855822
+          ],
+          "count_objective": -0.5279915409394009,
+          "count_gradient": [
+            -23.29296255988839,
+            0.607832890531237,
+            -2.2572787244697605,
+            -10.34796002472911,
+            -12.8248639524716,
+            0.3828952264793552,
+            0.8269288260454966,
+            3.7160496270807553,
+            -5.809488735996294
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 2.220446049250313e-16,
+              "parameter_gradient_error": 6.750155989720952e-14
+            },
+            "legendre": {
+              "value_error": 1.929567616798522e-13,
+              "parameter_gradient_error": 1.2445156016838155e-11
+            }
+          }
+        },
+        {
+          "name": "final_controlled",
+          "weights": [
+            0.2054733485836764,
+            0.03991599291511404,
+            -0.06188925253290683,
+            0.025526162166732737,
+            0.009128098101566472,
+            0.08265974174685324,
+            0.05773836092333394,
+            0.06795676951793861,
+            -0.5376706474722236
+          ],
+          "count_objective": -0.814421489912461,
+          "count_gradient": [
+            -3.440697312001931e-07,
+            -6.187949593954847e-08,
+            3.685650815115791e-07,
+            -1.5682393465023302e-07,
+            5.774660375519516e-08,
+            -2.5110102481475625e-07,
+            -1.6831935032248814e-07,
+            1.1046448979775032e-07,
+            -2.0020864232677183e-07
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 3.2959746043559335e-17
+            },
+            "legendre": {
+              "value_error": 3.340661081097096e-13,
+              "parameter_gradient_error": 1.300088509070818e-14
+            }
+          }
+        },
+        {
+          "name": "final_folded",
+          "weights": [
+            0.270157171540976,
+            0.0016967868876257947,
+            -0.08168471359236759,
+            -0.01475171218086368,
+            -0.05906384573973824,
+            0.12905498916950095,
+            0.07887047430994755,
+            0.06271857336942975,
+            -0.7323189402383365
+          ],
+          "count_objective": -0.7579218549358798,
+          "count_gradient": [
+            9.496857662555022e-08,
+            -3.7556276973740253e-07,
+            2.6644268531815854e-07,
+            4.7508667116275775e-07,
+            1.0589233827973778e-06,
+            1.5092558834726294e-07,
+            -1.6236312973814167e-07,
+            -3.1985698161418e-07,
+            -9.574404706797087e-08
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 5.551115123125783e-16,
+              "parameter_gradient_error": 3.200564813177209e-16
+            },
+            "legendre": {
+              "value_error": 3.353983757392598e-13,
+              "parameter_gradient_error": 2.7656696377498236e-14
+            }
+          }
+        },
+        {
+          "name": "final_legendre",
+          "weights": [
+            0.20547229584682347,
+            0.03991769238931353,
+            -0.06188974463300976,
+            0.02552686013324024,
+            0.009126729604753721,
+            0.08266052299683899,
+            0.05773795794134849,
+            0.06795692963832932,
+            -0.5376696607947323
+          ],
+          "count_objective": -0.8144214899093782,
+          "count_gradient": [
+            -5.87393019637044e-07,
+            1.7685985993084953e-06,
+            -5.621397091959933e-07,
+            2.1401657066303596e-07,
+            -9.293832132594554e-07,
+            1.0381409674996896e-06,
+            -7.613297987375291e-08,
+            9.342820878832864e-07,
+            2.7676309827366296e-07
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 4.683753385137379e-17
+            },
+            "legendre": {
+              "value_error": 3.339550858072471e-13,
+              "parameter_gradient_error": 1.2881189170865781e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13007,
+      "beta": 1,
+      "distinct_queries": 35,
+      "full_controls_max_value_difference": 3.7109204598095857e-13,
+      "full_controls_max_gradient_difference": 2.0153323454508154e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.602767377845721,
+            -0.42356983515121627,
+            0.6296361757533537,
+            0.2306911807845251,
+            -0.40441201517120756,
+            -0.10752702597437896,
+            0.20138410371929324,
+            -0.07686707869465541,
+            -4.620947312287015
+          ],
+          "count_objective": -0.36704564791851907,
+          "count_gradient": [
+            0.0562662188839944,
+            -0.006944902546487818,
+            0.019423662481851404,
+            0.007062083422071621,
+            -0.009502438895712683,
+            -0.01598317184819091,
+            0.012152320425517692,
+            -0.0047733755349009714,
+            0.07837482032599397
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 2.1094237467877974e-15,
+              "parameter_gradient_error": 3.0531133177191805e-16
+            },
+            "legendre": {
+              "value_error": 3.689826222341708e-13,
+              "parameter_gradient_error": 1.3471168625045493e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13007,
+      "beta": 16,
+      "distinct_queries": 127,
+      "full_controls_max_value_difference": 3.382849556032852e-13,
+      "full_controls_max_gradient_difference": 7.048805983345119e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.829408976278429,
+            -0.6076331302859452,
+            0.6955421812983492,
+            0.29374389204734597,
+            -0.5816370849589853,
+            -0.3037760321572002,
+            -0.2715673476232682,
+            0.23717504264492068,
+            -4.494432595145619
+          ],
+          "count_objective": -0.5798646610256287,
+          "count_gradient": [
+            -0.9036993210639481,
+            -0.22890202627410072,
+            -0.10651890733574322,
+            -0.3928745460374333,
+            0.014941156343665678,
+            -0.12895041685689487,
+            0.1825497813012812,
+            -0.059368785551234586,
+            -0.39296698811275954
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.7763568394002505e-15,
+              "parameter_gradient_error": 3.969047313034935e-15
+            },
+            "legendre": {
+              "value_error": 2.62456723021387e-13,
+              "parameter_gradient_error": 7.038813976123492e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13007,
+      "beta": 256,
+      "distinct_queries": 805,
+      "full_controls_max_value_difference": 4.2377212849942225e-13,
+      "full_controls_max_gradient_difference": 7.840839089112706e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.1918062077299014,
+            -0.04726646491717175,
+            0.5646237105339302,
+            0.4139053794132466,
+            -0.7172187713915941,
+            -0.1792427283138044,
+            0.10891748810354832,
+            -0.15360804524575492,
+            -4.6454902800326305
+          ],
+          "count_objective": -0.5619578277937772,
+          "count_gradient": [
+            -5.383902519506703,
+            1.9820214722735856,
+            -10.748829427115968,
+            -2.590219351776335,
+            0.20784162413105844,
+            3.8757490379408552,
+            -2.5415706036439687,
+            -2.3866450034824793,
+            -4.274585204810342
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 7.105427357601002e-15
+            },
+            "legendre": {
+              "value_error": 2.9687363678476686e-13,
+              "parameter_gradient_error": 7.833733661755105e-12
+            }
+          }
+        },
+        {
+          "name": "final_controlled",
+          "weights": [
+            0.38147965745012646,
+            -0.08244368845625831,
+            0.1050832808106555,
+            0.07348354435256195,
+            -0.021038072071431678,
+            -0.0032177590126873713,
+            -0.010820797004320693,
+            0.035928185234067475,
+            -0.8166037284760558
+          ],
+          "count_objective": -0.8376170612857399,
+          "count_gradient": [
+            5.518633351231199e-07,
+            4.243504132479597e-07,
+            -2.14367475645451e-06,
+            -6.386424350709238e-07,
+            2.5034656563031215e-07,
+            3.1386042689747517e-06,
+            -6.303865829610357e-07,
+            -4.463714532555534e-07,
+            -1.9352281191168952e-07
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 4.978656376053436e-16
+            },
+            "legendre": {
+              "value_error": 3.980149543281186e-13,
+              "parameter_gradient_error": 4.227868055650674e-14
+            }
+          }
+        },
+        {
+          "name": "final_folded",
+          "weights": [
+            0.49395007504220395,
+            -0.11219715082121756,
+            0.13839438976160895,
+            0.10122059053052192,
+            -0.03535749623531794,
+            0.003019569097653699,
+            -0.010407207297078449,
+            0.0870712596054744,
+            -1.0839443466718772
+          ],
+          "count_objective": -0.8647166441780366,
+          "count_gradient": [
+            3.355112548609346e-06,
+            -1.638570840137299e-06,
+            2.4229585908603062e-06,
+            -8.575896887662911e-07,
+            -3.5156702424715995e-07,
+            -9.643638043573463e-07,
+            1.1488645115926942e-06,
+            -1.0131499649246051e-06,
+            1.813329849118906e-06
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1102230246251565e-16,
+              "parameter_gradient_error": 5.557620336160696e-16
+            },
+            "legendre": {
+              "value_error": 3.97237798210881e-13,
+              "parameter_gradient_error": 8.182170219139806e-14
+            }
+          }
+        },
+        {
+          "name": "final_legendre",
+          "weights": [
+            0.40102200228668006,
+            -0.08284569482087169,
+            0.13314622178446184,
+            0.07306564320313455,
+            -0.07245536484760348,
+            -0.009806163683798755,
+            -0.018718120004440397,
+            0.06470145021428843,
+            -0.9104868480720963
+          ],
+          "count_objective": -0.7844075145527901,
+          "count_gradient": [
+            -1.3504195360385107e-07,
+            -4.228589591115514e-07,
+            1.7260202003152331e-06,
+            -3.5483990681037855e-07,
+            -1.6569240798824372e-06,
+            1.1693725566375602e-07,
+            -2.4175445716494127e-06,
+            -5.760203336685216e-07,
+            5.41946623556558e-07
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 4.440892098500626e-16,
+              "parameter_gradient_error": 3.494383601920781e-16
+            },
+            "legendre": {
+              "value_error": 3.3495428652940973e-13,
+              "parameter_gradient_error": 4.566312605813749e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13009,
+      "beta": 1,
+      "distinct_queries": 47,
+      "full_controls_max_value_difference": 3.543276783091187e-13,
+      "full_controls_max_gradient_difference": 2.0425328095541317e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            2.5534437872208224,
+            -0.07580192627652502,
+            0.49343134663195,
+            0.14530990446393902,
+            -0.07888141705828294,
+            -0.3802016281592683,
+            -0.4032247750925725,
+            -0.14081370759701428,
+            -4.658965454360745
+          ],
+          "count_objective": -0.3714566584690233,
+          "count_gradient": [
+            0.06999542538343806,
+            -0.005568776645706598,
+            0.021078864716220135,
+            0.011095985494633136,
+            -0.010072642873888895,
+            -0.014326438750062247,
+            -0.008795873592386014,
+            0.003644386509112774,
+            0.07967216280352724
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.887379141862766e-15,
+              "parameter_gradient_error": 5.134781488891349e-16
+            },
+            "legendre": {
+              "value_error": 3.5244029916725594e-13,
+              "parameter_gradient_error": 1.1114720255278598e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13009,
+      "beta": 16,
+      "distinct_queries": 135,
+      "full_controls_max_value_difference": 4.0023540037736893e-13,
+      "full_controls_max_gradient_difference": 9.339196083146817e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            1.6145627364892894,
+            -0.06724999839049689,
+            0.3952817143330216,
+            0.14548117347052048,
+            0.01563568141326998,
+            -0.19021712152420797,
+            -0.2277128831256235,
+            -0.2055399380375553,
+            -4.82859550376087
+          ],
+          "count_objective": -0.4356180187896314,
+          "count_gradient": [
+            -2.327562572629205,
+            -0.1161373194214608,
+            -0.5849907352712447,
+            -0.42051416055455215,
+            0.21819836980383867,
+            -0.006732350017929583,
+            1.3271168947231722,
+            -0.018472339417542595,
+            -0.9012701772693265
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 2.220446049250313e-16,
+              "parameter_gradient_error": 5.773159728050814e-15
+            },
+            "legendre": {
+              "value_error": 1.396660564978447e-13,
+              "parameter_gradient_error": 9.396927680427325e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "gaussian_strong_512",
+      "seed": 13009,
+      "beta": 256,
+      "distinct_queries": 740,
+      "full_controls_max_value_difference": 4.367547989936327e-13,
+      "full_controls_max_gradient_difference": 6.795453089125658e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.19378425531351917,
+            0.10755915246937493,
+            0.021227536364079036,
+            -0.004443301592743379,
+            -0.14246682892259102,
+            -0.08519593357731914,
+            -0.050059942959883724,
+            -0.10498146555969069,
+            -0.5456409164192939
+          ],
+          "count_objective": -0.5469207580140605,
+          "count_gradient": [
+            -7.3873428176586255,
+            1.7627703922926452,
+            -1.0493414689242293,
+            0.9831794497928944,
+            -3.075244225074254,
+            -2.6331727432757885,
+            0.997861876656571,
+            -1.9982421504740138,
+            -0.7897354772736658
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 2.1538326677728037e-14
+            },
+            "legendre": {
+              "value_error": 2.956523914576792e-13,
+              "parameter_gradient_error": 6.8123284790999605e-12
+            }
+          }
+        },
+        {
+          "name": "final_controlled",
+          "weights": [
+            0.1979885368833827,
+            0.031891677938398505,
+            0.011900719117855495,
+            -0.021258350329473805,
+            -0.10860316201891795,
+            -0.053038815194733205,
+            -0.026076584548215327,
+            -0.018270595860699353,
+            -0.47301244430929634
+          ],
+          "count_objective": -0.7329823422878573,
+          "count_gradient": [
+            3.224658474470718e-07,
+            -5.536742910256637e-07,
+            1.0029828123404643e-06,
+            8.26100938604448e-07,
+            -1.384890966247502e-07,
+            -5.98470961381747e-07,
+            -4.98622271578159e-07,
+            2.1498214597241456e-07,
+            2.704967218144808e-07
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 9.992007221626409e-16,
+              "parameter_gradient_error": 3.4867941867133823e-16
+            },
+            "legendre": {
+              "value_error": 3.360645095540349e-13,
+              "parameter_gradient_error": 1.440340902103543e-14
+            }
+          }
+        },
+        {
+          "name": "final_folded",
+          "weights": [
+            0.3049483042552264,
+            0.08210823781118669,
+            0.09945767134034213,
+            0.03183593716804018,
+            -0.14233672166382863,
+            -0.07481879127343388,
+            -0.038981481098764606,
+            -0.08417138353483798,
+            -0.8253646271421318
+          ],
+          "count_objective": -0.7133462684208447,
+          "count_gradient": [
+            -3.7153578740477256e-07,
+            -2.555853150017543e-06,
+            -1.358577323328598e-06,
+            3.148038117718147e-06,
+            -3.0924242129795262e-06,
+            -1.969262799683268e-06,
+            -8.30177235659204e-07,
+            2.1516697786697417e-06,
+            1.6339704654762255e-07
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 2.220446049250313e-16,
+              "parameter_gradient_error": 4.683753385137379e-17
+            },
+            "legendre": {
+              "value_error": 3.0464519795714295e-13,
+              "parameter_gradient_error": 4.000966224992908e-14
+            }
+          }
+        },
+        {
+          "name": "final_legendre",
+          "weights": [
+            0.49512152294951434,
+            -0.02951234929209764,
+            0.011390345949402433,
+            -0.007606181102629844,
+            0.016009101281218064,
+            -0.22114573688419453,
+            -0.2809872613826923,
+            -0.11759872670051971,
+            -1.4846170717608178
+          ],
+          "count_objective": -0.7381237827680418,
+          "count_gradient": [
+            7.618842743813137e-07,
+            3.2020047234488465e-07,
+            3.711836468186185e-07,
+            -5.167435323160318e-07,
+            1.011139077554846e-06,
+            3.1308405870492453e-07,
+            1.0802743534606141e-07,
+            4.121568430840751e-08,
+            1.997174711512728e-07
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 4.440892098500626e-16,
+              "parameter_gradient_error": 1.1518563880486e-15
+            },
+            "legendre": {
+              "value_error": 3.036459972349803e-13,
+              "parameter_gradient_error": 1.2236045510150007e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13001,
+      "beta": 1,
+      "distinct_queries": 39,
+      "full_controls_max_value_difference": 2.2537527399890678e-14,
+      "full_controls_max_gradient_difference": 1.0769163338864018e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -2.5439926830794235,
+            -1.4838428651750912,
+            -0.399636756286367,
+            0.6569461490566737,
+            -4.420158443642418
+          ],
+          "count_objective": -0.4211903188475121,
+          "count_gradient": [
+            -0.05136291941283306,
+            -0.07441541104165732,
+            0.1372140475439174,
+            0.02393231513980528,
+            0.09815517550647954
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 7.771561172376096e-16,
+              "parameter_gradient_error": 1.942890293094024e-16
+            },
+            "legendre": {
+              "value_error": 2.1760371282653068e-14,
+              "parameter_gradient_error": 6.356026815979021e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13001,
+      "beta": 16,
+      "distinct_queries": 127,
+      "full_controls_max_value_difference": 2.5868196473766147e-14,
+      "full_controls_max_gradient_difference": 7.616129948928574e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.7777387066629035,
+            -0.6275592087010465,
+            -0.6437744264534027,
+            0.3475431927015168,
+            -1.5330333185310858
+          ],
+          "count_objective": -0.8615390891763652,
+          "count_gradient": [
+            1.8365599381529192,
+            1.2202490594169988,
+            -1.026250587394925,
+            -0.1256921099016335,
+            -1.0225412902276292
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 6.661338147750939e-16,
+              "parameter_gradient_error": 4.440892098500626e-16
+            },
+            "legendre": {
+              "value_error": 1.7430501486614958e-14,
+              "parameter_gradient_error": 7.638334409421077e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13001,
+      "beta": 256,
+      "distinct_queries": 319,
+      "full_controls_max_value_difference": 2.9781732635569824e-14,
+      "full_controls_max_gradient_difference": 1.3002932064409833e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.0828200268363305,
+            -0.045948800400484865,
+            -0.0512487123339742,
+            0.04158926267742852,
+            -0.1592985129434517
+          ],
+          "count_objective": -0.8115208837171057,
+          "count_gradient": [
+            34.92505899857673,
+            24.514768352730414,
+            -21.02145203456981,
+            -3.187797210805833,
+            -19.449136690706922
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 3.3306690738754696e-16,
+              "parameter_gradient_error": 3.552713678800501e-14
+            },
+            "legendre": {
+              "value_error": 1.554312234475219e-14,
+              "parameter_gradient_error": 1.3287149158713873e-12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13007,
+      "beta": 1,
+      "distinct_queries": 39,
+      "full_controls_max_value_difference": 1.8762769116165146e-14,
+      "full_controls_max_gradient_difference": 1.0269562977782698e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -2.464657098655541,
+            -1.1227399090623904,
+            -1.3766136342250688,
+            0.16900443954425395,
+            -3.925804059372773
+          ],
+          "count_objective": -0.38126374615211245,
+          "count_gradient": [
+            -0.11463343439450681,
+            0.07677307991296653,
+            0.036866608886757385,
+            -0.10912722665971598,
+            0.09954247351857767
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 4.440892098500626e-16,
+              "parameter_gradient_error": 2.7755575615628914e-16
+            },
+            "legendre": {
+              "value_error": 1.8318679906315083e-14,
+              "parameter_gradient_error": 4.718447854656915e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13007,
+      "beta": 16,
+      "distinct_queries": 93,
+      "full_controls_max_value_difference": 2.1441182163073336e-14,
+      "full_controls_max_gradient_difference": 4.1772141301521515e-14,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.17831976063788324,
+            -0.2505502074279031,
+            0.7600671254601159,
+            -0.059681407450968726,
+            0.6521800915182903
+          ],
+          "count_objective": -0.04016584666463284,
+          "count_gradient": [
+            0.13433699235270571,
+            -0.005240814093562563,
+            -0.007721286388918159,
+            0.04972594613459458,
+            -0.01017601193221095
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 2.220446049250313e-16,
+              "parameter_gradient_error": 5.551115123125783e-16
+            },
+            "legendre": {
+              "value_error": 1.4405143744511406e-14,
+              "parameter_gradient_error": 4.1217029789208937e-14
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13007,
+      "beta": 256,
+      "distinct_queries": 460,
+      "full_controls_max_value_difference": 2.886579864025407e-14,
+      "full_controls_max_gradient_difference": 1.4139800441625994e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.07275485479768662,
+            -0.05657513258328942,
+            -0.040986243276857404,
+            0.03555954383895415,
+            -0.1546885337972625
+          ],
+          "count_objective": -0.757125654460722,
+          "count_gradient": [
+            42.58964359250876,
+            -8.972189508011093,
+            1.25234403219028,
+            21.53318743199531,
+            -12.160248200585023
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 4.440892098500626e-16,
+              "parameter_gradient_error": 7.105427357601002e-14
+            },
+            "legendre": {
+              "value_error": 1.3322676295501878e-14,
+              "parameter_gradient_error": 1.4850343177386094e-12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13009,
+      "beta": 1,
+      "distinct_queries": 35,
+      "full_controls_max_value_difference": 2.1316282072803006e-14,
+      "full_controls_max_gradient_difference": 9.325873406851315e-15,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -2.05653206664033,
+            -2.997438965740436,
+            -4.190847448400928,
+            2.0298696338504434,
+            -6.665390167944201
+          ],
+          "count_objective": -0.6674973720637404,
+          "count_gradient": [
+            -0.005006281018952747,
+            -0.002057019976711486,
+            -0.0010202128456138354,
+            0.0025240962161439257,
+            0.00585173286806576
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 7.771561172376096e-16,
+              "parameter_gradient_error": 1.3704315460216776e-16
+            },
+            "legendre": {
+              "value_error": 2.0539125955565396e-14,
+              "parameter_gradient_error": 3.174543961037557e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13009,
+      "beta": 16,
+      "distinct_queries": 103,
+      "full_controls_max_value_difference": 2.836619827917275e-14,
+      "full_controls_max_gradient_difference": 1.2168044349891716e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.2997276404782179,
+            -0.6570183083159735,
+            -0.8950230725110337,
+            -0.6102749807433149,
+            -0.17383541783083023
+          ],
+          "count_objective": -0.12610751288975805,
+          "count_gradient": [
+            0.697591578418216,
+            0.12380893179386654,
+            0.18889449407584094,
+            -0.015013746354565241,
+            -0.13471562266239837
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.6653345369377348e-16,
+              "parameter_gradient_error": 2.220446049250313e-15
+            },
+            "legendre": {
+              "value_error": 2.378652830259398e-14,
+              "parameter_gradient_error": 1.1945999744966684e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "banknote_128",
+      "seed": 13009,
+      "beta": 256,
+      "distinct_queries": 313,
+      "full_controls_max_value_difference": 2.8699265186560297e-14,
+      "full_controls_max_gradient_difference": 1.766586876783549e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.0008017390977202027,
+            0.18787006277745036,
+            0.07003955620005481,
+            0.07056069372301928,
+            0.14752319495086497
+          ],
+          "count_objective": -0.052595176093299306,
+          "count_gradient": [
+            4.590762832738987,
+            1.026029173309753,
+            1.4261433614142975,
+            -0.11440233323682476,
+            -1.9417587003509766
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.3877787807814457e-17,
+              "parameter_gradient_error": 1.1546319456101628e-14
+            },
+            "legendre": {
+              "value_error": 1.9546864127306662e-14,
+              "parameter_gradient_error": 1.7550405573274475e-12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13001,
+      "beta": 1,
+      "distinct_queries": 99,
+      "full_controls_max_value_difference": 2.531308496145357e-14,
+      "full_controls_max_gradient_difference": 5.7592819402429996e-15,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.4164071352684444,
+            -0.08149750034046341,
+            0.45903215005507997,
+            0.16606516297793417,
+            0.4396090400476055,
+            0.27260478748332145,
+            0.5260144777754078,
+            1.228391037806491,
+            -0.20844699195726357,
+            -0.15233144729566006,
+            -0.11228393729528093,
+            -0.14678081026745998,
+            0.20260098029432028,
+            -0.0178251444498269,
+            -0.20433407879277854,
+            1.0204149079049152,
+            0.2686604421016208,
+            -0.40170343574762796,
+            0.6948301770509848,
+            -0.2548998436570841,
+            0.887660880845766,
+            0.0,
+            -0.08129303955771922,
+            0.6444979255637109,
+            -0.12823047450094038,
+            -0.17545756115020167,
+            -0.11773958387310696,
+            -0.14241819637107242,
+            -0.08857087087768181,
+            -0.2949622858601922,
+            -0.15753650290978274,
+            -0.07225962083031909,
+            -0.09229653834170226,
+            -0.07225962083031909,
+            -0.05333570798856781,
+            -0.4413849540246725,
+            -0.33234721247383603,
+            -0.0873625326109542,
+            -0.10451556288164705,
+            -0.19115062967718238,
+            -0.0522907712717191,
+            -0.13820013424659738,
+            -0.09571767509951518,
+            -0.22123534046441484,
+            -0.024966457762556085,
+            -0.15260952774707462,
+            -0.04432580019326471,
+            -0.11830928015708567,
+            -0.12343605777373422,
+            -0.09631667573691544,
+            -0.12066182865149752,
+            0.4038932411201037,
+            0.6752610212500676,
+            -0.05198054628516342,
+            0.36942055091267884,
+            0.138423644732204,
+            -0.028173905553368253,
+            -5.674142120558965
+          ],
+          "count_objective": -0.7149620389501875,
+          "count_gradient": [
+            0.010215152308684682,
+            -0.009740738793517827,
+            0.011881912531725453,
+            -0.009183980826594895,
+            -0.011526596186088438,
+            0.0010319535638959971,
+            0.029490607929980872,
+            0.05223544490135339,
+            0.026769123069393965,
+            -0.02249071067853342,
+            0.11258492990373808,
+            0.06743476106384445,
+            -0.01554761963053378,
+            -0.011865515428764517,
+            0.0007245620965089889,
+            0.0808205940332335,
+            0.042120168463607374,
+            0.03294850299826561,
+            0.029704085424053308,
+            0.03514952152974792,
+            0.02456136820981082,
+            0.0,
+            -0.006986391061124349,
+            0.17046225081892413,
+            -0.03790206994772031,
+            -0.028879538547147268,
+            -0.02627569219992932,
+            -0.025916097614889194,
+            -0.013295954011843825,
+            -0.012773046069214165,
+            -0.0013044713758659748,
+            -0.018416963685517908,
+            -0.02615319529436593,
+            -0.018416963685517908,
+            -0.016177736933939257,
+            0.0017584925062757786,
+            -0.02127734881170572,
+            -0.007725789391955269,
+            -0.024789468425970386,
+            0.02692750834659947,
+            -0.019441057492151272,
+            -0.021417764162470307,
+            -0.023833182351775537,
+            0.039317118694110156,
+            -0.015454103273656452,
+            -0.016588502366753466,
+            -0.009532168162349629,
+            -0.011349283426530098,
+            -0.017303072871750248,
+            -0.014163293359647245,
+            -0.020697709422477988,
+            0.028232888492447764,
+            0.1286974179584735,
+            -0.01539704646339031,
+            0.05299709996184658,
+            0.06785334675723378,
+            -0.008174319635929376,
+            0.1215604179218088
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 6.661338147750939e-16,
+              "parameter_gradient_error": 3.608224830031759e-16
+            },
+            "legendre": {
+              "value_error": 2.4646951146678475e-14,
+              "parameter_gradient_error": 2.473715676742927e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13001,
+      "beta": 16,
+      "distinct_queries": 408,
+      "full_controls_max_value_difference": 2.7533531010703882e-14,
+      "full_controls_max_gradient_difference": 1.199040866595169e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.2425020626490985,
+            -0.05383044331826153,
+            0.16539091513994927,
+            0.061725759517890694,
+            0.26572612617903496,
+            0.19949992761031482,
+            0.49812370707648146,
+            0.8242187747494824,
+            -0.12143054965951242,
+            -0.09989404762643961,
+            0.08249627813357288,
+            -0.17852944430056478,
+            0.07329137566689695,
+            -0.015652934691809832,
+            -0.11926332125257652,
+            0.47034352757545406,
+            0.08803996654726429,
+            -0.23475889773642294,
+            0.46900671555864776,
+            -0.14837705586221533,
+            0.5846833417297037,
+            0.0,
+            -0.05086912704487781,
+            0.26810614054312065,
+            -0.09068423902691349,
+            -0.12090112948562558,
+            -0.08019136678111276,
+            -0.09399652985031524,
+            -0.058270534887136544,
+            -0.17774158901446482,
+            -0.1001136919700479,
+            -0.050666447799927704,
+            -0.06516465936556502,
+            -0.050666447799927704,
+            -0.0376766013014282,
+            -0.2577640450924985,
+            -0.20793717701223954,
+            -0.05273253769068942,
+            -0.0718073842915171,
+            -0.11710327158380389,
+            -0.038067253804257045,
+            -0.08848582600790114,
+            -0.06584303149703712,
+            -0.132730736908158,
+            -0.015100838897845595,
+            -0.09792993784466146,
+            -0.030173110581514728,
+            -0.07453001233130217,
+            -0.08076684192967118,
+            -0.13908485615839067,
+            -0.08000564695856359,
+            0.14921592036463827,
+            0.252358269307626,
+            -0.04981300928110308,
+            0.13736228229192235,
+            0.03523696902009372,
+            -0.02517458199590422,
+            -5.619407582408202
+          ],
+          "count_objective": -0.9134334504324135,
+          "count_gradient": [
+            0.18149986034157134,
+            0.11117309478766169,
+            -1.4083462032571052,
+            0.05872062201873212,
+            0.14069551709048347,
+            -0.2460906830995651,
+            -0.11221788389012632,
+            -0.9280838823733034,
+            0.09781618064905705,
+            0.19991114104400573,
+            -0.0041801493907555574,
+            -0.688601919673665,
+            -0.48861490269917657,
+            0.06874132381576246,
+            0.09764606493892009,
+            -0.17319815191152718,
+            -1.0270164505153754,
+            0.15315739316954055,
+            -0.5127545338348359,
+            0.11684755880145514,
+            -0.6767104173467108,
+            0.0,
+            0.07871325171681182,
+            -2.0208761166590614,
+            0.24398279300192754,
+            0.2946484058721482,
+            0.18824540286800612,
+            0.1937130390397359,
+            0.11274668306545367,
+            0.1882920933271512,
+            0.16892386291402606,
+            0.13158880951872023,
+            0.1745429805401908,
+            0.13158880951872023,
+            0.10102437142013514,
+            0.1836346423306197,
+            0.3076381730077157,
+            0.06291207441265528,
+            0.1741907162627112,
+            0.15432492089625485,
+            0.11223474727455801,
+            0.15761200826406352,
+            0.16041227165776767,
+            0.14126927999606723,
+            0.2848922687447622,
+            0.17605155893507288,
+            0.07081341829817173,
+            0.11246033115430228,
+            0.15983890378257012,
+            0.4702494862512424,
+            0.16848622145577324,
+            -0.10687934711142547,
+            -2.537300432935763,
+            0.1560234451430732,
+            -0.16405702231869754,
+            -0.4505252276851834,
+            0.050244385472570416,
+            -0.6547916627307495
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1102230246251565e-16,
+              "parameter_gradient_error": 1.7763568394002505e-15
+            },
+            "legendre": {
+              "value_error": 2.0095036745715333e-14,
+              "parameter_gradient_error": 1.2168044349891716e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13001,
+      "beta": 256,
+      "distinct_queries": 871,
+      "full_controls_max_value_difference": 2.90878432451791e-14,
+      "full_controls_max_gradient_difference": 4.462208380573429e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.11935477999770683,
+            -0.032564476556564956,
+            0.23209095593837867,
+            0.08030256151446119,
+            0.11882516961141404,
+            0.08487152250475379,
+            0.13069183179011085,
+            0.40476107791145277,
+            -0.06035936191710026,
+            -0.05988283306017294,
+            -0.03128403551602962,
+            0.03861776000716074,
+            0.08884814316558712,
+            -0.012587519146594811,
+            -0.059417032097969315,
+            0.39173622336111247,
+            0.15463913565868243,
+            -0.11361295785025276,
+            0.22568821092665461,
+            -0.07352456883066645,
+            0.2837911350025468,
+            0.0,
+            -0.028517058021082883,
+            0.3382998991403635,
+            -0.059714338008517005,
+            -0.07698856991204626,
+            -0.05044937311351332,
+            -0.05682740540315186,
+            -0.03459997638795945,
+            -0.09221876890109787,
+            -0.05732324573628913,
+            -0.03295832385042857,
+            -0.04284322296588824,
+            -0.03295832385042857,
+            -0.024780138116333686,
+            -0.12608019558051387,
+            -0.11535993910325787,
+            -0.027961616203260098,
+            -0.045656719412524284,
+            -0.06334607122103347,
+            -0.025907378560073937,
+            -0.05137681242427367,
+            -0.041923533377219345,
+            -0.06891795508584998,
+            -0.02107523906607654,
+            -0.05699879396433826,
+            -0.018980859730280915,
+            -0.0415359220673194,
+            -0.048263118820631494,
+            -0.029652347106904717,
+            -0.04867777954723498,
+            0.1753406324638035,
+            0.3902847846793988,
+            -0.014046202987675643,
+            0.15153522326683583,
+            0.08316946148657008,
+            -0.013901010740601022,
+            -5.595957321932775
+          ],
+          "count_objective": -0.7529456125279069,
+          "count_gradient": [
+            3.417743982008406,
+            2.0762519954852734,
+            5.254879047761699,
+            -137.16774672034612,
+            3.771191945634334,
+            1.5821925335265747,
+            1.2851366952970618,
+            -98.91223081522904,
+            1.84025145490358,
+            3.7340727082883713,
+            2.422846412418727,
+            8.04740827781644,
+            2.9918554131091786,
+            1.2806005532374436,
+            1.8366957750590736,
+            -29.662782132571547,
+            3.3217303254420836,
+            2.8895104035934605,
+            9.494298780196452,
+            2.198898761263101,
+            -9.984600879631731,
+            0.0,
+            1.4723534014185895,
+            1.4165817387212982,
+            4.5516002575251635,
+            5.498855949053921,
+            3.5136528188240415,
+            3.6177918864640772,
+            2.1063080714043347,
+            3.532236411407164,
+            3.1581237101596003,
+            2.4551629590905217,
+            3.2562244065644834,
+            2.4551629590905217,
+            1.8846747415135503,
+            3.4601966842601786,
+            5.756114976285702,
+            1.178980871422637,
+            3.250882912482708,
+            2.889845243094981,
+            2.0931231984030783,
+            2.9457482191881788,
+            2.99368719023219,
+            2.650006156501215,
+            5.9953938427527245,
+            3.2902161321188617,
+            1.321753432337969,
+            2.1039382188492044,
+            2.985739743109052,
+            8.76691166283439,
+            3.1463371094081176,
+            -17.26185701174561,
+            3.0352551040195674,
+            -45.52864824192411,
+            -4.622796773054977,
+            2.1505611040456003,
+            2.970621077665093,
+            -12.17177240042689
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 3.3306690738754696e-16,
+              "parameter_gradient_error": 2.5579538487363607e-13
+            },
+            "legendre": {
+              "value_error": 1.3433698597964394e-14,
+              "parameter_gradient_error": 4.718003765447065e-12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13007,
+      "beta": 1,
+      "distinct_queries": 77,
+      "full_controls_max_value_difference": 2.631228568361621e-14,
+      "full_controls_max_gradient_difference": 6.106226635438361e-15,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.03593184591908319,
+            0.016103655374902257,
+            0.22997081862361718,
+            -0.01078726882344708,
+            0.6554778851228376,
+            0.46612563467662826,
+            0.42366610481252,
+            -0.020556820218717825,
+            0.214316091663353,
+            -0.15877804647256916,
+            -0.06724718429611443,
+            0.22306688086735227,
+            0.024836324893510064,
+            0.10366477439769856,
+            -0.1553993928248688,
+            -0.062459449706531105,
+            -0.1053886989656295,
+            -0.049976308934677464,
+            0.35058322486624627,
+            0.0,
+            1.0258767299244747,
+            -0.018130282300333936,
+            0.13369202001587477,
+            0.9485815754120868,
+            -0.17285645840970176,
+            -0.13599501492591526,
+            -0.06256265765196103,
+            -0.05474779367052486,
+            -0.04647879388531828,
+            -0.05957929346650073,
+            -0.17601109624354772,
+            -0.02435436206825309,
+            -0.09446674375102596,
+            -0.13365814500107537,
+            -0.006026109912547896,
+            -0.04995680698492039,
+            -0.29258203728027915,
+            0.0,
+            -0.03546604305733528,
+            -0.36067843904410346,
+            -0.0751691940829878,
+            -0.09468214304801903,
+            -0.0965911882336899,
+            -0.06619019671136303,
+            -0.09306884465686463,
+            -0.13688692667368288,
+            -0.16847363749326458,
+            -0.08692662297485934,
+            -0.07931773984801564,
+            -0.23978827935505093,
+            0.3041642386154774,
+            0.7251264575214602,
+            0.37058651432578305,
+            -0.09377512729230285,
+            0.6136650690872892,
+            0.804470187139934,
+            0.6431495799440753,
+            -6.482785134313954
+          ],
+          "count_objective": -0.7266642166691447,
+          "count_gradient": [
+            -0.012550545106783165,
+            -0.008832494662577968,
+            0.01457376368404041,
+            -0.0093329039560382,
+            0.025706795668359213,
+            0.01926912152055381,
+            0.0799941536830015,
+            -0.015220747607873243,
+            0.08342915757157952,
+            0.02403770594027552,
+            -0.012774411720603453,
+            0.016414786500960166,
+            -0.01938986012870543,
+            -0.004437003365734125,
+            0.011217702952022417,
+            0.1577104260529917,
+            0.046157802266842296,
+            0.11933647618308287,
+            0.06067594397883422,
+            0.0,
+            0.08879884347763449,
+            -0.00903444764138114,
+            -0.008216445445732752,
+            0.11084813895937172,
+            -0.028103465258517875,
+            -0.023634476664771947,
+            -0.03240426546013595,
+            -0.020068426970266773,
+            -0.023085752451764786,
+            -0.02287057234018305,
+            0.03823375658579385,
+            -0.02058816403488506,
+            -0.011293479986047614,
+            -0.004163860096545319,
+            -0.012519308381197757,
+            -0.02784519210337623,
+            -0.000933155679145552,
+            0.0,
+            -0.01679777923977988,
+            0.13582982444519429,
+            -0.015005141491905844,
+            -0.02452526239077202,
+            -0.01552591102835906,
+            -0.020642745416943692,
+            -0.034643556751394806,
+            -0.019187308719190072,
+            0.043466382979158974,
+            -0.005116037969229376,
+            -0.013952537760463044,
+            -0.002439705058499873,
+            0.016985795898833853,
+            -0.013603314733230794,
+            0.14844739055071354,
+            0.028340478286054724,
+            0.15902667705242984,
+            0.17630179640726062,
+            0.08854349757281789,
+            0.10585878711515599
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 1.1102230246251565e-15,
+              "parameter_gradient_error": 4.440892098500626e-16
+            },
+            "legendre": {
+              "value_error": 2.5202062658991053e-14,
+              "parameter_gradient_error": 1.6653345369377348e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13007,
+      "beta": 16,
+      "distinct_queries": 250,
+      "full_controls_max_value_difference": 2.708944180085382e-14,
+      "full_controls_max_gradient_difference": 1.6475709685437323e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.012727948112612427,
+            -0.0019328127464358583,
+            0.0586774861805,
+            -0.014007582250698994,
+            0.18094415395395816,
+            0.21365134534582422,
+            0.1715927928934286,
+            -0.02272688038220531,
+            0.18677581534891113,
+            -0.002378767341225688,
+            -0.015373624555170485,
+            0.06785450960779299,
+            -0.05742218826581555,
+            0.02733802257922725,
+            0.016166229755320408,
+            0.05992804363023671,
+            -0.015400656952744677,
+            0.07741489093211536,
+            0.09601565850363987,
+            0.0,
+            0.23326644046614742,
+            -0.012762461538196834,
+            0.011852946711216226,
+            0.17958692252446773,
+            -0.04879951380967788,
+            -0.04150043618322347,
+            -0.052001631535503176,
+            -0.03229512990531788,
+            -0.03883980169091682,
+            -0.03601875581699278,
+            -0.05530486797085414,
+            -0.031500991532412925,
+            -0.017187015581646654,
+            -0.030775144405429937,
+            -0.01664197996755833,
+            -0.04101272812295503,
+            -0.04008265425715693,
+            0.0,
+            -0.025681899138080586,
+            -0.07020022251272147,
+            -0.020910938980145573,
+            -0.03289123578367085,
+            -0.020756346398315993,
+            -0.02682467193557668,
+            -0.03896246715172465,
+            -0.04269506637152891,
+            0.02520269929837349,
+            -0.019293658739744455,
+            -0.019664000769085324,
+            -0.04816777456131375,
+            0.06411843825112637,
+            0.13359892287790454,
+            0.1862907071157409,
+            0.02571487681743717,
+            0.2046512729031542,
+            0.2594543255710968,
+            0.24175552424910257,
+            -3.7605638499320175
+          ],
+          "count_objective": -0.9007197060145103,
+          "count_gradient": [
+            0.12639376675252187,
+            0.06845381352199571,
+            -0.7810923151538446,
+            0.044490555198151524,
+            0.18361752229967632,
+            0.14579398698516893,
+            0.08496020711884282,
+            0.07421165264872348,
+            0.10659599551145221,
+            0.14912394987986718,
+            0.08559117529108093,
+            -0.3151598778709842,
+            0.1516112164905772,
+            0.06475279957535418,
+            0.060229425890457794,
+            0.10259037966396814,
+            0.11363534346674162,
+            0.10148859011934297,
+            0.012743301752188949,
+            0.0,
+            -3.2983630657693324,
+            0.04604145385174129,
+            0.04534959056853836,
+            -3.4831315580511033,
+            0.24496061545233733,
+            0.201000137790637,
+            0.1754661417141481,
+            0.1224201169651531,
+            0.1343809016608355,
+            0.1355480111921316,
+            0.1248285607556503,
+            0.10011744206335826,
+            0.10857788250510746,
+            0.10562033038595056,
+            0.06579945698738189,
+            0.14245808863797,
+            0.20313314579468733,
+            0.0,
+            0.09199485518373993,
+            0.08786041829110723,
+            0.10564242753589852,
+            0.15049641115131396,
+            0.11946747558942948,
+            0.11540957234708492,
+            0.20570538042093928,
+            0.16571495746272044,
+            0.044882658013650524,
+            0.0813046199616802,
+            0.10510134847575893,
+            0.33217196398469945,
+            0.1318338411269515,
+            0.21015990621247885,
+            -1.8656016634297663,
+            0.09828241559058118,
+            -0.38484034048215565,
+            -0.07829756288215953,
+            0.13589182898173133,
+            -0.5029616681352326
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 8.881784197001252e-15
+            },
+            "legendre": {
+              "value_error": 1.9095836023552692e-14,
+              "parameter_gradient_error": 1.7363888105137448e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13007,
+      "beta": 256,
+      "distinct_queries": 633,
+      "full_controls_max_value_difference": 2.881028748902281e-14,
+      "full_controls_max_gradient_difference": 3.311129148642067e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            -0.015274765841487268,
+            -0.006895320863116132,
+            0.0680116500316276,
+            -0.0169564619117513,
+            0.2091841374817191,
+            0.14505795905080518,
+            0.07189078726885548,
+            -0.027910385052071742,
+            0.19896124200271037,
+            -0.010872039644501421,
+            -0.025846797671843415,
+            0.08935814216256276,
+            -0.06346289820423248,
+            0.03388604869667402,
+            -0.00239468090210959,
+            0.18504554872593448,
+            0.022574125561336693,
+            0.06615904430826396,
+            0.14395361170818705,
+            0.0,
+            0.2801981868401993,
+            -0.016533021919635543,
+            0.022597308817433662,
+            0.31885043787413525,
+            -0.07678271883429615,
+            -0.06385693780036314,
+            -0.06395754149275736,
+            -0.04300049257292264,
+            -0.04918546767389973,
+            -0.04776412434718726,
+            -0.026402141150749577,
+            -0.0381453302539836,
+            -0.03143315791967589,
+            -0.024974866222755108,
+            -0.02010399323999387,
+            -0.0520472585104154,
+            -0.04263341435608668,
+            0.0,
+            -0.033140584839819645,
+            0.01581163402939729,
+            -0.03303483068236902,
+            -0.04887631120253188,
+            -0.03566586753771149,
+            -0.03841870489712655,
+            -0.06603975625269355,
+            -0.049342657345080754,
+            0.005915230769497305,
+            -0.021388251926309228,
+            -0.03219851121513027,
+            -0.05485717505953,
+            0.10582163293389994,
+            0.13687489286355886,
+            0.3747568514177971,
+            0.028526975697406306,
+            0.23656036766467317,
+            0.3834362867627095,
+            0.3502447181905057,
+            -5.7378351610036304
+          ],
+          "count_objective": -0.9089283020050654,
+          "count_gradient": [
+            2.2048261780785814,
+            -2.554043277140968,
+            -3.9029588692038666,
+            0.7773825691243,
+            -13.955101472356253,
+            -40.03935122371075,
+            -71.39044787503165,
+            1.296591249207775,
+            1.8708465112719146,
+            -4.366012394204945,
+            1.4935841553124016,
+            0.5375500506642469,
+            2.6508277443927017,
+            1.1359592451335752,
+            1.0464729697799435,
+            1.7974080406252417,
+            1.98390939833401,
+            -23.034291557159836,
+            -9.99439528051876,
+            0.0,
+            -9.116100592098718,
+            0.8041895411794234,
+            0.7980823826484887,
+            1.5454635890573156,
+            4.275422736289075,
+            3.508403491335246,
+            3.065380536484456,
+            2.137992250113995,
+            2.347450671142152,
+            2.367306714810256,
+            2.1841267331375955,
+            1.749346604473767,
+            1.894317070958671,
+            1.8299523874195383,
+            1.1500889871593287,
+            2.488520878423993,
+            3.5225468040622645,
+            0.0,
+            1.6068716395906237,
+            1.5430871997076614,
+            1.8438086771639328,
+            2.62718083140469,
+            2.0846145784251306,
+            2.0149477270406284,
+            0.008144137179641523,
+            2.8848915200301968,
+            0.7776112860511137,
+            1.4131065907167453,
+            1.8341730202018731,
+            1.0466274869149004,
+            2.3197949533065385,
+            -18.894059103293454,
+            1.889815483023517,
+            -12.021038001731492,
+            -54.172990105746905,
+            -34.382417896032685,
+            -4.252411470127677,
+            -8.762567530552664
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 8.526512829121202e-14
+            },
+            "legendre": {
+              "value_error": 1.9317880628477724e-14,
+              "parameter_gradient_error": 3.225864020350855e-12
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13009,
+      "beta": 1,
+      "distinct_queries": 57,
+      "full_controls_max_value_difference": 1.8762769116165146e-14,
+      "full_controls_max_gradient_difference": 6.2450045135165055e-15,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.19255194002212336,
+            0.020179964874085174,
+            0.2671311192881038,
+            -0.10857562366736347,
+            0.10744703011772966,
+            0.008631050451146142,
+            0.4089314026689805,
+            0.7019411031323075,
+            0.21596463779902536,
+            0.10980401530072109,
+            0.08734017392025564,
+            0.08714083282246848,
+            0.3452108044014065,
+            0.26858315459601245,
+            0.5213637047108197,
+            0.06986269956310985,
+            0.05342915279529602,
+            0.06499508826674086,
+            0.11138179816387044,
+            0.20041153387432306,
+            0.3576471388997223,
+            -0.014704939652691217,
+            0.4265876054442292,
+            -0.03918331651460151,
+            -0.04592546763856357,
+            -0.041908271559980254,
+            -0.04274730599425856,
+            -0.040685665738360154,
+            -0.01704783610116964,
+            -0.054853274537587184,
+            -0.03482668600908596,
+            -0.04559784739227986,
+            -0.04016324592812605,
+            -0.04559784739227986,
+            -0.05031847049224335,
+            -0.05558499229867596,
+            -0.100318067768085,
+            -0.052414182900845936,
+            -0.014876213996429258,
+            0.007671142192423031,
+            -0.03554408684067303,
+            -0.07710697352946946,
+            -0.08255147288450716,
+            -0.024952984984772077,
+            -0.224178057624754,
+            -0.14842814126748954,
+            -0.03294564487049079,
+            -0.008846657154086928,
+            -0.029663144145875807,
+            -0.3384323424429192,
+            -0.02645400056488808,
+            1.062328786533409,
+            0.1966048182652636,
+            0.011962563398686638,
+            0.10071251021387337,
+            0.6284142776749828,
+            0.1928125865677081,
+            -5.815284560007353
+          ],
+          "count_objective": -0.6902976734538473,
+          "count_gradient": [
+            0.0068473212321951615,
+            -0.007677816695189934,
+            0.0355646209002532,
+            0.0179130807692034,
+            0.01264395003954863,
+            -0.006959755398749596,
+            0.08425403607979769,
+            0.020838974040907312,
+            -0.009376563305505969,
+            -0.014123663104997937,
+            0.05549762288091559,
+            0.011965821805619293,
+            -0.019439232677915492,
+            0.057791573227496895,
+            -0.0038200785690387495,
+            0.04547948840560186,
+            -0.010381256895815597,
+            0.05006123263661294,
+            0.007844761786003395,
+            0.00030756829506975165,
+            0.008017100875541796,
+            -0.006396392159628291,
+            0.022630803570452062,
+            -0.006150341826380673,
+            -0.022243161364163308,
+            -0.02786367968512688,
+            -0.013599895804344422,
+            -0.015019183410975813,
+            -0.01525725964015201,
+            -0.0034679673359577392,
+            -0.01706625885160283,
+            -0.01598271483560676,
+            -0.017153594268881345,
+            -0.01598271483560676,
+            -0.024397207143772612,
+            -0.019460978692690537,
+            0.00417861176636882,
+            -0.0058891983656932986,
+            -0.018818644437354873,
+            -0.018097152642500662,
+            -0.005362910028484635,
+            -0.01012933463786324,
+            -0.006843543985402789,
+            -0.015985688346953256,
+            -0.022127262291447656,
+            -0.012435834542213062,
+            -0.006092934350465552,
+            -0.007265936037150228,
+            -0.00985862700307635,
+            0.01150587508616242,
+            -0.01590637003028371,
+            0.09444462577100045,
+            -0.0019575465094421323,
+            -0.009778512514089632,
+            0.2158462960690629,
+            0.1876962346776425,
+            0.05347012896097165,
+            0.08594157509832162
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 6.661338147750939e-16,
+              "parameter_gradient_error": 5.134781488891349e-16
+            },
+            "legendre": {
+              "value_error": 1.8096635301390052e-14,
+              "parameter_gradient_error": 1.4155343563970746e-15
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13009,
+      "beta": 16,
+      "distinct_queries": 177,
+      "full_controls_max_value_difference": 1.8984813721090177e-14,
+      "full_controls_max_gradient_difference": 2.4868995751603507e-13,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.002508693621372196,
+            -0.00468450125195983,
+            -0.01915947435590508,
+            -0.001621058647998299,
+            -0.0033094500414746417,
+            0.0055344381877922705,
+            -0.020968887461808347,
+            0.08934324039144223,
+            0.026041018918184868,
+            0.003860314893112421,
+            0.01965130423786199,
+            -0.004080534935876637,
+            0.004345452351338958,
+            -0.00554321840367028,
+            0.01858336576396309,
+            0.0024796239563942835,
+            0.048007822604326116,
+            -0.03065139776065437,
+            -0.03004246797313897,
+            0.1121776560805904,
+            0.011959922794248665,
+            0.0005612112065721514,
+            -0.004319800072122529,
+            0.0009065966982550189,
+            0.0019921789840313246,
+            0.002436273526382032,
+            0.002085029359414273,
+            0.002747978637450787,
+            0.001269118003306629,
+            0.0029336991067879107,
+            0.0013165101656455623,
+            0.0011769337732678757,
+            0.0016959096078102386,
+            0.0011769337732678757,
+            0.0022765189615208915,
+            0.0015604284680879382,
+            0.004555387668523756,
+            0.000667061897500737,
+            0.001827665953079532,
+            0.02194536564130624,
+            0.000720005195854659,
+            0.0010819986833495807,
+            -0.008224538403143866,
+            0.0016306884300547474,
+            0.0048012452825943255,
+            -0.010293464840012301,
+            0.0005352958837046094,
+            0.0006197901244048847,
+            0.0009171492156731468,
+            -0.003949224512358157,
+            0.001528852157671706,
+            0.0404834737015979,
+            0.017963570280424696,
+            0.0006611750581145756,
+            0.013374120044452324,
+            0.03147532812107318,
+            0.007015775682433029,
+            -0.35537906056506374
+          ],
+          "count_objective": -0.5136257109734212,
+          "count_gradient": [
+            -0.3382988801108245,
+            -0.06037604637884917,
+            -1.5402181717755263,
+            0.16233412187600227,
+            -0.5832574259380118,
+            -0.983645444069587,
+            -4.127949881907022,
+            -0.3166347102509114,
+            -1.7999062839645077,
+            -0.06576009770753731,
+            -1.4400887341222688,
+            -0.0806851699971059,
+            -0.42794294589774545,
+            0.01925683562486522,
+            -5.466124246897709,
+            -0.23327192937616617,
+            1.6344349514904009,
+            -1.971857782595392,
+            -0.5644668395335216,
+            -0.47427445019702436,
+            -0.11304447857860038,
+            -0.018514417875598224,
+            -5.514049020489063,
+            -0.08950044067627956,
+            0.4567630039417846,
+            0.5477591767684564,
+            0.055327021163349775,
+            0.44731036092619864,
+            0.10028824066238384,
+            0.9521188736052097,
+            0.47450456168989047,
+            0.6593654781685492,
+            0.2175674829479905,
+            0.6593654781685492,
+            0.4446449781706797,
+            0.7514473254826429,
+            0.699172600738036,
+            -0.013455554117991651,
+            0.03927631773217878,
+            0.6700166808588751,
+            -0.022903351642311807,
+            -0.028553770897377238,
+            -0.22609060825623933,
+            0.38381890645145084,
+            0.13990486774885977,
+            -0.1511889891907472,
+            -0.019806805174461824,
+            -0.018850986835841747,
+            0.29627639868399286,
+            0.3038703626324684,
+            0.2897260537742744,
+            -0.6333280323246298,
+            -0.5817141874322572,
+            -0.02682414215653025,
+            1.5101517833707927,
+            -0.9738419377080395,
+            -0.6543666840485812,
+            0.33566372265693273
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 5.551115123125783e-16,
+              "parameter_gradient_error": 4.6629367034256575e-15
+            },
+            "legendre": {
+              "value_error": 1.6542323066914832e-14,
+              "parameter_gradient_error": 2.4513724383723456e-13
+            }
+          }
+        }
+      ]
+    },
+    {
+      "case": "spambase_128",
+      "seed": 13009,
+      "beta": 256,
+      "distinct_queries": 625,
+      "full_controls_max_value_difference": 2.796374243274613e-14,
+      "full_controls_max_gradient_difference": 4.149569576838985e-12,
+      "independent_count_checks": [
+        {
+          "name": "worst_cross_control_query",
+          "weights": [
+            0.04545825067966362,
+            -0.004864027056094819,
+            0.05856446966106743,
+            -0.04764600014031457,
+            0.011598907293770333,
+            -0.015776578724127535,
+            0.09928787681448659,
+            0.22060097014875876,
+            0.049002929834537474,
+            0.02264027283366541,
+            -0.004236414979083468,
+            -0.00027476693942486,
+            0.3699687231879802,
+            0.09188367531970773,
+            0.14732844413024487,
+            0.0064838253625242245,
+            -0.0030527219130311433,
+            -0.00999566129191143,
+            0.03380045848765846,
+            0.04091633930334291,
+            0.0984576243629012,
+            -0.011332857684851583,
+            0.11040977726350658,
+            -0.022753842132115613,
+            -0.0379474585919331,
+            -0.04103758235404181,
+            -0.033226619919076876,
+            -0.03644886367971952,
+            -0.01959177667103221,
+            -0.03853981715174114,
+            -0.026876982223482795,
+            -0.0295517871628672,
+            -0.032646654474359806,
+            -0.0295517871628672,
+            -0.04262474994070681,
+            -0.03726221506795124,
+            -0.06471075597432026,
+            -0.026640519923174216,
+            -0.024521398559980048,
+            -0.017191646016788846,
+            -0.02080598699918794,
+            -0.04045697335368923,
+            -0.04644472390645389,
+            -0.024825782859240888,
+            -0.10624550819183307,
+            -0.07985569128353273,
+            -0.01791752237533708,
+            -0.00974022966780392,
+            -0.020639592153781187,
+            -0.12809573967612498,
+            -0.025776266107383605,
+            0.5053669604267198,
+            0.05206484638282266,
+            -0.004332572261728066,
+            0.03347024550345564,
+            0.20662924372356975,
+            0.04677422462014676,
+            -5.6524384612699885
+          ],
+          "count_objective": -0.7605157903902088,
+          "count_gradient": [
+            -1.176542267293441,
+            1.7784542707589823,
+            -24.437375237518214,
+            1.5045893468391802,
+            -12.97303189720158,
+            -19.467366442931898,
+            -86.59019976387634,
+            -12.999125570205207,
+            -45.360738156893525,
+            2.3659693659778895,
+            -37.906200761669155,
+            -1.1187332482966108,
+            -4.85366261549411,
+            1.8463432361827332,
+            -116.99548172949156,
+            -6.686095628794105,
+            -0.3913576509604974,
+            -37.97087885034784,
+            -3.0022088860177654,
+            -8.792648337788375,
+            1.6142587494774414,
+            1.081253644309532,
+            -120.07319789194582,
+            0.3747704114130775,
+            3.8243291561072517,
+            4.63915120679374,
+            3.1865336562133106,
+            3.8804666086340203,
+            2.4045483444953915,
+            3.336084823279718,
+            2.544491264051308,
+            2.3168697566695684,
+            3.2566224268246393,
+            2.3168697566695684,
+            4.367768513639456,
+            3.054784182955308,
+            5.089106533203838,
+            1.3782733646338932,
+            3.43469274555742,
+            -0.8455012954301333,
+            1.4312626407882965,
+            2.2153613329544846,
+            -2.8282159659006414,
+            1.5663570406768723,
+            3.2594709114733553,
+            3.037850339440058,
+            1.0811877976626272,
+            1.1746433929341382,
+            1.7819046237136515,
+            4.318481902963331,
+            2.9099834696016402,
+            -13.26907891376257,
+            -12.800172343099735,
+            1.3404574668118125,
+            -1.459377531219022,
+            -49.06591779221783,
+            -25.827831442412595,
+            -12.186386885220765
+          ],
+          "controls": {
+            "folded": {
+              "value_error": 0.0,
+              "parameter_gradient_error": 7.105427357601002e-14
+            },
+            "legendre": {
+              "value_error": 1.3766765505351941e-14,
+              "parameter_gradient_error": 4.078515303262975e-12
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

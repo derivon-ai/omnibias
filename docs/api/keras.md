@@ -24,7 +24,7 @@ Version **0.0.2a1** · Python **>=3.10** · **3 - Alpha** · Apache-2.0
 
 [Source](https://github.com/derivon-ai/omnibias/tree/main/packages/omnibias-keras/src/omnibias/keras). Modules below are relative to `omnibias.keras`; underscored modules are internal.
 
-`activations`, `activations.classical`, `activations.nqs`, `activations.piecewise`, `activations.proximal`, `activations.registry`, `activations.smooth`, `activations.tempered`, `activations.trigonometric`, `blocks`, `blocks.conv`, `blocks.linear`, `blocks.operator`, `fastpath`, `fastpath.dispatch`, `fastpath.eulerian`, `fastpath.hermite`, `fastpath.legendre`, `growable`, `identity_init`, `stencil`, `tempered_blocks`, `training`, `training.k_scheduler`, `unit`.
+`activations`, `activations.classical`, `activations.nqs`, `activations.piecewise`, `activations.proximal`, `activations.registry`, `activations.smooth`, `activations.tempered`, `activations.trigonometric`, `blocks`, `blocks.conv`, `blocks.linear`, `blocks.operator`, `experimental`, `experimental.model`, `experimental.operator`, `experimental.precision`, `fastpath`, `fastpath.dispatch`, `fastpath.eulerian`, `fastpath.hermite`, `fastpath.legendre`, `growable`, `identity_init`, `stencil`, `tempered_blocks`, `training`, `training.k_scheduler`, `unit`.
 
 Exports from `omnibias.keras`:
 

@@ -21,10 +21,9 @@ interval arithmetic from :mod:`omnibias.core.verified` -- independent of the
   uses the Neumann certificate :func:`~omnibias.core.verified.neumann_inverse_norm_bound`
   for ``||Q^{-1}||_inf``.
 
-The width of the returned interval is a rigorous bound on the suboptimality gap;
-it shrinks to zero as ``(x, lambda)`` approach the true optimum (``v -> 0`` and the
-primal/dual objectives meet). This is the certificate that distinguishes the
-omnibias solver from a plain float solve.
+The width bounds the suboptimality gap. It can remain conservative at an
+optimum because the inverse quadratic form is bounded using matrix/vector
+norms. A small numerical solver residual alone does not make it tight.
 
 For a **linear** program (``Q = 0``, optionally with equalities ``A_eq x = b_eq``)
 the Neumann ``Q^{-1}`` machinery does not apply; :func:`lp_dual_lower_bound` /
@@ -46,6 +45,7 @@ multipliers only loosen -- never invalidate -- the bound.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from fractions import Fraction
 from typing import Any
 
 import numpy as np
@@ -187,6 +187,48 @@ def _broadcast_box(x_lower: Any, x_upper: Any, n: int) -> tuple[np.ndarray, np.n
     return xl, xu
 
 
+def _has_equalities(A_eq: Any, b_eq: Any) -> bool:
+    if (A_eq is None) != (b_eq is None):
+        raise CertificationError("A_eq and b_eq must be supplied together")
+    return A_eq is not None
+
+
+def _lp_residual(
+    c: Any,
+    A: list[list[Interval]],
+    dual: list[Interval],
+    A_eq: list[list[Interval]],
+    eq_dual: list[Interval],
+) -> list[Interval]:
+    """Enclose the dual residual, including cancellation in diagnostic fields."""
+    result = []
+    for j in range(len(c)):
+        value = Interval.point(float(c[j])) + sum_intervals(
+            [row[j] * multiplier for row, multiplier in zip(A, dual, strict=True)]
+        )
+        value = value + sum_intervals(
+            [row[j] * multiplier for row, multiplier in zip(A_eq, eq_dual, strict=True)]
+        )
+        result.append(value)
+    return result
+
+
+def _exact_equality_point(A_eq: Any, b_eq: Any, x: Any) -> bool:
+    """Check exact equality of the converted binary64 data, not interval overlap."""
+    if b_eq.ndim != 1 or x.ndim != 1 or A_eq.ndim != 2 or A_eq.shape != (len(b_eq), len(x)):
+        raise CertificationError("equality constraint dimensions do not match the primal point")
+    if not (np.isfinite(A_eq).all() and np.isfinite(b_eq).all() and np.isfinite(x).all()):
+        raise CertificationError("finite equality data and primal point required")
+    point = tuple(Fraction.from_float(float(value)) for value in x)
+    return all(
+        sum(
+            (Fraction.from_float(float(a)) * value for a, value in zip(row, point, strict=True)),
+            Fraction(0),
+        ) == Fraction.from_float(float(rhs))
+        for row, rhs in zip(A_eq, b_eq, strict=True)
+    )
+
+
 def lp_dual_lower_bound(
     c: Any,
     A: Any,
@@ -219,7 +261,7 @@ def lp_dual_lower_bound(
     A_iv = to_interval_matrix(An.tolist())
     lam_iv = _ivec(lam)
     b_iv = _ivec(bn)
-    has_eq = A_eq is not None and b_eq is not None
+    has_eq = _has_equalities(A_eq, b_eq)
     Aeq_iv: list[list[Interval]] = []
     nu_iv: list[Interval] = []
     beq_iv: list[Interval] = []
@@ -235,14 +277,8 @@ def lp_dual_lower_bound(
 
     # dual-residual r_j = c_j + sum_i A[i,j] lambda_i + sum_k A_eq[k,j] nu_k.
     box = [Interval(float(xl[j]), float(xu[j])) for j in range(n)]
-    terms: list[Interval] = []
-    for j in range(n):
-        r_j = Interval.point(float(cn[j])) + sum_intervals(
-            [A_iv[i][j] * lam_iv[i] for i in range(m)]
-        )
-        if has_eq:
-            r_j = r_j + sum_intervals([Aeq_iv[k][j] * nu_iv[k] for k in range(m_eq)])
-        terms.append(r_j * box[j])  # min over the box is (r_j * box_j).lo
+    residual = _lp_residual(cn, A_iv, lam_iv, Aeq_iv, nu_iv)
+    terms = [value * bound for value, bound in zip(residual, box, strict=True)]
 
     base = -sum_intervals([b_iv[i] * lam_iv[i] for i in range(m)])
     if has_eq:
@@ -267,9 +303,15 @@ def certify_lp_optimum(
 
     Lower bound: the verified :func:`lp_dual_lower_bound` (Neumaier-Shcherbina, valid
     for the solver's approximate multipliers). Upper bound: ``c^T x`` at the supplied
-    primal ``x``, which must be rigorously feasible (``A x <= b`` and, if given,
-    ``A_eq x = b_eq`` within rounding). ``x_lower`` / ``x_upper`` are required finite
+    primal ``x``, which must be rigorously feasible. Inequalities use directed
+    intervals; equalities use exact rational arithmetic on the converted binary64
+    coefficients and point. An equality residual interval containing zero does
+    not prove feasibility. ``x_lower`` / ``x_upper`` are required finite
     variable bounds containing the feasible set.
+
+    The certificate concerns the arrays after conversion to binary64. A nearly
+    feasible numerical point can fail the equality check; the dual lower bound
+    remains available independently through :func:`lp_dual_lower_bound`.
 
     Raises
     ------
@@ -295,33 +337,28 @@ def certify_lp_optimum(
     b_iv = _ivec(bn)
     Ax = matvec(A_iv, x_iv)
     primal_feasible = all((b_iv[i] - Ax[i]).lo >= 0.0 for i in range(m))
-    has_eq = A_eq is not None and b_eq is not None
+    has_eq = _has_equalities(A_eq, b_eq)
+    Aeq_iv: list[list[Interval]] = []
+    nu_iv: list[Interval] = []
     if has_eq:
         Aeqn = np.asarray(A_eq, dtype=float)
         beqn = np.asarray(b_eq, dtype=float)
         Aeq_iv = to_interval_matrix(Aeqn.tolist())
-        beq_iv = _ivec(beqn)
-        Aeqx = matvec(Aeq_iv, x_iv)
-        eq_ok = all(
-            (beq_iv[k] - Aeqx[k]).lo <= 0.0 <= (beq_iv[k] - Aeqx[k]).hi
-            for k in range(beqn.shape[0])
+        eq_ok = _exact_equality_point(Aeqn, beqn, xn)
+        nu = (
+            np.zeros(len(beqn)) if eq_dual is None else np.asarray(eq_dual, dtype=float)
         )
+        nu_iv = _ivec(nu)
         primal_feasible = primal_feasible and eq_ok
     if not primal_feasible:
         raise CertificationError(
             "x is not rigorously primal feasible (A x <= b / A_eq x = b_eq violated "
-            "within rounding); c^T x is then not a valid upper bound"
+            "by the supplied point); c^T x is then not a valid upper bound"
         )
 
-    resid = cn + An.T @ np.maximum(np.asarray(dual, dtype=float), 0.0)
-    if has_eq:
-        nu = (
-            np.zeros(np.asarray(b_eq).shape[0])
-            if eq_dual is None
-            else np.asarray(eq_dual, dtype=float)
-        )
-        resid = resid + np.asarray(A_eq, dtype=float).T @ nu
-    dual_residual_inf = float(np.max(np.abs(resid)))
+    lam_iv = _ivec(np.maximum(np.asarray(dual, dtype=float), 0.0))
+    residual = _lp_residual(cn, A_iv, lam_iv, Aeq_iv, nu_iv)
+    dual_residual_inf = inf_norm_vector(residual)
 
     cTx = sum_intervals([Interval.point(float(cn[j])) * x_iv[j] for j in range(n)])
     enclosure = Interval(lower.lo, cTx.hi)

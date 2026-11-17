@@ -1,0 +1,6 @@
+attack,seeds,accuracy_percent,std_pp
+clean,5,81.07,0.17
+FGSM,5,26.17,5.41
+PGD20,5,1.06,0.21
+PGD50,3,0.93,0.14
+AutoAttack,3,0.0,

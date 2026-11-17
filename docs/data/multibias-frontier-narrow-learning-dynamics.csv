@@ -1,0 +1,11 @@
+seed,method,last200_training_CE_reduction_fraction,final_validation_CE,scope
+7307,band,0.0012050734675008333,0.7675582445021059,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7307,mlp,-0.00010169151065836332,0.3818629985258707,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7309,band,0.011170144802593335,0.3157962421416201,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7309,mlp,0.020019848299737485,0.4897070027486511,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7321,band,0.00205657401588567,0.8151419145013143,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7321,mlp,0.02103979438444897,0.3786779088412035,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7331,band,0.0018418721880687793,0.4613733106346626,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7331,mlp,0.02325947350809537,0.5309277682745144,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7349,band,0.003427934392446726,0.5120470727325425,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof
+7349,mlp,0.01758510262591154,0.4669944487537824,selected final config; soft band-fitting head is discarded at compilation; no global convergence proof

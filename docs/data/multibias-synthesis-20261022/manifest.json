@@ -1,0 +1,658 @@
+{
+  "schema": "multibias-synthesis-v1",
+  "status": "COMPLETE_EVIDENCE_SYNTHESIS",
+  "created_utc": "2026-10-22T18:41:06.622453+00:00",
+  "scope": "Read-only historical extraction, 116 CPU compatibility records, independent size accounting, literature comparison. No new model training.",
+  "evidence_tiers": {
+    "A": "retained lab numerical evidence",
+    "B": "paper/repository reported, not independently retrained",
+    "C": "conditional proofs and analytic fixtures"
+  },
+  "inputs": {
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-evidence-index.json": {
+      "sha256": "a5749b01fc2c86f74aae99f4a0fbfa6b8c952f08ff27237317d3016f1307d930",
+      "bytes": 309798
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-manifest.json": {
+      "sha256": "9147314fd0edadbc43731167ced800fd6fd6c9ebadaef70b658a51cf8dce3caa",
+      "bytes": 72249
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/check_synthesis.py": {
+      "sha256": "a28962ad44499113c6e8361321ee110da0983a3d8e354ce6094f232d1db85af8",
+      "bytes": 3384
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/build_report.py": {
+      "sha256": "f00a1d2dc68fd844a157879d604fde85512ef39e897e437a325407922a893dde",
+      "bytes": 12303
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/replay_manifest.py": {
+      "sha256": "176f0d96d29448443854a790c3cfdcd1793b0c48841e812ede17b3eef1aab020",
+      "bytes": 1116
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/paper_additions.json": {
+      "sha256": "7f1d99460d03352bb1a32770e46febe80c181ab671192bb3f32b68c925cc0bc1",
+      "bytes": 8476
+    },
+    "/home/vardan/dev/projects/omnibias_projects/multi_bias/paper/appendix.tex": {
+      "sha256": "4ff0dfae636441babff4764b35dfc72415667a46013fb82ae8a3211245c0de66",
+      "bytes": 146686
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/paper_negatives.json": {
+      "sha256": "05e2e184bfb8e0c08ebc9fa040291c76fc187c79412375b607327e755849084a",
+      "bytes": 3059
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/compatibility_extra_raw.json": {
+      "sha256": "5b3c7e089f0c8b79557941e0a5f77b98b4fc67edba697d4e80c414d8da8f3a15",
+      "bytes": 1865
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/compatibility_raw.json": {
+      "sha256": "142782434f051ce2f5763bd4ff710c8bd4925732d95f35ae83b7b5a31bf82706",
+      "bytes": 29087
+    },
+    "/home/vardan/dev/projects/omnibias_projects/multi_bias/multibias/activation.py": {
+      "sha256": "bc25e8d4789c33b5eb9fef8fd4ee39c761cdaa51c075047aa4e74500f69643e5",
+      "bytes": 21436
+    },
+    "/home/vardan/dev/projects/omnibias_projects/multi_bias/multibias/_function.py": {
+      "sha256": "027a799579ccec293294cc6709640a558615aebbab918c27f80c77d2e823f899",
+      "bytes": 9945
+    },
+    "/home/vardan/dev/projects/omnibias/packages/omnibias-torch/src/omnibias/torch/fastpath/dispatch.py": {
+      "sha256": "ce4207a4e2a6d03e5b510103e05145a7ccf6a5af5a12cfce35412a2e3d397e44",
+      "bytes": 8749
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/compatibility_audit.py": {
+      "sha256": "3dc662e1d831afc4ca72c8e4c047104f68933e9e0fc00909f8faaf9925b5f57f",
+      "bytes": 4936
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/metrics.json": {
+      "sha256": "627f1a0463a1dafa94eda7bd1483d21902dad672bcdce5c21873d6c2f2c6164b",
+      "bytes": 128400
+    },
+    "/home/vardan/dev/projects/omnibias/docs/activation-profile-compression.md": {
+      "sha256": "799b35233d7cf052fde4db052720b98169c57cc505aa119074768fbe81fc556d",
+      "bytes": 30487
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4001_teacher_0/result.json": {
+      "sha256": "652f3d9d9d17d646f2686a8404d32cc398cc3cb4f4ddb650f8d5ef49cc9573d1",
+      "bytes": 8678
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4003_teacher_0/result.json": {
+      "sha256": "984ccc88d5d5acce56cc362ea46586982e358b8e9a133a17427721a1ee7bbdfc",
+      "bytes": 8686
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4007_teacher_0/result.json": {
+      "sha256": "92a7ff0cf3b7e410e61c8ae9d8305b38de516bbeb183fa71338783e43569b46e",
+      "bytes": 8689
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4001_fixed_16/result.json": {
+      "sha256": "1fde3718907f75abb48e09ea547f2cff97e3424a1ef6f3bf5bb0570a38858ab4",
+      "bytes": 11672
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4003_fixed_16/result.json": {
+      "sha256": "81f838774d396b7a41a33fbd8c6649fc0f744e3dc1203355812ba0a1381b5add",
+      "bytes": 11672
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4007_fixed_16/result.json": {
+      "sha256": "1920096fd07b16f52fb8aee8ec6dc8f23f2dfb53ab9b020d61103ca5f9c0318c",
+      "bytes": 11673
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4001_adaptive_16/result.json": {
+      "sha256": "daf932ec94814b0ad0ba47c72a26b2ed98890dbbc0734237d13a636da9ce6070",
+      "bytes": 13721
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4003_adaptive_16/result.json": {
+      "sha256": "d11bdabb02e3d026b0409a1fd988b3d61ba488c4d24e62012606c390b33cfdd9",
+      "bytes": 13725
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4007_adaptive_16/result.json": {
+      "sha256": "bc4a881ba91eba5bc3e432f29fc22edb709de31e3481c6a02415f502a61bdfa1",
+      "bytes": 13722
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4001_pruned_8/result.json": {
+      "sha256": "8757879dad54b9faa22231837bd023b956791d9a5cd7122bd057eaee8b51759b",
+      "bytes": 7896
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4003_pruned_8/result.json": {
+      "sha256": "611b165ea5f37ca6c528634acf7fd6da7bd8476f66e006c124695d6b8d77fce5",
+      "bytes": 7871
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4007_pruned_8/result.json": {
+      "sha256": "fe977778633e1a1edda826b655b292b42f1d12a9bbb197d612fc490d7380a3f9",
+      "bytes": 7870
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4001_pruned_16/result.json": {
+      "sha256": "92e88421ed3c1cc3db6dd23e6a2ad4803d4c176ec00cdec43eea320f0eaf585f",
+      "bytes": 7870
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4003_pruned_16/result.json": {
+      "sha256": "de53137fc64f1c99e4fd567d462594ccae59eaba03f6e86c923de9eb1dda0454",
+      "bytes": 7897
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4007_pruned_16/result.json": {
+      "sha256": "b2bbe05cd36c2272d38976f7d54c1f097c142b3815f3d09a8de34da916c4ad3f",
+      "bytes": 7872
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4001_merged_inverse_16/result.json": {
+      "sha256": "bfd7745e2b7bbc00c12ab935b775e0e8eac3d6f6b3b49c2808336b416c2b570c",
+      "bytes": 7918
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4003_merged_inverse_16/result.json": {
+      "sha256": "e7e8a8467530c1f9e9372a74b57e8730efb6552465c85616911a43ee8b13f4c3",
+      "bytes": 7914
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4007_merged_inverse_16/result.json": {
+      "sha256": "cd64c01150e2facfdb3c08d8e2d52470c8230347daa549aaeed789d39f44e034",
+      "bytes": 7908
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4001_lowrank_16/result.json": {
+      "sha256": "fd6f890cda96b3633048350e135d3ada5c5b642de877490c8113c9e0d775113c",
+      "bytes": 7905
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4003_lowrank_16/result.json": {
+      "sha256": "56904d0a63f2a9e44578a7e53014363c781314bfe6e98bff82c543e588168aa7",
+      "bytes": 7891
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4007_lowrank_16/result.json": {
+      "sha256": "7b51d1c739aba86b420266faeed327266b86c6328827aaa89c5b17748ab2dac8",
+      "bytes": 7869
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4001_spline_16/result.json": {
+      "sha256": "42831afffa8af40b10cea86de3cb4b45df55912183dd9ac37c39fa57b9611f13",
+      "bytes": 7772
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4003_spline_16/result.json": {
+      "sha256": "4c5c086f5b033eed5d8370dfb3044d141a173b0e80a92d0844708ff48b88a595",
+      "bytes": 7786
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/digits_standard_4007_spline_16/result.json": {
+      "sha256": "2ae2c21116bc024abe03ead373e262cca3e0095f4f593fab6113ab316bf84200",
+      "bytes": 7803
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4001_teacher_0/result.json": {
+      "sha256": "e1aa1330cfb1a669e151800a0bc5d905a8c67dc0eb5fa037f11684ecab90bbad",
+      "bytes": 8695
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4003_teacher_0/result.json": {
+      "sha256": "67142b7b2500f2204040042cf3b765d7886497921a0567bf3ab3262a911d06a3",
+      "bytes": 8666
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4007_teacher_0/result.json": {
+      "sha256": "01abf7140efcf075280963f4e61cde479ad1a1648ddfd935497807c0e7f4a26d",
+      "bytes": 8699
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4001_fixed_16/result.json": {
+      "sha256": "fa08fef5be0f4b10b19f11de051fdaa5515690a97b9530841d0a2acfeacddeb4",
+      "bytes": 9150
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4003_fixed_16/result.json": {
+      "sha256": "eb27a385f6388029e400d577a33e11cf7732ecfad8c612bb06a1ab1d6d7e652a",
+      "bytes": 9126
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4007_fixed_16/result.json": {
+      "sha256": "bef44abbf7bcc233a84a781bdfc2ff98af65c69346957d85ec5c8f7ab70f0402",
+      "bytes": 9155
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4001_narrow_sigmoid_16/result.json": {
+      "sha256": "b1732bfb0f07fdc0e43621e1fa62f54adf2c17a042aecb764f12630a3428acaa",
+      "bytes": 8105
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4003_narrow_sigmoid_16/result.json": {
+      "sha256": "a28a571a8ae7ec3b126dab517ebd4369bd96b5c4575e1586d825841cb123de60",
+      "bytes": 8105
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/artifacts/activation_compression_20261020_thread1/cases/depth_digits_standard_4007_narrow_sigmoid_16/result.json": {
+      "sha256": "386c832bd146299d7f63e7b904638806f046a8dafadb9cd4f56b7c3014fd47a7",
+      "bytes": 8086
+    },
+    "/home/vardan/dev/projects/omnibias/docs/multi-bias-learning-and-margin.md": {
+      "sha256": "6489325256487a0e85d5916f03a8df7165eddeafefa273f328fa9c1d31c75cfa",
+      "bytes": 68007
+    },
+    "/home/vardan/dev/projects/omnibias/docs/benchmarks/multibias_learning_and_margin.json": {
+      "sha256": "564da76670b07049960cf53062ebc16b1fb48d376a0e5390cab404d41af6a868",
+      "bytes": 135787
+    },
+    "/home/vardan/dev/projects/omnibias/docs/multibias-frontier-study.md": {
+      "sha256": "428acb05d4b6b88cff5e8cba6c6cfa64dd14bfa551f317cab780dbb46bd73de8",
+      "bytes": 99967
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-growth-discovery.csv": {
+      "sha256": "c38ad19415941e4a27078c3c3b70204a00a8ee7e937b1a6fcaf35dca5b1041a5",
+      "bytes": 12091
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-pretrained.csv": {
+      "sha256": "48b22d3e83529e2ba136eaeb5cf4db645ff742b9bb715d30574ee41dd887d81f",
+      "bytes": 19256
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-rollout-comparison.csv": {
+      "sha256": "c0a01d24a57bb5ff8d822197948c163af7b98aa628c6b92785e5d5cc95f53bf0",
+      "bytes": 2314
+    },
+    "/home/vardan/dev/projects/omnibias/docs/multibias-followup-audit.md": {
+      "sha256": "7dd80c1b354e1bb8134552953385a07860d3fcfc8f345defeecbed52320aa4db",
+      "bytes": 23374
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-compression.csv": {
+      "sha256": "fb7a2faa42e016e36aeb1bde98f85a6131d0f0b8327ed918ff35c118693c6d2b",
+      "bytes": 670
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-bands.csv": {
+      "sha256": "1acd0199d0d3228bf77c0bfacb920b7dc50512e470344a5f3885354c047710ed",
+      "bytes": 676
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-bands-corrected.csv": {
+      "sha256": "d68dc1962bc1d9afa695883b2c879a7b671fd72b4513a97e11c89981ea4edf26",
+      "bytes": 20540
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-count-diagnosis.csv": {
+      "sha256": "2f0ab7ac8e7737485c96b26ef6e331069471151bb43c6a40fed74ae337ff8c64",
+      "bytes": 1594
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-filtering.csv": {
+      "sha256": "13ca31f29454d1d5d5bc9d52c710f5c919bb233dbf3cfd041522461f131420f1",
+      "bytes": 28775
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-filtering-long.csv": {
+      "sha256": "e20d3c91ffd251e1bc94957e57a1893c324189bb4330b5cd681a92d2543327f2",
+      "bytes": 5127
+    },
+    "/home/vardan/dev/projects/omnibias_projects/multi_bias/paper/main.tex": {
+      "sha256": "625c9952f7ae46afc20ea5e5e5b44d5801f467ab7a9eaadc07aecbe6ee2cc5c1",
+      "bytes": 45905
+    },
+    "/home/vardan/dev/projects/omnibias_projects/multi_bias/rebuttals/reviewer_c3to_repro/reference/expected_numbers.md": {
+      "sha256": "a7bf3349acff663422ee49d17ec9ca82ad5ae1d619e812dc2dce9e0e4d752ed3",
+      "bytes": 2133
+    },
+    "/home/vardan/dev/projects/omnibias_projects/multi_bias/rebuttals/reviewer_c3to_repro/reference/baseline_comparison.md": {
+      "sha256": "626367b44a953aa1863123bee3750393e06b062e1bcc0489a45797f1e4fb5cbf",
+      "bytes": 2882
+    },
+    "/home/vardan/dev/projects/omnibias_projects/multi_bias/rebuttals/progk_summary.json": {
+      "sha256": "cc51c5b795049f384a8d014d50022166c22d25dbf352ddfab4c10bd197308d26",
+      "bytes": 728
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/prior.json": {
+      "sha256": "ecb319474ef9872cdb2e36245c63c9ca7b83adb5b17b09b30ca5ba55d28d3313",
+      "bytes": 6549
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/report_template.md": {
+      "sha256": "850cf893e0304af7b0c18bd7f389eb72bba1d7489f8b610cbe0f30cd40ef6f2f",
+      "bytes": 50835
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/README.md": {
+      "sha256": "22f7abe7cbf1fe0e17e1accb36476c66492dc9528d411ab741358972bda66930",
+      "bytes": 863
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/compatibility_extra.py": {
+      "sha256": "440a14563d2d76dd94e702ba6b3280527ac3d3fab997d30fa746299440a26620",
+      "bytes": 2543
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/make_manifest.py": {
+      "sha256": "2b45185ba1d1f3874ba0a991ecb78b34c3e4ff0494698ad4a46e6a013d62c9b4",
+      "bytes": 4300
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/compatibility.json": {
+      "sha256": "44cb81eb8aee7ea8812047cf28163042f9ddefa6cab23f55faf7081568350f15",
+      "bytes": 45954
+    },
+    "/home/vardan/dev/projects/omnibias/docs/two-bias-bell-experiment.md": {
+      "sha256": "dc70aef51d3e470e20a0bba86837810aac36a96179e97c46a494b3a655845c62",
+      "bytes": 21017
+    },
+    "/home/vardan/dev/projects/omnibias/docs/multi-bias-capacity-and-architecture.md": {
+      "sha256": "1c0c1efdf97a159f01eb945bd421ab20e9d96f9ef26eee3e26bb29ab42c955e7",
+      "bytes": 23684
+    },
+    "/home/vardan/dev/projects/omnibias/packages/omnibias-torch/src/omnibias/torch/identity_init.py": {
+      "sha256": "f4c1a446e7b276e6759e958b14fb1f1dea29898c56a384dde4888d91bd0e594d",
+      "bytes": 2658
+    },
+    "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/multibias_frontier_research/models.py": {
+      "sha256": "852fee4d2a08856b5464cf1e37547fa64ec71ab156efca480d4e91a02d6af0ce",
+      "bytes": 10875
+    }
+  },
+  "outputs": {
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/filtering_longer_diagnosis.csv": {
+      "sha256": "e20d3c91ffd251e1bc94957e57a1893c324189bb4330b5cd681a92d2543327f2",
+      "bytes": 5127
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_same_topology_binary_CIFAR.csv": {
+      "sha256": "9da57906b0d5cfe50c3e3e3a95610f15b5f24ebbf080f90fb17202a2e88eece4",
+      "bytes": 160
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/pretrained_primary.csv": {
+      "sha256": "452bfc2b928b3b14a596e56353be70dd1be7364e5184b1eafe4a6b7746c6a6da",
+      "bytes": 5563
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/digits_depth.csv": {
+      "sha256": "309e907c60fd6ef784b9c4625d73c313ccf6022d0c5bba8161cc11c4273ff586",
+      "bytes": 1963
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_adversarial_revision.csv": {
+      "sha256": "f6c7ac2a7c799a11093c56f771d038ebd16a3d63250faaebdbe8959f995a2b3e",
+      "bytes": 134
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/early_image_pilot.csv": {
+      "sha256": "879df2ac912ac0f6685f4e8ca8eb378100462ab0e97c97be333844f24e97944e",
+      "bytes": 2958
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_peft.csv": {
+      "sha256": "9417d136c3cc86fdf340c36862225b07254859a18816e508357a9c7861cf9c62",
+      "bytes": 2966
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_INR.csv": {
+      "sha256": "b5841ad9fbdb9635186b308cad38466c171f65c2816c639e80814072bd6524cd",
+      "bytes": 249
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_GMM.csv": {
+      "sha256": "2595dedd7243792fd7fc61539fa8994008f85c77d4af4b77fbd4f7204dfabf46",
+      "bytes": 244
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/fresh_bands.csv": {
+      "sha256": "08eb1f90dc6d58c207afc1111682a3c356507b987207c2b5202beb48fb3185dd",
+      "bytes": 589
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/resnet18_scale_aware_repair.csv": {
+      "sha256": "ae7ee3253b502665a4174ca3588c213755857651e87a278004f2af31a404db3c",
+      "bytes": 770
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_progressiveK.csv": {
+      "sha256": "b0a0aa7b01963c5a93816cd36535020ef5440c1961595f542e5694093b4d0396",
+      "bytes": 366
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_other_profile_controls.csv": {
+      "sha256": "2230893f4328ed76c2ab06fbc914ecdb22959c1dcdfbd3df16dc61675c5dd039",
+      "bytes": 200
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_tabular.csv": {
+      "sha256": "0bb755594d1d61e94740de02c6314d53e322b6eae6a764f6c4cf7710fd82daaa",
+      "bytes": 229
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_profile1D.csv": {
+      "sha256": "21d8e79858167e61c615ec444654be27c3013560b9893d7498a8e3ddbf5d62fd",
+      "bytes": 197
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/count_strong_controls.csv": {
+      "sha256": "2f0ab7ac8e7737485c96b26ef6e331069471151bb43c6a40fed74ae337ff8c64",
+      "bytes": 1594
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/growth_discovery.csv": {
+      "sha256": "4415b6cbaa91b845d9752f1b1484cd53f31f0db7df0d2fee4ab6511c8dfaa4b1",
+      "bytes": 1636
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/comparison_tables.json": {
+      "sha256": "917b93a2bfefbc2783825dc4c122a9e0bc1ed81111d7a6895fa9a0545d226a80",
+      "bytes": 8573
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/pretrained_composed.csv": {
+      "sha256": "81caf3d3bc0cd411af9be896370fbb4e5f9029ea58ed83d3f5e038d9eb070bb1",
+      "bytes": 850
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/evidence.json": {
+      "sha256": "63b0e576c918e56d3ad9b911ba1b5b45c616b3a64bc3fe5200205c6d2ff352bc",
+      "bytes": 204599
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_BNN.csv": {
+      "sha256": "145dc3f1469f32979836e81c685377d792748c9a99e506009b1cbfe818725485",
+      "bytes": 358
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_DWN.csv": {
+      "sha256": "fcb526bdc3c5c41edd0b4b744283b973999fffd6560b72dd05503213b4b4fe3b",
+      "bytes": 355
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_localization.csv": {
+      "sha256": "f851b1d5b76d35c7aa95290d5ffd5e9dcb661f49297b5587c7960d6346ed5d20",
+      "bytes": 492
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/digits_compression.csv": {
+      "sha256": "8d0b9e7ca3c313bbc297953f0e0ea417945c6d0415e38ea29fc090e5df1c2fe4",
+      "bytes": 5820
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_OOD.csv": {
+      "sha256": "4737f9e18dbee363a17da1c1694a37ae9d2d519758b6a80871bf267fa361b779",
+      "bytes": 232
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_staircase.csv": {
+      "sha256": "063ae17bf47484ea6074f6456c945f4e84475f7a880ff7ca41f9722cea8c1afe",
+      "bytes": 132
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_label_noise.csv": {
+      "sha256": "a24ae2cf4d4018e50aa0ad1c3deb2863f0dd98bb6ea5e58ea36baa9437e26246",
+      "bytes": 192
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_tiny_gpt.csv": {
+      "sha256": "16160c11e519a1158f1b933b79bc36bb3dd8dc2fba5f8ba91e7dd3114a77fe62",
+      "bytes": 374
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/dependencies.json": {
+      "sha256": "d927b61da8953ff09ba7cf42762f97c5758e3f9ad311563312533c9e8881a61d",
+      "bytes": 381
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/paper_extra_small_parity.csv": {
+      "sha256": "6806e038d8bf9d939784f5fe0f1c623b8adfc598bec299dadd912ba687697397",
+      "bytes": 107
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-synthesis-20261022/filtering_fresh.csv": {
+      "sha256": "430b8e91fb1b6315f7b7007155c5a701baa7204e72136eaceb505db786be9b60",
+      "bytes": 1515
+    },
+    "/home/vardan/dev/projects/omnibias/docs/multi-bias-research-synthesis.md": {
+      "sha256": "afce37d9e1a163c176670b82026b24a5f5108c85c9ed6ed34842f3bf3e664ebc",
+      "bytes": 58883
+    },
+    "/home/vardan/dev/projects/omnibias/docs/img/research/multibias-synthesis-20261022.png": {
+      "sha256": "e2d81c9b4f068fc1286737a7ab27f46e893e3ed0a00d5107c1eec3c2a38bd9c6",
+      "bytes": 153723
+    }
+  },
+  "preserved_public_files": {
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-bands-corrected.csv": {
+      "sha256": "d68dc1962bc1d9afa695883b2c879a7b671fd72b4513a97e11c89981ea4edf26",
+      "bytes": 20540
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-bands-primary.csv": {
+      "sha256": "45ddf7506535c50bf83eceac7c0986af7b2e5103df444503c9c2febdb8085582",
+      "bytes": 15490
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-cached-accuracy-followup.csv": {
+      "sha256": "5bb42cc63b9a0cf68487895e085e1cf14dfe4b1712e4afaa92099e07db190a95",
+      "bytes": 10447
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-cached-accuracy-latency.csv": {
+      "sha256": "2af17ae1983193fa409d1088094bdbb5224dbe80bd27ee3b93b40c20ef0ca532",
+      "bytes": 6054
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-confidence-replay.csv": {
+      "sha256": "3bc412ec4e001e54271c2ae7fb46de12109acfbef57bd9f33328d85fffee0f41",
+      "bytes": 5525
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-count-diagnosis.csv": {
+      "sha256": "2f0ab7ac8e7737485c96b26ef6e331069471151bb43c6a40fed74ae337ff8c64",
+      "bytes": 1594
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-count-readout-replay.csv": {
+      "sha256": "afe33e031c8ad71450241cf71e2fbeeb56d56c317f4bbe57b6783c62e82a3a83",
+      "bytes": 340
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-growth-discovery.csv": {
+      "sha256": "c38ad19415941e4a27078c3c3b70204a00a8ee7e937b1a6fcaf35dca5b1041a5",
+      "bytes": 12091
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-growth-latency.csv": {
+      "sha256": "3bba5ff2464f3d29af26d11565bb2166343c50e2caa62f85f0ad818c8fe4031c",
+      "bytes": 8316
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-isolated-gpu.csv": {
+      "sha256": "1b499ab404c8aabb5d06fa092c130635918b7c2e6aa752305053f2f30cc219db",
+      "bytes": 9252
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-learning-curves.csv": {
+      "sha256": "2ee9e5f54c07f8f8609691731277094a04823c63184f265e0547504543e16e20",
+      "bytes": 110736
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-longer-growth-diagnosis.csv": {
+      "sha256": "9b61d573e64f933098979943da4237cbe4df6c62b50b322df8c55563cfab7f92",
+      "bytes": 1442
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-matched-coverage.csv": {
+      "sha256": "8c9fde901adc1b20011396e94a1cadb6557c7d57e32ab00b6999597818e4ca8d",
+      "bytes": 84909
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-narrow-learning-dynamics.csv": {
+      "sha256": "a0d2ccc110a6de967d89b1fee8ed36eb44e11e81f214162440d5bbebc8f90929",
+      "bytes": 1614
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-paired-mistakes.csv": {
+      "sha256": "35ed4ee4ded0467b553ea58632b1918ad8c57c567469548f4a6f2e10bc72ab40",
+      "bytes": 1687
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-pretrained-case-status.csv": {
+      "sha256": "a8f149205afcc8ee976d9e86093b7a6ab6c8d88cf4a3570e7cbbca8432c45e5e",
+      "bytes": 290
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-pretrained-latency.csv": {
+      "sha256": "3f65602e9476af0f82c95f2a691f1dde02e1fefb9d6a784e16de5acae25ee743",
+      "bytes": 15171
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-pretrained.csv": {
+      "sha256": "48b22d3e83529e2ba136eaeb5cf4db645ff742b9bb715d30574ee41dd887d81f",
+      "bytes": 19256
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-profile-diagnostics.csv": {
+      "sha256": "988371761ae6c7c8abb6aa36723ae2e97c51cfbd283a1d46e7b9ac3505cd4582",
+      "bytes": 885
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-profile-shape-use.csv": {
+      "sha256": "ef29752be1898f6495bb700274b5dc781a2a9909e4b6c1ba27d9345e97d3fa68",
+      "bytes": 11905
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-projection-budget.json": {
+      "sha256": "2eab5c858d378028a85cc48eab4313a692adabace3d9843f4e4b7e2cb37f477d",
+      "bytes": 2684
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-projection-diagnosis.csv": {
+      "sha256": "9dfa7e6c61384b8114ff26571d8da974e04e0edc1dc37e39147a9d4992f71069",
+      "bytes": 2609
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-quantized-combinations.csv": {
+      "sha256": "dc6485c0c6f8aad248a7cc5a976c2ea45bd55d88ebbe96bc934cad487f100f6c",
+      "bytes": 9428
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-reconstruction.csv": {
+      "sha256": "332e9842d947a04a777e0d5ffb722b90eb88ccfd963550c6be3437f5eea60470",
+      "bytes": 146701
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-rollout-comparison.csv": {
+      "sha256": "c0a01d24a57bb5ff8d822197948c163af7b98aa628c6b92785e5d5cc95f53bf0",
+      "bytes": 2314
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-rollout.csv": {
+      "sha256": "a54b9c725d0b07186226cc12e0c6644ca9e754e0caf269866da2609eb79953d9",
+      "bytes": 2082
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-selective-risk.csv": {
+      "sha256": "02e85b9d917d0f58b37b09f7b9a76db11942094b3e6ed290851e52d5efa93162",
+      "bytes": 88481
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-smooth-followup.csv": {
+      "sha256": "039daf0882b09dcdeeb26e9eacb2da14bd66b10135887243e4376719ae314b82",
+      "bytes": 3138
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-table-manifest.json": {
+      "sha256": "bca3a9465fc7f2d7652dca8a94d055290fb1a414e3982be67a5c10a7016d83c8",
+      "bytes": 3803
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-two-level-feasibility.csv": {
+      "sha256": "2532a616c188007280ce7b4996360d135e27a7ade694043f7708ce9593ebe0fb",
+      "bytes": 5479
+    },
+    "/home/vardan/dev/projects/omnibias/docs/img/research/frontier-band-confirmation.png": {
+      "sha256": "4fde54e1b24a15c5a3c598fe6801cdae1bcbc3b2763b8ca19fefd1f110d8fff6",
+      "bytes": 218444
+    },
+    "/home/vardan/dev/projects/omnibias/docs/img/research/frontier-learned-profile-shapes.png": {
+      "sha256": "7223d1b082fb3d6df1ddc9c70e19f99cc9af7fdb1ae750efadd09f1ec0c0ee32",
+      "bytes": 243525
+    },
+    "/home/vardan/dev/projects/omnibias/docs/img/research/frontier-learning-curves.png": {
+      "sha256": "47300bf346b2ee17fda3ad34bf81fad01e76ea97008f457931d721a531118f52",
+      "bytes": 271848
+    },
+    "/home/vardan/dev/projects/omnibias/docs/img/research/frontier-longer-training.png": {
+      "sha256": "26f9a52d668dc188df0d5994cad910b2b8a420392658c94b23d98a1240136941",
+      "bytes": 267193
+    },
+    "/home/vardan/dev/projects/omnibias/docs/img/research/frontier-paired-errors.png": {
+      "sha256": "6ec471d5d5c8668623207032fbf9ad47aaf5414821246b709589e369479d7adc",
+      "bytes": 211760
+    },
+    "/home/vardan/dev/projects/omnibias/docs/multi-bias-learning-and-margin.md": {
+      "sha256": "6489325256487a0e85d5916f03a8df7165eddeafefa273f328fa9c1d31c75cfa",
+      "bytes": 68007
+    },
+    "/home/vardan/dev/projects/omnibias/docs/multibias-frontier-study.md": {
+      "sha256": "428acb05d4b6b88cff5e8cba6c6cfa64dd14bfa551f317cab780dbb46bd73de8",
+      "bytes": 99967
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-bands.csv": {
+      "bytes": 676,
+      "sha256": "1acd0199d0d3228bf77c0bfacb920b7dc50512e470344a5f3885354c047710ed"
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-block-reconstruction.csv": {
+      "bytes": 954,
+      "sha256": "f2e28bf217663585b079699ada9bf52f1120781302ae050820e002fd7d0c832e"
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-compression.csv": {
+      "bytes": 670,
+      "sha256": "fb7a2faa42e016e36aeb1bde98f85a6131d0f0b8327ed918ff35c118693c6d2b"
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-filtering-curves.csv": {
+      "bytes": 124765,
+      "sha256": "493a6662fd77e2c94c4d06ce0a56a30450f02114f65bbd0954d0670c88134b1c"
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-filtering-long.csv": {
+      "bytes": 5127,
+      "sha256": "e20d3c91ffd251e1bc94957e57a1893c324189bb4330b5cd681a92d2543327f2"
+    },
+    "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-filtering.csv": {
+      "bytes": 28775,
+      "sha256": "13ca31f29454d1d5d5bc9d52c710f5c919bb233dbf3cfd041522461f131420f1"
+    },
+    "/home/vardan/dev/projects/omnibias/docs/multibias-followup-audit.md": {
+      "bytes": 23374,
+      "sha256": "7dd80c1b354e1bb8134552953385a07860d3fcfc8f345defeecbed52320aa4db"
+    },
+    "/home/vardan/dev/projects/omnibias/docs/img/research/multibias-followup-20261022.png": {
+      "bytes": 238971,
+      "sha256": "e638810e4a78cdf7ffee1f4ff649f4a0c23f5f06ae2d2a8380fbd80c88320560"
+    }
+  },
+  "original_frozen_indices": [
+    {
+      "index": "/home/vardan/dev/projects/omnibias/docs/data/multibias-frontier-evidence-index.json",
+      "records_checked": 1749,
+      "status": "PASS"
+    },
+    {
+      "index": "/home/vardan/dev/projects/omnibias/docs/data/multibias-followup-20261022-manifest.json",
+      "records_checked": 363,
+      "status": "PASS"
+    }
+  ],
+  "review": {
+    "independent_reviewers": 2,
+    "mathematical_scope_corrections_applied": true,
+    "positive_rollout_and_symmetry_diagnostics_retained": true
+  },
+  "checks": {
+    "cpu_fixture_records": 116,
+    "repeated_cpu_outputs_equal": true,
+    "independent_parameter_and_byte_arithmetic": "PASS",
+    "nonfinite_JSON_values": "none"
+  },
+  "paper_unchanged_sha256": "625c9952f7ae46afc20ea5e5e5b44d5801f467ab7a9eaadc07aecbe6ee2cc5c1",
+  "self_reference": "Manifest does not hash itself; navigation file intentionally excluded because it has unrelated pre-existing edits."
+}

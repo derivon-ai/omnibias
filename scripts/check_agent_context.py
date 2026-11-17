@@ -22,6 +22,9 @@ RULE = Path('.cursor/rules/omnibias.mdc')
 SKILLS = Path('.agents/skills')
 EVIDENCE = '<!-- BEGIN GENERATED CAPABILITY EVIDENCE -->'
 ANCILLARY = ('omnibias_experiments', 'omnibias_papers', 'omnibias_web')
+#: Skills for the people who use the library, not for maintaining a package: the main repository may carry them in addition
+#: to one skill per package. They are held to the same discovery, link and single-owner checks.
+USER_SKILLS = {'omnibias-advisor'}
 
 
 def project_name(path: Path) -> str:
@@ -89,8 +92,12 @@ def check(root: Path = ROOT, projects: Path | None = None) -> tuple[list[str], d
     for repository, expected in repositories.items():
         skills = sorted((repository / SKILLS).glob('*/SKILL.md'))
         found = {path.parent.name for path in skills}
-        if found != expected:
-            errors.append(f'{repository.name}: skill coverage missing={sorted(expected-found)}, extra={sorted(found-expected)}')
+        allowed = USER_SKILLS if repository == root else set()
+        if not expected <= found or found - expected - allowed:
+            errors.append(
+                f'{repository.name}: skill coverage missing={sorted(expected-found)}, '
+                f'extra={sorted(found-expected-allowed)}'
+            )
         for old_root in ('.cursor/skills', '.claude/skills', '.codex/skills'):
             if list((repository / old_root).rglob('SKILL.md')):
                 errors.append(f'{repository.name}: duplicate discovery root {old_root}')

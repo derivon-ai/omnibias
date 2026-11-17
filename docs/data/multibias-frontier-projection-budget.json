@@ -1,0 +1,99 @@
+{
+  "status": "PASSED",
+  "configuration": {
+    "D": 256,
+    "G": 4,
+    "K": 20,
+    "expanded_width_H": 80,
+    "R": [
+      5,
+      1
+    ]
+  },
+  "scalar_parameter_budget": 1185,
+  "largest_unstructured_rank_with_same_width_and_budget": 3,
+  "profile_population_MSE_upper": [
+    186088235296999121,
+    2401514164751985936
+  ],
+  "profile_population_MSE_upper_float_diagnostic": 0.0774878774517731,
+  "unstructured_rank_population_MSE_lower": 2,
+  "exact_interpolation_checks": 100,
+  "conditional_variance_checks": [
+    {
+      "case": "aligned_r3",
+      "conditional_cross_variance": [
+        0,
+        1
+      ],
+      "conditional_normal_variance": [
+        2,
+        1
+      ],
+      "risk_from_orthogonal_chaos": [
+        2,
+        1
+      ]
+    },
+    {
+      "case": "orthogonal_r3",
+      "conditional_cross_variance": [
+        0,
+        1
+      ],
+      "conditional_normal_variance": [
+        8,
+        1
+      ],
+      "risk_from_orthogonal_chaos": [
+        8,
+        1
+      ]
+    },
+    {
+      "case": "rational_rotation_r3",
+      "conditional_cross_variance": [
+        1728,
+        625
+      ],
+      "conditional_normal_variance": [
+        2786,
+        625
+      ],
+      "risk_from_orthogonal_chaos": [
+        4514,
+        625
+      ]
+    },
+    {
+      "case": "aligned_r4",
+      "conditional_cross_variance": [
+        0,
+        1
+      ],
+      "conditional_normal_variance": [
+        0,
+        1
+      ],
+      "risk_from_orthogonal_chaos": [
+        0,
+        1
+      ]
+    }
+  ],
+  "source_sha256": "716b556c25ad11e4743e7404ef3915eccbdc315bb108a4fc2a2c6ead03851c94",
+  "assumptions": [
+    "standard Gaussian population inputs",
+    "rank-G orthogonal quadratic teacher",
+    "learned-coefficient ReLU profiles with fixed contiguous grouping",
+    "dense unstructured rank-r factorization retains expanded width H",
+    "scalar parameter budget, not actual inference artifact bytes"
+  ],
+  "classification": "illustrative architectural separation assembled from standard Gaussian quadratic-form variance and spline interpolation; no mathematical novelty claim",
+  "stronger_controls": [
+    "same-function tied-weight or spline implementation exactly reproduces the construction",
+    "a quadratic-activation model represents this teacher exactly with fewer parameters",
+    "no lower bound against ordinary narrow networks, deeper networks, sparse/structured factors or alternative encodings"
+  ],
+  "interpretation": "preserve independent input directions while spending additional scalar parameters on responses; cannot infer training, generalization on other distributions, hardware speed or unique multibias advantage"
+}

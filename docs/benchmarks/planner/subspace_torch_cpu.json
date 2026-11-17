@@ -1,0 +1,248 @@
+{
+ "backend": "torch",
+ "device": "cpu",
+ "problems": [
+  {
+   "D": 64,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.048764485865831375,
+      "median": 0.029091761563904583,
+      "min": 0.02367845841217786,
+      "max": 0.03900212002918124,
+      "calls": 2
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "error": "ValueError: cannot force 'subspace_jet' for a model that is not a dense chain; use one of ['taylor_jet', 'nested_autodiff']"
+    },
+    "subspace_nested": {
+     "error": "ValueError: cannot force 'subspace_nested' for a model that is not a dense chain; use one of ['taylor_jet', 'nested_autodiff']"
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.033501364989206195,
+      "median": 0.028403409523889422,
+      "min": 0.024577408097684383,
+      "max": 0.03275895654223859,
+      "calls": 2
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.012205054983496666,
+      "median": 0.012046184274367988,
+      "min": 0.011572392540983856,
+      "max": 0.013090531516354531,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 2.1279114569794046e-16
+    }
+   }
+  },
+  {
+   "D": 256,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.03627152694389224,
+      "median": 0.03265897394157946,
+      "min": 0.03051205794326961,
+      "max": 0.04124767309986055,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.03569645108655095,
+      "median": 0.03286864282563329,
+      "min": 0.03084788704290986,
+      "max": 0.038750770036131144,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.03521844698116183,
+      "median": 0.03530198987573385,
+      "min": 0.0326824439689517,
+      "max": 0.04177164891734719,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.22727782395668328,
+      "median": 0.16275800112634897,
+      "min": 0.1508164571132511,
+      "max": 0.21772749884985387,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 1.4110680557571517e-16
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.08766171988099813,
+      "median": 0.0835511120967567,
+      "min": 0.08268141699954867,
+      "max": 0.08502093516290188,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 3.01027851894859e-16
+    }
+   }
+  },
+  {
+   "D": 1024,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.0694765520747751,
+      "median": 0.06969984411261976,
+      "min": 0.06847842712886631,
+      "max": 0.07048163516446948,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.06942940992303193,
+      "median": 0.06941283610649407,
+      "min": 0.06822094204835594,
+      "max": 0.07013880298472941,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.07023264793679118,
+      "median": 0.07051963498815894,
+      "min": 0.06914164288900793,
+      "max": 0.08528046705760062,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 2.7052747618872672,
+      "median": 2.715084864059463,
+      "min": 2.6763050509616733,
+      "max": 2.7592743220739067,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 2.8114565874945163e-16
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 1.0291145448572934,
+      "median": 1.0329462720546871,
+      "min": 1.0246848638635129,
+      "max": 1.038311829091981,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 4.819639864276314e-16
+    }
+   }
+  },
+  {
+   "D": 4096,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.27179761813022196,
+      "median": 0.27285411302000284,
+      "min": 0.2659389739856124,
+      "max": 0.27533858292736113,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.2792831079568714,
+      "median": 0.26654713205061853,
+      "min": 0.2637245620135218,
+      "max": 0.2804067840334028,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.27098181284964085,
+      "median": 0.27190997707657516,
+      "min": 0.26538284309208393,
+      "max": 0.2743361950851977,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 44.989277908112854,
+      "median": 45.3986891459208,
+      "min": 44.17136996402405,
+      "max": 46.36699579306878,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 4.67648651243005e-16
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 14.801529498072341,
+      "median": 14.812372972955927,
+      "min": 14.756124328123406,
+      "max": 14.92517182789743,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 6.303090516753546e-16
+    }
+   }
+  }
+ ],
+ "protocol": {
+  "repeats": 9,
+  "target_s": 0.03,
+  "dtype": "float64",
+  "python": "3.12.13"
+ }
+}

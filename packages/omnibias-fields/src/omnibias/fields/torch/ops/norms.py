@@ -12,7 +12,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import torch
-from omnibias.fields._core.quadrature import QuadratureSpec
+from omnibias.fields._core.quadrature import QuadratureSpec, _converted
 from omnibias.fields.torch.ops.basic import gradient, value
 from omnibias.fields.torch.ops.high_order import spatial_hessian
 from torch import Tensor
@@ -22,7 +22,11 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def _weights(rule: QuadratureSpec, ref: Tensor) -> Tensor:
-    return torch.as_tensor(rule.weights, dtype=ref.dtype, device=ref.device)
+    return _converted(
+        rule,
+        ("weights", ref.dtype, ref.device),
+        lambda: torch.as_tensor(rule.weights, dtype=ref.dtype, device=ref.device),
+    )
 
 
 def _integrate_values(vals: Tensor, rule: QuadratureSpec) -> Tensor:

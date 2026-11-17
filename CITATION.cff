@@ -17,7 +17,7 @@ authors:
     affiliation: "Derivon"
     email: "vardan@derivon.ai"
     # orcid: "https://orcid.org/0000-0000-0000-0000"   # add if/when you have one
-version: "0.5.0rc1"
+version: "0.5.0"
 # Prerelease source version; set date-released only when publication occurs.
 # doi: "10.5281/zenodo.XXXXXXX"   # fill after the first Zenodo release (a GitHub Release mints it)
 # This checkout retains nine Apache-2.0 distributions and seven certified

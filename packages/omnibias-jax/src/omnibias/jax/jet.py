@@ -33,9 +33,10 @@ Truncation-order cost
 :func:`compose_jet` takes an **arbitrary** derivative tower, so what it has to
 evaluate is the truncated composition of the polynomial
 ``D(x) = sum_k sigma^(k)(u_0) x^k / k!`` with the valuation-1 series
-``v = u - u_0``. The kernel knows nothing about ``D`` beyond its coefficients,
-and every output coefficient ``b_n`` really does depend on all ``sigma^(k)(u_0)``
-and ``u_j`` with ``k, j <= n``, which already forces ``Omega(N^2)`` work.
+``v = u - u_0``. The kernel knows nothing about ``D`` beyond its coefficients.
+An output coefficient can depend on many input coefficients, but this does
+not establish a quadratic lower bound: shared arithmetic and alternative
+representations can reduce the work.
 
 * Because ``v^k`` has valuation ``k``, all coefficients of ``v^k`` below order
   ``k`` vanish identically. Restricting the recurrence to the triangle
@@ -44,17 +45,16 @@ and ``u_j`` with ``k, j <= n``, which already forces ``Omega(N^2)`` work.
   bit-for-bit in eager execution (see :func:`compose_jet`). The exponent is
   unchanged -- this is a constant factor, measured at 3.3x fewer multiplies at
   ``N = 16`` in ``benchmarks/jet_compose_cost.py``.
-* Sub-cubic composition is not ruled out in theory: baby-step / giant-step
+* Sub-cubic composition is available in theory: baby-step / giant-step
   (Brent-Kung) reaches ``O(N^{5/2})`` when truncated multiplication is
   schoolbook, and near-linear composition exists in the ring-operation model.
-  Both buy the exponent by transforming or reordering the coefficient axis
-  (FFT / Karatsuba style multiplication), which is *not* exact in floating
-  point -- the Taylor coefficients here span many magnitudes, so a transform
-  would trade the kernel's exactness (and the pinned cross-backend goldens) for
-  the exponent. At the truncation orders this API is used at (``N`` of order
-  ten) ``N^{5/2}`` with its larger constant is not even a win. So **no
-  ``O(N^2)`` claim is made for** :func:`compose_jet`; it is cubic in ``N``,
-  with a smaller constant than the dense form.
+  Their arithmetic graphs differ from this schoolbook implementation. All
+  binary floating-point variants, including this one, incur rounding; an
+  alternative requires numerical validation and a measured crossover before
+  replacing the current accumulation order. **No ``O(N^2)`` claim is made
+  for** :func:`compose_jet`; this implementation is cubic in ``N``, with a
+  smaller constant than the dense form. This is an implementation cost,
+  not a lower bound on general series composition.
 * ``O(N^2)`` *is* available when the outer map is not arbitrary. An activation
   in the Riccati class satisfies ``sigma' = P(sigma)`` for a polynomial ``P``
   (recorded as :attr:`omnibias.core.spec.ActivationSpec.riccati_polynomial`),
@@ -67,9 +67,10 @@ and ``u_j`` with ``k, j <= n``, which already forces ``Omega(N^2)`` work.
 
     **Bit-parity requires 64-bit JAX.** The "bit-identical twin" guarantee
     against :mod:`omnibias.torch.jet` holds in double precision. PyTorch defaults
-    to ``float64`` for Python floats, whereas JAX silently truncates arrays to
-    ``float32`` unless 64-bit mode is enabled. Enable it *before* the first JAX
-    import::
+    to ``float32`` unless its default dtype is changed, and JAX truncates
+    requested ``float64`` arrays unless 64-bit mode is enabled. Use explicit
+    ``float64`` tensors in both backends and enable JAX 64-bit mode before
+    constructing arrays::
 
         import jax
         jax.config.update("jax_enable_x64", True)
@@ -434,9 +435,39 @@ def mlp_jet(
     Array
         Jet of shape ``(N+1, C)`` whose ``jet_to_tower`` gives the directional
         derivatives ``d^k/dt^k f(x0 + t v)`` at ``t = 0``.
+
+    Notes
+    -----
+    On the default general path, an activated first layer uses the affine
+    input identity ``jet[n] = sigma^(n)(W x0 + b) * (W v)^n / n!``. This
+    avoids propagating structurally zero higher input coefficients and
+    composing their zero products. Later layers retain general composition;
+    the full deep-network kernel is still cubic in order.
     """
-    jet = _path_jet(x0, v, order)
-    for W, b, spec in layers:
+    if order < 0:
+        raise ValueError(f"order must be >= 0, got {order}")
+    remaining = layers
+    if order >= 2 and not riccati and layers and layers[0][2] is not None:
+        W, b, spec = layers[0]
+        assert spec is not None
+        W = jnp.asarray(W)
+        u0 = jnp.matmul(jnp.asarray(x0), W.T)
+        if b is not None:
+            u0 = u0 + jnp.asarray(b)
+        u1 = jnp.matmul(jnp.asarray(v), W.T)
+        tower = _sigma_tower(get_activation(spec), u0, order)
+        rows = [tower[0]]
+        power = jnp.ones_like(u1)
+        fact = 1.0
+        for n in range(1, order + 1):
+            power = power * u1
+            fact *= n
+            rows.append((tower[n] / fact) * power)
+        jet = jnp.stack(rows, axis=0)
+        remaining = layers[1:]
+    else:
+        jet = _path_jet(x0, v, order)
+    for W, b, spec in remaining:
         if spec is None:
             jet = affine_jet(jet, W, b)
         else:

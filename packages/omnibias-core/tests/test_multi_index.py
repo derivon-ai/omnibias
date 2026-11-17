@@ -148,3 +148,40 @@ def test_multi_indices_rejects_bad_dim() -> None:
 def test_multi_indices_rejects_bad_order() -> None:
     with pytest.raises(ValueError, match="order must be >= 0"):
         multi_indices(2, -1)
+
+
+# ----- generation order and read-only view -----
+
+
+def _reference_order(dim: int, order: int) -> list[tuple[int, ...]]:
+    """The canonical order by its definition: every exponent vector of total degree at most ``order``, sorted."""
+    from itertools import product as cartesian
+
+    return sorted(
+        (a for a in cartesian(range(order + 1), repeat=dim) if sum(a) <= order), key=lambda a: (sum(a), a)
+    )
+
+
+@pytest.mark.parametrize("dim", [1, 2, 3, 4, 5])
+@pytest.mark.parametrize("order", [0, 1, 2, 3, 4, 5])
+def test_generation_matches_the_sorted_definition(dim, order):
+    assert multi_indices(dim, order) == _reference_order(dim, order)
+
+
+def test_wide_low_order_generation_is_linear_in_its_output():
+    idx = multi_indices(600, 1)
+    assert len(idx) == 601 and idx[0] == (0,) * 600
+    assert all(a[599 - i] == 1 for i, a in enumerate(idx[1:]))  # unit vectors, last axis first (lexicographic)
+
+
+def test_index_position_view_reads_without_a_copy_and_refuses_writes():
+    from omnibias.core.multi_index import index_position_view
+
+    view = index_position_view(3, 3)
+    assert dict(view) == index_position(3, 3)
+    with pytest.raises(TypeError):
+        view[(0, 0, 0)] = 1  # type: ignore[index]
+    # the public function still returns a private copy
+    pos = index_position(3, 3)
+    pos[(0, 0, 0)] = 99
+    assert index_position(3, 3)[(0, 0, 0)] == 0

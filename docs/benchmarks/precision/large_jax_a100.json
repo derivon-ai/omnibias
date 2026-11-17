@@ -1,0 +1,183 @@
+{
+ "backend": "jax",
+ "device": "NVIDIA A100-SXM4-80GB",
+ "records": [
+  {
+   "backend": "jax",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "float32",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 1.1350077767091626e-06,
+   "scale": 1.2418122976671992,
+   "rel_error": 9.139930236166337e-07,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "float32_tf32",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 0.0012192592201423214,
+   "scale": 1.2418122976671992,
+   "rel_error": 0.0009818385777244718,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap1_D256",
+   "operator": "laplacian",
+   "mode": "bfloat16_allowed",
+   "reference_program": "forward_laplacian",
+   "status": "ok",
+   "abs_error": 0.01069854968323658,
+   "scale": 1.2418122976671992,
+   "rel_error": 0.008615271167256348,
+   "ran": "forward_laplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "float32",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 4.3212086242583325e-06,
+   "scale": 7.882992534508337,
+   "rel_error": 5.481685546880766e-07,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "float32_tf32",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 0.005976263430886419,
+   "scale": 7.882992534508337,
+   "rel_error": 0.0007581211582688832,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "lap2_D24",
+   "operator": "laplacian",
+   "mode": "bfloat16_allowed",
+   "reference_program": "forward_polylaplacian",
+   "status": "ok",
+   "abs_error": 0.11520378734128212,
+   "scale": 7.882992534508337,
+   "rel_error": 0.014614220023293144,
+   "ran": "forward_polylaplacian"
+  },
+  {
+   "backend": "jax",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "float32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 4.1142249129766384e-07,
+   "scale": 0.9110738283501334,
+   "rel_error": 4.51579749626559e-07,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "float32_tf32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 0.0006896887802477769,
+   "scale": 0.9110738283501334,
+   "rel_error": 0.000757006467298854,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "div_D64",
+   "operator": "divergence",
+   "mode": "bfloat16_allowed",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 0.007963374119453748,
+   "scale": 0.9110738283501334,
+   "rel_error": 0.008740646335845963,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "float32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 1.959018910785426e-06,
+   "scale": 1.1446923367104802,
+   "rel_error": 1.711393400618972e-06,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "float32_tf32",
+   "reference_program": "projected",
+   "status": "ok",
+   "abs_error": 0.0006585806758824808,
+   "scale": 1.1446923367104802,
+   "rel_error": 0.0005753342227965412,
+   "ran": "projected"
+  },
+  {
+   "backend": "jax",
+   "case": "logdet_D64",
+   "operator": "logdet",
+   "mode": "bfloat16_allowed",
+   "reference_program": "projected",
+   "status": "error",
+   "reason": "JaxRuntimeError: INVALID_ARGUMENT: Unsupported dtype BF16 in getrf [executable_name='jit__call_impl']"
+  },
+  {
+   "backend": "jax",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "float32",
+   "reference_program": "projected_streams",
+   "status": "ok",
+   "abs_error": 5.268618853904172e-05,
+   "scale": 224.0050905619077,
+   "rel_error": 2.3520085372560306e-07,
+   "ran": "projected_streams"
+  },
+  {
+   "backend": "jax",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "float32_tf32",
+   "reference_program": "projected_streams",
+   "status": "ok",
+   "abs_error": 0.042137984257607286,
+   "scale": 224.0050905619077,
+   "rel_error": 0.00018811172617508762,
+   "ran": "projected_streams"
+  },
+  {
+   "backend": "jax",
+   "case": "gram2_D16",
+   "operator": "gram",
+   "mode": "bfloat16_allowed",
+   "reference_program": "projected_streams",
+   "status": "ok",
+   "abs_error": 1.005090561907707,
+   "scale": 224.0050905619077,
+   "rel_error": 0.004486909468827151,
+   "ran": "projected_streams"
+  }
+ ]
+}

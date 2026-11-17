@@ -1,0 +1,248 @@
+{
+ "backend": "torch",
+ "device": "NVIDIA A100-SXM4-80GB",
+ "problems": [
+  {
+   "D": 64,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.011908773332834244,
+      "median": 0.010374183766543865,
+      "min": 0.009804402478039265,
+      "max": 0.012525574304163456,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "error": "ValueError: cannot force 'subspace_jet' for a model that is not a dense chain; use one of ['taylor_jet', 'nested_autodiff']"
+    },
+    "subspace_nested": {
+     "error": "ValueError: cannot force 'subspace_nested' for a model that is not a dense chain; use one of ['taylor_jet', 'nested_autodiff']"
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.011705324053764343,
+      "median": 0.012934094294905663,
+      "min": 0.009901324287056923,
+      "max": 0.015105842612683773,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.010949362069368362,
+      "median": 0.0063575441017746925,
+      "min": 0.005613315850496292,
+      "max": 0.008376567624509335,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 7.593404084519711e-17
+    }
+   }
+  },
+  {
+   "D": 256,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.011779777705669403,
+      "median": 0.011001411825418472,
+      "min": 0.00981922633945942,
+      "max": 0.014479191973805428,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.011401161551475525,
+      "median": 0.011100167408585548,
+      "min": 0.009684013202786446,
+      "max": 0.011404640041291714,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.010658331215381622,
+      "median": 0.01093293260782957,
+      "min": 0.010145420208573341,
+      "max": 0.02219219785183668,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.015141792595386505,
+      "median": 0.011580883525311947,
+      "min": 0.009948361665010452,
+      "max": 0.01624888088554144,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 1.4950311734862543e-16
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.011538401246070862,
+      "median": 0.00862151850014925,
+      "min": 0.007948859594762325,
+      "max": 0.013161322101950645,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 1.4950311734862543e-16
+    }
+   }
+  },
+  {
+   "D": 1024,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.011251706629991531,
+      "median": 0.011973340064287186,
+      "min": 0.009130957536399364,
+      "max": 0.016002988442778587,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.010596457868814468,
+      "median": 0.010463704355061054,
+      "min": 0.008633706718683243,
+      "max": 0.012527583166956902,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.010082144290208817,
+      "median": 0.008735289797186852,
+      "min": 0.008367802016437054,
+      "max": 0.00961387436836958,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.02292490378022194,
+      "median": 0.02061256393790245,
+      "min": 0.019620154052972794,
+      "max": 0.02151714637875557,
+      "calls": 2
+     },
+     "max_rel_diff_vs_first": 8.156586504813117e-17
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.05175914615392685,
+      "median": 0.05230027437210083,
+      "min": 0.049549221992492676,
+      "max": 0.05578625947237015,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 9.877116470672134e-17
+    }
+   }
+  },
+  {
+   "D": 4096,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.010711412876844406,
+      "median": 0.011868997476994991,
+      "min": 0.010502885095775127,
+      "max": 0.013185818679630756,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.010959349572658539,
+      "median": 0.011309515684843063,
+      "min": 0.010862182825803757,
+      "max": 0.013075103051960468,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.011763572692871094,
+      "median": 0.011645819991827011,
+      "min": 0.010542833246290684,
+      "max": 0.014033394865691662,
+      "calls": 4
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.21937542408704758,
+      "median": 0.21402446925640106,
+      "min": 0.20418306812644005,
+      "max": 0.2296823188662529,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 1.2317324779612268e-16
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 2.2578400932252407,
+      "median": 2.054289922118187,
+      "min": 1.7439012192189693,
+      "max": 2.0903278701007366,
+      "calls": 1
+     },
+     "max_rel_diff_vs_first": 1.2317324779612268e-16
+    }
+   }
+  }
+ ],
+ "protocol": {
+  "repeats": 9,
+  "target_s": 0.03,
+  "dtype": "float64",
+  "python": "3.12.13"
+ }
+}

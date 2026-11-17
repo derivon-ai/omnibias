@@ -22,11 +22,11 @@ Bias collapse becomes an analytic tensor kernel here: evaluate the shared activa
 ## Run this README
 
 The examples use `omnibias-torch` on Python >=3.10. Their installed-wheel
-profile selects runtime features, not an editable workspace. Install the prepared
-prerelease from PyPI:
+profile selects runtime features, not an editable workspace. Install the stable
+release from PyPI:
 
 ```bash
-python -m pip install --pre "omnibias-torch==0.5.0rc1"
+python -m pip install "omnibias-torch==0.5.0"
 ```
 
 For local development before publication, build and test the coordinated wheelhouse

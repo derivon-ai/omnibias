@@ -1,0 +1,10 @@
+seed,arm,updates,selected_step,test_accuracy,test_NLL,fit_seconds,provenance
+7201,k1,24000,6000,0.9087,0.2595158864293859,193.14669432397932,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation
+7201,practical_relu,24000,7000,0.9156,0.24673929001198247,162.01693076791707,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation
+7201,residual_lr10,24000,5500,0.9106,0.2513540642077135,447.5121936580399,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation
+7211,k1,24000,6000,0.9133,0.2476933325638785,194.65574757906143,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation
+7211,practical_relu,24000,7500,0.9183,0.2388300863781996,161.41522481199354,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation
+7211,residual_lr10,24000,6000,0.913,0.2471724970410394,462.93394448794425,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation
+7219,k1,24000,6500,0.9121,0.2508188720109619,194.66843303700443,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation
+7219,practical_relu,24000,6500,0.9156,0.24083590339183028,162.60806940798648,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation
+7219,residual_lr10,24000,4500,0.9102,0.2509453236513028,454.8039818609832,same discovery seeds; new 24000-update cosine schedule; not fresh confirmation

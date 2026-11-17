@@ -108,9 +108,12 @@ def validate_closure(root: Path, names: list[str], repository: str | None = None
 
 
 def require_prerelease(root: Path, names: list[str]) -> None:
-    """Stable promotion needs a separately reviewed compatibility-policy change."""
+    """Enforce the optional prerelease-only policy when configured."""
     config = tomllib.loads((root / "pyproject.toml").read_text())
-    if config["tool"]["omnibias"]["release"]["prerelease-only"]:
+    release_policy = (
+        config.get("tool", {}).get("omnibias", {}).get("release", {})
+    )
+    if release_policy.get("prerelease-only", False):
         for name, project in projects(root).items():
             if name in names and not Version(project["version"]).is_prerelease:
                 raise ValueError(

@@ -118,5 +118,11 @@ def soft_top_k(
     n = scores.reshape(-1).shape[0]
     if k < 1 or k > n:
         raise ValueError(f"k must be in [1, {n}]; got {k}")
-    p = soft_sort_permutation(scores, temperature=temperature, descending=True)
-    return p[:k, :].sum(dim=0)
+    if temperature <= 0.0:
+        raise ValueError(f"temperature must be > 0; got {temperature}")
+    s = scores.reshape(-1)
+    # Row normalization is independent. Retain the original sort and its tie
+    # gradients, while evaluating only the requested k-by-n block.
+    targets = torch.sort(s, descending=True).values[:k]
+    dist = torch.abs(targets.unsqueeze(-1) - s.unsqueeze(-2))
+    return torch.softmax(-dist / temperature, dim=-1).sum(dim=0)

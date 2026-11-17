@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING
 import jax
 import jax.numpy as jnp
 from jax import Array
-from omnibias.fields._core.quadrature import QuadratureSpec
+from omnibias.fields._core.quadrature import QuadratureSpec, _converted
 from omnibias.fields.jax.ops.basic import gradient, value
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -23,11 +23,21 @@ if TYPE_CHECKING:  # pragma: no cover
 
 def quadrature_nodes(rule: QuadratureSpec, *, like: Array) -> Array:
     """Return the rule's nodes as a ``(n_nodes, dim)`` array matching ``like``."""
-    return jnp.asarray(rule.nodes, dtype=like.dtype)
+    return _converted(
+        rule,
+        ("nodes", like.dtype, bool(jax.config.jax_enable_x64)),
+        lambda: jnp.asarray(rule.nodes, dtype=like.dtype),
+        lambda v: not isinstance(v, jax.core.Tracer),
+    )
 
 
 def _weights(rule: QuadratureSpec, ref: Array) -> Array:
-    return jnp.asarray(rule.weights, dtype=ref.dtype)
+    return _converted(
+        rule,
+        ("weights", ref.dtype, bool(jax.config.jax_enable_x64)),
+        lambda: jnp.asarray(rule.weights, dtype=ref.dtype),
+        lambda v: not isinstance(v, jax.core.Tracer),
+    )
 
 
 def integrate(state: FieldState, name: str, *, rule: QuadratureSpec) -> Array:

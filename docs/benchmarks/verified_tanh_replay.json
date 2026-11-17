@@ -1,0 +1,147 @@
+{
+  "replay": "passed",
+  "study_sha256": "c49369a79a3ffa3bc4d7afb18cadcaf0c9fc56c9fc2119f77d6f6c5f1f405026",
+  "reporter_sha256": "848d1da23518a9da86a05d2b7e9f969d9b4958b8d5de4c9e78f5fc8c81a3e57b",
+  "frozen_cli_issue": {
+    "initial_cli_result": "ValueError: source/protocol/dependency/lock mismatch",
+    "cause": "Python tuples protocol.methods and protocol.controls deserialize as JSON lists",
+    "direct_python_equality": false,
+    "canonical_json_equality": true,
+    "all_recorded_source_hashes_match": true,
+    "numerical_sources_or_results_changed": false
+  },
+  "counts": {
+    "ok": 444,
+    "point_budget_checks": 348,
+    "refused": 70,
+    "unbounded": 4,
+    "box_diagnostic_checks": 96
+  },
+  "box_diagnostics_passed": {
+    "stock": 9,
+    "recurrence": 14,
+    "mp_monomial": 11,
+    "factorized": 11,
+    "log_scaled": 11,
+    "mp_factorized": 11
+  },
+  "summary": {
+    "cases": 74,
+    "point_cases": 54,
+    "box_cases": 20,
+    "methods": {
+      "stock": {
+        "valid": 72,
+        "refused_or_unbounded": 2,
+        "point_budgets_passed": 16,
+        "median_warm_seconds": 0.00013000500621274114
+      },
+      "recurrence": {
+        "valid": 72,
+        "refused_or_unbounded": 2,
+        "point_budgets_passed": 48,
+        "median_warm_seconds": 0.0003063500043936074
+      },
+      "factorized": {
+        "valid": 56,
+        "refused_or_unbounded": 18,
+        "point_budgets_passed": 38,
+        "median_warm_seconds": 0.0001005234953481704
+      },
+      "log_scaled": {
+        "valid": 58,
+        "refused_or_unbounded": 16,
+        "point_budgets_passed": 44,
+        "median_warm_seconds": 0.00019919098122045398
+      },
+      "mp_factorized": {
+        "valid": 58,
+        "refused_or_unbounded": 16,
+        "point_budgets_passed": 46,
+        "median_warm_seconds": 0.0001348450023215264
+      },
+      "mp_monomial": {
+        "valid": 74,
+        "refused_or_unbounded": 0,
+        "point_budgets_passed": 54,
+        "median_warm_seconds": 0.00020149850752204657
+      },
+      "controlled": {
+        "valid": 54,
+        "refused_or_unbounded": 20,
+        "point_budgets_passed": 54,
+        "median_warm_seconds": 0.00021161651238799095
+      }
+    },
+    "controlled_branches": {
+      "recurrence": 8,
+      "log_scaled": 44,
+      "mp_fallback": 2
+    },
+    "matched_speed_ratios": [
+      0.45791302152370134,
+      0.4258811320440018,
+      0.2761720106966451,
+      0.14648129071332275,
+      0.4599708946987263,
+      0.41100259243537757,
+      0.27446253111205543,
+      0.14353011383453176,
+      0.539436818046537,
+      0.6131370319434827,
+      0.6841916587895769,
+      0.5044925348858578,
+      0.5303085122136274,
+      0.5890812496844373,
+      0.6648668967344369,
+      0.5014328966343551,
+      0.5074437519226348,
+      0.5590954209888764,
+      0.6452076020548005,
+      0.7287852000690104,
+      0.5343246584005316,
+      0.5595180241898886,
+      0.6496966578199406,
+      0.7422382957554573,
+      0.5549298404393903,
+      0.5772855078887622,
+      0.6783823765851875,
+      0.7297364537056295,
+      0.5283694981487185,
+      0.5571827185922955,
+      0.6508885697741236,
+      0.7398557505606944,
+      0.5519065195173778,
+      0.5708055688477501,
+      0.6431408267343253,
+      0.7317388957830431,
+      0.519438571300368,
+      0.5886013946100136,
+      0.6557353301992193,
+      0.7243791955722939,
+      0.5000781701370093,
+      0.6519929676820152,
+      0.8847130230695796,
+      0.4918966668745533,
+      0.6329426893016855,
+      0.9083809771279021,
+      0.4190539078471549,
+      0.45159933330148466,
+      0.5458021391547229,
+      0.6395835555203931,
+      0.4071901528788294,
+      0.4572302794416396,
+      0.532027299987624,
+      0.6351146356430448
+    ],
+    "matched_count": 54,
+    "geometric_speed_ratio": 0.535281720041116,
+    "primary_gate_passed": false
+  },
+  "timings_recollected": false,
+  "formal_build": false,
+  "limits": [
+    "High-precision samples check numerics; continuum containment relies on the stated interval arithmetic and analytic identities.",
+    "A frozen negative speed result is retained, without retrying timings or changing the candidate."
+  ]
+}

@@ -1,0 +1,61 @@
+Continue the authorized Omnibias scientific-ML research from this checkpoint.
+
+Read START_HERE.md, AGREED_SCOPE.md, RESULTS_AND_LESSONS.md,
+NEGATIVE_RESULTS.json, SOURCE_MAP.md and A100_LSF_CONTINUATION.md first.
+Use the exported research workspace, not just the Git repository. Respect the
+repository's AGENTS.md, capability rule, relevant package skill and shared
+numerical contracts. No public API/default/version changes or new research
+branch are implied by restoring this checkpoint.
+
+Human priorities: sustainable, measured advantages on practical derivatives
+2–6; complete forward AND first parameter gradients; accuracy and runtime
+reported for the SAME executable; useful scientific operators and complete
+training/PDE outcomes; correct precompute/reuse; preserved negative results.
+Significant-improvement target is a one-sided 95% lower speed-ratio bound >=2.
+Non-regression requires >=1 in every advertised cost regime. No universal
+superiority over JAX is assumed. Omnibias uses JAX as its execution backend.
+
+The old laptop's 10,818-record frozen schedule was still running at export.
+Do not restart it, manufacture its missing records, replace failures, or join
+cluster timings with it. A100 is a NEW hardware target. Obtain an isolated LSF
+allocation and bind actual GPU UUID/MIG profile, CPU topology, driver, plugins,
+compiler, versions and sources in a new experiment. Review export_state.json
+and the omissions list to see exactly what the archive contains.
+
+The finite source pipeline is reviewed but actual operational publications and
+caseplans are None/unissued. Resolve that dependency composition with actual
+target validation; do not fill fields with guessed hashes or accept arbitrary
+JSON receipts. Old PUB=None refusals are intentional, not proof that the math
+kernel fails. Current source reviews are reusable knowledge, not backend passes.
+
+Important corrections to stale summaries:
+- V15 source descriptions saying strict worker/owner/saved24 are unheld predate
+  the reviewed final source closures. The post-checkpoint044839 is authoritative.
+- Containing-domain and whole-block reuse sources exist. Their new numerical
+  tests remain unexecuted; do not implement those features from scratch again.
+- Checkpoint field current_frozen_five_source_manifest a693 is HISTORICAL V3.
+  Authoritative owner V4 manifest is 09e6f51ddf6c04e9ea5362d5727f6e1f3aa2475081242ad4d83b13e218097df2.
+- Historical CPU68/GPU68 passes cover the original private stage, not all new
+  changes. Initial GPU-labelled fallback attempts are not actual GPU evidence.
+
+Next useful work is actual final candidate assembly/qualification and running
+the prepared numerical suites on isolated resources. Existing source/audit
+tooling already includes many fixes; do not generate another source-only
+ledger cycle instead of closing those numerical and integration obligations.
+
+Keep tolerances unchanged: forward atol=1e-9 rtol=2e-10; gradient atol=1e-8
+rtol=2e-9. Qualify the actual emitted scalar objective and every requested
+gradient, including reductions, metric/symbol derivatives, cached arithmetic,
+control flow, solve error and runtime domains. Native transcendental/compiler
+assumptions stay explicit. Return unsupported/inconclusive where warranted.
+
+Preserve every unsuccessful experiment and classify it correctly: algorithmic
+failure, numerical disagreement, conservative bound refusal, evidence-layout
+budget refusal, timeout, memory exit, environment/setup failure, source or
+reviewer defect, or inconclusive timing. These are different outcomes.
+
+Deliver tested final configurations, full CPU/GPU tables including cold/setup,
+validation, execution, complete training and PDE time-to-target, preserved
+failures and an independently checked final evidence ledger. Promote only
+qualifying final-package configurations. A valid negative experiment may close
+an investigation, but cannot be advertised as a performance improvement.

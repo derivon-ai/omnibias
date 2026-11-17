@@ -1,0 +1,88 @@
+{
+  "description": "Counts from the pre-registered end-to-end suites (JAX: 13 problems; PyTorch: 2 Poisson problems), recomputed from the per-seed traces by analyze_suite.py and score_predictions.py / score_torch.py in omnibias_experiments/e2e_20261022. One exclusive A100-SXM4-80GB, float64.",
+  "jax_suite": {
+    "problems": 13,
+    "rows": 39,
+    "headlines_compile_included": 0,
+    "losses": 6,
+    "no_pair_reached": 13,
+    "headlines_compile_excluded": 11,
+    "headlines_exact_baselines_only": 0,
+    "predictions": {
+      "hit": 2,
+      "missed": 5,
+      "not_scored": 1
+    }
+  },
+  "torch_subset": {
+    "problems": 2,
+    "rows": 6,
+    "headlines_compile_included": 0,
+    "losses": 0,
+    "no_pair_reached": 5,
+    "headlines_compile_excluded": 0,
+    "headlines_exact_baselines_only": 0,
+    "predictions": {
+      "hit": 2,
+      "missed": 1
+    },
+    "post_hoc_step_and_memory": {
+      "poisson_d100/hutch": {
+        "step_ms": 10.21,
+        "peak_device_gib": 0.06
+      },
+      "poisson_d100/jet_collapsed": {
+        "step_ms": 5.65,
+        "peak_device_gib": 0.08
+      },
+      "poisson_d100/nested": {
+        "step_ms": 10.81,
+        "peak_device_gib": 0.15
+      },
+      "poisson_d100/nested_fwd": {
+        "step_ms": 12.75,
+        "peak_device_gib": 0.2
+      },
+      "poisson_d100/omnibias": {
+        "step_ms": 6.07,
+        "peak_device_gib": 0.06
+      },
+      "poisson_d100/sdgd": {
+        "step_ms": 13.27,
+        "peak_device_gib": 0.06
+      },
+      "poisson_d100/stde": {
+        "step_ms": 5.74,
+        "peak_device_gib": 0.08
+      },
+      "poisson_d1000/hutch": {
+        "step_ms": 10.5,
+        "peak_device_gib": 0.27
+      },
+      "poisson_d1000/jet_collapsed": {
+        "step_ms": 5.35,
+        "peak_device_gib": 0.62
+      },
+      "poisson_d1000/nested": {
+        "step_ms": 22.86,
+        "peak_device_gib": 3.9
+      },
+      "poisson_d1000/nested_fwd": {
+        "step_ms": 24.53,
+        "peak_device_gib": 1.83
+      },
+      "poisson_d1000/omnibias": {
+        "step_ms": 5.8,
+        "peak_device_gib": 0.2
+      },
+      "poisson_d1000/sdgd": {
+        "step_ms": 13.21,
+        "peak_device_gib": 0.21
+      },
+      "poisson_d1000/stde": {
+        "step_ms": 5.77,
+        "peak_device_gib": 0.24
+      }
+    }
+  }
+}

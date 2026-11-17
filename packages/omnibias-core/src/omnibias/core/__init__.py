@@ -11,6 +11,13 @@ from __future__ import annotations
 from importlib.metadata import PackageNotFoundError as _PkgNotFound
 from importlib.metadata import version as _pkg_version
 
+from omnibias.core.affine_geometry import (
+    AffineBudget,
+    AffineBudgetExceeded,
+    ExactAffineGeometry,
+    InconsistentAffineConstraints,
+    exact_affine_geometry,
+)
 from omnibias.core.bell import (
     bell_complete,
     bell_number,
@@ -66,6 +73,15 @@ from omnibias.core.implicit import (
     reject_anderson,
     reject_deq_contraction,
     spectral_radius_inf_bound,
+)
+from omnibias.core.jet_geometry import (
+    JetGeometryBudgetExceeded,
+    LinearJetEquation,
+    PolynomialJetBoundary,
+    PolynomialJetBudget,
+    PolynomialJetCertificate,
+    check_polynomial_jet,
+    polynomial_jet,
 )
 from omnibias.core.jets import contact_residual, is_holonomic
 from omnibias.core.line_search import (
@@ -192,6 +208,8 @@ __lineage__ = "bias collapse"
 
 __all__ = [
     'ActivationSpec',
+    'AffineBudget',
+    'AffineBudgetExceeded',
     'AffineSet',
     'BandPlan',
     'BankSpec',
@@ -204,13 +222,17 @@ __all__ = [
     'DEQSolverUnknown',
     'EffectiveOperator',
     'EqualitySystem',
+    'ExactAffineGeometry',
     'FlowSystem',
     'FrameSpec',
     'GradientSecant',
+    'InconsistentAffineConstraints',
     'Indicator',
+    'JetGeometryBudgetExceeded',
     'JetLineSearchConfig',
     'Layer',
     'LineSearchResult',
+    'LinearJetEquation',
     'LinearizingTransform',
     'MollifierSpec',
     'MomentSystem',
@@ -218,6 +240,9 @@ __all__ = [
     'NewtonResult',
     'NthDerivativeFn',
     'PackSpec',
+    'PolynomialJetBoundary',
+    'PolynomialJetBudget',
+    'PolynomialJetCertificate',
     'QuadratureRule',
     'RefinePolicy',
     'RefineReport',
@@ -248,6 +273,7 @@ __all__ = [
     'certified_truncation_radius',
     'certify_locus_point',
     'chain_rule_mse_blocks',
+    'check_polynomial_jet',
     'coarse_grain_linear',
     'cole_hopf_jet',
     'cole_hopf_u',
@@ -262,6 +288,7 @@ __all__ = [
     'eval_gaussian_derivative',
     'eval_sigma_derivative',
     'eval_tanh_derivative',
+    'exact_affine_geometry',
     'factorial_jet_multiply',
     'factorial_jet_reciprocal',
     'flow_coefficients',
@@ -298,6 +325,7 @@ __all__ = [
     'peak_frequency',
     'peano_kernel',
     'polya_condition',
+    'polynomial_jet',
     'polynomial_wolfe',
     'refine_bank',
     'reject_anderson',

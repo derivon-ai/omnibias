@@ -175,3 +175,43 @@ def test_dense_and_sparse_matvec_and_dot_are_sound() -> None:
         assert np.all(dense.contains(expected))
         assert np.all(sparse.contains(expected))
         assert dot.contains(float(vector_sample @ vector_sample))
+
+
+def _entrywise_sparse_matvec(rows, columns, data, vector, shape):
+    """The definition: one outward-rounded addition per COO entry, in entry order."""
+    from omnibias.core.verified.interval_array import _mul_bounds
+
+    lower, upper = np.zeros(shape[0]), np.zeros(shape[0])
+    for row, column, lo, hi in zip(rows, columns, data.lo, data.hi, strict=True):
+        plo, phi = _mul_bounds(
+            np.asarray(lo, dtype=np.float64),
+            np.asarray(hi, dtype=np.float64),
+            np.asarray(vector.lo[column], dtype=np.float64),
+            np.asarray(vector.hi[column], dtype=np.float64),
+        )
+        lower[row] = np.nextafter(lower[row] + plo.item(), -np.inf)
+        upper[row] = np.nextafter(upper[row] + phi.item(), np.inf)
+    return lower, upper
+
+
+def test_sparse_matvec_is_bit_identical_to_the_entry_by_entry_accumulation() -> None:
+    """Rounding after every addition makes the order of a row's entries part of the result; the vectorized
+    form adds the k-th entry of every row at once and so performs the same IEEE operations per row."""
+    rng = np.random.default_rng(7)
+    for trial in range(60):
+        n_rows, n_cols = int(rng.integers(1, 9)), int(rng.integers(1, 9))
+        nnz = int(rng.integers(0, 40))
+        rows = rng.integers(0, n_rows, nnz)
+        columns = rng.integers(0, n_cols, nnz)  # duplicates are separate entries
+        lo = rng.standard_normal(nnz) * 10.0 ** rng.integers(-6, 6, nnz)
+        hi = lo + np.abs(rng.standard_normal(nnz)) * 10.0 ** rng.integers(-9, 1, nnz)
+        if trial % 5 == 0 and nnz:
+            lo[0], hi[0] = -np.inf, np.inf
+        v_lo = rng.standard_normal(n_cols)
+        vector = IntervalArray(v_lo, v_lo + np.abs(rng.standard_normal(n_cols)) * 1e-3)
+        data = IntervalArray(lo, hi)
+        with np.errstate(invalid="ignore"):
+            got = sparse_matvec(rows, columns, data, vector, (n_rows, n_cols))
+            lower, upper = _entrywise_sparse_matvec(rows, columns, data, vector, (n_rows, n_cols))
+        assert np.array_equal(got.lo.view(np.uint64), lower.view(np.uint64))
+        assert np.array_equal(got.hi.view(np.uint64), upper.view(np.uint64))

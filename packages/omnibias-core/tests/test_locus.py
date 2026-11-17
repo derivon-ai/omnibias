@@ -166,3 +166,33 @@ def test_g4_certificate_soundness() -> None:
 
 def test_mismatched_is_not_affine() -> None:
     assert affine_locus(_case_b()) is None
+
+
+def test_higher_derivative_has_nonaffine_equal_value_branches() -> None:
+    # t-t^3 has the same value at t=1/2 and t=(sqrt(13)-1)/4.
+    # Thus tanh''(a)=tanh''(b), but a!=b and a!=-b. Equal derivative
+    # orders do not justify a complete identity/mirror classification.
+    a = math.atanh(0.5)
+    b = math.atanh((math.sqrt(13) - 1) / 4)
+    sys = EqualitySystem((UnitTerm(2, 1.0, (1.0,)), UnitTerm(2, 1.0, (1.0,), b - a)))
+    assert residual(sys, (a,))[0] == pytest.approx(0.0, abs=2e-15)
+    assert affine_locus(sys) is None
+
+
+def test_gaussian_value_has_mirror_branch_but_derivative_is_not_injective() -> None:
+    sys = EqualitySystem((UnitTerm(0, 1.0, (1.0, 0.0)),
+                          UnitTerm(0, 1.0, (0.0, 1.0))), base="gaussian")
+    planes = affine_locus(sys)
+    assert planes is not None and len(planes) == 2
+    assert residual(sys, (0.4, -0.4))[0] == pytest.approx(0.0)
+    assert branch_signature(sys, (0.4, -0.4)) == (-1,)
+    derivative = EqualitySystem((UnitTerm(1, 1.0, (1.0,)),
+                                 UnitTerm(1, 1.0, (2.0,))), base="gaussian")
+    assert affine_locus(derivative) is None
+
+
+def test_affine_classification_refuses_degenerate_and_multi_pair_systems() -> None:
+    zero = EqualitySystem((UnitTerm(0, 0.0, (1.0,)), UnitTerm(0, 0.0, (2.0,))))
+    assert affine_locus(zero) is None  # Entire space, not just equal arguments.
+    triple = EqualitySystem(tuple(UnitTerm(1, 1.0, (w,)) for w in (1.0, 2.0, 3.0)))
+    assert affine_locus(triple) is None  # Intersections of pairwise unions.

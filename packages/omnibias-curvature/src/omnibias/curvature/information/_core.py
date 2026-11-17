@@ -754,11 +754,8 @@ def _quadrature_metric(
 
 def _assemble_g(p: FloatArray, jac: FloatArray, w: FloatArray) -> FloatArray:
     safe = np.maximum(p, 1e-300)
-    # G_ij = int (dp_i dp_j / p) dx
-    weighted = (jac / safe[:, None]) * np.sqrt(safe)[:, None]
     # int score_i score_j p dx = int (dp_i dp_j / p) dx
     g = (jac.T * (w / safe)) @ jac
-    _ = weighted
     return np.asarray(0.5 * (g + g.T), dtype=np.float64)
 
 

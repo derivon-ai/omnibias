@@ -30,7 +30,7 @@ from fractions import Fraction
 
 from omnibias.core.multi_index import (
     MultiIndex,
-    index_position,
+    index_position_view,
     multi_indices,
     num_multi_indices,
 )
@@ -146,7 +146,7 @@ class TaylorModelMV:
         coeffs = [Interval.point(0.0) for _ in range(n)]
         coeffs[0] = Interval.point(float(center[axis]))
         unit = tuple(1 if i == axis else 0 for i in range(dim))
-        coeffs[index_position(dim, order)[unit]] = Interval.point(1.0)
+        coeffs[index_position_view(dim, order)[unit]] = Interval.point(1.0)
         return cls(center, radius, order, coeffs, Interval.point(0.0))
 
     # ----- helpers ------------------------------------------------------- #
@@ -232,7 +232,7 @@ class TaylorModelMV:
             )
         self._check(other)
         indices = multi_indices(self.dim, self.order)
-        pos = index_position(self.dim, self.order)
+        pos = index_position_view(self.dim, self.order)
         n = len(self.coeffs)
         low = [Interval.point(0.0) for _ in range(n)]
         high = Interval.point(0.0)
@@ -283,7 +283,7 @@ class TaylorModelMV:
             raise ValueError(f"axis {axis} out of range for dim {self.dim}")
         new_order = self.order + 1
         n_new = num_multi_indices(self.dim, new_order)
-        pos_new = index_position(self.dim, new_order)
+        pos_new = index_position_view(self.dim, new_order)
         old_indices = multi_indices(self.dim, self.order)
         new_coeffs = [Interval.point(0.0) for _ in range(n_new)]
         for c, alpha in zip(self.coeffs, old_indices, strict=True):

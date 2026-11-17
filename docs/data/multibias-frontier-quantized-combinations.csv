@@ -1,0 +1,55 @@
+model,seed,method,bits,status,accuracy,NLL,perplexity,whole_export_bytes,seconds,native_probe_status,scope
+resnet18,7201,teacher,8,COMPLETE_CACHED,0.7877707006369427,0.7816831871567403,,11827501,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7201,teacher,4,COMPLETE_CACHED,0.5161783439490446,2.241179457738596,,5988043,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7201,rank,8,COMPLETE,0.6178343949044586,1.709901618562333,,9901183,16.862342630978674,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7201,rank,4,COMPLETE,0.29095541401273883,4.664822675897052,,5019935,15.865079276030883,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7201,svd,8,COMPLETE,0.7704458598726115,0.8633840046155945,,11172046,15.565593785024248,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7201,svd,4,COMPLETE,0.3429299363057325,3.86031350896467,,5656172,16.296256170026027,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7211,teacher,8,COMPLETE_CACHED,0.7877707006369427,0.7816831871567403,,11827501,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7211,teacher,4,COMPLETE_CACHED,0.5161783439490446,2.241179457738596,,5988043,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7211,rank,8,COMPLETE,0.5798726114649682,2.0297944032325,,9901183,16.82627078006044,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7211,rank,4,COMPLETE,0.3780891719745223,3.5968307326324593,,5019935,17.36070222395938,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7211,svd,8,COMPLETE_CACHED,0.7696815286624203,0.8426938612957713,,11172009,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7211,svd,4,COMPLETE_CACHED,0.3597452229299363,3.622094720161413,,5656135,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7219,teacher,8,COMPLETE_CACHED,0.7877707006369427,0.7816831871567403,,11827501,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7219,teacher,4,COMPLETE_CACHED,0.5161783439490446,2.241179457738596,,5988043,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7219,rank,8,COMPLETE,0.6338853503184714,1.6200668090333883,,9901183,16.694993233075365,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7219,rank,4,COMPLETE,0.40662420382165604,3.5129244424241817,,5019935,17.247988377930596,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7219,svd,8,COMPLETE,0.7737579617834395,0.8296439319352532,,11172046,16.723350220010616,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet18,7219,svd,4,COMPLETE,0.39643312101910827,3.2924537024167484,,5656172,16.997166266082786,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7201,teacher,8,COMPLETE_CACHED,0.8685350318471338,1.137265527844542,,26157689,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7201,teacher,4,COMPLETE_CACHED,0.3228025477707006,3.5837598271905136,,13406233,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7201,shared,8,COMPLETE,0.8593630573248408,1.2689741980297724,,24872939,31.539034095942043,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7201,shared,4,COMPLETE,0.3472611464968153,3.753040019510491,,12757387,33.744042308069766,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7201,weighted_svd,8,COMPLETE_CACHED,0.8555414012738853,1.1887817696509133,,24874368,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7201,weighted_svd,4,COMPLETE_CACHED,0.25987261146496815,4.217692504727572,,12760480,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7211,teacher,8,COMPLETE_CACHED,0.8685350318471338,1.137265527844542,,26157689,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7211,teacher,4,COMPLETE_CACHED,0.3228025477707006,3.5837598271905136,,13406233,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7211,shared,8,COMPLETE,0.8644585987261146,1.2637472243756427,,24872939,31.78679614199791,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7211,shared,4,COMPLETE,0.3811464968152866,3.382219453560702,,12757387,33.44770125602372,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7211,weighted_svd,8,COMPLETE_CACHED,0.8629299363057324,1.2030852803171497,,24874368,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7211,weighted_svd,4,COMPLETE_CACHED,0.22828025477707006,4.621872847265318,,12760480,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7201,teacher,8,COMPLETE_CACHED,,3.251147633988418,25.819954778114983,125336550,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7201,teacher,4,COMPLETE_CACHED,,12.320251192576487,224190.4499462038,63177316,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7201,shared,8,COMPLETE,,3.4202160026760238,30.576018809691572,121779543,136.52310530201066,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7201,shared,4,COMPLETE,,12.437290379171653,252026.7166110041,61389781,136.4039252800867,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7201,prune,8,COMPLETE_CACHED,,3.293478949455892,26.93641125113539,121779502,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7201,prune,4,COMPLETE_CACHED,,12.152919654230535,189646.9859380246,61389740,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7211,teacher,8,COMPLETE_CACHED,,3.251147633988418,25.819954778114983,125336550,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7211,teacher,4,COMPLETE_CACHED,,12.320251192576487,224190.4499462038,63177316,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7211,shared,8,COMPLETE,,3.4195860182232303,30.556762459450653,121779543,136.89149894099683,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7211,shared,4,COMPLETE,,11.97739507389853,159117.0022664201,61389781,137.3369639700977,PASSED,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7211,prune,8,COMPLETE_CACHED,,3.2903429907276394,26.852072088349022,121779502,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+gpt2,7211,prune,4,COMPLETE_CACHED,,12.159829956707158,190962.04246073426,61389740,0.0,covered by primary independent replay for cached export,"packed storage; dequantized float32 evaluation, not packed runtime speed"
+resnet50,7219,teacher,8,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+resnet50,7219,teacher,4,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+resnet50,7219,shared,8,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+resnet50,7219,shared,4,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+resnet50,7219,weighted_svd,8,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+resnet50,7219,weighted_svd,4,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+gpt2,7219,teacher,8,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+gpt2,7219,teacher,4,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+gpt2,7219,shared,8,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+gpt2,7219,shared,4,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+gpt2,7219,prune,8,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,
+gpt2,7219,prune,4,NOT_RUN_INCOMPLETE_PRIMARY_SCREEN,,,,,,,

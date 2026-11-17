@@ -17,7 +17,7 @@ spec.loader.exec_module(release)
 
 
 def test_matching_package_tag() -> None:
-    assert release.select(ROOT, '', 'omnibias-core-v0.5.0rc1', 'push') == ['core']
+    assert release.select(ROOT, '', 'omnibias-core-v0.5.0', 'push') == ['core']
 
 
 @pytest.mark.parametrize('tag', ['omnibias-core-v9.9.9', 'v0.4.0', 'omnibias-pinn-v0.1.0'])
@@ -68,17 +68,26 @@ def test_incomplete_preparation_is_rejected() -> None:
 
 
 def test_published_closure_excludes_yanked_versions(monkeypatch) -> None:
-    monkeypatch.setattr(release, 'index_project', lambda *a: {'releases': {'0.5.0rc1': [{'yanked': True}]}})
+    monkeypatch.setattr(release, 'index_project', lambda *a: {'releases': {'0.5.0': [{'yanked': True}]}})
     with pytest.raises(ValueError, match='must be selected'):
         release.validate_closure(ROOT, ['torch'], 'pypi')
-    monkeypatch.setattr(release, 'index_project', lambda *a: {'releases': {'0.5.0rc1': [{'yanked': False}]}})
+    monkeypatch.setattr(release, 'index_project', lambda *a: {'releases': {'0.5.0': [{'yanked': False}]}})
     release.validate_closure(ROOT, ['torch'], 'pypi')
 
 
-def test_stable_promotion_remains_blocked(monkeypatch) -> None:
+def test_stable_promotion_is_allowed_without_guard(monkeypatch) -> None:
+    monkeypatch.setattr(release, 'projects', lambda root: {'core': {'version': '0.5.0'}})
+
+    release.require_prerelease(ROOT, ['core'])
+
+
+def test_prerelease_guard_blocks_stable_promotion(tmp_path: Path, monkeypatch) -> None:
+    (tmp_path / 'pyproject.toml').write_text(
+        '[tool.omnibias.release]\nprerelease-only = true\n'
+    )
     monkeypatch.setattr(release, 'projects', lambda root: {'core': {'version': '0.5.0'}})
     with pytest.raises(ValueError, match='Stable promotion'):
-        release.require_prerelease(ROOT, ['core'])
+        release.require_prerelease(tmp_path, ['core'])
 
 
 def test_publisher_identities_are_explicit_and_distinct() -> None:

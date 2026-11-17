@@ -1,0 +1,827 @@
+{
+  "schema": "omnibias-session-compendium-v1",
+  "date": "2026-10-23",
+  "root_base_commit": "72ef81d1ae9f8ae8792b21e6bc89ccc2e850959c",
+  "lab_snapshot_commit": "10ac0799c925c80a9ea20e5128bc2692e7ff10f6",
+  "overview_sha256": "0a6ef40ec660551e3463728d7a79c2d9d40c08c914bfc702b81762fb5ba497d8",
+  "sources": [
+    {
+      "appendix": 1,
+      "repository": "omnibias",
+      "path": "docs/bias-collapse-pde.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/bias-collapse-pde.md",
+      "sha256": "a9cb207fb6aba9cc21b7130fac955d17f9ea0b477bc5b0eb7ace341c11cdad9a",
+      "bytes": 131969
+    },
+    {
+      "appendix": 2,
+      "repository": "omnibias",
+      "path": "docs/affine-geometry.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/affine-geometry.md",
+      "sha256": "942f571dbfe8b876d94362fba29ad0aa8fc3f7d12f7360edaa12d6a1a408899b",
+      "bytes": 5094
+    },
+    {
+      "appendix": 3,
+      "repository": "omnibias",
+      "path": "docs/calculus-geometry-pilot.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/calculus-geometry-pilot.md",
+      "sha256": "9585ed99c683e6d9169a46fb3ca5a028f211c0b2e550b83654e3d1d6f55104c8",
+      "bytes": 24054
+    },
+    {
+      "appendix": 4,
+      "repository": "omnibias",
+      "path": "docs/calculus-geometry-results.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/calculus-geometry-results.md",
+      "sha256": "86412a25f14ac2515419d85d7bde1e1327c4dca091497dda5accbd0fe1fcc9e5",
+      "bytes": 13316
+    },
+    {
+      "appendix": 5,
+      "repository": "omnibias",
+      "path": "docs/calculus-geometry-opportunities.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/calculus-geometry-opportunities.md",
+      "sha256": "ce9dde73af1810d02c5b453f23c91971f807454cbb746609b7e926e7609f01ac",
+      "bytes": 21380
+    },
+    {
+      "appendix": 6,
+      "repository": "omnibias",
+      "path": "docs/calculus-geometry-campaign.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/calculus-geometry-campaign.md",
+      "sha256": "3b7e7a1be133cd92bd30f140f2525126fc36fc2ad2a4e5071409065aefb388c8",
+      "bytes": 51021
+    },
+    {
+      "appendix": 7,
+      "repository": "omnibias",
+      "path": "docs/verified-physical-calibration.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/verified-physical-calibration.md",
+      "sha256": "119dc48a99e6a0c13f0a8c43aaa07bd6057a90097fc737f2f07539b0ef194186",
+      "bytes": 31664
+    },
+    {
+      "appendix": 8,
+      "repository": "omnibias",
+      "path": "docs/unification-research-audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/unification-research-audit.md",
+      "sha256": "aa8e718b80adc5f41c2852b9ca6f7f2656aa8f9f904eec96bf228f3e9769d677",
+      "bytes": 21912
+    },
+    {
+      "appendix": 9,
+      "repository": "omnibias",
+      "path": "docs/two-bias-bell-experiment.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/two-bias-bell-experiment.md",
+      "sha256": "dc70aef51d3e470e20a0bba86837810aac36a96179e97c46a494b3a655845c62",
+      "bytes": 21017
+    },
+    {
+      "appendix": 10,
+      "repository": "omnibias",
+      "path": "docs/multi-bias-capacity-and-architecture.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/multi-bias-capacity-and-architecture.md",
+      "sha256": "1c0c1efdf97a159f01eb945bd421ab20e9d96f9ef26eee3e26bb29ab42c955e7",
+      "bytes": 23684
+    },
+    {
+      "appendix": 11,
+      "repository": "omnibias",
+      "path": "docs/activation-profile-compression.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/activation-profile-compression.md",
+      "sha256": "799b35233d7cf052fde4db052720b98169c57cc505aa119074768fbe81fc556d",
+      "bytes": 30487
+    },
+    {
+      "appendix": 12,
+      "repository": "omnibias",
+      "path": "docs/multi-bias-learning-and-margin.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/multi-bias-learning-and-margin.md",
+      "sha256": "6489325256487a0e85d5916f03a8df7165eddeafefa273f328fa9c1d31c75cfa",
+      "bytes": 68007
+    },
+    {
+      "appendix": 13,
+      "repository": "omnibias",
+      "path": "docs/multibias-frontier-study.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/multibias-frontier-study.md",
+      "sha256": "428acb05d4b6b88cff5e8cba6c6cfa64dd14bfa551f317cab780dbb46bd73de8",
+      "bytes": 99967
+    },
+    {
+      "appendix": 14,
+      "repository": "omnibias",
+      "path": "docs/multibias-followup-audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/multibias-followup-audit.md",
+      "sha256": "7dd80c1b354e1bb8134552953385a07860d3fcfc8f345defeecbed52320aa4db",
+      "bytes": 23374
+    },
+    {
+      "appendix": 15,
+      "repository": "omnibias",
+      "path": "docs/multi-bias-research-synthesis.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/multi-bias-research-synthesis.md",
+      "sha256": "05d95ab3e136aecf47763cc0ac58161617643dbf98a378599fd40de3ae15eee0",
+      "bytes": 59409
+    },
+    {
+      "appendix": 16,
+      "repository": "omnibias",
+      "path": "docs/projection-profile-allocation.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/projection-profile-allocation.md",
+      "sha256": "af82fa75ecb791bfcf5b77a95aa24e955ba665a586993eef9ceff08b382c13b7",
+      "bytes": 100410
+    },
+    {
+      "appendix": 17,
+      "repository": "omnibias",
+      "path": "docs/deep-bias-collapse.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/deep-bias-collapse.md",
+      "sha256": "b0413128d17b38b920de6f1f7ce81e524bed9993b2a3d311e2f5c5e970f639dc",
+      "bytes": 6948
+    },
+    {
+      "appendix": 18,
+      "repository": "omnibias",
+      "path": "docs/performance.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/performance.md",
+      "sha256": "795c287830568773f35c59c1092546b7bad7e63c59f776e5baafd1d5d7b8d9d7",
+      "bytes": 9526
+    },
+    {
+      "appendix": 19,
+      "repository": "omnibias",
+      "path": "docs/profile-pde.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/profile-pde.md",
+      "sha256": "8c827dd53aeb7cf84619366a2559913a13df15f672184bc5052503a4b350e2d4",
+      "bytes": 11459
+    },
+    {
+      "appendix": 20,
+      "repository": "omnibias",
+      "path": "docs/nonlinear-pde-identities.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/nonlinear-pde-identities.md",
+      "sha256": "67d8b61461d880e4cc16a11c2489c5507146a7a2e217e927650d886f75b06e11",
+      "bytes": 17587
+    },
+    {
+      "appendix": 21,
+      "repository": "omnibias",
+      "path": "docs/inverse-pde-map.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias/docs/inverse-pde-map.md",
+      "sha256": "3d409c3bc801791cc96c5a3ef949ad567dcd8f467494955e397767049fd8eeaa",
+      "bytes": 16806
+    },
+    {
+      "appendix": 22,
+      "repository": "omnibias-lab",
+      "path": "README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/README.md",
+      "sha256": "d3aeadd4fdc91e4d6a645cb3167253ce28b3b6b6f31e9ee171d6084e5f7834f2",
+      "bytes": 22879
+    },
+    {
+      "appendix": 23,
+      "repository": "omnibias-lab",
+      "path": "activation_compression_research/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/activation_compression_research/README.md",
+      "sha256": "8d99344fcceb42df614dd501416e9740ab7e047c5300e9728ddf225c75dbd915",
+      "bytes": 3040
+    },
+    {
+      "appendix": 24,
+      "repository": "omnibias-lab",
+      "path": "activation_compression_research/THEORY.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/activation_compression_research/THEORY.md",
+      "sha256": "b6dd80281cf29fdd2dc0e0753064e6f4e93ad002e15445277e20adf8d8a3e47b",
+      "bytes": 7416
+    },
+    {
+      "appendix": 25,
+      "repository": "omnibias-lab",
+      "path": "boolean_bias_research/order_audit/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/boolean_bias_research/order_audit/README.md",
+      "sha256": "44e2bf4945c65e3affcc3c1e8d4774b94875385516df1f9ed85aad4a7b30c3cc",
+      "bytes": 8889
+    },
+    {
+      "appendix": 26,
+      "repository": "omnibias-lab",
+      "path": "calculus_geometry/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/calculus_geometry/README.md",
+      "sha256": "d8bc2d6d50b8654a6b720a84d131daf514056555346eee92d1ee4ce9c7b3efb7",
+      "bytes": 2785
+    },
+    {
+      "appendix": 27,
+      "repository": "omnibias-lab",
+      "path": "calculus_geometry_continuous_bias/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/calculus_geometry_continuous_bias/README.md",
+      "sha256": "619e0388293c717e376114ed904cd7ca530bc6190bad6e6ff3b3e5d5fb89cdb2",
+      "bytes": 4693
+    },
+    {
+      "appendix": 28,
+      "repository": "omnibias-lab",
+      "path": "calculus_geometry_research/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/calculus_geometry_research/README.md",
+      "sha256": "feea7af87fc5ce3bc7f8af602c10af6c45f4aef2eef25be77d94beb1631fc494",
+      "bytes": 11063
+    },
+    {
+      "appendix": 29,
+      "repository": "omnibias-lab",
+      "path": "docs/activation-compression-math-supplement.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/docs/activation-compression-math-supplement.md",
+      "sha256": "33c0b00f06f6fbe8c0317f3f0f512b72e0dcf17b3106adb5d2d0de58208a50e2",
+      "bytes": 9430
+    },
+    {
+      "appendix": 30,
+      "repository": "omnibias-lab",
+      "path": "docs/directional-benchmarks.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/docs/directional-benchmarks.md",
+      "sha256": "dd1cb528264198b9774efe95fa0484c24d1d9ebea3b1f283657e58831dee93f1",
+      "bytes": 6440
+    },
+    {
+      "appendix": 31,
+      "repository": "omnibias-lab",
+      "path": "docs/pde-certificate.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/docs/pde-certificate.md",
+      "sha256": "8ae2d7dad4f6f03b0a9ea11bb67e574318037c1df47d1c1130b0dd91ec374834",
+      "bytes": 14834
+    },
+    {
+      "appendix": 32,
+      "repository": "omnibias-lab",
+      "path": "docs/reproduction-request.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/docs/reproduction-request.md",
+      "sha256": "5ee373c5276533246b2c514c010b68a7ce2a18c2596121dad335fed43334f4b0",
+      "bytes": 1511
+    },
+    {
+      "appendix": 33,
+      "repository": "omnibias-lab",
+      "path": "docs/research-note.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/docs/research-note.md",
+      "sha256": "27b6a373fb82771010ce975d527bed6daa3cee2fd181673ff22d8ded9a34dc03",
+      "bytes": 11999
+    },
+    {
+      "appendix": 34,
+      "repository": "omnibias-lab",
+      "path": "docs/source-compression.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/docs/source-compression.md",
+      "sha256": "b1fd546c47d273bb05467924081efd99a88b5341e653a8c208827aa653e28938",
+      "bytes": 3805
+    },
+    {
+      "appendix": 35,
+      "repository": "omnibias-lab",
+      "path": "multibias_frontier_research/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/multibias_frontier_research/README.md",
+      "sha256": "665b89804b5787293753f10222017a03cee0e8c852b73270a3e8f141097d9744",
+      "bytes": 5455
+    },
+    {
+      "appendix": 36,
+      "repository": "omnibias-lab",
+      "path": "multibias_learning_research/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/multibias_learning_research/README.md",
+      "sha256": "7516f2c5f3f0fed1ad6df1eda1ef93bf806a7d5fc1c76a9562046d38cf283667",
+      "bytes": 4459
+    },
+    {
+      "appendix": 37,
+      "repository": "omnibias-lab",
+      "path": "projection_profile_research/DERIVATIVE_ENERGY.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/projection_profile_research/DERIVATIVE_ENERGY.md",
+      "sha256": "5a70dcc660bd08375a145812d47dd9674aa737183c30342c51ebde8af5d99e8b",
+      "bytes": 10838
+    },
+    {
+      "appendix": 38,
+      "repository": "omnibias-lab",
+      "path": "projection_profile_research/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/projection_profile_research/README.md",
+      "sha256": "9d1f613be5e14d5465709689384c5614f07f3ed9434ce116170368dd3a82b163",
+      "bytes": 2947
+    },
+    {
+      "appendix": 39,
+      "repository": "omnibias-lab",
+      "path": "projection_profile_research/THEORY.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/projection_profile_research/THEORY.md",
+      "sha256": "a23e9ab6e4a79c4baae0df6ccd91192b003f65b88f52d7ece4f1b3c80fec8206",
+      "bytes": 15251
+    },
+    {
+      "appendix": 40,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_frontier_20261021/completion_checklist.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_frontier_20261021/completion_checklist.md",
+      "sha256": "7f411bace3ae50f7660bfe643934e392857b0c786461174ba6b724573eb126b2",
+      "bytes": 1244
+    },
+    {
+      "appendix": 41,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/band_segmentation.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/band_segmentation.md",
+      "sha256": "b18465f58115d54f3a6c7405d7d2a5af92a6f0d9891ddb405c86dd6d2a3f2e34",
+      "bytes": 14215
+    },
+    {
+      "appendix": 42,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/conditional_profile_risk.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/conditional_profile_risk.md",
+      "sha256": "c0380005705a00eb29c4c7199d992312321c6a8ac4f240b35f68fae99fc62270",
+      "bytes": 2555
+    },
+    {
+      "appendix": 43,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/final_protocol_audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/final_protocol_audit.md",
+      "sha256": "e3bd690dc2dc3bd1aec1fb54f0c88ff3b0de8355d3295445106b7fe4ca3b519e",
+      "bytes": 9671
+    },
+    {
+      "appendix": 44,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/image_learning_dynamics_partial.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/image_learning_dynamics_partial.md",
+      "sha256": "45f12301ec67e524bbace83ff39cd4adda8f9870ad82508ffcadf9316c7a3aec",
+      "bytes": 6175
+    },
+    {
+      "appendix": 45,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/margin_band_theory.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/margin_band_theory.md",
+      "sha256": "8eed83260c3e14467c2935768a7ff192f275a8183ae977c534729761a984fc4c",
+      "bytes": 16774
+    },
+    {
+      "appendix": 46,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/multibias_completed_evidence_audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/multibias_completed_evidence_audit.md",
+      "sha256": "274242150d3112ee60fe87474420e0df29a36f499592353893599f4ec2fe9340",
+      "bytes": 7924
+    },
+    {
+      "appendix": 47,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/nesting_tangent_probe.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/nesting_tangent_probe.md",
+      "sha256": "8e3c8625e06fef5ed04e2fa89fdaa65baa5b2c46f749a8428f7ad1558e979ceb",
+      "bytes": 5840
+    },
+    {
+      "appendix": 48,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/ordered_band_agreement.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/ordered_band_agreement.md",
+      "sha256": "475e7fe15b8cdbab10b498337f580e35663ad3219bb62dbb2d8e2a8c87b0357d",
+      "bytes": 5482
+    },
+    {
+      "appendix": 49,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/pair_descent_theorem.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/pair_descent_theorem.md",
+      "sha256": "f077bf277e5254f1e7395677c090fc3f4669ef14354fbf22e2e1100d43362f1e",
+      "bytes": 9435
+    },
+    {
+      "appendix": 50,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/pair_growth_search.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/pair_growth_search.md",
+      "sha256": "a3509df46d2354833337828be3cb68934088cc0acbf2e65eefc94622f38b36b5",
+      "bytes": 8442
+    },
+    {
+      "appendix": 51,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/profile_crossing_bound.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/profile_crossing_bound.md",
+      "sha256": "d8b22012a647011c333c7a809893e04cdb7829ae9fb07ab26483095e44296aaa",
+      "bytes": 8167
+    },
+    {
+      "appendix": 52,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/profile_crossing_independent_review.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/profile_crossing_independent_review.md",
+      "sha256": "da5a3bf8f0f1d87af5b043d3c85c613f6a0ec078c101c78ca6bd945260062ab2",
+      "bytes": 8756
+    },
+    {
+      "appendix": 53,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/profile_math_review.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/profile_math_review.md",
+      "sha256": "7ea898e1420341df05ed9db088848c3e3799fec18fbd24e3d624af513d30e3c8",
+      "bytes": 16192
+    },
+    {
+      "appendix": 54,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/profile_model_readonly_audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/profile_model_readonly_audit.md",
+      "sha256": "990d2f093dd75f6152628517fdcebcb666f5b6ed1a8188d7339aedc359c61da9",
+      "bytes": 4168
+    },
+    {
+      "appendix": 55,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/profile_tangent_learning.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/profile_tangent_learning.md",
+      "sha256": "05b7054f6e3598c698e237601734d3ee3c3d1bca487391bb7153ff9d2a4a189e",
+      "bytes": 6976
+    },
+    {
+      "appendix": 56,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/results_tables.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/results_tables.md",
+      "sha256": "43423680f3c33b88d17595ac1bb87d1f54bfae0551b48d2ace302916b427e9de",
+      "bytes": 1531
+    },
+    {
+      "appendix": 57,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/shared_profile_rank.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/shared_profile_rank.md",
+      "sha256": "1980df37a20577ee48e06c2716929f5a56f9dd8a53f0e8681a60955f83cd6ae0",
+      "bytes": 9191
+    },
+    {
+      "appendix": 58,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/shared_profile_rank_audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/shared_profile_rank_audit.md",
+      "sha256": "8723501a65b20bbb4b21b817dadbe39962ba551c0a3dcb336a22ddb3ffc76579",
+      "bytes": 4177
+    },
+    {
+      "appendix": 59,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_learning_20261020/training_evidence_audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_learning_20261020/training_evidence_audit.md",
+      "sha256": "f5f6d936ace2cd43cbaa14f7cbe7ba0b08962be364c6bb6900a3300d514bfb69",
+      "bytes": 13464
+    },
+    {
+      "appendix": 60,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_synthesis_20261022/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/README.md",
+      "sha256": "22f7abe7cbf1fe0e17e1accb36476c66492dc9528d411ab741358972bda66930",
+      "bytes": 863
+    },
+    {
+      "appendix": 61,
+      "repository": "omnibias-lab",
+      "path": "reports/multibias_synthesis_20261022/report_template.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/multibias_synthesis_20261022/report_template.md",
+      "sha256": "850cf893e0304af7b0c18bd7f389eb72bba1d7489f8b610cbe0f30cd40ef6f2f",
+      "bytes": 50835,
+      "link_context": "/home/vardan/dev/projects/omnibias/docs/multi-bias-research-synthesis.md"
+    },
+    {
+      "appendix": 62,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/README.md",
+      "sha256": "850f1bc0578a88dc2e247d388dd9bb8b20fcf280a33bff775c3dc7ffa85216ef",
+      "bytes": 4608
+    },
+    {
+      "appendix": 63,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/approximation-budget.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/approximation-budget.md",
+      "sha256": "9cca2a907ce4de02e01d701abac38dc70c15fccb27f4842eab2f0d92fd4271a3",
+      "bytes": 14441
+    },
+    {
+      "appendix": 64,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/cifar-validation-audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/cifar-validation-audit.md",
+      "sha256": "7e18bfa060813aa5ac68ef718a96621700a186de3ee2362123875512a6d305a2",
+      "bytes": 11134
+    },
+    {
+      "appendix": 65,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/cluster-cancellation.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/cluster-cancellation.md",
+      "sha256": "c1169035af80d3aeba2b143cacf96fa3bc2490119458553d6d81cd17e208ddf9",
+      "bytes": 12517
+    },
+    {
+      "appendix": 66,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/cnn-contract-audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/cnn-contract-audit.md",
+      "sha256": "3c11219525fa18271ebab8f7222ab47b95a2c2648271cbac9526af72717b9b8b",
+      "bytes": 11328
+    },
+    {
+      "appendix": 67,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/cnn-latency-representatives.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/cnn-latency-representatives.md",
+      "sha256": "25cf8ce1572c018d5bee184b86621c80dc1ee5dc1c3f5fc5a30432d0795e7fb6",
+      "bytes": 1799
+    },
+    {
+      "appendix": 68,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/cnn_candidate_diagnostics/REPORT.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/cnn_candidate_diagnostics/REPORT.md",
+      "sha256": "b45248eb73f5c478abe60adc83f8fe15fa30b53f007ec64b9607688876b5a92f",
+      "bytes": 4564
+    },
+    {
+      "appendix": 69,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/cone-opening.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/cone-opening.md",
+      "sha256": "b47224de69f1525e4ab3571dd9f0b7571426e24d3b76d16f771a2d7e0f546f3e",
+      "bytes": 11157
+    },
+    {
+      "appendix": 70,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/cost-summary.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/cost-summary.md",
+      "sha256": "73e757c3644324a2d8d93fb0624b3464ad7ddeb9953291bcf6ec082132fee0b2",
+      "bytes": 2301
+    },
+    {
+      "appendix": 71,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/decision-conditions.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/decision-conditions.md",
+      "sha256": "6ca6a238f7ba105725bbe1884f7c773260f3c1132ec9c34a9ca5f69ac2d8eb4d",
+      "bytes": 18663
+    },
+    {
+      "appendix": 72,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/decision-theorem.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/decision-theorem.md",
+      "sha256": "8d6456791061220043ccd2cc2f3abfe143e89a966ab7e5ec8619a48d69235b6b",
+      "bytes": 14523
+    },
+    {
+      "appendix": 73,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/derivation-review.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/derivation-review.md",
+      "sha256": "739818988f4df2be3bcc5380a3f013211ef97308fc5e4f2b046bd6ebf4db1201",
+      "bytes": 7119
+    },
+    {
+      "appendix": 74,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/diagnostics-final/scope.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/diagnostics-final/scope.md",
+      "sha256": "384c7ced83f909a03ad8507eea4b2241da7df44201de408cb13409454b06efc7",
+      "bytes": 2450
+    },
+    {
+      "appendix": 75,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/evidence-assessment.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/evidence-assessment.md",
+      "sha256": "57d32232ba8a3b2cbfc2e463cd512af441809a4e8d14dd0f525937a98f368582",
+      "bytes": 15860
+    },
+    {
+      "appendix": 76,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/fashion-validation-audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/fashion-validation-audit.md",
+      "sha256": "b086189f523e60adb1a4ca4f8c3e3dd375f6474cd870d9eb37fe3e058e94db5c",
+      "bytes": 11003
+    },
+    {
+      "appendix": 77,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/figures-final/captions-and-scope.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/figures-final/captions-and-scope.md",
+      "sha256": "f5bb4fe0628c00d23f7997e763e94033bb2a84c30ea669c55e8ca9ada624e4f0",
+      "bytes": 1706
+    },
+    {
+      "appendix": 78,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/final-synthetic-interpretation.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/final-synthetic-interpretation.md",
+      "sha256": "766b217fca92445c8904a486d7a91d6e91203ca8fce0afbcea496d4a82fc4f7d",
+      "bytes": 10981
+    },
+    {
+      "appendix": 79,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/finite-support-capacity.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/finite-support-capacity.md",
+      "sha256": "90670e5eafec69c18d1e0c54fbd2cb8be7075db17b8222df87a1b089062e0e21",
+      "bytes": 12792
+    },
+    {
+      "appendix": 80,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/profile-shapes/report.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/profile-shapes/report.md",
+      "sha256": "bdecb21d70eaff32e56c528dc2f892b7d3e01800865c6a49ad4e23d7c6b134cf",
+      "bytes": 3372
+    },
+    {
+      "appendix": 81,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/routing-rank.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/routing-rank.md",
+      "sha256": "6a6ce88bd0b8f909be1af582a3717a61490a7ff28032cb43363f103696c4ef81",
+      "bytes": 13104
+    },
+    {
+      "appendix": 82,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/spectral-extension.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/spectral-extension.md",
+      "sha256": "b912cb8d1ce4056589bf2f7938a3f1b4e795d20d87bc19fa5800500111e42799",
+      "bytes": 9733
+    },
+    {
+      "appendix": 83,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/synthetic-audit.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/synthetic-audit.md",
+      "sha256": "f000317ddea510c3908d2db5cac56edcf888210873b142d689bef71f48e072bb",
+      "bytes": 36899
+    },
+    {
+      "appendix": 84,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/analysis/synthetic_latency/REPORT.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/analysis/synthetic_latency/REPORT.md",
+      "sha256": "c45dfdfbd32df09e516d6cd6a8d916efc2dbac92b0b71a08882a731e95b66efc",
+      "bytes": 14179
+    },
+    {
+      "appendix": 85,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/report.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/report.md",
+      "sha256": "af82fa75ecb791bfcf5b77a95aa24e955ba665a586993eef9ceff08b382c13b7",
+      "bytes": 100410
+    },
+    {
+      "appendix": 86,
+      "repository": "omnibias-lab",
+      "path": "reports/projection_profile_20261023/campaign/report.registered.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/reports/projection_profile_20261023/campaign/report.registered.md",
+      "sha256": "5e304193a74cf864f90b9fe2b0d262ce944852d18dc83de8a6c2f6d77a4acb9f",
+      "bytes": 57287
+    },
+    {
+      "appendix": 87,
+      "repository": "omnibias-lab",
+      "path": "stability/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/stability/README.md",
+      "sha256": "f093f94215a552ef190871de702c464de87cc00c56e9f0d1e15756fe6f10478c",
+      "bytes": 3881
+    },
+    {
+      "appendix": 88,
+      "repository": "omnibias-lab",
+      "path": "tabular/DENSITY.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/DENSITY.md",
+      "sha256": "1591f6c67a8755369806af0c187c22619539f9a5c796f4f37a61ecabb8b7095c",
+      "bytes": 7454
+    },
+    {
+      "appendix": 89,
+      "repository": "omnibias-lab",
+      "path": "tabular/DENSITY_RESULTS.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/DENSITY_RESULTS.md",
+      "sha256": "cde4f40e8866fcce527a347cd35bc5b10ec8fc5f0df5d6037d96a4599aeed79a",
+      "bytes": 10832
+    },
+    {
+      "appendix": 90,
+      "repository": "omnibias-lab",
+      "path": "tabular/METRIC_EXPECTATION.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/METRIC_EXPECTATION.md",
+      "sha256": "35c30c1fe6d10b5caa810aeda6d5de78cfb386ad449884b1213a296425252c27",
+      "bytes": 7574
+    },
+    {
+      "appendix": 91,
+      "repository": "omnibias-lab",
+      "path": "tabular/PAIR_KERNEL.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/PAIR_KERNEL.md",
+      "sha256": "9c002bfeabf7c1f8600036ce7e4673d80a5555e4d9f98e4cb5233f037f23ef28",
+      "bytes": 3412
+    },
+    {
+      "appendix": 92,
+      "repository": "omnibias-lab",
+      "path": "tabular/PROFILES.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/PROFILES.md",
+      "sha256": "0b2db4148e110509e82952cb08de3af4346b240f72c5255b6dab99ae7825f130",
+      "bytes": 5651
+    },
+    {
+      "appendix": 93,
+      "repository": "omnibias-lab",
+      "path": "tabular/PROFILE_RESULTS.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/PROFILE_RESULTS.md",
+      "sha256": "e0ba1b3d1a4296b4c710e865ad5fac7ac1ccb1857c762910ecb971db20e19dc3",
+      "bytes": 9476
+    },
+    {
+      "appendix": 94,
+      "repository": "omnibias-lab",
+      "path": "tabular/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/README.md",
+      "sha256": "8c5d04a0f212f01b45071505552b10643e8223eed748caf077d5e0965bebac77",
+      "bytes": 4817
+    },
+    {
+      "appendix": 95,
+      "repository": "omnibias-lab",
+      "path": "tabular/RESULTS.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/RESULTS.md",
+      "sha256": "6f2681b0c2a455311edf1be86d15d58e70e81c3f666cd40de5729ea403d4031d",
+      "bytes": 3091
+    },
+    {
+      "appendix": 96,
+      "repository": "omnibias-lab",
+      "path": "tabular/SPECTRAL.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/SPECTRAL.md",
+      "sha256": "2c9517e7622d19a111deb86a26a221559d167342ec18d9e7576d90de583aa7e3",
+      "bytes": 7171
+    },
+    {
+      "appendix": 97,
+      "repository": "omnibias-lab",
+      "path": "tabular/SPECTRAL_RESULTS.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/SPECTRAL_RESULTS.md",
+      "sha256": "4a6d9c7a9043807e63ef8c36753889b558bf08ed9ff42d733c27bfc4d01e8c64",
+      "bytes": 4536
+    },
+    {
+      "appendix": 98,
+      "repository": "omnibias-lab",
+      "path": "tabular/STRONG_PAIR_KERNEL.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/STRONG_PAIR_KERNEL.md",
+      "sha256": "daef3a78e0218a64cebe6b9e83a544878d8d8e96c1e806f907eb6b08ec4e942e",
+      "bytes": 1597
+    },
+    {
+      "appendix": 99,
+      "repository": "omnibias-lab",
+      "path": "tabular/USTAT.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/USTAT.md",
+      "sha256": "23557adf4d9100702674b81bc1b4ebd5ce033afa060cdbd547c1e0b77d3f20df",
+      "bytes": 6778
+    },
+    {
+      "appendix": 100,
+      "repository": "omnibias-lab",
+      "path": "tabular/USTAT_RESULTS.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/tabular/USTAT_RESULTS.md",
+      "sha256": "325ce8fd19deb8877c7f480782943a6b44fe0e12f4f055fe738a199663b83f7c",
+      "bytes": 8801
+    },
+    {
+      "appendix": 101,
+      "repository": "omnibias-lab",
+      "path": "unification_research/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/unification_research/README.md",
+      "sha256": "eeacfcd67a93c56653b5bb47c30ca191fa9afd86870894286b2c3d04e9ab2d46",
+      "bytes": 1452
+    },
+    {
+      "appendix": 102,
+      "repository": "omnibias-lab",
+      "path": "verified_calibration_research/README.md",
+      "absolute_path": "/home/vardan/dev/projects/omnibias_projects/omnibias-lab/verified_calibration_research/README.md",
+      "sha256": "04ac7faee49b8eecd30440fc766edce8f57fcec67d9fd387f796822b31380d59",
+      "bytes": 4986
+    }
+  ],
+  "scope": "Complete canonical session reports and available LAB Markdown theory notes; historical prerequisite notes are retained with provenance. Raw numerical evidence and code are referenced and committed separately, not reproduced as prose."
+}

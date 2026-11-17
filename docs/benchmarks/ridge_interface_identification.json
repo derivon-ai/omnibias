@@ -1,0 +1,257 @@
+{
+  "scope": "Manufactured noiseless one-sheet inverse problem; local two-sheet identifiability",
+  "not_established": [
+    "new mathematics",
+    "speed advantage",
+    "noisy-data robustness",
+    "general PDE solver",
+    "global identification guarantee",
+    "rigorous enclosure"
+  ],
+  "truth": {
+    "angle": 0.55,
+    "bias": -0.17,
+    "strength": 1.7
+  },
+  "probe_width": 0.18,
+  "training_probes": 81,
+  "held_out_probes": 121,
+  "seeds": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "runs": [
+    {
+      "seed": 0,
+      "initial": [
+        0.8790371012645872,
+        -0.12012323254405091,
+        1.6593829431274507
+      ],
+      "recovered": [
+        0.5500000005697494,
+        -0.1699999997131602,
+        1.69999999970745
+      ],
+      "max_parameter_abs_error": 5.697493588030511e-10,
+      "held_out_relative_l2": 1.2861277108886975e-09,
+      "control_max_value_difference": 4.440892098500626e-16,
+      "control_max_gradient_difference": 8.881784197001252e-16,
+      "closure_evaluations": 13
+    },
+    {
+      "seed": 1,
+      "initial": [
+        0.24273729230373658,
+        -0.2361069184237639,
+        1.4342525139448394
+      ],
+      "recovered": [
+        0.5499999997128932,
+        -0.16999999972275856,
+        1.6999999962806362
+      ],
+      "max_parameter_abs_error": 3.71936370591186e-09,
+      "held_out_relative_l2": 2.3590610796246012e-09,
+      "control_max_value_difference": 4.440892098500626e-16,
+      "control_max_gradient_difference": 1.7763568394002505e-15,
+      "closure_evaluations": 15
+    },
+    {
+      "seed": 2,
+      "initial": [
+        0.8422924659526143,
+        -0.26674034902104987,
+        1.9087511767056515
+      ],
+      "recovered": [
+        0.5500000011314774,
+        -0.16999999973306595,
+        1.700000002319962
+      ],
+      "max_parameter_abs_error": 2.3199620002856136e-09,
+      "held_out_relative_l2": 2.7287841529493818e-09,
+      "control_max_value_difference": 4.440892098500626e-16,
+      "control_max_gradient_difference": 6.661338147750939e-16,
+      "closure_evaluations": 15
+    },
+    {
+      "seed": 3,
+      "initial": [
+        0.2238757369553644,
+        -0.22118234558688635,
+        1.9729149443285843
+      ],
+      "recovered": [
+        0.5499999976835572,
+        -0.17000000020046632,
+        1.7000000014729866
+      ],
+      "max_parameter_abs_error": 2.3164428153421568e-09,
+      "held_out_relative_l2": 4.742940565550165e-09,
+      "control_max_value_difference": 4.440892098500626e-16,
+      "control_max_gradient_difference": 4.996003610813204e-16,
+      "closure_evaluations": 16
+    },
+    {
+      "seed": 4,
+      "initial": [
+        0.5339765693831532,
+        -0.11440286567360021,
+        1.257557037172768
+      ],
+      "recovered": [
+        0.5499999978482801,
+        -0.16999999937140445,
+        1.6999999976163491
+      ],
+      "max_parameter_abs_error": 2.3836508322716554e-09,
+      "held_out_relative_l2": 5.512716391757244e-09,
+      "control_max_value_difference": 4.440892098500626e-16,
+      "control_max_gradient_difference": 8.326672684688674e-16,
+      "closure_evaluations": 13
+    }
+  ],
+  "two_source_conditioning": [
+    {
+      "separation": 0.0,
+      "separation_over_probe_width": 0.0,
+      "dimensionless_singular_values": [
+        11.503378658757315,
+        8.144814608703957,
+        1.8085674778466667e-15,
+        1.8995180623396799e-16
+      ],
+      "numerical_rank": 2,
+      "condition_number": null,
+      "rank_is_floating_diagnostic_not_certificate": true,
+      "collapsed_four_moment_condition_number": 3.6278016966412,
+      "sampled_collapse_max_error": 0.0,
+      "analytic_uniform_weak_error_bound_exact": "0",
+      "analytic_bound_does_not_enclose_float_rounding": true
+    },
+    {
+      "separation": 0.001,
+      "separation_over_probe_width": 0.005555555555555556,
+      "dimensionless_singular_values": [
+        11.503367563749531,
+        8.144798316994317,
+        0.022399459659595937,
+        7.228213300067669e-08
+      ],
+      "numerical_rank": 4,
+      "condition_number": 159145380.5554111,
+      "rank_is_floating_diagnostic_not_certificate": true,
+      "collapsed_four_moment_condition_number": 3.6278016966412,
+      "sampled_collapse_max_error": 3.298872286450205e-11,
+      "analytic_uniform_weak_error_bound_exact": "1/24186470400",
+      "analytic_bound_does_not_enclose_float_rounding": true
+    },
+    {
+      "separation": 0.003,
+      "separation_over_probe_width": 0.016666666666666666,
+      "dimensionless_singular_values": [
+        11.50327880333311,
+        8.144667995810806,
+        0.06719686196435633,
+        1.951586107550608e-06
+      ],
+      "numerical_rank": 4,
+      "condition_number": 5894322.960604909,
+      "rank_is_floating_diagnostic_not_certificate": true,
+      "collapsed_four_moment_condition_number": 3.6278016966412,
+      "sampled_collapse_max_error": 2.672068788456272e-09,
+      "analytic_uniform_weak_error_bound_exact": "1/298598400",
+      "analytic_bound_does_not_enclose_float_rounding": true
+    },
+    {
+      "separation": 0.01,
+      "separation_over_probe_width": 0.05555555555555556,
+      "dimensionless_singular_values": [
+        11.5022691092994,
+        8.143187154874912,
+        0.22393203381823062,
+        7.226769036310664e-05
+      ],
+      "numerical_rank": 4,
+      "condition_number": 159161.98582667616,
+      "rank_is_floating_diagnostic_not_certificate": true,
+      "collapsed_four_moment_condition_number": 3.6278016966412,
+      "sampled_collapse_max_error": 3.298463768786064e-07,
+      "analytic_uniform_weak_error_bound_exact": "25/60466176",
+      "analytic_bound_does_not_enclose_float_rounding": true
+    },
+    {
+      "separation": 0.03,
+      "separation_over_probe_width": 0.16666666666666666,
+      "dimensionless_singular_values": [
+        11.493389186300641,
+        8.130291876319639,
+        0.6702827912842726,
+        0.001948054247361324
+      ],
+      "numerical_rank": 4,
+      "condition_number": 5899.9328185386275,
+      "rank_is_floating_diagnostic_not_certificate": true,
+      "collapsed_four_moment_condition_number": 3.6278016966412,
+      "sampled_collapse_max_error": 2.669009225719776e-05,
+      "analytic_uniform_weak_error_bound_exact": "25/746496",
+      "analytic_bound_does_not_enclose_float_rounding": true
+    },
+    {
+      "separation": 0.1,
+      "separation_over_probe_width": 0.5555555555555556,
+      "dimensionless_singular_values": [
+        11.39195827511838,
+        7.998432903501637,
+        2.1782733386022777,
+        0.07071654236246928
+      ],
+      "numerical_rank": 4,
+      "condition_number": 161.09325901041686,
+      "rank_is_floating_diagnostic_not_certificate": true,
+      "collapsed_four_moment_condition_number": 3.6278016966412,
+      "sampled_collapse_max_error": 0.0032568700374415727,
+      "analytic_uniform_weak_error_bound_exact": "15625/3779136",
+      "analytic_bound_does_not_enclose_float_rounding": true
+    },
+    {
+      "separation": 0.3,
+      "separation_over_probe_width": 1.6666666666666667,
+      "dimensionless_singular_values": [
+        10.487751594909431,
+        7.575619116895034,
+        5.331166616651276,
+        1.4780477727022425
+      ],
+      "numerical_rank": 4,
+      "condition_number": 7.095678359391042,
+      "rank_is_floating_diagnostic_not_certificate": true,
+      "collapsed_four_moment_condition_number": 3.6278016966412,
+      "sampled_collapse_max_error": 0.23879133498062455,
+      "analytic_uniform_weak_error_bound_exact": "15625/46656",
+      "analytic_bound_does_not_enclose_float_rounding": true
+    }
+  ],
+  "source_commit": "72ef81d1ae9f8ae8792b21e6bc89ccc2e850959c",
+  "source_worktree_dirty": true,
+  "source_sha256": {
+    "benchmarks/ridge_interface_identification.py": "4912ae944dde3a4ee9fea95eb429f600ac96cdf93529dc4123838e39569be8ca",
+    "packages/omnibias-core/src/omnibias/core/ridge_distribution.py": "aeba80acd1d56732e37cfa19cfd1a0c4c5a7ee79d04724c490dc2f2851130d1c",
+    "packages/omnibias-torch/src/omnibias/torch/ridge_distribution.py": "bbf70c59d34f5d2f1581a889006d7b5c889104fad4c320e387c5a40d4794041b"
+  },
+  "environment": {
+    "python": "3.12.13",
+    "device": "cpu",
+    "dtype": "float64",
+    "torch_threads": 1
+  },
+  "versions": {
+    "torch": "2.14.1",
+    "omnibias-core": "0.5.0rc1"
+  },
+  "all_recovery_checks_passed": true
+}

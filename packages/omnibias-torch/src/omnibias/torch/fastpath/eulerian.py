@@ -54,11 +54,26 @@ sigmoid_polynomial_coeffs = _sigmoid_polynomial_coeffs_core
 
 
 def _horner(coeffs: tuple[float, ...], x: Tensor) -> Tensor:
-    """Stable Horner evaluation of ``sum_k coeffs[k] * x^k`` on a tensor."""
+    """Horner evaluation of ``sum_k coeffs[k] * x^k``: ``result = result * x + coeffs[k]`` from the leading coefficient down.
+
+    The leading step is ``x * c`` rather than a ``full_like`` tensor times ``x`` (the same product, one launch fewer), and the
+    add of a zero coefficient is skipped when the next coefficient down is not zero (the ``tanh`` and sigmoid-family
+    polynomials have parity, so that is about half of them). The next step multiplies by ``x`` and adds that nonzero
+    coefficient, which absorbs the one thing the skipped ``+ 0.0`` could change (the sign of an exact zero), so every bit of
+    the result is unchanged. Half precision keeps the original form, which rounds the coefficient to the tensor dtype first.
+    """
     deg = len(coeffs) - 1
-    result = torch.full_like(x, coeffs[deg])
+    if deg == 0 or x.dtype not in (torch.float32, torch.float64):
+        result = torch.full_like(x, coeffs[deg])
+        for k in range(deg - 1, -1, -1):
+            result = result * x + coeffs[k]
+        return result
+    result = x * coeffs[deg]  # r_{k+1} * x for k = deg - 1
     for k in range(deg - 1, -1, -1):
-        result = result * x + coeffs[k]
+        if k == 0 or coeffs[k] != 0.0 or coeffs[k - 1] == 0.0:
+            result = result + coeffs[k]
+        if k:
+            result = result * x
     return result
 
 
@@ -94,30 +109,40 @@ def softplus_nth_derivative(z: Tensor, n: int) -> Tensor:
 
 
 
-def sigmoid_tower(z: Tensor, max_order: int) -> Tensor:
-    """All derivatives through max_order from one native sigmoid evaluation."""
+def sigmoid_tower_rows(z: Tensor, max_order: int) -> list[Tensor]:
+    """The rows of :func:`sigmoid_tower` as a list, for callers that index them and need no stacked copy."""
     if max_order < 0:
         raise ValueError("max_order must be nonnegative")
     value = torch.sigmoid(z)
-    rows = [value] + [_horner(sigmoid_polynomial_coeffs(n), value) for n in range(1, max_order + 1)]
-    return torch.stack(rows, dim=0)
+    return [value] + [_horner(sigmoid_polynomial_coeffs(n), value) for n in range(1, max_order + 1)]
 
 
-def softplus_tower(z: Tensor, max_order: int) -> Tensor:
-    """Softplus value and its sigmoid derivative tower with one sigmoid call."""
+def sigmoid_tower(z: Tensor, max_order: int) -> Tensor:
+    """All derivatives through max_order from one native sigmoid evaluation."""
+    return torch.stack(sigmoid_tower_rows(z, max_order), dim=0)
+
+
+def softplus_tower_rows(z: Tensor, max_order: int) -> list[Tensor]:
+    """The rows of :func:`softplus_tower` as a list (no stacked copy)."""
     if max_order < 0:
         raise ValueError("max_order must be nonnegative")
     rows = [torch.nn.functional.softplus(z)]
     if max_order:
-        derivatives = sigmoid_tower(z, max_order - 1)
-        rows.extend(derivatives[n] for n in range(max_order))
-    return torch.stack(rows, dim=0)
+        rows.extend(sigmoid_tower_rows(z, max_order - 1))
+    return rows
+
+
+def softplus_tower(z: Tensor, max_order: int) -> Tensor:
+    """Softplus value and its sigmoid derivative tower with one sigmoid call."""
+    return torch.stack(softplus_tower_rows(z, max_order), dim=0)
 
 
 __all__ = [
     "sigmoid_nth_derivative",
     "sigmoid_polynomial_coeffs",
     "sigmoid_tower",
+    "sigmoid_tower_rows",
     "softplus_nth_derivative",
     "softplus_tower",
+    "softplus_tower_rows",
 ]

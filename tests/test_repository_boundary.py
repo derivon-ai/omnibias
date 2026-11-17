@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import ast
+import importlib.util
 import re
 from pathlib import Path
 
@@ -62,6 +63,13 @@ def test_context_has_one_canonical_guide() -> None:
     assert "AGENTS.md" in (ROOT / "CLAUDE.md").read_text()
     assert ".cursor/rules/omnibias.mdc" in (ROOT / "AGENTS.md").read_text()
     assert "AGENTS.md" in (ROOT / ".cursor/rules/omnibias.mdc").read_text()
-    assert {path.parent.name for path in (ROOT / ".agents/skills").glob("*/SKILL.md")} == set(_projects())
+    spec = importlib.util.spec_from_file_location("agent_context", ROOT / "scripts/check_agent_context.py")
+    assert spec and spec.loader
+    context = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(context)
+    # one maintenance skill per package, plus the user-facing skills the context checker names (the advisor)
+    assert {path.parent.name for path in (ROOT / ".agents/skills").glob("*/SKILL.md")} == set(_projects()) | set(
+        context.USER_SKILLS
+    )
     for retired in (".cursor/skills", ".claude/skills", ".codex/skills"):
         assert not list((ROOT / retired).rglob("SKILL.md"))

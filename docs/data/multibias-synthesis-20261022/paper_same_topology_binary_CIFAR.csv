@@ -1,0 +1,6 @@
+method,accuracy_percent,std_pp
+baseline_sign,81.89,0.33
+mbK2_fixedalt,70.15,2.16
+mbK2_learned,78.04,0.63
+mbK3_fixedalt,80.74,0.66
+mbK3_learned,83.79,0.16

@@ -144,7 +144,9 @@ def martens_grosse_combine(
     b1 = -torch.dot(j_d, r0)
     b2 = -torch.dot(j_p, r0)
     det = a11 * a22 - a12 * a12
-    det = torch.where(torch.abs(det) < 1e-30, torch.as_tensor(1e-30, dtype=det.dtype, device=det.device), det)
+    det = torch.where(
+        torch.abs(det) < 1e-30, torch.as_tensor(1e-30, dtype=det.dtype, device=det.device), det
+    )
     alpha = (a22 * b1 - a12 * b2) / det
     mu = (-a12 * b1 + a11 * b2) / det
     step = alpha * delta_gn + mu * prev_delta
@@ -430,9 +432,7 @@ def gauss_newton_direction_cg(
         Conjugate-gradient budget and relative tolerance.
     """
     res, jt, jvec = _linearize_gn(residual_fn, params)
-    return _gn_cg_direction(
-        res, jt, jvec, int(params.shape[0]), damping, cg_max_iter, cg_tol
-    )
+    return _gn_cg_direction(res, jt, jvec, int(params.shape[0]), damping, cg_max_iter, cg_tol)
 
 
 def _gn_cgls_direction(
@@ -757,9 +757,7 @@ class GaussNewton:
                 assert jt is not None and jvec is not None
                 delta = _gn_cgls_direction(res, jt, jvec, mu, self.cg_max_iter, self.cg_tol)
             if self.use_martens_grosse:
-                delta, mom = martens_grosse_combine(
-                    residual_fn, params, delta, self._prev_delta
-                )
+                delta, mom = martens_grosse_combine(residual_fn, params, delta, self._prev_delta)
             else:
                 mom = delta
             new_params = params + delta
@@ -847,7 +845,9 @@ def hvp(loss_fn: ScalarFn, params: Tensor, v: Tensor) -> Tensor:
     return cast(Tensor, jvp(grad_fn, (params,), (v,))[1])
 
 
-def lanczos_tridiag(matvec: MatVec, b: Tensor, k: int, *, tol: float = 1e-10) -> tuple[Tensor, Tensor]:
+def lanczos_tridiag(
+    matvec: MatVec, b: Tensor, k: int, *, tol: float = 1e-10
+) -> tuple[Tensor, Tensor]:
     r"""``k``-step Lanczos on a symmetric operator with full reorthogonalisation.
 
     Returns ``(Q, T)`` with ``Q`` (``n x m``) orthonormal and its first column ``b/||b||``,
@@ -890,8 +890,6 @@ def lanczos_tridiag(matvec: MatVec, b: Tensor, k: int, *, tol: float = 1e-10) ->
         off = torch.stack(betas[: m - 1])
         tri = tri + torch.diag(off, 1) + torch.diag(off, -1)
     return q_basis, tri
-
-
 
 
 def _solve_cubic_subproblem(tri: Tensor, c: Tensor, sigma: float, *, iters: int = 100) -> Tensor:
@@ -1083,7 +1081,12 @@ class _CubicArcOptimizer:
         self.n_iter = 0
 
     def _arc(
-        self, params: Tensor, g: Tensor, hess_matvec: MatVec, f0: float, eval_f: Callable[[Tensor], float]
+        self,
+        params: Tensor,
+        g: Tensor,
+        hess_matvec: MatVec,
+        f0: float,
+        eval_f: Callable[[Tensor], float],
     ) -> tuple[Tensor, bool, float, float, float]:
         return _cubic_arc_step(
             params,
@@ -1102,7 +1105,9 @@ class _CubicArcOptimizer:
             max_sigma=self.max_sigma,
         )
 
-    def step(self, fn: Callable[[Tensor], Tensor], params: Tensor) -> tuple[Tensor, CubicNewtonInfo]:
+    def step(
+        self, fn: Callable[[Tensor], Tensor], params: Tensor
+    ) -> tuple[Tensor, CubicNewtonInfo]:
         raise NotImplementedError
 
     def minimize(
@@ -1140,7 +1145,6 @@ class CubicRegularizedNewton(_CubicArcOptimizer):
 
         def matvec(v: Tensor) -> Tensor:
             return cast(Tensor, jvp(grad_fn, (params,), (v,))[1])
-
 
         f0 = float(fn(params))
         new_params, accepted, self.sigma, rho, loss = self._arc(
@@ -1825,9 +1829,7 @@ class _CurvatureOptimizer(torch.optim.Optimizer):
         the parameters yields ``H v``. Returns a detached flat vector.
         """
         v_list = self._unflat(v_flat)
-        hv = torch.autograd.grad(
-            list(g_list), self._params, grad_outputs=v_list, retain_graph=True
-        )
+        hv = torch.autograd.grad(list(g_list), self._params, grad_outputs=v_list, retain_graph=True)
         return self._flat([h.detach() for h in hv])
 
 
@@ -1869,7 +1871,9 @@ class CubicNewton(_CurvatureOptimizer):
         if sigma <= 0.0:
             raise ValueError(f"sigma must be > 0, got {sigma}")
         if not 0.0 < eta_accept <= eta_success < 1.0:
-            raise ValueError(f"need 0 < eta_accept <= eta_success < 1, got {eta_accept}, {eta_success}")
+            raise ValueError(
+                f"need 0 < eta_accept <= eta_success < 1, got {eta_accept}, {eta_success}"
+            )
         if sigma_increase <= 1.0 or sigma_decrease <= 1.0:
             raise ValueError("sigma_increase and sigma_decrease must be > 1")
         if krylov_dim < 1:
@@ -1899,7 +1903,6 @@ class CubicNewton(_CurvatureOptimizer):
 
         def matvec(v: Tensor) -> Tensor:
             return self._hvp(g_list, v)
-
 
         def eval_f(trial: Tensor) -> float:
             self._write_flat(trial)
@@ -1962,7 +1965,9 @@ class CubicGaussNewton(_CurvatureOptimizer):
         if sigma <= 0.0:
             raise ValueError(f"sigma must be > 0, got {sigma}")
         if not 0.0 < eta_accept <= eta_success < 1.0:
-            raise ValueError(f"need 0 < eta_accept <= eta_success < 1, got {eta_accept}, {eta_success}")
+            raise ValueError(
+                f"need 0 < eta_accept <= eta_success < 1, got {eta_accept}, {eta_success}"
+            )
         if sigma_increase <= 1.0 or sigma_decrease <= 1.0:
             raise ValueError("sigma_increase and sigma_decrease must be > 1")
         if krylov_dim < 1:
@@ -1984,10 +1989,14 @@ class CubicGaussNewton(_CurvatureOptimizer):
     def step(self, closure: Closure | None = None) -> Tensor:  # type: ignore[override]
         """One ARC iteration on the GN metric; ``closure`` returns the residual vector."""
         if closure is None:
-            raise ValueError("CubicGaussNewton.step requires a closure returning the residual vector")
+            raise ValueError(
+                "CubicGaussNewton.step requires a closure returning the residual vector"
+            )
         res = closure()
         if res.ndim != 1:
-            raise ValueError(f"residual closure must return a 1-D vector, got shape {tuple(res.shape)}")
+            raise ValueError(
+                f"residual closure must return a 1-D vector, got shape {tuple(res.shape)}"
+            )
         n_res = res.shape[0]
         res_det = res.detach()
         # g = (1/N) J^T r
@@ -2122,9 +2131,7 @@ class NaturalGradient(_CurvatureOptimizer):
             damping = self.damping
             if self.target_condition is not None and isinstance(m, Tensor):
                 # Certified-conditioning floor on the dense metric (eps -> 0 collapse).
-                eps_cert, self.last_certificate = _certified_damping_floor(
-                    m, self.target_condition
-                )
+                eps_cert, self.last_certificate = _certified_damping_floor(m, self.target_condition)
                 damping = max(self.damping, eps_cert)
             delta = natural_gradient_direction(
                 m, g, damping=damping, cg_max_iter=self.cg_max_iter, cg_tol=self.cg_tol
@@ -2353,7 +2360,11 @@ class JetSubspaceTensor(_CurvatureOptimizer):
         hcols_graph: list[tuple[Tensor, ...]] = []
         for j in range(m):
             hv = torch.autograd.grad(
-                list(g_list), self._params, grad_outputs=cols[j], create_graph=True, retain_graph=True
+                list(g_list),
+                self._params,
+                grad_outputs=cols[j],
+                create_graph=True,
+                retain_graph=True,
             )
             hcols_graph.append(hv)
         tensor3 = torch.zeros(m, m, m, dtype=basis.dtype, device=basis.device)
@@ -2370,7 +2381,10 @@ class JetSubspaceTensor(_CurvatureOptimizer):
                     outs, self._params, grad_outputs=gouts, retain_graph=True, allow_unused=True
                 )
                 tjl_flat = self._flat(
-                    [t.detach() if t is not None else torch.zeros_like(p) for t, p in zip(tjl, self._params, strict=True)]
+                    [
+                        t.detach() if t is not None else torch.zeros_like(p)
+                        for t, p in zip(tjl, self._params, strict=True)
+                    ]
                 )
                 proj = basis.t() @ tjl_flat
                 tensor3[:, j, el] = proj
@@ -2408,7 +2422,11 @@ class JetSubspaceTensor(_CurvatureOptimizer):
         predicted = -(
             float(c @ a)
             + 0.5 * float(a @ (tri @ a))
-            + ((1.0 / 6.0) * float(torch.einsum("ijl,i,j,l->", tensor3, a, a, a)) if tensor3 is not None else 0.0)
+            + (
+                (1.0 / 6.0) * float(torch.einsum("ijl,i,j,l->", tensor3, a, a, a))
+                if tensor3 is not None
+                else 0.0
+            )
         )
 
         params0 = self._clone_flat()
@@ -2448,6 +2466,7 @@ class _DiagonalCurvatureMixin(_CurvatureOptimizer):
     bias_correction: bool
     hutchinson_samples: int
     curvature_subsample: int | None
+    gn_diagonal: Callable[[], Tensor] | None = None
     _d: Tensor | None
     _d_updates: int
     _gen: torch.Generator | None
@@ -2455,11 +2474,21 @@ class _DiagonalCurvatureMixin(_CurvatureOptimizer):
     def _gn_diagonal(self, residual: Tensor, template: Tensor) -> Tensor:
         """Exact Gauss-Newton diagonal ``(1/m) sum_n (grad r_n)^2`` over ``m`` (sub)sampled rows.
 
+        With ``gn_diagonal`` set (see :func:`planned_gn_diagonal`) the diagonal comes from that callable instead of
+        one backward pass per row: the planned program evaluates it for all rows at once, exactly.
+
         With ``curvature_subsample`` set, ``m`` random rows are drawn per refresh (a persistent
         generator so successive refreshes resample); the ``1/m`` normalisation keeps it an
         unbiased estimate of the full row-mean ``(1/N) sum_n``.
         """
         n_res = int(residual.shape[0])
+        if self.gn_diagonal is not None:
+            d = self.gn_diagonal()
+            if d.shape != template.shape:
+                raise ValueError(
+                    f"gn_diagonal returned shape {tuple(d.shape)}, expected the flat parameter vector {tuple(template.shape)}"
+                )
+            return d.to(dtype=template.dtype, device=template.device)
         if self.curvature_subsample is not None and self.curvature_subsample < n_res:
             if self._gen is None:
                 self._gen = torch.Generator().manual_seed(0)
@@ -2471,7 +2500,9 @@ class _DiagonalCurvatureMixin(_CurvatureOptimizer):
         for n in rows:
             e = torch.zeros(n_res, dtype=residual.dtype, device=residual.device)
             e[n] = 1.0
-            row = self._flat(torch.autograd.grad(residual, self._params, grad_outputs=e, retain_graph=True))
+            row = self._flat(
+                torch.autograd.grad(residual, self._params, grad_outputs=e, retain_graph=True)
+            )
             acc = acc + row * row
         return acc / float(len(rows))
 
@@ -2487,7 +2518,11 @@ class _DiagonalCurvatureMixin(_CurvatureOptimizer):
     def _update_diagonal_ema(self, h: Tensor) -> None:
         """EMA-accumulate the curvature diagonal ``h`` into ``self._d`` (zero- or warm-init)."""
         if self.bias_correction:
-            self._d = (1.0 - self.beta2) * h if self._d is None else self.beta2 * self._d + (1.0 - self.beta2) * h
+            self._d = (
+                (1.0 - self.beta2) * h
+                if self._d is None
+                else self.beta2 * self._d + (1.0 - self.beta2) * h
+            )
         else:
             self._d = h if self._d is None else self.beta2 * self._d + (1.0 - self.beta2) * h
         self._d_updates += 1
@@ -2558,6 +2593,7 @@ class DiagonalCurvature(_DiagonalCurvatureMixin):
         rel_floor: float = 1e-2,
         bias_correction: bool = True,
         curvature_subsample: int | None = None,
+        gn_diagonal: Callable[[], Tensor] | None = None,
         safeguard: bool = False,
         safeguard_backtracks: int = 5,
     ) -> None:
@@ -2595,6 +2631,7 @@ class DiagonalCurvature(_DiagonalCurvatureMixin):
         self.rel_floor = float(rel_floor)
         self.bias_correction = bool(bias_correction)
         self.curvature_subsample = curvature_subsample
+        self.gn_diagonal = gn_diagonal
         self.safeguard = bool(safeguard)
         self.safeguard_backtracks = int(safeguard_backtracks)
         self._m: Tensor | None = None
@@ -2611,7 +2648,9 @@ class DiagonalCurvature(_DiagonalCurvatureMixin):
         out = closure()
         if self.curvature == "gauss_newton":
             if out.ndim != 1:
-                raise ValueError(f"gauss_newton closure must return a 1-D residual, got {tuple(out.shape)}")
+                raise ValueError(
+                    f"gauss_newton closure must return a 1-D residual, got {tuple(out.shape)}"
+                )
             loss = 0.5 * (out**2).mean()
             # retain the residual graph only when the diagonal will reuse it this step
             g_list = torch.autograd.grad(loss, self._params, retain_graph=refresh)
@@ -2630,7 +2669,11 @@ class DiagonalCurvature(_DiagonalCurvatureMixin):
             self._update_diagonal_ema(h)
         assert self._d is not None
         if self.bias_correction:
-            self._m = (1.0 - self.beta1) * g if self._m is None else self.beta1 * self._m + (1.0 - self.beta1) * g
+            self._m = (
+                (1.0 - self.beta1) * g
+                if self._m is None
+                else self.beta1 * self._m + (1.0 - self.beta1) * g
+            )
         else:
             self._m = g if self._m is None else self.beta1 * self._m + (1.0 - self.beta1) * g
 
@@ -2740,6 +2783,7 @@ class ConformalSymplectic(_DiagonalCurvatureMixin):
         rel_floor: float = 1e-2,
         bias_correction: bool = True,
         curvature_subsample: int | None = None,
+        gn_diagonal: Callable[[], Tensor] | None = None,
         clip: float | None = None,
         line_search: int | None = None,
         line_search_max_scale: float = 4.0,
@@ -2755,7 +2799,9 @@ class ConformalSymplectic(_DiagonalCurvatureMixin):
         if gamma is None and not 0.0 <= momentum < 1.0:
             raise ValueError(f"momentum must be in [0, 1), got {momentum}")
         if mass not in ("identity", "hutchinson", "gauss_newton"):
-            raise ValueError(f"mass must be 'identity', 'hutchinson' or 'gauss_newton', got {mass!r}")
+            raise ValueError(
+                f"mass must be 'identity', 'hutchinson' or 'gauss_newton', got {mass!r}"
+            )
         if clip is not None and clip <= 0.0:
             raise ValueError(f"clip must be > 0 or None, got {clip}")
         if not 0.0 <= beta2 < 1.0:
@@ -2794,6 +2840,7 @@ class ConformalSymplectic(_DiagonalCurvatureMixin):
         self.rel_floor = float(rel_floor)
         self.bias_correction = bool(bias_correction)
         self.curvature_subsample = curvature_subsample
+        self.gn_diagonal = gn_diagonal
         self.clip = clip
         self.line_search = line_search
         self.line_search_max_scale = float(line_search_max_scale)
@@ -2836,7 +2883,11 @@ class ConformalSymplectic(_DiagonalCurvatureMixin):
         c1 = float(g @ v)
         v_list = self._unflat(v)
         hv_list = torch.autograd.grad(
-            list(g_list), self._params, grad_outputs=v_list, create_graph=(order == 3), retain_graph=True
+            list(g_list),
+            self._params,
+            grad_outputs=v_list,
+            create_graph=(order == 3),
+            retain_graph=True,
         )
         hvv = torch.zeros((), dtype=v.dtype, device=v.device)
         for h_i, v_i in zip(hv_list, v_list, strict=True):
@@ -2846,7 +2897,10 @@ class ConformalSymplectic(_DiagonalCurvatureMixin):
         if order == 3 and hvv.requires_grad:  # a quadratic has no third derivative (no grad_fn)
             t_list = torch.autograd.grad(hvv, self._params, retain_graph=True, allow_unused=True)
             t_flat = self._flat(
-                [t.detach() if t is not None else torch.zeros_like(p) for t, p in zip(t_list, self._params, strict=True)]
+                [
+                    t.detach() if t is not None else torch.zeros_like(p)
+                    for t, p in zip(t_list, self._params, strict=True)
+                ]
             )
             c3 = float(t_flat @ v)
         return c1, c2, c3
@@ -2874,9 +2928,13 @@ class ConformalSymplectic(_DiagonalCurvatureMixin):
 
         if self.mass == "gauss_newton":
             if out.ndim != 1:
-                raise ValueError(f"gauss_newton closure must return a 1-D residual, got {tuple(out.shape)}")
+                raise ValueError(
+                    f"gauss_newton closure must return a 1-D residual, got {tuple(out.shape)}"
+                )
             loss = 0.5 * (out**2).mean()
-            g_list = torch.autograd.grad(loss, self._params, create_graph=ls_on, retain_graph=refresh or ls_on)
+            g_list = torch.autograd.grad(
+                loss, self._params, create_graph=ls_on, retain_graph=refresh or ls_on
+            )
             g = self._flat([t.detach() for t in g_list])
             if refresh:
                 self._update_diagonal_ema(self._gn_diagonal(out, g).abs())
@@ -2899,7 +2957,12 @@ class ConformalSymplectic(_DiagonalCurvatureMixin):
             if self._noise_gen is None:
                 self._noise_gen = torch.Generator(device=g.device).manual_seed(self.seed)
             noise = torch.randn(g.shape, dtype=g.dtype, device=g.device, generator=self._noise_gen)
-            v = v + math.sqrt(max(1.0 - self._mu * self._mu, 0.0) * self.temperature) * minv.sqrt() * noise
+            v = (
+                v
+                + math.sqrt(max(1.0 - self._mu * self._mu, 0.0) * self.temperature)
+                * minv.sqrt()
+                * noise
+            )
         self._v = v
 
         base = self._clone_flat()
@@ -2988,6 +3051,7 @@ class FrugalCurvature(_DiagonalCurvatureMixin):
         curvature_every: int = 10,
         hutchinson_samples: int = 1,
         curvature_subsample: int | None = None,
+        gn_diagonal: Callable[[], Tensor] | None = None,
         reduce: Literal["mean", "rms"] = "rms",
         sign_momentum: bool = False,
         bias_correction: bool = True,
@@ -3026,6 +3090,7 @@ class FrugalCurvature(_DiagonalCurvatureMixin):
         self.curvature_every = int(curvature_every)
         self.hutchinson_samples = int(hutchinson_samples)
         self.curvature_subsample = curvature_subsample
+        self.gn_diagonal = gn_diagonal
         self.reduce = reduce
         self.sign_momentum = bool(sign_momentum)
         self.bias_correction = bool(bias_correction)
@@ -3069,7 +3134,9 @@ class FrugalCurvature(_DiagonalCurvatureMixin):
         out = closure()
         if self.curvature == "gauss_newton":
             if out.ndim != 1:
-                raise ValueError(f"gauss_newton closure must return a 1-D residual, got {tuple(out.shape)}")
+                raise ValueError(
+                    f"gauss_newton closure must return a 1-D residual, got {tuple(out.shape)}"
+                )
             loss = 0.5 * (out**2).mean()
             g_list = torch.autograd.grad(loss, self._params, retain_graph=refresh)
             g = self._flat([t.detach() for t in g_list])
@@ -3085,14 +3152,24 @@ class FrugalCurvature(_DiagonalCurvatureMixin):
         if refresh:
             c_new = self._reduce_per_tensor(h)
             if self.bias_correction:
-                self._c = (1.0 - self.beta2) * c_new if self._c is None else self.beta2 * self._c + (1.0 - self.beta2) * c_new
+                self._c = (
+                    (1.0 - self.beta2) * c_new
+                    if self._c is None
+                    else self.beta2 * self._c + (1.0 - self.beta2) * c_new
+                )
             else:
-                self._c = c_new if self._c is None else self.beta2 * self._c + (1.0 - self.beta2) * c_new
+                self._c = (
+                    c_new if self._c is None else self.beta2 * self._c + (1.0 - self.beta2) * c_new
+                )
             self._c_updates += 1
         assert self._c is not None
 
         if self.bias_correction:
-            self._m = (1.0 - self.beta1) * g if self._m is None else self.beta1 * self._m + (1.0 - self.beta1) * g
+            self._m = (
+                (1.0 - self.beta1) * g
+                if self._m is None
+                else self.beta1 * self._m + (1.0 - self.beta1) * g
+            )
         else:
             self._m = g if self._m is None else self.beta1 * self._m + (1.0 - self.beta1) * g
         m_hat = self._m
@@ -3199,7 +3276,9 @@ class TrustRegionNewtonCG(_CurvatureOptimizer):
     def step(self, closure: Closure | None = None) -> Tensor:  # type: ignore[override]
         """One trust-region Newton-CG iteration; ``closure`` returns the scalar loss."""
         if closure is None:
-            raise ValueError("TrustRegionNewtonCG.step requires a closure returning the scalar loss")
+            raise ValueError(
+                "TrustRegionNewtonCG.step requires a closure returning the scalar loss"
+            )
         loss = closure()
         g, g_list = self._grad(loss, create_graph=True)
         self.n_iter += 1
@@ -3216,8 +3295,12 @@ class TrustRegionNewtonCG(_CurvatureOptimizer):
 
         # All Hessian-vector products happen *before* any trial writeback (the retained graph
         # is tied to the current parameters); the reduction ratio needs one extra product H p.
-        p, hit_boundary = steihaug_cg(matvec, g, self._radius, max_iter=self.cg_max_iter, tol=self.cg_tol)
-        self.last_cg_iters = cg_calls  # count only the products inside steihaug_cg (one per CG iter)
+        p, hit_boundary = steihaug_cg(
+            matvec, g, self._radius, max_iter=self.cg_max_iter, tol=self.cg_tol
+        )
+        self.last_cg_iters = (
+            cg_calls  # count only the products inside steihaug_cg (one per CG iter)
+        )
         hp = matvec(p)
         predicted = -(float(torch.dot(g, p)) + 0.5 * float(torch.dot(p, hp)))
 
@@ -3333,8 +3416,12 @@ class StochasticNewtonCG(_CurvatureOptimizer):
             cg_calls += 1
             return self._hvp(c_list, v) + self._lambda * v
 
-        p, _hit = steihaug_cg(damped_matvec, g, self.max_step, max_iter=self.cg_max_iter, tol=self.cg_tol)
-        self.last_cg_iters = cg_calls  # count only the products inside steihaug_cg (one per CG iter)
+        p, _hit = steihaug_cg(
+            damped_matvec, g, self.max_step, max_iter=self.cg_max_iter, tol=self.cg_tol
+        )
+        self.last_cg_iters = (
+            cg_calls  # count only the products inside steihaug_cg (one per CG iter)
+        )
         hp = matvec(p)  # undamped curvature for an honest model-reduction ratio
         predicted = -(float(torch.dot(g, p)) + 0.5 * float(torch.dot(p, hp)))
 
@@ -3446,7 +3533,9 @@ class KFAC(torch.optim.Optimizer):
         if not 0.0 < damping_decrease < 1.0:
             raise ValueError(f"damping_decrease must be in (0, 1), got {damping_decrease}")
         if not 0.0 < min_damping <= max_damping:
-            raise ValueError(f"require 0 < min_damping <= max_damping, got {min_damping}, {max_damping}")
+            raise ValueError(
+                f"require 0 < min_damping <= max_damping, got {min_damping}, {max_damping}"
+            )
         if max_step_norm is not None and max_step_norm <= 0.0:
             raise ValueError(f"max_step_norm must be > 0 or None, got {max_step_norm}")
         if solver not in ("eigh", "cholesky"):
@@ -3604,12 +3693,16 @@ class KFAC(torch.optim.Optimizer):
             tr_g = float(eval_g.mean())
             pi = math.sqrt(tr_a / tr_g) if tr_a > 0.0 and tr_g > 0.0 else 1.0
             v = evec_g.t() @ grad_aug @ evec_a
-            denom = (eval_g.reshape(-1, 1) + sqrt_damp / pi) * (eval_a.reshape(1, -1) + sqrt_damp * pi)
+            denom = (eval_g.reshape(-1, 1) + sqrt_damp / pi) * (
+                eval_a.reshape(1, -1) + sqrt_damp * pi
+            )
             return evec_g @ (v / denom) @ evec_a.t()
         l_a, l_g, _pi = self._chol[lin]
         # nat = G_damped^{-1} grad_aug A_damped^{-1}; solve each Kronecker factor by cholesky_solve.
         y = torch.cholesky_solve(grad_aug, l_g)  # G_damped y = grad_aug
-        return torch.cholesky_solve(y.t().contiguous(), l_a).t()  # nat A_damped = y  ->  nat = (A^{-1} y^T)^T
+        return torch.cholesky_solve(
+            y.t().contiguous(), l_a
+        ).t()  # nat A_damped = y  ->  nat = (A^{-1} y^T)^T
 
     @torch.no_grad()
     def _apply(self) -> None:
@@ -3694,6 +3787,149 @@ class KFAC(torch.optim.Optimizer):
         return loss.detach()
 
 
+@dataclass
+class PlannedStepInfo:
+    """What one :meth:`PlannedGaussNewton.step` did."""
+
+    loss_before: float
+    loss_after: float
+    damping: float
+    accepted: bool
+    attempts: int
+    algorithm: str
+    conditioning: dict[str, Any] | None
+
+
+def planned_gauss_newton_step(
+    program: Any, damping: float | Tensor, *, scale: float = 1.0, apply: bool = True
+) -> tuple[Tensor, list[Tensor]]:
+    """One damped Gauss-Newton step of a planned residual program (a ``compile_residual`` result).
+
+    The step is ``J^T (J J^T + damping I)^{-1} r`` for the program's Gram (dual form), computed by whatever engine the
+    planner picked, so the nested per-row backward graphs of :func:`gauss_newton_direction` callers are not built.
+    With ``apply`` the model's parameters move by ``theta -= scale * step``. Returns ``(r, step)``; ``step`` is aligned
+    with ``program.parameters``.
+    """
+    r, _, step = program(damping=damping)
+    if apply:
+        program.apply_step(step, scale)
+    return r, list(step)
+
+
+def planned_gn_diagonal(program: Any) -> Callable[[], Tensor]:
+    """A ``gn_diagonal`` callable for :class:`DiagonalCurvature` (and its siblings) from a planned residual program.
+
+    It returns the exact Gauss-Newton diagonal ``(1/N) sum_n (d r_n / d theta_i)^2`` as one flat vector in the order of
+    ``program.parameters`` (the order of ``model.parameters()`` for an ``nn.Sequential`` of ``Linear`` layers), with
+    every row evaluated by the planned program instead of one backward pass per row.
+    """
+
+    def diagonal() -> Tensor:
+        r, parts = program.parameter_diagonal()
+        return torch.cat([d.reshape(-1) for d in parts]) / float(r.numel())
+
+    return diagonal
+
+
+class PlannedGaussNewton:
+    r"""Levenberg-Marquardt training on a planned residual program.
+
+    Each :meth:`step` asks the program for the damped dual steps at ``damping * (1/nu, 1, nu)`` from **one** Gram
+    (a 1-D ``damping`` stacks the solves), tries them in that order with the cheap residual-only evaluation
+    ``program.residual()``, and keeps the best one that lowers ``0.5 ||r||^2``. The damping follows the accepted
+    candidate (``/ nu``, same, ``* nu``). When no candidate lowers the loss the parameters are restored, the damping is
+    multiplied by ``nu ** 2`` and the Gram is recomputed, up to ``max_attempts`` times.
+
+    Parameters
+    ----------
+    program:
+        ``compile_residual(model, blocks, quantity="gauss_newton")`` (or any object with ``parameters``,
+        ``residual()``, ``apply_step`` and a ``(damping=...) -> (r, K, step)`` call).
+    damping, nu, min_damping, max_damping, max_attempts:
+        The LM schedule.
+    """
+
+    def __init__(
+        self,
+        program: Any,
+        *,
+        damping: float = 1e-2,
+        nu: float = 4.0,
+        min_damping: float = 1e-14,
+        max_damping: float = 1e12,
+        max_attempts: int = 6,
+    ) -> None:
+        if damping <= 0.0 or nu <= 1.0:
+            raise ValueError("damping must be > 0 and nu > 1")
+        if not 0.0 < min_damping <= max_damping:
+            raise ValueError("need 0 < min_damping <= max_damping")
+        if max_attempts < 1:
+            raise ValueError("max_attempts must be >= 1")
+        self.program = program
+        self.damping = float(damping)
+        self.nu = float(nu)
+        self.min_damping = float(min_damping)
+        self.max_damping = float(max_damping)
+        self.max_attempts = int(max_attempts)
+        self.history: list[PlannedStepInfo] = []
+
+    def _snapshot(self) -> list[Tensor]:
+        return [p.detach().clone() for p in self.program.parameters]
+
+    def _restore(self, snap: Sequence[Tensor]) -> None:
+        with torch.no_grad():
+            for p, s0 in zip(self.program.parameters, snap, strict=True):
+                p.copy_(s0)
+
+    def step(self) -> PlannedStepInfo:
+        snap = self._snapshot()
+        mu = self.damping
+        f0 = math.nan
+        for attempt in range(1, self.max_attempts + 1):
+            grid = [max(mu / self.nu, self.min_damping), mu, min(mu * self.nu, self.max_damping)]
+            r, _, steps = self.program(
+                damping=torch.tensor(grid, dtype=snap[0].dtype, device=snap[0].device)
+            )
+            if attempt == 1:
+                f0 = 0.5 * float((r**2).sum())
+            best = (math.inf, -1)
+            for k in range(len(grid)):
+                self._restore(snap)
+                self.program.apply_step([s[k] for s in steps])
+                fk = 0.5 * float((self.program.residual() ** 2).sum())
+                if math.isfinite(fk) and fk < best[0]:
+                    best = (fk, k)
+            if best[1] >= 0 and best[0] < f0:
+                self._restore(snap)
+                self.program.apply_step([s[best[1]] for s in steps])
+                self.damping = grid[best[1]]
+                info = PlannedStepInfo(
+                    f0,
+                    best[0],
+                    self.damping,
+                    True,
+                    attempt,
+                    self.program.algorithm,
+                    self.program.last_conditioning,
+                )
+                self.history.append(info)
+                return info
+            mu = min(mu * self.nu * self.nu, self.max_damping)
+        self._restore(snap)
+        self.damping = mu
+        info = PlannedStepInfo(
+            f0,
+            f0,
+            mu,
+            False,
+            self.max_attempts,
+            self.program.algorithm,
+            self.program.last_conditioning,
+        )
+        self.history.append(info)
+        return info
+
+
 __all__ = [
     "BlockSpec",
     "Closure",
@@ -3718,6 +3954,8 @@ __all__ = [
     "MatVec",
     "MetricProvider",
     "NaturalGradient",
+    "PlannedGaussNewton",
+    "PlannedStepInfo",
     "ResidualFn",
     "ScalarFn",
     "StochasticNewtonCG",
@@ -3745,6 +3983,8 @@ __all__ = [
     "martens_grosse_gauss_newton_minimize",
     "natural_gradient_direction",
     "ombu_bias_block",
+    "planned_gauss_newton_step",
+    "planned_gn_diagonal",
     "quadrature_loss",
     "solve_subspace_trust_region",
     "steihaug_cg",

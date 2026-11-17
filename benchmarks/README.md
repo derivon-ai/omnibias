@@ -11,9 +11,14 @@ installed. The two Laplacian comparison scripts also require `folx`.
 | `uv run --with folx python benchmarks/polylaplacian_order.py` | Repeated Laplacian cost and accuracy versus derivative order. |
 | `uv run python benchmarks/jet_vs_nested_ad.py` | Directional-jet residuals and parameter optimization on a manufactured Poisson problem. |
 | `uv run python benchmarks/deep_laplacian_scaling.py` | Deep Laplacian accuracy, dimension limits, cost and backend parity. |
+| `uv run python benchmarks/operator_compiler.py` | Automatic ridge, disjoint-branch and affine-bottleneck lowering, with accuracy-gated Taylor/operator baselines and derivative-only training. |
+| `uv run python benchmarks/gaussian_inverse_jets.py` | Gaussian inverse Taylor jets versus recursively differentiating the same implicit inverse, orders 1, 2, 4, 6, 8; exact rational accuracy gates, one CPU thread, fresh subprocess wall/RSS limits, first execution and nine raw samples. Use `--check-only --orders 1,2` for an untimed correctness smoke. |
+| `uv run python benchmarks/gaussian_inverse_approximation.py` | Certified Chebyshev enclosures versus fresh certified Gaussian inverse solves at 17 rational queries, both gated at coordinate half-width ≤1e−6 and independent 80-digit roots. Records construction separately, nine raw samples and conditional break-even query count. Pure core, bounded subprocess; use `--check-only` without performance sampling. |
+| `uv run python benchmarks/gaussian_inverse_predictor.py` | One-pass moment predictors versus fresh certified Gaussian inverse solves at 17 targets, with a common ≤1e−6 physical half-width requirement. Both return fresh certificates; model construction is excluded equally. Includes a smaller-age accuracy failure, independent 80-digit roots and nine raw samples. Use `--check-only` for untimed validation. |
 
-The last two commands accept `--full`; their default runs write `*_smoke.json`.
-The first three use their fixed script configurations and have no CLI flags.
+`jet_vs_nested_ad.py` and `deep_laplacian_scaling.py` accept `--full`;
+their default runs write `*_smoke.json`. The operator comparison has its own
+family/order/method controls and does not use `--full`.
 Every JSON output goes to `$OMNIBIAS_SCRATCH`, defaulting to repository-relative
 `artifacts/`. Full runs use distinct filenames in the same output directory.
 
@@ -22,6 +27,25 @@ and timing protocol. Scripts record configuration and environment provenance;
 a failed accuracy or cost threshold must remain a failure in any report.
 Higher-order baselines can be expensive. A timing win does not establish PINN
 training convergence or continuous-domain error bounds.
+
+The experimental operator comparison defaults to 20 synchronized samples in
+each of three fresh processes. It stores exact implementation snapshots,
+runtime operands, compilation/first-call costs, warm forward and training
+samples, process RSS, and a separate untimed CPU tensor-memory profile.
+Protocol v2 precomputes independently verified references outside the engine
+worker budget, keyed by exact operands and request, and records both their cost
+and total elapsed time. `--cache cold` starts with empty isolated compiler caches
+and permits normal reuse within each worker; `--cache disabled` is the separate
+cache-disabling diagnostic. The default allows persistent caches.
+Optional `torch-jet` and `folx` baselines are used only when already installed.
+The [operator guide](../docs/operator-compiler.md) describes the four workload
+families, applicability limits, and reproduction commands. Failed accuracy,
+timeouts, insufficient sample counts, or changed sources disqualify speedup
+comparisons. The fastest successful applicable baseline is always reported.
+Use `operator_report.py` to verify snapshot hashes and bundle raw reports,
+source files, license notices and diagnostic attachments. The
+[v2 measured results](../docs/operator-compiler-v2-results.md) keep different source
+snapshots separate and include baseline wins.
 
 The deep-MLP measurement is retained in `docs/benchmarks/readme_derivatives.json`.
 It includes slower results as well as faster ones, and times derivative

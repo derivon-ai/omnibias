@@ -1,0 +1,248 @@
+{
+ "backend": "jax",
+ "device": "cuda:0",
+ "problems": [
+  {
+   "D": 64,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.0007394813001155853,
+      "median": 0.0004554202314466238,
+      "min": 0.000376868003513664,
+      "max": 0.0005426224088296294,
+      "calls": 128
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "error": "ValueError: cannot force 'subspace_jet' for a model that is not a dense chain; use one of ['taylor_jet', 'nested_autodiff']"
+    },
+    "subspace_nested": {
+     "error": "ValueError: cannot force 'subspace_nested' for a model that is not a dense chain; use one of ['taylor_jet', 'nested_autodiff']"
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.000931471586227417,
+      "median": 0.0003870326036121696,
+      "min": 0.0003691941674333066,
+      "max": 0.0004081595689058304,
+      "calls": 128
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.000934407114982605,
+      "median": 0.00038453034358099103,
+      "min": 0.00036843630368821323,
+      "max": 0.0004384951898828149,
+      "calls": 128
+     },
+     "max_rel_diff_vs_first": 2.0682914676002375e-15
+    }
+   }
+  },
+  {
+   "D": 256,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.001192677766084671,
+      "median": 0.001004733145236969,
+      "min": 0.0008219544542953372,
+      "max": 0.0013899608165957034,
+      "calls": 64
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.0015925206243991852,
+      "median": 0.0009422710863873363,
+      "min": 0.0007639076793566346,
+      "max": 0.0010305526666343212,
+      "calls": 32
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.001160062849521637,
+      "median": 0.0007511191652156413,
+      "min": 0.0007269736961461604,
+      "max": 0.0008239710587076843,
+      "calls": 64
+     },
+     "max_rel_diff_vs_first": 2.0128608147329114e-15
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.0009755417704582214,
+      "median": 0.0008778251940384507,
+      "min": 0.0008129853522405028,
+      "max": 0.0011854636250063777,
+      "calls": 64
+     },
+     "max_rel_diff_vs_first": 4.473024032739804e-16
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.0012486204504966736,
+      "median": 0.0006575525039806962,
+      "min": 0.0005564474267885089,
+      "max": 0.0007890429114922881,
+      "calls": 64
+     },
+     "max_rel_diff_vs_first": 2.1246864155514067e-15
+    }
+   }
+  },
+  {
+   "D": 1024,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.001397106796503067,
+      "median": 0.00113974220585078,
+      "min": 0.0009737948421388865,
+      "max": 0.0013181802351027727,
+      "calls": 32
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.001115642488002777,
+      "median": 0.0012716986238956451,
+      "min": 0.0010019016917794943,
+      "max": 0.002218569745309651,
+      "calls": 32
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.004208356142044067,
+      "median": 0.001151482341811061,
+      "min": 0.0011347420513629913,
+      "max": 0.0014618784189224243,
+      "calls": 16
+     },
+     "max_rel_diff_vs_first": 2.0740785035061304e-15
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.0015849769115447998,
+      "median": 0.0010263723088428378,
+      "min": 0.0009508498478680849,
+      "max": 0.0012900755973532796,
+      "calls": 32
+     },
+     "max_rel_diff_vs_first": 4.148157007012261e-16
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.0026853978633880615,
+      "median": 0.0021934094838798046,
+      "min": 0.001959864515811205,
+      "max": 0.005152497673407197,
+      "calls": 16
+     },
+     "max_rel_diff_vs_first": 2.2814863538567435e-15
+    }
+   }
+  },
+  {
+   "D": 4096,
+   "H": 64,
+   "blocks": 2,
+   "B": 64,
+   "engines": {
+    "planned": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.0021285563707351685,
+      "median": 0.0013303915038704872,
+      "min": 0.0012987818336114287,
+      "max": 0.00160941609647125,
+      "calls": 32
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_jet": {
+     "algorithm": "subspace_jet",
+     "timing": {
+      "first": 0.0015939176082611084,
+      "median": 0.0016087788389995694,
+      "min": 0.0013720736606046557,
+      "max": 0.003989111864939332,
+      "calls": 32
+     },
+     "max_rel_diff_vs_first": 0.0
+    },
+    "subspace_nested": {
+     "algorithm": "subspace_nested",
+     "timing": {
+      "first": 0.0014032535254955292,
+      "median": 0.0014231691602617502,
+      "min": 0.001389282988384366,
+      "max": 0.0016163371037691832,
+      "calls": 32
+     },
+     "max_rel_diff_vs_first": 2.0880631989663114e-15
+    },
+    "taylor_jet": {
+     "algorithm": "taylor_jet",
+     "timing": {
+      "first": 0.004177134484052658,
+      "median": 0.003265966661274433,
+      "min": 0.0027768199797719717,
+      "max": 0.004821223206818104,
+      "calls": 16
+     },
+     "max_rel_diff_vs_first": 2.0880631989663115e-16
+    },
+    "nested_autodiff": {
+     "algorithm": "nested_autodiff",
+     "timing": {
+      "first": 0.021661628037691116,
+      "median": 0.020997922867536545,
+      "min": 0.020716220140457153,
+      "max": 0.024098528549075127,
+      "calls": 2
+     },
+     "max_rel_diff_vs_first": 1.6704505591730492e-15
+    }
+   }
+  }
+ ],
+ "protocol": {
+  "repeats": 9,
+  "target_s": 0.03,
+  "dtype": "float64",
+  "python": "3.12.13"
+ }
+}

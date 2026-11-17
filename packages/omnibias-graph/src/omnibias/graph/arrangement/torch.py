@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import torch
 import torch.nn as nn
-from omnibias.graph.arrangement._core import ArrangementGraph, node_features
+from omnibias.graph.arrangement._core import ArrangementGraph, _message_topology, node_features
 from omnibias.partition.arrangement import Arrangement
 from torch import Tensor
 
@@ -35,27 +35,21 @@ class FaceNet(nn.Module):
         self.readout = nn.Linear(hidden, 1, dtype=dt)
 
     def forward(self, graph: ArrangementGraph, arr: Arrangement) -> Tensor:
-        feats = torch.tensor(node_features(arr, graph, beta=self.beta), dtype=self.lift.weight.dtype)
+        feats = torch.tensor(node_features(arr, graph, beta=self.beta),
+                             dtype=self.lift.weight.dtype, device=self.lift.weight.device)
         h = torch.tanh(self.lift(feats))
         n = h.shape[0]
-        adj = torch.zeros(n, n, dtype=h.dtype)
-        crossed = torch.zeros(n, n, dtype=h.dtype)
-        for u, v, k in graph.edges:
-            adj[u, v] = adj[v, u] = 1.0
-            crossed[u, v] = crossed[v, u] = float(k)
-        for _ in range(self.rounds):
-            msgs = []
-            for i in range(n):
-                acc = torch.zeros_like(h[i])
-                deg = 0.0
-                for j in range(n):
-                    if float(adj[i, j].detach()) <= 0.0:
-                        continue
-                    cat = torch.cat([h[j], crossed[i, j].reshape(1)])
-                    acc = acc + torch.tanh(self.msg(cat))
-                    deg += 1.0
-                msgs.append(acc / max(deg, 1.0))
-            h = h + torch.stack(msgs)
+        receivers, senders, labels, degrees = _message_topology(graph, n)
+        if receivers:
+            dst = torch.tensor(receivers, dtype=torch.long, device=h.device)
+            src = torch.tensor(senders, dtype=torch.long, device=h.device)
+            crossed = torch.tensor(labels, dtype=h.dtype, device=h.device).reshape(-1, 1)
+            degree = torch.tensor(degrees, dtype=h.dtype, device=h.device).reshape(-1, 1)
+            for _ in range(self.rounds):
+                cat = torch.cat([h[src], crossed], dim=-1)
+                messages = torch.tanh(self.msg(cat))
+                aggregated = torch.zeros_like(h).index_add(0, dst, messages)
+                h = h + aggregated / degree
         return self.readout(h).squeeze(-1)
 
 

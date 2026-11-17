@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 import jax.numpy as jnp
 from jax import Array
+from omnibias.fields.jax.ops._planned import routed as _routed
 from omnibias.fields.jax.ops.basic import (
     _is_chebyshev,
     _is_jet_mlp,
@@ -17,6 +18,7 @@ from omnibias.fields.jax.ops.basic import (
     _sigma_of_order,
     derivative,
     gradient,
+    mixed_partial,
 )
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -32,6 +34,9 @@ def biharmonic(state: FieldState, name: str) -> Array:
     if _is_chebyshev(state):
         return state.field.biharmonic(state, name)  # type: ignore[attr-defined]
     if _is_jet_mlp(state):
+        planned = _routed(state, (name,), "laplacian", power=2)
+        if planned is not None:
+            return planned
         return state.field.biharmonic(state, name)  # type: ignore[attr-defined]
     raise NotImplementedError(
         f"biharmonic not implemented for field type {type(state.field).__name__}"
@@ -52,6 +57,9 @@ def polylaplacian(state: FieldState, name: str, *, k: int) -> Array:
     if _is_chebyshev(state):
         return state.field.polylaplacian(state, name, k=k)  # type: ignore[attr-defined]
     if _is_jet_mlp(state):
+        planned = _routed(state, (name,), "laplacian", power=k)
+        if planned is not None:
+            return planned
         # Multinomial expansion of (sum_i d_i^2)^k over one order-2k jet.
         return state.field.polylaplacian(state, name, k=k)  # type: ignore[attr-defined]
     raise NotImplementedError(
@@ -84,11 +92,18 @@ def hessian(
             return full
         idx = jnp.array(list(axis_idx))
         return full[..., idx, :][..., :, idx]
-    rows = []
-    idx = jnp.array(list(axis_idx))
-    for i in axis_idx:
-        gi = gradient_of_derivative(state, name, axis=i)
-        rows.append(gi[..., idx])
+    # Request only the selected entries (a full gradient would compute every coordinate even when the caller needs a
+    # small Hessian block): the upper triangle, mirrored, since mixed partials commute.
+    n = len(axis_idx)
+    upper: dict[tuple[int, int], Array] = {}
+    for p in range(n):
+        for q in range(p, n):
+            i, j = axis_idx[p], axis_idx[q]
+            upper[(p, q)] = (
+                derivative(state, name, axis=i, order=2)
+                if i == j else mixed_partial(state, name, (i, j), (1, 1))
+            )
+    rows = [jnp.stack([upper[(min(p, q), max(p, q))] for q in range(n)], axis=-1) for p in range(n)]
     return jnp.stack(rows, axis=-2)
 
 
@@ -137,18 +152,41 @@ def vector_hessian(
     return jnp.stack(rows, axis=-3)
 
 
+def _routed_vector(state: FieldState, names: tuple[str, ...], power: int) -> Array | None:
+    """The ``power``-th Laplacian of every component of ``names`` in one planner call, or ``None``.
+
+    ``None`` when there is one component, the field is not a deep field or does not opt in to the planner: the
+    components are then evaluated one by one as before.  The planner serves a vector-valued chain with one program, so the
+    first layers are evaluated once for all components instead of once per component.
+    """
+    if len(names) < 2 or not _is_jet_mlp(state):
+        return None
+    return _routed(state, tuple(names), "laplacian", power=power)
+
+
 def vector_laplacian(state: FieldState, names: tuple[str, ...]) -> Array:
     from omnibias.fields.jax.ops.basic import laplacian
+    planned = _routed_vector(state, names, 1)
+    if planned is not None:
+        return planned
     cols = [laplacian(state, n) for n in names]
     return jnp.stack(cols, axis=-1)
 
 
 def vector_biharmonic(state: FieldState, names: tuple[str, ...]) -> Array:
+    planned = _routed_vector(state, names, 2)
+    if planned is not None:
+        return planned
     cols = [biharmonic(state, n) for n in names]
     return jnp.stack(cols, axis=-1)
 
 
 def vector_polylaplacian(state: FieldState, names: tuple[str, ...], *, k: int) -> Array:
+    if k < 1:
+        raise ValueError(f"polylaplacian k must be >= 1, got {k}")
+    planned = _routed_vector(state, names, k)
+    if planned is not None:
+        return planned
     cols = [polylaplacian(state, n, k=k) for n in names]
     return jnp.stack(cols, axis=-1)
 

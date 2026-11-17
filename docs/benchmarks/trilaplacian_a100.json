@@ -1,0 +1,5095 @@
+{
+ "schema": "omnibias-benchmark/trilaplacian-a100/v1",
+ "prediction": "trilaplacian",
+ "shipped": {
+  "module": "omnibias.jax.experimental",
+  "names": [
+   "projected_deep_trilaplacian"
+  ],
+  "note": null
+ },
+ "status": "adopted: held-out gate met in 20 of 20 target rows (lower95 5.6 to 198 against the full-seed tier); projected-input comparators reported separately",
+ "what": "tri-Laplacian and the PFC residual by composition of the projected bi-Laplacian program over k = min(D, H) outer directions",
+ "hardware": "one NVIDIA A100-SXM4-80GB (exclusive process mode, whole GPU), JAX 0.10.2 with jaxlib 0.10.2 CUDA 12 plugins, CPython 3.12, float64",
+ "protocol": {
+  "precision": "float64",
+  "repetitions": "3 fresh processes (paired by repetition, rotating method order)",
+  "warmups": 3,
+  "samples": 51,
+  "statistic": "ratio = strongest-comparator median / candidate median; lower95 = exp(mean(log r) - 2.920 sd(log r)/sqrt(3))",
+  "qualification": "every method on a reduced instance against a 40 to 50 digit mpmath oracle on repetition 0",
+  "compile_time": "excluded from the speed ratios and reported separately",
+  "failures": "failed, out-of-memory and autotuning-failed members are recorded and suppress their tier from promotion"
+ },
+ "candidate": "pkg3",
+ "tiers": {
+  "full_seed": [
+   "full_comp",
+   "folx3",
+   "jet",
+   "nested"
+  ],
+  "projected_inner_full_outer": [
+   "inner_proj"
+  ],
+  "projected_generic": [
+   "folx3_proj"
+  ]
+ },
+ "registered_gate": {
+  "adoption": "lower95 >= 2 against the strongest member of the full-seed tier in cells with D >= 2 H, reported separately against the projected-inner tier",
+  "theory": "log-log slope of the full-seed / projected ratio against D at fixed k = 16 (D = 48, 64, 96) in [2.5, 3.5]; parity (0.5-2) against the generic engine given the same columns"
+ },
+ "roles": {
+  "calibration": "seed range disjoint from the held-out seed; used to apply the registered gate only",
+  "held_out": "frozen protocol, new data seed, no refit"
+ },
+ "outcome": {
+  "status": "adopted: held-out gate met in 20 of 20 target rows (lower95 5.6 to 198 against the full-seed tier); projected-input comparators reported separately",
+  "summary": "Composing the projected bi-Laplacian program over k = min(D, H) outer directions gives the tri-Laplacian and the PFC residual without the full-input sixth-order program. On the frozen held-out seed it beat the strongest completed full-seed comparator (full_comp, folx3 or jet) by a lower95 of 5.6 to 198 in all 20 rows with D >= 2H (five cells, two operators, forward and value-and-gradient); the ratio grows with D at fixed k = 16 with log-log slopes 2.61 to 3.06 (registered band 2.5 to 3.5). Against the existing projected bi-Laplacian program fed the same inputs (inner_proj) it is 2.9 to 8.5x faster.",
+  "held_out_numbers": {
+   "target_rows": 20,
+   "lower95_range": [
+    5.59,
+    197.83
+   ],
+   "slopes": {
+    "pfc/forward": 2.61,
+    "pfc/vg": 3.02,
+    "tri/forward": 2.63,
+    "tri/vg": 3.06
+   },
+   "vs_inner_proj": [
+    2.95,
+    8.5
+   ],
+   "vs_folx3_proj": [
+    0.3,
+    0.58
+   ],
+   "full_size_agreement_worst_relative": 1.05e-14,
+   "cold_compile_s": [
+    4.6,
+    34.8
+   ],
+   "failed_members": "folx3: 48 out-of-memory or autotuning failures, nested: 9, jet: 6 (recorded; full_comp was the strongest completed member in all rows from D = 48)"
+  },
+  "theory_check": "measured / predicted in [1/3, 3] in 18 of 20 target rows (misses: t24_8 pfc vg 0.32 and t24_8 tri forward 0.26); slope band met in 4 of 4 series. Parity with a generic engine fed the same projected columns (folx3_proj) is outside the registered [0.5, 2] in 16 of 20 rows: that engine is 1.7 to 3.3x FASTER than the candidate program, a baseline win that stays visible.",
+  "audit": "A1, A3 and A5 pass (396 records, 84 ratios recomputed, max relative difference 0); A4 reports 3 rep-0 records of the baseline nested autodiff at the D < H control cell that failed qualification (parameter directional-derivative check); that baseline is suppressed from the comparison and the three records are listed in the audit, not repaired.",
+  "refuted_or_null": "none of the registered adoption or theory criteria is refuted for the full-seed tier; the parity criterion against folx3_proj is missed.",
+  "where_it_does_not_help": "D < H (control t12_16): 0.33 to 0.60 of folx3 and jet, i.e. slower. In every D >= 2H cell a generic engine given the same projected columns (folx3_proj) is 1.7 to 3.3x faster than the candidate program, so the gain is over the full-input comparators and over the projected bi-Laplacian program, not over a generic engine fed the projected columns. Cold compile is 4.6 to 34.8 s.",
+  "short": "adopted (held-out gate met in 20 of 20 rows)",
+  "notes": "The nested-autodiff baseline did not pass the oracle check at the D < H control cell in the value-and-gradient and forward programs (its parameter directional derivative disagreed with the oracle), so it is excluded from the comparison there; the folx3, jet and nested baselines also ran out of memory or failed autotuning in the larger cells, and the strongest completed member is the comparator."
+ },
+ "calibration": {
+  "summary": {
+   "adoption_gate_passes": true,
+   "n_rows": 24,
+   "slopes": {
+    "pfc/forward": {
+     "points": [
+      [
+       48,
+       34.141002873621424
+      ],
+      [
+       64,
+       71.35124732151161
+      ],
+      [
+       96,
+       211.61552684010294
+      ]
+     ],
+     "slope": 2.635109784867169,
+     "pass": true
+    },
+    "pfc/vg": {
+     "points": [
+      [
+       48,
+       16.159778194138273
+      ],
+      [
+       64,
+       32.39916676112136
+      ],
+      [
+       96,
+       130.27353949974665
+      ]
+     ],
+     "slope": 3.0386842603560567,
+     "pass": true
+    },
+    "tri/forward": {
+     "points": [
+      [
+       48,
+       34.34702567794801
+      ],
+      [
+       64,
+       72.48756644791459
+      ],
+      [
+       96,
+       212.2126304416882
+      ]
+     ],
+     "slope": 2.6286964185783077,
+     "pass": true
+    },
+    "tri/vg": {
+     "points": [
+      [
+       48,
+       16.278422915925933
+      ],
+      [
+       64,
+       32.73274796501529
+      ],
+      [
+       96,
+       133.74875887676373
+      ]
+     ],
+     "slope": 3.0669154226315514,
+     "pass": true
+    }
+   },
+   "failed_members": [
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [executable_name='jit_vg'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [tf-allocator-allocation-error=''"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [executable_name='jit_vg'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "nested",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "nested",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "nested",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.29GiB. [tf-allocator-allocation-error=''"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.29GiB. [executable_name='jit_vg'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.29GiB. [executable_name='jit_vg'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusi"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusi"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusi"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %gemm_fusion_dot.302 = f64[113246208,24]{1,0} fusion(%get-tuple-el"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 3 out of 375 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 3 out of 375 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 833300, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusio"
+    ]
+   ]
+  },
+  "rows": [
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "D": 12,
+    "H": 16,
+    "B": 2048,
+    "regime": "forward",
+    "pkg3_ms": 25.360667,
+    "predicted_vs_full_seed": 1.0,
+    "predicted_vs_inner_proj": 1.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 0.8247181643813724,
+      "lower95": 0.8121221389628629
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 0.42819503156238076,
+      "lower95": 0.4207883235543679
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 0.6293553720158138,
+      "lower95": 0.6201599127391332
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 0.9980270378751378,
+      "lower95": 0.9893381482877258
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 0.42819503156238076,
+    "lower95_vs_full_seed": 0.4207883235543679,
+    "theory_ratio_vs_full_seed": 0.42819503156238076,
+    "measured_vs_inner_proj": 0.9980270378751378,
+    "lower95_vs_inner_proj": 0.9893381482877258,
+    "theory_ratio_vs_inner_proj": 0.9980270378751378,
+    "gate": "control or below the registered D >= 2H region",
+    "baselines_suppressed": [
+     "nested",
+     "folx3_proj"
+    ]
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "D": 12,
+    "H": 16,
+    "B": 2048,
+    "regime": "vg",
+    "pkg3_ms": 179.936129,
+    "predicted_vs_full_seed": 1.0,
+    "predicted_vs_inner_proj": 1.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 0.5627219340685784,
+      "lower95": 0.5608752673076627
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 0.32413130679457997,
+      "lower95": 0.3215606956333731
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 0.543004028589414,
+      "lower95": 0.5416525604265874
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 1.0004441929511394,
+      "lower95": 0.997506356260536
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 0.32413130679457997,
+    "lower95_vs_full_seed": 0.3215606956333731,
+    "theory_ratio_vs_full_seed": 0.32413130679457997,
+    "measured_vs_inner_proj": 1.0004441929511394,
+    "lower95_vs_inner_proj": 0.997506356260536,
+    "theory_ratio_vs_inner_proj": 1.0004441929511394,
+    "gate": "control or below the registered D >= 2H region",
+    "baselines_suppressed": [
+     "nested",
+     "folx3_proj"
+    ]
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "D": 12,
+    "H": 16,
+    "B": 2048,
+    "regime": "forward",
+    "pkg3_ms": 24.984143,
+    "predicted_vs_full_seed": 1.0,
+    "predicted_vs_inner_proj": 1.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 0.8095630877680877,
+      "lower95": 0.8070146983951084
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 0.7337336501479109,
+      "lower95": 0.7229563146163762
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 0.6082274345819775,
+      "lower95": 0.6070584719957813
+     },
+     "nested": {
+      "baseline": "nested",
+      "n": 3,
+      "ratio": 5.674233704551157,
+      "lower95": 5.650759210194893
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 1.0033244615359105,
+      "lower95": 0.9977996698584334
+     }
+    },
+    "strongest_full_seed": "jet",
+    "measured_vs_full_seed": 0.6082274345819775,
+    "lower95_vs_full_seed": 0.6070584719957813,
+    "theory_ratio_vs_full_seed": 0.6082274345819775,
+    "measured_vs_inner_proj": 1.0033244615359105,
+    "lower95_vs_inner_proj": 0.9977996698584334,
+    "theory_ratio_vs_inner_proj": 1.0033244615359105,
+    "gate": "control or below the registered D >= 2H region",
+    "baselines_suppressed": [
+     "folx3_proj"
+    ]
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "D": 12,
+    "H": 16,
+    "B": 2048,
+    "regime": "vg",
+    "pkg3_ms": 178.468304,
+    "predicted_vs_full_seed": 1.0,
+    "predicted_vs_inner_proj": 1.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 0.5563690855741058,
+      "lower95": 0.5543845623927559
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 0.3534002083206354,
+      "lower95": 0.35251307467798404
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 0.5648474197573814,
+      "lower95": 0.5636690110349192
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 0.9993615121098195,
+      "lower95": 0.9975337573838817
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 0.3534002083206354,
+    "lower95_vs_full_seed": 0.35251307467798404,
+    "theory_ratio_vs_full_seed": 0.3534002083206354,
+    "measured_vs_inner_proj": 0.9993615121098195,
+    "lower95_vs_inner_proj": 0.9975337573838817,
+    "theory_ratio_vs_inner_proj": 0.9993615121098195,
+    "gate": "control or below the registered D >= 2H region",
+    "baselines_suppressed": [
+     "nested",
+     "folx3_proj"
+    ]
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "D": 24,
+    "H": 8,
+    "B": 2048,
+    "regime": "forward",
+    "pkg3_ms": 6.123165,
+    "predicted_vs_full_seed": 22.662650602409638,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 13.232699462438967,
+      "lower95": 12.576018205796391
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 9.656378492537717,
+      "lower95": 9.17023239461022
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 11.445467195658626,
+      "lower95": 10.837609733307945
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.0282622467580165,
+      "lower95": 2.8764174960317894
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.42858100086735806,
+      "lower95": 0.40559805743698785
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 9.656378492537717,
+    "lower95_vs_full_seed": 9.17023239461022,
+    "theory_ratio_vs_full_seed": 0.4260921929189955,
+    "measured_vs_inner_proj": 3.0282622467580165,
+    "lower95_vs_inner_proj": 2.8764174960317894,
+    "theory_ratio_vs_inner_proj": 1.0094207489193388,
+    "parity_vs_folx3_proj": 0.42858100086735806,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "nested"
+    ]
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "D": 24,
+    "H": 8,
+    "B": 2048,
+    "regime": "vg",
+    "pkg3_ms": 20.54775,
+    "predicted_vs_full_seed": 22.662650602409638,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 16.88852450124979,
+      "lower95": 16.290105472369543
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 7.274323977923672,
+      "lower95": 7.0454203323083595
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 5.978415158775417,
+      "lower95": 5.765877026557645
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.5249129691144717,
+      "lower95": 0.49500916444579224
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 7.274323977923672,
+    "lower95_vs_full_seed": 7.0454203323083595,
+    "theory_ratio_vs_full_seed": 0.32098292938206524,
+    "measured_vs_inner_proj": 5.978415158775417,
+    "lower95_vs_inner_proj": 5.765877026557645,
+    "theory_ratio_vs_inner_proj": 1.9928050529251389,
+    "parity_vs_folx3_proj": 0.5249129691144717,
+    "parity_pass": true,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "D": 24,
+    "H": 8,
+    "B": 2048,
+    "regime": "forward",
+    "pkg3_ms": 5.486497,
+    "predicted_vs_full_seed": 22.662650602409638,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 14.451639156948973,
+      "lower95": 14.158687724141435
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 6.134519750175077,
+      "lower95": 6.0435332924224126
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 12.507062956576437,
+      "lower95": 12.19352816481398
+     },
+     "nested": {
+      "baseline": "nested",
+      "n": 3,
+      "ratio": 184.7606670334469,
+      "lower95": 180.88065455175308
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.31738898410545,
+      "lower95": 3.2585957162680974
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.47248675964881676,
+      "lower95": 0.46309087859265374
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 6.134519750175077,
+    "lower95_vs_full_seed": 6.0435332924224126,
+    "theory_ratio_vs_full_seed": 0.27068853762069717,
+    "measured_vs_inner_proj": 3.31738898410545,
+    "lower95_vs_inner_proj": 3.2585957162680974,
+    "theory_ratio_vs_inner_proj": 1.10579632803515,
+    "parity_vs_folx3_proj": 0.47248675964881676,
+    "parity_pass": false,
+    "gate": "PASS"
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "D": 24,
+    "H": 8,
+    "B": 2048,
+    "regime": "vg",
+    "pkg3_ms": 19.813347,
+    "predicted_vs_full_seed": 22.662650602409638,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 17.29640914719021,
+      "lower95": 16.705551584383052
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 7.790014272345891,
+      "lower95": 7.531330166231835
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 6.140371381320531,
+      "lower95": 5.922268355975137
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.5790181366335061,
+      "lower95": 0.5484294891712693
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 7.790014272345891,
+    "lower95_vs_full_seed": 7.531330166231835,
+    "theory_ratio_vs_full_seed": 0.34373800351127537,
+    "measured_vs_inner_proj": 6.140371381320531,
+    "lower95_vs_inner_proj": 5.922268355975137,
+    "theory_ratio_vs_inner_proj": 2.0467904604401768,
+    "parity_vs_folx3_proj": 0.5790181366335061,
+    "parity_pass": true,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "D": 48,
+    "H": 16,
+    "B": 1024,
+    "regime": "forward",
+    "pkg3_ms": 27.221159,
+    "predicted_vs_full_seed": 24.77319587628866,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 34.141002873621424,
+      "lower95": 33.86181033816122
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 2.9428366276063653,
+      "lower95": 2.918255818895357
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.4338389952403153,
+      "lower95": 0.4255592188435202
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 34.141002873621424,
+    "lower95_vs_full_seed": 33.86181033816122,
+    "theory_ratio_vs_full_seed": 1.3781428542410645,
+    "measured_vs_inner_proj": 2.9428366276063653,
+    "lower95_vs_inner_proj": 2.918255818895357,
+    "theory_ratio_vs_inner_proj": 0.9809455425354551,
+    "parity_vs_folx3_proj": 0.4338389952403153,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "D": 48,
+    "H": 16,
+    "B": 1024,
+    "regime": "vg",
+    "pkg3_ms": 142.129041,
+    "predicted_vs_full_seed": 24.77319587628866,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 16.159778194138273,
+      "lower95": 16.087787392604824
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 2.944204110414716,
+      "lower95": 2.9320599646735412
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.31423910240698577,
+      "lower95": 0.3115277293125787
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 16.159778194138273,
+    "lower95_vs_full_seed": 16.087787392604824,
+    "theory_ratio_vs_full_seed": 0.6523089824516906,
+    "measured_vs_inner_proj": 2.944204110414716,
+    "lower95_vs_inner_proj": 2.9320599646735412,
+    "theory_ratio_vs_inner_proj": 0.9814013701382387,
+    "parity_vs_folx3_proj": 0.31423910240698577,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "D": 48,
+    "H": 16,
+    "B": 1024,
+    "regime": "forward",
+    "pkg3_ms": 26.971403,
+    "predicted_vs_full_seed": 24.77319587628866,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 34.34702567794801,
+      "lower95": 34.32956192981408
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 2.9617941231843385,
+      "lower95": 2.957031061767078
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.40036900864467007,
+      "lower95": 0.39241242781281765
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 34.34702567794801,
+    "lower95_vs_full_seed": 34.32956192981408,
+    "theory_ratio_vs_full_seed": 1.3864592137998157,
+    "measured_vs_inner_proj": 2.9617941231843385,
+    "lower95_vs_inner_proj": 2.957031061767078,
+    "theory_ratio_vs_inner_proj": 0.9872647077281128,
+    "parity_vs_folx3_proj": 0.40036900864467007,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "D": 48,
+    "H": 16,
+    "B": 1024,
+    "regime": "vg",
+    "pkg3_ms": 140.606331,
+    "predicted_vs_full_seed": 24.77319587628866,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 16.278422915925933,
+      "lower95": 16.212539242520915
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 2.9667406464767536,
+      "lower95": 2.9537405210726155
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.350302652495422,
+      "lower95": 0.34441978656452343
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 16.278422915925933,
+    "lower95_vs_full_seed": 16.212539242520915,
+    "theory_ratio_vs_full_seed": 0.6570982200769103,
+    "measured_vs_inner_proj": 2.9667406464767536,
+    "lower95_vs_inner_proj": 2.9537405210726155,
+    "theory_ratio_vs_inner_proj": 0.9889135488255846,
+    "parity_vs_folx3_proj": 0.350302652495422,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "D": 64,
+    "H": 16,
+    "B": 512,
+    "regime": "forward",
+    "pkg3_ms": 15.484652,
+    "predicted_vs_full_seed": 58.103092783505154,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 71.35124732151161,
+      "lower95": 71.11279462028305
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.9057926380999803,
+      "lower95": 3.904556472829305
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.4003851030853915,
+      "lower95": 0.39464381121456205
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 71.35124732151161,
+    "lower95_vs_full_seed": 71.11279462028305,
+    "theory_ratio_vs_full_seed": 1.2280111763993304,
+    "measured_vs_inner_proj": 3.9057926380999803,
+    "lower95_vs_inner_proj": 3.904556472829305,
+    "theory_ratio_vs_inner_proj": 0.9764481595249951,
+    "parity_vs_folx3_proj": 0.4003851030853915,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "D": 64,
+    "H": 16,
+    "B": 512,
+    "regime": "vg",
+    "pkg3_ms": 80.49845,
+    "predicted_vs_full_seed": 58.103092783505154,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 32.39916676112136,
+      "lower95": 32.21500632533001
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.897081786175599,
+      "lower95": 3.888705844163253
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.30279214430863666,
+      "lower95": 0.3009056917314475
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 32.39916676112136,
+    "lower95_vs_full_seed": 32.21500632533001,
+    "theory_ratio_vs_full_seed": 0.5576151837879296,
+    "measured_vs_inner_proj": 3.897081786175599,
+    "lower95_vs_inner_proj": 3.888705844163253,
+    "theory_ratio_vs_inner_proj": 0.9742704465438997,
+    "parity_vs_folx3_proj": 0.30279214430863666,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "D": 64,
+    "H": 16,
+    "B": 512,
+    "regime": "forward",
+    "pkg3_ms": 15.326607,
+    "predicted_vs_full_seed": 58.103092783505154,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 72.48756644791459,
+      "lower95": 72.06545542951669
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.9245241374704136,
+      "lower95": 3.905901728389372
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.4162260340173022,
+      "lower95": 0.3964783088899051
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 72.48756644791459,
+    "lower95_vs_full_seed": 72.06545542951669,
+    "theory_ratio_vs_full_seed": 1.2475681237487075,
+    "measured_vs_inner_proj": 3.9245241374704136,
+    "lower95_vs_inner_proj": 3.905901728389372,
+    "theory_ratio_vs_inner_proj": 0.9811310343676034,
+    "parity_vs_folx3_proj": 0.4162260340173022,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "D": 64,
+    "H": 16,
+    "B": 512,
+    "regime": "vg",
+    "pkg3_ms": 79.470203,
+    "predicted_vs_full_seed": 58.103092783505154,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 32.73274796501529,
+      "lower95": 32.55135144177394
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.9357821597136895,
+      "lower95": 3.9205812534026725
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.32462106948026004,
+      "lower95": 0.31982238438794036
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 32.73274796501529,
+    "lower95_vs_full_seed": 32.55135144177394,
+    "theory_ratio_vs_full_seed": 0.5633563790998019,
+    "measured_vs_inner_proj": 3.9357821597136895,
+    "lower95_vs_inner_proj": 3.9205812534026725,
+    "theory_ratio_vs_inner_proj": 0.9839455399284224,
+    "parity_vs_folx3_proj": 0.32462106948026004,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "D": 96,
+    "H": 16,
+    "B": 128,
+    "regime": "forward",
+    "pkg3_ms": 4.668717,
+    "predicted_vs_full_seed": 194.04123711340208,
+    "predicted_vs_inner_proj": 6.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 211.61552684010294,
+      "lower95": 193.96097544419985
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 6.0484877143689255,
+      "lower95": 5.5033980739687705
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.4806020963892896,
+      "lower95": 0.4383078218238043
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 211.61552684010294,
+    "lower95_vs_full_seed": 193.96097544419985,
+    "theory_ratio_vs_full_seed": 1.0905698705498876,
+    "measured_vs_inner_proj": 6.0484877143689255,
+    "lower95_vs_inner_proj": 5.5033980739687705,
+    "theory_ratio_vs_inner_proj": 1.0080812857281543,
+    "parity_vs_folx3_proj": 0.4806020963892896,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "D": 96,
+    "H": 16,
+    "B": 128,
+    "regime": "vg",
+    "pkg3_ms": 16.783299,
+    "predicted_vs_full_seed": 194.04123711340208,
+    "predicted_vs_inner_proj": 6.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 130.27353949974665,
+      "lower95": 125.21771082195687
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 8.328553348777,
+      "lower95": 8.01419556426371
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.6218479102215746,
+      "lower95": 0.6080080694115034
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 130.27353949974665,
+    "lower95_vs_full_seed": 125.21771082195687,
+    "theory_ratio_vs_full_seed": 0.6713703820781758,
+    "measured_vs_inner_proj": 8.328553348777,
+    "lower95_vs_inner_proj": 8.01419556426371,
+    "theory_ratio_vs_inner_proj": 1.3880922247961667,
+    "parity_vs_folx3_proj": 0.6218479102215746,
+    "parity_pass": true,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "D": 96,
+    "H": 16,
+    "B": 128,
+    "regime": "forward",
+    "pkg3_ms": 4.558437,
+    "predicted_vs_full_seed": 194.04123711340208,
+    "predicted_vs_inner_proj": 6.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 212.2126304416882,
+      "lower95": 190.5204587652638
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 6.071246780076575,
+      "lower95": 5.432758572489405
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.4891837276872204,
+      "lower95": 0.4440610960828733
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 212.2126304416882,
+    "lower95_vs_full_seed": 190.5204587652638,
+    "theory_ratio_vs_full_seed": 1.0936470700692675,
+    "measured_vs_inner_proj": 6.071246780076575,
+    "lower95_vs_inner_proj": 5.432758572489405,
+    "theory_ratio_vs_inner_proj": 1.0118744633460959,
+    "parity_vs_folx3_proj": 0.4891837276872204,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "D": 96,
+    "H": 16,
+    "B": 128,
+    "regime": "vg",
+    "pkg3_ms": 16.362228,
+    "predicted_vs_full_seed": 194.04123711340208,
+    "predicted_vs_inner_proj": 6.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 133.74875887676373,
+      "lower95": 128.00205584621912
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 8.516830946712949,
+      "lower95": 8.132597059187898
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.6114920281924706,
+      "lower95": 0.5430973081041962
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 133.74875887676373,
+    "lower95_vs_full_seed": 128.00205584621912,
+    "theory_ratio_vs_full_seed": 0.6892800770930868,
+    "measured_vs_inner_proj": 8.516830946712949,
+    "lower95_vs_inner_proj": 8.132597059187898,
+    "theory_ratio_vs_inner_proj": 1.419471824452158,
+    "parity_vs_folx3_proj": 0.6114920281924706,
+    "parity_pass": true,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "D": 96,
+    "H": 24,
+    "B": 128,
+    "regime": "forward",
+    "pkg3_ms": 18.249884,
+    "predicted_vs_full_seed": 60.038277511961724,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 77.37173278153375,
+      "lower95": 76.78349493538799
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.917918263998671,
+      "lower95": 3.8872628415796684
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.40204198545581965,
+      "lower95": 0.39378467695492375
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 77.37173278153375,
+    "lower95_vs_full_seed": 76.78349493538799,
+    "theory_ratio_vs_full_seed": 1.2887067382324318,
+    "measured_vs_inner_proj": 3.917918263998671,
+    "lower95_vs_inner_proj": 3.8872628415796684,
+    "theory_ratio_vs_inner_proj": 0.9794795659996678,
+    "parity_vs_folx3_proj": 0.40204198545581965,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "D": 96,
+    "H": 24,
+    "B": 128,
+    "regime": "vg",
+    "pkg3_ms": 91.080835,
+    "predicted_vs_full_seed": 60.038277511961724,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 35.77604599475112,
+      "lower95": 35.66545160600664
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.902903364447879,
+      "lower95": 3.892132571094552
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.3600433415553404,
+      "lower95": 0.3476169269518828
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 35.77604599475112,
+    "lower95_vs_full_seed": 35.66545160600664,
+    "theory_ratio_vs_full_seed": 0.5958872818698585,
+    "measured_vs_inner_proj": 3.902903364447879,
+    "lower95_vs_inner_proj": 3.892132571094552,
+    "theory_ratio_vs_inner_proj": 0.9757258411119698,
+    "parity_vs_folx3_proj": 0.3600433415553404,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "D": 96,
+    "H": 24,
+    "B": 128,
+    "regime": "forward",
+    "pkg3_ms": 18.403258,
+    "predicted_vs_full_seed": 60.038277511961724,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 76.92960366136974,
+      "lower95": 75.54539624948215
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.900491487591282,
+      "lower95": 3.8319162003790517
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.3897403325413689,
+      "lower95": 0.3765476465325567
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 76.92960366136974,
+    "lower95_vs_full_seed": 75.54539624948215,
+    "theory_ratio_vs_full_seed": 1.281342617566646,
+    "measured_vs_inner_proj": 3.900491487591282,
+    "lower95_vs_inner_proj": 3.8319162003790517,
+    "theory_ratio_vs_inner_proj": 0.9751228718978205,
+    "parity_vs_folx3_proj": 0.3897403325413689,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "D": 96,
+    "H": 24,
+    "B": 128,
+    "regime": "vg",
+    "pkg3_ms": 90.267034,
+    "predicted_vs_full_seed": 60.038277511961724,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 36.01104567360982,
+      "lower95": 35.94888219401144
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.9313478212915056,
+      "lower95": 3.92550321151731
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.37308980557613197,
+      "lower95": 0.36186709113204923
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 36.01104567360982,
+    "lower95_vs_full_seed": 35.94888219401144,
+    "theory_ratio_vs_full_seed": 0.599801446109695,
+    "measured_vs_inner_proj": 3.9313478212915056,
+    "lower95_vs_inner_proj": 3.92550321151731,
+    "theory_ratio_vs_inner_proj": 0.9828369553228764,
+    "parity_vs_folx3_proj": 0.37308980557613197,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   }
+  ]
+ },
+ "held_out": {
+  "seed": 834034,
+  "statistics": {
+   "ratio": "baseline median / candidate median, paired by fresh-process repetition on log scale",
+   "lower95": "exp(mean(log r) - 2.920 * sd(log r)/sqrt(3))",
+   "strongest_control": "smallest mean log median over all controls",
+   "promotion": "lower95 >= 1 in every advertised regime (>= 2 significant); missing/failed/unqualified member suppresses the ratio",
+   "tier_rule": "per tier: strongest = smallest mean log median among members that ran and qualified; a tier with a failed/refused/unqualified member is reported with that failure and is not promoted",
+   "reproduction": "pkg median / rg_lib median per cell (shipped module vs independent program, same rule)",
+   "tiers": {
+    "full_seed": [
+     "full_comp",
+     "folx3",
+     "jet",
+     "nested"
+    ],
+    "projected_inner_full_outer": [
+     "inner_proj"
+    ],
+    "projected_generic": [
+     "folx3_proj"
+    ]
+   },
+   "candidate": "pkg3"
+  },
+  "summary": {
+   "adoption_gate_passes": true,
+   "n_rows": 24,
+   "slopes": {
+    "pfc/forward": {
+     "points": [
+      [
+       48,
+       34.26571111346025
+      ],
+      [
+       64,
+       71.2377532693164
+      ],
+      [
+       96,
+       209.0728555514281
+      ]
+     ],
+     "slope": 2.612200672016355,
+     "pass": true
+    },
+    "pfc/vg": {
+     "points": [
+      [
+       48,
+       16.18456915215834
+      ],
+      [
+       64,
+       32.81552470497707
+      ],
+      [
+       96,
+       129.30343791402086
+      ]
+     ],
+     "slope": 3.0232652472787573,
+     "pass": true
+    },
+    "tri/forward": {
+     "points": [
+      [
+       48,
+       34.342522125918606
+      ],
+      [
+       64,
+       72.818017023597
+      ],
+      [
+       96,
+       212.49087926505206
+      ]
+     ],
+     "slope": 2.6301153379281024,
+     "pass": true
+    },
+    "tri/vg": {
+     "points": [
+      [
+       48,
+       16.351431405433633
+      ],
+      [
+       64,
+       32.83475252536183
+      ],
+      [
+       96,
+       133.8326421867399
+      ]
+     ],
+     "slope": 3.061326151497258,
+     "pass": true
+    }
+   },
+   "failed_members": [
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [executable_name='jit_vg'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [executable_name='jit_vg'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [executable_name='jit_vg'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "nested",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "nested",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "nested",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "jet",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.29GiB. [tf-allocator-allocation-error=''"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.31GiB. [tf-allocator-allocation-error=''"
+    ],
+    [
+     "('{\"B\": 2048, \"D\": 24, \"H\": 8, \"cell\": \"t24_8\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"jet\", \"nested\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "nested",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.29GiB. [tf-allocator-allocation-error=''"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusi"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusi"
+    ],
+    [
+     "('{\"B\": 1024, \"D\": 48, \"H\": 16, \"cell\": \"t48_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusi"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 512, \"D\": 64, \"H\": 16, \"cell\": \"t64_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [executable_name='jit_vg'] [tf-all"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 16, \"cell\": \"t96_16\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Failed to get configs for: 4 out of 375 instructions. See logs for all failures. Example fail"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %gemm_fusion_dot.302 = f64[113246208,24]{1,0} fusion(%get-tuple-el"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"tri\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %gemm_fusion_dot.302 = f64[113246208,24]{1,0} fusion(%get-tuple-el"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [executable_name='jit_fwd'] [tf-al"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'forward')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [tf-allocator-allocation-error='']"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "0",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "1",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusio"
+    ],
+    [
+     "('{\"B\": 128, \"D\": 96, \"H\": 24, \"cell\": \"t96_24\", \"depth\": 3, \"methods\": [\"pkg3\", \"inner_proj\", \"full_comp\", \"folx3\", \"folx3_proj\"], \"op\": \"pfc\", \"regimes\": [\"forward\", \"vg\"], \"seed\": 834034, \"workload\": \"p3_trilap\"}', 'vg')",
+     "folx3",
+     "2",
+     "error",
+     "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusio"
+    ]
+   ]
+  },
+  "rows": [
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "D": 12,
+    "H": 16,
+    "B": 2048,
+    "regime": "forward",
+    "pkg3_ms": 25.344313,
+    "predicted_vs_full_seed": 1.0,
+    "predicted_vs_inner_proj": 1.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 0.8242541310613201,
+      "lower95": 0.8196576305450206
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 0.4288053361418339,
+      "lower95": 0.4215254966874947
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 0.6185975998975382,
+      "lower95": 0.6143514415270849
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 0.9989188260080877,
+      "lower95": 0.9949693134540638
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 0.4288053361418339,
+    "lower95_vs_full_seed": 0.4215254966874947,
+    "theory_ratio_vs_full_seed": 0.4288053361418339,
+    "measured_vs_inner_proj": 0.9989188260080877,
+    "lower95_vs_inner_proj": 0.9949693134540638,
+    "theory_ratio_vs_inner_proj": 0.9989188260080877,
+    "gate": "control or below the registered D >= 2H region",
+    "baselines_suppressed": [
+     "nested",
+     "folx3_proj"
+    ]
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "D": 12,
+    "H": 16,
+    "B": 2048,
+    "regime": "vg",
+    "pkg3_ms": 179.458277,
+    "predicted_vs_full_seed": 1.0,
+    "predicted_vs_inner_proj": 1.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 0.5608945285484357,
+      "lower95": 0.5581812988843295
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 0.3261102509038108,
+      "lower95": 0.3238641591051738
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 0.5450161274576864,
+      "lower95": 0.5446688858534168
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 0.9990441891872691,
+      "lower95": 0.9959383008212797
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 0.3261102509038108,
+    "lower95_vs_full_seed": 0.3238641591051738,
+    "theory_ratio_vs_full_seed": 0.3261102509038108,
+    "measured_vs_inner_proj": 0.9990441891872691,
+    "lower95_vs_inner_proj": 0.9959383008212797,
+    "theory_ratio_vs_inner_proj": 0.9990441891872691,
+    "gate": "control or below the registered D >= 2H region",
+    "baselines_suppressed": [
+     "nested",
+     "folx3_proj"
+    ]
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "D": 12,
+    "H": 16,
+    "B": 2048,
+    "regime": "forward",
+    "pkg3_ms": 24.976672,
+    "predicted_vs_full_seed": 1.0,
+    "predicted_vs_inner_proj": 1.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 0.8154696425270699,
+      "lower95": 0.8076623105948734
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 0.7414855255995247,
+      "lower95": 0.7349253020778936
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 0.6048113316322513,
+      "lower95": 0.5983093251064567
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 1.000987968436953,
+      "lower95": 0.9925180002437265
+     }
+    },
+    "strongest_full_seed": "jet",
+    "measured_vs_full_seed": 0.6048113316322513,
+    "lower95_vs_full_seed": 0.5983093251064567,
+    "theory_ratio_vs_full_seed": 0.6048113316322513,
+    "measured_vs_inner_proj": 1.000987968436953,
+    "lower95_vs_inner_proj": 0.9925180002437265,
+    "theory_ratio_vs_inner_proj": 1.000987968436953,
+    "gate": "control or below the registered D >= 2H region",
+    "baselines_suppressed": [
+     "nested",
+     "folx3_proj"
+    ]
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "D": 12,
+    "H": 16,
+    "B": 2048,
+    "regime": "vg",
+    "pkg3_ms": 177.965544,
+    "predicted_vs_full_seed": 1.0,
+    "predicted_vs_inner_proj": 1.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 0.555991935270492,
+      "lower95": 0.5544347443640467
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 0.35441273856722605,
+      "lower95": 0.3467854751241036
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 0.5678683486887568,
+      "lower95": 0.5637840079128047
+     },
+     "nested": {
+      "baseline": "nested",
+      "n": 3,
+      "ratio": 4.369333854853445,
+      "lower95": 4.358614289409676
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 1.0010553751045002,
+      "lower95": 0.9995868266396517
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 0.35441273856722605,
+    "lower95_vs_full_seed": 0.3467854751241036,
+    "theory_ratio_vs_full_seed": 0.35441273856722605,
+    "measured_vs_inner_proj": 1.0010553751045002,
+    "lower95_vs_inner_proj": 0.9995868266396517,
+    "theory_ratio_vs_inner_proj": 1.0010553751045002,
+    "gate": "control or below the registered D >= 2H region",
+    "baselines_suppressed": [
+     "folx3_proj"
+    ]
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "D": 24,
+    "H": 8,
+    "B": 2048,
+    "regime": "forward",
+    "pkg3_ms": 6.047959,
+    "predicted_vs_full_seed": 22.662650602409638,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 13.435965058215453,
+      "lower95": 12.347772392969933
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 9.788815404403627,
+      "lower95": 8.97858555587913
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 11.74104368248285,
+      "lower95": 10.727049146091305
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.070351337923109,
+      "lower95": 2.8279319253850814
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.4245719046756577,
+      "lower95": 0.3697801795565651
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 9.788815404403627,
+    "lower95_vs_full_seed": 8.97858555587913,
+    "theory_ratio_vs_full_seed": 0.4319360332618294,
+    "measured_vs_inner_proj": 3.070351337923109,
+    "lower95_vs_inner_proj": 2.8279319253850814,
+    "theory_ratio_vs_inner_proj": 1.0234504459743696,
+    "parity_vs_folx3_proj": 0.4245719046756577,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "nested"
+    ]
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "D": 24,
+    "H": 8,
+    "B": 2048,
+    "regime": "vg",
+    "pkg3_ms": 20.267789,
+    "predicted_vs_full_seed": 22.662650602409638,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 17.05741425584658,
+      "lower95": 16.53000151386533
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 7.3448505275410065,
+      "lower95": 7.114159026805619
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 6.011875606258658,
+      "lower95": 5.8261457609371226
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.5179028026646356,
+      "lower95": 0.5014705971991346
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 7.3448505275410065,
+    "lower95_vs_full_seed": 7.114159026805619,
+    "theory_ratio_vs_full_seed": 0.3240949461913363,
+    "measured_vs_inner_proj": 6.011875606258658,
+    "lower95_vs_inner_proj": 5.8261457609371226,
+    "theory_ratio_vs_inner_proj": 2.0039585354195526,
+    "parity_vs_folx3_proj": 0.5179028026646356,
+    "parity_pass": true,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "D": 24,
+    "H": 8,
+    "B": 2048,
+    "regime": "forward",
+    "pkg3_ms": 5.587637,
+    "predicted_vs_full_seed": 22.662650602409638,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 14.030614100353137,
+      "lower95": 13.166335810195871
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 5.950529054269507,
+      "lower95": 5.593036198344084
+     },
+     "jet": {
+      "baseline": "jet",
+      "n": 3,
+      "ratio": 12.185049366806192,
+      "lower95": 11.482999370361581
+     },
+     "nested": {
+      "baseline": "nested",
+      "n": 3,
+      "ratio": 178.9027216368928,
+      "lower95": 167.9276804676965
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.2114194439872814,
+      "lower95": 3.0130606658597556
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.44407371234793835,
+      "lower95": 0.4104558311133122
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 5.950529054269507,
+    "lower95_vs_full_seed": 5.593036198344084,
+    "theory_ratio_vs_full_seed": 0.26256986257542214,
+    "measured_vs_inner_proj": 3.2114194439872814,
+    "lower95_vs_inner_proj": 3.0130606658597556,
+    "theory_ratio_vs_inner_proj": 1.0704731479957605,
+    "parity_vs_folx3_proj": 0.44407371234793835,
+    "parity_pass": false,
+    "gate": "PASS"
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "D": 24,
+    "H": 8,
+    "B": 2048,
+    "regime": "vg",
+    "pkg3_ms": 19.529292,
+    "predicted_vs_full_seed": 22.662650602409638,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 17.309970731928907,
+      "lower95": 16.460593013369675
+     },
+     "folx3": {
+      "baseline": "folx3",
+      "n": 3,
+      "ratio": 7.777644823550664,
+      "lower95": 7.406545381779364
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 6.148885598644474,
+      "lower95": 5.844377279980395
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.5569248586988824,
+      "lower95": 0.5352268275115014
+     }
+    },
+    "strongest_full_seed": "folx3",
+    "measured_vs_full_seed": 7.777644823550664,
+    "lower95_vs_full_seed": 7.406545381779364,
+    "theory_ratio_vs_full_seed": 0.3431921958291893,
+    "measured_vs_inner_proj": 6.148885598644474,
+    "lower95_vs_inner_proj": 5.844377279980395,
+    "theory_ratio_vs_inner_proj": 2.0496285328814916,
+    "parity_vs_folx3_proj": 0.5569248586988824,
+    "parity_pass": true,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "D": 48,
+    "H": 16,
+    "B": 1024,
+    "regime": "forward",
+    "pkg3_ms": 27.175332,
+    "predicted_vs_full_seed": 24.77319587628866,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 34.26571111346025,
+      "lower95": 34.08829622072087
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 2.9553528625530667,
+      "lower95": 2.9332420296735964
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.43971128272426885,
+      "lower95": 0.4269588000692644
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 34.26571111346025,
+    "lower95_vs_full_seed": 34.08829622072087,
+    "theory_ratio_vs_full_seed": 1.38317685310264,
+    "measured_vs_inner_proj": 2.9553528625530667,
+    "lower95_vs_inner_proj": 2.9332420296735964,
+    "theory_ratio_vs_inner_proj": 0.9851176208510223,
+    "parity_vs_folx3_proj": 0.43971128272426885,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "D": 48,
+    "H": 16,
+    "B": 1024,
+    "regime": "vg",
+    "pkg3_ms": 142.42837,
+    "predicted_vs_full_seed": 24.77319587628866,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 16.18456915215834,
+      "lower95": 16.15384384127491
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 2.9505471487634964,
+      "lower95": 2.9486579709432705
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.3170601006167257,
+      "lower95": 0.3133285339505097
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 16.18456915215834,
+    "lower95_vs_full_seed": 16.15384384127491,
+    "theory_ratio_vs_full_seed": 0.6533096994420969,
+    "measured_vs_inner_proj": 2.9505471487634964,
+    "lower95_vs_inner_proj": 2.9486579709432705,
+    "theory_ratio_vs_inner_proj": 0.9835157162544989,
+    "parity_vs_folx3_proj": 0.3170601006167257,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "D": 48,
+    "H": 16,
+    "B": 1024,
+    "regime": "forward",
+    "pkg3_ms": 27.089263,
+    "predicted_vs_full_seed": 24.77319587628866,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 34.342522125918606,
+      "lower95": 33.84454455107647
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 2.9588623879383524,
+      "lower95": 2.924081297882406
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.3996392267140294,
+      "lower95": 0.39177077443239705
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 34.342522125918606,
+    "lower95_vs_full_seed": 33.84454455107647,
+    "theory_ratio_vs_full_seed": 1.3862774224777796,
+    "measured_vs_inner_proj": 2.9588623879383524,
+    "lower95_vs_inner_proj": 2.924081297882406,
+    "theory_ratio_vs_inner_proj": 0.9862874626461174,
+    "parity_vs_folx3_proj": 0.3996392267140294,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "D": 48,
+    "H": 16,
+    "B": 1024,
+    "regime": "vg",
+    "pkg3_ms": 140.945903,
+    "predicted_vs_full_seed": 24.77319587628866,
+    "predicted_vs_inner_proj": 3.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 16.351431405433633,
+      "lower95": 16.276880474821702
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 2.973401550568097,
+      "lower95": 2.96975078866575
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.351758831910168,
+      "lower95": 0.34713390886968176
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 16.351431405433633,
+    "lower95_vs_full_seed": 16.276880474821702,
+    "theory_ratio_vs_full_seed": 0.6600452960162556,
+    "measured_vs_inner_proj": 2.973401550568097,
+    "lower95_vs_inner_proj": 2.96975078866575,
+    "theory_ratio_vs_inner_proj": 0.9911338501893656,
+    "parity_vs_folx3_proj": 0.351758831910168,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "D": 64,
+    "H": 16,
+    "B": 512,
+    "regime": "forward",
+    "pkg3_ms": 15.48305,
+    "predicted_vs_full_seed": 58.103092783505154,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 71.2377532693164,
+      "lower95": 70.7579831590339
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.88816658517876,
+      "lower95": 3.877698067455535
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.3919742070352403,
+      "lower95": 0.375794840641403
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 71.2377532693164,
+    "lower95_vs_full_seed": 70.7579831590339,
+    "theory_ratio_vs_full_seed": 1.2260578543512581,
+    "measured_vs_inner_proj": 3.88816658517876,
+    "lower95_vs_inner_proj": 3.877698067455535,
+    "theory_ratio_vs_inner_proj": 0.97204164629469,
+    "parity_vs_folx3_proj": 0.3919742070352403,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "D": 64,
+    "H": 16,
+    "B": 512,
+    "regime": "vg",
+    "pkg3_ms": 79.724885,
+    "predicted_vs_full_seed": 58.103092783505154,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 32.81552470497707,
+      "lower95": 32.403663696329104
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.9197723025624063,
+      "lower95": 3.914397590771821
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.30164252275764064,
+      "lower95": 0.3002783315253702
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 32.81552470497707,
+    "lower95_vs_full_seed": 32.403663696329104,
+    "theory_ratio_vs_full_seed": 0.5647810320054606,
+    "measured_vs_inner_proj": 3.9197723025624063,
+    "lower95_vs_inner_proj": 3.914397590771821,
+    "theory_ratio_vs_inner_proj": 0.9799430756406016,
+    "parity_vs_folx3_proj": 0.30164252275764064,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "D": 64,
+    "H": 16,
+    "B": 512,
+    "regime": "forward",
+    "pkg3_ms": 15.282511,
+    "predicted_vs_full_seed": 58.103092783505154,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 72.818017023597,
+      "lower95": 72.78477220332601
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.935660310275025,
+      "lower95": 3.9301100924077903
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.40961433102582595,
+      "lower95": 0.38459735220871993
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 72.818017023597,
+    "lower95_vs_full_seed": 72.78477220332601,
+    "theory_ratio_vs_full_seed": 1.253255438482773,
+    "measured_vs_inner_proj": 3.935660310275025,
+    "lower95_vs_inner_proj": 3.9301100924077903,
+    "theory_ratio_vs_inner_proj": 0.9839150775687563,
+    "parity_vs_folx3_proj": 0.40961433102582595,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "D": 64,
+    "H": 16,
+    "B": 512,
+    "regime": "vg",
+    "pkg3_ms": 79.020568,
+    "predicted_vs_full_seed": 58.103092783505154,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 32.83475252536183,
+      "lower95": 32.75391949625111
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.9437900046431364,
+      "lower95": 3.9284472543551026
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.32345318075595675,
+      "lower95": 0.32121790389046473
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 32.83475252536183,
+    "lower95_vs_full_seed": 32.75391949625111,
+    "theory_ratio_vs_full_seed": 0.56511195794182,
+    "measured_vs_inner_proj": 3.9437900046431364,
+    "lower95_vs_inner_proj": 3.9284472543551026,
+    "theory_ratio_vs_inner_proj": 0.9859475011607841,
+    "parity_vs_folx3_proj": 0.32345318075595675,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "D": 96,
+    "H": 16,
+    "B": 128,
+    "regime": "forward",
+    "pkg3_ms": 4.731082,
+    "predicted_vs_full_seed": 194.04123711340208,
+    "predicted_vs_inner_proj": 6.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 209.0728555514281,
+      "lower95": 196.5925637475725
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 5.931108604430259,
+      "lower95": 5.5780160985429275
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.46704826234786206,
+      "lower95": 0.43456333194923447
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 209.0728555514281,
+    "lower95_vs_full_seed": 196.5925637475725,
+    "theory_ratio_vs_full_seed": 1.0774661028843122,
+    "measured_vs_inner_proj": 5.931108604430259,
+    "lower95_vs_inner_proj": 5.5780160985429275,
+    "theory_ratio_vs_inner_proj": 0.9885181007383764,
+    "parity_vs_folx3_proj": 0.46704826234786206,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "D": 96,
+    "H": 16,
+    "B": 128,
+    "regime": "vg",
+    "pkg3_ms": 16.677631,
+    "predicted_vs_full_seed": 194.04123711340208,
+    "predicted_vs_inner_proj": 6.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 129.30343791402086,
+      "lower95": 125.83915073384715
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 8.256538813460308,
+      "lower95": 8.020864450822113
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.5808787116386707,
+      "lower95": 0.5263414118935505
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 129.30343791402086,
+    "lower95_vs_full_seed": 125.83915073384715,
+    "theory_ratio_vs_full_seed": 0.6663709211380312,
+    "measured_vs_inner_proj": 8.256538813460308,
+    "lower95_vs_inner_proj": 8.020864450822113,
+    "theory_ratio_vs_inner_proj": 1.3760898022433847,
+    "parity_vs_folx3_proj": 0.5808787116386707,
+    "parity_pass": true,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "D": 96,
+    "H": 16,
+    "B": 128,
+    "regime": "forward",
+    "pkg3_ms": 4.593931,
+    "predicted_vs_full_seed": 194.04123711340208,
+    "predicted_vs_inner_proj": 6.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 212.49087926505206,
+      "lower95": 197.83014320894793
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 6.353453858063762,
+      "lower95": 5.518438714209866
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.4896053180097162,
+      "lower95": 0.4578552874836478
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 212.49087926505206,
+    "lower95_vs_full_seed": 197.83014320894793,
+    "theory_ratio_vs_full_seed": 1.095081037547022,
+    "measured_vs_inner_proj": 6.353453858063762,
+    "lower95_vs_inner_proj": 5.518438714209866,
+    "theory_ratio_vs_inner_proj": 1.0589089763439603,
+    "parity_vs_folx3_proj": 0.4896053180097162,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "D": 96,
+    "H": 16,
+    "B": 128,
+    "regime": "vg",
+    "pkg3_ms": 16.338344,
+    "predicted_vs_full_seed": 194.04123711340208,
+    "predicted_vs_inner_proj": 6.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 133.8326421867399,
+      "lower95": 128.29908154885115
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 8.50127870276135,
+      "lower95": 8.112897912557052
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.5742815478165659,
+      "lower95": 0.491408260311256
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 133.8326421867399,
+    "lower95_vs_full_seed": 128.29908154885115,
+    "theory_ratio_vs_full_seed": 0.6897123733988826,
+    "measured_vs_inner_proj": 8.50127870276135,
+    "lower95_vs_inner_proj": 8.112897912557052,
+    "theory_ratio_vs_inner_proj": 1.4168797837935585,
+    "parity_vs_folx3_proj": 0.5742815478165659,
+    "parity_pass": true,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "D": 96,
+    "H": 24,
+    "B": 128,
+    "regime": "forward",
+    "pkg3_ms": 18.279802,
+    "predicted_vs_full_seed": 60.038277511961724,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 77.0153124801193,
+      "lower95": 75.8431101071693
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.8955529151617148,
+      "lower95": 3.8413639510014526
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.37447711894045127,
+      "lower95": 0.3499666402585203
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 77.0153124801193,
+    "lower95_vs_full_seed": 75.8431101071693,
+    "theory_ratio_vs_full_seed": 1.2827701871489428,
+    "measured_vs_inner_proj": 3.8955529151617148,
+    "lower95_vs_inner_proj": 3.8413639510014526,
+    "theory_ratio_vs_inner_proj": 0.9738882287904287,
+    "parity_vs_folx3_proj": 0.37447711894045127,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "D": 96,
+    "H": 24,
+    "B": 128,
+    "regime": "vg",
+    "pkg3_ms": 90.407563,
+    "predicted_vs_full_seed": 60.038277511961724,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 36.01633086052979,
+      "lower95": 35.715471969103234
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.931724615626924,
+      "lower95": 3.8973602063354025
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.3541289002656259,
+      "lower95": 0.352111798399891
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 36.01633086052979,
+    "lower95_vs_full_seed": 35.715471969103234,
+    "theory_ratio_vs_full_seed": 0.5998894763986872,
+    "measured_vs_inner_proj": 3.931724615626924,
+    "lower95_vs_inner_proj": 3.8973602063354025,
+    "theory_ratio_vs_inner_proj": 0.982931153906731,
+    "parity_vs_folx3_proj": 0.3541289002656259,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "D": 96,
+    "H": 24,
+    "B": 128,
+    "regime": "forward",
+    "pkg3_ms": 18.135887,
+    "predicted_vs_full_seed": 60.038277511961724,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 77.30797809624417,
+      "lower95": 76.01268511169137
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.918281183387691,
+      "lower95": 3.8602900938187936
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.38996420605889864,
+      "lower95": 0.38150871812795084
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 77.30797809624417,
+    "lower95_vs_full_seed": 76.01268511169137,
+    "theory_ratio_vs_full_seed": 1.287644837592846,
+    "measured_vs_inner_proj": 3.918281183387691,
+    "lower95_vs_inner_proj": 3.8602900938187936,
+    "theory_ratio_vs_inner_proj": 0.9795702958469228,
+    "parity_vs_folx3_proj": 0.38996420605889864,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "D": 96,
+    "H": 24,
+    "B": 128,
+    "regime": "vg",
+    "pkg3_ms": 90.186074,
+    "predicted_vs_full_seed": 60.038277511961724,
+    "predicted_vs_inner_proj": 4.0,
+    "ratios": {
+     "full_comp": {
+      "baseline": "full_comp",
+      "n": 3,
+      "ratio": 36.02642059966447,
+      "lower95": 35.98472038773299
+     },
+     "inner_proj": {
+      "baseline": "inner_proj",
+      "n": 3,
+      "ratio": 3.938340511901021,
+      "lower95": 3.933780966567791
+     },
+     "folx3_proj": {
+      "baseline": "folx3_proj",
+      "n": 3,
+      "ratio": 0.373639623709032,
+      "lower95": 0.36974372585478016
+     }
+    },
+    "strongest_full_seed": "full_comp",
+    "measured_vs_full_seed": 36.02642059966447,
+    "lower95_vs_full_seed": 35.98472038773299,
+    "theory_ratio_vs_full_seed": 0.6000575315054092,
+    "measured_vs_inner_proj": 3.938340511901021,
+    "lower95_vs_inner_proj": 3.933780966567791,
+    "theory_ratio_vs_inner_proj": 0.9845851279752552,
+    "parity_vs_folx3_proj": 0.373639623709032,
+    "parity_pass": false,
+    "gate": "PASS",
+    "baselines_suppressed": [
+     "folx3",
+     "jet",
+     "nested"
+    ]
+   }
+  ],
+  "audit": {
+   "pass": false,
+   "checks": {
+    "A1": {
+     "records": 396,
+     "without_gpu_device": []
+    },
+    "A3": {
+     "missing": []
+    },
+    "A4": {
+     "unqualified_or_missing": [
+      [
+       "nested",
+       "forward",
+       "{'workload': 'p3_trilap', 'cell': 't12_16', 'D': 12, 'H': 16, 'depth': 3, 'B': 2"
+      ],
+      [
+       "nested",
+       "forward",
+       "{'workload': 'p3_trilap', 'cell': 't12_16', 'D': 12, 'H': 16, 'depth': 3, 'B': 2"
+      ],
+      [
+       "nested",
+       "vg",
+       "{'workload': 'p3_trilap', 'cell': 't12_16', 'D': 12, 'H': 16, 'depth': 3, 'B': 2"
+      ]
+     ]
+    },
+    "A5": {
+     "ratios_compared": 84,
+     "max_relative_difference": 0.0
+    }
+   },
+   "failures": [
+    {
+     "check": "A4",
+     "detail": "3 rep-0 members not qualified"
+    }
+   ],
+   "recorded_member_failures": [
+    {
+     "member": "jet/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'tri', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [executable_name='jit_vg'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "jet/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'tri', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "jet/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'tri', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 77.63GiB. [executable_name='jit_vg'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "nested/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'tri', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [executable_name='jit_vg'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "nested/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'tri', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [executable_name='jit_vg'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "nested/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'tri', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 117.71GiB. [executable_name='jit_vg'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "nested/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "nested/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "nested/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 48.70GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "jet/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "jet/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "jet/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.76GiB. [executable_name='jit_vg'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "nested/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.29GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "nested/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.31GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "nested/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't24_8', 'D': 24, 'H': 8, 'depth': 3, 'B': 2048, 'op': 'pfc', 'see",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 126.29GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "folx3/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'tri', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'tri', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'tri', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.75GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'tri', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "folx3/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'tri', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "folx3/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'tri', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 80.72GiB. [executable_name='jit_vg'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'pfc', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'pfc', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'pfc', 's",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 44.04GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'pfc', 's",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.1056, %get-tuple-element.1016,"
+    },
+    {
+     "member": "folx3/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'pfc', 's",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.1056, %get-tuple-element.1016,"
+    },
+    {
+     "member": "folx3/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't48_16', 'D': 48, 'H': 16, 'depth': 3, 'B': 1024, 'op': 'pfc', 's",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.52 = f64[1024,16,48,48,48]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.1056, %get-tuple-element.1016,"
+    },
+    {
+     "member": "folx3/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "folx3/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 50.60GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.996, %get-tuple-element.969, %i"
+    },
+    {
+     "member": "folx3/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.996, %get-tuple-element.969, %i"
+    },
+    {
+     "member": "folx3/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.54 = f64[512,16,64,64,64]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.996, %get-tuple-element.969, %i"
+    },
+    {
+     "member": "folx3/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "folx3/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 51.11GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example failure: \\nAutotuning failed for HLO: %input_transpose_fusion.2 = f64[512,16,64,64,6"
+    },
+    {
+     "member": "folx3/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example failure: \\nAutotuning failed for HLO: %input_transpose_fusion.2 = f64[512,16,64,64,6"
+    },
+    {
+     "member": "folx3/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't64_16', 'D': 64, 'H': 16, 'depth': 3, 'B': 512, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Failed to get configs for: 6 out of 363 instructions. See logs for all failures. Example failure: \\nAutotuning failed for HLO: %input_transpose_fusion.2 = f64[512,16,64,64,6"
+    },
+    {
+     "member": "folx3/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "folx3/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.64GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "folx3/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.960, %get-tuple-element.931, %i"
+    },
+    {
+     "member": "folx3/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.960, %get-tuple-element.931, %i"
+    },
+    {
+     "member": "folx3/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.73 = f64[128,16,96,96,96]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.960, %get-tuple-element.931, %i"
+    },
+    {
+     "member": "folx3/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "folx3/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 42.08GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "folx3/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [executable_name='jit_vg'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "folx3/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_16', 'D': 96, 'H': 16, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 85.03GiB. [tf-allocator-allocation-error=''] [executable_name='jit_vg']\")"
+    },
+    {
+     "member": "folx3/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "folx3/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 43.32GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Failed to get configs for: 4 out of 375 instructions. See logs for all failures. Example failure: \\nAutotuning failed for HLO: %gemm_fusion_dot.1002 = f64[2048,24,24]{2,1,0}"
+    },
+    {
+     "member": "folx3/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %gemm_fusion_dot.302 = f64[113246208,24]{1,0} fusion(%get-tuple-element.130, %args_2_.1), kind=kCustom, calls=%gemm_fusion_dot.302_computation, me"
+    },
+    {
+     "member": "folx3/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'tri', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %gemm_fusion_dot.302 = f64[113246208,24]{1,0} fusion(%get-tuple-element.130, %args_2_.1), kind=kCustom, calls=%gemm_fusion_dot.302_computation, me"
+    },
+    {
+     "member": "folx3/forward/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [executable_name='jit_fwd'] [tf-allocator-allocation-error='']\")"
+    },
+    {
+     "member": "folx3/forward/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError(\"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 62.48GiB. [tf-allocator-allocation-error=''] [executable_name='jit_fwd']\")"
+    },
+    {
+     "member": "folx3/vg/r0",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.1075, %get-tuple-element.1053, "
+    },
+    {
+     "member": "folx3/vg/r1",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.1075, %get-tuple-element.1053, "
+    },
+    {
+     "member": "folx3/vg/r2",
+     "cfg": "{'workload': 'p3_trilap', 'cell': 't96_24', 'D': 96, 'H': 24, 'depth': 3, 'B': 128, 'op': 'pfc', 'se",
+     "status": "error",
+     "error": "JaxRuntimeError('INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.72 = f64[128,24,96,96,96]{4,3,2,1,0} fusion(%input_transpose_fusion.10, %get-tuple-element.1075, %get-tuple-element.1053, "
+    }
+   ]
+  }
+ },
+ "full_size_accuracy": {
+  "candidate": "pkg3",
+  "worst_relative_deviation": 1.0514890475385049e-14,
+  "rows": [
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "folx3",
+    "max_relative": 6.150996529543628e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 1.230199305908726e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 6.15099652954363e-17
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "jet",
+    "max_relative": 4.6747573624531814e-15
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "nested",
+    "max_relative": 3.6905979177261785e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "folx3",
+    "max_relative": 2.58996591577991e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 1.8741649005920037e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 1.8741649005920037e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "jet",
+    "max_relative": 8.894796304677652e-15
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "nested",
+    "max_relative": 5.641980921149259e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "folx3",
+    "max_relative": 7.646737583623589e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 7.965351649607909e-17
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 1.2744562639372654e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "jet",
+    "max_relative": 4.7154881765679044e-15
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "nested",
+    "max_relative": 5.097825055749062e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "folx3",
+    "max_relative": 4.526540971078927e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 2.038565846338157e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 1.8986414803626356e-16
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "jet",
+    "max_relative": 1.0514890475385049e-14
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "nested",
+    "max_relative": 1.508846990359644e-15
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "forward",
+    "member": "folx3",
+    "max_relative": 4.933336428621146e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 6.278791818245098e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 4.484851298746496e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 3.587881038997197e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "forward",
+    "member": "jet",
+    "max_relative": 4.41625818244563e-15
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "forward",
+    "member": "nested",
+    "max_relative": 4.0363661688718465e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "vg",
+    "member": "folx3",
+    "max_relative": 6.641854782094527e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 1.3700177157587808e-15
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 7.309928602598704e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 3.654964301299349e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "folx3",
+    "max_relative": 4.62168908448811e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 6.470364718283356e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 4.1595201760392993e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 3.697351267590488e-16
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "jet",
+    "max_relative": 4.5851215180906564e-15
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "folx3",
+    "max_relative": 1.2031021563488565e-15
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 2.4062043126977157e-15
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 1.031230419727591e-15
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 7.253208365412912e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 3.1851081515881843e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 6.370216303176364e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 3.185108151588183e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 5.243569689780945e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 1.518112165922391e-15
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 5.826188544201047e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 3.3189024302421366e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 6.637804860484268e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 2.171274065272641e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 6.963078923411797e-16
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 1.3994946653315223e-15
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 7.316199648937603e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 5.248671268941225e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 5.24867126894122e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 1.7495570896470737e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 4.804317124820979e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 1.3102683067693576e-15
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 6.240757926429183e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 3.4396775008052895e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 6.879355001610573e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 3.4396775008052875e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 6.4100750744456575e-16
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 1.4422668917502718e-15
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 6.413464989683497e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 6.147320153898723e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 4.098213435932483e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 2.049106717966242e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 7.494235289495244e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 5.967072334132647e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 3.5323090443447095e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 6.427962333289044e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 3.9556691281778734e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 1.9778345640889372e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 7.868428548104567e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 5.160829321933165e-16
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 1.9994980143309978e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 6.755944027763776e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 2.8149766782349067e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 2.2519813425879254e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 9.60191118322815e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 5.852977393723936e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 4.1877636896025227e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "folx3_proj",
+    "max_relative": 6.978480271321954e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "full_comp",
+    "max_relative": 2.326160090440651e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "regime": "forward",
+    "member": "inner_proj",
+    "max_relative": 2.326160090440651e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "folx3_proj",
+    "max_relative": 1.0234805372922392e-15
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "full_comp",
+    "max_relative": 5.03024321587658e-16
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "regime": "vg",
+    "member": "inner_proj",
+    "max_relative": 2.766633768732117e-16
+   }
+  ]
+ },
+ "cold_cost": {
+  "candidate": "pkg3",
+  "rows": [
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "regime": "forward",
+    "candidate_cold_ms": 8124.596394598484,
+    "candidate_steady_ms": 27.175332,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 11.9016,
+      "cold_ms": 13055.45735731721
+     },
+     "full_comp": {
+      "steady_ms": 932.580072,
+      "cold_ms": 7459.735665470362
+     },
+     "inner_proj": {
+      "steady_ms": 80.315191,
+      "cold_ms": 7790.30703753233
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t48_16",
+    "op": "pfc",
+    "regime": "vg",
+    "candidate_cold_ms": 26271.212853491306,
+    "candidate_steady_ms": 142.42837,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 44.97961,
+      "cold_ms": 36636.60941272974
+     },
+     "full_comp": {
+      "steady_ms": 2306.280695,
+      "cold_ms": 20478.003337979317
+     },
+     "inner_proj": {
+      "steady_ms": 420.420366,
+      "cold_ms": 29053.24761196971
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "regime": "forward",
+    "candidate_cold_ms": 6330.74190095067,
+    "candidate_steady_ms": 27.089263,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 10.770881,
+      "cold_ms": 12252.963222563267
+     },
+     "full_comp": {
+      "steady_ms": 929.368169,
+      "cold_ms": 5470.850773155689
+     },
+     "inner_proj": {
+      "steady_ms": 80.088433,
+      "cold_ms": 6753.1891241669655
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t48_16",
+    "op": "tri",
+    "regime": "vg",
+    "candidate_cold_ms": 24706.435654312372,
+    "candidate_steady_ms": 140.945903,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 49.794479,
+      "cold_ms": 38308.658577501774
+     },
+     "full_comp": {
+      "steady_ms": 2305.868936,
+      "cold_ms": 16762.950465083122
+     },
+     "inner_proj": {
+      "steady_ms": 419.000782,
+      "cold_ms": 26007.51981139183
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "regime": "forward",
+    "candidate_cold_ms": 7052.05398099497,
+    "candidate_steady_ms": 4.731082,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 2.174705,
+      "cold_ms": 9861.422625835985
+     },
+     "full_comp": {
+      "steady_ms": 968.875116,
+      "cold_ms": 6913.526234682649
+     },
+     "inner_proj": {
+      "steady_ms": 27.481739,
+      "cold_ms": 8084.164394065738
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t96_16",
+    "op": "pfc",
+    "regime": "vg",
+    "candidate_cold_ms": 19453.028197400272,
+    "candidate_steady_ms": 16.677631,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 9.548079,
+      "cold_ms": 34540.59506673366
+     },
+     "full_comp": {
+      "steady_ms": 2168.176995,
+      "cold_ms": 20079.770996700972
+     },
+     "inner_proj": {
+      "steady_ms": 138.291617,
+      "cold_ms": 24933.645422104746
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "regime": "forward",
+    "candidate_cold_ms": 5759.73942829296,
+    "candidate_steady_ms": 4.593931,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 2.226909,
+      "cold_ms": 9643.838218413293
+     },
+     "full_comp": {
+      "steady_ms": 965.540564,
+      "cold_ms": 5065.880412701517
+     },
+     "inner_proj": {
+      "steady_ms": 27.627527,
+      "cold_ms": 6925.4890801385045
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t96_16",
+    "op": "tri",
+    "regime": "vg",
+    "candidate_cold_ms": 17770.97941096872,
+    "candidate_steady_ms": 16.338344,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 8.92899,
+      "cold_ms": 35628.15904663876
+     },
+     "full_comp": {
+      "steady_ms": 2159.919666,
+      "cold_ms": 14116.39928817749
+     },
+     "inner_proj": {
+      "steady_ms": 137.128839,
+      "cold_ms": 22804.69117173925
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "regime": "forward",
+    "candidate_cold_ms": 8952.790327370167,
+    "candidate_steady_ms": 18.279802,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 6.71108,
+      "cold_ms": 11807.0276863873
+     },
+     "full_comp": {
+      "steady_ms": 1415.307896,
+      "cold_ms": 8005.278244614601
+     },
+     "inner_proj": {
+      "steady_ms": 71.587179,
+      "cold_ms": 7614.544324576855
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t96_24",
+    "op": "pfc",
+    "regime": "vg",
+    "candidate_cold_ms": 34846.71377018094,
+    "candidate_steady_ms": 90.407563,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 31.986379,
+      "cold_ms": 39199.130449444056
+     },
+     "full_comp": {
+      "steady_ms": 3260.492994,
+      "cold_ms": 22804.460681974888
+     },
+     "inner_proj": {
+      "steady_ms": 355.954103,
+      "cold_ms": 33475.3642603755
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "regime": "forward",
+    "candidate_cold_ms": 7616.314150393009,
+    "candidate_steady_ms": 18.135887,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 7.107121,
+      "cold_ms": 11559.053882956505
+     },
+     "full_comp": {
+      "steady_ms": 1409.854742,
+      "cold_ms": 5047.164965420961
+     },
+     "inner_proj": {
+      "steady_ms": 71.503061,
+      "cold_ms": 6580.531105399132
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t96_24",
+    "op": "tri",
+    "regime": "vg",
+    "candidate_cold_ms": 29741.02232605219,
+    "candidate_steady_ms": 90.186074,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 33.691056,
+      "cold_ms": 43508.18909704685
+     },
+     "full_comp": {
+      "steady_ms": 3249.225954,
+      "cold_ms": 18489.310920238495
+     },
+     "inner_proj": {
+      "steady_ms": 355.151297,
+      "cold_ms": 35532.60776773095
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "forward",
+    "candidate_cold_ms": 6294.364165514708,
+    "candidate_steady_ms": 25.344313,
+    "members": {
+     "folx3": {
+      "steady_ms": 10.779505,
+      "cold_ms": 10833.81698653102
+     },
+     "full_comp": {
+      "steady_ms": 20.810389,
+      "cold_ms": 5343.680448830128
+     },
+     "inner_proj": {
+      "steady_ms": 25.250726,
+      "cold_ms": 6045.106261968613
+     },
+     "jet": {
+      "steady_ms": 15.605294,
+      "cold_ms": 3026.830729097128
+     },
+     "nested": {
+      "steady_ms": 128.160665,
+      "cold_ms": 14936.301443725824
+     }
+    },
+    "strongest": "folx3"
+   },
+   {
+    "cell": "t12_16",
+    "op": "pfc",
+    "regime": "vg",
+    "candidate_cold_ms": 23135.908644646406,
+    "candidate_steady_ms": 179.458277,
+    "members": {
+     "folx3": {
+      "steady_ms": 58.605636,
+      "cold_ms": 35699.80075210333
+     },
+     "full_comp": {
+      "steady_ms": 100.842176,
+      "cold_ms": 20286.73768788576
+     },
+     "inner_proj": {
+      "steady_ms": 179.544772,
+      "cold_ms": 24743.55635419488
+     },
+     "jet": {
+      "steady_ms": 97.787782,
+      "cold_ms": 13571.402583271265
+     },
+     "nested": {
+      "steady_ms": 531.382021,
+      "cold_ms": 78995.96359208226
+     }
+    },
+    "strongest": "folx3"
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "forward",
+    "candidate_cold_ms": 5829.763382673264,
+    "candidate_steady_ms": 24.976672,
+    "members": {
+     "folx3": {
+      "steady_ms": 18.527157,
+      "cold_ms": 9721.085533499718
+     },
+     "full_comp": {
+      "steady_ms": 20.382265,
+      "cold_ms": 4622.214328497648
+     },
+     "inner_proj": {
+      "steady_ms": 24.996984,
+      "cold_ms": 6812.388684600592
+     },
+     "jet": {
+      "steady_ms": 15.142532,
+      "cold_ms": 2830.8212012052536
+     },
+     "nested": {
+      "steady_ms": 142.113395,
+      "cold_ms": 17393.297735601664
+     }
+    },
+    "strongest": "jet"
+   },
+   {
+    "cell": "t12_16",
+    "op": "tri",
+    "regime": "vg",
+    "candidate_cold_ms": 20871.238436549902,
+    "candidate_steady_ms": 177.965544,
+    "members": {
+     "folx3": {
+      "steady_ms": 63.229432,
+      "cold_ms": 39509.048752486706
+     },
+     "full_comp": {
+      "steady_ms": 98.982771,
+      "cold_ms": 18109.94315892458
+     },
+     "inner_proj": {
+      "steady_ms": 178.133883,
+      "cold_ms": 21425.79811811447
+     },
+     "jet": {
+      "steady_ms": 100.826905,
+      "cold_ms": 13965.419705957174
+     },
+     "nested": {
+      "steady_ms": 777.670418,
+      "cold_ms": 62815.083514899015
+     }
+    },
+    "strongest": "folx3"
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "forward",
+    "candidate_cold_ms": 4567.101518623531,
+    "candidate_steady_ms": 6.047959,
+    "members": {
+     "folx3": {
+      "steady_ms": 58.285517,
+      "cold_ms": 9913.291023112833
+     },
+     "folx3_proj": {
+      "steady_ms": 2.576553,
+      "cold_ms": 13590.346429962665
+     },
+     "full_comp": {
+      "steady_ms": 79.982446,
+      "cold_ms": 5304.063324816525
+     },
+     "inner_proj": {
+      "steady_ms": 18.256804,
+      "cold_ms": 5288.831341546029
+     },
+     "jet": {
+      "steady_ms": 69.760526,
+      "cold_ms": 3802.1465349011123
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t24_8",
+    "op": "pfc",
+    "regime": "vg",
+    "candidate_cold_ms": 15862.677928991616,
+    "candidate_steady_ms": 20.267789,
+    "members": {
+     "folx3": {
+      "steady_ms": 149.101601,
+      "cold_ms": 38185.82771392539
+     },
+     "folx3_proj": {
+      "steady_ms": 10.475486,
+      "cold_ms": 27977.560722269118
+     },
+     "full_comp": {
+      "steady_ms": 346.177207,
+      "cold_ms": 16920.680476352572
+     },
+     "inner_proj": {
+      "steady_ms": 122.097864,
+      "cold_ms": 21985.033532604575
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "forward",
+    "candidate_cold_ms": 6199.328477028757,
+    "candidate_steady_ms": 5.587637,
+    "members": {
+     "folx3": {
+      "steady_ms": 33.691567,
+      "cold_ms": 10325.068371836096
+     },
+     "folx3_proj": {
+      "steady_ms": 2.552568,
+      "cold_ms": 11336.183676030487
+     },
+     "full_comp": {
+      "steady_ms": 79.466212,
+      "cold_ms": 4159.688477404416
+     },
+     "inner_proj": {
+      "steady_ms": 18.203127,
+      "cold_ms": 5671.598761342466
+     },
+     "jet": {
+      "steady_ms": 68.9714,
+      "cold_ms": 3044.5632450282574
+     },
+     "nested": {
+      "steady_ms": 1013.097219,
+      "cold_ms": 38501.58987706527
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t24_8",
+    "op": "tri",
+    "regime": "vg",
+    "candidate_cold_ms": 14531.035817228258,
+    "candidate_steady_ms": 19.529292,
+    "members": {
+     "folx3": {
+      "steady_ms": 154.008421,
+      "cold_ms": 35319.671960081905
+     },
+     "folx3_proj": {
+      "steady_ms": 11.005259,
+      "cold_ms": 29043.432888109237
+     },
+     "full_comp": {
+      "steady_ms": 342.993991,
+      "cold_ms": 16403.627292253077
+     },
+     "inner_proj": {
+      "steady_ms": 121.829959,
+      "cold_ms": 19713.672763668
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "regime": "forward",
+    "candidate_cold_ms": 6894.494693726301,
+    "candidate_steady_ms": 15.48305,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 6.156867,
+      "cold_ms": 10926.275549456477
+     },
+     "full_comp": {
+      "steady_ms": 1105.844376,
+      "cold_ms": 5547.055403701961
+     },
+     "inner_proj": {
+      "steady_ms": 60.257718,
+      "cold_ms": 7515.5830746516585
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t64_16",
+    "op": "pfc",
+    "regime": "vg",
+    "candidate_cold_ms": 28433.490010909736,
+    "candidate_steady_ms": 79.724885,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 24.058624,
+      "cold_ms": 31748.980316333473
+     },
+     "full_comp": {
+      "steady_ms": 2604.554473,
+      "cold_ms": 17485.808453522623
+     },
+     "inner_proj": {
+      "steady_ms": 312.723057,
+      "cold_ms": 27584.820149466395
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "regime": "forward",
+    "candidate_cold_ms": 6172.836314886808,
+    "candidate_steady_ms": 15.282511,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 6.149406,
+      "cold_ms": 9612.217843532562
+     },
+     "full_comp": {
+      "steady_ms": 1112.913859,
+      "cold_ms": 4874.3618773296475
+     },
+     "inner_proj": {
+      "steady_ms": 60.111738,
+      "cold_ms": 6633.366127498448
+     }
+    },
+    "strongest": "folx3_proj"
+   },
+   {
+    "cell": "t64_16",
+    "op": "tri",
+    "regime": "vg",
+    "candidate_cold_ms": 26752.86039710045,
+    "candidate_steady_ms": 79.020568,
+    "members": {
+     "folx3_proj": {
+      "steady_ms": 25.537082,
+      "cold_ms": 33208.818754181266
+     },
+     "full_comp": {
+      "steady_ms": 2596.227322,
+      "cold_ms": 14228.97638566792
+     },
+     "inner_proj": {
+      "steady_ms": 311.848255,
+      "cold_ms": 27192.074282094836
+     }
+    },
+    "strongest": "folx3_proj"
+   }
+  ]
+ }
+}

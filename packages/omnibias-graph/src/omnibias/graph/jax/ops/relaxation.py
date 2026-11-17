@@ -86,5 +86,12 @@ def soft_top_k(scores: Array, k: int, *, temperature: float = 1.0) -> Array:
     n = scores.reshape(-1).shape[0]
     if k < 1 or k > n:
         raise ValueError(f"k must be in [1, {n}]; got {k}")
-    p = soft_sort_permutation(scores, temperature=temperature, descending=True)
-    return p[:k, :].sum(axis=0)
+    if temperature <= 0.0:
+        raise ValueError(f"temperature must be > 0; got {temperature}")
+    s = scores.reshape(-1)
+    # SoftSort normalizes each row independently; unrequested rows cannot
+    # contribute. Keep the same sort (including tie gradients), but only form
+    # the k-by-n distances instead of the complete n-by-n permutation.
+    targets = jnp.sort(s)[::-1][:k]
+    dist = jnp.abs(targets[:, None] - s[None, :])
+    return jax.nn.softmax(-dist / temperature, axis=-1).sum(axis=0)

@@ -1,0 +1,5 @@
+noise_percent,relu_final_accuracy_percent,relu_std_pp,mb_final_accuracy_percent,mb_std_pp
+10,89.67,0.39,89.2,0.6
+20,86.01,0.21,85.27,0.43
+30,82.13,0.19,80.93,0.56
+40,77.8,0.45,75.46,0.19

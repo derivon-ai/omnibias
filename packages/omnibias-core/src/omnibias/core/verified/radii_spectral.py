@@ -368,8 +368,14 @@ def _weight(nu: float, k: Wavevector) -> Interval:
     return Interval.point(nu).pow_int(sum(abs(ki) for ki in k))
 
 
+def _require_finite(series: ValidatedFourierSeries) -> None:
+    if series.tail.hi or series.global_remainder.hi:
+        raise ValueError("finite spectral operation requires zero tail and global remainder")
+
+
 def _apply_finite_symbol(series: ValidatedFourierSeries, symbol: Symbol) -> ValidatedFourierSeries:
-    """``ell * series`` for a finite (zero-tail) series and a diagonal symbol."""
+    """``ell * series`` for a finite (zero-remainder) series and a diagonal symbol."""
+    _require_finite(series)
     coeffs = {k: symbol(k) * v for k, v in series.coeffs.items()}
     return ValidatedFourierSeries(series.dim, series.trunc, series.nu, coeffs, Interval.point(0.0))
 
@@ -391,6 +397,7 @@ def _apply_finite_banded(
     ``SpectralProblem.nu: float``; this module never uses the anisotropic
     per-axis form of :data:`~omnibias.core.verified.fourier.NuLike`).
     """
+    _require_finite(series)
     trunc = series.trunc
     support = list(series.coeffs)
     out_indices: set[Wavevector] = set(support)
@@ -441,8 +448,10 @@ class _SplitInverse:
     the caller's ``mu`` bound. This is strictly *sound* (``mu`` bounds the
     banded tail operator's norm, so scaling any enclosed magnitude by it is a
     valid enclosure of that magnitude's image) but looser than the diagonal
-    case's exact per-mode inverse on the shell -- the cost of admitting a
-    non-diagonal linear part, not a soundness gap.
+    case's exact per-mode inverse on the shell. The aggregate goes into a
+    global remainder, since these shell modes lie inside ``work_trunc``.
+    An input global remainder is propagated by the full operator norm,
+    including the finite inverse block, rather than merely by ``mu``.
     """
 
     def __init__(
@@ -472,8 +481,15 @@ class _SplitInverse:
         self.trunc = trunc
 
     def apply(self, w: ValidatedFourierSeries) -> ValidatedFourierSeries:
+        if (w.dim, w.trunc, w.nu) != (self.dim, self.work_trunc, self.nu):
+            raise ValueError("split inverse input must match its dimension, work truncation and weight")
         n = len(self.modes)
-        v = [w.get(self.modes[j]) for j in range(n)]
+        # Apply to the finite representative. Its global uncertainty is handled
+        # once through the complete operator norm below, not copied per mode.
+        v = [w.coeffs.get(self.modes[j], ComplexInterval.zero()) for j in range(n)]
+        global_error = Interval.point(0.0)
+        if w.global_remainder.hi:
+            global_error = _clip_nonneg(w.global_remainder * Interval.point(self.op_norm()))
         out: dict[Wavevector, ComplexInterval] = {}
         for i in range(n):
             acc = ComplexInterval.zero()
@@ -488,7 +504,10 @@ class _SplitInverse:
             for m, val in w.coeffs.items():
                 if any(abs(c) > self.trunc for c in m):
                     extra = extra + Interval.point(val.mag) * _weight(self.nu, m)
-            tail = (w.tail + extra) * Interval.point(self.mu)
+            aggregate = _clip_nonneg((w.tail + extra) * Interval.point(self.mu))
+            if aggregate.hi:
+                global_error = _clip_nonneg(global_error + aggregate)
+            tail = Interval.point(0.0)
         else:
             assert self.symbol is not None
             one = ComplexInterval.one()
@@ -497,7 +516,7 @@ class _SplitInverse:
                     out[m] = (one / self.symbol(m)) * val
             tail = w.tail * Interval.point(self.mu)
         tail = _clip_nonneg(tail)
-        return ValidatedFourierSeries(self.dim, self.work_trunc, self.nu, out, tail)
+        return ValidatedFourierSeries(self.dim, self.work_trunc, self.nu, out, tail, global_error)
 
     def op_norm(self) -> float:
         """Weighted-l1 operator norm ``max(||A_N||, mu)``."""
@@ -545,6 +564,9 @@ class _Assembled:
 
     def df_apply(self, h: ValidatedFourierSeries) -> ValidatedFourierSeries:
         """``DF(ab) h`` for a finite ``h`` (supported on ``||k||inf <= N``)."""
+        _require_finite(h)
+        if any(any(abs(kd) > self.problem.trunc for kd in k) for k in h.coeffs):
+            raise ValueError("finite Jacobian input must be supported inside the finite block")
         out = ValidatedFourierSeries.zero(self.problem.dim, self.problem.work_trunc, self.problem.nu)
         for col, k in zip(self.df_cols, self.modes, strict=True):
             out = out + col.scale(h.get(k))

@@ -21,7 +21,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 import torch
-from omnibias.fields._core.quadrature import QuadratureSpec
+from omnibias.fields._core.quadrature import QuadratureSpec, _converted
 from omnibias.fields.torch.ops.basic import gradient, value
 from torch import Tensor
 from torch.func import jacfwd, vmap
@@ -42,11 +42,19 @@ def quadrature_nodes(rule: QuadratureSpec, *, like: Tensor) -> Tensor:
     like
         A tensor whose dtype and device the nodes should match.
     """
-    return torch.as_tensor(rule.nodes, dtype=like.dtype, device=like.device)
+    return _converted(
+        rule,
+        ("nodes", like.dtype, like.device),
+        lambda: torch.as_tensor(rule.nodes, dtype=like.dtype, device=like.device),
+    )
 
 
 def _weights(rule: QuadratureSpec, ref: Tensor) -> Tensor:
-    return torch.as_tensor(rule.weights, dtype=ref.dtype, device=ref.device)
+    return _converted(
+        rule,
+        ("weights", ref.dtype, ref.device),
+        lambda: torch.as_tensor(rule.weights, dtype=ref.dtype, device=ref.device),
+    )
 
 
 def integrate(state: FieldState, name: str, *, rule: QuadratureSpec) -> Tensor:

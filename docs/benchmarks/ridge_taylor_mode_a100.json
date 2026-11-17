@@ -1,0 +1,4633 @@
+{
+ "schema": "omnibias-benchmark/ridge-taylor-mode-a100/v1",
+ "what": "secondary analysis (not the pre-registered comparison of that run): float64 value-and-gradient of mean-square operator residuals of one-hidden-layer ridge networks; XLA closed-form programs vs structure-aware and network-level Taylor-mode AD",
+ "hardware": "one NVIDIA A100-SXM4-80GB (exclusive), JAX 0.10.2 with jaxlib 0.10.2 CUDA 12 plugins, CPython 3.12",
+ "protocol": {
+  "precision": "float64",
+  "repetitions": "3 fresh processes (paired by repetition, rotating method order)",
+  "warmups": 3,
+  "samples": 51,
+  "statistic": "ratio = strongest-control median / candidate median per tier; lower95 = exp(mean(log r) - 2.920 sd(log r)/sqrt(3)); strongest control = smallest mean log median among qualified tier members",
+  "qualification": "every compared method: loss and gradients vs 40-digit mpmath on a row subset (gradients atol 1e-8 / rtol 2e-9, values 1e-9 / 2e-10, scaled); full-size outputs finite and digest-checked",
+  "status": {
+   "significant_2x": "lower95 >= 2",
+   "lower95_ge_1": "1 <= lower95 < 2",
+   "parity": "lower95 < 1 <= ratio or ratio < 1 <= upper bound",
+   "loss": "candidate slower with confidence",
+   "partial": "an applicable tier member failed (e.g. out of memory) or did not qualify; never promoted",
+   "suppressed": "no applicable tier member ran"
+  },
+  "fairness": "identical data, initialisation, loss and float64 inputs for every method; compilation excluded (value-and-gradient steady state)"
+ },
+ "tiers": {
+  "taylor_structure_aware": "Taylor mode in the ridge variable z per hidden unit, combined with exact operator-symbol amplitudes (exploits the one-layer ridge structure)",
+  "taylor_network_level": "network-level higher-order AD of u(x): JAX Taylor mode (jet) and collapsed Taylor mode along exact polarization directions (run when <= 400 directions), nested forward-mode AD per monomial (run when the monomial work is bounded), folx forward Laplacian (Delta to Delta^3 only)"
+ },
+ "candidates": {
+  "closed_vjp2": "tanh benchmark program reproduced by omnibias.jax.experimental.tanh_ridge_residual_loss",
+  "esym_vjp": "sin benchmark program reproduced by omnibias.jax.experimental.closed_ridge_residual_loss",
+  "struct_closed": "autodiff of the tanh closed-form symbol for general multi-index operators (no shipped module; reported because it loses)"
+ },
+ "aggregates": [
+  {
+   "role": "secondary_analysis",
+   "family": "pde_losses",
+   "candidate": "closed_vjp2",
+   "tier": "taylor_network_level",
+   "cells": 16,
+   "input_dims": [
+    2
+   ],
+   "lower95_ge_1": 2,
+   "significant_2x": 14,
+   "geomean_ratio_complete_tiers": 3.478130738437328,
+   "ratio_range_complete_tiers": [
+    1.926100533375633,
+    11.859069160625339
+   ]
+  },
+  {
+   "role": "secondary_analysis",
+   "family": "pde_losses",
+   "candidate": "closed_vjp2",
+   "tier": "taylor_structure_aware",
+   "cells": 16,
+   "input_dims": [
+    2
+   ],
+   "lower95_ge_1": 16,
+   "geomean_ratio_complete_tiers": 1.3446065087054582,
+   "ratio_range_complete_tiers": [
+    1.1610369417622786,
+    1.5736769815758807
+   ]
+  },
+  {
+   "role": "secondary_analysis",
+   "family": "sin_operators",
+   "candidate": "esym_vjp",
+   "tier": "taylor_network_level",
+   "cells": 48,
+   "input_dims": [
+    2,
+    3,
+    5,
+    12
+   ],
+   "lower95_ge_1": 13,
+   "partial": 3,
+   "significant_2x": 26,
+   "suppressed": 6,
+   "geomean_ratio_complete_tiers": 2.9702479481948902,
+   "ratio_range_complete_tiers": [
+    1.3941377125647216,
+    190.8597260821748
+   ]
+  },
+  {
+   "role": "secondary_analysis",
+   "family": "sin_operators",
+   "candidate": "esym_vjp",
+   "tier": "taylor_structure_aware",
+   "cells": 48,
+   "input_dims": [
+    2,
+    3,
+    5,
+    12
+   ],
+   "lower95_ge_1": 48,
+   "geomean_ratio_complete_tiers": 1.3537050994788589,
+   "ratio_range_complete_tiers": [
+    1.127199904399178,
+    1.9530984960154378
+   ]
+  },
+  {
+   "role": "secondary_analysis",
+   "family": "tanh_operators",
+   "candidate": "closed_vjp2",
+   "tier": "taylor_network_level",
+   "cells": 20,
+   "input_dims": [
+    2,
+    3,
+    5,
+    12
+   ],
+   "lower95_ge_1": 4,
+   "partial": 4,
+   "significant_2x": 9,
+   "suppressed": 3,
+   "geomean_ratio_complete_tiers": 6.096194122219496,
+   "ratio_range_complete_tiers": [
+    1.3336513068973914,
+    49.66671632548584
+   ]
+  },
+  {
+   "role": "secondary_analysis",
+   "family": "tanh_operators",
+   "candidate": "closed_vjp2",
+   "tier": "taylor_structure_aware",
+   "cells": 20,
+   "input_dims": [
+    2,
+    3,
+    5,
+    12
+   ],
+   "lower95_ge_1": 18,
+   "parity": 2,
+   "geomean_ratio_complete_tiers": 1.3482181850876611,
+   "ratio_range_complete_tiers": [
+    1.0158430518370214,
+    1.6788311819362975
+   ]
+  },
+  {
+   "role": "secondary_analysis",
+   "family": "tanh_operators",
+   "candidate": "struct_closed",
+   "tier": "taylor_network_level",
+   "cells": 28,
+   "input_dims": [
+    2,
+    3,
+    5,
+    12
+   ],
+   "lower95_ge_1": 7,
+   "partial": 2,
+   "significant_2x": 18,
+   "suppressed": 1,
+   "geomean_ratio_complete_tiers": 2.9781871875963257,
+   "ratio_range_complete_tiers": [
+    1.4990681553972718,
+    13.29682741058174
+   ]
+  },
+  {
+   "role": "secondary_analysis",
+   "family": "tanh_operators",
+   "candidate": "struct_closed",
+   "tier": "taylor_structure_aware",
+   "cells": 28,
+   "input_dims": [
+    2,
+    3,
+    5,
+    12
+   ],
+   "loss": 28,
+   "geomean_ratio_complete_tiers": 0.642791529471244,
+   "ratio_range_complete_tiers": [
+    0.5439253083481798,
+    0.8015890131157996
+   ]
+  }
+ ],
+ "rows": [
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.882062,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.040101,
+   "speed_ratio": 1.167183759573138,
+   "lower95": 1.136305353936117
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.887782,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.110452,
+   "speed_ratio": 1.235593675964386,
+   "lower95": 1.203835643098678
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap4",
+    "operator_definition": "Delta^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.829292,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.263653,
+   "speed_ratio": 1.5108527325051062,
+   "lower95": 1.4103644549825534
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.877781,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.128642,
+   "speed_ratio": 1.2801183388065667,
+   "lower95": 1.224884129417643
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.896262,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.278733,
+   "speed_ratio": 1.3752834401164142,
+   "lower95": 1.215529335737318
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.900212,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.186551,
+   "speed_ratio": 1.3434962953982474,
+   "lower95": 1.3056160602373799
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.89297,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.379733,
+   "speed_ratio": 1.55116380066169,
+   "lower95": 1.512236996590803
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.899262,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.084033,
+   "speed_ratio": 1.2028411592512018,
+   "lower95": 1.1461065084238617
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.871241,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.075464,
+   "speed_ratio": 1.225705628358231,
+   "lower95": 1.2033379770184547
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx8",
+    "operator_definition": "d_1^8",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.873811,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.259053,
+   "speed_ratio": 1.4296011912459872,
+   "lower95": 1.3902266895181359
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.876392,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.648324,
+   "speed_ratio": 1.9530984960154378,
+   "lower95": 1.841298926365938
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.873641,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.012482,
+   "speed_ratio": 1.151193687264643,
+   "lower95": 1.1314875971270797
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.882062,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 8.485972,
+   "speed_ratio": 9.561430916312306,
+   "lower95": 9.340662975881656
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.887782,
+   "status": "suppressed",
+   "failed_tier_members": {}
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap4",
+    "operator_definition": "Delta^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.829292,
+   "status": "suppressed",
+   "failed_tier_members": {}
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.877781,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 2.841665,
+   "speed_ratio": 3.190429585205033,
+   "lower95": 3.062287654257489
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.896262,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.046884,
+   "speed_ratio": 2.26826951230316,
+   "lower95": 2.2050880187767965
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.900212,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 8.243369,
+   "speed_ratio": 9.2049133903209,
+   "lower95": 8.736891071414664
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.89297,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.831944,
+   "speed_ratio": 2.0571069668233486,
+   "lower95": 2.0000045258771864
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.899262,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.262463,
+   "speed_ratio": 1.3941377125647216,
+   "lower95": 1.3325257979341365
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.871241,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.811917,
+   "speed_ratio": 2.0553116300442764,
+   "lower95": 1.9919153638037066
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx8",
+    "operator_definition": "d_1^8",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.873811,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.592244,
+   "speed_ratio": 1.7641466227668243,
+   "lower95": 1.6278504287572
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.876392,
+   "status": "suppressed",
+   "failed_tier_members": {}
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.873641,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.312302,
+   "speed_ratio": 1.4994776560825305,
+   "lower95": 1.4927230864773635
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx8",
+    "operator_definition": "d_1^8",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.853469,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.264849,
+   "speed_ratio": 1.4793058797554708,
+   "lower95": 1.4216520556237273
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.84462,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.073999,
+   "speed_ratio": 1.2526843789352209,
+   "lower95": 1.2128594341297705
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.873399,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.604249,
+   "speed_ratio": 1.7961390570572604,
+   "lower95": 1.651858171496142
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.871388,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.017718,
+   "speed_ratio": 1.1656342133237154,
+   "lower95": 1.1516170535567458
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.862729,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.16836,
+   "speed_ratio": 1.3832607101304515,
+   "lower95": 1.2762071135998159
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.86652,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.077369,
+   "speed_ratio": 1.252005380726984,
+   "lower95": 1.2030966587281724
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.863679,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.225259,
+   "speed_ratio": 1.4270579607659382,
+   "lower95": 1.3921313949099596
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap4",
+    "operator_definition": "Delta^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.84487,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.259279,
+   "speed_ratio": 1.4814593601913273,
+   "lower95": 1.43220639716074
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.86691,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.36278,
+   "speed_ratio": 1.57144441542239,
+   "lower95": 1.5510679153210005
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.86905,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.07387,
+   "speed_ratio": 1.2024394698712086,
+   "lower95": 1.1059283427836142
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.751258,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.245961,
+   "speed_ratio": 1.6535731365734903,
+   "lower95": 1.6362360509268468
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.868889,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.005789,
+   "speed_ratio": 1.1531771393739438,
+   "lower95": 1.132923604132968
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx8",
+    "operator_definition": "d_1^8",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.853469,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.673409,
+   "speed_ratio": 1.9733890555797908,
+   "lower95": 1.921278111057237
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.84462,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.298969,
+   "speed_ratio": 1.5234167157851377,
+   "lower95": 1.4725913348936013
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.873399,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 8.245974,
+   "speed_ratio": 9.434635681229416,
+   "lower95": 9.260633049328906
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.871388,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.314999,
+   "speed_ratio": 1.5023376459774993,
+   "lower95": 1.4709336060547245
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.862729,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 3.026218,
+   "speed_ratio": 3.522516327644484,
+   "lower95": 3.494897335789899
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.86652,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.105572,
+   "speed_ratio": 3.5917091903287637,
+   "lower95": 3.55668827831224
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.863679,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.335038,
+   "speed_ratio": 2.7241870831943444,
+   "lower95": 2.6604882371793073
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap4",
+    "operator_definition": "Delta^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.84487,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 6.440505,
+   "speed_ratio": 7.655878359287472,
+   "lower95": 7.247563638355244
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.86691,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.933968,
+   "speed_ratio": 2.2253386398344874,
+   "lower95": 2.103484870435504
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.86905,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.973269,
+   "speed_ratio": 2.28403451689069,
+   "lower95": 2.2137280659991165
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.751258,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.985647,
+   "speed_ratio": 2.636454440254477,
+   "lower95": 2.618836720848824
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.868889,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.877749,
+   "speed_ratio": 2.1682028279083494,
+   "lower95": 2.1252468661167114
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76052,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.872189,
+   "speed_ratio": 1.145429443842978,
+   "lower95": 1.141165953796445
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.743819,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.865159,
+   "speed_ratio": 1.1605240451280148,
+   "lower95": 1.0783498466099268
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.773629,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.145828,
+   "speed_ratio": 1.489265563202105,
+   "lower95": 1.468990242690335
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.696449,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.028739,
+   "speed_ratio": 1.472890346806253,
+   "lower95": 1.4311704387865454
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx8",
+    "operator_definition": "d_1^8",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.768039,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.067719,
+   "speed_ratio": 1.3725233848256204,
+   "lower95": 1.3361980721041717
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76279,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.87569,
+   "speed_ratio": 1.1653671763052804,
+   "lower95": 1.110950848986332
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76801,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.875709,
+   "speed_ratio": 1.1466247286257603,
+   "lower95": 1.1281368637641178
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76948,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.04822,
+   "speed_ratio": 1.3832256351986938,
+   "lower95": 1.2962351535527805
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.77167,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.344188,
+   "speed_ratio": 1.7432763625842456,
+   "lower95": 1.7241389498989812
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap4",
+    "operator_definition": "Delta^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.75951,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.07835,
+   "speed_ratio": 1.4335966745374082,
+   "lower95": 1.3551953198536828
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76951,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.883869,
+   "speed_ratio": 1.166033896329051,
+   "lower95": 1.093531310475533
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76427,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.97266,
+   "speed_ratio": 1.2831977752462704,
+   "lower95": 1.2517415501912177
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76052,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.234218,
+   "speed_ratio": 2.945128813675089,
+   "lower95": 2.8868067514715787
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.743819,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.09981,
+   "speed_ratio": 1.4712381526401412,
+   "lower95": 1.396592618892189
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.773629,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.665578,
+   "speed_ratio": 2.171130524406732,
+   "lower95": 2.1292229235631033
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.696449,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.627799,
+   "speed_ratio": 2.339825059307573,
+   "lower95": 2.3008743485237417
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx8",
+    "operator_definition": "d_1^8",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.768039,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.283901,
+   "speed_ratio": 1.6821148427123003,
+   "lower95": 1.6344156059788537
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76279,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 4.856371,
+   "speed_ratio": 6.426264741036332,
+   "lower95": 6.186976972588557
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76801,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.104419,
+   "speed_ratio": 1.4439999866101625,
+   "lower95": 1.4214954031515186
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76948,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.528578,
+   "speed_ratio": 3.3480932319279604,
+   "lower95": 3.157796853840686
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.77167,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_collapsed",
+   "strongest_control_median_ms": 147.276082,
+   "speed_ratio": 190.8597260821748,
+   "lower95": 189.56397359564846
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap4",
+    "operator_definition": "Delta^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.75951,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 68.91GiB. [tf-",
+    "net_jet": "error: 'INTERNAL: Autotuning failed for HLO: %input_reduce_fusion.8 = f64[45,256,"
+   }
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76951,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.641238,
+   "speed_ratio": 2.1665148157512855,
+   "lower95": 2.0335726940507066
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.76427,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 2.509988,
+   "speed_ratio": 3.2462544688622095,
+   "lower95": 3.0917591534053086
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.710756,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.82065,
+   "speed_ratio": 1.1646993649611088,
+   "lower95": 1.1036883774757436
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.692141,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.845377,
+   "speed_ratio": 1.2242470561264058,
+   "lower95": 1.1703616600315905
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.68662,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.807796,
+   "speed_ratio": 1.1731180325771813,
+   "lower95": 1.1394138039870212
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.719632,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.800573,
+   "speed_ratio": 1.127199904399178,
+   "lower95": 1.0969782504980607
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.700857,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.840928,
+   "speed_ratio": 1.1908273671859626,
+   "lower95": 1.1292936679740102
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.707348,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.086316,
+   "speed_ratio": 1.539479375082249,
+   "lower95": 1.522292119712798
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.695827,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 1.295375,
+   "speed_ratio": 1.8609830449618083,
+   "lower95": 1.7645199328314862
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.718009,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.983885,
+   "speed_ratio": 1.3807547802032696,
+   "lower95": 1.2689612918993451
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap4",
+    "operator_definition": "Delta^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.699945,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.970309,
+   "speed_ratio": 1.3911474424383008,
+   "lower95": 1.380322147272071
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.703733,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.934702,
+   "speed_ratio": 1.3215192762556682,
+   "lower95": 1.290901032245411
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.560855,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.930495,
+   "speed_ratio": 1.6373030174107668,
+   "lower95": 1.5588130882559466
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx8",
+    "operator_definition": "d_1^8",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.702129,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.989144,
+   "speed_ratio": 1.4342725224733763,
+   "lower95": 1.386549946868845
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.710756,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 53.06GiB. [exe"
+   },
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 10.778538,
+   "speed_ratio": 15.157087306861744,
+   "lower95": 14.302802945910638
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.692141,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.03015,
+   "speed_ratio": 1.4876842354813258,
+   "lower95": 1.4011359797301357
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.68662,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.03552,
+   "speed_ratio": 1.481285243677348,
+   "lower95": 1.4005551635690048
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.719632,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.244089,
+   "speed_ratio": 4.57113119218951,
+   "lower95": 4.390269676786612
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.700857,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 53.06GiB. [exe"
+   },
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.556021,
+   "speed_ratio": 2.2108163178434483,
+   "lower95": 2.116223491976306
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.707348,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.564086,
+   "speed_ratio": 2.2259555928430146,
+   "lower95": 2.1138068496831948
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.695827,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 283.22GiB. [tf",
+    "net_jet": "error: 'INTERNAL: Autotuning failed for HLO: %input_reduce_fusion.14 = f64[256,19"
+   }
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.718009,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.351559,
+   "speed_ratio": 4.661250331130289,
+   "lower95": 4.139295631919586
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap4",
+    "operator_definition": "Delta^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.699945,
+   "status": "suppressed",
+   "failed_tier_members": {}
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.703733,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 256.97GiB. [tf",
+    "net_jet": "error: 'INTERNAL: Autotuning failed for HLO: %input_reduce_fusion.12 = f64[210,25"
+   },
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 2.66045,
+   "speed_ratio": 3.6931261794390844,
+   "lower95": 3.454665384196086
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.560855,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.521337,
+   "speed_ratio": 2.702613775199034,
+   "lower95": 2.653807740631339
+  },
+  {
+   "config": {
+    "activation": "sin",
+    "operator": "dx8",
+    "operator_definition": "d_1^8",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "esym_vjp",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.702129,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.346881,
+   "speed_ratio": 1.94139898472073,
+   "lower95": 1.863623710285553
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.704949,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.705059,
+   "speed_ratio": 1.0158430518370214,
+   "lower95": 0.9460705478372923
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.738949,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.201129,
+   "speed_ratio": 1.5619694180301362,
+   "lower95": 1.3867729221710527
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.74085,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.907829,
+   "speed_ratio": 1.2670420521634569,
+   "lower95": 1.1846387672101173
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.734209,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.911329,
+   "speed_ratio": 1.2503036080247174,
+   "lower95": 1.2165398505927059
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.946629,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.503639,
+   "speed_ratio": 1.5790505972926157,
+   "lower95": 1.533028175719269
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.101229,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.856999,
+   "speed_ratio": 0.778457519828546,
+   "lower95": 0.7691852505370897
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.304989,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.047689,
+   "speed_ratio": 0.8015890131157996,
+   "lower95": 0.7919045531757576
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.191269,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.718089,
+   "speed_ratio": 0.5920581795527015,
+   "lower95": 0.5377232446500654
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.250519,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.823899,
+   "speed_ratio": 0.6512503586807593,
+   "lower95": 0.6198283483889998
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.185389,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.92382,
+   "speed_ratio": 0.7799327914493202,
+   "lower95": 0.7606305689918221
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "advdiff",
+    "operator_definition": "sum_d cos(d+1) d_d + 0.1 Delta",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.350229,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.817549,
+   "speed_ratio": 0.6020909788980607,
+   "lower95": 0.5868881584071662
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed11",
+    "operator_definition": "mixed11",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.158059,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.701969,
+   "speed_ratio": 0.6042929594292186,
+   "lower95": 0.5871675287616637
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.704949,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.024349,
+   "speed_ratio": 1.464605652855341,
+   "lower95": 1.3615391209898275
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.738949,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "net_folx": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 98.47GiB. [exe"
+   }
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.74085,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_collapsed",
+   "strongest_control_median_ms": 2.874102,
+   "speed_ratio": 3.986256409842375,
+   "lower95": 3.708772590409375
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.734209,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 18.751704,
+   "speed_ratio": 25.554309173221302,
+   "lower95": 25.45102192470047
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.946629,
+   "status": "suppressed",
+   "failed_tier_members": {}
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.101229,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.194759,
+   "speed_ratio": 1.9914161108373571,
+   "lower95": 1.9665257892215953
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.304989,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.684747,
+   "speed_ratio": 2.8091896908752667,
+   "lower95": 2.737997720123013
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.191269,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 9.085692,
+   "speed_ratio": 7.670017309511062,
+   "lower95": 7.533011761774832
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.250519,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 9.411363,
+   "speed_ratio": 7.60123803846403,
+   "lower95": 7.255966578727646
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.185389,
+   "status": "suppressed",
+   "failed_tier_members": {}
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "advdiff",
+    "operator_definition": "sum_d cos(d+1) d_d + 0.1 Delta",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.350229,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_collapsed",
+   "strongest_control_median_ms": 12.348513,
+   "speed_ratio": 9.235862850559124,
+   "lower95": 8.878586722158971
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed11",
+    "operator_definition": "mixed11",
+    "D": 12,
+    "H": 48,
+    "B": 262144
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.158059,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 31.64GiB. [exe"
+   },
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.698538,
+   "speed_ratio": 2.3146245282035434,
+   "lower95": 2.25754845731517
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.723414,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.968976,
+   "speed_ratio": 1.324763033910437,
+   "lower95": 1.2393297416306044
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.706372,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.755611,
+   "speed_ratio": 1.066662588741211,
+   "lower95": 1.028192456713943
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.717757,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.923089,
+   "speed_ratio": 1.2363407740320065,
+   "lower95": 1.100043508576191
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.735637,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.241077,
+   "speed_ratio": 1.6788311819362975,
+   "lower95": 1.4530721500178272
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.960874,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.548586,
+   "speed_ratio": 1.6105115554743914,
+   "lower95": 1.5925758870574678
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.438238,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.970232,
+   "speed_ratio": 0.6740579850772903,
+   "lower95": 0.6251719168769788
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "advdiff",
+    "operator_definition": "sum_d cos(d+1) d_d + 0.1 Delta",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.620453,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.914079,
+   "speed_ratio": 0.5671603127786972,
+   "lower95": 0.5475595927135578
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.296808,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.036163,
+   "speed_ratio": 0.8000151933375803,
+   "lower95": 0.7783706184269394
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.539927,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.914569,
+   "speed_ratio": 0.5897295850888179,
+   "lower95": 0.5686942775155467
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.385716,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.75568,
+   "speed_ratio": 0.5445577219167763,
+   "lower95": 0.5423593411658741
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed11",
+    "operator_definition": "mixed11",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.39759,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.765458,
+   "speed_ratio": 0.5499992643810778,
+   "lower95": 0.5454258874816337
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.619544,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.087215,
+   "speed_ratio": 0.6681172025880526,
+   "lower95": 0.652036211881672
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.723414,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 9.135914,
+   "speed_ratio": 12.551984603348172,
+   "lower95": 12.016498658580211
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.706372,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 1.018563,
+   "speed_ratio": 1.4494413566133169,
+   "lower95": 1.4015818578590113
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.717757,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.475849,
+   "speed_ratio": 4.8127620930639505,
+   "lower95": 4.749334235646626
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.735637,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_collapsed",
+   "strongest_control_median_ms": 31.980867,
+   "speed_ratio": 44.4060305963106,
+   "lower95": 40.69028764928805
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.960874,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_collapsed",
+   "strongest_control_median_ms": 47.762538,
+   "speed_ratio": 49.66671632548584,
+   "lower95": 49.47277172395525
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.438238,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 9.257437,
+   "speed_ratio": 6.47864676211907,
+   "lower95": 6.332538555856077
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "advdiff",
+    "operator_definition": "sum_d cos(d+1) d_d + 0.1 Delta",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.620453,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.174627,
+   "speed_ratio": 1.952863837115263,
+   "lower95": 1.897043509043592
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.296808,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.342889,
+   "speed_ratio": 1.8019345633645265,
+   "lower95": 1.7642304515564438
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.539927,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.422369,
+   "speed_ratio": 1.5688670649315382,
+   "lower95": 1.5589656265380667
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.385716,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.093974,
+   "speed_ratio": 1.4990681553972718,
+   "lower95": 1.4595290375225718
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed11",
+    "operator_definition": "mixed11",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.39759,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.90539,
+   "speed_ratio": 2.0916633482576366,
+   "lower95": 2.0609661615677592
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 2,
+    "H": 384,
+    "B": 40960
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.619544,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 4.052251,
+   "speed_ratio": 2.504020975157067,
+   "lower95": 2.4906808959751863
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.56933,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.73764,
+   "speed_ratio": 1.3215388381894433,
+   "lower95": 1.2591978905556342
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.56868,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.617739,
+   "speed_ratio": 1.0902256994898973,
+   "lower95": 1.0644223589177477
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.560939,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.736269,
+   "speed_ratio": 1.3159192077837796,
+   "lower95": 1.2692852270468744
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.57354,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.903479,
+   "speed_ratio": 1.6270729917362354,
+   "lower95": 1.4439640497212654
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.75773,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.276238,
+   "speed_ratio": 1.6772701201735103,
+   "lower95": 1.6449887117006345
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.104578,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.617909,
+   "speed_ratio": 0.5561884713631722,
+   "lower95": 0.5375048137113613
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "advdiff",
+    "operator_definition": "sum_d cos(d+1) d_d + 0.1 Delta",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.295909,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.749739,
+   "speed_ratio": 0.5785392916981891,
+   "lower95": 0.5664430060317498
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed11",
+    "operator_definition": "mixed11",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.110869,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.602739,
+   "speed_ratio": 0.5439253083481798,
+   "lower95": 0.5324713438329047
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.112129,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.734069,
+   "speed_ratio": 0.665914688819607,
+   "lower95": 0.6465348653350974
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.193699,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.743539,
+   "speed_ratio": 0.6243082152179962,
+   "lower95": 0.618827809353821
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.249609,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.88981,
+   "speed_ratio": 0.7137135155593599,
+   "lower95": 0.6937563626356411
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.029509,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.762039,
+   "speed_ratio": 0.7466048637282041,
+   "lower95": 0.7201427710858715
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.56933,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.799211,
+   "speed_ratio": 4.97758392764911,
+   "lower95": 4.740146666952418
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.56868,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 0.819279,
+   "speed_ratio": 1.4449093464571887,
+   "lower95": 1.4041742946606657
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.560939,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 7.265884,
+   "speed_ratio": 13.15843902620115,
+   "lower95": 12.235946687209905
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.57354,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 55.93GiB. [tf-"
+   },
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 89.585253,
+   "speed_ratio": 156.22555679501588,
+   "lower95": 152.63742733868938
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.75773,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 56.78GiB. [tf-"
+   },
+   "strongest_control": "net_collapsed",
+   "strongest_control_median_ms": 167.047818,
+   "speed_ratio": 220.22351123864604,
+   "lower95": 216.16428163851336
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.104578,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.421008,
+   "speed_ratio": 2.190990743698643,
+   "lower95": 2.189276443668342
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "advdiff",
+    "operator_definition": "sum_d cos(d+1) d_d + 0.1 Delta",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.295909,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.568647,
+   "speed_ratio": 2.790225580029168,
+   "lower95": 2.6797071864622133
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed11",
+    "operator_definition": "mixed11",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.110869,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.404317,
+   "speed_ratio": 2.168458808383814,
+   "lower95": 2.1109468517087544
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.112129,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 14.786947,
+   "speed_ratio": 13.29682741058174,
+   "lower95": 13.272100248847048
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.193699,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.683537,
+   "speed_ratio": 2.253360669793438,
+   "lower95": 2.238458446974979
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.249609,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.305637,
+   "speed_ratio": 2.6445224675606496,
+   "lower95": 2.6069301942396126
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 3,
+    "H": 96,
+    "B": 131072
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.029509,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.950278,
+   "speed_ratio": 1.902392931405262,
+   "lower95": 1.8906935913892955
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.665654,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.06551,
+   "speed_ratio": 1.6098017515028185,
+   "lower95": 1.5773660476276368
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.642394,
+   "status": "parity",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.670889,
+   "speed_ratio": 1.035453097628339,
+   "lower95": 0.9992980799913592
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.653849,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.822234,
+   "speed_ratio": 1.2777673758861379,
+   "lower95": 1.1999181970000783
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.651474,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.82419,
+   "speed_ratio": 1.220991783875539,
+   "lower95": 1.0404413234347452
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.85499,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 1.328021,
+   "speed_ratio": 1.560718582979124,
+   "lower95": 1.5394845560606745
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.249868,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.80862,
+   "speed_ratio": 0.6462534563743845,
+   "lower95": 0.636695995723843
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.176187,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.67515,
+   "speed_ratio": 0.5755690517824715,
+   "lower95": 0.5726087472906605
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "advdiff",
+    "operator_definition": "sum_d cos(d+1) d_d + 0.1 Delta",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.363567,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.802817,
+   "speed_ratio": 0.5904197428074571,
+   "lower95": 0.5869056793364502
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.183728,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.830825,
+   "speed_ratio": 0.7006448169631284,
+   "lower95": 0.6938473929700659
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed11",
+    "operator_definition": "mixed11",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.172841,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_jet",
+   "strongest_control_median_ms": 0.670401,
+   "speed_ratio": 0.5701832620061463,
+   "lower95": 0.5648170734679326
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.110467,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.819929,
+   "speed_ratio": 0.7499782962790024,
+   "lower95": 0.723563844849131
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.311886,
+   "status": "loss",
+   "failed_tier_members": {},
+   "strongest_control": "struct_riccati",
+   "strongest_control_median_ms": 0.89417,
+   "speed_ratio": 0.6722588396431443,
+   "lower95": 0.6171068383233683
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap3",
+    "operator_definition": "Delta^3",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.665654,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 296.44GiB. [tf",
+    "net_jet": "error: 'INTERNAL: Autotuning failed for HLO: %input_reduce_fusion.8 = f64[210,256"
+   },
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 173.959206,
+   "speed_ratio": 262.6050496287027,
+   "lower95": 257.5502268705768
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap1",
+    "operator_definition": "Delta",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.642394,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 0.879504,
+   "speed_ratio": 1.3336513068973914,
+   "lower95": 1.229179864557574
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "lap2",
+    "operator_definition": "Delta^2",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.653849,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 66.47GiB. [exe",
+    "net_jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 73.47GiB. [exe"
+   },
+   "strongest_control": "net_folx",
+   "strongest_control_median_ms": 9.933013,
+   "speed_ratio": 15.421040517083265,
+   "lower95": 14.442652734158761
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "dx4",
+    "operator_definition": "d_1^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.651474,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.87562,
+   "speed_ratio": 4.4166548279297215,
+   "lower95": 4.261757912318199
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed",
+    "operator_definition": "0.5 Delta + 0.25 Delta^2 + 0.125 Delta^3",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.85499,
+   "status": "suppressed",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 322.69GiB. [ex",
+    "net_jet": "error: 'INTERNAL: Autotuning failed for HLO: %input_transpose_fusion.2 = f64[6553"
+   }
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "helmholtz",
+    "operator_definition": "helmholtz",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.249868,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 4.074014,
+   "speed_ratio": 3.2251729700618585,
+   "lower95": 3.085211007195133
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "aniso2",
+    "operator_definition": "sum_d a_d d_d^2, a_d = 1 + d/(D-1)",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.176187,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.808692,
+   "speed_ratio": 3.205871142560197,
+   "lower95": 3.0799891601609963
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "advdiff",
+    "operator_definition": "sum_d cos(d+1) d_d + 0.1 Delta",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.363567,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_collapsed",
+   "strongest_control_median_ms": 5.743124,
+   "speed_ratio": 4.204667006318898,
+   "lower95": 4.124582730175222
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "biharm_aniso",
+    "operator_definition": "biharm_aniso",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.183728,
+   "status": "partial",
+   "failed_tier_members": {
+    "net_collapsed": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 59.91GiB. [exe",
+    "net_jet": "error: \"RESOURCE_EXHAUSTED: Out of memory while trying to allocate 73.47GiB. [exe"
+   },
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 36.989578,
+   "speed_ratio": 31.183997705977475,
+   "lower95": 30.85711054337758
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "mixed11",
+    "operator_definition": "mixed11",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.172841,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 2.453502,
+   "speed_ratio": 2.093416571227037,
+   "lower95": 2.0737911065564294
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "kdv_lin",
+    "operator_definition": "d_1^3 + d_1",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.110467,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.964336,
+   "speed_ratio": 1.7674951645682584,
+   "lower95": 1.6866013499772314
+  },
+  {
+   "config": {
+    "activation": "tanh",
+    "operator": "ks_lin",
+    "operator_definition": "d_1^2 + d_1^4",
+    "D": 5,
+    "H": 192,
+    "B": 65536
+   },
+   "tier": "taylor_network_level",
+   "candidate": "struct_closed",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 1.311886,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 3.389926,
+   "speed_ratio": 2.596355460877371,
+   "lower95": 2.5542047774990992
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "hyper4_nu0.01",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.598599,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.804374,
+   "speed_ratio": 1.3364048728738747,
+   "lower95": 1.3078195231423833
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "burgers_nu0.1",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.647,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.732008,
+   "speed_ratio": 1.1610369417622786,
+   "lower95": 1.1175993020565436
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "poly3_2d",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.901114,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 1.413332,
+   "speed_ratio": 1.5736769815758807,
+   "lower95": 1.515045458750406
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "hyper6_nu0.001",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.673348,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.998095,
+   "speed_ratio": 1.4840419744835003,
+   "lower95": 1.4772071469775263
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "poly2_2d",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.75469,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 1.091509,
+   "speed_ratio": 1.455359769856142,
+   "lower95": 1.4237571515362737
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "burgers_nu0.01",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.613066,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.745313,
+   "speed_ratio": 1.221608745426166,
+   "lower95": 1.1519433999652353
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "heat_nu1",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.535511,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.651007,
+   "speed_ratio": 1.2346173541601964,
+   "lower95": 1.2029923701426073
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "heat_nu0.1",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.523288,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.654924,
+   "speed_ratio": 1.2622518338661897,
+   "lower95": 1.2253893541017293
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "hyper4_nu0.01",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.598599,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 1.766611,
+   "speed_ratio": 2.926148626648241,
+   "lower95": 2.7942800914369843
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "burgers_nu0.1",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.647,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.534187,
+   "speed_ratio": 2.4152036225437246,
+   "lower95": 2.3079072835118684
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "poly3_2d",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.901114,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 10.711767,
+   "speed_ratio": 11.859069160625339,
+   "lower95": 11.239826814813407
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "hyper6_nu0.001",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.673348,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 3.112527,
+   "speed_ratio": 4.524630791903564,
+   "lower95": 4.302978022650856
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "poly2_2d",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.75469,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 4.765115,
+   "speed_ratio": 6.21413742627346,
+   "lower95": 5.719794582685786
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "burgers_nu0.01",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.613066,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.546961,
+   "speed_ratio": 2.4887537406217732,
+   "lower95": 2.3045681228539716
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "heat_nu1",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.535511,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 1.16155,
+   "speed_ratio": 2.1719037208686087,
+   "lower95": 2.073790735842752
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "heat_nu0.1",
+    "D": 2,
+    "B": 16384,
+    "H": 288
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.523288,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.152434,
+   "speed_ratio": 2.180055117144623,
+   "lower95": 2.11047538404584
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "hyper6_nu0.001",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.610958,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.984627,
+   "speed_ratio": 1.5463207017054807,
+   "lower95": 1.4109352951323408
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "poly3_2d",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.757118,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 1.239607,
+   "speed_ratio": 1.5667689721801954,
+   "lower95": 1.3736591836635719
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "heat_nu0.1",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.525958,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati",
+   "strongest_control_median_ms": 0.626498,
+   "speed_ratio": 1.1773089281265008,
+   "lower95": 1.0420607177108925
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "burgers_nu0.1",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.584169,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati",
+   "strongest_control_median_ms": 0.757168,
+   "speed_ratio": 1.2700133242708616,
+   "lower95": 1.1200694276066265
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "poly2_2d",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.653568,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati",
+   "strongest_control_median_ms": 0.946157,
+   "speed_ratio": 1.371465446129373,
+   "lower95": 1.1181646842206125
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "burgers_nu0.01",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.579179,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.746458,
+   "speed_ratio": 1.3029689476855304,
+   "lower95": 1.1307439556434076
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "hyper4_nu0.01",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.561348,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.800118,
+   "speed_ratio": 1.4375069580873945,
+   "lower95": 1.4105915371902473
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "heat_nu1",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_structure_aware",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.504468,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "riccati_L",
+   "strongest_control_median_ms": 0.622638,
+   "speed_ratio": 1.2219810070330173,
+   "lower95": 1.151210038873939
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "hyper6_nu0.001",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.610958,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 2.410003,
+   "speed_ratio": 3.8183029907839057,
+   "lower95": 3.422648421130797
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "poly3_2d",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.757118,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 8.132427,
+   "speed_ratio": 10.715704293835643,
+   "lower95": 10.647432399831708
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "heat_nu0.1",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.525958,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.004307,
+   "speed_ratio": 1.926100533375633,
+   "lower95": 1.8395795053190347
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "burgers_nu0.1",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.584169,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.335986,
+   "speed_ratio": 2.2963281910072015,
+   "lower95": 2.2824109592452513
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "poly2_2d",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.653568,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 4.467676,
+   "speed_ratio": 6.7439988605605965,
+   "lower95": 6.456344190993288
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "burgers_nu0.01",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.579179,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.349372,
+   "speed_ratio": 2.3881444865446864,
+   "lower95": 2.1320226779593425
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "hyper4_nu0.01",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.561348,
+   "status": "significant_2x",
+   "failed_tier_members": {},
+   "strongest_control": "net_jet",
+   "strongest_control_median_ms": 1.612045,
+   "speed_ratio": 2.8751413090344484,
+   "lower95": 2.839270102202386
+  },
+  {
+   "config": {
+    "workload": "pde",
+    "pde": "heat_nu1",
+    "D": 2,
+    "B": 49152,
+    "H": 96
+   },
+   "tier": "taylor_network_level",
+   "candidate": "closed_vjp2",
+   "role": "secondary_analysis",
+   "candidate_median_ms": 0.504468,
+   "status": "lower95_ge_1",
+   "failed_tier_members": {},
+   "strongest_control": "net_nested",
+   "strongest_control_median_ms": 1.004587,
+   "speed_ratio": 1.971235166955765,
+   "lower95": 1.8558852611166239
+  }
+ ]
+}

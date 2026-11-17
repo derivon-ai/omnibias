@@ -1,0 +1,207 @@
+{
+  "workspace": "completion_execution_20261013",
+  "package": "omnibias/jax/_experimental_stage",
+  "files": {
+    "bounds.py": {
+      "source_sha256": "ae46096cc05bba2fd66fdecbf29b624c958841c563ff43cb971c4683669e7463",
+      "import_conversion": "AST relative imports only",
+      "source": "bounds.py",
+      "measured_package_sha256": "dd5c3f177863efe87065c00ac6f4b7731d57cbcebf896564b01f9d76be531f8f",
+      "current_sha256": "73ec8d89a2e02257c3c1fcf04ac146e67e1b52e85ffd8aa89504aba7f57642dc"
+    },
+    "providers.py": {
+      "source_sha256": "533fdf470630493879dbc8ba55bfa5d03ca72945a135442d0fa6225243a81845",
+      "import_conversion": "AST relative imports only",
+      "source": "providers.py",
+      "measured_package_sha256": "1b63bb9aa9d71be4a6ae04f209ad30d27aa5190ab996797f0476f4a95d3f4f3c",
+      "current_sha256": "39e217b5c479813af100d1a5a1b0bb7b063a4872ad49375b344459a59acd7188"
+    },
+    "bundles.py": {
+      "source_sha256": "cc683eb37823d4c8715b6685884d3af076bee8fa27f63c4a8d61dae4f83bcfe0",
+      "import_conversion": "AST relative imports only",
+      "source": "bundles.py",
+      "measured_package_sha256": "2de148cd8a8e0972124ea28f75e8d6bafb62b650c160804749348ba138fa7987",
+      "current_sha256": "7ef9f351684ed384cb0bc78c8c738cda973539a1942b9f94775e4751dddb36b5"
+    },
+    "reuse.py": {
+      "source_sha256": "d517ab8333dc9506b01f3c48ba41b51e8a4b65839bc237bcf06d32d340d6ed04",
+      "import_conversion": "AST relative imports only",
+      "source": "reuse.py",
+      "measured_package_sha256": "c2804b8a115e42db53c865527318ab6e4b1d8b86e24143afc3cd64b9064f993d",
+      "current_sha256": "b069315f183c0dd2a9eea4876cb90dac3f7b6cf41b6503bb96c4041dabb6a636"
+    },
+    "certificates.py": {
+      "source_sha256": "e6afd684eaaaafec273d65a7c69d63e0773621a8dc75981e965f90f6815af577",
+      "import_conversion": "AST relative imports only",
+      "source": "certificates.py",
+      "measured_package_sha256": "8641c3ac365afabb0d81a3c973643ffaa066578ce96085853e94faa63b6c44ca",
+      "current_sha256": "be131f4ce8892e20e3ad72b3ab40ff0d6050890560cdef2b34aa9d3392127395"
+    },
+    "planner.py": {
+      "source_sha256": "c6e49a46351ebfc12f39745bab9f8e22cf62451f383451577ba6ebbe686098c6",
+      "import_conversion": "AST relative imports only",
+      "source": "planner.py",
+      "measured_package_sha256": "8621268128e519cda31ac7517bc5caa0eb37dc08fe9c9a34c81e2cfc6fc9eb6e",
+      "current_sha256": "f3009b471632740cccec66ec6e2cfa573cf5a6dd9a7a9528b6a24b1a1904625b"
+    },
+    "cache_manager.py": {
+      "source_sha256": "946aafa3f4a9138e58e195833b1ed56734174086f111fa6b481c108c8996f2fc",
+      "import_conversion": "AST relative imports only",
+      "source": "cache_manager.py",
+      "measured_package_sha256": "ac24048bfc7ba19cc9a1ab4e220a6eab21dce9502ddca979ace79765dee04900",
+      "current_sha256": "b025bcccc3821ad296d2d1f2281f8c86f19a92e55d52004632185d11d92fce67"
+    },
+    "streaming.py": {
+      "source_sha256": "0799b8931576bcc366f375f9ca4617ce6fc7e7e825f290c245c79b1f5142541e",
+      "import_conversion": "AST relative imports only",
+      "source": "streaming.py",
+      "measured_package_sha256": "70c8b0bd1c54b8f399a64136efa04e55ed3553d3a864bdc459f7a9b10ac20996",
+      "current_sha256": "b175d23838c80fb212677ed4bdf611a69699faa28991e41486fdc705b6166483"
+    },
+    "device_training.py": {
+      "source_sha256": "bcee046430a7ae463cc94b7f433cafd8b554805b96a101bd4419e876bc0abb00",
+      "import_conversion": "AST relative imports only",
+      "source": "device_training.py",
+      "measured_package_sha256": "39f5a78c974177c3b95a0d66c764004213bd443ffb1fac93c7189bbc86858bed",
+      "current_sha256": "a6dd17287082e048ea6e5a80933eb3992b9a86df5df7c895fe6ce8201ed0420c"
+    },
+    "prefetch.py": {
+      "source_sha256": "63212563bfb56c6dc7607983d8de168d5a488f17006725487507ec93d5da1a33",
+      "import_conversion": "AST relative imports only",
+      "source": "prefetch.py",
+      "measured_package_sha256": "c5079f8968f0b508df0f03e8c0b087f468ca21f8a2b45889cfc36289c90582f6",
+      "current_sha256": "627f2cd132b89d1c0d9048e25d829efaf4bc0083878fee7a8fe73ea420802a66"
+    },
+    "reduction.py": {
+      "source_sha256": "c41afc9a2a033d85c904b7bc938d967100a8626de9bb313eeec493418054f9c0",
+      "import_conversion": "AST relative imports only",
+      "source": "reduction.py",
+      "measured_package_sha256": "b5da9f5faaaf40b2901acadb317af869cdf3c2ed7d3c15e52d7f614c78a6dc95",
+      "current_sha256": "3b1c4dc1ca4a11f95caef52de5f1c6dc80f524693cf4ad33fb76c9e62775e8c0"
+    },
+    "variable_projection.py": {
+      "source_sha256": "caf95b0a0d1b97c75b26300dabd90f46751d12b52ee22d253b741911d251d766",
+      "import_conversion": "AST relative imports only",
+      "source": "variable_projection.py",
+      "measured_package_sha256": "ae7178ae00897b0f1bf5f70b228199f5618ade2c11b1b6e68508060bfa9f4db0",
+      "current_sha256": "08ab748986aa5fab2c77450ff135badcf48d531885bc291dc129354726c6e3ca"
+    },
+    "feature_models.py": {
+      "source_sha256": "8a80d912cfa6da7334310f6652559292bbb04b2eb30b7e2529d8db47c2bcf51d",
+      "import_conversion": "AST relative imports only",
+      "source": "feature_models.py",
+      "measured_package_sha256": "53a088b7249cdcb6b22e52a47bd1a3a55cf354a3f7f60e7bfcc9b173700a6ee8",
+      "current_sha256": "2e20b0cd9f61bf249a87ac7f97498417f7603ac2eb50bc47cc9a3d6d410f6bc7"
+    },
+    "explicit_fft.py": {
+      "source_sha256": "eb25e3acaaa8a28cdb51da74dcbf1820d7dc84a744e8a66b3cb900bccdb74c99",
+      "import_conversion": "AST relative imports only",
+      "source": "explicit_fft.py",
+      "measured_package_sha256": "1112969c096730d342707de559660addc2a930a44ea473b5977e3b080681c076",
+      "current_sha256": "7ac614b5c217851c12d7a97ec726b6980ee84bf5950e52a0ca004344e1acb150"
+    },
+    "low_rank_operators.py": {
+      "source_sha256": "fc0c8d16db11e05ea3ae9dbc92ddacc9671b81bee50fe7c33e2ceafaccfc1ec5",
+      "import_conversion": "AST relative imports only",
+      "source": "low_rank_operators.py",
+      "measured_package_sha256": "55d0aa81c69ad00a53308a15fb399885a3829d60763e69187beea4b43b2a8d1a",
+      "current_sha256": "76a3152ad44448d9fa156bddf85d3a506164a9594d40b66f549737f63b442077"
+    },
+    "shared_models.py": {
+      "source_sha256": "89f75b26506de5d6e2023976fa86f246d71adc159f696f5273477268959368ce",
+      "import_conversion": "AST relative imports only",
+      "source": "shared_models.py",
+      "measured_package_sha256": "7077af916835ada34b35522a5725940baeb7a4dfce0fc649feb1683579008fc1",
+      "current_sha256": "38fda34af6ee700357193639db38303d6a4dbf9079101d7b04b5f115491af295"
+    },
+    "qualification_session.py": {
+      "source_sha256": "47dd27b23e9535d5b5397e5cf96e4eee5eb2df20407db6c5315eda78ac55fcf4",
+      "import_conversion": "AST relative imports only",
+      "source": "qualification_session.py",
+      "measured_package_sha256": "c6e0b33547dd9a208dfa9edf7004b40153f2a7bbae597e5fcdf794e34546839b",
+      "current_sha256": "825416a4858afef216ded755fe891c67b8e4a4701b299ca7cea28bf019e3a812"
+    },
+    "solve_certificate.py": {
+      "source_sha256": "d1c258fa20563a4f0f43b32cc02633187f12c843d128463789b5bbebb5ce5ded",
+      "import_conversion": "AST relative imports only",
+      "source": "solve_certificate.py",
+      "measured_package_sha256": "bc62d8145b243ff5c09fb1baf16e655b698feb81d041df2c830600f661e90c68",
+      "current_sha256": "e80b4dea1ad04a3a5084e8236c22ceff94b7d88ff2c694157d36b7409882b365"
+    },
+    "frozen_previous.py": {
+      "source_sha256": "9d0b89265caf93676cf7ef0d892530fc01521ba66bbfc5af59e981f4eb19f0b4",
+      "import_conversion": "AST relative imports only",
+      "source": "frozen_previous.py",
+      "measured_package_sha256": "0b709d680224b659919ecbf72c3c81fcc2792a3ac3fc960fb643b3422bd99c0d",
+      "current_sha256": "6e16cac897edf0a65762bbb38149fafa602c21c2c67d7c73ee6550eba616581d"
+    },
+    "legacy.py": {
+      "source_sha256": "a6b39289fc76ce37168de8a33c9d36f001b25327f27c24690f8947571099c3b5",
+      "import_conversion": "AST relative imports only",
+      "source": "legacy.py",
+      "measured_package_sha256": "0cf5568338394431edfb8e9f93b3c44628db88f7f458e1b803424bce1a431ff3",
+      "current_sha256": "eb6ee95e37fdbfbbd35f5d4cab6a78c86fe518361351b9ce7e8695335e0529db"
+    },
+    "operators.py": {
+      "source_sha256": "0f5efac3fd671147cb402796908a4fe7fc8ce76fbcfa67dc02f5239fd381e0d4",
+      "import_conversion": "AST relative imports only",
+      "source": "operators.py",
+      "measured_package_sha256": "f340713ec9af13e255b8873ed3817d0ba52397ab0507df8858d30f43438d7e4a",
+      "current_sha256": "e1182cc38f89a10da69ca4731b6251ff48de9bf9ff9544b76500eab783463cad"
+    },
+    "kernels.py": {
+      "source_sha256": "314ce9ca82748826f9ba3a3a99bca00a43ebc5f4b583ff196e2f219b3c097749",
+      "import_conversion": "AST relative imports only",
+      "source": "kernels.py",
+      "measured_package_sha256": "821cdbda1e5201c6c729e7cf9cfc972c5e1df8d250ba1429b1f70c91f38a27b4",
+      "current_sha256": "383f080f7a538d4c1134e83185e400805e56fe23fe0fba797ff94d98e23330f8"
+    },
+    "generic_programs.py": {
+      "source_sha256": "7be091ef560ef9e396667e7cf4c5a8664989046a8a111fba9d1a04a528922970",
+      "import_conversion": "AST relative imports only",
+      "source": "generic_programs.py",
+      "measured_package_sha256": "f2584d281fc4b78992c5f12423a3759895fb07478cd9fb358bdf72ef0fc0403f",
+      "current_sha256": "fc8883522323f3a02bbbe189e6f2b7588c5591506615b77c3d16f6f9cd15f105"
+    },
+    "series_fourier.py": {
+      "source_sha256": "8e75bcd8541b735eb649eb4d91f6dc64902130d38e749cbbb87f3453a1fc7666",
+      "import_conversion": "AST relative imports only",
+      "source": "series_fourier.py",
+      "measured_package_sha256": "77667139c9fc8449208a0dbce7a9f29223ab6b85f218851fbe1ddb9751671133",
+      "current_sha256": "9a6738bcbac5f9ab6d96ed923325d911f940f7d7c7273a93ce9edbdf11639e40"
+    },
+    "pde_math.py": {
+      "source_sha256": "94b15c5010fa959975a73b760b1533d3069efc5dae26772165ec58ad9d1299b3",
+      "import_conversion": "AST relative imports only",
+      "source": "pde_math.py",
+      "measured_package_sha256": "1ef4ca5a4c36e1df960de135dd4274f4eb4d0ab6453f55e16205894ed7aa5d46",
+      "current_sha256": "5e483f7e5cc533ca227827b738f4b7c654b8da4fda3e4f85f9c70bab6046f11a"
+    },
+    "execution_measurements.py": {
+      "source_sha256": "1a85c0a2a0a1ddf2b174e09be9c3fba8d7d1469d7044153d7c9c37a48d8467e5",
+      "import_conversion": "AST relative imports only",
+      "source": "execution_measurements.py",
+      "measured_package_sha256": "8eead4fa4925659d8f6e5dbb4b898b65db54309a0871de5f332e4c5b95d5622f",
+      "current_sha256": "5e6f934883052522a9a8048b81ffddb7c617532450ddb186bd361ca7c3b31d89"
+    },
+    "frozen_batch.py": {
+      "source_sha256": "987182276fb92a2dfeb5ea169c9d6a359809e125e1f22ea1b4492a9aa8fac3bf",
+      "import_conversion": "AST relative imports only",
+      "source": "frozen_batch.py",
+      "measured_package_sha256": "846c4ad56843b7c45acf926d2519abfc6d812722e2aaf51cce42c7d20d019538",
+      "current_sha256": "0e8dd549c36b4518907e8357661d75958d829bffa92cb36de4d7dde49ee9bd3e"
+    },
+    "__init__.py": {
+      "source_sha256": null,
+      "source": null,
+      "measured_package_sha256": "dea464634242bde3ea18771411c179ebc39ada273938fec68eb4c3916416f568",
+      "current_sha256": "9456e0d00858eaeea052eea1af7693b7310494a6a7048c74c1eee0e618691d4e"
+    }
+  },
+  "public_exports": [],
+  "gate": "requires final-package numerical and matched performance evidence",
+  "post_measurement_edits": {
+    "headers": "every file gained the two-line SPDX/copyright header the licence guard requires (no code change)",
+    "bounds.py": "the interval interpreter treats device_put as the identity on its operands: JAX 0.10.0 keeps device_put in the jaxprs of the variable-projection checks (0.10.2 does not), and the primitive moves no values"
+  }
+}

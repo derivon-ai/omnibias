@@ -372,8 +372,9 @@ class JetMLP(_JetMLPCore):
     but *every* mixed input partial ``D^alpha u(x)`` up to total order ``N`` is
     obtained **exactly** in a single forward pass through
     :func:`omnibias.torch.jet_mv.mlp_jet_mv` -- no ``torch.autograd.grad`` stacking,
-    no finite differences, and a cost independent of the derivative order beyond the
-    jet truncation. This generalises :class:`PINNOMBU` (single hidden layer, order 2)
+    no finite differences. The coefficient count is ``binomial(D + N, N)`` for
+    input dimension ``D``; computation and storage grow with this layout and the
+    requested order. This generalises :class:`PINNOMBU` (single hidden layer, order 2)
     to arbitrary depth and order while keeping the closed-form-tower contract: the
     base activation must expose a fast-path derivative kernel.
 

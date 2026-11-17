@@ -8,9 +8,10 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Literal
 
+import jax
 import jax.numpy as jnp
 from jax import Array, grad
-from omnibias.fields._core.quadrature import QuadratureSpec
+from omnibias.fields._core.quadrature import QuadratureSpec, _converted
 from omnibias.fields.weak._core import (
     TestFunctionSpace,
     WeakForm,
@@ -76,8 +77,18 @@ def _stiffness_term(
         return jnp.asarray(acc, dtype=jnp.float64), "exact"
     if quadrature is None:
         raise ValueError("callable field needs a QuadratureSpec for the coefficient factor")
-    xs = jnp.asarray(quadrature.nodes[:, 0], dtype=jnp.float64)
-    ws = jnp.asarray(quadrature.weights, dtype=jnp.float64)
+    xs = _converted(
+        quadrature,
+        ("axis0", jnp.float64, bool(jax.config.jax_enable_x64)),
+        lambda: jnp.asarray(quadrature.nodes[:, 0], dtype=jnp.float64),
+        lambda v: not isinstance(v, jax.core.Tracer),
+    )
+    ws = _converted(
+        quadrature,
+        ("weights", jnp.float64, bool(jax.config.jax_enable_x64)),
+        lambda: jnp.asarray(quadrature.weights, dtype=jnp.float64),
+        lambda v: not isinstance(v, jax.core.Tracer),
+    )
 
     def _scalar_at(x_s: Array) -> Array:
         return field(x_s.reshape((1, 1))).reshape(())
@@ -106,8 +117,18 @@ def _load_term(
         return jnp.asarray(acc, dtype=jnp.float64), "exact"
     if quadrature is None:
         raise ValueError("callable source needs a QuadratureSpec")
-    xs = jnp.asarray(quadrature.nodes[:, 0], dtype=jnp.float64)
-    ws = jnp.asarray(quadrature.weights, dtype=jnp.float64)
+    xs = _converted(
+        quadrature,
+        ("axis0", jnp.float64, bool(jax.config.jax_enable_x64)),
+        lambda: jnp.asarray(quadrature.nodes[:, 0], dtype=jnp.float64),
+        lambda v: not isinstance(v, jax.core.Tracer),
+    )
+    ws = _converted(
+        quadrature,
+        ("weights", jnp.float64, bool(jax.config.jax_enable_x64)),
+        lambda: jnp.asarray(quadrature.weights, dtype=jnp.float64),
+        lambda v: not isinstance(v, jax.core.Tracer),
+    )
     f = source(xs.reshape((-1, 1))).reshape(-1)
     v = jnp.asarray(
         [eval_test(space, index, float(x), deriv=0) for x in xs.tolist()],

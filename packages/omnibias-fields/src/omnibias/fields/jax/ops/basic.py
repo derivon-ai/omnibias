@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING
 
 import jax.numpy as jnp
 from jax import Array
+from omnibias.fields.jax.ops._planned import routed as _routed
 
 if TYPE_CHECKING:  # pragma: no cover
     from omnibias.fields._core.state import FieldState
@@ -193,6 +194,10 @@ def divergence(state: FieldState, names: tuple[str, ...]) -> Array:
             f"divergence: number of components {len(names)} must equal "
             f"number of spatial axes {len(sa)} ({sa!r})"
         )
+    if _is_jet_mlp(state):
+        planned = _routed(state, tuple(names), "divergence")
+        if planned is not None:
+            return planned
     out = None
     for n, a in zip(names, sa, strict=False):
         d = derivative(state, n, axis=a, order=1)
@@ -211,6 +216,9 @@ def laplacian(
         sigma_pp = _sigma_of_order(state, 2)
         return state.field.laplacian(sigma_pp, name)
     if axes is None and _is_jet_mlp(state):
+        planned = _routed(state, (name,), "laplacian")
+        if planned is not None:  # the field opted in to the planner (see fields._core.planned)
+            return planned
         # Fast-path: the spatial trace of the Hessian block of a single jet.
         return state.field.laplacian(state, name)  # type: ignore[attr-defined]
     if axes is None:

@@ -49,9 +49,25 @@ Measured float64 CPU medians, 9 repeats; derivative evaluation, not training:
 - [`Δ³` / `Δ⁴`](../../docs/benchmarks/polylaplacian_order.json), D=16/B=32/H=16: **4,974×** / **5,036×** vs dense JAX / nested folx respectively.
 
 Operator timings use JAX JIT, runtime inputs/weights, compilation excluded. Dense `Δ⁴`: `memory_budget` under 3,072 MiB / 120 s process budgets; no speedup for that run.
-[Full protocol, accuracy and baseline wins](../../docs/performance.md).
+
+Full scope ([`full_scope.json`](../../docs/benchmarks/full_scope.json), 8,794 cells; verdict from each cell's 95 % interval of baseline time / omnibias time: big win lower bound ≥ 2, win > 1, parity contains 1, loss upper bound < 1):
+
+| Baseline | Cells | Big win | Win | Parity | Loss | Incomplete |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| independent (Taylor mode, folx, jet, nested autodiff, dense, DeepXDE, GMRES) | 6,980 | 3,453 | 1,700 | 823 | 465 | 539 |
+| generic engine on omnibias's own projection | 300 | 12 | 170 | 80 | 38 | 0 |
+| omnibias's own variants and hand-written closed forms | 1,514 | 775 | 316 | 163 | 150 | 110 |
+
+Independent baselines by family: Activation derivatives 7/1/8/0; Deep Laplacian, per-call grid 1,681/1,004/701/361; Deep Laplacian, projected 235/14/3/1; Divergence and log-determinant 55/2/5/1; End-to-end time to target 105/64/39/47; Higher-order operators 259/182/21/31; Interop adapters and drop-ins 17/8/2/17; One-layer Laplacian 7/4/1/0; Operator compiler 7/2/5/5; Residual Gram, Gauss-Newton step, NTK diagonal 353/33/1/0; Residual solves 57/0/6/0; Ridge and tensor-grid losses 656/382/30/0; Training step 14/4/1/2 (big win/win/parity/loss; incomplete cells omitted).
+
+[Full matrix, protocol, accuracy and every baseline win and loss](../../docs/performance.md#full-scope-matrix).
 
 <!-- END GENERATED CAPABILITY EVIDENCE -->
+
+Read a cell through its baseline kind ([matrix and protocol](../../docs/performance.md#full-scope-matrix)): a "loss"
+to `closed`, `riccati` or the released compiler is omnibias against its own variant on the same XLA, so say which variant
+won; a baseline that failed inside omnibias construction code is incomplete, not slow; a generic engine fed omnibias's
+projection shares that projection. Say where an independent baseline is faster, with its cells, instead of summarizing.
 
 Before editing a claim, consult [performance evidence](../../docs/performance.md):
 specialized activation/operator workloads and general deep jets are different

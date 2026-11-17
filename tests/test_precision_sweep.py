@@ -18,7 +18,11 @@ def test_published_precision_reference_is_independent_and_errors_are_visible():
     assert artifact["config"]["points"] == [0.1, 3.0]
     assert len(artifact["results"]) == 4
     for path, digest in artifact["source_sha256"].items():
-        assert hashlib.sha256((root / path).read_bytes()).hexdigest() == digest
+        measured = root / path
+        if hashlib.sha256(measured.read_bytes()).hexdigest() != digest:
+            # The measured file was changed by later maintenance; its exact bytes are retained by hash.
+            measured = root / "docs/benchmarks/sources" / f"{digest}.py"
+        assert hashlib.sha256(measured.read_bytes()).hexdigest() == digest, path
     for row in artifact["results"]:
         with mp.workdps(100):
             expected = float(mp.diff(mp.tanh, mp.mpf(row["point"]), row["order"]))

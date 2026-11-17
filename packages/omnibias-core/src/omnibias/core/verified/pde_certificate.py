@@ -864,19 +864,25 @@ def spectral_residual_norm(
     linear_symbol: Symbol,
     linear_tail_factor: float,
     *,
+    linear_global_factor: float | None = None,
     quadratic: Callable[[ValidatedFourierSeries], ValidatedFourierSeries] | None = None,
     rhs: ValidatedFourierSeries | None = None,
 ) -> Interval:
     r"""Rigorous ``l1_nu`` norm of the residual ``F(a) = L a + Q(a) - rhs``.
 
     ``L`` is the diagonal Fourier multiplier ``linear_symbol`` (with
-    ``linear_tail_factor`` a sound bound on ``sup_{|k|>N}|symbol(k)|``); ``Q`` is
+    ``linear_tail_factor`` a sound bound on ``sup_{|k|>N}|symbol(k)|``).
+    If the ansatz carries a global remainder, ``linear_global_factor`` must
+    additionally bound ``sup_k |symbol(k)|``; missing such a bound is refused.
+    ``Q`` is
     an optional quadratic term built from the validated algebra (e.g.
     ``lambda a: a * a`` for ``u^2``, or a Riesz/convolution advection); ``rhs`` is
     the forcing.  The returned interval's ``.hi`` is the natural ``Y0`` for
     :func:`radii_polynomial_residual_certificate`.
     """
-    residual = ansatz.apply_multiplier(linear_symbol, linear_tail_factor)
+    residual = ansatz.apply_multiplier(
+        linear_symbol, linear_tail_factor, global_factor=linear_global_factor,
+    )
     if quadratic is not None:
         residual = residual + quadratic(ansatz)
     if rhs is not None:
